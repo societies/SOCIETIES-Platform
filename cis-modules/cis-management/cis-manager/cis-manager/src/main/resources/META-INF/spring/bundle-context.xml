@@ -91,4 +91,10 @@
     <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" >
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
+    
+    <bean id="CisClientService" 
+    	class="org.societies.cis.manager.CisManagerClient">
+    	<constructor-arg ref="CisManagementBundle"/>
+    </bean>
+    
 </beans>

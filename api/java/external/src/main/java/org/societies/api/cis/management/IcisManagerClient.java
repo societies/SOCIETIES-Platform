@@ -22,6 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.societies.api.cis.management;
 
 import java.util.List;
@@ -30,20 +31,35 @@ import java.util.concurrent.Future;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
-
-
-
 /**
- * @author Babak.Farshchian@sintef.no
- *
- */
+ * @author Thomas Vilarinho (Sintef)
+*/
 
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICisManager {
+public interface IcisManagerClient {
+	
+	
+	/**
+	 * Join a CIS (at the moment hosted remotely).
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 * it can be know the result of the join
+	 *  
+	 * @param cisId JID of the CIS to be joined
+	 * @param callback callback function
+	 */
+	public void joinRemoteCIS(String cisId, ICisManagerCallback callback);
+	
+	/**
+	 * Leave a CIS, most likely hosted remotely.
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 *  
+	 * @param cisId JID of the CIS to be joined
+	 * @param callback callback function
+	 */
+	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback);
 
-	
-	// API implementing server functionality
-	
 	
 	/**
 	 * Create a new CIS for the CSS whose JID is the one in cssId. Password is needed and is the
@@ -64,6 +80,7 @@ public interface ICisManager {
 	 * null if the CIS was not created.
 	 */
 	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
+	
 	
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
@@ -116,56 +133,5 @@ public interface ICisManager {
 	public List<ICisOwned> getListOfOwnedCis();
 
 	
-	/**
-	 * join a CIS hosted in another machine (now 
-	 * 
-	 * @param cisId The ID (jabber ID) of the CIS to join.
-	 * @return interface toward the CIS {@link ICis} in which the user joined
-	 */
-	public Future<ICis> joinRemoteCIS(String cisId);
-	
-	
-	// END OF API implementing server functionality
-	
-	// API implementing client functionality (to be called from webapp)
-
-	
-	
-	// END of API implementing client functionality
-
-	
-	
-	// API which is not yet properly defined
-	
-	/**
-	 * Return an array of all the CISs that match the query. 
-	 * 
-	 * TODO: DO NOT USE THIS METHOD YET
-	 * We need to refine first what to be searched
-	 * 
-	 * @param cssId The ID of the owner CSS
-	 * @param query Defines what to search for.
-	 * @return Array of CIS Records that match the query.
-	 */
-	ICis[] getCisList(ICis query);
-
-	
-	
-	
-	
-	/**
-	 * Method not yet defined. 
-	 * 
-	 * TODO: DO NOT USE THIS METHOD YET - not yet defined
-	 * 
-	 * 
-	 * @param currentOwnerCssId The ID of the owner CSS
-	 * @param currentOwnerCssPassword passwod of the owner of the CIS
-	 * @param newOwnerCssId JID of the new owner
-	 * @param cisId JID of the CIS which will have its owner changed
-	 * @return boolean stating if the operation worked or failed
-	 */
-	boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
-		String newOwnerCssId, String cisId);
 
 }

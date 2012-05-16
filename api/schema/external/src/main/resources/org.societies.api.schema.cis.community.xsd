@@ -44,7 +44,24 @@
 				<xs:element ref='who'/>
 				<xs:element ref='add'/>
 				<xs:element ref='subscription'/>
+				<xs:element ref='delete'/>
+				<xs:element ref='getInfo'/>
+				<xs:element ref='setInfo'/>
+				<xs:element ref='joinResponse'/>
+				<xs:element ref='leaveResponse'/>
+				<xs:element ref='addResponse'/>
+				<xs:element ref='deleteResponse'/>
+				<xs:element ref='getInfoResponse'/>
+				<xs:element ref='setInfoResponse'/>
 			</xs:choice>
+		  <xs:attribute name='owner-jid' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='community-jid' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='community-password' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='owner-password' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='community-type' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='community-name' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='membership-mode' type='xs:int'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='description' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
 		</xs:complexType>
 	</xs:element>
 
@@ -57,15 +74,44 @@
 		</xs:complexType>
 	</xs:element>
 
+	<xs:element name='joinResponse'>
+		<xs:complexType>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element ref='participant'/>
+			</xs:sequence>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>
 
+	<xs:element name='leaveResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>
 
+	<xs:element name='addResponse'>
+		<xs:complexType>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element ref='participant'/>
+			</xs:sequence>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name='deleteResponse'>
+		<xs:complexType>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element ref='participant'/>
+			</xs:sequence>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>
 
 	<xs:element name='participant'>
 		<xs:complexType>
 			<xs:simpleContent>
 				<xs:extension base='empty'>
 					<xs:attribute name='jid' type='xs:string' use='required'/>
-					<xs:attribute name='role' type='tns:participantRole' use='required'/>
+					<xs:attribute name='role' type='tns:participantRole'/>
 				</xs:extension>
 			</xs:simpleContent>
 		</xs:complexType>
@@ -82,16 +128,28 @@
 	</xs:simpleType>
 	
 	
+	<xs:element name='getInfo' type='empty' />	
+	<xs:element name='setInfo' type='empty' />
 	
-	
-	
-	<xs:element name='join' >
+	<xs:element name='getInfoResponse'>
 		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref='participant'/>
-			</xs:sequence>
+			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
 	</xs:element>
+	
+	<xs:element name='setInfoResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>
+<!--	<xs:element name='join' >
+		<xs:complexType>
+ 		<xs:sequence>
+				<xs:element ref='participant'/>
+			</xs:sequence> 
+		</xs:complexType>
+	</xs:element>-->
+	<xs:element name='join' type='empty' />
 	<xs:element name='leave' type='empty' />
 	<xs:element name='invite'>
 		<xs:complexType>
@@ -110,6 +168,13 @@
 		</xs:complexType>
 	</xs:element>
 	<xs:element name='add'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='participant'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name='delete'>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref='participant'/>

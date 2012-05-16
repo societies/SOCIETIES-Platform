@@ -23,51 +23,72 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package org.societies.cis.manager.tester;
 
-package org.societies.cis.manager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManagerCallback;
+import org.societies.api.cis.management.IcisManagerClient;
+import org.societies.api.internal.css.management.ICSSManagerCallback;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
-import org.societies.api.cis.management.ICis;
-import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 
 /**
  * @author Thomas Vilarinho (Sintef)
 */
 
 
-public class CisSubscribedImp implements ICis {
+public class CisMgmtTester {
 
+	private IcisManagerClient cisClient;
+	
+	private static Logger LOG = LoggerFactory
+			.getLogger(CisMgmtTester.class);
+	
+	private String targetCisId = null;
+	
+	
+	public CisMgmtTester(IcisManagerClient cisClient, String targetCisId){
+		LOG.info("starting CIS MGMT tester");
+		this.cisClient = cisClient;
+		LOG.info("got autowired reference, target cisId is " + targetCisId);
+
+		ICisManagerCallback icall = new ICisManagerCallback()
+		 {
+			public void receiveResult(boolean result){
+				LOG.info("boolean return on CIS Mgmgt tester");
+				LOG.info("Result Status: " + result);
+
+			}; 
+
+			public void receiveResult(int result) {};
+			
+			public void receiveResult(String result){}
+
+			public void receiveResult(Community communityResultObject) {
+				if(communityResultObject == null){
+					LOG.info("boolean return on CIS Mgmgt tester");
+				}
+				else{
+					LOG.info("boolean return on CIS Mgmgt tester");
+					LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());					
+				}
+				
+				
+			};
+			
+		 };
+		
+		 LOG.info("created callback");
+	
+	
+		this.cisClient.joinRemoteCIS(targetCisId, icall);
+
+		LOG.info("join sent");
+	
+	}
 
 	
-	private CisRecord cisRecord;
-	
-	public CisSubscribedImp(CisRecord cisRecord) {
-		super();
-		this.cisRecord = cisRecord;
-	}
-
-	@Override
-	public String getCisId() {
-		return this.cisRecord.getCisJid();
-	}
-
-	@Override
-	public String getName() {
-		return this.cisRecord.getCisName();
-	}
-
-	@Override
-	public int getMembershipCriteria() {
-
-		return this.cisRecord.getMembershipCriteria();
-	}
-
-
 }
