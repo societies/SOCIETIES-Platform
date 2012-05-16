@@ -140,6 +140,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		LOG.debug("logCommsFw()");
 
 		String dataType;
+		String invokerClass = "";  // FIXME
+		
 		if (payload != null) {
 			dataType = payload.getClass().getSimpleName();
 		}
@@ -151,6 +153,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 				new Date(),
 				receiver,
 				sender,
+				invokerClass,
 				-1,
 				ChannelType.XMPP);
 		
@@ -164,8 +167,10 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logContext()");
 		
+		String invokerClass = "";  // FIXME
+		
 		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-				new Date(), requestor.getRequestorId(), owner, -1);
+				new Date(), requestor.getRequestorId(), invokerClass, owner, -1);
 		privacyLog.getDataAccess().add(logEntry);
 	}
 
@@ -174,8 +179,10 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logContext()");
 		
+		String invokerClass = "";  // FIXME
+		
 		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-				new Date(), requestor.getRequestorId(), owner, dataSize);
+				new Date(), requestor.getRequestorId(), invokerClass, owner, dataSize);
 		privacyLog.getDataAccess().add(logEntry);
 	}
 

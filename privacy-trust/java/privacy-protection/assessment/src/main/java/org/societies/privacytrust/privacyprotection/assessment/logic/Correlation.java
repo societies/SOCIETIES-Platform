@@ -24,13 +24,11 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 
@@ -52,8 +50,7 @@ public class Correlation {
 	private CorrelationInData correlationInData;
 	private CorrelationInTime correlationInTime;
 	
-	private List<AssessmentResultClassName> assessmentResultClassName = new ArrayList<AssessmentResultClassName>();
-	private List<AssessmentResultIIdentity> assessmentResultIIdentity = new ArrayList<AssessmentResultIIdentity>();
+	private Date lastRun = null;
 	
 	public Correlation(List<DataAccessLogEntry> dataAccess, List<DataTransmissionLogEntry> dataTransmission) {
 		this.dataAccess = dataAccess;
@@ -90,6 +87,23 @@ public class Correlation {
 			}
 			tr.setCorrelationWithDataAccess(corr12);
 		}
+	}
+	
+	/**
+	 * If {@link #run()} has not been invoked yet, it is invoked to populate the
+	 * {@link DataTransmissionLogEntry} instances with results. If it has been
+	 * invoked before, it is not invoked again and the results may be old in
+	 * that case.
+	 * Then all {@link DataTransmissionLogEntry} instances are returned.
+	 * 
+	 * @return All data transmissions
+	 */
+	public List<DataTransmissionLogEntry> getDataTransmission() {
+		
+		if (lastRun == null) {
+			run();
+		}
+		return dataTransmission;
 	}
 	
 	/**

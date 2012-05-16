@@ -43,13 +43,14 @@ public class DataTransmissionLogEntry {
 	private final boolean sentToLocalCss;
 	private final IIdentity receiver;	
 	private final IIdentity sender;
+	private final String senderClass;
 	private final long payloadSize;
 	private final ChannelType channelId;
 	
-	private double correlationWithDataAccess = 0;
+	private double correlationWithDataAccess = -1;
 
 	public DataTransmissionLogEntry(String dataType, Date time, IIdentity receiver,
-			IIdentity sender, long payloadSize, ChannelType channelId) {
+			IIdentity sender, String senderClass, long payloadSize, ChannelType channelId) {
 		
 		this.dataType = dataType;
 		this.time = time;
@@ -86,6 +87,7 @@ public class DataTransmissionLogEntry {
 
 		this.receiver = receiver;
 		this.sender = sender;
+		this.senderClass = senderClass;
 		this.payloadSize = payloadSize;
 		this.channelId = channelId;
 	}
@@ -114,6 +116,10 @@ public class DataTransmissionLogEntry {
 		return sender;
 	}
 	
+	public String getSenderClass() {
+		return senderClass;
+	}
+	
 	public long getPayloadSize() {
 		return payloadSize;
 	}
@@ -133,9 +139,10 @@ public class DataTransmissionLogEntry {
 	}
 	
 	/**
-	 * Get correlation with all data access events
+	 * Get correlation with all data access events.
 	 * 
-	 * @return Correlation with all data access events
+	 * @return Correlation (non-negative value) with all data access events, or
+	 * negative value if the correlation has not been set yet.
 	 */
 	public double getCorrelationWithDataAccess() {
 		return correlationWithDataAccess;
@@ -147,6 +154,11 @@ public class DataTransmissionLogEntry {
 	 * @param correlationWithDataAccess Correlation with all data access events
 	 */
 	public void setCorrelationWithDataAccess(double correlationWithDataAccess) {
+		
+		if (correlationWithDataAccess < 0) {
+			// Log a warning if logger available
+			return;
+		}
 		this.correlationWithDataAccess = correlationWithDataAccess;
 	}
 }

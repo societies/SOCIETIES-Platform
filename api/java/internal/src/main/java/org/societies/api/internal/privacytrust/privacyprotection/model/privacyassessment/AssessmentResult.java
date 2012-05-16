@@ -38,65 +38,112 @@ public abstract class AssessmentResult {
 	private long numPacketsPerMonth = 0;
 	private double corrWithDataAccessBySender = 0;
 	private double corrWithDataAccessByAll = 0;
+	private double corrWithDataAccessBySenderDev = 0;
+	private double corrWithDataAccessByAllDev = 0;
 	
 	public AssessmentResult(Object sender) {
 		this.sender = sender;
 	}
 	
 	/**
-	 * @return the numAllPackets
+	 * @return Number of all packets transmitted by this sender
 	 */
 	public long getNumAllPackets() {
 		return numAllPackets;
 	}
 
 	/**
-	 * @param numAllPackets the numAllPackets to set
+	 * @param numAllPackets Number of all packets transmitted by this sender
 	 */
 	public void setNumAllPackets(long numAllPackets) {
 		this.numAllPackets = numAllPackets;
 	}
 
 	/**
-	 * @return the numPacketsPerMonth
+	 * @return Number of packets transmitted per month by this sender
 	 */
 	public long getNumPacketsPerMonth() {
 		return numPacketsPerMonth;
 	}
 
 	/**
-	 * @param numPacketsPerMonth the numPacketsPerMonth to set
+	 * @param numPacketsPerMonth Number of packets transmitted per month by this sender
 	 */
 	public void setNumPacketsPerMonth(long numPacketsPerMonth) {
 		this.numPacketsPerMonth = numPacketsPerMonth;
 	}
 
 	/**
-	 * @return the corrWithDataAccessBySender
+	 * @return Correlation of:<br/>
+	 * - all data transmissions by this sender<br/>
+	 * - data access by this sender
 	 */
 	public double getCorrWithDataAccessBySender() {
 		return corrWithDataAccessBySender;
 	}
 
 	/**
-	 * @param corrWithDataAccessBySender the corrWithDataAccessBySender to set
+	 * @param corrWithDataAccessBySender Correlation of:<br/>
+	 * - all data transmissions by this sender<br/>
+	 * - data access by this sender
 	 */
 	public void setCorrWithDataAccessBySender(double corrWithDataAccessBySender) {
 		this.corrWithDataAccessBySender = corrWithDataAccessBySender;
 	}
 
 	/**
-	 * @return the corrWithDataAccessByAll
+	 * @return Correlation of:<br/>
+	 * - all data transmissions by this sender<br/>
+	 * - data access by anyone
 	 */
 	public double getCorrWithDataAccessByAll() {
 		return corrWithDataAccessByAll;
 	}
 
 	/**
-	 * @param corrWithDataAccessByAll the corrWithDataAccessByAll to set
+	 * @param corrWithDataAccessByAll Correlation of:<br/>
+	 * - all data transmissions by this sender<br/>
+	 * - data access by anyone
 	 */
 	public void setCorrWithDataAccessByAll(double corrWithDataAccessByAll) {
 		this.corrWithDataAccessByAll = corrWithDataAccessByAll;
+	}
+	
+	/**
+	 * @return Median absolute deviation of correlation of:<br/>
+	 * - all data transmissions by this sender<br/>
+	 * - data access by this sender
+	 */
+	public double getCorrWithDataAccessBySenderDev() {
+		return corrWithDataAccessBySenderDev;
+	}
+
+	/**
+	 * @param corrWithDataAccessBySenderDev Median absolute deviation of correlation of:<br/>
+	 * - all data transmissions by this sender<br/>
+	 * - data access by this sender
+	 */
+	public void setCorrWithDataAccessBySenderDev(
+			double corrWithDataAccessBySenderDev) {
+		this.corrWithDataAccessBySenderDev = corrWithDataAccessBySenderDev;
+	}
+
+	/**
+	 * @return Median absolute deviation of correlation of:<br/>
+	 * - all data transmissions by this sender<br/>
+	 * - data access by anyone
+	 */
+	public double getCorrWithDataAccessByAllDev() {
+		return corrWithDataAccessByAllDev;
+	}
+
+	/**
+	 * @param corrWithDataAccessByAllDev Median absolute deviation of correlation of:<br/>
+	 * - all data transmissions by this sender<br/>
+	 * - data access by anyone
+	 */
+	public void setCorrWithDataAccessByAllDev(double corrWithDataAccessByAllDev) {
+		this.corrWithDataAccessByAllDev = corrWithDataAccessByAllDev;
 	}
 
 	/**

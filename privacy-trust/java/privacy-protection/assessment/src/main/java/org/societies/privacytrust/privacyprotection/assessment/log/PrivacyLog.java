@@ -68,7 +68,7 @@ public class PrivacyLog implements IPrivacyLog {
 		
 		LOG.debug("search({})", filter);
 		
-		return null;
+		return null;  // FIXME
 	}
 	
 	@Override
@@ -76,6 +76,6 @@ public class PrivacyLog implements IPrivacyLog {
 		
 		LOG.debug("getAll()");
 		
-		return null;
+		return dataTransmission;
 	}
 }

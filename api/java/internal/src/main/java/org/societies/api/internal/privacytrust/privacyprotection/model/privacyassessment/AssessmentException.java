@@ -24,57 +24,23 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
-import java.util.Date;
-
-import org.societies.api.identity.IIdentity;
-
 /**
  * 
  *
  * @author Mitja Vardjan
  *
  */
-public class DataAccessLogEntry {
-	
-	private final Date time;
-	private final long timeInMs;
-	private final IIdentity requestor;	
-	private final String requestorClass;	
-	private final IIdentity owner;
-	private final long dataSize;
-	
-	public DataAccessLogEntry(Date time, IIdentity requestor, String requestorClass,
-			IIdentity owner, long payloadSize) {
-		
-		this.time = time;
-		this.timeInMs = time.getTime();
-		this.requestor = requestor;
-		this.requestorClass = requestorClass;
-		this.owner = owner;
-		this.dataSize = payloadSize;
+public class AssessmentException extends Exception {
+
+	/**
+	 * Generated serial version ID
+	 */
+	private static final long serialVersionUID = 8199267032424112244L;
+
+	public AssessmentException() {
 	}
 	
-	public Date getTime() {
-		return time;
-	}
-	
-	public long getTimeInMs() {
-		return timeInMs;
-	}
-	
-	public IIdentity getRequestor() {
-		return requestor;
-	}
-	
-	public String getRequestorClass() {
-		return requestorClass;
-	}
-	
-	public IIdentity getOwner() {
-		return owner;
-	}
-	
-	public long getPayloadSize() {
-		return dataSize;
+	public AssessmentException(String msg) {
+		super(msg);
 	}
 }
