@@ -22,31 +22,26 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.assessment.logger;
-
-import java.util.Date;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 /**
- * 
+ * Privacy Assessment result for a particular sender in form of a particular class name.
+ * Based on all data packets that were sent by this sender.
+ * This assessment is more reliable because the sender identity is determined by the assessment.
  *
  * @author Mitja Vardjan
  *
  */
-public class Point {
+public class AssessmentResultClassName extends AssessmentResult {
 
-	private Date time;
-	private long dataSize;
-	
-	public Point(Date time, long dataSize) {
-		this.time = time;
-		this.dataSize = dataSize;
+	public AssessmentResultClassName(String sender) {
+		super(sender);
 	}
-	
-	public Date getTime() {
-		return time;
-	}
-	
-	public long getDataSize() {
-		return dataSize;
+
+	/**
+	 * @return the sender
+	 */
+	public String getSender() {
+		return (String) sender;
 	}
 }

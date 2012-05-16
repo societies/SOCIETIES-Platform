@@ -22,60 +22,35 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.assessment.log;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
+import java.util.concurrent.Future;
 
 /**
- * Storage of raw events (data access, data transmission)
+ * High-level interface for Privacy Assessment.
  *
  * @author Mitja Vardjan
  *
  */
-public class PrivacyLog implements IPrivacyLog {
+public interface IAssessment {
 
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyLog.class);
-
-	private List<DataAccessLogEntry> dataAccess;
-	private List<DataTransmissionLogEntry> dataTransmission;
+	/**
+	 * Set time interval after which the Privacy Assessment will automatically
+	 * evaluate past events and perform assessment.
+	 * 
+	 * @param seconds period in seconds
+	 */
+	public void setAutoPeriod(int seconds);
 	
-	public PrivacyLog() {
-		
-		LOG.info("Constructor");
-		
-		dataAccess = new ArrayList<DataAccessLogEntry>();
-		dataTransmission = new ArrayList<DataTransmissionLogEntry>();
-	}
+	/**
+	 * Perform a-posteriori assessment now
+	 */
+	public Future<List<AssessmentResult>> assessNow();
 	
-	public List<DataAccessLogEntry> getDataAccess() {
-		return dataAccess;
-	}
-	
-	public List<DataTransmissionLogEntry> getDataTransmission() {
-		return dataTransmission;
-	}
-	
-	@Override
-	public List<DataTransmissionLogEntry> search(PrivacyLogFilter filter) {
-		
-		LOG.debug("search({})", filter);
-		
-		return null;  // FIXME
-	}
-	
-	@Override
-	public List<DataTransmissionLogEntry> getAll() {
-		
-		LOG.debug("getAll()");
-		
-		return dataTransmission;
-	}
+	/**
+	 * 
+	 * @return Result of the most recent assessment
+	 */
+	public List<AssessmentResult> getLastResult();
 }

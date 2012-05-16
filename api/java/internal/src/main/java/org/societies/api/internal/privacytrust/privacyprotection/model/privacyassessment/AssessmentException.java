@@ -22,60 +22,25 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.assessment.log;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 /**
- * Storage of raw events (data access, data transmission)
+ * 
  *
  * @author Mitja Vardjan
  *
  */
-public class PrivacyLog implements IPrivacyLog {
+public class AssessmentException extends Exception {
 
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyLog.class);
+	/**
+	 * Generated serial version ID
+	 */
+	private static final long serialVersionUID = 8199267032424112244L;
 
-	private List<DataAccessLogEntry> dataAccess;
-	private List<DataTransmissionLogEntry> dataTransmission;
-	
-	public PrivacyLog() {
-		
-		LOG.info("Constructor");
-		
-		dataAccess = new ArrayList<DataAccessLogEntry>();
-		dataTransmission = new ArrayList<DataTransmissionLogEntry>();
+	public AssessmentException() {
 	}
 	
-	public List<DataAccessLogEntry> getDataAccess() {
-		return dataAccess;
-	}
-	
-	public List<DataTransmissionLogEntry> getDataTransmission() {
-		return dataTransmission;
-	}
-	
-	@Override
-	public List<DataTransmissionLogEntry> search(PrivacyLogFilter filter) {
-		
-		LOG.debug("search({})", filter);
-		
-		return null;  // FIXME
-	}
-	
-	@Override
-	public List<DataTransmissionLogEntry> getAll() {
-		
-		LOG.debug("getAll()");
-		
-		return dataTransmission;
+	public AssessmentException(String msg) {
+		super(msg);
 	}
 }

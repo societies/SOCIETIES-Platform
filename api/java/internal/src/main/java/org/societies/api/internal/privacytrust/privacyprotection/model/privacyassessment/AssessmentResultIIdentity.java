@@ -24,55 +24,26 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
-import java.util.Date;
+import org.societies.api.identity.IIdentity;
 
 /**
- * 
+ * Privacy Assessment result for a particular sender in form of a particular {@link IIdentity}.
+ * Based on all data packets that were sent by this sender.
+ * This assessment is less reliable because the sender identity is given by the sender itself.
  *
  * @author Mitja Vardjan
  *
  */
-public class LogEntry {
-	
-	private final String dataType;
-	private final Date time;
-	private final boolean sentToGroup;
-	private final String receiverId;	
-	private final String senderId;
-	private final ChannelType channelId;
-	
-	public LogEntry(String dataType, Date time, boolean sentToGroup, String receiverId,
-			String senderId, ChannelType channelId) {
-		
-		this.dataType = dataType;
-		this.time = time;
-		this.sentToGroup = sentToGroup;
-		this.receiverId = receiverId;
-		this.senderId = senderId;
-		this.channelId = channelId;
+public class AssessmentResultIIdentity extends AssessmentResult {
+
+	public AssessmentResultIIdentity(IIdentity sender) {
+		super(sender);
 	}
-	
-	public String getDataType() {
-		return dataType;
-	}
-	
-	public Date getTime() {
-		return time;
-	}
-	
-	public boolean getSentToGroup() {
-		return sentToGroup;
-	}
-	
-	public String getReceiverId() {
-		return receiverId;
-	}
-	
-	public String getSenderId() {
-		return senderId;
-	}
-	
-	public ChannelType getChannelId() {
-		return channelId;
+
+	/**
+	 * @return the sender
+	 */
+	public IIdentity getSender() {
+		return (IIdentity) sender;
 	}
 }

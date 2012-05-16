@@ -22,60 +22,59 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.assessment.log;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
+import org.societies.api.identity.IIdentity;
 
 /**
- * Storage of raw events (data access, data transmission)
+ * 
  *
  * @author Mitja Vardjan
  *
  */
-public class PrivacyLog implements IPrivacyLog {
-
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyLog.class);
-
-	private List<DataAccessLogEntry> dataAccess;
-	private List<DataTransmissionLogEntry> dataTransmission;
+public class DataAccessLogEntry {
 	
-	public PrivacyLog() {
+	private final Date time;
+	private final long timeInMs;
+	private final IIdentity requestor;	
+	private final String requestorClass;	
+	private final IIdentity owner;
+	private final long dataSize;
+	
+	public DataAccessLogEntry(Date time, IIdentity requestor, String requestorClass,
+			IIdentity owner, long payloadSize) {
 		
-		LOG.info("Constructor");
-		
-		dataAccess = new ArrayList<DataAccessLogEntry>();
-		dataTransmission = new ArrayList<DataTransmissionLogEntry>();
+		this.time = time;
+		this.timeInMs = time.getTime();
+		this.requestor = requestor;
+		this.requestorClass = requestorClass;
+		this.owner = owner;
+		this.dataSize = payloadSize;
 	}
 	
-	public List<DataAccessLogEntry> getDataAccess() {
-		return dataAccess;
+	public Date getTime() {
+		return time;
 	}
 	
-	public List<DataTransmissionLogEntry> getDataTransmission() {
-		return dataTransmission;
+	public long getTimeInMs() {
+		return timeInMs;
 	}
 	
-	@Override
-	public List<DataTransmissionLogEntry> search(PrivacyLogFilter filter) {
-		
-		LOG.debug("search({})", filter);
-		
-		return null;  // FIXME
+	public IIdentity getRequestor() {
+		return requestor;
 	}
 	
-	@Override
-	public List<DataTransmissionLogEntry> getAll() {
-		
-		LOG.debug("getAll()");
-		
-		return dataTransmission;
+	public String getRequestorClass() {
+		return requestorClass;
+	}
+	
+	public IIdentity getOwner() {
+		return owner;
+	}
+	
+	public long getPayloadSize() {
+		return dataSize;
 	}
 }

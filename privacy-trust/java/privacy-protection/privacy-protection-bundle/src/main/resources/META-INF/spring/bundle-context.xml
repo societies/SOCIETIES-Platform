@@ -123,13 +123,25 @@
 		</property>
 	</bean>
 
+	<bean id="PrivacyLog"
+		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog"
+		>
+	</bean>
+
 	<bean id="PrivacyLogAppender"
 		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender"
 		init-method="init"
 		depends-on="CommManagerBundle"
 		>
 		<property name="commMgr" ref="CommManagerBundle"/>
+		<property name="privacyLog" ref="PrivacyLog"/>
 		<!--property name="testBean" ref="CommsFwTestBean"/-->
+	</bean>
+
+	<bean id="Assessment"
+		class="org.societies.privacytrust.privacyprotection.assessment.logic.Assessment"
+		>
+		<property name="privacyLog" ref="PrivacyLog"/>
 	</bean>
 
 </beans>
