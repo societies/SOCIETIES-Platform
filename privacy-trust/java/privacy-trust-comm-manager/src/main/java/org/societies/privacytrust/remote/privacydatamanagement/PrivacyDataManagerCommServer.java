@@ -69,11 +69,6 @@ public class PrivacyDataManagerCommServer {
 
 	
 	public Object getQuery(Stanza stanza, PrivacyDataManagerBean bean){
-		LOG.info("getQuery({}, {})", stanza, bean);
-		LOG.info("getQuery(): stanza.id   = {}", stanza.getId());
-		LOG.info("getQuery(): stanza.from = {}", stanza.getFrom());
-		LOG.info("getQuery(): stanza.to   = {}", stanza.getTo());
-		
 		PrivacyDataManagerBeanResult beanResult = new PrivacyDataManagerBeanResult();
 		boolean ack = true;
 
@@ -91,6 +86,10 @@ public class PrivacyDataManagerCommServer {
 			beanResult.setMethod(MethodType.OBFUSCATE_DATA);
 			ack = obfuscateData(bean, beanResult);
 			LOG.info("getQuery(): ObfuscateData remote response sending");
+		}
+		else {
+			LOG.info("getQuery(): Unknown method "+bean.getMethod().name());
+			beanResult.setAckMessage("Error Unknown method "+bean.getMethod().name());
 		}
 
 		beanResult.setAck(ack);

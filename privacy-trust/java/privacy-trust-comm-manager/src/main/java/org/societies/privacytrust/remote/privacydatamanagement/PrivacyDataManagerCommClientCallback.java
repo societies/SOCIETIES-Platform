@@ -24,18 +24,12 @@
  */
 package org.societies.privacytrust.remote.privacydatamanagement;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ResponseItemUtils;
@@ -46,18 +40,10 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyd
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PrivacyDataManagerCommClientCallback implements ICommCallback {
+public class PrivacyDataManagerCommClientCallback {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerCommClientCallback.class);
-	
-	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement",
-					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
-					"http://societies.org/api/schema/identity"));
-	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement",
-					"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
-					"org.societies.api.schema.identity"));
 
+	// -- Listeners list
 	public Map<String, IPrivacyDataManagerListener> privacyDataManagerlisteners; 
 	public Map<String, IDataObfuscationListener> dataObfuscationlisteners;
 
@@ -67,18 +53,6 @@ public class PrivacyDataManagerCommClientCallback implements ICommCallback {
 		dataObfuscationlisteners = new HashMap<String, IDataObfuscationListener>();
 	}
 	
-	@Override
-	public void receiveResult(Stanza stanza, Object payload) {
-		LOG.info("$$$$ PrivacyTrustCommManager response received");
-		LOG.debug("receiveResult({}, {})", stanza, payload);
-		LOG.debug("receiveResult(): stanza.id   = {}", stanza.getId());
-		LOG.debug("receiveResult(): stanza.from = {}", stanza.getFrom());
-		LOG.debug("receiveResult(): stanza.to   = {}", stanza.getTo());
-		if (payload instanceof PrivacyDataManagerBeanResult){
-			this.receiveResult(stanza, (PrivacyDataManagerBeanResult) payload);
-			return;
-		}
-	}
 
 	public void receiveResult(Stanza stanza, PrivacyDataManagerBeanResult bean) {
 		// -- Check Permission
@@ -109,54 +83,4 @@ public class PrivacyDataManagerCommClientCallback implements ICommCallback {
 			return;
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, org.societies.comm.xmpp.datatypes.XMPPError)
-	 */
-	@Override
-	public void receiveError(Stanza returnStanza, XMPPError info) {
-		LOG.error(info.getMessage(), info);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveInfo(org.societies.comm.xmpp.datatypes.Stanza, java.lang.String, org.societies.comm.xmpp.datatypes.XMPPInfo)
-	 */
-	@Override
-	public void receiveInfo(Stanza returnStanza, String node, XMPPInfo info) {
-		LOG.info(info.getIdentityName(), info);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveMessage(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
-	 */
-	@Override
-	public void receiveMessage(Stanza stanza, Object payload) {
-		LOG.info("Message received from "+stanza.getFrom()+" to "+stanza.getTo());
-		LOG.debug("receiveMessage({}, {})", stanza, payload);
-		LOG.debug("receiveMessage(): stanza.id   = {}", stanza.getId());
-		LOG.debug("receiveMessage(): stanza.from = {}", stanza.getFrom());
-		LOG.debug("receiveMessage(): stanza.to   = {}", stanza.getTo());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
-	 */
-	@Override
-	public void receiveItems(Stanza stanza, String arg1, List<String> arg2) {
-		LOG.info("Items received from "+stanza.getFrom()+" to "+stanza.getTo());
-	}
-	
-	
-
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getJavaPackages() */
-	@Override
-	public List<String> getJavaPackages() { return PACKAGES; }
-
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getXMLNamespaces() */
-	@Override
-	public List<String> getXMLNamespaces() { return NAMESPACES; }
 }

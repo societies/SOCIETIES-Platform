@@ -18,12 +18,21 @@
 	<!-- Required for Async processing -->
 	<tx:annotation-driven />
 	
+	<bean name="PrivacyTrustCommClientCallback"
+		class="org.societies.privacytrust.remote.PrivacyTrustCommClientCallback"
+		depends-on="commManager, PrivacyDataManagerCommClientCallback"
+		init-method="initBean">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyDataManagerCommClientCallback" ref="PrivacyDataManagerCommClientCallback" />
+	</bean>
+	
 	<bean name="PrivacyTrustCommServer"
 		class="org.societies.privacytrust.remote.PrivacyTrustCommServer"
 		depends-on="commManager"
-		init-method="initService">
+		init-method="initBean">
 		<property name="commManager" ref="commManager" />
 		<property name="privacyDataManagerCommServer" ref="PrivacyDataManagerCommServer" />
+		<property name="privacyNegotiationManagerCommServer" ref="PrivacyNegotiationManagerCommServer" />
 	</bean>
 	
 	
@@ -33,9 +42,14 @@
 
 	<bean name="PrivacyDataManagerCommClient"
 		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClient"
-		depends-on="commManager"
-		init-method="initBean">
+		depends-on="commManager, PrivacyDataManagerCommClientCallback, PrivacyTrustCommClientCallback">
 		<property name="commManager" ref="commManager" />
+		<property name="listeners" ref="PrivacyDataManagerCommClientCallback" />
+		<property name="privacyTrustCommClientCallback" ref="PrivacyTrustCommClientCallback" />
+	</bean>
+	
+	<bean name="PrivacyDataManagerCommClientCallback"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback">
 	</bean>
 
 	<bean name="PrivacyDataManagerCommServer"
@@ -56,6 +70,20 @@
 
 
 	<!-- Privacy Policy Negotiation Management Configuration -->
+	
+	<bean name="PrivacyNegotiationManagerCommClient"
+		class="org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommClient"
+		depends-on="commManager"
+		init-method="initBean">
+		<property name="commManager" ref="commManager" />
+	</bean>
+
+	<bean name="PrivacyNegotiationManagerCommServer"
+		class="org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer"
+		depends-on="commManager, privacyNegotiationAgent">
+		<property name="commManager" ref="commManager" />
+		<property name="negAgent" ref="privacyNegotiationAgent" />
+	</bean>
 
 
 

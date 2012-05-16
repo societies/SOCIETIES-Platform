@@ -17,7 +17,7 @@
 		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote" />
 
 	<osgi:reference id="privacyDataManager"
-		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager" />
+		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager" cardinality="0..1" />
 
 
 	<!-- Privacy Policy Management Configuration -->
@@ -29,6 +29,12 @@
 
 
 	<!-- Privacy Policy Negotiation Management Configuration -->
+	
+	<!-- <osgi:service ref="PrivacyNegotiationManagerCommClient"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote" /> -->
+		
+	<osgi:reference id="privacyNegotiationAgent"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent" cardinality="0..1" />
 
 
 

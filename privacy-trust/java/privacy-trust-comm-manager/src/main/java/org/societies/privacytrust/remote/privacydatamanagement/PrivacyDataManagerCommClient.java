@@ -42,6 +42,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.util.model.priv
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
+import org.societies.privacytrust.remote.PrivacyTrustCommClientCallback;
 /**
  * Comms Client that initiates the remote communication
  *
@@ -53,28 +54,11 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 	
 	private ICommManager commManager;
 	private PrivacyDataManagerCommClientCallback listeners;
+	private PrivacyTrustCommClientCallback privacyTrustCommClientCallback;
 
+	
 	public PrivacyDataManagerCommClient() {	
 	}
-
-	/**
-	 * Register the listener to the Societies Communication Manager
-	 * Entry point of the PrivacyDataManagerCommClient
-	 */
-	public void initBean() {
-		LOG.info("initBean(): commMgr = {}", commManager.toString());
-		
-		try {
-			// Create listener
-			listeners = new PrivacyDataManagerCommClientCallback();
-			// Register to the Societies Comm Manager
-			commManager.register(listeners);
-			LOG.info("initBean(): PrivacyDataManagerCommClientCallback registered to the Societies Comm Manager");
-		} catch (CommunicationException e) {
-			LOG.error("initBean(): ", e);
-		}
-	}
-
 
 
 	/* (non-Javadoc)
@@ -96,7 +80,7 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 		bean.setDataId(dataId.toUriString());
 		bean.setAction(ActionUtils.toActionBean(action));
 		try {
-			this.commManager.sendIQGet(stanza, bean, listeners);
+			this.commManager.sendIQGet(stanza, bean, privacyTrustCommClientCallback);
 		} catch (CommunicationException e) {
 			LOG.error("CommunicationException: "+MethodType.CHECK_PERMISSION, e);
 			throw new PrivacyException("CommunicationException: "+MethodType.CHECK_PERMISSION, e);
@@ -123,7 +107,7 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 		bean.setOwnerId(ownerId.getJid());
 		bean.setDataId(dataWrapper.getDataId().toUriString());
 		try {
-			this.commManager.sendIQGet(stanza, bean, listeners);
+			this.commManager.sendIQGet(stanza, bean, privacyTrustCommClientCallback);
 		} catch (CommunicationException e) {
 			LOG.error("CommunicationException: "+MethodType.OBFUSCATE_DATA, e);
 			throw new PrivacyException("CommunicationException: "+MethodType.OBFUSCATE_DATA, e);
@@ -138,5 +122,14 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 		LOG.info("[DependencyInjection] CommManager injected");
+	}
+	public void setListeners(PrivacyDataManagerCommClientCallback listeners) {
+		this.listeners = listeners;
+		LOG.info("[DependencyInjection] PrivacyDataManagerCommClientCallback injected");
+	}
+	public void setPrivacyTrustCommClientCallback(
+			PrivacyTrustCommClientCallback privacyTrustCommClientCallback) {
+		this.privacyTrustCommClientCallback = privacyTrustCommClientCallback;
+		LOG.info("[DependencyInjection] PrivacyTrustCommClientCallback injected");
 	}
 }

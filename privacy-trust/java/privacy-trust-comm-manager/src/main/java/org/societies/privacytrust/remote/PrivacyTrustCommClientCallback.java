@@ -22,54 +22,55 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-/**
- * Describe your class here...
- *
- * @author aleckey
- *
- */
 package org.societies.privacytrust.remote;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ResponseItemUtils;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
+import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer;
 import org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer;
 
-
-public class PrivacyTrustCommServer implements IFeatureServer {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyTrustCommServer.class);
+/**
+ * @author Olivier Maridat (Trialog)
+ *
+ */
+public class PrivacyTrustCommClientCallback implements ICommCallback {
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyTrustCommClientCallback.class);
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement",
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
-					"http://societies.org/api/schema/identity",
-					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
-			  		"http://societies.org/api/schema/servicelifecycle/model"));
+					"http://societies.org/api/schema/identity"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
-					"org.societies.api.schema.identity",
-					"org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation",
-			  		"org.societies.api.schema.servicelifecycle.model"));
+					"org.societies.api.schema.identity"));
 
+	// Dependencies
 	private ICommManager commManager;
-	private PrivacyDataManagerCommServer privacyDataManagerCommServer;
-	private PrivacyNegotiationManagerCommServer privacyNegotiationManagerCommServer;
+	private PrivacyDataManagerCommClientCallback privacyDataManagerCommClientCallback;
 
 	
-	public PrivacyTrustCommServer() {
+	public PrivacyTrustCommClientCallback() {
 	}
 
 	/**
@@ -82,7 +83,7 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		try {
 			// Register to the Societies Comm Manager
 			commManager.register(this);
-			LOG.info("initBean(): PrivacyTrustCommServer registered to the Societies Comm Manager");
+			LOG.info("initBean(): PrivacyTrustCommClientCallback registered to the Societies Comm Manager");
 		} catch (CommunicationException e) {
 			LOG.error("initBean(): ", e);
 		}
@@ -90,50 +91,20 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 
 
 	/**
-	 * Get Request Received
-	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#getQuery(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 * Received a result
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, Object payload)
 	 */
 	@Override
-	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
-		LOG.info("getQuery({}, {})", stanza, payload);
-		LOG.info("getQuery(): stanza.id   = {}", stanza.getId());
-		LOG.info("getQuery(): stanza.from = {}", stanza.getFrom());
-		LOG.info("getQuery(): stanza.to   = {}", stanza.getTo());
+	public void receiveResult(Stanza stanza, Object payload) {
+		LOG.info("receiveResult({}, {})", stanza, payload);
+		LOG.info("receiveResult(): stanza.id   = {}", stanza.getId());
+		LOG.info("receiveResult(): stanza.from = {}", stanza.getFrom());
+		LOG.info("receiveResult(): stanza.to   = {}", stanza.getTo());
 
 		// -- Privacy Data Management
-		if (payload instanceof PrivacyDataManagerBean) {
-			return privacyDataManagerCommServer.getQuery(stanza, (PrivacyDataManagerBean) payload);
+		if (payload instanceof PrivacyDataManagerBeanResult) {
+			privacyDataManagerCommClientCallback.receiveResult(stanza, (PrivacyDataManagerBeanResult) payload);
 		}
-		// -- Privacy Policy Management
-
-		// -- Privacy Preference Management
-
-		// -- Privacy Policy Negotiation Management
-		if (payload instanceof NegotiationAgentBean){
-			return privacyNegotiationManagerCommServer.getQuery(stanza, (NegotiationAgentBean) payload);
-		}
-
-		// -- Assessment Management
-
-		// -- Trust Management
-
-		return null;
-	}
-	
-
-	/**
-	 * Get Request Received
-	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#setQuery(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
-	 */
-	@Override
-	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
-		LOG.info("setQuery({}, {})", stanza, payload);
-		LOG.info("setQuery(): stanza.id   = {}", stanza.getId());
-		LOG.info("setQuery(): stanza.from = {}", stanza.getFrom());
-		LOG.info("setQuery(): stanza.to   = {}", stanza.getTo());
-
-		// -- Privacy Data Management
-
 		// -- Privacy Policy Management
 
 		// -- Privacy Preference Management
@@ -143,20 +114,18 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		// -- Assessment Management
 
 		// -- Trust Management
-		
-		return null;
+
 	}
 
-	/**
-	 * Message Received
-	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#receiveMessage(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveMessage(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		LOG.info("receiveMessage({}, {})", stanza, payload);
-		LOG.info("receiveMessage(): stanza.id   = {}", stanza.getId());
-		LOG.info("receiveMessage(): stanza.from = {}", stanza.getFrom());
-		LOG.info("receiveMessage(): stanza.to   = {}", stanza.getTo());
+		LOG.debug("receiveMessage({}, {})", stanza, payload);
+		LOG.debug("receiveMessage(): stanza.id   = {}", stanza.getId());
+		LOG.debug("receiveMessage(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("receiveMessage(): stanza.to   = {}", stanza.getTo());
 
 		// -- Privacy Data Management
 
@@ -169,7 +138,79 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		// -- Assessment Management
 
 		// -- Trust Management
-		
+
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
+	 */
+	@Override
+	public void receiveItems(Stanza stanza, String arg1, List<String> arg2) {
+		LOG.debug("receiveItems({}, {}, {})", stanza, arg1);
+		LOG.debug("receiveItems(): stanza.id   = {}", stanza.getId());
+		LOG.debug("receiveItems(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("receiveItems(): stanza.to   = {}", stanza.getTo());
+
+		// -- Privacy Data Management
+
+		// -- Privacy Policy Management
+
+		// -- Privacy Preference Management
+
+		// -- Privacy Policy Negotiation Management
+
+		// -- Assessment Management
+
+		// -- Trust Management
+
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveInfo(org.societies.comm.xmpp.datatypes.Stanza, java.lang.String, org.societies.comm.xmpp.datatypes.XMPPInfo)
+	 */
+	@Override
+	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+		LOG.info("receiveInfo({}, {})", stanza, info);
+		LOG.info("receiveInfo(): stanza.id   = {}", stanza.getId());
+		LOG.info("receiveInfo(): stanza.from = {}", stanza.getFrom());
+		LOG.info("receiveInfo(): stanza.to   = {}", stanza.getTo());
+
+		// -- Privacy Data Management
+
+		// -- Privacy Policy Management
+
+		// -- Privacy Preference Management
+
+		// -- Privacy Policy Negotiation Management
+
+		// -- Assessment Management
+
+		// -- Trust Management
+
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, org.societies.comm.xmpp.datatypes.XMPPError)
+	 */
+	@Override
+	public void receiveError(Stanza stanza, XMPPError info) {
+		LOG.info("receiveError({}, {})", stanza, info);
+		LOG.info("receiveError(): stanza.id   = {}", stanza.getId());
+		LOG.info("receiveError(): stanza.from = {}", stanza.getFrom());
+		LOG.info("receiveError(): stanza.to   = {}", stanza.getTo());
+
+		// -- Privacy Data Management
+
+		// -- Privacy Policy Management
+
+		// -- Privacy Preference Management
+
+		// -- Privacy Policy Negotiation Management
+
+		// -- Assessment Management
+
+		// -- Trust Management
+
 	}
 
 
@@ -180,21 +221,16 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		this.commManager = commManager;
 		LOG.info("[DependencyInjection] CommManager injected");
 	}
-	public void setPrivacyDataManagerCommServer(
-			PrivacyDataManagerCommServer privacyDataManagerCommServer) {
-		this.privacyDataManagerCommServer = privacyDataManagerCommServer;
-		LOG.info("[DependencyInjection] PrivacyDataManagerCommServer injected");
-	}
-	public void setPrivacyNegotiationManagerCommServer(
-			PrivacyNegotiationManagerCommServer privacyNegotiationManagerCommServer) {
-		this.privacyNegotiationManagerCommServer = privacyNegotiationManagerCommServer;
-		LOG.info("[DependencyInjection] PrivacyNegotiationManagerCommServer injected");
+	public void setPrivacyDataManagerCommClientCallback(
+			PrivacyDataManagerCommClientCallback privacyDataManagerCommClientCallback) {
+		this.privacyDataManagerCommClientCallback = privacyDataManagerCommClientCallback;
+		LOG.info("[DependencyInjection] PrivacyDataManagerCommClientCallback injected");
 	}
 
-	
+
 
 	// -- Getters / Setters
-	
+
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#getJavaPackages()
 	 */
