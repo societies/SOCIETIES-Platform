@@ -25,6 +25,7 @@
 package org.societies.context.broker.test;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -62,14 +63,15 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.context.broker.impl.InternalCtxBroker;
 
 import org.societies.context.broker.test.util.MockBlobClass;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
-
 
 /**
  * Describe your class here...
@@ -79,7 +81,16 @@ import org.societies.context.userHistory.impl.UserContextHistoryManagement;
  */
 public class InternalCtxBrokerTest {
 
+	// ATTENTION: This should match the constant defined in UserCtxDBMgr class
+	private static final String OPERATOR_IDENTITY_STRING = "myFooIIdentity@societies.local";
+	
+	@SuppressWarnings("unused")
+	private static final IIdentity OPERATOR_IDENTITY = 
+			new MockIdentity(IdentityType.CSS, OPERATOR_IDENTITY_STRING, "");
+	
 	private InternalCtxBroker internalCtxBroker;
+	
+	private IIdentityManager mockIdentityMgr = mock(IIdentityManager.class);
 
 	/**
 	 * @throws java.lang.Exception
@@ -100,10 +111,12 @@ public class InternalCtxBrokerTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		
 		internalCtxBroker = new InternalCtxBroker();
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
-		//	internalCtxBroker.createCSSOperator();
+		internalCtxBroker.setIdentityMgr(mockIdentityMgr);
+		internalCtxBroker.createCssOperator(); // TODO remove?
 	}
 
 	/**
@@ -111,6 +124,7 @@ public class InternalCtxBrokerTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		
 		internalCtxBroker = null;
 	}
 
@@ -121,25 +135,17 @@ public class InternalCtxBrokerTest {
 	 * @throws CtxException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
+	 * @throws InvalidFormatException 
 	 */
 	@Test
-	public void testCreateCSSOperator() {
+	public void testCreateCSSOperator() throws Exception {
 
-		//internalCtxBroker.createCSSOperator();
-		try {
-			IndividualCtxEntity ctxEntity = internalCtxBroker.retrieveCssOperator().get();
-
-			System.out.println("operator entity " +ctxEntity);
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// setup mock IIdentityManager behaviour
+		// TODO when(mockIdentityMgr.fromJid(OPERATOR_IDENTITY_STRING)).thenReturn(OPERATOR_IDENTITY);
+		
+		final IndividualCtxEntity operatorEnt = internalCtxBroker.retrieveCssOperator().get();
+		assertNotNull(operatorEnt);
+		assertEquals(OPERATOR_IDENTITY_STRING, operatorEnt.getId().getOperatorId());
 	}
 
 

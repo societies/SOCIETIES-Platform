@@ -79,9 +79,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	private final IIdentity privateId;
 	
 	// TODO Remove and instantiate privateId properly so that privateId.toString() can be used instead
-	private final String privateIdtoString = "myFooIIdentity";
+	private final String privateIdtoString = "myFooIIdentity@societies.local";
 	
 	public UserCtxDBMgr() {
+		
+		LOG.info(this.getClass() + " instantiated");
 		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
 		
 		// TODO !!!!!! Identity should be instantiated properly
