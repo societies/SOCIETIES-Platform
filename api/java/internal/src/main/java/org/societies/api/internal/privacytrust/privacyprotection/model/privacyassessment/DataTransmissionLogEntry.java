@@ -38,6 +38,7 @@ public class DataTransmissionLogEntry {
 
 	private final String dataType;
 	private final Date time;
+	private final long timeInMs;
 	private final boolean sentToGroup;
 	private final boolean sentToLocalCss;
 	private final IIdentity receiver;	
@@ -45,11 +46,14 @@ public class DataTransmissionLogEntry {
 	private final long payloadSize;
 	private final ChannelType channelId;
 	
+	private double correlationWithDataAccess = 0;
+
 	public DataTransmissionLogEntry(String dataType, Date time, IIdentity receiver,
 			IIdentity sender, long payloadSize, ChannelType channelId) {
 		
 		this.dataType = dataType;
 		this.time = time;
+		this.timeInMs = time.getTime();
 		
 		switch (receiver.getType()) {
 		case CIS:
@@ -94,6 +98,10 @@ public class DataTransmissionLogEntry {
 		return time;
 	}
 	
+	public long getTimeInMs() {
+		return timeInMs;
+	}
+	
 	public boolean isSentToGroup() {
 		return sentToGroup;
 	}
@@ -122,5 +130,23 @@ public class DataTransmissionLogEntry {
 	 */
 	public boolean isSentToLocalCss() {
 		return sentToLocalCss;
+	}
+	
+	/**
+	 * Get correlation with all data access events
+	 * 
+	 * @return Correlation with all data access events
+	 */
+	public double getCorrelationWithDataAccess() {
+		return correlationWithDataAccess;
+	}
+
+	/**
+	 * Set correlation with all data access events
+	 * 
+	 * @param correlationWithDataAccess Correlation with all data access events
+	 */
+	public void setCorrelationWithDataAccess(double correlationWithDataAccess) {
+		this.correlationWithDataAccess = correlationWithDataAccess;
 	}
 }

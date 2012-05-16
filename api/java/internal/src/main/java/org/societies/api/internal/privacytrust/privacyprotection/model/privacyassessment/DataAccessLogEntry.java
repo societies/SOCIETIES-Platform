@@ -37,6 +37,7 @@ import org.societies.api.identity.IIdentity;
 public class DataAccessLogEntry {
 	
 	private final Date time;
+	private final long timeInMs;
 	private final IIdentity requestor;	
 	private final IIdentity owner;
 	private final long dataSize;
@@ -45,6 +46,7 @@ public class DataAccessLogEntry {
 			IIdentity owner, long payloadSize) {
 		
 		this.time = time;
+		this.timeInMs = time.getTime();
 		this.requestor = requestor;
 		this.owner = owner;
 		this.dataSize = payloadSize;
@@ -52,6 +54,10 @@ public class DataAccessLogEntry {
 	
 	public Date getTime() {
 		return time;
+	}
+	
+	public long getTimeInMs() {
+		return timeInMs;
 	}
 	
 	public IIdentity getRequestor() {

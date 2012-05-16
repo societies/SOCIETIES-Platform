@@ -31,7 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
-import org.societies.privacytrust.privacyprotection.assessment.logger.DataEvent;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 
 /**
  * Worker class.
@@ -45,8 +46,8 @@ public class Correlation {
 
 	private static Logger LOG = LoggerFactory.getLogger(Correlation.class);
 
-	private List<DataEvent> dataAccess;
-	private List<DataEvent> dataTransmission;
+	private List<DataAccessLogEntry> dataAccess;
+	private List<DataTransmissionLogEntry> dataTransmission;
 	
 	private CorrelationInData correlationInData;
 	private CorrelationInTime correlationInTime;
@@ -54,7 +55,7 @@ public class Correlation {
 	private List<AssessmentResultClassName> assessmentResultClassName = new ArrayList<AssessmentResultClassName>();
 	private List<AssessmentResultIIdentity> assessmentResultIIdentity = new ArrayList<AssessmentResultIIdentity>();
 	
-	public Correlation(List<DataEvent> dataAccess, List<DataEvent> dataTransmission) {
+	public Correlation(List<DataAccessLogEntry> dataAccess, List<DataTransmissionLogEntry> dataTransmission) {
 		this.dataAccess = dataAccess;
 		this.dataTransmission = dataTransmission;
 		correlationInData = new CorrelationInData();
@@ -74,18 +75,20 @@ public class Correlation {
 		long time2;
 		double corr12;
 		
-		for (DataEvent tr : dataTransmission) {
+		for (DataTransmissionLogEntry tr : dataTransmission) {
 			
-			size2 = tr.getDataSize();
-			time2 = tr.getTime();
+			size2 = tr.getPayloadSize();
+			time2 = tr.getTimeInMs();
+			corr12 = 0;
 			
-			for (DataEvent ac : dataAccess) {
+			for (DataAccessLogEntry ac : dataAccess) {
 				
-				size1 = ac.getDataSize();
-				time1 = ac.getTime();
+				size1 = ac.getPayloadSize();
+				time1 = ac.getTimeInMs();
 				
-				corr12 = correlation(size2 - size1, time2 - time1);
+				corr12 += correlation(size2 - size1, time2 - time1);
 			}
+			tr.setCorrelationWithDataAccess(corr12);
 		}
 	}
 	
