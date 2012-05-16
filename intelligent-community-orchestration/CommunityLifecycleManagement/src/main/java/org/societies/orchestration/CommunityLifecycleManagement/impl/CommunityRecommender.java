@@ -248,9 +248,23 @@ public class CommunityRecommender //implements ICommCallback
 			cisNotDeletedMetadata = identifyCissToDelete(theSubList, null);
 		}
 		HashMap<String, ArrayList<ArrayList<ICisProposal>>> temp = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
-		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
-		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
-		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
+		ArrayList<ArrayList<ICisProposal>> temp2 = cisPossibilities.get("Configure CISs");
+		
+		if (temp2 != null) {
+			if (temp2.size() > 0)
+				temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
+		}
+		ArrayList<ArrayList<ICisProposal>> temp2 = cisPossibilities.get("Merge CISs");
+		if (temp2 != null) {
+			if (temp2.size() > 0)
+				temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
+		}
+		
+		ArrayList<ArrayList<ICisProposal>> temp2 = cisPossibilities.get("Split CISs");
+		if (temp2 != null) {
+			if (temp2.size() > 0)
+				temp.put("Split CISs", cisPossibilities.get("Split CISs"));
+		}
 		
 		if (temp.size() > 0)
 		    cisCreatedFromConfigurationMetadata = identifyCissToConfigure(temp, null);
@@ -309,14 +323,14 @@ public class CommunityRecommender //implements ICommCallback
 					for (int m = lastIndex + 1; (m < creatableCiss.size()) && (foundCis == false); m++) {
 						if (cissToCreate.get(m) != null) {
 							if (!(cissToCreateMetadata.get(m).split("---")[0].substring(0, 7).equals("CIS ID: ")))
-								cissToCreateMetadata.set(m, "CIS ID: " + createdCis.getCisId() + "---" + cissToCreateMetadata.get(m).substring(8));
+								cissToCreateMetadata.set(m, "CIS ID: " + createdCis.getCisId() + "---" + cissToCreateMetadata.get(m));
 							lastIndex = m;
 							foundCis = true;
 						}
 					}
 				}
 			    
-			    //ICisAdvertisementRecord createdCisAdvert = new ICisAdvertisementRecord(createdCis.get().getName() + createdCis.getDescription(), createdCis.getCisEditor().getURI());
+			    //ICisAdvertisementRecord createdCisAdvert = new ICisAdvertisementRecord(createdCis.get().getName(), createdCis.getDescription(), createdCis.getCisEditor().getURI());
 			    //for (int m = 0; m < cissToCreate.get(i).getMembersList(); m++) {
 			    //    ICssRecord member = cssManager.getCssRecord(cissToCreate.get(i).getMembersList().get(m));
 			    //    ICssActivityFeed feed = member.getActivityFeed();
@@ -495,8 +509,24 @@ public class CommunityRecommender //implements ICommCallback
 				    // TODO Auto-generated catch block
 				    e.printStackTrace();
 			    }
-		        //if (cisManager.get(cisID).getMembersList() != configurableCis.get(i).get(1).getMembersList())
+	            //Set<ICisParticipant>> participants = cisManager.get(cisID).getMemberList();
+		        //ArrayList<String> members = new ArrayList<String>();
+	            //Iterator<ICisParticipant> partIt = participants.iterator();
+	            //while (partIt.hasNext()) {
+	            //    members.add(it.next().toString());
+	            //}
+	            //if (!(members.contains(configurableCis.get(i).get(1).getMemberList())) {
+	                //if(!(members.contains(linkedCss)) && (configurableCis.get(i).get(1).getMemberList().contains(linkedCss)))
+	                    //cisManager.joinCis(linkedCss, cisID);
+	                //else
 	            //    cisManager.setMembersList(cisID, configurableCis.get(i).get(1).getMembersList();
+	            //}
+	            //if (!(configurableCis.get(i).get(1).getMemberList().contains(members)) {
+                    //if(!(configurableCis.get(i).get(1).getMemberList().contains(linkedCss)) && (members.contains(linkedCss)))
+                        //cisManager.leaveCis(linkedCss, cisID);
+                    //else
+                //    cisManager.setMembersList(cisID, configurableCis.get(i).get(1).getMembersList();
+                //}
 	            //if (cisManager.get(cisID).getMembershipCriteria() != configurableCis.get(i).get(1).getMembershipCriteria())
 	            //    cisManager.setMembershipCriteria(cisID, configurableCis.get(i).get(1).getMembershipCriteria();
 	            //if (cisManager.get(cisID).getOwner() != configurableCis.get(i).get(1).getOwner())

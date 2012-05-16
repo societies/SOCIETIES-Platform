@@ -759,12 +759,17 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				        //add another attribute to it (suggest one?), or change one or more
 				        //model attributes (specify them?)
 			        }
-				    else if (members.size() >= (1.3 * cisProposal.getMemberList().size())) {
-				        cisProposal.setParentCis(userJoinedCiss.get(m));
+				    else if (members.size() >= (1.3 * cisProposal.getMemberList().size()) &&
+				    		(members.contains(cisProposal.getMemberList())) &&
+				    		(cisProposal.getMembershipCriteria() != userJoinedCiss.get(m).getMembershipCriteria())) {
+				        //TODO: alternatively: membership criteria is identical, but CIS activity feed
+				    	//shows greater than average activity for the group, so sub-CIS for cluster.
+				    	//needs activity feed defined to do so
+				    	cisProposal.setParentCis(userJoinedCiss.get(m));
 				    	creations.set(i, cisProposal);
 				    }
 				}
-				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion,
+				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion(?),
 				//may be grounds to delete the old CIS. E.g. the suggestion is based on location,
 				//which is different to the location of an existing CIS, which is known to be short-term temporary.
 			}
