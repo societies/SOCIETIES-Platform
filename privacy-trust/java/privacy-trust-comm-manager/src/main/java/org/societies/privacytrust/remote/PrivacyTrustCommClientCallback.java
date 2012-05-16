@@ -26,9 +26,7 @@ package org.societies.privacytrust.remote;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,16 +36,8 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
-import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ResponseItemUtils;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback;
-import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer;
-import org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer;
 
 /**
  * @author Olivier Maridat (Trialog)

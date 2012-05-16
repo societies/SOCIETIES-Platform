@@ -45,8 +45,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../parent/spring-osgi.xml</relativePath>
+		<artifactId>version-parent</artifactId>
 		<version>0.1</version>
 	</parent>
+
 </project>

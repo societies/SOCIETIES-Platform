@@ -30,7 +30,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.privacytrust</groupId>
 	<artifactId>privacytrustcommmanagement</artifactId>
-	<name>Privacy and trust Communication Management</name>
+	<name>Privacy and Trust Communication Management</name>
 	<packaging>bundle</packaging>
 	<version>${version.pt}</version>
 	<developers>
