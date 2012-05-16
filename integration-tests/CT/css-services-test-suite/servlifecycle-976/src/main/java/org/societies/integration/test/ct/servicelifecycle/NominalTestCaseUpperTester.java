@@ -45,7 +45,7 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
 /**
- * Upper Tester for the Nominal Test Case of #714
+ * Upper Tester for the Nominal Test Case of #976
  *
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
@@ -116,6 +116,39 @@ public class NominalTestCaseUpperTester {
 	}
 	
 	/**
+	 * Do the test
+	 */
+	@Test
+	public void testServiceLifecycle(){
+		
+		// Check if we're going to use another JID
+		String ourJid = TestCase976.getCommManager().getIdManager().getThisNetworkNode().getJid();
+		if(LOG.isDebugEnabled()) LOG.debug("[#976] Remote JID is " + REMOTEJID + " and local JID is " + ourJid);
+		
+		if(ourJid.equals(REMOTEJID)){
+			fail("Our JID is the Remote JID!");
+			return;
+		}
+		
+		// Now we can start!
+		LOG.info("[#976] Testing remote service lifecycle");
+		
+		try{
+		
+			testInstallService();
+			testStopService();
+			testStartService();
+			testUninstallService();
+			
+		} catch(Exception ex){
+			LOG.error("Error while running test: " + ex);
+			ex.printStackTrace();
+			fail("Exception occured");
+		}		
+	}
+
+	
+	/**
 	 * Test installing a service
 	 */
 	private void testInstallService(){
@@ -157,9 +190,11 @@ public class NominalTestCaseUpperTester {
 			Service installedService = getServiceFromList(resultList);
 			
 			assertNotNull(installedService);
-			if(installedService != null)
+			if(installedService != null){
 				Assert.assertEquals("[#976] Service is not installed and started!",installedService.getServiceStatus(),ServiceStatus.STARTED);
-	
+				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service found and in status: " + installedService.getServiceStatus().toString());
+			}
+			
 		} catch(Exception ex){
 			LOG.error("[#976] Exception occurred: " + ex);
 			fail("[#976] Exception occurred: " + ex);
@@ -202,9 +237,11 @@ public class NominalTestCaseUpperTester {
 			Service installedService = getServiceFromList(resultList);
 			
 			assertNotNull(installedService);
-			if(installedService != null)
+			if(installedService != null){
 				Assert.assertEquals("[#976] Service is not stopped!",installedService.getServiceStatus(),ServiceStatus.STOPPED);
-	
+				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service found and in status: " + installedService.getServiceStatus().toString());
+			}
+			
 		} catch(Exception ex){
 			LOG.error("[#976] Exception occurred: " + ex);
 			fail("[#976] Exception occurred: " + ex);
@@ -247,9 +284,11 @@ public class NominalTestCaseUpperTester {
 			Service installedService = getServiceFromList(resultList);
 			
 			assertNotNull(installedService);
-			if(installedService != null)
+			if(installedService != null){
 				Assert.assertEquals("[#976] Service is not started!",installedService.getServiceStatus(),ServiceStatus.STARTED);
-	
+				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service found and in status: " + installedService.getServiceStatus().toString());
+			}
+			
 		} catch(Exception ex){
 			LOG.error("[#976] Exception occurred: " + ex);
 			fail("[#976] Exception occurred: " + ex);
@@ -308,41 +347,8 @@ public class NominalTestCaseUpperTester {
 		
 	}
 	
-	/**
-	 * Do the test
-	 */
-	@Test
-	public void testServiceLifecycle(){
-		
-		// Check if we're going to use another JID
-		String ourJid = TestCase976.getCommManager().getIdManager().getThisNetworkNode().getJid();
-		LOG.error("[#976] Remote JID is " + REMOTEJID + " and local JID is " + ourJid);
-		
-		if(ourJid.equals(REMOTEJID)){
-			fail("Our JID is the Remote JID!");
-			return;
-		}
-		
-		// Now we can start!
-		LOG.info("[#796] Testing remote service lifecycle");
-		
-		try{
-		
-			testInstallService();
-			testStopService();
-			testStartService();
-			testUninstallService();
-			
-		} catch(Exception ex){
-			LOG.error("Error while running test: " + ex);
-			ex.printStackTrace();
-			fail("Exception occured");
-		}		
-	}
-
-	
 	private Service getServiceFromList(List<Service> resultList) {
-		if(LOG.isDebugEnabled()) LOG.debug("[]");
+		if(LOG.isDebugEnabled()) LOG.debug("[#976] Checking for Service...");
 		Service result = null;
 		
 		for(Service service : resultList){

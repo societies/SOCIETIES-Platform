@@ -120,7 +120,7 @@ public class NominalTestCaseUpperTester {
 				String serviceJid = service.getServiceInstance().getXMPPNode();
 				if(LOG.isDebugEnabled()) LOG.debug("[#728] Service " + service.getServiceName() + " has jid " + serviceJid);
 				Assert.assertEquals("[#728] Service JID is not the correct one!", REMOTEJID, serviceJid);
-				Assert.assertTrue(service.getServiceName().equals("Calculator") || service.getServiceName().equals("FortuneCookie"));
+				Assert.assertTrue(service.getServiceName().equals("Calculator Service") || service.getServiceName().equals("FortuneCookie Service"));
 			}
 			
 			

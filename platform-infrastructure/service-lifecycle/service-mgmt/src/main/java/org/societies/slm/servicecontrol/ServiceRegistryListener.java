@@ -181,14 +181,16 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		if(log.isDebugEnabled()){
 			log.debug("**Service MetadataModel Data Read**");
-			log.debug("**Service Name** : "+service.getServiceName());
-			log.debug("**Service Desc** : "+service.getServiceDescription());
-			log.debug("**Service type** : "+service.getServiceType().toString());
-			log.debug("**Service Location** : "+service.getServiceLocation().toString());
-			log.debug("**Service Endpoint** : "+service.getServiceEndpoint());
-			log.debug("**Service Provider** : "+service.getServiceInstance().getServiceImpl().getServiceProvider());
-			log.debug("**Service Namespace** : "+service.getServiceInstance().getServiceImpl().getServiceNameSpace());
-			log.debug("**Service Version** : "+service.getServiceInstance().getServiceImpl().getServiceVersion());
+			log.debug("Service Name: "+service.getServiceName());
+			log.debug("Service Description: "+service.getServiceDescription());
+			log.debug("Service type: "+service.getServiceType().toString());
+			log.debug("Service Location: "+service.getServiceLocation().toString());
+			log.debug("Service Endpoint: "+service.getServiceEndpoint());
+			log.debug("Service Provider: "+service.getServiceInstance().getServiceImpl().getServiceProvider());
+			log.debug("Service Namespace: "+service.getServiceInstance().getServiceImpl().getServiceNameSpace());
+			log.debug("Service Version: "+service.getServiceInstance().getServiceImpl().getServiceVersion());
+			log.debug("Service XMPPNode: "+service.getServiceInstance().getXMPPNode());
+			log.debug("Service FullJid: "+service.getServiceInstance().getFullJid());
 		}
 		
 		service.setServiceStatus(ServiceStatus.STARTED);
