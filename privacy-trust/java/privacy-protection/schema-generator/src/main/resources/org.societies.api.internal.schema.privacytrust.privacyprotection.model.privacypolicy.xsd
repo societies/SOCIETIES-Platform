@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" elementFormDefault="qualified"
+	targetNamespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
+	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
+	
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="responseItem">
+    <xs:sequence>
+      <xs:element name="decision" type="tns:decision" minOccurs="0"/>
+      <xs:element name="requestItem" type="tns:requestItem" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="requestItem">
+    <xs:sequence>
+      <xs:element name="actions" type="tns:action" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="conditions" type="tns:condition" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="optional" type="xs:boolean"/>
+      <xs:element name="resource" type="tns:resource" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="action">
+    <xs:sequence>
+      <xs:element name="actionConstant" type="tns:actionConstants" minOccurs="0"/>
+      <xs:element name="optional" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="condition">
+    <xs:sequence>
+      <xs:element name="conditionConstant" type="tns:conditionConstants" minOccurs="0"/>
+      <xs:element name="optional" type="xs:boolean"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resource">
+    <xs:sequence>
+      <xs:element name="contextType" type="xs:string" minOccurs="0"/>
+      <xs:element name="ctxUriIdentifier" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="actionConstants">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="READ"/>
+      <xs:enumeration value="WRITE"/>
+      <xs:enumeration value="CREATE"/>
+      <xs:enumeration value="DELETE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="decision">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PERMIT"/>
+      <xs:enumeration value="DENY"/>
+      <xs:enumeration value="INDETERMINATE"/>
+      <xs:enumeration value="NOT_APPLICABLE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="conditionConstants">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SHARE_WITH_3RD_PARTIES"/>
+      <xs:enumeration value="DATA_RETENTION_IN_SECONDS"/>
+      <xs:enumeration value="DATA_RETENTION_IN_MINUTES"/>
+      <xs:enumeration value="DATA_RETENTION_IN_HOURS"/>
+      <xs:enumeration value="RIGHT_TO_OPTOUT"/>
+      <xs:enumeration value="STORE_IN_SECURE_STORAGE"/>
+      <xs:enumeration value="RIGHT_TO_ACCESS_HELD_DATA"/>
+      <xs:enumeration value="RIGHT_TO_CORRECT_INCORRECT_DATA"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+
