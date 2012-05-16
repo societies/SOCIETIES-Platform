@@ -128,7 +128,7 @@ public class ICisProposal {
 		return description;
 	}
 	
-	/**
+	/**j
 	 * Set the proposed description for the CIS proposal.
 	 * 
 	 * @param String: the proposed description for the CIS proposal 
