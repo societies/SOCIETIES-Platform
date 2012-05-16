@@ -62,17 +62,17 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 	
 	@Before
 	public void setUp() {
-		LOG.info("[#755] NominalTestCaseLowerTester::setUp");
+		LOG.info("[#755] SpecificTestCaseUpperTester::setUp");
 
 		Future<CssInterfaceResult> interfaceResult = null;
 		//CssRecord profile = null;
 		
 		profile = createCSSRecord();
-		LOG.info("[#755] CSS Record: profile:" +profile);
+		LOG.info("[#755] SpecificTestCaseUpperTester CSS Record: profile:" +profile);
 
 			// -- Create the CSS Record
 		
-			LOG.info("[#755] Preamble: Create the CSS Record");
+			LOG.info("[#755] SpecificTestCaseUpperTester Preamble: Create the CSS Record");
 	}
 	
 	private CssRecord createCSSRecord() {
@@ -125,13 +125,13 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#755] tearDown");
+		LOG.info("[#755] SpecificTestCaseUpperTester tearDown");
 	}
 	
 	
 	@Test
 	public void bodyCreateNodetwice() {
-		LOG.info("[#755] create CSS Cloud Node");
+		LOG.info("[#755] SpecificTestCaseUpperTester create CSS Cloud Node");
 		String Name = null;
 		Name ="liam";
 		String compareName;
@@ -143,7 +143,7 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 		try {
 			cssDetails = TestCase755.cssRegistry.getCssRecord();
 		} catch (CssRegistrationException e) {
-			LOG.info("[#755] CssRegistrationException - Could not get the CSS Record from the CSS Registry");
+			LOG.info("[#755] SpecificTestCaseUpperTester CssRegistrationException - Could not get the CSS Record from the CSS Registry");
 			e.printStackTrace();
 		}
 		
@@ -151,20 +151,20 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 		
 		try {
 			Name = TestCase755.cssRegistry.getCssRecord().getName();
-			LOG.info("[#755] Name of CSS is .................:" +Name);
+			LOG.info("[#755] SpecificTestCaseUpperTester Name of CSS is .................:" +Name);
 		} catch (CssRegistrationException e) {
-			LOG.info("[#755] CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
+			LOG.info("[#755] SpecificTestCaseUpperTester CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
 			e.printStackTrace();
 		}
 		compareName = profile.getName();
 		assertEquals(Name, compareName);
-		LOG.info("[#755] create CSS Cloud Node END.................");
+		LOG.info("[#755] SpecificTestCaseUpperTester create CSS Cloud Node END.................");
 		interfaceResult = TestCase755.cssLocalManager.registerCSSNode(profile);
 	}
 	
 	@Test
 	public void bodydeleteNon_existnode() {
-		LOG.info("[#755] create CSS Cloud Node");
+		LOG.info("[#755] SpecificTestCaseUpperTester create CSS Cloud Node");
 		String Name = null;
 		Name ="liam";
 		String compareName;
@@ -176,7 +176,7 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 		try {
 			cssDetails = TestCase755.cssRegistry.getCssRecord();
 		} catch (CssRegistrationException e) {
-			LOG.info("[#755] CssRegistrationException - Could not get the CSS Record from the CSS Registry");
+			LOG.info("[#755] SpecificTestCaseUpperTester CssRegistrationException - Could not get the CSS Record from the CSS Registry");
 			e.printStackTrace();
 		}
 		
@@ -186,12 +186,12 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 			Name = TestCase755.cssRegistry.getCssRecord().getName();
 			LOG.info("[#755] Name of CSS is .................:" +Name);
 		} catch (CssRegistrationException e) {
-			LOG.info("[#755] CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
+			LOG.info("[#755] SpecificTestCaseUpperTester CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
 			e.printStackTrace();
 		}
 		compareName = profile.getName();
 		assertEquals(Name, compareName);
-		LOG.info("[#755] create CSS Cloud Node END.................");
+		LOG.info("[#755] SpecificTestCaseUpperTester create CSS Cloud Node END.................");
 		
 		TestCase755.cssLocalManager.unregisterCSSNode(cssDetails);
 	}

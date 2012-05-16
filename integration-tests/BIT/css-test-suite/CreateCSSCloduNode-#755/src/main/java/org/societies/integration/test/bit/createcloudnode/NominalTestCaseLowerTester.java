@@ -152,9 +152,12 @@ public class NominalTestCaseLowerTester {
 	public void bodyCreateNode() {
 		LOG.info("[#755] create CSS Cloud Node");
 		String Name = null;
-		Name ="liam";
+		Name ="Liam";
 		String compareName;
-		assertTrue(null != Name);
+		LOG.info("[#755] ######################## .................:" +Name);
+		LOG.info("[#755] ##########@@@@@@@@@@@@@@ .................:" +profile.getForeName());
+		assertTrue("Name".equals(profile.getForeName()));
+		assertFalse(null != Name);
 		
 		interfaceResult = TestCase755.cssLocalManager.registerCSSNode(profile);
 		assertNotNull(interfaceResult);
@@ -166,11 +169,11 @@ public class NominalTestCaseLowerTester {
 			e.printStackTrace();
 		}
 		
-		assertTrue(null != cssDetails);
+		assertFalse(null != cssDetails);
 		
 		try {
 			Name = TestCase755.cssRegistry.getCssRecord().getName();
-			LOG.info("[#755] Name of CSS is .................:" +Name);
+			LOG.info("[#755] &&&&&&&&&&&&&& fuck this shit Name of CSS is .................:" +Name);
 		} catch (CssRegistrationException e) {
 			LOG.info("[#755] CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
 			e.printStackTrace();
