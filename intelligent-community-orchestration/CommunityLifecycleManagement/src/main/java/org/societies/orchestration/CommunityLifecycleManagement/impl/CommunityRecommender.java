@@ -254,13 +254,13 @@ public class CommunityRecommender //implements ICommCallback
 			if (temp2.size() > 0)
 				temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
 		}
-		ArrayList<ArrayList<ICisProposal>> temp2 = cisPossibilities.get("Merge CISs");
+		temp2 = cisPossibilities.get("Merge CISs");
 		if (temp2 != null) {
 			if (temp2.size() > 0)
 				temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
 		}
 		
-		ArrayList<ArrayList<ICisProposal>> temp2 = cisPossibilities.get("Split CISs");
+		temp2 = cisPossibilities.get("Split CISs");
 		if (temp2 != null) {
 			if (temp2.size() > 0)
 				temp.put("Split CISs", cisPossibilities.get("Split CISs"));
