@@ -24,12 +24,22 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypolicy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -38,15 +48,28 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @date 5 déc. 2011
  */
 public class PrivacyPolicyManager implements IPrivacyPolicyManager {
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManager.class);
 
+	ICommManager commManager;
+	ICtxBroker ctxBroker;
+	PrivacyPolicyRegistryManager registryManager;
+
+	
+	public void init() {
+		registryManager = new PrivacyPolicyRegistryManager(ctxBroker);
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.identity.IIdentity)
 	 */
 	@Override
 	public RequestPolicy getPrivacyPolicy(IIdentity cisId)
 			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
+		IIdentity ownerId = commManager.getIdManager().getThisNetworkNode();
+		RequestorCis requestor = new RequestorCis(ownerId, cisId);
+		RequestPolicy privacyPolicy = registryManager.getPolicy(requestor);
+		return privacyPolicy;
 	}
 
 	/* (non-Javadoc)
@@ -55,8 +78,10 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	@Override
 	public RequestPolicy getPrivacyPolicy(ServiceResourceIdentifier serviceId)
 			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
+		IIdentity ownerId = commManager.getIdManager().getThisNetworkNode();
+		RequestorService requestor = new RequestorService(ownerId, serviceId);
+		RequestPolicy privacyPolicy = registryManager.getPolicy(requestor);
+		return privacyPolicy;
 	}
 
 	/* (non-Javadoc)
@@ -65,8 +90,9 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	@Override
 	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy)
 			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
+		Requestor requestor = privacyPolicy.getRequestor();
+		registryManager.addPolicy(requestor, privacyPolicy);
+		return privacyPolicy;
 	}
 
 	/* (non-Javadoc)
@@ -74,7 +100,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	 */
 	@Override
 	public boolean deletePrivacyPolicy(IIdentity cisId) throws PrivacyException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -88,13 +113,28 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * Try to infer a privacy policy a configuration map
+	 * At the moment it only returns an empty privacy policy
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#inferPrivacyPolicy(int, java.util.Map)
 	 */
 	@Override
 	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType,
 			Map configuration) throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
+		List<RequestItem> requests = new ArrayList<RequestItem>();
+		RequestPolicy privacyPolicy = new RequestPolicy(requests);
+		return privacyPolicy;
+	}
+	
+	
+	// -- Dependency Injection
+	
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+		LOG.info("[DependencyInjection] CommManager injected");
+	}
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+		LOG.info("[DependencyInjection] ICtxBroker injected");
 	}
 }

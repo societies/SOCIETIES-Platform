@@ -71,7 +71,11 @@
 	<!-- Privacy Policy Manager Configuration -->
 	
 	<bean name="PrivacyPolicyManager"
-		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager">
+		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager"
+		depends-on="ctxBorker"
+		init-method="init">
+		<property name="commManager" ref="CommManagerBundle"/>
+		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
 	
 	
