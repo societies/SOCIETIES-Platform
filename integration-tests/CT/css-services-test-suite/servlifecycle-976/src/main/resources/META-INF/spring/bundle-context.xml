@@ -22,10 +22,10 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="TestCase714" class="org.societies.integration.test.bit.startstop.TestCase714" init-method="run">
+  <bean id="TestCase976" class="org.societies.integration.test.ct.servicelifecycle.TestCase976" init-method="run">
 		<property name="serviceControl" ref="serviceControlBundle" />
 		<property name="serviceDiscovery" ref="serviceDiscoveryBundle" />
-		<property name="serviceRegistry" ref="serviceRegistryBundle" />
+		<property name="commManager" ref="commManagerBundle" />
   	</bean>
 
 </beans>

@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>bit-714-start-stop</artifactId>
-	<name>#714 Start-Stop Integration Test</name>
+	<artifactId>ct-976-servlifecycle</artifactId>
+	<name>#976 Remote Service Lifecycle</name>
 	<packaging>bundle</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 
