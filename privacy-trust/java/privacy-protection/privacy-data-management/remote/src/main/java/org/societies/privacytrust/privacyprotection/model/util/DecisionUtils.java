@@ -22,52 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper;
+package org.societies.privacytrust.privacyprotection.model.util;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 
 /**
- * Utilities to instantiate DataWrapper for data obfuscation
- * @state skeleton 
- * @author olivierm
- * @date 14 oct. 2011
+ * @author Olivier Maridat (Trialog)
  */
-public class DataWrapperFactory {
-	// -- CONTEXT ATTRIBUTE
-	/**
-	 * To select automatically the relevant DataWrapper
-	 * for this ContextAttribute
-	 * 
-	 * @param contextData
-	 * @return A relevant DataWrapper
-	 * @throw RuntimeException
-	 */
-	public static IDataWrapper selectDataWrapper(Object contextData) throws RuntimeException{
-		// TODO : populate this stub function
-		try {
-			if (contextData.equals("A Data Type")) {
-//				return new [A Data Type]Wrapper(data);
-			}
-			// TODO STUB RETURN, TO BE REMOVED
-			return new SampleWrapper(3);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("No Obfuscator to obfuscate that type of data");
+public class DecisionUtils {
+	public static Decision toDecision(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision decisionBean)
+	{
+		if (null == decisionBean) {
+			return null;
 		}
-//		throw new RuntimeException("No Obfuscator to obfuscate that type of data");
+		return Decision.valueOf(decisionBean.name());
+	}
+	public static List<Decision> toDecisions(List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision> decisionBeans)
+	{
+		if (null == decisionBeans) {
+			return null;
+		}
+		List<Decision> decisions = new ArrayList<Decision>();
+		for(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision decisionBean : decisionBeans) {
+			decisions.add(DecisionUtils.toDecision(decisionBean));
+		}
+		return decisions;
 	}
 	
-//	// -- GEOLOCATION
-//	/**
-//	 * To get a GeolocaltionDataWrapper
-//	 * The persistence is disabled by default, the obfuscated geolocation will not
-//	 * be stored after obfuscation.
-//	 * @param latitude Latitude
-//	 * @param longitude Longitude
-//	 * @param accuracy Accuracy in meters
-//	 * @return A GeolocationDataWrapper
-//	 */
-//	public static GeolocationDataWrapper getGeolocationDataWrapper(double latitude, double longitude, double accuracy) {
-//		return new GeolocationDataWrapper(latitude, longitude, accuracy);
-//	}
+	public static org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision toDecisionBean(Decision decision)
+	{
+		if (null == decision) {
+			return null;
+		}
+		return org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision.valueOf(decision.name());
+	}
+	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision> toDecisionBeans(List<Decision> decisions)
+	{
+		if (null == decisions) {
+			return null;
+		}
+		List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision> decisionBeans = new ArrayList<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision>();
+		for(Decision decision : decisions) {
+			decisionBeans.add(DecisionUtils.toDecisionBean(decision));
+		}
+		return decisionBeans;
+	}
 }

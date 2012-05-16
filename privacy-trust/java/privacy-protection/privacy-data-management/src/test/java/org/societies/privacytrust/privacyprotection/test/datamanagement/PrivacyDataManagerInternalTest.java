@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +38,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
@@ -45,6 +47,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager;
+import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -58,11 +62,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 // Run this test case using Spring jUnit
 @RunWith(SpringJUnit4ClassRunner.class)
 // Search context configuration file in classpath:<ClassName>-context.xml
-@ContextConfiguration
+@ContextConfiguration(locations = { "PrivacyDataManagerInternalTest-context.xml" })
 public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger log = LoggerFactory.getLogger(PrivacyDataManagerInternalTest.class.getSimpleName());
 	
 	@Autowired
+	SessionFactory sessionFactory;
 	IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
 	/**
@@ -70,7 +75,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	 */
 	@Before
 	public void setUp() throws Exception {
-//		privacyDataManagerInternal = new PrivacyDataManagerInternal();
+		privacyDataManagerInternal = new PrivacyDataManagerInternal(sessionFactory);
 	}
 
 	/**
@@ -208,19 +213,9 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	}
 
 	
-	/**
-	 * @return the privacyDataManagerInternal
-	 */
-	public IPrivacyDataManagerInternal getPrivacyDataManagerInternal() {
-		return privacyDataManagerInternal;
-	}
-
-	/**
-	 * @param privacyDataManagerInternal the privacyDataManagerInternal to set
-	 */
-	public void setPrivacyDataManagerInternal(
-			IPrivacyDataManagerInternal privacyDataManagerInternal) {
-		log.info("privacyDataManagerInternal injected");
-		this.privacyDataManagerInternal = privacyDataManagerInternal;
+	public void setSessionFactory(
+			SessionFactory sessionFactory) {
+		log.info("sessionFactory injected");
+		this.sessionFactory = sessionFactory;
 	}
 }

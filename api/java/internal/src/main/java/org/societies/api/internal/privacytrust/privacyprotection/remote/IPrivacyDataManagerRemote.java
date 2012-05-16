@@ -48,7 +48,7 @@ public interface IPrivacyDataManagerRemote {
 	 * @param action Action requested over this data.
 	 * @param listener The callback object
 	 */
-	public void checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action, IPrivacyDataManagerListener listener);
+	public void checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action, IPrivacyDataManagerListener listener) throws PrivacyException;
 
 	/**
 	 * Remote call to protect a data following the user preferences by obfuscating it to a correct
