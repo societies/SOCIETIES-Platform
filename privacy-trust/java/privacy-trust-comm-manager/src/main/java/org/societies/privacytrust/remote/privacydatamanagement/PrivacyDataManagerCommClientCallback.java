@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.privacydatamanagement.remote;
+package org.societies.privacytrust.remote.privacydatamanagement;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,16 +38,16 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ResponseItemUtils;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
-import org.societies.privacytrust.privacyprotection.model.util.ResponseItemUtils;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class CommsClientCallback implements ICommCallback {
-	private static Logger LOG = LoggerFactory.getLogger(CommsClientCallback.class);
+public class PrivacyDataManagerCommClientCallback implements ICommCallback {
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerCommClientCallback.class);
 	
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement",
@@ -62,7 +62,7 @@ public class CommsClientCallback implements ICommCallback {
 	public Map<String, IDataObfuscationListener> dataObfuscationlisteners;
 
 
-	public CommsClientCallback() {
+	public PrivacyDataManagerCommClientCallback() {
 		privacyDataManagerlisteners = new HashMap<String, IPrivacyDataManagerListener>();
 		dataObfuscationlisteners = new HashMap<String, IDataObfuscationListener>();
 	}

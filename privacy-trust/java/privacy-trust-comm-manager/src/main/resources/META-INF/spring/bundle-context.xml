@@ -11,23 +11,60 @@
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
 	xmlns:tx="http://www.springframework.org/schema/tx">
 
+	
+
+	<!-- Global configuration -->
+	
+	<!-- Required for Async processing -->
+	<tx:annotation-driven />
+	
+	<bean name="PrivacyTrustCommServer"
+		class="org.societies.privacytrust.remote.PrivacyTrustCommServer"
+		depends-on="commManager"
+		init-method="initService">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyDataManagerCommServer" ref="PrivacyDataManagerCommServer" />
+	</bean>
+	
+	
+	
+
 	<!-- Privacy Data Management Configuration -->
-	<bean name="PrivacyDataManagerRemote"
-		class="org.societies.privacytrust.privacyprotection.privacydatamanagement.remote.CommsClient"
-		depends-on="commManager" 
-		init-method="InitService">
+
+	<bean name="PrivacyDataManagerCommClient"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClient"
+		depends-on="commManager"
+		init-method="initBean">
 		<property name="commManager" ref="commManager" />
 	</bean>
 
-	<bean name="PrivacyDataManagerRemoteServer"
-		class="org.societies.privacytrust.privacyprotection.privacydatamanagement.remote.CommsServer"
-		depends-on="commManager, privacyDataManager" 
-		init-method="InitService">
+	<bean name="PrivacyDataManagerCommServer"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer"
+		depends-on="commManager, privacyDataManager">
 		<property name="commManager" ref="commManager" />
 		<property name="privacyDataManager" ref="privacyDataManager" />
 	</bean>
 
-	<!-- Required for Async processing -->
-	<tx:annotation-driven />
+
+
+	<!-- Privacy Policy Management Configuration -->
+
+
+
+	<!-- Privacy Preference Management Configuration -->
+
+
+
+	<!-- Privacy Policy Negotiation Management Configuration -->
+
+
+
+	<!-- Privacy Assessment Management Configuration -->
+
+
+
+	<!-- Trust Management Configuration -->
+
+
 
 </beans>

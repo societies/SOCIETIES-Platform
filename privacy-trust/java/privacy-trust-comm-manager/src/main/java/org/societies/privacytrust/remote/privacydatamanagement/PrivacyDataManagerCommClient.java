@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.privacydatamanagement.remote;
+package org.societies.privacytrust.remote.privacydatamanagement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,34 +38,40 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.listener.
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ActionUtils;
+import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
-import org.societies.privacytrust.privacyprotection.model.util.ActionUtils;
 /**
  * Comms Client that initiates the remote communication
  *
  * @author Olivier Maridat (Trialog)
  *
  */
-//public class CommsClient implements IPrivacyDataManagerRemote, ICommCallback{
-public class CommsClient implements IPrivacyDataManagerRemote {
-	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
+public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerCommClient.class);
 	
 	private ICommManager commManager;
-	private CommsClientCallback listeners;
+	private PrivacyDataManagerCommClientCallback listeners;
 
-	public CommsClient() {	
+	public PrivacyDataManagerCommClient() {	
 	}
 
-	public void InitService() {
-		listeners = new CommsClientCallback();
-		LOG.info("init(): commMgr = {}", commManager.toString());
-		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
+	/**
+	 * Register the listener to the Societies Communication Manager
+	 * Entry point of the PrivacyDataManagerCommClient
+	 */
+	public void initBean() {
+		LOG.info("initBean(): commMgr = {}", commManager.toString());
+		
 		try {
+			// Create listener
+			listeners = new PrivacyDataManagerCommClientCallback();
+			// Register to the Societies Comm Manager
 			commManager.register(listeners);
-			LOG.info("init(): listeners is commManager registered");
+			LOG.info("initBean(): PrivacyDataManagerCommClientCallback registered to the Societies Comm Manager");
 		} catch (CommunicationException e) {
-			LOG.error("init(): ", e);
+			LOG.error("initBean(): ", e);
 		}
 	}
 
@@ -126,11 +132,11 @@ public class CommsClient implements IPrivacyDataManagerRemote {
 	}
 
 	
-	public ICommManager getCommManager() {
-		return commManager;
-	}
+	
+	// -- Dependency Injection
+	
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("#### CommManager injected");
+		LOG.info("[DependencyInjection] CommManager injected");
 	}
 }

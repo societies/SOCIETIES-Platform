@@ -22,24 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.model.util;
+package org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 
 /**
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class ResourceUtils {
-	private static Logger log = LoggerFactory.getLogger(ResourceUtils.class);
-	
 	public static Resource toResource(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resourceBean)
 	{
 		if (null == resourceBean) {
@@ -49,7 +46,6 @@ public class ResourceUtils {
 		try {
 			resource = new Resource((CtxAttributeIdentifier) CtxIdentifierFactory.getInstance().fromString(resourceBean.getCtxUriIdentifier()));
 		} catch (MalformedCtxIdentifierException e) {
-			log.error("Malformed ContexteAttributeIdentifier "+resourceBean.getCtxUriIdentifier(), e);
 			return null;
 		}
 		return resource;

@@ -28,11 +28,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.privacytrust.privacyprotection</groupId>
-	<artifactId>privacydatamanagementremote</artifactId>
-	<name>Privacy Data Management Remote</name>
+	<groupId>org.societies.privacytrust</groupId>
+	<artifactId>privacytrustcommmanagement</artifactId>
+	<name>Privacy and trust Communication Management</name>
 	<packaging>bundle</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>${version.pt}</version>
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>
@@ -132,10 +132,10 @@
 					</instructions>
 				</configuration>
 			</plugin>
-			<!-- <plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
-			</plugin> -->
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>

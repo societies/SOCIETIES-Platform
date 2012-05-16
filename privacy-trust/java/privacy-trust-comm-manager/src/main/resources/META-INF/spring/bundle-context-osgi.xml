@@ -4,14 +4,41 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-	<osgi:service ref="PrivacyDataManagerRemote"
-		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote" />
-		
-	
-	<osgi:reference id="privacyDataManager"
-		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager" />
-		
+	<!-- Common Configuration -->
+
 	<osgi:reference id="commManager"
 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />
-	
+
+
+
+	<!-- Privacy Data Management Configuration -->
+
+	<osgi:service ref="PrivacyDataManagerCommClient"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote" />
+
+	<osgi:reference id="privacyDataManager"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager" />
+
+
+	<!-- Privacy Policy Management Configuration -->
+
+
+
+	<!-- Privacy Preference Management Configuration -->
+
+
+
+	<!-- Privacy Policy Negotiation Management Configuration -->
+
+
+
+	<!-- Privacy Assessment Management Configuration -->
+
+
+
+	<!-- Trust Management Configuration -->
+
+
+
+
 </beans>
