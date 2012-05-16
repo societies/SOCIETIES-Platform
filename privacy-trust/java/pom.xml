@@ -28,11 +28,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.privacytrust.privacyprotection</groupId>
-	<artifactId>builder</artifactId>
-	<name>Privacy Protection Builder</name>
+	<groupId>org.societies</groupId>
+	<artifactId>privacytrust</artifactId>
+	<name>Privacy and Trust Builder</name>
 	<packaging>pom</packaging>
-	<version>${version.pt}</version>
+	<version>1</version>
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>
@@ -46,22 +46,15 @@
 		</developer>
 	</developers>
 
-	<!-- All builder projects should inherit from version-parent -->
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>version-parent</artifactId>
 		<version>0.1</version>
 	</parent>
-	
+
 	<modules>
-		<module>api</module>
-		<module>identity-selection</module>
-		<module>privacy-data-management</module>
-		<module>privacy-policy-management</module>
-		<module>privacy-preference-management</module>
-		<module>privacy-negotiation-management</module>
-		<module>assessment</module>
-		<module>privacy-protection-bundle</module>
-		<module>privacy-protection-bundle-test</module>
+		<module>privacy-protection</module>
+		<module>trust</module>
+		<module>privacy-trust-comm-manager</module>
 	</modules>
 </project>
