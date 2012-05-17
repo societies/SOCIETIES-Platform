@@ -41,7 +41,10 @@
 		</property>
 		
 		<property name="eventListeners">
-			<map>  
+			<map>
+				<entry key="post-insert">
+					<bean class="org.societies.privacytrust.trust.impl.common.hibernate.event.PostInsertEventUserListener" />
+				</entry>
 				<entry key="post-update">
 					<bean class="org.societies.privacytrust.trust.impl.common.hibernate.event.PostUpdateEventUserListener" />
 				</entry>

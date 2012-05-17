@@ -24,30 +24,23 @@
  */
 package org.societies.privacytrust.trust.api.event;
 
+import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
+
 /**
- * The constants of this type specify the topic name of a trust event.
- * The following names have been identified:
- * <ul>
- * <li>{@link #USER_PERCEIVED_TRUST_UPDATED}: User-perceived trust update event</li>
- * </ul>
+ * An interface that must be implemented by a component that wants to be
+ * notified whenever the trust evidence is updated.  
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 0.0.8
  */
-public class TrustEventTopic {
-
-	private static final String BASE_TOPIC = "org/societies/privacytrust/trust/event/"; 
+public interface ITrustEvidenceUpdateEventListener extends ITrustEventListener {
 	
-	public static final String DIRECT_TRUST_UPDATED = BASE_TOPIC + "DIRECT_TRUST_UPDATED";
-	
-	public static final String INDIRECT_TRUST_UPDATED = BASE_TOPIC + "INDIRECT_TRUST_UPDATED";
-	
-	public static final String USER_PERCEIVED_TRUST_UPDATED = BASE_TOPIC + "USER-PERCEIVED_TRUST_UPDATED";
-	
-	public static final String DIRECT_TRUST_EVIDENCE_UPDATED = BASE_TOPIC + "DIRECT_TRUST_EVIDENCE_UPDATED";
-	
-	public static final String INDIRECT_TRUST_EVIDENCE_UPDATED = BASE_TOPIC + "INDIRECT_TRUST_EVIDENCE_UPDATED";
-	
-	/* Prevents instantiation */
-	private TrustEventTopic() {}
+	/**
+	 * Notifies registered listeners that the trust evidence is updated.
+	 * 
+	 * @param evt
+	 *            the <code>TrustEvidenceUpdateEvent</code> object describing
+	 *            the event source.
+	 */
+	public void onUpdate(TrustEvidenceUpdateEvent evt);
 }

@@ -55,6 +55,8 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(PostUpdateEventUserListener.class);
 	
+	private static final String EVENT_SOURCE = "TrustRepository"; 
+	
 	private static final Map<String, String> TRUST_PROPERTY_MAP;
     
 	static {
@@ -66,6 +68,7 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
         TRUST_PROPERTY_MAP = Collections.unmodifiableMap(aMap);
     }
 	
+	/** The Trust Event Mgr service reference. */
 	@Autowired
 	private ITrustEventMgr trustEventMgr;
 
@@ -102,7 +105,8 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	            	if (LOG.isDebugEnabled())
 	            		LOG.debug("Posting TrustUpdateEvent " + trustUpdateEvent
 	            				+ " to topic '" + TRUST_PROPERTY_MAP.get(propName) + "'");
-	            	// TODO this.trustEventMgr.postEvent(event, topics, source);
+	            	// TODO this.trustEventMgr.postEvent(trustUpdateEvent, 
+	            	// 		new String[] { TRUST_PROPERTY_MAP.get(propName) }, EVENT_SOURCE);
 	            }
 	        }
 		}
