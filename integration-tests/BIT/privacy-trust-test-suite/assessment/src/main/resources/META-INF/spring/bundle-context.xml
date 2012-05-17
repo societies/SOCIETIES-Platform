@@ -21,7 +21,7 @@
 
     <bean
         id="TestCase000"
-        class="org.societies.integration.test.bit.assessment.TestCase000"
+        class="org.societies.integration.test.bit.assessment.TestCase1055"
 		depends-on="PrivacyLogAppender"
         init-method="run">
   		<property name="privacyLogAppender" ref="PrivacyLogAppender"/>

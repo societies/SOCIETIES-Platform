@@ -79,16 +79,16 @@ public class NominalTestCaseLowerTester {
 	}
 
 	@Test
-	public void testSpeedOfExecution() throws InterruptedException {
+	public void testSpeedOfExecution() {
 		
 		LOG.info("[#1055] testSpeedOfExecution()");
 
-		IIdentity owner = new IdentityImpl("owner-1@a.com");
-		IIdentity requestorId = new IdentityImpl("requestor-1@a.com");
+		IIdentity owner = new IdentityImpl("owner.a@a.com");
+		IIdentity requestorId = new IdentityImpl("requestor.a@a.com");
 		Requestor requestor = new Requestor(requestorId);
 		
-		IIdentity fromIdentity = new IdentityImpl("from-1@a.com");
-		IIdentity toIdentity = new IdentityImpl("to-1@a.com");
+		IIdentity fromIdentity = new IdentityImpl("from.a@a.com");
+		IIdentity toIdentity = new IdentityImpl("to.a@a.com");
 		Object payload = "dada";
 		
 		Calendar cal = Calendar.getInstance();
