@@ -157,7 +157,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 				-1,
 				ChannelType.XMPP);
 		
-		privacyLog.getDataTransmission().add(logEntry);
+		privacyLog.append(logEntry);
 		
 		return true;
 	}
@@ -207,7 +207,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("log(DataTransmissionLogEntry)");
 
-		privacyLog.getDataTransmission().add(entry);
+		privacyLog.append(entry);
 
 		return true;
 	}
