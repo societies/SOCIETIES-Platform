@@ -33,6 +33,7 @@
 		<property name="commManager" ref="commManager" />
 		<property name="privacyDataManagerCommServer" ref="PrivacyDataManagerCommServer" />
 		<property name="privacyNegotiationManagerCommServer" ref="PrivacyNegotiationManagerCommServer" />
+		<property name="trustBrokerCommServer" ref="TrustBrokerCommServer" />
 	</bean>
 	
 	
@@ -93,6 +94,29 @@
 
 	<!-- Trust Management Configuration -->
 
-
+	<bean name="TrustBrokerCommClient"
+		class="org.societies.privacytrust.remote.trust.TrustBrokerCommClient"
+		depends-on="commManager">
+<!--	
+		depends-on="commManager, PrivacyDataManagerCommClientCallback, PrivacyTrustCommClientCallback">  
+-->
+		
+		<property name="commManager" ref="commManager" />
+<!--
+		<property name="listeners" ref="PrivacyDataManagerCommClientCallback" />
+		<property name="privacyTrustCommClientCallback" ref="PrivacyTrustCommClientCallback" />
+-->
+	</bean>
+<!-- 	
+	<bean name="PrivacyDataManagerCommClientCallback"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback">
+	</bean>
+-->
+	<bean name="TrustBrokerCommServer"
+		class="org.societies.privacytrust.remote.trust.TrustBrokerCommServer"
+		depends-on="commManager, trustBroker">
+		<property name="commManager" ref="commManager" />
+		<property name="trustBroker" ref="trustBroker" />
+	</bean>
 
 </beans>
