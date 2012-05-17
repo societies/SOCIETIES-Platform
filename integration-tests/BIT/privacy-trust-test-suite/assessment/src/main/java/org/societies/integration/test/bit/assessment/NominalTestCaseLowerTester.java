@@ -23,7 +23,7 @@ public class NominalTestCaseLowerTester {
 	
 	private static Logger LOG = LoggerFactory.getLogger(NominalTestCaseLowerTester.class);
 
-	private static final long PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS = 100;
+	private static final long PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS = 200;
 	
 	private static IPrivacyLogAppender privacyLogAppender;
 	
@@ -89,27 +89,30 @@ public class NominalTestCaseLowerTester {
 		IIdentity toIdentity = new MockIdentity("to.a@a.com");
 		Object payload = "dada";
 		
-		Calendar cal = Calendar.getInstance();
 		long start;
 		long end;
+		long dt;
 		
-		start = cal.getTimeInMillis();
+		start = Calendar.getInstance().getTimeInMillis();
 		privacyLogAppender.logContext(requestor, owner);
-		end = cal.getTimeInMillis();
-		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + (end - start) + " ms");
-		assertTrue(end - start < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
+		end = Calendar.getInstance().getTimeInMillis();
+		dt = end - start;
+		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + dt + " ms");
+		assertTrue(dt < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
-		start = cal.getTimeInMillis();
+		start = Calendar.getInstance().getTimeInMillis();
 		privacyLogAppender.logContext(requestor, owner, 6543);
-		end = cal.getTimeInMillis();
-		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + (end - start) + " ms");
-		assertTrue(end - start < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
+		end = Calendar.getInstance().getTimeInMillis();
+		dt = end - start;
+		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + dt + " ms");
+		assertTrue(dt < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
-		start = cal.getTimeInMillis();
+		start = Calendar.getInstance().getTimeInMillis();
 		privacyLogAppender.logCommsFw(fromIdentity, toIdentity, payload);
-		end = cal.getTimeInMillis();
-		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + (end - start) + " ms");
-		assertTrue(end - start < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
+		end = Calendar.getInstance().getTimeInMillis();
+		dt = end - start;
+		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + dt + " ms");
+		assertTrue(dt < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
 		LOG.info("[#1055] testSpeedOfExecution(): FINISHED");
 	}
