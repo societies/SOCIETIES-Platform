@@ -46,6 +46,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiat
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer;
 import org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer;
+import org.societies.privacytrust.remote.trust.TrustBrokerCommServer;
 
 
 public class PrivacyTrustCommServer implements IFeatureServer {
@@ -56,18 +57,20 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
 					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
-			  		"http://societies.org/api/schema/servicelifecycle/model"));
+			  		"http://societies.org/api/schema/servicelifecycle/model",
+			  		"http://societies.org/api/internal/schema/privacytrust/trust/model"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
 					"org.societies.api.schema.identity",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation",
-			  		"org.societies.api.schema.servicelifecycle.model"));
+			  		"org.societies.api.schema.servicelifecycle.model",
+			  		"org.api.internal.schema.privacytrust.trust.model"));
 
 	private ICommManager commManager;
 	private PrivacyDataManagerCommServer privacyDataManagerCommServer;
 	private PrivacyNegotiationManagerCommServer privacyNegotiationManagerCommServer;
-
+	private TrustBrokerCommServer trustBrokerCommServer;
 	
 	public PrivacyTrustCommServer() {
 	}
@@ -116,7 +119,8 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		// -- Assessment Management
 
 		// -- Trust Management
-
+		// TODO
+		
 		return null;
 	}
 	
@@ -190,8 +194,11 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		this.privacyNegotiationManagerCommServer = privacyNegotiationManagerCommServer;
 		LOG.info("[DependencyInjection] PrivacyNegotiationManagerCommServer injected");
 	}
-
 	
+	public void setTrustBrokerCommServer(TrustBrokerCommServer trustBrokerCommServer) {
+		this.trustBrokerCommServer = trustBrokerCommServer;
+		LOG.info("[DependencyInjection] TrustBrokerCommServer injected");
+	}
 
 	// -- Getters / Setters
 	

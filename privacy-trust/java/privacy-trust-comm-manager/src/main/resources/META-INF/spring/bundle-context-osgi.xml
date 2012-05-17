@@ -43,8 +43,7 @@
 
 
 	<!-- Trust Management Configuration -->
-
-
-
+	<osgi:reference id="trustBroker"
+		interface="org.societies.api.internal.privacytrust.trust.ITrustBroker" cardinality="0..1" />
 
 </beans>

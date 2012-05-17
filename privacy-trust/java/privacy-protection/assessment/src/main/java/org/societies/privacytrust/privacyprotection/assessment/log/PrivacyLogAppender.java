@@ -139,25 +139,25 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logCommsFw()");
 
-//		String dataType;
-//		String invokerClass = "";  // FIXME
-//		
-//		if (payload != null) {
-//			dataType = payload.getClass().getSimpleName();
-//		}
-//		else {
-//			dataType = null;
-//		}
-//		DataTransmissionLogEntry logEntry = new DataTransmissionLogEntry(
-//				dataType,
-//				new Date(),
-//				receiver,
-//				sender,
-//				invokerClass,
-//				-1,
-//				ChannelType.XMPP);
-//		
-//		privacyLog.getDataTransmission().add(logEntry);
+		String dataType;
+		String invokerClass = "";  // FIXME
+		
+		if (payload != null) {
+			dataType = payload.getClass().getSimpleName();
+		}
+		else {
+			dataType = null;
+		}
+		DataTransmissionLogEntry logEntry = new DataTransmissionLogEntry(
+				dataType,
+				new Date(),
+				receiver,
+				sender,
+				invokerClass,
+				-1,
+				ChannelType.XMPP);
+		
+		privacyLog.append(logEntry);
 		
 		return true;
 	}
@@ -167,11 +167,11 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logContext()");
 		
-//		String invokerClass = "";  // FIXME
-//		
-//		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-//				new Date(), requestor.getRequestorId(), invokerClass, owner, -1);
-//		privacyLog.getDataAccess().add(logEntry);
+		String invokerClass = "";  // FIXME
+		
+		DataAccessLogEntry logEntry = new DataAccessLogEntry(
+				new Date(), requestor.getRequestorId(), invokerClass, owner, -1);
+		privacyLog.getDataAccess().add(logEntry);
 	}
 
 	@Override
@@ -179,11 +179,11 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logContext({})", dataSize);
 		
-//		String invokerClass = "";  // FIXME
-//		
-//		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-//				new Date(), requestor.getRequestorId(), invokerClass, owner, dataSize);
-//		privacyLog.getDataAccess().add(logEntry);
+		String invokerClass = "";  // FIXME
+		
+		DataAccessLogEntry logEntry = new DataAccessLogEntry(
+				new Date(), requestor.getRequestorId(), invokerClass, owner, dataSize);
+		privacyLog.getDataAccess().add(logEntry);
 	}
 
 	/* (non-Javadoc)
@@ -207,7 +207,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("log(DataTransmissionLogEntry)");
 
-		privacyLog.getDataTransmission().add(entry);
+		privacyLog.append(entry);
 
 		return true;
 	}
