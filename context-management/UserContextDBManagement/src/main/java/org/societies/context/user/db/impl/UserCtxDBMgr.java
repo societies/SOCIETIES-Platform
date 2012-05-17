@@ -49,6 +49,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.context.model.util.SerialisationHelper;
 
 import org.societies.context.api.event.CtxChangeEventTopic;
@@ -76,18 +77,35 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
+	private final IIdentityManager idm;
+	
 	private final IIdentity privateId;
 	
 	// TODO Remove and instantiate privateId properly so that privateId.toString() can be used instead
 	private final String privateIdtoString = "myFooIIdentity@societies.local";
 	
+	@Autowired(required=true)
+	UserCtxDBMgr (IIdentityManager idm) {
+
+		LOG.info(this.getClass() + " instantiated");
+		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
+		
+		this.idm = idm;
+		privateId = idm.getThisNetworkNode();
+		
+	}
+
+	/*
+	 * Used for JUnit testing only
+	 */
 	public UserCtxDBMgr() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		LOG.info(this.getClass() + " instantiated - fooId");
 		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
 		
 		// TODO !!!!!! Identity should be instantiated properly
 		this.privateId = null;
+		this.idm = null;
 	}
 
 	/*
@@ -100,8 +118,17 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
-		final CtxAssociationIdentifier identifier = new CtxAssociationIdentifier(this.privateIdtoString, 
+		final CtxAssociationIdentifier identifier;
+		
+		if (this.idm != null) {
+			identifier = new CtxAssociationIdentifier(this.privateId.getJid(), 
+					type, CtxModelObjectNumberGenerator.getNextValue());
+		}
+		else {
+			identifier = new CtxAssociationIdentifier(this.privateIdtoString, 
 				type, CtxModelObjectNumberGenerator.getNextValue());
+		}
+		
 		final CtxAssociation association = new  CtxAssociation(identifier);
 		this.modelObjects.put(association.getId(), association);		
 
@@ -163,8 +190,17 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Override
 	public CtxEntity createEntity(String type) throws CtxException {
 
-		final CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateIdtoString, 
-				type, CtxModelObjectNumberGenerator.getNextValue());
+		final CtxEntityIdentifier identifier;
+		
+		if (this.idm != null) {
+			identifier = new CtxEntityIdentifier(this.privateId.getJid(), 
+					type, CtxModelObjectNumberGenerator.getNextValue());
+		}
+		else {
+			identifier = new CtxEntityIdentifier(this.privateIdtoString, 
+					type, CtxModelObjectNumberGenerator.getNextValue());
+		}
+
 		final CtxEntity entity = new  CtxEntity(identifier);
 		this.modelObjects.put(entity.getId(), entity);		
 
@@ -188,8 +224,17 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Override
 	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException {
 
-		CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateIdtoString,
-				type, CtxModelObjectNumberGenerator.getNextValue());
+		CtxEntityIdentifier identifier;
+		
+		if (this.idm != null) {
+			identifier = new CtxEntityIdentifier(this.privateId.getJid(),
+					type, CtxModelObjectNumberGenerator.getNextValue());	
+		}
+		else {
+			identifier = new CtxEntityIdentifier(this.privateIdtoString,
+					type, CtxModelObjectNumberGenerator.getNextValue());			
+		}
+		
 		IndividualCtxEntity entity = new IndividualCtxEntity(identifier);
 		this.modelObjects.put(entity.getId(), entity);
 
