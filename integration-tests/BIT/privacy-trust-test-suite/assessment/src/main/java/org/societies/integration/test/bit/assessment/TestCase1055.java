@@ -29,7 +29,7 @@ public class TestCase1055 extends IntegrationTestCase {
 	}
 
 	public void setPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender) {
-		LOG.debug("[#1055] setNegotiator()");
+		LOG.debug("[#1055] setPrivacyLogAppender()");
 		TestCase1055.privacyLogAppender = privacyLogAppender;
 	}
 	
