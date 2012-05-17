@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" 
+           targetNamespace="http://societies.org/api/internal/schema/privacytrust/trust/model"   
+           xmlns:tns="http://societies.org/api/internal/schema/privacytrust/trust/model"   
+           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="trustedEntityIdBean">
+    <xs:sequence>
+      <xs:element name="trustorId" type="xs:string" nillable="false"/>
+      <xs:element name="entityType" type="tns:trustedEntityTypeBean" nillable="false"/>
+      <xs:element name="trusteeId" type="xs:string" nillable="false"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="trustedEntityTypeBean">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CSS"/>
+      <xs:enumeration value="CIS"/>
+      <xs:enumeration value="SVC"/>
+      <xs:enumeration value="DVP"/>
+      <xs:enumeration value="LGC"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+</xs:schema>

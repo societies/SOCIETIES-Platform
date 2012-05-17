@@ -34,6 +34,54 @@ public class CtxAttributeTypes {
 
 	/**
      * 
+     * @since 0.0.8
+     */
+    public static final String ADDRESS_HOME_CITY = "addressHomeCity";
+    
+    /**
+     * 
+     * @since 0.0.8
+     */
+    public static final String ADDRESS_HOME_COUNTRY = "addressHomeCountry";
+	
+	/**
+     * 
+     * @since 0.0.8
+     */
+    public static final String ADDRESS_HOME_STREET_NAME = "addressHomeStreetName";
+    
+    /**
+     * 
+     * @since 0.0.8
+     */
+    public static final String ADDRESS_HOME_STREET_NUMBER = "addressHomeStreetNumber";
+    
+    /**
+     * 
+     * @since 0.0.8
+     */
+    public static final String ADDRESS_WORK_CITY = "addressWorkCity";
+    
+    /**
+     * 
+     * @since 0.0.8
+     */
+    public static final String ADDRESS_WORK_COUNTRY = "addressWorkCountry";
+	
+	/**
+     * 
+     * @since 0.0.8
+     */
+    public static final String ADDRESS_WORK_STREET_NAME = "addressWorkStreetName";
+    
+    /**
+     * 
+     * @since 0.0.8
+     */
+    public static final String ADDRESS_WORK_STREET_NUMBER = "addressWorkStreetNumber";
+	
+	/**
+     * 
      */
     public static final String ID = "id";
     
@@ -54,6 +102,18 @@ public class CtxAttributeTypes {
     
     /**
      * 
+     * @since 0.0.8
+     */
+    public static final String NAME_FIRST = "nameFirst";
+    
+    /**
+     * 
+     * @since 0.0.8
+     */
+    public static final String NAME_LAST = "nameLast";
+    
+    /**
+     * 
      */
     public static final String STATUS = "status";
     
@@ -68,18 +128,21 @@ public class CtxAttributeTypes {
     public static final String ACTION = "action";
    
     /**
-     * 
+     * TODO move to platform CtxAttributeTypes
      */
+    @Deprecated
     public static final String PRIVACY_POLICY_REGISTRY = "privacyPolicyRegistry";
    
     /**
-     * 
+     * TODO move to platform CtxAttributeTypes
      */
+    @Deprecated
     public static final String CAUI_MODEL = "caui_model";
     
     /**
-     * 
+     * TODO move to platform CtxAttributeTypes
      */
+    @Deprecated
     public static final String CRIST_MODEL = "crist_model";
        
     /**

@@ -31,6 +31,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
@@ -95,8 +97,9 @@ public class MergingManager implements IC45Consumer{
 		try{
 			logging.debug(this.getClass().getName()+ " received C45Output! size of list:" +list.size());
 			for (IC45Output output : list){
-
+				
 				IIdentity identity = output.getOwner();
+				this.logging.debug("Processing output for user: "+identity.getIdentifier());
 				ServiceResourceIdentifier serviceID = output.getServiceId();
 				String serviceType = output.getServiceType();
 				List<IPreferenceTreeModel> treeList = output.getTreeList();

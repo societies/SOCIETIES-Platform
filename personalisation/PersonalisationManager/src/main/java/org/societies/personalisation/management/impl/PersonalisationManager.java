@@ -255,18 +255,6 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		this.ctxBroker = broker;
 	}
 
-	/*
-	 * IMPLEMENT INTERFACE METHODS
-	 */
-
-	public IIdentityManager getIdm() {
-		return idm;
-	}
-
-	public void setIdm(IIdentityManager idm) {
-		this.idm = idm;
-	}
-
 	public IDecisionMaker getDecisionMaker() {
 		return decisionMaker;
 	}
@@ -287,6 +275,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	 */
 	public void setCommsMgr(ICommManager commsMgr) {
 		this.commsMgr = commsMgr;
+		this.idm = commsMgr.getIdManager();
 	}
 
 	/**

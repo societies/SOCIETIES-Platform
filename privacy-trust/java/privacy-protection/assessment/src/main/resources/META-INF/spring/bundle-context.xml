@@ -17,34 +17,5 @@
 
     <!-- Defined in privacy-protection-bundle -->   
 
-	<!--bean id="aopBean" class="org.societies.api.comm.xmpp.interfaces.ICommManager"-->
-		<!--property name="aspectName" value="No_Aspect" /-->
-	<!--bean id="aopBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean">
-	</bean>
-
-	<bean id="catchBeforeMethod" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwAdvice" />
-	<bean id="pointcut" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwPointcut" />
-
-	<bean name="methodPointcut"
-		class="org.springframework.aop.support.DefaultPointcutAdvisor">
-		<property name="advice" ref="catchBeforeMethod" />
-		<property name="pointcut" ref="pointcut" />
-	</bean>
-
-	<bean id="aopBeanProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
-
-		<property name="target" ref="aopBean" />
-
-		<property name="interceptorNames">
-			<list>
-				<value>methodPointcut</value>
-			</list>
-		</property>
-	</bean>
-	
-	<bean id="PrivacyLog"
-		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog"
-		init-method="init" >
-	</bean-->
 
 </beans>

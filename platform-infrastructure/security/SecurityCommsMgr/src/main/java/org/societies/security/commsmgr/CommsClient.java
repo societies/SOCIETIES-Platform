@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
@@ -123,11 +124,11 @@ public class CommsClient implements INegotiationProviderRemote {
 	 */
 	@Override
 	@Async
-	public void getPolicyOptions(String serviceId, IIdentity toIdentity, INegotiationProviderCallback callback) {
+	public void getPolicyOptions(String serviceId, Requestor provider, INegotiationProviderCallback callback) {
 		
-		LOG.debug("getPolicyOptions({}, {})", serviceId, toIdentity);
+		LOG.debug("getPolicyOptions({})", provider.getRequestorId());
 		
-		sendIQ(toIdentity, MethodType.GET_POLICY_OPTIONS, serviceId, -1, null, false, callback);
+		sendIQ(provider.getRequestorId(), MethodType.GET_POLICY_OPTIONS, serviceId, -1, null, false, callback);
 	}
 
 	/*

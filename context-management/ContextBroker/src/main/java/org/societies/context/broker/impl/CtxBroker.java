@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
@@ -43,6 +44,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -64,29 +66,45 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
+	
+	/** The privacy logging facility. */
+	@Autowired(required=false)
+	private IPrivacyLogAppender privacyLogAppender;
 
+	/**
+	 * The IIdentity Mgmt service reference.
+	 *
+	 * @see {@link #setIdentityMgr(IIdentityManager)}
+	 */
+	private IIdentityManager idMgr;
+	
 	/**
 	 * The Internal Ctx Broker service reference.
 	 *
 	 * @see {@link #setCtxBroker(ICtxBroker)}
 	 */
 	@Autowired(required=true)
-	private ICtxBroker internalCtxBroker = null;
-
+	private ICtxBroker internalCtxBroker;
+	
 	/**
-	 * The Internal Ctx Broker service reference.
-	 *
-	 * @see {@link #setidentManager(IIdentityManager)}
+	 * Instantiates the external Context Broker in Spring.
+	 * 
+	 * @param commMgr
+	 *            the Comm Manager
 	 */
-	// TODO change to true
-	@Autowired(required=false)
-	private IIdentityManager identManager= null;
-
-
-	public CtxBroker() throws CtxException {
-		LOG.info(this.getClass().getName()+": External Broker ");
-		LOG.info(this.getClass().getName()+": Return internalCtxBroker "+ this.internalCtxBroker);
-		LOG.info(this.getClass().getName()+": Return identManager "+ this.identManager);
+	@Autowired(required=true)
+	CtxBroker(ICommManager commMgr) {
+		
+		LOG.info(this.getClass() + " instantiated");
+		this.idMgr = commMgr.getIdManager();
+	}
+	
+	/*
+	 * Used for JUnit testing only.
+	 */
+	public CtxBroker() {
+		
+		LOG.info(this.getClass() + " instantiated");
 	}
 
 	@Override
@@ -95,7 +113,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			final IIdentity targetCss, final String type) throws CtxException {
 
 		Future<CtxEntity> entity = null;
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			entity = internalCtxBroker.createEntity(type);
 		} else {
 			LOG.info("remote call");
@@ -112,11 +130,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<CtxAttribute> ctxAttribute = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(scope.getOperatorId());
+			targetCss = this.idMgr.fromJid(scope.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			ctxAttribute = internalCtxBroker.createAttribute(scope, type);
 		} else{
 			LOG.info("remote call");
@@ -131,7 +149,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		Future<CtxAssociation> ctxAssoc = null;
 
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			ctxAssoc = internalCtxBroker.createAssociation(type);
 		} else {
 			LOG.info("remote call");
@@ -158,11 +176,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<CtxModelObject> obj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(identifier.getOperatorId());
+			targetCss = this.idMgr.fromJid(identifier.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			obj = internalCtxBroker.remove(identifier);
 		} else {
 			LOG.info("remote call");
@@ -178,11 +196,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<CtxModelObject> obj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(identifier.getOperatorId());
+			targetCss = this.idMgr.fromJid(identifier.getOperatorId());
+			if (this.privacyLogAppender != null)
+				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
-			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
+			throw new CtxBrokerException("Could not create IIdentity from JID '"
+					+ identifier.getOperatorId() + "':" + ife.getLocalizedMessage(), ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			obj = internalCtxBroker.retrieve(identifier);
 		} else {
 			LOG.info("remote call");
@@ -198,11 +219,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<List<CtxAttribute>> futureObj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(attrId.getOperatorId());
+			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
+			if (this.privacyLogAppender != null)
+				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
-			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
+			throw new CtxBrokerException("Could not create IIdentity from JID '"
+					+ attrId.getOperatorId() + "': " + ife.getLocalizedMessage(), ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			futureObj = internalCtxBroker.retrieveFuture(attrId, date);
 		} else {
 			LOG.info("remote call");
@@ -219,11 +243,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<List<CtxAttribute>> futureObj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(attrId.getOperatorId());
+			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
+			if (this.privacyLogAppender != null)
+				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
-			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
+			throw new CtxBrokerException("Could not create IIdentity from JID '"
+					+ attrId.getOperatorId() + "': " + ife.getLocalizedMessage(), ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			futureObj = internalCtxBroker.retrieveFuture(attrId, modificationIndex);
 		} else {
 			LOG.info("remote call");
@@ -240,11 +267,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<List<CtxHistoryAttribute>> hocObj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(attrId.getOperatorId());
+			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
+			if (this.privacyLogAppender != null)
+				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
-			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
+			throw new CtxBrokerException("Could not create IIdentity from JID '"
+					+ attrId.getOperatorId() + "': " + ife.getLocalizedMessage(), ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			hocObj = internalCtxBroker.retrieveHistory(attrId, modificationIndex);
 		} else {
 			LOG.info("remote call");
@@ -262,11 +292,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<List<CtxHistoryAttribute>> hocObj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(attrId.getOperatorId());
+			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
+			if (this.privacyLogAppender != null)
+				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
-			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
+			throw new CtxBrokerException("Could not create IIdentity from JID '"
+					+ attrId.getOperatorId() + "': " + ife.getLocalizedMessage(), ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			hocObj = internalCtxBroker.retrieveHistory(attrId, startDate, endDate);
 		} else {
 			LOG.info("remote call");
@@ -283,11 +316,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<CtxModelObject> obj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(object.getId().getOperatorId());
+			targetCss = this.idMgr.fromJid(object.getId().getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			obj = internalCtxBroker.update(object);
 		} else {
 			LOG.info("remote call");
@@ -315,11 +348,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		
 		IIdentity targetCis;
 		try {
-			targetCis = this.identManager.fromJid(community.getOperatorId());
+			targetCis = this.idMgr.fromJid(community.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCis)) {
+		if (idMgr.isMine(targetCis)) {
 			entID = internalCtxBroker.retrieveCommunityMembers(community);
 		}else{
 			LOG.info("remote call");
@@ -337,11 +370,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		
 		IIdentity targetCis;
 		try {
-			targetCis = this.identManager.fromJid(community.getOperatorId());
+			targetCis = this.idMgr.fromJid(community.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCis)) {
+		if (idMgr.isMine(targetCis)) {
 			entityList = internalCtxBroker.retrieveParentCommunities(community);
 		} else {
 			LOG.info("remote call");
@@ -357,7 +390,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			final String type) throws CtxException {
 
 		Future<List<CtxIdentifier>> ctxIdList = null;
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			ctxIdList = internalCtxBroker.lookup(modelType, type);
 		} else {
 			LOG.info("remote call");
@@ -376,7 +409,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		Future<List<CtxEntityIdentifier>> entIdList = null;
 
-		if (identManager.isMine(targetCss)){
+		if (idMgr.isMine(targetCss)){
 			entIdList = internalCtxBroker.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue);
 		}else{
 			LOG.info("remote call");
@@ -402,11 +435,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(ctxId.getOperatorId());
+			targetCss = this.idMgr.fromJid(ctxId.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			internalCtxBroker.registerForChanges(listener, ctxId);
 		} else {
 			LOG.info("remote call");
@@ -432,11 +465,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(ctxId.getOperatorId());
+			targetCss = this.idMgr.fromJid(ctxId.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			internalCtxBroker.unregisterFromChanges(listener, ctxId);
 		} else {
 			LOG.info("remote call");
@@ -464,11 +497,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(scope.getOperatorId());
+			targetCss = this.idMgr.fromJid(scope.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			internalCtxBroker.registerForChanges(listener, scope,attrType);
 		} else {
 			LOG.info("remote call");
@@ -495,11 +528,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.identManager.fromJid(scope.getOperatorId());
+			targetCss = this.idMgr.fromJid(scope.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCss)) {
+		if (idMgr.isMine(targetCss)) {
 			internalCtxBroker.unregisterFromChanges(listener, scope, attrType);
 		} else {
 			LOG.info("remote call");
@@ -515,11 +548,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		
 		IIdentity targetCis;
 		try {
-			targetCis = this.identManager.fromJid(community.getOperatorId());
+			targetCis = this.idMgr.fromJid(community.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCis)) {
+		if (idMgr.isMine(targetCis)) {
 			bonds = internalCtxBroker.retrieveBonds(community);
 		} else {
 			LOG.info("remote call");
@@ -538,16 +571,27 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		
 		IIdentity targetCis;
 		try {
-			targetCis = this.identManager.fromJid(community.getOperatorId());
+			targetCis = this.idMgr.fromJid(community.getOperatorId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (identManager.isMine(targetCis)) {
+		if (idMgr.isMine(targetCis)) {
 			ctxEntIdList = internalCtxBroker.retrieveSubCommunities(community);
 		} else {
 			LOG.info("remote call");
 		}
 
 		return ctxEntIdList;
+	}
+	
+	/**
+	 * Sets the IIdentity Mgmt service reference.
+	 * 
+	 * @param idMgr
+	 *            the IIdentity Mgmt service reference to set.
+	 */
+	public void setIdentityMgr(IIdentityManager idMgr) {
+		
+		this.idMgr = idMgr;
 	}
 }

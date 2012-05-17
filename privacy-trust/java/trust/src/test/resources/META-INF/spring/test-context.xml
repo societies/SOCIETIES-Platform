@@ -39,9 +39,6 @@
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCss</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCis</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedService</value>
-				<value>org.societies.privacytrust.trust.impl.repo.model.DirectTrust</value>
-				<value>org.societies.privacytrust.trust.impl.repo.model.IndirectTrust</value>
-				<value>org.societies.privacytrust.trust.impl.repo.model.UserPerceivedTrust</value>
 				<value>org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustOpinion</value>
 			</list>
 		</property>
@@ -52,6 +49,17 @@
 				<value>org.societies.privacytrust.trust.impl.evidence.repo.model</value>
 			</list>
 		</property>
+		
+		<property name="eventListeners">
+			<map>
+				<entry key="post-insert">
+					<bean class="org.societies.privacytrust.trust.impl.common.hibernate.event.PostInsertEventUserListener" />
+				</entry>
+				<entry key="post-update">
+					<bean class="org.societies.privacytrust.trust.impl.common.hibernate.event.PostUpdateEventUserListener" />
+				</entry>
+  			</map>
+ 		</property>
 
 		<property name="hibernateProperties">
 			<props>
