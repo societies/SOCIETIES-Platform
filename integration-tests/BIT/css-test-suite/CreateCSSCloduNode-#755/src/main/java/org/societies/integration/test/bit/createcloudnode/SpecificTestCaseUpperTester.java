@@ -157,9 +157,10 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 			e.printStackTrace();
 		}
 		compareName = profile.getName();
-		assertEquals(Name, compareName);
-		LOG.info("[#755] SpecificTestCaseUpperTester create CSS Cloud Node END.................");
+		//assertEquals(Name, compareName);
+		
 		interfaceResult = TestCase755.cssLocalManager.registerCSSNode(profile);
+		LOG.info("[#755] SpecificTestCaseUpperTester CreateNodetwice END.................");
 	}
 	
 	@Test
@@ -168,11 +169,11 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 		String Name = null;
 		Name ="liam";
 		String compareName;
-		assertTrue(null != Name);
+		assertNotNull(Name);
 		
 		interfaceResult = TestCase755.cssLocalManager.registerCSSNode(profile);
 		assertNotNull(interfaceResult);
-		assertTrue(null != interfaceResult);
+		
 		try {
 			cssDetails = TestCase755.cssRegistry.getCssRecord();
 		} catch (CssRegistrationException e) {
@@ -180,20 +181,28 @@ private static Logger LOG = LoggerFactory.getLogger(SpecificTestCaseUpperTester.
 			e.printStackTrace();
 		}
 		
-		assertTrue(null != cssDetails);
+		assertNotNull(cssDetails);
+		
+		TestCase755.cssLocalManager.unregisterCSSNode(cssDetails);
 		
 		try {
 			Name = TestCase755.cssRegistry.getCssRecord().getName();
-			LOG.info("[#755] Name of CSS is .................:" +Name);
+			LOG.info("[#755] Name of this CSS is .................:" +Name);
 		} catch (CssRegistrationException e) {
 			LOG.info("[#755] SpecificTestCaseUpperTester CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
 			e.printStackTrace();
 		}
 		compareName = profile.getName();
-		assertEquals(Name, compareName);
-		LOG.info("[#755] SpecificTestCaseUpperTester create CSS Cloud Node END.................");
+		LOG.info("[#755] CompareName of this CSS is .................:" +compareName);
 		
+
+		
+		//assertNull(cssDetails);
 		TestCase755.cssLocalManager.unregisterCSSNode(cssDetails);
+		
+		LOG.info("[#755] SpecificTestCaseUpperTester Delete Non_exist Node END.................");
+		
+		
 	}
 
 }
