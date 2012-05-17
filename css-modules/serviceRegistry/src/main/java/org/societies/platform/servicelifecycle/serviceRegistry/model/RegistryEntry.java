@@ -219,6 +219,7 @@ public class RegistryEntry implements Serializable {
 			returnedService.setServiceEndpoint(serviceEndPoint);
 			ServiceInstance si = new ServiceInstance();
 			si.setFullJid(this.serviceInstance.getFullJid());
+			si.setXMPPNode(this.serviceInstance.getXMPPNode());
 			ServiceImplementation servImpl = new ServiceImplementation();
 			servImpl.setServiceNameSpace(this.serviceInstance.getServiceImpl()
 					.getServiceNameSpace());
