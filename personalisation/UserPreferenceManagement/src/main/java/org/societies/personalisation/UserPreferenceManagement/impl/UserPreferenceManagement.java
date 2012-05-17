@@ -65,13 +65,13 @@ public class UserPreferenceManagement{
 	private PrivatePreferenceCache preferenceCache;
 	private Hashtable<IPreferenceOutcome, List<CtxIdentifier>> outcomeConditionListTable; 
 	private ICtxBroker ctxBroker;	
-	private IIdentity userId; 
+	//private IIdentity userId; 
 	
-	public UserPreferenceManagement(IIdentity userId, ICtxBroker broker){
-		this.userId = userId;
+	public UserPreferenceManagement(ICtxBroker broker){
+		
 		this.ctxBroker = broker;
 		this.contextCache = new PrivateContextCache(this.ctxBroker);
-		this.preferenceCache = new PrivatePreferenceCache(this.userId,this.ctxBroker);
+		this.preferenceCache = new PrivatePreferenceCache(this.ctxBroker);
 		outcomeConditionListTable = new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
 
 	}
@@ -249,7 +249,7 @@ public class UserPreferenceManagement{
 			model.setServiceID(details.getServiceID());
 		}
 		model.setServiceType(details.getServiceType());
-		this.preferenceCache.storePreference(userId,details,model);
+		this.preferenceCache.storePreference(ownerID,details,model);
 		this.calculateSizeOfObject(preference);
 		
 

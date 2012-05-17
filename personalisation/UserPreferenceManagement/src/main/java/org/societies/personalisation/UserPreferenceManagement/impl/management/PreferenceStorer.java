@@ -153,14 +153,14 @@ public class PreferenceStorer {
 					List<CtxIdentifier> personCtxIDs = futurePersonCtxIDs.get();
 					
 					if (personCtxIDs.size()==0){
-						this.logging.debug("CtxEntity for operator with userId: "+userId.toString()+" does not exist. aborting storing and exiting");
+						this.logging.debug("CtxEntity for operator with userId: "+userId.getIdentifier()+" does not exist. aborting storing and exiting");
 						return null;
 					}
 					
 					Future<CtxModelObject> futurePerson = broker.retrieve(personCtxIDs.get(0));
 					CtxEntity person = (CtxEntity) futurePerson.get();
 					if (person==null){
-						this.logging.debug("CtxEntity for operator with userId: "+userId.toString()+" does not exist. aborting storing and exiting");
+						this.logging.debug("CtxEntity for operator with userId: "+userId.getIdentifier()+" does not exist. aborting storing and exiting");
 						return null;
 					}
 
@@ -171,7 +171,7 @@ public class PreferenceStorer {
 
 				}else{
 					if (assocCtxIDs.size()>1){
-						this.logging.debug("There's more than one association of type hasPreferences for userId:"+userId.toString()+"\nStoring Preference under the first in the list");
+						this.logging.debug("There's more than one association of type hasPreferences for userId:"+userId.getIdentifier()+"\nStoring Preference under the first in the list");
 					}
 					assoc = (CtxAssociation) broker.retrieve(assocCtxIDs.get(0));
 				}
@@ -218,7 +218,7 @@ public class PreferenceStorer {
 					attr.setBinaryValue(this.toByteArray(registry));
 					
 					broker.update(attr);					
-					this.logging.debug("Successfully updated preference registry for userId: "+userId.toString());
+					this.logging.debug("Successfully updated preference registry for userId: "+userId.getIdentifier());
 				}else{
 					this.logging.debug("PreferenceRegistry not found in DB for userId:. Creating new registry");
 					
@@ -226,7 +226,7 @@ public class PreferenceStorer {
 					List<CtxIdentifier> personCtxIDs = futurePersonCtxIDs.get();
 					
 					if (personCtxIDs.size()==0){
-						this.logging.debug("CtxEntity for operator with userId: "+userId.toString()+" does not exist. aborting storing and exiting");
+						this.logging.debug("CtxEntity for operator with userId: "+userId.getIdentifier()+" does not exist. aborting storing and exiting");
 						return ;
 					}
 					
@@ -242,7 +242,7 @@ public class PreferenceStorer {
 				}
 			
 		} catch (CtxException e) {
-			this.logging.debug("Exception while storing PreferenceRegistry to DB for userId:"+userId.toString());
+			this.logging.debug("Exception while storing PreferenceRegistry to DB for userId:"+userId.getIdentifier());
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

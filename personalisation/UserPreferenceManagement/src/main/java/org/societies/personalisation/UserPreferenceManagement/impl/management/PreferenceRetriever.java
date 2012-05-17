@@ -54,7 +54,7 @@ public class PreferenceRetriever {
 		this.broker = broker;
 	}
 	
-	public Registry retrieveRegistry(IIdentity userId){
+	public Registry retrieveRegistry(){
 		try {
 			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
 			if (futureAttrList==null){
