@@ -28,6 +28,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -42,6 +43,7 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
@@ -52,14 +54,16 @@ import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
+// remove after testing
+import org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager;
 
 
 
 public class CAUIDiscovery implements ICAUIDiscovery{
 
-	private static final Logger LOG = LoggerFactory.getLogger(CAUIDiscovery.class);
+	public static final Logger LOG = LoggerFactory.getLogger(CAUIDiscovery.class);
 
-	private ICAUITaskManager cauiTaskManager;
+	public ICAUITaskManager cauiTaskManager;
 	private ICtxBroker ctxBroker;
 
 	LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
@@ -72,6 +76,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	public CAUIDiscovery(){
 		actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+		//remove after testing
+		cauiTaskManager = new CAUITaskManager();
+	
 	}
 
 	public ICAUITaskManager getCauiTaskManager() {
@@ -103,28 +110,20 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	@Override
 	public void generateNewUserModel() {
 
-		// which attribute id to use for context history retrieval?
-	//	CtxAttributeIdentifier ctxAttrID = null;
-	//	if(lookupAttrHelp("SymAction") != null){
-	//		CtxAttribute ctxAttr = lookupAttrHelp("SymAction");
-	//		ctxAttrID = ctxAttr.getId();
-//		}
-
+		LOG.info("start model generation");
 		LOG.info("1. Retrieve History Data");
-		//if( ctxAttrID!=null && retrieveHistoryTupleData(ctxAttrID).size() > 1){
-		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
 
 		if (retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION) != null ){
-			
-			//Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
+
+			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
 
 			LOG.info("2. Convert History Data");
 			List<MockHistoryData> mockData = convertHistoryData(mapHocData);
-		
+
 			LOG.info("3. Generate Transition Dictionary");
 			System.out.println("3. Generate Transition Dictionary");
 			LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = generateTransitionsDictionary(mockData);
-		
+
 			LOG.info("4. Generate Transition Propability Dictionary (step2)");
 			TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc(actCtxDictionary);
 			LinkedHashMap<String,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob();	
@@ -133,11 +132,11 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			LOG.info("5. Generate UserIntentModelData");
 			ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
 			UserIntentModelData modelData = cmodel.constructModel(trans2ProbDictionary);
-			
+
 			LOG.info("6. result "+modelData);
 
 			LOG.info("7. Store UserIntentModelData to ctx DB");
-		
+
 			CtxAttribute ctxAttr = storeModelCtxDB(modelData);
 			LOG.info("model stored "+ctxAttr.getId());
 
@@ -145,13 +144,16 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	}
 
 
+
+
+
 	private Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTupleData(String attributeType){
-		
+
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
 		try {
 			results = ctxBroker.retrieveHistoryTuples(attributeType, listOfEscortingAttributeIds, null, null).get();
-						
+
 		}catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -162,9 +164,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		return results;
 	}
 
-/*
+	/*
 	private Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTupleData(CtxAttributeIdentifier primaryAttrID){
-		
+
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
 		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
@@ -183,7 +185,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		}
 		return mapHocData;
 	}
-*/
+	 */
 
 	public LinkedHashMap<List<String>,ActionDictObject> generateTransitionsDictionary(List<MockHistoryData> data) {
 
@@ -191,7 +193,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		this.actCtxDictionary = getDictionary(); 
 		this.actCtxDictionary = populateActionCtxDictionary(data);
 		this.setActiveDictionary(actCtxDictionary);
-		printDictionary(actCtxDictionary);
+		//printDictionary(actCtxDictionary);
 		//	LinkedHashMap<String,HashMap<String,Double>> trans3ProbDictionary = transProb.calcTrans3Prob();	
 		//	printTransProbDictionary(trans3ProbDictionary);
 		//	TaskDiscovery taskDisc = new TaskDiscovery(actCtxDictionary);
@@ -243,13 +245,13 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		// LinkedHashMap<String,DictObject> actCtxDictionary = new LinkedHashMap<String,DictObject>();
 		//	LinkedHashMap<List<String>,ActionDictObject> newActCtxDictionary = this.actCtxDictionary;
 		int historySize = historyData.size();
-		//System.out.println("historySize "+historySize);
+		System.out.println("historySize "+historySize);
 		//System.out.println(historyData);
 		List<String> currentActPhrase = null;
 		List<String> currentCtxPhrase = null;
 
 		// j is the step and the longest phrase has 3 actions
-		for (int j=1; j<3; j++) {
+		for (int j=1; j<4; j++) {
 
 			for (int i = 0; i < historySize ; i++) {
 				MockHistoryData currentHocData =  historyData.get(i);
@@ -266,18 +268,18 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				//Map<String,Serializable> map = new HashMap<String,Serializable>();
 				//map = currentHocData.getContext();
 				//Serializable locValue = map.get("symLoc");
-				ctxObjTemp.add(currentHocData.getContextValue("SymLoc"));
+				ctxObjTemp.add(currentHocData.getContextValue(CtxAttributeTypes.LOCATION_SYMBOLIC));
 
 				//System.out.println("j="+j+" i="+i+" actionName "+actionName+" context"+currentHocData.getContext());
 				MockHistoryData tempHocData = null;
-
+				//get next action
 				for (int k=1; k<j; k++){
 					//avoid null pointer at end of file
 					if( i+k < historySize ){
 						tempHocData = historyData.get(i+k);
 						//String tempNextActName = tempHocData.getActionValue();
 						String tempNextActName = tempHocData.getParameterName()+"/"+tempHocData.getActionValue();
-						String tempNextCtx = tempHocData.getContextValue("SymLoc");
+						String tempNextCtx = tempHocData.getContextValue(CtxAttributeTypes.LOCATION_SYMBOLIC);
 						//System.out.println(".."+tempNextActName);
 						actionNameObjTemp.add(tempNextActName);
 						//nextActName.add(tempNextActName);
@@ -398,29 +400,27 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		return total2Trans;
 	}
 
-	protected List<MockHistoryData> convertHistoryData (Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
+	public List<MockHistoryData> convertHistoryData (Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
 
 		List<MockHistoryData> result = new ArrayList<MockHistoryData>();
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> ctxHocTuples = mapHocData;
 
 		for(CtxHistoryAttribute primaryHocAttr: ctxHocTuples.keySet()){
 			//String primaryCtxValue = primaryHocAttr.getStringValue();
-			String primaryCtxValue = null;
-
+	
 			try {
 				IAction retrievedAction = (IAction) SerialisationHelper.deserialise(primaryHocAttr.getBinaryValue(), this.getClass().getClassLoader());
-				primaryCtxValue = retrievedAction.getvalue();
 				List<CtxHistoryAttribute> listHocAttrs = ctxHocTuples.get(primaryHocAttr);
 				//assume that only one escorting context object exists 
-
-				Map<String,Serializable> context = new HashMap<String,Serializable>();
+				
+				Map<String,String> context = new HashMap<String,String>();
 				for(int i=0; i<listHocAttrs.size(); i++){
 					CtxHistoryAttribute escortingHocAttr = listHocAttrs.get(i);
-					//  !!!!!	fix escortingHocAttr.getStringValue() to escortingHocAttr.getValue()
-					context.put(escortingHocAttr.getType(), escortingHocAttr.getStringValue());
+					String value = castAttrValtoString(escortingHocAttr);
+					context.put(escortingHocAttr.getType(), value);
 				}
-
-				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(),context);
+				
+				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified());
 				result.add(mockHocData);
 
 			} catch (IOException e) {
@@ -433,6 +433,20 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		}
 
 		return result;
+	}
+
+
+	protected String castAttrValtoString(CtxHistoryAttribute attr){
+
+		String valueStr = "";
+		if (attr.getStringValue() != null) {
+			valueStr = attr.getStringValue();
+		} else if (attr.getIntegerValue() != null) {
+			valueStr = attr.getIntegerValue().toString();
+		} else if (attr.getDoubleValue() != null) {
+			valueStr = attr.getDoubleValue().toString();
+		}
+		return valueStr;
 	}
 
 	protected CtxAttribute lookupAttrHelp(String type){

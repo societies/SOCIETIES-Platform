@@ -7,7 +7,7 @@ import java.util.List;
 public class TransitionProbabilitiesCalc {
 	LinkedHashMap<List<String>,ActionDictObject> dictionary; 
 
-	TransitionProbabilitiesCalc(LinkedHashMap<List<String>,ActionDictObject> dict){
+	public TransitionProbabilitiesCalc(LinkedHashMap<List<String>,ActionDictObject> dict){
 		System.out.println("TransitionProbabilitiesCalc");
 		dictionary = dict;
 	}
