@@ -24,8 +24,8 @@ public class TestCase1055 extends IntegrationTestCase {
 		// with test case number
 		// and test case classes to run
 		//super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(0, new Class[] {NominalTestCaseLowerTester.class});
-		NominalTestCaseLowerTester.testCaseNumber = 0;
+		super(1055, new Class[] {NominalTestCaseLowerTester.class});
+		NominalTestCaseLowerTester.testCaseNumber = 1055;
 	}
 
 	public void setPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender) {

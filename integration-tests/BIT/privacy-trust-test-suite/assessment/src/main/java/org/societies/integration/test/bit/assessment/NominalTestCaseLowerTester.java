@@ -3,7 +3,6 @@ package org.societies.integration.test.bit.assessment;
 import static org.junit.Assert.*;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import org.junit.After;
 import org.junit.Before;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
-import org.societies.identity.IdentityImpl;
 import org.societies.integration.test.IntegrationTestUtils;
 
 /**
@@ -79,16 +77,16 @@ public class NominalTestCaseLowerTester {
 	}
 
 	@Test
-	public void testSpeedOfExecution() throws InterruptedException {
+	public void testSpeedOfExecution() {
 		
 		LOG.info("[#1055] testSpeedOfExecution()");
 
-		IIdentity owner = new IdentityImpl("owner-1@a.com");
-		IIdentity requestorId = new IdentityImpl("requestor-1@a.com");
+		IIdentity owner = new MockIdentity("owner.a@a.com");
+		IIdentity requestorId = new MockIdentity("requestor.a@a.com");
 		Requestor requestor = new Requestor(requestorId);
 		
-		IIdentity fromIdentity = new IdentityImpl("from-1@a.com");
-		IIdentity toIdentity = new IdentityImpl("to-1@a.com");
+		IIdentity fromIdentity = new MockIdentity("from.a@a.com");
+		IIdentity toIdentity = new MockIdentity("to.a@a.com");
 		Object payload = "dada";
 		
 		Calendar cal = Calendar.getInstance();
