@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.impl.repo.model.Trust;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedEntity;
@@ -98,15 +99,26 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	            final Object newValue = event.getState()[i];
 	            if (areDifferent(oldValue, newValue)) {
 	            	final TrustedEntityId teid = ((TrustedEntity) event.getEntity()).getTeid();
-	            	final Double oldTrustValue = (oldValue != null) ? ((Trust) oldValue).getValue() : null; 
-	            	final Double newTrustValue = (newValue != null) ? ((Trust) newValue).getValue() : null;
+	            	final Double oldTrustValue = (oldValue != null) 
+	            			? ((Trust) oldValue).getValue() : null; 
+	            	final Double newTrustValue = (newValue != null) 
+	            			? ((Trust) newValue).getValue() : null;
 	            	final TrustUpdateEvent trustUpdateEvent = new TrustUpdateEvent(
 	            			teid, oldTrustValue, newTrustValue);
+	            	final String topic = TRUST_PROPERTY_MAP.get(propName);
 	            	if (LOG.isDebugEnabled())
 	            		LOG.debug("Posting TrustUpdateEvent " + trustUpdateEvent
-	            				+ " to topic '" + TRUST_PROPERTY_MAP.get(propName) + "'");
-	            	// TODO this.trustEventMgr.postEvent(trustUpdateEvent, 
-	            	// 		new String[] { TRUST_PROPERTY_MAP.get(propName) }, EVENT_SOURCE);
+	            				+ " to topic '" + topic + "'");
+	            	try {
+						this.trustEventMgr.postEvent(trustUpdateEvent, 
+								new String[] { topic }, EVENT_SOURCE);
+					} catch (TrustEventMgrException teme) {
+						
+						LOG.error("Could not post TrustUpdateEvent " 
+								+ trustUpdateEvent
+	            				+ " to topic '" + topic + "': " 
+								+ teme.getLocalizedMessage(), teme);
+					}
 	            }
 	        }
 		}
