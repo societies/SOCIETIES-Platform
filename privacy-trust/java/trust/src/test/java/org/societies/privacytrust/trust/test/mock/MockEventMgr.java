@@ -22,62 +22,56 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.event;
+package org.societies.privacytrust.trust.test.mock;
 
-import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 
 /**
- * This event is fired whenever the trust evidence is updated. A 
- * <code>TrustEvidenceUpdateEvent</code> object is sent as an argument to the
- * {@link ITrustEvidenceUpdateEventListener} methods.
- * <p>
- * TrustEvidenceUpdateEvents are accompanied by the source, i.e. the 
- * {@link TrustedEntityId identifier} of the entity whose trust evidence was
- * updated. 
+ * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public class TrustEvidenceUpdateEvent extends TrustEvent {
-
-	private static final long serialVersionUID = 569610138360162405L;
-
-	/**
-	 * Constructs a <code>TrustEvidenceUpdateEvent</code> object with the
-	 * specified source.
-	 *  
-	 * @param source
-	 *            the identifier of the entity whose trust evidence was updated
-	 */
-	public TrustEvidenceUpdateEvent(TrustedEntityId source) {
-		
-		super(source);
-	}
+public class MockEventMgr implements IEventMgr {
 	
-	/**
-	 * Returns the identifier of the entity whose trust evidence was updated.
-	 * 
-	 * @return the identifier of the entity whose trust evidence was updated.
-	 * @since 0.0.7
-	 */
-	public TrustedEntityId getId() {
-		
-		return (TrustedEntityId) super.getSource();
-	}
+	private static final Logger LOG = LoggerFactory.getLogger(MockEventMgr.class);
 	
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.EventObject#toString()
+	MockEventMgr() {
+		
+		LOG.info(this.getClass() + " instantiated");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.osgi.event.IEventMgr#publishInternalEvent(org.societies.api.osgi.event.InternalEvent)
 	 */
 	@Override
-	public String toString() {
+	public void publishInternalEvent(InternalEvent arg0) throws EMSException {
+		// TODO Auto-generated method stub
 		
-		final StringBuilder sb = new StringBuilder();
-		sb.append("{");
-		sb.append("id=" + this.getId());
-		sb.append("}");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.osgi.event.IEventMgr#subscribeInternalEvent(org.societies.api.osgi.event.EventListener, java.lang.String[], java.lang.String)
+	 */
+	@Override
+	public void subscribeInternalEvent(EventListener arg0, String[] arg1,
+			String arg2) {
+		// TODO Auto-generated method stub
 		
-		return sb.toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.osgi.event.IEventMgr#unSubscribeInternalEvent(org.societies.api.osgi.event.EventListener, java.lang.String[], java.lang.String)
+	 */
+	@Override
+	public void unSubscribeInternalEvent(EventListener arg0, String[] arg1,
+			String arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 }
