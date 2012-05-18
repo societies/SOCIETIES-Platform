@@ -32,6 +32,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender;
@@ -67,14 +70,79 @@ public class PrivacyLogAppenderTest {
 	}
 
 	@Test
-	public void testLog() {
+	public void testLogDataAccess() {
 		
-		LOG.debug("testLog()");
+		LOG.debug("testLogDataAccess()");
+		
+		DataAccessLogEntry entry = mock(DataAccessLogEntry.class);
+		
+		privacyLogAppender.log(entry);
+	}
+
+	@Test
+	public void testLogDataTransmission() {
+		
+		LOG.debug("testLogDataTransmission()");
 		
 		DataTransmissionLogEntry entry = mock(DataTransmissionLogEntry.class);
 		boolean result;
 		
 		result = privacyLogAppender.log(entry);
 		assertTrue(result);
+	}
+
+	@Test
+	public void testLogCommsFw() {
+		
+		LOG.debug("testLogCommsFw()");
+		
+		IIdentity sender = mock(IIdentity.class);
+		IIdentity receiver = mock(IIdentity.class);
+		Object payload = "abcdef";
+		boolean result;
+		
+		result = privacyLogAppender.logCommsFw(sender, receiver, payload);
+		assertTrue(result);
+		result = privacyLogAppender.logCommsFw(null, receiver, payload);
+		assertTrue(result);
+		result = privacyLogAppender.logCommsFw(sender, null, payload);
+		assertTrue(result);
+		result = privacyLogAppender.logCommsFw(sender, receiver, null);
+		assertTrue(result);
+	}
+
+	@Test
+	public void testLogContext() {
+		
+		LOG.debug("testLogContext()");
+		
+		Requestor requestor = new Requestor(mock(IIdentity.class));
+		assertNotNull(requestor.getRequestorId());
+		IIdentity owner = mock(IIdentity.class);
+		
+		privacyLogAppender.logContext(requestor, owner);
+		privacyLogAppender.logContext(null, owner);
+		privacyLogAppender.logContext(requestor, null);
+		privacyLogAppender.logContext(null, null);
+	}
+
+	@Test
+	public void testLogContextSize() {
+		
+		LOG.debug("testLogContext()");
+		
+		Requestor requestor = new Requestor(mock(IIdentity.class));
+		assertNotNull(requestor.getRequestorId());
+		IIdentity owner = mock(IIdentity.class);
+		
+		privacyLogAppender.logContext(requestor, owner, 1000);
+		privacyLogAppender.logContext(null, owner, 1000);
+		privacyLogAppender.logContext(requestor, null, 1000);
+		privacyLogAppender.logContext(null, null, 1000);
+		
+		privacyLogAppender.logContext(requestor, owner, -1);
+		privacyLogAppender.logContext(null, owner, -1);
+		privacyLogAppender.logContext(requestor, null, -1);
+		privacyLogAppender.logContext(null, null, -1);
 	}
 }

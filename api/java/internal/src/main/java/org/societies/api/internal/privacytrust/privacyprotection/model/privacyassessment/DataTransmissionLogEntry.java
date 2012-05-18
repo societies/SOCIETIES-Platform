@@ -55,34 +55,41 @@ public class DataTransmissionLogEntry {
 		this.dataType = dataType;
 		this.time = time;
 		this.timeInMs = time.getTime();
-		
-		switch (receiver.getType()) {
-		case CIS:
-			// Some CIS
-			this.sentToGroup = true;
-			this.sentToLocalCss = false;
-			break;
-		case CSS:
-			// Some other CSS
-			this.sentToGroup = false;
-			this.sentToLocalCss = false;
-			break;
-		case CSS_LIGHT:
-			// User's own CSS
-			this.sentToGroup = false;
-			this.sentToLocalCss = true;
-			break;
-		case CSS_RICH:
-			// User's own CSS
-			this.sentToGroup = false;
-			this.sentToLocalCss = true;
-			break;
-		default:
-			//LOG.warn("isSentToLocalCss(): unrecognized receiver type: {}", receiver.getType());
-			
+
+		if (receiver == null || receiver.getType() == null) {
 			// Assume most problematic cases
 			this.sentToGroup = true;
 			this.sentToLocalCss = false;
+		}
+		else {
+			switch (receiver.getType()) {
+			case CIS:
+				// Some CIS
+				this.sentToGroup = true;
+				this.sentToLocalCss = false;
+				break;
+			case CSS:
+				// Some other CSS
+				this.sentToGroup = false;
+				this.sentToLocalCss = false;
+				break;
+			case CSS_LIGHT:
+				// User's own CSS
+				this.sentToGroup = false;
+				this.sentToLocalCss = true;
+				break;
+			case CSS_RICH:
+				// User's own CSS
+				this.sentToGroup = false;
+				this.sentToLocalCss = true;
+				break;
+			default:
+				//LOG.warn("isSentToLocalCss(): unrecognized receiver type: {}", receiver.getType());
+				
+				// Assume most problematic cases
+				this.sentToGroup = true;
+				this.sentToLocalCss = false;
+			}
 		}
 
 		this.receiver = receiver;
