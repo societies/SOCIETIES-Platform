@@ -86,8 +86,11 @@ public interface IDIANNE {
 	 */
 	public void disableDIANNELearning(IIdentity ownerId);
 	
-	
-	
+	/**
+	 * This method is called by the PersonalisationManager to let the DIANNE know that 
+	 * it can now register for context updates with the PersonalisationManager
+	 */
+	public void registerContext();
 	
 
 }

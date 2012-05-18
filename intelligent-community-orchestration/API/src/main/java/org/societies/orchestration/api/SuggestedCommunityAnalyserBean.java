@@ -20,8 +20,8 @@
 package org.societies.orchestration.api;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-//import org.societies.api.cis.management.ICisRecord;
-import org.societies.orchestration.api.ICisRecord;
+//import org.societies.api.cis.management.ICis;
+import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 
 import org.societies.api.activity.IActivity;
@@ -37,8 +37,8 @@ import java.util.HashMap;
 public class SuggestedCommunityAnalyserBean {
 
 	private SuggestedCommunityAnalyserMethodType method;
-	private HashMap<String, ArrayList<ICisRecord>> ciss;
-	private HashMap<String, ArrayList<ArrayList<ICisRecord>>> configureCiss;
+	private HashMap<String, ArrayList<ICisProposal>> ciss;
+	private HashMap<String, ArrayList<ArrayList<ICisProposal>>> configureCiss;
 	private ArrayList<String> cissMetadata;
 	
 	private ArrayList<IIdentity> cssList;
@@ -59,19 +59,19 @@ public class SuggestedCommunityAnalyserBean {
 		this.method = method;
 	}
 	
-	public HashMap<String, ArrayList<ICisRecord>> getCiss(){
+	public HashMap<String, ArrayList<ICisProposal>> getCiss(){
 		return this.ciss;
 	}
 	
-	public void setCiss(HashMap<String, ArrayList<ICisRecord>> ciss){
+	public void setCiss(HashMap<String, ArrayList<ICisProposal>> ciss){
 		this.ciss = ciss;
 	}
 	
-	public HashMap<String, ArrayList<ArrayList<ICisRecord>>> getConfigureCiss(){
+	public HashMap<String, ArrayList<ArrayList<ICisProposal>>> getConfigureCiss(){
 		return this.configureCiss;
 	}
 	
-	public void setConfigureCiss(HashMap<String, ArrayList<ArrayList<ICisRecord>>> configureCiss){
+	public void setConfigureCiss(HashMap<String, ArrayList<ArrayList<ICisProposal>>> configureCiss){
 		this.configureCiss = configureCiss;
 	}
 	

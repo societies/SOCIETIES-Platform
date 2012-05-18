@@ -42,22 +42,22 @@ import org.societies.api.schema.context.contextschema.CtxBroker;
 //import org.societies.api.internal.cis.management.ICisActivityFeed;
 //import org.societies.api.internal.cis.management.ServiceSharingRecord;
 //import org.societies.api.internal.cis.management.ICisActivity;
-//import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICis;
 //import org.societies.api.internal.cis.management.ICisManager;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-/**import org.societies.api.cis.management.ICisRecord;
+/**import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 
 import org.societies.api.cis.management.ICisEditor;*/
 
-import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ICisOwned;
-import org.societies.orchestration.api.ICisEditor;
-import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.orchestration.api.ICisParticipant;
+//import org.societies.orchestration.api.ICisEditor;
 
 
 import org.societies.api.activity.IActivity;
@@ -135,7 +135,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 
 	private IIdentity linkedCss;
 	
-    private ICisRecord linkedCis;
+    private ICis linkedCis;
     
     //private Domain linkedDomain;  // No datatype yet representing a domain
 	//private IIdentity linkedDomain;
@@ -155,7 +155,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	//private IUserFeedbackCallback userFeedbackCallback;
 	private String userResponse;
 	
-	private ArrayList<ICisRecord> recentRefusals;
+	private ArrayList<ICis> recentRefusals;
 
 	private IUserFeedbackCallback userFeedbackCallback;
 	
@@ -200,7 +200,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	 *                          continually checking for whether to delete it/suggest deleting it.
 	 */
 	
-	public EgocentricCommunityDeletionManager(ICisRecord linkedCis) {
+	public EgocentricCommunityDeletionManager(ICis linkedCis) {
 		this.linkedCis = linkedCis;
 	}
 	
@@ -221,19 +221,19 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		//activityFeed = mock(ICssActivityFeed.class);
 		
 		it[0] = linkedCss.getIdentifier();
-		//ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new ICisRecord(null, null, null, null, null, it, null, null, null));
-		//ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];
+		//ICis[] listOfUserJoinedCiss = cisManager.getCisList(new ICis(null, null, null, null, null, it, null, null, null));
+		//ICis[] listOfUserJoinedCiss = new ICis[0];
 		
-		ICisRecord record = cisManager.getCis(linkedCss.toString(), "default CIS");
+		ICis record = cisManager.getCis(linkedCss.toString(), "default CIS");
 		//edit out all CIS attributes
 		
-		ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(record);
-		//ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new ICisRecord(null, null, null, null, null, it, null, null, null));
-		//ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];
+		ICis[] listOfUserJoinedCiss = cisManager.getCisList(record);
+		//ICis[] listOfUserJoinedCiss = cisManager.getCisList(new ICis(null, null, null, null, null, it, null, null, null));
+		//ICis[] listOfUserJoinedCiss = new ICis[0];
 		
-		ArrayList<ICisRecord> userJoinedCiss = new ArrayList<ICisRecord>();
+		ArrayList<ICis> userJoinedCiss = new ArrayList<ICis>();
 		
-		ICisRecord[] records;
+		ICis[] records;
 		if (linkedCss != null && listOfUserJoinedCiss != null) {
 			for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
 			    userJoinedCiss.add(listOfUserJoinedCiss[i]);   
@@ -248,11 +248,11 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
 		//}
 		
-		ArrayList<ICisRecord> cissToDelete = new ArrayList<ICisRecord>();
+		ArrayList<ICis> cissToDelete = new ArrayList<ICis>();
 		Date theDate = new Date();
 		for (int i = 0; i < userJoinedCiss.size(); i++) {
 			boolean deleteThisCis = false;
-			ICisRecord thisCis = userJoinedCiss.get(i);
+			ICis thisCis = userJoinedCiss.get(i);
 			String deadFeed = null;
 			//deadFeed = (thisCis.feed.getActivities(it[0],  (new Timestamp(theDate.getDate() - (1000 * 60 * 60 * 2))), new Timestamp(theDate.getDate())); //between now and 2 hours ago
 		    if (deadFeed != null) {
@@ -318,7 +318,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		    }
 		    
 		    //if (thisCis.getMembersList().size() == 0) {
-		    //    ArrayList<ICisRecord> refusedTimes = new ArrayList<ICisRecord>();
+		    //    ArrayList<ICis> refusedTimes = new ArrayList<ICis>();
 		    //    for (int m = 0; m < recentRefusals.size(); m++) {
 		    //        if ((recentRefusals().get(m).getCisId() == thisCis.getCisId()))
 		    //            refusedTimes.add(recentRefusals.get(m));
@@ -353,9 +353,11 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		//    }
 		//}
 		}
-		HashMap<String, ArrayList<ICisRecord>> deletionSuggestions = new HashMap<String, ArrayList<ICisRecord>>();
+		HashMap<String, ArrayList<ICis>> deletionSuggestions = new HashMap<String, ArrayList<ICis>>();
 		deletionSuggestions.put("Delete CISs", cissToDelete);
-		suggestedCommunityAnalyser.processEgocentricRecommendations(deletionSuggestions, new ArrayList<String>());
+		
+		return;
+		//suggestedCommunityAnalyser.processEgocentricRecommendations(deletionSuggestions, new ArrayList<String>());
 		
 		//Can't use GUI in tests
         //cissToDelete = getUserFeedbackOnDeletion(cissToDelete);

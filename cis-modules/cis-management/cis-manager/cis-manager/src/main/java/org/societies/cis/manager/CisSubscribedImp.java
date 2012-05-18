@@ -26,17 +26,49 @@
 
 package org.societies.cis.manager;
 
-import org.societies.api.cis.management.ICisRecord;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManagerCallback;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.cis.community.Community;
 
 /**
  * @author Thomas Vilarinho (Sintef)
 */
 
 
-public class CisSubscribedImp implements ICisRecord {
+public class CisSubscribedImp implements ICis {
 
+
+
+
+	private static Logger LOG = LoggerFactory
+			.getLogger(CisManagerClient.class);
+	
+	
 	
 	private CisRecord cisRecord;
+	
+	private CisManager cisManag = null;
+	
+	public CisSubscribedImp(CisRecord cisRecord, CisManager cisManag) {
+		super();
+		this.cisRecord = cisRecord;
+		this.cisManag =cisManag;
+	}
 	
 	public CisSubscribedImp(CisRecord cisRecord) {
 		super();
@@ -59,4 +91,61 @@ public class CisSubscribedImp implements ICisRecord {
 		return this.cisRecord.getMembershipCriteria();
 	}
 
+	
+	public void getInfo(ICisManagerCallback callback){
+		LOG.debug("client call to get info from a RemoteCIS");
+
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = this.cisManag.CSSendpoint.getIdManager().fromJid(this.getCisId());
+			Stanza stanza = new Stanza(toIdentity);
+			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
+					stanza.getId(), callback, this.cisManag);
+
+			Community c = new Community();
+			c.setGetInfo("");
+			try {
+				LOG.info("Sending stanza with leave");
+				this.cisManag.CSSendpoint.sendIQGet(stanza, c, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			LOG.info("Problem with the input jid when trying to send the join");
+			e1.printStackTrace();
+		}	
+	}
+
+	
+	//Overriding hash and equals to compare cisRecord only
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((cisRecord == null) ? 0 : cisRecord.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CisSubscribedImp other = (CisSubscribedImp) obj;
+		if (cisRecord == null) {
+			if (other.cisRecord != null)
+				return false;
+		} else if (!cisRecord.equals(other.cisRecord))
+			return false;
+		return true;
+	}
+	// end of Overriding hash and equals to compare cisRecord only
+	
+	
 }

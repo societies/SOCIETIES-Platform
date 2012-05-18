@@ -17,6 +17,7 @@
 	<osgi:reference id="xcCommunication" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 
   	<osgi:service ref="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
+  	 <!--<osgi:service ref="CisClientService" interface="org.societies.api.cis.management.IcisManagerClient"/>-->
 		<osgi:reference id="societiesDataSource" interface="javax.sql.DataSource"/>
 	 <!--<osgi:reference id="PrivacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"/>-->	
 		

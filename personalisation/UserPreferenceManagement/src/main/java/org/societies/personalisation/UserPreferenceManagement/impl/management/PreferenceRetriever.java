@@ -54,7 +54,7 @@ public class PreferenceRetriever {
 		this.broker = broker;
 	}
 	
-	public Registry retrieveRegistry(IIdentity userId){
+	public Registry retrieveRegistry(){
 		try {
 			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
 			if (futureAttrList==null){
@@ -65,20 +65,15 @@ public class PreferenceRetriever {
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
 					CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier).get();
-					Object obj = this.convertToObject(attr.getBinaryValue());
 					
-					if (obj==null){
-						this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
+					Registry registry = (Registry) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
+					if (null==registry){
+						this.logging.debug("Error retrieving binary value from attribute");
 						return new Registry();
-					}else{
-						if (obj instanceof Registry){
-							this.logging.debug("PreferenceRegistry found in DB");
-							return (Registry) obj;
-						}else{
-							this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
-							return new Registry();
-						}
 					}
+					
+					return registry;
+					
 				}
 				this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 				return new Registry();
@@ -92,6 +87,12 @@ public class PreferenceRetriever {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -139,13 +140,8 @@ public class PreferenceRetriever {
 		try{
 			//retrieve directly the attribute in context that holds the preference as a blob value
 			CtxAttribute attrPref = (CtxAttribute) broker.retrieve(id).get();
-			//cast the blob value to type IPreference and return it
-			Object obj = this.convertToObject(attrPref.getBinaryValue());
-			if (null!=obj){
-				if (obj instanceof IPreferenceTreeModel){
-					return (IPreferenceTreeModel) obj;
-				}
-			}
+			IPreferenceTreeModel iptm = (IPreferenceTreeModel) SerialisationHelper.deserialise(attrPref.getBinaryValue(), this.getClass().getClassLoader());
+			return iptm;
 		}
 		catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -154,6 +150,12 @@ public class PreferenceRetriever {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

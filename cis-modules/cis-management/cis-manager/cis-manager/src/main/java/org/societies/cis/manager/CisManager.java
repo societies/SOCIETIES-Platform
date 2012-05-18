@@ -50,32 +50,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.activity.ActivityFeed;
-import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICis;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
-import org.societies.cis.manager.CisEditor;
+import org.societies.cis.manager.Cis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
 
-import org.societies.api.schema.cis.manager.Community;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.manager.Communities;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
+import org.societies.api.schema.cis.manager.CisCommunity;
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteNotification;
 import org.societies.api.schema.cis.manager.SubscribedTo;
@@ -83,18 +88,18 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 
 
 // this is the class which manages all the CIS from a CSS
-// for the class responsible for editing and managing each CIS instance, consult the CISEditor
+// for the class responsible for editing and managing each CIS instance, consult the CIS
 
 /**
  * @author Thomas Vilarinho (Sintef)
 */
 
 @Component
-public class CisManager implements ICisManager, IFeatureServer{
+public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback{
 
 	
 
-	Set<CisEditor> ownedCISs; 
+	Set<Cis> ownedCISs; 
 	ICISCommunicationMgrFactory ccmFactory;
 	IIdentity cisManagerId;
 	ICommManager CSSendpoint;
@@ -105,25 +110,27 @@ public class CisManager implements ICisManager, IFeatureServer{
 	
 
 	public void startup(){
-		ActivityFeed ret = null;
+		//ActivityFeed ret = null;
 	
 		if(session == null)
 			session = this.getSession();//sessionFactory.openSession();
+		
+		//ActivityFeed.setSession(session);
 		//getting owned CISes
-		Query q = session.createQuery("select o from org_societies_cis_manager_CisEditor o");
-		this.ownedCISs = (Set<CisEditor>) q.list();
-		q = session.createQuery("select s from org_societies_cis_manager_CisRecord s");
-		this.subscribedCISs = (Set<CisSubscribedImp>) q.list();
+		//Query q = session.createQuery("select o from org_societies_cis_manager_Cis o");
+		//this.ownedCISs = (Set<Cis>) q.list();
+		//q = session.createQuery("select s from org_societies_cis_manager_CisRecord s");
+		//this.subscribedCISs = (Set<CisSubscribedImp>) q.list();
 	}
 
 	private final static List<String> NAMESPACES = Collections
-			//.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
-				//		  		"http://societies.org/api/schema/cis/community"));
-			.singletonList("http://societies.org/api/schema/cis/manager");
+			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+						  		"http://societies.org/api/schema/cis/community"));
+			//.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
-			.singletonList("org.societies.api.schema.cis.manager");
-			//.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
-				//	"org.societies.api.schema.cis.community"));
+			//.singletonList("org.societies.api.schema.cis.manager");
+			.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+					"org.societies.api.schema.cis.community"));
 
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisManager.class);
@@ -133,19 +140,24 @@ public class CisManager implements ICisManager, IFeatureServer{
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
 
+		//LOG.info("starting up session");
+		//this.startup();
+		//LOG.info("finished starting up session");
+		
 		cisManagerId = CSSendpoint.getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
 
 
 			try {
-				CSSendpoint.register(this);
+				CSSendpoint.register((IFeatureServer)this);
+//				CSSendpoint.register((ICommCallback)this);
 			} catch (CommunicationException e) {
 				e.printStackTrace();
 			} // TODO unregister??
 			
 			LOG.info("listener registered");
 
-			this.ownedCISs = new HashSet<CisEditor>();	
+			this.ownedCISs = new HashSet<Cis>();	
 			subscribedCISs = new HashSet<CisSubscribedImp>();
 			
 			//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
@@ -184,11 +196,11 @@ public class CisManager implements ICisManager, IFeatureServer{
 	
 	
 	
-	private CisEditor getOwnedCisByJid(String jid){
-		Iterator<CisEditor> it = getOwnedCISs().iterator();
+	private Cis getOwnedCisByJid(String jid){
+		Iterator<Cis> it = getOwnedCISs().iterator();
 		 
 		while(it.hasNext()){
-			 CisEditor element = it.next();
+			 Cis element = it.next();
 			 if (element.getCisRecord().getCisJid().equals(jid))
 				 return element;
 	     }
@@ -201,9 +213,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 	private boolean deleteOwnedCis(String cssId, String cssPassword, String cisJid){
 		// TODO: how do we check fo the cssID/pwd?
 		
-		boolean ret = true;
-		if(getOwnedCISs().contains(new CisEditor(new CisRecord(cisJid)))){
-			CisEditor cis = this.getOwnedCisByJid(cisJid);
+		boolean ret = false;
+		if(getOwnedCISs().contains(new Cis(new CisRecord(cisJid)))){
+			Cis cis = this.getOwnedCisByJid(cisJid);
 			ret = cis.deleteCIS();
 			ret = ret && getOwnedCISs().remove(cis);
 		}
@@ -224,7 +236,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		//}
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		
-		CisEditor cis = new  CisEditor(cssId, cisName, cisType, mode,this.ccmFactory);
+		Cis cis = new  Cis(cssId, cisName, cisType, mode,this.ccmFactory);
 		this.persist(cis);
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
@@ -238,13 +250,26 @@ public class CisManager implements ICisManager, IFeatureServer{
 	// internal method used to register that the user has subscribed into a CIS
 	// it is triggered by the subscription notification on XMPP
 	// TODO: review
-	private boolean subscribeToCis(CisRecord i) {
+	public boolean subscribeToCis(CisRecord i) {
 
-		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid())));
+		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid()),this));
 		return true;
 		
 	}
+	
+	// internal method used to leave from a CIS
+	// this is triggered by the receipt of a confirmation of a leave
+	// TODO: review
+	public boolean unsubscribeToCis(String cisjid) {
 
+		if(subscribedCISs.contains(new CisSubscribedImp(new CisRecord(cisjid)))){
+			return subscribedCISs.remove(new CisSubscribedImp(new CisRecord(cisjid)));
+		}else{
+			return false;
+		}
+		
+
+	}
 
 
 
@@ -253,10 +278,10 @@ public class CisManager implements ICisManager, IFeatureServer{
 		
 		List<CisRecord> l = new ArrayList<CisRecord>();
 
-		Iterator<CisEditor> it = getOwnedCISs().iterator();
+		Iterator<Cis> it = getOwnedCISs().iterator();
 		 
 		while(it.hasNext()){
-			 CisEditor element = it.next();
+			 Cis element = it.next();
 			 l.add(element.getCisRecord());
 			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 	     }
@@ -337,13 +362,13 @@ public class CisManager implements ICisManager, IFeatureServer{
 				if(listingType.equals("owned") || listingType.equals("all")){
 				// GET LIST CODE of ownedCIS
 					
-					Iterator<CisEditor> it = ownedCISs.iterator();
+					Iterator<Cis> it = ownedCISs.iterator();
 					
 					while(it.hasNext()){
 						CisRecord element = it.next().getCisRecord();
-						Community community = new Community();
+						CisCommunity community = new CisCommunity();
 						community.setCommunityJid(element.getCisJid());
-						com.getCommunity().add(community);
+						com.getCisCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
 				}
@@ -355,9 +380,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 					
 					while(it.hasNext()){
 						CisSubscribedImp element = it.next();
-						Community community = new Community();
+						CisCommunity community = new CisCommunity();
 						community.setCommunityJid(element.getCisId());
-						com.getCommunity().add(community);
+						com.getCisCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
 				}
@@ -410,7 +435,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		LOG.info("message received");
+		LOG.info("message received with class, id, from: " + payload.getClass() + " , " + stanza.getId() + " , " + stanza.getFrom().getBareJid());
 		if (payload.getClass().equals(org.societies.api.schema.cis.manager.CommunityManager.class)) {
 
 			CommunityManager c = (CommunityManager) payload;
@@ -433,6 +458,20 @@ public class CisManager implements ICisManager, IFeatureServer{
 				return;
 			}
 		}
+		if (payload.getClass().equals(Community.class)) {
+
+			Community c = (Community) payload;
+
+			// treating new member notifications
+			if (c.getWho() != null) {
+				LOG.info("new member joined a CIS notification received");
+				// TODO: do something? or maybe remove those notifications
+				return;
+			}
+			
+
+		}
+		
 		
 	}
 
@@ -453,20 +492,20 @@ public class CisManager implements ICisManager, IFeatureServer{
 	}
 
 	@Override
-	public List<ICisRecord> getCisList(){
+	public List<ICis> getCisList(){
 		
 		// add subscribed CIS to the list to be returned
-		List<ICisRecord> l = new ArrayList<ICisRecord>();
+		List<ICis> l = new ArrayList<ICis>();
 		l.addAll(subscribedCISs);
 
 		
 		/*// add owned CIS to the list to be returned
-		List<ICisRecord> l2 = new ArrayList<ICisRecord>();
+		List<ICis> l2 = new ArrayList<ICis>();
 
-		Iterator<CisEditor> it = getOwnedCISs().iterator();
+		Iterator<Cis> it = getOwnedCISs().iterator();
 		 
 		while(it.hasNext()){
-			 CisEditor element = it.next();
+			 Cis element = it.next();
 			 l2.add(element);
 			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 	     }*/
@@ -488,7 +527,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 
 	@Override
-	public ICisRecord[] getCisList(ICisRecord arg0) {
+	public ICis[] getCisList(ICis arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -504,10 +543,6 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 
 
-
-
-
-
 	
 	/**
 	 * Get a CIS Record with the ID cisId.
@@ -518,12 +553,12 @@ public class CisManager implements ICisManager, IFeatureServer{
 	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
 	 */
 	@Override
-	public ICisRecord getCis(String cssId, String cisId) {
+	public ICis getCis(String cssId, String cisId) {
 		
 		// first we check it on the owned CISs		
-		Iterator<CisEditor> it = getOwnedCISs().iterator();
+		Iterator<Cis> it = getOwnedCISs().iterator();
 		while(it.hasNext()){
-			 CisEditor element = it.next();
+			 Cis element = it.next();
 			 if (element.getCisId().equals(cisId))
 				 return element;
 	     }
@@ -545,9 +580,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 	@Override
 	public ICisOwned getOwnedCis(String cisId) {
 		// first we check it on the owned CISs		
-		Iterator<CisEditor> it = getOwnedCISs().iterator();
+		Iterator<Cis> it = getOwnedCISs().iterator();
 		while(it.hasNext()){
-			 CisEditor element = it.next();
+			 Cis element = it.next();
 			 if (element.getCisId().equals(cisId))
 				 return element;
 	     }
@@ -586,13 +621,74 @@ public class CisManager implements ICisManager, IFeatureServer{
 	// getters and setters
 	
 	
-	public Set<CisEditor> getOwnedCISs() {
+	public Set<Cis> getOwnedCISs() {
 		return ownedCISs;
 	}
 
 	public Set<CisSubscribedImp> getSubscribedCISs() {
 		return subscribedCISs;
 	}
+
+
+// client methods
+	
+	@Override
+	public void joinRemoteCIS(String cisId, ICisManagerCallback callback) {
+		
+		LOG.debug("client call to join a RemoteCIS");
+
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = this.CSSendpoint.getIdManager().fromJid(cisId);
+			Stanza stanza = new Stanza(toIdentity);
+			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
+					stanza.getId(), callback, this);
+
+			Community c = new Community();
+
+			c.setJoin("");
+			try {
+				LOG.info("Sending stanza with join");
+				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			LOG.info("Problem with the input jid when trying to send the join");
+			e1.printStackTrace();
+		}
+	}
+
+	@Override
+	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback){
+		LOG.debug("client call to leave a RemoteCIS");
+
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = this.CSSendpoint.getIdManager().fromJid(cisId);
+			Stanza stanza = new Stanza(toIdentity);
+			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
+					stanza.getId(), callback, this);
+
+			Community c = new Community();
+
+			c.setLeave("");
+			try {
+				LOG.info("Sending stanza with leave");
+				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			LOG.info("Problem with the input jid when trying to send the join");
+			e1.printStackTrace();
+		}
+	}
+
 
 
 }

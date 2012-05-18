@@ -55,17 +55,18 @@ import org.societies.api.context.model.CtxAttributeValueType;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-/**import org.societies.api.cis.management.ICisRecord;
+/**import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisEditor;*/
 
-import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ICisOwned;
-import org.societies.orchestration.api.ICisEditor;
+import org.societies.orchestration.api.ICisParticipant;
+//import org.societies.orchestration.api.ICisEditor;
 
-import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisSubscribed;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
@@ -161,7 +162,7 @@ public class EgocentricCommunityCreationManagerTest {
 		
 		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null)));
 		
-		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICis(null, null, null, null, null, members, null, null, null)));
 	}
 	
 	@Test
@@ -239,7 +240,7 @@ public class EgocentricCommunityCreationManagerTest {
 		
 		String[] members = new String[1];
 		members[0] = "James";
-		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICis(null, null, null, null, null, members, null, null, null)));
 	}
     
     @Test
@@ -250,7 +251,7 @@ public class EgocentricCommunityCreationManagerTest {
     @Test
     public void testNotCreateDuplicateCis() {
     	cisManager = mock(ICisManager.class);
-    	ICisRecord cisRecord = mock(ICisRecord.class);
+    	ICis cisRecord = mock(ICis.class);
     	IIdentity ownerId = mock(IIdentity.class);
     	//cisManager.addCis(ownerId, cisRecord);
     	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
@@ -270,7 +271,7 @@ public class EgocentricCommunityCreationManagerTest {
     @Test
     public void testNotSuggestUndesiredCis() {
     	cisManager = mock(ICisManager.class);
-    	ICisRecord cisRecord = mock(ICisRecord.class);
+    	ICis cisRecord = mock(ICis.class);
     	IIdentity ownerId = mock(IIdentity.class);
     	//cisManager.addCis(ownerId, cisRecord);
     	ServiceResourceIdentifier serviceId = mock(ServiceResourceIdentifier.class);

@@ -24,14 +24,19 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
 
 /**
- * 
+ * Storage of raw events (data access, data transmission)
  *
  * @author Mitja Vardjan
  *
@@ -40,23 +45,78 @@ public class PrivacyLog implements IPrivacyLog {
 
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyLog.class);
 
+	private List<DataAccessLogEntry> dataAccess = new ArrayList<DataAccessLogEntry>();
+	private List<DataTransmissionLogEntry> dataTransmission = new ArrayList<DataTransmissionLogEntry>();;
+	private List<IIdentity> senderIds = new ArrayList<IIdentity>();
+
+	private List<String> senderClassNames = new ArrayList<String>();
+	
 	public PrivacyLog() {
-		LOG.info("constructor");
+		
+		LOG.info("Constructor");
+	}
+	
+	/**
+	 * Gets all data access recorded so far.
+	 * If you need to add any new element, then use
+	 * {@link #append(DataAccessLogEntry)} instead.
+	 * This method shall be used only to change or add information to existing elements.
+	 * 
+	 * @return all data access entries
+	 */
+	public List<DataAccessLogEntry> getDataAccess() {
+		return dataAccess;
+	}
+	
+	/**
+	 * Gets all data transmissions recorded so far.
+	 * If you need to add any new transmission, then use
+	 * {@link #append(DataTransmissionLogEntry)} instead.
+	 * This method shall be used only to change or add information to existing elements.
+	 * 
+	 * @return all data transmissions
+	 */
+	public List<DataTransmissionLogEntry> getDataTransmission() {
+		return dataTransmission;
+	}
+	
+	public void append(DataAccessLogEntry entry) {
+		dataAccess.add(entry);
+	}
+	
+	public void append(DataTransmissionLogEntry entry) {
+		dataTransmission.add(entry);
+		senderIds.add(entry.getSender());
+		senderClassNames.add(entry.getSenderClass());
+	}
+	
+	/**
+	 * @return the senderIds
+	 */
+	public List<IIdentity> getSenderIds() {
+		return senderIds;
+	}
+
+	/**
+	 * @return the senderClassNames
+	 */
+	public List<String> getSenderClassNames() {
+		return senderClassNames;
 	}
 	
 	@Override
-	public LogEntry[] search(PrivacyLogFilter filter) {
+	public List<DataTransmissionLogEntry> search(PrivacyLogFilter filter) {
 		
 		LOG.debug("search({})", filter);
 		
-		return null;
+		return null;  // FIXME
 	}
 	
 	@Override
-	public LogEntry[] getAll() {
+	public List<DataTransmissionLogEntry> getAll() {
 		
 		LOG.debug("getAll()");
 		
-		return null;
+		return dataTransmission;
 	}
 }

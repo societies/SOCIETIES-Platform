@@ -54,7 +54,7 @@
         <property name="dataSource" ref="societiesDataSource" />
         <property name="annotatedClasses" >
             <list>
-                <value>org.societies.cis.manager.CisEditor</value>
+                <value>org.societies.cis.manager.Cis</value>
                 <value>org.societies.cis.manager.CisRecord</value>
                 <value>org.societies.cis.manager.CisParticipant</value>
                 <value>org.societies.activity.model.Activity</value>
@@ -91,4 +91,10 @@
     <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" >
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
+    
+   <!-- <bean id="CisClientService" 
+    	class="org.societies.cis.manager.CisManagerClient">
+    	<constructor-arg ref="CisManagementBundle"/>
+    </bean>-->
+    
 </beans>

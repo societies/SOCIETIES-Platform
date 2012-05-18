@@ -24,6 +24,8 @@
  */
 package org.societies.integration.test.bit.ctx_personalisation;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -56,6 +58,12 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 		volumes = new Hashtable<IIdentity, String>();
 		myServiceID = new ServiceResourceIdentifier();
 		myServiceID.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
+		try {
+			myServiceID.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	@Override
 	public ServiceResourceIdentifier getServiceIdentifier() {
@@ -92,6 +100,7 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	public void setVolume(IIdentity userId, String volume) {
 		
 		IAction action = new Action(this.myServiceID, "HelloWorld", "volume", volume);
+		log("sending action to uam: "+action.toString());
 		this.uam.monitor(userId, action);
 	}
 	/**

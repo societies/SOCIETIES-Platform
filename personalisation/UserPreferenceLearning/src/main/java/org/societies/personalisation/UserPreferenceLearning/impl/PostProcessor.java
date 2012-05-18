@@ -177,6 +177,8 @@ public class PostProcessor
 		//Add tree to return list
 		IPreferenceTreeModel newTree = new PreferenceTreeModel(root);
 		newTree.setPreferenceName(paramName);
+		newTree.setServiceID(serviceId);
+		newTree.setServiceType(serviceType);
 
 		return newTree;
 	}

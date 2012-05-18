@@ -24,12 +24,13 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
-import javax.persistence.CascadeType;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
@@ -62,23 +63,38 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	private long id;
 	
 	/** The identifier of this trusted entity. */
-	@Columns(columns={
-			@Column(name = "trustorId", nullable = false, updatable = false, length = 256),
-			@Column(name = "trusteeId", nullable = false, updatable = false, length = 256)
+	@Columns(columns = {
+			@Column(name = "trustor_id", nullable = false, updatable = false, length = 256),
+			@Column(name = "trustee_id", nullable = false, updatable = false, length = 256)
 	})
-	@Type(type="org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
+	@Type(type = "org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
 	
 	/** The direct trust in this entity. */
-	@OneToOne(cascade = CascadeType.ALL)
+	@Embedded
+	@AttributeOverrides({
+        @AttributeOverride(name = "value", column = @Column(name = "direct_trust_value")),
+        @AttributeOverride(name = "lastModified", column = @Column(name = "direct_trust_last_modified")),
+        @AttributeOverride(name = "lastUpdated", column = @Column(name = "direct_trust_last_updated"))
+	})
 	private DirectTrust directTrust = new DirectTrust();
 	
 	/** The indirect trust in this entity. */
-	@OneToOne(cascade = CascadeType.ALL)
+	@Embedded
+	@AttributeOverrides({
+        @AttributeOverride(name = "value", column = @Column(name = "indirect_trust_value")),
+        @AttributeOverride(name = "lastModified", column = @Column(name = "indirect_trust_last_modified")),
+        @AttributeOverride(name = "lastUpdated", column = @Column(name = "indirect_trust_last_updated"))
+	})
 	private IndirectTrust indirectTrust = new IndirectTrust();
 	
 	/** The user-perceived trust in this entity. */
-	@OneToOne(cascade = CascadeType.ALL)
+	@Embedded
+	@AttributeOverrides({
+        @AttributeOverride(name = "value", column = @Column(name = "user_perceived_trust_value")),
+        @AttributeOverride(name = "lastModified", column = @Column(name = "user_perceived_trust_last_modified")),
+        @AttributeOverride(name = "lastUpdated", column = @Column(name = "user_perceived_trust_last_updated"))
+	})
 	private UserPerceivedTrust userPerceivedTrust = new UserPerceivedTrust();
 
 	TrustedEntity(final TrustedEntityId teid) {
@@ -102,6 +118,8 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	@Override
 	public IDirectTrust getDirectTrust() {
 		
+		// ugly hack - see https://issues.jboss.org/browse/HIBERNATE-50
+		if (this.directTrust == null) this.directTrust = new DirectTrust();
 		return this.directTrust;
 	}
 	
@@ -112,6 +130,8 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	@Override
 	public IIndirectTrust getIndirectTrust() {
 		
+		// ugly hack - see https://issues.jboss.org/browse/HIBERNATE-50
+		if (this.indirectTrust == null) this.indirectTrust = new IndirectTrust();
 		return this.indirectTrust;
 	}
 	
@@ -122,6 +142,8 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	@Override
 	public IUserPerceivedTrust getUserPerceivedTrust() {
 		
+		// ugly hack - see https://issues.jboss.org/browse/HIBERNATE-50
+		if (this.userPerceivedTrust == null) this.userPerceivedTrust = new UserPerceivedTrust();
 		return this.userPerceivedTrust;
 	}
 	
@@ -163,13 +185,13 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		
 		final StringBuilder sb = new StringBuilder();
+		
 		sb.append("{");
 		sb.append("teid=" + this.teid);
 		sb.append(",");

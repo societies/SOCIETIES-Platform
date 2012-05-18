@@ -24,14 +24,17 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
-import org.societies.privacytrust.trust.api.model.ITrustedDeveloper;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 
 /**
@@ -45,7 +48,10 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
  * @since 0.0.1
  */
 @Entity
-@Table(name=TableName.TRUSTED_SERVICE, uniqueConstraints={@UniqueConstraint(columnNames={"trustorId", "trusteeId"})})
+@Table(
+		name = TableName.TRUSTED_SERVICE, 
+		uniqueConstraints = { @UniqueConstraint(columnNames = { "trustor_id", "trustee_id" }) }
+)
 public class TrustedService extends TrustedEntity implements ITrustedService {
 
 	private static final long serialVersionUID = 8253551733059925542L;
@@ -55,13 +61,24 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	private final String type;
 	
 	/** The CSS providing this service. */
+	@ManyToOne(
+			cascade = CascadeType.MERGE,
+			targetEntity = TrustedCss.class,
+			fetch = FetchType.EAGER,
+			optional = true
+	)
+	@JoinColumn(
+			name = TableName.TRUSTED_CSS + "_id",
+			nullable = true,
+			updatable = true
+	)
 	private ITrustedCss provider;
 	
 	/** The developer of this service. */
 	//private ITrustedDeveloper developer;
 	
 	/* The communities sharing this service. */
-	//private final Set<TrustedCis> communities = new CopyOnWriteArraySet<TrustedCis>();
+	//private final Set<TrustedCis> communities = new HashSet<TrustedCis>();
 
 	/* Empty constructor required by Hibernate */
 	private TrustedService() {
@@ -76,7 +93,7 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 		this.type = type;
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getType()
 	 */
 	@Override
@@ -85,7 +102,7 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 		return this.type;
 	}
 	
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getProvider()
 	 */
 	@Override
@@ -95,11 +112,23 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#setProvider(org.societies.privacytrust.trust.api.model.ITrustedCss)
 	 */
 	@Override
 	public void setProvider(ITrustedCss provider) {
+		
+		if (this.provider == null && provider != null) {
+			
+			if (!provider.getServices().contains(this))
+				provider.getServices().add(this);
+		} else if (this.provider != null) {
+		
+			if (this.provider.getServices().contains(this))
+				this.provider.getServices().remove(this);
+			
+			if (provider != null && !provider.getServices().contains(this))
+				provider.getServices().add(this);
+		}
 		
 		this.provider = provider;
 	}

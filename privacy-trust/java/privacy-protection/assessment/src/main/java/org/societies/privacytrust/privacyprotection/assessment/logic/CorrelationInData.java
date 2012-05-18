@@ -24,55 +24,132 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
+ * Estimation of correlation between two events (data access and data transmission) based on size
+ * difference between the data in events.
  * 
+ * The function itself is basically e^(-x^2), usually without x axis shift, with max value
+ * of 1.
+ * This results in a correlation that: <br/>
+ * - is 1 if size of accessed data matches size of transmitted data. <br/>
+ * - continuously decreases with size difference <br/>
+ * - then asymptotically approaches a value greater than zero (multiple data can be accumulated and
+ * sent at once in a bigger chunk; on the other hand data can be compressed and smaller transmitted
+ * data does not necessarily mean the events are not correlated) <br/>
  *
  * @author Mitja Vardjan
  *
  */
 public class CorrelationInData {
-	
-	private final double VALUE_AT_INF_DEFAULT = 0;
-	private final double SIZE_SHIFT_DEFAULT = 0;
+
+	private static Logger LOG = LoggerFactory.getLogger(CorrelationInData.class);
+
+	private final double VALUE_AT_INF_DEFAULT = 0.1;
+	private final double SIZE_SCALE_DEFAULT = 1;
 	
 	private double valueAtInf;
-	private double xShift;
+	private double xScaleLeft;
+	private double xScaleRight;
 
+	private double normalizationFactor;
+	private double normalizationOffset;
+	
+	/**
+	 * Constructor with default values.
+	 */
 	public CorrelationInData() {
 		valueAtInf = VALUE_AT_INF_DEFAULT;
-		xShift = SIZE_SHIFT_DEFAULT;
+		xScaleLeft = SIZE_SCALE_DEFAULT;
+		xScaleRight = SIZE_SCALE_DEFAULT;
+		calculateNormalizationParameters();
 	}
 	
-	public CorrelationInData(double valueAtInf, double sizeShift) {
-		this.valueAtInf = valueAtInf;
-		this.xShift = sizeShift;
-	}
-	
-	private double correlationUnnormalized(double dt) {
+	/**
+	 * Constructor.
+	 * 
+	 * @param valueAtInf Minimal correlation value for events that are most far apart.
+	 * 
+	 * @param sizeScaleLeft x axis scaling factor for cases when data size difference is negative.
+	 * Negative difference can occur for example when data has been compressed before sending.
+	 * If greater than 1, the correlation function gets wider (less sensitive to size differences).
+	 * If smaller than 1, the function gets more narrow (more sensitive to size differences).
+	 * 
+	 * @param sizeScaleRight x axis scaling factor for cases when data size difference is positive.
+	 * Positive difference can occur for example when multiple pieces of data have been accumulated
+	 * before sending everything in a single packet.
+	 * If greater than 1, the correlation function gets wider (less sensitive to size differences).
+	 * If smaller than 1, the function gets more narrow (more sensitive to size differences).
+	 */
+	public CorrelationInData(double valueAtInf, double sizeScaleLeft, double sizeScaleRight) {
 		
-		double c;
-		
-		c = 1 - 1 / (1 + Math.exp(-(dt - xShift)));
-		return c;
-	}
-	
-	public double correlation(double dt) {
-		
-		double c;
-		
-		if (dt < 0) {
-			c = 0;
+		if (valueAtInf >= 1 || valueAtInf < 0) {
+			LOG.warn("Unexpected value for valueAtInf: {}. Setting default value: {}",
+					valueAtInf, VALUE_AT_INF_DEFAULT);
+			this.valueAtInf = VALUE_AT_INF_DEFAULT;
 		}
 		else {
-			c = normalize(correlationUnnormalized(dt));
+			this.valueAtInf = valueAtInf;
 		}
+		this.xScaleLeft = sizeScaleLeft;
+		this.xScaleRight = sizeScaleRight;
+		calculateNormalizationParameters();
+	}
+	
+	private double correlationUnnormalized(long deltaSize) {
+		
+		double c;
+		double xScale;
+		
+		if (deltaSize < 0) {
+			xScale = this.xScaleLeft;
+		}
+		else {
+			xScale = this.xScaleRight;
+		}
+		
+		c = Math.exp(-Math.pow(deltaSize / xScale, 2));
 		return c;
 	}
 	
-	public double normalize(double x) {
+	/**
+	 * Estimates correlation between two events (data access and data transmission) based on sizes
+	 * of data in both events.
+	 * 
+	 * @param deltaSize Difference in size of data in bytes.
+	 * Size of transmitted data - size of accessed data.
+	 * 
+	 * @return correlation based on difference in data sizes.
+	 */
+	public double correlation(long deltaSize) {
 		
-		double k = 1 - valueAtInf;
-		double n = valueAtInf;
-		return k * x + n;
+		double c;
+		
+		c = normalize(correlationUnnormalized(deltaSize));
+		return c;
+	}
+	
+	/**
+	 * Normalize to interval [valueAtInf, 1]
+	 * 
+	 * @param x The value to normalize
+	 * @return Normalized value
+	 */
+	private double normalize(double x) {
+		return normalizationFactor * x + normalizationOffset;
+	}
+	
+	private void calculateNormalizationParameters() {
+		
+		// Value of Math.exp(-Math.pow(0 / xScale, 2)) is always 1
+		// => no need to divide normalizationFactor with it
+		this.normalizationFactor = (1 - valueAtInf);
+		this.normalizationOffset = valueAtInf;
+	}
+	
+	public double getMeanCorrelation() {
+		return (1 - valueAtInf) / 2;
 	}
 }

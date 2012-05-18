@@ -21,8 +21,8 @@ package org.societies.orchestration.api;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-//import org.societies.api.cis.management.ICisRecord;
-import org.societies.orchestration.api.ICisRecord;
+//import org.societies.api.cis.management.ICis;
+import org.societies.orchestration.api.ICis;
 
 import java.util.ArrayList;
 import java.util.HashMap;

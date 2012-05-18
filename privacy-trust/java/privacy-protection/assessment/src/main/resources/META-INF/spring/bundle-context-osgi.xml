@@ -12,6 +12,6 @@
        testing of the bundle outside of an OSGi container -->
        
     <!-- Defined in privacy-protection-bundle -->   
-	<!-- osgi:service ref="PrivacyLog" interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog" /-->
+
 	
 </beans>

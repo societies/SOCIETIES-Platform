@@ -35,23 +35,29 @@ import static org.mockito.Mockito.*;
 
 //import org.societies.api.internal.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICisManager;
-//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICis;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-//import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICis;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 
-import org.societies.api.cis.management.ICisRecord;
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisSubscribed;
-import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 //import org.societies.api.cis.management.ICis;
+
+/**import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisEditor;*/
+
+import org.societies.orchestration.api.ICis;
+import org.societies.orchestration.api.ICisManager;
+import org.societies.orchestration.api.ICisOwned;
+import org.societies.orchestration.api.ICisParticipant;
+//import org.societies.orchestration.api.ICisEditor;
 
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 
@@ -83,7 +89,7 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	private EgocentricCommunityConfigurationManager egocentricConfigurationManager;
 	private EgocentricCommunityDeletionManager egocentricDeletionManager;
 	
-	private ArrayList<ICisRecord> userCiss;
+	private ArrayList<ICis> userCiss;
 	private HashMap<IIdentity, String> userCissMetadata;
 	
 	private IIdentity linkedCss;
@@ -116,7 +122,7 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		
-		userCiss = new ArrayList<ICisRecord>();
+		userCiss = new ArrayList<ICis>();
 		userCissMetadata = new HashMap<IIdentity, String>();
 		
 		lastTemporaryCheck = new Date();
@@ -127,7 +133,7 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	}
 	
 	public void removeObsoleteRecordedCiss() {
-		ICisRecord[] ciss = cisManager.getCisList(null);
+		ICis[] ciss = cisManager.getCisList(null);
 		//boolean notFound = true;
 		//for (int m = 0; m < ciss.length; m++) {
 		//    if (userCissMetadata.get(ciss[m].getID()) == null)
