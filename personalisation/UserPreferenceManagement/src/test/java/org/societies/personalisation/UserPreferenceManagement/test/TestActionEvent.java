@@ -41,9 +41,11 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
@@ -205,12 +207,14 @@ public class TestActionEvent {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY")).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			List<CtxIdentifier> prefCtxIdlist = new ArrayList<CtxIdentifier>();
 			prefCtxIdlist.add(this.preferenceEntity.getId());
-			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, "PREFERENCE")).thenReturn(new AsyncResult<List<CtxIdentifier>>(prefCtxIdlist));
+			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(prefCtxIdlist));
 			Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) Mockito.eq(preferenceEntity.getId()), Mockito.anyString())).thenReturn(new AsyncResult<CtxAttribute>(this.preferenceAttribute));
 			List<CtxIdentifier> personList = new ArrayList<CtxIdentifier>();
 			personList.add(this.personEntity.getId());
 			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, "PERSON")).thenReturn(new AsyncResult<List<CtxIdentifier>>(personList));
 			Mockito.when(ctxBroker.retrieve(Mockito.eq(personEntity.getId()))).thenReturn(new AsyncResult<CtxModelObject>(personEntity));
+			IndividualCtxEntity weirdPerson = new IndividualCtxEntity(personEntity.getId());
+			Mockito.when(ctxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
