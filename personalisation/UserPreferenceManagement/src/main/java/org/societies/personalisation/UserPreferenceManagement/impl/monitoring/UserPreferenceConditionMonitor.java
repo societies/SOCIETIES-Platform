@@ -125,7 +125,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 	
 	public void initialisePreferenceManagement(){
-		this.prefMgr = new UserPreferenceManagement(null, this.getCtxBroker());
+		this.prefMgr = new UserPreferenceManagement(this.getCtxBroker());
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
 		logging.debug(this.getClass().toString()+": INITIALISED");
@@ -149,7 +149,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		this.setCtxBroker(broker);
 		
 		
-		this.prefMgr = new UserPreferenceManagement(null, this.getCtxBroker());
+		this.prefMgr = new UserPreferenceManagement( this.getCtxBroker());
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
 		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
