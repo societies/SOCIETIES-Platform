@@ -168,9 +168,17 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		LOG.debug("logContext()");
 		
 		String invokerClass = "";  // FIXME
+		IIdentity requestorId;
+		
+		if (requestor == null) {
+			requestorId = null;
+		}
+		else {
+			requestorId = requestor.getRequestorId();
+		}
 		
 		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-				new Date(), requestor.getRequestorId(), invokerClass, owner, -1);
+				new Date(), requestorId, invokerClass, owner, -1);
 		privacyLog.getDataAccess().add(logEntry);
 	}
 
@@ -180,9 +188,17 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		LOG.debug("logContext({})", dataSize);
 		
 		String invokerClass = "";  // FIXME
+		IIdentity requestorId;
+		
+		if (requestor == null) {
+			requestorId = null;
+		}
+		else {
+			requestorId = requestor.getRequestorId();
+		}
 		
 		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-				new Date(), requestor.getRequestorId(), invokerClass, owner, dataSize);
+				new Date(), requestorId, invokerClass, owner, dataSize);
 		privacyLog.getDataAccess().add(logEntry);
 	}
 
