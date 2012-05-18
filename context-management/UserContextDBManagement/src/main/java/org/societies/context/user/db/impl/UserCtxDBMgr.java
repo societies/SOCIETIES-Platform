@@ -48,6 +48,7 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -77,7 +78,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
-	private final IIdentityManager idm;
+	private final IIdentityManager idMgr;
 	
 	private final IIdentity privateId;
 	
@@ -85,13 +86,13 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	private final String privateIdtoString = "myFooIIdentity@societies.local";
 	
 	@Autowired(required=true)
-	UserCtxDBMgr (IIdentityManager idm) {
+	UserCtxDBMgr (ICommManager commMgr) {
 
 		LOG.info(this.getClass() + " instantiated");
 		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
 		
-		this.idm = idm;
-		privateId = idm.getThisNetworkNode();
+		this.idMgr = commMgr.getIdManager();
+		privateId = idMgr.getThisNetworkNode();
 		
 	}
 
@@ -105,7 +106,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		
 		// TODO !!!!!! Identity should be instantiated properly
 		this.privateId = null;
-		this.idm = null;
+		this.idMgr = null;
 	}
 
 	/*
@@ -120,7 +121,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 		final CtxAssociationIdentifier identifier;
 		
-		if (this.idm != null) {
+		if (this.idMgr != null) {
 			identifier = new CtxAssociationIdentifier(this.privateId.getJid(), 
 					type, CtxModelObjectNumberGenerator.getNextValue());
 		}
@@ -192,7 +193,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 		final CtxEntityIdentifier identifier;
 		
-		if (this.idm != null) {
+		if (this.idMgr != null) {
 			identifier = new CtxEntityIdentifier(this.privateId.getJid(), 
 					type, CtxModelObjectNumberGenerator.getNextValue());
 		}
@@ -226,7 +227,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 		CtxEntityIdentifier identifier;
 		
-		if (this.idm != null) {
+		if (this.idMgr != null) {
 			identifier = new CtxEntityIdentifier(this.privateId.getJid(),
 					type, CtxModelObjectNumberGenerator.getNextValue());	
 		}
