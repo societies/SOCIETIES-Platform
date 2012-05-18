@@ -115,7 +115,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		if(session == null)
 			session = this.getSession();//sessionFactory.openSession();
 		
-		ActivityFeed.setSession(session);
+		//ActivityFeed.setSession(session);
 		//getting owned CISes
 		//Query q = session.createQuery("select o from org_societies_cis_manager_Cis o");
 		//this.ownedCISs = (Set<Cis>) q.list();
@@ -140,9 +140,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
 
-		LOG.info("starting up session");
-		this.startup();
-		LOG.info("finished starting up session");
+		//LOG.info("starting up session");
+		//this.startup();
+		//LOG.info("finished starting up session");
 		
 		cisManagerId = CSSendpoint.getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );

@@ -32,7 +32,7 @@ public class ActivityFeed implements IActivityFeed {
 	public ActivityFeed(String id){
 		this.id = id;
 	}
-	//@Autowired 
+	@Autowired 
 	private static SessionFactory sessionFactory;
 	private static Logger log = LoggerFactory.getLogger(ActivityFeed.class);
 	
