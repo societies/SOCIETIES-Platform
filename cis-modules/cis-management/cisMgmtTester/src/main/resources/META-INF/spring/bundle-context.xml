@@ -14,8 +14,8 @@
        	 
 	<bean id="CisMgmtClientTest" 
   		class="org.societies.cis.manager.tester.CisMgmtTester"
-  		depends-on="CisClientService">
-  		<constructor-arg ref="CisClientService"/>
+  		depends-on="CisManagementBundle">
+  		<constructor-arg ref="CisManagementBundle"/>
         <constructor-arg value="${targetCisId}"/>
 	</bean>
        

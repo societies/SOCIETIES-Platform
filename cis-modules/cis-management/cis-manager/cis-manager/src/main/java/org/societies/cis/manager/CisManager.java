@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import org.societies.activity.ActivityFeed;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
 
@@ -74,11 +75,12 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
 
+import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
-import org.societies.api.schema.cis.manager.Community;
 import org.societies.api.schema.cis.manager.Communities;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
+import org.societies.api.schema.cis.manager.CisCommunity;
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteNotification;
 import org.societies.api.schema.cis.manager.SubscribedTo;
@@ -244,7 +246,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	// TODO: review
 	public boolean subscribeToCis(CisRecord i) {
 
-		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid())));
+		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid()),this));
 		return true;
 		
 	}
@@ -358,9 +360,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					
 					while(it.hasNext()){
 						CisRecord element = it.next().getCisRecord();
-						Community community = new Community();
+						CisCommunity community = new CisCommunity();
 						community.setCommunityJid(element.getCisJid());
-						com.getCommunity().add(community);
+						com.getCisCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
 				}
@@ -372,9 +374,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					
 					while(it.hasNext()){
 						CisSubscribedImp element = it.next();
-						Community community = new Community();
+						CisCommunity community = new CisCommunity();
 						community.setCommunityJid(element.getCisId());
-						com.getCommunity().add(community);
+						com.getCisCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
 				}
@@ -450,9 +452,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				return;
 			}
 		}
-		if (payload.getClass().equals(org.societies.api.schema.cis.manager.Community.class)) {
+		if (payload.getClass().equals(Community.class)) {
 
-			org.societies.api.schema.cis.community.Community c = (org.societies.api.schema.cis.community.Community) payload;
+			Community c = (Community) payload;
 
 			// treating new member notifications
 			if (c.getWho() != null) {
@@ -531,43 +533,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			String arg3) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-
-
-
-
-	@Override
-	public Future<ICis> joinRemoteCIS(String cisId) {
-
-/*		org.societies.api.schema.cis.community.Community c = new org.societies.api.schema.cis.community.Community();
-		Join j = new Join();
-		Participant p = new Participant();
-		p.setJid(this.cisManagerId.getJid());
-		j.setParticipant(p);
-		c.setJoin(j);
-		
-		IIdentity targetCisIdentity = null;
-		try {
-			targetCisIdentity = this.CSSendpoint.getIdManager().fromJid(cisId);
-		} catch (InvalidFormatException e) {
-			LOG.warn("invalid cisID as input to joinRemoteCIS");
-			return null;
-		}
-		Stanza stanza = new Stanza(targetCisIdentity);
-		
-		try {
-			this.CSSendpoint.sendIQGet(stanza, c, this);
-		} catch (CommunicationException e) {
-			LOG.warn("communication exception when trying to send join");
-			return null;
-		}*/
-
-		
-		
-		
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 
@@ -659,37 +624,64 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-/*
+// client methods
+	
 	@Override
-	public void receiveResult(Stanza stanza, Object payload) {
-		// TODO Auto-generated method stub
-		LOG.info("callback receive result called");
+	public void joinRemoteCIS(String cisId, ICisManagerCallback callback) {
+		
+		LOG.debug("client call to join a RemoteCIS");
+
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = this.CSSendpoint.getIdManager().fromJid(cisId);
+			Stanza stanza = new Stanza(toIdentity);
+			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
+					stanza.getId(), callback, this);
+
+			Community c = new Community();
+
+			c.setJoin("");
+			try {
+				LOG.info("Sending stanza with join");
+				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			LOG.info("Problem with the input jid when trying to send the join");
+			e1.printStackTrace();
+		}
 	}
 
-
-
 	@Override
-	public void receiveError(Stanza stanza, XMPPError error) {
-		// TODO Auto-generated method stub
-		LOG.info("callback receive error called");
+	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback){
+		LOG.debug("client call to leave a RemoteCIS");
+
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = this.CSSendpoint.getIdManager().fromJid(cisId);
+			Stanza stanza = new Stanza(toIdentity);
+			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
+					stanza.getId(), callback, this);
+
+			Community c = new Community();
+
+			c.setLeave("");
+			try {
+				LOG.info("Sending stanza with leave");
+				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			LOG.info("Problem with the input jid when trying to send the join");
+			e1.printStackTrace();
+		}
 	}
-
-
-
-	@Override
-	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-		// TODO Auto-generated method stub
-		LOG.info("callback receive info called");
-	}
-
-
-
-	@Override
-	public void receiveItems(Stanza stanza, String node, List<String> items) {
-		// TODO Auto-generated method stub
-		LOG.info("callback receive itens called");
-	}
-*/
 
 
 

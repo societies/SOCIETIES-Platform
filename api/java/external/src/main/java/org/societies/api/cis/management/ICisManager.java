@@ -116,19 +116,32 @@ public interface ICisManager {
 	public List<ICisOwned> getListOfOwnedCis();
 
 	
-	/**
-	 * join a CIS hosted in another machine (now 
-	 * 
-	 * @param cisId The ID (jabber ID) of the CIS to join.
-	 * @return interface toward the CIS {@link ICis} in which the user joined
-	 */
-	public Future<ICis> joinRemoteCIS(String cisId);
-	
-	
+
 	// END OF API implementing server functionality
 	
 	// API implementing client functionality (to be called from webapp)
 
+	
+	/**
+	 * Join a CIS (at the moment hosted remotely).
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 * it can be know the result of the join
+	 *  
+	 * @param cisId JID of the CIS to be joined
+	 * @param callback callback function
+	 */
+	public void joinRemoteCIS(String cisId, ICisManagerCallback callback);
+	
+	/**
+	 * Leave a CIS, most likely hosted remotely.
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 *  
+	 * @param cisId JID of the CIS to be joined
+	 * @param callback callback function
+	 */
+	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback);
 	
 	
 	// END of API implementing client functionality

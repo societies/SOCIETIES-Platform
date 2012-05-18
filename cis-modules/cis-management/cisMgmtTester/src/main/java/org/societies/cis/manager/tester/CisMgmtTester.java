@@ -27,6 +27,7 @@ package org.societies.cis.manager.tester;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.IcisManagerClient;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
@@ -42,7 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class CisMgmtTester {
 
-	private IcisManagerClient cisClient;
+	//private IcisManagerClient cisClient;
+	private ICisManager cisClient;
 	
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisMgmtTester.class);
@@ -50,7 +52,7 @@ public class CisMgmtTester {
 	private String targetCisId = null;
 	
 	
-	public CisMgmtTester(IcisManagerClient cisClient, String targetCisId){
+	public CisMgmtTester(ICisManager cisClient, String targetCisId){
 		LOG.info("starting CIS MGMT tester");
 		this.cisClient = cisClient;
 		LOG.info("got autowired reference, target cisId is " + targetCisId);

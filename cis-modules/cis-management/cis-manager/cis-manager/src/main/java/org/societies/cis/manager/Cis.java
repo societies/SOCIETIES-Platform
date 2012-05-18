@@ -532,6 +532,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		// all received IQs contain a community element
 		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
+			LOG.info("community type received");
 			Community c = (Community) payload;
 
 			// JOIN
@@ -574,6 +575,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//return result;
 			}
 			if (c.getLeave() != null) {
+				LOG.info("get leave received");
 				Community result = new Community();
 				result.setCommunityJid(this.getCisId());
 				String jid = stanza.getFrom().getBareJid();
@@ -598,6 +600,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}
 			if (c.getWho() != null) {
 				// WHO
+				LOG.info("get who received");
 				Community result = new Community();
 				Who who = new Who();
 				this.getMembersCss();

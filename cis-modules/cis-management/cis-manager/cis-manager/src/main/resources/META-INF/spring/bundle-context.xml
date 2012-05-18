@@ -92,9 +92,9 @@
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
     
-    <bean id="CisClientService" 
+   <!-- <bean id="CisClientService" 
     	class="org.societies.cis.manager.CisManagerClient">
     	<constructor-arg ref="CisManagementBundle"/>
-    </bean>
+    </bean>-->
     
 </beans>
