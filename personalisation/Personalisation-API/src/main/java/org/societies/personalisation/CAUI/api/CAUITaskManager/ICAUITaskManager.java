@@ -28,6 +28,7 @@ package org.societies.personalisation.CAUI.api.CAUITaskManager;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,8 +82,7 @@ public interface ICAUITaskManager {
 	 * @param taskID
 	 * @param trans Prob
 	 */
-	public IUserIntentTask createTask(String taskName, List<IUserIntentAction> actions, Double [][] matrix);
-
+	public IUserIntentTask createTask(String taskName,LinkedHashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> actions);
 	
 	/**
 	 * Creates a task and assigns a task id to it.
@@ -91,7 +91,7 @@ public interface ICAUITaskManager {
 	 * @param taskID
 	 * @param trans Prob
 	 */
-	public UserIntentModelData createModel(List<IUserIntentTask> tasks, Double [][] matrix);
+	public UserIntentModelData createModel();
 	
 	/**
 	 * Returns the UserAction object of the specified id.
@@ -156,4 +156,8 @@ public interface ICAUITaskManager {
 	public void displayTask (IUserIntentTask task);
 	
 	public void displayModel (UserIntentModelData model);
+	
+	public void setActionLink(IUserIntentAction sourceAction ,IUserIntentAction targetAction, Double transProb);
+
+	public Map<IUserIntentAction, Double> retrieveNextActions(IUserIntentAction currentAction);
 }
