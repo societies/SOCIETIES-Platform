@@ -82,7 +82,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
-	
+
 	/** The privacy logging facility. */
 	@Autowired(required=false)
 	private IPrivacyLogAppender privacyLogAppender;
@@ -93,7 +93,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * @see {@link #setIdentityMgr(IIdentityManager)}
 	 */
 	private IIdentityManager idMgr;
-	
+
 	/** The Context Event Mgmt service reference. */
 	@Autowired(required=true)
 	private ICtxEventMgr ctxEventMgr;
@@ -105,7 +105,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 */
 	@Autowired(required=true)
 	private IUserCtxHistoryMgr userCtxHistoryMgr;
-	
+
 	/**
 	 * The User Context DB Mgmt service reference.
 	 * 
@@ -121,19 +121,19 @@ public class InternalCtxBroker implements ICtxBroker {
 	 */
 	@Autowired(required=true)
 	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr) {
-		
+
 		LOG.info(this.getClass() + " instantiated");
 		this.userCtxDBMgr = userCtxDBMgr;
 		this.idMgr = commMgr.getIdManager();
-		
+
 		this.createCssOperator(); // TODO remove
 	}
-	
+
 	/*
 	 * Used for JUnit testing only.
 	 */
 	public InternalCtxBroker() {
-		
+
 		LOG.info(this.getClass() + " instantiated");
 	}
 
@@ -323,7 +323,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			if (entId.getObjectNumber() == 0) operatorCss = (IndividualCtxEntity) this.userCtxDBMgr.retrieve(entId);
 		}
 		if (operatorCss != null) {
-			
+
 			IIdentity targetCss;
 			try {
 				targetCss = this.idMgr.fromJid(operatorCss.getId().getOperatorId());
@@ -853,17 +853,17 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
 			String attributeType, List<CtxAttributeIdentifier> escortingAttrIds,
 			Date startDate, Date endDate) {
-		
-		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
-	
+
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
+
 		try {
 			List<CtxIdentifier> ctxAttrListIds = this.lookup(CtxModelType.ATTRIBUTE, attributeType).get();
 			//LOG.info("ctxAttribute list "+ctxAttrListIds);
 			CtxAttributeIdentifier primaryAttrId = null;
-					
+
 			for(int i=0; i< ctxAttrListIds.size(); i++){
 				primaryAttrId = (CtxAttributeIdentifier) ctxAttrListIds.get(i);
-				
+
 				IIdentity targetCss;
 				try {
 					targetCss = this.idMgr.fromJid(primaryAttrId.getOperatorId());
@@ -872,7 +872,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				} catch (InvalidFormatException ife) {
 					throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 				}
-				
+
 				List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
 				Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tempTupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>(); 
 
@@ -880,6 +880,8 @@ public class InternalCtxBroker implements ICtxBroker {
 				tupleResults.putAll(tempTupleResults);
 			}			
 			// short tupleResults data based on timestamps
+			// tupleResults = shortByTime((HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>) tupleResults);
+		
 
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -891,11 +893,22 @@ public class InternalCtxBroker implements ICtxBroker {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return new AsyncResult<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>>(tupleResults);
 	}
 
 
+	private LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>> shortByTime(HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>> data){
+		LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>> result = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
+
+		for(CtxHistoryAttribute hocAttr: data.keySet()){
+			System.out.println("shortByTime"+ hocAttr.getLastModified());
+		}
+		
+
+
+		return result;
+	}
 
 
 
@@ -906,11 +919,11 @@ public class InternalCtxBroker implements ICtxBroker {
 			Date arg2, Date arg3) throws CtxException {
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
-		
+
 		//LOG.info("retrieveHistoryTuples updating hocAttrs primaryAttr: "+primaryAttrId);
 
 		if(primaryAttrId!= null){ // TODO throw NPE otherwise
-			
+
 			IIdentity targetCss;
 			try {
 				targetCss = this.idMgr.fromJid(primaryAttrId.getOperatorId());
@@ -1161,7 +1174,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 *            the User Context DB Mgmt service reference to set.
 	 */
 	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
-		
+
 		this.userCtxDBMgr = userDB;
 	}
 
@@ -1172,10 +1185,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	 *            the User Context History Mgmt service reference to set
 	 */
 	public void setUserCtxHistoryMgr(IUserCtxHistoryMgr userCtxHistoryMgr) {
-		
+
 		this.userCtxHistoryMgr = userCtxHistoryMgr;
 	}
-	
+
 	/**
 	 * Sets the IIdentity Mgmt service reference.
 	 * 
@@ -1183,10 +1196,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	 *            the IIdentity Mgmt service reference to set.
 	 */
 	public void setIdentityMgr(IIdentityManager identityMgr) {
-		
+
 		this.idMgr = identityMgr;
 	}
-	
+
 	// TODO remove
 	public void createCssOperator() {
 		try {

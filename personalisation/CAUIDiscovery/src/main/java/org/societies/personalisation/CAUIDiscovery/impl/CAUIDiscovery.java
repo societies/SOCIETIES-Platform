@@ -133,6 +133,8 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			LOG.info("5. Generate UserIntentModelData");
 	
 			ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
+			LOG.info("5a trans2ProbDictionary "+ trans2ProbDictionary);
+			LOG.info("5a ctxActionsMap "+ ctxActionsMap);
 			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
 
 			LOG.info("6. result "+modelData);

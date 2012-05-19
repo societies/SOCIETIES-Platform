@@ -169,7 +169,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 		if(modelExist == false && enablePrediction == true && cauiDiscovery != null){
 			LOG.info("no model predictionRequestsCounter:" +predictionRequestsCounter);
-			if(predictionRequestsCounter >= 4){
+			if(predictionRequestsCounter >= 8){
 				LOG.info("this.cauiDiscovery.generateNewUserModel()");
 				this.cauiDiscovery.generateNewUserModel();	
 				predictionRequestsCounter = 0;
@@ -178,29 +178,34 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 
 		if(modelExist == true && enablePrediction == true){
-			LOG.info("model exists, generateNewUserModel" +modelExist);
+			LOG.info("1. model exists " +modelExist);
+			LOG.info("START PREDICTION ");
 			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
 			//setActiveModel(requestor);
 			String par = action.getparameterName();
 			String val = action.getvalue();
+			LOG.info("2. action perf par:"+ par+" action val:"+val);
 			// add code here for retrieving current context;
 			HashMap<String,Serializable> currentContext = new HashMap<String,Serializable>();
 			// add current context retrieval code
 
 			//Map<IUserIntentAction, IUserIntentTask> currentActionTask = cauiTaskManager.identifyActionTaskInModel(par, val, currentContext, this.lastActions);
 			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
+			LOG.info("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 			if(actionsList.size()>0){
 				IUserIntentAction currentAction = actionsList.get(0);
+				LOG.info("4. currentAction " +currentAction);
 				Map<IUserIntentAction,Double> nextActionsMap = cauiTaskManager.retrieveNextActions(currentAction);	
+				LOG.info("5. nextActionsMap " +nextActionsMap);
 				for(IUserIntentAction nextAction : nextActionsMap.keySet()){
-					//Integer confLevel = new Integer(0);
 					Double doubleConf = nextActionsMap.get(nextAction);
 					nextAction.setConfidenceLevel(doubleConf.intValue());
+					LOG.info("6. nextActionsMap " +nextAction);
 					results.add(nextAction);
 				}			
 			}
 		}
-
+		LOG.info(" ****** prediction map created "+ results);
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
@@ -266,7 +271,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}			
 	}
 
-
+	
 	public void setActiveModel(UserIntentModelData newUIModelData){
 
 		// retrieve model from Context DB
