@@ -74,6 +74,10 @@ public class CAUITaskManagerTest {
 		IUserIntentTask task = modelManager.retrieveTask(taskID);
 		System.out.println("task retrieved:"+task);
 		System.out.println("task retrieved:"+task.getActions());
+		//modelManager.identifyActionTaskInModel("A-homePc", "on", null,null);
+		modelManager.retrieveNextActions(retrievedAction);
+		System.out.println("next action : " +modelManager.retrieveNextActions(retrievedAction));
+		
 	}
 
 	private void createModel(){

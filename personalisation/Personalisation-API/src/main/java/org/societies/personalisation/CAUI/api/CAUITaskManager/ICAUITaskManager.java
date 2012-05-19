@@ -158,4 +158,6 @@ public interface ICAUITaskManager {
 	public void displayModel (UserIntentModelData model);
 	
 	public void setActionLink(IUserIntentAction sourceAction ,IUserIntentAction targetAction, Double transProb);
+
+	public Map<IUserIntentAction, Double> retrieveNextActions(IUserIntentAction currentAction);
 }

@@ -227,25 +227,40 @@ public class CAUITaskManager implements ICAUITaskManager{
 		return false;
 	}
 
+	/*
+	 * need further implementation
+	 * 
+	 * @see org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager#identifyActionTaskInModel(java.lang.String, java.lang.String, java.util.HashMap, java.lang.String[])
+	 */
+	
 	@Override
 	public Map<IUserIntentAction, IUserIntentTask> identifyActionTaskInModel(
 			String actionType, String actionValue, HashMap<String, Serializable> context,
 			String[] lastAction) {
 
 		Map<IUserIntentAction, IUserIntentTask> results = new HashMap<IUserIntentAction, IUserIntentTask>();
-		/*	
-		List<IUserIntentTask> tasks = this.activeModel.getTaskList();
-		for(IUserIntentTask task : tasks){
-			List<IUserIntentAction> actions = task.getActions();
-			for(IUserIntentAction action : actions){
-				if (action.getparameterName().equals(actionType) && action.getvalue().equals(actionValue) ) results.put(action,task);
-			}
-		}	
-		 */
+		
+		UserIntentModelData model = retrieveModel();
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
+		// !!! add code that identifies task
+		for(IUserIntentAction action : actionsMap.keySet()){
+			if (action.getparameterName().equals(actionType) && action.getvalue().equals(actionValue) ) results.put(action,null);
+		}
+	
 		return results;
 	}
 
-	
+	@Override
+	public Map<IUserIntentAction, Double> retrieveNextActions(IUserIntentAction currentAction){
+		 
+		Map<IUserIntentAction, Double> results = new HashMap<IUserIntentAction, Double>();
+		UserIntentModelData model = retrieveModel();
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
+		if(actionsMap.keySet().contains(currentAction)){
+			results = actionsMap.get(currentAction);
+		}		 
+		return results;
+	}
 
 	//*********************************************
 	// model management
