@@ -201,6 +201,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	// this method is not complete
 	private IUserIntentAction findNextAction(IUserIntentTask uiTask,IUserIntentAction uiAction ){
 		IUserIntentAction actionResult = null;
+		/*
 		List<IUserIntentAction> actionList = uiTask.getActions();
 
 		int i = 0;
@@ -210,6 +211,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				actionResult = actionList.get(i+1);
 			}
 		}
+		*/
 		return actionResult;
 	}
 
@@ -264,7 +266,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		// set model as active in CauiTaskManager
 		// until then create and use a fake model
 		//createFakeModel();
-		if (newUIModelData.getMatrix() != null && newUIModelData.getTaskList() != null){
+		if (newUIModelData != null){
 			cauiTaskManager.updateModel(newUIModelData);
 			modelExists = true;		 
 		}
@@ -294,7 +296,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 					uiModelAttr = (CtxAttribute) ctxBroker.retrieve(uiModelAttrID).get();
 					UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
 					LOG.info("UserIntentModelData "+newUIModelData);
-					LOG.info("UserIntentModelData matrix"+newUIModelData.getMatrix()+" tasks "+newUIModelData.getTaskList());
+				//	LOG.info("UserIntentModelData matrix"+newUIModelData.getMatrix()+" tasks "+newUIModelData.getTaskList());
 				
 					//setActiveModel(newUIModelData);
 					} catch (InterruptedException e) {
