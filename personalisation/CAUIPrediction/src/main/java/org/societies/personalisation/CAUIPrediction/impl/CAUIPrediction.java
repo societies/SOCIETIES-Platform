@@ -149,8 +149,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 	@Override
 	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String userActionType) {
-
-		LOG.info("prediction request "+predictionRequestsCounter+" serviceID"+ serviceID+" identity requestor"+ownerID+" userActionType"+userActionType);
+		
+		LOG.info("getCurrentIntentAction "+predictionRequestsCounter+" serviceID"+ serviceID+" identity requestor"+ownerID+" userActionType"+userActionType);
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		IUserIntentAction action = null;
 
@@ -177,7 +177,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		//System.out.println("getPrediction requestor:" + requestor+" action:"+action);
 		//System.out.println("modelExists: "+ modelExists+" cauiDiscovery:" +cauiDiscovery);
-		LOG.info("prediction request "+predictionRequestsCounter+" action"+ action+" identity requestor"+requestor);
+		LOG.info("getCurrentIntentAction "+predictionRequestsCounter+" action"+ action+" identity requestor"+requestor);
 		predictionRequestsCounter = predictionRequestsCounter +1;
 
 		// initiate caui model discovery
@@ -244,8 +244,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			CtxAttribute contextAttribute) {
-
-		LOG.info("prediction request "+predictionRequestsCounter+" contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
+		
+		LOG.info("getCurrentIntentAction"+predictionRequestsCounter+" contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		IUserIntentAction action = null;
