@@ -214,6 +214,12 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		 * The PCM is notified of changes in the personalisable parameters of a service using context. the User Action Monitor 
 		 * populates the context database with this information as soon as it receives an action from a service. 
 		 */
+		
+		
+		if (!this.mt.isServiceRunning(action.getServiceType(), action.getServiceID())){
+			this.processServiceStarted(ownerId, action.getServiceType(), action.getServiceID());
+		}
+		
 		this.logging.debug("request for outcome with input: "+ownerId.getJid()+"\n"+action.toString());
 		this.merging.processActionReceived(ownerId, action);
 		List<IPreferenceOutcome> outcomes = new ArrayList<IPreferenceOutcome>();
@@ -241,7 +247,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 			if (this.registered.contains(info.getICtxIdentifier())){
 				this.logging.debug("Already subscribed for: "+info.getICtxIdentifier().toUriString());
 			}else{
-				this.getPersoMgr().registerForContextUpdate(userId, PersonalisationTypes.UserPreference, info.getICtxIdentifier());
+				this.persoMgr.registerForContextUpdate(userId, PersonalisationTypes.UserPreference, info.getICtxIdentifier());
 				//this.registerForContextEvent((CtxAttributeIdentifier) info.getICtxIdentifier());
 				this.registered.add((CtxAttributeIdentifier) info.getICtxIdentifier());
 				this.logging.debug(userId.getJid()+" Registered for :"+info.getICtxIdentifier().toUriString());
@@ -267,6 +273,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 			}else{
 				//this.registerForContextEvent((CtxAttributeIdentifier) id);
 				this.registered.add((CtxAttributeIdentifier) id);
+				this.persoMgr.registerForContextUpdate(userID, PersonalisationTypes.UserPreference, (CtxAttributeIdentifier) id);
 			}
 		}
 		/*IOutcome out = this.prefMgr.getPreference(this.getMyUSERDPI(), serviceType, serviceId, prefName);

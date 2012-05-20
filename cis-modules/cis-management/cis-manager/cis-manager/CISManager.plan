@@ -8,7 +8,7 @@
 
 
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-    <artifact type="plan" name="org.societies.activityfeed.plan"/> 
+	<artifact type="bundle" name="org.societies.hibernate_classes"/>
 	    <artifact type="bundle" name="org.societies.common-data-source"/>
     <artifact type="bundle" name="org.societies.cis.manager"/>
 

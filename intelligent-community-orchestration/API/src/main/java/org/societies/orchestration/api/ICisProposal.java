@@ -46,9 +46,16 @@ import org.societies.api.identity.IIdentityManager;
  * This interface represents a CIS proposed to be created, or an existing CIS that is stored within
  * it as an ICis. Used internally within T5.1.
  * This is a convenient way to store and pass around data on a CIS that could be created.
- * For configuration and deletion of CISs, where existing CISs are involved, the CisProposal should
- * still be used to pass suggestions to Community Lifecycle Management, but only pass it the ICis
- * that exists.
+ * For configuration and deletion of CISs, where existing CISs are involved, the ICisProposal should
+ * still be used to pass suggestions to Community Lifecycle Management, but whenever an ICisProposal
+ * is used to represent a CIS that already exists, use the 'setActualCis' method to have it store
+ * the CIS. 
+ * 
+ * NOTE: if a suggestion is being made to change an existing CIS's attributes, then
+ * create an ICisProposal and invoke 'setActualCis' for the CIS as it is now, and create another ICisProposal
+ * and don't use setActualCis, but instead set all the attributes on the ICisProposal
+ * for the CIS as you want it to become, with the new attributes.
+ * 
  *
  */
 
@@ -93,10 +100,20 @@ public class ICisProposal {
 		subCiss = new ArrayList<ICisProposal>();
 	}
 	
+	/**
+	 * Get the existing CIS that this proposal datatype is referencing.
+	 * 
+	 * @return The existing CIS that this proposal datatype is referencing
+	 */
 	public ICis getActualCis() {
 		return actualCis;
 	}
 	
+	/**
+	 * Set the existing CIS that this proposal datatype is referencing.
+	 * 
+	 * @param ICis: the existing CIS that this proposal datatype is referencing.
+	 */
 	public void setActualCis(ICis actualCis) {
 		this.actualCis = actualCis;
 	}
