@@ -592,6 +592,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>(); 
     	
+    	String returnStatement = "";
+    	
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		//ICis proposedCis = cisManager.getBlankCisRecord();
     	ICisProposal proposedCis = null;
@@ -759,6 +761,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 						(cisProposal.getMemberList().contains(members))) {
 						
 				        creations.remove(i);
+				        //if (userJoinedCiss.get(m).getActivityFeed().getLastActivity(linkedCss).getTimestamp() < (new Date().getTime() - (1000 * 60 * 60 * 24 * 21))) {
+				            //configurations.add(userJoinedCiss.get(m), new ICisProposal().populate().removeMember(linkedCss));
+				        //returnStatement = "PERFECT MATCH CIS EXISTS";
+				        //}
+				        //else
 				        return "PERFECT MATCH CIS EXISTS";
 				        //Feedback to CSM Analyser suggesting to either remove this model,
 				        //add another attribute to it (suggest one?), or change one or more
