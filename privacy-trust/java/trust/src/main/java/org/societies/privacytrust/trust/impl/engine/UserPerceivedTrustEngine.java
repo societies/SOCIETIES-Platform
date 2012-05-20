@@ -24,9 +24,20 @@
  */
 package org.societies.privacytrust.trust.impl.engine;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
+import org.societies.api.internal.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
+import org.societies.privacytrust.trust.api.event.TrustEventTopic;
+import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +52,8 @@ public class UserPerceivedTrustEngine {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(UserPerceivedTrustEngine.class);
 	
+	private static final double a = 0.5d;
+	
 	/** The Trust Event Mgr service reference. */
 	private ITrustEventMgr trustEventMgr;
 	
@@ -48,9 +61,123 @@ public class UserPerceivedTrustEngine {
 	@Autowired
 	private ITrustRepository trustRepo;
 	
+	/** The executor service. */
+	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
 	@Autowired
-	UserPerceivedTrustEngine(ITrustEventMgr trustEventMgr) {
+	UserPerceivedTrustEngine(ITrustEventMgr trustEventMgr) throws TrustEventMgrException {
 		
 		LOG.info(this.getClass() + " instantiated");
+		this.trustEventMgr = trustEventMgr;
+		
+		LOG.info("Registering for direct and indirect trust updates...");
+		this.trustEventMgr.registerListener(
+				new TrustUpdateListener(), 
+				new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
+					TrustEventTopic.INDIRECT_TRUST_UPDATED }, null);
+	}
+	
+	private class CssUserPerceivedTrustEngine implements Runnable {
+
+		private final TrustedEntityId teid;
+		
+		private CssUserPerceivedTrustEngine(final TrustedEntityId teid) {
+			
+			this.teid = teid;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			if (LOG.isDebugEnabled())
+				LOG.debug("Running CssUserPerceivedTrustEngine for entity " + teid);
+			
+			try {
+				ITrustedCss css = (ITrustedCss) trustRepo.retrieveEntity(teid);
+				if (css == null) {
+					LOG.error("Could not (re)evaluate user-perceived trust for entity "
+						+ teid + ": Entity not found in the trust repository");
+					return;
+				}
+				final double directTrustValue = (css.getDirectTrust().getValue() != null)
+						? css.getDirectTrust().getValue() : 0.0d;
+				final double indirectTrustValue = (css.getIndirectTrust().getValue() != null)
+						? css.getIndirectTrust().getValue() : 0.0d;
+				final double userPerceivedTrustValue = a * directTrustValue + (1-a) * indirectTrustValue;
+				css.getDirectTrust().setValue(userPerceivedTrustValue);
+				trustRepo.updateEntity(css);
+			} catch (TrustException te) {
+				
+				LOG.error("Could not (re)evaluate user-perceived trust for entity "
+						+ teid + ": " + te.getLocalizedMessage(), te);
+			}
+		} 
+	}
+	
+	private class CisUserPerceivedTrustEngine implements Runnable {
+
+		private final TrustedEntityId teid;
+		
+		private CisUserPerceivedTrustEngine(final TrustedEntityId teid) {
+			
+			this.teid = teid;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			if (LOG.isDebugEnabled())
+				LOG.debug("Running CisDirectTrustEngine for entity " + teid);
+		} 
+	}
+	
+	private class ServiceUserPerceivedTrustEngine implements Runnable {
+
+		private final TrustedEntityId teid;
+		
+		private ServiceUserPerceivedTrustEngine(final TrustedEntityId teid) {
+			
+			this.teid = teid;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			if (LOG.isDebugEnabled())
+				LOG.debug("Running ServiceDirectTrustEngine for entity " + teid);
+		} 
+	}
+	
+	private class TrustUpdateListener implements ITrustUpdateEventListener {
+
+		/*
+		 * @see org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener#onUpdate(org.societies.api.internal.privacytrust.trust.event.TrustUpdateEvent)
+		 */
+		@Override
+		public void onUpdate(TrustUpdateEvent evt) {
+			
+			if (LOG.isDebugEnabled())
+				LOG.debug("Received TrustUpdateEvent " + evt);
+			
+			final TrustedEntityId teid = evt.getId();
+			final TrustedEntityType entityType = teid.getEntityType();
+			if (TrustedEntityType.CSS.equals(entityType))
+				executorService.execute(new CssUserPerceivedTrustEngine(teid));
+			else if (TrustedEntityType.CIS.equals(entityType))
+				executorService.execute(new CisUserPerceivedTrustEngine(teid));
+			else if (TrustedEntityType.SVC.equals(entityType))
+				executorService.execute(new ServiceUserPerceivedTrustEngine(teid));
+			else
+				LOG.warn("Unsupported trusted entity type: " + entityType);
+		}		
 	}
 }

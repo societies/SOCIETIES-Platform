@@ -18,5 +18,4 @@
 <!--	<artifact type="bundle" name="org.societies.privacytrust.privacytrustcommmanagement"/>    -->
 	<artifact type="bundle" name="org.societies.privacytrust.privacyprotection"/>
 	<artifact type="bundle" name="org.societies.privacytrust.trust"/>
-	<artifact type="bundle" name="org.societies.privacytrust.trust-client-example"/>
 </plan>
