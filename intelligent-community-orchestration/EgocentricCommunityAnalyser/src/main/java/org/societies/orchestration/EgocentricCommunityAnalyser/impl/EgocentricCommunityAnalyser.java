@@ -62,6 +62,7 @@ import org.societies.orchestration.api.ICisParticipant;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.identity.IIdentityManager;
 
@@ -147,12 +148,24 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	}
 	
 	public void addNewCissToRecords(ArrayList<String> newCissMetadata) {
-		//for (int i = 0; i < newCissMetadata.size(); i++) {
-				//    if (userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) == null)
-				//        userCissMetadata.add(newCissMetadata..get(i).split("---")[0], newCissMetadata.get(i));
-		        //    else if (userCissMetadata.get(newCissMetadata.get(i).split"---")[0] != null)
-		        //        userCissMetadata.replace(newCissMetadata.get(i).split("---")[0], newCissMetadata.get(i));
-	    //}
+		for (int i = 0; i < newCissMetadata.size(); i++) {
+				    if (userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) == null) {
+				        try {
+							userCissMetadata.put(identityManager.fromJid(newCissMetadata.get(i).split("---")[0]), newCissMetadata.get(i));
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				    }
+				    else if (userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) != null) {
+		                try {
+							userCissMetadata.put(identityManager.fromJid(newCissMetadata.get(i).split("---")[0]), newCissMetadata.get(i));
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				    }
+	    }
 	}
 	
 	public void processPreviousLongTimeCycle() {
