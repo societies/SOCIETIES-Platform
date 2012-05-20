@@ -34,7 +34,9 @@ import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
+import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -93,7 +95,7 @@ public class UserPerceivedTrustEngine extends TrustEngine {
 				final double indirectTrustValue = (css.getIndirectTrust().getValue() != null)
 						? css.getIndirectTrust().getValue() : 0.0d;
 				final double userPerceivedTrustValue = a * directTrustValue + (1-a) * indirectTrustValue;
-				css.getDirectTrust().setValue(userPerceivedTrustValue);
+				css.getUserPerceivedTrust().setValue(userPerceivedTrustValue);
 				trustRepo.updateEntity(css);
 			} catch (TrustException te) {
 				
@@ -117,9 +119,29 @@ public class UserPerceivedTrustEngine extends TrustEngine {
 		 */
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
+			
 			if (LOG.isDebugEnabled())
 				LOG.debug("Running CisDirectTrustEngine for entity " + teid);
+			
+			try {
+				ITrustedCis cis = (ITrustedCis) trustRepo.retrieveEntity(teid);
+				if (cis == null) {
+					LOG.error("Could not (re)evaluate user-perceived trust for entity "
+						+ teid + ": Entity not found in the trust repository");
+					return;
+				}
+				final double directTrustValue = (cis.getDirectTrust().getValue() != null)
+						? cis.getDirectTrust().getValue() : 0.0d;
+				final double indirectTrustValue = (cis.getIndirectTrust().getValue() != null)
+						? cis.getIndirectTrust().getValue() : 0.0d;
+				final double userPerceivedTrustValue = a * directTrustValue + (1-a) * indirectTrustValue;
+				cis.getUserPerceivedTrust().setValue(userPerceivedTrustValue);
+				trustRepo.updateEntity(cis);
+			} catch (TrustException te) {
+				
+				LOG.error("Could not (re)evaluate user-perceived trust for entity "
+						+ teid + ": " + te.getLocalizedMessage(), te);
+			}
 		} 
 	}
 	
@@ -137,9 +159,29 @@ public class UserPerceivedTrustEngine extends TrustEngine {
 		 */
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
+			
 			if (LOG.isDebugEnabled())
 				LOG.debug("Running ServiceDirectTrustEngine for entity " + teid);
+			
+			try {
+				ITrustedService service = (ITrustedService) trustRepo.retrieveEntity(teid);
+				if (service == null) {
+					LOG.error("Could not (re)evaluate user-perceived trust for entity "
+						+ teid + ": Entity not found in the trust repository");
+					return;
+				}
+				final double directTrustValue = (service.getDirectTrust().getValue() != null)
+						? service.getDirectTrust().getValue() : 0.0d;
+				final double indirectTrustValue = (service.getIndirectTrust().getValue() != null)
+						? service.getIndirectTrust().getValue() : 0.0d;
+				final double userPerceivedTrustValue = a * directTrustValue + (1-a) * indirectTrustValue;
+				service.getUserPerceivedTrust().setValue(userPerceivedTrustValue);
+				trustRepo.updateEntity(service);
+			} catch (TrustException te) {
+				
+				LOG.error("Could not (re)evaluate user-perceived trust for entity "
+						+ teid + ": " + te.getLocalizedMessage(), te);
+			}
 		} 
 	}
 	
