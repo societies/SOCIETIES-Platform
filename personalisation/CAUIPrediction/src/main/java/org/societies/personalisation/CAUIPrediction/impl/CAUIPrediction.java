@@ -178,29 +178,29 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 
 		if(modelExist == true && enablePrediction == true){
-			LOG.info("1. model exists " +modelExist);
+			//LOG.info("1. model exists " +modelExist);
 			LOG.info("START PREDICTION ");
 			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
 			//setActiveModel(requestor);
 			String par = action.getparameterName();
 			String val = action.getvalue();
-			LOG.info("2. action perf par:"+ par+" action val:"+val);
+		//	LOG.info("2. action perf par:"+ par+" action val:"+val);
 			// add code here for retrieving current context;
 			HashMap<String,Serializable> currentContext = new HashMap<String,Serializable>();
 			// add current context retrieval code
 
 			//Map<IUserIntentAction, IUserIntentTask> currentActionTask = cauiTaskManager.identifyActionTaskInModel(par, val, currentContext, this.lastActions);
-			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
-			LOG.info("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
+		 	List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
+		//	LOG.info("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 			if(actionsList.size()>0){
 				IUserIntentAction currentAction = actionsList.get(0);
-				LOG.info("4. currentAction " +currentAction);
+			//	LOG.info("4. currentAction " +currentAction);
 				Map<IUserIntentAction,Double> nextActionsMap = cauiTaskManager.retrieveNextActions(currentAction);	
-				LOG.info("5. nextActionsMap " +nextActionsMap);
+			//	LOG.info("5. nextActionsMap " +nextActionsMap);
 				for(IUserIntentAction nextAction : nextActionsMap.keySet()){
 					Double doubleConf = nextActionsMap.get(nextAction);
 					nextAction.setConfidenceLevel(doubleConf.intValue());
-					LOG.info("6. nextActionsMap " +nextAction);
+			//		LOG.info("6. nextActionsMap " +nextAction);
 					results.add(nextAction);
 				}			
 			}

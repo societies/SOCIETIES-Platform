@@ -110,39 +110,37 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	public void generateNewUserModel() {
 
 		LOG.info("start model generation");
-		LOG.info("1. Retrieve History Data");
-
+	
 		if (retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION) != null ){
 
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
 
-			LOG.info("2. Convert History Data");
+			//LOG.info("2. Convert History Data");
 			List<MockHistoryData> mockData = convertHistoryData(mapHocData);
 
-			LOG.info("3. Generate Transition Dictionary");
-			System.out.println("3. Generate Transition Dictionary");
+			//LOG.info("3. Generate Transition Dictionary");
 			LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = generateTransitionsDictionary(mockData);
 					
-			LOG.info("4. Generate Transition Propability Dictionary (step2)");
+			//LOG.info("4. Generate Transition Propability Dictionary (step2)");
 			TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
 			LinkedHashMap<String,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(currentActCtxDictionary);	
 			//printTransProbDictionary(trans2ProbDictionary);
-			LOG.info("5. Assign context to actions");
+			//LOG.info("5. Assign context to actions");
 			
 			HashMap<String,List<String>> ctxActionsMap =  assignContextToAction(currentActCtxDictionary);
-			LOG.info("5. Generate UserIntentModelData");
+			//LOG.info("5. Generate UserIntentModelData");
 	
 			ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
-			LOG.info("5a trans2ProbDictionary "+ trans2ProbDictionary);
-			LOG.info("5a ctxActionsMap "+ ctxActionsMap);
+			//LOG.info("5a trans2ProbDictionary "+ trans2ProbDictionary);
+			//LOG.info("5a ctxActionsMap "+ ctxActionsMap);
 			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
 
-			LOG.info("6. result "+modelData);
+			//LOG.info("6. result "+modelData);
 
-			LOG.info("7. Store UserIntentModelData to ctx DB");
+			//LOG.info("7. Store UserIntentModelData to ctx DB");
 
 			CtxAttribute ctxAttr = storeModelCtxDB(modelData);
-			LOG.info("model stored "+ctxAttr.getId());
+			//LOG.info("model stored "+ctxAttr.getId());
 
 		}else LOG.info("not enough history data");
 	}
