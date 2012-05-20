@@ -108,6 +108,9 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	
 	private IDeviceManager deviceManager;
 	
+	private int temporaryCheckInterval;
+	private int ongoingCheckInterval;
+	
 	/*
      * Constructor for EgocentricCommunityAnalyser
      * 
@@ -128,17 +131,19 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 		lastTemporaryCheck = new Date();
 		lastOngoingCheck = new Date();
 		
+		temporaryCheckInterval = 1000 * 60 * 3;
+		ongoingCheckInterval = 1000 * 60 * 60 * 24;
 		//else
 		//	this.linkedDomain = linkedEntity;
 	}
 	
 	public void removeObsoleteRecordedCiss() {
 		ICis[] ciss = cisManager.getCisList(null);
-		//boolean notFound = true;
-		//for (int m = 0; m < ciss.length; m++) {
-		//    if (userCissMetadata.get(ciss[m].getID()) == null)
-		//        userCissMetadata.remove(ciss[m]);
-		//}
+		boolean notFound = true;
+		for (int m = 0; m < ciss.length; m++) {
+		    if (userCissMetadata.get(ciss[m].getCisId()) == null)
+		        userCissMetadata.remove(ciss[m]);
+		}
 	}
 	
 	public void addNewCissToRecords(ArrayList<String> newCissMetadata) {
@@ -179,7 +184,7 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 			while (true) {
 				//try {
 					Date date = new Date();
-					if (date.getTime() >= (lastTemporaryCheck.getTime() + (1000 * 180))) {
+					if (date.getTime() >= (lastTemporaryCheck.getTime() + (temporaryCheckInterval))) {
 						processPreviousShortTimeCycle();
 						lastTemporaryCheck.setTime(date.getTime());
 					}
@@ -198,7 +203,7 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 		public void run() {
 			while (true) {
 				Date date = new Date();
-				if (date.getTime() >= (lastOngoingCheck.getTime() + (1000 * 60 ^ 60 * 24))) {
+				if (date.getTime() >= (lastOngoingCheck.getTime() + (ongoingCheckInterval))) {
 					processPreviousLongTimeCycle();
 					lastOngoingCheck.setTime(date.getTime());
 				}
