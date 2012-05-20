@@ -24,9 +24,6 @@
  */
 package org.societies.privacytrust.trust.impl.engine;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.TrustException;
@@ -38,7 +35,6 @@ import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
-import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,31 +43,21 @@ import org.springframework.stereotype.Service;
  * @since 0.0.8
  */
 @Service
-public class UserPerceivedTrustEngine {
+public class UserPerceivedTrustEngine extends TrustEngine {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(UserPerceivedTrustEngine.class);
 	
 	private static final double a = 0.5d;
 	
-	/** The Trust Event Mgr service reference. */
-	private ITrustEventMgr trustEventMgr;
-	
-	/** The Trust Repository service reference. */
-	@Autowired
-	private ITrustRepository trustRepo;
-	
-	/** The executor service. */
-	private ExecutorService executorService = Executors.newSingleThreadExecutor();
-	
 	@Autowired
 	UserPerceivedTrustEngine(ITrustEventMgr trustEventMgr) throws TrustEventMgrException {
 		
+		super(trustEventMgr);
 		LOG.info(this.getClass() + " instantiated");
-		this.trustEventMgr = trustEventMgr;
 		
 		LOG.info("Registering for direct and indirect trust updates...");
-		this.trustEventMgr.registerListener(
+		super.trustEventMgr.registerListener(
 				new TrustUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
 					TrustEventTopic.INDIRECT_TRUST_UPDATED }, null);
