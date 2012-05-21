@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
@@ -67,6 +69,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
 		// TODO Auto-generated method stub
 		HashSet<IOutcome> conflicts=new HashSet<IOutcome>();
+		Logger.getGlobal().log(Level.INFO, "start resolving DM");
 		for (IOutcome intent : intents) {
 			IOutcome action=intent;
 			//unresolved preference ioutcomes
@@ -95,6 +98,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 			}
 			conflicts.clear();
 		}
+		Logger.getGlobal().log(Level.INFO, "after resolving DM");
 	}
 
 	protected abstract ConflictType detectConflict(IOutcome intent,
