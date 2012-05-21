@@ -14,10 +14,14 @@
 	<!-- Privacy Data Management Configuration -->
 	
 	<bean name="PrivacyDataManager"
-		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager"
-		init-method="init">
-		<property name="sessionFactory" ref="sessionFactory" />
+		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
+		<property name="privacyDataManagerInternal" ref="PrivacyDataManagerInternal" />
 		<property name="privacyPreferenceManager" ref="PrivacyPreferenceManager" />
+	</bean>
+	
+	<bean name="PrivacyDataManagerInternal"
+		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal">
+		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
 		<!-- Persistance Configuration -->
