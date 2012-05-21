@@ -22,36 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.common.api.management;
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager.test;
 
-import org.societies.api.context.model.CtxAttributeIdentifier;
+import java.io.Serializable;
+
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.personalisation.model.IFeedbackEvent;
-import org.societies.api.internal.personalisation.IPersonalisationManager;
-import org.societies.personalisation.common.api.model.PersonalisationTypes;
-
+import org.societies.api.identity.IdentityType;
 
 
 /**
+ * Describe your class here...
+ *
  * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 14:43:37
+ *
  */
-public interface IInternalPersonalisationManager extends IPersonalisationManager{
+public class MyIdentity implements IIdentity, Serializable{
 
-
-	/**
-	 * 
-	 * @param className
-	 * @param ctxAttributeId
-	 */
-	public void registerForContextUpdate(IIdentity id, PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId);
-
-	/**
-	 * 
-	 * @param feedback
-	 */
-	public void returnFeedback(IFeedbackEvent feedback);
 	
+	private final IdentityType type;
+	private final String identifier;
+	private final String domainIdentifier;
+
+	public MyIdentity(IdentityType type, String identifier,
+			String domainIdentifier) {
+				this.type = type;
+				this.identifier = identifier;
+				this.domainIdentifier = domainIdentifier;
+		
+		
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public String getJid() {
+		return type+"://"+identifier+"@"+domainIdentifier;
+	}
+
+	@Override
+	public String getBareJid() {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	@Override
+	public String getDomain() {
+		return domainIdentifier;
+	}
+
+	@Override
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	@Override
+	public IdentityType getType() {
+		return type;
+	}
 
 }

@@ -101,7 +101,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	
 	private IIdentityManager idm;
 	
-	private ICommManager commsManager;
+	private ICommManager commsMgr;
 	
 	private boolean test = false;
 	
@@ -1019,21 +1019,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 
-	/**
-	 * @return the commsManager
-	 */
-	public ICommManager getCommsManager() {
-		return commsManager;
-	}
 
-
-	/**
-	 * @param commsManager the commsManager to set
-	 */
-	public void setCommsManager(ICommManager commsManager) {
-		this.commsManager = commsManager;
-		this.idm = commsManager.getIdManager();
-	}
 
 
 	/**
@@ -1066,6 +1052,24 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public void setMyMessageBox(MessageBox myMessageBox) {
 		this.myMessageBox = myMessageBox;
 	}
+
+
+	/**
+	 * @return the commsMgr
+	 */
+	public ICommManager getCommsMgr() {
+		return commsMgr;
+	}
+
+
+	/**
+	 * @param commsMgr the commsMgr to set
+	 */
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
+		this.idm = commsMgr.getIdManager();
+	}
+
 
 
 

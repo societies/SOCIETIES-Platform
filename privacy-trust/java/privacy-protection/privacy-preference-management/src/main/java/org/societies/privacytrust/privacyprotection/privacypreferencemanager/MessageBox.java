@@ -22,36 +22,35 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.common.api.management;
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager;
 
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.personalisation.model.IFeedbackEvent;
-import org.societies.api.internal.personalisation.IPersonalisationManager;
-import org.societies.personalisation.common.api.model.PersonalisationTypes;
+import java.util.List;
 
+import javax.swing.JOptionPane;
 
+import org.societies.api.context.model.CtxIdentifier;
 
 /**
+ * Describe your class here...
+ *
  * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 14:43:37
+ *
  */
-public interface IInternalPersonalisationManager extends IPersonalisationManager{
+public class MessageBox {
 
-
-	/**
-	 * 
-	 * @param className
-	 * @param ctxAttributeId
-	 */
-	public void registerForContextUpdate(IIdentity id, PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId);
-
-	/**
-	 * 
-	 * @param feedback
-	 */
-	public void returnFeedback(IFeedbackEvent feedback);
+	public int showConfirmDialog(String message, String title, int messageType){
+		return JOptionPane.showConfirmDialog(null, title, message, messageType);
+	}
 	
+	public CtxIdentifier showInputDialog(String message, String title, int messageType, Object[] ctxIds, CtxIdentifier ctxId){
+		return (CtxIdentifier) JOptionPane.showInputDialog(null, message, title, messageType, null, ctxIds, ctxId);
+	}
 
+	public String showInputDialog(String message, String title,
+			int questionMessage, Object[] array, String string) {
+		return (String) JOptionPane.showInputDialog(null, message, title, questionMessage, null, array, string);
+	}
+	
+	
+	 
 }
