@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator;
 
+import java.lang.reflect.Type;
+
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 
@@ -44,4 +46,25 @@ public interface IDataObfuscator {
 	 * @throws Exception
 	 */
 	public IDataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException;
+
+	/**
+	 * Type of the obfuscation
+	 * @return the type of the obfuscation
+	 */
+	public ObfuscationLevelType getObfuscationLevelType();
+	/**
+	 * Number of classes for a discrete obfuscation level
+	 * @return the number of steps available
+	 */
+	int getStepNumber();
+	/**
+	 * Wrapper of the data to obfuscate
+	 * @return the wrapped data to obfuscate
+	 */
+	public IDataWrapper getDataWrapper();
+	/**
+	 * Type of the data wrapper to obfuscate
+	 * @return the type of the data wrapper to obfuscate
+	 */
+	public Type getDataType();
 }

@@ -103,7 +103,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		Resource resource = new Resource(dataAttributeId);
 		RequestItem requestItemNull = new RequestItem(resource, actions, conditions);
 
-
 		// -- Retrieve a stored permission
 		ResponseItem permission = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
 		// - Permission available: check actions
@@ -154,7 +153,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 
 		// -- Retrieve the obfuscation level
-		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId().toUriString());
+		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId());
 		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
 		//		double obfuscationLevel = 1;
 		// If no obfuscation is required: return directly the wrapped data
@@ -172,7 +171,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public CtxIdentifier hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+	public String hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		verifyParemeters(requestor, ownerId, dataWrapper, null);
 		if (!isDepencyInjectionDone(2)) {
@@ -193,7 +192,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (null == requestor || null == ownerId) {
 			throw new NullPointerException("Not enought information: requestor or owner id is missing");
 		}
-		if (null == dataId && (null == dataWrapper || null == dataWrapper.getDataId())) {
+		if (null == dataId && (null == dataWrapper || null == dataWrapper.getData())) {
 			throw new PrivacyException("Not enought information: data id is missing");
 		}
 	}
