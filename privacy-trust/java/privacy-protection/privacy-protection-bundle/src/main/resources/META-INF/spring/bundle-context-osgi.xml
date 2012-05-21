@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-	<osgi:service ref="PrivacyDataManager"
+	<osgi:service ref="privacyDataManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager" />
 
 	<osgi:service ref="PrivacyPolicyManager"
@@ -19,7 +19,13 @@
 		interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment" />
 
 	
-	
+	    <osgi:service ref="privacyPreferenceManager" >
+        <osgi:interfaces>
+            <value>
+				org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager
+            </value>
+        </osgi:interfaces>
+    </osgi:service>
 	
 	
 	<osgi:reference
@@ -44,5 +50,9 @@
 	<osgi:reference id="privacyDataManagerInternal"
 		interface="org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal" cardinality="0..1" />
 	
+	
+	<osgi:reference id="privacyPreferenceManager" interface="org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager">
+        
+    </osgi:reference>
 	
 </beans>
