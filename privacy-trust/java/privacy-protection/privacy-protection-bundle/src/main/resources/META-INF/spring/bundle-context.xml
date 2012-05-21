@@ -13,11 +13,15 @@
 
 	<!-- Privacy Data Management Configuration -->
 	
-	<bean name="PrivacyDataManager"
-		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager"
-		init-method="init">
+	<bean name="privacyDataManager"
+		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
+		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
+		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
+	</bean>
+	
+	<bean name="privacyDataManagerInternal"
+		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal">
 		<property name="sessionFactory" ref="sessionFactory" />
-		<property name="privacyPreferenceManager" ref="PrivacyPreferenceManager" />
 	</bean>
 
 		<!-- Persistance Configuration -->
@@ -81,9 +85,13 @@
 
 
 	<!-- Privacy Preference Manager Configuration -->
-	
-	<bean name="PrivacyPreferenceManager"
-		class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager">
+	<bean name="privacyPreferenceManager"
+		class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager" 
+		init-method="initialisePrivacyPreferenceManager">
+			<property name="ctxBroker" ref="ctxBroker"></property>
+			<property name="commsMgr" ref="commsMgr"></property>
+			<property name="trustBroker" ref="trustBroker"></property>
+			<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
 	</bean>
 	
 	

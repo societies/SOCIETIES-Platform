@@ -82,7 +82,7 @@ public class Test implements IPrivacyDataManagerListener {
 			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			Action action = new Action(ActionConstants.READ);
 			ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
-			LOG.info("************* [Test Resullt] Permission checked? "+(null != permission));
+			LOG.info("************* [Test Result] Permission checked? "+(null != permission));
 			if (null != permission) {
 				LOG.info(permission.toString());
 			}

@@ -48,20 +48,20 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.Ctx
 public class PreferenceRetriever {
 	
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	private ICtxBroker broker; 
+	private ICtxBroker ctxBroker; 
 
-	public PreferenceRetriever(ICtxBroker broker){
-		this.broker = broker;
+	public PreferenceRetriever(ICtxBroker ctxBroker){
+		this.ctxBroker = ctxBroker;
 	}
 	
 	public Registry retrieveRegistry(){
 		try {
-			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY); 
+			Future<List<CtxIdentifier>> futureAttrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY); 
 			List<CtxIdentifier> attrList = futureAttrList.get();
 			if (null!=attrList){
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
-					CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier).get();
+					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
 					Object obj = this.convertToObject(attr.getBinaryValue());
 					
 					if (obj==null){
@@ -120,7 +120,7 @@ public class PreferenceRetriever {
 	public IPrivacyPreferenceTreeModel retrievePreference(CtxIdentifier id){
 		try{
 			//retrieve directly the attribute in context that holds the preference as a blob value
-			CtxAttribute attrPref = (CtxAttribute) broker.retrieve(id).get();
+			CtxAttribute attrPref = (CtxAttribute) ctxBroker.retrieve(id).get();
 			//cast the blob value to type IPreference and return it
 			Object obj = this.convertToObject(attrPref.getBinaryValue());
 			if (null!=obj){

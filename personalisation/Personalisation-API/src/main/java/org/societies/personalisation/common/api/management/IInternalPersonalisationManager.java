@@ -24,14 +24,10 @@
  */
 package org.societies.personalisation.common.api.management;
 
-import java.util.concurrent.Future;
-
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
-import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.personalisation.IPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 
 
@@ -43,19 +39,6 @@ import org.societies.personalisation.common.api.model.PersonalisationTypes;
  */
 public interface IInternalPersonalisationManager extends IPersonalisationManager{
 
-
-	/**
-	 * Allows any service to request an context-based evaluated preference outcome.
-	 * @return					the outcome in the form of an IAction object
-	 * 
-	 * @param ownerID    the DigitalIIdentity of the owner of the preferences (i.e. the
-	 * user of this service)
-	 * @param serviceType    the type of the service requesting the outcome
-	 * @param serviceID    the service identifier of the service requesting the
-	 * outcome
-	 * @param preferenceName    the name of the preference requested
-	 */
-	public Future<IAction> getPreference(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * 
@@ -70,12 +53,5 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 */
 	public void returnFeedback(IFeedbackEvent feedback);
 	
-	/**
-	 * 
-	 * @param ownerID
-	 * @param serviceID
-	 * @param preferenceName
-	 * @param callback
-	 */
-	public Future<IAction> getIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
+
 }

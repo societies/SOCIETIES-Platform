@@ -41,6 +41,8 @@ import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
  */
 public class TrustEvidenceUpdateEvent extends TrustEvent {
 
+	private static final long serialVersionUID = 569610138360162405L;
+
 	/**
 	 * Constructs a <code>TrustEvidenceUpdateEvent</code> object with the
 	 * specified source.

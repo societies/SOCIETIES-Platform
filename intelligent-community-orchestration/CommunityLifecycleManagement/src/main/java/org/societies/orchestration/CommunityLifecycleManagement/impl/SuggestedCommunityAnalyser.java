@@ -91,6 +91,7 @@ import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -650,10 +651,14 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		    	
 	    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
 	    		boolean refuseSuggestion = false;
+	    		String returnMessage = "";
 	    		if (privacyConflicts.size() != 0) {
+	    			
 	    			for (int m = 0; m < privacyConflicts.size(); m++) {
-	    				if (privacyConflicts.get(m).contains("User"))
+	    				if (privacyConflicts.get(m).contains("User")) {
 	    				    refuseSuggestion = true;
+	    				    returnMessage = "REMOVE MODEL ATTRIBUTE " + privacyConflicts.get(m).split("data")[1];
+	    				}
 	    				else if (privacyConflicts.get(m).contains("CSS: ")) {
 	    					ICisProposal updatedCreation = creations.get(i);
 	    					
@@ -759,12 +764,17 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				        //add another attribute to it (suggest one?), or change one or more
 				        //model attributes (specify them?)
 			        }
-				    else if (members.size() >= (1.3 * cisProposal.getMemberList().size())) {
-				        cisProposal.setParentCis(userJoinedCiss.get(m));
+				    else if (members.size() >= (1.3 * cisProposal.getMemberList().size()) &&
+				    		(members.contains(cisProposal.getMemberList())) &&
+				    		(cisProposal.getMembershipCriteria() != userJoinedCiss.get(m).getMembershipCriteria())) {
+				        //TODO: alternatively: membership criteria is identical, but CIS activity feed
+				    	//shows greater than average activity for the group, so sub-CIS for cluster.
+				    	//needs activity feed defined to do so
+				    	cisProposal.setParentCis(userJoinedCiss.get(m));
 				    	creations.set(i, cisProposal);
 				    }
 				}
-				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion,
+				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion(?),
 				//may be grounds to delete the old CIS. E.g. the suggestion is based on location,
 				//which is different to the location of an existing CIS, which is known to be short-term temporary.
 			}
@@ -787,6 +797,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			ArrayList<ICisProposal> ciss = new ArrayList<ICisProposal>();
 			ciss.add(cisProposal);
 			convertedRecommendations = advancedCisCreationAnalysis(ciss);
+			
+			if (convertedRecommendations.get("Remove from CSM") != null) {
+				if (convertedRecommendations.get("Remove from CSM").size() > 0) {
+					return "DELETE MODEL";
+				}
+			}
 			
 		}
 	
@@ -887,7 +903,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     							}
     		    			    Decision decision = response.getDecision();
     		    		        if (decision.values()[0] != decision.PERMIT) conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "User");
-    		    		        //else if (ctxBroker.get(thisMember, thisAttribute).equals("Access refused"))
+    		    		        //else if (userContextBroker.get(thisMember, thisAttribute).equals("Access refused"))
     		    		        //    conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
     		    		    }
     		    		}
@@ -922,47 +938,105 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	for (int i = 0; i < proposedCiss.size(); i++) {
     		ICisProposal thisCis = proposedCiss.get(i);
     		boolean allAttributes = true;
-    		//for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
-    		    //if (thisCis.getMembershipCriteria.get(m) instanceof CtxAssociation)
-    		        //allAttributes = false;
-    		//}
-    		//if (allAttributes == true) {
-    		    //if (thisCis.getMembershipCriteria().get(m).getType().equals("address") {
-		            //if (thisCis.getMembershipCriteria().contains("friends")) {
+    		
+    		
+    		
+    		for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
+    			CtxIdentifier theCriteriaId = null;
+				try {
+					theCriteriaId = userContextBroker.lookup(CtxModelType.ATTRIBUTE, thisCis.getMembershipCriteria().get(m)).get().get(0);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		    CtxModelObject theCriteriaObject = null;
+				try {
+					theCriteriaObject = userContextBroker.retrieve(theCriteriaId).get();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		    if (theCriteriaObject instanceof CtxAssociation)
+    		        allAttributes = false;
+    		}
+    		if (allAttributes == true) {
+    		    if (thisCis.getMembershipCriteria().contains("address")) {
+		            if (thisCis.getMembershipCriteria().contains("friends")) {
     		            //Put address as sub-CIS of friends CIS
     		            //proposedActionsWithMetadata.add(i);
-    	            //}
-    		        //else
+    	            }
+    		        else {
     		            //Put address first, and other attributes as sub-CISs.
-    		    //        
-		        //}
-    		    //else {
-    		        //ArrayList<ArrayList<ICis>> csmFeedback = new ArrayList<ArrayList<ICis>();
+    		        }
+    		            
+		        }
+    		    else {
+    		        ArrayList<ArrayList<ICisProposal>> csmFeedback = new ArrayList<ArrayList<ICisProposal>>();
     		        //csmFeedback
-    		        //finalisedCiss.put("Remove from CSM", csmFeedback);
+    		        finalisedCiss.put("Remove from CSM", csmFeedback);
     		        
-    	        //}
-    		//}
-    		//for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
-    		    //if (thisCis.getMembershipCriteria.get(m) instanceof CtxAssociation) {
-    		    //    CtxAssociation theCriteria = thisCis.getMembershipCriteria.get(m);
-    		    //    if (theCriteria.getId().getType().equals("proximity")) {
+    	        }
+    		}
+    		for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
+    			CtxIdentifier theCriteriaId = null;
+				try {
+					theCriteriaId = userContextBroker.lookup(CtxModelType.ATTRIBUTE, thisCis.getMembershipCriteria().get(m)).get().get(0);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		    CtxModelObject theCriteriaObject = null;
+				try {
+					theCriteriaObject = userContextBroker.retrieve(theCriteriaId).get();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    			if (theCriteriaObject instanceof CtxAssociation) {
+    		        CtxAssociation theCriteria = (CtxAssociation)theCriteriaObject;
+    		        if (theCriteria.getId().getType().equals("proximity")) {
     		    //        //need access to proximity on other CSSs and
     		              //timestamp on proximity associations
-    		    //    }
+    		        }
     	
-    		    //}
-    		    //else if (thisCis.getMembershipCriteria.get(m) instanceof CtxAttribute) {
-		        //    CtxAttribute theCriteria = thisCis.getMembershipCriteria.get(m);
-    		    //    if (thisCis.getMembershipCriteria().get(m).getType().equals("address") {
-		        //        //if (thisCis.getMembershipCriteria().contains("friends"))
+    		    }
+    		    else if (theCriteriaObject instanceof CtxAttribute) {
+    		    	CtxAttribute theCriteria = (CtxAttribute)theCriteriaObject;
+    		        if (theCriteria.getType().equals("address")) {
+		                if (thisCis.getMembershipCriteria().contains("friends")) {
     		                  //Put address as sub-CIS of friends CIS
-    		              //else
-    		                  //Put address first, and other attributes as sub-CISs.
-    		    //        
-		        //    }
-		        //}
-    		//}
+		                }
+    		            else {
+    		                //Put address first, and other attributes as sub-CISs.
+    		            }
+    		            
+		            }
+		        }
+    		}
     	}
     	return finalisedCiss;
     }

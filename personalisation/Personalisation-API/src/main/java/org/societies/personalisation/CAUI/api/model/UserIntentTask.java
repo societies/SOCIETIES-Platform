@@ -27,22 +27,21 @@ package org.societies.personalisation.CAUI.api.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class UserIntentTask implements IUserIntentTask,Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	
+	LinkedHashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> actions = new  LinkedHashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
 
 	String taskID;
 
 	int confidenceLevel;
-	private List<IUserIntentAction> actions = new ArrayList<IUserIntentAction>();
-	Double [][] matrix = null;
-	
+
 	private double transProb;
 
 	//A map that contains the context type and the context values assigned to this UserTask;
@@ -53,12 +52,10 @@ public class UserIntentTask implements IUserIntentTask,Serializable{
 	}
 
 
-	public UserIntentTask (String taskName, Long uniqueNumber, List<IUserIntentAction> actions, Double[][] matrix){
+	public UserIntentTask (String taskName, Long uniqueNumber, LinkedHashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> actions ){
 		this.taskID = taskName+"/"+uniqueNumber;
 		this.confidenceLevel = 51;
-		this.matrix = matrix; 
-		this.actions = actions;
-		//this.transProb = transProb;
+		setActions(actions);
 	}
 
 
@@ -94,26 +91,15 @@ public class UserIntentTask implements IUserIntentTask,Serializable{
 	public int getConfidenceLevel() {
 		return this.confidenceLevel;
 	}
-
-	@Override
-	public List<IUserIntentAction> getActions() {
-		
-		return this.actions;
+	
+	public LinkedHashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getActions() {
+		return actions;
 	}
 
-	@Override
-	public void setActions(List<IUserIntentAction> userActions) {
-		this.actions = userActions;
 
+	public void setActions(
+			LinkedHashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> actions) {
+		this.actions = actions;
 	}
-
-	@Override
-	public Double[][] getMatrix() {
-		return this.matrix;
-	}
-
-	@Override
-	public void setMatrix(Double[][] matrix) {
-		this.matrix = matrix;		
-	}
+	
 }

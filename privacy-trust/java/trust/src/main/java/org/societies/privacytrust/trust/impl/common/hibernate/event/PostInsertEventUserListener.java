@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
@@ -81,8 +82,16 @@ public class PostInsertEventUserListener implements PostInsertEventListener {
 			if (LOG.isDebugEnabled())
         		LOG.debug("Posting TrustEvidenceUpdateEvent " + trustEvidenceUpdateEvent
         				+ " to topic '" + topic + "'");
-			// TODO this.trustEventMgr.postEvent(trustEvidenceUpdateEvent, 
-			//	new String[] { topic }, EVENT_SOURCE);
+			try {
+				this.trustEventMgr.postEvent(trustEvidenceUpdateEvent, 
+						new String[] { topic }, EVENT_SOURCE);
+			} catch (TrustEventMgrException teme) {
+				
+				LOG.error("Could not post TrustEvidenceUpdateEvent " 
+						+ trustEvidenceUpdateEvent
+        				+ " to topic '" + topic + "': " 
+						+ teme.getLocalizedMessage(), teme);
+			}
 		}
 	}
 }
