@@ -27,6 +27,8 @@ package org.societies.privacytrust.privacyprotection.privacypreferencemanager;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -39,15 +41,60 @@ import org.societies.api.context.model.CtxIdentifier;
 public class MessageBox {
 
 	public int showConfirmDialog(String message, String title, int messageType){
+		try {
+			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return JOptionPane.showConfirmDialog(null, title, message, messageType);
 	}
 	
 	public CtxIdentifier showInputDialog(String message, String title, int messageType, Object[] ctxIds, CtxIdentifier ctxId){
+		try {
+			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return (CtxIdentifier) JOptionPane.showInputDialog(null, message, title, messageType, null, ctxIds, ctxId);
 	}
 
 	public String showInputDialog(String message, String title,
 			int questionMessage, Object[] array, String string) {
+		try {
+			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return (String) JOptionPane.showInputDialog(null, message, title, questionMessage, null, array, string);
 	}
 	
