@@ -12,10 +12,9 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.personalisation.IPersonalisationManager;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -77,7 +76,7 @@ public class Tester {
 			}
 		}
 		PreferenceCallBack callback=new PreferenceCallBack();
-		this.personMan.getPreference(this.userId,"serviceintest", this.id, "volume", callback);
+		this.personMan.getPreference(this.userId,"serviceintest", this.id, "volume");
 		Assert.assertTrue(callback.get());
 	}
 	

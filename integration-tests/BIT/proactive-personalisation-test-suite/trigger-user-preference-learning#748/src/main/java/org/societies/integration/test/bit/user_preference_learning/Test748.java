@@ -3,7 +3,7 @@ package org.societies.integration.test.bit.user_preference_learning;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.integration.test.IntegrationTestCase;
-import org.societies.api.internal.personalisation.IPersonalisationManager;
+import org.societies.api.personalisation.mgmt.*;
 
 
 public class Test748 extends IntegrationTestCase{
