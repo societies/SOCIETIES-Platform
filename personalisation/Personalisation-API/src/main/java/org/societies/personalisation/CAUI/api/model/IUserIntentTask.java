@@ -25,6 +25,8 @@
 package org.societies.personalisation.CAUI.api.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,37 +46,18 @@ public interface IUserIntentTask extends Serializable{
     public String getTaskID();
 
     /**
-     * Returns a map with the userActions contained in the UserTask and the respective transition 
-     * probability from previous action to next action. 
-     * e.g. action1, 0
-     *      action2, 33
-     *      action3, 12
-     *    
-     * @return map
-     */
-  //  public Map<IUserIntentAction,Double > getActions();
-
-    /**
-     * Returns a List of UserIntentActions contained in the UserTask 
+     * Returns a map of UserIntentActions contained in the UserTask 
      *    
      * @return List
      */
-    public List<IUserIntentAction> getActions();
+    public LinkedHashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getActions();
     
     /**
-     * Adds a map of userActions to the UserTask. The map contains the action object and the transition
-     * probability to the next action. 
+     * Adds a map of userActions to the UserTask.
      * 
      * @param userActions
      */
-  //  public void addActions(LinkedHashMap<IUserIntentAction,Double> userActions);
-
-    /**
-     * Adds a list of userActions to the UserTask.
-     * 
-     * @param userActions
-     */
-    public void setActions(List<IUserIntentAction> userActions);
+    public void setActions(LinkedHashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> actions);
  
     /**
      * Returns a map with context types and values associated with this task.
@@ -101,7 +84,7 @@ public interface IUserIntentTask extends Serializable{
      *  
      * @return string
      */
-    public String toString ();
+    public String toString();
 
     /**
      * Sets the confidence level
@@ -115,23 +98,5 @@ public interface IUserIntentTask extends Serializable{
      * 
      */
     public int getConfidenceLevel();
-    
-    
-    /**
-     * Returns the transition probability from previous UserTask to this UserTask.
-     * @return
-     */
-    public Double [][] getMatrix();
-    
-    /**
-     * Returns the transition probability from previous UserTask to this UserTask.
-     * @return
-     */
-    public void setMatrix(Double [][] matrix);
-    
-    /**
-     * Returns the transition probability from previous UserTask to this UserTask.
-     * @return
-     */
-  //  public double getTransProb(); 
+       
 }

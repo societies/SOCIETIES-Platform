@@ -19,15 +19,15 @@
  */
 package org.societies.privacytrust.privacyprotection.test.datamanagement;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -51,7 +51,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
-import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -70,9 +69,7 @@ public class PrivacyDataManagerTest {
 	
 	@Autowired
 	IPrivacyDataManager privacyDataManager;
-	
 	@Autowired
-	SessionFactory sessionFactory;
 	IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
 	/**
@@ -80,7 +77,6 @@ public class PrivacyDataManagerTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		privacyDataManagerInternal = new PrivacyDataManagerInternal(sessionFactory);
 	}
 
 	/**
@@ -88,7 +84,6 @@ public class PrivacyDataManagerTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
-		privacyDataManagerInternal = null;
 	}
 
 
@@ -188,13 +183,14 @@ public class PrivacyDataManagerTest {
 	}
 	
 	
-	
+	// -- Dependency Injection
 	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
-		LOG.info("privacyDataManager injected");
 		this.privacyDataManager = privacyDataManager;
+		LOG.info("[Dependency Injection] IPrivacyDataManager injected");
 	}
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		LOG.info("sessionFactory injected");
-		this.sessionFactory = sessionFactory;
+	public void setPrivacyDataManagerInternal(
+			IPrivacyDataManagerInternal privacyDataManagerInternal) {
+		this.privacyDataManagerInternal = privacyDataManagerInternal;
+		LOG.info("[Dependency Injection] PrivacyDataManagerInternal injected");
 	}
 }

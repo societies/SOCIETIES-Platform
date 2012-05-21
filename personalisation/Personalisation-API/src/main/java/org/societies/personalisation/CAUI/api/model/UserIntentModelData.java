@@ -26,6 +26,7 @@ package org.societies.personalisation.CAUI.api.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -42,35 +43,29 @@ public class UserIntentModelData implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	String uiModelID;
-	
-	private List<IUserIntentTask> tasks = new ArrayList<IUserIntentTask>();
-	Double [][] matrix = null;
-	
-	
-	public UserIntentModelData(List<IUserIntentTask> tasks, Double [][] matrix){
-		this.tasks = tasks;
-		this.matrix = matrix;
-	}
-
-
-	public List<IUserIntentTask> getTaskList() {
-		return tasks;
-	}
-
-
-	public void setTaskList(List<IUserIntentTask> tasks) {
-		this.tasks = tasks;
-	}
-
-
-	public Double[][] getMatrix() {
-		return matrix;
-	}
-
-
-	public void setMatrix(Double[][] matrix) {
-		this.matrix = matrix;
+	public UserIntentModelData(){
+		
 	}
 	
+	HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> actionModel = new  HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
+	HashMap<IUserIntentTask,HashMap<IUserIntentTask,Double>> taskModel = new  HashMap<IUserIntentTask,HashMap<IUserIntentTask,Double>>();
+	
+	
+	public HashMap<IUserIntentTask, HashMap<IUserIntentTask, Double>> getTaskModel() {
+		return taskModel;
+	}
+
+	public void setTaskModel(
+			HashMap<IUserIntentTask, HashMap<IUserIntentTask, Double>> taskModel) {
+		this.taskModel = taskModel;
+	}
+
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getActionModel() {
+		return actionModel;
+	}
+
+	public void setActionModel(
+			HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> actionModel) {
+		this.actionModel = actionModel;
+	}
 }

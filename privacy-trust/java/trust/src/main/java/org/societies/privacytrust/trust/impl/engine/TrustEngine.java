@@ -24,26 +24,33 @@
  */
 package org.societies.privacytrust.trust.impl.engine;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
+ * Describe your class here...
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-@Service
-public class IndirectTrustEngine extends TrustEngine {
-
-	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(IndirectTrustEngine.class);
+public abstract class TrustEngine {
 	
+	/** The Trust Repository service reference. */
 	@Autowired
-	IndirectTrustEngine(ITrustEventMgr trustEventMgr) {
+	protected ITrustRepository trustRepo;
+	
+	/** The Trust Event Mgr service reference. */
+	protected ITrustEventMgr trustEventMgr;
+	
+	/** The executor service. */
+	protected ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
+	protected TrustEngine(ITrustEventMgr trustEventMgr) {
 		
-		super(trustEventMgr);
-		LOG.info(this.getClass() + " instantiated");
+		this.trustEventMgr = trustEventMgr;
 	}
 }

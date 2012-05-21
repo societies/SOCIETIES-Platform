@@ -1,29 +1,33 @@
 package org.societies.personalisation.CAUIDiscovery.impl;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MockHistoryData {
 
-	Map<String,Serializable> context = new HashMap<String,Serializable>();
+	
+	Date timestamp;
+	Map<String,String> contextMap = new HashMap<String,String>();
 	String contextValue = "";
 
 	String parameterName;
 	String actionValue;
 
-	public MockHistoryData(String parameterName,String actionValue, Map<String,Serializable> context){
+	public MockHistoryData(String parameterName,String actionValue, Map<String,String> context, Date timestamp){
 		this.parameterName = parameterName;
 		this.actionValue = actionValue;
-		this.context = context;
+		this.contextMap = context;
+		this.timestamp = timestamp;
 	}
 
-	public Map<String,Serializable> getContext() {
-		return context;
+	public Map<String,String> getContext() {
+		return contextMap;
 	}
 
-	public void setContext(Map<String,Serializable> context) {
-		this.context = context;
+	public void setContext(Map<String,String> context) {
+		this.contextMap = context;
 	}
 
 	public String getActionValue() {
@@ -43,10 +47,9 @@ public class MockHistoryData {
 		this.parameterName = parameterName;
 	}
 
-
 	public String getContextValue(String type) {
-		if(context.containsKey(type)){
-			Serializable valueSerial = context.get(type);
+		if(contextMap.containsKey(type)){
+			Serializable valueSerial = contextMap.get(type);
 			if (valueSerial instanceof String) {
 				String value = (String) valueSerial;	
 				contextValue = value;
@@ -55,15 +58,12 @@ public class MockHistoryData {
 		return contextValue;
 	}
 
-
 	public void setSymLoc() {
 		
 	}
 
-
-
 	public String toString(){
-		String string = this.parameterName+" "+this.actionValue+" "+this.context;
+		String string = this.parameterName+" "+this.actionValue+" "+this.timestamp.getTime()+" "+this.contextMap ;
 		return string; 
 	}
 }
