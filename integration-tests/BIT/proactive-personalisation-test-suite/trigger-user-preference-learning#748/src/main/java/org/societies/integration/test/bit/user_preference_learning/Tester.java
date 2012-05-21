@@ -14,7 +14,7 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+import org.societies.api.internal.personalisation.IPersonalisationManager;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -30,66 +30,80 @@ public class Tester {
 	private CtxAttribute statusAttribute;
 	private CtxAttribute activitiesAttribute;
 	private IPersonalisationManager personMan;
-//	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	// private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IAction action$1;
 	private IAction action$2;
-//	private IAction action$3;
+	// private IAction action$3;
 	private ServiceResourceIdentifier id;
-	public Tester(){
+
+	public Tester() {
 
 	}
-	
+
 	@Before
-	public void setUp(){
-		try{
-		this.uam = Test748.getUam();
-		this.ctxBroker = Test748.getCtxBroker();
-		this.userId=new MockIdentity(IdentityType.CSS, "user", "societies.org");
-		 id = new ServiceResourceIdentifier();
-		this.action$1=new Action(id,"serviceintest","volume","0");
-		this.action$2=new Action(id,"serviceintest","volume","10");
-//		this.action$3=new Action(id,"serviceintest","volume","90");
-		this.personMan=Test748.getPersonMan();
-		setupContext();
-		changeContext("home", "free", "sleep");
-		}catch(Exception e){
+	public void setUp() {
+		try {
+			this.uam = Test748.getUam();
+			this.ctxBroker = Test748.getCtxBroker();
+			this.userId = new MockIdentity(IdentityType.CSS, "user",
+					"societies.org");
+			id = new ServiceResourceIdentifier();
+			this.action$1 = new Action(id, "serviceintest", "volume", "0");
+			this.action$2 = new Action(id, "serviceintest", "volume", "10");
+			// this.action$3=new Action(id,"serviceintest","volume","90");
+			this.personMan = Test748.getPersonMan();
+			setupContext();
+			changeContext("home", "free", "sleep");
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-			
-	}
-	
-	
-	@org.junit.Test
-	public void Test(){
-		for (int i=1; i<21; i++){
-			if(i%2==0){
-				uam.monitor(userId, action$1);
-			}else if(i%2==1){
-				uam.monitor(userId, action$2);
-	//		}else if(i%3==2){
-	//			uam.monitor(userId, action$3);
-			}
-			if(i%2==0){
-				this.changeContext("home", "busy", "working");
-			}else if(i%2==1){
-				this.changeContext("office", "free", "cafe");
-			}
-		}
-		PreferenceCallBack callback=new PreferenceCallBack();
-		this.personMan.getPreference(this.userId,"serviceintest", this.id, "volume");
-		Assert.assertTrue(callback.get());
-	}
-	
 
-	private void changeContext(String symLocValue, String statusValue, String activityValue){
+	}
+
+	@org.junit.Test
+	public void Test() {
+		try {
+			for (int i = 1; i < 21; i++) {
+				if (i % 2 == 0) {
+					uam.monitor(userId, action$1);
+				} else if (i % 2 == 1) {
+					uam.monitor(userId, action$2);
+					// }else if(i%3==2){
+					// uam.monitor(userId, action$3);
+				}
+				if (i % 2 == 0) {
+					this.changeContext("home", "busy", "working");
+				} else if (i % 2 == 1) {
+					this.changeContext("office", "free", "cafe");
+				}
+			}
+			this.changeContext("office", "free", "cafe");
+			Future<IAction> value = this.personMan.getPreference(this.userId,
+					"serviceintest", this.id, "volume");
+			IAction preference = value.get();
+			Assert.assertTrue(preference.getvalue().equals("10"));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void changeContext(String symLocValue, String statusValue,
+			String activityValue) {
 		try {
 			this.symLocAttribute.setStringValue(symLocValue);
-			this.symLocAttribute = (CtxAttribute) this.ctxBroker.update(symLocAttribute).get();
-			
+			this.symLocAttribute = (CtxAttribute) this.ctxBroker.update(
+					symLocAttribute).get();
+
 			this.statusAttribute.setStringValue(statusValue);
-			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
+			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(
+					statusAttribute).get();
 			this.activitiesAttribute.setStringValue(activityValue);
-			this.activitiesAttribute = (CtxAttribute) this.ctxBroker.update(activitiesAttribute).get();
+			this.activitiesAttribute = (CtxAttribute) this.ctxBroker.update(
+					activitiesAttribute).get();
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,54 +115,32 @@ public class Tester {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * PreTest setup:
 	 */
-	
-	
-	
-	
+
 	private void setupContext() {
 		this.getPersonEntity();
 		this.getSymLocAttribute();
 		this.getStatusAttribute();
 	}
-//
-	private void getPersonEntity(){
+
+	//
+	private void getPersonEntity() {
 		try {
- 		Future<List<CtxIdentifier>> futurePersons = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
+			Future<List<CtxIdentifier>> futurePersons = this.ctxBroker.lookup(
+					CtxModelType.ENTITY, CtxEntityTypes.PERSON);
 			List<CtxIdentifier> persons = futurePersons.get();
-			if (persons.size() == 0){
-				person = this.ctxBroker.createEntity(CtxEntityTypes.PERSON).get();
-				
-			}else{
-				person = (CtxEntity) this.ctxBroker.retrieve(persons.get(0)).get();
+			if (persons.size() == 0) {
+				person = this.ctxBroker.createEntity(CtxEntityTypes.PERSON)
+						.get();
+
+			} else {
+				person = (CtxEntity) this.ctxBroker.retrieve(persons.get(0))
+						.get();
 			}
-			
- 		
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-		e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private void getSymLocAttribute(){
-		try {
-			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
-			List<CtxIdentifier> attrs = futureAttrs.get();
-			if (attrs.size() == 0){
-				symLocAttribute = this.ctxBroker.createAttribute(person.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
-			}else{
-				symLocAttribute = (CtxAttribute) this.ctxBroker.retrieve(attrs.get(0)).get();
-			}
-			
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -158,25 +150,56 @@ public class Tester {
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch(Exception e){
-			e.printStackTrace();
 		}
-			
 	}
-	private void getStatusAttribute(){
+
+	private void getSymLocAttribute() {
 		try {
-			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);
+			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker
+					.lookup(CtxModelType.ATTRIBUTE,
+							CtxAttributeTypes.LOCATION_SYMBOLIC);
 			List<CtxIdentifier> attrs = futureAttrs.get();
-			if (attrs.size() == 0){
-				statusAttribute = this.ctxBroker.createAttribute(person.getId(), CtxAttributeTypes.STATUS).get();
-			}else{
-				statusAttribute = (CtxAttribute) this.ctxBroker.retrieve(attrs.get(0)).get();
+			if (attrs.size() == 0) {
+				symLocAttribute = this.ctxBroker.createAttribute(
+						person.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC)
+						.get();
+			} else {
+				symLocAttribute = (CtxAttribute) this.ctxBroker.retrieve(
+						attrs.get(0)).get();
 			}
-			
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			} catch (InterruptedException e) {
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void getStatusAttribute() {
+		try {
+			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(
+					CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);
+			List<CtxIdentifier> attrs = futureAttrs.get();
+			if (attrs.size() == 0) {
+				statusAttribute = this.ctxBroker.createAttribute(
+						person.getId(), CtxAttributeTypes.STATUS).get();
+			} else {
+				statusAttribute = (CtxAttribute) this.ctxBroker.retrieve(
+						attrs.get(0)).get();
+			}
+
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
@@ -184,20 +207,24 @@ public class Tester {
 			e.printStackTrace();
 		}
 	}
-	private void getActivitiesAttribute(){
+
+	private void getActivitiesAttribute() {
 		try {
-			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.ACTION);
+			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(
+					CtxModelType.ATTRIBUTE, CtxAttributeTypes.ACTION);
 			List<CtxIdentifier> attrs = futureAttrs.get();
-			if (attrs.size() == 0){
-				activitiesAttribute = this.ctxBroker.createAttribute(person.getId(), CtxAttributeTypes.ACTION).get();
-			}else{
-				activitiesAttribute = (CtxAttribute) this.ctxBroker.retrieve(attrs.get(0)).get();
+			if (attrs.size() == 0) {
+				activitiesAttribute = this.ctxBroker.createAttribute(
+						person.getId(), CtxAttributeTypes.ACTION).get();
+			} else {
+				activitiesAttribute = (CtxAttribute) this.ctxBroker.retrieve(
+						attrs.get(0)).get();
 			}
-			
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			} catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
