@@ -24,54 +24,82 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 /**
- * This data wrapper is an abstraction between obfuscation manager
- * and data models. This is the way for wrapping data to obfuscate them,
- * and filling a type of data (needed to know how obfuscate them) 
- * This wrapper is linked to a specific data obfuscator
- * and know what kind of data is needed to launch the obfuscation. 
- * @author Olivier Maridat (Trialog)
- * @date 18 oct. 2011
+ * Describe your class here...
+ *
+ * @author olivierm
+ *
  */
-public interface IDataWrapper<E> {
+public class Name {
+	private String firstName;
+	private String lastName;
+	
+	public Name() {
+		super();
+	}
 	/**
-	 * @return Id of the data to be obfuscated
+	 * @param firstName
+	 * @param lastName
 	 */
-	public String getDataId();
-	/**
-	 * @param dataId Id of the data to be obfuscated
-	 */
-	public void setDataId(String dataId);
+	public Name(String firstName, String lastName) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+	
 	
 	/**
-	 * Data
-	 * @return The data to be obfuscated
+	 * @return the firstName
 	 */
-	public E getData();
+	public String getFirstName() {
+		return firstName;
+	}
 	/**
-	 * Set the data to be obfuscated
-	 * @param data The data to be obfuscated
+	 * @param firstName the firstName to set
 	 */
-	public void setData(E data);
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	/**
+	 * @return the lastName
+	 */
+	public String getLastName() {
+		return lastName;
+	}
+	/**
+	 * @param lastName the lastName to set
+	 */
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 	
-	/**
-	 * To know if obfuscated data will be stored with this obfuscator
-	 * 
-	 * @return True if this obfuscator has enabled persistence
-	 * @return Otherwise false
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean isPersistenceEnabled();
-	/**
-	 * To enable storage of obfuscated data
-	 * @param persist True to persist the data, false otherwise
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == this) {
+			return true;
+		}
+
+		// -- Verify obj type
+		if (obj instanceof Name) {
+			Name other = (Name) obj;
+			return new EqualsBuilder()
+			.append(this.getFirstName(), other.getFirstName())
+			.append(this.getLastName(), other.getLastName())
+			.isEquals();
+		}
+		return false;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
 	 */
-	public void setPersistenceEnabled(boolean persist);
-	
-	/**
-	 * To know if this wrapper is ready for obfuscation operation
-	 * 
-	 * @return True if this DataWrapper is ready for obfuscation
-	 * @return Otherwise false
-	 */
-	public boolean isReadyForObfuscation();
+	@Override
+	public String toString() {
+		return "Name [firstName=" + firstName + ", lastName=" + lastName + "]";
+	}
 }
