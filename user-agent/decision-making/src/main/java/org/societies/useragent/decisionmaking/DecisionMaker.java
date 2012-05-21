@@ -34,8 +34,7 @@ package org.societies.useragent.decisionmaking;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.*;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
@@ -56,6 +55,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 	private List<IActionConsumer> temporal=null;
 	
 	private IServiceDiscovery SerDiscovery;
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	
 	public IServiceDiscovery getSerDiscovery() {
 		return SerDiscovery;
@@ -98,7 +98,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 		man.addRule(new ConfidenceTradeoffRule());
 		man.addRule(new IntentPriorRule());
 		this.manager=man;
-		Logger.getGlobal().log(Level.INFO, "Intialized DM");
+		logging.debug("Intialized DM");
 	}
 	@Override
 	protected ConflictType detectConflict(IOutcome intent, IOutcome prefernce) {
@@ -113,7 +113,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 					}
 				}
 			}
-			Logger.getGlobal().log(Level.INFO, "detecting conflict DM");
+			logging.debug("detecting conflict DM");
 			return ConflictType.NO_CONFLICT;
 		} catch (Exception e) {
 			return ConflictType.UNKNOWN_CONFLICT;
@@ -136,11 +136,11 @@ public class DecisionMaker extends AbstractDecisionMaker {
 		//System.out.println("with Parameter:\t"+action.getparameterName());
 		//System.out.println("with Parameter:\t"+action.getvalue());
 		//System.out.println("****************************************");
-		Logger.getGlobal().log(Level.INFO, "implement IAction DM");
+		logging.debug( "implement IAction DM");
 		for(IActionConsumer consumer:this.temporal){
 			if(consumer.getServiceIdentifier().equals(action.getServiceID())){
 				consumer.setIAction(this.entityID, action);
-				Logger.getGlobal().log(Level.INFO, "set IAction DM");
+				logging.debug("set IAction DM");
 			}
 		}
 		
