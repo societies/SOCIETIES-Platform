@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
@@ -42,6 +44,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
@@ -56,22 +59,22 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.Ctx
 public class PreferenceStorer {
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	private final ICtxBroker broker;
+	private final ICtxBroker ctxBroker;
 
 
 	public PreferenceStorer(ICtxBroker broker){
-		this.broker = broker;	
+		this.ctxBroker = broker;	
 	}
 
 
 	public void deletePreference(CtxIdentifier id){
 		CtxAttribute attrPreference;
 		try {
-			attrPreference = (CtxAttribute) broker.retrieve(id);
+			attrPreference = (CtxAttribute) ctxBroker.retrieve(id);
 			if (attrPreference == null){
 				this.logging.debug("Cannot delete preference. Doesn't exist");
 			}else{
-				broker.remove(id);
+				ctxBroker.remove(id);
 			}
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -84,7 +87,7 @@ public class PreferenceStorer {
 		this.logging.debug("Request to store preference to id:"+id.toUriString());
 		try {
 			
-			Future<CtxAttribute> futureAttr = broker.updateAttribute(((CtxAttributeIdentifier) id), this.toByteArray(p));
+			Future<CtxAttribute> futureAttr = ctxBroker.updateAttribute(((CtxAttributeIdentifier) id), SerialisationHelper.serialise(p));
 			
 			CtxAttribute attr = futureAttr.get();
 			
@@ -105,6 +108,10 @@ public class PreferenceStorer {
 			return false;
 		} catch (ExecutionException e) {
 			this.logging.debug("Error while updating preference in db for id"+id.toUriString());
+			e.printStackTrace();
+			return false;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -134,18 +141,18 @@ public class PreferenceStorer {
 
 
 		try {
-			List<CtxIdentifier> ctxIDs = broker.lookup(CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE).get();
+			List<CtxIdentifier> ctxIDs = ctxBroker.lookup(CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE).get();
 			if (ctxIDs.size()==0){
 				//Preference Entity doesn't exist for this dpi so we're going to check if an association exists of type hasPreferences
 
-				List<CtxIdentifier> assocCtxIDs = broker.lookup(CtxModelType.ASSOCIATION, CtxTypes.HAS_PRIVACY_PREFERENCES).get();
+				List<CtxIdentifier> assocCtxIDs = ctxBroker.lookup(CtxModelType.ASSOCIATION, CtxTypes.HAS_PRIVACY_PREFERENCES).get();
 
 				CtxAssociation assoc = null;
 				if (assocCtxIDs.size()==0){
 					//Has_Preferences association doesn't exist for this dpi, so we're going to check if the Person Entity exists and create the association
-					//CtxEntity person = broker.retrieveOperator();
+					CtxEntity person = (CtxEntity) ctxBroker.retrieveCssOperator().get();
 					
-					Future<List<CtxIdentifier>> futurePersonCtxIDs = broker.lookup(CtxModelType.ENTITY, "PERSON");
+					/*Future<List<CtxIdentifier>> futurePersonCtxIDs = ctxBroker.lookup(CtxModelType.ENTITY, "PERSON");
 					List<CtxIdentifier> personCtxIDs = futurePersonCtxIDs.get();
 					
 					if (personCtxIDs.size()==0){
@@ -153,31 +160,32 @@ public class PreferenceStorer {
 						return null;
 					}
 					
-					Future<CtxModelObject> futurePerson = broker.retrieve(personCtxIDs.get(0));
-					CtxEntity person = (CtxEntity) futurePerson.get();
+					Future<CtxModelObject> futurePerson = ctxBroker.retrieve(personCtxIDs.get(0));
+					CtxEntity person = (CtxEntity) futurePerson.get();*/
 					
 					if (person==null){
 						this.logging.debug("Error retrieving Person Entity: aborting storing and exiting");
 						return null;
 					}
 
-					assoc = broker.createAssociation(CtxTypes.HAS_PRIVACY_PREFERENCES).get();
+					assoc = ctxBroker.createAssociation(CtxTypes.HAS_PRIVACY_PREFERENCES).get();
 					assoc.setParentEntity(person.getId());
 		
-					broker.update(assoc);
+					ctxBroker.update(assoc);
 
 				}else{
 					if (assocCtxIDs.size()>1){
 						this.logging.debug("There's more than one association of type hasPreferences for private DPI\nStoring Preference under the first in the list");
 					}
-					assoc = (CtxAssociation) broker.retrieve(assocCtxIDs.get(0));
+					assoc = (CtxAssociation) ctxBroker.retrieve(assocCtxIDs.get(0));
 				}
 
-				CtxEntity preferenceEntity = broker.createEntity(CtxTypes.PRIVACY_PREFERENCE).get();
+				CtxEntity preferenceEntity = ctxBroker.createEntity(CtxTypes.PRIVACY_PREFERENCE).get();
 				assoc.addChildEntity(preferenceEntity.getId());
-				broker.update(assoc);
-				CtxAttribute attr = broker.createAttribute(preferenceEntity.getId(), key).get();
-				broker.updateAttribute(attr.getId(), SerialisationHelper.serialise(iptm));
+				ctxBroker.update(assoc);
+				//JOptionPane.showMessageDialog(null, "key is: "+key);
+				CtxAttribute attr = ctxBroker.createAttribute(preferenceEntity.getId(), key).get();
+				ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(iptm));
 				this.logging.debug("Created attribute: "+attr.getType());
 				return attr.getId();
 			}else{
@@ -185,8 +193,8 @@ public class PreferenceStorer {
 					this.logging.debug("There's more than one entity of type Privacy_Preference\nStoring preference under the first entity in the list");
 				}
 				CtxIdentifier preferenceEntityID = ctxIDs.get(0);
-				CtxAttribute attr = broker.createAttribute((CtxEntityIdentifier) preferenceEntityID, key).get();
-				broker.updateAttribute(attr.getId(), SerialisationHelper.serialise(iptm));
+				CtxAttribute attr = ctxBroker.createAttribute((CtxEntityIdentifier) preferenceEntityID, key).get();
+				ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(iptm));
 				this.logging.debug("Created attribute: "+attr.getType());
 				return attr.getId();
 			}
@@ -212,12 +220,12 @@ public class PreferenceStorer {
 	
 	public void storeRegistry(Registry registry){
 		try {
-			List<CtxIdentifier> attrList = broker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY).get();
+			List<CtxIdentifier> attrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY).get();
 			
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
-					CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier);
-					attr = broker.updateAttribute(attr.getId(), SerialisationHelper.serialise(registry)).get();
+					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier);
+					attr = ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(registry)).get();
 					if (null==attr){
 						this.logging.debug("Preference Registry not updated.");
 					}else{
@@ -226,23 +234,25 @@ public class PreferenceStorer {
 				}else{
 					this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 					
-					Future<List<CtxIdentifier>> futurePersonCtxIDs = broker.lookup(CtxModelType.ENTITY, "PERSON");
+/*					Future<List<CtxIdentifier>> futurePersonCtxIDs = ctxBroker.lookup(CtxModelType.ENTITY, "PERSON");
 					List<CtxIdentifier> personCtxIDs = futurePersonCtxIDs.get();
 					
 					if (personCtxIDs.size()==0){
 						this.logging.debug("CtxEntity Person does not exist. aborting storing and exiting");
 					}
 					
-					Future<CtxModelObject> futurePerson = broker.retrieve(personCtxIDs.get(0));
+					Future<CtxModelObject> futurePerson = ctxBroker.retrieve(personCtxIDs.get(0));*/
+					Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveCssOperator();
 					CtxEntity person = (CtxEntity) futurePerson.get();
 					
 					if (person==null){
 						this.logging.debug("Error retrieving Person Entity: aborting storing and exiting");
 					}
 					
-					CtxAttribute attr = broker.createAttribute(person.getId(), CtxTypes.PRIVACY_PREFERENCE_REGISTRY).get();
+					CtxAttribute attr = ctxBroker.createAttribute(person.getId(), CtxTypes.PRIVACY_PREFERENCE_REGISTRY).get();
+					attr.setBinaryValue(SerialisationHelper.serialise(registry));
+					ctxBroker.update(attr);
 					
-					attr = broker.updateAttribute(attr.getId(), SerialisationHelper.serialise(registry)).get();
 					
 					if (null==attr){
 						this.logging.debug("Preference Registry not updated.");
