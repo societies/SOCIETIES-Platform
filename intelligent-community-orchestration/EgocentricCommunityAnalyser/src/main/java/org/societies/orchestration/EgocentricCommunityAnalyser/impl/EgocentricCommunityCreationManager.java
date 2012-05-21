@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisProposal;
@@ -321,12 +322,23 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				if (cssDirectoryMembers.size() >= 2  && !cisExistsAlready)
 				    for (int i = 0; i < userJoinedCiss.size(); i++) {
 					    ArrayList<IIdentity> membersOfCis = new ArrayList<IIdentity>();
-					    //String[] membersOfCisStringArray = userJoinedCiss.get(i).membersCss;
-					    String[] membersOfCisStringArray = new String[1];
-					    for (int m = 0; m < membersOfCisStringArray.length; m++) {
+					    
+					    Set<ICisParticipant> participants = null;
+						try {
+							participants = userJoinedCiss.get(i).getMembersList().get();
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (ExecutionException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					    Iterator<ICisParticipant> participantsIterator = participants.iterator();
+					    //String[] membersOfCisStringArray = new String[1];
+					    while (participantsIterator.hasNext()) {
 					    	
 							try {
-								IIdentity id = identityManager.fromJid(membersOfCisStringArray[m]);
+								IIdentity id = identityManager.fromJid(participantsIterator.next().getMembersJid());
 								membersOfCis.add(id);
 							} catch (InvalidFormatException e) {
 								// TODO Auto-generated catch block
