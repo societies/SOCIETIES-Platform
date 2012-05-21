@@ -140,9 +140,18 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
 
+
+
+	}
+
+	
+	public void InitService() {
 		//LOG.info("starting up session");
 		//this.startup();
 		//LOG.info("finished starting up session");
+		
+		while (CSSendpoint.getIdManager() ==null)
+			;//just wait untill the XCommanager is ready
 		
 		cisManagerId = CSSendpoint.getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
@@ -161,9 +170,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			subscribedCISs = new HashSet<CisSubscribedImp>();
 			
 			//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
-
 	}
-
+	
 
 	
 	/**
