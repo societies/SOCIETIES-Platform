@@ -26,10 +26,11 @@ package org.societies.context.api.community.estimation;
 
 import java.util.List;
 
-//import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.identity.IIdentity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.context.api.community.estimation.EstimationModels;
 
 /**
  * @author yboul
@@ -41,33 +42,37 @@ public interface ICommunityCtxEstimationMgr {
 	 * 
 	 * @param estimationModel
 	 * @param list
+	 * @return 
 	 * @since 0.0.1
 	 */
-	public void estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
+	public Integer estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
+	
+	public void estimateContext(EstimationModels estimationmodel, CtxAttribute type, CtxIdentifier cisId);
+		
 
-	/**
-	 * 
-	 * @param Current
-	 * @param communityID
-	 * @param list
-	 * @since 0.0.1
-	 */
-	public void retrieveCurrentCisContext(boolean Current, IIdentity communityID, List<CtxAttribute> list);
-
-	/**
-	 * 
-	 * @param Current
-	 * @param communityID
-	 * @param list
-	 * @since 0.0.1
-	 */
-	public void retrieveHistoryCisContext(boolean Current, IIdentity communityID, List<CtxAttribute> list);
-
-	/**
-	 * 
-	 * @param estimatedContext
-	 * @since 0.0.1
-	 */
-	public void updateContextModelObject(CtxEntity estimatedContext);
+//	/**
+//	 * 
+//	 * @param Current
+//	 * @param communityID
+//	 * @param list
+//	 * @since 0.0.1
+//	 */
+//	public void retrieveCurrentCisContext(boolean Current, CtxEntityIdentifier communityID, List<CtxAttribute> list);
+//
+//	/**
+//	 * 
+//	 * @param Current
+//	 * @param communityID
+//	 * @param list
+//	 * @since 0.0.1
+//	 */
+//	public void retrieveHistoryCisContext(boolean Current, CtxEntityIdentifier communityID, List<CtxAttribute> list);
+//
+//	/**
+//	 * 
+//	 * @param estimatedContext
+//	 * @since 0.0.1
+//	 */
+//	public void updateContextModelObject(CtxEntity estimatedContext);
 
 }
