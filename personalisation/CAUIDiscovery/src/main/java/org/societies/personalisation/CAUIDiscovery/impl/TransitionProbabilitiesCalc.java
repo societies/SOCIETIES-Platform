@@ -79,9 +79,9 @@ public class TransitionProbabilitiesCalc {
 		
 		LinkedHashMap<List<String>,ActionDictObject> step2Dict = new  LinkedHashMap<List<String>,ActionDictObject>();
 	    step2Dict = getStepDict(dictionary,2);
-	    System.out.println("***************************");
-	    printDictionary(step2Dict);
-	    System.out.println("***************************");
+	   // System.out.println("***************************");
+	   // printDictionary(step2Dict);
+	   // System.out.println("***************************");
 	    
 		for (List<String> act : step2Dict.keySet()){
 			HashMap<String,Double> transResultsForAct = new HashMap<String,Double>();

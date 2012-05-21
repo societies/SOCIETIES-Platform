@@ -26,8 +26,6 @@ package org.societies.privacytrust.trust.impl.engine;
 
 import java.util.Date;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +41,6 @@ import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustOpinion;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
-import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,33 +50,23 @@ import org.springframework.stereotype.Service;
  * @since 0.0.8
  */
 @Service
-public class DirectTrustEngine {
+public class DirectTrustEngine extends TrustEngine {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(DirectTrustEngine.class);
-	
-	/** The Trust Event Mgr service reference. */
-	private ITrustEventMgr trustEventMgr;
-	
-	/** The Trust Repository service reference. */
-	@Autowired
-	private ITrustRepository trustRepo;
 	
 	/** The Trust Evidence Repository service reference. */
 	@Autowired
 	private ITrustEvidenceRepository trustEvidenceRepo;
 	
-	/** The executor service. */
-	private ExecutorService executorService = Executors.newSingleThreadExecutor();
-	
 	@Autowired
 	DirectTrustEngine(ITrustEventMgr trustEventMgr) throws TrustEventMgrException {
 		
+		super(trustEventMgr);
 		LOG.info(this.getClass() + " instantiated");
-		this.trustEventMgr = trustEventMgr;
 		
 		LOG.info("Registering for direct trust evidence updates...");
-		this.trustEventMgr.registerListener(
+		super.trustEventMgr.registerListener(
 				new DirectTrustEvidenceUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED }, null);
 	}

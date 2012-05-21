@@ -28,13 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
@@ -64,14 +62,9 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	private IPrivacyPreferenceManager privacyPreferenceManager;
 	private IDataObfuscationManager dataObfuscationManager;
-	private SessionFactory sessionFactory;
 
 	public PrivacyDataManager()  {
 		dataObfuscationManager = new DataObfuscationManager();
-	}
-
-	public void init() {
-		privacyDataManagerInternal = new PrivacyDataManagerInternal(sessionFactory);
 	}
 
 
@@ -220,16 +213,16 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 
 	// --- Dependency Injection
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-		LOG.info("sessionFactory injected");
-	}
 	public void setPrivacyPreferenceManager(
 			IPrivacyPreferenceManager privacyPreferenceManager) {
 		this.privacyPreferenceManager = privacyPreferenceManager;
-		LOG.info("privacyPreferenceManager injected");
+		LOG.info("[Dependency Injection] privacyPreferenceManager injected");
 	}
-
+	public void setPrivacyDataManagerInternal(
+			IPrivacyDataManagerInternal privacyDataManagerInternal) {
+		this.privacyDataManagerInternal = privacyDataManagerInternal;
+		LOG.info("[Dependency Injection] PrivacyDataManagerInternal injected");
+	}
 
 
 	private boolean isDepencyInjectionDone() {
