@@ -1,4 +1,4 @@
-package societies.integration.test.bit.user_preference_learning;
+package org.societies.integration.test.bit.user_preference_learning;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -22,7 +22,6 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.junit.*;
 
-import com.sun.corba.se.spi.presentation.rmi.PresentationManager;
 public class Tester {
 	private IUserActionMonitor uam;
 	private IIdentity userId;
@@ -35,7 +34,7 @@ public class Tester {
 //	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IAction action$1;
 	private IAction action$2;
-	private IAction action$3;
+//	private IAction action$3;
 	private ServiceResourceIdentifier id;
 	public Tester(){
 
@@ -50,7 +49,7 @@ public class Tester {
 		 id = new ServiceResourceIdentifier();
 		this.action$1=new Action(id,"serviceintest","volume","0");
 		this.action$2=new Action(id,"serviceintest","volume","10");
-		this.action$3=new Action(id,"serviceintest","volume","90");
+//		this.action$3=new Action(id,"serviceintest","volume","90");
 		this.personMan=Test748.getPersonMan();
 		setupContext();
 		changeContext("home", "free", "sleep");
@@ -64,12 +63,12 @@ public class Tester {
 	@org.junit.Test
 	public void Test(){
 		for (int i=1; i<21; i++){
-			if(i%3==0){
+			if(i%2==0){
 				uam.monitor(userId, action$1);
-			}else if(i%3==1){
+			}else if(i%2==1){
 				uam.monitor(userId, action$2);
-			}else if(i%3==2){
-				uam.monitor(userId, action$3);
+	//		}else if(i%3==2){
+	//			uam.monitor(userId, action$3);
 			}
 			if(i%2==0){
 				this.changeContext("home", "busy", "working");
