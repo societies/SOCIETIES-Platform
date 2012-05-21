@@ -97,21 +97,40 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	
 	private PrivacyPreferenceConditionMonitor privacyPCM;
 	
-	private IPrivacyDataManagerInternal privacyDataManager;
+	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
 	private IIdentityManager idm;
 	
 	private ICommManager commsManager;
 	
+	private boolean test = false;
+	
+	private MessageBox myMessageBox;
+	
 	public PrivacyPreferenceManager(){
-		
+		if (this.myMessageBox==null){
+			myMessageBox = new MessageBox();
+		}
 	}
 	
 
 	public void initialisePrivacyPreferenceManager(ICtxBroker ctxBroker, ITrustBroker trustBroker){
 		this.setCtxBroker(ctxBroker);
 		this.trustBroker = trustBroker;
-		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, getPrivacyDataManager(), idm);
+		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, getprivacyDataManagerInternal(), idm);
+		prefCache = new PrivatePreferenceCache(ctxBroker);
+		contextCache = new PrivateContextCache(ctxBroker);
+		if (this.myMessageBox==null){
+			myMessageBox = new MessageBox();
+		}
+	}
+	
+	public void initialisePrivacyPreferenceManager(){
+		prefCache = new PrivatePreferenceCache(ctxBroker);
+		contextCache = new PrivateContextCache(ctxBroker);
+		if (this.myMessageBox==null){
+			myMessageBox = new MessageBox();
+		}
 	}
 	
 	/**
@@ -185,9 +204,9 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			return this.checkPreferenceForAccessControl(model, requestor, ctxId, conditions, actions);
 		}
 		
-	
-		int n = JOptionPane.showConfirmDialog(null, requestor.getRequestorId().toString()+" is requesting access to: \n"
+		 int n = myMessageBox.showConfirmDialog(requestor.getRequestorId().toString()+" is requesting access to: \n"
 				+ "resource:"+ctxId.getType()+"\n("+ctxId.toUriString()+")\nto perform a "+actionList+" operation. \nAllow?", "Access request", JOptionPane.YES_NO_OPTION);
+		
 		if (n==JOptionPane.YES_OPTION){
 			this.askToStoreDecision(requestor, ctxId, conditions, actions, PrivacyOutcomeConstants.ALLOW);
 			return this.createResponseItem(requestor, ctxId, actions, conditions, Decision.PERMIT);
@@ -236,8 +255,10 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 				ctxId = (CtxAttributeIdentifier) ctxIds.get(0);
 			}else{
 				this.logging.debug("Asking the user: "+ctxType);
-				ctxId = (CtxAttributeIdentifier) JOptionPane.showInputDialog(null, requestor.toString()+" is requesting access to: \n"
-						+ "resource:"+ctxType+"\n(to perform a "+actionList+" operation.\nSelect an attribute to provide access to or click cancel to abort.", "Access request", JOptionPane.PLAIN_MESSAGE, null, ctxIds.toArray(), ctxIds.get(0));
+				
+				ctxId = (CtxAttributeIdentifier) myMessageBox.showInputDialog(requestor.toString()+" is requesting access to: \n"
+						+ "resource:"+ctxType+"\n(to perform a "+actionList+" operation.\nSelect an attribute to provide access to or click cancel to abort.", 
+						"Access request", JOptionPane.PLAIN_MESSAGE, ctxIds.toArray(), ctxIds.get(0));
 				if (ctxId == null){
 					this.logging.debug("User aborted. Returning block");
 					this.askToStoreDecision(requestor, ctxId, conditions, actions, PrivacyOutcomeConstants.BLOCK);
@@ -334,7 +355,11 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	
 	public IPrivacyOutcome evaluatePPNPreference(PPNPreferenceDetails detail){
 		IPrivacyPreferenceTreeModel model = this.prefCache.getPPNPreference(detail);
+		if (model==null){
+			JOptionPane.showMessageDialog(null, "no stored ppnp preference with these details");
+		}
 		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
+		
 		return outcome;
 	}
 
@@ -640,7 +665,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 		if (null==outcome){
 			this.logging.debug("Evaluation returned no result. Asking the user: "+ctxId.getType());
-			int n = JOptionPane.showConfirmDialog(null, requestor.getRequestorId().toString()+" is requesting access to: \n"
+			int n = myMessageBox.showConfirmDialog(requestor.getRequestorId().toString()+" is requesting access to: \n"
 					+ "resource:"+ctxId.getType()+"\n("+ctxId.toUriString()+")\nto perform a "+actionList+" operation. \nAllow?", "Access request", JOptionPane.YES_NO_OPTION);
 			if (n==JOptionPane.YES_OPTION){
 				this.askToStoreDecision(requestor, ctxId, conditions, actions,  PrivacyOutcomeConstants.ALLOW);
@@ -689,8 +714,9 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 					ctxId = (CtxAttributeIdentifier) ctxIds.get(0);
 				}else{
 					this.logging.debug("Asking the user: "+ctxType);
-					ctxId = (CtxAttributeIdentifier) JOptionPane.showInputDialog(null, requestor.getRequestorId().toString()+" is requesting access to: \n"
-							+ "resource:"+ctxType+"\n(to perform a "+actionList+" operation.\nSelect an attribute to provide access to or click cancel to abort.", "Access request", JOptionPane.PLAIN_MESSAGE, null, ctxIds.toArray(), ctxIds.get(0));
+					ctxId = (CtxAttributeIdentifier) myMessageBox.showInputDialog(requestor.getRequestorId().toString()+" is requesting access to: \n"
+							+ "resource:"+ctxType+"\n(to perform a "+actionList+" operation.\nSelect an attribute to provide access to or click cancel to abort.", 
+							"Access request", JOptionPane.PLAIN_MESSAGE, ctxIds.toArray(), ctxIds.get(0));
 					if (ctxId == null){
 						this.logging.debug("User aborted. Returning block");
 						this.askToStoreDecision(requestor, ctxType, actions, conditions, PrivacyOutcomeConstants.BLOCK);
@@ -723,7 +749,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);		}
 	}
 	private void askToStoreDecision(Requestor requestor, CtxAttributeIdentifier ctxID, List<Condition> conditions,List<Action> actions,  PrivacyOutcomeConstants decision){
-		int n = JOptionPane.showConfirmDialog(null, "Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
+		int n = myMessageBox.showConfirmDialog("Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
 		if (n==JOptionPane.YES_OPTION){
 			
 			Resource r = new Resource(ctxID);
@@ -748,7 +774,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 	private void askToStoreDecision(Requestor requestor, String ctxType, List<Action> actions, List<Condition> conditions, PrivacyOutcomeConstants decision){
-		int n = JOptionPane.showConfirmDialog(null, "Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
+		int n = myMessageBox.showConfirmDialog("Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
 		if (n==JOptionPane.YES_OPTION){
 			
 			Resource r = new Resource(ctxType);
@@ -945,31 +971,28 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 	
 	private String askUserToSelectIdentityForStartingService(RequestorService requestor, List<String> strCandidates){
-		return (String) JOptionPane.showInputDialog(
-				null,
+		return (String) myMessageBox.showInputDialog(
 				"Select an IIdentity for starting session with service:\n",
 						"provided by: "+requestor.getRequestorId().toString()+
 						"\nwith serviceID: "+requestor.getRequestorServiceId().toString(),
-						JOptionPane.QUESTION_MESSAGE, null,
+						JOptionPane.QUESTION_MESSAGE, 
 						strCandidates.toArray(), strCandidates.get(0));
 	}
 	
 	private String askUserToSelectIdentityForJoiningCIS(RequestorCis requestor, List<String> strCandidates){
-		return (String) JOptionPane.showInputDialog(
-				null,
+		return (String) myMessageBox.showInputDialog(
 				"Select an IIdentity for joining CIS:\n", 
 						"CIS id: "+requestor.getCisRequestorId().toString()+
 						 "\nadministered by: "+requestor.getRequestorId().toString(),
-						JOptionPane.QUESTION_MESSAGE, null,
+						JOptionPane.QUESTION_MESSAGE, 
 						strCandidates.toArray(), strCandidates.get(0));
 	}
 	
 	private String askUserToSelectIdentityForInteractingWithCSS(Requestor requestor, List<String> strCandidates){
-		return (String) JOptionPane.showInputDialog(
-				null,
+		return (String) myMessageBox.showInputDialog(
 				"Select an IIdentity for interacting with  CSS:\n", 
 						"CSS id: "+requestor.getRequestorId().toString(),
-						JOptionPane.QUESTION_MESSAGE, null,
+						JOptionPane.QUESTION_MESSAGE, 
 						strCandidates.toArray(), strCandidates.get(0));
 	}
 
@@ -983,16 +1006,16 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	/**
 	 * @return the privacyDataManager
 	 */
-	public IPrivacyDataManagerInternal getPrivacyDataManager() {
-		return privacyDataManager;
+	public IPrivacyDataManagerInternal getprivacyDataManagerInternal() {
+		return privacyDataManagerInternal;
 	}
 
 
 	/**
-	 * @param privacyDataManager the privacyDataManager to set
+	 * @param privacyDataManagerInternal the privacyDataManager to set
 	 */
-	public void setPrivacyDataManager(IPrivacyDataManagerInternal privacyDataManager) {
-		this.privacyDataManager = privacyDataManager;
+	public void setprivacyDataManagerInternal(IPrivacyDataManagerInternal privacyDataManagerInternal) {
+		this.privacyDataManagerInternal = privacyDataManagerInternal;
 	}
 
 
@@ -1010,6 +1033,38 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public void setCommsManager(ICommManager commsManager) {
 		this.commsManager = commsManager;
 		this.idm = commsManager.getIdManager();
+	}
+
+
+	/**
+	 * @return the test
+	 */
+	public boolean isTest() {
+		return test;
+	}
+
+
+	/**
+	 * @param test the test to set
+	 */
+	public void setTest(boolean test) {
+		this.test = test;
+	}
+
+
+	/**
+	 * @return the myMessageBox
+	 */
+	public MessageBox getMyMessageBox() {
+		return myMessageBox;
+	}
+
+
+	/**
+	 * @param myMessageBox the myMessageBox to set
+	 */
+	public void setMyMessageBox(MessageBox myMessageBox) {
+		this.myMessageBox = myMessageBox;
 	}
 
 
