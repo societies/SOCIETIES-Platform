@@ -245,18 +245,17 @@ public class ProfilerEngine implements Variables{
 				SocialPerson endPerson=graph.getPerson(previous_id);
 				logger.info("---# Trying to create relationship between "+current_id+" and "+previous_id+" with name "+nameDescription);
 				graph.createDescription(startPerson, endPerson, current_id, previous_id);
-			}			
-			
-			// TODO
-			createFanPagesAndCategories(current_id, startPerson, profiles);    
+			}
 			
 			// Initialize USER Generic information
 			initialiseUserInformation(current_id, startPerson);			
 			generateUserInformation(current_id, profiles);		
 			
 			// Initialize USER Behavioural profiles
-			initialiseUserProfiles(current_id, startPerson);			
+			initialiseUserProfiles(current_id, startPerson);	
 			
+			createFanPagesAndCategories(current_id, startPerson, profiles);    
+						
 			//// SET WINDOW TIME to get the last Activities			
 			//current time- 1 week				
 			java.util.TimeZone.setDefault(TimeZone.getTimeZone("GMT")); 
@@ -464,25 +463,32 @@ public class ProfilerEngine implements Variables{
 	{
 		logger.debug("retrieving the fanpages ,for which user "+current_id+" is fan of");				
 		ArrayList <String> pages_ids=new ArrayList <String> ();
-		Person information = (Person) profiles.get(0);
+		
+		Person information = null;
+		
+		if (profiles.size()>0)
+			information = (Person) profiles.get(0);
 		
 		Hashtable <String,ArrayList<String>> pages_data = new Hashtable<String, ArrayList<String>>();
-		List<String> turnOns = information.getTurnOns();
-		Iterator<String> it =  turnOns.iterator();
-		while(it.hasNext()){
-			try {
-				JSONObject info = new JSONObject(it.next());
-				ArrayList<String> pageData = new ArrayList<String>();
-				pageData.add(info.getString("value"));
-				pageData.add(info.getString("type"));
-				pages_data.put(info.getString("id"), pageData);
-				pages_ids.add(info.getString("id"));
-			} 
-			catch (JSONException e) {
+		
+		if (information != null) {
+			List<String> turnOns = information.getTurnOns();
+			Iterator<String> it =  turnOns.iterator();
+			while(it.hasNext()){
+				try {
+					JSONObject info = new JSONObject(it.next());
+					ArrayList<String> pageData = new ArrayList<String>();
+					pageData.add(info.getString("value"));
+					pageData.add(info.getString("type"));
+					pages_data.put(info.getString("id"), pageData);
+					pages_ids.add(info.getString("id"));
+				} 
+				catch (JSONException e) {
+					
+					e.printStackTrace();
+				}
 				
-				e.printStackTrace();
 			}
-			
 		}
 		
 		ArrayList <Long> existent_pages_ids=graph.getListOfPagesOfInterest(current_id);
@@ -496,12 +502,10 @@ public class ProfilerEngine implements Variables{
 			}else{
 				logger.debug("----   page id "+ page);
 				SocialPage fanPage=graph.linkPageOfInterest(startPerson, page);
-				logger.debug("adding content to pages");
 				ArrayList<String> page_data=pages_data.get(page);
 				String type=page_data.get(1);
 				graph.updatePageOfInterest(page, page_data.get(0),type );
 				if ((!type.equals(""))&&(type!=null)){
-					logger.debug("checking if type "+type+" of fanPage "+page+" exists" );
 					graph.linkPageOfInterestCategory(fanPage, type, startPerson);
 				}
 			}

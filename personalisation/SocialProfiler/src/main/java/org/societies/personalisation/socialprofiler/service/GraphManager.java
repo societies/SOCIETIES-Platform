@@ -631,7 +631,6 @@ public class GraphManager implements Variables{
 			if (fanPage==null){
 				logger.fatal("ERROR- fanpage was created just before , normally should exist");
 			}else{
-				logger.debug("checking to see if a new fanPageCategory will be created or it exists already");
 				fanPageCategory=getPageOfInterestCategory(type);
 				if (fanPageCategory==null){
 					logger.debug("creating new fanPageCateogry before linking");
@@ -640,7 +639,7 @@ public class GraphManager implements Variables{
 						logger.fatal("ERROR - fanPageCategory seemed not to exist - was created - but is null");
 					}
 				}else{
-					logger.debug("fanPageCategory solved =>now linking....");
+//					logger.debug("fanPageCategory solved =>now linking....");
 				}
 				
 				boolean check=existsRelationshipPageOfInterestPageOfInterestCategory(fanPage, fanPageCategory);
@@ -650,7 +649,6 @@ public class GraphManager implements Variables{
 					@SuppressWarnings("unused")
 					final Relationship relationship = startNode.createRelationshipTo( endNode,
 		        		RelTypes.BELONGS_TO );
-					logger.debug("relationship was created");
 					logger.debug("Now fanPage "+fanPage.getName()+" BELONGS_TO "+fanPageCategory.getName());
 				}
 				
@@ -1619,7 +1617,6 @@ public class GraphManager implements Variables{
 		Profile maniac = null;
 		Transaction tx_Man = getNeoService().beginTx();
 		try{
-			logger.debug("**Reading Lucene Index**  searching for Maniac profile "+name);
 			Node maniacNode = luceneIndexService.getSingleNode( NAME_INDEX, name );
 			if ( maniacNode == null )
 			{
@@ -1628,7 +1625,6 @@ public class GraphManager implements Variables{
 			
 			if ( maniacNode != null )
 			{
-				logger.debug("Maniac "+name+" was found on Lucene index => returning it");
 				maniac = new ProfileImpl( maniacNode, type, name);
 				if(maniac==null){logger.error("ERROR while creating instance of " +
 						"Maniac - to be returned");}
