@@ -9,8 +9,11 @@ import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IDriverService;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
+import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+import org.societies.api.internal.css.devicemgmt.model.DeviceMgmtDriverServiceConstants;
 import org.springframework.osgi.context.BundleContextAware;
 
 
@@ -27,12 +30,6 @@ public class SampleActivatorDriver implements BundleContextAware{
 	private LightSensor ls3;
 	private Screen screen;
 	
-	private String driverServiceId1 = "lightSensorService";
-	private String driverServiceId2 = "lightSensorService";
-	private String driverServiceId3 = "lightSensorService";
-	
-	private String screenDriverServiceId = "screenService";
-	
 	private String physicalDeviceId1 = "3b:6d:01";
 	private String physicalDeviceId2 = "3b:6d:02";
 	private String physicalDeviceId3 = "3b:6d:03";
@@ -45,11 +42,9 @@ public class SampleActivatorDriver implements BundleContextAware{
 	
 	private DeviceCommonInfo screenCommonInfo;
 	
-	private String [] serviceIds1 = {driverServiceId1};
-	private String [] serviceIds2 = {driverServiceId2};
-	private String [] serviceIds3 = {driverServiceId3};
+	private String [] lightDriverServiceNamesList = {DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE};
 	
-	private String [] screenServiceIds = {screenDriverServiceId};
+	private String [] screenDriverServiceNamesList = {DeviceMgmtDriverServiceNames.SCREEN_DRIVER_SERVICE};
 	
 	private Dictionary<String, String> properties;
 	/** Service registration */
@@ -107,21 +102,21 @@ public class SampleActivatorDriver implements BundleContextAware{
 	 */
 	public void startSimul() 
 	{
-		deviceCommonInfo1 = new DeviceCommonInfo("family1", "Light Sensor", "LightSensor", "Light Sensor 1 test", "Zigbee", "Room1", "Trialog", null, true);
-		deviceCommonInfo2 = new DeviceCommonInfo("family1", "Light Sensor", "LightSensor", "Light Sensor 2 test", "Zigbee", "Room2", "Trialog", null, true);
-		deviceCommonInfo3 = new DeviceCommonInfo("family1", "Light Sensor", "LightSensor", "Light Sensor 3 test", "Zigbee", "Room3", "Trialog", null, true);
+		deviceCommonInfo1 = new DeviceCommonInfo("org.societies.DeviceDriverSimulator", "Light Sensor", DeviceTypeConstants.LIGHT_SENSOR, "Light Sensor 1 test", "Zigbee", "Room1", "Trialog", null, true);
+		deviceCommonInfo2 = new DeviceCommonInfo("org.societies.DeviceDriverSimulator", "Light Sensor", DeviceTypeConstants.LIGHT_SENSOR, "Light Sensor 2 test", "Zigbee", "Room2", "Trialog", null, true);
+		deviceCommonInfo3 = new DeviceCommonInfo("org.societies.DeviceDriverSimulator", "Light Sensor", DeviceTypeConstants.LIGHT_SENSOR, "Light Sensor 3 test", "Zigbee", "Room3", "Trialog", null, true);
 
-		screenCommonInfo = new DeviceCommonInfo("family2", "Sony Screen", "Screen", "Screen display test", "HDMI", "Corridor1", "Trialog", null, false);
+		screenCommonInfo = new DeviceCommonInfo("org.societies.DeviceDriverSimulator", "Sony Screen", DeviceTypeConstants.SCREEN, "Screen display test", "HDMI", "Corridor1", "Trialog", null, false);
 		/* creation of sensors */
 		
-		ls = new LightSensor(this, driverServiceId1, physicalDeviceId1, lightSensorCount);
+		ls = new LightSensor(this, DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE, physicalDeviceId1, lightSensorCount);
 		lightSensorCount++;
-		ls2 = new LightSensor(this, driverServiceId2, physicalDeviceId2, lightSensorCount);
+		ls2 = new LightSensor(this, DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE, physicalDeviceId2, lightSensorCount);
 		lightSensorCount++;
-		ls3 = new LightSensor(this, driverServiceId3, physicalDeviceId3, lightSensorCount);
+		ls3 = new LightSensor(this, DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE, physicalDeviceId3, lightSensorCount);
 		lightSensorCount++;
 
-		screen = new Screen(this, screenDriverServiceId, screenPhysicalDeviceId);
+		screen = new Screen(this, DeviceMgmtDriverServiceNames.SCREEN_DRIVER_SERVICE, screenPhysicalDeviceId);
 			
 		Object lock = new Object();			
 
@@ -130,35 +125,42 @@ public class SampleActivatorDriver implements BundleContextAware{
 			LOG.info("DeviceDriverExample: " + "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii registration process");
 			
 			properties = new Hashtable<String, String>();
-			properties.put("driverServiceId", driverServiceId1);
-			properties.put("physicalDeviceId", physicalDeviceId1);
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME, 
+					DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE);
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID, 
+					physicalDeviceId1);
 			//properties.put("deviceId", lsDeviceId1);
 			lsReg = bc.registerService(IDriverService.class.getName(), ls, properties);
 			
 			properties = new Hashtable<String, String>();
-			properties.put("driverServiceId", driverServiceId2);
-			properties.put("physicalDeviceId", physicalDeviceId2);
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME, 
+					DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE);
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID, 
+					physicalDeviceId2);
 			//properties.put("deviceId", lsDeviceId2);
 			lsReg2 = bc.registerService(IDriverService.class.getName(), ls2, properties);
 			
 			properties = new Hashtable<String, String>();
-			properties.put("driverServiceId", driverServiceId3);
-			properties.put("physicalDeviceId", physicalDeviceId3);
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME, 
+					DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE);
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID, 
+					physicalDeviceId3);
 			//properties.put("deviceId", lsDeviceId3);
 			lsReg3 = bc.registerService(IDriverService.class.getName(), ls3, properties);
 			
 			properties = new Hashtable<String, String>();
-			properties.put("driverServiceId", screenDriverServiceId);
-			properties.put("physicalDeviceId", screenPhysicalDeviceId);
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME,
+					DeviceMgmtDriverServiceNames.SCREEN_DRIVER_SERVICE);
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID, screenPhysicalDeviceId);
 			//properties.put("deviceId", screenDeviceId);
 			screenReg = bc.registerService(IDriverService.class.getName(), screen, properties);
 		}
 		
 		
-		String lsDeviceId1 = deviceManager.fireNewDeviceConnected(physicalDeviceId1, deviceCommonInfo1, serviceIds1);
-		String lsDeviceId2 = deviceManager.fireNewDeviceConnected(physicalDeviceId2, deviceCommonInfo2, serviceIds2);
-		String lsDeviceId3 = deviceManager.fireNewDeviceConnected(physicalDeviceId3, deviceCommonInfo3, serviceIds3);	
-		String screenDeviceId = deviceManager.fireNewDeviceConnected(screenPhysicalDeviceId, screenCommonInfo, screenServiceIds);
+		String lsDeviceId1 = deviceManager.fireNewDeviceConnected(physicalDeviceId1, deviceCommonInfo1, lightDriverServiceNamesList);
+		String lsDeviceId2 = deviceManager.fireNewDeviceConnected(physicalDeviceId2, deviceCommonInfo2, lightDriverServiceNamesList);
+		String lsDeviceId3 = deviceManager.fireNewDeviceConnected(physicalDeviceId3, deviceCommonInfo3, lightDriverServiceNamesList);	
+		String screenDeviceId = deviceManager.fireNewDeviceConnected(screenPhysicalDeviceId, screenCommonInfo, screenDriverServiceNamesList);
 		
 		
 		LOG.info("DeviceDriverExample: " + "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii " + lsDeviceId1);
@@ -194,21 +196,21 @@ public class SampleActivatorDriver implements BundleContextAware{
 
 		/* Light sensors */
 		if (ls!=null){
-			deviceManager.fireDeviceDisconnected("family1", physicalDeviceId1);
+			deviceManager.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", physicalDeviceId1);
 			ls = null;
 		}
 		else {
 			System.out.println("no ls");
 		}
 		if (ls2!=null){
-			deviceManager.fireDeviceDisconnected("family1", physicalDeviceId2);
+			deviceManager.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", physicalDeviceId2);
 			ls2 = null;
 		}
 		else {
 			System.out.println("no ls2");
 		}
 		if (ls3!=null){
-			deviceManager.fireDeviceDisconnected("family1", physicalDeviceId3);
+			deviceManager.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", physicalDeviceId3);
 			ls3 = null;
 		}
 		else {
@@ -217,7 +219,7 @@ public class SampleActivatorDriver implements BundleContextAware{
 		
 		/* Screen */
 		if (screen!=null){
-			deviceManager.fireDeviceDisconnected("family2", screenPhysicalDeviceId);
+			deviceManager.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", screenPhysicalDeviceId);
 			screen = null;
 		}
 		else {

@@ -22,45 +22,26 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.devicemgmt;
+package org.societies.api.internal.css.devicemgmt.model;
 
-import java.util.Dictionary;
-
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 /**
- * Interface used by the device deriver bundles to inform the device manager about a state of devices
+ * Describe your class here...
  *
  * @author Rafik
  *
  */
-public interface IDeviceManager {
+public class DeviceMgmtDriverServiceConstants {
 	
 
-
 	/**
-	 * 
-	 * @param physicalDeviceId
-	 * @param deviceCommonInfo
-	 * @param serviceIds
-	 * @return a deviceId
+	 * Property (Named DEVICE_DRIVER_SERVICE_NAME) Used when registering a driver service 
 	 */
-	public String fireNewDeviceConnected (String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceNames);
+	public static final String DEVICE_DRIVER_SERVICE_NAME = "driverServiceName";
 	
 	/**
-	 * Method used to inform the Device Manager about disconnection of a device
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
+	 * Property (Named DEVICE_DRIVER_PHYSICAL_DEVICE_ID) Used when registering a driver service
 	 */
-	public String fireDeviceDisconnected (String deviceFamily, String physicalDeviceId);
+	public static final String DEVICE_DRIVER_PHYSICAL_DEVICE_ID = "physicalDeviceId";
 	
-	/**
-	 * 
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
-	 * @param data TODO to define
-	 */
-	public String fireNewDataReceived (String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data);
 
 }

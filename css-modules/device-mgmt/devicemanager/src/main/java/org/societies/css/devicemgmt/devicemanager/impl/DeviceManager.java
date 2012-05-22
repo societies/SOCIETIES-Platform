@@ -64,7 +64,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	
 	private DeviceImpl deviceImpl;
 	
-	private Map<String, String []> deviceServiceIdsContainer;
+	private Map<String, String []> deviceServiceNamesContainer;
 	
 	private BundleContext bundleContext;
 	
@@ -88,7 +88,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	public DeviceManager() {
 
 		deviceFamilyContainer = new HashMap<String, Map<String,DeviceImpl>>();
-		deviceServiceIdsContainer = new HashMap<String, String[]>();
+		deviceServiceNamesContainer = new HashMap<String, String[]>();
 		//TODO Fill this table
 		deviceIdBindingTable = new DualHashBidiMap();
 		
@@ -122,17 +122,17 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 		if (deviceFamilyContainer.get(deviceFamily).get(deviceId) != null)
 		{
 			deviceFamilyContainer.get(deviceFamily).remove(deviceId);
-			deviceServiceIdsContainer.remove(deviceId);
+			deviceServiceNamesContainer.remove(deviceId);
 			deviceIdBindingTable.inverseBidiMap().removeValue(deviceId);
 		}
 	}
 	
-	public List<String> getDeviceServiceIds (String deviceId)
+	public List<String> getDeviceServiceNames (String deviceId)
 	{
 		LOG.info("////////////////////////////////// getDeviceServiceIds : " + deviceId); 
-		String [] deviceListArray = deviceServiceIdsContainer.get(deviceId);
+		String [] deviceListArray = deviceServiceNamesContainer.get(deviceId);
 		
-		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceIdsContainer.toString());
+		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceNamesContainer.toString());
 		
 		LOG.info("////////////////////////////////// getDeviceServiceIds : " + deviceListArray.toString()); 
 		
@@ -140,14 +140,14 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 		{
 			LOG.info("////////////////////////////////// deviceListArray non null"); 
 			
-			List <String> deviceIdsList = new ArrayList<String>();
+			List <String> deviceNamesList = new ArrayList<String>();
 			
 			for (String str : deviceListArray)
 			{
-				deviceIdsList.add(str);
+				deviceNamesList.add(str);
 			}
-			LOG.info("////////////////////////////////// deviceListArray non null" + deviceIdsList.toString()); 
-			return deviceIdsList;
+			LOG.info("////////////////////////////////// deviceListArray non null" + deviceNamesList.toString()); 
+			return deviceNamesList;
 		}
 		return null;
 	}
@@ -173,7 +173,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	 * TODO Add in this method a call to a device binding table class to generate an Id to each new device connected
 	 */
 	@Override
-	public String fireNewDeviceConnected(String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceIds) 
+	public String fireNewDeviceConnected(String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceNames) 
 	{
 		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected ");
 		
@@ -220,8 +220,8 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
 			
 			deviceInstanceContainer.put(deviceId, deviceImpl);
-			deviceServiceIdsContainer.put(deviceId, serviceIds);
-			LOG.info(" %%%%%%%%%%%%%%%%======================%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceIdsContainer.toString());
+			deviceServiceNamesContainer.put(deviceId, serviceNames);
+			LOG.info(" %%%%%%%%%%%%%%%%======================%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceNamesContainer.toString());
 			deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
 			
 			synchronized(lock)
@@ -270,8 +270,8 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 				deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
 				
 				deviceInstanceContainer.put(deviceId, deviceImpl);
-				deviceServiceIdsContainer.put(deviceId, serviceIds);
-				LOG.info(" %%%%%%%%%%%%%%%%======================%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceIdsContainer.toString());
+				deviceServiceNamesContainer.put(deviceId, serviceNames);
+				LOG.info(" %%%%%%%%%%%%%%%%======================%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceNamesContainer.toString());
 					
 				deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
 				

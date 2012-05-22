@@ -22,45 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.devicemgmt;
+package org.societies.api.css.devicemgmt.model;
 
-import java.util.Dictionary;
-
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 /**
- * Interface used by the device deriver bundles to inform the device manager about a state of devices
+ * Describe your class here...
  *
  * @author Rafik
  *
  */
-public interface IDeviceManager {
-	
-
-
-	/**
-	 * 
-	 * @param physicalDeviceId
-	 * @param deviceCommonInfo
-	 * @param serviceIds
-	 * @return a deviceId
-	 */
-	public String fireNewDeviceConnected (String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceNames);
+public class DeviceMgmtEventConstants {
 	
 	/**
-	 * Method used to inform the Device Manager about disconnection of a device
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
+	 * Constant used to subscribe to the light sensors events
 	 */
-	public String fireDeviceDisconnected (String deviceFamily, String physicalDeviceId);
+	public static final String LIGHT_SENSOR_EVENT = "sensor/ligntSensorEvent";
 	
 	/**
-	 * 
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
-	 * @param data TODO to define
+	 * Constant used to subscribe to temperature sensor events
 	 */
-	public String fireNewDataReceived (String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data);
+	public static final String TEMPERATURE_SENSOR_EVENT = "sensor/temperatureSensorEvent";
+	
+	
+	/**
+	 * Constant used to subscribe to receive GPS sensor events
+	 */
+	public static final String GPS_SENSOR_EVENT = "sensor/gpsSensorEvent";
+	
+	/**
+	 * Constant used to subscribe to receive pressure mat events
+	 */
+	public static final String PRESSURE_MAT_EVENT = "sensor/pressureMatEvent";
+	
+	/**
+	 * Constant used to subscribe to receive RFiD reader events
+	 */
+	public static final String RFID_READER_EVENT = "sensor/rfidReaderEvent";
+	
+	/**
+	 * Constant used to subscribe to receive kinect events
+	 */
+	public static final String KINECT_EVENT = "sensor/kinectEvent";
+	
+	
+	/**
+	 * Constant used to subscribe to receive screen events if any
+	 */
+	public static final String SCREEN_EVENT = "actuator/screenEvent";
+	
+	/**
+	 * Constant used to subscribe to receive directional speaker events if any
+	 */
+	public static final String DIRECTIONAL_SPEAKER_EVENT = "actuator/directionalSpeakerEvent";
+	
+	/**
+	 * Constant used to subscribe to receive directional light actuator events if any
+	 */
+	public static final String LIGHT_ACTUATOR_EVENT = "actuator/lightActuatorEvent";
 
 }

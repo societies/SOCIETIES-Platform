@@ -22,45 +22,57 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.devicemgmt;
+package org.societies.api.css.devicemgmt.model;
 
-import java.util.Dictionary;
-
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 /**
- * Interface used by the device deriver bundles to inform the device manager about a state of devices
+ * Describe your class here...
  *
  * @author Rafik
  *
  */
-public interface IDeviceManager {
-	
-
-
-	/**
-	 * 
-	 * @param physicalDeviceId
-	 * @param deviceCommonInfo
-	 * @param serviceIds
-	 * @return a deviceId
-	 */
-	public String fireNewDeviceConnected (String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceNames);
+public class DeviceMgmtDriverServiceNames {
 	
 	/**
-	 * Method used to inform the Device Manager about disconnection of a device
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
+	 * Constant used to get light sensor driver service object which will be used to invoke actions on the light sensor devices
 	 */
-	public String fireDeviceDisconnected (String deviceFamily, String physicalDeviceId);
+	public static final String LIGHT_SENSOR_DRIVER_SERVICE = "sensor/lightSensorDriverService";
 	
 	/**
-	 * 
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
-	 * @param data TODO to define
+	 * Constant used to get temperature driver service object which will be used to invoke actions on the temperature sensor devices
 	 */
-	public String fireNewDataReceived (String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data);
-
+	public static final String TEMPERATURE_SENSOR_DRIVER_SERVICE = "sensor/temperatureSensorDriverService";
+	
+	
+	/**
+	 * Constant used to get screen driver service object which will be used to invoke actions on the screen devices
+	 */
+	public static final String SCREEN_DRIVER_SERVICE = "actuator/screenDriverService";
+	
+	/**
+	 * Constant used to get RFiD reader driver service object which will be used to invoke actions on the RFiD reader devices
+	 */
+	public static final String RFID_READER_DRIVER_SERVICE = "sensor/rfidReaderDriverService";
+	
+	
+	/**
+	 * Constant used to get pressure mat driver service object which will be used to invoke actions on the pressure mat devices
+	 */
+	public static final String PRESSURE_MAT_DRIVER_SERVICE = "sensor/pressureMatDriverService";
+	
+	
+	/**
+	 * Constant used to get GPS driver service object which will be used to invoke actions on the GPS devices
+	 */
+	public static final String GPS_SENSOR_DRIVER_SERVICE = "sensor/gpsDriverService";
+	
+	/**
+	 * Constant used to get kinect driver service object which will be used to invoke actions on the kinect devices
+	 */
+	public static final String KINECT_DRIVER_SERVICE = "sensor/gpsDriverService";
+	
+	
+	/**
+	 * Constant used to get Light actuator driver service object, which will be used to invoke actions on the light actuator devices
+	 */
+	public static final String LIGHT_ACTUATOR_DRIVER_SERVICE = "actuator/lightActuatorDriverService";
 }

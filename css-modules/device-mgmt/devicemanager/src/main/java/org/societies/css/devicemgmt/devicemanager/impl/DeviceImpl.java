@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+import org.societies.api.internal.css.devicemgmt.model.DeviceMgmtDriverServiceConstants;
 
 
 
@@ -122,28 +123,29 @@ public class DeviceImpl implements IDevice{
 	}
 
 	@Override
-	public IDriverService getService(String serviceId) {
+	public IDriverService getService(String serviceName) {
 	
-		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 1 " + serviceId); 
+		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 1 " + serviceName); 
 		
 		String physicalDeviceId = deviceManager.getPhysicalDeviceId(deviceId);
 		
 		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 2 physicalDeviceId: " + physicalDeviceId);
 		
-		List <String> serviceList = deviceManager.getDeviceServiceIds(deviceId);
+		List <String> serviceList = deviceManager.getDeviceServiceNames(deviceId);
 		
 		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 3"); 
 		
 		if (serviceList != null && physicalDeviceId != null) 
 		{
 			LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ serviceList non null"); 
-			if (serviceList.contains(serviceId))
+			if (serviceList.contains(serviceName))
 			{
-				LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ serviceList.contains(serviceId) get service by: service id = " + serviceId +" and device Id = " + deviceId); 
+				LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ serviceList.contains(serviceId) get service by: service id = " + serviceName +" and device Id = " + deviceId); 
 				ServiceReference[] sr = null;
 				try 
 				{
-					sr = bundleContext.getServiceReferences(IDriverService.class.getName(), "(&(driverServiceId="+serviceId+")(physicalDeviceId="+physicalDeviceId+"))");
+					sr = bundleContext.getServiceReferences(IDriverService.class.getName(),  "(&("+DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME+"="+serviceName+")("+
+							DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID+"="+physicalDeviceId+"))");
 				} 
 				catch (InvalidSyntaxException e) 
 				{
@@ -169,18 +171,19 @@ public class DeviceImpl implements IDevice{
 	public IDriverService [] getServices() {
 
 		String physicalDeviceId = deviceManager.getPhysicalDeviceId(this.deviceId);
-		List <String> serviceList = deviceManager.getDeviceServiceIds(this.deviceId);
+		List <String> serviceNameList = deviceManager.getDeviceServiceNames(this.deviceId);
 		
 		List<IDriverService> deviceServiceList = new ArrayList<IDriverService>();
 		
-		if (serviceList != null && physicalDeviceId != null) 
+		if (serviceNameList != null && physicalDeviceId != null) 
 		{
 			ServiceReference[] sr = null;
-			for(String serviceId : serviceList)
+			for(String serviceName : serviceNameList)
 			{
 				try 
 				{
-					sr = bundleContext.getServiceReferences(IDriverService.class.getName(), "(&(driverServiceId="+serviceId+")(physicalDeviceId="+physicalDeviceId+"))");
+					sr = bundleContext.getServiceReferences(IDriverService.class.getName(), "(&("+DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME+"="+serviceName+")("+
+							DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID+"="+physicalDeviceId+"))");
 				
 				} catch (InvalidSyntaxException e) {
 					e.printStackTrace();
