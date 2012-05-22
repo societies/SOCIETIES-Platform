@@ -30,7 +30,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.source.ICtxSourceMgr;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.context.api.user.location.ILocationManagementAdapter;
 import org.societies.context.api.user.location.ITag;
 import org.societies.context.api.user.location.IUserLocation;
@@ -41,7 +53,7 @@ import org.societies.context.api.user.location.impl.TagImpl;
 import org.societies.context.api.user.location.impl.UserLocationImpl;
 import org.societies.context.api.user.location.impl.ZoneIdImpl;
 import org.societies.context.api.user.location.impl.ZoneImpl;
-import org.societies.api.context.source.ICtxSourceMgr;
+import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 
 
 public class LMAdapterImpl implements ILocationManagementAdapter {
@@ -49,15 +61,20 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	//TODO TEMP - replace with config file  //
 	private static final int UPDATE_CYCLE = 30*1000;
 	
-	private PZWrapperImpl pzWrapperImpl = new PZWrapperImpl();
+	private MockPZWrapperImpl pzWrapperImpl = new MockPZWrapperImpl();
 	private final Timer timer = new Timer();
+	private LocationManagementContextAccessor locationInference;
 	
 	private ICtxSourceMgr contextSourceManagement;
+	private ICtxBroker contextBroker;
+	private ICommManager commManager;
 	
-	public LMAdapterImpl(){
-		timer.scheduleAtFixedRate(new UpdateTask(), UPDATE_CYCLE, UPDATE_CYCLE);
+	
+	private void init() throws InterruptedException, ExecutionException{
+		locationInference = new LocationManagementContextAccessor();
+		locationInference.init(contextSourceManagement, contextBroker, commManager);
+		timer.scheduleAtFixedRate(new MockUpdateTask(), 0, UPDATE_CYCLE);
 	}
-	
 	
 	@Override
 	public Set<String> getActiveEntitiesIdsInZone(IZoneId arg0) {
@@ -66,12 +83,12 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 
 	@Override
 	public Collection<IZone> getActiveZones() {
-		Collection<PZWrapperImpl.Zone> mockZones = pzWrapperImpl.getActiveZones();
+		Collection<MockPZWrapperImpl.Zone> mockZones = pzWrapperImpl.getActiveZones();
 		
 		Collection<IZone> zones = new ArrayList<IZone>();
 		
 		IZone zone;
-		for (PZWrapperImpl.Zone mockZone : mockZones){
+		for (MockPZWrapperImpl.Zone mockZone : mockZones){
 			zone = convert(mockZone);
 			zones.add(zone);
 		}
@@ -82,12 +99,12 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	public IUserLocation getEntityFullLocation(String entityId) {
 		IUserLocation userLocation = new UserLocationImpl();
 		
-		PZWrapperImpl.Location location = pzWrapperImpl.getEntityFullLocation(entityId);
+		MockPZWrapperImpl.Location location = pzWrapperImpl.getEntityFullLocation(entityId);
 		userLocation.setXCoordinate(new CoordinateImpl(location.getX().doubleValue()));
 		userLocation.setYCoordinate(new CoordinateImpl(location.getY().longValue()));
 		
 		List<IZone> zones = new ArrayList<IZone>();
-		for (PZWrapperImpl.ExZone exZone : location.getZones()){
+		for (MockPZWrapperImpl.ExZone exZone : location.getZones()){
 			IZone zone = convert(exZone);
 			zones.add(zone);
 		}
@@ -95,8 +112,8 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		return userLocation;
 	}
 	
-	private IZone convert(PZWrapperImpl.ExZone mockZone){
-		IZone zone = convert((PZWrapperImpl.Zone)mockZone);
+	private IZone convert(MockPZWrapperImpl.ExZone mockZone){
+		IZone zone = convert((MockPZWrapperImpl.Zone)mockZone);
 		zone.setPersonalTag(new TagImpl(mockZone.getPersonalTag()));
 		
 		List<ITag> tags = new ArrayList<ITag>();
@@ -109,7 +126,8 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	}
 	
 	
-	private IZone convert(PZWrapperImpl.Zone mockZone){
+	
+	private IZone convert(MockPZWrapperImpl.Zone mockZone){
 		IZone zone = new ZoneImpl();
 		
 		IZoneId zoneId = new ZoneIdImpl(); 
@@ -134,27 +152,22 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		
 	}
 	
-	private class UpdateTask extends TimerTask{
+	private class MockUpdateTask extends TimerTask{
 
 		@Override
 		public void run() {
+			
 			try{
 				System.out.println("here");
 				IUserLocation userLocation;
 				for (IZone iZone : getActiveZones()){
 					for (String entityId : getActiveEntitiesIdsInZone(iZone.getId())){
 						userLocation = getEntityFullLocation(entityId);
-						System.out.println(userLocation.getXCoordinate());
-					
-						//TODO 
-						//1. do a batch call for all the entities ?
-						//2. Update the API to also contain zones and tags
-						
-						//use --> contextSourceManagement.sendUpdate("", "", "", "", "", "");		
+						locationInference.updateCSM(userLocation);
 					}
 				}
 				
-				
+					
 			}catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -162,14 +175,31 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		}
 		
 	}
-
+	
+	
 	public ICtxSourceMgr getContextSourceManagement() {
 		return contextSourceManagement;
 	}
-
-
+	
 	public void setContextSourceManagement(ICtxSourceMgr contextSourceManagement) {
 		this.contextSourceManagement = contextSourceManagement;
+	}
+	
+	public ICtxBroker getContextBroker() {
+		return contextBroker;
+	}
+
+
+	public void setContextBroker(ICtxBroker contextBroker) {
+		this.contextBroker = contextBroker;
+	}
+	
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
 	}
 
 }
