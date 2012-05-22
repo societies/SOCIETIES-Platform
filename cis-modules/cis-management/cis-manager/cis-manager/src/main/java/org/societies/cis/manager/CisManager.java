@@ -140,12 +140,30 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
 
+		while (CSSendpoint.getIdManager() ==null)
+			;//just wait untill the XCommanager is ready
+		
+		cisManagerId = CSSendpoint.getIdManager().getThisNetworkNode();
+		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
 
+
+			try {
+				CSSendpoint.register((IFeatureServer)this);
+//				CSSendpoint.register((ICommCallback)this);
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			} // TODO unregister??
+			
+			LOG.info("listener registered");
+
+			this.ownedCISs = new HashSet<Cis>();	
+			subscribedCISs = new HashSet<CisSubscribedImp>();
+			
 
 	}
 
 	
-	public void InitService() {
+/*	public void InitService() {
 		//LOG.info("starting up session");
 		//this.startup();
 		//LOG.info("finished starting up session");
@@ -170,7 +188,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			subscribedCISs = new HashSet<CisSubscribedImp>();
 			
 			//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
-	}
+	}*/
 	
 
 	
@@ -245,7 +263,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		
 		Cis cis = new  Cis(cssId, cisName, cisType, mode,this.ccmFactory);
-		this.persist(cis);
+		//this.persist(cis);
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
 			return i;

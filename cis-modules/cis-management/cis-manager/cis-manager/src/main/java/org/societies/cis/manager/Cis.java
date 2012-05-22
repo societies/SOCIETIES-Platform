@@ -485,7 +485,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	}
 
-	// index for hash and equals was only the cisRecord
+
+	
+	// equals comparing only cisRecord
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -507,10 +510,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 		if (cisRecord == null) {
 			if (other.cisRecord != null)
 				return false;
-		} else if (cisRecord.equals(other.cisRecord) == false)
+		} else if (!cisRecord.equals(other.cisRecord))
 			return false;
 		return true;
 	}
+	
+	
+	
 
 	public CisRecord getCisRecord() {
 		return cisRecord;

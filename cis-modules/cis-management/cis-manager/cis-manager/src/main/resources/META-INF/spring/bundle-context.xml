@@ -88,13 +88,13 @@
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
-   <!--  <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" >
-        <property name="sessionFactory" ref="sessionFactory" />
-    </bean>-->
-    <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" 
-    depends-on="xcCommunication,cisCommMgrFactory" init-method="InitService">
+     <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" >
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
+   <!-- <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" 
+    depends-on="xcCommunication,cisCommMgrFactory" init-method="InitService">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>-->
     
 
    <!-- <bean id="CisClientService" 
