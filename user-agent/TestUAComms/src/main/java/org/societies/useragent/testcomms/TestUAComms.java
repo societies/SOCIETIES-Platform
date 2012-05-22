@@ -23,77 +23,48 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.monitoring;
+package org.societies.useragent.testcomms;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.useragent.monitoring.UIMEvent;
-import org.societies.api.osgi.event.EMSException;
-import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
+import org.societies.api.internal.useragent.remote.IUserAgentRemoteMgr;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-public class UserActionMonitor implements IUserActionMonitor{
+public class TestUAComms {
 
-	private static Logger LOG = LoggerFactory.getLogger(UserActionMonitor.class);
-	private boolean cloud;
-	private ICtxBroker ctxBroker;
-	private IEventMgr eventMgr;
+	private IUserAgentRemoteMgr uaRemote;
 	private ICommManager commsMgr;
-	private ContextCommunicator ctxComm;
+	private Logger LOG = LoggerFactory.getLogger(TestUAComms.class);
 
-	@Override
-	public void monitor(IIdentity owner, IAction action) {
-		LOG.info("UAM - Received user action!");
-		LOG.info("action ServiceId: "+action.getServiceID().toString());
-		LOG.info("action serviceType: "+action.getServiceType());
-		LOG.info("action parameterName: "+action.getparameterName());
-		LOG.info("action value: "+action.getvalue());
+	public void initService(){
+		startTest();
+	}
 
-		//save action in context - IIdentity (Person) > ServiceId > paramName
-		//create new entities and attributes if necessary
-		ctxComm.updateHistory(owner, action);
+	private void startTest(){
 
-		//update interactionDevice if NOT on cloud node
-		if(!cloud){
-			ctxComm.updateUID(owner);
-		}
-
-		//send local event
-		UIMEvent payload = new UIMEvent(owner, action);
-		InternalEvent event = new InternalEvent(EventTypes.UIM_EVENT, "newaction", "org/societies/useragent/monitoring", payload);
+		IIdentity myIdentity = commsMgr.getIdManager().getThisNetworkNode();
+		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+		serviceId.setServiceInstanceIdentifier("http://testService");
 		try {
-			eventMgr.publishInternalEvent(event);
-		} catch (EMSException e) {
+			serviceId.setIdentifier(new URI("http://testService"));
+		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+
+		LOG.info("Calling remote UAM interface");
+		uaRemote.monitor(myIdentity,serviceId, "testService", "volume", "high");
 	}
 
-	public void initialiseUserActionMonitor(){
-		System.out.println("Initialising user action monitor!");
-		ctxComm = new ContextCommunicator(ctxBroker);
-
-		//Set cloud flag - get device type from Identity Manager
-		IdentityType nodeType = commsMgr.getIdManager().getThisNetworkNode().getType();
-		//if()
+	public void setUaRemote(IUserAgentRemoteMgr uaRemote){
+		this.uaRemote = uaRemote;
 	}
 
-	public void setCtxBroker(ICtxBroker broker){
-		this.ctxBroker = broker;
-	}
-
-	public void setEventMgr(IEventMgr eventMgr){
-		this.eventMgr = eventMgr;
-	}
-	
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
 	}
-	
 }
