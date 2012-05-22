@@ -154,6 +154,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		when(mockIICisId_3.getThisNetworkNode()).thenReturn(testCisId_3);
 		
 		
+		when(mockCISendpoint1.UnRegisterCommManager()).thenReturn(true);
+		when(mockCISendpoint2.UnRegisterCommManager()).thenReturn(true);
+		when(mockCISendpoint3.UnRegisterCommManager()).thenReturn(true);
+		
+		
+		
 		when(mockCcmFactory.getNewCommManager()).thenReturn(mockCISendpoint1,mockCISendpoint2,mockCISendpoint3);
 		
 		
@@ -291,6 +297,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ciss[1] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
 				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
+		
 		List<ICis> l = cisManagerUnderTest.getCisList();
 		Iterator<ICis> it = l.iterator();
 		ICis element = it.next(); 
@@ -298,11 +305,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		boolean presence = false;
 		
-		presence = cisManagerUnderTest.deleteCis(jidTobeDeleted, "", "");
+		presence = cisManagerUnderTest.deleteCis("", "", jidTobeDeleted);
 		assertEquals(true,presence);
 		
 		presence = false;
-		// get a new iterator
+		// refresh list and get a new iterator
+		l = cisManagerUnderTest.getCisList();
 		it = l.iterator();
 		
 		int interactions = 0;

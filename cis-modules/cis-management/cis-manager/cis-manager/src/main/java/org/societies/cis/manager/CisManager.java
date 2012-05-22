@@ -240,7 +240,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		// TODO: how do we check fo the cssID/pwd?
 		
 		boolean ret = false;
-		if(getOwnedCISs().contains(new Cis(new CisRecord(cisJid)))){
+		//temp
+		Cis c = new Cis(new CisRecord(cisJid));
+		int h = c.hashCode();
+		
+		// end of temp
+		if(getOwnedCISs().contains(c)){
 			Cis cis = this.getOwnedCisByJid(cisJid);
 			ret = cis.deleteCIS();
 			ret = ret && getOwnedCISs().remove(cis);
@@ -263,6 +268,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		
 		Cis cis = new  Cis(cssId, cisName, cisType, mode,this.ccmFactory);
+		System.out.println("cis " + cis.getCisId() + " whose hash is " + cis.hashCode());
 		//this.persist(cis);
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
