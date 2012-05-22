@@ -24,34 +24,35 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
-import org.societies.personalisation.CRISTUserIntentTaskManager.impl.MockHistoryData;
 
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
-	private ICRISTUserIntentTaskManager cristTaskManager;
-	ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
-	LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
+	private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+	
+	private ArrayList<CRISTHistoryData> historyList = new ArrayList<CRISTHistoryData>();
+	private LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 
 	public CRISTUserIntentDiscovery(){
-		
+		LOG.info("Hello! I'm the CRIST User Intent Discovery!");
 	}
-	public CRISTUserIntentDiscovery(ICRISTUserIntentTaskManager cristTaskManager){
-		this.setCristTaskManager(cristTaskManager);
-	}
-	
-	public ICRISTUserIntentTaskManager getCristTaskManager(){
-		return cristTaskManager;
-	}
-	
-	public void setCristTaskManager(ICRISTUserIntentTaskManager cristTaskManager){
-		this.cristTaskManager = cristTaskManager;
-	}
+
 	
 	public void initialiseCRISTDiscovery() {
-		System.out.println("Yo!! I'm a brand new service and my interface is: "
+		LOG.info("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
+		//registerForContextChanges();
 	}
 
 	/*
@@ -75,7 +76,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	@Override
 	public LinkedHashMap generateNewCRISTUIModel() {
 		// TODO Auto-generated method stub
-		
+		// get context from broker?
 		return intentModel;
 	}
 
@@ -88,12 +89,14 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	@Override
 	public LinkedHashMap generateNewCRISTUIModel(ArrayList historyData) {
 		// TODO Auto-generated method stub
+
 		this.historyList = historyData;
 		constructModel();
 		
 		return intentModel;
 	}
 
+	// main function is implemented here
 	private void constructModel() {
 		int historySize = this.historyList.size();
 		ArrayList<String> behaviorRecords = new ArrayList<String>();
@@ -105,7 +108,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 		// By mining user behavior patterns
 		// Identify all the possible user behaviors
 		for (int i = 0; i < historySize; i++) {
-			MockHistoryData currentHisData = this.historyList.get(i);
+			CRISTHistoryData currentHisData = this.historyList.get(i);
 			String currentHisAction = currentHisData.getActionValue();
 			String currentHisSituation = currentHisData.getSituationValue();
 			String currentBehavior = currentHisAction + "@"
@@ -117,7 +120,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
 		// Convert history data to the "Action#Situation" format
 		for (int i = 0; i < historySize; i++) {
-			MockHistoryData currentHisData = this.historyList.get(i);
+			CRISTHistoryData currentHisData = this.historyList.get(i);
 			String currentHisAction = currentHisData.getActionValue();
 			String currentHisSituation = currentHisData.getSituationValue();
 			String currentBehavior = currentHisAction + "@"
@@ -133,13 +136,18 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 			ArrayList<String> cadidateActionList = new ArrayList<String>();
 			for (int j = 0; j < indexList.length; j++) {
 				String currentCadidate = "";
-				for (int k = 1; k <= 3; k++) {
+				for (int k = 1; k <= maxPredictionStep; k++) {
 					int currentIndex = indexList[j] + k;
 
+					String situationValue = historyList.get(currentIndex).getSituationValue();
+					if (situationValue == null)
+					{
+						LOG.debug("situationValue is null, set to \"\".");
+						situationValue = "";
+					}
+					
 					if (indexList[j] + k < historySize
-							&& behaviorRecords.get(i).endsWith(
-									this.historyList.get(currentIndex)
-											.getSituationValue())) {
+							&& behaviorRecords.get(i).endsWith(situationValue)) {
 						currentCadidate = currentCadidate
 								+ "#"
 								+ this.historyList.get(currentIndex)
@@ -191,4 +199,12 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 		}
 		return localIndex;
 	}
+	
+	
+	
+	
+
+	
+	
+	
 }
