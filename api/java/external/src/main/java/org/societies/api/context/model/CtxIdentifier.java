@@ -30,6 +30,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.societies.api.schema.identity.DataIdentifier;
+
 //import org.societies.api.identity.IIdentity;
 
 /**
@@ -52,7 +54,7 @@ import java.io.Serializable;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public abstract class CtxIdentifier implements Serializable {
+public abstract class CtxIdentifier extends DataIdentifier implements Serializable {
 
 	private static final long serialVersionUID = 3552976823045895472L;
 	
@@ -61,9 +63,6 @@ public abstract class CtxIdentifier implements Serializable {
 	
 	/** The type of the identified context model object. */
 	protected transient CtxModelType modelType;
-	
-	/** The semantic tag that characterises the identified context model object. */
-	protected transient String type;
 	
 	/** The unique number within the CSS/CIS where the identified context model object was initially sensed/collected and stored. */
 	protected transient Long objectNumber;
@@ -125,17 +124,6 @@ public abstract class CtxIdentifier implements Serializable {
 	public CtxModelType getModelType() {
 		
 		return this.modelType;
-	}
-
-	/**
-	 * Returns the semantic tag (e.g. "person") that characterises the
-	 * identified context model object
-     * 
-     * @return the semantic tag of the identified context model object 
-	 */
-	public String getType() {
-		
-		return this.type;
 	}
 	
 	/**

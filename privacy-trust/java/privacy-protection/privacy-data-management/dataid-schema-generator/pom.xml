@@ -73,13 +73,10 @@
 			</execution>
 		</executions>
 		<configuration>
-			<!-- Namespace define in the CommClient and CommServer of the beans -->
+			<!--  We only have complex type here, no bean element that can be called -->
 			<beans>
-				<bean>DataIdentifier</bean>
-				<bean>RequestorBean</bean>
-				<bean>RequestorCisBean</bean>
-				<bean>RequestorServiceBean</bean>
 			</beans>
+			<!-- Namespace define in the CommClient and CommServer of the beans -->
 			<packageName>org.societies.api.schema.identity</packageName>
 			<httpNamespace>http://societies.org/api/schema/identity</httpNamespace>
 			<!-- Output and input directories -->
