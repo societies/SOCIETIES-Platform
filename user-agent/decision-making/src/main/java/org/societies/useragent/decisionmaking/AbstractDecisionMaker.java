@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
@@ -42,11 +43,14 @@ import org.societies.api.personalisation.model.IAction;
 import org.societies.api.personalisation.model.IActionConsumer;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.internal.personalisation.model.IOutcome;
+import org.slf4j.*;
+
 
 public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	IConflictResolutionManager manager;
 	IUserFeedback feedbackHandler;
-	
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+
 	public IConflictResolutionManager getManager() {
 		return manager;
 	}
@@ -67,6 +71,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
 		// TODO Auto-generated method stub
 		HashSet<IOutcome> conflicts=new HashSet<IOutcome>();
+		logging.debug("start resolving DM");
 		for (IOutcome intent : intents) {
 			IOutcome action=intent;
 			//unresolved preference ioutcomes
@@ -95,6 +100,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 			}
 			conflicts.clear();
 		}
+		logging.debug("after resolving DM");
 	}
 
 	protected abstract ConflictType detectConflict(IOutcome intent,

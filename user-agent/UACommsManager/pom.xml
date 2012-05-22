@@ -11,7 +11,7 @@
 	<groupId>org.societies.useragent</groupId>
 	<artifactId>UACommsManager</artifactId>
 	<packaging>bundle</packaging>
-	<version>${release.version}</version>
+	<version>${version.ua}</version>
 	
 	<developers>
 	    <developer>
@@ -112,7 +112,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
+							<version>${version.ua}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>

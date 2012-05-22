@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.DriverService;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
 import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.actions.GetLightLevelAction;
@@ -104,7 +106,7 @@ public class LightSensor extends DriverService {
 		LOG.info("Publish internal event: org/societies/css/device -> Sensor/LightSensorEvent");
 		HashMap<String, Object> payload = new HashMap<String, Object>();
 		payload.put("lightLevel", getLightValue());
-		InternalEvent event = new InternalEvent("org/societies/css/device", "Sensor/LightSensorEvent", deviceId, payload);
+		InternalEvent event = new InternalEvent(EventTypes.DEVICE_MANAGEMENT_EVENT, DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT, deviceId, payload);
 		try {
 			eventManager.publishInternalEvent(event);
 		} catch (EMSException e) {

@@ -266,7 +266,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		// TODO: broadcast its creation to other nodes?
 		
 		
-		//activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
+		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
 
 	}
 	

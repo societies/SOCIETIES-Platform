@@ -50,15 +50,9 @@ import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
  */
 public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerInternal.class.getSimpleName());
-	
+
 	private SessionFactory sessionFactory;
 
-	/**
-	 * @param sessionFactory2
-	 */
-	public PrivacyDataManagerInternal(SessionFactory sessionFactory) {
-		setSessionFactory(sessionFactory);
-	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier)
@@ -234,12 +228,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 
 
 	// --- Dependency Injection
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
 	public void setSessionFactory(SessionFactory sessionFactory) {
-		LOG.info("sessionFactory injected");
 		this.sessionFactory = sessionFactory;
+		LOG.info("[Dependency Injection] sessionFactory injected");
 	}
 
 	private boolean isDepencyInjectionDone() {
