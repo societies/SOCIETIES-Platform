@@ -60,6 +60,13 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.beans</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CRISTUserIntentDiscovery</artifactId>
+			<version>${version.pm}</version>
+			<scope>provided</scope>
+		</dependency>
 	
 	</dependencies>
 

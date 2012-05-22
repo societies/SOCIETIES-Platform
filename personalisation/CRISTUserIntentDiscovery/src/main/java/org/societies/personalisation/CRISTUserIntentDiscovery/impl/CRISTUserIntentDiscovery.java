@@ -36,13 +36,12 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
-import org.societies.personalisation.CRISTUserIntentTaskManager.impl.MockHistoryData;
 
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
 	private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 	
-	private ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
+	private ArrayList<CRISTHistoryData> historyList = new ArrayList<CRISTHistoryData>();
 	private LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 
 	public CRISTUserIntentDiscovery(){
@@ -77,7 +76,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	@Override
 	public LinkedHashMap generateNewCRISTUIModel() {
 		// TODO Auto-generated method stub
-		//finish before 17, for all user? get context from broker?
+		// get context from broker?
 		return intentModel;
 	}
 
@@ -90,7 +89,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	@Override
 	public LinkedHashMap generateNewCRISTUIModel(ArrayList historyData) {
 		// TODO Auto-generated method stub
-		// finish before 17, historyData is a list of CtxEntity=CtxAttribute, do not use mock
+
 		this.historyList = historyData;
 		constructModel();
 		
@@ -109,7 +108,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 		// By mining user behavior patterns
 		// Identify all the possible user behaviors
 		for (int i = 0; i < historySize; i++) {
-			MockHistoryData currentHisData = this.historyList.get(i);
+			CRISTHistoryData currentHisData = this.historyList.get(i);
 			String currentHisAction = currentHisData.getActionValue();
 			String currentHisSituation = currentHisData.getSituationValue();
 			String currentBehavior = currentHisAction + "@"
@@ -121,7 +120,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
 		// Convert history data to the "Action#Situation" format
 		for (int i = 0; i < historySize; i++) {
-			MockHistoryData currentHisData = this.historyList.get(i);
+			CRISTHistoryData currentHisData = this.historyList.get(i);
 			String currentHisAction = currentHisData.getActionValue();
 			String currentHisSituation = currentHisData.getSituationValue();
 			String currentBehavior = currentHisAction + "@"
@@ -140,10 +139,15 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 				for (int k = 1; k <= maxPredictionStep; k++) {
 					int currentIndex = indexList[j] + k;
 
+					String situationValue = historyList.get(currentIndex).getSituationValue();
+					if (situationValue == null)
+					{
+						LOG.debug("situationValue is null, set to \"\".");
+						situationValue = "";
+					}
+					
 					if (indexList[j] + k < historySize
-							&& behaviorRecords.get(i).endsWith(
-									this.historyList.get(currentIndex)
-											.getSituationValue())) {
+							&& behaviorRecords.get(i).endsWith(situationValue)) {
 						currentCadidate = currentCadidate
 								+ "#"
 								+ this.historyList.get(currentIndex)
