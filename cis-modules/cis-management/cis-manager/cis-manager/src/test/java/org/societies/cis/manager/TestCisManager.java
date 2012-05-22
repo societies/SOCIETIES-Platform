@@ -177,12 +177,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		// mocking the activity feed static methods
 		PowerMockito.mockStatic(ActivityFeed.class);
-		this.session = sessionFactory.openSession();
+		//this.session = sessionFactory.openSession();
 		System.out.println("in setup! cisManagerUnderTest.getSessionFactory(): "+sessionFactory);
-		//ActivityFeed.setStaticSessionFactory(sessionFactory);
+		ActivityFeed.setStaticSessionFactory(sessionFactory);
 		//cisManagerUnderTest.setSessionFactory(sessionFactory);
-		cisManagerUnderTest.setSessionFactory(sessionFactory);
-		Mockito.when(ActivityFeed.startUp(anyString())).thenReturn(new ActivityFeed());
+		//cisManagerUnderTest.setSessionFactory(sessionFactory);
+		//Mockito.when(ActivityFeed.startUp(anyString())).thenReturn(new ActivityFeed());
 		setUpFactory();
 		
 	}
@@ -198,20 +198,21 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		//	sessionFactory.getCurrentSession().disconnect();
 
 	}
-	@Ignore
 	@Test
 	public void testConstructor() {
 
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory);
+		cisManagerUnderTest.init();
+		
 		assertEquals(TEST_GOOD_JID, cisManagerUnderTest.cisManagerId.getJid());
 	}
-	@Ignore
 	@Test
 	public void testCreateCIS() {
 		
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
-		cisManagerUnderTest.setSession(this.session);
-		ActivityFeed.setSession(this.session);
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
 		
 		Future<ICisOwned> testCIS = cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE);
@@ -228,13 +229,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 	
 	}
-	@Ignore
 	@Test
 	public void testListCIS() throws InterruptedException, ExecutionException {
 
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
-		cisManagerUnderTest.setSession(this.session);
-		ActivityFeed.setSession(this.session);
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
 		
 		ICisOwned[] ciss = new ICisOwned [3]; 
 		int[] cissCheck = {0,0,0};
@@ -271,13 +271,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 }
 	
 	}
-	@Ignore
 	@Test
 	public void testdeleteCIS() throws InterruptedException, ExecutionException {
 
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
-		cisManagerUnderTest.setSession(this.session);
-		ActivityFeed.setSession(this.session);
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
 		
 		
 		ICisOwned[] ciss = new ICisOwned [2]; 
@@ -312,14 +311,13 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 	
-	@Ignore
 	//@Rollback
 	@Test
 	public void testAddMemberToOwnedCIS() throws InterruptedException, ExecutionException {
 
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
-		cisManagerUnderTest.setSession(this.session);
-		ActivityFeed.setSession(this.session);
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
 		
 		ICisOwned Iciss =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
@@ -335,14 +333,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		} 		
 	
 	}
-	@Ignore
 	@Test
 	public void listdMembersOnOwnedCIS() throws InterruptedException, ExecutionException {
 
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
-		cisManagerUnderTest.setSession(this.session);
-		ActivityFeed.setSession(this.session);
-		
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
 		ICisOwned Iciss =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 				

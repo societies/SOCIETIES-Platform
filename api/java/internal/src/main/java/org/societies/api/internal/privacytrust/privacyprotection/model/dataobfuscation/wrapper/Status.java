@@ -22,64 +22,63 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.CRISTUserIntentPrediction.test;
+package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
-import java.util.List;
-import java.util.concurrent.Future;
-
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.mock.Identity;
-import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
-import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
-import org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
- * Describe your class here...
- * 
- * @author Zhu WANG
- * 
+ * Status
+ *
+ * @author olivierm
+ *
  */
-public class CRISTUserIntentPredictionTesting {
-
+public class Status {
+	private String status;
+	
+	public Status() {
+		super();
+	}
 	/**
-	 * @param args
+	 * @param firstName
+	 * @param lastName
 	 */
-	private static ICRISTUserIntentPrediction cristPredictor = new CRISTUserIntentPrediction();
-	private static IIdentity myID;
-	private static CtxAttribute myCtx;
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		System.out.println("CRIST UI Prediction Testing");
-		cristPredictor.enableCRISTPrediction(true);
-		Future<List<CRISTUserAction>> results = cristPredictor
-				.getCRISTPrediction(myID, myCtx);
-		if (results == null) {
-			System.out.println("The result is NULL.");
-		} else {
-			System.out.println("results: " + results.toString());
+	public Status(String status) {
+		super();
+		this.status = status;
+	}
+	
+	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == this) {
+			return true;
 		}
-	}
 
-	public CRISTUserIntentPredictionTesting(
-			ICRISTUserIntentPrediction CRISTPredictor) {
-		this.cristPredictor = CRISTPredictor;
+		// -- Verify obj type
+		if (obj instanceof Status) {
+			Status other = (Status) obj;
+			return new EqualsBuilder()
+			.append(this.getStatus(), other.getStatus())
+			.isEquals();
+		}
+		return false;
 	}
-
-	public void initialiseTesting() {
-		System.out
-				.println("This is the testing class for CRIST UI Predictioin");
-		cristPredictor.getCRISTPrediction(myID, myCtx);
-	}
-
-	public ICRISTUserIntentPrediction getCristPredictor() {
-		System.out.println(this.getClass().getName() + "Return CRISTPredictor");
-		return cristPredictor;
-	}
-
-	public void setPreManager(ICRISTUserIntentPrediction CRISTPredictor) {
-		System.out.println(this.getClass().getName() + "GOT CRISTPredictor");
-		this.cristPredictor = CRISTPredictor;
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Name [status=" + status + "]";
 	}
 }

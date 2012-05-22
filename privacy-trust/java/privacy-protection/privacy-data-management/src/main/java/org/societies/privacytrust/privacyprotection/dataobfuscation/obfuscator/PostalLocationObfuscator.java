@@ -22,64 +22,38 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.CRISTUserIntentPrediction.test;
+package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
-import java.util.List;
-import java.util.concurrent.Future;
-
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.mock.Identity;
-import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
-import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
-import org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.PostalLocation;
 
 /**
- * Describe your class here...
- * 
- * @author Zhu WANG
- * 
+ * Obfuscator for name
+ *
+ * @author Olivier Maridat (Trialog)
+ *
  */
-public class CRISTUserIntentPredictionTesting {
-
+public class PostalLocationObfuscator extends DataObfuscator<IDataWrapper<PostalLocation>> {
 	/**
-	 * @param args
+	 * @param data
 	 */
-	private static ICRISTUserIntentPrediction cristPredictor = new CRISTUserIntentPrediction();
-	private static IIdentity myID;
-	private static CtxAttribute myCtx;
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		System.out.println("CRIST UI Prediction Testing");
-		cristPredictor.enableCRISTPrediction(true);
-		Future<List<CRISTUserAction>> results = cristPredictor
-				.getCRISTPrediction(myID, myCtx);
-		if (results == null) {
-			System.out.println("The result is NULL.");
-		} else {
-			System.out.println("results: " + results.toString());
-		}
+	public PostalLocationObfuscator(IDataWrapper<PostalLocation> data) {
+		super(data);
+		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
+		stepNumber = 1;
+		dataType = PostalLocation.class;
 	}
 
-	public CRISTUserIntentPredictionTesting(
-			ICRISTUserIntentPrediction CRISTPredictor) {
-		this.cristPredictor = CRISTPredictor;
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
+	 */
+	@Override
+	public IDataWrapper<PostalLocation> obfuscateData(double obfuscationLevel)
+			throws PrivacyException {
+		return dataWrapper;
 	}
 
-	public void initialiseTesting() {
-		System.out
-				.println("This is the testing class for CRIST UI Predictioin");
-		cristPredictor.getCRISTPrediction(myID, myCtx);
-	}
-
-	public ICRISTUserIntentPrediction getCristPredictor() {
-		System.out.println(this.getClass().getName() + "Return CRISTPredictor");
-		return cristPredictor;
-	}
-
-	public void setPreManager(ICRISTUserIntentPrediction CRISTPredictor) {
-		System.out.println(this.getClass().getName() + "GOT CRISTPredictor");
-		this.cristPredictor = CRISTPredictor;
-	}
 }
