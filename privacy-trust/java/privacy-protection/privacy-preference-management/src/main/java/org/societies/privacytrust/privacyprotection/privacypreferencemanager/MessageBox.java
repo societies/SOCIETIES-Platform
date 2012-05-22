@@ -56,7 +56,8 @@ public class MessageBox {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return JOptionPane.showConfirmDialog(null, title, message, messageType);
+		int n =  JOptionPane.showConfirmDialog(null, title, message, messageType);
+		return n;
 	}
 	
 	public CtxIdentifier showInputDialog(String message, String title, int messageType, Object[] ctxIds, CtxIdentifier ctxId){
@@ -75,7 +76,8 @@ public class MessageBox {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return (CtxIdentifier) JOptionPane.showInputDialog(null, message, title, messageType, null, ctxIds, ctxId);
+		CtxIdentifier selectedctxId= (CtxIdentifier) JOptionPane.showInputDialog(null, message, title, messageType, null, ctxIds, ctxId);
+		return selectedctxId;
 	}
 
 	public String showInputDialog(String message, String title,
@@ -95,7 +97,8 @@ public class MessageBox {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return (String) JOptionPane.showInputDialog(null, message, title, questionMessage, null, array, string);
+		String str =  (String) JOptionPane.showInputDialog(null, message, title, questionMessage, null, array, string);
+		return str;
 	}
 	
 	
