@@ -37,6 +37,7 @@ import org.societies.api.internal.css.devicemgmt.device.Device;
  * @version 1.0
  * @created 06-d�c.-2011 15:18:11
  */
+@Deprecated
 public interface Actuator extends Device {
 
 	public static final int EVENT_STATUS_CHANGED = 1;

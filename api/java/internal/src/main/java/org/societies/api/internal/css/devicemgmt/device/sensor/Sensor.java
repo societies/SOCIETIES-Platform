@@ -38,6 +38,7 @@ import org.societies.api.internal.css.devicemgmt.device.Device;
  * @version 1.0
  * @created 06-d�c.-2011 15:18:16
  */
+@Deprecated
 public interface Sensor extends Device {
 
 	public static final int EVENT_EVENT_RAISED = 6;

@@ -35,6 +35,7 @@ import org.societies.api.internal.css.devicemgmt.device.DeviceListener;
  * @version 1.0
  * @created 06-d�c.-2011 15:39:03
  */
+@Deprecated
 public interface ActuatorListener extends DeviceListener {
 
 	/**

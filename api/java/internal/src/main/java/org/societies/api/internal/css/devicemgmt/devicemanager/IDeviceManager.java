@@ -27,6 +27,7 @@ package org.societies.api.internal.css.devicemgmt.devicemanager;
 
 import org.societies.api.internal.css.devicemgmt.device.Device;
 
+@Deprecated
 public interface IDeviceManager {
 	
 	/**

@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.IDriverService;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
+import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
 import org.springframework.osgi.context.BundleContextAware;
 
 
@@ -54,12 +57,12 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 	public void handleEvent(Event event) {
 		
 		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent ");
-		if (event.getProperty("event_name").equals("Sensor/LigntSensorEvent")) 
+		if (event.getProperty("event_name").equals(DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT)) 
 		{
 			ll = (Double)event.getProperty("lightLevel");
 			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent lightLevel: " + ll);
 		}
-		else if (event.getProperty("event_name").equals("Actuator/ScreenActuatorEvent"))
+		else if (event.getProperty("event_name").equals(DeviceMgmtEventConstants.SCREEN_EVENT))
 		{
 			screenMessage = (String)event.getProperty("screenEvent");
 			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent screenMessage: " + screenMessage);
@@ -76,13 +79,13 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 
 		if (iDevice != null) 
 		{ 		
-			if (iDevice.getDeviceType() == "LightSensor") 
+			if (iDevice.getDeviceType() == DeviceTypeConstants.LIGHT_SENSOR) 
 			{
 				if (iDevice.getDeviceLocation().equalsIgnoreCase("Room1")) 
 				{
 					
 					IDevice ls1 = iDevice;
-					IDriverService driverService = ls1.getService("lightSensorService");
+					IDriverService driverService = ls1.getService(DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE);
 					
 					IAction ia = driverService.getAction("getLightLevel");
 					
@@ -102,7 +105,7 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 				{
 					
 					IDevice ls2 = iDevice;
-					IDriverService driverService = ls2.getService("lightSensorService");
+					IDriverService driverService = ls2.getService(DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE);
 					
 					IAction ia = driverService.getAction("getLightLevel");
 
@@ -121,7 +124,7 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 				else if (iDevice.getDeviceLocation().equalsIgnoreCase("Room3")) 
 				{
 					IDevice ls3 = iDevice;
-					IDriverService driverService = ls3.getService("lightSensorService");
+					IDriverService driverService = ls3.getService(DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE);
 					
 					IAction ia = driverService.getAction("getLightLevel");
 
@@ -138,12 +141,12 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 				}
 			}
-			else if (iDevice.getDeviceType() == "Screen")
+			else if (iDevice.getDeviceType() == DeviceTypeConstants.SCREEN)
 			{
 				if (iDevice.getDeviceLocation().equalsIgnoreCase("Corridor1")) 
 				{
 					IDevice screen1 = iDevice;
-					IDriverService driverService = screen1.getService("screenService");
+					IDriverService driverService = screen1.getService(DeviceMgmtDriverServiceNames.SCREEN_DRIVER_SERVICE);
 					
 					IAction ia = driverService.getAction("displayMessage");
 
