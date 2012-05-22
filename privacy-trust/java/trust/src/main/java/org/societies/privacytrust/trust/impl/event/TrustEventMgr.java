@@ -42,7 +42,9 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
+import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -59,6 +61,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TrustEventMgr.class); 
 	
+	/** The platform Event Mgr service reference. */
 	@Autowired(required=true)
 	private IEventMgr eventMgr;
 	
@@ -68,7 +71,6 @@ public class TrustEventMgr implements ITrustEventMgr {
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.event.ITrustEventMgr#postEvent(org.societies.api.internal.privacytrust.trust.event.TrustEvent, java.lang.String[], java.lang.String)
 	 */
 	@Override
@@ -84,13 +86,14 @@ public class TrustEventMgr implements ITrustEventMgr {
 		
 		if (event instanceof TrustUpdateEvent)
 			this.postUpdateEvent((TrustUpdateEvent) event, topics, source);
+		else if (event instanceof TrustEvidenceUpdateEvent)
+			this.postEvidenceUpdateEvent((TrustEvidenceUpdateEvent) event, topics, source);
 		else
 			throw new TrustEventMgrException("Could not post event "
 					+ event + ": Unsupported TrustEvent implementation");
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.event.ITrustEventMgr#registerListener(org.societies.api.internal.privacytrust.trust.event.ITrustEventListener, java.lang.String[], org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
@@ -104,6 +107,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 		
 		if (listener instanceof ITrustUpdateEventListener)
 			this.registerUpdateListener((ITrustUpdateEventListener) listener, topics, teid);
+		else if (listener instanceof ITrustEvidenceUpdateEventListener)
+			this.registerEvidenceUpdateListener((ITrustEvidenceUpdateEventListener) listener, topics, teid);
 		else
 			throw new TrustEventMgrException("Could not register trust event listener "
 					+ listener + ": Unsupported ITrustEventListener extension");
@@ -122,6 +127,40 @@ public class TrustEventMgr implements ITrustEventMgr {
 
 			if (this.eventMgr == null)
 				throw new TrustEventMgrException("Could not send TrustUpdateEvent '"
+						+ event + "' to topic " + topics[i]
+						+ ": IEventMgr service is not available");
+			try {
+				if (LOG.isDebugEnabled())
+					LOG.debug("Posting internal event"
+							+ ": type=" + internalEvent.geteventType()
+							+ ", name=" + internalEvent.geteventName()
+							+ ", source=" + internalEvent.geteventSource()
+							+ ", info=" + internalEvent.geteventInfo()
+							+ " to topic " + topics[i]);
+				this.eventMgr.publishInternalEvent(internalEvent);
+			} catch (EMSException emse) {
+
+				throw new TrustEventMgrException("Could not post internal event"
+						+ ": type=" + internalEvent.geteventType()
+						+ ", name=" + internalEvent.geteventName()
+						+ ", source=" + internalEvent.geteventSource()
+						+ ", info=" + internalEvent.geteventInfo()
+						+ " to topic " + topics[i]
+						+ ": " + emse.getLocalizedMessage(), emse);
+			}
+		}
+	}
+	
+	private void postEvidenceUpdateEvent(final TrustEvidenceUpdateEvent event, final String[] topics,
+			final String source) throws TrustEventMgrException {
+		
+		for (int i = 0; i < topics.length; ++i) {
+			
+			final InternalEvent internalEvent = new InternalEvent(
+					topics[i], event.getId().toString(), source, null);
+
+			if (this.eventMgr == null)
+				throw new TrustEventMgrException("Could not send TrustEvidenceUpdateEvent '"
 						+ event + "' to topic " + topics[i]
 						+ ": IEventMgr service is not available");
 			try {
@@ -166,6 +205,26 @@ public class TrustEventMgr implements ITrustEventMgr {
 				topics,	filter); // TODO Should we specify filter for event source
 	}
 	
+	private void registerEvidenceUpdateListener(final ITrustEvidenceUpdateEventListener listener,
+			final String[] topics, final TrustedEntityId teid) throws TrustEventMgrException {
+		
+		String filter = null;
+		if (teid != null)
+			filter = "("
+				+ CSSEventConstants.EVENT_NAME + "=" + teid.toString()
+				+ ")";
+			
+		if (this.eventMgr == null)
+			throw new TrustEventMgrException("Could not register TrustEvidenceUpdateEvent listener '"
+					+ listener + "' to topics " + Arrays.toString(topics)
+					+ ": IEventMgr service is not available");
+		if (LOG.isInfoEnabled()) 
+			LOG.info("Registering TrustEvidenceUpdateEvent listener to topics "
+					+ Arrays.toString(topics));
+		this.eventMgr.subscribeInternalEvent(new TrustEvidenceUpdateEventHandler(listener),
+				topics,	filter); // TODO Should we specify filter for event source
+	}
+	
 	private class TrustUpdateEventHandler extends EventListener {
 
 		/** The listener to forward TrustUpdateEvents. */
@@ -176,7 +235,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 			this.listener = listener;
 		}
 
-		/* (non-Javadoc)
+		/*
 		 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
 		 */
 		@Override
@@ -213,7 +272,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 			
 		}
 
-		/* (non-Javadoc)
+		/*
 		 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
 		 */
 		@Override
@@ -265,6 +324,56 @@ public class TrustEventMgr implements ITrustEventMgr {
 			sb.append("}");
 			
 			return sb.toString();
+		}
+	}
+	
+	private class TrustEvidenceUpdateEventHandler extends EventListener {
+
+		/** The listener to forward TrustUpdateEvents. */
+		private final ITrustEvidenceUpdateEventListener listener;
+		
+		private TrustEvidenceUpdateEventHandler(final ITrustEvidenceUpdateEventListener listener) {
+			
+			this.listener = listener;
+		}
+
+		/*
+		 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
+		 */
+		@Override
+		public void handleInternalEvent(InternalEvent internalEvent) {
+			
+			if (LOG.isDebugEnabled())
+				LOG.debug("Received internal event"
+					+ ": type=" + internalEvent.geteventType()
+					+ ", name=" + internalEvent.geteventName()
+					+ ", source=" + internalEvent.geteventSource());
+			
+			TrustedEntityId teid;
+			try {
+				teid = new TrustedEntityId(internalEvent.geteventName());
+				final TrustEvidenceUpdateEvent event = new TrustEvidenceUpdateEvent(teid);
+				if (LOG.isDebugEnabled())
+					LOG.debug("Forwarding TrustEvidenceUpdateEvent " + event + " to listener");
+				this.listener.onUpdate(event);
+			} catch (MalformedTrustedEntityIdException mteide) {
+				
+				LOG.error("Cannot forward TrustEvidenceUpdateEvent to listener:"
+						+ " Failed to create TrustedEntityId from internal event name:"
+						+ internalEvent.geteventName(), mteide);
+			}	
+		}
+
+		/*
+		 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
+		 */
+		@Override
+		public void handleExternalEvent(CSSEvent cssEvent) {
+			
+			LOG.warn("Received unexpected external CSS event"
+					+ ": type=" + cssEvent.geteventType()
+					+ ", name=" + cssEvent.geteventName()
+					+ ", source=" + cssEvent.geteventSource());
 		}
 	}
 }

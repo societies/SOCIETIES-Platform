@@ -24,14 +24,18 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.privacytrust.privacyprotection.assessment.logger.Point;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 
 /**
- * 
+ * Worker class.
+ * Correlations between a single data access event and a single data transmission event,
+ * calculated for every data transmission event.
  *
  * @author Mitja Vardjan
  *
@@ -40,12 +44,85 @@ public class Correlation {
 
 	private static Logger LOG = LoggerFactory.getLogger(Correlation.class);
 
-	private List<Point> dataAccess;
-	private List<Point> dataTransmission;
+	private List<DataAccessLogEntry> dataAccess;
+	private List<DataTransmissionLogEntry> dataTransmission;
 	
-	public Correlation(List<Point> dataAccess, List<Point> dataTransmission) {
+	private CorrelationInData correlationInData;
+	private CorrelationInTime correlationInTime;
+	
+	private Date lastRun = null;
+	
+	public Correlation(List<DataAccessLogEntry> dataAccess, List<DataTransmissionLogEntry> dataTransmission) {
 		this.dataAccess = dataAccess;
 		this.dataTransmission = dataTransmission;
+		correlationInData = new CorrelationInData();
+		correlationInTime = new CorrelationInTime();
 	}
 	
+	/**
+	 * Perform all calculations. May take a long time.
+	 */
+	public void run() {
+		
+		LOG.info("run()");
+		
+		long size1;
+		long size2;
+		long time1;
+		long time2;
+		double corr12;
+		
+		for (DataTransmissionLogEntry tr : dataTransmission) {
+			
+			size2 = tr.getPayloadSize();
+			time2 = tr.getTimeInMs();
+			corr12 = 0;
+			
+			for (DataAccessLogEntry ac : dataAccess) {
+				
+				size1 = ac.getPayloadSize();
+				time1 = ac.getTimeInMs();
+				
+				corr12 += correlation(size2 - size1, time2 - time1);
+			}
+			tr.setCorrelationWithDataAccess(corr12);
+		}
+	}
+	
+	/**
+	 * If {@link #run()} has not been invoked yet, it is invoked to populate the
+	 * {@link DataTransmissionLogEntry} instances with results. If it has been
+	 * invoked before, it is not invoked again and the results may be old in
+	 * that case.
+	 * Then all {@link DataTransmissionLogEntry} instances are returned.
+	 * 
+	 * @return All data transmissions
+	 */
+	public List<DataTransmissionLogEntry> getDataTransmission() {
+		
+		if (lastRun == null) {
+			run();
+		}
+		return dataTransmission;
+	}
+	
+	/**
+	 * Correlation between a single data transmission and a single data access.
+	 *
+	 * @param deltaSize difference in data size
+	 * @param dt difference in time
+	 * 
+	 * @return correlation value, combined from correlation based on time and
+	 * correlation based on data
+	 */
+	private double correlation(long deltaSize, long dt) {
+		
+		double cData;
+		double cTime;
+		
+		cData = correlationInData.correlation(deltaSize);
+		cTime = correlationInTime.correlation(dt);
+		
+		return cData * cTime;
+	}
 }

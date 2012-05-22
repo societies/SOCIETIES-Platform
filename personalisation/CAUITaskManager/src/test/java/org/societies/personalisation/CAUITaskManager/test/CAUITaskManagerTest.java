@@ -23,10 +23,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
@@ -41,17 +43,13 @@ import org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager;
 public class CAUITaskManagerTest {
 
 
-
 	ICAUITaskManager modelManager;
-
-
-
+	String taskID = "";
+	
 	CAUITaskManagerTest(){
 		modelManager = new CAUITaskManager();
-
 		createModel();
 		retrieveTests();
-
 	}
 
 
@@ -60,100 +58,70 @@ public class CAUITaskManagerTest {
 		IUserIntentAction retrievedAction = modelManager.retrieveAction("A-homePc=off/0");
 		System.out.println("retrievedAction "+ retrievedAction.getparameterName()+" "+retrievedAction.getvalue());
 
-		IUserIntentTask retrievedTask = modelManager.retrieveTask("TaskA/4");
-		System.out.println("retrievedTask "+ retrievedTask.getTaskID());
-
 		List<IUserIntentAction> resultsType = modelManager.retrieveActionsByType("A-homePc");
 		System.out.println("getActionsByType(homePC) " + resultsType);
 
 		List<IUserIntentAction> resultsTypeValue = modelManager.retrieveActionsByTypeValue("A-homePc","on");
 		System.out.println("getActionsByType(homePC,on) " + resultsTypeValue);
 
-		List<IUserIntentAction> resultsTypeValue2 = modelManager.retrieveActionsByTypeValue("A-homePc","tttt");
+		List<IUserIntentAction> resultsTypeValue2 = modelManager.retrieveActionsByTypeValue("A-homePc","off");
 		System.out.println("getActionsByType(homePC,ttt) " + resultsTypeValue2);
 
-		//identify the task that contains the "B-homePc","off"
-		// no context or previous actions are used
-		HashMap<String, Serializable> currentContext = new HashMap<String, Serializable>();
-		String[] lastAction = {"none"};
-		Map<IUserIntentAction, IUserIntentTask> actionTasksMap = modelManager.identifyActionTaskInModel("F-homePc","off",currentContext, lastAction);
-		System.out.println("modelManager.identifyActionTaskInModel(B-homePc,off): "+ actionTasksMap);
-		}
+		UserIntentModelData model = modelManager.retrieveModel();
+		System.out.println(model.getActionModel());
+		System.out.println(model.getTaskModel());
+		
+		IUserIntentTask task = modelManager.retrieveTask(taskID);
+		System.out.println("task retrieved:"+task);
+		System.out.println("task retrieved:"+task.getActions());
+		//modelManager.identifyActionTaskInModel("A-homePc", "on", null,null);
+		modelManager.retrieveNextActions(retrievedAction);
+		System.out.println("next action : " +modelManager.retrieveNextActions(retrievedAction));
+		
+	}
 
 	private void createModel(){
 
 		//create Task A
 		IUserIntentAction userActionA = modelManager.createAction(null,"ServiceType","A-homePc","off");
-		IUserIntentAction userActionB = modelManager.createAction(null,"ServiceType","F-homePc","off");
-		IUserIntentAction userActionC = modelManager.createAction(null,"ServiceType","C-homePc","off");
-		IUserIntentAction userActionD = modelManager.createAction(null,"ServiceType","D-homePc","off");
-
-		List<IUserIntentAction> actionList = new ArrayList<IUserIntentAction>();
-		actionList.add(0,userActionA);
-		actionList.add(1,userActionB);
-		actionList.add(2,userActionC);
-		actionList.add(3,userActionD);
-
-		Double [][] actionMatrixA  = new Double[actionList.size()][actionList.size()] ;
-
-		for(int i=0; i<actionList.size();i++){
-			for (int j=0; j<actionList.size();j++){
-				actionMatrixA[i][j] = 0.0  ;
-			}
-		}
-
-		actionMatrixA[0][1]=1.0;
-		actionMatrixA[1][2]=1.0;
-		actionMatrixA[2][3]=1.0;
-
-		IUserIntentTask taskA = modelManager.createTask("TaskA", actionList, actionMatrixA);
-
-		modelManager.displayTask(taskA);
-
-
-		//create Task B
-		IUserIntentAction userActionE = modelManager.createAction(null,"ServiceType","A-homePc","on");
-		IUserIntentAction userActionF = modelManager.createAction(null,"ServiceType","F-homePc","off");
-		IUserIntentAction userActionG = modelManager.createAction(null,"ServiceType","G-homePc","off");
-		//IUserIntentAction userActionH = modelManager.createAction(null,"ServiceType","H-homePc","off");
-
-		List<IUserIntentAction> actionListB = new ArrayList<IUserIntentAction>();
-		actionListB.add(0,userActionE);
-		actionListB.add(1,userActionF);
-		actionListB.add(2,userActionG);
-		//actionListB.add(3,userActionH);
-		Double [][] actionMatrixB  = new Double[actionListB.size()][actionListB.size()] ;
-
-		for(int i=0; i<actionListB.size();i++){
-			for (int j=0; j<actionListB.size();j++){
-				actionMatrixB[i][j] = 0.0  ;
-			}
-		}
-
-		actionMatrixB[0][1]=0.5;
-		actionMatrixB[0][2]=0.5;
-		actionMatrixB[1][2]=1.0;
-		actionMatrixB[2][1]=1.0;
-		IUserIntentTask taskB = modelManager.createTask("TaskB", actionListB, actionMatrixB);
-		modelManager.displayTask(taskB);
-
-		// create model
-		List<IUserIntentTask> taskList = new ArrayList<IUserIntentTask>();
-		taskList.add(0,taskA);
-		taskList.add(1,taskB);
-
-		Double [][] taskMatrix = new Double[taskList.size()][taskList.size()] ;
-		for(int i=0; i<taskList.size();i++){
-			for (int j=0; j<taskList.size();j++){
-				taskMatrix[i][j] = 0.0  ;
-			}
-		}
-		taskMatrix[0][1] = 1.0;
-
-		UserIntentModelData modelData = modelManager.createModel(taskList, taskMatrix);
-		modelManager.displayModel(modelData);
-
-		modelManager.updateModel(modelData);
+		
+		HashMap<String,Serializable> contextMap = new HashMap<String,Serializable>(); 
+		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"earth");
+		contextMap.put(CtxAttributeTypes.STATUS,"free");
+		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
+		userActionA.setActionContext(contextMap);
+		
+		IUserIntentAction userActionB = modelManager.createAction(null,"ServiceType","B-tv","on");
+		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"moon");
+		contextMap.put(CtxAttributeTypes.STATUS,"free");
+		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
+		userActionB.setActionContext(contextMap);
+		
+		IUserIntentAction userActionC = modelManager.createAction(null,"ServiceType","C-radio","mute");
+		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"mars");
+		contextMap.put(CtxAttributeTypes.STATUS,"free");
+		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
+		userActionC.setActionContext(contextMap);
+		
+		modelManager.setActionLink(userActionA, userActionB, 0.82);
+		modelManager.setActionLink(userActionB, userActionC, 0.42);
+		modelManager.setActionLink(userActionA, userActionC, 0.18);
+	
+		LinkedHashMap<IUserIntentAction,HashMap<IUserIntentAction, Double>> actions = new LinkedHashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
+		
+		HashMap<IUserIntentAction, Double> targetActionsMapActionA = new HashMap<IUserIntentAction, Double>();
+		targetActionsMapActionA.put(userActionB, 0.82);
+		targetActionsMapActionA.put(userActionC, 0.18);
+		actions.put(userActionA,targetActionsMapActionA);
+		
+		HashMap<IUserIntentAction, Double> targetActionsMapActionB = new HashMap<IUserIntentAction, Double>();
+		targetActionsMapActionB.put(userActionC, 0.82);
+		actions.put(userActionB,targetActionsMapActionB);
+		
+		//actions.put(userActionA, userActionB, 0.82)
+		
+		IUserIntentTask task = modelManager.createTask("TaskA", actions);
+	    taskID = task.getTaskID() ;
 	}
 
 	public static void main(String[] args) {

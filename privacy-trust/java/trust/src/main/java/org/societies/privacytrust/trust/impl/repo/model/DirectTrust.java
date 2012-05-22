@@ -24,8 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Embeddable;
 
 import org.societies.privacytrust.trust.api.model.IDirectTrust;
 
@@ -35,8 +34,7 @@ import org.societies.privacytrust.trust.api.model.IDirectTrust;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-@Entity
-@Table(name = TableName.DIRECT_TRUST)
+@Embeddable
 public class DirectTrust extends Trust implements IDirectTrust {
 
 	private static final long serialVersionUID = 2604976855460869815L;

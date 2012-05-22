@@ -19,50 +19,277 @@
  */
 package org.societies.privacytrust.privacyprotection.test;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class Test {
-	private static Logger log = LoggerFactory.getLogger(Test.class.getSimpleName());
+public class Test implements IPrivacyDataManagerListener {
+	private static Logger LOG = LoggerFactory.getLogger(Test.class.getSimpleName());
 	
 	private IPrivacyDataManager privacyDataManager;
+	private IPrivacyDataManagerRemote privacyDataManagerRemote;
 	private IPrivacyPolicyManager privacyPolicyManager;
+	private ICommManager commManager;
+	private ICtxBroker ctxBroker;
+	private CtxEntity person;
+	private CtxAttribute symLocAttribute;
+	private CtxAttribute statusAttribute;
+	private IIdentityManager idm;
+
+	private IIdentity ownerId;
 	
-	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
-		this.privacyDataManager = privacyDataManager;
-		log.info("************* privacyDataManager injected");
+	public void start() {
 		try {
-			ResponseItem permission = privacyDataManager.checkPermission(null, null, null, null);
-			log.info("Permission checked: "+permission.toString());
-		} catch (Exception e) {
-			log.error("************* Error PrivacyException: "+e.getMessage(), e);
-		}
-	}
-	
-	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
-		this.privacyPolicyManager = privacyPolicyManager;
-		log.info("************* privacyPolicyManager injected");
-		IIdentity cisId = null;
-		boolean result = false;
-		try {
+			if (null == privacyPolicyManager) {
+				throw new Exception("privacyPolicyManager NULL");
+			}
+			if (null == commManager) {
+				throw new Exception("CommManager NULL");
+			}
+			if (null == commManager.getIdManager()) {
+				throw new Exception("IdManager NULL");
+			}
+			this.idm = commManager.getIdManager();
+			IIdentity cisId = commManager.getIdManager().fromJid("red@societies.local");
+			boolean result = false;
 			result = privacyPolicyManager.deletePrivacyPolicy(cisId);
-			log.info("************* privacyPolicyManager "+result);
+			LOG.info("************* [Test Resullt] Privacy policy deleted? "+result);
 		} catch (Exception e) {
-			log.error("************* Error PrivacyException: "+e.getMessage(), e);
+			LOG.error("************* [Tests PrivacyPolicyManager] Error Exception: "+e.getMessage()+"\n", e);
+		}
+		
+		
+		try {
+			if (null == privacyDataManager) {
+				throw new Exception("privacyDataManager NULL");
+			}
+			if (null == commManager) {
+				throw new Exception("CommManager NULL");
+			}
+			if (null == commManager.getIdManager()) {
+				throw new Exception("IdManager NULL");
+			}
+			IIdentity requestorId = commManager.getIdManager().fromJid("orange@societies.local");
+			ownerId = commManager.getIdManager().getThisNetworkNode();
+			Requestor requestor = new Requestor(requestorId);
+			//CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			this.getPersonEntity();
+			this.getStatusAttribute();
+			this.getSymLocAttribute();
+			Action action = new Action(ActionConstants.READ);
+
+			
+			ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, this.symLocAttribute.getId(), action);
+			LOG.info("************* [Test Resullt] Permission checked? "+(null != permission));
+
+	
+
+			if (null != permission) {
+				LOG.info(permission.toString());
+			}
+		} catch (Exception e) {
+			LOG.error("************* [Tests PrivacyDataManager] Error Exception: "+e.getMessage()+"\n", e);
+		}
+		
+		try {
+			if (null == privacyDataManagerRemote) {
+				throw new Exception("privacyDataManagerRemote NULL");
+			}
+			if (null == commManager) {
+				throw new Exception("CommManager NULL");
+			}
+			if (null == commManager.getIdManager()) {
+				throw new Exception("IdManager NULL");
+			}
+			IIdentity requestorId = commManager.getIdManager().fromJid("orange@societies.local");
+			//IIdentity ownerId = commManager.getIdManager().fromJid("red@societies.local");
+			IIdentity ownerId = commManager.getIdManager().getThisNetworkNode();
+			Requestor requestor = new Requestor(requestorId);
+			//CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			Action action = new Action(ActionConstants.READ);
+			privacyDataManagerRemote.checkPermission(requestor, ownerId, this.statusAttribute.getId(), action, this);
+			LOG.info("************* Permission check remote: launched");
+		} catch (Exception e) {
+			LOG.error("************* [Tests PrivacyDataManagerRemote] Error Exception: "+e.getMessage()+"\n", e);
 		}
 	}
 
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+		LOG.info("************* commManager injected");
+	}
+	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+		LOG.info("************* privacyDataManager injected");
+	}
+	public void setPrivacyDataManagerRemote(
+			IPrivacyDataManagerRemote privacyDataManagerRemote) {
+		this.privacyDataManagerRemote = privacyDataManagerRemote;
+		LOG.info("************* privacyDataManagerREMOTE injected");
+	}
+	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+		this.privacyPolicyManager = privacyPolicyManager;
+		LOG.info("************* privacyPolicyManager injected");
+	}
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener#onAccessControlChecked(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
+	 */
+	@Override
+	public void onAccessControlChecked(ResponseItem permission) {
+		LOG.info("************* onAccessControlChecked "+permission.toXMLString());
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener#onAccessControlCancelled(java.lang.String)
+	 */
+	@Override
+	public void onAccessControlCancelled(String msg) {
+		LOG.info("************* onAccessControlCancelled "+msg);
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener#onAccessControlAborted(java.lang.String, java.lang.Exception)
+	 */
+	@Override
+	public void onAccessControlAborted(String msg, Exception e) {
+		LOG.info("************* onAccessControlAborted "+msg, e);
+	}
+
+	private void getPersonEntity(){
+		try {
+			Future<IndividualCtxEntity> futurePerson = this.getCtxBroker().retrieveCssOperator();
+			person = futurePerson.get();
+			this.ownerId = idm.fromJid(person.getId().getOperatorId());
+			/*Future<List<CtxIdentifier>> futurePersons = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
+			List<CtxIdentifier> persons = futurePersons.get();
+			if (persons.size() == 0){
+				person = this.ctxBroker.createEntity(CtxEntityTypes.PERSON).get();
+				
+			}else{
+				person = (CtxEntity) this.ctxBroker.retrieve(persons.get(0)).get();
+			}*/
+			
+			if (person==null){
+				LOG.debug("Person CtxEntity is null");
+			}else{
+				LOG.debug("Got Person CtxEntity - NOT NULL");
+			}
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void getSymLocAttribute(){
+		try {
+			
+			Future<List<CtxIdentifier>> futureAttrs = this.getCtxBroker().lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
+			List<CtxIdentifier> attrs = futureAttrs.get();
+			if (attrs.size() == 0){
+				symLocAttribute = this.getCtxBroker().createAttribute(person.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			}else{
+				symLocAttribute = (CtxAttribute) this.getCtxBroker().retrieve(attrs.get(0)).get();
+			}
+			if (symLocAttribute==null){
+				LOG.debug(CtxAttributeTypes.LOCATION_SYMBOLIC+" CtxAttribute is null");
+			}else{
+				LOG.debug(CtxAttributeTypes.LOCATION_SYMBOLIC+" CtxAttribute - NOT NULL");
+			}
+			
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch(Exception e){
+			e.printStackTrace();
+			this.LOG.debug("EXCEPTION!");
+		}
+			
+	}
+	
+	
+	private void getStatusAttribute(){
+		try {
+			Future<List<CtxIdentifier>> futureAttrs = this.getCtxBroker().lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);
+			List<CtxIdentifier> attrs = futureAttrs.get();
+			if (attrs.size() == 0){
+				statusAttribute = this.getCtxBroker().createAttribute(person.getId(), CtxAttributeTypes.STATUS).get();
+			}else{
+				statusAttribute = (CtxAttribute) this.getCtxBroker().retrieve(attrs.get(0)).get();
+			}
+			
+			if (statusAttribute==null){
+				LOG.debug(CtxAttributeTypes.STATUS+" CtxAttribute is null");
+			}else{
+				LOG.debug(CtxAttributeTypes.STATUS+" CtxAttribute - NOT NULL");
+			}
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @return the ctxBroker
+	 */
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+
+	/**
+	 * @param ctxBroker the ctxBroker to set
+	 */
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}	
+	
 }

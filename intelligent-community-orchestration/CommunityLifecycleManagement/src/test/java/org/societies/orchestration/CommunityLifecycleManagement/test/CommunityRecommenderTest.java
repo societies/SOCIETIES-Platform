@@ -90,6 +90,7 @@ import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ICisOwned;
 import org.societies.orchestration.api.ICisParticipant;
+import org.societies.orchestration.api.ICisProposal;
 //import org.societies.orchestration.api.ICisEditor;
 
 import org.societies.api.activity.IActivity;
@@ -128,15 +129,15 @@ public class CommunityRecommenderTest {
 		
     	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
-    	ICisOwned theNewCis = mock(ICisOwned.class);
-    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
-		ArrayList<ArrayList<ICisOwned>> theSuggestions = new ArrayList<ArrayList<ICisOwned>>();
-		ArrayList<ICisOwned> oneSuggestion = new ArrayList<ICisOwned>();
+    	ICisProposal theNewCis = mock(ICisProposal.class);
+    	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
+		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
-		//Assert.assertNull(cisManager.getCisList(new ICisOwned(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICisProposal(null, null, null, null, null, members, null, null, null)));
 	}
 	
 	@Test
@@ -151,15 +152,15 @@ public class CommunityRecommenderTest {
 		
     	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
-    	ICisOwned theNewCis = mock(ICisOwned.class);
-    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
-		ArrayList<ArrayList<ICisOwned>> theSuggestions = new ArrayList<ArrayList<ICisOwned>>();
-		ArrayList<ICisOwned> oneSuggestion = new ArrayList<ICisOwned>();
+    	ICisProposal theNewCis = mock(ICisProposal.class);
+    	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
+		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
-		//Assert.assertNull(cisManager.getCisList(new ICisOwned(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICisProposal(null, null, null, null, null, members, null, null, null)));
 	}
 	
 	@Test
@@ -174,15 +175,15 @@ public class CommunityRecommenderTest {
 		
     	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
-    	ICisOwned theNewCis = mock(ICisOwned.class);
-    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
-		ArrayList<ArrayList<ICisOwned>> theSuggestions = new ArrayList<ArrayList<ICisOwned>>();
-		ArrayList<ICisOwned> oneSuggestion = new ArrayList<ICisOwned>();
+    	ICisProposal theNewCis = mock(ICisProposal.class);
+    	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
+		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
-		//Assert.assertNull(cisManager.getCisList(new ICisOwned(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICisProposal(null, null, null, null, null, members, null, null, null)));
 	}
 	
 	@Test
@@ -197,15 +198,15 @@ public class CommunityRecommenderTest {
 		
     	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
-    	ICisOwned theNewCis = mock(ICisOwned.class);
-    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
-		ArrayList<ArrayList<ICisOwned>> theSuggestions = new ArrayList<ArrayList<ICisOwned>>();
-		ArrayList<ICisOwned> oneSuggestion = new ArrayList<ICisOwned>();
+    	ICisProposal theNewCis = mock(ICisProposal.class);
+    	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
+		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
-		//Assert.assertNull(cisManager.getCisList(new ICisOwned(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICisProposal(null, null, null, null, null, members, null, null, null)));
 	}
 	
 	@Test
@@ -220,15 +221,15 @@ public class CommunityRecommenderTest {
 		
     	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
-    	ICisOwned theNewCis = mock(ICisOwned.class);
-    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
-		ArrayList<ArrayList<ICisOwned>> theSuggestions = new ArrayList<ArrayList<ICisOwned>>();
-		ArrayList<ICisOwned> oneSuggestion = new ArrayList<ICisOwned>();
+    	ICisProposal theNewCis = mock(ICisProposal.class);
+    	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
+		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
-		//Assert.assertNull(cisManager.getCisList(new ICisOwned(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICisProposal(null, null, null, null, null, members, null, null, null)));
 	}
 	
 	@Test
@@ -243,15 +244,15 @@ public class CommunityRecommenderTest {
 		
     	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
-    	ICisOwned theNewCis = mock(ICisOwned.class);
-    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
-		ArrayList<ArrayList<ICisOwned>> theSuggestions = new ArrayList<ArrayList<ICisOwned>>();
-		ArrayList<ICisOwned> oneSuggestion = new ArrayList<ICisOwned>();
+    	ICisProposal theNewCis = mock(ICisProposal.class);
+    	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
+		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
-		//Assert.assertNull(cisManager.getCisList(new ICisOwned(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICisProposal(null, null, null, null, null, members, null, null, null)));
 	}
 	
 	@Test
@@ -266,10 +267,10 @@ public class CommunityRecommenderTest {
 		
     	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
-    	ICisOwned theNewCis = mock(ICisOwned.class);
-    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
-		ArrayList<ArrayList<ICisOwned>> theSuggestions = new ArrayList<ArrayList<ICisOwned>>();
-		ArrayList<ICisOwned> oneSuggestion = new ArrayList<ICisOwned>();
+    	ICisProposal theNewCis = mock(ICisProposal.class);
+    	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
+		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
@@ -289,10 +290,10 @@ public class CommunityRecommenderTest {
 		
     	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
-    	ICisOwned theNewCis = mock(ICisOwned.class);
-    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
-		ArrayList<ArrayList<ICisOwned>> theSuggestions = new ArrayList<ArrayList<ICisOwned>>();
-		ArrayList<ICisOwned> oneSuggestion = new ArrayList<ICisOwned>();
+    	ICisProposal theNewCis = mock(ICisProposal.class);
+    	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
+		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
@@ -340,7 +341,7 @@ public class CommunityRecommenderTest {
     	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
     	
     	//check user joined CISs before
-		communityRecommender.identifyCissToCreate(new ArrayList<ICisOwned>(), new ArrayList<String>());
+		communityRecommender.identifyCissToCreate(new ArrayList<ICisProposal>(), new ArrayList<String>());
 		//check and compare user joined CISs after
 		
 		//Assert.assertNotNull(/**User's joined CISs*/);

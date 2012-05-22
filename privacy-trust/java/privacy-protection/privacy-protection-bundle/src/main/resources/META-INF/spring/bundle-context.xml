@@ -11,20 +11,92 @@
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
 	xmlns:tx="http://www.springframework.org/schema/tx">
 
-	<!-- regular spring configuration file defining the beans for this bundle. 
-		We've kept the osgi definitions in a separate configuration file so that 
-		this file can easily be used for integration testing outside of an OSGi environment -->
-
-	<bean name="PrivacyDataManager"
+	<!-- Privacy Data Management Configuration -->
+	
+	<bean name="privacyDataManager"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
- 		<!-- <property name="privacyDataManager" ref="privacyDataManager" /> -->
-	</bean>
-
-	<bean name="PrivacyPolicyManager"
-		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager">
-		<!-- <property name="privacyPolicyManager" ref="privacyPolicyManager" /> -->
+		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
+		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 	</bean>
 	
+	<bean name="privacyDataManagerInternal"
+		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+		<!-- Persistance Configuration -->
+		<context:annotation-config />
+		
+		<tx:annotation-driven />
+	
+		<!-- <bean id="PrivacyPermissionRegistryPropertiesConfig"
+			class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+			<property name="ignoreResourceNotFound" value="true"></property>
+			<property name="locations">
+				<list>
+					<value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value>
+				</list>
+			</property>
+		</bean> -->
+	
+		<bean id="sessionFactory"
+			class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+			<property name="dataSource" ref="dataSource" />
+			<property name="annotatedClasses">
+				<list>
+					<value>org.societies.privacytrust.privacyprotection.model.PrivacyPermission</value>
+				</list>
+			</property>
+			<property name="annotatedPackages">
+				<list>
+					<value>org.societies.privacytrust.privacyprotection.model</value>
+				</list>
+			</property>
+			<property name="hibernateProperties">
+				<props>
+					<prop key="hibernate.show_sql">true</prop>
+					<prop key="hibernate.show_dlll">true</prop>
+					<prop key="hibernate.cache.use_second_level_cache">false</prop>
+					<prop key="hibernate.hbm2ddl.auto">update</prop>
+					<prop key="hibernate.format_sql">true</prop>
+				</props>
+			</property>
+		</bean>
+	
+		<tx:annotation-driven transaction-manager="transactionManager" />
+	
+		<bean id="transactionManager"
+			class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+			<property name="sessionFactory" ref="sessionFactory" />
+		</bean>
+
+
+
+	<!-- Privacy Policy Manager Configuration -->
+	
+	<bean name="PrivacyPolicyManager"
+		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager">
+	</bean>
+	
+	
+	
+	<!-- Privacy Policy Negotiation Manager Configuration -->
+
+
+
+	<!-- Privacy Preference Manager Configuration -->
+	<bean name="privacyPreferenceManager"
+		class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager" 
+		init-method="initialisePrivacyPreferenceManager">
+			<property name="ctxBroker" ref="ctxBroker"></property>
+			<property name="commsMgr" ref="commsMgr"></property>
+			<property name="trustBroker" ref="trustBroker"></property>
+			<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
+	</bean>
+	
+	
+	
+	<!-- Privacy Assessment Configuration -->
 	
 	<!--bean id="aopBean" class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr">
 	</bean-->
@@ -35,7 +107,7 @@
 		init-method="init"
 		>
 	</bean-->
-
+	
 	<bean id="catchBeforeMethod"
 		class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwAdvice" />
 	<bean id="pointcut"
@@ -59,13 +131,25 @@
 		</property>
 	</bean>
 
+	<bean id="PrivacyLog"
+		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog"
+		>
+	</bean>
+
 	<bean id="PrivacyLogAppender"
 		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender"
 		init-method="init"
 		depends-on="CommManagerBundle"
 		>
 		<property name="commMgr" ref="CommManagerBundle"/>
+		<property name="privacyLog" ref="PrivacyLog"/>
 		<!--property name="testBean" ref="CommsFwTestBean"/-->
+	</bean>
+
+	<bean id="Assessment"
+		class="org.societies.privacytrust.privacyprotection.assessment.logic.Assessment"
+		>
+		<property name="privacyLog" ref="PrivacyLog"/>
 	</bean>
 
 </beans>

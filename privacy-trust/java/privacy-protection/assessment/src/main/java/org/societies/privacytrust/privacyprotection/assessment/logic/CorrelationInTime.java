@@ -47,11 +47,14 @@ public class CorrelationInTime {
 
 	private static Logger LOG = LoggerFactory.getLogger(CorrelationInTime.class);
 
+	/** Asymptote */
 	private final double VALUE_AT_INF_DEFAULT = 0.2;
-	private final double TIME_SHIFT_DEFAULT = 3;
+	
+	/** Default time shift in ms */
+	private final long TIME_SHIFT_DEFAULT = 3000;
 	
 	private double valueAtInf;
-	private double timeShift;
+	private long timeShift;
 
 	private double normalizationFactor;
 	private double normalizationOffset;
@@ -70,19 +73,27 @@ public class CorrelationInTime {
 	 * 
 	 * @param valueAtInf Minimal correlation value for events that are most far apart.
 	 * 
-	 * @param timeShift Shift the correlation function along the x axis.
+	 * @param timeShift Shift the correlation function along the x axis. Value in ms.
 	 */
-	public CorrelationInTime(double valueAtInf, double timeShift) {
-		this.valueAtInf = valueAtInf;
+	public CorrelationInTime(double valueAtInf, long timeShift) {
+		if (valueAtInf >= 1 || valueAtInf < 0) {
+			LOG.warn("Unexpected value for valueAtInf: {}. Setting default value: {}",
+					valueAtInf, VALUE_AT_INF_DEFAULT);
+			this.valueAtInf = VALUE_AT_INF_DEFAULT;
+		}
+		else {
+			this.valueAtInf = valueAtInf;
+		}
 		this.timeShift = timeShift;
 		calculateNormalizationParameters();
 	}
 	
-	private double correlationUnnormalized(double dt) {
+	private double correlationUnnormalized(long dt) {
 		
 		double c;
+		double exponent = ((double) (dt - timeShift)) / 1000.0;
 		
-		c = 1 - 1 / (1 + Math.exp(-(dt - timeShift)));
+		c = 1 - 1 / (1 + Math.exp(- exponent));
 		
 		return c;
 	}
@@ -91,11 +102,11 @@ public class CorrelationInTime {
 	 * Estimates correlation between two events (data access and data transmission) based on time
 	 * of both events.
 	 * 
-	 * @param dt Difference in time in seconds. Time of data transmission - time of data access.
+	 * @param dt Difference in time in miliseconds. Time of data transmission - time of data access.
 	 * 
 	 * @return correlation based on difference in time.
 	 */
-	public double correlation(double dt) {
+	public double correlation(long dt) {
 		
 		double c;
 		
@@ -116,12 +127,15 @@ public class CorrelationInTime {
 	 * @return Normalized value
 	 */
 	private double normalize(double x) {
+//		LOG.info("normalize({})", x);
 		return normalizationFactor * x + normalizationOffset;
 	}
 	
 	private void calculateNormalizationParameters() {
 		
-		this.normalizationFactor = (1 - valueAtInf) / (1 - 1 / (1 + Math.exp(-(0 - timeShift))));
+		this.normalizationFactor = (1 - valueAtInf) / (1 - 1 / (1 + Math.exp(-(0 - timeShift)/1000.0)));
 		this.normalizationOffset = valueAtInf;
+//		LOG.info("calculateNormalizationParameters(): normalizationFactor = {}, normalizationOffset = {}",
+//				normalizationFactor, normalizationOffset);
 	}
 }

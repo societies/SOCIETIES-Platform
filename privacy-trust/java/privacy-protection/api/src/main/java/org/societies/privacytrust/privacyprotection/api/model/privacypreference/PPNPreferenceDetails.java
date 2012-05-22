@@ -62,7 +62,7 @@ public class PPNPreferenceDetails implements Serializable{
 		return contextType;
 	}
 	
-	private boolean compareRequestorIdentities(IIdentity id){
+/*	private boolean compareRequestorIdentities(IIdentity id){
 		if (id==null){
 			if (this.getRequestor().getRequestorId()==null){
 				return true;
@@ -80,9 +80,9 @@ public class PPNPreferenceDetails implements Serializable{
 				}
 			}
 		}
-	}
+	}*/
 	
-	private boolean compareServiceID(ServiceResourceIdentifier serviceID2){
+/*	private boolean compareServiceID(ServiceResourceIdentifier serviceID2){
 		
 		if (this.getRequestor() instanceof RequestorService){
 			if (serviceID2==null){
@@ -106,8 +106,8 @@ public class PPNPreferenceDetails implements Serializable{
 			return false;
 		}
 		
-	}
-	private boolean compareCtxIDs(CtxAttributeIdentifier ctxID){
+	}*/
+/*	private boolean compareCtxIDs(CtxAttributeIdentifier ctxID){
 		if (ctxID==null){
 			if (this.affectedCtxID==null){
 				return true;
@@ -125,8 +125,8 @@ public class PPNPreferenceDetails implements Serializable{
 				}
 			}
 		}
-	}
-	@Override
+	}*/
+/*	@Override
 	public boolean equals(Object obj){
 		if (obj instanceof PPNPreferenceDetails){
 			PPNPreferenceDetails det = (PPNPreferenceDetails) obj;
@@ -144,6 +144,13 @@ public class PPNPreferenceDetails implements Serializable{
 	}
 	
 	private boolean compareRequestors(Requestor requestor) {
+		if (null==requestor){
+			if (null==this.getRequestor()){
+				return true;
+			}else{
+				
+			}
+		}
 		if (this.compareRequestorIdentities(requestor.getRequestorId())){
 			if (this.requestor instanceof RequestorService){
 				if (requestor instanceof RequestorService){
@@ -165,7 +172,7 @@ public class PPNPreferenceDetails implements Serializable{
 			return (((RequestorCis) this.requestor).getCisRequestorId().toString().equals(cisRequestorId.toString()));
 		}
 		return false;
-	}
+	}*/
 
 	@Override
 	public String toString(){
@@ -180,6 +187,55 @@ public class PPNPreferenceDetails implements Serializable{
 		}
 		str = str.concat("\n");
 		return str;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((affectedCtxID == null) ? 0 : affectedCtxID.hashCode());
+		result = prime * result
+				+ ((contextType == null) ? 0 : contextType.hashCode());
+		result = prime * result
+				+ ((requestor == null) ? 0 : requestor.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof PPNPreferenceDetails)) {
+			return false;
+		}
+		PPNPreferenceDetails other = (PPNPreferenceDetails) obj;
+		if (affectedCtxID == null) {
+			if (other.affectedCtxID != null) {
+				return false;
+			}
+		} else if (!affectedCtxID.equals(other.affectedCtxID)) {
+			return false;
+		}
+		if (contextType == null) {
+			if (other.contextType != null) {
+				return false;
+			}
+		} else if (!contextType.equals(other.contextType)) {
+			return false;
+		}
+		if (requestor == null) {
+			if (other.requestor != null) {
+				return false;
+			}
+		} else if (!requestor.equals(other.requestor)) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

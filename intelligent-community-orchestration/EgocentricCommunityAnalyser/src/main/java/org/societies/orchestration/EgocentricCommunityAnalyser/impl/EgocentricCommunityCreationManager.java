@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.Iterator;
 
 import org.societies.orchestration.api.ICis;
+import org.societies.orchestration.api.ICisProposal;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
@@ -1147,10 +1148,20 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
 		
-		HashMap<String, ArrayList<ICis>> theResult = new HashMap<String, ArrayList<ICis>>();
-		theResult.put("Create CISs", cissToCreate);
+		//HashMap<String, ArrayList<ICis>> theResult = new HashMap<String, ArrayList<ICis>>();
+		//theResult.put("Create CISs", cissToCreate);
+		HashMap<String, ArrayList<ICisProposal>> theResult = new HashMap<String, ArrayList<ICisProposal>>();
+		
+		ArrayList<ICisProposal> cisProposals = new ArrayList<ICisProposal>();
+		Iterator<ICis> creationsIterator = cissToCreate.iterator();
+		while (creationsIterator.hasNext()) {
+			ICisProposal proposal = new ICisProposal();
+			proposal.setActualCis(creationsIterator.next());
+			cisProposals.add(proposal);
+		}
+		theResult.put("Create CISs", cisProposals);
 
-		// creating the identity of the CtxBroker that will be contacted
+		// creating the identity of the node that will be contacted
 		IIdentity toIdentity = null;
 		//try {
 			
@@ -1170,7 +1181,9 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		suggestedCommunityAnalyserBean = new SuggestedCommunityAnalyserBean();
 		suggestedCommunityAnalyserBean.setMethod(suggestedCommunityAnalyserMethodType.processEgocentricRecommendations);
-		//suggestedCommunityAnalyserBean.setCiss(theResult);
+		suggestedCommunityAnalyserBean.setCissMetadata(cissToCreateMetadata);
+		//suggestedCommunityAnalyserBean.setCiss(cisProposals);
+		suggestedCommunityAnalyserBean.setCiss(theResult);
 
 		//cbPacket.setUpdateAttr(ctxBrokerUpdateAttributeBean);
 

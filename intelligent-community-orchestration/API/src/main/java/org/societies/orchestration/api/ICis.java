@@ -28,6 +28,9 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 import org.societies.api.identity.IIdentity;
 import java.util.ArrayList;
+import java.util.Set;
+
+import java.util.concurrent.Future;
 
 /**
  * @author Babak.Farshchian@sintef.no
@@ -73,9 +76,11 @@ public class ICis {
    // public String getUserDefineName();
     //public String getCisType();
     
-    public ArrayList<IIdentity> getMembersList() {
-    	return new ArrayList<IIdentity>();
+    public Future<Set<ICisParticipant>> getMembersList() {
+    	return null;
     }
+    
+    
     
     //public int getMembershipCriteria() {
     //	return 0;

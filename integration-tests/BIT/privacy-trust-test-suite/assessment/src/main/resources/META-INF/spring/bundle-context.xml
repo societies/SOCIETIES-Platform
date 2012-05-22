@@ -20,8 +20,8 @@
 		http://www.springframework.org/schema/tx/spring-tx.xsd" >
 
     <bean
-        id="TestCase713"
-        class="org.societies.integration.test.bit.assessment.TestCase713"
+        id="TestCase1055"
+        class="org.societies.integration.test.bit.assessment.TestCase1055"
 		depends-on="PrivacyLogAppender"
         init-method="run">
   		<property name="privacyLogAppender" ref="PrivacyLogAppender"/>
@@ -29,7 +29,7 @@
     
     <bean
         id="NominalTestCaseLowerTester"
-        class="org.societies.integration.test.bit.policynegotiate.NominalTestCaseLowerTester">
+        class="org.societies.integration.test.bit.assessment.NominalTestCaseLowerTester">
     </bean>
 
 </beans>

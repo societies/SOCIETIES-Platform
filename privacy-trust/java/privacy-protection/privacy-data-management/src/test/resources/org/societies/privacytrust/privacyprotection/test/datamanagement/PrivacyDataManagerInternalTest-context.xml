@@ -12,28 +12,29 @@
 	xmlns:tx="http://www.springframework.org/schema/tx">
 
 	<!-- Privacy Data Management Configuration -->
-	
 	<bean name="PrivacyDataManager"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
+		<property name="privacyDataManagerInternal" ref="PrivacyDataManagerInternal" />
+		<property name="privacyPreferenceManager" ref="PrivacyPreferenceManager" />
+	</bean>
+	
+	<bean name="PrivacyPreferenceManager"
+		class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager">
 	</bean>
 	
 	<bean name="PrivacyDataManagerInternal"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-	
-<!-- 	<bean name="PrivacyDataManagerInternalTest"
-		class="org.societies.privacytrust.privacyprotection.test.datamanagement.PrivacyDataManagerInternalTest">
-		<property name="privacyDataManagerInternal" ref="PrivacyDataManagerInternal" />
-	</bean> -->
+
 
 
 	<!-- Persistance Configuration -->
-	
+
 	<context:annotation-config />
 
 	<tx:annotation-driven />
-	
+
 	<bean id="PrivacyPermissionRegistryPropertiesConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="false"></property>
@@ -43,7 +44,7 @@
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		init-method="createDataSource" destroy-method="close">
 		<property name="driverClassName" value="${jdbc.driverClassName}" />

@@ -31,6 +31,7 @@
 		<property name="persoMgr" ref="persoMgr"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="cauiDiscovery" ref="cauiDiscovery"></property>
+		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
 	</bean>
 
 	<bean id="cauiDiscovery"

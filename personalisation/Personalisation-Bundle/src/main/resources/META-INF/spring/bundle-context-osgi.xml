@@ -15,6 +15,7 @@
         <osgi:service ref="persoMgr">
         <osgi:interfaces>
         <value>org.societies.api.personalisation.mgmt.IPersonalisationManager</value>
+        <value>org.societies.api.internal.personalisation.IPersonalisationManager</value>
         <value>org.societies.personalisation.common.api.management.IInternalPersonalisationManager</value>
         </osgi:interfaces>
         </osgi:service>

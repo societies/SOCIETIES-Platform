@@ -48,11 +48,11 @@ public class CorrelationInTimeTest {
 	private CorrelationInTime correlationInTimeCustom;
 	
 	// Octave plot:
-	// t = 0:0.1:10; a = 0.2; b = 3; plot(t, (1 - 1 ./ (1 + exp(-(t-b)))) * (1-a) / (1 - 1 ./ (1 + exp(-(0-b)))) + a); grid
+	// dt = 0:100:10000; a = 0.2; b = 3; plot(dt, (1 - 1 ./ (1 + exp(-(dt/1000-b)))) * (1-a) / (1 - 1 ./ (1 + exp(-(0-b)))) + a); grid
 	
 	// Octave calculate value for specific time difference:
-	// t = XXX; valueAtInf = 0.43921; timeShift = 7.927645;
-	// (1 - 1 ./ (1 + exp(-(t-timeShift)))) * (1-valueAtInf) / (1 - 1 ./ (1 + exp(-(0-timeShift)))) + valueAtInf 
+	// dt = XXX; valueAtInf = 0.43921; timeShift = 7927;
+	// (1 - 1 ./ (1 + exp(-(dt-timeShift)/1e3))) * (1-valueAtInf) / (1 - 1 ./ (1 + exp(-(0-timeShift)/1e3))) + valueAtInf 
 	
 	/**
 	 * @throws java.lang.Exception
@@ -61,7 +61,7 @@ public class CorrelationInTimeTest {
 	public void setUp() throws Exception {
 		LOG.debug("setUp()");
 		correlationInTimeDefault = new CorrelationInTime();
-		correlationInTimeCustom = new CorrelationInTime(0.43921, 7.927645);
+		correlationInTimeCustom = new CorrelationInTime(0.43921, 7927);
 	}
 
 	/**
@@ -78,14 +78,14 @@ public class CorrelationInTimeTest {
 		
 		LOG.debug("testCorrelationDefault()");
 		
-		double dt;
+		long dt;
 		double result;
 		
-		dt = Double.NEGATIVE_INFINITY;
+		dt = Long.MIN_VALUE;
 		result = correlationInTimeDefault.correlation(dt);
 		assertEquals(0, result, 1e-5);
 		
-		dt = -2.8;
+		dt = -2800;
 		result = correlationInTimeDefault.correlation(dt);
 		assertEquals(0, result, 1e-5);
 		
@@ -93,12 +93,12 @@ public class CorrelationInTimeTest {
 		result = correlationInTimeDefault.correlation(dt);
 		assertEquals(1, result, 1e-5);
 		
-		dt = 3.1;
+		dt = 3100;
 		result = correlationInTimeDefault.correlation(dt);
 		assertTrue(result < 1);
 		assertTrue(result > 0);
 		
-		dt = Double.MAX_VALUE;
+		dt = Long.MAX_VALUE;
 		result = correlationInTimeDefault.correlation(dt);
 		assertTrue(result < 1);
 		assertTrue(result > 0);
@@ -109,14 +109,14 @@ public class CorrelationInTimeTest {
 		
 		LOG.debug("testCorrelationCustom()");
 		
-		double dt;
+		long dt;
 		double result;
 		
-		dt = Double.NEGATIVE_INFINITY;
+		dt = Long.MIN_VALUE;
 		result = correlationInTimeCustom.correlation(dt);
 		assertEquals(0, result, 1e-5);
 		
-		dt = -2.8;
+		dt = -2800;
 		result = correlationInTimeCustom.correlation(dt);
 		assertEquals(0, result, 1e-5);
 		
@@ -124,15 +124,15 @@ public class CorrelationInTimeTest {
 		result = correlationInTimeCustom.correlation(dt);
 		assertEquals(1, result, 1e-5);
 		
-		dt = 3.1;
+		dt = 3100;
 		result = correlationInTimeCustom.correlation(dt);
-		assertEquals(0.99575, result, 1e-5);
+		assertEquals(0.99574, result, 1e-5);
 		
-		dt = 8.0973;
+		dt = 8097;
 		result = correlationInTimeCustom.correlation(dt);
-		assertEquals(0.69597, result, 1e-5);
+		assertEquals(0.69592, result, 1e-5);
 		
-		dt = Double.MAX_VALUE;
+		dt = Long.MAX_VALUE;
 		result = correlationInTimeCustom.correlation(dt);
 		assertEquals(0.43921, result, 1e-5);
 	}

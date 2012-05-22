@@ -19,41 +19,65 @@
  */
 package org.societies.privacytrust.privacyprotection.test.datamanagement;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxEntityIdentifier;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.mock.DataIdentifier;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author olivierm
  *
  */
+//Run this test case using Spring jUnit
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "PrivacyDataManagerInternalTest-context.xml" })
 public class PrivacyDataManagerTest {
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class.getSimpleName());
+	
+	@Autowired
 	IPrivacyDataManager privacyDataManager;
+	@Autowired
+	IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		privacyDataManager = new PrivacyDataManager();
 	}
 
 	/**
@@ -61,24 +85,47 @@ public class PrivacyDataManagerTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
-		privacyDataManager = null;
 	}
+
 
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)}.
 	 * @throws PrivacyException 
 	 */
 	@Test
-	@Ignore
+	@Ignore("PrivacyPreferenceManager not ready yet")
 	public void testObfuscateData() {
-		IDataWrapper actual = new SampleWrapper(3);
-		boolean expection = false;
+		LOG.info("[Test begin] testObfuscateData()");
+		IDataWrapper<Name> wrapper = DataWrapperFactory.getNameWrapper("Olivier", "Maridat");
+		Future<IDataWrapper> obfuscatedDataWrapperAsync = null;
+		IDataWrapper<Name> obfuscatedDataWrapper = null;
 		try {
-			privacyDataManager.obfuscateData(null, null, null);
+			IIdentity requestorId = Mockito.mock(IIdentity.class);
+			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
+			Requestor requestor = new Requestor(requestorId);
+			IIdentity ownerId = Mockito.mock(IIdentity.class);
+			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
+			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, ownerId, wrapper);
+			obfuscatedDataWrapper = obfuscatedDataWrapperAsync.get();
 		} catch (PrivacyException e) {
-			expection = true;
+			LOG.info("testObfuscateData(): obfuscation error "+e.getLocalizedMessage()+"\n", e);
+			fail("testObfuscateData(): obfuscation error "+e.getLocalizedMessage());
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.info("testObfuscateData(): CtxId creation error "+e.getLocalizedMessage()+"\n", e);
+			fail("testObfuscateData(): CtxId creation error "+e.getLocalizedMessage());
+		} catch (InterruptedException e) {
+			LOG.info("testObfuscateData(): Async interrupted error "+e.getLocalizedMessage()+"\n", e);
+			fail("testObfuscateData(): Async interrupted error "+e.getLocalizedMessage());
+		} catch (ExecutionException e) {
+			LOG.info("testObfuscateData(): Async excecution error "+e.getLocalizedMessage()+"\n", e);
+			fail("testObfuscateData(): Async excecution error "+e.getLocalizedMessage());
 		}
-		assertFalse(expection);
+		
+		// Verify
+		LOG.info("### Orginal name:\n"+wrapper.getData().toString());
+		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
+		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 	}
 
 	/**
@@ -87,7 +134,7 @@ public class PrivacyDataManagerTest {
 	@Test
 	@Ignore
 	public void testHasObfuscatedVersion() {
-		CtxIdentifier actual = new CtxAttributeIdentifier(new CtxEntityIdentifier(null, null, null), null, null);
+		String actual = "";
 		boolean expection = false;
 		try {
 			actual = privacyDataManager.hasObfuscatedVersion(null, null, null);
@@ -102,16 +149,72 @@ public class PrivacyDataManagerTest {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, IIdentity, IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)}.
 	 */
 	@Test
-	@Ignore
-	public void testCheckPermission() {
-		ResponseItem expected = null;
-		ResponseItem actual = null;
+	@Rollback(true)
+	public void testCheckPermissionPreviouslyAdded() {
+		boolean dataUpdated = false;
+		ResponseItem permission = null;
 		try {
-			actual = privacyDataManager.checkPermission(null, null, null, null);
+			IIdentity requestorId = Mockito.mock(IIdentity.class);
+			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
+			Requestor requestor = new Requestor(requestorId);
+			IIdentity ownerId = Mockito.mock(IIdentity.class);
+			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
+			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			Action action = new Action(ActionConstants.READ);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(action);
+			Decision decision = Decision.PERMIT;
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, decision);
+			permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
 		} catch (PrivacyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.info("PrivacyException: testCheckPermission\n", e);
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.info("MalformedCtxIdentifierException: testCheckPermission2\n", e);
 		}
-		assertEquals(expected, actual);
+		assertTrue("Data permission not updated", dataUpdated);
+		assertNotNull("No permission retrieved", permission);
+		assertNotNull("No (real) permission retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", permission.getDecision().name(), Decision.PERMIT.name());
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, IIdentity, IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)}.
+	 */
+	@Test
+	@Rollback(true)
+	public void testCheckPermissionPreviouslyDeleted() {
+		boolean dataDeleted = false;
+		ResponseItem permission = null;
+		try {
+			IIdentity requestorId = Mockito.mock(IIdentity.class);
+			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
+			Requestor requestor = new Requestor(requestorId);
+			IIdentity ownerId = Mockito.mock(IIdentity.class);
+			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
+			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			Action action = new Action(ActionConstants.READ);
+			dataDeleted = privacyDataManagerInternal.deletePermission(requestor, ownerId, dataId);
+			permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
+		} catch (PrivacyException e) {
+			LOG.info("PrivacyException: testCheckPermissionPreviouslyDeleted\n", e);
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.info("MalformedCtxIdentifierException: testCheckPermissionPreviouslyDeleted\n", e);
+		}
+		assertTrue("Data permission not deleted", dataDeleted);
+		assertNotNull("No permission retrieved", permission);
+		assertNotNull("No (real) permission retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", permission.getDecision().name(), Decision.DENY.name());
+	}
+	
+	
+	// -- Dependency Injection
+	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+		LOG.info("[Dependency Injection] IPrivacyDataManager injected");
+	}
+	public void setPrivacyDataManagerInternal(
+			IPrivacyDataManagerInternal privacyDataManagerInternal) {
+		this.privacyDataManagerInternal = privacyDataManagerInternal;
+		LOG.info("[Dependency Injection] PrivacyDataManagerInternal injected");
 	}
 }

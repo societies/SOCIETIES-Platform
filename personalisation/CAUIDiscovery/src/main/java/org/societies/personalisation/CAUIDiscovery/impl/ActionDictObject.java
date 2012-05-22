@@ -10,11 +10,39 @@ public class ActionDictObject implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	int totalOccurences;
-	List<String> contextData = new ArrayList<String>();
+	//List<String> contextData = new ArrayList<String>();
 	
 	//[C1]=1
 	//key:list(C1,C2) value(int)
-	HashMap<List<String>,Integer> contextMap = new HashMap<List<String>,Integer>(); 
+	HashMap<List<String>,Integer> locationContextMap = new HashMap<List<String>,Integer>(); 
+	HashMap<List<String>,Integer> statusContextMap = new HashMap<List<String>,Integer>();
+	HashMap<List<String>,Integer> temperatureContextMap = new HashMap<List<String>,Integer>();
+	
+	public HashMap<List<String>, Integer> getLocationContextMap() {
+		return locationContextMap;
+	}
+
+	public void setLocationContextMap(
+			HashMap<List<String>, Integer> locationContextMap) {
+		this.locationContextMap = locationContextMap;
+	}
+
+	public HashMap<List<String>, Integer> getStatusContextMap() {
+		return statusContextMap;
+	}
+
+	public void setStatusContextMap(HashMap<List<String>, Integer> statusContextMap) {
+		this.statusContextMap = statusContextMap;
+	}
+
+	public HashMap<List<String>, Integer> getTemperatureContextMap() {
+		return temperatureContextMap;
+	}
+
+	public void setTemperatureContextMap(
+			HashMap<List<String>, Integer> temperatureContextMap) {
+		this.temperatureContextMap = temperatureContextMap;
+	}
 
 	
 	public int getTotalOccurences() {
@@ -25,18 +53,9 @@ public class ActionDictObject implements Serializable{
 		this.totalOccurences = totalOccurences;
 	}
 
-	public HashMap<List<String>,Integer> getContextMap() {
-		return contextMap;
-	}
-
-	public void setContextMap(HashMap<List<String>,Integer> contextMap) {
-		this.contextMap = contextMap;
-	}
-
-
 	public String toString(){
 		String result = null;
-		result= totalOccurences +" context:"+contextMap;
+		result= totalOccurences +" location:"+getLocationContextMap() +" status:"+getStatusContextMap()+" temperature"+getTemperatureContextMap();
 		
 		return result;
 	}
