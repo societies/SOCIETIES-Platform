@@ -153,9 +153,9 @@ public class XMPPMojo extends AbstractMojo
 
 			// -- Step 2: Add relevant namespace to complex type
 			//		    Pattern patternTypeNamespace = Pattern.compile("type=\"(xs:(?!char|byte|short|int|long|float|double|boolean|string))\"", Pattern.CASE_INSENSITIVE);
-			Pattern patternTypeNamespace = Pattern.compile("type=\"((?!xs|ns[0-9]{1,3})[^\"]+)\"", Pattern.CASE_INSENSITIVE);
+			Pattern patternTypeNamespace = Pattern.compile("(type|base)=\"((?!xs|ns[0-9]{1,3})[^\"]+)\"", Pattern.CASE_INSENSITIVE);
 			Matcher matcherTypeNamespace = patternTypeNamespace.matcher(newSchemaContent);
-			newSchemaContent = matcherTypeNamespace.replaceAll("type=\"tns:$1\"");
+			newSchemaContent = matcherTypeNamespace.replaceAll("$1=\"tns:$2\"");
 			//		    getLog().info("#################### After TypeNamespace");
 			//		    getLog().info(newSchemaContent);
 
@@ -174,6 +174,9 @@ public class XMPPMojo extends AbstractMojo
 			Pattern patternImportCheck = Pattern.compile("schemaLocation", Pattern.CASE_INSENSITIVE);
 			Matcher matcherImportCheck = patternImportCheck.matcher(newSchemaContent);
 			if (matcherImportCheck.find()) {
+				Pattern patternIsInternal = Pattern.compile("internal/", Pattern.CASE_INSENSITIVE);
+				Matcher matcherIsInternal = patternIsInternal.matcher(httpNamespace);
+				boolean isInternal = matcherIsInternal.find();
 				Pattern patternImport = Pattern.compile("<xs:import namespace=\"(http://societies.org/api/(internal/)?schema/([^\"]+))\" schemaLocation=\"([^\"]*)\" ?/>", Pattern.CASE_INSENSITIVE);
 				Matcher matcherImport = patternImport.matcher(newSchemaContent);
 				StringBuffer importsContent = new StringBuffer();
@@ -193,7 +196,7 @@ public class XMPPMojo extends AbstractMojo
 						getLog().info("external:"+httpNs);
 						getLog().info("external:"+typeHttpNs);
 						getLog().info("external:"+endHttpNs);
-						matcherImport.appendReplacement(importsContent, "<xs:import namespace=\"http://societies.org/api/$2schema/$3\" schemaLocation=\"../../../../external/src/main/resources/org.societies.api.schema."+endHttpNs.replace("/", ".")+".xsd\" />");
+						matcherImport.appendReplacement(importsContent, "<xs:import namespace=\"http://societies.org/api/$2schema/$3\" schemaLocation=\""+(isInternal ? "../../../../external/src/main/resources/" : "")+"org.societies.api.schema."+endHttpNs.replace("/", ".")+".xsd\" />");
 					}
 				}
 				matcherImport.appendTail(importsContent);
