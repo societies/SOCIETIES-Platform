@@ -87,8 +87,16 @@ public class PrivacyLog implements IPrivacyLog {
 
 	public void append(DataTransmissionLogEntry entry) {
 		dataTransmission.add(entry);
-		senderIds.add(entry.getSender());
-		senderClassNames.add(entry.getSenderClass());
+		
+		IIdentity sender = entry.getSender();
+		if (!senderIds.contains(sender)) {
+			senderIds.add(sender);
+		}
+		
+		String senderClass = entry.getSenderClass();
+		if (!senderClassNames.contains(senderClass)) {
+			senderClassNames.add(senderClass);
+		}
 	}
 
 	/**
