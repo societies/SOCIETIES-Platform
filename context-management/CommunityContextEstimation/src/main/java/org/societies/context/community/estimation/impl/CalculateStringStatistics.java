@@ -35,14 +35,14 @@ public class CalculateStringStatistics {
 		
 		ArrayList <String> proffesions = new ArrayList<String>();
 		proffesions.add("Engineer");
-		proffesions.add("Enginner");
-		proffesions.add("Enginner");
-		proffesions.add("Enginner");
-		proffesions.add("Enginner");
-		proffesions.add("Schef");
+		proffesions.add("Engineer");
+		proffesions.add("Engineer");
+		proffesions.add("Engineer");
+		proffesions.add("Engineer");
+		proffesions.add("Chef");
 		proffesions.add("Architect");
-		proffesions.add("Plumper");
-		proffesions.add("Plumper");
+		proffesions.add("Plumber");
+		proffesions.add("Plumber");
 		proffesions.add("Cook");
 		
 		Hashtable <String, Integer> frequencyMap = new Hashtable();
@@ -54,7 +54,7 @@ public class CalculateStringStatistics {
 				if (finalList.contains(proffesions.get(i)))
 				{
 					int elementCount = 
-							Integer.parseInt(frequencyMap.get(i).toString());
+							Integer.parseInt(frequencyMap.get(proffesions.get(i)).toString());
 					elementCount++;
 					frequencyMap.put(proffesions.get(i), elementCount);
 				}

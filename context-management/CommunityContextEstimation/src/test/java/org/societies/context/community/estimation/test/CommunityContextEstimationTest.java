@@ -308,7 +308,10 @@ public void testConvexHull(){
 	//return setOfPoints;
 }
 
+@Test
+public void testCalculateStringStatistics(){
 
+}
 
 
 }
