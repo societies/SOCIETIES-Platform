@@ -8,7 +8,6 @@ public interface FacebookConnector extends ISocialConnector {
 
 	
 	public String ME		 = "me";
-	public String ACTIVITIES = "me/activities";
 	public String BOOKS 	 = "me/books";
 	public String EVENTS     = "me/events";
 	public String GROUPS     = "me/groups";
