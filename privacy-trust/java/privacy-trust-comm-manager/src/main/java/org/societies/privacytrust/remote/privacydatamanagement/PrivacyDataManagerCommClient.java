@@ -105,7 +105,7 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 		bean.setMethod(MethodType.OBFUSCATE_DATA);
 		bean.setRequestor(Util.createRequestorBean(requestor));
 		bean.setOwnerId(ownerId.getJid());
-		bean.setDataId(dataWrapper.getDataId().toUriString());
+		bean.setDataId(dataWrapper.getDataId());
 		try {
 			this.commManager.sendIQGet(stanza, bean, privacyTrustCommClientCallback);
 		} catch (CommunicationException e) {
