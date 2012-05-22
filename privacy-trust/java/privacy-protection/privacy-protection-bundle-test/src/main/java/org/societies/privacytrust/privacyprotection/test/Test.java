@@ -105,8 +105,11 @@ public class Test implements IPrivacyDataManagerListener {
 			this.getStatusAttribute();
 			this.getSymLocAttribute();
 			Action action = new Action(ActionConstants.READ);
+
 			ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, this.symLocAttribute.getId(), action);
 			LOG.info("************* [Test Resullt] Permission checked? "+(null != permission));
+
+	
 			if (null != permission) {
 				LOG.info(permission.toString());
 			}

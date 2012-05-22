@@ -24,54 +24,32 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 /**
- * This data wrapper is an abstraction between obfuscation manager
- * and data models. This is the way for wrapping data to obfuscate them,
- * and filling a type of data (needed to know how obfuscate them) 
- * This wrapper is linked to a specific data obfuscator
- * and know what kind of data is needed to launch the obfuscation. 
- * @author Olivier Maridat (Trialog)
- * @date 18 oct. 2011
+ * Wrapper for location coordinates obfuscation
+ *
+ * @author Olivier Maridat
+ *
  */
-public interface IDataWrapper<E> {
+public class LocationCoordinatesWrapper extends DataWrapper<LocationCoordinates> {
+	// -- CONSTRUCTOR
 	/**
-	 * @return Id of the data to be obfuscated
+	 * @param dataId
+	 * @param data
 	 */
-	public String getDataId();
+	public LocationCoordinatesWrapper(LocationCoordinates data) {
+		super(data);
+	}
 	/**
-	 * @param dataId Id of the data to be obfuscated
+	 * DO NOT USE
+	 * @param dataId
+	 * @param data
 	 */
-	public void setDataId(String dataId);
+	private LocationCoordinatesWrapper(String dataId, LocationCoordinates data, boolean persist) {
+		super(data);
+	}
+
 	
-	/**
-	 * Data
-	 * @return The data to be obfuscated
-	 */
-	public E getData();
-	/**
-	 * Set the data to be obfuscated
-	 * @param data The data to be obfuscated
-	 */
-	public void setData(E data);
-	
-	/**
-	 * To know if obfuscated data will be stored with this obfuscator
-	 * 
-	 * @return True if this obfuscator has enabled persistence
-	 * @return Otherwise false
-	 */
-	public boolean isPersistenceEnabled();
-	/**
-	 * To enable storage of obfuscated data
-	 * @param persist True to persist the data, false otherwise
-	 */
-	public void setPersistenceEnabled(boolean persist);
-	
-	/**
-	 * To know if this wrapper is ready for obfuscation operation
-	 * 
-	 * @return True if this DataWrapper is ready for obfuscation
-	 * @return Otherwise false
-	 */
-	public boolean isReadyForObfuscation();
+	// --- GET/SET
 }

@@ -22,65 +22,113 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper;
+package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.DataWrapper;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.SampleObfuscator;
 
 /**
- * This is a sample wrapper, it doing nothing
- * @state skeleton 
+ * Describe your class here...
+ *
  * @author olivierm
+ *
  */
-public class SampleWrapper extends DataWrapper {
-	private SampleObfuscator obfuscator;
+public class LocationCoordinates {
+	private double latitude;
+	private double longitude;
+	private double accuracy;
 	
-	// -- CONSTRUCTOR
-	public SampleWrapper(int param1) {
+	/**
+	 * @param latitude
+	 * @param longitude
+	 */
+	public LocationCoordinates(double latitude, double longitude, double accuracy) {
 		super();
-		obfuscator = new SampleObfuscator(param1);
-		setObfuscator(obfuscator);
-		setAsReadyForObfuscation();
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.accuracy = accuracy;
 	}
-
 	
-	// -- GET/SET
+	
 	/**
-	 * @return the param1
+	 * @return the latitude
 	 */
-	public double getParam1() {
-		return obfuscator.getParam1();
+	public double getLatitude() {
+		return latitude;
 	}
 	/**
-	 * @param param1 the param1 to set
+	 * @param latitude the latitude to set
 	 */
-	public void setParam1(int param1) {
-		obfuscator.setParam1(param1);
-		if (-1 != obfuscator.getParam1()) {
-			setAsReadyForObfuscation();
-		}
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+	/**
+	 * @return the longitude
+	 */
+	public double getLongitude() {
+		return longitude;
+	}
+	/**
+	 * @param longitude the longitude to set
+	 */
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+	/**
+	 * @return the accuracy
+	 */
+	public double getAccuracy() {
+		return accuracy;
+	}
+	/**
+	 * @param accuracy the accuracy to set
+	 */
+	public void setAccuracy(double accuracy) {
+		this.accuracy = accuracy;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Geolocation [latitude=" + latitude + ", longitude=" + longitude
+				+ ", accuracy=" + accuracy + "]";
+	}
+	public String toXMLString() {
+		return "<geolocation>\n" +
+				"\t<latitude>" + latitude + "</latitude>\n" +
+				"\t<longitude>" + longitude+ "</longitude>\n" +
+				"\t<horizontalAccuracy>" + accuracy + "</horizontalAccuracy>\n" +
+			"</geolocation>";
+	}
+	public String toJSONString() {
+		return "{\n" +
+				"\"latitude\": \""+latitude+"\",\n" +
+				"\"longitude\": \""+longitude+"\",\n" +
+				"\"horizontalAccuracy\": \""+accuracy+"\"\n" +
+				"}";
+	}
+	
 	/*
-	 * @see org.societies.privacytrust.privacyprotection.dataobfuscation.DataWrapper#equals(java.lang.Object)
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
 		// -- Verify reference equality
-        if (obj == this) {
-            return true;
-        }
-        
-        // -- Verify obj type
-        if (obj instanceof SampleWrapper) {
-        	SampleWrapper other = (SampleWrapper) obj;
-        	return (new EqualsBuilder()
-	            .append(this.getParam1(), other.getParam1())
-	            .isEquals()) && (super.equals(obj));
-        }
-        
-        return false;
+		if (obj == this) {
+			return true;
+		}
+
+		// -- Verify obj type
+		if (obj instanceof LocationCoordinates) {
+			LocationCoordinates other = (LocationCoordinates) obj;
+			return new EqualsBuilder()
+			.append(this.getLatitude(), other.getLatitude())
+			.append(this.getLongitude(), other.getLongitude())
+			.append(this.getAccuracy(), other.getAccuracy())
+			.isEquals();
+		}
+		return false;
 	}
 }

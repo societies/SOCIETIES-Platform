@@ -22,56 +22,72 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
+package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
+
+import java.lang.reflect.Type;
+
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 
 /**
- * This data wrapper is an abstraction between obfuscation manager
- * and data models. This is the way for wrapping data to obfuscate them,
- * and filling a type of data (needed to know how obfuscate them) 
- * This wrapper is linked to a specific data obfuscator
- * and know what kind of data is needed to launch the obfuscation. 
+ * Abstract class helping the creation of an obfuscator
+ *
  * @author Olivier Maridat (Trialog)
- * @date 18 oct. 2011
+ *
  */
-public interface IDataWrapper<E> {
+public abstract class DataObfuscator<E extends IDataWrapper> implements IDataObfuscator {
 	/**
-	 * @return Id of the data to be obfuscated
+	 * Data to obfuscate
 	 */
-	public String getDataId();
+	protected E dataWrapper;
 	/**
-	 * @param dataId Id of the data to be obfuscated
+	 * Type of the obfuscation level
 	 */
-	public void setDataId(String dataId);
+	protected ObfuscationLevelType obfuscationLevelType;
+	/**
+	 * For a DISCRETE obfuscation level type, there is a number
+	 * of classes available. This step number is this number of
+	 * classes
+	 */
+	protected int stepNumber = 1;
+	/**
+	 * Type of the data to obfuscate
+	 */
+	protected Type dataType;
 	
-	/**
-	 * Data
-	 * @return The data to be obfuscated
-	 */
-	public E getData();
-	/**
-	 * Set the data to be obfuscated
-	 * @param data The data to be obfuscated
-	 */
-	public void setData(E data);
 	
-	/**
-	 * To know if obfuscated data will be stored with this obfuscator
-	 * 
-	 * @return True if this obfuscator has enabled persistence
-	 * @return Otherwise false
-	 */
-	public boolean isPersistenceEnabled();
-	/**
-	 * To enable storage of obfuscated data
-	 * @param persist True to persist the data, false otherwise
-	 */
-	public void setPersistenceEnabled(boolean persist);
+	public DataObfuscator(E data) {
+		super();
+		this.dataWrapper = data;
+	}
+
 	
-	/**
-	 * To know if this wrapper is ready for obfuscation operation
-	 * 
-	 * @return True if this DataWrapper is ready for obfuscation
-	 * @return Otherwise false
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getObfuscationType()
 	 */
-	public boolean isReadyForObfuscation();
+	@Override
+	public ObfuscationLevelType getObfuscationLevelType() {
+		return obfuscationLevelType;
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getDataWrapper()
+	 */
+	public IDataWrapper getDataWrapper() {
+		return dataWrapper;
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getDataType()
+	 */
+	@Override
+	public Type getDataType() {
+		return dataType;
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getStepNumber()
+	 */
+	@Override
+	public int getStepNumber() {
+		return stepNumber;
+	}
 }
