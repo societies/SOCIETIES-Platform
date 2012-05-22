@@ -65,4 +65,6 @@ public interface ICis {
     
     public int getMembershipCriteria();
 
+    
+    public void getInfo(ICisManagerCallback callback);
 }

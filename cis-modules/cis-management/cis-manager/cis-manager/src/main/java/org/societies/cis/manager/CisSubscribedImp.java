@@ -91,7 +91,7 @@ public class CisSubscribedImp implements ICis {
 		return this.cisRecord.getMembershipCriteria();
 	}
 
-	
+	@Override
 	public void getInfo(ICisManagerCallback callback){
 		LOG.debug("client call to get info from a RemoteCIS");
 
