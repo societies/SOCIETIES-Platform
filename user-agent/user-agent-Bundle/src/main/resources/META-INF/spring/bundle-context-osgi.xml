@@ -36,6 +36,10 @@
 	<osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr">
 	</osgi:reference>
 	
+	<!-- comms manager is needed by the uam -->
+	<osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
+	</osgi:reference>
+	
 	<!-- IServiceDiscovery is needed by dm (at least) -->
 	<osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
 	</osgi:reference>
