@@ -105,10 +105,10 @@ public interface IDevice {
     
     /**
      * 
-     * @param serviceId
+     * @param serviceName
      * @return a service provided by the driver that provides this device
      */
-    public IDriverService getService (String serviceId);
+    public IDriverService getService (String serviceName);
     
     
     /**

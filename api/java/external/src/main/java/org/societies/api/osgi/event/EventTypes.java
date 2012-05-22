@@ -72,4 +72,7 @@ public class EventTypes {
 	
 	/** User to notify peers of a failed negotiation */
 	public static final String FAILED_NEGOTIATION_EVENT = "org/societies/privacyprotection/negotiation/failednegotiation";
+	
+	/** Used by the device drivers to publish events about device (sensors/actuators) data change*/
+	public static final String DEVICE_MANAGEMENT_EVENT = "org/societies/css/device";
 }

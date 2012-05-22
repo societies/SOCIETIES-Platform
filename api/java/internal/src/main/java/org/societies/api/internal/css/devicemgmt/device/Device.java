@@ -32,6 +32,7 @@ package org.societies.api.internal.css.devicemgmt.device;
  * @version 1.0
  * @created 06-d�c.-2011 15:18:20
  */
+@Deprecated
 public interface Device {
 
 	public static final String DEVICE_CATEGORY = null;
