@@ -25,13 +25,15 @@
 
 package org.societies.context.community.estimation.impl;
 
+import java.awt.List;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public class CalculateStringStatistics {
-	public Integer proffesionCounter1 = 0;
+import org.societies.api.context.model.CtxAttribute;
 
-	public void CalculateAttributeStatistics() {
+public class CalculateStringStatistics {
+
+	public void CalculateAttributeStatistics(List attrList) {
 		
 		ArrayList <String> proffesions = new ArrayList<String>();
 		proffesions.add("Engineer");
@@ -64,28 +66,10 @@ public class CalculateStringStatistics {
 					frequencyMap.put(proffesions.get(i), 1);
 				}
 			}
-			System.out.println(frequencyMap);
+			System.out.println("CalculateAttributeStatistics"+frequencyMap);
 		}
 }
 	 
 			 
 	
 	 
-//}
-
-//proffesions.remove(0);
-//for (int j=0; j<proffesions.size(); j++){
-//	if (proffesions.get(i).compareTo(proffesions.get(j))>0){
-//		proffesions.remove(j);
-//		finalListOfProffesions.
-//		
-//		proffesionCounter1++;
-//		proffesions.
-//	}
-//	
-//	foreach(String a in animals) {
-//	  if(frequencymap.containsKey(a)) {
-//	    frequencymap.put(a, frequencymap.get(a)+1);
-//	  }
-//	  else{ frequencymap.put(a, 1); }
-//	}

@@ -28,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -309,8 +310,109 @@ public void testConvexHull(){
 }
 
 @Test
-public void testCalculateStringStatistics(){
+public void testCalculateStringStatistics() throws InterruptedException, ExecutionException, CtxException{
+	
+	List<CtxAttribute> attrList = new ArrayList<CtxAttribute>();
+	
+	//Create a person entity 1
+	CtxEntity person1 = iB.createEntity("person1").get();				
+	CtxEntityIdentifier pId1 = person1.getId();
+	CtxAttribute person1Age = this.iB.createAttribute(pId1, "profession").get(); 
+	person1Age.setValueType(CtxAttributeValueType.STRING);
+	person1Age = (CtxAttribute) iB.update(person1Age).get();
+	person1Age.setStringValue("Engineer");
+	attrList.add(person1Age);
 
+	//Create a person entity 2
+	CtxEntity person2 = iB.createEntity("person2").get();
+	CtxEntityIdentifier pId2 = person2.getId();
+	CtxAttribute person2Age = iB.createAttribute(pId2, "profession").get(); 
+	person2Age.setValueType(CtxAttributeValueType.STRING);
+	person2Age = (CtxAttribute) iB.update(person2Age).get();
+	person2Age.setStringValue("Chef");
+	attrList.add(person2Age);
+
+	//Create a person entity 3
+	CtxEntity person3 = iB.createEntity("person3").get();
+	CtxEntityIdentifier pId3 = person3.getId();
+	CtxAttribute person3Age = this.iB.createAttribute(pId3, "age").get(); 
+	person3Age.setValueType(CtxAttributeValueType.STRING);
+	person3Age = (CtxAttribute) iB.update(person3Age).get();
+	person3Age.setStringValue("Cook");
+	attrList.add(person3Age);
+	
+	//Create a person entity 4
+	CtxEntity person4 = iB.createEntity("person4").get();				
+	CtxEntityIdentifier pId4 = person4.getId();
+	CtxAttribute person4Age = this.iB.createAttribute(pId4, "profession").get(); 
+	person4Age.setValueType(CtxAttributeValueType.STRING);
+	person4Age = (CtxAttribute) iB.update(person4Age).get();
+	person4Age.setStringValue("Engineer");
+	attrList.add(person4Age);
+	
+	//Create a person entity 5
+	CtxEntity person5 = iB.createEntity("person5").get();				
+	CtxEntityIdentifier pId5 = person5.getId();
+	CtxAttribute person5Age = this.iB.createAttribute(pId5, "profession").get(); 
+	person5Age.setValueType(CtxAttributeValueType.STRING);
+	person5Age = (CtxAttribute) iB.update(person5Age).get();
+	person5Age.setStringValue("Plumber");
+	attrList.add(person5Age);
+	
+	//Create a person entity 6
+	CtxEntity person6 = iB.createEntity("person6").get();				
+	CtxEntityIdentifier pId6 = person1.getId();
+	CtxAttribute person6Age = this.iB.createAttribute(pId6, "profession").get(); 
+	person6Age.setValueType(CtxAttributeValueType.STRING);
+	person6Age = (CtxAttribute) iB.update(person6Age).get();
+	person6Age.setStringValue("Engineer");
+	attrList.add(person6Age);
+	
+	//Create a person entity 7
+	CtxEntity person7 = iB.createEntity("person7").get();				
+	CtxEntityIdentifier pId7 = person7.getId();
+	CtxAttribute person7Age = this.iB.createAttribute(pId7, "profession").get(); 
+	person7Age.setValueType(CtxAttributeValueType.STRING);
+	person7Age = (CtxAttribute) iB.update(person7Age).get();
+	person7Age.setStringValue("Engineer");
+	attrList.add(person7Age);
+	
+	//Create a person entity 8
+	CtxEntity person8 = iB.createEntity("person8").get();				
+	CtxEntityIdentifier pId8 = person8.getId();
+	CtxAttribute person8Age = this.iB.createAttribute(pId8, "profession").get(); 
+	person8Age.setValueType(CtxAttributeValueType.STRING);
+	person8Age = (CtxAttribute) iB.update(person8Age).get();
+	person8Age.setStringValue("Engineer");
+	attrList.add(person8Age);
+	
+	//Create a person entity 9
+	CtxEntity person9 = iB.createEntity("person9").get();				
+	CtxEntityIdentifier pId9 = person1.getId();
+	CtxAttribute person9Age = this.iB.createAttribute(pId9, "profession").get(); 
+	person9Age.setValueType(CtxAttributeValueType.STRING);
+	person9Age = (CtxAttribute) iB.update(person9Age).get();
+	person9Age.setStringValue("Plumber");
+	attrList.add(person9Age);
+	
+	//Create a person entity 10
+	CtxEntity person10 = iB.createEntity("person10").get();				
+	CtxEntityIdentifier pId10 = person1.getId();
+	CtxAttribute person10Age = this.iB.createAttribute(pId10, "profession").get(); 
+	person10Age.setValueType(CtxAttributeValueType.STRING);
+	person10Age = (CtxAttribute) iB.update(person10Age).get();
+	person10Age.setStringValue("Chef");
+	attrList.add(person10Age);
+
+	//Run the tests!!
+	CommunityContextEstimation cce = new CommunityContextEstimation();
+	Hashtable<String, Integer> res = cce.calculateStringAttributeStatistics(attrList);
+	Hashtable<String, Integer> expectedHashMapTable = new Hashtable<String, Integer>();
+	expectedHashMapTable.put("Engineer", 5);
+	expectedHashMapTable.put("Plumber", 2);
+	expectedHashMapTable.put("Cook", 1);
+	expectedHashMapTable.put("Chef", 2);
+	assertEquals(expectedHashMapTable, res);
 }
 
 
@@ -327,5 +429,6 @@ public void testCalculateStringStatistics(){
 //	Integer actual = cce.estimateContext(EstimationModels.MEAN, null);
 //	Assert.assertEquals(5, actual.intValue());
 //}
+
 
 

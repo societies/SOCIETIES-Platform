@@ -27,6 +27,7 @@ package org.societies.context.community.estimation.impl;
 import java.awt.Point;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -83,6 +84,8 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 
 	}
+
+
 
 	@Override
 	public void estimateContext(EstimationModels estimationmodel, CtxAttribute type, CtxIdentifier cisId) {
@@ -263,6 +266,40 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 	public void setAttributeType(String attributeType) {
 		this.attributeType = attributeType;
+	}
+
+
+
+	@Override
+	public Hashtable<String, Integer> calculateStringAttributeStatistics(List<CtxAttribute> list) {
+		
+		//List<CtxAttribute> list = new List<CtxAttribute>;
+		
+		List<String> proffesions = new ArrayList<String>();
+
+		for(int i=0; i<list.size(); ++i){
+			proffesions.add(list.get(i).getStringValue());
+		}
+
+		Hashtable <String, Integer> frequencyMap = new Hashtable();
+		ArrayList<String> finalList = new ArrayList<String>();
+
+		for (int i=0; i<proffesions.size(); i++){
+			if (finalList.contains(proffesions.get(i)))
+			{
+				int elementCount =
+						Integer.parseInt(frequencyMap.get(proffesions.get(i)).toString());
+				elementCount++;
+				frequencyMap.put(proffesions.get(i), elementCount);
+			}
+			else
+			{
+				finalList.add(proffesions.get(i));
+				frequencyMap.put(proffesions.get(i), 1);
+			}
+		}
+		System.out.println(frequencyMap);
+		return frequencyMap;
 	}
 
 	// private void returnListOfDesiredAttributes(List<CtxAttributeIdentifier> listOfMembersOfGivenType) {

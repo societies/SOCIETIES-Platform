@@ -24,6 +24,7 @@
  */
 package org.societies.context.api.community.estimation;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -46,6 +47,8 @@ public interface ICommunityCtxEstimationMgr {
 	 * @since 0.0.1
 	 */
 	public Integer estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
+	
+	public Hashtable<String, Integer> calculateStringAttributeStatistics(List<CtxAttribute> list);
 	
 	public void estimateContext(EstimationModels estimationmodel, CtxAttribute type, CtxIdentifier cisId);
 		
