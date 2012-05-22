@@ -104,15 +104,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	ICommManager iCommMgr;
 	Set<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
-	private Session session;
 //	IPrivacyPolicyManager polManager;
 	
 
 	public void startup(){
 		//ActivityFeed ret = null;
 	
-		if(session == null)
-			session = this.getSession();//sessionFactory.openSession();
 		
 		//ActivityFeed.setSession(session);
 		//getting owned CISes
@@ -608,20 +605,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	// session related methods
 
-	public void setSession(Session s){
-		 session = s;
-	}
-	public Session getSession()
-	{
-		if(session == null)
-			session = sessionFactory.openSession();
-		return session;
-	}
 	private void persist(Object o){
-		Session s = getSession();
-		Transaction t = s.beginTransaction();
-		s.save(o);
-		t.commit();
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			session.save(o);
+			t.commit();
+		}catch(Exception e){
+			t.rollback();
+			LOG.warn("Saving CIS object failed, rolling back");
+		}finally{
+			if(session!=null)
+				session.close();
+		}
 	}
 	
 	public  SessionFactory getSessionFactory() {

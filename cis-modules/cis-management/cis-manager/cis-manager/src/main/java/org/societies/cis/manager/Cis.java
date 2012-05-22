@@ -166,7 +166,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		return  new AsyncResult<IActivityFeed>(activityFeed);
 	}
 	
-	private ActivityFeed getActivityFeed() {
+	@Override
+	public IActivityFeed getActivityFeed() {
 		return activityFeed;
 	}
 

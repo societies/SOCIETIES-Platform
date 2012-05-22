@@ -51,14 +51,21 @@ public class ActivityFeed implements IActivityFeed {
 
 	@Override
 	public void addCisActivity(IActivity activity) {
-		
+
 		//persist.
-		Session session = ActivityFeed.getSession();//getSessionFactory().openSession();
+		Session session = sessionFactory.openSession();//getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		Activity newact = new Activity(activity);
-		session.save(newact);
-		t.commit();
-		
+		try{
+			session.save(newact);
+			t.commit();
+		}catch(Exception e){
+			t.rollback();
+			log.warn("Saving activity failed, rolling back");
+		}finally{
+			if(session!=null)
+				session.close();
+		}		
 	}
 
 	@Override
@@ -66,20 +73,6 @@ public class ActivityFeed implements IActivityFeed {
 		// TODO Auto-generated method stub
 		
 	}
-	
-	
-	private static Session session;
-	public static void setSession(Session s){
-		 session = s;
-	}
-	public static Session getSession()
-	{
-		if(session == null)
-			session = sessionFactory.openSession();
-		return session;
-	}
-	
-	
 
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
@@ -97,16 +90,24 @@ public class ActivityFeed implements IActivityFeed {
 	
 	public static ActivityFeed startUp(String id){
 		ActivityFeed ret = null;
-		Session session = ActivityFeed.getSession();//sessionFactory.getCurrentSession();
-		
-		Query q = session.createQuery("select a from ActivityFeed a");
-		long l = q.list().size();
-		System.out.println("l: "+l);
-		if(l== 0)
-			return new ActivityFeed(id);
-		q = session.createQuery("select a from ActivityFeed a where a.id = ?");
-		q.setString(0, id);
-		ret = (ActivityFeed) q.uniqueResult();
+		Session session = sessionFactory.openSession();//sessionFactory.getCurrentSession();
+		log.info("using session: "+session.hashCode());
+		try{
+			Query q = session.createQuery("select a from ActivityFeed a");
+			long l = q.list().size();
+			System.out.println("l: "+l);
+			if(l== 0)
+				return new ActivityFeed(id);
+			q = session.createQuery("select a from ActivityFeed a where a.id = ?");
+			q.setString(0, id);
+			ret = (ActivityFeed) q.uniqueResult();
+		}catch(Exception e){
+			log.warn("Query for actitvies failed..");
+
+		}finally{
+			if(session!=null)
+				session.close();
+		}
 		return ret;
 	}
 
