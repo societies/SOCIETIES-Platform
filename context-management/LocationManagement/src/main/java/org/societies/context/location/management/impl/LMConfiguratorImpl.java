@@ -30,16 +30,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.comm.EventsType;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.schema.css.devicemanagment.DmEvent;
-import org.societies.comm.xmpp.event.PubsubEvent;
 import org.societies.context.api.user.location.ILocationManagementConfigurator;
-import org.springframework.context.ApplicationListener;
+
 
 public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 
+	private PubsubClient pubSubManager; 
+	private ICommManager commManager;
+	private IDeviceRegistry deviceRegistry;
+	
 	private static final Set<String> entityIds = new HashSet<String>();
-	private DevicesListener devicesListener = new DevicesListener();
 	
 	public LMConfiguratorImpl(){
 		
@@ -58,26 +66,86 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 		return lEntityIds;
 	}
 	
-	private class DevicesListener implements ApplicationListener<PubsubEvent>{
-		@Override
-		public void onApplicationEvent(PubsubEvent arg0) {
-			DmEvent dmEvent;
-			
-			//TODO change to MAC address and entity id
-			if (EventsType.DEVICE_CONNECTED.equals(arg0.getNode())){
-				dmEvent = (DmEvent)arg0.getPayload();
-				synchronized (dmEvent) {
-					entityIds.add(dmEvent.getDeviceId());	
-				}
-				
-				
-			}else if (EventsType.DEVICE_DISCONNECTED.equals(arg0.getNode())){
-				dmEvent = (DmEvent)arg0.getPayload();
-				synchronized (dmEvent) {
-					entityIds.remove(dmEvent.getDeviceId());	
-				}
-			}
-		}
+	public void init(){
+		register();
 	}
+
+	public PubsubClient getPubSubManager() {
+		return pubSubManager;
+	}
+
+	public void setPubSubManager(PubsubClient pubSubManager) {
+		this.pubSubManager = pubSubManager;
+	}
+	
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+	}
+
+	
+	private DeviceConnected deviceConnected = new DeviceConnected();
+	private DeviceDisconnected deviceDisconnected = new DeviceDisconnected();
+	
+	private void register(){
+		try {
+			IIdentity identity = commManager.getIdManager().getThisNetworkNode();
+			pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_CONNECTED, deviceConnected);
+			pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_DISCONNECTED, deviceDisconnected);
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private class DeviceConnected implements Subscriber{
+
+		@Override
+		public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
+			DmEvent dmEvent = null;
+			try{
+				dmEvent = (DmEvent)item;
+				
+				DeviceCommonInfo deviceCommonInfo = deviceRegistry.findDevice(dmEvent.getDeviceId());
+				
+				String macAddress = deviceCommonInfo.getDevicePhysicalAddress();
+				
+				
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+	}
+	private class DeviceDisconnected implements Subscriber{
+
+		@Override
+		public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
+			DmEvent dmEvent = null;
+			try{
+				dmEvent = (DmEvent)item;
+				
+				
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+	}
+	
+	public IDeviceRegistry getDeviceRegistry() {
+		return deviceRegistry;
+	}
+
+	public void setDeviceRegistry(IDeviceRegistry deviceRegistry) {
+		this.deviceRegistry = deviceRegistry;
+	}	
 
 }

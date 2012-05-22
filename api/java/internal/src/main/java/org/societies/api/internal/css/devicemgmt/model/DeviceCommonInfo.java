@@ -25,7 +25,8 @@
 package org.societies.api.internal.css.devicemgmt.model;
 
 /**
- * Describe your class here...
+ * This class defines the device management common data.
+ * To be used by the driver to describe the device that is connected to it
  *
  * @author rafik
  *

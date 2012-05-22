@@ -39,7 +39,8 @@
 			<email>bjornmagnus.mathisen@sintef.no</email>
 			<organization>SINTEF</organization>
 			<roles>
-				<role>owner, developer</role>
+				<role>owner</role>
+				<role>developer</role>
 			</roles>
 		</developer>
 	</developers>

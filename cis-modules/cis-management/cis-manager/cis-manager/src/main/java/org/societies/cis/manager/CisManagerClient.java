@@ -75,7 +75,7 @@ public class CisManagerClient implements IcisManagerClient {
 	
 	public CisManagerClient(CisManager cisManag){
 		this.cisManag = cisManag;
-		this.CSSendpoint = cisManag.CSSendpoint;
+		this.CSSendpoint = cisManag.iCommMgr;
 		
 		cssManagerId = CSSendpoint.getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cssManagerId.getBareJid() + ", domain = " + cssManagerId.getDomain() );

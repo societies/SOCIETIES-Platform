@@ -35,6 +35,7 @@ import org.societies.api.internal.css.devicemgmt.device.DeviceListener;
  * @version 1.0
  * @created 06-d�c.-2011 15:39:01
  */
+@Deprecated
 public interface SensorListener extends DeviceListener {
 
 	/**

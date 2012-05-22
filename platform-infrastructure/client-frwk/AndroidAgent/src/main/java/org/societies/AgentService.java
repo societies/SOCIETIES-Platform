@@ -25,6 +25,7 @@ public class AgentService extends Service {
 	private static final String DEFAULT_CONFIG_FILE_NAME = "defaultconfig.properties";
 	private static final String CONFIG_FILE_NAME = "AndroidAgent.properties";
 	
+	private static XMPPClient xmppClient;
 	private static Skeleton skeleton;   
 	
 	@Override
@@ -40,14 +41,15 @@ public class AgentService extends Service {
     public void onCreate()
     {
     	Log.d(LOG_TAG, "onCreate");
-    	if(skeleton == null) {
-    		try {
-    			ResourceBundle config = getConfig();
-        		skeleton = new Skeleton(new XMPPClient(config));	
-    		} catch (Exception e) {
-    	    	Log.e(LOG_TAG, e.getMessage(), e);
-			}
-    	}
+    	try {
+	    	if(xmppClient == null)
+	    		xmppClient = new XMPPClient(getConfig());
+	    	if(skeleton == null) {
+	        	skeleton = new Skeleton(xmppClient);		    		
+	    	}
+    	} catch (Exception e) {
+	    	Log.e(LOG_TAG, e.getMessage(), e);
+		}
     }
     
     @Override

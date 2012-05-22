@@ -94,7 +94,6 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
  * @author Thomas Vilarinho (Sintef)
 */
 
-@Component
 public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback{
 
 	
@@ -102,9 +101,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	Set<Cis> ownedCISs; 
 	ICISCommunicationMgrFactory ccmFactory;
 	IIdentity cisManagerId;
-	ICommManager CSSendpoint;
+	ICommManager iCommMgr;
 	Set<CisSubscribedImp> subscribedCISs;
-	@Autowired private SessionFactory sessionFactory;
+	private SessionFactory sessionFactory;
 	private Session session;
 //	IPrivacyPolicyManager polManager;
 	
@@ -135,37 +134,54 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisManager.class);
 
-	@Autowired
-	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint) {
-		this.CSSendpoint = CSSendpoint;
-		this.ccmFactory = ccmFactory;
+	public CisManager() {
+			this.ownedCISs = new HashSet<Cis>();	
+			subscribedCISs = new HashSet<CisSubscribedImp>();
+			
 
-		//LOG.info("starting up session");
-		//this.startup();
-		//LOG.info("finished starting up session");
-		
-		cisManagerId = CSSendpoint.getIdManager().getThisNetworkNode();
+	}
+	public void init(){
+		//ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint
+		cisManagerId = iCommMgr.getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
 
 
 			try {
-				CSSendpoint.register((IFeatureServer)this);
-//				CSSendpoint.register((ICommCallback)this);
+				iCommMgr.register((IFeatureServer)this);
 			} catch (CommunicationException e) {
 				e.printStackTrace();
 			} // TODO unregister??
 			
-			LOG.info("listener registered");
-
-			this.ownedCISs = new HashSet<Cis>();	
-			subscribedCISs = new HashSet<CisSubscribedImp>();
-			
+			LOG.info("listener registered");	
 			//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
-
 	}
 
 
 	
+	public ICISCommunicationMgrFactory getCcmFactory() {
+		return ccmFactory;
+	}
+
+
+
+	public void setCcmFactory(ICISCommunicationMgrFactory ccmFactory) {
+		this.ccmFactory = ccmFactory;
+	}
+
+
+
+	public ICommManager getICommMgr() {
+		return iCommMgr;
+	}
+
+
+
+	public void setICommMgr(ICommManager cSSendpoint) {
+		iCommMgr = cSSendpoint;
+	}
+
+
+
 	/**
 	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
 	 * same as the CSS password.
@@ -614,6 +630,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
+		LOG.info("in setsessionfactory!! sessionFactory is: "+sessionFactory);
+		ActivityFeed.setStaticSessionFactory(sessionFactory);
 	}
 
 	
@@ -640,7 +658,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.CSSendpoint.getIdManager().fromJid(cisId);
+			toIdentity = this.iCommMgr.getIdManager().fromJid(cisId);
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this);
@@ -650,7 +668,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			c.setJoin("");
 			try {
 				LOG.info("Sending stanza with join");
-				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);
+				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -668,7 +686,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.CSSendpoint.getIdManager().fromJid(cisId);
+			toIdentity = this.iCommMgr.getIdManager().fromJid(cisId);
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this);
@@ -678,7 +696,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			c.setLeave("");
 			try {
 				LOG.info("Sending stanza with leave");
-				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);
+				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
