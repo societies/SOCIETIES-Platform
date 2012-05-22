@@ -71,6 +71,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 				if(ser instanceof IActionConsumer){
 					lst.add((IActionConsumer)ser);
 				}
+				logging.debug("fetch service:\t"+ser);
 			}
 		} catch (ServiceDiscoveryException e) {
 			// TODO Auto-generated catch block
