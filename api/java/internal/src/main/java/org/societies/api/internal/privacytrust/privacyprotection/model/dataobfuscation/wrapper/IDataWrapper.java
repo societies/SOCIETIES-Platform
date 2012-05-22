@@ -24,20 +24,36 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
-import org.societies.api.context.model.CtxIdentifier;
-
-
-
 /**
  * This data wrapper is an abstraction between obfuscation manager
  * and data models. This is the way for wrapping data to obfuscate them,
  * and filling a type of data (needed to know how obfuscate them) 
  * This wrapper is linked to a specific data obfuscator
  * and know what kind of data is needed to launch the obfuscation. 
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  * @date 18 oct. 2011
  */
-public interface IDataWrapper {
+public interface IDataWrapper<E> {
+	/**
+	 * @return Id of the data to be obfuscated
+	 */
+	public String getDataId();
+	/**
+	 * @param dataId Id of the data to be obfuscated
+	 */
+	public void setDataId(String dataId);
+	
+	/**
+	 * Data
+	 * @return The data to be obfuscated
+	 */
+	public E getData();
+	/**
+	 * Set the data to be obfuscated
+	 * @param data The data to be obfuscated
+	 */
+	public void setData(E data);
+	
 	/**
 	 * To know if obfuscated data will be stored with this obfuscator
 	 * 
@@ -47,14 +63,10 @@ public interface IDataWrapper {
 	public boolean isPersistenceEnabled();
 	/**
 	 * To enable storage of obfuscated data
-	 * 
-	 * @param dataId A unique ID of the data to obfuscate is needed to enable persistence
+	 * @param persist True to persist the data, false otherwise
 	 */
-	public void enabledPersistence(CtxIdentifier dataId);
-	/**
-	 * To disabled storage of obfuscated data
-	 */
-	public void disabledPersistence();
+	public void setPersistenceEnabled(boolean persist);
+	
 	/**
 	 * To know if this wrapper is ready for obfuscation operation
 	 * 
@@ -62,20 +74,4 @@ public interface IDataWrapper {
 	 * @return Otherwise false
 	 */
 	public boolean isReadyForObfuscation();
-	/**
-	 * To set this wrapper as ready for obfuscation operation when all information have been filled
-	 */
-	void setAsReadyForObfuscation();
-	/**
-	 * To set this wrapper as not ready for obfuscation operation
-	 */
-	void setAsNotReadyForObfuscation();
-	/**
-	 * @return the dataId
-	 */
-	public CtxIdentifier getDataId();
-	/**
-	 * @param dataId the dataId to set
-	 */
-	public void setDataId(CtxIdentifier dataId);
 }

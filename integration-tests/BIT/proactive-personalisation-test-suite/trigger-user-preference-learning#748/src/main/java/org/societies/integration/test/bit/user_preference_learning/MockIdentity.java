@@ -1,4 +1,4 @@
-package societies.integration.test.bit.user_preference_learning;
+package org.societies.integration.test.bit.user_preference_learning;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;

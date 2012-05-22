@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.persistence.CascadeType;
@@ -67,7 +68,11 @@ import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
-import org.societies.api.schema.cis.community.Join;
+import org.societies.api.schema.cis.community.AddResponse;
+import org.societies.api.schema.cis.community.GetInfoResponse;
+import org.societies.api.schema.cis.community.JoinResponse;
+import org.societies.api.schema.cis.community.LeaveResponse;
+import org.societies.api.schema.cis.community.SetInfoResponse;
 import org.societies.api.schema.cis.community.Who;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
@@ -146,7 +151,16 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	String description = "";
 	
+	@Override
+	public String getDescription() {
+		return description;
+	}
 	
+	@Override
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	@Override
 	public Future<IActivityFeed> getCisActivityFeed(){
 		return  new AsyncResult<IActivityFeed>(activityFeed);
@@ -302,7 +316,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 			// should we send a XMPP notification to all the users to say that the new member has been added to the group
 			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
 			// and the GUI can be updated with that new member
-			LOG.info("new member added, going to notify community");
+			Stanza sta;
+/*			LOG.info("new member added, going to notify community");
 			
 			// 1) Notifying the added user
 
@@ -321,7 +336,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			Stanza sta = new Stanza(targetCssIdentity);
 			CISendpoint.sendMessage(sta, cMan);
 					
-			LOG.info("notification sent to the new user");
+			LOG.info("notification sent to the new user");*/
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a pubsub notification
 			
@@ -517,6 +532,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		// all received IQs contain a community element
 		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
+			LOG.info("community type received");
 			Community c = (Community) payload;
 
 			// JOIN
@@ -525,47 +541,66 @@ public class Cis implements IFeatureServer, ICisOwned {
 				LOG.info("join received");
 				String senderjid = stanza.getFrom().getBareJid();
 				boolean addresult = false; 
-				try{
-					if(c.getJoin().getParticipant() != null){
-						jid = c.getJoin().getParticipant().getJid();
-						addresult = this.addMember(jid, MembershipType.participant);
-					}
-						
-				}catch(CommunicationException e){
+				try {
+					addresult = this.addMember(senderjid, MembershipType.participant);
+				} catch (CommunicationException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
+				}
+				
 				Community result = new Community();
-				if(addresult == false){
-					result.setJoin(new Join());
-				}
-				else{
-					
-					Participant p = new Participant();
-					p.setJid(jid);
+				
+				Participant p = new Participant();
+				JoinResponse j = new JoinResponse();
+				
+				// information sent on the xmpp in case of failure or success
+				j.setResult(addresult);
+				p.setJid(jid);
+				result.setCommunityJid(this.getCisId()); 
+								
+				if(addresult == true){
+					// information sent on the xmpp just in the case of success
 					p.setRole( ParticipantRole.fromValue("participant")  );
-					Subscription sub = new Subscription();
-					sub.setParticipant(p);
-					result.setSubscription(sub);
-					
+					result.setCommunityName(this.getName());
+					result.setCommunityType(this.cisType);
+					result.setMembershipMode(this.getMembershipCriteria());
+					result.setOwnerJid(this.getOwnerId());
 				}
+					
+				j.setParticipant(p);
+				result.setJoinResponse(j);
+					
 				return result;
 
 				//return result;
 			}
 			if (c.getLeave() != null) {
+				LOG.info("get leave received");
+				Community result = new Community();
+				result.setCommunityJid(this.getCisId());
 				String jid = stanza.getFrom().getBareJid();
+				boolean b = false;
 				try{
-					this.removeMemberFromCIS(jid);
+					b = this.removeMemberFromCIS(jid).get().booleanValue();
 				}catch(CommunicationException e){
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} 
-				Community result = new Community();
-				result.setLeave(""); // TODO: probably change the return message
+				
+				LeaveResponse l = new LeaveResponse();
+				l.setResult(b);
+				result.setLeaveResponse(l);
 				return result;
 			}
 			if (c.getWho() != null) {
 				// WHO
+				LOG.info("get who received");
 				Community result = new Community();
 				Who who = new Who();
 				this.getMembersCss();
@@ -589,29 +624,90 @@ public class Cis implements IFeatureServer, ICisOwned {
 			if (c.getAdd() != null) {
 				// ADD
 				Community result = new Community();
-				Add a = new Add();
-				result.setAdd(a);
-
-				//TODO: possibly check that the sender is the owner of the CSS
+				AddResponse ar = new AddResponse();
+				result.setCommunityJid(this.getCisId());
+				String senderJid = stanza.getFrom().getBareJid();
 				Participant p = c.getAdd().getParticipant();
-				if(p!= null && p.getJid() != null){
-					String role = "";
-					if (p.getRole() != null)				
-						role = p.getRole().value();
-					
-					try{
-						if(this.addMember(p.getJid(), MembershipType.valueOf(role))){
-							a.setParticipant(p);
+				ar.setParticipant(p);			
+				
+				
+				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+					//requester is not the owner
+					ar.setResult(false);
+				}else{
+					if(p!= null && p.getJid() != null){
+						String role = "";
+						if (p.getRole() != null)				
+							role = p.getRole().value();
+						
+						try{
+							if(this.addMember(p.getJid(), MembershipType.valueOf(role))){
+								ar.setParticipant(p);
+								ar.setResult(true);
+							}
+							else{
+								ar.setResult(false);
+							}
 						}
-					}
-					catch(Exception e){
-						e.printStackTrace();
-					}
+						catch(Exception e){
+							e.printStackTrace();
+							ar.setResult(false);
+						}
+					}					
+					
 				}
+				
+				
 				return result;
 				// END OF ADD
 			}
 
+			// get Info
+			if (c.getGetInfo()!= null) {
+				Community result = new Community();
+				GetInfoResponse r = new GetInfoResponse();
+				result.setMembershipMode(this.getMembershipCriteria());
+				result.setOwnerJid(this.getOwnerId());
+				result.setCommunityJid(this.getCisId());
+				result.setCommunityName(this.getName());
+				result.setCommunityType(this.getCisType());
+				result.setDescription(this.getDescription());
+				r.setResult(true);
+				result.setGetInfoResponse(r);
+				return result;
+
+			}				// END OF GET INFO
+
+			// set Info
+			// at the moment we limit this to description and type
+			if (c.getSetInfo()!= null) {
+				Community result = new Community();
+				SetInfoResponse r = new SetInfoResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+					r.setResult(false);
+				}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+					if( (c.getCommunityType() != null) &&  (!c.getCommunityType().isEmpty()) && 
+							(!c.getCommunityType().equals(this.getCisType()))) // if is not empty and is different from current value
+						this.setCisType(c.getCommunityType());
+					if( (c.getDescription() != null) &&  (!c.getDescription().isEmpty()) && 
+							(!c.getDescription().equals(this.getDescription()))) // if is not empty and is different from current value
+						this.setDescription(c.getDescription());
+					r.setResult(true);						
+				}
+				
+				result.setMembershipMode(this.getMembershipCriteria());
+				result.setOwnerJid(this.getOwnerId());
+				result.setCommunityJid(this.getCisId());
+				result.setCommunityName(this.getName());
+				result.setCommunityType(this.getCisType());				
+				result.setDescription(this.getDescription());
+				return result;
+
+			}				// END OF GET INFO
+
+			
 			
 		}
 		return null;

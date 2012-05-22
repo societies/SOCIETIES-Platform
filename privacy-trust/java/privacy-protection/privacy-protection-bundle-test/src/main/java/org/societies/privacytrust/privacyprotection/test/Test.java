@@ -21,48 +21,137 @@ package org.societies.privacytrust.privacyprotection.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class Test {
-	private static Logger log = LoggerFactory.getLogger(Test.class.getSimpleName());
+public class Test implements IPrivacyDataManagerListener {
+	private static Logger LOG = LoggerFactory.getLogger(Test.class.getSimpleName());
 	
 	private IPrivacyDataManager privacyDataManager;
+	private IPrivacyDataManagerRemote privacyDataManagerRemote;
 	private IPrivacyPolicyManager privacyPolicyManager;
+	private ICommManager commManager;
 	
-	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
-		this.privacyDataManager = privacyDataManager;
-		log.info("************* privacyDataManager injected");
+	public void start() {
 		try {
-			ResponseItem permission = privacyDataManager.checkPermission(null, null, null, null);
-			log.info("Permission checked: "+permission.toString());
+			if (null == privacyPolicyManager) {
+				throw new Exception("privacyPolicyManager NULL");
+			}
+			if (null == commManager) {
+				throw new Exception("CommManager NULL");
+			}
+			if (null == commManager.getIdManager()) {
+				throw new Exception("IdManager NULL");
+			}
+			IIdentity cisId = commManager.getIdManager().fromJid("red@societies.local");
+			boolean result = false;
+			result = privacyPolicyManager.deletePrivacyPolicy(cisId);
+			LOG.info("************* [Test Resullt] Privacy policy deleted? "+result);
 		} catch (Exception e) {
-			log.error("************* Error PrivacyException: "+e.getMessage(), e);
+			LOG.error("************* [Tests PrivacyPolicyManager] Error Exception: "+e.getMessage()+"\n", e);
+		}
+		
+		
+		try {
+			if (null == privacyDataManager) {
+				throw new Exception("privacyDataManager NULL");
+			}
+			if (null == commManager) {
+				throw new Exception("CommManager NULL");
+			}
+			if (null == commManager.getIdManager()) {
+				throw new Exception("IdManager NULL");
+			}
+			IIdentity requestorId = commManager.getIdManager().fromJid("orange@societies.local");
+			IIdentity ownerId = commManager.getIdManager().fromJid("red@societies.local");
+			Requestor requestor = new Requestor(requestorId);
+			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			Action action = new Action(ActionConstants.READ);
+			ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
+			LOG.info("************* [Test Result] Permission checked? "+(null != permission));
+			if (null != permission) {
+				LOG.info(permission.toString());
+			}
+		} catch (Exception e) {
+			LOG.error("************* [Tests PrivacyDataManager] Error Exception: "+e.getMessage()+"\n", e);
+		}
+		
+		try {
+			if (null == privacyDataManagerRemote) {
+				throw new Exception("privacyDataManagerRemote NULL");
+			}
+			if (null == commManager) {
+				throw new Exception("CommManager NULL");
+			}
+			if (null == commManager.getIdManager()) {
+				throw new Exception("IdManager NULL");
+			}
+			IIdentity requestorId = commManager.getIdManager().fromJid("orange@societies.local");
+			IIdentity ownerId = commManager.getIdManager().fromJid("red@societies.local");
+			Requestor requestor = new Requestor(requestorId);
+			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			Action action = new Action(ActionConstants.READ);
+			privacyDataManagerRemote.checkPermission(requestor, ownerId, dataId, action, this);
+			LOG.info("************* Permission check remote: launched");
+		} catch (Exception e) {
+			LOG.error("************* [Tests PrivacyDataManagerRemote] Error Exception: "+e.getMessage()+"\n", e);
 		}
 	}
-	
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+		LOG.info("************* commManager injected");
+	}
+	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+		LOG.info("************* privacyDataManager injected");
+	}
+	public void setPrivacyDataManagerRemote(
+			IPrivacyDataManagerRemote privacyDataManagerRemote) {
+		this.privacyDataManagerRemote = privacyDataManagerRemote;
+		LOG.info("************* privacyDataManagerREMOTE injected");
+	}
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
-		log.info("************* privacyPolicyManager injected");
-		IIdentity cisId = null;
-		boolean result = false;
-		try {
-			result = privacyPolicyManager.deletePrivacyPolicy(cisId);
-			log.info("************* privacyPolicyManager "+result);
-		} catch (Exception e) {
-			log.error("************* Error PrivacyException: "+e.getMessage(), e);
-		}
+		LOG.info("************* privacyPolicyManager injected");
+	}
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener#onAccessControlChecked(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
+	 */
+	@Override
+	public void onAccessControlChecked(ResponseItem permission) {
+		LOG.info("************* onAccessControlChecked "+permission.toXMLString());
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener#onAccessControlCancelled(java.lang.String)
+	 */
+	@Override
+	public void onAccessControlCancelled(String msg) {
+		LOG.info("************* onAccessControlCancelled "+msg);
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener#onAccessControlAborted(java.lang.String, java.lang.Exception)
+	 */
+	@Override
+	public void onAccessControlAborted(String msg, Exception e) {
+		LOG.info("************* onAccessControlAborted "+msg, e);
 	}
 
 }

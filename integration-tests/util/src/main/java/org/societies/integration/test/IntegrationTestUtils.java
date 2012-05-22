@@ -74,7 +74,7 @@ public class IntegrationTestUtils {
 		String testRunCt = "Runs: ";
 		String testRunTm = "Run Time: ";
 		String testSuccess = "Success: ";
-		String newln = "\n";
+		String newln = " \n";
 		for (int j=0; j<testCaseClasses.length; j++) {
 			results += testClass + testCaseClasses[j].getName() + newln;
 		}

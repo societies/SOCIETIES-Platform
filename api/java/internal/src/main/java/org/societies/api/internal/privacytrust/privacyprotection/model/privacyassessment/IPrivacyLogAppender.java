@@ -90,10 +90,17 @@ public interface IPrivacyLogAppender {
 	public void logContext(Requestor requestor, IIdentity dataOwner, int dataSize);
 	
 	/**
-	 * General logger.
+	 * General logger for transmission of data.
 	 * 
 	 * @param entry
 	 * @return
 	 */
-	public boolean log(LogEntry entry);
+	public boolean log(DataTransmissionLogEntry entry);
+	
+	/**
+	 * General logger for accessing data.
+	 * 
+	 * @param entry
+	 */
+	public void log(DataAccessLogEntry entry);
 }

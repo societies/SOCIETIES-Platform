@@ -25,6 +25,7 @@
 package org.societies.context.broker.test;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -62,14 +63,15 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.context.broker.impl.InternalCtxBroker;
 
 import org.societies.context.broker.test.util.MockBlobClass;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
-
 
 /**
  * Describe your class here...
@@ -79,7 +81,16 @@ import org.societies.context.userHistory.impl.UserContextHistoryManagement;
  */
 public class InternalCtxBrokerTest {
 
+	// ATTENTION: This should match the constant defined in UserCtxDBMgr class
+	private static final String OPERATOR_IDENTITY_STRING = "myFooIIdentity@societies.local";
+	
+	@SuppressWarnings("unused")
+	private static final IIdentity OPERATOR_IDENTITY = 
+			new MockIdentity(IdentityType.CSS, OPERATOR_IDENTITY_STRING, "");
+	
 	private InternalCtxBroker internalCtxBroker;
+	
+	private IIdentityManager mockIdentityMgr = mock(IIdentityManager.class);
 
 	/**
 	 * @throws java.lang.Exception
@@ -100,10 +111,12 @@ public class InternalCtxBrokerTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		
 		internalCtxBroker = new InternalCtxBroker();
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
-		//	internalCtxBroker.createCSSOperator();
+		internalCtxBroker.setIdentityMgr(mockIdentityMgr);
+		internalCtxBroker.createCssOperator(); // TODO remove?
 	}
 
 	/**
@@ -111,6 +124,7 @@ public class InternalCtxBrokerTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		
 		internalCtxBroker = null;
 	}
 
@@ -121,25 +135,17 @@ public class InternalCtxBrokerTest {
 	 * @throws CtxException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
+	 * @throws InvalidFormatException 
 	 */
 	@Test
-	public void testCreateCSSOperator() {
+	public void testCreateCSSOperator() throws Exception {
 
-		//internalCtxBroker.createCSSOperator();
-		try {
-			IndividualCtxEntity ctxEntity = internalCtxBroker.retrieveCssOperator().get();
-
-			System.out.println("operator entity " +ctxEntity);
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// setup mock IIdentityManager behaviour
+		// TODO when(mockIdentityMgr.fromJid(OPERATOR_IDENTITY_STRING)).thenReturn(OPERATOR_IDENTITY);
+		
+		final IndividualCtxEntity operatorEnt = internalCtxBroker.retrieveCssOperator().get();
+		assertNotNull(operatorEnt);
+		assertEquals(OPERATOR_IDENTITY_STRING, operatorEnt.getId().getOperatorId());
 	}
 
 
@@ -1174,7 +1180,120 @@ public class InternalCtxBrokerTest {
 
 	}
 
+	@Test
+	public void testHistoryTupleDataRetrievalByType() throws CtxException, InterruptedException, ExecutionException {
+		
+		
+		System.out.println("testHistoryTupleDataRetrievalByType");
+		final CtxEntity scope1;
+		final CtxEntity scope2;
+		CtxAttribute primaryAttribute1;
+		CtxAttribute primaryAttribute2;
+		CtxAttribute escortingAttribute1;
+		CtxAttribute escortingAttribute2;
 
+		scope1 = (CtxEntity)internalCtxBroker.createEntity("entType").get();
+		// Create the attribute to be tested
+		primaryAttribute1 = (CtxAttribute) internalCtxBroker.createAttribute(scope1.getId(), "primaryAttribute").get();
+		primaryAttribute1.setStringValue("fistValue");
+		primaryAttribute1.setHistoryRecorded(true);
+		
+		scope2 = (CtxEntity)internalCtxBroker.createEntity("entType").get();
+		// Create the attribute to be tested
+		primaryAttribute2 = (CtxAttribute) internalCtxBroker.createAttribute(scope2.getId(), "primaryAttribute").get();
+		primaryAttribute2.setStringValue("fistValue2");
+		primaryAttribute2.setHistoryRecorded(true);
+		
+		//1.
+		internalCtxBroker.update(primaryAttribute1);
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		internalCtxBroker.update(primaryAttribute2);
+		
+				
+		escortingAttribute1 = (CtxAttribute)internalCtxBroker.createAttribute(scope1.getId(), "escortingAttribute1").get();
+		escortingAttribute1.setHistoryRecorded(true);
+		escortingAttribute2 = (CtxAttribute)internalCtxBroker.createAttribute(scope1.getId(), "escortingAttribute2").get();
+		escortingAttribute2.setHistoryRecorded(true);
+
+		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1_xx").get();
+		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2_xx").get();
+
+
+		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+		listOfEscortingAttributeIds.add(escortingAttribute1.getId());
+		listOfEscortingAttributeIds.add(escortingAttribute2.getId());
+
+		assertTrue(internalCtxBroker.setHistoryTuples(primaryAttribute1.getId(), listOfEscortingAttributeIds).get());	
+		assertTrue(internalCtxBroker.setHistoryTuples(primaryAttribute2.getId(), listOfEscortingAttributeIds).get());
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		//2.
+		internalCtxBroker.update(primaryAttribute1);
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		internalCtxBroker.update(primaryAttribute2);
+		
+		primaryAttribute1 =  internalCtxBroker.updateAttribute(primaryAttribute1.getId(),(Serializable)"secondValue1").get();
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		primaryAttribute2 =  internalCtxBroker.updateAttribute(primaryAttribute2.getId(),(Serializable)"secondValue2").get();
+
+
+		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1_zz").get();
+		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2_yy").get();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		//3.
+		primaryAttribute1 =  internalCtxBroker.updateAttribute(primaryAttribute1.getId(),(Serializable)"thirdValue").get();
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		primaryAttribute2 =  internalCtxBroker.updateAttribute(primaryAttribute2.getId(),(Serializable)"thirdValue").get();
+		
+		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1_oo").get();
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2_tt").get();
+		
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		//4.
+		primaryAttribute1 =  internalCtxBroker.updateAttribute(primaryAttribute1.getId(),(Serializable)"forthValue").get();
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		primaryAttribute2 =  internalCtxBroker.updateAttribute(primaryAttribute2.getId(),(Serializable)"forthValue").get();
+
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = internalCtxBroker.retrieveHistoryTuples("primaryAttribute", listOfEscortingAttributeIds, null, null).get();
+		System.out.println("testHistoryTupleDataRetrievalByType tupleResults "+ tupleResults);
+		
+	}
 
 	@Test
 	public void testHistoryMultipleSizeTupleDataRetrieval() throws CtxException, InterruptedException, ExecutionException {

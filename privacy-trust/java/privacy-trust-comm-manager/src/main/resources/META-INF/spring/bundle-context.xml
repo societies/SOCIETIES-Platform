@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+	xmlns:tx="http://www.springframework.org/schema/tx">
+
+	
+
+	<!-- Global configuration -->
+	
+	<!-- Required for Async processing -->
+	<tx:annotation-driven />
+	
+	<bean name="PrivacyTrustCommClientCallback"
+		class="org.societies.privacytrust.remote.PrivacyTrustCommClientCallback"
+		depends-on="commManager, PrivacyDataManagerCommClientCallback"
+		init-method="initBean">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyDataManagerCommClientCallback" ref="PrivacyDataManagerCommClientCallback" />
+	</bean>
+	
+	<bean name="PrivacyTrustCommServer"
+		class="org.societies.privacytrust.remote.PrivacyTrustCommServer"
+		depends-on="commManager"
+		init-method="initBean">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyDataManagerCommServer" ref="PrivacyDataManagerCommServer" />
+		<property name="privacyNegotiationManagerCommServer" ref="PrivacyNegotiationManagerCommServer" />
+		<property name="trustBrokerCommServer" ref="TrustBrokerCommServer" />
+	</bean>
+	
+	
+	
+
+	<!-- Privacy Data Management Configuration -->
+
+	<bean name="PrivacyDataManagerCommClient"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClient"
+		depends-on="commManager, PrivacyDataManagerCommClientCallback, PrivacyTrustCommClientCallback">
+		<property name="commManager" ref="commManager" />
+		<property name="listeners" ref="PrivacyDataManagerCommClientCallback" />
+		<property name="privacyTrustCommClientCallback" ref="PrivacyTrustCommClientCallback" />
+	</bean>
+	
+	<bean name="PrivacyDataManagerCommClientCallback"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback">
+	</bean>
+
+	<bean name="PrivacyDataManagerCommServer"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer"
+		depends-on="commManager, privacyDataManager">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyDataManager" ref="privacyDataManager" />
+	</bean>
+
+
+
+	<!-- Privacy Policy Management Configuration -->
+
+
+
+	<!-- Privacy Preference Management Configuration -->
+
+
+
+	<!-- Privacy Policy Negotiation Management Configuration -->
+	
+	<bean name="PrivacyNegotiationManagerCommClient"
+		class="org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommClient"
+		depends-on="commManager"
+		init-method="initBean">
+		<property name="commManager" ref="commManager" />
+	</bean>
+
+	<bean name="PrivacyNegotiationManagerCommServer"
+		class="org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer"
+		depends-on="commManager, privacyNegotiationAgent">
+		<property name="commManager" ref="commManager" />
+		<property name="negAgent" ref="privacyNegotiationAgent" />
+	</bean>
+
+
+
+	<!-- Privacy Assessment Management Configuration -->
+
+
+
+	<!-- Trust Management Configuration -->
+
+	<bean name="TrustBrokerCommClient"
+		class="org.societies.privacytrust.remote.trust.TrustBrokerCommClient"
+		depends-on="commManager">
+<!--	
+		depends-on="commManager, PrivacyDataManagerCommClientCallback, PrivacyTrustCommClientCallback">  
+-->
+		
+		<property name="commManager" ref="commManager" />
+<!--
+		<property name="listeners" ref="PrivacyDataManagerCommClientCallback" />
+		<property name="privacyTrustCommClientCallback" ref="PrivacyTrustCommClientCallback" />
+-->
+	</bean>
+<!-- 	
+	<bean name="PrivacyDataManagerCommClientCallback"
+		class="org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback">
+	</bean>
+-->
+	<bean name="TrustBrokerCommServer"
+		class="org.societies.privacytrust.remote.trust.TrustBrokerCommServer"
+		depends-on="commManager, trustBroker">
+		<property name="commManager" ref="commManager" />
+		<property name="trustBroker" ref="trustBroker" />
+	</bean>
+
+</beans>

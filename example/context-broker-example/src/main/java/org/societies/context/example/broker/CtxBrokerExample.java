@@ -72,31 +72,31 @@ public class CtxBrokerExample 	{
 	@Autowired(required=true)
 	public CtxBrokerExample(ICtxBroker internalCtxBroker) {
 
-		LOG.info("CtxBrokerExample instantiated");
+		LOG.info("*** CtxBrokerExample instantiated");
 		this.internalCtxBroker = internalCtxBroker;
 
-		try {
-			IndividualCtxEntity operator = this.internalCtxBroker.retrieveCssOperator().get();
-			LOG.info(" operator: " +operator);
-		
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		LOG.info("Starting examples...");
+		LOG.info("*** Starting examples...");
+		this.retrieveCssOperator();
 		this.createContext();
 		this.retrieveContext();
 		this.lookupContext();
 		this.registerForContextChanges();
 		this.simpleCtxHistoryTest();
 		this.tuplesCtxHistoryTest();
+	}
+	
+	private void retrieveCssOperator() {
+		
+		LOG.info("*** retrieveCssOperator");
+		
+		try {
+			IndividualCtxEntity operator = this.internalCtxBroker.retrieveCssOperator().get();
+			LOG.info("*** operator context entity id: " + operator.getId());
+		
+		} catch (Exception e) {
+			
+			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+		}
 	}
 
 	/**
@@ -159,15 +159,9 @@ public class CtxBrokerExample 	{
 			// a ctxAttribute of type "deviceID" with a string value
 			// and a ctxAttribute of type "CustomData" with a binary value
 
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			
+			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -180,20 +174,14 @@ public class CtxBrokerExample 	{
 		try {
 
 			List<CtxIdentifier> idsEntities =this.internalCtxBroker.lookup(CtxModelType.ENTITY, "Device").get();
-			LOG.info("lookup results for Entity type: 'Device' " +idsEntities);
+			LOG.info("*** lookup results for Entity type: 'Device' " +idsEntities);
 
 			List<CtxIdentifier> idsAttribute =this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "DeviceID").get();
-			LOG.info("lookup results for Attribute type: 'DeviceID' " +idsAttribute);
+			LOG.info("*** lookup results for Attribute type: 'DeviceID' " +idsAttribute);
 
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			
+			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -230,21 +218,9 @@ public class CtxBrokerExample 	{
 			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeRetrievedBinary.getBinaryValue(), this.getClass().getClassLoader());
 			LOG.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
 
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			
+			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 
 	}
@@ -435,7 +411,7 @@ public class CtxBrokerExample 	{
 
 		} catch (CtxException ce) {
 
-			LOG.error("CM sucks", ce);
+			LOG.error("*** CM sucks " + ce.getLocalizedMessage(), ce);
 		}
 	}
 

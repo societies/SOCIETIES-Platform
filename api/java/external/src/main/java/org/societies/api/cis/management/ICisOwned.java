@@ -92,6 +92,10 @@ public interface ICisOwned extends ICis {
 	public String getOwnerId();
 	public String getCisType();
 	public String setCisType(String type);
-	public int getMembershipCriteria();
+	public int getMembershipCriteria();	
+	public String getDescription();
+	public void setDescription(String description); 
 	
+
+
 }

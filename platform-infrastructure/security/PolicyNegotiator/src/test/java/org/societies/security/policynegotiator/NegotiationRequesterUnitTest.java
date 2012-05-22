@@ -30,8 +30,8 @@ import static org.mockito.Mockito.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.storage.ISecureStorage;
@@ -105,10 +105,16 @@ public class NegotiationRequesterUnitTest {
 	@Test
 	public void testReject() {
 
-		IIdentity provider = mock(IIdentity.class);
-		String serviceId = "service-386";
-		INegotiationCallback callback = mock(INegotiationCallback.class);
+		Requestor provider;
+		INegotiationCallback callback;
 		
-		classUnderTest.startNegotiation(provider, serviceId, callback);
+		provider = mock(Requestor.class);
+		callback = new INegotiationCallback() {
+			@Override
+			public void onNegotiationComplete(String agreementKey) {
+				assertNull(agreementKey);
+			}
+		};
+		classUnderTest.startNegotiation(provider, callback);
 	}
 }

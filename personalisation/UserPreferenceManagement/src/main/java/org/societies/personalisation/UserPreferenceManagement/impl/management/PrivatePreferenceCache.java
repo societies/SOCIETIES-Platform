@@ -59,12 +59,12 @@ public class PrivatePreferenceCache {
 	private final ICtxBroker broker;
 	private PreferenceRetriever retriever;
 	
-	public PrivatePreferenceCache(IIdentity dpi, ICtxBroker broker){
+	public PrivatePreferenceCache(ICtxBroker broker){
 		
 		this.broker = broker;
 		this.idToIPreferenceTreeModel = new Hashtable<CtxIdentifier, IPreferenceTreeModel>();
 		this.retriever = new PreferenceRetriever(this.broker);
-		this.registry = retriever.retrieveRegistry(dpi);
+		this.registry = retriever.retrieveRegistry();
 		
 	}
 
@@ -117,7 +117,7 @@ public class PrivatePreferenceCache {
 	}
 
 	
-	public void storePreference(IIdentity dpi, PreferenceDetails details, IPreferenceTreeModel model){
+	public void storePreference(IIdentity userId, PreferenceDetails details, IPreferenceTreeModel model){
 		this.logging.debug("Request to store preference for:"+details.toString());
 
 		
@@ -126,7 +126,7 @@ public class PrivatePreferenceCache {
 			this.logging.debug("Preference doesn't exist in DB. Attempt  to store new preference");
 			//preference doesn't exist. we're going to store new preference in the db
 			PreferenceStorer storer = new PreferenceStorer(this.broker);
-			CtxIdentifier newCtxIdentifier = storer.storeNewPreference(dpi, model, this.registry.getNameForNewPreference());
+			CtxIdentifier newCtxIdentifier = storer.storeNewPreference(userId, model, this.registry.getNameForNewPreference());
 			if (newCtxIdentifier==null){
 				this.logging.debug("Could not store NEW preference in DB. aborting");
 				return;
@@ -135,7 +135,7 @@ public class PrivatePreferenceCache {
 			this.registry.addPreference(details, newCtxIdentifier);
 			this.logging.debug("Successfully added preference details to registry: ");
 			this.logging.debug("Stored preference for: "+details.toString());
-			storer.storeRegistry(dpi, registry);
+			storer.storeRegistry(userId, registry);
 			this.logging.debug("Successfully stored registry in DB");
 			this.idToIPreferenceTreeModel.put(newCtxIdentifier, model);
 			this.logging.debug("Successfully added preference to cache");
@@ -143,7 +143,7 @@ public class PrivatePreferenceCache {
 		}else{
 			this.logging.debug("Preference exists in DB. Attempt  to update existing preference");
 			PreferenceStorer storer = new PreferenceStorer(this.broker);
-			storer.storeExisting(dpi, id, model);
+			storer.storeExisting(userId, id, model);
 			this.logging.debug("Successfully updated preference in DB. CtxID: "+id.toUriString());
 			this.idToIPreferenceTreeModel.put(id, model);
 			this.logging.debug("Successfully updated preference cache with new preference");
