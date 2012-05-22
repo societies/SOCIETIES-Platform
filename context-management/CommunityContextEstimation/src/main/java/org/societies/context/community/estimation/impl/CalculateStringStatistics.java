@@ -46,7 +46,12 @@ public class CalculateStringStatistics {
 		proffesions.add("Plumber");
 		proffesions.add("Plumber");
 		proffesions.add("Cook");
-		
+
+// Ta parapano einai mono gia testing. Kanonika prepei na pernaei h lista san orisma kai na
+// epistrefetai h lista me th syxnothta emfanishs kathe timhs. Isos akoma na baloume kai ena
+// counter synoliko kai na to "kotsaroume" sto telos tou pinaka gia na mporoume na bgazoume
+// eykola ta pososta meta ...
+
 		Hashtable <String, Integer> frequencyMap = new Hashtable();
 		ArrayList<String> finalList = new ArrayList<String>();
 		

@@ -95,6 +95,8 @@ public class ConvexHull {
 		for (int i=0; i<convexHullSet.size(); ++i){
 			System.out.println("ConvexHull Point"+i+"is"+convexHullSet.get(i));
 		}
+
+// Ta debugging kommatia tou Yiorgou, opos to parapano, prepei na fygoun ...
 		
 		// Separate Left Or Right Points
 		for (int i=0; i<points.size(); ++i){
