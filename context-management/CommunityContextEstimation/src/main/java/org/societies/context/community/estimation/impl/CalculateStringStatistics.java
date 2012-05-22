@@ -44,7 +44,9 @@ public class CalculateStringStatistics {
 		proffesions.add("Plumber");
 		proffesions.add("Plumber");
 		proffesions.add("Cook");
-		
+
+// gfkgjhfkghfkghk
+
 		Hashtable <String, Integer> frequencyMap = new Hashtable();
 		ArrayList<String> finalList = new ArrayList<String>();
 		
