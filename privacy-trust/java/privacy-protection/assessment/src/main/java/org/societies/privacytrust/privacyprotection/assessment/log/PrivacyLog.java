@@ -30,6 +30,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog;
@@ -50,12 +51,12 @@ public class PrivacyLog implements IPrivacyLog {
 	private List<IIdentity> senderIds = new ArrayList<IIdentity>();
 
 	private List<String> senderClassNames = new ArrayList<String>();
-	
+
 	public PrivacyLog() {
-		
+
 		LOG.info("Constructor");
 	}
-	
+
 	/**
 	 * Gets all data access recorded so far.
 	 * If you need to add any new element, then use
@@ -67,7 +68,7 @@ public class PrivacyLog implements IPrivacyLog {
 	public List<DataAccessLogEntry> getDataAccess() {
 		return dataAccess;
 	}
-	
+
 	/**
 	 * Gets all data transmissions recorded so far.
 	 * If you need to add any new transmission, then use
@@ -79,17 +80,17 @@ public class PrivacyLog implements IPrivacyLog {
 	public List<DataTransmissionLogEntry> getDataTransmission() {
 		return dataTransmission;
 	}
-	
+
 	public void append(DataAccessLogEntry entry) {
 		dataAccess.add(entry);
 	}
-	
+
 	public void append(DataTransmissionLogEntry entry) {
 		dataTransmission.add(entry);
 		senderIds.add(entry.getSender());
 		senderClassNames.add(entry.getSenderClass());
 	}
-	
+
 	/**
 	 * @return the senderIds
 	 */
@@ -103,20 +104,86 @@ public class PrivacyLog implements IPrivacyLog {
 	public List<String> getSenderClassNames() {
 		return senderClassNames;
 	}
-	
+
 	@Override
-	public List<DataTransmissionLogEntry> search(PrivacyLogFilter filter) {
-		
-		LOG.debug("search({})", filter);
-		
-		return null;  // FIXME
+	public List<DataTransmissionLogEntry> search(PrivacyLogFilter f) {
+
+		LOG.debug("search({})", f);
+
+		if (f == null) {
+			return getAll();
+		}
+		List<DataTransmissionLogEntry> match = new ArrayList<DataTransmissionLogEntry>();
+
+		for (DataTransmissionLogEntry l : dataTransmission) {
+			if (isMatching(l, f)) {
+				match.add(l);
+			}
+		}
+
+		return match;
 	}
-	
+
+	private boolean isMatching(DataTransmissionLogEntry l, PrivacyLogFilter f) {
+		if (f.getSentToGroup() != null) {
+			if (f.getSentToGroup() != l.isSentToGroup()) {
+				return false;
+			}
+		}
+		if (f.getSentToLocalCss() != null) {
+			if (f.getSentToLocalCss() != l.isSentToLocalCss()) {
+				return false;
+			}
+		}
+		if (f.getChannelId() != null) {
+			for (ChannelType channel : f.getChannelId()) {
+				if (channel == l.getChannelId()) {
+					break;
+				}
+				return false;
+			}
+		}
+		if (f.getDataType() != null) {
+			for (String dataType : f.getDataType()) {
+				if (dataType == l.getDataType()) {
+					break;
+				}
+				return false;
+			}
+		}
+		if (f.getEnd() != null) {
+			if (f.getEnd().before(l.getTime())) {
+				return false;
+			}
+		}
+		if (f.getReceiver() != null) {
+			if (f.getReceiver() != l.getReceiver()) {
+				return false;
+			}
+		}
+		if (f.getSender() != null) {
+			if (f.getSender() != l.getSender()) {
+				return false;
+			}
+		}
+		if (f.getSenderClass() != null) {
+			if (f.getSenderClass() != l.getSenderClass()) {
+				return false;
+			}
+		}
+		if (f.getStart() != null) {
+			if (f.getStart().after(l.getTime())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public List<DataTransmissionLogEntry> getAll() {
-		
+
 		LOG.debug("getAll()");
-		
+
 		return dataTransmission;
 	}
 }

@@ -41,8 +41,8 @@ public class PrivacyLogFilter {
 	private Date end;
 	private Boolean sentToGroup;
 	private Boolean sentToLocalCss;
-	private IIdentity receiverId;
-	private IIdentity senderId;
+	private IIdentity receiver;
+	private IIdentity sender;
 	private String senderClass;
 	private ChannelType[] channelId;
 	
@@ -55,8 +55,8 @@ public class PrivacyLogFilter {
 		this.end = null;
 		this.sentToGroup = null;
 		this.sentToLocalCss = null;
-		this.receiverId = null;
-		this.senderId = null;
+		this.receiver = null;
+		this.sender = null;
 		this.senderClass = null;
 		this.channelId = null;
 	}
@@ -67,9 +67,12 @@ public class PrivacyLogFilter {
 	 * @param dataType Filter by these data types.
 	 * @param start Select entries on and after this time
 	 * @param end Select entries before and on this time
-	 * @param sentToGroup True to select only multicast entries, False for singlecast entries 
-	 * @param receiverId  CSS ID of the receiver
-	 * @param senderId    CSS ID of the sender
+	 * @param sentToGroup True to select only multicast entries. False for singlecast entries
+	 * @param sentToLocalCss True to select only data sent to nodes in local CSS.
+	 * False to select only data sent outside CSS.
+	 * @param receiver  CSS ID of the receiver
+	 * @param sender    CSS ID of the sender
+	 * @param senderClass Class name of the component that invoked sending.
 	 * @param channelId   IDs of the possible channels.
 	 */
 	public PrivacyLogFilter(
@@ -78,8 +81,8 @@ public class PrivacyLogFilter {
 			Date end,
 			Boolean sentToGroup,
 			Boolean sentToLocalCss,
-			IIdentity receiverId,
-			IIdentity senderId,
+			IIdentity receiver,
+			IIdentity sender,
 			String senderClass,
 			ChannelType[] channelId
 			) {
@@ -88,8 +91,8 @@ public class PrivacyLogFilter {
 		this.end = end;
 		this.sentToGroup = sentToGroup;
 		this.sentToLocalCss = sentToLocalCss;
-		this.receiverId = receiverId;
-		this.senderId = senderId;
+		this.receiver = receiver;
+		this.sender = sender;
 		this.senderClass = senderClass;
 		this.channelId = channelId;
 	}
@@ -134,20 +137,20 @@ public class PrivacyLogFilter {
 		this.sentToLocalCss = sentToLocalCss;
 	}
 
-	public IIdentity getReceiverId() {
-		return receiverId;
+	public IIdentity getReceiver() {
+		return receiver;
 	}
 
-	public void setReceiverId(IIdentity receiverId) {
-		this.receiverId = receiverId;
+	public void setReceiver(IIdentity receiver) {
+		this.receiver = receiver;
 	}
 
-	public IIdentity getSenderId() {
-		return senderId;
+	public IIdentity getSender() {
+		return sender;
 	}
 
-	public void setSenderId(IIdentity senderId) {
-		this.senderId = senderId;
+	public void setSender(IIdentity sender) {
+		this.sender = sender;
 	}
 
 	public String getSenderClass() {
