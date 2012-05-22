@@ -69,8 +69,8 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	private ICtxBroker contextBroker;
 	private ICommManager commManager;
 	
-	
-	private void init() throws InterruptedException, ExecutionException{
+	 
+	private void init(){
 		locationInference = new LocationManagementContextAccessor();
 		locationInference.init(contextSourceManagement, contextBroker, commManager);
 		timer.scheduleAtFixedRate(new MockUpdateTask(), 0, UPDATE_CYCLE);

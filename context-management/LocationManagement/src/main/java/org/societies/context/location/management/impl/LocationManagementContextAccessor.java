@@ -59,7 +59,7 @@ import org.societies.context.api.user.location.IZone;
  * Describe your class here...
  *
  * @author Guy Feigenblat (guyf@il.ibm.com)
- *
+ * 
  */
 public class LocationManagementContextAccessor {
 
