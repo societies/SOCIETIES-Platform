@@ -37,9 +37,30 @@ public class CtxAssociationTypes extends
 		org.societies.api.context.model.CtxAssociationTypes {
 
 	/**
+	 * Directed context association used by the CommunityLifecycleManagement
+	 * 
+	 * @since 0.0.8
+	 */
+	public static final String HAS_CLM = "hasClm";
+	
+	/**
 	 * Directed context association
 	 * 
 	 * @since 0.0.8
 	 */
 	public static final String HAS_DIANNE = "hasDianne";
+	
+	/**
+	 * Directed context association used by the EgocentricCommunityAnalyser.
+	 * 
+	 * @since 0.0.8
+	 */
+	public static final String HAS_ECA = "hasEca";
+	
+	/**
+	 * Directed context association
+	 *  
+	 * @since 0.0.8
+	 */
+	public static final String HAS_PROXIMITY_HISTORY = "hasProximityHistory";
 }

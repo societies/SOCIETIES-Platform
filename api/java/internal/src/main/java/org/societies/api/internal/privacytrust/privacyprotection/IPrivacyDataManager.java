@@ -92,5 +92,5 @@ public interface IPrivacyDataManager {
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws PrivacyException
 	 */
-	public CtxIdentifier hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException;
+	public String hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException;
 }

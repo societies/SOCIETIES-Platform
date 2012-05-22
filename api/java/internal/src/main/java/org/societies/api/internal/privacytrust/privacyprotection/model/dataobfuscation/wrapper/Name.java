@@ -22,59 +22,84 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
+package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
- * @state skeleton 
+ * Describe your class here...
+ *
  * @author olivierm
+ *
  */
-public class SampleObfuscator implements IDataObfuscator {
-	private int param1;
+public class Name {
+	private String firstName;
+	private String lastName;
 	
-	// -- CONSTRUCTOR
-	public SampleObfuscator(int param1) {
-		this.param1 = param1;
-	}
-
-	
-	// -- METHODS
-	@Override
-	public IDataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException {
-		// TODO : populate this stub function
-		// Obfuscate
-		param1= 0;
-		return new SampleWrapper(param1);
-	}
-
-
-	// -- GET/SET
-	/**
-	 * @return the param1
-	 */
-	public int getParam1() {
-		return param1;
+	public Name() {
+		super();
 	}
 	/**
-	 * @param param1 the param1 to set
+	 * @param firstName
+	 * @param lastName
 	 */
-	public void setParam1(int param1) {
-		this.param1 = param1;
+	public Name(String firstName, String lastName) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
 	}
-
-
+	
+	
+	/**
+	 * @return the firstName
+	 */
+	public String getFirstName() {
+		return firstName;
+	}
+	/**
+	 * @param firstName the firstName to set
+	 */
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	/**
+	 * @return the lastName
+	 */
+	public String getLastName() {
+		return lastName;
+	}
+	/**
+	 * @param lastName the lastName to set
+	 */
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	
 	/*
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		return (obj==this || obj instanceof SampleObfuscator);
+		// -- Verify reference equality
+		if (obj == this) {
+			return true;
+		}
+
+		// -- Verify obj type
+		if (obj instanceof Name) {
+			Name other = (Name) obj;
+			return new EqualsBuilder()
+			.append(this.getFirstName(), other.getFirstName())
+			.append(this.getLastName(), other.getLastName())
+			.isEquals();
+		}
+		return false;
 	}
-	
-	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Name [firstName=" + firstName + ", lastName=" + lastName + "]";
+	}
 }

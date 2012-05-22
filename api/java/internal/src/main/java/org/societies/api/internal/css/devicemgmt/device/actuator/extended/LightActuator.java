@@ -34,6 +34,7 @@ import org.societies.api.internal.css.devicemgmt.device.actuator.Actuator;
  * @version 1.0
  * @created 06-dec.-2011 15:18:15
  */
+@Deprecated
 public interface LightActuator extends Actuator {
 
 	/**

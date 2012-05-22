@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -38,47 +40,49 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.useragent.monitoring.IUserActionListener;
+import org.societies.api.internal.useragent.remote.IUserAgentRemoteMgr;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.useragent.monitoring.MethodType;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
-import org.societies.useragent.api.monitoring.remote.IUserActionMonitorRemote;
 
-public class UACommsClient implements IUserActionMonitorRemote, ICommCallback{	
+public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{	
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList("http://societies.org/api/schema/useragent/monitoring"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.schema.useragent.monitoring"));
 
 	//PRIVATE VARIABLES
-	private ICommManager commManager;
+	private ICommManager commsMgr;
 	private IIdentityManager idManager;
+	private Logger LOG = LoggerFactory.getLogger(UACommsClient.class);
 
 	//PROPERTIES
-	public ICommManager getCommManager() {
-		return commManager;
+	public ICommManager getCommsMgr() {
+		return commsMgr;
 	}
 
-	public void setCommManager(ICommManager commManager) {
-		this.commManager = commManager;
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
 	}
 
 	public UACommsClient() {	
 	}
 
-	public void InitService() {
+	public void initService() {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
+		LOG.info("Registering UACommsClient with XMPP Communication Manager");
 		try {
-			getCommManager().register(this); 
+			getCommsMgr().register(this); 
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
-		idManager = commManager.getIdManager();
+		idManager = commsMgr.getIdManager();
 	}
 
 	@Override
 	public void monitor(IIdentity owner, ServiceResourceIdentifier serviceId, String serviceType,
 			String parameterName, String value) {
+		LOG.info("monitor method called in UACommsClient");
 		IIdentity toIdentity = null;
 		try {
 			toIdentity = idManager.fromJid("XCManager.societies.local");
@@ -88,6 +92,7 @@ public class UACommsClient implements IUserActionMonitorRemote, ICommCallback{
 		Stanza stanza = new Stanza(toIdentity);
 
 		//CREATE MESSAGE BEAN
+		LOG.info("Creating message to send to UACommsServer");
 		UserActionMonitorBean uaBean = new UserActionMonitorBean();
 		uaBean.setIdentity(owner.getJid());
 		uaBean.setServiceResourceIdentifier(serviceId);
@@ -96,14 +101,15 @@ public class UACommsClient implements IUserActionMonitorRemote, ICommCallback{
 		uaBean.setValue(value);
 		uaBean.setMethod(MethodType.MONITOR);
 		try {
+			LOG.info("Sending message to UACommsServer");
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
-			commManager.sendMessage(stanza, uaBean);
+			commsMgr.sendMessage(stanza, uaBean);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		};
 	}
 
-	@Override
+	/*@Override
 	public void registerForActionUpdates(IUserActionListener listener) {
 		IIdentity toIdentity = null;
 		try {
@@ -123,7 +129,7 @@ public class UACommsClient implements IUserActionMonitorRemote, ICommCallback{
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		};
-	}
+	}*/
 
 	
 	

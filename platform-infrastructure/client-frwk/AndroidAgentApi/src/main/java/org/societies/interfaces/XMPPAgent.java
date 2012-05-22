@@ -20,9 +20,13 @@ public interface XMPPAgent {
 	
 	public Boolean isConnected();
 	
+	public String newMainIdentity(String identifier, String domain, String password) throws CommunicationException; // TODO this takes no credentials in a private/public key case
+	
 	public String login(String identifier, String domain, String password);
 	
 	public String loginFromConfig();
 	
 	public boolean logout();
+	
+	public boolean destroyMainIdentity();
 }

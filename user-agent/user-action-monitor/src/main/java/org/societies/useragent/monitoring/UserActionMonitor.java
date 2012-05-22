@@ -27,7 +27,9 @@ package org.societies.useragent.monitoring;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.EMSException;
@@ -43,6 +45,7 @@ public class UserActionMonitor implements IUserActionMonitor{
 	private boolean cloud;
 	private ICtxBroker ctxBroker;
 	private IEventMgr eventMgr;
+	private ICommManager commsMgr;
 	private ContextCommunicator ctxComm;
 
 	@Override
@@ -76,8 +79,9 @@ public class UserActionMonitor implements IUserActionMonitor{
 		System.out.println("Initialising user action monitor!");
 		ctxComm = new ContextCommunicator(ctxBroker);
 
-		//Set cloud flag - get device type from Identity Manager (speak to Alec)
-		//TODO
+		//Set cloud flag - get device type from Identity Manager
+		IdentityType nodeType = commsMgr.getIdManager().getThisNetworkNode().getType();
+		//if()
 	}
 
 	public void setCtxBroker(ICtxBroker broker){
@@ -88,13 +92,8 @@ public class UserActionMonitor implements IUserActionMonitor{
 		this.eventMgr = eventMgr;
 	}
 	
-/*
-	@Deprecated
-	public void monitor(ServiceResourceIdentifier arg0, IIdentity arg1,
-			String arg2) {
+	public void setCommsMgr(ICommManager commsMgr){
+		this.commsMgr = commsMgr;
 	}
 	
-	@Deprecated
-	public void registerForActionUpdates(IUserActionListener listener) {
-	}*/
 }

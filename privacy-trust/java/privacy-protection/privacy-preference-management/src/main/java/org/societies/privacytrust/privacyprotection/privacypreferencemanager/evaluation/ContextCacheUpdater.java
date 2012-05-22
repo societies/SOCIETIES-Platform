@@ -25,22 +25,27 @@
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
 
 
-public class ContextCacheUpdater /*extends EventListener*/{
+public class ContextCacheUpdater /*extends EventListener*/ implements CtxChangeEventListener{
 
-	private ICtxBroker broker;
+	private ICtxBroker ctxBroker;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private PrivateContextCache contextCache;
 	private ArrayList<CtxAttributeIdentifier> attrList;
 	public ContextCacheUpdater(ICtxBroker broker, PrivateContextCache cache){
-		this.broker = broker;
+		this.ctxBroker = broker;
 		this.contextCache = cache;
 		this.attrList = new ArrayList<CtxAttributeIdentifier>();
 	}
@@ -52,7 +57,8 @@ public class ContextCacheUpdater /*extends EventListener*/{
 		}
 		try {
 			//this.broker.registerUpdateNotification(this, id);
-			this.broker.registerForUpdates(id);
+			
+			this.ctxBroker.registerForChanges(this, id);
 			this.logging.debug("Registered for context events for : "+id.getType()+" ID: "+id.toUriString());
 		} catch (CtxException e) {
 			this.logging.debug("Unable to register for context events for : "+id.getType()+" ID: "+id.toUriString());
@@ -84,4 +90,49 @@ public class ContextCacheUpdater /*extends EventListener*/{
 		}
 		
 	}*/
+
+	@Override
+	public void onCreation(CtxChangeEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onModification(CtxChangeEvent event) {
+		CtxIdentifier ctxId = event.getId();
+		try {
+			CtxAttribute ctxAttr = (CtxAttribute) ctxBroker.retrieve(ctxId).get();
+			if (ctxAttr!=null){
+				String type = ctxAttr.getType();
+				String value = ctxAttr.getStringValue();
+				this.logging.debug("Event received: type: "+type+" value: "+value);
+				
+				this.contextCache.updateCache(ctxAttr);
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
+
+	@Override
+	public void onRemoval(CtxChangeEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUpdate(CtxChangeEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

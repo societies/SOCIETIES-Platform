@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
@@ -53,12 +55,12 @@ public class PrivateContextCache {
 	 */
 	private Hashtable<String, CtxIdentifier> mapping;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	private ICtxBroker broker;
+	private ICtxBroker ctxBroker;
 	private ContextCacheUpdater updater;
 	
 	
 	public PrivateContextCache(ICtxBroker broker){
-		this.broker = broker;
+		this.ctxBroker = broker;
 		this.mapping = new Hashtable<String, CtxIdentifier>();
 		this.cache = new Hashtable<CtxIdentifier, String>();
 		this.updater = new ContextCacheUpdater(broker,this);
@@ -79,6 +81,7 @@ public class PrivateContextCache {
 		if (this.cache.containsKey(id)){
 			return this.cache.get(id);
 		}
+		
 		return "";
 	
 	}
@@ -99,11 +102,11 @@ public class PrivateContextCache {
 		this.printCache();
 		
 		try {
-			Future<List<CtxIdentifier>> futureAttrList =broker.lookup(CtxModelType.ATTRIBUTE, type); 
+			Future<List<CtxIdentifier>> futureAttrList =ctxBroker.lookup(CtxModelType.ATTRIBUTE, type); 
 			List<CtxIdentifier> attrList = futureAttrList.get();
 			if (attrList.size()>0){
 				CtxIdentifier id = (CtxIdentifier) attrList.get(0);
-				CtxAttribute attr =  (CtxAttribute) broker.retrieve(id);
+				CtxAttribute attr =  (CtxAttribute) ctxBroker.retrieve(id);
 				String val = attr.getStringValue();
 				this.mapping.put(type, id);
 				this.cache.put(id,val);
@@ -122,9 +125,10 @@ public class PrivateContextCache {
 	private void retrieveContext(CtxIdentifier id){
 		this.updater.registerForContextEvent((CtxAttributeIdentifier) id);
 		this.printCache();
+		//JOptionPane.showMessageDialog(null, "contacting context DB for retrieving id"+id.toUriString());
 		this.logging.debug("contacting context DB for retrieving id"+id.toUriString());
 		try {
-			CtxAttribute attr = (CtxAttribute) broker.retrieve(id);
+			CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(id).get();
 			if (null!=attr){
 				this.logging.debug ("found id: "+id.toUriString()+" in context DB");
 				String val = attr.getStringValue();
@@ -147,6 +151,12 @@ public class PrivateContextCache {
 				this.logging.debug("id :"+id.toUriString()+" not found in context DB");
 			}
 		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
