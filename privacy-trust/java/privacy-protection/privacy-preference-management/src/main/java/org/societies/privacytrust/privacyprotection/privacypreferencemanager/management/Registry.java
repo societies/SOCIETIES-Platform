@@ -30,6 +30,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
@@ -159,7 +161,6 @@ public class Registry implements Serializable{
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
-			
 			if (details.equals(d)){
 				return this.ppnpMappings.get(d);
 			}

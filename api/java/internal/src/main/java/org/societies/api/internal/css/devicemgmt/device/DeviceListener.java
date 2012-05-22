@@ -33,6 +33,7 @@ package org.societies.api.internal.css.devicemgmt.device;
  * @version 1.0
  * @created 06-d�c.-2011 15:38:57
  */
+@Deprecated
 public interface DeviceListener {
 
 	/**

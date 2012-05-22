@@ -28,13 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
@@ -64,14 +62,9 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	private IPrivacyPreferenceManager privacyPreferenceManager;
 	private IDataObfuscationManager dataObfuscationManager;
-	private SessionFactory sessionFactory;
 
 	public PrivacyDataManager()  {
 		dataObfuscationManager = new DataObfuscationManager();
-	}
-
-	public void init() {
-		privacyDataManagerInternal = new PrivacyDataManagerInternal(sessionFactory);
 	}
 
 
@@ -109,7 +102,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		// RequestItem
 		Resource resource = new Resource(dataAttributeId);
 		RequestItem requestItemNull = new RequestItem(resource, actions, conditions);
-
 
 		// -- Retrieve a stored permission
 		ResponseItem permission = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
@@ -161,7 +153,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 
 		// -- Retrieve the obfuscation level
-		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId().toUriString());
+		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId());
 		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
 		//		double obfuscationLevel = 1;
 		// If no obfuscation is required: return directly the wrapped data
@@ -179,7 +171,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public CtxIdentifier hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+	public String hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		verifyParemeters(requestor, ownerId, dataWrapper, null);
 		if (!isDepencyInjectionDone(2)) {
@@ -200,7 +192,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (null == requestor || null == ownerId) {
 			throw new NullPointerException("Not enought information: requestor or owner id is missing");
 		}
-		if (null == dataId && (null == dataWrapper || null == dataWrapper.getDataId())) {
+		if (null == dataId && (null == dataWrapper || null == dataWrapper.getData())) {
 			throw new PrivacyException("Not enought information: data id is missing");
 		}
 	}
@@ -220,16 +212,16 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 
 	// --- Dependency Injection
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-		LOG.info("sessionFactory injected");
-	}
 	public void setPrivacyPreferenceManager(
 			IPrivacyPreferenceManager privacyPreferenceManager) {
 		this.privacyPreferenceManager = privacyPreferenceManager;
-		LOG.info("privacyPreferenceManager injected");
+		LOG.info("[Dependency Injection] privacyPreferenceManager injected");
 	}
-
+	public void setPrivacyDataManagerInternal(
+			IPrivacyDataManagerInternal privacyDataManagerInternal) {
+		this.privacyDataManagerInternal = privacyDataManagerInternal;
+		LOG.info("[Dependency Injection] PrivacyDataManagerInternal injected");
+	}
 
 
 	private boolean isDepencyInjectionDone() {

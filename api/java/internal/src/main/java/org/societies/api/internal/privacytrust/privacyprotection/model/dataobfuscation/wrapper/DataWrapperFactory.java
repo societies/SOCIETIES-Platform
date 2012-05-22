@@ -56,17 +56,34 @@ public class DataWrapperFactory {
 //		throw new RuntimeException("No Obfuscator to obfuscate that type of data");
 	}
 	
-//	// -- GEOLOCATION
-//	/**
-//	 * To get a GeolocaltionDataWrapper
-//	 * The persistence is disabled by default, the obfuscated geolocation will not
-//	 * be stored after obfuscation.
-//	 * @param latitude Latitude
-//	 * @param longitude Longitude
-//	 * @param accuracy Accuracy in meters
-//	 * @return A GeolocationDataWrapper
-//	 */
-//	public static GeolocationDataWrapper getGeolocationDataWrapper(double latitude, double longitude, double accuracy) {
-//		return new GeolocationDataWrapper(latitude, longitude, accuracy);
-//	}
+	// -- GEOLOCATION
+	/**
+	 * To get a LocationCoordinatesWrapper
+	 * The persistence is disabled by default, the obfuscated geolocation will not
+	 * be stored after obfuscation.
+	 * @param latitude Latitude
+	 * @param longitude Longitude
+	 * @param accuracy Accuracy in meters
+	 * @return A LocationCoordinatesWrapper
+	 */
+	public static LocationCoordinatesWrapper getLocationCoordinatesWrapper(double latitude, double longitude, double accuracy) {
+		LocationCoordinates data = new LocationCoordinates(latitude, longitude, accuracy);
+		return new LocationCoordinatesWrapper(data);
+	}
+	
+	
+	// -- NAME
+	/**
+	 * To get a NameWrapper
+	 * The persistence is disabled by default, the obfuscated geolocation will not
+	 * be stored after obfuscation.
+	 * @param latitude Latitude
+	 * @param longitude Longitude
+	 * @param accuracy Accuracy in meters
+	 * @return A LocationCoordinatesWrapper
+	 */
+	public static NameWrapper getNameWrapper(String firstName, String lastName) {
+		Name data = new Name(firstName, lastName);
+		return new NameWrapper(data);
+	}
 }
