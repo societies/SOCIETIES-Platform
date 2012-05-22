@@ -22,10 +22,11 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="TestCase714" class="org.societies.integration.test.bit.cisshareservice.TestCase962" init-method="run">
+  <bean id="TestCase962" class="org.societies.integration.test.bit.cisshareservice.TestCase962" init-method="run">
 		<property name="serviceControl" ref="serviceControlBundle" />
-		<property name="serviceDiscovery" ref="serviceDiscoveryBundle" />
+		<property name="commManager" ref="commManagerBundle" />
 		<property name="serviceRegistry" ref="serviceRegistryBundle" />
+		<property name="cisManager" ref="cisManagerBundle" />
   	</bean>
 
 </beans>

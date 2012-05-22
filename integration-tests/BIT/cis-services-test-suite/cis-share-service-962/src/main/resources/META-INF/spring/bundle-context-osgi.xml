@@ -20,8 +20,9 @@
        testing of the bundle outside of an OSGi container -->
        
 <osgi:reference id="serviceRegistryBundle" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry"/>
-<osgi:reference id="serviceDiscoveryBundle" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
+<osgi:reference id="commManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 <osgi:reference id="serviceControlBundle" interface="org.societies.api.internal.servicelifecycle.IServiceControl"/>
+<osgi:reference id="cisManagerBundle" interface="org.societies.api.cis.management"/>
 
 
 </beans>

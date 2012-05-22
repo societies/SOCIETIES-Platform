@@ -28,6 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.junit.After;
@@ -95,6 +96,7 @@ public class NominalTestCaseUpperTester {
 		
 		assertNotNull(serviceBundleUrl);
 		assertNotNull(TestCase962.getServiceControl());
+		assertNotNull(TestCase962.getCommManager());
 	}
 
 	
@@ -116,8 +118,25 @@ public class NominalTestCaseUpperTester {
 			
 			testServiceId =installResult.getServiceId();
 			
+			if(LOG.isDebugEnabled()){
+				LOG.debug("Our CSS Id is " + TestCase962.getCommManager().getIdManager().getThisNetworkNode().getJid());
+				
+			}
+			int mode = 1;
+			String cisType = "Test";
+			String cisName ="TestCIS";
+			String cssPassword = "testPassword";
+			String cssId = TestCase962.getCommManager().getIdManager().getThisNetworkNode().getJid();
 			Future<ICisOwned> asyncCis = TestCase962.getCisManager().createCis(cssId, cssPassword, cisName, cisType, mode);
 			myCis = asyncCis.get();
+			
+			if(LOG.isDebugEnabled()) {
+				LOG.debug("[#962] myCis.getCisId()" + myCis.getCisId());
+				LOG.debug("[#962] myCis.getCisType()" + myCis.getCisType());
+				LOG.debug("[#962] myCis.getOwnerId()" + myCis.getOwnerId());
+				LOG.debug("[#962] myCis.getName()" + myCis.getName());
+				LOG.debug("[#962] myCis.getDescription()" + myCis.getDescription());
+			}
 			
 		} catch(Exception ex){
 			LOG.error("[#962] Preamble Install Service: Exception occured: " + ex);
@@ -137,9 +156,16 @@ public class NominalTestCaseUpperTester {
 			Future<ServiceControlResult> uninstallResultFuture =TestCase962.getServiceControl().uninstallService(testServiceId);
 			ServiceControlResult uninstallResult = uninstallResultFuture.get();
 			if (!uninstallResult.getMessage().equals(ResultMessage.SUCCESS)) {
-				LOG.error("[#962] Teardown UnInstall Service: Couldn't uninstall");
-				fail("[#962] Preamble UnInstall Service: Couldn't uninstall");
+				LOG.error("[#962] Teardown Uninstall Service: Couldn't uninstall");
+				fail("[#962] Preamble Uninstall Service: Couldn't uninstall");
 				return;
+			}
+			
+			boolean result = TestCase962.getCisManager().deleteCis(TestCase962.getCommManager().getIdManager().getThisNetworkNode().getJid(), "testPassword", myCis.getCisId());
+		
+			if(!result){
+				LOG.error("[#962] Teardown delete CIS: Couldn't delete!");
+				fail("[#962] Teardown delete CIS: Couldn't delete!");
 			}
 			
 		} catch(Exception ex){
@@ -154,16 +180,16 @@ public class NominalTestCaseUpperTester {
 	 * Do the test
 	 */
 	@Test
-	public void testStartStop(){
+	public void testShareService(){
 		
-		LOG.info("[#962] Testing Start-Stop!");
+		LOG.info("[#962] Testing Local CIS Share Service!");
 		
 		//STEP 1: Get the Service
 		Service serviceUnderTest = null;
 			
 		try {
 			if(LOG.isDebugEnabled())
-				LOG.debug("[#962] Selecting service to Start & Stop!");
+				LOG.debug("[#962] Selecting service to Share!");
 				
 			serviceUnderTest = TestCase962.getServiceRegistry().retrieveService(testServiceId);
 		
@@ -182,32 +208,44 @@ public class NominalTestCaseUpperTester {
 		if(LOG.isDebugEnabled())
 			LOG.debug("[#962] Service selected: " + serviceUnderTest.getServiceEndpoint());
 		
+		
+		
 		try {
 			
-			if(serviceUnderTest.getServiceStatus().equals(ServiceStatus.STARTED)){
-				
-				stopService(serviceUnderTest);
-				Thread.sleep(1000);
-				checkIfStopped(serviceUnderTest);
-				startService(serviceUnderTest);
-				Thread.sleep(1000);
-				checkIfStarted(serviceUnderTest);
-				
-			} else 
-				if(serviceUnderTest.getServiceStatus().equals(ServiceStatus.STOPPED)){
-					
-					startService(serviceUnderTest);
-					Thread.sleep(1000);
-					//Need to sleep to wait for container
-					checkIfStarted(serviceUnderTest);
-					stopService(serviceUnderTest);
-					Thread.sleep(1000);
-					checkIfStopped(serviceUnderTest);
-					
-				} else{
-					fail("Unrecognized state");
-				}
+			if(LOG.isDebugEnabled()) LOG.debug("[#962] Share service with CIS!");
 			
+			TestCase962.getServiceRegistry().notifyServiceIsSharedInCIS(testServiceId, myCis.getCisId());
+			
+			if(LOG.isDebugEnabled()) LOG.debug("[#962] Now checking if service is shared on that CIS!");
+			
+			List<Service> serviceList = TestCase962.getServiceRegistry().retrieveServicesSharedByCIS(myCis.getCisId());
+			
+			Assert.assertNotNull(serviceList);
+			Assert.assertEquals(1, serviceList.size());
+			
+			Service myService= serviceList.get(0);
+			
+			if(LOG.isDebugEnabled()) 
+				LOG.debug("[#962] Service shared is: " + myService.getServiceName());
+			
+			Assert.assertEquals(myService.getServiceIdentifier().getServiceInstanceIdentifier(),testServiceId.getServiceInstanceIdentifier());
+			Assert.assertEquals(myService.getServiceIdentifier().getIdentifier(),testServiceId.getIdentifier());
+			
+			// Next we remove the service
+			if(LOG.isDebugEnabled()) 
+				LOG.debug("[#962] Attempting to remove the service from sharing!");
+			
+			TestCase962.getServiceRegistry().removeServiceSharingInCIS(testServiceId, myCis.getCisId());
+
+			if(LOG.isDebugEnabled()) LOG.debug("[#962] Now checking if service no longer shared on that CIS!");
+			
+			serviceList = TestCase962.getServiceRegistry().retrieveServicesSharedByCIS(myCis.getCisId());
+			
+			Assert.assertNotNull(serviceList);
+			Assert.assertTrue(serviceList.isEmpty());
+			
+			if(LOG.isDebugEnabled()) LOG.debug("CIS now has " + serviceList.size() + " services shared!");
+
 		
 		} catch(Exception ex){
 			LOG.error("Error while running test: " + ex);
@@ -216,89 +254,4 @@ public class NominalTestCaseUpperTester {
 		}		
 	}
 
-	private void stopService(Service serviceUnderTest) {
-		try{
-			
-			if(LOG.isDebugEnabled()) LOG.debug("[#962] Service " + serviceUnderTest.getServiceName() + " is started, we shall stop it");
-			
-			Future<ServiceControlResult> stopResultFuture = TestCase962.getServiceControl().stopService(serviceUnderTest.getServiceIdentifier());
-			ServiceControlResult stopResult = stopResultFuture.get();
-			
-			Assert.assertEquals("[#962] Service was not stopped correctly!", ResultMessage.SUCCESS, stopResult.getMessage());
-			
-		} catch(Exception ex){
-			LOG.error("[#962] Error while running test: " + ex);
-			ex.printStackTrace();
-			fail("[#962] Exception occured");
-		}
-	}
-	
-	private void checkIfStopped(Service serviceUnderTest) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#962] checkIfStopped");
-		
-		try{
-			
-			Service testService = TestCase962.getServiceRegistry().retrieveService(serviceUnderTest.getServiceIdentifier());
-
-			if(testService == null){
-				fail("[#962] Couldn't find the service");
-				return;
-			}
-			
-			LOG.info("[#962] Service " + testService.getServiceName() + " is " + testService.getServiceStatus());
-
-			Assert.assertEquals("[#962] Service is not in the correct state!", ServiceStatus.STOPPED, testService.getServiceStatus());
-			
-		} catch(Exception ex){
-			LOG.error("[#962] Error while running test: " + ex);
-			ex.printStackTrace();
-			fail("[#962] Exception occured");
-		}
-
-	}
-	
-	private void startService(Service serviceUnderTest) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#962] startService");
-		
-		try{
-			
-			LOG.info("[#962] Service " + serviceUnderTest.getServiceName() + " is stopped, we shall start it");
-			
-			Future<ServiceControlResult> startResultFuture = TestCase962.getServiceControl().startService(serviceUnderTest.getServiceIdentifier());
-			ServiceControlResult startResult = startResultFuture.get();
-			
-			Assert.assertEquals("[#962] Service was not started correctly", ResultMessage.SUCCESS, startResult.getMessage());
-			
-			
-		} catch(Exception ex){
-			LOG.error("[#962] Error while running test: " + ex);
-			ex.printStackTrace();
-			fail("[#962] Exception occured");
-		}
-
-	}
-	
-	
-	private void checkIfStarted(Service serviceUnderTest) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#962] checkIfStarted");
-			
-		try{
-			
-			Service testService = TestCase962.getServiceRegistry().retrieveService(serviceUnderTest.getServiceIdentifier());
-
-			if(testService == null){
-				fail("[#962] Couldn't find the service");
-				return;
-			}
-
-			LOG.info("[#962] Service " + testService.getServiceName() + " is " + testService.getServiceStatus());
-
-			Assert.assertEquals("[#962] Service is not in the correct state!", ServiceStatus.STARTED, testService.getServiceStatus());
-			
-		} catch(Exception ex){
-			LOG.error("[#962] Error while running test: " + ex);
-			ex.printStackTrace();
-			fail("[#962] Exception occured");
-		}
-	}
 }

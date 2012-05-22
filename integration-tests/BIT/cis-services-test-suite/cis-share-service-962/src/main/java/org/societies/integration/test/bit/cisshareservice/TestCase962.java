@@ -28,7 +28,7 @@ package org.societies.integration.test.bit.cisshareservice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
-import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.integration.test.IntegrationTestCase;
@@ -39,6 +39,7 @@ import org.societies.integration.test.IntegrationTestCase;
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
+
 public class TestCase962 extends IntegrationTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase962.class);
 
@@ -57,6 +58,11 @@ public class TestCase962 extends IntegrationTestCase {
 	 */
 	private static IServiceRegistry serviceRegistry;
 
+	/**
+	 * Communication Framework (injected)
+	 */
+	private static ICommManager commManager;
+	
 	public TestCase962() {
 		// Call the super constructor
 		// with test case number
@@ -82,6 +88,11 @@ public class TestCase962 extends IntegrationTestCase {
 		TestCase962.serviceRegistry = serviceRegistry;
 	}
 
+	public void setCommManager(ICommManager commManager) {
+		if(LOG.isDebugEnabled()) LOG.debug("[#962] setCommManager()");
+		TestCase962.commManager = commManager;
+	}
+	
 	protected static ICisManager getCisManager() {
 		return cisManager;
 	}
@@ -92,5 +103,9 @@ public class TestCase962 extends IntegrationTestCase {
 	
 	protected static IServiceRegistry getServiceRegistry(){
 		return serviceRegistry;
+	}
+
+	protected static ICommManager getCommManager() {
+		return commManager;
 	}
 }
