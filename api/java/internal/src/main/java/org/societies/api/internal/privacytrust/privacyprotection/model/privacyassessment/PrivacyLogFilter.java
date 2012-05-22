@@ -26,6 +26,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacya
 
 import java.util.Date;
 
+import org.societies.api.identity.IIdentity;
+
 /**
  * 
  *
@@ -35,16 +37,13 @@ import java.util.Date;
 public class PrivacyLogFilter {
 	
 	private String[] dataType;
-	
 	private Date start;
 	private Date end;
-	
 	private Boolean sentToGroup;
-	
-	private String receiverId;
-	
-	private String senderId;
-	
+	private Boolean sentToLocalCss;
+	private IIdentity receiverId;
+	private IIdentity senderId;
+	private String senderClass;
 	private ChannelType[] channelId;
 	
 	/**
@@ -55,11 +54,13 @@ public class PrivacyLogFilter {
 		this.start = null;
 		this.end = null;
 		this.sentToGroup = null;
+		this.sentToLocalCss = null;
 		this.receiverId = null;
 		this.senderId = null;
+		this.senderClass = null;
 		this.channelId = null;
 	}
-	
+
 	/**
 	 * Constructor. Creates a new filter. A null parameter will match any value.
 	 * 
@@ -76,44 +77,92 @@ public class PrivacyLogFilter {
 			Date start,
 			Date end,
 			Boolean sentToGroup,
-			String receiverId,
-			String senderId,
+			Boolean sentToLocalCss,
+			IIdentity receiverId,
+			IIdentity senderId,
+			String senderClass,
 			ChannelType[] channelId
 			) {
 		this.dataType = dataType;
 		this.start = start;
 		this.end = end;
 		this.sentToGroup = sentToGroup;
+		this.sentToLocalCss = sentToLocalCss;
 		this.receiverId = receiverId;
 		this.senderId = senderId;
+		this.senderClass = senderClass;
 		this.channelId = channelId;
+	}
+	
+	public String[] getDataType() {
+		return dataType;
 	}
 
 	public void setDataType(String[] dataType) {
 		this.dataType = dataType;
 	}
 
+	public Date getStart() {
+		return start;
+	}
+
 	public void setStart(Date start) {
 		this.start = start;
 	}
 
-	public void setend(Date end) {
+	public Date getEnd() {
+		return end;
+	}
+
+	public void setEnd(Date end) {
 		this.end = end;
 	}
 
-	public void setsentToGroup(Boolean sentToGroup) {
+	public Boolean getSentToGroup() {
+		return sentToGroup;
+	}
+
+	public void setSentToGroup(Boolean sentToGroup) {
 		this.sentToGroup = sentToGroup;
 	}
 
-	public void setreceiverId(String receiverId) {
+	public Boolean getSentToLocalCss() {
+		return sentToLocalCss;
+	}
+
+	public void setSentToLocalCss(Boolean sentToLocalCss) {
+		this.sentToLocalCss = sentToLocalCss;
+	}
+
+	public IIdentity getReceiverId() {
+		return receiverId;
+	}
+
+	public void setReceiverId(IIdentity receiverId) {
 		this.receiverId = receiverId;
 	}
 
-	public void setsenderId(String senderId) {
+	public IIdentity getSenderId() {
+		return senderId;
+	}
+
+	public void setSenderId(IIdentity senderId) {
 		this.senderId = senderId;
 	}
 
-	public void setchannelId(ChannelType[] channelId) {
+	public String getSenderClass() {
+		return senderClass;
+	}
+
+	public void setSenderClass(String senderClass) {
+		this.senderClass = senderClass;
+	}
+
+	public ChannelType[] getChannelId() {
+		return channelId;
+	}
+
+	public void setChannelId(ChannelType[] channelId) {
 		this.channelId = channelId;
 	}
 }
