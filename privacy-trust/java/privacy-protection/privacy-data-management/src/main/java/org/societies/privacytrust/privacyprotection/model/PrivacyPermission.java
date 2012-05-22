@@ -45,6 +45,7 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
@@ -166,7 +167,7 @@ public class PrivacyPermission implements Serializable {
 		}
 
 		// - Create the ResponseItem
-		RequestItem requestItem = new RequestItem(resource, actions, null);
+		RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
 		ResponseItem reponseItem = new ResponseItem(requestItem, permission);
 
 		return reponseItem;
