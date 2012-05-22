@@ -34,6 +34,7 @@ import org.societies.api.internal.css.devicemgmt.device.sensor.Sensor;
  * @version 1.0
  * @created 06-d�c.-2011 15:18:17
  */
+@Deprecated
 public interface LightSensor extends Sensor {
 
 	/**

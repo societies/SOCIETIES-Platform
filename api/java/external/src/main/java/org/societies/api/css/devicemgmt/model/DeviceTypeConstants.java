@@ -22,45 +22,69 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.devicemgmt;
+package org.societies.api.css.devicemgmt.model;
 
-import java.util.Dictionary;
-
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 /**
- * Interface used by the device deriver bundles to inform the device manager about a state of devices
+ * Describe your class here...
  *
  * @author Rafik
  *
  */
-public interface IDeviceManager {
-	
-
-
-	/**
-	 * 
-	 * @param physicalDeviceId
-	 * @param deviceCommonInfo
-	 * @param serviceIds
-	 * @return a deviceId
-	 */
-	public String fireNewDeviceConnected (String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceNames);
-	
-	/**
-	 * Method used to inform the Device Manager about disconnection of a device
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
-	 */
-	public String fireDeviceDisconnected (String deviceFamily, String physicalDeviceId);
+public class DeviceTypeConstants {
 	
 	/**
 	 * 
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
-	 * @param data TODO to define
 	 */
-	public String fireNewDataReceived (String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data);
+	public static final String LIGHT_SENSOR = "lightSensor";
+	
+	/**
+	 * 
+	 */
+	public static final String TEMPERATURE_SENSOR = "temperatureSensor";
+	
+	/**
+	 * 
+	 */
+	public static final String GPS_SENSOR = "gpsSensor";
+	
+	/**
+	 * 
+	 */
+	public static final String PRESSURE_MAT = "pressureMat";
+	
+	/**
+	 * 
+	 */
+	public static final String RFID_READER = "rfidReader";
+	
+	/**
+	 * 
+	 */
+	public static final String KINECT = "kinect";
+	
+	
+	/**
+	 * 
+	 */
+	public static final String SCREEN = "screen";
+	
+	/**
+	 * 
+	 */
+	public static final String DIRECTIONAL_SPEAKER = "directionalSpeaker";
+	
+	/**
+	 * 
+	 */
+	public static final String LIGHT_ACTUATOR = "lightActuator";
+	
+	/**
+	 * 
+	 */
+	public static final String PZ_LOCATION_SERVER = "pzLocationServer";
+	
+	
+	
+	
 
 }
