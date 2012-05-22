@@ -94,9 +94,11 @@ public class NominalTestCaseUpperTester {
 
 		serviceBundleUrl = NominalTestCaseUpperTester.class.getClassLoader().getResource(SERVICE_PATH);
 		
-		assertNotNull(serviceBundleUrl);
-		assertNotNull(TestCase962.getServiceControl());
-		assertNotNull(TestCase962.getCommManager());
+		assertNotNull("[#962] ServiceBundle is null",serviceBundleUrl);
+		assertNotNull("[#962] getServiceControl is null",TestCase962.getServiceControl());
+		assertNotNull("[#962] getCommManager is null",TestCase962.getCommManager());
+		assertNotNull("[#962] getCisManager is null",TestCase962.getCisManager());
+		assertNotNull("[#962] getServiceRegistry is null",TestCase962.getServiceRegistry());
 	}
 
 	
@@ -119,9 +121,9 @@ public class NominalTestCaseUpperTester {
 			testServiceId =installResult.getServiceId();
 			
 			if(LOG.isDebugEnabled()){
-				LOG.debug("Our CSS Id is " + TestCase962.getCommManager().getIdManager().getThisNetworkNode().getJid());
-				
+				LOG.debug("[#962] Our CSS Id is " + TestCase962.getCommManager().getIdManager().getThisNetworkNode().getJid());
 			}
+			
 			int mode = 1;
 			String cisType = "Test";
 			String cisName ="TestCIS";
@@ -130,17 +132,21 @@ public class NominalTestCaseUpperTester {
 			Future<ICisOwned> asyncCis = TestCase962.getCisManager().createCis(cssId, cssPassword, cisName, cisType, mode);
 			myCis = asyncCis.get();
 			
-			if(LOG.isDebugEnabled()) {
+			assertNotNull("[#962] CIS is null! Failed creating!",myCis);
+			
+			if(LOG.isDebugEnabled() && myCis != null) {
+				LOG.debug("[#962] myCis is " + myCis);
 				LOG.debug("[#962] myCis.getCisId()" + myCis.getCisId());
 				LOG.debug("[#962] myCis.getCisType()" + myCis.getCisType());
 				LOG.debug("[#962] myCis.getOwnerId()" + myCis.getOwnerId());
 				LOG.debug("[#962] myCis.getName()" + myCis.getName());
 				LOG.debug("[#962] myCis.getDescription()" + myCis.getDescription());
-			}
+			} 
 			
 		} catch(Exception ex){
-			LOG.error("[#962] Preamble Install Service: Exception occured: " + ex);
-			fail("[#962] Preamble Install Service: Exception occured: " + ex);
+			ex.printStackTrace();
+			LOG.error("[#962] Preamble Service: Exception occured: " + ex);
+			fail("[#962] Preamble Service: Exception occured: " + ex);
 			return;
 		}
 	}
