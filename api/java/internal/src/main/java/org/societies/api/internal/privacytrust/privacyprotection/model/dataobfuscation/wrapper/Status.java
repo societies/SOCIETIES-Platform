@@ -27,88 +27,32 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfu
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
- * Describe your class here...
+ * Status
  *
  * @author olivierm
  *
  */
-public class LocationCoordinates {
-	private double latitude;
-	private double longitude;
-	private double accuracy;
+public class Status {
+	private String status;
 	
-	
-	/**
-	 * @param latitude
-	 * @param longitude
-	 */
-	public LocationCoordinates(double latitude, double longitude, double accuracy) {
+	public Status() {
 		super();
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.accuracy = accuracy;
+	}
+	/**
+	 * @param firstName
+	 * @param lastName
+	 */
+	public Status(String status) {
+		super();
+		this.status = status;
 	}
 	
 	
-	/**
-	 * @return the latitude
-	 */
-	public double getLatitude() {
-		return latitude;
+	public String getStatus() {
+		return status;
 	}
-	/**
-	 * @param latitude the latitude to set
-	 */
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-	/**
-	 * @return the longitude
-	 */
-	public double getLongitude() {
-		return longitude;
-	}
-	/**
-	 * @param longitude the longitude to set
-	 */
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-	/**
-	 * @return the accuracy
-	 */
-	public double getAccuracy() {
-		return accuracy;
-	}
-	/**
-	 * @param accuracy the accuracy to set
-	 */
-	public void setAccuracy(double accuracy) {
-		this.accuracy = accuracy;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Geolocation [latitude=" + latitude + ", longitude=" + longitude
-				+ ", accuracy=" + accuracy + "]";
-	}
-	public String toXMLString() {
-		return "<geolocation>\n" +
-				"\t<latitude>" + latitude + "</latitude>\n" +
-				"\t<longitude>" + longitude+ "</longitude>\n" +
-				"\t<horizontalAccuracy>" + accuracy + "</horizontalAccuracy>\n" +
-			"</geolocation>";
-	}
-	public String toJSONString() {
-		return "{\n" +
-				"\"latitude\": \""+latitude+"\",\n" +
-				"\"longitude\": \""+longitude+"\",\n" +
-				"\"horizontalAccuracy\": \""+accuracy+"\"\n" +
-				"}";
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 	/*
@@ -122,14 +66,19 @@ public class LocationCoordinates {
 		}
 
 		// -- Verify obj type
-		if (obj instanceof LocationCoordinates) {
-			LocationCoordinates other = (LocationCoordinates) obj;
+		if (obj instanceof Status) {
+			Status other = (Status) obj;
 			return new EqualsBuilder()
-			.append(this.getLatitude(), other.getLatitude())
-			.append(this.getLongitude(), other.getLongitude())
-			.append(this.getAccuracy(), other.getAccuracy())
+			.append(this.getStatus(), other.getStatus())
 			.isEquals();
 		}
 		return false;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Name [status=" + status + "]";
 	}
 }

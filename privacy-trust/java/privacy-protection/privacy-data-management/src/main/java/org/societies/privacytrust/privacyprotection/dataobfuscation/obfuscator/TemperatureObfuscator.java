@@ -22,29 +22,38 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
+package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Temperature;
 
 /**
- * Wrapper for name obfuscation
+ * Obfuscator for name
  *
  * @author Olivier Maridat (Trialog)
  *
  */
-public class NameWrapper extends DataWrapper<Name> {
+public class TemperatureObfuscator extends DataObfuscator<IDataWrapper<Temperature>> {
+	/**
+	 * @param data
+	 */
+	public TemperatureObfuscator(IDataWrapper<Temperature> data) {
+		super(data);
+		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
+		stepNumber = 1;
+		dataType = Temperature.class;
+	}
 
-	/**
-	 * @param data
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
-	public NameWrapper(Name data) {
-		super(data);
+	@Override
+	public IDataWrapper<Temperature> obfuscateData(double obfuscationLevel)
+			throws PrivacyException {
+		return dataWrapper;
 	}
-	/**
-	 * DO NOT USE
-	 * @param data
-	 */
-	private NameWrapper(String dataId, Name data) {
-		super(data);
-	}
+
 }

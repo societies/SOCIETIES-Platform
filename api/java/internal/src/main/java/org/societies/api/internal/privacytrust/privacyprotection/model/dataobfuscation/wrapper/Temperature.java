@@ -27,90 +27,79 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfu
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
- * Describe your class here...
+ * Temperature
  *
  * @author olivierm
  *
  */
-public class LocationCoordinates {
-	private double latitude;
-	private double longitude;
-	private double accuracy;
+public class Temperature {
+	private double degree;
+	private String degreeString;
+	private boolean resultIsString;
+	public static enum heat {burny, hot, cool, cold, freezy};
+	public static String[] heatString = {"burny", "hot", "cool", "cold", "freezy"};
 	
-	
-	/**
-	 * @param latitude
-	 * @param longitude
-	 */
-	public LocationCoordinates(double latitude, double longitude, double accuracy) {
+	public Temperature() {
 		super();
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.accuracy = accuracy;
+	}
+	public Temperature(double degree) {
+		super();
+		this.degree = degree;
+		resultIsString = false;
+	}
+	public Temperature(String degree) {
+		super();
+		this.degreeString = degree;
+		resultIsString = true;
 	}
 	
 	
+
 	/**
-	 * @return the latitude
+	 * @return the degree
 	 */
-	public double getLatitude() {
-		return latitude;
+	public double getDegree() {
+		return degree;
 	}
 	/**
-	 * @param latitude the latitude to set
+	 * @param degree the degree to set
 	 */
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
+	public void setDegree(double degree) {
+		this.degree = degree;
+		resultIsString = false;
+	}
+
+	/**
+	 * @return the degreeString
+	 */
+	public String getDegreeString() {
+		return degreeString;
 	}
 	/**
-	 * @return the longitude
+	 * @param degreeString the degreeString to set
 	 */
-	public double getLongitude() {
-		return longitude;
+	public void setDegreeString(String degreeString) {
+		this.degreeString = degreeString;
+		resultIsString = false;
+		if (null != degreeString && !degreeString.equals("")) {
+			resultIsString = true;
+		}
+	}
+
+	/**
+	 * @return the resultIsString
+	 */
+	public boolean isResultIsString() {
+		return resultIsString;
 	}
 	/**
-	 * @param longitude the longitude to set
+	 * @param resultIsString the resultIsString to set
 	 */
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-	/**
-	 * @return the accuracy
-	 */
-	public double getAccuracy() {
-		return accuracy;
-	}
-	/**
-	 * @param accuracy the accuracy to set
-	 */
-	public void setAccuracy(double accuracy) {
-		this.accuracy = accuracy;
+	public void setResultIsString(boolean resultIsString) {
+		this.resultIsString = resultIsString;
 	}
 
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Geolocation [latitude=" + latitude + ", longitude=" + longitude
-				+ ", accuracy=" + accuracy + "]";
-	}
-	public String toXMLString() {
-		return "<geolocation>\n" +
-				"\t<latitude>" + latitude + "</latitude>\n" +
-				"\t<longitude>" + longitude+ "</longitude>\n" +
-				"\t<horizontalAccuracy>" + accuracy + "</horizontalAccuracy>\n" +
-			"</geolocation>";
-	}
-	public String toJSONString() {
-		return "{\n" +
-				"\"latitude\": \""+latitude+"\",\n" +
-				"\"longitude\": \""+longitude+"\",\n" +
-				"\"horizontalAccuracy\": \""+accuracy+"\"\n" +
-				"}";
-	}
-	
 	/*
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -122,14 +111,23 @@ public class LocationCoordinates {
 		}
 
 		// -- Verify obj type
-		if (obj instanceof LocationCoordinates) {
-			LocationCoordinates other = (LocationCoordinates) obj;
+		if (obj instanceof Temperature) {
+			Temperature other = (Temperature) obj;
 			return new EqualsBuilder()
-			.append(this.getLatitude(), other.getLatitude())
-			.append(this.getLongitude(), other.getLongitude())
-			.append(this.getAccuracy(), other.getAccuracy())
+			.append(this.getDegree(), other.getDegree())
+			.append(this.getDegreeString(), other.getDegreeString())
+			.append(this.isResultIsString(), other.isResultIsString())
 			.isEquals();
 		}
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Temperature [degree=" + degree + ", degreeString="
+				+ degreeString + ", resultIsString=" + resultIsString + "]";
 	}
 }
