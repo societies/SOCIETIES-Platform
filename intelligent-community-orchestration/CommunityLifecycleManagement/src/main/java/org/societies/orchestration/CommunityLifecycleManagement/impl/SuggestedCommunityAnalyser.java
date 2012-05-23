@@ -91,6 +91,7 @@ import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
@@ -697,7 +698,10 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		if (sharedContextAttributes.size() > 0) {
     			Iterator<CtxAttribute> contextAttributesIterator = sharedContextAttributes.iterator();
     			while (contextAttributesIterator.hasNext()) {
-    				allMembershipCriteria.add("CONTEXT ATTRIBUTE---" + contextAttributesIterator.next().getType() + "---" + contextAttributesIterator.next().getStringValue());
+    				CtxAttribute z = contextAttributesIterator.next();
+    				String x = z.getType();
+    				String y = z.getStringValue();
+    				allMembershipCriteria.add("CONTEXT ATTRIBUTE---" + x + "---" + y);
     			}
     		}
     	}
@@ -706,7 +710,10 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		if (sharedContextAssociations.size() > 0) {
     			Iterator<CtxAssociation> contextAssociationsIterator = sharedContextAssociations.iterator();
     			while (contextAssociationsIterator.hasNext()) {
-    				allMembershipCriteria.add("CONTEXT ASSOCIATION---" + contextAssociationsIterator.next().getType() + "---" + contextAssociationsIterator.next().getChildEntities());
+    				CtxAssociation z = contextAssociationsIterator.next();
+    				String x = z.getType();
+    				Set<CtxEntityIdentifier> y = z.getChildEntities();
+    				allMembershipCriteria.add("CONTEXT ASSOCIATION---" + x + "---" + y);
     			}
     		}
     	}
@@ -1027,7 +1034,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     							} catch (ExecutionException e) {
     								// TODO Auto-generated catch block
     								e.printStackTrace();
+    							} catch (RuntimeException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
     							}
+    							
     		    		        
     		    		        CtxAttribute thisAttribute = null;
     							try {
@@ -1041,7 +1052,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     							} catch (CtxException e) {
     								// TODO Auto-generated catch block
     								e.printStackTrace();
+    							} catch (RuntimeException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
     							}
+    							
     		    		        //Action xAction = new Action();
     		    		        ResponseItem response = null;
     							try {
@@ -1049,12 +1064,17 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     							} catch (PrivacyException e) {
     								// TODO Auto-generated catch block
     								e.printStackTrace();
+    							} catch (RuntimeException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
     							}
-    		    			    Decision decision = response.getDecision();
-    		    		        if (decision.values()[0] != decision.PERMIT) conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "User");
-    		    		        //else if (userContextBroker.get(thisMember, thisAttribute).equals("Access refused"))
-    		    		        //    conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
-    		    		    }
+    							if (response != null) {
+    		    			        Decision decision = response.getDecision();
+    		    		            if (decision.values()[0] != decision.PERMIT) conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "User");
+    		    		            //else if (userContextBroker.get(thisMember, thisAttribute).equals("Access refused"))
+    		    		            //    conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
+    							}
+    						}
     		    		}
     				}
     			}
@@ -1110,7 +1130,14 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
     			CtxIdentifier theCriteriaId = null;
 				try {
-					theCriteriaId = userContextBroker.lookup(CtxModelType.ATTRIBUTE, thisCis.getMembershipCriteria().get(m)).get().get(0);
+					Future<List<CtxIdentifier>> futureList = userContextBroker.lookup(CtxModelType.ATTRIBUTE, thisCis.getMembershipCriteria().get(m));
+					List<CtxIdentifier> list = futureList.get();
+					if (list != null) {
+						if (list.size() > 0) {
+							theCriteriaId =  list.get(0);
+						}
+					}
+					
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -1118,6 +1145,9 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (RuntimeException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -1133,7 +1163,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} catch (RuntimeException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+				
     		    if (theCriteriaObject instanceof CtxAssociation)
     		        allAttributes = false;
     		}
@@ -1171,6 +1205,9 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} catch (RuntimeException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
     		    CtxModelObject theCriteriaObject = null;
 				try {
@@ -1182,6 +1219,9 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (RuntimeException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -1343,6 +1383,10 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	this.personalisationManager = personalisationManager;
     }
     
+    public void setIdentityManager(IIdentityManager identityManager) {
+		this.identityManager = identityManager;
+	}
+    
 /*   Eliza: these are not needed anymore
  *  public IPersonalisationCallback getPersonalisationCallback() {
     	return personalisationCallback;
@@ -1433,6 +1477,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     	return null;
     }
+
+	
     
     /** Put your functionality here if there IS a return object and you are updating also */
     //public Object setQuery(Stanza arg0, Object arg1) {

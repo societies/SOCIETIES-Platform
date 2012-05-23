@@ -315,10 +315,17 @@ public class CommunityRecommender //implements ICommCallback
 		if (cissToCreate != null) {
 			int lastIndex = -1;
 		    for (int i = 0; i < cissToCreate.size(); i++) {
-			    Future<ICisOwned> createdCisFuture = cisManager.createCis(linkedCss.getIdentifier(), null, null, null, 0);
-			    ICisOwned createdCis = null;
+		    	Future<ICisOwned> createdCisFuture = null;
+			    try {
+		    	    createdCisFuture = cisManager.createCis(linkedCss.getIdentifier(), null, null, null, 0);
+			    } catch (NullPointerException e) {
+			    	e.printStackTrace();
+			    }
+			    
+		    	ICisOwned createdCis = null;
 				try {
-					createdCis = createdCisFuture.get();
+					if (createdCisFuture != null)
+					    createdCis = createdCisFuture.get();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
