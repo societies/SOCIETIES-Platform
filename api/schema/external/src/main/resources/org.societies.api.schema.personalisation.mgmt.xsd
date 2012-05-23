@@ -22,7 +22,7 @@
 			<xs:sequence>
 				<xs:element name="method" type="personalisationMethodType"
 					minOccurs="1"></xs:element>
-				<xs:element name="requestor" type="tns:RequestorBean"
+				<xs:element name="requestor" type="tns:requestorBean"
 					minOccurs="1"></xs:element>
 				<xs:element name="userIdentity" type="xs:string"
 					minOccurs="1"></xs:element>

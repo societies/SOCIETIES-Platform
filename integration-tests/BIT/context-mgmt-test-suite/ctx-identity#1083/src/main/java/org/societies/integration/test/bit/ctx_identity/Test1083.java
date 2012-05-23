@@ -25,6 +25,7 @@
 package org.societies.integration.test.bit.ctx_identity;
 
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.integration.test.IntegrationTestCase;
 
@@ -38,6 +39,8 @@ public class Test1083 extends IntegrationTestCase{
 
 	
 	public static ICtxBroker ctxBroker;
+	private static ICommManager commMgr;
+
 	
 	public Test1083(){
 		super(1083, new Class[]{Tester.class});
@@ -55,6 +58,20 @@ public class Test1083 extends IntegrationTestCase{
 	 */
 	public  void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
+	}
+
+	/**
+	 * @return the commMgr
+	 */
+	public static ICommManager getCommMgr() {
+		return commMgr;
+	}
+
+	/**
+	 * @param commMgr the commMgr to set
+	 */
+	public void setCommMgr(ICommManager commMgr) {
+		this.commMgr = commMgr;
 	}
 
 }

@@ -91,7 +91,7 @@ public class CisSubscribedImp implements ICis {
 		return this.cisRecord.getMembershipCriteria();
 	}
 
-	
+	@Override
 	public void getInfo(ICisManagerCallback callback){
 		LOG.debug("client call to get info from a RemoteCIS");
 
@@ -118,8 +118,10 @@ public class CisSubscribedImp implements ICis {
 		}	
 	}
 
+
 	
 	//Overriding hash and equals to compare cisRecord only
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -145,7 +147,6 @@ public class CisSubscribedImp implements ICis {
 			return false;
 		return true;
 	}
-	// end of Overriding hash and equals to compare cisRecord only
-	
+
 	
 }

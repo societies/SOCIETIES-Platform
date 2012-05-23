@@ -125,8 +125,9 @@ public interface ICisManager {
 	/**
 	 * Join a CIS (at the moment hosted remotely).
 	 * The callback must be able to retrieve a community object
+	 * containg a join response
 	 * defined at org.societies.api.schema.cis.community 
-	 * it can be know the result of the join
+	 * it has the result of the join plus some complimentary info from the CIS
 	 *  
 	 * @param cisId JID of the CIS to be joined
 	 * @param callback callback function
@@ -136,7 +137,9 @@ public interface ICisManager {
 	/**
 	 * Leave a CIS, most likely hosted remotely.
 	 * The callback must be able to retrieve a community object
+	 * containg a leave response
 	 * defined at org.societies.api.schema.cis.community 
+	 * it has the result of the leave plus some complimentary info from the CIS
 	 *  
 	 * @param cisId JID of the CIS to be joined
 	 * @param callback callback function

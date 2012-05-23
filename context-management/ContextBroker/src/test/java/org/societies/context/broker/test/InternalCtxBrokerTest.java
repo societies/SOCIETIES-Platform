@@ -765,10 +765,12 @@ public class InternalCtxBrokerTest {
 	@Test
 	public void testRetrieveHistoryCtxAttributeIdentifierDateDate() {
 
+		
 		final CtxAttribute emptyAttribute;
 		CtxAttribute initialisedAttribute;
 		final CtxEntity scope;
-
+		System.out.println("testRetrieveHistoryCtxAttributeIdentifierDateDate");
+		
 		// Create the attribute's scope
 		Future<CtxEntity> futureEntity;
 		try {
@@ -800,14 +802,16 @@ public class InternalCtxBrokerTest {
 			// Verify the initial attribute value
 			assertEquals(new Integer(300), initialisedAttribute.getIntegerValue());
 
-			//			Future<List<CtxHistoryAttribute>> historyFuture = internalCtxBroker.retrieveHistory(initialisedAttribute.getId(), null, null);
+			//	Future<List<CtxHistoryAttribute>> historyFuture = internalCtxBroker.retrieveHistory(initialisedAttribute.getId(), null, null);
 
 			List<CtxHistoryAttribute> history = internalCtxBroker.retrieveHistory(initialisedAttribute.getId(), null, null).get();
 
 			for(CtxHistoryAttribute hocAttr: history){
+				System.out.println(history.size());
 				System.out.println("history List id:"+hocAttr.getId()+" getLastMod:"+hocAttr.getLastModified() +" hocAttr value:"+hocAttr.getIntegerValue());		
 			}
 
+			
 			CtxHistoryAttribute hocAttr1 = history.get(0);
 			CtxHistoryAttribute hocAttr2 = history.get(1);
 			CtxHistoryAttribute hocAttr3 = history.get(2);

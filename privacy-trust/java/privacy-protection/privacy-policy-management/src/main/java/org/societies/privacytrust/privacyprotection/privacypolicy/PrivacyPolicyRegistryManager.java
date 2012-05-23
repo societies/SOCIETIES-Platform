@@ -62,14 +62,14 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 public class PrivacyPolicyRegistryManager {
 
 	private PrivacyPolicyRegistry policyRegistry;
-	private ICtxBroker broker;
+	private ICtxBroker ctxBroker;
 		
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IIdentity myPublicDPI;
 	private IIdentityManager idm;
 	
 	public PrivacyPolicyRegistryManager(ICtxBroker ctxBroker){
-		this.broker = ctxBroker;
+		this.ctxBroker = ctxBroker;
 		this.loadPolicies();
 	}
 
@@ -88,7 +88,7 @@ public class PrivacyPolicyRegistryManager {
 		CtxIdentifier id = this.storePolicyToDB(requestor, policy);
 		this.policyRegistry.addPolicy(requestor,id);
 		this.storePolicies(); 
-		this.storePolicyToFile(policy);		
+		//this.storePolicyToFile(policy);		
 		
 
 	}
@@ -106,6 +106,8 @@ public class PrivacyPolicyRegistryManager {
 			this.log("registry empty. loading policies");
 			this.loadPolicies();
 		}
+		
+		
 		CtxIdentifier id = this.policyRegistry.getPolicyStorageID(requestor);
 		if (id==null){
 			this.logging.warn("Requestor: "+requestor.toString()+" has not provided a privacy policy document");
@@ -113,7 +115,7 @@ public class PrivacyPolicyRegistryManager {
 		}
 		CtxAttribute ctxAttr;
 		try {
-			ctxAttr = (CtxAttribute) broker.retrieve(id).get();
+			ctxAttr = (CtxAttribute) ctxBroker.retrieve(id).get();
 			RequestPolicy policy = (RequestPolicy) SerialisationHelper.deserialise(ctxAttr.getBinaryValue(), this.getClass().getClassLoader());
 			return policy;
 		} catch (CtxException e) {
@@ -144,11 +146,11 @@ public class PrivacyPolicyRegistryManager {
 				name = ((RequestorCis) requestor).getCisRequestorId().getJid();
 			}
 			//TODO: The name might cause an error. We might need to provide different names for storing the policies as attributes in DB
-			List<CtxIdentifier> ctxIDs = broker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+name).get();
+			List<CtxIdentifier> ctxIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+name).get();
 			if (ctxIDs.size()==0){
-				List<CtxIdentifier> entityIDs = broker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PRIVACY_POLICY).get();
+				List<CtxIdentifier> entityIDs = ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PRIVACY_POLICY).get();
 				if (entityIDs.size()==0){
-					CtxEntity person = broker.retrieveCssOperator().get();
+					CtxEntity person = ctxBroker.retrieveCssOperator().get();
 					if (person==null){
 						this.log("ERROR in DB. Operator Entity doesn't exist");
 						return null;
@@ -156,29 +158,29 @@ public class PrivacyPolicyRegistryManager {
 					Set<CtxAssociationIdentifier> assocIDs = person.getAssociations(CtxAssociationTypes.HAS_PRIVACY_POLICIES);
 					CtxAssociation assoc;
 					if (assocIDs.size()==0){
-						assoc = broker.createAssociation(CtxAssociationTypes.HAS_PRIVACY_POLICIES).get();
+						assoc = ctxBroker.createAssociation(CtxAssociationTypes.HAS_PRIVACY_POLICIES).get();
 						assoc.setParentEntity(person.getId());
 					}else{
-						assoc = (CtxAssociation) broker.retrieve(assocIDs.iterator().next());
+						assoc = (CtxAssociation) ctxBroker.retrieve(assocIDs.iterator().next());
 					}
-					CtxEntity policyEntity = broker.createEntity(CtxEntityTypes.PRIVACY_POLICY).get();
+					CtxEntity policyEntity = ctxBroker.createEntity(CtxEntityTypes.PRIVACY_POLICY).get();
 					assoc.addChildEntity(policyEntity.getId());
-					broker.update(assoc);
+					ctxBroker.update(assoc);
 					
 					entityIDs.add(policyEntity.getId());
 					
 				}
-				CtxAttribute ctxAttr = broker.createAttribute((CtxEntityIdentifier) entityIDs.get(0), "policyOf"+name).get();
+				CtxAttribute ctxAttr = ctxBroker.createAttribute((CtxEntityIdentifier) entityIDs.get(0), "policyOf"+name).get();
 				ctxAttr.setBinaryValue(SerialisationHelper.serialise(policy));
-				broker.update(ctxAttr);
+				ctxBroker.update(ctxAttr);
 				this.log("Created attribute: "+ctxAttr.getType());
 				return ctxAttr.getId();
 				
 			
 			}else{
-				CtxAttribute ctxAttr = (CtxAttribute) broker.retrieve(ctxIDs.get(0)).get();
+				CtxAttribute ctxAttr = (CtxAttribute) ctxBroker.retrieve(ctxIDs.get(0)).get();
 				ctxAttr.setBinaryValue(SerialisationHelper.serialise(policy));
-				broker.update(ctxAttr);
+				ctxBroker.update(ctxAttr);
 				this.log("Updated attribute:"+ctxAttr.getType());
 				return ctxAttr.getId();
 			}
@@ -202,19 +204,19 @@ public class PrivacyPolicyRegistryManager {
 	 */
 	private void loadPolicies(){
 		try {
-			List<CtxIdentifier> attrList = broker.lookup(CtxModelType.ATTRIBUTE, "SERVICE_PRIVACY_POLICY_REGISTRY").get();
+			List<CtxIdentifier> attrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY).get();
 			if (null!=attrList){
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
-					CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier).get();
+					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
 					this.policyRegistry = (PrivacyPolicyRegistry) SerialisationHelper.deserialise(attr.getBinaryValue(),this.getClass().getClassLoader());
 					if (this.policyRegistry==null){
 						this.policyRegistry = new PrivacyPolicyRegistry();
-						this.loadPoliciesFromFile();
+						//this.loadPoliciesFromFile();
 						
 						this.log("No service privacy policies found in context DB, reading from file");
 					}else if (this.policyRegistry.isEmpty()){
-						this.loadPoliciesFromFile();
+						//this.loadPoliciesFromFile();
 						this.log("No service policies loaded from context DB. Reading from file");
 					}
 					else{
@@ -224,17 +226,17 @@ public class PrivacyPolicyRegistryManager {
 				else{
 					this.policyRegistry = new PrivacyPolicyRegistry();
 					this.log("No service privacy policies found in context DB, reading from file");
-					this.loadPoliciesFromFile();
+					//this.loadPoliciesFromFile();
 				}
 			}else{
 				this.policyRegistry = new PrivacyPolicyRegistry();
 				this.log("No service privacy policies found in context DB, reading from file");
-				this.loadPoliciesFromFile();
+				//this.loadPoliciesFromFile();
 			}
 		} catch (CtxException e) {
 			this.policyRegistry = new PrivacyPolicyRegistry();
 			this.log("No service privacy policies found in context DB, reading from file");
-			this.loadPoliciesFromFile();
+			//this.loadPoliciesFromFile();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -252,12 +254,12 @@ public class PrivacyPolicyRegistryManager {
 	}
 	/**
 	 * method to load the policies from the filesystem
-	 */
+	 *
 	private void loadPoliciesFromFile(){
 		File dir = new File("./servicePrivacyPolicies");
 		if (dir.isDirectory()){
 			File[] files = dir.listFiles(new Filter("xml"));
-			XMLPolicyReader reader = new XMLPolicyReader(broker, idm);
+			XMLPolicyReader reader = new XMLPolicyReader(ctxBroker, idm);
 			for (int i=0; i<files.length; i++){
 				RequestPolicy request = reader.readPolicyFromFile(files[i]);
 				if (request!=null){
@@ -270,7 +272,7 @@ public class PrivacyPolicyRegistryManager {
 			this.log("Directory: "+dir.toString()+" doesn't exist");
 		}
 		
-	}
+	}*/
 	
 	/**
 	 * method to set the new public dpi in the registry objects
@@ -286,19 +288,19 @@ public class PrivacyPolicyRegistryManager {
 	 */
 	private void storePolicies(){
 		try {
-			List<CtxIdentifier> attrList = broker.lookup(CtxModelType.ATTRIBUTE, "SERVICE_PRIVACY_POLICY_REGISTRY").get();
+			List<CtxIdentifier> attrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY).get();
 
 			if (attrList.size()>0){
 				CtxIdentifier identifier = attrList.get(0);
-				CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier);
+				CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier);
 				attr.setBinaryValue(SerialisationHelper.serialise(this.policyRegistry));
-				broker.update(attr);
+				ctxBroker.update(attr);
 				this.log("Stored service privacy policies");
 			}else{
-				CtxEntity operator = broker.retrieveCssOperator().get();
-				CtxAttribute attr = broker.createAttribute(operator.getId(), CtxAttributeTypes.PRIVACY_POLICY_REGISTRY).get();
+				CtxEntity operator = ctxBroker.retrieveCssOperator().get();
+				CtxAttribute attr = ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.PRIVACY_POLICY_REGISTRY).get();
 				attr.setBinaryValue(SerialisationHelper.serialise(this.policyRegistry));
-				broker.update(attr);
+				ctxBroker.update(attr);
 				this.log("Created new Attribute: "+CtxAttributeTypes.PRIVACY_POLICY_REGISTRY+" and stored the service privacy policies");
 			}
 		} catch (CtxException e) {
@@ -369,4 +371,20 @@ public class PrivacyPolicyRegistryManager {
 		}
 		
 	}
+
+	public void deletePolicy(Requestor requestor) {
+		CtxIdentifier ctxId = this.policyRegistry.getPolicyStorageID(requestor);
+		
+		if (ctxId!=null){
+			try {
+				this.ctxBroker.remove(ctxId);
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		this.policyRegistry.removePolicy(requestor);
+	}
 }
+

@@ -37,7 +37,10 @@ import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
+import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.actions.DisplayMessageAction;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables.MessageStateVariable;
 
@@ -55,21 +58,21 @@ public class Screen implements IDriverService{
 	
 	private static Logger LOG = LoggerFactory.getLogger(Screen.class);
 	
-	private SampleActivatorDriver sampleActivatorDriver;
+	private SampleActivatorDriver activatorDriver;
 	private String serviceId;
 	private String  physicalDeviceId;
 	private String deviceId;
 	
-	private EventAdmin eventAdmin;
+	private IEventMgr eventManager;
 	
-	public Screen(SampleActivatorDriver sampleActivatorDriver, String serviceId, String physicalDeviceId, String deviceId) {
+	public Screen(SampleActivatorDriver activatorDriver, String serviceId, String physicalDeviceId, String deviceId) {
 		
-		this.sampleActivatorDriver = sampleActivatorDriver;
+		this.activatorDriver = activatorDriver;
 		this.serviceId = serviceId;
 		this.physicalDeviceId = physicalDeviceId;
 		this.deviceId = deviceId;
 		
-		eventAdmin = sampleActivatorDriver.getEventAdmin();
+		eventManager = activatorDriver.getEventManager();
 		
 		IDeviceStateVariable stateVariable;
 		IAction action;
@@ -81,14 +84,14 @@ public class Screen implements IDriverService{
 		actions.put(action.getName(), action);
 	}
 	
-	public Screen(SampleActivatorDriver sampleActivatorDriver, String serviceId, String physicalDeviceId) {
+	public Screen(SampleActivatorDriver activatorDriver, String serviceId, String physicalDeviceId) {
 		
-		this.sampleActivatorDriver = sampleActivatorDriver;
+		this.activatorDriver = activatorDriver;
 		this.serviceId = serviceId;
 		this.physicalDeviceId = physicalDeviceId;
 		
 		
-		eventAdmin = sampleActivatorDriver.getEventAdmin();
+		eventManager = activatorDriver.getEventManager();
 		
 		IDeviceStateVariable stateVariable;
 		IAction action;
@@ -141,16 +144,16 @@ public class Screen implements IDriverService{
 	
 	
 	public  void sendMessageToScreen (String message)
-	{
-		LOG.info("DeviceDriverSimulator Screen Displays: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " + message);
+	{			
 		
-		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by eventAdmin");
-		Dictionary<String, Object> eventAdminDic = new Hashtable<String, Object>();
-		
-		eventAdminDic.put("screenEvent", message);
-		eventAdminDic.put("event_name", DeviceMgmtEventConstants.SCREEN_EVENT);
-		
-		eventAdmin.sendEvent(new Event(EventTypes.DEVICE_MANAGEMENT_EVENT, eventAdminDic));
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("screenEvent", message);
+		InternalEvent event = new InternalEvent(EventTypes.DEVICE_MANAGEMENT_EVENT, DeviceMgmtEventConstants.SCREEN_EVENT, deviceId, payload);
+		try {
+			eventManager.publishInternalEvent(event);
+		} catch (EMSException e) {
+			LOG.error("Error when publishing new screen", e);
+		}
 		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by eventAdmin");
 	}
 

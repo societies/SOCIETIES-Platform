@@ -109,6 +109,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		
 		ctxBrokerContact = new CRISTCtxBrokerContact(ctxBroker);
 		
+		/* debug
 		CRISTCtxBrokerContact.initializeHistory(registeredContext, ctxBrokerContact);
 		
 		historyList = CRISTCtxBrokerContact.retrieveHistoryData(ctxBrokerContact);
@@ -117,6 +118,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		{
 			LOG.info("retrieveHistoryData ----- " + historyData.toString());
 		}
+		*/
 	}
 
 	/*

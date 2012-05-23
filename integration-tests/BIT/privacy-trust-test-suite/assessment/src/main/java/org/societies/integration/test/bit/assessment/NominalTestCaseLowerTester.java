@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.integration.test.IntegrationTestUtils;
@@ -26,6 +27,7 @@ public class NominalTestCaseLowerTester {
 	private static final long PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS = 200;
 	
 	private static IPrivacyLogAppender privacyLogAppender;
+	private static IIdentityManager identityManager;
 	
 	/**
 	 * Tools for integration test
@@ -55,8 +57,10 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#1055] Prerequisite: The user is logged to the CSS");
 
 		privacyLogAppender = TestCase1055.getPrivacyLogAppender();
+		identityManager = TestCase1055.getIdentityManager();
 		
 		assertNotNull(privacyLogAppender);
+		assertNotNull(identityManager);
 	}
 
 	/**
@@ -115,5 +119,10 @@ public class NominalTestCaseLowerTester {
 		assertTrue(dt < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
 		LOG.info("[#1055] testSpeedOfExecution(): FINISHED");
+	}
+	
+	@Test
+	public void testAssessment() {
+		// TODO
 	}
 }
