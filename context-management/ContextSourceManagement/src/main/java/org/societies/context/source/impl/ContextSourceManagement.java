@@ -40,7 +40,6 @@ import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.source.ICtxSourceMgr;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
-import org.societies.context.api.user.db.IUserCtxDBMgr;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,13 +54,6 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 	private static Logger LOG = LoggerFactory
 			.getLogger(ContextSourceManagement.class);
-	/**
-	 * The User Context DB Mgmt service reference.
-	 * 
-	 * @see {@link #setUserCtxDBMgr(IUserCtxDBMgr)}
-	 */
-	@Autowired(required = true)
-	private IUserCtxDBMgr userCtxDBMgr = null;
 
 	/**
 	 * The Context Broker service reference.
@@ -92,16 +84,6 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	private NewDeviceListener newDeviceListener;
 	private final String sensor = "CONTEXT_SOURCE";
 	private int counter;
-
-	/**
-	 * Sets the User Context DB Mgmt service reference.
-	 * 
-	 * @param userDB
-	 *            the User Context DB Mgmt service reference to set.
-	 */
-	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
-		this.userCtxDBMgr = userDB;
-	}
 
 	/**
 	 * Sets the Context Broker service reference
