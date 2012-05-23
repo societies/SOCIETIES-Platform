@@ -39,6 +39,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
@@ -160,7 +161,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			List<Action> actions = new ArrayList<Action>();
 			Decision decision = Decision.PERMIT;
 			Resource resource = new Resource(dataId);
-			RequestItem requestItem = new RequestItem(resource, actions, null);
+			RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
 			ResponseItem permission = new ResponseItem(requestItem, decision);
 			if (null == privacyDataManagerInternal) {
 				LOG.info("privacyDataManagerInternal null");

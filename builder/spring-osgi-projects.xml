@@ -138,9 +138,10 @@
 		<module>../intelligent-community-orchestration/API</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
+		<!-- 
 		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
 		</module>
-
+		-->
 		<!-- Privacy & Trust -->
 		<module>../privacy-trust/java/privacy-protection</module>
 		<module>../privacy-trust/java/trust</module>
