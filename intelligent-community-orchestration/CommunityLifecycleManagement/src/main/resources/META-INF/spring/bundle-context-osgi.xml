@@ -39,7 +39,6 @@
 		<osgi:reference id="IUserFeedbackCallback" interface="org.societies.api.internal.useragent.feedback.IUserFeedbackCallback"/>
 		<osgi:reference id="IPrivacyDataManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager"/>
         <osgi:reference id="IPersonalisationManager" interface="org.societies.api.personalisation.mgmt.IPersonalisationManager"/>
-        <osgi:reference id="IPersonalisationCallback" interface="org.societies.api.personalisation.mgmt.IPersonalisationCallback"/>
 		<osgi:reference id="IServiceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
 		<osgi:reference id="IServiceDiscoveryCallback" interface="org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback"/>
 		<!-- <osgi:reference id="ISuggestedCommunityAnalyser" interface="org.societies.orchestration.api.ISuggestedCommunityAnalyser"/>

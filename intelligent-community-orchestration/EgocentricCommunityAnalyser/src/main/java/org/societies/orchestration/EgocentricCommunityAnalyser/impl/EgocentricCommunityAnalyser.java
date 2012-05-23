@@ -62,6 +62,7 @@ import org.societies.orchestration.api.ICisParticipant;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.identity.IIdentityManager;
 
@@ -108,6 +109,9 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	
 	private IDeviceManager deviceManager;
 	
+	private int temporaryCheckInterval;
+	private int ongoingCheckInterval;
+	
 	/*
      * Constructor for EgocentricCommunityAnalyser
      * 
@@ -128,26 +132,40 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 		lastTemporaryCheck = new Date();
 		lastOngoingCheck = new Date();
 		
+		temporaryCheckInterval = 1000 * 60 * 3;
+		ongoingCheckInterval = 1000 * 60 * 60 * 24;
 		//else
 		//	this.linkedDomain = linkedEntity;
 	}
 	
 	public void removeObsoleteRecordedCiss() {
 		ICis[] ciss = cisManager.getCisList(null);
-		//boolean notFound = true;
-		//for (int m = 0; m < ciss.length; m++) {
-		//    if (userCissMetadata.get(ciss[m].getID()) == null)
-		//        userCissMetadata.remove(ciss[m]);
-		//}
+		boolean notFound = true;
+		for (int m = 0; m < ciss.length; m++) {
+		    if (userCissMetadata.get(ciss[m].getCisId()) == null)
+		        userCissMetadata.remove(ciss[m]);
+		}
 	}
 	
 	public void addNewCissToRecords(ArrayList<String> newCissMetadata) {
-		//for (int i = 0; i < newCissMetadata.size(); i++) {
-				//    if (userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) == null)
-				//        userCissMetadata.add(newCissMetadata..get(i).split("---")[0], newCissMetadata.get(i));
-		        //    else if (userCissMetadata.get(newCissMetadata.get(i).split"---")[0] != null)
-		        //        userCissMetadata.replace(newCissMetadata.get(i).split("---")[0], newCissMetadata.get(i));
-	    //}
+		for (int i = 0; i < newCissMetadata.size(); i++) {
+				    if (userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) == null) {
+				        try {
+							userCissMetadata.put(identityManager.fromJid(newCissMetadata.get(i).split("---")[0]), newCissMetadata.get(i));
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				    }
+				    else if (userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) != null) {
+		                try {
+							userCissMetadata.put(identityManager.fromJid(newCissMetadata.get(i).split("---")[0]), newCissMetadata.get(i));
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				    }
+	    }
 	}
 	
 	public void processPreviousLongTimeCycle() {
@@ -179,7 +197,7 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 			while (true) {
 				//try {
 					Date date = new Date();
-					if (date.getTime() >= (lastTemporaryCheck.getTime() + (1000 * 180))) {
+					if (date.getTime() >= (lastTemporaryCheck.getTime() + (temporaryCheckInterval))) {
 						processPreviousShortTimeCycle();
 						lastTemporaryCheck.setTime(date.getTime());
 					}
@@ -198,7 +216,7 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 		public void run() {
 			while (true) {
 				Date date = new Date();
-				if (date.getTime() >= (lastOngoingCheck.getTime() + (1000 * 60 ^ 60 * 24))) {
+				if (date.getTime() >= (lastOngoingCheck.getTime() + (ongoingCheckInterval))) {
 					processPreviousLongTimeCycle();
 					lastOngoingCheck.setTime(date.getTime());
 				}
