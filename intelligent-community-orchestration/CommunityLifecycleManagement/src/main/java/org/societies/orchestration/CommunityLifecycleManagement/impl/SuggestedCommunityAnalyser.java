@@ -556,7 +556,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			ArrayList<ICisProposal> ciss = new ArrayList<ICisProposal>();
 			ciss.add(cisProposal);
 			if (creations.size() > 0)
-			convertedRecommendations = advancedCisCreationAnalysis(creations);
+			convertedRecommendations = advancedCisCreationAnalysis(creations, configurations, deletions);
 			
 			if (configurations.size() > 0)
 			    convertedRecommendations.put("Configure CIS", configurations);
@@ -673,13 +673,66 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		else
     			return;
     	*/
-    		
-    	//proposedCis.setName("");
+    	
+    	if (cssList == null)
+    		return "FAILURE";
+    	else if (!(cssList.size() > 0))
+    		return "FAILURE";
+    	
+    	Iterator<IIdentity> cssListIterator = cssList.iterator();
+    	
+    	while (cssListIterator.hasNext()) {
+    		try {
+				proposedCis.addMember(cssListIterator.next().getJid(), "participant");
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	
     	//proposedCis.setType("");
-    	//proposedCis.setMembershipCriteria(-1);
+    	
+    	ArrayList<String> allMembershipCriteria = new ArrayList<String>();
+    	if (sharedContextAttributes != null) {
+    		if (sharedContextAttributes.size() > 0) {
+    			Iterator<CtxAttribute> contextAttributesIterator = sharedContextAttributes.iterator();
+    			while (contextAttributesIterator.hasNext()) {
+    				allMembershipCriteria.add("CONTEXT ATTRIBUTE---" + contextAttributesIterator.next().getType() + "---" + contextAttributesIterator.next().getStringValue());
+    			}
+    		}
+    	}
+
+    	if (sharedContextAssociations != null) {
+    		if (sharedContextAssociations.size() > 0) {
+    			Iterator<CtxAssociation> contextAssociationsIterator = sharedContextAssociations.iterator();
+    			while (contextAssociationsIterator.hasNext()) {
+    				allMembershipCriteria.add("CONTEXT ASSOCIATION---" + contextAssociationsIterator.next().getType() + "---" + contextAssociationsIterator.next().getChildEntities());
+    			}
+    		}
+    	}
+    	
+    	if (sharedCssActivities != null) {
+    		if (sharedCssActivities.size() > 0) {
+    			Iterator<ICssActivity> cssActivitiesIterator = sharedCssActivities.iterator();
+    			while (cssActivitiesIterator.hasNext()) {
+    				allMembershipCriteria.add("ACTIVITY---" + cssActivitiesIterator.next().toString());
+    			}
+    		}
+    	}
+
+    	if (sharedCisActivities != null) {
+    		if (sharedCisActivities.size() > 0) {
+    			Iterator<IActivity> cisActivitiesIterator = sharedCisActivities.iterator();
+    			while (cisActivitiesIterator.hasNext()) {
+    				allMembershipCriteria.add("ACTIVITY---" + cisActivitiesIterator.next().toString());
+    			}
+    		}
+    	}
+    	
+    	proposedCis.setMembershipCriteria(allMembershipCriteria);
     	
     	//proposedCis.setMembersList(cssList);
-    	ArrayList<Object> membershipCriteria = new ArrayList<Object>();
+    	/**ArrayList<Object> membershipCriteria = new ArrayList<Object>();
     	for (int i = 0; i < sharedContextAttributes.size(); i++) {
     		membershipCriteria.add(sharedContextAttributes.get(i));
     	}
@@ -691,7 +744,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	}
     	for (int i = 0; i < sharedCssActivities.size(); i++) {
     		membershipCriteria.add(sharedCssActivities.get(i));
-    	}
+    	}*/
     	//proposedCis.setMembershipCriteria(membershipCriteria);
     	
     	ArrayList<ICisProposal> creations = new ArrayList<ICisProposal>();
@@ -711,76 +764,78 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	
 		ArrayList<ArrayList<ICisProposal>> configurations = new ArrayList<ArrayList<ICisProposal>>();
 		
-			ArrayList<String> preferenceConflicts = checkForPreferenceConflicts("Create CISs", abstractCreations);
-			if (preferenceConflicts.size() != 0)
-				for (int i = 0; i < preferenceConflicts.size(); i++) {
-				    creations.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
-		        }
+		ArrayList<ICisProposal> deletions = new ArrayList<ICisProposal>();
+		
+		ArrayList<String> preferenceConflicts = checkForPreferenceConflicts("Create CISs", abstractCreations);
+		if (preferenceConflicts.size() != 0)
+			for (int i = 0; i < preferenceConflicts.size(); i++) {
+			    creations.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
+		    }
 	
 			
-            for (int i = 0; i < creations.size(); i++) {
+        for (int i = 0; i < creations.size(); i++) {
 		    	
-	    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
-	    		boolean refuseSuggestion = false;
-	    		String returnMessage = "";
-	    		if (privacyConflicts.size() != 0) {
+	    	ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
+	    	boolean refuseSuggestion = false;
+	    	String returnMessage = "";
+	    	if (privacyConflicts.size() != 0) {
 	    			
-	    			for (int m = 0; m < privacyConflicts.size(); m++) {
-	    				if (privacyConflicts.get(m).contains("User")) {
-	    				    refuseSuggestion = true;
-	    				    returnMessage = "REMOVE MODEL ATTRIBUTE " + privacyConflicts.get(m).split("data")[1];
-	    				}
-	    				else if (privacyConflicts.get(m).contains("CSS: ")) {
-	    					ICisProposal updatedCreation = creations.get(i);
-	    					
-	    					Future<Set<ICisParticipant>> theParticipants = null;
-	    					if (updatedCreation.getActualCis() != null)
-	    						theParticipants = updatedCreation.getActualCis().getMembersList();
-	    					updatedCreation.getMemberList();
-	    					ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
-	    					if (theParticipants != null) {
-	    						Set<ICisParticipant> theParticipantsSet = null;
-								try {
-									theParticipantsSet = theParticipants.get();
-								} catch (InterruptedException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								} catch (ExecutionException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-	    						if (theParticipantsSet != null) {
-	    							Iterator<ICisParticipant> it = theParticipantsSet.iterator();
-	    							while (it.hasNext()) {
-	        							try {
-											theMembers.add(identityManager.fromJid(it.next().toString()));
-										} catch (InvalidFormatException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										}
-	        						}
-	    						}
-	    					}
-	    						
-	    					
-	    					
-	    					theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
-	    					try {
-								updatedCreation.removeMember(privacyConflicts.get(m).split("CSS: ")[1]);
-							} catch (CommunicationException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-	    					creations.set(i, updatedCreation);
-	    				}
-	    					
+	    		for (int m = 0; m < privacyConflicts.size(); m++) {
+	    			if (privacyConflicts.get(m).contains("User")) {
+	    			    refuseSuggestion = true;
+	    			    returnMessage = "REMOVE MODEL ATTRIBUTE " + privacyConflicts.get(m).split("data")[1];
 	    			}
+	    			else if (privacyConflicts.get(m).contains("CSS: ")) {
+	    				ICisProposal updatedCreation = creations.get(i);
+	    				
+	    				Future<Set<ICisParticipant>> theParticipants = null;
+	    				if (updatedCreation.getActualCis() != null)
+	    					theParticipants = updatedCreation.getActualCis().getMembersList();
+	    				updatedCreation.getMemberList();
+	    				ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
+	    				if (theParticipants != null) {
+	    					Set<ICisParticipant> theParticipantsSet = null;
+							try {
+								theParticipantsSet = theParticipants.get();
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (ExecutionException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+	    					if (theParticipantsSet != null) {
+	    						Iterator<ICisParticipant> it = theParticipantsSet.iterator();
+	    						while (it.hasNext()) {
+	       							try {
+										theMembers.add(identityManager.fromJid(it.next().toString()));
+									} catch (InvalidFormatException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+	       						}
+	    					}
+	    				}
+	    						
+	    				
+	    				
+	    				theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
+	    				try {
+							updatedCreation.removeMember(privacyConflicts.get(m).split("CSS: ")[1]);
+						} catch (CommunicationException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	    				creations.set(i, updatedCreation);
+	    			}
+	    					
 	    		}
-	    		if (refuseSuggestion == true)
-	    			creations.remove(i);
-	    		
-	    		
 	    	}
+	    	if (refuseSuggestion == true)
+	    		creations.remove(i);
+	    		
+	    		
+	    }
 			
 		/**for (int i = 0; i < creations.size(); i++) {
 	
@@ -883,10 +938,14 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			//}
 			ArrayList<ICisProposal> ciss = new ArrayList<ICisProposal>();
 			ciss.add(cisProposal);
-			if (creations.size() > 0)
-			convertedRecommendations = advancedCisCreationAnalysis(creations);
 			
-			convertedRecommendations.put("Configure CIS", configurations);
+			
+			
+			if (creations.size() > 0)
+			    convertedRecommendations = advancedCisCreationAnalysis(creations, configurations, deletions);
+			
+			//if (configurations.size() > 0)
+			    //convertedRecommendations.put("Configure CIS", configurations);
 			
 			if (convertedRecommendations.get("Remove from CSM") != null) {
 				if (convertedRecommendations.get("Remove from CSM").size() > 0) {
@@ -1023,8 +1082,25 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		return conflictingPreferences;
     }
     
-    public HashMap<String, ArrayList<ArrayList<ICisProposal>>> advancedCisCreationAnalysis(ArrayList<ICisProposal> proposedCiss) {
+    public HashMap<String, ArrayList<ArrayList<ICisProposal>>> advancedCisCreationAnalysis(ArrayList<ICisProposal> proposedCiss, ArrayList<ArrayList<ICisProposal>> proposedConfigurations, ArrayList<ICisProposal> proposedDeletions) {
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> finalisedCiss = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+    	ArrayList<ArrayList<ICisProposal>> creations = new ArrayList<ArrayList<ICisProposal>>();
+    	ArrayList<ArrayList<ICisProposal>> configurations = new ArrayList<ArrayList<ICisProposal>>();
+    	ArrayList<ArrayList<ICisProposal>> deletions = new ArrayList<ArrayList<ICisProposal>>();
+    	
+    	if (proposedConfigurations != null) 
+    		if (proposedConfigurations.size() > 0)
+    			configurations = proposedConfigurations;
+    	
+    	if (proposedDeletions != null) 
+    		if (proposedDeletions.size() > 0) {
+    			ArrayList<ICisProposal> temp = new ArrayList<ICisProposal>();
+    			Iterator<ICisProposal> it = proposedDeletions.iterator();
+    			while (it.hasNext()) {
+    			    temp.add(it.next());
+    			    deletions.add(temp);
+    			}
+    		}
     	for (int i = 0; i < proposedCiss.size(); i++) {
     		ICisProposal thisCis = proposedCiss.get(i);
     		boolean allAttributes = true;
@@ -1065,7 +1141,10 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		    if (thisCis.getMembershipCriteria().contains("address")) {
 		            if (thisCis.getMembershipCriteria().contains("friends")) {
     		            //Put address as sub-CIS of friends CIS
-    		            //proposedActionsWithMetadata.add(i);
+    		            proposedActionsWithMetadata.add(i);
+    		            ArrayList<ICisProposal> temp = new ArrayList<ICisProposal>();
+    		            temp.add(thisCis);
+    		            creations.add(temp);
     	            }
     		        else {
     		            //Put address first, and other attributes as sub-CISs.
@@ -1128,6 +1207,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		        }
     		}
     	}
+    	if (creations.size() > 0)
+    	    finalisedCiss.put("Create CISs", creations);
+    	if (configurations.size() > 0)
+    	    finalisedCiss.put("Configure CISs", configurations);
+    	if (deletions.size() > 0)
+    	    finalisedCiss.put("Delete CISs", deletions);
     	return finalisedCiss;
     }
     
