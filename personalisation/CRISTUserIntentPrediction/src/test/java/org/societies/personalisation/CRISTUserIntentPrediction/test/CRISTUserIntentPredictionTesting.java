@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.mock.Identity;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction;

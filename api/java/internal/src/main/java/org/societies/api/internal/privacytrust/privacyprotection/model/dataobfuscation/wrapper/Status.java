@@ -22,27 +22,63 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.management;
+package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * Status
+ *
+ * @author olivierm
  *
  */
-/**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
- */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICssActivity {
-	public String getVerb();
-	public void setVerb(String verb);
-	public String getActor();
-	public void setActor(String actor);
-	public String getObject();
-	public void setObject(String object);
-	public String getTarget();
-	public void setTarget(String target);
+public class Status {
+	private String status;
+	
+	public Status() {
+		super();
+	}
+	/**
+	 * @param firstName
+	 * @param lastName
+	 */
+	public Status(String status) {
+		super();
+		this.status = status;
+	}
+	
+	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == this) {
+			return true;
+		}
+
+		// -- Verify obj type
+		if (obj instanceof Status) {
+			Status other = (Status) obj;
+			return new EqualsBuilder()
+			.append(this.getStatus(), other.getStatus())
+			.isEquals();
+		}
+		return false;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Name [status=" + status + "]";
+	}
 }

@@ -22,27 +22,38 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.management;
+package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.PostalLocation;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * Obfuscator for name
+ *
+ * @author Olivier Maridat (Trialog)
  *
  */
-/**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
- */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICssActivity {
-	public String getVerb();
-	public void setVerb(String verb);
-	public String getActor();
-	public void setActor(String actor);
-	public String getObject();
-	public void setObject(String object);
-	public String getTarget();
-	public void setTarget(String target);
+public class PostalLocationObfuscator extends DataObfuscator<IDataWrapper<PostalLocation>> {
+	/**
+	 * @param data
+	 */
+	public PostalLocationObfuscator(IDataWrapper<PostalLocation> data) {
+		super(data);
+		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
+		stepNumber = 1;
+		dataType = PostalLocation.class;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
+	 */
+	@Override
+	public IDataWrapper<PostalLocation> obfuscateData(double obfuscationLevel)
+			throws PrivacyException {
+		return dataWrapper;
+	}
+
 }
