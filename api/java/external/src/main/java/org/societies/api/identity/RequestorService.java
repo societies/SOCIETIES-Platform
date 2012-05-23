@@ -28,8 +28,6 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
-
-import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
