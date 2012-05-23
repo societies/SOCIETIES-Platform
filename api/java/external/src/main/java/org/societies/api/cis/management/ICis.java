@@ -33,12 +33,6 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  */
 
 
-
-/**
- * MISSING_JAVADOCS
- * 
- * this will be changed on W20, please wait by then
- */
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICis {
 
@@ -63,8 +57,23 @@ public interface ICis {
    // public String getUserDefineName();
     //public String getCisType();
     
+	/**
+	 * Returns the membership criteria (also known as mode) of the CIS
+	 * 
+	 * @param 
+	 * @return name of the CIS as a string
+	 */ 
     public int getMembershipCriteria();
 
-    
+	/**
+	 * Get info from a CIS.
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 * it has the  info from the CIS
+	 * 
+	 *  IMPORTANT: this function is still under tests
+	 * 
+	 * @param callback callback function
+	 */
     public void getInfo(ICisManagerCallback callback);
 }
