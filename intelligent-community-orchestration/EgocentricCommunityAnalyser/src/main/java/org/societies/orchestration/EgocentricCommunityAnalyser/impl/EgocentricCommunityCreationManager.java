@@ -41,7 +41,6 @@ import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 
 import static org.mockito.Mockito.*;
 
-import org.societies.api.schema.context.contextschema.CtxBroker;
 
 import org.societies.api.internal.css.directory.ICssDirectory;
 
@@ -1185,7 +1184,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
-		org.societies.api.schema.context.contextschema.CtxBroker cbPacket = new org.societies.api.schema.context.contextschema.CtxBroker();
+		//org.societies.api.schema.context.contextschema.CtxBroker cbPacket = new org.societies.api.schema.context.contextschema.CtxBroker();
 		// use the method : remove(CtxIdentifier identifier)
 		//org.societies.api.schema.context.contextschema.CtxBrokerUpdateAttributeBean ctxBrokerUpdateAttributeBean = new org.societies.api.schema.context.contextschema.CtxBrokerUpdateAttributeBean();
 		// add the signatures of the method
