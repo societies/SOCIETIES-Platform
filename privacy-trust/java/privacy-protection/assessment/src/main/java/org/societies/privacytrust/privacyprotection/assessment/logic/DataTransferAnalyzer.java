@@ -60,6 +60,19 @@ public class DataTransferAnalyzer {
 //		this.correlation = new Correlation(privacyLog.getDataAccess(), privacyLog.getDataTransmission());
 	}
 	
+	/**
+	 * 
+	 * @param sender The sender to assess
+	 * 
+	 * @return Values in array:<br/>
+	 * - sum of correlations with all data access events<br/>
+	 * - sum of correlations with those data access events where access was performed
+	 * by the sender identity<br/>
+	 * - sum of correlations with those data access events where access was performed
+	 * by the sender class<br/>
+	 * 
+	 * @throws AssessmentException
+	 */
 	public double[] estimatePrivacyBreach(IIdentity sender) throws AssessmentException {
 		
 		if (sender == null || sender.getJid() == null) {
@@ -73,6 +86,19 @@ public class DataTransferAnalyzer {
 		return estimatePrivacyBreach(filter);
 	}
 	
+	/**
+	 * 
+	 * @param sender The sender to assess
+	 * 
+	 * @return Values in array:<br/>
+	 * - sum of correlations with all data access events<br/>
+	 * - sum of correlations with those data access events where access was performed
+	 * by the sender identity<br/>
+	 * - sum of correlations with those data access events where access was performed
+	 * by the sender class<br/>
+	 * 
+	 * @throws AssessmentException
+	 */
 	public double[] estimatePrivacyBreach(String sender) throws AssessmentException {
 
 		if (sender == null) {
