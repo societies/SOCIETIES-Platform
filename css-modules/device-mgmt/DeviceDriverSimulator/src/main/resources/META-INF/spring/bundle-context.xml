@@ -20,6 +20,6 @@
   
   	<bean name="DeviceDriver" class="org.societies.css.devicemgmt.DeviceDriverSimulator.SampleActivatorDriver" init-method="initSimul">
   		<property name="deviceManager" ref ="deviceManager" />
-  		<property name="eventAdmin" ref ="eventAdmin" />	
+  		<property name="eventManager" ref="EventManager" />	
   	</bean>
 </beans>

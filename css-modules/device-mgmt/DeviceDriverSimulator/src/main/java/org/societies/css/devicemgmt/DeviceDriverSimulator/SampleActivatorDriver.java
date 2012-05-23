@@ -14,6 +14,7 @@ import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.internal.css.devicemgmt.model.DeviceMgmtDriverServiceConstants;
+import org.societies.api.osgi.event.IEventMgr;
 import org.springframework.osgi.context.BundleContextAware;
 
 
@@ -22,7 +23,7 @@ public class SampleActivatorDriver implements BundleContextAware{
 	private BundleContext bc;
 	
 	private IDeviceManager deviceManager;
-	private EventAdmin eventAdmin;
+	private IEventMgr eventManager;
 	
 	/* sensors */
 	private LightSensor ls;
@@ -70,18 +71,17 @@ public class SampleActivatorDriver implements BundleContextAware{
 	}
 	
 	
-	public EventAdmin getEventAdmin()
-	{
-		return this.eventAdmin;
+	/* --- Injections --- */
+	public IEventMgr getEventManager()
+	{ 
+		return eventManager; 
 	}
 	
-	public void setEventAdmin(EventAdmin eventAdmin)
-	{
-		
-		LOG.info("DeviceDriverExample: " + "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% setEventAdmin injection");
-		this.eventAdmin = eventAdmin;
-		
-		LOG.info("DeviceDriverExample: " + "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post setEventAdmin injection" + eventAdmin.toString());
+	public void setEventManager(IEventMgr eventManager) { 
+		if (null == eventManager) {
+			LOG.error("[COMM02] EventManager not available");
+		}
+		this.eventManager = eventManager;
 	}
 	
 	
