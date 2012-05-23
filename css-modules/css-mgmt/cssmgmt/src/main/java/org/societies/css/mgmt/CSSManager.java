@@ -27,18 +27,28 @@ package org.societies.css.mgmt;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.css.directory.ICssDirectoryRemote;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
@@ -74,20 +84,85 @@ public class CSSManager implements ICSSLocalManager {
 	public static final String TEST_PASSWORD = "androidpass";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-
+	private static final String THIS_NODE = "XCManager.societies.local";
+	
 	private ICssRegistry cssRegistry;
 	private ICssDirectoryRemote cssDirectoryRemote;
 	private IServiceDiscovery serviceDiscovery;
 	private ICSSRemoteManager cssManagerRemote;
-	
+    private PubsubClient pubSubManager;
+    private IIdentityManager idManager;
+    private ICommManager commManager;
+    private IIdentity pubsubID;
+    
+    private Random randomGenerator;
+    
 	private CssRecord cssRecord;
 	
 	public void cssManagerInit() {
 		LOG.debug("CSS Manager initialised");
 		this.cssRecord = createCSSRecord();
+		
+        
+        this.idManager = commManager.getIdManager();
+//        
+//        try {
+//			pubsubID = idManager.fromJid(THIS_NODE);
+//		} catch (InvalidFormatException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		  Supposedly, the correct way to obtain the identity
+        IIdentity pubsubID = idManager.getThisNetworkNode();
+        
+        this.createPubSubNodes();
+        this.subscribeToPubSubNodes();
+        
+        this.randomGenerator = new Random();
+
 	}
 
+	/**
+	 * Subscribe to relevant Pubsub nodes
+	 */
+	private void subscribeToPubSubNodes() {
+        LOG.debug("Subscribing to relevant Pubsub nodes");
+//        pubSubManager.subscriberSubscribe(???);
+		
+	}
 	
+	/**
+	 * TODO: Presumably on the Cloud node CSSManager should
+	 * create these PubSub nodes.
+	 * 1. How will the CSSManager know that it is on a cloud node ?
+	 * 2. What happens if these PubSub nodes already exist ?
+	 */
+	private void createPubSubNodes() {
+        LOG.debug("Creating PubsubNode(s) for CSSManager");
+        
+        try {
+        	
+            List<String> packageList = new ArrayList<String>();
+            packageList.add("org.societies.api.schema.cssmanagement.CssManagerMessageBean");
+			pubSubManager.addJaxbPackages(packageList);
+
+			pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
+	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.DEPART_CSS_NODE);
+	        
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+	        LOG.debug(CSSManagerEnums.ADD_CSS_NODE + "PubsubNode created for CSSManager");
+	        LOG.debug(CSSManagerEnums.DEPART_CSS_NODE + "PubsubNode created for CSSManager");
+		}
+	}
 
 	/**
 	 * Create a default CSSrecord
@@ -224,7 +299,10 @@ public class CSSManager implements ICSSLocalManager {
 
 			result.setProfile(this.cssRecord);
 			result.setResultStatus(true);
+			
+			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, this.cssRecord);
 		}
+		
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
@@ -266,6 +344,9 @@ public class CSSManager implements ICSSLocalManager {
 
 				result.setProfile(this.cssRecord);
 				result.setResultStatus(true);
+				
+				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, this.cssRecord);
+
 		} 
 	
 		return new AsyncResult<CssInterfaceResult>(result);
@@ -532,6 +613,27 @@ public class CSSManager implements ICSSLocalManager {
 		}
 		return new AsyncResult<List<Service>>(serviceList);
 	}
+	/**
+	 * Create an event for a fiven Pubsub node
+	 * 
+	 * @param pubsubNodeName
+	 */
+	private void publishEvent(String pubsubNodeName, CssRecord cssRecord) {
+	    LOG.debug("Publish event node: " + pubsubNodeName);
+	    CssManagerMessageBean messageBean = new CssManagerMessageBean();
+	    messageBean.setProfile(cssRecord);
+	    try {
+			LOG.debug("Event published: " + this.pubSubManager.publisherPublish(pubsubID, pubsubNodeName, Integer.toString(this.randomGenerator.nextInt()), pubsubNodeName));
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
 
 	//Spring injection
 	
@@ -595,7 +697,19 @@ public class CSSManager implements ICSSLocalManager {
 		return cssManagerRemote;
 	}
 
+    public PubsubClient getPubSubManager() { 
+    	return this.pubSubManager;     
+    }
+    public void setPubSubManager(PubsubClient pubSubManager) { 
+    	this.pubSubManager = pubSubManager;
+    }
 
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
 
 	/**
 	 * @param cssManagerRemote the cssManagerRemote to set

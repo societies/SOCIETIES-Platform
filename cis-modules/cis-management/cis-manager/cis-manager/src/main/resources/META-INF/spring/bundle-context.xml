@@ -41,7 +41,7 @@
 				<!-- local testing -->
 				<value>classpath:META-INF/spring/derby_database.properties</value>
 				<!-- final deployment into server --> 
-				<value>file:${CONFIG_DIR}\org.societies.platform.properties</value>
+				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
 			</list>
 		</property>
 	</bean>

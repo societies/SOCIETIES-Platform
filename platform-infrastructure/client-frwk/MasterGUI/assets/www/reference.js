@@ -118,6 +118,9 @@ function onDeviceReady() {
 		console.log("Register DeviceStatus Service plugin ");
 		cordova.addPlugin("DeviceStatus", DeviceStatus);
 
+		console.log("Register Preferences plugin ");
+		cordova.addPlugin("Preferences", new Preferences);
+
 	});
 	
 	//handle the Android Back button 
@@ -357,6 +360,30 @@ var DeviceStatus = {
 		}
 };
 
+
+/**
+ * Preferences object
+ */
+var Preferences = function() { 
+};
+
+/**
+ * Connect to LocalCSSManager service
+ * 
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
+*/
+Preferences.prototype.getStringPref = function(successCallback, failureCallback) {
+	console.log("Call Preferences - getStringPref");
+
+	prefName = jQuery("#prefName").val()
+	
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+	failureCallback,     //Callback which will be called when plugin action encounters an error
+	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+	'getStringPref',          //Telling the plugin, which action we want to perform
+	[prefName]);        //Passing a list of arguments to the plugin
+};
 
 /**
  * LocalCSSManagerService object
@@ -750,7 +777,24 @@ function onFailure(e) {
 	$('<span>').addClass('error').html(e).appendTo('#main article[data-role=content]');
 }
 
+var getAppPref = function() {
+	console.log("Get app preference");
+	
+	jQuery("#prefValue").val("");
+	
+	function success(data) {
+		console.log("getAppPref - successful: " + data);
+		jQuery("#prefValue").val(data);
+		
+	};
+	
+	function failure(data) {
+		console.log("getAppPref - failure: " + data);
+	};
 
+	window.plugins.Preferences.getStringPref(success, failure);
+
+};
 
 /**
  * Add Javascript functions to various HTML tags using JQuery
@@ -801,6 +845,10 @@ jQuery(function() {
 	});
 	$('#registerBattery').click(function() {
 		window.plugins.DeviceStatus.registerToBatteryStatus(onSuccess, onFailure);
+	});
+
+	$('#getPref').click(function() {
+		getAppPref();
 	});
 
 });

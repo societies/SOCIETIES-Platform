@@ -39,4 +39,5 @@
     <!-- Societies Android plugins -->
     <plugin name="PluginCoreServiceMonitor" value="org.societies.android.platform.phongegap.PluginCoreServiceMonitor"/>
     <plugin name="PluginCSSManager" value="org.societies.android.platform.phongegap.PluginCSSManager"/>
+    <plugin name="PluginPreferences" value="org.societies.android.platform.phongegap.PreferencesPlugin"/>
 </plugins>
