@@ -42,6 +42,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegis
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
@@ -283,9 +284,26 @@ public class ServiceRegistryListener implements BundleContextAware,
 		List<Service> servicesToRemove = new ArrayList<Service>();
 		servicesToRemove.add(serviceToRemove);
 			
-		if(log.isDebugEnabled()) log.debug("Removing service: " + serviceToRemove.getServiceName() + " from SOCIETIES Registry");
 			
 		try {
+			
+			if(log.isDebugEnabled()) log.debug("Checking if service is shared with any owned CIS, and removing that");
+			List<String> cisSharedList = new ArrayList<String>();
+			
+			if(!cisSharedList.isEmpty()){
+				for(String cisShared: cisSharedList){
+					if(log.isDebugEnabled()) log.debug("Removing sharing to CIS: " + cisShared);
+					try {
+						getServiceReg().removeServiceSharingInCIS(serviceToRemove.getServiceIdentifier(), cisShared);
+					} catch (ServiceSharingNotificationException e) {
+						e.printStackTrace();
+						log.error("Exception while removing sharing to CIS: " + e.getMessage());
+					}
+				}
+			}
+			
+			if(log.isDebugEnabled()) log.debug("Removing service: " + serviceToRemove.getServiceName() + " from SOCIETIES Registry");
+
 			getServiceReg().unregisterServiceList(servicesToRemove);
 			log.info("Service " + serviceToRemove.getServiceName() + " has been uninstalled");
 
@@ -328,28 +346,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		} 
 		
 		Service result = null;
-		/*
-		if(listServices.size() > 1){
-			if(log.isDebugEnabled()) log.debug("More than one service found... this is not good! Time to fix it.");
-			
-			for(Service service: listServices){
-				Long serBundleId = Long.parseLong(service.getServiceIdentifier().getServiceInstanceIdentifier());
-				
-				if(log.isDebugEnabled())
-					log.debug("Checking service " + service.getServiceName() + " with bundleId " + service.getServiceIdentifier().getServiceInstanceIdentifier());
-				
-				if(serBundleId == bundle.getBundleId()){
-					result = service;
-					break;
-				}
-			}
-			
-		} else{
-			result = listServices.get(0);
-		}
-		
-		*/
-		
+
 		for(Service service: listServices){
 			Long serBundleId = Long.parseLong(service.getServiceIdentifier().getServiceInstanceIdentifier());
 			

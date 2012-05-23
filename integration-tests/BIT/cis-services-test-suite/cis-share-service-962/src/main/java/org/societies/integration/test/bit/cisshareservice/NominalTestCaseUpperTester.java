@@ -39,6 +39,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -135,13 +137,22 @@ public class NominalTestCaseUpperTester {
 			assertNotNull("[#962] CIS is null! Failed creating!",myCis);
 			
 			if(LOG.isDebugEnabled() && myCis != null) {
-				LOG.debug("[#962] myCis is " + myCis);
-				LOG.debug("[#962] myCis.getCisId()" + myCis.getCisId());
-				LOG.debug("[#962] myCis.getCisType()" + myCis.getCisType());
-				LOG.debug("[#962] myCis.getOwnerId()" + myCis.getOwnerId());
-				LOG.debug("[#962] myCis.getName()" + myCis.getName());
-				LOG.debug("[#962] myCis.getDescription()" + myCis.getDescription());
-			} 
+				LOG.debug("[#962] myCis.getCisId(): " + myCis.getCisId());
+				LOG.debug("[#962] myCis.getCisType(): " + myCis.getCisType());
+				LOG.debug("[#962] myCis.getOwnerId(): " + myCis.getOwnerId());
+				LOG.debug("[#962] myCis.getName(): " + myCis.getName());
+				LOG.debug("[#962] myCis.getDescription(): " + myCis.getDescription());
+			
+				IIdentity cisNode = TestCase962.getCommManager().getIdManager().fromJid(myCis.getCisId());
+				
+				switch(cisNode.getType()){
+				case CSS: LOG.debug("[#962] Node is of type: CSS"); break;
+				case CSS_RICH: LOG.debug("[#962] Node is of type: CSS_RICH"); break;
+				case CSS_LIGHT:LOG.debug("[#962] Node is of type: CSS_LIGHT"); break;
+				case CIS: LOG.debug("[#962] Node is of type: CIS"); break;
+				default: LOG.debug("[#962] Node is strange");
+				}
+			}
 			
 		} catch(Exception ex){
 			ex.printStackTrace();
@@ -250,7 +261,7 @@ public class NominalTestCaseUpperTester {
 			Assert.assertNotNull(serviceList);
 			Assert.assertTrue(serviceList.isEmpty());
 			
-			if(LOG.isDebugEnabled()) LOG.debug("CIS now has " + serviceList.size() + " services shared!");
+			if(LOG.isDebugEnabled()) LOG.debug("[#962] CIS now has " + serviceList.size() + " services shared!");
 
 		
 		} catch(Exception ex){

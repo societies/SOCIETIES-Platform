@@ -311,6 +311,78 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 	}
 
+	public Future<ServiceControlResult> installService(Service serviceToInstall) 
+			throws ServiceControlException {
+		
+		try{
+		
+			if(logger.isDebugEnabled()) 
+				logger.debug("Service Management: installService method, on another node: jid");
+		
+			
+			// Now install the client!
+			Future<ServiceControlResult> asyncResult = null;
+			URL bundleLocation = null;
+			
+			asyncResult = installService(bundleLocation);
+			ServiceControlResult result = asyncResult.get();
+			
+			return new AsyncResult<ServiceControlResult>(result);
+		
+		} catch (Exception ex) {
+			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
+			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
+		}
+		
+	}
+
+	public Future<ServiceControlResult> installService(Service serviceToInstall, IIdentity node) 
+			throws ServiceControlException {
+		
+		try{
+		
+			if(logger.isDebugEnabled()) 
+				logger.debug("Service Management: installService method, on another node: jid");
+		
+			// Now install the client!
+			Future<ServiceControlResult> asyncResult = null;
+			URL bundleLocation = null;
+			
+			asyncResult = installService(bundleLocation,node);
+			ServiceControlResult result = asyncResult.get();
+			
+			return new AsyncResult<ServiceControlResult>(result);
+		
+		} catch (Exception ex) {
+			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
+			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
+		}
+		
+	}
+	
+	public Future<ServiceControlResult> installService(Service serviceToInstall, String jid) 
+			throws ServiceControlException {
+		
+		try{
+		
+			if(logger.isDebugEnabled()) 
+				logger.debug("Service Management: installService method, on another node: jid");
+		
+			// Now install the client!
+			Future<ServiceControlResult> asyncResult = null;
+			URL bundleLocation = null;
+			
+			asyncResult = installService(bundleLocation,jid);
+			ServiceControlResult result = asyncResult.get();
+			
+			return new AsyncResult<ServiceControlResult>(result);
+		
+		} catch (Exception ex) {
+			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
+			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
+		}
+		
+	}
 	
 	@Override
 	public Future<ServiceControlResult> installService(URL bundleLocation)
