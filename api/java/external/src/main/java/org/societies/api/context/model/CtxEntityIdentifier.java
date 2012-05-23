@@ -28,7 +28,7 @@ package org.societies.api.context.model;
  * This class is used to identify context entities. It provides methods that
  * return information about the identified entity including:
  * <ul>
- * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
+ * <li><tt>OwnerId</tt>: A unique identifier of the CSS or CIS where the 
  * identified context entity is stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
  * object, i.e. {@link CtxModelType#ENTITY ENTITY}.</li>
@@ -41,7 +41,7 @@ package org.societies.api.context.model;
  * A context entity identifier can be represented as a URI formatted String as
  * follows:
  * <pre>
- * &lt;OperatorId&gt;/ENTITY/&lt;Type&gt;/&lt;ObjectNumber&gt;
+ * &lt;OwnerId&gt;/ENTITY/&lt;Type&gt;/&lt;ObjectNumber&gt;
  * </pre>
  * 
  * @see CtxIdentifier
@@ -57,7 +57,7 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 	 * where the identified context model object is stored, as well as,
 	 * the entity type and the unique numeric model object identifier.
 	 * 
-	 * @param operatorId
+	 * @param ownerId
 	 *            the identifier of the CSS/CIS where the identified context
 	 *            model object is stored
 	 * @param type
@@ -65,10 +65,10 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	public CtxEntityIdentifier(String operatorId, String type, 
+	public CtxEntityIdentifier(String ownerId, String type, 
 			Long objectNumber) {
 		
-		super(operatorId, CtxModelType.ENTITY, type, objectNumber);
+		super(ownerId, CtxModelType.ENTITY, type, objectNumber);
 	}
 	
 	public CtxEntityIdentifier(String str) throws MalformedCtxIdentifierException {
@@ -79,7 +79,7 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 	/** 
 	 * Formats the string representation of a context entity identifier as follows:
 	 * <pre> 
-	 * operatorId/ENTITY/type/objectNumber
+	 * ownerId/ENTITY/type/objectNumber
 	 * </pre>
 	 * 
 	 * @see CtxIdentifier#defineString()
@@ -92,7 +92,7 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append(super.operatorId);
+		sb.append(super.ownerId);
 		sb.append("/");
 		sb.append(CtxModelType.ENTITY);
 		sb.append("/");
@@ -106,7 +106,7 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 	/**
 	 * Parses the string form of a context entity identifier as follows:
 	 * <pre> 
-	 * operatorId/ENTITY/type/objectNumber
+	 * ownerId/ENTITY/type/objectNumber
 	 * </pre>
 	 * 
 	 * @see CtxIdentifier#parseString(java.lang.String)
@@ -151,9 +151,9 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 					+ "': Expected 'ENTITY' but found '"
 					+ super.modelType + "'");
 
-		operatorId = input.substring(0, modelTypeDelim);
-		if (operatorId.isEmpty())
+		super.ownerId = input.substring(0, modelTypeDelim);
+		if (super.ownerId.isEmpty())
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Operator ID cannot be empty");
+					+ "': Owner ID cannot be empty");
 	}
 }

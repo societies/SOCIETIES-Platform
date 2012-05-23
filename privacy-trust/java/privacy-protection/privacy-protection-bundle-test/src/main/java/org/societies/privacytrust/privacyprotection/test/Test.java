@@ -86,7 +86,6 @@ public class Test implements IPrivacyDataManagerListener {
 			LOG.error("************* [Tests PrivacyPolicyManager] Error Exception: "+e.getMessage()+"\n", e);
 		}
 		
-		
 		try {
 			if (null == privacyDataManager) {
 				throw new Exception("privacyDataManager NULL");
@@ -118,7 +117,7 @@ public class Test implements IPrivacyDataManagerListener {
 		} catch (Exception e) {
 			LOG.error("************* [Tests PrivacyDataManager] Error Exception: "+e.getMessage()+"\n", e);
 		}
-		
+
 		try {
 			if (null == privacyDataManagerRemote) {
 				throw new Exception("privacyDataManagerRemote NULL");

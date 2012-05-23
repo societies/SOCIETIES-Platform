@@ -21,7 +21,7 @@
 		<property name="locations">
 			<list>
 			<!-- 	<value>classpath:META-INF/spring/derby_database.properties</value> -->
-				<value>file:${CONFIG_DIR}\org.societies.platform.properties</value>
+				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
 			</list>
 		</property>	
 	</bean>

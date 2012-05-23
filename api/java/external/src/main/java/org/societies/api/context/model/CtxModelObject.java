@@ -86,6 +86,19 @@ public abstract class CtxModelObject implements Serializable {
 	}
 	
 	/**
+	 * Returns the IIdentity String representation of the CSS or CIS where the
+	 * identified context model object is stored
+     * 
+	 * @return the IIdentity String representation of the CSS or CIS where the
+	 *             identified context model object is stored
+	 * @see CtxIdentifier#getOwnerId()
+	 */
+	public String getOwnerId() {
+		
+	    return this.getId().getOwnerId();
+	}
+	
+	/**
 	 * Returns the model type of this context model object, i.e. Entity,
 	 * Attribute or Association
 	 * 
