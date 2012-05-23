@@ -32,13 +32,11 @@ import java.io.Serializable;
 
 import org.societies.api.schema.identity.DataIdentifier;
 
-//import org.societies.api.identity.IIdentity;
-
 /**
  * This abstract class is used to identify context model objects. It provides
  * methods that return information about the identified model object including:
  * <ul>
- * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
+ * <li><tt>OwnerId</tt>: A unique identifier of the CSS or CIS where the 
  * identified context model object is stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
  * object, i.e. is one of the following: {@link CtxModelType#ENTITY ENTITY},
@@ -58,9 +56,6 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
 
 	private static final long serialVersionUID = 3552976823045895472L;
 	
-	/** The unique identifier of the CSS or CIS where the identified context model object is stored.*/
-	protected transient String operatorId;
-	
 	/** The type of the identified context model object. */
 	protected transient CtxModelType modelType;
 	
@@ -75,7 +70,7 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
 	 * where the identified object is stored, as well as, the {@link CtxModelType}
 	 * and the unique numeric model object identifier.
 	 * 
-	 * @param operatorId
+	 * @param ownerId
 	 *            the identifier of the CSS/CIS where the identified context
 	 *            model object is stored
 	 * @param type
@@ -84,11 +79,11 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	CtxIdentifier(String operatorId, CtxModelType modelType, String type, Long objectNumber) {
+	CtxIdentifier(String ownerId, CtxModelType modelType, String type, Long objectNumber) {
 		
-		this.operatorId = operatorId;
+		super.ownerId = ownerId;
 		this.modelType = modelType;
-		this.type = type;
+		super.type = type;
 		this.objectNumber = objectNumber;
 	}
 	
@@ -109,10 +104,12 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
      * 
 	 * @return a unique identifier of the CSS or CIS where the identified 
 	 * context model object is stored
+	 * @deprecated As of release 0.0.8 use {@link #getOwnerId()}
 	 */
+	@Deprecated
 	public String getOperatorId() {
 		
-		return this.operatorId;
+		return super.getOwnerId();
 	}
 	
 	/**
@@ -172,11 +169,11 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
         int result = 1;
         
         result = prime * result
-                + ((this.operatorId == null) ? 0 : this.operatorId.hashCode());
+                + ((super.ownerId == null) ? 0 : super.ownerId.hashCode());
         result = prime * result
                 + ((this.modelType == null) ? 0 : this.modelType.hashCode());
         result = prime * result
-                + ((this.type == null) ? 0 : this.type.hashCode());
+                + ((super.type == null) ? 0 : super.type.hashCode());
         result = prime * result
                 + ((this.objectNumber == null) ? 0 : this.objectNumber.hashCode());
         
@@ -198,20 +195,20 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
             return false;
         
         CtxIdentifier other = (CtxIdentifier) that;
-        if (this.operatorId == null) {
-            if (other.operatorId != null)
+        if (super.ownerId == null) {
+            if (other.ownerId != null)
                 return false;
-        } else if (!this.operatorId.equals(other.operatorId))
+        } else if (!super.ownerId.equals(other.ownerId))
             return false;
         if (this.modelType == null) {
             if (other.modelType != null)
                 return false;
         } else if (!this.modelType.equals(other.modelType))
             return false;
-        if (this.type == null) {
+        if (super.type == null) {
             if (other.type != null)
                 return false;
-        } else if (!this.type.equals(other.type))
+        } else if (!super.type.equals(other.type))
             return false;
         if (this.objectNumber == null) {
             if (other.objectNumber != null)
