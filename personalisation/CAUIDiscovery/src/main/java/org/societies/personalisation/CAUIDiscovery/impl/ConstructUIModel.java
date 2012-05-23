@@ -62,9 +62,13 @@ public class ConstructUIModel {
 				HashMap<String,Serializable> context = new HashMap<String,Serializable>();
 				for(String contextTypeValueConc : contexValuesStringList){
 					String [] contextTypeValue = contextTypeValueConc.split("=");
+					LOG.info("constructNewModel "+contextTypeValue);
+					if(contextTypeValue.length == 2 ){
 					String contextType = contextTypeValue[0];
 					String contextValue = contextTypeValue[1];
+					LOG.info("constructNewModel type:"+contextType+" value:"+contextValue);
 					context.put(contextType, contextValue);
+					}
 				}		
 				userAction.setActionContext(context);	
 			}

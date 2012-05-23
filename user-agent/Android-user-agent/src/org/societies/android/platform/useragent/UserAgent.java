@@ -29,45 +29,67 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.personalisation.model.IAction;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
-public class UserActionMonitor extends Activity implements OnClickListener {
+public class UserAgent extends Service /*implements IAndroidUserAgent*/{
 	
-	private static final String LOG_TAG = UserActionMonitor.class.getName();
+	private static final String LOG_TAG = UserAgent.class.getName();
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("userActionMonitorBean");
     private static final List<String> NAME_SPACES = Arrays.asList(
     		"http://societies.org/api/schema/useragent/monitoring");
     private static final List<String> PACKAGES = Arrays.asList(
 		"org.societies.api.schema.useragent.monitoring");
     
+    //currently hard coded but should be injected
     private static final String DESTINATION = "xcmanager.societies.local";
-    
-    private final IIdentity toXCManager = null;
+        
+    private IIdentity toXCManager = null;
     //private ClientCommunicationMgr ccm;
+
+	private IBinder binder = null;
 	
-	/** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.uam);
-        
-        Button sayHello = (Button)findViewById(R.id.sayHello);
-        sayHello.setOnClickListener(this);
-        
-        Button sayGoodbye = (Button)findViewById(R.id.sayGoodbye);
-        sayGoodbye.setOnClickListener(this);
-    }
-    
-    public void onClick(View v){
-    	if(v.getId() == R.id.sayHello){
-			//send hello message to backend
-		}else if(v.getId() == R.id.sayGoodbye){
-			//send goodbye message to backend
-		}
-    }
+	@Override
+	public void onCreate () {
+		
+		this.binder = new LocalBinder();
+
+		//this.ccm = new ClientCommunicationMgr(this);
+		
+    	/*try {
+			toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
+		} catch (InvalidFormatException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			throw new RuntimeException(e);
+		} */    
+		Log.d(LOG_TAG, "User Agent service starting");
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "User Agent service terminating");
+	}
+
+	/**
+	 * Create Binder object for local service invocation
+	 */
+	 public class LocalBinder extends Binder {
+		 public UserAgent getService() {
+	            return UserAgent.this;
+	        }
+	    }
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}
+	
+	public void monitor(IIdentity identity, IAction action){
+		Log.d(LOG_TAG, "User Agent received monitored user action: "+action.getparameterName()+" = "+action.getvalue());
+	}
 }
