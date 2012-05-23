@@ -25,7 +25,11 @@
 package org.societies.api.identity;
 
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
 
+import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -94,6 +98,7 @@ public class RequestorService extends Requestor implements Serializable{
 		if (!super.equals(obj)) {
 			return false;
 		}
+		
 		if (!(obj instanceof RequestorService)) {
 			return false;
 		}
@@ -102,12 +107,39 @@ public class RequestorService extends Requestor implements Serializable{
 			if (other.requestorServiceId != null) {
 				return false;
 			}
-		} else if (!requestorServiceId.equals(other.requestorServiceId)) {
-			return false;
+		} else {
+			if (other.getRequestorServiceId() == null){
+				return false;
+			}else{
+				return equalsServiceIdentifier(other.getRequestorServiceId());
+			}
 		}
+		
+		
+
 		return true;
 	}
 	
+	private boolean equalsServiceIdentifier(ServiceResourceIdentifier other){
+		
+		if (null==this.requestorServiceId.getIdentifier()) {
+			if (other.getIdentifier() != null) {
+				return false;
+			}
+		} else if (!this.requestorServiceId.getIdentifier().equals(other.getIdentifier())) {
+			return false;
+		}
+		if (this.requestorServiceId.getServiceInstanceIdentifier() == null) {
+			if (other.getServiceInstanceIdentifier() != null) {
+				return false;
+			}
+		} else if (!this.requestorServiceId.getServiceInstanceIdentifier()
+				.equals(other.getServiceInstanceIdentifier())) {
+			return false;
+		}
+		
+		return true;
+	}
 	
-	
+
 }

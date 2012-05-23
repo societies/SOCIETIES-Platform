@@ -22,80 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.identity;
+package org.societies.privacytrust.privacyprotection.test.privacypolicy;
 
 import java.io.Serializable;
 
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+
+
 /**
- * This class is used to represent a CSS requesting resources 
+ * Describe your class here...
  *
- * @author Eliza, Nicolas, Olivier
+ * @author Eliza
  *
  */
-public class Requestor implements Serializable{
+public class MyIdentity implements IIdentity, Serializable{
 
-	private final IIdentity requestorId;
+	
+	private final IdentityType type;
+	private final String identifier;
+	private final String domainIdentifier;
 
-	public Requestor(IIdentity requestorId){
-		this.requestorId = requestorId;
+	public MyIdentity(IdentityType type, String identifier,
+			String domainIdentifier) {
+				this.type = type;
+				this.identifier = identifier;
+				this.domainIdentifier = domainIdentifier;
 		
-	}
-	/**
-	 * @return the requestorId
-	 */
-	public IIdentity getRequestorId() {
-		return requestorId;
+		
+		// TODO Auto-generated constructor stub
 	}
 
-
-
-	public String toXMLString(){
-		String str = "";
-		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\"" +
-		"\n \t\t\tDataType=\"org.societies.api.identity.IIdentity\">");
-
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.requestorId.toString());
-		str = str.concat("</AttributeValue>");
-
-		str = str.concat("\n\t</Attribute>");
-		return str;
-	}
-	
 	@Override
-	public String toString(){
-		return "Identity: "+this.requestorId.getJid();
-	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((requestorId == null) ? 0 : requestorId.hashCode());
-		return result;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		Requestor other = (Requestor) obj;
-		if (requestorId == null) {
-			if (other.requestorId != null) {
-				return false;
-			}
-		} else if (!requestorId.equals(other.requestorId)) {
-			return false;
-		}
-		return true;
+	public String getJid() {
+		return type+"://"+identifier+"@"+domainIdentifier;
 	}
 
-	
+	@Override
+	public String getBareJid() {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	@Override
+	public String getDomain() {
+		return domainIdentifier;
+	}
+
+	@Override
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	@Override
+	public IdentityType getType() {
+		return type;
+	}
+
 }
