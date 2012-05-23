@@ -159,6 +159,7 @@ public class CommunityContextEstimationTest{
 		//Create a person entity 2
 		CtxEntity person2 = iB.createEntity("person2").get();
 		CtxEntityIdentifier pId2 = person2.getId();
+	
 		CtxAttribute person2Age = iB.createAttribute(pId2, "age").get(); 
 		person2Age = (CtxAttribute) iB.update(person2Age).get();
 		person2Age.setIntegerValue(40);
@@ -326,6 +327,7 @@ public void testCalculateStringStatistics() throws InterruptedException, Executi
 	//Create a person entity 2
 	CtxEntity person2 = iB.createEntity("person2").get();
 	CtxEntityIdentifier pId2 = person2.getId();
+	System.out.println("PID2 = "+pId2);
 	CtxAttribute person2Age = iB.createAttribute(pId2, "profession").get(); 
 	person2Age.setValueType(CtxAttributeValueType.STRING);
 	person2Age = (CtxAttribute) iB.update(person2Age).get();

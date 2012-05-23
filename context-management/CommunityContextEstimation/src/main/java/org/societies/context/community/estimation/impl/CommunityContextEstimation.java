@@ -46,11 +46,13 @@ import org.societies.context.api.community.estimation.EstimationModels;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.context.broker.impl.InternalCtxBroker; //impl.InternalCtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 /**
  * @author yboul 07-Dec-2011 4:15:14 PM
  */
+@Service("communityCtxEstimation")
 public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 
@@ -61,8 +63,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 	}
 
-	@Autowired
-	//private InternalCtxBroker b;
+	@Autowired(required=true)
 	private InternalCtxBroker b;
 	private CtxEntityIdentifier comId;
 	private String entityType;
