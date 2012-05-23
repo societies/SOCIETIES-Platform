@@ -203,7 +203,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		
 		proximityHistory = new ArrayList<ProximityRecord>();
 			
-		new ProximityRecordingThread().start();
+		//new ProximityRecordingThread().start();
 	}
 	
 	class ProximityRecordingThread extends Thread {
@@ -262,19 +262,22 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     			}
     	}
     	
-    	if (creations != null) {
-    	    abstractCreations = new ArrayList<ArrayList<ICisProposal>>();
-    	    abstractCreations.add(creations);
-    	    convertedRecommendations.put("Create CISs", abstractCreations);
-    	}
+    	ArrayList<String> preferenceConflicts = checkForPreferenceConflicts("Create CISs", abstractCreations);
+		if (preferenceConflicts.size() != 0)
+			for (int i = 0; i < preferenceConflicts.size(); i++) {
+			    creations.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
+			    //cissToCreateMetadata.set(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]), "FAILED");
+			    cissToCreateMetadata.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
+			}
 
-    	if (deletions != null) {
-    	    abstractDeletions = new ArrayList<ArrayList<ICisProposal>>();
-    	    abstractDeletions.add(deletions);
-    	    convertedRecommendations.put("Delete CISs", abstractDeletions);
-    	}
+		ArrayList<String> preferenceConflictsDeletion = checkForPreferenceConflicts("Delete CISs", abstractDeletions);
+		if (preferenceConflictsDeletion.size() != 0)
+			for (int i = 0; i < preferenceConflictsDeletion.size(); i++) {
+			    deletions.remove(Integer.valueOf(preferenceConflictsDeletion.get(i).split("---")[0]));
+			    //cissToDeleteMetadata.set(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]), "FAILED");
+			}
     	
-    	for (int i = 0; i < creations.size(); i++) {
+		/**for (int i = 0; i < creations.size(); i++) {
     		if (checkForPreferenceConflicts("Create CISs", abstractCreations).size() != 0) {
     			creations.remove(i);
     			cissToCreateMetadata.set(i, "FAILED");
@@ -286,7 +289,25 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     			deletions.remove(i);
     		    cissToCreateMetadata.set(i, "FAILED");
     	    }
+    	}*/
+		
+    	if (creations != null) {
+    		if (creations.size() > 0) {
+    	        abstractCreations = new ArrayList<ArrayList<ICisProposal>>();
+    	        abstractCreations.add(creations);
+    	        convertedRecommendations.put("Create CISs", abstractCreations);
+    		}
     	}
+
+    	if (deletions != null) {
+    		if (deletions.size() > 0) {
+    	        abstractDeletions = new ArrayList<ArrayList<ICisProposal>>();
+    	        abstractDeletions.add(deletions);
+    	        convertedRecommendations.put("Delete CISs", abstractDeletions);
+    		}
+    	}
+    	
+    	
     	
     	if (convertedRecommendations.size() != 0) {
     		return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata);
