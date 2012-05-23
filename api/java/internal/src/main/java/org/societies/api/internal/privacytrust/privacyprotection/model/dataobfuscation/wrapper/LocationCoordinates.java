@@ -37,7 +37,6 @@ public class LocationCoordinates {
 	private double longitude;
 	private double accuracy;
 	
-	
 	/**
 	 * @param latitude
 	 * @param longitude

@@ -12,8 +12,7 @@
 
 
    <bean id="ContextSourceManagement" class="org.societies.context.source.impl.ContextSourceManagement" 
-   depends-on="userCtxDBMgr,ctxBroker,deviceManager" name="ContextSourceManagement" init-method="initialise">
-		  <property name="userCtxDBMgr" ref="userCtxDBMgr"></property>
+   depends-on="ctxBroker,deviceManager" name="ContextSourceManagement" init-method="initialise">
 		  <property name="ctxBroker" ref="ctxBroker"></property>
 		  <property name="deviceManager" ref="deviceManager"></property>
   </bean>

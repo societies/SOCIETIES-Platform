@@ -29,11 +29,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
@@ -88,6 +88,8 @@ public class InternalCtxBroker implements ICtxBroker {
 	/** The privacy logging facility. */
 	@Autowired(required=false)
 	private IPrivacyLogAppender privacyLogAppender;
+	
+	private boolean hasPrivacyLogAppender = false;
 
 	/**
 	 * The IIdentity Mgmt service reference.
@@ -300,7 +302,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(identifier.getOperatorId());
-			if (this.privacyLogAppender != null)
+			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
@@ -329,7 +331,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			IIdentity targetCss;
 			try {
 				targetCss = this.idMgr.fromJid(operatorCss.getId().getOperatorId());
-				if (this.privacyLogAppender != null)
+				if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 					this.privacyLogAppender.logContext(null, targetCss);
 			} catch (InvalidFormatException ife) {
 				throw new CtxBrokerException("Could not create IIdentity from JID", ife);
@@ -586,7 +588,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
-			if (this.privacyLogAppender != null)
+			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
@@ -602,7 +604,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
-			if (this.privacyLogAppender != null)
+			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
@@ -663,7 +665,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
-			if (this.privacyLogAppender != null)
+			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
@@ -687,7 +689,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
-			if (this.privacyLogAppender != null)
+			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
@@ -869,7 +871,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				IIdentity targetCss;
 				try {
 					targetCss = this.idMgr.fromJid(primaryAttrId.getOperatorId());
-					if (this.privacyLogAppender != null)
+					if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 						this.privacyLogAppender.logContext(null, targetCss);
 				} catch (InvalidFormatException ife) {
 					throw new CtxBrokerException("Could not create IIdentity from JID", ife);
@@ -936,14 +938,14 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
-		LOG.info("retrieveHistoryTuples updating hocAttrs primaryAttr: "+primaryAttrId);
+		//LOG.info("retrieveHistoryTuples updating hocAttrs primaryAttr: "+primaryAttrId);
 
 		if(primaryAttrId!= null){ // TODO throw NPE otherwise
 
 			IIdentity targetCss;
 			try {
 				targetCss = this.idMgr.fromJid(primaryAttrId.getOperatorId());
-				if (this.privacyLogAppender != null)
+				if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 					this.privacyLogAppender.logContext(null, targetCss);
 			} catch (InvalidFormatException ife) {
 				throw new CtxBrokerException("Could not create IIdentity from JID", ife);
@@ -1204,6 +1206,36 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void setIdentityMgr(IIdentityManager identityMgr) {
 
 		this.idMgr = identityMgr;
+	}
+	
+	/**
+	 * This method is called when the {@link IPrivacyLogAppender} service is
+	 * bound.
+	 * 
+	 * @param privacyLogAppender
+	 *            the service that was bound
+	 * @param props
+	 *            the set of properties that the service was registered with
+	 */
+	public void bindPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender, Dictionary<Object,Object> props) {
+		
+		LOG.info("Binding service reference " + privacyLogAppender);
+		this.hasPrivacyLogAppender = true;
+	}
+	
+	/**
+	 * This method is called when the {@link IPrivacyLogAppender} service is
+	 * unbound.
+	 * 
+	 * @param privacyLogAppender
+	 *            the service that was unbound
+	 * @param props
+	 *            the set of properties that the service was registered with
+	 */
+	public void unbindPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender, Dictionary<Object,Object> props) {
+		
+		LOG.info("Unbinding service reference " + privacyLogAppender);
+		this.hasPrivacyLogAppender = false;
 	}
 
 	// TODO remove

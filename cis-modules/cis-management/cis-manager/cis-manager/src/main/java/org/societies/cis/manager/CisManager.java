@@ -136,15 +136,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			subscribedCISs = new HashSet<CisSubscribedImp>();
 			
 
+
 	}
 	public void init(){
-		//ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint
+		while (iCommMgr.getIdManager() ==null)
+			;//just wait untill the XCommanager is ready
+		
 		cisManagerId = iCommMgr.getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
 
 
 			try {
 				iCommMgr.register((IFeatureServer)this);
+//				CSSendpoint.register((ICommCallback)this);
 			} catch (CommunicationException e) {
 				e.printStackTrace();
 			} // TODO unregister??
@@ -152,6 +156,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			LOG.info("listener registered");	
 			//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
 	}
+
+
+
 
 
 	
@@ -166,7 +173,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-
+	
 	public ICommManager getICommMgr() {
 		return iCommMgr;
 	}
@@ -176,6 +183,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setICommMgr(ICommManager cSSendpoint) {
 		iCommMgr = cSSendpoint;
 	}
+
+
+
 
 
 

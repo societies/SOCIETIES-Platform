@@ -70,22 +70,36 @@ public class Correlation {
 		long size2;
 		long time1;
 		long time2;
-		double corr12;
+		double corr;
+		double corrByAll;
+		double corrBySender;
+		double corrBySenderClass;
 		
 		for (DataTransmissionLogEntry tr : dataTransmission) {
 			
 			size2 = tr.getPayloadSize();
 			time2 = tr.getTimeInMs();
-			corr12 = 0;
+			corrByAll = 0;
+			corrBySender = 0;
+			corrBySenderClass = 0;
 			
 			for (DataAccessLogEntry ac : dataAccess) {
 				
 				size1 = ac.getPayloadSize();
 				time1 = ac.getTimeInMs();
 				
-				corr12 += correlation(size2 - size1, time2 - time1);
+				corr = correlation(size2 - size1, time2 - time1);
+				corrByAll += corr;
+				if (ac.getRequestor().getJid().equals(tr.getSender().getJid())) {
+					corrBySender += corr;
+				}
+				if (ac.getRequestorClass().equals(tr.getSenderClass())) {
+					corrBySenderClass += corr;
+				}
 			}
-			tr.setCorrelationWithDataAccess(corr12);
+			tr.setCorrelationWithDataAccess(corrByAll);
+			tr.setCorrelationWithDataAccessBySender(corrBySender);
+			tr.setCorrelationWithDataAccessBySenderClass(corrBySenderClass);
 		}
 	}
 	
