@@ -34,6 +34,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
 /**
@@ -48,61 +49,77 @@ public class DataTransferAnalyzer {
 	private static Logger LOG = LoggerFactory.getLogger(DataTransferAnalyzer.class);
 
 	private PrivacyLog privacyLog;
-	private Correlation correlation;
+//	private Correlation correlation;
 	
-	private List<AssessmentResultClassName> assessmentResultClassName = new ArrayList<AssessmentResultClassName>();
-	private List<AssessmentResultIIdentity> assessmentResultIIdentity = new ArrayList<AssessmentResultIIdentity>();
+//	private List<AssessmentResultClassName> assessmentResultClassName = new ArrayList<AssessmentResultClassName>();
+//	private List<AssessmentResultIIdentity> assessmentResultIIdentity = new ArrayList<AssessmentResultIIdentity>();
 	
 	public DataTransferAnalyzer(PrivacyLog privacyLog) {
 		LOG.info("Constructor");
 		this.privacyLog = privacyLog;
-		this.correlation = new Correlation(privacyLog.getDataAccess(), privacyLog.getDataTransmission());
+//		this.correlation = new Correlation(privacyLog.getDataAccess(), privacyLog.getDataTransmission());
 	}
 	
-	public double estimatePrivacyBreach(IIdentity sender) throws AssessmentException {
+	/**
+	 * 
+	 * @param sender The sender to assess
+	 * 
+	 * @return Values in array:<br/>
+	 * - sum of correlations with all data access events<br/>
+	 * - sum of correlations with those data access events where access was performed
+	 * by the sender identity<br/>
+	 * - sum of correlations with those data access events where access was performed
+	 * by the sender class<br/>
+	 * 
+	 * @throws AssessmentException
+	 */
+	public double[] estimatePrivacyBreach(IIdentity sender) throws AssessmentException {
 		
-		if (sender == null) {
-			throw new AssessmentException("sender must not be null");
+		if (sender == null || sender.getJid() == null) {
+			LOG.warn("estimatePrivacyBreach({}): sender or sender JID is null", sender);
+			throw new AssessmentException("sender or sender JID is null");
 		}
 		
-		double corr = 0;
-		String needle = sender.getJid();
-		String senderInLog;
+		PrivacyLogFilter filter = new PrivacyLogFilter();
+		filter.setSender(sender);
 		
-		if (needle == null) {
-			LOG.warn("correlation({}): sender JID is null", sender);
-			throw new AssessmentException("sender JID is null");
-		}
-		
-		for (DataTransmissionLogEntry tr : correlation.getDataTransmission()) {
-			senderInLog = tr.getSender().getJid();
-			if (senderInLog == null) {
-				LOG.warn("correlation(): ignoring null sender in log");
-			}
-			else if (senderInLog.equals(needle)) {
-				corr += tr.getCorrelationWithDataAccess();
-			}
-		}
-		return corr;
+		return estimatePrivacyBreach(filter);
 	}
 	
-	public double estimatePrivacyBreach(String sender) throws AssessmentException {
-		
+	/**
+	 * 
+	 * @param sender The sender to assess
+	 * 
+	 * @return Values in array:<br/>
+	 * - sum of correlations with all data access events<br/>
+	 * - sum of correlations with those data access events where access was performed
+	 * by the sender identity<br/>
+	 * - sum of correlations with those data access events where access was performed
+	 * by the sender class<br/>
+	 * 
+	 * @throws AssessmentException
+	 */
+	public double[] estimatePrivacyBreach(String sender) throws AssessmentException {
+
 		if (sender == null) {
-			throw new AssessmentException("sender must not be null");
+			LOG.warn("estimatePrivacyBreach({}): sender is null", sender);
+			throw new AssessmentException("sender is null");
 		}
 		
-		double corr = 0;
-		String senderInLog;
+		PrivacyLogFilter filter = new PrivacyLogFilter();
+		filter.setSenderClass(sender);
 		
-		for (DataTransmissionLogEntry tr : correlation.getDataTransmission()) {
-			senderInLog = tr.getSenderClass();
-			if (senderInLog == null) {
-				LOG.warn("correlation(): ignoring null sender in log");
-			}
-			else if (senderInLog.equals(sender)) {
-				corr += tr.getCorrelationWithDataAccess();
-			}
+		return estimatePrivacyBreach(filter);
+	}
+	
+	private double[] estimatePrivacyBreach(PrivacyLogFilter filter) throws AssessmentException {
+
+		double[] corr = new double[] {0, 0, 0};
+		
+		for (DataTransmissionLogEntry tr : privacyLog.search(filter)) {
+			corr[0] += tr.getCorrelationWithDataAccess();
+			corr[1] += tr.getCorrelationWithDataAccessBySender();
+			corr[2] += tr.getCorrelationWithDataAccessBySenderClass();
 		}
 		return corr;
 	}
