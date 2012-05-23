@@ -37,7 +37,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	
 	private Properties			parameters;
 	private FacebookClient 		facebookClient;
-	private int					maxPostLimit    = 50000;
+	private int					maxPostLimit    = 700;
 	private long				tokenExpiration = 0;
 	private boolean				firstTime = true;
 	
