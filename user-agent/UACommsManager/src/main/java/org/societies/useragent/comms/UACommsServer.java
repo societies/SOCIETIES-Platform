@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -51,24 +53,21 @@ public class UACommsServer implements IFeatureServer{
 			Arrays.asList("org.societies.api.schema.useragent.monitoring"));
 
 	//PRIVATE VARIABLES
-	private ICommManager commManager;
+	private ICommManager commsMgr;
 	private IUserActionMonitor uam;
 	private IIdentityManager idManager;
+	private Logger LOG = LoggerFactory.getLogger(UACommsServer.class);
 
 	//PROPERTIES
-	public ICommManager getCommManager() {
-		return commManager;
+	public ICommManager getCommsMgr() {
+		return commsMgr;
 	}
 
-	public void setCommManager(ICommManager commManager) {
-		this.commManager = commManager;
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
 	}
 
-	public IUserActionMonitor getUAM() {
-		return uam;
-	}
-
-	public void setUAM(IUserActionMonitor uam) {
+	public void setUam(IUserActionMonitor uam) {
 		this.uam = uam;
 	}
 
@@ -76,14 +75,14 @@ public class UACommsServer implements IFeatureServer{
 	public UACommsServer(){
 	}
 
-	public void InitService() {
+	public void initService() {
 		//REGISTER OUR CommsManager WITH THE XMPP Communication Manager
 		try {
-			getCommManager().register(this); 
+			getCommsMgr().register(this); 
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
-		idManager = commManager.getIdManager();
+		idManager = commsMgr.getIdManager();
 	}
 
 	public List<String> getJavaPackages() {
@@ -95,12 +94,14 @@ public class UACommsServer implements IFeatureServer{
 	}
 
 	public void receiveMessage(Stanza stanza, Object payload) {
+		LOG.info("UACommsServer received message!!!");
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
 		if (payload instanceof UserActionMonitorBean){ this.receiveMessage(stanza, (UserActionMonitorBean)payload);}	
 	}
 
 	public void receiveMessage(Stanza stanza, UserActionMonitorBean payload){
 		//---- UAM Bundle ---
+		LOG.info("Message received for UAM - processing");
 		UserActionMonitorBean monitorBean = (UserActionMonitorBean) payload;
 
 		switch(monitorBean.getMethod()){
@@ -112,6 +113,7 @@ public class UACommsServer implements IFeatureServer{
 				String parameterName = monitorBean.getParameterName();
 				String value = monitorBean.getValue();
 				IAction action = new Action(serviceId, serviceType, parameterName, value);
+				LOG.info("Sending remote message to local UAM");
 				uam.monitor(owner, action);
 				break;
 			} catch (InvalidFormatException e) {

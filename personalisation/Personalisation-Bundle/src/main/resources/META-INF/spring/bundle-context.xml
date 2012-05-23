@@ -9,7 +9,7 @@
 		We've kept the osgi definitions in a separate configuration file so that 
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
-
+ 
 	<bean id="pcm"
 		class="org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor"
 		name="pcm" init-method="initialisePreferenceManagement">
@@ -89,7 +89,6 @@
 		name="userPrefLearning" depends-on="ctxBroker" init-method="initialiseUserPreferenceLearning">
 		<property name="ctxBroker" ref="ctxBroker"></property>
 	</bean>
-
 
 	<!-- <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->
 </beans>

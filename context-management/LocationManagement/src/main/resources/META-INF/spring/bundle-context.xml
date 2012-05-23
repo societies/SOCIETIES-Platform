@@ -10,8 +10,12 @@
 
    <bean id="LMAdapterBean" 
        		 class="org.societies.context.location.management.impl.LMAdapterImpl" 
-       		 depends-on="ContextSourceManagement">
+       		 depends-on="ContextSourceManagement,ContextBroker,CommManager,DeviceRegistry" init-method="init">
 			<property name="contextSourceManagement" ref="ContextSourceManagement" />
+			<property name="contextBroker" ref="ContextBroker" />
+			<property name="commManager" ref="CommManager" />
+			<property name="deviceRegistry" ref="DeviceRegistry" />
+			<property name="pubSubManager" ref="PubsubClient"/>
    </bean>
 
 </beans>

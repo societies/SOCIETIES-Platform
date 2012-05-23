@@ -3,13 +3,17 @@ package org.societies.impl;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jivesoftware.smack.AccountManager;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -273,10 +277,43 @@ public class XMPPClient implements XMPPAgent {
 		return connection.isConnected();
 	}
 	
+	public String newMainIdentity(String identifier, String domain, String password) throws CommunicationException { // TODO this takes no credentials in a private/public key case
+
+		String serverHost = domain;
+		int port = defaultConfig.getPort();
+		String serviceName = domain;
+		
+		try {
+			if(connection.isConnected() && connection.getHost().equals(serverHost) && connection.getPort()==port && connection.getServiceName().equals(serviceName)) {
+				createAccount(connection, identifier, password);
+			}
+			else {
+				ConnectionConfiguration config = new ConnectionConfiguration(domain, port, domain);
+				Connection newIdConnection = new XMPPConnection(config);			
+				newIdConnection.connect();
+				createAccount(newIdConnection, identifier, password);
+				newIdConnection.disconnect();
+			}
+		} catch (XMPPException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			throw new CommunicationException(e.getMessage());
+		}		
+		
+		return username(identifier, domain) + "/" + resource;
+	}
+	
+	private void createAccount(Connection connection, String username, String password) throws XMPPException {
+		AccountManager accountMgr = connection.getAccountManager();
+		Map<String, String> attributes = new HashMap<String, String>();
+		attributes.put("username", username);
+		attributes.put("password", password);
+		accountMgr.createAccount(username, password, attributes);
+	}
+	
 	public String login(String identifier, String domain, String password) {
 		if(isConnected())
 			logout();
-		String username = identifier + "@" + domain;
+		String username = username(identifier, domain);
 		loadConfig(domain, username, password);
 		try {
 			connect();
@@ -300,11 +337,26 @@ public class XMPPClient implements XMPPAgent {
 		}
 	}
 	
+	private String username(String identifier, String domain) {
+		return identifier + "@" + domain;
+	}
+	
 	public boolean logout() {
-		UnRegisterCommManager();
+		UnRegisterCommManager();		
 		connection.disconnect();
 		usingConnectionCounter = 0;
 		return true;
+	}
+	
+	public boolean destroyMainIdentity() {
+		return false; // http://code.google.com/p/asmack/issues/detail?id=63
+//		try {
+//			connection.getAccountManager().deleteAccount();
+//			return true;			
+//		} catch (Exception e) {
+//			Log.e(LOG_TAG, e.getMessage(), e);
+//			return false;
+//		}
 	}
 	
 	private void loadDefaultConfig() {		
