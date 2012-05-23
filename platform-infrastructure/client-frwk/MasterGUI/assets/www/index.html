@@ -444,6 +444,16 @@
 	<div data-role="content" data-theme="a">	
 		<button id="getPref" data-theme="a">Get Preference Value</button>	
 		
+		<label for="prefType">Name: </label>
+		
+		<select name="preferenceType" id="prefType">
+  			<option value="string" selected="selected">String</option>
+  			<option value="boolean">Boolean</option>
+  			<option value="integer">Integer</option>
+  			<option value="long">Long</option>
+  			<option value="float">Float</option>
+		</select> 
+
 		<label for="prefName">Name: </label>
 		<input type="text" name="preferenceName" id="prefName" value="" />
 

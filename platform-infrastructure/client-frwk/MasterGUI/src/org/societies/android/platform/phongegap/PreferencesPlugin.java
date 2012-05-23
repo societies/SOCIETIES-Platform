@@ -33,6 +33,7 @@ import org.apache.cordova.api.Plugin;
 import org.apache.cordova.api.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.android.platform.gui.MasterPreferences;
 import org.societies.utilities.DBC.Dbc;
 
@@ -53,61 +54,78 @@ public class PreferencesPlugin extends Plugin {
 	private static final float UNDEFINED_PREF_FLOAT_VALUE = -99999999999.99999F;
 	private static final boolean UNDEFINED_PREF_BOOLEAN_VALUE = false;
 
-	private SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.ctx.getContext());
+	private SharedPreferences sharedPrefs = null;
 	/**
 	 * Actions required to be executed
 	 */
 	private static final String GET_ALL_PREFS = "getAllPrefs";
-	private static final String getPrefValue = "getPrefValue";
-	private static final String getPrefNames = "getPrefNames";
+	private static final String GET_STRING_PREF_VALUE = "getStringPrefValue";
+	private static final String GET_BOOLEAN_PREF_VALUE = "getBooleanPrefValue";
+	private static final String GET_INTEGER_PREF_VALUE = "getIntegerPrefValue";
+	private static final String GET_LONG_PREF_VALUE = "getLongPrefValue";
+	private static final String GET_FLOAT_PREF_VALUE = "getFloatPrefValue";
+	private static final String GET_PREF_NAMES = "getPrefNames";
+	
+	private static final String JSON_RETURN_VALUE = "value";
 	
 
 	@Override
 	public PluginResult execute(String action, JSONArray parameters, String callbackId) {
-		Log.d(LOG_TAG, "execute: " + action + " for callback: " + callbackId);
+		
+		if (null == sharedPrefs) {
+			Log.d(LOG_TAG, "Get access to app shared preferences");
+			sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.ctx.getContext());
+		}
+		
+		try {
+			Log.d(LOG_TAG, "execute: " + action + " parameters: " + parameters.getString(0) + " for callback: " + callbackId);
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		PluginResult result = null;
 		
-		if (action.equals("getStringPref")) {
+		if (action.equals(GET_STRING_PREF_VALUE)) {
 			try {
-				result = new PluginResult(PluginResult.Status.OK, this.getStringPrefValue(parameters.getString(0)));
+				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getStringPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 			
-		} else if (action.equals("getIntegerPref")) {
+		} else if (action.equals(GET_INTEGER_PREF_VALUE)) {
 			try {
-				result = new PluginResult(PluginResult.Status.OK, this.getIntegerPrefValue(parameters.getString(0)));
+				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getIntegerPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 			
-		} else if (action.equals("getLongPref")) {
+		} else if (action.equals(GET_LONG_PREF_VALUE)) {
 			try {
-				result = new PluginResult(PluginResult.Status.OK, this.getLongPrefValue(parameters.getString(0)));
+				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getLongPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 			
-		} else if (action.equals("getFloatPref")) {
+		} else if (action.equals(GET_FLOAT_PREF_VALUE)) {
 			try {
-				result = new PluginResult(PluginResult.Status.OK, this.getFloatPrefValue(parameters.getString(0)));
+				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getFloatPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 			
-		} else if (action.equals("getBooleanPref")) {
+		} else if (action.equals(GET_BOOLEAN_PREF_VALUE)) {
 			try {
-				result = new PluginResult(PluginResult.Status.OK, this.getBooleanPrefValue(parameters.getString(0)));
+				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getBooleanPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 			
-		} else	
+		} else	{
 			//if method does not exist send synchronous error result
 	        result = new PluginResult(PluginResult.Status.ERROR);
-	        result.setKeepCallback(false);
-
+		}
+        result.setKeepCallback(false);
 		return result;
 	}
 
@@ -142,9 +160,11 @@ public class PreferencesPlugin extends Plugin {
 	 */
 	private String getStringPrefValue(String prefName) {
 		Dbc.require("Preference name must be supplied", prefName != null && prefName.length() > 0);
+		Log.d(LOG_TAG, "getStringPrefValue for: " + prefName);
 		String retValue = null;
 		if (this.sharedPrefs.contains(prefName)) {
 			retValue = this.sharedPrefs.getString(prefName, UNDEFINED_PREF_STRING_VALUE);
+			Log.d(LOG_TAG, "getStringPrefValue value: " + retValue);
 		}
 		return retValue;
 	}
@@ -156,9 +176,11 @@ public class PreferencesPlugin extends Plugin {
 	 */
 	private int getIntegerPrefValue(String prefName) {
 		Dbc.require("Preference name must be supplied", prefName != null && prefName.length() > 0);
+		Log.d(LOG_TAG, "getIntegerPrefValue for: " + prefName);
 		int retValue = 0;
 		if (this.sharedPrefs.contains(prefName)) {
 			retValue = this.sharedPrefs.getInt(prefName, UNDEFINED_PREF_INTEGER_VALUE);
+			Log.d(LOG_TAG, "getIntegerPrefValue value: " + retValue);
 		}
 		return retValue;
 	}
@@ -170,9 +192,11 @@ public class PreferencesPlugin extends Plugin {
 	 */
 	private long getLongPrefValue(String prefName) {
 		Dbc.require("Preference name must be supplied", prefName != null && prefName.length() > 0);
+		Log.d(LOG_TAG, "getLongPrefValue for: " + prefName);
 		long retValue = 0;
 		if (this.sharedPrefs.contains(prefName)) {
 			retValue = this.sharedPrefs.getLong(prefName, UNDEFINED_PREF_LONG_VALUE);
+			Log.d(LOG_TAG, "getLongPrefValue value: " + retValue);
 		}
 		return retValue;
 	}
@@ -184,9 +208,11 @@ public class PreferencesPlugin extends Plugin {
 	 */
 	private float getFloatPrefValue(String prefName) {
 		Dbc.require("Preference name must be supplied", prefName != null && prefName.length() > 0);
+		Log.d(LOG_TAG, "getFloatPrefValue for: " + prefName);
 		float retValue = 0;
 		if (this.sharedPrefs.contains(prefName)) {
 			retValue = this.sharedPrefs.getFloat(prefName, UNDEFINED_PREF_FLOAT_VALUE);
+			Log.d(LOG_TAG, "getFloatPrefValue value: " + retValue);
 		}
 		return retValue;
 	}
@@ -198,9 +224,11 @@ public class PreferencesPlugin extends Plugin {
 	 */
 	private boolean getBooleanPrefValue(String prefName) {
 		Dbc.require("Preference name must be supplied", prefName != null && prefName.length() > 0);
+		Log.d(LOG_TAG, "getBooleanPrefValue for: " + prefName);
 		boolean retValue = false;
 		if (this.sharedPrefs.contains(prefName)) {
 			retValue = this.sharedPrefs.getBoolean(prefName, UNDEFINED_PREF_BOOLEAN_VALUE);
+			Log.d(LOG_TAG, "getBooleanPrefValue value: " + retValue);
 		}
 		return retValue;
 	}

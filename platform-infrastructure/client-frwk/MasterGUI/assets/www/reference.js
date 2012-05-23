@@ -368,20 +368,87 @@ var Preferences = function() {
 };
 
 /**
- * Connect to LocalCSSManager service
+ * Get a String Preference value
  * 
  * @param successCallback The callback which will be called when Java method is successful
  * @param failureCallback The callback which will be called when Java method has an error
+ * @param prefName name of preference to be retrieved
 */
-Preferences.prototype.getStringPref = function(successCallback, failureCallback) {
-	console.log("Call Preferences - getStringPref");
-
-	prefName = jQuery("#prefName").val()
+Preferences.prototype.getStringPrefValue = function(successCallback, failureCallback, prefName) {
+	console.log("Call Preferences - getStringPrefValue");
 	
 	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-	'getStringPref',          //Telling the plugin, which action we want to perform
+	'getStringPrefValue',          //Telling the plugin, which action we want to perform
+	[prefName]);        //Passing a list of arguments to the plugin
+};
+
+/**
+ * Get a Integer Preference value
+ * 
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
+ * @param prefName name of preference to be retrieved
+*/
+Preferences.prototype.getIntegerPrefValue = function(successCallback, failureCallback, prefName) {
+	console.log("Call Preferences - getIntegerPrefValue");
+	
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+	failureCallback,     //Callback which will be called when plugin action encounters an error
+	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+	'getIntegerPrefValue',          //Telling the plugin, which action we want to perform
+	[prefName]);        //Passing a list of arguments to the plugin
+};
+
+/**
+ * Get a Long Preference value
+ * 
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
+ * @param prefName name of preference to be retrieved
+*/
+Preferences.prototype.getLongPrefValue = function(successCallback, failureCallback, prefName) {
+	console.log("Call Preferences - getLongPrefValue");
+	
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+	failureCallback,     //Callback which will be called when plugin action encounters an error
+	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+	'getLongPrefValue',          //Telling the plugin, which action we want to perform
+	[prefName]);        //Passing a list of arguments to the plugin
+};
+
+/**
+ * Get a Float Preference value
+ * 
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
+ * @param prefName name of preference to be retrieved
+*/
+Preferences.prototype.getFloatPrefValue = function(successCallback, failureCallback, prefName) {
+	console.log("Call Preferences - getFloatPrefValue");
+	
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+	failureCallback,     //Callback which will be called when plugin action encounters an error
+	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+	'getFloatPrefValue',          //Telling the plugin, which action we want to perform
+	[prefName]);        //Passing a list of arguments to the plugin
+};
+
+/**
+ * Get a Boolean Preference value
+ * 
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
+ * @param prefName name of preference to be retrieved
+*/
+Preferences.prototype.getBooleanPrefValue = function(successCallback, failureCallback, prefName) {
+	console.log("Call Preferences - getBooleanPrefValue");
+	
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+	failureCallback,     //Callback which will be called when plugin action encounters an error
+	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+	'getBooleanPrefValue',          //Telling the plugin, which action we want to perform
 	[prefName]);        //Passing a list of arguments to the plugin
 };
 
@@ -781,18 +848,41 @@ var getAppPref = function() {
 	console.log("Get app preference");
 	
 	jQuery("#prefValue").val("");
-	
+	prefName = jQuery("#prefName").val();
+	type = jQuery("#prefType").val();
+
 	function success(data) {
-		console.log("getAppPref - successful: " + data);
-		jQuery("#prefValue").val(data);
+		console.log("getAppPref - successful: " + data.value);
+		jQuery("#prefValue").val(data.value);
 		
 	};
 	
 	function failure(data) {
-		console.log("getAppPref - failure: " + data);
+		console.log("getAppPref - failure: " + data.value);
 	};
 
-	window.plugins.Preferences.getStringPref(success, failure);
+	console.log("Preference type: " + type);
+	
+	switch(type)
+	{
+	case "string":
+		window.plugins.Preferences.getStringPrefValue(success, failure, prefName, type);
+		break;
+	case "integer":
+		window.plugins.Preferences.getIntegerPrefValue(success, failure, prefName, type);
+		break;
+	case "long":
+		window.plugins.Preferences.getLongPrefValue(success, failure, prefName, type);
+		break;
+	case "float":
+		window.plugins.Preferences.getFloatPrefValue(success, failure, prefName, type);
+		break;
+	case "boolean":
+		window.plugins.Preferences.getBooleanPrefValue(success, failure, prefName, type);
+		break;
+	default:
+	  console.log("Error - Preference type is not defined");
+	}
 
 };
 
