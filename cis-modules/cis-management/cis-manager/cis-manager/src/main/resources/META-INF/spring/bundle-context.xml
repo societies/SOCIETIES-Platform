@@ -51,12 +51,13 @@
         id="sessionFactory"
         class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >
 
-        <property name="dataSource" ref="societiesDataSource" />
+        <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses" >
             <list>
                 <value>org.societies.cis.manager.Cis</value>
                 <value>org.societies.cis.manager.CisRecord</value>
                 <value>org.societies.cis.manager.CisParticipant</value>
+                <value>org.societies.cis.manager.CisSubscribedImp</value>
                 <value>org.societies.activity.model.Activity</value>
                 <value>org.societies.activity.ActivityFeed</value>
             </list>

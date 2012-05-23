@@ -34,6 +34,7 @@ package org.societies.cis.manager;
  */
 
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -55,6 +56,7 @@ import org.societies.api.cis.management.ICis;
 @Entity
 @Table(name = "org_societies_cis_manager_CisRecord")
 public class CisRecord {
+	private static final long serialVersionUID = 1L;
 	
 	//public String ownerCss;
 	public int membershipCriteria; // also know as mode

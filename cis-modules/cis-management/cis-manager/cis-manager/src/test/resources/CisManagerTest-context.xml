@@ -60,6 +60,7 @@
                 <value>org.societies.cis.manager.Cis</value>
                 <value>org.societies.cis.manager.CisRecord</value>
                 <value>org.societies.cis.manager.CisParticipant</value>
+                <value>org.societies.cis.manager.CisSubscribedImp</value>
                 <value>org.societies.activity.model.Activity</value>
                 <value>org.societies.activity.ActivityFeed</value>
             </list>
