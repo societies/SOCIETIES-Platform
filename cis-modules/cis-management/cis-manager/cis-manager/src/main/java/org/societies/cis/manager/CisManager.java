@@ -104,15 +104,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	ICommManager iCommMgr;
 	Set<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
-	private Session session;
 //	IPrivacyPolicyManager polManager;
 	
 
 	public void startup(){
 		//ActivityFeed ret = null;
 	
-		if(session == null)
-			session = this.getSession();//sessionFactory.openSession();
 		
 		//ActivityFeed.setSession(session);
 		//getting owned CISes
@@ -139,15 +136,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			subscribedCISs = new HashSet<CisSubscribedImp>();
 			
 
+
 	}
 	public void init(){
-		//ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint
+		while (iCommMgr.getIdManager() ==null)
+			;//just wait untill the XCommanager is ready
+		
 		cisManagerId = iCommMgr.getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
 
 
 			try {
 				iCommMgr.register((IFeatureServer)this);
+//				CSSendpoint.register((ICommCallback)this);
 			} catch (CommunicationException e) {
 				e.printStackTrace();
 			} // TODO unregister??
@@ -155,6 +156,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			LOG.info("listener registered");	
 			//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
 	}
+
+
+
 
 
 	
@@ -169,7 +173,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-
+	
 	public ICommManager getICommMgr() {
 		return iCommMgr;
 	}
@@ -179,6 +183,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setICommMgr(ICommManager cSSendpoint) {
 		iCommMgr = cSSendpoint;
 	}
+
+
+
 
 
 
@@ -608,20 +615,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	// session related methods
 
-	public void setSession(Session s){
-		 session = s;
-	}
-	public Session getSession()
-	{
-		if(session == null)
-			session = sessionFactory.openSession();
-		return session;
-	}
 	private void persist(Object o){
-		Session s = getSession();
-		Transaction t = s.beginTransaction();
-		s.save(o);
-		t.commit();
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			session.save(o);
+			t.commit();
+		}catch(Exception e){
+			t.rollback();
+			LOG.warn("Saving CIS object failed, rolling back");
+		}finally{
+			if(session!=null)
+				session.close();
+		}
 	}
 	
 	public  SessionFactory getSessionFactory() {

@@ -167,6 +167,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		if(modelExist == true && enablePrediction == true){
 			action = cauiTaskManager.createAction(null, "fakeServiceType", "fake", "prediction");
 		}
+		LOG.info("this.cauiDiscovery.generateNewUserModel() predictio "+action );
 		return new AsyncResult<IUserIntentAction>(action);
 	}
 
@@ -175,8 +176,6 @@ public class CAUIPrediction implements ICAUIPrediction{
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			IAction action) {
 
-		//System.out.println("getPrediction requestor:" + requestor+" action:"+action);
-		//System.out.println("modelExists: "+ modelExists+" cauiDiscovery:" +cauiDiscovery);
 		LOG.info("getCurrentIntentAction "+predictionRequestsCounter+" action"+ action+" identity requestor"+requestor);
 		predictionRequestsCounter = predictionRequestsCounter +1;
 
@@ -194,7 +193,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		if(modelExist == true && enablePrediction == true){
 			//LOG.info("1. model exists " +modelExist);
-			LOG.info("START PREDICTION ");
+			LOG.info("START PREDICTION caui modelExist "+modelExist);
 			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
 			//setActiveModel(requestor);
 			String par = action.getparameterName();
@@ -217,10 +216,11 @@ public class CAUIPrediction implements ICAUIPrediction{
 					nextAction.setConfidenceLevel(doubleConf.intValue());
 					//		LOG.info("6. nextActionsMap " +nextAction);
 					results.add(nextAction);
+					LOG.info(" ****** prediction map created "+ results);
 				}			
 			}
 		}
-		LOG.info(" ****** prediction map created "+ results);
+		
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
@@ -245,7 +245,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			CtxAttribute contextAttribute) {
 		
-		LOG.info("getCurrentIntentAction"+predictionRequestsCounter+" contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
+		LOG.info("getPrediction 2 "+predictionRequestsCounter+" contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		IUserIntentAction action = null;
@@ -262,7 +262,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 		if(modelExist == true && enablePrediction == true){
 			action = cauiTaskManager.createAction(null, "fakeServiceType", "fake", "prediction");
 			results.add(action);		
-		}			
+		
+		}
+		
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
@@ -289,7 +291,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				this.ctxBroker.registerForChanges(new MyCtxChangeEventListener(),uiModelAttributeId);	
 			}		
 
-			LOG.info("registration for context attribute updates of type "+uiModelAttributeId);
+			LOG.info("registration for context attribute updates of type CAUI: "+uiModelAttributeId);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -310,6 +312,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		if (newUIModelData != null){
 			cauiTaskManager.updateModel(newUIModelData);
 			modelExist = true;		 
+		LOG.info("caui model set active modelExist: "+modelExist);
 		}
 	}
 
@@ -336,7 +339,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 				try {
 					uiModelAttr = (CtxAttribute) ctxBroker.retrieve(uiModelAttrID).get();
 					UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
-					LOG.info("UserIntentModelData "+newUIModelData);
+					LOG.info("UserIntentModelData actions map: "+newUIModelData.getActionModel());
+					
 					//	LOG.info("UserIntentModelData matrix"+newUIModelData.getMatrix()+" tasks "+newUIModelData.getTaskList());
 
 					setActiveModel(newUIModelData);

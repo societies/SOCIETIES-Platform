@@ -48,6 +48,8 @@ public class DataTransmissionLogEntry {
 	private final ChannelType channelId;
 	
 	private double correlationWithDataAccess = -1;
+	private double correlationWithDataAccessBySender = -1;
+	private double correlationWithDataAccessBySenderClass = -1;
 
 	public DataTransmissionLogEntry(String dataType, Date time, IIdentity receiver,
 			IIdentity sender, String senderClass, long payloadSize, ChannelType channelId) {
@@ -148,8 +150,8 @@ public class DataTransmissionLogEntry {
 	/**
 	 * Get correlation with all data access events.
 	 * 
-	 * @return Correlation (non-negative value) with all data access events, or
-	 * negative value if the correlation has not been set yet.
+	 * @return Correlation (non-negative value), or negative value if the
+	 * correlation has not been set yet.
 	 */
 	public double getCorrelationWithDataAccess() {
 		return correlationWithDataAccess;
@@ -160,12 +162,60 @@ public class DataTransmissionLogEntry {
 	 * 
 	 * @param correlationWithDataAccess Correlation with all data access events
 	 */
-	public void setCorrelationWithDataAccess(double correlationWithDataAccess) {
+	public void setCorrelationWithDataAccess(double correlation) {
 		
-		if (correlationWithDataAccess < 0) {
+		if (correlation < 0) {
 			// Log a warning if logger available
 			return;
 		}
-		this.correlationWithDataAccess = correlationWithDataAccess;
+		this.correlationWithDataAccess = correlation;
+	}
+
+	/**
+	 * Get correlation with those data access events where the sender ID has accessed the data.
+	 * 
+	 * @return Correlation (non-negative value), or negative value if the
+	 * correlation has not been set yet.
+	 */
+	public double getCorrelationWithDataAccessBySender() {
+		return correlationWithDataAccessBySender;
+	}
+	
+	/**
+	 * Set correlation with those data access events where the sender ID has accessed the data.
+	 * 
+	 * @param correlationWithDataAccess Correlation with all data access events
+	 */
+	public void setCorrelationWithDataAccessBySender(double correlation) {
+		
+		if (correlation < 0) {
+			// Log a warning if logger available
+			return;
+		}
+		this.correlationWithDataAccessBySender = correlation;
+	}
+
+	/**
+	 * Get correlation with those data access events where the sender class has accessed the data.
+	 * 
+	 * @return Correlation (non-negative value), or negative value if the
+	 * correlation has not been set yet.
+	 */
+	public double getCorrelationWithDataAccessBySenderClass() {
+		return correlationWithDataAccessBySenderClass;
+	}
+
+	/**
+	 * Set correlation with those data access events where the sender class has accessed the data
+	 * 
+	 * @param correlationWithDataAccess Correlation with all data access events
+	 */
+	public void setCorrelationWithDataAccessBySenderClass(double correlation) {
+		
+		if (correlation < 0) {
+			// Log a warning if logger available
+			return;
+		}
+		this.correlationWithDataAccessBySenderClass = correlation;
 	}
 }

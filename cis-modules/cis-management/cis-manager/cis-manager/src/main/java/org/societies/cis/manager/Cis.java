@@ -61,6 +61,7 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICis;
@@ -166,7 +167,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		return  new AsyncResult<IActivityFeed>(activityFeed);
 	}
 	
-	private ActivityFeed getActivityFeed() {
+	@Override
+	public IActivityFeed getActivityFeed() {
 		return activityFeed;
 	}
 
@@ -484,7 +486,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	}
 
-	// index for hash and equals was only the cisRecord
+
+	
+	// equals comparing only cisRecord
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -506,10 +511,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 		if (cisRecord == null) {
 			if (other.cisRecord != null)
 				return false;
-		} else if (cisRecord.equals(other.cisRecord) == false)
+		} else if (!cisRecord.equals(other.cisRecord))
 			return false;
 		return true;
 	}
+	
+	
+	
 
 	public CisRecord getCisRecord() {
 		return cisRecord;
@@ -853,7 +861,21 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public int getMembershipCriteria() {
 		return this.cisRecord.getMembershipCriteria();
 	}
-    
 	
+	@Override
+	public void getInfo(ICisManagerCallback callback){
+		LOG.debug("local client call to get info from this CIS");
+
+		
+		Community c = new Community();
+		c.setCommunityJid(this.getCisId());
+		c.setCommunityName(this.getName());
+		c.setCommunityType(this.getCisType());
+		c.setOwnerJid(this.getOwnerId());
+		c.setDescription(this.getDescription());
+		c.setGetInfo("");
+		
+		callback.receiveResult(c);	
+	}
 	
 }
