@@ -26,10 +26,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 /**
  * Contains CSS Manager Enum classes
- * 
+ *  and PubSub nodes
  *
  */
 public class CSSManagerEnums {
+	//CSS Manager Eventing (a.k.a Pubsub) nodes
+    public static final String ADD_CSS_NODE = "addCSSNode";
+    public static final String ADD_CSS_NODE_DESC = "Additional node available on CSS";
+
+    public static final String DEPART_CSS_NODE = "departCSSNode";
+    public static final String DEPART_CSS_NODE_DESC = "Existing node no longer available on CSS";
 
 	/**
 	 * Enum for device status types
