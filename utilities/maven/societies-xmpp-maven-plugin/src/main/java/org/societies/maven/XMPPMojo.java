@@ -128,7 +128,7 @@ public class XMPPMojo extends AbstractMojo
 			// - Step 1: change "complexType" of Beans to "element"
 			Pattern patternComplexeType = null;
 			// Bean list not null : use it
-			if (null != beans && beans.size() > 0) {
+			if (null != beans) {
 				StringBuffer beansString = new StringBuffer();
 				int i = beans.size();
 				for(String bean : (List<String>) beans) {
@@ -140,22 +140,22 @@ public class XMPPMojo extends AbstractMojo
 						beansString.append(bean+"|");
 					}
 				}
-				patternComplexeType = Pattern.compile("<xs:complexType name=\"("+beansString+")\">(.*?)</xs:complexType>", Pattern.DOTALL|Pattern.CASE_INSENSITIVE);
+				patternComplexeType = Pattern.compile("<xs:complexType name=\"("+beansString+")\"(.*?)</xs:complexType>", Pattern.DOTALL|Pattern.CASE_INSENSITIVE);
 			}
 			// Else use complexeType finishing by Bean or BeanResult
 			else {
-				patternComplexeType = Pattern.compile("<xs:complexType name=\"([^\"]*Bean(?:Result)?)\">(.*?)</xs:complexType>", Pattern.DOTALL|Pattern.CASE_INSENSITIVE);
+				patternComplexeType = Pattern.compile("<xs:complexType name=\"([^\"]*Bean(?:Result)?)\"(.*?)</xs:complexType>", Pattern.DOTALL|Pattern.CASE_INSENSITIVE);
 			}
 			Matcher matcherComplexeType = patternComplexeType.matcher(schemaContent);
-			newSchemaContent = matcherComplexeType.replaceAll("<xs:element name=\"$1\">\n\t<xs:complexType>$2\t</xs:complexType>\n\t</xs:element>");
+			newSchemaContent = matcherComplexeType.replaceAll("<xs:element name=\"$1\">\n\t<xs:complexType$2\t</xs:complexType>\n\t</xs:element>");
 			//		    getLog().info("#################### After ComplexeType");
 			//		    getLog().info(newSchemaContent);
 
 			// -- Step 2: Add relevant namespace to complex type
 			//		    Pattern patternTypeNamespace = Pattern.compile("type=\"(xs:(?!char|byte|short|int|long|float|double|boolean|string))\"", Pattern.CASE_INSENSITIVE);
-			Pattern patternTypeNamespace = Pattern.compile("type=\"((?!xs|ns[0-9]{1,3})[^\"]+)\"", Pattern.CASE_INSENSITIVE);
+			Pattern patternTypeNamespace = Pattern.compile("(type|base)=\"((?!xs|ns[0-9]{1,3})[^\"]+)\"", Pattern.CASE_INSENSITIVE);
 			Matcher matcherTypeNamespace = patternTypeNamespace.matcher(newSchemaContent);
-			newSchemaContent = matcherTypeNamespace.replaceAll("type=\"tns:$1\"");
+			newSchemaContent = matcherTypeNamespace.replaceAll("$1=\"tns:$2\"");
 			//		    getLog().info("#################### After TypeNamespace");
 			//		    getLog().info(newSchemaContent);
 
@@ -174,6 +174,9 @@ public class XMPPMojo extends AbstractMojo
 			Pattern patternImportCheck = Pattern.compile("schemaLocation", Pattern.CASE_INSENSITIVE);
 			Matcher matcherImportCheck = patternImportCheck.matcher(newSchemaContent);
 			if (matcherImportCheck.find()) {
+				Pattern patternIsInternal = Pattern.compile("internal/", Pattern.CASE_INSENSITIVE);
+				Matcher matcherIsInternal = patternIsInternal.matcher(httpNamespace);
+				boolean isInternal = matcherIsInternal.find();
 				Pattern patternImport = Pattern.compile("<xs:import namespace=\"(http://societies.org/api/(internal/)?schema/([^\"]+))\" schemaLocation=\"([^\"]*)\" ?/>", Pattern.CASE_INSENSITIVE);
 				Matcher matcherImport = patternImport.matcher(newSchemaContent);
 				StringBuffer importsContent = new StringBuffer();
@@ -184,16 +187,16 @@ public class XMPPMojo extends AbstractMojo
 					String typeHttpNs = matcherImport.group(2);
 					String endHttpNs = matcherImport.group(3);
 					if (matcherInternalCheck.find()) {
-						getLog().info("internal:"+httpNs);
-						getLog().info("internal:"+typeHttpNs);
-						getLog().info("internal:"+endHttpNs);
+//						getLog().info("internal:"+httpNs);
+//						getLog().info("internal:"+typeHttpNs);
+//						getLog().info("internal:"+endHttpNs);
 						matcherImport.appendReplacement(importsContent, "<xs:import namespace=\"http://societies.org/api/$2schema/$3\" schemaLocation=\"org.societies.api."+typeHttpNs.replace("/", ".")+"schema."+endHttpNs.replace("/", ".")+".xsd\" />");
 					}
 					else {
-						getLog().info("external:"+httpNs);
-						getLog().info("external:"+typeHttpNs);
-						getLog().info("external:"+endHttpNs);
-						matcherImport.appendReplacement(importsContent, "<xs:import namespace=\"http://societies.org/api/$2schema/$3\" schemaLocation=\"../../../../external/src/main/resources/org.societies.api.schema."+endHttpNs.replace("/", ".")+".xsd\" />");
+//						getLog().info("external:"+httpNs);
+//						getLog().info("external:"+typeHttpNs);
+//						getLog().info("external:"+endHttpNs);
+						matcherImport.appendReplacement(importsContent, "<xs:import namespace=\"http://societies.org/api/$2schema/$3\" schemaLocation=\""+(isInternal ? "../../../../external/src/main/resources/" : "")+"org.societies.api.schema."+endHttpNs.replace("/", ".")+".xsd\" />");
 					}
 				}
 				matcherImport.appendTail(importsContent);
