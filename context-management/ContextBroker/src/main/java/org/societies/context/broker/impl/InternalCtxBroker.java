@@ -938,7 +938,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
-		LOG.info("retrieveHistoryTuples updating hocAttrs primaryAttr: "+primaryAttrId);
+		//LOG.info("retrieveHistoryTuples updating hocAttrs primaryAttr: "+primaryAttrId);
 
 		if(primaryAttrId!= null){ // TODO throw NPE otherwise
 
