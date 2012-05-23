@@ -56,20 +56,34 @@
 	<dependencies>
 		<!-- Societies -->
 		<dependency>
-			<groupId>org.societies.android.privacytrust</groupId>
-			<artifactId>api</artifactId>
-			<version>${version.pt}</version>
-			<scope>provided</scope>
+			<groupId>org.societies.android.api</groupId>
+			<artifactId>societies-android-api</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.schema.internal</groupId>
 			<artifactId>societies-api-schema-internal</artifactId>
 			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.privacytrust</groupId>
+			<artifactId>api</artifactId>
+			<version>${version.pt}</version>
+			<scope>compile</scope>
 		</dependency>
 		<!-- Android -->
 		<dependency>
