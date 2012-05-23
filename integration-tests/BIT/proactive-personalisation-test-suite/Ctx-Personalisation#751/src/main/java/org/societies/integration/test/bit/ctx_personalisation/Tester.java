@@ -40,6 +40,7 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -76,7 +77,7 @@ public class Tester {
 		this.idm = Test751.getCommsMgr().getIdManager();
 		this.helloWorldService = Test751.getHelloWorld();
 		this.ctxBroker = Test751.getCtxBroker();
-		userId = idm.getThisNetworkNode();
+		//userId = idm.getThisNetworkNode();
 		setupContext();
 		
 		logging.debug("751SETUPCOMPLETE");
@@ -92,15 +93,16 @@ public class Tester {
 	
 		changeContext("home", "free");
 		
-		for (int i=0; i<5; i++){
+		for (int i=0; i<10; i++){
 			log("Step: "+i);
 			
 			this.helloWorldService.setBackgroundColour(userId, "red");
-			
+			changeContext("home", "busy");
+			this.helloWorldService.setVolume(userId, "10");
 			changeContext("work", "busy");
-			
 			this.helloWorldService.setBackgroundColour(userId, "black");
-			
+			changeContext("work", "free");
+			this.helloWorldService.setVolume(userId, "50");
 			changeContext("home", "free");	
 		}
 					
@@ -152,14 +154,17 @@ public class Tester {
 
 	private void getPersonEntity(){
 		try {
-			Future<List<CtxIdentifier>> futurePersons = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
+			Future<IndividualCtxEntity> futurePerson = this.ctxBroker.retrieveCssOperator();
+			person = futurePerson.get();
+			this.userId = idm.fromJid(person.getId().getOperatorId());
+			/*Future<List<CtxIdentifier>> futurePersons = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
 			List<CtxIdentifier> persons = futurePersons.get();
 			if (persons.size() == 0){
 				person = this.ctxBroker.createEntity(CtxEntityTypes.PERSON).get();
 				
 			}else{
 				person = (CtxEntity) this.ctxBroker.retrieve(persons.get(0)).get();
-			}
+			}*/
 			
 			if (person==null){
 				log("Person CtxEntity is null");
@@ -175,11 +180,15 @@ public class Tester {
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
 	private void getSymLocAttribute(){
 		try {
+			
 			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
 			List<CtxIdentifier> attrs = futureAttrs.get();
 			if (attrs.size() == 0){

@@ -44,7 +44,7 @@ public interface IDeviceManager {
 	 * @param serviceIds
 	 * @return a deviceId
 	 */
-	public String fireNewDeviceConnected (String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceIds);
+	public String fireNewDeviceConnected (String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceNames);
 	
 	/**
 	 * Method used to inform the Device Manager about disconnection of a device

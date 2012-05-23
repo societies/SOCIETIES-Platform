@@ -34,6 +34,7 @@
  
 <xs:schema targetNamespace='http://societies.org/api/schema/cis/manager'
 	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/api/schema/cis/manager">
+<!--	xmlns:ns1="http://societies.org/api/schema/cis/community">-->
 
 	<xs:annotation>
 		<xs:documentation>
@@ -41,10 +42,14 @@
 		</xs:documentation>
 	</xs:annotation>
 
+<!--  <xs:import namespace="http://societies.org/api/schema/cis/community" 
+  		schemaLocation="org.societies.api.schema.cis.community.xsd"/>-->
+
 	<xs:element name='communities'>
 	   <xs:complexType>
 	       <xs:sequence>
-      		<xs:element ref='community' minOccurs='0' maxOccurs='unbounded'/>
+<!--      		<xs:element name="community" type="ns1:community-type" minOccurs='0' maxOccurs='unbounded'/> -->
+				<xs:element ref="cis-community" minOccurs='0' maxOccurs='unbounded'/>
       		</xs:sequence>
 	    </xs:complexType>
 	</xs:element>
@@ -63,11 +68,11 @@
 	    </xs:complexType>
 	</xs:element>
 	
-	<xs:element name='community'>
+	<xs:element name='cis-community'>
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base='empty'>
-         	<xs:attribute name='community-jid' type='xs:string'/><!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+         	<xs:attribute name='community-jid' type='xs:string'/>
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>
@@ -123,6 +128,7 @@
       <xs:choice>
         <xs:element ref='delete-notification'/>
         <xs:element ref='subscribedTo'/>
+        <xs:element ref='deleteMemberNotification'/>   
       </xs:choice>
     </xs:complexType>
   </xs:element>
@@ -134,6 +140,17 @@
       <xs:simpleContent>
         <xs:extension base='empty'>
           <xs:attribute name='owner-jid' type='xs:string'/> 
+          <xs:attribute name='community-jid' type='xs:string'  use='required'/> 
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+   <xs:element name='deleteMemberNotification'>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base='empty'>
+          <xs:attribute name='member-jid' type='xs:string' use='required'/> 
           <xs:attribute name='community-jid' type='xs:string'  use='required'/> 
         </xs:extension>
       </xs:simpleContent>

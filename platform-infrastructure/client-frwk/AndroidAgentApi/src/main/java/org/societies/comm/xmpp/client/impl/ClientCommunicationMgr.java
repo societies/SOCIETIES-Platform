@@ -11,6 +11,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.interfaces.XMPPAgent;
@@ -85,6 +86,20 @@ public class ClientCommunicationMgr {
 		bindService(connection);
 	}
 	
+	public boolean UnRegisterCommManager() {
+		boolean rv;
+		try {
+			rv = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.UnRegisterCommManager();
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		return rv;
+	}
+	
 	public void sendMessage(Stanza stanza, Message.Type type, Object payload)
 			throws CommunicationException {
 		
@@ -157,14 +172,12 @@ public class ClientCommunicationMgr {
 	private void sendMessage(final String xml) {
 		ServiceConnection connection = new ServiceConnection() {
 
-			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
 				agent.sendMessage(xml);		
 				androidContext.unbindService(this);
 			}
 
-			@Override
 			public void onServiceDisconnected(ComponentName cn) {				
 			}
 			
@@ -176,13 +189,11 @@ public class ClientCommunicationMgr {
 	private void sendIQ(final String xml, final ICommCallback callback) {
 		ServiceConnection connection = new ServiceConnection() {
 
-			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));				
 				agent.sendIQ(xml, new CallbackAdapter(callback, androidContext, this, marshaller));
 			}
 
-			@Override
 			public void onServiceDisconnected(ComponentName cn) {				
 			}
 			
@@ -224,4 +235,78 @@ public class ClientCommunicationMgr {
 		}
 		return connected;
 	}
+	
+	public INetworkNode newMainIdentity(final String identifier, final String domain, final String password) throws XMPPError { // TODO this takes no credentials in a private/public key case
+		try {
+			String rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.newMainIdentity(identifier, domain, password);
+				}
+			});
+			if(rv == null)
+				return null;
+			return new IdentityManagerImpl(rv).getThisNetworkNode();
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	public INetworkNode login(final String identifier, final String domain, final String password) {		
+		try {
+			String rv;
+			rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.login(identifier, domain, password);
+				}
+			});
+			if(rv == null)
+				return null;
+			return new IdentityManagerImpl(rv).getThisNetworkNode();
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	public INetworkNode loginFromConfig() {
+		try {
+			String rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.loginFromConfig();
+				}
+			});
+			if(rv == null)
+				return null;
+			return new IdentityManagerImpl(rv).getThisNetworkNode();
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	public boolean logout() {
+		boolean rv;
+		try {
+			rv = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.logout();
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		return rv;
+	}
+	
+	public boolean destroyMainIdentity() {
+		boolean rv;
+		try {
+			rv = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.destroyMainIdentity();
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		return rv;
+	}	
 }

@@ -55,6 +55,13 @@ public class RequestItem implements Serializable{
 		this.actions = actions;
 		this.conditions = conditions;
 		this.optional = false;
+		if (null==conditions){
+			throw new NullPointerException("List<Condition> condition parameter cannot be null. Use empty list instead");
+		}
+		
+		if (null==actions){
+			throw new NullPointerException("List<Action> action parameter cannot be null. Use empty list instead");
+		}
 	}
 
 	public RequestItem(Resource r, List<Action> actions, List<Condition> conditions, boolean isOptional){

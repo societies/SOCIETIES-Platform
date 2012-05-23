@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -103,54 +104,59 @@ public class DatabaseConnection implements Variables {
 	
 	public void sendMomentToDatabase(String userId,String lastTime, int number,int option){
 		
-		int week_number=calculateWeek(lastTime);
+		int week_number;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		try {
+			long long_lastTime=sdf.parse(lastTime).getTime();
+			week_number = calculateWeek(lastTime);
 			//logger.debug("adding moment for user "+userId+" profile "+option+"  week "+week_number+" to database");
 			Statement st = connection.createStatement();
 			logger.debug("insert into info (week ,starts , profile , last_time , number_actions ,user_id) values " +
-					"( "+week_number+","+option+","+lastTime+","+number+","+userId+") " +
-					"on duplicate key update last_time="+lastTime+" , number_actions="+number+" ;");
+					"( "+week_number+","+option+","+long_lastTime+","+number+","+userId+") " +
+					"on duplicate key update last_time="+long_lastTime+" , number_actions="+number+" ;");
 			st.execute("insert into info (week ,starts, profile , last_time ,last_time_timestamp, number_actions ,user_id) " +
-					"values " +	"( "+week_number+", '"+getMysqlTimeStampForWeek(week_number)+"',"+option+","+lastTime+
+					"values " +	"( "+week_number+", '"+getMysqlTimeStampForWeek(week_number)+"',"+option+","+long_lastTime+
 					",'"+getMysqlTimeStamp(lastTime)+"',"+number+","+userId+") " +
-					"on duplicate key update starts='"+getMysqlTimeStampForWeek(week_number)+"' ,last_time="+lastTime+" ,last_time_timestamp='"+getMysqlTimeStamp(lastTime)+
+					"on duplicate key update starts='"+getMysqlTimeStampForWeek(week_number)+"' ,last_time="+long_lastTime+" ,last_time_timestamp='"+getMysqlTimeStamp(lastTime)+
 					"' ,  number_actions="+number+" ;");
 			
 		}catch (SQLException e) {
 			logger.debug("error while adding moment for user "+userId+" to Mysql"+e);
 			e.printStackTrace();
+		}catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
 	
 	
-	public int calculateWeek(String lastTime){
+	public int calculateWeek(String lastTime) throws ParseException{
 		//1249084800=1 aug 2009 00:00:00 GMT
-		long date_start=1249084800L;
-		long date_lastTime=Long.parseLong(lastTime);
+		long date_start=0L;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		long date_lastTime=sdf.parse(lastTime).getTime();
 		long difference= date_lastTime-date_start;
 		//1 week=7 x 24 x 60 x 60=604800
-		int week_time=604800;
+		long week_time=604800000;
 		int week_number=(int) (difference/week_time);
 		//logger.debug("date last time "+date_lastTime+" difference "+difference+" week "+week_number);
 		return week_number;
 	}
 	
 	 	
-	public String getMysqlTimeStamp(String time){
-		long t=Long.parseLong(time)*1000;
-		Date time1 = new Date(t);
+	public String getMysqlTimeStamp(String time) throws ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
-		String mysql_time = df.format(time1);	
-		return mysql_time;
+		return df.format(sdf.parse(time));
 	}
 	
 		
 	public String getMysqlTimeStampForWeek(int week){
-		long date_start=1249084800L;
-		long week_time=604800L;
+		long date_start=0L;
+		long week_time=604800000L;
 		long date =date_start+week*week_time;
-		Date time = new Date(date*1000);
+		Date time = new Date(date);
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String mysql_time = df.format(time);	
@@ -196,14 +202,14 @@ public class DatabaseConnection implements Variables {
 		java.util.Date today = new java.util.Date();//current date
 	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime());
 	    long current_time = timestamp.getTime()/1000;
-	    int current_week=calculateWeek(String.valueOf(current_time));
-	    int week=0,aux=0,aux_number=0; 
-	    if (caName.equals("user_not_found_on_CA")){
-	    	logger.error("error while trying to generate profile evolution for user "+
-	    			userId+" reason: user was not found on CA platform");
-	    	return series;
-	    }
 	    try {
+		    int current_week=calculateWeek(String.valueOf(current_time));
+		    int week=0,aux=0,aux_number=0; 
+		    if (caName.equals("user_not_found_on_CA")){
+		    	logger.error("error while trying to generate profile evolution for user "+
+		    			userId+" reason: user was not found on CA platform");
+		    	return series;
+		    }
 	    	Statement st = connection.createStatement();
 	    	while ((week)<=current_week){   //adding procedure
 	    		ResultSet result=st.executeQuery("select number_actions from info where week="+week+" " +
@@ -230,9 +236,9 @@ public class DatabaseConnection implements Variables {
 				week++;
 	    	}
 	    	//series.add(current_week, 0);
-	    }catch (SQLException e) {
+	    }catch (Exception e) {
 			logger.debug("error (create_Series) while retrieving number_actions for user "+userId+" " +
-					"profile="+profile+" week="+current_week+" from Mysql"+e);
+					"profile="+profile+" from Mysql"+e);
 			e.printStackTrace();
 		}
 	    return series;
@@ -260,15 +266,21 @@ public class DatabaseConnection implements Variables {
 		java.util.Date today = new java.util.Date();
 	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime());
 	    long current_time = timestamp.getTime()/1000;
-	    int current_week=calculateWeek(String.valueOf(current_time));
+	    int current_week;
+		try {
+			current_week = calculateWeek(String.valueOf(current_time));
 		
-		//add points to series
-		int aux=getSumForGroup(group, 0, profile);
-		series.add(0-current_week,aux);
-		for (int j=1;j<=current_week;j++){
-			int value=getSumForGroup(group, j, profile);
-			series.add(j-current_week,value-aux);
-			aux=value;
+			//add points to series
+			int aux=getSumForGroup(group, 0, profile);
+			series.add(0-current_week,aux);
+			for (int j=1;j<=current_week;j++){
+				int value=getSumForGroup(group, j, profile);
+				series.add(j-current_week,value-aux);
+				aux=value;
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 	    return series;
@@ -350,12 +362,18 @@ public class DatabaseConnection implements Variables {
 		java.util.Date today = new java.util.Date();
 	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime()); //FIXME: minor: il fuso orario e' sbagliato.
 	    long current_time = timestamp.getTime()/1000;
-	    int current_week=calculateWeek(String.valueOf(current_time));
-		logger.debug("current week is "+current_week+" :"+timestamp);//current date and week
-		
-		int lastWeek=getLastWeekForCommunity(); //last week on total info
-		for (int i=lastWeek;i<=current_week;i++){
-			addSumsToTotalInfo(i);
+	    int current_week;
+		try {
+			current_week = calculateWeek(String.valueOf(current_time));
+			logger.debug("current week is "+current_week+" :"+timestamp);//current date and week
+			
+			int lastWeek=getLastWeekForCommunity(); //last week on total info
+			for (int i=lastWeek;i<=current_week;i++){
+				addSumsToTotalInfo(i);
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -366,11 +384,13 @@ public class DatabaseConnection implements Variables {
 		java.util.Date today = new java.util.Date();
 	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime());
 	    long current_time = timestamp.getTime()/1000;
-	    int current_week=calculateWeek(String.valueOf(current_time));
+	    int current_week;
+		try {
+			current_week = calculateWeek(String.valueOf(current_time));
 		
-		int lastWeek=getLastWeekForCommunity(); //last week on total info
-	    int week=0,aux_number=0; 
-	    try {
+			int lastWeek=getLastWeekForCommunity(); //last week on total info
+		    int week=0,aux_number=0; 
+
 	    	Statement st = connection.createStatement();
 	    	while ((week)<=lastWeek){   //adding procedure
 	    		ResultSet result=st.executeQuery("select number_actions from total_info where week="+week+" " +
@@ -386,9 +406,12 @@ public class DatabaseConnection implements Variables {
 				}
 				week++;
 	    	}
-	    }catch (SQLException e) {
+	    }catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}catch (SQLException e) {
 			logger.debug("error (create_XSeries) while retrieving number_actions for " +
-					"profile="+profile+" week="+week+" from Mysql"+e);
+					"profile="+profile+" from Mysql"+e);
 			e.printStackTrace();
 		}
 	    return series;
@@ -398,7 +421,7 @@ public class DatabaseConnection implements Variables {
 	
 	
 	//replace into code with this function - avoid redondancy
-	public int getCurrentWeek(){
+	public int getCurrentWeek() throws ParseException{
 		java.util.Date today = new java.util.Date();
 	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime());
 	    long current_time = timestamp.getTime()/1000;

@@ -34,6 +34,7 @@ package org.societies.useragent.decisionmaking;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import org.slf4j.*;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
@@ -54,6 +55,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 	private List<IActionConsumer> temporal=null;
 	
 	private IServiceDiscovery SerDiscovery;
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	
 	public IServiceDiscovery getSerDiscovery() {
 		return SerDiscovery;
@@ -69,6 +71,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 				if(ser instanceof IActionConsumer){
 					lst.add((IActionConsumer)ser);
 				}
+				logging.debug("fetch service:\t"+ser);
 			}
 		} catch (ServiceDiscoveryException e) {
 			// TODO Auto-generated catch block
@@ -96,7 +99,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 		man.addRule(new ConfidenceTradeoffRule());
 		man.addRule(new IntentPriorRule());
 		this.manager=man;
-		
+		logging.debug("Intialized DM");
 	}
 	@Override
 	protected ConflictType detectConflict(IOutcome intent, IOutcome prefernce) {
@@ -111,10 +114,12 @@ public class DecisionMaker extends AbstractDecisionMaker {
 					}
 				}
 			}
+			logging.debug("detecting conflict DM");
 			return ConflictType.NO_CONFLICT;
 		} catch (Exception e) {
 			return ConflictType.UNKNOWN_CONFLICT;
 		}
+		
 	}
 	@Override
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
@@ -132,9 +137,11 @@ public class DecisionMaker extends AbstractDecisionMaker {
 		//System.out.println("with Parameter:\t"+action.getparameterName());
 		//System.out.println("with Parameter:\t"+action.getvalue());
 		//System.out.println("****************************************");
+		logging.debug( "implement IAction DM");
 		for(IActionConsumer consumer:this.temporal){
 			if(consumer.getServiceIdentifier().equals(action.getServiceID())){
 				consumer.setIAction(this.entityID, action);
+				logging.debug("set IAction DM");
 			}
 		}
 		

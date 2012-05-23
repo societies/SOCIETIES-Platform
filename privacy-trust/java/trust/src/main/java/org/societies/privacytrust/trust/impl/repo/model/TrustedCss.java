@@ -24,14 +24,23 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.ITrustedService;
 
 /**
  * This class represents trusted CSSs. A <code>TrustedCss</code> object is
@@ -46,16 +55,35 @@ import org.societies.privacytrust.trust.api.model.ITrustedCss;
  * @since 0.0.1
  */
 @Entity
-@Table(name = TableName.TRUSTED_CSS, uniqueConstraints={@UniqueConstraint(columnNames={"trustorId", "trusteeId"})})
+@Table(
+		name = TableName.TRUSTED_CSS, 
+		uniqueConstraints = { @UniqueConstraint(columnNames = { "trustor_id", "trustee_id" }) }
+)
 public class TrustedCss extends TrustedEntity implements ITrustedCss {
 	
 	private static final long serialVersionUID = 6564159563124215460L;
 	
 	/** The communities this CSS is member of. */
-	//private final Set<TrustedCis> communities = new CopyOnWriteArraySet<TrustedCis>();
+	@ManyToMany(
+			cascade = CascadeType.MERGE,
+			targetEntity = TrustedCis.class,
+			fetch = FetchType.EAGER
+	)
+	@JoinTable(
+			name = TableName.TRUSTED_CSS_CIS, 
+			joinColumns = { @JoinColumn(name = TableName.TRUSTED_CSS + "_id") }, 
+			inverseJoinColumns = { @JoinColumn(name = TableName.TRUSTED_CIS + "_id") }
+	)
+	private final Set<ITrustedCis> communities = new HashSet<ITrustedCis>();
 	
 	/** The services provided by this CSS. */
-	//private final Set<TrustedService> services = new CopyOnWriteArraySet<TrustedService>();
+	@OneToMany(
+			cascade = CascadeType.REMOVE,
+			mappedBy = "provider",
+			targetEntity = TrustedService.class,
+			fetch = FetchType.EAGER
+	)
+	private final Set<ITrustedService> services = new HashSet<ITrustedService>();
 
 	/* Empty constructor required by Hibernate */
 	private TrustedCss() {
@@ -74,31 +102,33 @@ public class TrustedCss extends TrustedEntity implements ITrustedCss {
 		super(teid);
 	}
 
-	/*public Set<TrustedCis> getCommunities(){
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedCss#getCommunities()
+	 */
+	@Override
+	public Set<ITrustedCis> getCommunities(){
 		
 		return this.communities;
 	}
 	
-	/**
-	 * 
-	 * @param community
-	 * @since 0.0.3
-	 *
-	public void addCommunity(final TrustedCis community) {
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedCss#addCommunity(org.societies.privacytrust.trust.api.model.ITrustedCis)
+	 */
+	@Override
+	public void addCommunity(final ITrustedCis community) {
 		
 		if (!this.communities.contains(community))
 			this.communities.add(community);
-		
+	
 		if (!community.getMembers().contains(this))
 			community.getMembers().add(this);
 	}
 	
-	/**
-	 * 
-	 * @param community
-	 * @since 0.0.3
-	 *
-	public void removeCommunity(final TrustedCis community) {
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedCss#removeCommunity(org.societies.privacytrust.trust.api.model.ITrustedCis)
+	 */
+	@Override
+	public void removeCommunity(final ITrustedCis community) {
 		
 		if (this.communities.contains(community))
 			this.communities.remove(community);
@@ -107,27 +137,20 @@ public class TrustedCss extends TrustedEntity implements ITrustedCss {
 			community.getMembers().remove(this);
 	}
 
-	/**
-	 * Returns a set containing the services provided by this CSS.
-	 * 
-	 * @return a set containing the services provided by this CSS.
-	 *
-	public Set<TrustedService> getServices() {
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedCss#getServices()
+	 */
+	@Override
+	public Set<ITrustedService> getServices() {
 		
 		return this.services;
 	}
-
+	
 	/*
 	 * TODO 
 	 * @param serviceType
 	 *
 	public Set<TrustedService> getServices(String serviceType) {
 		return null;
-	}*/
-/*	
-	public void addService(final TrustedService service) {
-		
-		if (!this.services.contains(service))
-			this.services.add(service);
 	}*/
 }

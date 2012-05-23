@@ -31,7 +31,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICis;
+import org.societies.orchestration.api.ICisProposal;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
@@ -51,22 +52,23 @@ import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 //import org.societies.api.internal.cis.management.ICisActivityFeed;
 //import org.societies.api.internal.cis.management.ServiceSharingRecord;
 //import org.societies.api.internal.cis.management.ICisActivity;
-//import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICis;
 //import org.societies.api.internal.cis.management.ICisManager;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-/**import org.societies.api.cis.management.ICisRecord;
+/**import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisEditor;*/
 
-//import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ICisOwned;
-import org.societies.orchestration.api.ICisEditor;
+import org.societies.orchestration.api.ICisParticipant;
+//import org.societies.orchestration.api.ICisEditor;
 
-import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisSubscribed;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
@@ -134,7 +136,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	private IIdentity linkedCss;
 	private IIdentityManager linkedCssManager;
 	
-    private ICisRecord linkedSuperCis;
+    private ICis linkedSuperCis;
     
 	private IIdentity linkedDomain;
 	
@@ -143,7 +145,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	//private IUserCtxBroker userContextBroker;
 	//private ICommunityCtxBroker communityContextBroker;
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
-	private ArrayList<ICisRecord> recentRefusals;
+	private ArrayList<ICis> recentRefusals;
 	private IUserFeedback userFeedback;
 	private IUserFeedbackCallback userFeedbackCallback;
 	
@@ -156,7 +158,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	
 	private ICssActivityFeed activityFeed;
 	
-	private HashMap<String, ICisRecord> personalCiss;
+	private HashMap<String, ICis> personalCiss;
 	
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
@@ -195,7 +197,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 			this.linkedCss = linkedEntity;
 		else
 			this.linkedDomain = linkedEntity;
-		personalCiss = new HashMap<String, ICisRecord>();
+		personalCiss = new HashMap<String, ICis>();
 	}
 	
 	/*
@@ -208,7 +210,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	 *                               suggesting sub-CISs on it.
 	 */
 	
-	public EgocentricCommunityCreationManager(ICisRecord linkedSuperCis) {
+	public EgocentricCommunityCreationManager(ICis linkedSuperCis) {
 		this.linkedSuperCis = linkedSuperCis;
 	}
 		
@@ -232,10 +234,10 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		ArrayList<IIdentity> localCsss = new ArrayList<IIdentity>();
 		// ...
 		
-		ArrayList<ICisRecord> cissToCreate = new ArrayList<ICisRecord>();
+		ArrayList<ICis> cissToCreate = new ArrayList<ICis>();
 		ArrayList<String> cissToCreateMetadata = new ArrayList<String>();
 		
-		ArrayList<ICisRecord> cissToAutomaticallyCreate = new ArrayList<ICisRecord>();
+		ArrayList<ICis> cissToAutomaticallyCreate = new ArrayList<ICis>();
 		//v1.0 algorithms
 		
 		//linkedCss = mock(IIdentity.class);
@@ -248,13 +250,13 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		String[] it = new String[1];
 		it[0] = linkedCss.getIdentifier();
 	
-		ICisRecord record = cisManager.getCis(linkedCss.toString(), "default CIS");
+		ICis record = cisManager.getCis(linkedCss.toString(), "default CIS");
 		//edit out all CIS attributes
 		
-		ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(record);
-		//ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new ICisRecord(null, null, null, null, null, it, null, null, null));
-		//ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];
-		ArrayList<ICisRecord> userJoinedCiss = new ArrayList<ICisRecord>();
+		ICis[] listOfUserJoinedCiss = cisManager.getCisList(record);
+		//ICis[] listOfUserJoinedCiss = cisManager.getCisList(new ICis(null, null, null, null, null, it, null, null, null));
+		//ICis[] listOfUserJoinedCiss = new ICis[0];
+		ArrayList<ICis> userJoinedCiss = new ArrayList<ICis>();
 		if (listOfUserJoinedCiss != null)
 		    for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
 		        userJoinedCiss.add(listOfUserJoinedCiss[i]);   
@@ -383,13 +385,13 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				    /**    if (!cisManager.getCiss().get(i).getMembers() == people)*/
 				    }
 				if (cisExistsAlready == false) {
-					ICisRecord temp = cisManager.getCis(linkedCss.toString(), "Default CIS");
+					ICis temp = cisManager.getCis(linkedCss.toString(), "Default CIS");
 					//temp.setName("PERSONAL CIS containing your CSS directory members");
 					//temp.setMembers(cssDirectoryMembers);
-				    //cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS containing your CSS directory members", null, null, null, cssDirectoryMembers, null, null));
+				    //cissToCreate.add(new ICis(null, linkedCss.toString(), "PERSONAL CIS containing your CSS directory members", null, null, null, cssDirectoryMembers, null, null));
 				    cissToCreate.add(temp);
 					personalCiss.remove("CSS Directory");
-				    //personalCiss.put("CSS Directory", new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS containing your CSS directory members", null, null, null, cssDirectoryMembers, null, null));
+				    //personalCiss.put("CSS Directory", new ICis(null, linkedCss.toString(), "PERSONAL CIS containing your CSS directory members", null, null, null, cssDirectoryMembers, null, null));
 			        personalCiss.put("CSS Directory", temp);
 					cissToCreateMetadata.add("PERSONAL CIS containing your CSS directory members");
 				
@@ -406,7 +408,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//Does Personal CSS directory CIS need sub-CISs:
 				
 				if (cisExistsAlready == true) {
-					ICisRecord thisCis = personalCiss.get("CSS Directory");
+					ICis thisCis = personalCiss.get("CSS Directory");
 					boolean subCisExistsAlready = false;
 					
 					int confidence = 0;
@@ -430,7 +432,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 					//    // and the time passed since then is at least the last 10% of its life... sub-CIS the old friends into a new overall one?
 					//    }
 					//    if ((subCisExistsAlready == false))
-					//        cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "Your friends in your CSS Directory", null, null, null, "friend", identifiedFriends, null));
+					//        cissToCreate.add(new ICis(null, linkedCss.toString(), "Your friends in your CSS Directory", null, null, null, "friend", identifiedFriends, null));
 					}
 				}
 				
@@ -479,9 +481,9 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				}
 				
 				//if (cisExistsAlready == false) {
-				//    cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS containing your friends", null, null, null, theFriends, null, null));
+				//    cissToCreate.add(new ICis(null, linkedCss.toString(), "PERSONAL CIS containing your friends", null, null, null, theFriends, null, null));
 				//    personalCiss.remove("CSS Directory");
-				//    personalCiss.add("CSS Directory", new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS containing your friends", null, null, null, null, null, null));
+				//    personalCiss.add("CSS Directory", new ICis(null, linkedCss.toString(), "PERSONAL CIS containing your friends", null, null, null, null, null, null));
 			    //    cissToCreateMetadata.add("PERSONAL CIS containing your friends");
 				//
 				//}
@@ -490,7 +492,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				boolean similarCis = false;
 				if (listOfUserJoinedCiss != null) {
 				    for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
-					    //String[] members = ((ICisRecord)listOfUserJoinedCiss[i]).membersCss;
+					    //String[] members = ((ICis)listOfUserJoinedCiss[i]).membersCss;
 					    int number = 0;
 					    //for (int m = 0; m < members.length; m++) {
 						//    if (theFriends.contains(members[i]))
@@ -566,7 +568,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				    		}
 				    		//
 				    		//    if CIS doesn't already exist
-				    		//    ICisRecord mutualFriendsCis = cisManager.getBlankCisRecord();
+				    		//    ICis mutualFriendsCis = cisManager.getBlankCisRecord();
 				    		//    mutualFriendsCis.setMembersList(theFriends.get(i), theFriends.get(m));
 				    		//    cissToCreate.add(mutualFriendsCis);
 				    		//    cissToCreateMetadata.add("Ongoing");
@@ -575,7 +577,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				    		//
 				    	}if (!mutualFriendsGroups.contains(mutualFriendsCisMembers)) {
 //				    	    if CIS doesn't already exist
-				    		//    ICisRecord mutualFriendsCis = cisManager.getBlankCisRecord();
+				    		//    ICis mutualFriendsCis = cisManager.getBlankCisRecord();
 				    		//    mutualFriendsCis.setMembersList(theFriends.get(i), theFriends.get(m));
 				    		//    cissToCreate.add(mutualFriendsCis);
 				    		//    cissToCreateMetadata.add("Ongoing");
@@ -649,10 +651,10 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				    }
 				}
 				if (cisExistsAlready == false) {
-					ICisRecord temp = cisManager.getCis(linkedCss.toString(), "Default CIS");
+					ICis temp = cisManager.getCis(linkedCss.toString(), "Default CIS");
 					//temp.setName("Mutual friends CIS");
 					//temp.setMembers(these members);
-				    //cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "Mutual friends CIS", null, null, null, cssDirectoryMembers, null, null));
+				    //cissToCreate.add(new ICis(null, linkedCss.toString(), "Mutual friends CIS", null, null, null, cssDirectoryMembers, null, null));
 				    cissToCreate.add(temp);
 					cissToCreateMetadata.add("Mutual friends CIS");
 				
@@ -685,7 +687,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				similarCis = false;
 				if (listOfUserJoinedCiss != null) {
 				    for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
-					    //String[] members = ((ICisRecord)listOfUserJoinedCiss[i]).membersCss;
+					    //String[] members = ((ICis)listOfUserJoinedCiss[i]).membersCss;
 					    int number = 0;
 					    //for (int m = 0; m < members.length; m++) {
 						//    if (theFriends.contains(members[i]))
@@ -707,7 +709,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				    }
 				}
 				if (similarCis == false) {
-		            //cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "Mutual friends", null, null, null, null, null, null));
+		            //cissToCreate.add(new ICis(null, linkedCss.toString(), "Mutual friends", null, null, null, null, null, null));
 				    
 				}
 				
@@ -1010,7 +1012,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				if (temporaryLocalCsss != null) {
 				    for (int i = 0; i < temporaryLocalCsss.size(); i++) {
 					    if (userCssDirectory.findForAllCss().contains(temporaryLocalCsss.get(i))) {
-						    //if (userJoinedCiss.contains(new ICisRecord(null, null, "friends", null, null, null, null, null, null))) {
+						    //if (userJoinedCiss.contains(new ICis(null, null, "friends", null, null, null, null, null, null))) {
 							
 							//    if (userJoinedCiss.get(i).membershipCriteria.equals("friends") /**&& userJoinedCiss.getSubCiss("proximity") != null*/ /**it has a sub-CIS defined on this location*/) {
 								//not create
@@ -1146,10 +1148,20 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
 		
-		HashMap<String, ArrayList<ICisRecord>> theResult = new HashMap<String, ArrayList<ICisRecord>>();
-		theResult.put("Create CISs", cissToCreate);
+		//HashMap<String, ArrayList<ICis>> theResult = new HashMap<String, ArrayList<ICis>>();
+		//theResult.put("Create CISs", cissToCreate);
+		HashMap<String, ArrayList<ICisProposal>> theResult = new HashMap<String, ArrayList<ICisProposal>>();
+		
+		ArrayList<ICisProposal> cisProposals = new ArrayList<ICisProposal>();
+		Iterator<ICis> creationsIterator = cissToCreate.iterator();
+		while (creationsIterator.hasNext()) {
+			ICisProposal proposal = new ICisProposal();
+			proposal.setActualCis(creationsIterator.next());
+			cisProposals.add(proposal);
+		}
+		theResult.put("Create CISs", cisProposals);
 
-		// creating the identity of the CtxBroker that will be contacted
+		// creating the identity of the node that will be contacted
 		IIdentity toIdentity = null;
 		//try {
 			
@@ -1169,6 +1181,8 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		suggestedCommunityAnalyserBean = new SuggestedCommunityAnalyserBean();
 		suggestedCommunityAnalyserBean.setMethod(suggestedCommunityAnalyserMethodType.processEgocentricRecommendations);
+		suggestedCommunityAnalyserBean.setCissMetadata(cissToCreateMetadata);
+		//suggestedCommunityAnalyserBean.setCiss(cisProposals);
 		suggestedCommunityAnalyserBean.setCiss(theResult);
 
 		//cbPacket.setUpdateAttr(ctxBrokerUpdateAttributeBean);
@@ -1185,14 +1199,15 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		//while (returnMetadata == null);
 		//return returnMetadata;
 		
-		return suggestedCommunityAnalyser.processEgocentricRecommendations(theResult, cissToCreateMetadata);
+		return null;
+		//return suggestedCommunityAnalyser.processEgocentricRecommendations(theResult, cissToCreateMetadata);
 		//if (cissToCreate != null) 
 		//    for (int i = 0; i < cissToCreate.size(); i++)
 		//	    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
 	}
 	
-	public ArrayList<ICisRecord> getUserFeedbackOnCreation(ArrayList<ICisRecord> cissToCreate) {
-		ArrayList<ICisRecord> finalisedCiss = null;
+	public ArrayList<ICis> getUserFeedbackOnCreation(ArrayList<ICis> cissToCreate) {
+		ArrayList<ICis> finalisedCiss = null;
 		String[] options = new String[1];
 		options[0] = "options";
 		String userResponse = null;
@@ -1215,9 +1230,9 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		    String background = "This message is in your inbox or something, waiting for you to read it";
 		}
 		else {
-		   	Iterator<ICisRecord> iterator = cissToCreate.iterator();
+		   	Iterator<ICis> iterator = cissToCreate.iterator();
 			while (iterator.hasNext()) {
-			    ICisRecord potentiallyCreatableCis = iterator.next();
+			    ICis potentiallyCreatableCis = iterator.next();
 		        if (userResponse.equals("Yes")) {
 				    finalisedCiss.add(potentiallyCreatableCis);
 			       // cisManager.createCis(linkedCss, potentiallyCreatableCis.getCisId());
@@ -1567,11 +1582,11 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     	this.linkedCss = linkedCss;
     }
     
-    public ICisRecord getLinkedSuperCis() {
+    public ICis getLinkedSuperCis() {
     	return linkedSuperCis;
     }
     
-    public void setLinkedCis(ICisRecord linkedSuperCis) {
+    public void setLinkedCis(ICis linkedSuperCis) {
     	this.linkedSuperCis = linkedSuperCis;
     }
     

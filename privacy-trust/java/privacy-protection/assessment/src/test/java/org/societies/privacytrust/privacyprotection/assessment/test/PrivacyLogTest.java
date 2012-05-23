@@ -28,12 +28,14 @@ package org.societies.privacytrust.privacyprotection.assessment.test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
@@ -70,7 +72,7 @@ public class PrivacyLogTest {
 		
 		LOG.debug("testGetAll()");
 		
-		LogEntry[] result;
+		List<DataTransmissionLogEntry> result;
 		
 		result = privacyLog.getAll();
 		//assertNotNull(result);
@@ -81,7 +83,7 @@ public class PrivacyLogTest {
 		
 		PrivacyLogFilter filter = new PrivacyLogFilter();
 		
-		LogEntry[] result;
+		List<DataTransmissionLogEntry> result;
 		
 		result = privacyLog.search(filter);
 		//assertNotNull(result);

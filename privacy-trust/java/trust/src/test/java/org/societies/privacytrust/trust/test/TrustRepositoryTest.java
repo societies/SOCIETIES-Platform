@@ -32,7 +32,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.societies.api.internal.privacytrust.trust.TrustException;
@@ -62,16 +61,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
 public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 	
-	private static final String TRUSTOR_ID = "aFooTrustorIIdentity";
-	private static final String TRUSTOR_ID2 = "aBarTrustorIIdentity";
+	private static final String BASE_ID = "trt";
 	
-	private static final String TRUSTED_CSS_ID = "aFooCssIIdentity";
+	private static final String TRUSTOR_ID = BASE_ID + "TrustorIIdentity";
+	private static final String TRUSTOR_ID2 = BASE_ID + "TrustorIIdentity2";
 	
-	private static final String TRUSTED_CIS_ID = "aFooCisIIdentity";
+	private static final String TRUSTED_CSS_ID = BASE_ID + "CssIIdentity";
 	
-	private static final String TRUSTED_SERVICE_ID = "aFooServiceResourceIdentifier";
+	private static final String TRUSTED_CIS_ID = BASE_ID + "CisIIdentity";
 	
-	private static final String TRUSTED_SERVICE_TYPE = "aFooServiceType";
+	private static final String TRUSTED_SERVICE_ID = BASE_ID + "ServiceResourceIdentifier";
+	
+	private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
 	
 	private static ITrustedCss trustedCss;
 	
@@ -129,7 +130,6 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustException
 	 */
 	@Test
-	@Ignore
 	public void testTrustedCssCRUD() throws TrustException {
 		
 		this.testAddTrustedCss();
@@ -146,7 +146,6 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustException
 	 */
 	@Test
-	@Ignore
 	public void testTrustedCisCRUD() throws TrustException {
 		
 		this.testAddTrustedCis();
@@ -163,7 +162,6 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustException
 	 */
 	@Test
-	@Ignore
 	public void testTrustedServiceCRUD() throws TrustException {
 		
 		this.testAddTrustedService();

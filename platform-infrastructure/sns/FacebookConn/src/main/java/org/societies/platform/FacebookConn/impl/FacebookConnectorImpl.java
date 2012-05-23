@@ -37,8 +37,9 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	
 	private Properties			parameters;
 	private FacebookClient 		facebookClient;
-	private int					maxPostLimit = 200;
-	private long				tokenExpiration=0;
+	private int					maxPostLimit    = 50000;
+	private long				tokenExpiration = 0;
+	private boolean				firstTime = true;
 	
 	public FacebookConnectorImpl(){}
 	
@@ -245,6 +246,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 			
 			field.put("value", like.get("name"));
 			field.put("type",  like.get("category"));
+			field.put("id",  like.get("id"));
 			
 			pluralFields.put(field);
 			
@@ -300,17 +302,65 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		
 		BatchRequest request   = null;
 		BatchResponse response = null;
-		try{
-			request= new BatchRequestBuilder(FEED).parameters(Parameter.with("since", lastUpdate), Parameter.with("limit", maxPostLimit)).build();
-			List<BatchResponse> batchResponses = facebookClient.executeBatch(request);
-			response = batchResponses.get(0);
-			System.out.println("response:::"+response.toString());
+//		try{
+//			
+			
+			if (firstTime){
+				request   = new BatchRequestBuilder(FEED).parameters(Parameter.with("limit", maxPostLimit)).build();
+				firstTime = false;
+			}
+			else
+				request= new BatchRequestBuilder(FEED).parameters(Parameter.with("since", lastUpdate), Parameter.with("limit", maxPostLimit)).build();
+			
+
+			try{
+				JsonArray fullActivities = new JsonArray();
+				
+		 		
+				List<BatchResponse> batchResponses = facebookClient.executeBatch(request);
+				response = batchResponses.get(0);
+				JsonObject activities = new JsonObject(response.getBody());
+				fullActivities = activities.getJsonArray("data");
+				boolean goOn = activities.has("paging");
+				
+				
+				while (goOn){
+					
+					if (activities.getJsonObject("paging").has("next")){
+						
+					    String url = activities.getJsonObject("paging").getString("next");
+						Response resp = facebookClient.getWebRequestor().executeGet(url);
+						if (resp!=null){
+							activities = new JsonObject(resp.getBody());
+							if (activities.has("data")){
+							    JsonArray moreActivities = new JsonArray(activities.getString("data"));
+							    for(int i=0; i<moreActivities.length();i++)
+							    	fullActivities.put(moreActivities.getJsonObject(i));
+							}
+							else goOn=false;
+						}
+						goOn = activities.has("paging");
+					}
+					else goOn=false;
+				}
+				
+				JsonObject jresp = new JsonObject();
+				jresp.put("data", fullActivities);
+				return jresp.toString(1);
+			}catch(Exception ex){
+				return genError(ex.getMessage(), "Unable to get Activities", 400);
+			}
+			
+			
+//			List<BatchResponse> batchResponses = facebookClient.executeBatch(request);
+//			response = batchResponses.get(0);
+//			System.out.println("response:::"+response.toString());
 		
-		return response.getBody();
-		}
-		  catch(Exception ex){
-			  return genError(ex.getMessage(), "Request failure", 400);
-		  }
+//		return response.getBody();
+//		}
+//		  catch(Exception ex){
+//			  return genError(ex.getMessage(), "Request failure", 400);
+//		  }
 		
 		
 	}

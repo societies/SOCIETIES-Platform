@@ -26,7 +26,9 @@ package org.societies.security.policynegotiator.requester;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
@@ -60,6 +62,7 @@ public class NegotiationRequester implements INegotiation {
 		//LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "id"));
 		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 
+		LOG.debug("init()");
 		LOG.debug("init(): group manager = {}", groupMgr.toString());
 		
 		// Test: initialization of negotiation. Integration test is available to replace this.
@@ -100,12 +103,29 @@ public class NegotiationRequester implements INegotiation {
 	}
 
 	@Override
-	public void startNegotiation(IIdentity provider, String serviceId, INegotiationCallback callback) {
+	public void startNegotiation(Requestor provider, INegotiationCallback callback) {
 
-		LOG.info("startNegotiation({}, {})", provider, serviceId);
+		String serviceId;
 		
+		if (provider instanceof RequestorService) {
+			RequestorService providerService = (RequestorService) provider;
+			LOG.info("startNegotiation([{}; {}])", providerService.getRequestorId(),
+					providerService.getRequestorServiceId());
+			serviceId = providerService.getRequestorServiceId().getIdentifier().toString();
+		}
+		else if (provider instanceof RequestorCis) {
+			RequestorCis providerCis = (RequestorCis) provider;
+			LOG.info("startNegotiation([{}; {}])", providerCis.getRequestorId(),
+					providerCis.getCisRequestorId());
+			serviceId = providerCis.getCisRequestorId().getJid();
+		}
+		else {
+			LOG.warn("Terminating: Inappropriate provider: " + provider.getClass().getName());
+			callback.onNegotiationComplete(null);
+			return;
+		}
 		ProviderCallback providerCallback = new ProviderCallback(this, provider,
-				serviceId, MethodType.GET_POLICY_OPTIONS, callback);
+				MethodType.GET_POLICY_OPTIONS, callback);
 		
 		groupMgr.getPolicyOptions(serviceId, provider, providerCallback);
 	}

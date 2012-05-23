@@ -158,14 +158,19 @@ public class SocialPersonImpl implements SocialPerson, NodeProperties/*,DirtyMak
 		switch (profileType) {
 			case EGO_CENTRIC:
 				property = NARCISSISM_PERCENTAGE_PROPERTY;
+				break;
 			case PHOTO_MANIAC:
 				property = PHOTO_PERCENTAGE_PROPERTY;
+				break;
 			case SUPER_ACTIVE:
 				property = SUPER_ACTIVE_PERCENTAGE_PROPERTY;
+				break;
 			case SURF_MANIAC:
 				property = SURF_PERCENTAGE_PROPERTY;
+				break;
 			case QUIZ_MANIAC:
 				property = QUIZ_PERCENTAGE_PROPERTY;
+				break;
 		}
 		return property;
     }

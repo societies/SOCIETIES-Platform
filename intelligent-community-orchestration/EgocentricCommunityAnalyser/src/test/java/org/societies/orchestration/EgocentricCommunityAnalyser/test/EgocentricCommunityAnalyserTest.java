@@ -41,10 +41,16 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxModelType;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICis;
 //import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.identity.IdentityType;
 //import org.societies.api.comm.xmpp.datatypes.IdentityType;
+
+import org.societies.orchestration.api.ICis;
+import org.societies.orchestration.api.ICisManager;
+import org.societies.orchestration.api.ICisOwned;
+import org.societies.orchestration.api.ICisParticipant;
+//import org.societies.orchestration.api.ICisEditor;
 
 /**
  * This is the test class for the Egocentric Community Analyser component

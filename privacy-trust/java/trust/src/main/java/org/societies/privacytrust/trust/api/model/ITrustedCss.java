@@ -27,9 +27,6 @@ package org.societies.privacytrust.trust.api.model;
 import java.util.Set;
 
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.impl.repo.model.Trust;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 
 /**
  * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
@@ -46,38 +43,36 @@ import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 public interface ITrustedCss extends ITrustedEntity {
 
 	/**
+	 * Returns a set containing the communities this CSS is member of.
 	 * 
-	 * @return
-	 *
-	public Set<TrustedCis> getCommunities();
-	*/
+	 * @return a set containing the communities this CSS is member of.
+	 */
+	public Set<ITrustedCis> getCommunities();
 
 	/**
 	 * 
 	 * @param community
-	 *
-	public void addCommunity(final TrustedCis community);
-	*/
+	 */
+	public void addCommunity(final ITrustedCis community);
 
 	/**
 	 * 
 	 * @param community
-	 *
+	 */
 	public void removeCommunity(final ITrustedCis community);
-	*/
 
 	/**
 	 * Returns a set containing the services provided by this CSS.
 	 * 
 	 * @return a set containing the services provided by this CSS.
+	 */
+	public Set<ITrustedService> getServices();
+	
+	/*
+	 * TODO 
+	 * @param serviceType
 	 *
-	public Set<TrustedService> getServices();
-	*/
-
-	/**
-	 * 
-	 * @param service
-	 *
-	public void addService(final TrustedService service);
-	*/
+	public Set<TrustedService> getServices(String serviceType) {
+		return null;
+	}*/
 }

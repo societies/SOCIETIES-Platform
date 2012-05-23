@@ -175,13 +175,14 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Stanza stanza = new Stanza(toXCManager);
 		
 		ICommCallback callback = new CSSManagerCallback(client, LOGIN_CSS);
+		
         try {
     		ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
 		} catch (Exception e) {
 			Log.e(this.getClass().getName(), e.getMessage());
-        }
+        } 
 
 		return null;
 	}
@@ -235,7 +236,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			Log.d(LOG_TAG, "Send stanza");
 		} catch (Exception e) {
 			Log.e(this.getClass().getName(), e.getMessage());
-        }
+        } 
 		return null;
 	}
 
@@ -385,6 +386,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				Log.d(LOG_TAG, "Callback receiveResult sent return value: " + retValue);
 
 				LocalCSSManagerService.this.sendBroadcast(intent);
+				
+				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
+		        	
 			}
 		}
 	}

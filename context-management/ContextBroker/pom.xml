@@ -40,6 +40,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>user-context-db-mgmt</artifactId>
 			<version>${version.cm}</version>

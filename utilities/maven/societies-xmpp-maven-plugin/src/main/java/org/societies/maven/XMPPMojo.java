@@ -90,28 +90,28 @@ public class XMPPMojo extends AbstractMojo
 	 * @parameter
 	 */
 	private List beans;
-	
+
 
 	public void execute() throws MojoExecutionException
 	{
 		// Init
 		initParameters();
-		
+
 		// ---- Execute SchemaGen
 		// To do. For now, do mvn jaxb2:schemagen
-//		getLog().info("Don't forget to begin with a \"mvn jaxb2:schemagen\"");
-		
-		
-		
+		//		getLog().info("Don't forget to begin with a \"mvn jaxb2:schemagen\"");
+
+
+
 		// ---- Refactor the Schema
 		File schemaInputDirectory = new File(folderInputDirectory+file);
-		
+
 		if (!schemaInputDirectory.canRead()) {
 			getLog().info("Schema XSD not readable. Refactoring aborted.");
 			return;
 		}
-		
-		
+
+
 		Scanner scanner = null;
 		try {
 			// Read the schema XSD content
@@ -122,9 +122,9 @@ public class XMPPMojo extends AbstractMojo
 			}
 			getLog().info("#################### Before refactoring");
 			getLog().info(schemaContent);
-			
+
 			String newSchemaContent = new String();
-			
+
 			// - Step 1: change "complexType" of Beans to "element"
 			Pattern patternComplexeType = null;
 			// Bean list not null : use it
@@ -146,43 +146,75 @@ public class XMPPMojo extends AbstractMojo
 			else {
 				patternComplexeType = Pattern.compile("<xs:complexType name=\"([^\"]*Bean(?:Result)?)\">(.*?)</xs:complexType>", Pattern.DOTALL|Pattern.CASE_INSENSITIVE);
 			}
-		    Matcher matcherComplexeType = patternComplexeType.matcher(schemaContent);
-		    newSchemaContent = matcherComplexeType.replaceAll("<xs:element name=\"$1\">\n\t<xs:complexType>$2\t</xs:complexType>\n\t</xs:element>");
-//		    getLog().info("#################### After ComplexeType");
-//		    getLog().info(newSchemaContent);
-		    
-		    // -- Step 2: Add relevant namespace to complexe type
-//		    Pattern patternTypeNamespace = Pattern.compile("type=\"(xs:(?!char|byte|short|int|long|float|double|boolean|string))\"", Pattern.CASE_INSENSITIVE);
-		    Pattern patternTypeNamespace = Pattern.compile("type=\"((?!xs:)[^\"]+)\"", Pattern.CASE_INSENSITIVE);
-		    Matcher matcherTypeNamespace = patternTypeNamespace.matcher(newSchemaContent);
-		    newSchemaContent = matcherTypeNamespace.replaceAll("type=\"tns:$1\"");
-//		    getLog().info("#################### After TypeNamespace");
-//		    getLog().info(newSchemaContent);
-		    
-		    // - Step 3: If they are not already added, add namespace in the root markup
-		    Pattern patternNamespaceCheck = Pattern.compile("xmlns:tns", Pattern.CASE_INSENSITIVE);
-		    Matcher matcherNamespaceCheck = patternNamespaceCheck.matcher(newSchemaContent);
-		    if (!matcherNamespaceCheck.find()) {
-		    	Pattern patternNamespace = Pattern.compile("<xs:schema version=\"1.0\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">", Pattern.CASE_INSENSITIVE);
-		    	Matcher matcherNamespace = patternNamespace.matcher(newSchemaContent);
-			    newSchemaContent = matcherNamespace.replaceAll("<xs:schema version=\"1.0\" elementFormDefault=\"qualified\"\n\ttargetNamespace=\""+httpNamespace+"\"\n\txmlns:tns=\""+httpNamespace+"\"\n\txmlns:xs=\"http://www.w3.org/2001/XMLSchema\">");
-//			    getLog().info("#################### After Namespace");
-//			    getLog().info(newSchemaContent);
-		    }
-		    
-		    getLog().info("#################### After refactoring");
-		    getLog().info(newSchemaContent);
-		    
-		    // - Step 4: Save in the folderOutputDirectory
-		    FileWriter newFile = new FileWriter(folderOutputDirectory+packageName+".xsd");
-		    newFile.write(newSchemaContent);
-		    newFile.close();
-		    
-		    // - Step 5: Save in the Societies Schema API
-//		    FileWriter finalSchema = new FileWriter(pathToParentSchema+folderOutputDirectory+packageName+".xsd");
-//		    finalSchema.write(newSchemaContent);
-//		    finalSchema.close();
-			
+			Matcher matcherComplexeType = patternComplexeType.matcher(schemaContent);
+			newSchemaContent = matcherComplexeType.replaceAll("<xs:element name=\"$1\">\n\t<xs:complexType>$2\t</xs:complexType>\n\t</xs:element>");
+			//		    getLog().info("#################### After ComplexeType");
+			//		    getLog().info(newSchemaContent);
+
+			// -- Step 2: Add relevant namespace to complex type
+			//		    Pattern patternTypeNamespace = Pattern.compile("type=\"(xs:(?!char|byte|short|int|long|float|double|boolean|string))\"", Pattern.CASE_INSENSITIVE);
+			Pattern patternTypeNamespace = Pattern.compile("type=\"((?!xs|ns[0-9]{1,3})[^\"]+)\"", Pattern.CASE_INSENSITIVE);
+			Matcher matcherTypeNamespace = patternTypeNamespace.matcher(newSchemaContent);
+			newSchemaContent = matcherTypeNamespace.replaceAll("type=\"tns:$1\"");
+			//		    getLog().info("#################### After TypeNamespace");
+			//		    getLog().info(newSchemaContent);
+
+			// - Step 3: If they are not already added, add namespace in the root markup
+			Pattern patternNamespaceCheck = Pattern.compile("xmlns:tns", Pattern.CASE_INSENSITIVE);
+			Matcher matcherNamespaceCheck = patternNamespaceCheck.matcher(newSchemaContent);
+			if (!matcherNamespaceCheck.find()) {
+				Pattern patternNamespace = Pattern.compile("<xs:schema version=\"1.0\" (.*)xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">", Pattern.DOTALL|Pattern.CASE_INSENSITIVE);
+				Matcher matcherNamespace = patternNamespace.matcher(newSchemaContent);
+				newSchemaContent = matcherNamespace.replaceAll("<xs:schema version=\"1.0\" elementFormDefault=\"qualified\"\n\ttargetNamespace=\""+httpNamespace+"\"\n\txmlns:tns=\""+httpNamespace+"\"\n\t$1\n\txmlns:xs=\"http://www.w3.org/2001/XMLSchema\">");
+				//			    getLog().info("#################### After Namespace");
+				//			    getLog().info(newSchemaContent);
+			}
+
+			// - Step 4: If this schema import other existing schema, add their relevant URL
+			Pattern patternImportCheck = Pattern.compile("schemaLocation", Pattern.CASE_INSENSITIVE);
+			Matcher matcherImportCheck = patternImportCheck.matcher(newSchemaContent);
+			if (matcherImportCheck.find()) {
+				Pattern patternImport = Pattern.compile("<xs:import namespace=\"(http://societies.org/api/(internal/)?schema/([^\"]+))\" schemaLocation=\"([^\"]*)\" ?/>", Pattern.CASE_INSENSITIVE);
+				Matcher matcherImport = patternImport.matcher(newSchemaContent);
+				StringBuffer importsContent = new StringBuffer();
+				while (matcherImport.find()) {
+					Pattern patternInternalCheck = Pattern.compile("internal/", Pattern.CASE_INSENSITIVE);
+					Matcher matcherInternalCheck = patternInternalCheck.matcher(matcherImport.group());
+					String httpNs = matcherImport.group(1);
+					String typeHttpNs = matcherImport.group(2);
+					String endHttpNs = matcherImport.group(3);
+					if (matcherInternalCheck.find()) {
+						getLog().info("internal:"+httpNs);
+						getLog().info("internal:"+typeHttpNs);
+						getLog().info("internal:"+endHttpNs);
+						matcherImport.appendReplacement(importsContent, "<xs:import namespace=\"http://societies.org/api/$2schema/$3\" schemaLocation=\"org.societies.api."+typeHttpNs.replace("/", ".")+"schema."+endHttpNs.replace("/", ".")+".xsd\" />");
+					}
+					else {
+						getLog().info("external:"+httpNs);
+						getLog().info("external:"+typeHttpNs);
+						getLog().info("external:"+endHttpNs);
+						matcherImport.appendReplacement(importsContent, "<xs:import namespace=\"http://societies.org/api/$2schema/$3\" schemaLocation=\"../../../../external/src/main/resources/org.societies.api.schema."+endHttpNs.replace("/", ".")+".xsd\" />");
+					}
+				}
+				matcherImport.appendTail(importsContent);
+				newSchemaContent = importsContent.toString();
+				getLog().info("#################### After Import");
+				getLog().info(newSchemaContent);
+			}
+
+			getLog().info("#################### After refactoring");
+			getLog().info(newSchemaContent);
+
+			// - Step 5: Save in the folderOutputDirectory
+			FileWriter newFile = new FileWriter(folderOutputDirectory+packageName+".xsd");
+			newFile.write(newSchemaContent);
+			newFile.close();
+
+			// - Step 6: Save in the Societies Schema API
+			//		    FileWriter finalSchema = new FileWriter(pathToParentSchema+folderOutputDirectory+packageName+".xsd");
+			//		    finalSchema.write(newSchemaContent);
+			//		    finalSchema.close();
+
 		} catch (FileNotFoundException e) {
 			getLog().error("File not found");
 			getLog().error(e);
@@ -209,5 +241,16 @@ public class XMPPMojo extends AbstractMojo
 		if (!pathToParentSchema.equals(".") && !pathToParentSchema.endsWith("/")) {
 			pathToParentSchema += "/";
 		}
+	}
+
+	private String httpNs2packageNs(String httpNs) {
+//		getLog().info("httpNs2packageNs: "+httpNs);
+//		Pattern pattern = Pattern.compile("http://societies.org/api/(internal/)?schema/([^\"]+)", Pattern.CASE_INSENSITIVE);
+//		Matcher matcher = pattern.matcher(httpNs);
+//		String type = matcher.group(1);
+//		String endHttpNs = matcher.group(2);
+//		getLog().info("httpNs2packageNs: "+type+", endHttpNs:"+endHttpNs);
+//		return new String("org.societies.api.schema."+type.replace("/", ".")+endHttpNs.replace("/", "."));
+		return new String("org.societies.api.schema.");
 	}
 }

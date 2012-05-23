@@ -25,22 +25,49 @@
 package org.societies.privacytrust.trust.impl.repo.model;
 
 /**
- * Describe your class here...
+ * This class is used to define the names of the Trust Repository database
+ * tables.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.7
  */
 public class TableName {
 
+	/**
+	 * The table used to maintain {@link TrustedCss CSSs}.
+	 */
 	public static final String TRUSTED_CSS = "t_users";
 	
+	/**
+	 * The table used to maintain {@link TrustedCis CISs}.
+	 */
 	public static final String TRUSTED_CIS = "t_communities";
 	
+	/**
+	 * The table used to maintain {@link TrustedService services}.
+	 */
 	public static final String TRUSTED_SERVICE = "t_services";
 	
+	/**
+	 * The table used to maintain {@link DirectTrust} data.
+	 */
 	public static final String DIRECT_TRUST = "t_direct_trust";
 	
+	/**
+	 * The table used to maintain {@link IndirectTrust} data.
+	 */
 	public static final String INDIRECT_TRUST = "t_indirect_trust";
 	
+	/**
+	 * The table used to maintain {@link UserPerceivedTrust} data.
+	 */
 	public static final String USER_PERCEIVED_TRUST = "t_user_perceived_trust";
+	
+	/**
+	 * The table used to associate {@link TrustedCss CSSs} with
+	 * {@link TrustedCis CISs}.
+	 * 
+	 * @since 0.0.8
+	 */
+	public static final String TRUSTED_CSS_CIS = "t_users_communities";
 }

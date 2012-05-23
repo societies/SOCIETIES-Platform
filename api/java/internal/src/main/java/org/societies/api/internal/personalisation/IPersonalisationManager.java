@@ -25,9 +25,11 @@
 
 package org.societies.api.internal.personalisation;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import java.util.concurrent.Future;
 
+import org.societies.api.identity.IIdentity;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 
@@ -37,33 +39,28 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @version 1.0
  * @created 11-Nov-2011 14:42:55
  */
-public interface IPersonalisationManager {
+public interface IPersonalisationManager extends org.societies.api.personalisation.mgmt.IPersonalisationManager{
 
 	/**
-	 * Allows any service to request an context-based evaluated preference outcome.
-	 * @return					the outcome in the form of an IAction object
 	 * 
-	 * @param requestor    the DigitalIdentity of the service requesting the outcome
-	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
-	 * user of this service)
-	 * @param serviceID    the service identifier of the service requesting the
-	 * outcome
-	 * @param preferenceName    the name of the preference requested
+	 * @param ownerID
+	 * @param serviceID
+	 * @param preferenceName
+	 * @param callback
 	 */
-	public void getIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
+	public Future<IAction> getIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
 	 * @return					the outcome in the form of an IAction object
 	 * 
-	 * @param requestor    the DigitalIdentity of the service requesting the outcome
-	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
+	 * @param ownerID    the DigitalIIdentity of the owner of the preferences (i.e. the
 	 * user of this service)
 	 * @param serviceType    the type of the service requesting the outcome
 	 * @param serviceID    the service identifier of the service requesting the
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public void getPreference(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
+	public Future<IAction> getPreference(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
 
 }

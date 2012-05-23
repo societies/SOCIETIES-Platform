@@ -31,63 +31,218 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
+import org.junit.Test;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.util.SerialisationHelper;
-/*import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;*/
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-//import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
-import org.societies.personalisation.UserPreferenceLearning.impl.PostProcessor;
-import org.societies.personalisation.UserPreferenceLearning.impl.PreProcessor;
-import org.societies.personalisation.preference.api.model.ActionSubset;
-import org.societies.personalisation.preference.api.model.ServiceSubset;
-
-import weka.core.Instances;
+import org.societies.personalisation.UserPreferenceLearning.impl.UserPreferenceLearning;
+import org.societies.personalisation.preference.api.model.IC45Consumer;
+import org.societies.personalisation.preference.api.model.IC45Output;
+import org.societies.personalisation.preference.api.model.IPreference;
+import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-public class TestUserPreferenceLearning extends TestCase{
+import static org.mockito.Mockito.*;
 
-	PreProcessor pre;
-	PostProcessor post;
-	ServiceResourceIdentifier serviceId1;
-	ServiceResourceIdentifier serviceId2;
-	//IIdentity ownerId;
-	String identity;
+public class TestUserPreferenceLearning extends TestCase implements IC45Consumer{
+
 	NumberGenerator ng;
+	ICtxBroker mockCtxBroker;
+	UserPreferenceLearning prefLearning;
+	IIdentity mockID;
+	String mockCssOperator;
+	ServiceResourceIdentifier mockServiceID_A;
+	ServiceResourceIdentifier mockServiceID_B;
+	//Date startDate;
+	List<CtxAttributeIdentifier> emptyList;
+	Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> history;
+	List<IC45Output> results;
 
 	public void setUp() throws Exception {
-		pre = new PreProcessor();
-		post = new PostProcessor();
-		serviceId1 = new ServiceResourceIdentifier();
-		serviceId1.setIdentifier(new URI("tennisPlanner"));
-		serviceId2 = new ServiceResourceIdentifier();
-		serviceId2.setIdentifier(new URI("lymphChecker"));
-		//ownerId = new MockIdentity(IdentityType.CSS, "test", "domain");
-		identity = "sarah@societies.org";
+		mockCtxBroker = mock(ICtxBroker.class);
+		prefLearning = new UserPreferenceLearning();
+		prefLearning.setCtxBroker(mockCtxBroker);
+		mockID = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
+		mockCssOperator = "mockFooIdentity";
+		mockServiceID_A = new ServiceResourceIdentifier();
+		mockServiceID_A.setIdentifier(new URI("http://testServiceA"));
+		mockServiceID_A.setServiceInstanceIdentifier("testServiceA");
+		mockServiceID_B = new ServiceResourceIdentifier();
+		mockServiceID_B.setIdentifier(new URI("http://testServiceB"));
+		mockServiceID_B.setServiceInstanceIdentifier("testServiceB");
+		//startDate = new Date();
+		emptyList = new ArrayList<CtxAttributeIdentifier>();
 		ng = new NumberGenerator();
+		history = new AsyncResult<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>>(this.getDataset());
+		results = null;
 	}
 
 	public void tearDown() throws Exception {
-		//null
+		mockCtxBroker = null;
+		prefLearning = null;
+		mockID = null;
+		mockCssOperator = null;
+		mockServiceID_A = null;
+		mockServiceID_B = null;
+		//startDate = null;
+		history = null;
+		ng = null;
+		results = null;
 	}
+
+
+	//test all actions and all identities
+	@Test
+	public void testAA_AI(){
+		System.out.println("Running test 1...");
+		Date startDate = new Date();
+		when(mockCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null))
+		.thenReturn(history);
+
+		prefLearning.runC45Learning(this, startDate);
+
+		//check return
+		int counter = 10;
+		while(results == null && counter > 0){
+			try {
+				Thread.sleep(1000);
+				counter --;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		verify(mockCtxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null);
+
+		Assert.assertNotNull(results);
+		printResults();
+	}
+
+	//test all actions and specific identity
+	@Test
+	public void testAA_SI(){
+		System.out.println("Running test 2...");
+		Date startDate = new Date();
+		when(mockCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null))
+		.thenReturn(history);
+
+		prefLearning.runC45Learning(this, startDate, mockID);		
+
+		//check return
+		int counter = 10;
+		while(results == null && counter > 0){
+			try {
+				Thread.sleep(1000);
+				counter --;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		verify(mockCtxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null);
+
+		Assert.assertNotNull(results);
+		printResults();
+	}
+
+	//test specific action and all identities
+	@Test
+	public void testSA_AI(){
+		System.out.println("Running test 3...");
+		Date startDate = new Date();
+		when(mockCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null))
+		.thenReturn(history);
+
+		prefLearning.runC45Learning(this, startDate, mockServiceID_A, "tennis1");	
+
+		//check return
+		int counter = 10;
+		while(results == null && counter > 0){
+			try {
+				Thread.sleep(1000);
+				counter --;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		verify(mockCtxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null);
+
+		Assert.assertNotNull(results);
+		printResults();
+	}
+
+	//test specific action and specific identity
+	@Test
+	public void testSA_SI(){
+		System.out.println("Running test 4...");
+		Date startDate = new Date();
+		when(mockCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null))
+		.thenReturn(history);
+
+		prefLearning.runC45Learning(this, startDate, mockID, mockServiceID_A, "tennis1");
+
+		//check return
+		int counter = 10;
+		while(results == null && counter > 0){
+			try {
+				Thread.sleep(1000);
+				counter --;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		verify(mockCtxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null);
+
+		Assert.assertNotNull(results);
+		printResults();
+	}
+
+
+
+	private void printResults(){
+		for(IC45Output nextOutput: results){
+			System.out.println("**********************RESULTS**************************************");
+			System.out.println("Data Owner: "+nextOutput.getOwner());
+			System.out.println("Service ID: "+nextOutput.getServiceId());
+			System.out.println("Service Type: "+nextOutput.getServiceType());
+			List<IPreferenceTreeModel> trees = nextOutput.getTreeList();
+			for(IPreferenceTreeModel nextTree: trees){
+				System.out.println("-----------------------------------------------------");
+				IPreference preference = nextTree.getRootPreference();
+				System.out.println(preference.toTreeString());
+			}
+			System.out.println("-----------------------------------------------------");
+		}
+		System.out.println("**************************END**********************************");
+	}
+
 
 	/*
 	 * PreProcessor tests
-	 */
-	/**
+
+	 *//**
 	 * This test should extract a list of actions for a particular serviceId from the dataset
-	 */
+	 *//*
 	public void testServiceActionExtraction(){
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> dataset = this.getFullDataset();
 		System.out.println("*************************************************");
@@ -115,7 +270,7 @@ public class TestUserPreferenceLearning extends TestCase{
 			System.out.println("action list size = "+nextSubset.size());
 
 			//Print action subsets
-			/*for(Iterator<CtxHistoryAttribute> nextSubset_it = nextSubset.keySet().iterator(); nextSubset_it.hasNext();){
+			for(Iterator<CtxHistoryAttribute> nextSubset_it = nextSubset.keySet().iterator(); nextSubset_it.hasNext();){
 				CtxHistoryAttribute nextAttr = nextSubset_it.next();
 				List<CtxHistoryAttribute> context = nextSubset.get(nextAttr);
 				try {
@@ -130,7 +285,7 @@ public class TestUserPreferenceLearning extends TestCase{
 					System.out.println(nextContext.getType()+" = "+nextContext.getStringValue());
 				}
 			}
-			System.out.println("DONE PRINTING");*/
+			System.out.println("DONE PRINTING");
 		}
 
 		System.out.println();
@@ -138,9 +293,9 @@ public class TestUserPreferenceLearning extends TestCase{
 		System.out.println();
 	}
 
-	/**
-	 * This test should return a list of ServiceSubsets - one for each serviceId in the dataset
-	 */
+	  *//**
+	  * This test should return a list of ServiceSubsets - one for each serviceId in the dataset
+	  *//*
 	public void testSplitHistory(){
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> dataset = this.getFullDataset();
 		System.out.println("*************************************************");
@@ -169,7 +324,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				System.out.println("action subset size = "+nextSubset.size());
 
 				//Print action subsets
-				/*for(Iterator<CtxHistoryAttribute> nextSubset_it = nextSubset.keySet().iterator(); nextSubset_it.hasNext();){
+				for(Iterator<CtxHistoryAttribute> nextSubset_it = nextSubset.keySet().iterator(); nextSubset_it.hasNext();){
 					CtxHistoryAttribute nextAttr = nextSubset_it.next();
 					List<CtxHistoryAttribute> context = nextSubset.get(nextAttr);
 					try {
@@ -183,7 +338,7 @@ public class TestUserPreferenceLearning extends TestCase{
 					for(CtxHistoryAttribute nextContext: context){
 						System.out.println(nextContext.getType()+" = "+nextContext.getStringValue());
 					}
-				}*/
+				}
 			}
 		}
 
@@ -192,9 +347,9 @@ public class TestUserPreferenceLearning extends TestCase{
 		System.out.println();
 	}
 
-	/**
-	 * This test should return a trimmed ServiceSubset where consistent context attributes have been removed from ActionSubsets
-	 */
+	   *//**
+	   * This test should return a trimmed ServiceSubset where consistent context attributes have been removed from ActionSubsets
+	   *//*
 	public void testTrimServiceSubset(){
 		ServiceSubset dataset = this.getServiceSubset();
 		System.out.println("*************************************************");
@@ -219,7 +374,7 @@ public class TestUserPreferenceLearning extends TestCase{
 			System.out.println("action subset size = "+nextSubset.size());
 
 			//Print action subsets
-			/*for(Iterator<CtxHistoryAttribute> nextSubset_it = nextSubset.keySet().iterator(); nextSubset_it.hasNext();){
+			for(Iterator<CtxHistoryAttribute> nextSubset_it = nextSubset.keySet().iterator(); nextSubset_it.hasNext();){
 				CtxHistoryAttribute nextAttr = nextSubset_it.next();
 				List<CtxHistoryAttribute> context = nextSubset.get(nextAttr);
 				try {
@@ -233,7 +388,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				for(CtxHistoryAttribute nextContext: context){
 					System.out.println(nextContext.getType()+" = "+nextContext.getStringValue());
 				}
-			}*/
+			}
 		}
 
 		System.out.println();
@@ -241,9 +396,9 @@ public class TestUserPreferenceLearning extends TestCase{
 		System.out.println();
 	}
 
-	/**
-	 * This test should translate the ActionSubset into Weka instances
-	 */
+	    *//**
+	    * This test should translate the ActionSubset into Weka instances
+	    *//*
 	public void testToInstances(){
 		ActionSubset dataset = this.getActionSubset();
 		System.out.println("*************************************************");
@@ -257,15 +412,15 @@ public class TestUserPreferenceLearning extends TestCase{
 		System.out.println("-----------------------------------------------------------");
 		System.out.println();
 	}
-
+	     */
 	/*
 	 * PostProcessor tests
 	 */
-	public void testPostProcessor(){
+	/*	public void testPostProcessor(){
 		//String dataset = this.getTreeString();
 		//EntityIdentifier ownerId = new EntityIdentifier();
 		//IPreferenceTreeModel preference = post.process(ownerId, "tennis", dataset, cache, serviceId1, "testService"); 
-	}
+	}*/
 
 
 
@@ -274,12 +429,12 @@ public class TestUserPreferenceLearning extends TestCase{
 	/*
 	 * Dataset methods
 	 */
-	private Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> getFullDataset(){
+	private Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> getDataset(){
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> fulldataset = 
 				new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
 		//Create EntityIdentifier
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(identity, "testEntity", new Long(12345));
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(mockCssOperator, "testEntity", new Long(12345));
 
 		//extract tennis dataset
 		//ServiceId = tennisPlanner
@@ -300,7 +455,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				CtxAttributeIdentifier action_attrId = new CtxAttributeIdentifier(entityId, "action", new Long(12345));
 				CtxAttribute action_attribute = new CtxAttribute(action_attrId);
 				if(toggle == 1) toggle = 0; else toggle = 1;
-				Action value = new Action(serviceId1, "testService", tennisActionTypes[toggle], instance[0]);
+				Action value = new Action(mockServiceID_A, "testService", tennisActionTypes[toggle], instance[0]);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
 				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
@@ -340,7 +495,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				CtxAttributeIdentifier action_attrId = new CtxAttributeIdentifier(entityId, "action", new Long(12345));
 				CtxAttribute action_attribute = new CtxAttribute(action_attrId);
 				if(toggle == 1) toggle = 0; else toggle = 1;
-				Action value = new Action(serviceId2, "testService", lymphActionTypes[toggle], instance[0]);
+				Action value = new Action(mockServiceID_B, "testService", lymphActionTypes[toggle], instance[0]);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
 				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
@@ -388,8 +543,13 @@ public class TestUserPreferenceLearning extends TestCase{
 		return fulldataset;
 	}
 
+	@Override
+	public void handleC45Output(List<IC45Output> results) {
+		this.results = results;
+	}
 
-	private ServiceSubset getServiceSubset(){
+
+	/*	private ServiceSubset getServiceSubset(){
 		//Create EntityIdentifier
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(identity, "testEntity", new Long(12345));
 		List<ActionSubset> actionSubsets = new ArrayList<ActionSubset>();
@@ -509,11 +669,12 @@ public class TestUserPreferenceLearning extends TestCase{
 		}
 		return actionSubset;
 	}
-
+	 */	
+	/*
 
 	private String getTreeString(){
 		return null;
-	}
+	}*/
 
 	/*private void printDataset(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> dataset){
 		//printout full dataset test
@@ -527,10 +688,8 @@ public class TestUserPreferenceLearning extends TestCase{
 					System.out.println(nextParam.getType()+" = "+nextParam.getStringValue());
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

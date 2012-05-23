@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	targetNamespace="http://societies.org/api/schema/personalisation/mgmt"
+	xmlns:tns="http://societies.org/api/schema/identity" 
+	xmlns:tns2="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:tns3="http://societies.org/api/schema/personalisation/model"
+	xmlns="http://societies.org/api/schema/personalisation/mgmt" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:import namespace="http://societies.org/api/schema/identity"
+		schemaLocation="org.societies.api.schema.identity.xsd"></xs:import>
+
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+		schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd" />
+		
+	<xs:import namespace="http://societies.org/api/schema/personalisation/model"
+		schemaLocation="org.societies.api.schema.personalisation.model.xsd"/>
+
+	<xs:element name="personalisationManagerBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="method" type="personalisationMethodType"
+					minOccurs="1"></xs:element>
+				<xs:element name="requestor" type="tns:RequestorBean"
+					minOccurs="1"></xs:element>
+				<xs:element name="userIdentity" type="xs:string"
+					minOccurs="1"></xs:element>
+				<xs:element name="serviceType" type="xs:string"
+					maxOccurs="1"></xs:element>
+				<xs:element name="serviceId" type="tns2:serviceResourceIdentifier"
+					minOccurs="1"></xs:element>
+				<xs:element name="parameterName" type="xs:string"
+					minOccurs="1"></xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="personalisationMethodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="getIntentAction" />
+			<xs:enumeration value="getPreference" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:element name="personalisationResultBean">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="action" type="tns3:ActionBean" minOccurs="1"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	</xs:element>
+</xs:schema>
+	

@@ -49,9 +49,10 @@ import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
  * @author Olivier Maridat (Trialog)
  */
 public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
-	private static Logger log = LoggerFactory.getLogger(PrivacyDataManagerInternal.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerInternal.class.getSimpleName());
 
 	private SessionFactory sessionFactory;
+
 
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier)
@@ -86,13 +87,13 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// -- Generate the response item
 			// - Privacy Permission doesn't exist
 			if (null == privacyPermission) {
-				log.info("PrivacyPermission not available");
+				LOG.info("PrivacyPermission not available");
 				return null;
 			}
 			// - Privacy permission retrieved
-			log.info(privacyPermission.toString());
+			LOG.info(privacyPermission.toString());
 			permission = privacyPermission.createResponseItem();
-			log.info("PrivacyPermission retrieved.");
+			LOG.info("PrivacyPermission retrieved.");
 		} catch (Exception e) {
 			t.rollback();
 			throw new PrivacyException("Error during the persistance of the privacy permission", e);
@@ -136,7 +137,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// -- Update this privacy permission
 			// - Privacy Permission doesn't exist: create a new one
 			if (null == privacyPermission) {
-				log.info("PrivacyPermission not available: create it");
+				LOG.info("PrivacyPermission not available: create it");
 				privacyPermission = new PrivacyPermission(requestor, ownerId, dataId, actions, permission);
 			}
 			// - Privacy permission already exists: update it
@@ -150,7 +151,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// - Update
 			session.save(privacyPermission);
 			t.commit();
-			log.info("PrivacyPermission saved.");
+			LOG.info("PrivacyPermission saved.");
 			result = true;
 		} catch (Exception e) {
 			t.rollback();
@@ -204,14 +205,14 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// -- Delete the privacy permission
 			// - Privacy Permission doesn't exist
 			if (null == privacyPermission) {
-				log.debug("PrivacyPermission not available: no need to delete");
+				LOG.debug("PrivacyPermission not available: no need to delete");
 			}
 			// - Privacy permission retrieved: delete it
 			else {
-				log.info(privacyPermission.toString());
+				LOG.info(privacyPermission.toString());
 				session.delete(privacyPermission);
 				t.commit();
-				log.debug("PrivacyPermission deleted.");
+				LOG.debug("PrivacyPermission deleted.");
 			}
 			result = true;
 		} catch (Exception e) {
@@ -227,12 +228,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 
 
 	// --- Dependency Injection
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
 	public void setSessionFactory(SessionFactory sessionFactory) {
-		log.info("sessionFactory injected");
 		this.sessionFactory = sessionFactory;
+		LOG.info("[Dependency Injection] sessionFactory injected");
 	}
 
 	private boolean isDepencyInjectionDone() {

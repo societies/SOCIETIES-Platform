@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.model.CtxAttribute;
@@ -74,6 +75,7 @@ public class TestPersonalisationManager {
 	ICRISTUserIntentPrediction cristPrediction = Mockito.mock(ICRISTUserIntentPrediction.class);
 	IUserPreferenceConditionMonitor pcm = Mockito.mock(IUserPreferenceConditionMonitor.class);
 	IIdentityManager idm = Mockito.mock(IIdentityManager.class);
+	ICommManager commsMgr = Mockito.mock(ICommManager.class);
 	private CtxAttributeIdentifier ctxLocationAttributeId;
 	private CtxEntityIdentifier ctxEntityId;
 	private CtxEntity ctxEntity;
@@ -103,7 +105,15 @@ public class TestPersonalisationManager {
 		personalisationManager.setCtxBroker(broker);
 		personalisationManager.setDecisionMaker(userAgent);
 		personalisationManager.setDianne(dianne);
-		personalisationManager.setIdm(idm);
+		//instead of: personalisationManager.setIdm(idm);
+		Mockito.when(commsMgr.getIdManager()).thenReturn(idm);
+		personalisationManager.setCommsMgr(commsMgr);
+		try {
+			Mockito.when(idm.fromJid(Mockito.anyString())).thenReturn(mockId);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		personalisationManager.setPcm(pcm);
 		
 		personalisationManager.registerForContextUpdate(mockId, PersonalisationTypes.UserPreference, ctxLocationAttributeId);

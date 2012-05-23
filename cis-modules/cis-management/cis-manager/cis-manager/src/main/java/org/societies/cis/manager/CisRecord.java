@@ -49,15 +49,14 @@ import javax.persistence.Transient;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisRecord;
-import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.api.cis.management.ICis;
 
 
 @Entity
 @Table(name = "org_societies_cis_manager_CisRecord")
 public class CisRecord {
 	
-	public String ownerCss;
+	//public String ownerCss;
 	public int membershipCriteria; // also know as mode
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -78,15 +77,17 @@ public class CisRecord {
 
 	public String cisName;
 	public String cisJID;
-	public String cisType;
+	
 
 	public CisRecord(){}
 
-	/**
-	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
-	 */
+	/** permaLink is a permanent URL to this CIS. A type of CIS homepage.
+	 * 
+	 
+	 public String cisType;
+	 
 	@Column
-	public String permaLink;
+	public String permaLink; // all those have been moved to the Editor
 	
 	// public Set<CisParticipant> membersCss; moved to only CIS Editor 
 	@Column
@@ -94,42 +95,23 @@ public class CisRecord {
 	@Column
 	private String host = "none";
 	//@OneToMany(cascade=CascadeType.ALL)
-	
+	*/
 	// public Set<IServiceSharingRecord> sharedServices; moved to only CIS Editor
 	
 
 	
-	public CisRecord(String ownerCss,
-			int membershipCriteria, String cisId, String permaLink, String password, String host) {
+	public CisRecord(
+			int membershipCriteria, String cisName, String cisJid) {
 		super();
-		this.ownerCss = ownerCss;
 		this.membershipCriteria = membershipCriteria;
-		this.cisName = cisId;
-		this.permaLink = permaLink;
-		this.password = password;
-		this.host = host;
+		this.cisName = cisName;
 		
-		this.cisJID = cisId + "." + host;
-		
-		this.cisType = "default";
+		this.cisJID = cisJid;
+
 	}
 	
 
 	
-	public CisRecord(String ownerCss,
-			int membershipCriteria, String cisJid, String permaLink,String password,String cisType, String cisName) {
-		super();
-		this.ownerCss = ownerCss;
-		this.membershipCriteria = membershipCriteria;
-		this.cisName = cisName;
-		this.permaLink = permaLink;
-		this.password = password;
-		this.host = host;
-		
-		this.cisJID = cisJid;
-		
-		this.cisType = cisType;
-	}
 	
 	public CisRecord(String cisJid) {		
 		this.cisJID = cisJid;
@@ -167,27 +149,11 @@ public class CisRecord {
 
 	
 
-	public String getCisType() {
-		return cisType;
-	}
-
-
-
-	public void setCisType(String cisType) {
-		this.cisType = cisType;
-	}
-
-
 	
-	
-	public String getOwnerCss() {
-		return ownerCss;
-	}
-
 
 
 	public int getMembershipCriteria() {
-		return membershipCriteria;
+		return this.membershipCriteria;
 	}
 
 
@@ -197,13 +163,8 @@ public class CisRecord {
 	}
 
 
-	public void setOwnerCss(String ownerCss) {
-		this.ownerCss = ownerCss;
-	}
-
-
 	public String getCisName() {
-		return cisName;
+		return this.cisName;
 	}
 
 
@@ -213,53 +174,12 @@ public class CisRecord {
 	}
 
 
-	public String getPassword() {
-		return password;
+	
+	public String getCisJid() {
+		return this.cisJID;
 	}
 
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-
-	public String getHost() {
-		return host;
-	}
-
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-
-
-	public String getCisId() {
-		return cisJID;
-	}
-
-
-
-	public String getName() {
-		return cisName;
-	}
-
-	public String getOwnerId() {
-		return this.ownerCss;
-	}
-
-
-
-	public String getUserDefineName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	public String setUserDefinedName(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 

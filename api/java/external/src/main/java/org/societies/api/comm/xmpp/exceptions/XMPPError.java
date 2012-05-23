@@ -29,34 +29,67 @@ package org.societies.api.comm.xmpp.exceptions;
 import org.societies.api.comm.xmpp.datatypes.StanzaError;
 
 /**
+ * The Class XMPPError.
+ *
  * @author Joao M. Goncalves (PTIN)
  * 
  * TODO
- * 
  */
 
 // TODO parse error (client side)
 public class XMPPError extends Exception {
 	
+	/** The Constant STANZA_ERROR_NAMESPACE_DECL. */
 	public static final String STANZA_ERROR_NAMESPACE_DECL = "urn:ietf:params:xml:ns:xmpp-stanzas";
+	
+	/** The Constant CLOSE_ERROR. */
 	public static final String CLOSE_ERROR = "</error>";
+	
+	/** The Constant CLOSE_ERROR_BYTES. */
 	public static final byte[] CLOSE_ERROR_BYTES = CLOSE_ERROR.getBytes();
 	
+	/** The stanza error. */
 	private StanzaError stanzaError;
+	
+	/** The application error. */
 	private Object applicationError;
+	
+	/** The stanza error text. */
 	private String stanzaErrorText;
+	
+	/** The stanza error bytes with text. */
 	private byte[] stanzaErrorBytesWithText;
+	
+	/** The generic text. */
 	private String genericText; // TODO support output of this
 	
+	/**
+	 * Instantiates a new XMPP error.
+	 *
+	 * @param stanzaError the stanza error {@link org.societies.api.comm.xmpp.datatypes.StanzaError}
+	 */
 	public XMPPError(StanzaError stanzaError) {
 		this.stanzaError = stanzaError;
 	}
 	
+	/**
+	 * Instantiates a new XMPP error.
+	 *
+	 * @param stanzaError the stanza error {@link org.societies.api.comm.xmpp.datatypes.StanzaError}
+	 * @param genericText the generic text
+	 */
 	public XMPPError(StanzaError stanzaError, String genericText) {
 		this.stanzaError = stanzaError;
 		this.genericText = genericText;
 	}
 	
+	/**
+	 * Instantiates a new xMPP error.
+	 *
+	 * @param stanzaError the stanza error {@link org.societies.api.comm.xmpp.datatypes.StanzaError}
+	 * @param stanzaErrorText the stanza error text
+	 * @param applicationError the application error
+	 */
 	public XMPPError(StanzaError stanzaError, String stanzaErrorText, Object applicationError) {
 		this.applicationError = applicationError;
 		this.stanzaError = stanzaError;
@@ -70,14 +103,29 @@ public class XMPPError extends Exception {
 		}
 	}
 	
+	/**
+	 * Gets the generic text.
+	 *
+	 * @return the generic text
+	 */
 	public String getGenericText() {
 		return genericText;
 	}
 	
+	/**
+	 * Gets the application error.
+	 *
+	 * @return the application error
+	 */
 	public Object getApplicationError() {
 		return applicationError;
 	}
 	
+	/**
+	 * Gets the stanza error string.
+	 *
+	 * @return the stanza error string
+	 */
 	public String getStanzaErrorString() {
 		if (stanzaError.hasText() && stanzaErrorText!=null)
 			return stanzaError.toString()+stanzaErrorText;
@@ -85,6 +133,11 @@ public class XMPPError extends Exception {
 			return stanzaError.toString();
 	}
 	
+	/**
+	 * Gets the stanza error bytes.
+	 *
+	 * @return the stanza error bytes
+	 */
 	public byte[] getStanzaErrorBytes(){
 		if (stanzaError.hasText() && stanzaErrorBytesWithText!=null)
 			return stanzaErrorBytesWithText;

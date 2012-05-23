@@ -73,6 +73,7 @@
 		<module>../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
 		<!-- Domain Authority Modules -->
 		<module>../domain-authority/group-manager</module>
+		<module>../domain-authority/registry</module>
 		<!-- Example 3rd party services <module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module> 
 			<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module> 
 			<module>../platform-infrastructure/comms-frwk/ExampleServices/ComplexServiceBundle</module> 
@@ -137,9 +138,10 @@
 		<module>../intelligent-community-orchestration/API</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
+		<!-- 
 		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
 		</module>
-
+		-->
 		<!-- Privacy & Trust -->
 		<module>../privacy-trust/java/privacy-protection</module>
 		<module>../privacy-trust/java/trust</module>
@@ -147,6 +149,8 @@
 		<!-- PlatForm Web App -->
 		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
 		</module>
+		
+		<module>../domain-authority/webapp</module>
 
 	</modules>
 </project>

@@ -27,29 +27,36 @@ package org.societies.api.osgi.event;
 import java.io.Serializable;
 
 /**
- * 
- * @author pkuppuud
+ * The societies CSSEvent class
  *
+ * @author pkuppuud
  */
+
+
 public class CSSEvent implements Serializable {
 
-	/**
-	 * Default
-	 */
+	/** Default. */
 	private static final long serialVersionUID = 1L;
 	
+	/** The event type. */
 	private String eventType;
+	
+	/** The event name. */
 	private String eventName;
+	
+	/** The event source. */
 	private String eventSource;
+	
+	/** The event info as xml. */
 	private String eventInfoAsXML;
 
 	/**
-	 * Constructor
-	 * 
-	 * @param eventType String for the type of event {@link EventTypes} 
+	 * Constructor.
+	 *
+	 * @param eventType String for the type of event {@link EventTypes}
 	 * @param eventName String for the name of event
 	 * @param eventSource String for the source component or peer id
-	 * @param eventInfo String for the event info as serialised XML
+	 * @param eventInfoAsXML the event info as xml
 	 */
 	public CSSEvent(String eventType, String eventName, String eventSource, String eventInfoAsXML){
 		this.eventType = eventType;
@@ -58,18 +65,38 @@ public class CSSEvent implements Serializable {
 		this.eventInfoAsXML = eventInfoAsXML;
 	}
 
+	/**
+	 * Gets the event info as xml.
+	 *
+	 * @return the event info as xml
+	 */
 	public String geteventInfoAsXML(){
 		return eventInfoAsXML;
 	}
 
+	/**
+	 * Gets the event source.
+	 *
+	 * @return the event source
+	 */
 	public String geteventSource(){
 		return eventSource;
 	}
 
+	/**
+	 * Gets the event name.
+	 *
+	 * @return the event name
+	 */
 	public String geteventName(){
 		return eventName;
 	}
 
+	/**
+	 * Gets the event type.
+	 *
+	 * @return the event type
+	 */
 	public String geteventType(){
 		return eventType;
 	}

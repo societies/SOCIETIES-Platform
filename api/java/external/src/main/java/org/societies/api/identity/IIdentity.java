@@ -2,9 +2,6 @@ package org.societies.api.identity;
 
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-/**
- * MISSING_JAVADOCS
- */
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IIdentity {
 	/**

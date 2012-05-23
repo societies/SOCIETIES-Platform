@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
+import org.societies.api.osgi.event.EventTypes;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.actions.GetLightLevelAction;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables.LightLevelStateVariable;
 
@@ -171,9 +173,9 @@ public class LightSensor implements IDriverService{
 		Dictionary<String, Object> eventAdminDic = new Hashtable<String, Object>();
 		
 		eventAdminDic.put("lightLevel", getLightValue());
-		eventAdminDic.put("event_name", "Sensor/LigntSensorEvent");
+		eventAdminDic.put("event_name", DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT);
 		
-		eventAdmin.sendEvent(new Event("org/societies/css/device", eventAdminDic));
+		eventAdmin.sendEvent(new Event(EventTypes.DEVICE_MANAGEMENT_EVENT, eventAdminDic));
 		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by eventAdmin");
 	}
 }

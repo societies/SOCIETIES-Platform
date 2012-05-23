@@ -1,0 +1,105 @@
+<!-- 
+
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+ -->
+ 
+ 
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="keywords" content="context gui" />
+<meta name="description" content="this webapp allow to edit and add context information" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Societies Context GUI</title>
+<link href="http://fonts.googleapis.com/css?family=Abel" rel="stylesheet" type="text/css" />
+<link href="css/style.css" rel="stylesheet" type="text/css" media="screen" />
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="js/jquery.slidertron-1.0.js"></script>
+</head>
+<body>
+<div id="wrapper">
+	<div id="header-wrapper">
+		<div id="header">
+			<div id="logo">
+				<h1><a href="#">Societies Context GUI</a></h1>
+				<p>Context data manager and monitor</p>
+			</div>
+		</div>
+	</div>
+	<!-- end #header -->
+	<div id="menu">
+		<ul>
+			<li><a href="default.html">Homepage</a></li>
+			<li><a href="lookup.html">Lookup</a></li>
+			<li><a href="addcontext.html">Add Context</a></li>
+			<li><a href="history.html">Context History</a></li>
+			<li><a href="config.html">Configuration</a></li>
+			<li><a class="current_page_item" href="#">Mobile</a></li>
+		</ul>
+	</div>
+	<!-- end #menu -->
+	<div id="page">
+		<div id="content">
+			<div id="slider">
+				<div class="viewer">
+					<div class="reel">
+						<div class="slide"> <img src="images/pic01.jpg" width="590" height="300" alt="" /> </div>
+						<div class="slide"> <img src="images/pic02.jpg" width="590" height="300" alt="" /> </div>
+					</div>
+				</div>
+			</div>
+			<script type="text/javascript">
+				$('#slider').slidertron({
+					viewerSelector: '.viewer',
+					reelSelector: '.viewer .reel',
+					slidesSelector: '.viewer .reel .slide',
+					advanceDelay: 3000,
+					speed: 'slow'
+				});
+			</script>
+
+			<div class="post">
+				<h2 class="title"><a href="#">Welcome to Boldness</a></h2>
+				<p class="meta">Posted by <a href="#">Someone</a> on April 22, 2012
+					&nbsp;&bull;&nbsp; <a href="#" class="comments">Comments (64)</a> &nbsp;&bull;&nbsp; <a href="#" class="permalink">Full article</a></p>
+				<div class="entry">
+					<p>This is <strong>Boldness</strong>, a free, fully standards-compliant CSS template designed by FreeCssTemplates<a href="http://www.nodethirtythree.com/"></a> for <a href="http://www.freecsstemplates.org/">Free CSS Templates</a>.  The picture in this template is from <a href="http://fotogrph.com/"><strong>FotoGrph</strong></a>.The gallery slider used in this template is powered by <strong><a href="http://nodethirtythree.com/">Slidertron</a></strong>. This free template is released under a <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attributions 3.0</a> license, so you’re pretty much free to do whatever you want with it (even use it commercially) provided you keep the links in the footer intact. Aside from that, have fun with it :)</p>
+					<p>Sed lacus. Donec lectus. Nullam pretium nibh ut turpis. Nam bibendum. In nulla tortor, elementum ipsum. Proin imperdiet est. Phasellus dapibus semper urna. Pellentesque ornare, orci in felis. Donec ut ante. In id eros. Suspendisse lacus turpis, cursus egestas at sem.</p>
+				</div>
+			</div>
+			
+			<div style="clear: both;">&nbsp;</div>
+		</div>
+		
+		
+		<!-- end #content -->
+		<div id="sidebar-bg">
+			<div id="sidebar">
+				<ul>
+					<li>
+						<h2>Context Data</h2>
+						<p>
+							<ul>
+							<li><a href="#">Aliquam libero</a></li>
+							<li><a href="#">Consectetuer adipiscing elit</a></li>
+							<li><a href="#">Metus aliquam pellentesque</a></li>
+							<li><a href="#">Suspendisse iaculis mauris</a></li>
+							<li><a href="#">Urnanet non molestie semper</a></li>
+							<li><a href="#">Proin gravida orci porttitor</a></li>
+							</ul>
+						</p>
+					
+					</li>
+				</ul>
+			</div>
+		</div>r
+		<!-- end #sidebar -->
+		<div style="clear: both;">&nbsp;</div>
+	</div>
+	<!-- end #page -->
+</div>
+<div id="footer">
+	<p>Copyright © 2010-2012 <a href="www.ict-societies.eu">www.ict-societies.eu</a>. All rights reserved.</p>
+</div>
+<!-- end #footer -->
+</body>
+</html>R

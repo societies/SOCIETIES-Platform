@@ -43,6 +43,7 @@ import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCo
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.Requestor;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxEntity;
@@ -54,17 +55,18 @@ import org.societies.api.context.model.CtxAttributeValueType;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-/**import org.societies.api.cis.management.ICisRecord;
+/**import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisEditor;*/
 
-import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ICisOwned;
-import org.societies.orchestration.api.ICisEditor;
+import org.societies.orchestration.api.ICisParticipant;
+//import org.societies.orchestration.api.ICisEditor;
 
-import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisSubscribed;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
@@ -77,7 +79,8 @@ import org.societies.api.css.management.ICssRecord;
 
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
+//Eliza: commented this: doesn't exist anymore
+//import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
@@ -159,7 +162,7 @@ public class EgocentricCommunityCreationManagerTest {
 		
 		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null)));
 		
-		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICis(null, null, null, null, null, members, null, null, null)));
 	}
 	
 	@Test
@@ -237,7 +240,7 @@ public class EgocentricCommunityCreationManagerTest {
 		
 		String[] members = new String[1];
 		members[0] = "James";
-		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new ICis(null, null, null, null, null, members, null, null, null)));
 	}
     
     @Test
@@ -248,7 +251,7 @@ public class EgocentricCommunityCreationManagerTest {
     @Test
     public void testNotCreateDuplicateCis() {
     	cisManager = mock(ICisManager.class);
-    	ICisRecord cisRecord = mock(ICisRecord.class);
+    	ICis cisRecord = mock(ICis.class);
     	IIdentity ownerId = mock(IIdentity.class);
     	//cisManager.addCis(ownerId, cisRecord);
     	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
@@ -268,14 +271,17 @@ public class EgocentricCommunityCreationManagerTest {
     @Test
     public void testNotSuggestUndesiredCis() {
     	cisManager = mock(ICisManager.class);
-    	ICisRecord cisRecord = mock(ICisRecord.class);
+    	ICis cisRecord = mock(ICis.class);
     	IIdentity ownerId = mock(IIdentity.class);
     	//cisManager.addCis(ownerId, cisRecord);
     	ServiceResourceIdentifier serviceId = mock(ServiceResourceIdentifier.class);
     	
     	IPersonalisationManager personalisationManager = mock(IPersonalisationManager.class);
-    	IPersonalisationCallback pc = mock(IPersonalisationCallback.class);
-    	personalisationManager.getPreference(ownerId, ownerId, "refuse creation of " + cisRecord.toString(), serviceId, "", pc);
+    	//Eliza: this doesn't exist anymore (you were re supposed to implement this not mock it)
+    	//IPersonalisationCallback pc = mock(IPersonalisationCallback.class);
+    	//Eliza: the method signature has changed. The first identity parameter is now a Requestor (see replacement below 
+    	//personalisationManager.getPreference(ownerId, ownerId, "refuse creation of " + cisRecord.toString(), serviceId, "");
+    	personalisationManager.getPreference(new Requestor(ownerId), ownerId, "refuse creation of " + cisRecord.toString(), serviceId, "");
     	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
 		
     	egocentricCommunityCreationManager.setCisManager(cisManager);

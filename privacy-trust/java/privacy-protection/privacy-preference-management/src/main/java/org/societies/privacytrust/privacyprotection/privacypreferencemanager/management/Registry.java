@@ -30,10 +30,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
@@ -43,14 +46,18 @@ public class Registry implements Serializable{
 	//the key refers to the name of the preference which will be either ppnp_preference_<n> or ids_preference_<n>
 	private Hashtable<PPNPreferenceDetails, CtxAttributeIdentifier> ppnpMappings;
 	private Hashtable<IDSPreferenceDetails, CtxAttributeIdentifier> idsMappings;
+	private Hashtable<DObfPreferenceDetails, CtxAttributeIdentifier> dobfMappings;
 
 	int ppnp_index;
 	int ids_index;
+	int dobf_index;
 
 
 	public Registry(){
 		this.ppnpMappings = new Hashtable<PPNPreferenceDetails, CtxAttributeIdentifier>();
 		this.idsMappings = new Hashtable<IDSPreferenceDetails, CtxAttributeIdentifier>();
+		this.dobfMappings = new Hashtable<DObfPreferenceDetails, CtxAttributeIdentifier>();
+		this.dobf_index = 0;
 		ppnp_index = 0;
 		ids_index = 0;
 	}
@@ -60,9 +67,12 @@ public class Registry implements Serializable{
 		if (preferenceType.equals(PrivacyPreferenceTypeConstants.PPNP)){
 			this.ppnp_index +=1;
 			return "ppnp_preference_"+this.ppnp_index; 
-		}else{
+		}else if (preferenceType.equals(PrivacyPreferenceTypeConstants.IDS)){
 			this.ids_index += 1;
 			return "ids_preference_"+this.ids_index;
+		}else{
+			this.dobf_index +=1;
+			return "dobf_preference_"+this.dobf_index;
 		}
 
 	}
@@ -77,6 +87,10 @@ public class Registry implements Serializable{
 		this.idsMappings.put(details, preferenceCtxID);
 	}
 
+	void addDObfPreference(DObfPreferenceDetails details, CtxAttributeIdentifier preferenceCtxID){
+		this.dobfMappings.put(details, preferenceCtxID);
+	}
+	
 	void removePPNPreference(PPNPreferenceDetails details){
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
@@ -93,11 +107,17 @@ public class Registry implements Serializable{
 
 	void removeIDSPreference(IDSPreferenceDetails details){
 		IDSPreferenceDetails d = this.containsIDS(details);
-		if (d!=null){
+		if (null!=d){
 			this.idsMappings.remove(d);
 		}
 	}
 
+	void removeDObfPreference(DObfPreferenceDetails details){
+		DObfPreferenceDetails d = this.containsDObf(details);
+		if (null!=d){
+			this.dobfMappings.remove(d);
+		}
+	}
 	private PPNPreferenceDetails containsPPNP(PPNPreferenceDetails d){
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 
@@ -111,6 +131,7 @@ public class Registry implements Serializable{
 		}
 		return null;
 	}
+	
 	private IDSPreferenceDetails containsIDS(IDSPreferenceDetails d){
 		Enumeration<IDSPreferenceDetails> e = this.idsMappings.keys();
 
@@ -123,11 +144,23 @@ public class Registry implements Serializable{
 		return null;
 	}
 
+	private DObfPreferenceDetails containsDObf(DObfPreferenceDetails d){
+		Enumeration<DObfPreferenceDetails> e = this.dobfMappings.keys();
+		
+		while(e.hasMoreElements()){
+			DObfPreferenceDetails detail = e.nextElement();
+			if (d.equals(detail)){
+				return detail;
+			}
+		}
+		return null;
+	}
+	
+	
 	CtxAttributeIdentifier getPPNPreference(PPNPreferenceDetails details){
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
-			
 			if (details.equals(d)){
 				return this.ppnpMappings.get(d);
 			}
@@ -153,8 +186,17 @@ public class Registry implements Serializable{
 		return null;
 	}
 
-
-
+	CtxAttributeIdentifier getDObfPreference(DObfPreferenceDetails details){
+		Enumeration<DObfPreferenceDetails> e = this.dobfMappings.keys();
+		while (e.hasMoreElements()){
+			DObfPreferenceDetails d = e.nextElement();
+			if (details.equals(d)){
+				return this.dobfMappings.get(d);
+			}
+		}
+		return null;
+	}
+	
 	List<CtxAttributeIdentifier> getPPNPreferences(String contextType){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
@@ -178,6 +220,12 @@ public class Registry implements Serializable{
 		}
 
 		return preferenceCtxIDs;
+	}
+	
+	List<CtxAttributeIdentifier> getDObfPreferences(CtxAttributeIdentifier ctxId){
+		//TODO: TBD with Olivier
+		return new ArrayList<CtxAttributeIdentifier>();
+		
 	}
 	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, Requestor requestor){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
@@ -338,5 +386,16 @@ public class Registry implements Serializable{
 			details.add(keys.nextElement());
 		}
 		return details;		
+	}
+
+
+	public List<DObfPreferenceDetails> getDObfPreferenceDetails() {
+		Enumeration<DObfPreferenceDetails> keys = this.dobfMappings.keys();
+		ArrayList<DObfPreferenceDetails> details = new ArrayList<DObfPreferenceDetails>();
+		while (keys.hasMoreElements()){
+			details.add(keys.nextElement());
+			
+		}
+		return details;
 	}
 }

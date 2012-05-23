@@ -11,14 +11,14 @@
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
 	xmlns:tx="http://www.springframework.org/schema/tx">
 
-	<!-- regular spring configuration file defining the beans for this bundle. 
-		We've kept the osgi definitions in a separate configuration file so that 
-		this file can easily be used for integration testing outside of an OSGi environment -->
-
 	<bean name="Test"
-		class="org.societies.privacytrust.privacyprotection.test.Test">
+		class="org.societies.privacytrust.privacyprotection.test.Test"
+		init-method="start">
+		<property name="commManager" ref="commManager"/>
 		<property name="privacyDataManager" ref="privacyDataManager" />
+		<property name="privacyDataManagerRemote" ref="privacyDataManagerRemote" />
 		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
+		<property name="ctxBroker" ref="ctxBroker"/>
 	</bean>
 
 </beans>

@@ -27,9 +27,10 @@ package org.societies.personalisation.CRISTUserIntentDiscovery.test;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import org.societies.api.personalisation.model.Action;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
 import org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery;
-import org.societies.personalisation.CRISTUserIntentDiscovery.impl.MockHistoryData;
 
 /**
  * Describe your class here...
@@ -38,13 +39,12 @@ import org.societies.personalisation.CRISTUserIntentDiscovery.impl.MockHistoryDa
  *
  */
 public class CRISTUserIntentDiscoveryTesting {
-
-	/**
-	 * @param args
-	 */
-	private static ICRISTUserIntentDiscovery cristDiscovery = new CRISTUserIntentDiscovery(null);
+	
+/*
+    @Ignore
+	private static ICRISTUserIntentDiscovery cristDiscovery = new CRISTUserIntentDiscovery();
 	private static ArrayList<String> registeredContext = new ArrayList<String>();
-	private static ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
+	private static ArrayList<CRISTHistoryData> historyList = new ArrayList<CRISTHistoryData>();
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -61,7 +61,7 @@ public class CRISTUserIntentDiscoveryTesting {
 	}
 
 	private static void initiateHistoryData(){
-		ArrayList<String> historyAction = new ArrayList<String>();
+		ArrayList<IAction> historyAction = new ArrayList<IAction>();
 		ArrayList<String> historySituation = new ArrayList<String>();
 		ArrayList<ArrayList<String>> historyContext = new ArrayList<ArrayList<String>>();
 		// Assuming that the following sensors are available: light, sound,
@@ -71,174 +71,64 @@ public class CRISTUserIntentDiscoveryTesting {
 		registeredContext.add("Temperature");
 		registeredContext.add("GPS");
 
-		ArrayList<String> historyContextClique = new ArrayList<String>();
-
 		// Mock history data
-		historyAction.add("Turn on MP3 Player");
+		ArrayList<String> historyContextClique = new ArrayList<String>();
+		historyAction.add(new Action(CRISTHistoryData.getServiceId_music(), "musicService", "switch", "on"));
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
 		historyContextClique.add("30");
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn down volume");
+		//LOG.info("historyContext: "+historyContext.toString());
+		//LOG.info("clique 0: "+historyContextClique.toString());
+		
+		historyContextClique = new ArrayList<String>();
+		historyAction.add(new Action(CRISTHistoryData.getServiceId_music(), "musicService", "volume", "low"));
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
 		historyContextClique.add("30");
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
-		historyAction.add("Switch songs");
+		//LOG.info("historyContext: "+historyContext.toString());
+		//LOG.info("clique 1: "+historyContextClique.toString());
+		
+		historyContextClique = new ArrayList<String>();
+		historyAction.add(new Action(CRISTHistoryData.getServiceId_music(), "musicService", "switch", "next"));
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
 		historyContextClique.add("30");
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn off MP3 Player");
+		//LOG.info("historyContext: "+historyContext.toString());
+		//LOG.info("clique 2: "+historyContextClique.toString());
+		
+		historyContextClique = new ArrayList<String>();
+		historyAction.add(new Action(CRISTHistoryData.getServiceId_music(), "musicService", "switch", "off"));
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
 		historyContextClique.add("30");
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
-		historyAction.add("Start the GPS navigator");
+		
+		historyContextClique = new ArrayList<String>();
+		historyAction.add(new Action(CRISTHistoryData.getServiceId_checkin(), "checkinService", "GPS", "on"));
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
 		historyContextClique.add("60");
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Input a location name");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Close the GPS navigator");
-		historySituation.add("Shopping Mall");
-		historyContextClique.add("100");
-		historyContextClique.add("80");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn up volume");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Switch songs");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn off MP3 Player");
-		historySituation.add("Office");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("26");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Start the GPS navigator");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Input a location name");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Close the GPS navigator");
-		historySituation.add("Shopping Mall");
-		historyContextClique.add("100");
-		historyContextClique.add("80");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn down volume");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Switch songs");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn off MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-		historyAction.add("Turn down volume");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
 
 		for (int i = 0; i < historyAction.size(); i++) {
-			MockHistoryData currentHisData = new MockHistoryData(
+			CRISTHistoryData currentHisData = new CRISTHistoryData(
 					historyAction.get(i), historySituation.get(i),
 					historyContext.get(i));
 			historyList.add(currentHisData);
 		}
 	}
+*/
 }

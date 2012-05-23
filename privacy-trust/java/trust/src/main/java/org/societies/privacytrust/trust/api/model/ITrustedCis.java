@@ -27,7 +27,6 @@ package org.societies.privacytrust.trust.api.model;
 import java.util.Set;
 
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.impl.repo.model.Trust;
 
 /**
  * This interface represents trusted CISs. A <code>TrustedCis</code> object is
@@ -45,7 +44,7 @@ public interface ITrustedCis extends ITrustedEntity {
 	 * Returns a set containing the members of this community.
 	 * 
 	 * @return a set containing the members of this community.
-	 *
+	 */
 	public Set<ITrustedCss> getMembers();
 
 	/**
@@ -53,16 +52,14 @@ public interface ITrustedCis extends ITrustedEntity {
 	 * 
 	 * @param member
 	 *            the trusted individual to add to the members of this community
-	 *
-	public void addMember(final TrustedCss member);
 	 */
+	public void addMember(final ITrustedCss member);
 
 	/**
 	 * Removes the specified trusted individual from the members of this community.
 	 * 
 	 * @param member
 	 *            the trusted individual to remove from the members of this community
-	 *
-	public void removeMember(final ITrustedCss member);
 	 */
+	public void removeMember(final ITrustedCss member);
 }

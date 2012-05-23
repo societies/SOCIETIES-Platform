@@ -30,49 +30,50 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.OperatorConstants;
 
 public class CtxIdentifierCache {
 
-    Hashtable<IIdentity, Hashtable<String, CtxIdentifier>> dataOwner_cache;
+	Logger LOG = LoggerFactory.getLogger(CtxIdentifierCache.class);
+	Hashtable<String, CtxIdentifier> type_cache;
 
-    public CtxIdentifierCache(){
-        dataOwner_cache = new Hashtable<IIdentity, Hashtable<String, CtxIdentifier>>();
-    }
-    
-    public void cacheCtxIdentifiers(IIdentity dataOwner, Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history){
-        Iterator<CtxHistoryAttribute> history_it = history.keySet().iterator();
-        while(history_it.hasNext()){
-            CtxHistoryAttribute nextPrimary = (CtxHistoryAttribute)history_it.next();
-            List<CtxHistoryAttribute> context = (List<CtxHistoryAttribute>)history.get(nextPrimary);
-            Iterator<CtxHistoryAttribute> context_it = context.iterator();
-            while(context_it.hasNext()){
-                CtxHistoryAttribute nextAttr = (CtxHistoryAttribute)context_it.next();
-                storeCtxIdentifier(dataOwner, nextAttr.getType(), nextAttr.getId());
-            }
-        }
-    }
-    
-    public IPreferenceCondition getPreferenceCondition(IIdentity dpi, String parameterName, String value){
-        CtxAttributeIdentifier id = retrieveCtxIdentifier(dpi, parameterName);
-        IPreferenceCondition translated = new ContextPreferenceCondition(
-                id, 
-                OperatorConstants.EQUALS, 
-                value, 
-                parameterName);
-        
-        return translated;
-    }
-    
-    /*public IPreferenceTreeModel translateToCtxIdentifiers(IDigitalPersonalIdentifier dpi, IPreferenceTreeModel tree){
-        
+	public CtxIdentifierCache(){
+		type_cache = new Hashtable<String, CtxIdentifier>();
+	}
+
+	public void cacheCtxIdentifiers(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history){
+		Iterator<CtxHistoryAttribute> history_it = history.keySet().iterator();
+		while(history_it.hasNext()){
+			CtxHistoryAttribute nextPrimary = (CtxHistoryAttribute)history_it.next();
+			List<CtxHistoryAttribute> context = (List<CtxHistoryAttribute>)history.get(nextPrimary);
+			Iterator<CtxHistoryAttribute> context_it = context.iterator();
+			while(context_it.hasNext()){
+				CtxHistoryAttribute nextAttr = (CtxHistoryAttribute)context_it.next();
+				storeCtxIdentifier(nextAttr.getType(), nextAttr.getId());
+			}
+		}
+	}
+
+	public IPreferenceCondition getPreferenceCondition(String parameterName, String value){
+		CtxAttributeIdentifier id = retrieveCtxIdentifier(parameterName);
+		IPreferenceCondition translated = new ContextPreferenceCondition(
+				id, 
+				OperatorConstants.EQUALS, 
+				value, 
+				parameterName);
+
+		return translated;
+	}
+
+	/*public IPreferenceTreeModel translateToCtxIdentifiers(IDigitalPersonalIdentifier dpi, IPreferenceTreeModel tree){
+
         IPreference root = (IPreference)tree.getRootPreference();
         Enumeration<IPreference> preOrder = root.depthFirstEnumeration();
         preOrder.nextElement();  //ignore root
@@ -101,39 +102,27 @@ public class CtxIdentifierCache {
         return treeModel;
     }*/
 
-    /*
-     * Helper methods
-     */
-    private void storeCtxIdentifier(IIdentity dataOwner, String type, CtxIdentifier id){    
-        Hashtable<String, CtxIdentifier> type_cache = null;
-        if(dataOwner_cache.containsKey(dataOwner)){
-            //System.out.println("dpi_cache already contains dpi: "+dpi.toString());
-            type_cache = dataOwner_cache.get(dataOwner);
-            if(!type_cache.containsKey(type)){
-                //System.out.println("Storing "+type+" with CtxIdentifier: "+id.toString());
-                type_cache.put(type, id);
-            }
-        }else{
-            //System.out.println("DPI: "+dpi.toString()+" not found in dpi_cache, creating");
-            type_cache = new Hashtable<String, CtxIdentifier>();
-            //System.out.println("Storing "+type+" with CtxIdentifier: "+id.toString());
-            type_cache.put(type, id);
-            dataOwner_cache.put(dataOwner, type_cache);
-        }
-    }
+	/*
+	 * Helper methods
+	 */
+	private void storeCtxIdentifier(String type, CtxIdentifier id){    
+		if(!type_cache.containsKey(type)){
+			LOG.info("Storing "+type+" with CtxIdentifier: "+id.toString());
+			type_cache.put(type, id);
+		}
+	}
 
-    private CtxAttributeIdentifier retrieveCtxIdentifier(IIdentity dataOwner, String type){
-        CtxAttributeIdentifier id = null;
-        Hashtable<String, CtxIdentifier> type_cache = dataOwner_cache.get(dataOwner);
-        if(type_cache != null){
-            id = (CtxAttributeIdentifier)type_cache.get(type);
-            if(id == null){
-                System.out.println("Could not find an CtxIdentifier for this type: "+type);
-            }
-        }else{
-            System.out.println("Could not find a type_cache for this data owner: "+dataOwner.toString());
-        }
-        
-        return id;
-    }
+	private CtxAttributeIdentifier retrieveCtxIdentifier(String type){
+		CtxAttributeIdentifier id = null;
+		if(type_cache != null){
+			id = (CtxAttributeIdentifier)type_cache.get(type);
+			if(id == null){
+				LOG.error("Could not find a CtxIdentifier for this type: "+type);
+			}
+		}else{
+			LOG.error("type_cache is NULL");
+		}
+
+		return id;
+	}
 }

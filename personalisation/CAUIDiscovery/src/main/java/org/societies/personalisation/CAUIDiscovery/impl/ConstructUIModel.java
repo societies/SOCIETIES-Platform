@@ -1,20 +1,15 @@
 package org.societies.personalisation.CAUIDiscovery.impl;
 
-import java.io.IOException;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.util.SerialisationHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
@@ -23,100 +18,101 @@ import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
 public class ConstructUIModel {
 
+	private static Logger LOG = LoggerFactory.getLogger(ConstructUIModel.class);
 
 	private ICAUITaskManager cauiTaskManager;
-	private ICtxBroker ctxBroker;
+	//private ICtxBroker ctxBroker;
 
 	public ConstructUIModel(ICAUITaskManager cauiTaskManager,ICtxBroker ctxBroker ){
 		this.cauiTaskManager =  cauiTaskManager;
-		this.ctxBroker = ctxBroker;
+		//this.ctxBroker = ctxBroker;
 	}
 
 
-	public UserIntentModelData constructModel(LinkedHashMap<String,HashMap<String,Double>> transDictionary) {
+	private LinkedHashMap<String,HashMap<String,Double>> filterDictionary(LinkedHashMap<String,HashMap<String,Double>> dictionary, Double limit){
 
-		UserIntentModelData modelData = constructFakeModel();
-		//UserIntentModelData modelData = constructFakeModel(transDictionary);
+		LinkedHashMap<String,HashMap<String,Double>> filtered = new LinkedHashMap<String,HashMap<String,Double>>();
+		for(String actions : dictionary.keySet()){
+			HashMap<String,Double> transTargets = dictionary.get(actions);
+			System.out.println("Action:"+actions+ "| target: "+transTargets);
+			for(String targetAction : transTargets.keySet()){
+				if(transTargets.get(targetAction) >= limit){
+					filtered.put(actions, transTargets);
+				}
+			}
+		}
+		System.out.println("filterDictionary results for limit "+limit+ "| filtered: "+filtered);
+		return filtered;
+	}
+
+
+	public UserIntentModelData constructNewModel(LinkedHashMap<String,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap){
+
+		UserIntentModelData modelData = null;
+		//create all actions and assign context
+		for (String actionTemp : transDictionaryAll.keySet()){
+			String [] action = actionTemp.split("\\/");
+		//	LOG.info("1 paramName: "+action[0]+"paramValue: "+action[1]);
+
+			IUserIntentAction userAction = cauiTaskManager.createAction(null,"ServiceType",action[0],action[1]);
+		//	LOG.info("2 userAction created "+userAction);
+
+			if(ctxActionsMap.get(actionTemp)!=null){
+				List<String> contexValuesStringList = ctxActionsMap.get(actionTemp);
+				HashMap<String,Serializable> context = new HashMap<String,Serializable>();
+				for(String contextTypeValueConc : contexValuesStringList){
+					String [] contextTypeValue = contextTypeValueConc.split("=");
+					String contextType = contextTypeValue[0];
+					String contextValue = contextTypeValue[1];
+					context.put(contextType, contextValue);
+				}		
+				userAction.setActionContext(context);	
+			}
+		//	LOG.info("3 act id :"+userAction.getActionID()+" context :"+userAction.getActionContext());
+		}
+
+		// set links among actions
+	//	LOG.info("4 set links among actions");
+		for (String sourceActionConc : transDictionaryAll.keySet()){
+
+			String [] sourceAction = sourceActionConc.split("\\/");
+			List<IUserIntentAction> sourceActionList = cauiTaskManager.retrieveActionsByTypeValue(sourceAction[0],sourceAction[1]);
+		//	LOG.info("5 sourceActionList "+ sourceActionList);
+			IUserIntentAction sourceActionObj = sourceActionList.get(0);
+
+			HashMap<String,Double> targetActionsMap = transDictionaryAll.get(sourceActionConc);
+		//	LOG.info("6 targetActionsMap "+ targetActionsMap);
+			for(String targetActionString : targetActionsMap.keySet()){
+				String [] actionStringTarg = targetActionString.split("\\/");
+
+				Double transProb = targetActionsMap.get(targetActionString);
+			//	LOG.info("7a actionStringTarg[0] "+ actionStringTarg[0]);
+		//		LOG.info("7b actionStringTarg[1] "+ actionStringTarg[1]);
+
+				List<IUserIntentAction> actionObjTargetList = cauiTaskManager.retrieveActionsByTypeValue(actionStringTarg[0],actionStringTarg[1]);
+				// more than one target action might exist with the same param and value!!
+			//	LOG.info("8 actionObjTargetList "+ actionObjTargetList);
+				
+				if(actionObjTargetList.size()>0){
+					
+					IUserIntentAction targetActionObj = actionObjTargetList.get(0);
+			//		LOG.info("9 targetActionObj "+ targetActionObj);
+					cauiTaskManager.setActionLink(sourceActionObj, targetActionObj, transProb);	
+				}
+			}
+		}		 
+		modelData  = cauiTaskManager.retrieveModel();
+	//	LOG.info("10 modelData action model:"+ modelData.getActionModel());
 		return modelData;
+	}
+
+	public void printTransProbDictionary (LinkedHashMap<String,HashMap<String,Double>> transProbDictionary){
+
+		//System.out.println ("** ConstructUIModel ** total number of entries: " + transProbDictionary.size());
+		for(String actions : transProbDictionary.keySet()){
+			HashMap<String,Double> transTargets = transProbDictionary.get(actions);
+			System.out.println("Action:"+actions+ "| target: "+transTargets);
+		}
 	}	
-	
 
-
-
-	private UserIntentModelData constructFakeModel(){
-		//create Task A
-		IUserIntentAction userActionA = cauiTaskManager.createAction(null,"ServiceType","A-homePc","off");
-		IUserIntentAction userActionB = cauiTaskManager.createAction(null,"ServiceType","F-homePc","off");
-		IUserIntentAction userActionC = cauiTaskManager.createAction(null,"ServiceType","C-homePc","off");
-		IUserIntentAction userActionD = cauiTaskManager.createAction(null,"ServiceType","D-homePc","off");
-
-		List<IUserIntentAction> actionList = new ArrayList<IUserIntentAction>();
-		actionList.add(0,userActionA);
-		actionList.add(1,userActionB);
-		actionList.add(2,userActionC);
-		actionList.add(3,userActionD);
-
-		Double [][] actionMatrixA  = new Double[actionList.size()][actionList.size()] ;
-
-		for(int i=0; i<actionList.size();i++){
-			for (int j=0; j<actionList.size();j++){
-				actionMatrixA[i][j] = 0.0  ;
-			}
-		}
-
-		actionMatrixA[0][1]=1.0;
-		actionMatrixA[1][2]=1.0;
-		actionMatrixA[2][3]=1.0;
-
-		IUserIntentTask taskA = cauiTaskManager.createTask("TaskA", actionList, actionMatrixA);
-
-		cauiTaskManager.displayTask(taskA);
-
-
-		//create Task B
-		IUserIntentAction userActionE = cauiTaskManager.createAction(null,"ServiceType","A-homePc","on");
-		IUserIntentAction userActionF = cauiTaskManager.createAction(null,"ServiceType","F-homePc","off");
-		IUserIntentAction userActionG = cauiTaskManager.createAction(null,"ServiceType","G-homePc","off");
-		//IUserIntentAction userActionH = modelManager.createAction(null,"ServiceType","H-homePc","off");
-
-		List<IUserIntentAction> actionListB = new ArrayList<IUserIntentAction>();
-		actionListB.add(0,userActionE);
-		actionListB.add(1,userActionF);
-		actionListB.add(2,userActionG);
-		//actionListB.add(3,userActionH);
-		Double [][] actionMatrixB  = new Double[actionListB.size()][actionListB.size()] ;
-
-		for(int i=0; i<actionListB.size();i++){
-			for (int j=0; j<actionListB.size();j++){
-				actionMatrixB[i][j] = 0.0  ;
-			}
-		}
-
-		actionMatrixB[0][1]=0.5;
-		actionMatrixB[0][2]=0.5;
-		actionMatrixB[1][2]=1.0;
-		actionMatrixB[2][1]=1.0;
-		IUserIntentTask taskB = cauiTaskManager.createTask("TaskB", actionListB, actionMatrixB);
-		cauiTaskManager.displayTask(taskB);
-
-		// create model
-		List<IUserIntentTask> taskList = new ArrayList<IUserIntentTask>();
-		taskList.add(0,taskA);
-		taskList.add(1,taskB);
-
-		Double [][] taskMatrix = new Double[taskList.size()][taskList.size()] ;
-		for(int i=0; i<taskList.size();i++){
-			for (int j=0; j<taskList.size();j++){
-				taskMatrix[i][j] = 0.0  ;
-			}
-		}
-		taskMatrix[0][1] = 1.0;
-
-		UserIntentModelData modelData = cauiTaskManager.createModel(taskList, taskMatrix);
-		System.out.println("*********** modelData ******* getMatrix "+modelData.getMatrix()+" getTaskList"+modelData.getTaskList() );
-		cauiTaskManager.displayModel(modelData);
-		cauiTaskManager.updateModel(modelData);
-
-		return modelData;
-	}
 }

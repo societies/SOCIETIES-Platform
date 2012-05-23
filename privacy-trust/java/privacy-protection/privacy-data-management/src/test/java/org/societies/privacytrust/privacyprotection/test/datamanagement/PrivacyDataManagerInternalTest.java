@@ -39,6 +39,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
@@ -58,9 +59,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 // Run this test case using Spring jUnit
 @RunWith(SpringJUnit4ClassRunner.class)
 // Search context configuration file in classpath:<ClassName>-context.xml
-@ContextConfiguration
+@ContextConfiguration(locations = { "PrivacyDataManagerInternalTest-context.xml" })
 public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4SpringContextTests {
-	private static Logger log = LoggerFactory.getLogger(PrivacyDataManagerInternalTest.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerInternalTest.class.getSimpleName());
 	
 	@Autowired
 	IPrivacyDataManagerInternal privacyDataManagerInternal;
@@ -70,7 +71,6 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	 */
 	@Before
 	public void setUp() throws Exception {
-//		privacyDataManagerInternal = new PrivacyDataManagerInternal();
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@Test
 	@Rollback(true)
 	public void testGetPermission() {
-		log.info("### testGetPermission");
+		LOG.info("### testGetPermission");
 		boolean dataUpdated = false;
 		ResponseItem responseItem = null;
 		try {
@@ -102,12 +102,12 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			actions.add(new Action(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
-				log.info("privacyDataManagerInternal null");
+				LOG.info("privacyDataManagerInternal null");
 			}
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
 			responseItem = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
 		} catch (PrivacyException e) {
-			log.info("PrivacyException: testGetPermission", e);
+			LOG.info("PrivacyException: testGetPermission", e);
 		}
 		assertTrue("Data not updated", dataUpdated);
 		assertNotNull("ResponseItem permission can't be retrieved", responseItem);
@@ -119,7 +119,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@Test
 	@Rollback(true)
 	public void testUpdatePermission() {
-		log.info("### testUpdatePermission");
+		LOG.info("### testUpdatePermission");
 		boolean dataUpdated = false;
 		try {
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
@@ -132,11 +132,11 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			List<Action> actions = new ArrayList<Action>();
 			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
-				log.info("privacyDataManagerInternal null");
+				LOG.info("privacyDataManagerInternal null");
 			}
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
 		} catch (PrivacyException e) {
-			log.info("PrivacyException: testUpdatePermission 1", e);
+			LOG.info("PrivacyException: testUpdatePermission 1", e);
 		}
 		assertTrue(dataUpdated);
 	}
@@ -148,7 +148,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@Test
 	@Rollback(true)
 	public void testUpdatePermissionResponseItem() {
-		log.info("### testUpdatePermissionResponseItem");
+		LOG.info("### testUpdatePermissionResponseItem");
 		boolean dataUpdated = false;
 		try {
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
@@ -161,14 +161,14 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			List<Action> actions = new ArrayList<Action>();
 			Decision decision = Decision.PERMIT;
 			Resource resource = new Resource(dataId);
-			RequestItem requestItem = new RequestItem(resource, actions, null);
+			RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
 			ResponseItem permission = new ResponseItem(requestItem, decision);
 			if (null == privacyDataManagerInternal) {
-				log.info("privacyDataManagerInternal null");
+				LOG.info("privacyDataManagerInternal null");
 			}
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, permission);
 		} catch (PrivacyException e) {
-			log.info("PrivacyException: testUpdatePermission 1", e);
+			LOG.info("PrivacyException: testUpdatePermission 1", e);
 		}
 		assertTrue(dataUpdated);
 	}
@@ -179,7 +179,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@Test
 	@Rollback(true)
 	public void testDeletePermission() {
-		log.info("### testDeletePermission");
+		LOG.info("### testDeletePermission");
 		boolean dataUpdated = false;
 		boolean dataDeleted = false;
 		ResponseItem responseItem = null;
@@ -194,13 +194,13 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			List<Action> actions = null;
 			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
-				log.info("privacyDataManagerInternal null");
+				LOG.info("privacyDataManagerInternal null");
 			}
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
 			dataDeleted = privacyDataManagerInternal.deletePermission(requestor, ownerId, dataId);
 			responseItem = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
 		} catch (PrivacyException e) {
-			log.info("PrivacyException: testDeletePermission", e);
+			LOG.info("PrivacyException: testDeletePermission", e);
 		}
 		assertTrue("Privacy permission not added", dataUpdated);
 		assertTrue("Privacy permission not deleted", dataDeleted);
@@ -208,19 +208,10 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	}
 
 	
-	/**
-	 * @return the privacyDataManagerInternal
-	 */
-	public IPrivacyDataManagerInternal getPrivacyDataManagerInternal() {
-		return privacyDataManagerInternal;
-	}
-
-	/**
-	 * @param privacyDataManagerInternal the privacyDataManagerInternal to set
-	 */
 	public void setPrivacyDataManagerInternal(
 			IPrivacyDataManagerInternal privacyDataManagerInternal) {
-		log.info("privacyDataManagerInternal injected");
 		this.privacyDataManagerInternal = privacyDataManagerInternal;
+		LOG.info("[Dependency Injection] PrivacyDataManagerInternal injected");
 	}
+	
 }

@@ -9,7 +9,7 @@
 		We've kept the osgi definitions in a separate configuration file so that 
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
-
+ 
 	<bean id="pcm"
 		class="org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor"
 		name="pcm" init-method="initialisePreferenceManagement">
@@ -31,6 +31,7 @@
 		<property name="persoMgr" ref="persoMgr"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="cauiDiscovery" ref="cauiDiscovery"></property>
+		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
 	</bean>
 
 	<bean id="cauiDiscovery"
@@ -78,6 +79,8 @@
 	<bean id="dianne" class="org.societies.personalisation.dianne.DIANNE"
 		name="dianne" init-method="initialiseDIANNELearning">
 		<property name="persoMgr" ref="persoMgr"></property>
+		<property name="ctxBroker" ref="ctxBroker"></property>
+		<property name="commsMgr" ref="commsMgr"></property>
 	</bean>
 
 
@@ -86,7 +89,6 @@
 		name="userPrefLearning" depends-on="ctxBroker" init-method="initialiseUserPreferenceLearning">
 		<property name="ctxBroker" ref="ctxBroker"></property>
 	</bean>
-
 
 	<!-- <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->
 </beans>

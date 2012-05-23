@@ -54,7 +54,7 @@
         <property name="dataSource" ref="societiesDataSource" />
         <property name="annotatedClasses" >
             <list>
-                <value>org.societies.cis.manager.CisEditor</value>
+                <value>org.societies.cis.manager.Cis</value>
                 <value>org.societies.cis.manager.CisRecord</value>
                 <value>org.societies.cis.manager.CisParticipant</value>
                 <value>org.societies.activity.model.Activity</value>
@@ -66,6 +66,7 @@
 
             <list>
                 <value>org.societies.cis.manager</value>
+                <value>org.societies.cis.activity</value>
             </list>
         </property>
 
@@ -87,7 +88,15 @@
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
-    <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" >
+    <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" init-method="init">
         <property name="sessionFactory" ref="sessionFactory" />
+        <property name="ccmFactory" ref="cisCommMgrFactory"/>
+        <property name="iCommMgr" ref="xcCommunication"/>
     </bean>
+    
+   <!-- <bean id="CisClientService" 
+    	class="org.societies.cis.manager.CisManagerClient">
+    	<constructor-arg ref="CisManagementBundle"/>
+    </bean>-->
+    
 </beans>

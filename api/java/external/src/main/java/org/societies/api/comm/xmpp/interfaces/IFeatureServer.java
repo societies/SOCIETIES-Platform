@@ -38,7 +38,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * @author Joao M. Goncalves (PTIN), Miquel Martin (NEC)
  * 
  * This is the interface that the bundles that deal with a specific XMPP namespace or feature (in XEP-0030 terminology) need to
- * implement. It defines methods for getting information and delivering messages. 
+ * implement. It defines methods for getting information and delivering messages.
  * A FeatureServer is able to receive and process messages that refer to the
  * namespace it registered using {@link ICommManager#register(FeatureServer)}
  * 
@@ -50,29 +50,50 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  */
 @SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface IFeatureServer {
+	
 	/**
 	 * Get the xml namespaces for this FeatureServer. This will be used in the
 	 * XMPP payloads.
+	 *
+	 * @return the XML namespaces
 	 */
 	List<String> getXMLNamespaces();
 
 	/**
 	 * Get the java package to which the objects this feature deals with belong.
+	 *
+	 * @return the java packages
 	 */
 	List<String> getJavaPackages();
 
+	
 	/**
-	 * MISSING_JAVADOCS
+	 * Receive message.
+	 *
+	 * @param stanza the stanza
+	 * @param payload the payload
 	 */
 	void receiveMessage(Stanza stanza, Object payload);
 
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Gets the query.
+	 *
+	 * @param stanza the stanza
+	 * @param payload the payload
+	 * @return the query
+	 * @throws XMPPError the XMPP error
 	 */
 	Object getQuery(Stanza stanza, Object payload) throws XMPPError;
 	
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Sets the query.
+	 *
+	 * @param stanza the stanza
+	 * @param payload the payload
+	 * @return the object
+	 * @throws XMPPError the xMPP error
 	 */
 	Object setQuery(Stanza stanza, Object payload) throws XMPPError;
 }

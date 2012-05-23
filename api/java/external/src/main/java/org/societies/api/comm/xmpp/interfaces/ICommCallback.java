@@ -35,51 +35,72 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
+ * The Interface ICommCallback.
+ *
  * @author Miquel Martin (NEC)
  * 
  * Implementors of this interface are meant to process the replies resulting
  * from {@link Stanza} messages of the IQ type.
- * 
  */
 @SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface ICommCallback {
 	
+	/**
+	 * Gets the XML namespaces which this feature handles.
+	 *
+	 * @return the XML namespaces
+	 */
 	List<String> getXMLNamespaces();
 
 	/**
 	 * Get the java package to which the objects this feature deals with belong.
+	 *
+	 * @return the java packages
 	 */
 	List<String> getJavaPackages();
 	
 	/**
-	 * Receive a result
-	 * 
-	 * @param stanza
-	 *            information regarding the stanza that wrapped the payload
-	 *            (e.g. To/From IDs)
-	 * @param payload
-	 *            the payload of the result message
+	 * Receive a result.
+	 *
+	 * @param stanza information regarding the stanza that wrapped the payload
+	 * (e.g. To/From IDs)
+	 * @param payload the payload of the result message
 	 */
 	void receiveResult(Stanza stanza, Object payload);
 
 	/**
-	 * Receive an error
-	 * 
-	 * @param stanza
-	 *            information regarding the error stanza (e.g. To/From IDs)
+	 * Receive an error.
+	 *
+	 * @param stanza information regarding the error stanza (e.g. To/From IDs)
+	 * @param error the error
 	 */
 	void receiveError(Stanza stanza, XMPPError error);
 	
 	/**
-	 * MISSING_JAVADOCS
+	 * Receive Info
+	 *
+	 * @param stanza the stanza
+	 * @param node the node
+	 * @param info the info
 	 */
 	void receiveInfo(Stanza stanza, String node, XMPPInfo info);
+	
 	/**
-	 * MISSING_ANNOTATION
+
+	 * Receive Items
+	 *
+	 * @param stanza the stanza
+	 * @param node the node
+	 * @param items the items
 	 */
 	void receiveItems(Stanza stanza, String node, List<String> items);
+	
 	/**
-	 * MISSING_JAVADOCS
+	 * Receive a Message
+	 *
+	 * @param  stanza information regarding the stanza that wrapped the payload
+	 * (e.g. To/From IDs)
+	 * @param payload the payload of the message
 	 */
 	void receiveMessage(Stanza stanza, Object payload);
 }

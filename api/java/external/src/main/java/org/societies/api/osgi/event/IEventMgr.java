@@ -25,14 +25,16 @@
 package org.societies.api.osgi.event;
 
 import org.osgi.service.event.EventConstants;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * 
+ * Interface to the Event manager class
  * @author pkuppuud
  *
  */
-/**
- * MISSING_ANNOTATION
- */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IEventMgr {
 
 	/**

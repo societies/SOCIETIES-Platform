@@ -101,7 +101,8 @@ public class PrivateContextCache {
 			List<CtxIdentifier> attrList = futureAttrList.get();
 			if (attrList.size()>0){
 				CtxIdentifier id = (CtxIdentifier) attrList.get(0);
-				CtxAttribute attr =  (CtxAttribute) broker.retrieve(id);
+				
+				CtxAttribute attr =  (CtxAttribute) broker.retrieve(id).get();
 				String val = attr.getStringValue();
 				this.mapping.put(type, id);
 				this.cache.put(id,val);
@@ -122,7 +123,7 @@ public class PrivateContextCache {
 		this.printCache();
 		this.logging.debug("contacting context DB for retrieving id"+id.toUriString());
 		try {
-			CtxAttribute attr = (CtxAttribute) broker.retrieve(id);
+			CtxAttribute attr = (CtxAttribute) broker.retrieve(id).get();
 			if (null!=attr){
 				this.logging.debug ("found id: "+id.toUriString()+" in context DB");
 				String val = attr.getStringValue();
@@ -145,6 +146,12 @@ public class PrivateContextCache {
 				this.logging.debug("id :"+id.toUriString()+" not found in context DB");
 			}
 		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

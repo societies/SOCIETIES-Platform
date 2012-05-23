@@ -3,14 +3,17 @@ package org.societies.impl;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.MissingResourceException;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jivesoftware.smack.AccountManager;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -22,21 +25,18 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.provider.IQProvider;
-import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.DiscoverItems;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.interfaces.Callback;
 import org.societies.interfaces.XMPPAgent;
-import org.societies.utilities.DBC.Dbc;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
 import android.util.Log;
 
 
@@ -49,53 +49,13 @@ public class XMPPClient implements XMPPAgent {
 	private int usingConnectionCounter = 0;
 	private ProviderElementNamespaceRegistrar providerRegistrar = new ProviderElementNamespaceRegistrar();
 	private RawXmlProvider rawXmlProvider = new RawXmlProvider();
+	private Configuration defaultConfig;
 	
 	public XMPPClient(ResourceBundle configutationBundle) {
 		
-		String server = configutationBundle.getString("server");
-		int port = Integer.parseInt(configutationBundle.getString("port"));
-		username = configutationBundle.getString("username");
-		password = configutationBundle.getString("password");
-		resource = configutationBundle.getString("resource");
-		boolean debug;
-		try {
-			debug = configutationBundle.getString("debug").equalsIgnoreCase("true");
-		} catch(MissingResourceException e) {
-			debug = false;
-		}
+		defaultConfig = new Configuration(configutationBundle);
 		
-		ConnectionConfiguration config = new ConnectionConfiguration(server, port, server);
-
-		connection = new XMPPConnection(config);
-		
-		if(debug) {
-			connection.addPacketListener(new PacketListener() {
-	
-				public void processPacket(Packet packet) {
-					Log.d(LOG_TAG, "Packet received: " + packet.toXML());
-				}
-				
-			}, new PacketFilter() {
-	
-				public boolean accept(Packet packet) {
-					return true;
-				}
-				
-			});
-			connection.addPacketSendingListener(new PacketListener() {
-	
-				public void processPacket(Packet packet) {
-					Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
-				}
-				
-			}, new PacketFilter() {
-	
-				public boolean accept(Packet packet) {
-					return true;
-				}
-				
-			});
-		}
+		loadDefaultConfig();
 	}
 	
 	public void register(String[] elementNames, String[] namespaces, final Callback callback) {
@@ -116,21 +76,18 @@ public class XMPPClient implements XMPPAgent {
 				}			
 			}, new AndFilter(new PacketTypeFilter(Message.class), new NamespaceFilter(namespaces)));
 		} catch (XMPPException e) {
-			throw new RuntimeException(e);
+			Log.e(LOG_TAG, e.getMessage(), e);
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 	
-	@Override
 	public void unregister(String[] elementNames, String[] namespaces) {
-		ProviderManager pmgr = ProviderManager.getInstance();	
-		
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
 				ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple = new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]);		
 				providerRegistrar.unregister(tuple);
 				if(!providerRegistrar.isRegistered(tuple)) { 
-					ProviderManager.getInstance().removeIQProvider(tuple.elementName, tuple.namespace);
-					ProviderManager.getInstance().removeExtensionProvider(tuple.elementName, tuple.namespace);
+					removeProviders(tuple);
 				}
 			}
 		}
@@ -138,7 +95,20 @@ public class XMPPClient implements XMPPAgent {
 		disconnect();
 	}
 	
-	@Override
+	public boolean UnRegisterCommManager() {
+		Set<ProviderElementNamespaceRegistrar.ElementNamespaceTuple> tuples = providerRegistrar.getRegists();
+		for(ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple:tuples) {
+			removeProviders(tuple);
+		}
+		providerRegistrar.clear();
+		return true;
+	}
+	
+	private void removeProviders(ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple) {
+		ProviderManager.getInstance().removeIQProvider(tuple.elementName, tuple.namespace);
+		ProviderManager.getInstance().removeExtensionProvider(tuple.elementName, tuple.namespace);
+	}
+	
 	public void sendMessage(String messageXml) {
 		try {
 			connect();	
@@ -147,17 +117,16 @@ public class XMPPClient implements XMPPAgent {
 		
 			disconnect();
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			Log.d(LOG_TAG, e.getMessage(), e);
+			throw new RuntimeException(e.getMessage());
 		}
 	}	
 
-	@Override
 	public void sendIQ(String xml, final Callback callback) {
 		try {
 			connect(); 
 			
 			PacketListener packetListener = new PacketListener() {
-				@Override
 				public void processPacket(Packet packet) {
 					IQ iq = (IQ)packet;
 					connection.removePacketListener(this);
@@ -181,7 +150,8 @@ public class XMPPClient implements XMPPAgent {
 			connection.sendPacket(createPacketFromXml(xml));		
 			
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			Log.e(LOG_TAG, e.getMessage(), e);
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 	
@@ -192,7 +162,8 @@ public class XMPPClient implements XMPPAgent {
 			disconnect();			
 			return identity;
 		} catch (XMPPException e) {
-			throw new RuntimeException(e.getMessage(), e);
+			Log.e(LOG_TAG, e.getMessage(), e);
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 	
@@ -231,7 +202,8 @@ public class XMPPClient implements XMPPAgent {
 			
 			return discoItems.getPacketID();
 		} catch (XMPPException e) {
-			throw new CommunicationException(e.getMessage(), e);
+			Log.e(LOG_TAG, e.getMessage(), e);
+			throw new CommunicationException(e.getMessage());
 		}
 	}
 	
@@ -303,5 +275,132 @@ public class XMPPClient implements XMPPAgent {
 
 	public Boolean isConnected() {
 		return connection.isConnected();
+	}
+	
+	public String newMainIdentity(String identifier, String domain, String password) throws CommunicationException { // TODO this takes no credentials in a private/public key case
+
+		String serverHost = domain;
+		int port = defaultConfig.getPort();
+		String serviceName = domain;
+		
+		try {
+			if(connection.isConnected() && connection.getHost().equals(serverHost) && connection.getPort()==port && connection.getServiceName().equals(serviceName)) {
+				createAccount(connection, identifier, password);
+			}
+			else {
+				ConnectionConfiguration config = new ConnectionConfiguration(domain, port, domain);
+				Connection newIdConnection = new XMPPConnection(config);			
+				newIdConnection.connect();
+				createAccount(newIdConnection, identifier, password);
+				newIdConnection.disconnect();
+			}
+		} catch (XMPPException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			throw new CommunicationException(e.getMessage());
+		}		
+		
+		return username(identifier, domain) + "/" + resource;
+	}
+	
+	private void createAccount(Connection connection, String username, String password) throws XMPPException {
+		AccountManager accountMgr = connection.getAccountManager();
+		Map<String, String> attributes = new HashMap<String, String>();
+		attributes.put("username", username);
+		attributes.put("password", password);
+		accountMgr.createAccount(username, password, attributes);
+	}
+	
+	public String login(String identifier, String domain, String password) {
+		if(isConnected())
+			logout();
+		String username = username(identifier, domain);
+		loadConfig(domain, username, password);
+		try {
+			connect();
+			return username + "/" + resource;
+		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			return null;
+		}
+	}	
+	
+	public String loginFromConfig() {
+		if(isConnected())
+			logout();
+		loadDefaultConfig();
+		try {
+			connect();
+			return username + "/" + resource;
+		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			return null;
+		}
+	}
+	
+	private String username(String identifier, String domain) {
+		return identifier + "@" + domain;
+	}
+	
+	public boolean logout() {
+		UnRegisterCommManager();		
+		connection.disconnect();
+		usingConnectionCounter = 0;
+		return true;
+	}
+	
+	public boolean destroyMainIdentity() {
+		return false; // http://code.google.com/p/asmack/issues/detail?id=63
+//		try {
+//			connection.getAccountManager().deleteAccount();
+//			return true;			
+//		} catch (Exception e) {
+//			Log.e(LOG_TAG, e.getMessage(), e);
+//			return false;
+//		}
+	}
+	
+	private void loadDefaultConfig() {		
+		loadConfig(defaultConfig.getServer(), defaultConfig.getUsername(), defaultConfig.getPassword());
+	}
+	
+	private void loadConfig(String server, String username, String password) {
+		int port = defaultConfig.getPort();
+		this.username = username;
+		this.password = password;
+		resource = defaultConfig.getResource();
+		boolean debug = defaultConfig.getDebug();
+		
+		ConnectionConfiguration config = new ConnectionConfiguration(server, port, server);
+
+		connection = new XMPPConnection(config);
+		
+		if(debug) {
+			connection.addPacketListener(new PacketListener() {
+	
+				public void processPacket(Packet packet) {
+					Log.d(LOG_TAG, "Packet received: " + packet.toXML());
+				}
+				
+			}, new PacketFilter() {
+	
+				public boolean accept(Packet packet) {
+					return true;
+				}
+				
+			});
+			connection.addPacketSendingListener(new PacketListener() {
+	
+				public void processPacket(Packet packet) {
+					Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
+				}
+				
+			}, new PacketFilter() {
+	
+				public boolean accept(Packet packet) {
+					return true;
+				}
+				
+			});
+		}
 	}
 }

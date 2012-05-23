@@ -32,6 +32,10 @@ public class ProviderElementNamespaceRegistrar {
 		return providersElementsAndNamespaces.keySet().contains(tuple);
 	}
 	
+	public void clear() {
+		providersElementsAndNamespaces.clear();
+	}
+	
 	public Set<ElementNamespaceTuple> getRegists() {
 		return providersElementsAndNamespaces.keySet();
 	}

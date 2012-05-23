@@ -27,14 +27,17 @@ package org.societies.cis.manager;
 
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -46,16 +49,22 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisParticipant;
+import org.societies.api.cis.management.ICis;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
+
 import static org.mockito.Mockito.*;
 
 /**
@@ -65,6 +74,7 @@ import static org.mockito.Mockito.*;
  *
  */
 //@RunWith(PowerMockRunner.class)
+  
 @PrepareForTest( { ActivityFeed.class })
 @ContextConfiguration(locations = { "../../../../CisManagerTest-context.xml" })
 public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTests {
@@ -91,6 +101,20 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	public static final String TEST_CIS_NAME_2 = "Santos Futebol Clube";
 	public static final String TEST_CISID_3 = "palmeiras.societies.local";
 	public static final String TEST_CIS_NAME_3 = "Palmeiras Futebol Clube";
+	
+	public static final String MEMBER_JID_1 = "zico@flamengo.com";
+	public static final String MEMBER_ROLE_1 = "participant";
+
+	public static final String MEMBER_JID_2 = "romario@vasco.com";
+	public static final String MEMBER_ROLE_2 = "participant";
+
+	public static final String MEMBER_JID_3 = "pele@santos.com";
+	public static final String MEMBER_ROLE_3 = "admin";
+
+	
+	public static final String INVALID_USER_JID = "invalid";
+	public static final String INVALID_ROLE = "invalid";
+	
 	
 	IIdentityManager mockIICisManagerId;
 	INetworkNode testCisManagerId;
@@ -153,11 +177,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		// mocking the activity feed static methods
 		PowerMockito.mockStatic(ActivityFeed.class);
-		this.session = sessionFactory.openSession();
+		//this.session = sessionFactory.openSession();
 		System.out.println("in setup! cisManagerUnderTest.getSessionFactory(): "+sessionFactory);
 		ActivityFeed.setStaticSessionFactory(sessionFactory);
 		//cisManagerUnderTest.setSessionFactory(sessionFactory);
-//		Mockito.when(ActivityFeed.startUp(anyString())).thenReturn(new ActivityFeed());
+		//cisManagerUnderTest.setSessionFactory(sessionFactory);
+		//Mockito.when(ActivityFeed.startUp(anyString())).thenReturn(new ActivityFeed());
 		setUpFactory();
 		
 	}
@@ -167,22 +192,27 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockCcmFactory = null;
 		mockCSSendpoint = null;
 		testCisManagerId = null;
+		
+		//sessionFactory.getCurrentSession().close();
+		//if(sessionFactory.getCurrentSession()!=null)
+		//	sessionFactory.getCurrentSession().disconnect();
 
 	}
-
 	@Test
 	public void testConstructor() {
 
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory);
+		cisManagerUnderTest.init();
+		
 		assertEquals(TEST_GOOD_JID, cisManagerUnderTest.cisManagerId.getJid());
 	}
-
 	@Test
 	public void testCreateCIS() {
 		
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
-		cisManagerUnderTest.setSession(this.session);
-		ActivityFeed.setSession(this.session);
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
 		
 		Future<ICisOwned> testCIS = cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE);
@@ -199,13 +229,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 	
 	}
-	//@Ignore
 	@Test
 	public void testListCIS() throws InterruptedException, ExecutionException {
 
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
-		cisManagerUnderTest.setSession(this.session);
-		ActivityFeed.setSession(this.session);
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
 		
 		ICisOwned[] ciss = new ICisOwned [3]; 
 		int[] cissCheck = {0,0,0};
@@ -217,11 +246,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ciss[2] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
 				TEST_CIS_NAME_3, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 
-		List<ICisRecord> l = cisManagerUnderTest.getCisList();
-		Iterator<ICisRecord> it = l.iterator();
+		List<ICisOwned> l = cisManagerUnderTest.getListOfOwnedCis();
+		Iterator<ICisOwned> it = l.iterator();
 		 
 		while(it.hasNext()){
-			 ICisRecord element = it.next();
+			ICisOwned element = it.next();
 			 assertEquals(element.getOwnerId(),TEST_CSSID);
 			 for(int i=0;i<ciss.length;i++){
 				 if(element.getName().equals(ciss[i].getName()) 
@@ -242,13 +271,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 }
 	
 	}
-
 	@Test
 	public void testdeleteCIS() throws InterruptedException, ExecutionException {
 
-		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
-		cisManagerUnderTest.setSession(this.session);
-		ActivityFeed.setSession(this.session);
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
 		
 		
 		ICisOwned[] ciss = new ICisOwned [2]; 
@@ -259,9 +287,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ciss[1] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
 				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
-		List<ICisRecord> l = cisManagerUnderTest.getCisList();
-		Iterator<ICisRecord> it = l.iterator();
-		ICisRecord element = it.next(); 
+		List<ICis> l = cisManagerUnderTest.getCisList();
+		Iterator<ICis> it = l.iterator();
+		ICis element = it.next(); 
 		jidTobeDeleted = element.getCisId();
 		
 		cisManagerUnderTest.deleteCis(jidTobeDeleted, "", "");
@@ -283,5 +311,68 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 	
+	//@Rollback
+	@Test
+	public void testAddMemberToOwnedCIS() throws InterruptedException, ExecutionException {
+
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
+		
+		ICisOwned Iciss =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+
+		try {
+			assertEquals(true,Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get());
+			assertEquals(true,Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2).get());
+			assertEquals(false,Iciss.addMember(MEMBER_JID_3, INVALID_ROLE).get());
+			// assertEquals(false,Iciss.addMember(INVALID_USER_JID, MEMBER_ROLE_3).get());  NOT USE OF TESTING THAT AS IDENTITY MANAGER HAS BEEN MOCKED
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 		
+	
+	}
+	@Test
+	public void listdMembersOnOwnedCIS() throws InterruptedException, ExecutionException {
+
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.init();
+		ICisOwned Iciss =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				
+		try {
+			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get();
+			Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2).get();
+			Iciss.addMember(MEMBER_JID_3, MEMBER_ROLE_3).get();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		int[] memberCheck = {0,0,0};
+		
+		Set<ICisParticipant> l = (Iciss.getMemberList()).get();
+		Iterator<ICisParticipant> it = l.iterator();
+		 
+		while(it.hasNext()){
+			ICisParticipant element = it.next();
+			if(element.getMembersJid().equals(MEMBER_JID_1) && element.getMembershipType().equals(MEMBER_ROLE_1))
+				memberCheck[0] = 1;
+			if(element.getMembersJid().equals(MEMBER_JID_2) && element.getMembershipType().equals(MEMBER_ROLE_2))
+				memberCheck[1] = 1;	
+			if(element.getMembersJid().equals(MEMBER_JID_3) && element.getMembershipType().equals(MEMBER_ROLE_3))
+				memberCheck[2] = 1;	
+
+	     }
+		
+		// check if it found all matching CISs
+		 for(int i=0;i<memberCheck.length;i++){
+			 assertEquals(memberCheck[i], 1);
+		 }	
+	
+	}
 	
 }

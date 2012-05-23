@@ -124,13 +124,14 @@ public class ContextStorageTest {
 				LOG.error("Person entity is NULL");
 			}
 			Assert.assertNotNull(person);
-
-			Set<CtxAssociationIdentifier> usesServiceAssocIDs = person.getAssociations(CtxAssociationTypes.USES_SERVICE);
+			LOG.info("PERSON entity ID is: "+person.getId());
+			
+			Set<CtxAssociationIdentifier> usesServiceAssocIDs = person.getAssociations(CtxAssociationTypes.USES_SERVICES);
 			if(usesServiceAssocIDs == null){
 				LOG.error("USES_SERVICE association IDs in null");
 			}
 			if(usesServiceAssocIDs.size() != 1){
-				LOG.error("Incorrect number of USES_SERVICE association IDs :"+usesServiceAssocIDs.size());
+				LOG.error("Incorrect number of USES_SERVICES association IDs :"+usesServiceAssocIDs.size());
 			}
 			Assert.assertNotNull(usesServiceAssocIDs);
 			Assert.assertTrue(usesServiceAssocIDs.size() == 1);
@@ -194,7 +195,7 @@ public class ContextStorageTest {
 			Assert.assertEquals(serviceId1.getIdentifier(), actualServiceId);
 
 			//check service HAS_PARAMETER associations
-			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
+			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS);
 			if(hasParamIDs == null){
 				LOG.error("1) NULL - no HAS_PARAMETER associations for SERVICE entity");
 			}
@@ -232,15 +233,6 @@ public class ContextStorageTest {
 
 					LOG.info("1) "+action3+" should be the same as "+actualAction);
 					Assert.assertEquals(action3, actualAction);
-				}else if(nextAttr.getType().equals("tuple_volume")){
-					//ignore
-				}else if(nextAttr.getType().equals("tupleIds_volume")){
-					//ignore
-				}else{ //unknown parameter!
-
-					LOG.error("1) received unknown attribute type: "+nextAttr.getType());
-					Assert.fail("Unknown parameter type for serviceId1");
-
 				}
 			}
 		} catch (CtxException e) {
@@ -296,7 +288,7 @@ public class ContextStorageTest {
 			Assert.assertEquals(serviceId2.getIdentifier(), actualServiceId);
 
 			//check service HAS_PARAMETER associations
-			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
+			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS);
 			if(hasParamIDs == null){
 				LOG.error("2) NULL - no HAS_PARAMETER associations for SERVICE entity");
 			}
@@ -343,14 +335,6 @@ public class ContextStorageTest {
 						}
 					}else if(nextAttr.getType().equals(CtxAttributeTypes.LAST_ACTION)){
 						actualAction = (IAction)SerialisationHelper.deserialise(nextAttr.getBinaryValue(), this.getClass().getClassLoader());
-					}else if(nextAttr.getType().equals("tuple_volume")){
-						//ignore
-					}else if(nextAttr.getType().equals("tupleIds_volume")){
-						//ignore
-					}else{ //unknown parameter!
-
-						LOG.error("2) received unknown attribute type: "+nextAttr.getType());
-						Assert.fail("Unknown parameter type for serviceId2");
 					}
 				}
 				LOG.info("2) Expected LAST_ACTION: "+expectedAction+", should equal actual LAST_ACTION: "+actualAction);

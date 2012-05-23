@@ -25,7 +25,6 @@
 
 package org.societies.personalisation.UserPreferenceLearning.impl;
 
-import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
@@ -38,7 +37,6 @@ import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
 public class PostProcessor 
 {
 	public IPreferenceTreeModel process(
-			IIdentity dataOwner, 
 			String paramName, 
 			String treeString, 
 			CtxIdentifierCache cache,
@@ -68,7 +66,7 @@ public class PostProcessor
 						String leafString = tmp[1].trim();
 
 						IPreference branch = 
-								new PreferenceTreeNode(createCondition(dataOwner, branchString, cache));
+								new PreferenceTreeNode(createCondition(branchString, cache));
 						IPreference leaf = 
 								new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
 
@@ -81,7 +79,7 @@ public class PostProcessor
 						currentLevel ++;
 					}else{
 						IPreference branch = 
-								new PreferenceTreeNode(createCondition(dataOwner, nextLine, cache));
+								new PreferenceTreeNode(createCondition(nextLine, cache));
 
 						//add branch
 						currentNode.add(branch);
@@ -96,7 +94,7 @@ public class PostProcessor
 							String leafString = tmp[1].trim();
 
 							IPreference branch = 
-									new PreferenceTreeNode(createCondition(dataOwner, branchString, cache));
+									new PreferenceTreeNode(createCondition(branchString, cache));
 							IPreference leaf = 
 									new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
 
@@ -112,7 +110,7 @@ public class PostProcessor
 							currentLevel ++;
 						}else{
 							IPreference branch = 
-									new PreferenceTreeNode(createCondition(dataOwner, nextLine, cache));
+									new PreferenceTreeNode(createCondition(nextLine, cache));
 
 							//get parent node to add branch
 							currentNode = 
@@ -130,7 +128,7 @@ public class PostProcessor
 								String leafString = tmp[1].trim();
 
 								IPreference branch = 
-										new PreferenceTreeNode(createCondition(dataOwner, branchString, cache));
+										new PreferenceTreeNode(createCondition(branchString, cache));
 								IPreference leaf = 
 										new PreferenceTreeNode(createOutcome(paramName, leafString, serviceId, serviceType));
 
@@ -153,7 +151,7 @@ public class PostProcessor
 								currentLevel ++;
 							}else{
 								IPreference branch = 
-										new PreferenceTreeNode(createCondition(dataOwner, nextLine, cache));
+										new PreferenceTreeNode(createCondition(nextLine, cache));
 
 								//move back up the tree
 								while(currentLevel > level){
@@ -179,6 +177,8 @@ public class PostProcessor
 		//Add tree to return list
 		IPreferenceTreeModel newTree = new PreferenceTreeModel(root);
 		newTree.setPreferenceName(paramName);
+		newTree.setServiceID(serviceId);
+		newTree.setServiceType(serviceType);
 
 		return newTree;
 	}
@@ -192,14 +192,14 @@ public class PostProcessor
 		return false;
 	}
 
-	private IPreferenceCondition createCondition(IIdentity dataOwner, String temp, CtxIdentifierCache cache){
+	private IPreferenceCondition createCondition(String temp, CtxIdentifierCache cache){
 
 		System.out.println("Creating condition from String: "+temp);
 		String noBars = removeChar(temp, '|');
 		noBars.trim();
 		String[] tuple = noBars.split("=");
 		//IAction action = new Action(ServiceResourceIdentifier, ServiceType, tuple[0].trim(), tuple[1].trim());
-		IPreferenceCondition condition = cache.getPreferenceCondition(dataOwner, tuple[0].trim(), tuple[1].trim());
+		IPreferenceCondition condition = cache.getPreferenceCondition(tuple[0].trim(), tuple[1].trim());
 
 		return condition;
 	}

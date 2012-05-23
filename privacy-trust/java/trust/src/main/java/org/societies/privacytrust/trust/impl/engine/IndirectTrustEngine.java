@@ -27,7 +27,6 @@ package org.societies.privacytrust.trust.impl.engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
-import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,21 +35,15 @@ import org.springframework.stereotype.Service;
  * @since 0.0.8
  */
 @Service
-public class IndirectTrustEngine {
+public class IndirectTrustEngine extends TrustEngine {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(IndirectTrustEngine.class);
 	
-	/** The Trust Event Mgr service reference. */
-	private ITrustEventMgr trustEventMgr;
-	
-	/** The Trust Repository service reference. */
-	@Autowired
-	private ITrustRepository trustRepo;
-	
 	@Autowired
 	IndirectTrustEngine(ITrustEventMgr trustEventMgr) {
 		
+		super(trustEventMgr);
 		LOG.info(this.getClass() + " instantiated");
 	}
 }

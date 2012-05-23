@@ -27,8 +27,6 @@ package org.societies.privacytrust.trust.impl.repo.model;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.Type;
@@ -45,25 +43,18 @@ public abstract class Trust implements ITrust {
 
 	private static final long serialVersionUID = 3965922195661451444L;
 	
-	/* The surrogate key used by Hibernate. */
-	@Id
-	@GeneratedValue
-	@Column(name = "id")
-	@SuppressWarnings("unused")
-	private long id;
-	
 	@Column(name = "value")
 	private Double value;
 	
-	@Column(name = "lastModified")
-	@Type(type="org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
+	@Column(name = "last_modified")
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
 	private Date lastModified;
 	
-	@Column(name = "lastUpdated")
-	@Type(type="org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
+	@Column(name = "last_updated")
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
 	private Date lastUpdated;
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrust#getValue()
 	 */
 	@Override
@@ -73,7 +64,6 @@ public abstract class Trust implements ITrust {
 	}
 
 	/*
-	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.model.ITrust#setValue(java.lang.Double)
 	 */
 	@Override
@@ -85,21 +75,13 @@ public abstract class Trust implements ITrust {
 		this.value = newValue;
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrust#getLastModified()
 	 */
 	@Override
 	public Date getLastModified() {
 		
 		return this.lastModified;
-	}
-
-	/**
-	 * @param lastModified the lastModified to set
-	 */
-	public void setLastModified(Date lastModified) {
-		
-		this.lastModified = lastModified;
 	}
 
 	/* (non-Javadoc)
@@ -111,15 +93,7 @@ public abstract class Trust implements ITrust {
 		return this.lastUpdated;
 	}
 
-	/**
-	 * @param lastUpdated the lastUpdated to set
-	 */
-	public void setLastUpdated(Date lastUpdated) {
-		
-		this.lastUpdated = lastUpdated;
-	}
-
-	/* (non-Javadoc)
+	/*
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -136,7 +110,7 @@ public abstract class Trust implements ITrust {
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -170,7 +144,6 @@ public abstract class Trust implements ITrust {
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
