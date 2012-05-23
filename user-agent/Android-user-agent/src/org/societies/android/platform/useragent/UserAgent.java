@@ -22,58 +22,74 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+package org.societies.android.platform.useragent;
 
-/**
- * @author Babak.Farshchian@sintef.no
- *
- */
+import java.util.Arrays;
+import java.util.List;
 
+import org.societies.api.identity.IIdentity;
+import org.societies.api.personalisation.model.IAction;
 
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICis {
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
+public class UserAgent extends Service /*implements IAndroidUserAgent*/{
+	
+	private static final String LOG_TAG = UserAgent.class.getName();
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("userActionMonitorBean");
+    private static final List<String> NAME_SPACES = Arrays.asList(
+    		"http://societies.org/api/schema/useragent/monitoring");
+    private static final List<String> PACKAGES = Arrays.asList(
+		"org.societies.api.schema.useragent.monitoring");
     
+    //currently hard coded but should be injected
+    private static final String DESTINATION = "xcmanager.societies.local";
+        
+    private IIdentity toXCManager = null;
+    //private ClientCommunicationMgr ccm;
+
+	private IBinder binder = null;
+	
+	@Override
+	public void onCreate () {
+		
+		this.binder = new LocalBinder();
+
+		//this.ccm = new ClientCommunicationMgr(this);
+		
+    	/*try {
+			toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
+		} catch (InvalidFormatException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			throw new RuntimeException(e);
+		} */    
+		Log.d(LOG_TAG, "User Agent service starting");
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "User Agent service terminating");
+	}
+
 	/**
-	 * Returns the jid of the CIS
-	 * 
-	 * @param 
-	 * @return jid to address the CIS as a string
+	 * Create Binder object for local service invocation
 	 */
-	public String getCisId();
-    
-	/**
-	 * Returns the Name of the CIS
-	 * 
-	 * @param 
-	 * @return name of the CIS as a string
-	 */ 
-    public String getName();
-    //public String getOwnerId();
-    //public String setUserDefinedName(String _name);
-   // public String getUserDefineName();
-    //public String getCisType();
-    
-	/**
-	 * Returns the membership criteria (also known as mode) of the CIS
-	 * 
-	 * @param 
-	 * @return name of the CIS as a string
-	 */ 
-    public int getMembershipCriteria();
-
-	/**
-	 * Get info from a CIS.
-	 * The callback must be able to retrieve a community object
-	 * defined at org.societies.api.schema.cis.community 
-	 * it has the  info from the CIS
-	 * 
-	 *  IMPORTANT: this function is still under tests
-	 * 
-	 * @param callback callback function
-	 */
-    public void getInfo(ICisManagerCallback callback);
+	 public class LocalBinder extends Binder {
+		 public UserAgent getService() {
+	            return UserAgent.this;
+	        }
+	    }
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}
+	
+	public void monitor(IIdentity identity, IAction action){
+		Log.d(LOG_TAG, "User Agent received monitored user action: "+action.getparameterName()+" = "+action.getvalue());
+	}
 }

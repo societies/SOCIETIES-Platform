@@ -146,7 +146,6 @@ public class CisRecord {
 			return false;
 		return true;
 	}
-
 	
 
 	
@@ -155,6 +154,10 @@ public class CisRecord {
 	public int getMembershipCriteria() {
 		return this.membershipCriteria;
 	}
+
+
+
+
 
 
 

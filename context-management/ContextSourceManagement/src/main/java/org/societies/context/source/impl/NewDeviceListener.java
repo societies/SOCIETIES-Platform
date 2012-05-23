@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.css.devicemgmt.IDevice;
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 
 public class NewDeviceListener implements Runnable{
 	private static Logger LOG = LoggerFactory.getLogger(ContextSourceManagement.class);

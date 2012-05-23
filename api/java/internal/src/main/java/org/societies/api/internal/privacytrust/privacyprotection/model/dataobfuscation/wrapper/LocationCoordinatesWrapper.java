@@ -22,27 +22,34 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.management;
+package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * Wrapper for location coordinates obfuscation
+ *
+ * @author Olivier Maridat
  *
  */
-/**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
- */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICssActivity {
-	public String getVerb();
-	public void setVerb(String verb);
-	public String getActor();
-	public void setActor(String actor);
-	public String getObject();
-	public void setObject(String object);
-	public String getTarget();
-	public void setTarget(String target);
+public class LocationCoordinatesWrapper extends DataWrapper<LocationCoordinates> {
+	// -- CONSTRUCTOR
+	/**
+	 * @param dataId
+	 * @param data
+	 */
+	public LocationCoordinatesWrapper(LocationCoordinates data) {
+		super(data);
+	}
+	/**
+	 * DO NOT USE
+	 * @param dataId
+	 * @param data
+	 */
+	private LocationCoordinatesWrapper(String dataId, LocationCoordinates data, boolean persist) {
+		super(data);
+	}
+
+	
+	// --- GET/SET
 }
