@@ -1,3 +1,5 @@
+package org.societies.context.community.estimation.impl;
+
 import java.awt.Point;
 import java.util.ArrayList;
 

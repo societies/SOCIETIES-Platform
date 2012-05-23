@@ -9,7 +9,7 @@ public class CalculateOccurencesAndMode {
 	public ArrayList CalculateAttributeStatistics(List attrList) {
 
 
-	      Hashtable <String, Integer> frequencyMap = new Hashtable();
+	      Hashtable <String, Integer> frequencyMap = new Hashtable<String, Integer>();
 	      ArrayList<String> finalList = new ArrayList<String>();
 
 
