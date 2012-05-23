@@ -187,7 +187,8 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#755] ==================== .................:" +compareName);
 		//assertTrue(Name.equals(cssDetails.getForeName())); 
 		assertTrue(compareName.equalsIgnoreCase(profile.getName()));
-		LOG.info("[#755] create CSS Cloud Node END................."); 
+		assertTrue(compareName.equalsIgnoreCase(Name));
+		LOG.info("[#755] create CSS Cloud Node END............finally....."); 
 	}
 	
 	@Test
