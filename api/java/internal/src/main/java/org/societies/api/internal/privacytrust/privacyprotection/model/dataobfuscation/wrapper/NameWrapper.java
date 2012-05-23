@@ -22,49 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * Wrapper for name obfuscation
+ *
+ * @author Olivier Maridat (Trialog)
  *
  */
+public class NameWrapper extends DataWrapper<Name> {
 
-
-
-/**
- * MISSING_JAVADOCS
- * 
- * this will be changed on W20, please wait by then
- */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICis {
-
-    
 	/**
-	 * Returns the jid of the CIS
-	 * 
-	 * @param 
-	 * @return jid to address the CIS as a string
+	 * @param data
 	 */
-	public String getCisId();
-    
+	public NameWrapper(Name data) {
+		super(data);
+	}
 	/**
-	 * Returns the Name of the CIS
-	 * 
-	 * @param 
-	 * @return name of the CIS as a string
-	 */ 
-    public String getName();
-    //public String getOwnerId();
-    //public String setUserDefinedName(String _name);
-   // public String getUserDefineName();
-    //public String getCisType();
-    
-    public int getMembershipCriteria();
-
-    
-    public void getInfo(ICisManagerCallback callback);
+	 * DO NOT USE
+	 * @param data
+	 */
+	private NameWrapper(String dataId, Name data) {
+		super(data);
+	}
 }
