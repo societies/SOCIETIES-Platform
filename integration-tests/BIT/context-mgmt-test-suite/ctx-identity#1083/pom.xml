@@ -2,19 +2,20 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>integration.test.bit.ctx_identity</artifactId>
+	<artifactId>integration.test.bit.ctx_identity_1083</artifactId>
 	<name>Context Identity Integration Test</name>
 	<packaging>bundle</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<developers>
 		<developer>
-			<name>Pavlos Kosmidis</name>
+			<name>Pavlos Kosmides</name>
 			<email>pkosmidi@central.ntua.gr</email>
-			<organization>HWU</organization>
+			<organization>ICCS</organization>
 			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
-				<role>Senior Developer</role>
+			    <role>owner</role>
+				<role>developer</role>
 			</roles>
 			<timezone>+2</timezone>
 		</developer>

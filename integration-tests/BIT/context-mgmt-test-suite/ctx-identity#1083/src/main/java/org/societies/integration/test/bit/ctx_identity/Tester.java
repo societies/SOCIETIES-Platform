@@ -24,6 +24,9 @@
  */
 
 package org.societies.integration.test.bit.ctx_identity;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -33,6 +36,12 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 
 /**
  * Utility class that creates mock actions
@@ -42,19 +51,55 @@ import org.slf4j.LoggerFactory;
  */
 public class Tester {
 	
+	private static Logger LOG = LoggerFactory.getLogger(Tester.class);
+		
+	private IIdentityManager idMgr;
+	private IIdentity privateId;
+	
 	public Tester(){
 
 	}
 	
 	@Before
 	public void setUp(){
-			
+		LOG.info("[#1083] Tester::setUp");
 	}
 	
 	
 	@org.junit.Test
-	public void Test(){
+	public void Test() {
+
+		idMgr = Test1083.getCommMgr().getIdManager();
+		privateId = idMgr.getThisNetworkNode();
+		
+		assertNotNull(idMgr);
+		assertNotNull(privateId);
+		
+		IndividualCtxEntity operator = null;
+		
+		try {
+			operator = Test1083.ctxBroker.retrieveCssOperator().get();
 			
+			LOG.info("[#1083] Id from broker is " + operator.getId().getOperatorId());
+			LOG.info("[#1083] Id directly from idMgr is " + privateId);
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		assertNotNull(operator);
+		assertEquals(operator.getId().getOperatorId(),privateId.getBareJid());
+
+		LOG.info("[#1083] Using equals with getOperatorId() - " + operator.getId().getOperatorId().equals(privateId.getBareJid()));
+
+		LOG.info("[#1083] Using equals - " + operator.getId().equals(privateId));
 	}
 		
 }

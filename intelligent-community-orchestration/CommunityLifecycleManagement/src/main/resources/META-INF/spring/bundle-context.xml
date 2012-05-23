@@ -25,7 +25,6 @@
    <property name="communityRecommender" ref="CommunityRecommender"></property>
    <property name="privacyDataManager" ref="IPrivacyDataManager"></property>
    <property name="personalisationManager" ref="IPersonalisationManager"></property>
-   <property name="personalisationCallback" ref="IPersonalisationCallback"></property>
    <property name="linkedCssManager" ref="IIdentityManager"></property>
    <property name="deviceManager" ref="IDeviceManager"></property>
    <!-- <property name="suggestedCommunityAnalyser" ref="ISuggestedCommunityAnalyser"></property>

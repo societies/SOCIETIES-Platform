@@ -26,9 +26,9 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.NameWrapper;
 
 /**
  * Obfuscator for name
@@ -36,15 +36,15 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
  * @author Olivier Maridat (Trialog)
  *
  */
-public class NameObfuscator extends DataObfuscator<IDataWrapper<Name>> {
+public class NameObfuscator extends DataObfuscator<NameWrapper> {
 	/**
 	 * @param data
 	 */
-	public NameObfuscator(IDataWrapper<Name> data) {
+	public NameObfuscator(NameWrapper data) {
 		super(data);
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
 		stepNumber = 4;
-		dataType = Name.class;
+		dataType = NameWrapper.class;
 	}
 
 
@@ -88,7 +88,7 @@ public class NameObfuscator extends DataObfuscator<IDataWrapper<Name>> {
 		else if (obfuscationLevel >= 1) {
 			obfuscatedName = dataWrapper.getData();
 		}
-		return new DataWrapper<Name>(obfuscatedName);
+		return new NameWrapper(obfuscatedName);
 	}
 
 }
