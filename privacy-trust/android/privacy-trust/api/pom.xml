@@ -58,24 +58,31 @@
 
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<artifactId>android-parent</artifactId>
+		<relativePath>../../../../parent/android.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 
 	<dependencies>
-		<!-- add your dependencies here -->
+		<!-- Societies -->
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
+			<groupId>org.societies.api.schema.internal</groupId>
+			<artifactId>societies-api-schema-internal</artifactId>
 			<version>${release.version}</version>
-			<scope>provided</scope>
+		</dependency>
+		<!-- Android -->
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.phonegap</groupId>
+			<artifactId>phonegap</artifactId>
 		</dependency>
 	</dependencies>
 
