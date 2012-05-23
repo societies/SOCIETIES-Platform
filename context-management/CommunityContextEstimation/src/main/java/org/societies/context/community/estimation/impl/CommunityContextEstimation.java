@@ -44,7 +44,8 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.context.api.community.estimation.EstimationModels;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
-import org.societies.context.broker.impl.InternalCtxBroker;
+//import org.societies.context.broker.impl.InternalCtxBroker;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -62,9 +63,10 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		// TODO Auto-generated constructor stub
 
 	}
+	
+	@Autowired(required = true)
+	private ICtxBroker ctxBroker = null;
 
-	@Autowired(required=true)
-	private InternalCtxBroker b;
 	private CtxEntityIdentifier comId;
 	private String entityType;
 	private String attributeType;
@@ -92,9 +94,9 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	public void estimateContext(EstimationModels estimationmodel, CtxAttribute type, CtxIdentifier cisId) {
 		// TODO Auto-generated method stub
 		Assert.notNull(cisId,"Cannot use estimation without any cmmunity");
-		b = new InternalCtxBroker();
+		//b = new InternalCtxBroker();
 		try {
-			CtxEntity retrievedCtxEntity = (CtxEntity) this.b.retrieve(cisId).get();
+			CtxEntity retrievedCtxEntity = (CtxEntity) this.ctxBroker.retrieve(cisId).get();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -218,12 +220,12 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	 */
 	public List<CtxEntity> retrieveListOfCtxEntities(CtxModelType modelType, String ctxEntityType) throws CtxException, InterruptedException, ExecutionException {
 
-		Future<List<CtxIdentifier>> ctxEntitiesIdentifiersFutureList = b.lookup(modelType, ctxEntityType);
+		Future<List<CtxIdentifier>> ctxEntitiesIdentifiersFutureList = this.ctxBroker.lookup(modelType, ctxEntityType);
 		List<CtxIdentifier> ctxEntitiesIdentifiersList = ctxEntitiesIdentifiersFutureList.get();
 		List<CtxEntity> listOfCtxEntities= new ArrayList<CtxEntity>();
 
 		for (CtxIdentifier id : ctxEntitiesIdentifiersList){
-			CtxEntity ctxEntity = (CtxEntity) b.retrieve(id);
+			CtxEntity ctxEntity = (CtxEntity) this.ctxBroker.retrieve(id);
 			listOfCtxEntities.add(ctxEntity);
 		}
 		return listOfCtxEntities;
@@ -231,12 +233,12 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 	// Setters and Getters for the private fields ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//^
 
-	public InternalCtxBroker getB() {
-		return b;
-	}
+//	public ICtxBroker getB() {
+//		return b;
+//	}
 
-	public void setB(InternalCtxBroker b) {
-		this.b = b;
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
 	}
 
 
