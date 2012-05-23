@@ -164,33 +164,7 @@ public class CommunityRecommender //implements ICommCallback
 		//	this.linkedDomain = linkedEntity;
 	}
 	
-	public ArrayList<String> identifyCisActionForEgocentricCommunityAnalyser(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
-		ArrayList<String> cisAddMetadata = new ArrayList<String>();
-		ArrayList<String> cisNotDeletedMetadata = new ArrayList<String>();
-		ArrayList<String> cisCreatedFromConfigurationMetadata = new ArrayList<String>();
-		if (cisPossibilities.get("Create CISs") != null)
-		    cisAddMetadata = identifyCissToCreate(cisPossibilities.get("Create CISs").get(0), cissToCreateMetadata);
-		if (cisPossibilities.get("Delete CISs") != null)
-		    cisNotDeletedMetadata = identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0), cissToCreateMetadata);
-		HashMap<String, ArrayList<ArrayList<ICisProposal>>> temp = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
-		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
-		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
-		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
-		if (temp.size() > 0)
-		    cisCreatedFromConfigurationMetadata = identifyCissToConfigure(temp, cissToCreateMetadata);
-		
-		ArrayList<String> cisMetadata = new ArrayList<String>();
-		for (int i = 0; i < cisAddMetadata.size(); i++)
-			cisMetadata.add(cisAddMetadata.get(i));
-		for (int i = 0; i < cisNotDeletedMetadata.size(); i++)
-			cisMetadata.add(cisNotDeletedMetadata.get(i));
-		for (int i = 0; i < cisCreatedFromConfigurationMetadata.size(); i++)
-			cisMetadata.add(cisCreatedFromConfigurationMetadata.get(i));
-		
-		return cisMetadata;
-	}
-	
-	public ArrayList<String> identifyCisActionForCSCW(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities) {
+	public ArrayList<String> identifyAndPerformCisActions(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
 		ArrayList<String> cisAddMetadata = new ArrayList<String>();
 		ArrayList<String> cisNotDeletedMetadata = new ArrayList<String>();
 		ArrayList<String> cisCreatedFromConfigurationMetadata = new ArrayList<String>();
@@ -199,7 +173,7 @@ public class CommunityRecommender //implements ICommCallback
 			ArrayList<ICisProposal> theSubList = new ArrayList<ICisProposal>();
 			for (int i = 0; i < theList.size(); i++)
 				theSubList.add(theList.get(i).get(0));
-			cisAddMetadata = identifyCissToCreate(theSubList, null);
+			cisAddMetadata = identifyCissToCreate(theSubList, cissToCreateMetadata);
 		}
 		    
 		if (cisPossibilities.get("Delete CISs") != null) {
@@ -207,45 +181,7 @@ public class CommunityRecommender //implements ICommCallback
 			ArrayList<ICisProposal> theSubList = new ArrayList<ICisProposal>();
 			for (int i = 0; i < theList.size(); i++)
 				theSubList.add(theList.get(i).get(0));
-			cisNotDeletedMetadata = identifyCissToDelete(theSubList, null);
-		}
-		HashMap<String, ArrayList<ArrayList<ICisProposal>>> temp = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
-		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
-		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
-		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
-		
-		if (temp.size() > 0)
-		    cisCreatedFromConfigurationMetadata = identifyCissToConfigure(temp, null);
-		
-		ArrayList<String> cisMetadata = new ArrayList<String>();
-		for (int i = 0; i < cisAddMetadata.size(); i++)
-			cisMetadata.add(cisAddMetadata.get(i));
-		for (int i = 0; i < cisNotDeletedMetadata.size(); i++)
-			cisMetadata.add(cisNotDeletedMetadata.get(i));
-		for (int i = 0; i < cisCreatedFromConfigurationMetadata.size(); i++)
-			cisMetadata.add(cisCreatedFromConfigurationMetadata.get(i));
-		return cisMetadata;
-		
-	}
-	
-    public ArrayList<String> identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities) {
-    	ArrayList<String> cisAddMetadata = new ArrayList<String>();
-		ArrayList<String> cisNotDeletedMetadata = new ArrayList<String>();
-		ArrayList<String> cisCreatedFromConfigurationMetadata = new ArrayList<String>();
-		if (cisPossibilities.get("Create CISs") != null) {
-			ArrayList<ArrayList<ICisProposal>> theList = cisPossibilities.get("Create CISs");
-			ArrayList<ICisProposal> theSubList = new ArrayList<ICisProposal>();
-			for (int i = 0; i < theList.size(); i++)
-				theSubList.add(theList.get(i).get(0));
-			cisAddMetadata = identifyCissToCreate(theSubList, null);
-		}
-		    
-		if (cisPossibilities.get("Delete CISs") != null) {
-			ArrayList<ArrayList<ICisProposal>> theList = cisPossibilities.get("Delete CISs");
-			ArrayList<ICisProposal> theSubList = new ArrayList<ICisProposal>();
-			for (int i = 0; i < theList.size(); i++)
-				theSubList.add(theList.get(i).get(0));
-			cisNotDeletedMetadata = identifyCissToDelete(theSubList, null);
+			cisNotDeletedMetadata = identifyCissToDelete(theSubList, cissToCreateMetadata);
 		}
 		HashMap<String, ArrayList<ArrayList<ICisProposal>>> temp = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		ArrayList<ArrayList<ICisProposal>> temp2 = cisPossibilities.get("Configure CISs");
@@ -267,7 +203,7 @@ public class CommunityRecommender //implements ICommCallback
 		}
 		
 		if (temp.size() > 0)
-		    cisCreatedFromConfigurationMetadata = identifyCissToConfigure(temp, null);
+		    cisCreatedFromConfigurationMetadata = identifyCissToConfigure(temp, cissToCreateMetadata);
 		
 		ArrayList<String> cisMetadata = new ArrayList<String>();
 		for (int i = 0; i < cisAddMetadata.size(); i++)
@@ -277,6 +213,80 @@ public class CommunityRecommender //implements ICommCallback
 		for (int i = 0; i < cisCreatedFromConfigurationMetadata.size(); i++)
 			cisMetadata.add(cisCreatedFromConfigurationMetadata.get(i));
 		return cisMetadata;
+	}
+	
+	public ArrayList<String> identifyCisActionForEgocentricCommunityAnalyser(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
+		
+		return identifyAndPerformCisActions(cisPossibilities, cissToCreateMetadata);
+		
+		/**ArrayList<String> cisAddMetadata = new ArrayList<String>();
+		ArrayList<String> cisNotDeletedMetadata = new ArrayList<String>();
+		ArrayList<String> cisCreatedFromConfigurationMetadata = new ArrayList<String>();
+		if (cisPossibilities.get("Create CISs") != null)
+		    cisAddMetadata = identifyCissToCreate(cisPossibilities.get("Create CISs").get(0), cissToCreateMetadata);
+		if (cisPossibilities.get("Delete CISs") != null)
+		    cisNotDeletedMetadata = identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0), cissToCreateMetadata);
+		HashMap<String, ArrayList<ArrayList<ICisProposal>>> temp = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
+		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
+		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
+		if (temp.size() > 0)
+		    cisCreatedFromConfigurationMetadata = identifyCissToConfigure(temp, cissToCreateMetadata);
+		
+		ArrayList<String> cisMetadata = new ArrayList<String>();
+		for (int i = 0; i < cisAddMetadata.size(); i++)
+			cisMetadata.add(cisAddMetadata.get(i));
+		for (int i = 0; i < cisNotDeletedMetadata.size(); i++)
+			cisMetadata.add(cisNotDeletedMetadata.get(i));
+		for (int i = 0; i < cisCreatedFromConfigurationMetadata.size(); i++)
+			cisMetadata.add(cisCreatedFromConfigurationMetadata.get(i));
+		
+		return cisMetadata;*/
+	}
+	
+	public ArrayList<String> identifyCisActionForCSCW(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities) {
+		
+		return identifyAndPerformCisActions(cisPossibilities, null);
+		
+		/**ArrayList<String> cisAddMetadata = new ArrayList<String>();
+		ArrayList<String> cisNotDeletedMetadata = new ArrayList<String>();
+		ArrayList<String> cisCreatedFromConfigurationMetadata = new ArrayList<String>();
+		if (cisPossibilities.get("Create CISs") != null) {
+			ArrayList<ArrayList<ICisProposal>> theList = cisPossibilities.get("Create CISs");
+			ArrayList<ICisProposal> theSubList = new ArrayList<ICisProposal>();
+			for (int i = 0; i < theList.size(); i++)
+				theSubList.add(theList.get(i).get(0));
+			cisAddMetadata = identifyCissToCreate(theSubList, null);
+		}
+		    
+		if (cisPossibilities.get("Delete CISs") != null) {
+			ArrayList<ArrayList<ICisProposal>> theList = cisPossibilities.get("Delete CISs");
+			ArrayList<ICisProposal> theSubList = new ArrayList<ICisProposal>();
+			for (int i = 0; i < theList.size(); i++)
+				theSubList.add(theList.get(i).get(0));
+			cisNotDeletedMetadata = identifyCissToDelete(theSubList, null);
+		}
+		HashMap<String, ArrayList<ArrayList<ICisProposal>>> temp = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
+		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
+		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
+		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
+		
+		if (temp.size() > 0)
+		    cisCreatedFromConfigurationMetadata = identifyCissToConfigure(temp, null);
+		
+		ArrayList<String> cisMetadata = new ArrayList<String>();
+		for (int i = 0; i < cisAddMetadata.size(); i++)
+			cisMetadata.add(cisAddMetadata.get(i));
+		for (int i = 0; i < cisNotDeletedMetadata.size(); i++)
+			cisMetadata.add(cisNotDeletedMetadata.get(i));
+		for (int i = 0; i < cisCreatedFromConfigurationMetadata.size(); i++)
+			cisMetadata.add(cisCreatedFromConfigurationMetadata.get(i));
+		return cisMetadata;*/
+		
+	}
+	
+    public ArrayList<String> identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities) {
+    	return identifyAndPerformCisActions(cisPossibilities, null);
 	}
 	
 	/*
