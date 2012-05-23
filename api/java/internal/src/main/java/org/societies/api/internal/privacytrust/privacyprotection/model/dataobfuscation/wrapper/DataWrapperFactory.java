@@ -24,6 +24,10 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.schema.activity.Activity;
+
 
 /**
  * Utilities to instantiate DataWrapper for data obfuscation
@@ -41,32 +45,127 @@ public class DataWrapperFactory {
 	 * @return A relevant DataWrapper
 	 * @throw RuntimeException
 	 */
-	public static IDataWrapper selectDataWrapper(Object contextData) throws RuntimeException{
-		// TODO : populate this stub function
+	public static IDataWrapper selectDataWrapper(CtxIdentifier contextData) throws RuntimeException{
 		try {
-			if (contextData.equals("A Data Type")) {
-//				return new [A Data Type]Wrapper(data);
+			if (contextData.getType().equals(CtxAttributeTypes.NAME)) {
+				//				return new [A Data Type]Wrapper(data);
+				// TODO
 			}
-			// TODO STUB RETURN, TO BE REMOVED
 			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("No Obfuscator to obfuscate that type of data");
 		}
-//		throw new RuntimeException("No Obfuscator to obfuscate that type of data");
+		//		throw new RuntimeException("No Obfuscator to obfuscate that type of data");
+	}
+
+	
+	// -- GEOLOCATION
+	
+	/**
+	 * To get a LocationCoordinatesWrapper
+	 * The persistence is disabled by default, the obfuscated geolocation will not
+	 * be stored after obfuscation.
+	 * @param latitude Latitude
+	 * @param longitude Longitude
+	 * @param accuracy Accuracy in meters
+	 * @return A LocationCoordinatesWrapper
+	 */
+	public static IDataWrapper<LocationCoordinates> getLocationCoordinatesWrapper(double latitude, double longitude, double accuracy) {
+		LocationCoordinates data = new LocationCoordinates(latitude, longitude, accuracy);
+		return new DataWrapper<LocationCoordinates>(data);
 	}
 	
-//	// -- GEOLOCATION
-//	/**
-//	 * To get a GeolocaltionDataWrapper
-//	 * The persistence is disabled by default, the obfuscated geolocation will not
-//	 * be stored after obfuscation.
-//	 * @param latitude Latitude
-//	 * @param longitude Longitude
-//	 * @param accuracy Accuracy in meters
-//	 * @return A GeolocationDataWrapper
-//	 */
-//	public static GeolocationDataWrapper getGeolocationDataWrapper(double latitude, double longitude, double accuracy) {
-//		return new GeolocationDataWrapper(latitude, longitude, accuracy);
-//	}
+	/**
+	 * To get the Postal location wrapper
+	 * @param logicalName
+	 * @param streetNumber
+	 * @param streetName
+	 * @param district
+	 * @param town
+	 * @param postalCode
+	 * @param department
+	 * @param region
+	 * @param country
+	 * @param continent
+	 * @param planet
+	 * @return
+	 */
+	public static IDataWrapper<PostalLocation> getPostalLocationWrapper(String logicalName, String streetNumber,
+			String streetName, String district, String town, String postalCode,
+			String department, String region, String country, String continent,
+			String planet) {
+		PostalLocation data = new PostalLocation(logicalName, streetNumber, streetName, district, town, postalCode, department, region, country, continent, planet);
+		return new DataWrapper<PostalLocation>(data);
+	}
+
+
+	// -- NAME
+	
+	/**
+	 * To get a NameWrapper
+	 * The persistence is disabled by default, the obfuscated name will not
+	 * @param firstName
+	 * @param lastName
+	 * @return the NameWrapper
+	 */
+	public static IDataWrapper<Name> getNameWrapper(String firstName, String lastName) {
+		Name data = new Name(firstName, lastName);
+		return new DataWrapper<Name>(data);
+	}
+
+	
+	// -- TEMPERATURE
+	
+	/**
+	 * To get a TemperatureWrapper
+	 * The persistence is disabled by default
+	 * @param degree Degree in number value
+	 * @return the Temperature wrapper
+	 */
+	public static IDataWrapper<Temperature> getTemperatureWrapper(double degree) {
+		Temperature data = new Temperature(degree);
+		return new DataWrapper<Temperature>(data);
+	}
+	/**
+	 * To get a TemperatureWrapper
+	 * The persistence is disabled by default
+	 * @param degree Degree in string value @see {@value org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Temperature#heatString}
+	 * @return the Temperature wrapper
+	 */
+	public static IDataWrapper<Temperature> getTemperatureWrapper(String degree) {
+		Temperature data = new Temperature(degree);
+		return new DataWrapper<Temperature>(data);
+	}
+	
+	
+	// -- ACTION
+	
+	/**
+	 * To get a ActivityWrapper
+	 * @param actor
+	 * @param verb
+	 * @param object
+	 * @return
+	 */
+	public static IDataWrapper<Activity> getActivityWrapper(String actor, String verb, String object) {
+		Activity data = new Activity();
+		data.setActor(actor);
+		data.setVerb(verb);
+		data.setObject(object);
+		return new DataWrapper<Activity>(data);
+	}
+	
+	
+	// -- STATUS
+	
+	/**
+	 * 
+	 * @param status
+	 * @return
+	 */
+	public static IDataWrapper<Status> getStatusWrapper(String status) {
+		Status data = new Status(status);
+		return new DataWrapper<Status>(data);
+	}
 }

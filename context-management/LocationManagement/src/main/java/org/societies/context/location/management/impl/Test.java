@@ -86,17 +86,17 @@ public class Test {
 	private static final int OptionEntityFullLocation = 3;
 	private static final int OptionExit = 4;
 
-	private static PZWrapperImpl pz = new PZWrapperImpl();
+	private static MockPZWrapperImpl pz = new MockPZWrapperImpl();
 	private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	
 	private static void activeZones() {
 		System.out.println("****************************");
 		System.out.println("Active Zones");
 		System.out.println("------------");
-		Collection<PZWrapperImpl.Zone> zones = pz.getActiveZones();
+		Collection<MockPZWrapperImpl.Zone> zones = pz.getActiveZones();
 		System.out.println("[");
 		int count = zones.size();
-		for (PZWrapperImpl.Zone zone : zones) {
+		for (MockPZWrapperImpl.Zone zone : zones) {
 			count--;
 			System.out.println(zone + (count > 0 ? ", " : ""));
 		}
@@ -132,7 +132,7 @@ public class Test {
 		System.out.println("--------------------");
 		System.out.print("Enter Entity ID: ");
 		String entityId = br.readLine();
-		PZWrapperImpl.Location location = pz.getEntityFullLocation(entityId);
+		MockPZWrapperImpl.Location location = pz.getEntityFullLocation(entityId);
 		System.out.println(location);
 	}
 
