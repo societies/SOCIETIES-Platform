@@ -39,7 +39,7 @@ import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.source.ICtxSourceMgr;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +100,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	}
 		
 	public void initialise(){
-		this.newDeviceListener = new NewDeviceListener(deviceManager);
+		this.newDeviceListener = new NewDeviceListener (deviceManager);
 		newDeviceListener.run();
 		LOG.info("{}", "CSM started");
 	}
