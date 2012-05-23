@@ -76,7 +76,7 @@ public class ContextStorageTest {
 	}
 
 	@Test
-	public void monitorActionsContext() {
+	public void TestMonitorActionsContext() {
 
 		//create actions
 		IIdentity identity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
