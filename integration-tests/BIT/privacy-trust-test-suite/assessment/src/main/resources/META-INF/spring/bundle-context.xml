@@ -25,6 +25,7 @@
 		depends-on="PrivacyLogAppender"
         init-method="run">
   		<property name="privacyLogAppender" ref="PrivacyLogAppender"/>
+  		<property name="identityManager" ref="IdentityManager"/>
     </bean>
     
     <bean
