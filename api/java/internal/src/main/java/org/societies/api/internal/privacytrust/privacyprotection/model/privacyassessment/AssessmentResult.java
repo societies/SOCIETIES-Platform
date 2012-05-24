@@ -35,7 +35,7 @@ public abstract class AssessmentResult {
 
 	protected Object sender;
 	private long numAllPackets = 0;
-	private long numPacketsPerMonth = 0;
+	private double numPacketsPerMonth = 0;
 	private double corrWithDataAccessBySender = 0;
 	private double corrWithDataAccessByAll = 0;
 	private double corrWithDataAccessBySenderDev = 0;
@@ -62,14 +62,14 @@ public abstract class AssessmentResult {
 	/**
 	 * @return Number of packets transmitted per month by this sender
 	 */
-	public long getNumPacketsPerMonth() {
+	public double getNumPacketsPerMonth() {
 		return numPacketsPerMonth;
 	}
 
 	/**
 	 * @param numPacketsPerMonth Number of packets transmitted per month by this sender
 	 */
-	public void setNumPacketsPerMonth(long numPacketsPerMonth) {
+	public void setNumPacketsPerMonth(double numPacketsPerMonth) {
 		this.numPacketsPerMonth = numPacketsPerMonth;
 	}
 
