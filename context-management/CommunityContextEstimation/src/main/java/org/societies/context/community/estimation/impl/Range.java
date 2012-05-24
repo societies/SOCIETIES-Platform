@@ -1,11 +1,13 @@
 package org.societies.context.community.estimation.impl;
 
+import java.util.ArrayList;
+
 
 public class Range {
 	
-	public int[] range(ArrayList<int> numbers) {
+	public int[] range(ArrayList<Integer> numbers) {
 
-	      r = new int[2];
+	      int[] r = new int[2];
 	// Arkoun to min kai to max.
 
 
@@ -29,7 +31,7 @@ public class Range {
 	      r[1]=max;
 
 
-	      return {r};
+	      return r;
 	   }
 }
 

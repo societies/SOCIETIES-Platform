@@ -26,31 +26,22 @@ public class MinBoundingBox {
 	         if (points.get(i).x > maxX){
 	            maxX=points.get(i).x;
 	         }
-	         if (points.get(i).x < minX){
-	         minX=points.get(i).x;
-	         }
-	         if (points.get(i).x > maxX){ 
-	         maxX=points.get(i).x;
-	         }
 	         if (points.get(i).y < minY){
 	            minY=points.get(i).y;
 	         }
 	         if (points.get(i).y > maxY){
 	            maxY=points.get(i).y;
 	         }
-	         if (points.get(i).y < minY){
-	         minY=points.get(i).y;
-	         }
-	         if (points.get(i).y > maxY){ 
-	         maxY=points.get(i).y;
-	         }
 	      }
 
 	      Point topLeft = new Point(minX,maxY);
 	      Point bottomRight = new Point(maxX,minY);
-
-
-	      return {topLeft,bottomRight};
+	      
+	      minBB[0]=topLeft;
+	      minBB[1]=bottomRight;
+	      return minBB;
+	      
+	      //return {topLeft,bottomRight};
 	   }
 
 }
