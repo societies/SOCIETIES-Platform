@@ -22,28 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.platform.TwitterConnector;
 
-import org.societies.api.internal.sns.ISocialConnector;
+package org.societies.android.platform.useragent.api;
 
-public interface TwitterConnector extends ISocialConnector {
+import org.societies.api.identity.IIdentity;
+import org.societies.api.personalisation.model.IAction;
 
-	public static final String PROTECTED_RESOURCE_URL = "https://api.twitter.com/1/statuses/update.json";
-	public static final String ACCOUNT_VERIFICATION = "https://api.twitter.com/1/account/verify_credentials.json";
-	public static final String GET_USERINFO_URL = "http://api.twitter.com/1/users/lookup.json?user_id=";
-	public static final String GET_FRIENDS_URL = "https://api.twitter.com/1/friends/ids.json?user_id=";
-	public static final String GET_FOLLOWERS_URL = "https://api.twitter.com/1/followers/ids.json?user_id=";
-	public static final String GET_OTHER_PROFILE_URL = "https://api.twitter.com/1/users/lookup.json?user_id=";
-	public static final String GET_TWEETS_URL = "http://api.twitter.com/1/statuses/home_timeline.json?count=200";
+public interface IAndroidUserAgent {
+	
+	public void monitor(IIdentity indentity, IAction action);
 
-	/**
-	 * @return
-	 */
-	String getUserFollowers();
-
-	/**
-	 * @param id
-	 * @return
-	 */
-	String getOtherProfileString(String id);
 }

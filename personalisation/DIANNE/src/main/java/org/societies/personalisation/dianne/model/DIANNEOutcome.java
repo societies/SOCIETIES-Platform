@@ -22,28 +22,28 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.platform.TwitterConnector;
 
-import org.societies.api.internal.sns.ISocialConnector;
+package org.societies.personalisation.dianne.model;
 
-public interface TwitterConnector extends ISocialConnector {
+import org.societies.api.personalisation.model.Action;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 
-	public static final String PROTECTED_RESOURCE_URL = "https://api.twitter.com/1/statuses/update.json";
-	public static final String ACCOUNT_VERIFICATION = "https://api.twitter.com/1/account/verify_credentials.json";
-	public static final String GET_USERINFO_URL = "http://api.twitter.com/1/users/lookup.json?user_id=";
-	public static final String GET_FRIENDS_URL = "https://api.twitter.com/1/friends/ids.json?user_id=";
-	public static final String GET_FOLLOWERS_URL = "https://api.twitter.com/1/followers/ids.json?user_id=";
-	public static final String GET_OTHER_PROFILE_URL = "https://api.twitter.com/1/users/lookup.json?user_id=";
-	public static final String GET_TWEETS_URL = "http://api.twitter.com/1/statuses/home_timeline.json?count=200";
+public class DIANNEOutcome extends Action implements IDIANNEOutcome{
 
-	/**
-	 * @return
-	 */
-	String getUserFollowers();
+	private static final long serialVersionUID = 1L;
+	private int confidenceLevel;
 
-	/**
-	 * @param id
-	 * @return
-	 */
-	String getOtherProfileString(String id);
+	public DIANNEOutcome(ServiceResourceIdentifier serviceId, String serviceType, String parameterName, String value){
+		super(serviceId, serviceType, parameterName, value);
+	}
+	
+	@Override
+	public int getConfidenceLevel() {
+		return this.confidenceLevel;
+	}
+	
+	public void setConfidenceLevel(int confidenceLevel){
+		this.confidenceLevel = confidenceLevel;
+	}
 }

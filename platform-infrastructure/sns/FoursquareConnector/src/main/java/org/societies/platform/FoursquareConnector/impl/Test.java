@@ -30,7 +30,7 @@ class Test {
 
 	// static String defaultAccessTokenString =
 	// "5ZAFZUGOUSFQAEDSWPCXQLJVMBFY1GDI41T5SNMUJP5B2QNA";
-	static String defaultAccessTokenString = "";
+	static String defaultAccessTokenString = "5ZAFZUGOUSFQAEDSWPCXQLJVMBFY1GDI41T5SNMUJP5B2QNA";
 
 	public static void main(String[] args) {
 		FoursquareConnectorImpl f = new FoursquareConnectorImpl(

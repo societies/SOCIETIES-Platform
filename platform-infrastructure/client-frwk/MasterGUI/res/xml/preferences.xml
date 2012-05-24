@@ -12,7 +12,7 @@
    		    	android:title="Float Preference" 
    	    		android:key="AFloatPref" 
    	    		android:numeric="decimal"
-   	    		android:defaultValue="100000000000" 
+   	    		android:defaultValue="89999.9098" 
    	    		android:summary="A large float"/>
    		<EditTextPreference 
    		    	android:title="Integer Preference" 

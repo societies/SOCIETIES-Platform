@@ -11,15 +11,17 @@ public class MockHistoryData {
 	Date timestamp;
 	Map<String,String> contextMap = new HashMap<String,String>();
 	String contextValue = "";
-
+	String serviceId = "";
+	
 	String parameterName;
 	String actionValue;
 
-	public MockHistoryData(String parameterName,String actionValue, Map<String,String> context, Date timestamp){
+	public MockHistoryData(String parameterName,String actionValue, Map<String,String> context, Date timestamp, String serviceId){
 		this.parameterName = parameterName;
 		this.actionValue = actionValue;
 		this.contextMap = context;
 		this.timestamp = timestamp;
+		this.serviceId  = serviceId;
 	}
 
 	public Map<String,String> getContext() {
@@ -61,7 +63,15 @@ public class MockHistoryData {
 	public void setSymLoc() {
 		
 	}
+	
+	public String getServiceId() {
+		return serviceId;
+	}
 
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
+	}
+	
 	public String toString(){
 		String string = this.parameterName+" "+this.actionValue+" "+this.timestamp.getTime()+" "+this.contextMap ;
 		return string; 
