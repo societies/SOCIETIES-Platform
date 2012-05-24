@@ -134,9 +134,12 @@ public class CAUIDiscoveryLearningTest {
 		try {
 			serviceId1.setIdentifier(new URI("http://testService1"));
 			serviceId2.setIdentifier(new URI("http://testService2"));
+			serviceId1.setServiceInstanceIdentifier("http://testService1");
+			serviceId2.setServiceInstanceIdentifier("http://testService2");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+		
 		//create actions
 		IAction action1 = new Action(serviceId1, "testService", "volume", "high");
 		IAction action2 = new Action(serviceId2, "testService", "volume", "low");
@@ -145,7 +148,7 @@ public class CAUIDiscoveryLearningTest {
 		IAction action4 = new Action(serviceId2, "testService", "colour", "blue");
 		IAction action5 = new Action(serviceId2, "testService", "colour", "green");
 		IAction actionY = new Action(serviceId1, "testService", "YYYY", "YYYY");
-		
+		System.out.println ("action service ID "+actionY.getServiceID().getServiceInstanceIdentifier());
 		for (int i=0; i<4; i++){
 
 			monitorAction(action1,"home","free",10);
@@ -193,25 +196,32 @@ public class CAUIDiscoveryLearningTest {
 		context.put("temperature","hot");
 		context.put("SymLoc","free");
 		Date date = new Date();
-
-		data.add(new MockHistoryData("volume","mute",context,date));
-		data.add(new MockHistoryData("paramA","valueA",context,date));
-		data.add(new MockHistoryData("paramB","valueB",context,date));
-		data.add(new MockHistoryData("paramC","valueC",context,date));
-		data.add(new MockHistoryData("paramX","valueX",context,date));
-		data.add(new MockHistoryData("paramY","valueY",context,date));
-		data.add(new MockHistoryData("paramA","valueA",context,date));
-		data.add(new MockHistoryData("paramB","valueB",context,date));
-		data.add(new MockHistoryData("paramC","valueC",context,date));
-		data.add(new MockHistoryData("paramO","valueO",context,date));
-		data.add(new MockHistoryData("paramP","valueP",context,date));
-		data.add(new MockHistoryData("paramA","valueA",context,date));
-		data.add(new MockHistoryData("paramB","valueB",context,date));
-		data.add(new MockHistoryData("paramC","valueC",context,date));
-		data.add(new MockHistoryData("paramL","valueL",context,date));
-		data.add(new MockHistoryData("paramA","valueA",context,date));
-		data.add(new MockHistoryData("paramB","valueB",context,date));
-		data.add(new MockHistoryData("paramC","valueC",context,date));
+		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+		try {
+			serviceId1.setIdentifier(new URI("http://testService1"));
+			
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		
+		data.add(new MockHistoryData("volume","mute",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramA","valueA",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramB","valueB",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramC","valueC",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramX","valueX",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramY","valueY",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramA","valueA",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramB","valueB",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramC","valueC",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramO","valueO",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramP","valueP",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramA","valueA",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramB","valueB",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramC","valueC",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramL","valueL",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramA","valueA",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramB","valueB",context,date,serviceId1.getServiceInstanceIdentifier()));
+		data.add(new MockHistoryData("paramC","valueC",context,date,serviceId1.getServiceInstanceIdentifier()));
 
 		List<MockHistoryData> newSet = new ArrayList<MockHistoryData>();
 

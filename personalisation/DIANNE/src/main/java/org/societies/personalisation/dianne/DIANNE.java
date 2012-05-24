@@ -34,11 +34,14 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.dianne.model.Network;
+import org.societies.personalisation.dianne.model.OutcomeNode;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -61,8 +64,9 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 public class DIANNE implements IDIANNE{
 
-	private HashMap<IIdentity, Network> d_nets;
-	private HashMap<IIdentity, NetworkRunner> runnerMappings;
+	private Logger LOG = LoggerFactory.getLogger(DIANNE.class);
+	private HashMap<IIdentity, Network> d_nets;  //IIdentity - Network mappings
+	private HashMap<IIdentity, NetworkRunner> runnerMappings;  //IIdentity - runner mappings
 	private String[] defaultContext = {
 			CtxAttributeTypes.LOCATION_SYMBOLIC, 
 			CtxAttributeTypes.STATUS,
@@ -81,27 +85,61 @@ public class DIANNE implements IDIANNE{
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName) {
-		return new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
+		//no updates received - just return current outcome
+		List<IDIANNEOutcome> results = new ArrayList<IDIANNEOutcome>();
+		if(runnerMappings.containsKey(ownerId)){
+			NetworkRunner runner = runnerMappings.get(ownerId);
+			IDIANNEOutcome outcome = runner.getPrefOutcome(serviceId, preferenceName);
+			results.add(outcome);
+		}else{
+			LOG.error("No DIANNE exists for this identity: "+ownerId.getBareJid());
+		}
+		
+		return new AsyncResult<List<IDIANNEOutcome>>(results);
 	}
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute) {
+		LOG.info("Received request for outcome with new context update");
+		List<IDIANNEOutcome> results = new ArrayList<IDIANNEOutcome>();
 		// Context update received!!!
 		if(runnerMappings.containsKey(ownerId)){
-
+			LOG.debug("Network runner already exists for this ownerId: "+ownerId.getBareJid());
+			NetworkRunner runner = runnerMappings.get(ownerId);
+			runner.contextUpdate(attribute);
 		}else{
-			//NetworkRunner newNetwork = new NetworkRunner();
+			LOG.debug("Network runner does not exist for this ownerId: "+ownerId.getBareJid());
+			Network newD_net = new Network();
+			NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net);
+			d_nets.put(ownerId, newD_net);
+			runnerMappings.put(ownerId, newRunner);
+			newRunner.contextUpdate(attribute);
 		}
-		return new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
+		
+		//query DIANNE for new outcomes
+		
+		return new AsyncResult<List<IDIANNEOutcome>>(results);
 	}
 
 	@Override
-	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId,
-			IAction action){
+	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, IAction action){
+		LOG.info("Received request for outcome with new action update");
 		// Action update received!!!
+		if(runnerMappings.containsKey(ownerId)){
+			NetworkRunner runner = runnerMappings.get(ownerId);
+			runner.actionUpdate(action);
+		}else{
+			Network newD_net = new Network();
+			NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net);
+			d_nets.put(ownerId, newD_net);
+			runnerMappings.put(ownerId, newRunner);
+			newRunner.actionUpdate(action);
+		}		
+		//No new outcomes will be provided after action updates - return empty list
 		return new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
 	}
 
+	
 	@Override
 	public void enableDIANNELearning(IIdentity ownerId) {
 		System.out.println("Enabling incremental learning for identity: "+ ownerId);
@@ -125,6 +163,11 @@ public class DIANNE implements IDIANNE{
 	}
 	
 	@Override
+	/*
+	 * Called by PersonalisationManager when initialised
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE#registerContext()
+	 */
 	public void registerContext(){
 		for(int i=0; i<defaultContext.length; i++){
 			try {
@@ -148,6 +191,9 @@ public class DIANNE implements IDIANNE{
 		retrieveNetworks();  //get Networks from context
 		initialiseNetworks();  //start runners for each network
 		//start DIANNE storage thread - store DIANNEs every 1?/5? minute(s)
+		Thread persistThread = new Thread(new PersistenceManager(this, ctxBroker));
+		persistThread.setName("DIANNE Persistence Thread");
+		persistThread.start();
 	}
 	
 	private void retrieveNetworks(){
@@ -168,7 +214,7 @@ public class DIANNE implements IDIANNE{
 							IIdentity dNetID = null;
 							Network dNet = null;
 							for(CtxAttribute nextAttr: attributes){
-								if(nextAttr.getType().equals("dnet"/*CtxAttributeTypes.D_NET*/)){
+								if(nextAttr.getType().equals(CtxAttributeTypes.D_NET)){
 									dNet = (Network)SerialisationHelper.deserialise(nextAttr.getBinaryValue(), this.getClass().getClassLoader());
 								}else if(nextAttr.getType().equals(CtxAttributeTypes.ID)){
 									dNetID = (IIdentity)SerialisationHelper.deserialise(nextAttr.getBinaryValue(), this.getClass().getClassLoader());
@@ -197,7 +243,7 @@ public class DIANNE implements IDIANNE{
 		while(e.hasNext()){
 			IIdentity nextIdentity = e.next();
 			Network nextNetwork = d_nets.get(nextIdentity);
-			NetworkRunner nextRunner = new NetworkRunner(nextNetwork);
+			NetworkRunner nextRunner = new NetworkRunner(nextIdentity, nextNetwork);
 			runnerMappings.put(nextIdentity, nextRunner);
 		}
 	}
@@ -215,6 +261,10 @@ public class DIANNE implements IDIANNE{
 	
 	public ICommManager getCommsMgr(){
 		return commsMgr;
+	}
+	
+	public HashMap<IIdentity, Network> getDNets(){
+		return this.d_nets;
 	}
 
 	/*

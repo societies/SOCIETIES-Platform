@@ -84,7 +84,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		else
 			return null;
 	}
-
+	
 	public String getUserFriends() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
@@ -96,35 +96,52 @@ public class TwitterConnectorImpl implements TwitterConnector {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		JSONObject friends = new JSONObject();
-		JSONArray friendsList = new JSONArray();
-		// System.out.println(res.toString());
-		try {
-			JSONArray friendsIDList = res.getJSONArray("ids");
-
-			JSONObject other = null;
-
-			for (int i = 0; i < friendsIDList.length(); i++) {
-				// System.out.println(friendsIDList.get(i).toString());
-
-				other = getOtherProfileJson(friendsIDList.get(i).toString());
-
-				// System.out.println(other);
-				if (!other.toString().contains(
-						"No user matches for specified terms"))
-					friendsList.put(other);
-				friends.put("friends", friendsList);
-			}
-		} catch (JSONException e) {
-			return response.getBody();
-		}
-
 		if (res != null)
-			// return res.toJSONString();
-			return friends.toString();
+			return res.toString();
 		else
 			return null;
 	}
+
+//	public String getUserFriends() {
+//		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
+//		this.service.signRequest(twToken.getAccessToken(), request);
+//		Response response = request.send();
+//		JSONObject res = null;
+//		try {
+//			res = new JSONObject(response.getBody());
+//		} catch (JSONException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		JSONObject friends = new JSONObject();
+//		JSONArray friendsList = new JSONArray();
+//		// System.out.println(res.toString());
+//		try {
+//			JSONArray friendsIDList = res.getJSONArray("ids");
+//
+//			JSONObject other = null;
+//
+//			for (int i = 0; i < friendsIDList.length(); i++) {
+//				// System.out.println(friendsIDList.get(i).toString());
+//
+//				other = getOtherProfileJson(friendsIDList.get(i).toString());
+//
+//				// System.out.println(other);
+//				if (!other.toString().contains(
+//						"No user matches for specified terms"))
+//					friendsList.put(other);
+//				friends.put("friends", friendsList);
+//			}
+//		} catch (JSONException e) {
+//			return response.getBody();
+//		}
+//
+//		if (res != null)
+//			// return res.toJSONString();
+//			return friends.toString();
+//		else
+//			return null;
+//	}
 
 	public String getUserFollowers() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FOLLOWERS_URL);

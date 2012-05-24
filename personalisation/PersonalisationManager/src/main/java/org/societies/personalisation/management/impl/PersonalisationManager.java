@@ -500,6 +500,13 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 					if (preferenceOutcomes.size()==0 && intentOutcomes.size()==0){
 						this.logging.debug("Nothing to send to decisionMaker");
 						return;
+					}else{
+						for (int i =0; i<preferenceOutcomes.size(); i++){
+							this.logging.debug("Pref Outcome "+i+" :"+preferenceOutcomes.get(i));
+						}
+						for (int i =0; i<intentOutcomes.size(); i++){
+							this.logging.debug("Intent Outcome "+i+" :"+intentOutcomes.get(i));
+						}
 					}
 					this.logging.debug("Sending "+preferenceOutcomes.size()+" preference outcomes and "+intentOutcomes.size()+" intent outcomes to decisionMaker");
 					this.decisionMaker.makeDecision(intentOutcomes, preferenceOutcomes);
@@ -897,6 +904,16 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 					prefNonOverlapping.add(this.resolvePreferenceConflicts(dianne, pref));
 				}
 
+				if (intentNonOverlapping.size() ==0 & prefNonOverlapping.size() ==0){
+					this.logging.debug("Action Event-> Nothing to send to decisionMaker");
+				}else{
+					for (int i=0; i<prefNonOverlapping.size(); i++){
+						this.logging.debug("Preference Outcome "+i+" :"+prefNonOverlapping.get(i));
+					}
+					for (int i=0; i<intentNonOverlapping.size(); i++){
+						this.logging.debug("Intent Outcome "+i+" :"+intentNonOverlapping.get(i));
+					}
+				}
 				this.decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping);
 			}else{
 				logging.debug("event: "+event.geteventType()+" not a "+EventTypes.UIM_EVENT);

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.ActivityEntryImpl;
@@ -57,7 +58,8 @@ public class ActivityConverterFromTwitter implements ActivityConverter {
 					}
 				}
 				if (elm.has("created_at")) {
-					SimpleDateFormat date = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
+//					System.out.println(elm.getString("created_at"));
+					SimpleDateFormat date = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy",Locale.ENGLISH);
 					SimpleDateFormat publishedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 					Date datetemp = null;
 					try {

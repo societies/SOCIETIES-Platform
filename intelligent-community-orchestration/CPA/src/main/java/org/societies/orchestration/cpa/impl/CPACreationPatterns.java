@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,28 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.platform.TwitterConnector;
 
-import org.societies.api.internal.sns.ISocialConnector;
+package org.societies.orchestration.cpa.impl;
 
-public interface TwitterConnector extends ISocialConnector {
+import org.societies.api.cis.management.ICisParticipant;
+import org.societies.orchestration.api.ICis;
+import org.societies.orchestration.api.ICisProposal;
 
-	public static final String PROTECTED_RESOURCE_URL = "https://api.twitter.com/1/statuses/update.json";
-	public static final String ACCOUNT_VERIFICATION = "https://api.twitter.com/1/account/verify_credentials.json";
-	public static final String GET_USERINFO_URL = "http://api.twitter.com/1/users/lookup.json?user_id=";
-	public static final String GET_FRIENDS_URL = "https://api.twitter.com/1/friends/ids.json?user_id=";
-	public static final String GET_FOLLOWERS_URL = "https://api.twitter.com/1/followers/ids.json?user_id=";
-	public static final String GET_OTHER_PROFILE_URL = "https://api.twitter.com/1/users/lookup.json?user_id=";
-	public static final String GET_TWEETS_URL = "http://api.twitter.com/1/statuses/home_timeline.json?count=200";
+import java.util.ArrayList;
+import java.util.List;
 
-	/**
-	 * @return
-	 */
-	String getUserFollowers();
+/**
+ * This
+ * 
+ * 
+ * @author Bjørn Magnus Mathisen, based on work from Fraser Blackmun
+ * @version 0
+ * 
+ */
 
-	/**
-	 * @param id
-	 * @return
-	 */
-	String getOtherProfileString(String id);
+public class CPACreationPatterns
+{
+	public List<ICisProposal> analyze(List<ICis> cises){
+		ArrayList<ICisProposal> ret = new ArrayList<ICisProposal>();
+		return ret;
+		
+	}
+	private double cooperation(ICisParticipant member){
+		return Math.random();
+	}
 }
