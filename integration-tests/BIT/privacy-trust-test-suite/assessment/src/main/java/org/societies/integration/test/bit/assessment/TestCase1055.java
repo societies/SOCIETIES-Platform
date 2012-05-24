@@ -2,8 +2,10 @@ package org.societies.integration.test.bit.assessment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.integration.test.IntegrationTestCase;
 
@@ -15,9 +17,10 @@ public class TestCase1055 extends IntegrationTestCase {
 	 */
 	private static IPrivacyLogAppender privacyLogAppender;
 	private static IIdentityManager identityManager;
+	private static ICommManager commsManager;
 	private static ICtxBroker ctxBrokerExternal;
 	private static org.societies.api.internal.context.broker.ICtxBroker ctxBrokerInternal;
-	
+	private static IAssessment assessment;
 
 	public TestCase1055() {
 		// Call the super constructor
@@ -43,6 +46,13 @@ public class TestCase1055 extends IntegrationTestCase {
 		LOG.debug("[#1055] setIdentityManager()");
 		TestCase1055.identityManager = identityManager;
 	}
+	protected static ICommManager getCommManager() {
+		return commsManager;
+	}
+	public void setCommManager(ICommManager commsManager) {
+		LOG.debug("[#1055] setCommManager()");
+		TestCase1055.commsManager = commsManager;
+	}
 	protected static ICtxBroker getCtxBrokerExternal() {
 		return ctxBrokerExternal;
 	}
@@ -56,5 +66,12 @@ public class TestCase1055 extends IntegrationTestCase {
 	public void setCtxBrokerInternal(org.societies.api.internal.context.broker.ICtxBroker ctxBrokerInternal) {
 		LOG.debug("[#1055] setCtxBrokerInternal()");
 		TestCase1055.ctxBrokerInternal = ctxBrokerInternal;
+	}
+	protected static IAssessment getAssessment() {
+		return assessment;
+	}
+	public void setAssessment(IAssessment assessment) {
+		LOG.debug("[#1055] setAssessment()");
+		TestCase1055.assessment = assessment;
 	}
 }
