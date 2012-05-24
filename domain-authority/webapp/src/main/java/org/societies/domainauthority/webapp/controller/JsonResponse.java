@@ -22,28 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.platform.TwitterConnector;
+package org.societies.domainauthority.webapp.controller;
 
-import org.societies.api.internal.sns.ISocialConnector;
 
-public interface TwitterConnector extends ISocialConnector {
 
-	public static final String PROTECTED_RESOURCE_URL = "https://api.twitter.com/1/statuses/update.json";
-	public static final String ACCOUNT_VERIFICATION = "https://api.twitter.com/1/account/verify_credentials.json";
-	public static final String GET_USERINFO_URL = "http://api.twitter.com/1/users/lookup.json?user_id=";
-	public static final String GET_FRIENDS_URL = "https://api.twitter.com/1/friends/ids.json?user_id=";
-	public static final String GET_FOLLOWERS_URL = "https://api.twitter.com/1/followers/ids.json?user_id=";
-	public static final String GET_OTHER_PROFILE_URL = "https://api.twitter.com/1/users/lookup.json?user_id=";
-	public static final String GET_TWEETS_URL = "http://api.twitter.com/1/statuses/home_timeline.json?count=200";
+public class JsonResponse {
+        private String status = null;
+        private Object result = null;
+        public String getStatus() {
+                return status;
+        }
+        public void setStatus(String status) {
+                this.status = status;
+        }
+        public Object getResult() {
+                return result;
+        }
+        public void setResult(Object result) {
+                this.result = result;
+        }
 
-	/**
-	 * @return
-	 */
-	String getUserFollowers();
-
-	/**
-	 * @param id
-	 * @return
-	 */
-	String getOtherProfileString(String id);
 }
