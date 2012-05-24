@@ -415,6 +415,12 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		
 		
 	}
+
+	@Override
+	public void post(String value) {
+	
+		
+	}
 	
 	
 }
