@@ -1,8 +1,8 @@
 /**
-z * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÃ‡ÃƒO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -35,6 +35,7 @@ import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -565,7 +566,19 @@ public class ProfilerEngine implements Variables{
 				ActivityEntry activity=(ActivityEntry) posts.get(j);
 				
 				String viewer=current_id;
-				String source=activity.getActor().getDisplayName();
+				try {
+					Person p = (Person) profiles.get(0);
+					viewer = p.getDisplayName();
+					if (viewer == null)
+						viewer = p.getId();
+				} catch (Exception e) {}
+				String source=null;
+				ActivityObject a = activity.getActor();
+				if (a != null) {
+					source = a.getDisplayName();
+					if (source == null)
+						source = a.getId();
+				}
 				String type="note";
 				try {
 					type = activity.getObject().getObjectType();
@@ -594,7 +607,7 @@ public class ProfilerEngine implements Variables{
 		String lastTime=activity.getPublished();
 		
 		if ("note".equals(type)){ //status message
-			if (activity.getTarget() == null) // no target, go to wall -> this is consider narcissist			
+			if (activity.getTarget() == null && viewer.equals(source)) // no target, go to wall -> this is consider narcissist			
 				incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
 			else // someone else's activity or wall
 				incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
@@ -607,7 +620,7 @@ public class ProfilerEngine implements Variables{
 		} else if ("application".equals(type)){  //TODO quiz, applications
 			incrementManiacStatistics(lastTime, current_id, "_QuizManiac", Profile.Type.QUIZ_MANIAC, QUIZ_PROFILE);
 		} else if ("person".equals(type)){ 
-			if ("update".equals(activity.getVerb())) // update profile photos -> this is consider narcissist			
+			if ("update".equals(activity.getVerb()) && viewer.equals(source)) // update profile photos -> this is consider narcissist			
 				incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
 			else { // e.g. "tag" someone or "make-friend". 
 				//TODO this is actually receiving tags, so it is a sign of popularity (as well as the number of likes or comments to own activities)
@@ -619,6 +632,8 @@ public class ProfilerEngine implements Variables{
 			incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
 		} else if ("question".equals(type)){ // ask a question
 			incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+		} else if ("place".equals(type) && viewer.equals(source)){ // checkin a place			
+			incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
 		} else {
 				logger.info("****WARNING this type is unknown for the engine *** :"+type);
 //		} else if ("message".equals(type)){ //TODO

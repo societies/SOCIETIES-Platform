@@ -55,17 +55,17 @@ public class TesterSN {
             
 			// prepare Connector...
 			Map<String, String> pars = new HashMap<String, String>();
-//			pars.put(ISocialConnector.AUTH_TOKEN, props.getProperty("facebook.token"));
-//			socialData.addSocialConnector(
-//					socialData.createConnector(ISocialConnector.SocialNetwork.Facebook, pars));
+			pars.put(ISocialConnector.AUTH_TOKEN, props.getProperty("facebook.token"));
+			socialData.addSocialConnector(
+					socialData.createConnector(ISocialConnector.SocialNetwork.Facebook, pars));
 
 //			pars.put(ISocialConnector.AUTH_TOKEN, props.getProperty("twitter.token"));
 //			socialData.addSocialConnector(
 //					socialData.createConnector(ISocialConnector.SocialNetwork.twitter, pars));
 		   
-			pars.put(ISocialConnector.AUTH_TOKEN, props.getProperty("foursquare.token"));
-			socialData.addSocialConnector(
-					socialData.createConnector(ISocialConnector.SocialNetwork.Foursquare, pars));
+//			pars.put(ISocialConnector.AUTH_TOKEN, props.getProperty("foursquare.token"));
+//			socialData.addSocialConnector(
+//					socialData.createConnector(ISocialConnector.SocialNetwork.Foursquare, pars));
 		   
 			System.out.println("===================================================");
 			System.out.println("=== STARTING");
