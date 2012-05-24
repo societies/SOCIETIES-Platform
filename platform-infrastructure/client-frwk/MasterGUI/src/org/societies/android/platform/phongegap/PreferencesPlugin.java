@@ -26,8 +26,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 package org.societies.android.platform.phongegap;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.cordova.api.Plugin;
 import org.apache.cordova.api.PluginResult;
@@ -49,9 +50,9 @@ public class PreferencesPlugin extends Plugin {
 	//Logging tag
 	private static final String LOG_TAG = PluginCSSManager.class.getName();
 	private static final String UNDEFINED_PREF_STRING_VALUE = "undefined";
-	private static final int UNDEFINED_PREF_INTEGER_VALUE = -999999;
-	private static final long UNDEFINED_PREF_LONG_VALUE = -99999999999L;
-	private static final float UNDEFINED_PREF_FLOAT_VALUE = -99999999999.99999F;
+	private static final String UNDEFINED_PREF_INTEGER_VALUE = "-99999";
+	private static final String UNDEFINED_PREF_LONG_VALUE = "-9999999";
+	private static final String UNDEFINED_PREF_FLOAT_VALUE = "-9999999.99999";
 	private static final boolean UNDEFINED_PREF_BOOLEAN_VALUE = false;
 
 	private SharedPreferences sharedPrefs = null;
@@ -84,13 +85,20 @@ public class PreferencesPlugin extends Plugin {
 			e1.printStackTrace();
 		}
 
-		PluginResult result = null;
+        PluginResult result = new PluginResult(PluginResult.Status.ERROR);
 		
 		if (action.equals(GET_STRING_PREF_VALUE)) {
 			try {
+				Set<String> allPrefNames = this.getPrefNames();
+				
+				for (String prefName : allPrefNames) {
+					Log.d(LOG_TAG, "Pref name: " + prefName);
+				}
 				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getStringPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 			
 		} else if (action.equals(GET_INTEGER_PREF_VALUE)) {
@@ -98,6 +106,8 @@ public class PreferencesPlugin extends Plugin {
 				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getIntegerPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 			
 		} else if (action.equals(GET_LONG_PREF_VALUE)) {
@@ -105,6 +115,8 @@ public class PreferencesPlugin extends Plugin {
 				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getLongPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 			
 		} else if (action.equals(GET_FLOAT_PREF_VALUE)) {
@@ -112,6 +124,8 @@ public class PreferencesPlugin extends Plugin {
 				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getFloatPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 			
 		} else if (action.equals(GET_BOOLEAN_PREF_VALUE)) {
@@ -119,11 +133,12 @@ public class PreferencesPlugin extends Plugin {
 				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getBooleanPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 			
 		} else	{
-			//if method does not exist send synchronous error result
-	        result = new PluginResult(PluginResult.Status.ERROR);
+			Log.d(LOG_TAG, "Undefined action: " + action);
 		}
         result.setKeepCallback(false);
 		return result;
@@ -143,13 +158,13 @@ public class PreferencesPlugin extends Plugin {
 	/**
 	 * Get all of the preference names
 	 * 
-	 * @return ArrayList<String> of preference names
+	 * @return Set<String> of preference names
 	 */
-	private ArrayList<String> getPrefNames() {
-		ArrayList<String> prefNames = null;
+	private Set<String> getPrefNames() {
+		Set<String> prefNames = null;
 		
 		HashMap<String,?> allPrefs  = this.getAllPrefs();
-		prefNames = (ArrayList<String>) allPrefs.keySet();
+		prefNames = allPrefs.keySet();
 		return prefNames;
 	}
 	/**
@@ -179,7 +194,7 @@ public class PreferencesPlugin extends Plugin {
 		Log.d(LOG_TAG, "getIntegerPrefValue for: " + prefName);
 		int retValue = 0;
 		if (this.sharedPrefs.contains(prefName)) {
-			retValue = this.sharedPrefs.getInt(prefName, UNDEFINED_PREF_INTEGER_VALUE);
+			retValue = Integer.parseInt(this.sharedPrefs.getString(prefName, UNDEFINED_PREF_INTEGER_VALUE));
 			Log.d(LOG_TAG, "getIntegerPrefValue value: " + retValue);
 		}
 		return retValue;
@@ -195,7 +210,7 @@ public class PreferencesPlugin extends Plugin {
 		Log.d(LOG_TAG, "getLongPrefValue for: " + prefName);
 		long retValue = 0;
 		if (this.sharedPrefs.contains(prefName)) {
-			retValue = this.sharedPrefs.getLong(prefName, UNDEFINED_PREF_LONG_VALUE);
+			retValue = Long.parseLong(this.sharedPrefs.getString(prefName, UNDEFINED_PREF_LONG_VALUE));
 			Log.d(LOG_TAG, "getLongPrefValue value: " + retValue);
 		}
 		return retValue;
@@ -211,7 +226,7 @@ public class PreferencesPlugin extends Plugin {
 		Log.d(LOG_TAG, "getFloatPrefValue for: " + prefName);
 		float retValue = 0;
 		if (this.sharedPrefs.contains(prefName)) {
-			retValue = this.sharedPrefs.getFloat(prefName, UNDEFINED_PREF_FLOAT_VALUE);
+			retValue = Float.parseFloat(this.sharedPrefs.getString(prefName, UNDEFINED_PREF_FLOAT_VALUE));
 			Log.d(LOG_TAG, "getFloatPrefValue value: " + retValue);
 		}
 		return retValue;
