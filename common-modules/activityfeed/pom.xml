@@ -132,6 +132,12 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp.pubsub</groupId>
+			<artifactId>PubsubClientBundle</artifactId>
+			<version>${version.comm}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

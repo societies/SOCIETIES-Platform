@@ -67,7 +67,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 	public FoursquareConnectorImpl(String access_token, String identity) {
 		this.accessTokenString = access_token;
 		this.identity = identity;
-		this.name = ISocialConnector.TWITTER_CONN;
+		this.name = ISocialConnector.FOURSQUARE_CONN;
 		this.id = this.name + "_" + UUID.randomUUID();
 		this.service = new ServiceBuilder()
 				.provider(Foursquare2Api.class)

@@ -12,11 +12,12 @@
 
    <groupId>org.societies.android.platform</groupId>
    <artifactId>useragent</artifactId>
-   <!-- see Redmine wiki for componentname from project structure -->
-   <version>0.1</version> 
-   <!-- still being discussed -->
+   <version>${version.ua}</version> 
    <name>Android-user-agent</name>
    <packaging>apk</packaging>
+   
+   
+   
 	<developers>
 	    <developer>
 	      <name>S Gallacher</name>
@@ -33,10 +34,10 @@
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
 		</dependency>
-        <dependency>
+       <!--  <dependency>
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
-        </dependency>
+        </dependency> -->
         <dependency>
 	    	<groupId>org.societies.api.external</groupId>
 	    	<artifactId>societies-api</artifactId>
@@ -51,16 +52,95 @@
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
 		</dependency>
+		<dependency>
+ 			<groupId>org.slf4j</groupId>
+  			<artifactId>slf4j-api</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+		
+		
+        
+		<dependency>
+		    <groupId>org.societies.comm.xmpp</groupId>
+		    <artifactId>CommunicationFrameworkCommons</artifactId>
+		    <version>${version.comm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+		
+		
+		
+		<dependency>
+			<groupId>org.asmack</groupId>
+	    	<artifactId>asmack</artifactId>
+		</dependency>
+		<dependency>
+	    	<groupId>org.societies.android.jaxb</groupId>
+	    	<artifactId>jaxb-android-societies</artifactId>
+	    	<version>0.1</version>
+		</dependency>
+		<dependency>
+	    	<groupId>xerces</groupId>
+	    	<artifactId>xercesImpl</artifactId>
+	    	<version>2.10.0</version>
+	    	<exclusions>
+				<exclusion>
+		    		<groupId>xml-apis</groupId> 
+		    		<artifactId>xml-apis</artifactId>
+				</exclusion>
+	    	</exclusions>
+		</dependency>
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
-        <sourceDirectory>src</sourceDirectory>
+	<finalName>${project.artifactId}</finalName>
+	<sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
+                <artifactId>maven-android-plugin</artifactId>
+                <version>2.9.0-issue170</version>
+		<extensions>true</extensions>
+                <configuration>
+                    <sdk>
+			<platform>${test.android.apilevel}</platform>
+                    <path>${android.home}</path>
+		    </sdk>
+		    <emulator>
+		        <!-- the name of the avd device to use for starting the emulator -->
+		        <avd>${test.android.avd}</avd>
+		    </emulator>
+		    <undeployBeforeDeploy>true</undeployBeforeDeploy>
+		    <unpackDependencies>false</unpackDependencies>
+		    <fileToUnpack>${project.artifactId}.${project.version}-shaded.apk</fileToUnpack>
+		    <jvmArguments>
+			    <jvmArgument>-Xms512m</jvmArgument>
+			    <jvmArgument>-Xmx1024m</jvmArgument>
+		    </jvmArguments>
+                </configuration>
             </plugin>
+	    <plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-shade-plugin</artifactId>
+		    <version>1.5</version>
+		    <configuration>
+			    <shadedArtifactAttached>true</shadedArtifactAttached>
+			    <finalName>${project.artifactId}.${project.version}-shaded</finalName>
+			    <relocations>
+				    <relocation>
+					    <pattern>javax.xml.bind</pattern>
+					    <shadedPattern>jaxb</shadedPattern>
+				    </relocation>
+				    <relocation>
+					    <pattern>javax.xml.stream</pattern>
+					    <shadedPattern>stax</shadedPattern>
+				    </relocation>
+			    </relocations>
+		    </configuration>
+	    </plugin>
         </plugins>
     </build>
 </project>
