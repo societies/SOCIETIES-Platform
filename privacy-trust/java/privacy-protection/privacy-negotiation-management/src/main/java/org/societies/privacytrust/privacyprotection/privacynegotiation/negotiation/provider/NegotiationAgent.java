@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
@@ -45,13 +46,13 @@ import org.springframework.scheduling.annotation.AsyncResult;
 public class NegotiationAgent implements INegotiationAgent{
 
 	private IIdentity myIdentity;
-	private PrivacyPolicyRegistryManager policyRegistryManager;
+	private IPrivacyPolicyManager policyMgr;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	
-	public NegotiationAgent(IIdentity myID, PrivacyPolicyRegistryManager pprmgr){
+	public NegotiationAgent(IIdentity myID, PrivacypolicyMgr pprmgr){
 		this.myIdentity = myID;
-		//this.policyRegistryManager = new PrivacyPolicyRegistryManager(context);
-		this.policyRegistryManager = pprmgr;
+		//this.policyMgr = new PrivacypolicyMgr(context);
+		this.policyMgr = pprmgr;
 	}
 	
 	public void setPublicIdentity(IIdentity identity){
@@ -65,13 +66,14 @@ public class NegotiationAgent implements INegotiationAgent{
 	@Override
 	public Future<RequestPolicy> getPolicy(Requestor requestor) {
 		this.log("Returning requested policy for : "+requestor.toString());
-		RequestPolicy requestedPolicy = this.policyRegistryManager.getPolicy(requestor);
+		RequestPolicy requestedPolicy = this.policyMgr.
+		RequestPolicy requestedPolicy = this.policyMgr.getPolicy(requestor);
 		if (requestedPolicy==null){
 			log("RequestPolicy is NULL");
 		}else{
 			log("FOUND non-null request policy and returning to requestor");
 		}
-		return new AsyncResult<RequestPolicy>(this.policyRegistryManager.getPolicy(requestor));
+		return new AsyncResult<RequestPolicy>(this.policyMgr.getPolicy(requestor));
 	}
 
 	/* 
@@ -91,7 +93,7 @@ public class NegotiationAgent implements INegotiationAgent{
 	public Future<ResponsePolicy> negotiate(Requestor requestor, ResponsePolicy policy) {
 		log("Received responsePolicy from client");
 		log(policy.toString());
-		RequestPolicy myPolicy = this.policyRegistryManager.getPolicy(requestor);
+		RequestPolicy myPolicy = this.policyMgr.getPolicy(requestor);
 		if (myPolicy==null){
 			log("Could not retrieve MY POLICY!");
 		}
