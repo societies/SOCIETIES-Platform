@@ -72,6 +72,18 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 		// TODO Auto-generated method stub
 		HashSet<IOutcome> conflicts=new HashSet<IOutcome>();
 		logging.debug("start resolving DM");
+		if(intents.size()==0){
+			for(IOutcome action:preferences){
+				this.implementIAction(action);
+			}
+			return;
+		}
+		if(preferences.size()==0){
+			for(IOutcome action:intents){
+				this.implementIAction(action);
+			}
+			return;
+		}
 		for (IOutcome intent : intents) {
 			IOutcome action=intent;
 			//unresolved preference ioutcomes
