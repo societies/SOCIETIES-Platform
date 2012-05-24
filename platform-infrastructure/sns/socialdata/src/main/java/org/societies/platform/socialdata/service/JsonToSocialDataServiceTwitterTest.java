@@ -38,7 +38,8 @@ public class JsonToSocialDataServiceTwitterTest {
 			Iterator<Person> it = f.iterator();
 			while (it.hasNext()){
 				Person p = it.next();
-				System.out.println(p.getName().getFormatted() + " ("+p.getId()+")");
+//				System.out.println(p.getName().getFormatted() + " ("+p.getId()+")");
+				System.out.println(" ("+p.getId()+")");
 			}
 
 		} catch (Exception e) {

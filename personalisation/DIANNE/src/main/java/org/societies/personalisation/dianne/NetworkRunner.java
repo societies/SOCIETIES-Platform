@@ -28,13 +28,17 @@ package org.societies.personalisation.dianne;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.dianne.model.ContextNode;
+import org.societies.personalisation.dianne.model.DIANNEOutcome;
 import org.societies.personalisation.dianne.model.Network;
 import org.societies.personalisation.dianne.model.ContextGroup;
 import org.societies.personalisation.dianne.model.Node;
 import org.societies.personalisation.dianne.model.OutcomeGroup;
 import org.societies.personalisation.dianne.model.OutcomeNode;
 import org.societies.personalisation.dianne.model.Synapse;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -51,7 +55,7 @@ public class NetworkRunner implements Runnable{
 	private Object pauseMonitor = new Object();
 	private boolean paused = false;
 
-	public NetworkRunner(Network network){
+	public NetworkRunner(IIdentity identity, Network network){
 		this.network = network;
 		
 		buffer = new NetworkBuffer();
@@ -60,8 +64,27 @@ public class NetworkRunner implements Runnable{
 
 		//start thread
 		myThread = new Thread(this);
-		myThread.setName("EntityIdentifier");
+		myThread.setName("Network runner ID: "+ identity.getBareJid());
 		myThread.start();
+	}
+	
+	public void contextUpdate(CtxAttribute attribute){
+		buffer.addContextUpdate(attribute);
+	}
+	
+	public void actionUpdate(IAction action){
+		buffer.addOutcomeUpdate(action);
+	}
+	
+	public IDIANNEOutcome getPrefOutcome(ServiceResourceIdentifier serviceId, String preferenceName){
+		OutcomeGroup outcomeGroup = network.getOutcomeGroup(serviceId, preferenceName);
+		OutcomeNode activeNode = (OutcomeNode)outcomeGroup.getActiveNode();
+		IDIANNEOutcome outcome = new DIANNEOutcome(
+				serviceId, 
+				outcomeGroup.getServiceType(), 
+				outcomeGroup.getGroupName(), 
+				activeNode.getNodeName());
+		return outcome;
 	}
 
 	@Override
@@ -95,7 +118,7 @@ public class NetworkRunner implements Runnable{
 	}
 
 	private void updateNetwork(){
-		ArrayList<IAction>[] snapshot = buffer.getSnapshot();
+		ArrayList[] snapshot = buffer.getSnapshot();
 		updateContextLayer(snapshot[0]);  //set network to reflect context updates
 		updateOutcomeLayer(snapshot[1]);  //set network to reflect outcome updates
 		updateNetworkOutput();  //update synapses and outcomes
@@ -113,15 +136,15 @@ public class NetworkRunner implements Runnable{
 	/*
 	 * Context layer update methods
 	 */
-	public void updateContextLayer(ArrayList<IAction> contextUpdates)
+	public void updateContextLayer(ArrayList<CtxAttribute> contextUpdates)
 	{
-		Iterator<IAction> contextUpdates_it = contextUpdates.iterator();
+		Iterator<CtxAttribute> contextUpdates_it = contextUpdates.iterator();
 		while(contextUpdates_it.hasNext())
 		{
-			IAction nextUpdate = (IAction)contextUpdates_it.next();
+			CtxAttribute nextUpdate = (CtxAttribute)contextUpdates_it.next();
 
-			String groupName = nextUpdate.getparameterName();
-			String nodeName = nextUpdate.getvalue();
+			String groupName = nextUpdate.getType();
+			String nodeName = nextUpdate.getStringValue();
 
 			//search for group
 			ContextGroup contextGroup = network.getContextGroup(groupName);

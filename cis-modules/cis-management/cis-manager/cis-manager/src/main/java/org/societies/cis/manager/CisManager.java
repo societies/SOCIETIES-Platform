@@ -121,6 +121,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			if(session!=null)
 				session.close();
 		}
+		for(Cis cis : ownedCISs)
+			cis.setSessionFactory(sessionFactory);
 		//ActivityFeed.setSession(session);
 		//getting owned CISes
 		//Query q = session.createQuery("select o from org_societies_cis_manager_Cis o");
@@ -273,8 +275,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		
 		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory);
-		cis.setSessionFactory(sessionFactory);
+		
+		LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
 		this.persist(cis);
+		cis.setSessionFactory(sessionFactory);
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
 			return i;
@@ -637,14 +641,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			t.commit();
 			LOG.info("Saving CIS object succeded!");
 //			Query q = session.createQuery("select o from Cis aso");
-			LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			t.rollback();
 			LOG.warn("Saving CIS object failed, rolling back");
 		}finally{
-			if(session!=null)
+			if(session!=null){
 				session.close();
+				session = sessionFactory.openSession();
+				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				session.close();
+			}
+			
 		}
 	}
 	
@@ -656,6 +665,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		this.sessionFactory = sessionFactory;
 		LOG.info("in setsessionfactory!! sessionFactory is: "+sessionFactory);
 		ActivityFeed.setStaticSessionFactory(sessionFactory);
+		for(Cis cis : ownedCISs)
+			cis.setSessionFactory(sessionFactory);
 	}
 
 	
