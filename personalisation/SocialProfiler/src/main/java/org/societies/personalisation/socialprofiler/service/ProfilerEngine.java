@@ -471,7 +471,7 @@ public class ProfilerEngine implements Variables{
 		
 		Hashtable <String,ArrayList<String>> pages_data = new Hashtable<String, ArrayList<String>>();
 		
-		if (information != null) {
+		if (information != null && information.getTurnOns() != null) {
 			List<String> turnOns = information.getTurnOns();
 			Iterator<String> it =  turnOns.iterator();
 			while(it.hasNext()){
@@ -591,20 +591,34 @@ public class ProfilerEngine implements Variables{
 
 		logger.info("----post: viewer "+viewer+" source "+source+" type "+type+" message "+message);
 
-		String lastTime=activity.getUpdated();
+		String lastTime=activity.getPublished();
 		
 		if ("note".equals(type)){ //status message
+			if (activity.getTarget() == null) // no target, go to wall -> this is consider narcissist			
 				incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
+			else // someone else's activity or wall
+				incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
 		} else if ("image".equals(type)){
 			incrementManiacStatistics(lastTime, current_id, "_PhotoManiac", Profile.Type.PHOTO_MANIAC, PHOTO_PROFILE);
 		} else if ("bookmark".equals(type)){ //link , youtube or others
 			incrementManiacStatistics(lastTime, current_id, "_SurfManiac", Profile.Type.SURF_MANIAC, SURF_PROFILE);
-		} else if ("quiz".equals(type)){  //TODO quiz,applications
-			incrementManiacStatistics(lastTime, current_id, "_QuizManiac", Profile.Type.QUIZ_MANIAC, QUIZ_PROFILE);
 		} else if ("video".equals(type)){   //TODO posts containing movies , mp4 link inside the post 
 			incrementManiacStatistics(lastTime, current_id, "_SurfManiac", Profile.Type.SURF_MANIAC, SURF_PROFILE);
-		} else if ("profile".equals(type)){ //TODO profile photos -> this is consider narcissist
-			incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
+		} else if ("application".equals(type)){  //TODO quiz, applications
+			incrementManiacStatistics(lastTime, current_id, "_QuizManiac", Profile.Type.QUIZ_MANIAC, QUIZ_PROFILE);
+		} else if ("person".equals(type)){ 
+			if ("update".equals(activity.getVerb())) // update profile photos -> this is consider narcissist			
+				incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
+			else { // e.g. "tag" someone or "make-friend". 
+				//TODO this is actually receiving tags, so it is a sign of popularity (as well as the number of likes or comments to own activities)
+				incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+			}
+		} else if ("comment".equals(type)){ // comment someone else's activity
+			incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+		} else if ("event".equals(type)){ // deal with events (e.g. attend). TODO improve
+			incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+		} else if ("question".equals(type)){ // ask a question
+			incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
 		} else {
 				logger.info("****WARNING this type is unknown for the engine *** :"+type);
 //		} else if ("message".equals(type)){ //TODO
@@ -625,10 +639,10 @@ public class ProfilerEngine implements Variables{
 		try {
 			if (sdf.parse(profile_last_time).
 				before(sdf.parse(lastTime))){
-			logger.debug(maniacType+" interaction");
-			graph.incrementManiacNumber(current_id+maniacType, ptype);
-			updateProfileStatistics(current_id, lastTime, profile_last_time, profile);
-		}
+				logger.debug(maniacType+" interaction");
+				graph.incrementManiacNumber(current_id+maniacType, ptype);
+				updateProfileStatistics(current_id, lastTime, profile_last_time, profile);
+			}
 		} catch (ParseException e){
 			e.printStackTrace();
 		}
@@ -713,13 +727,24 @@ public class ProfilerEngine implements Variables{
 							      user.getAboutMe(),
 								  updatedDateS);
 			try {
+				String first = null;
+				if (user.getName() != null) {
+					first = user.getName().getGivenName();
+					if (first == null)
+						first = user.getName().getFormatted();
+				}
+				
+				String currentLoc = null;
+				if (user.getCurrentLocation() != null)
+					currentLoc = user.getCurrentLocation().getFormatted();
+				
 				graph.updateGeneralInfo(current_id+"_GeneralInfo", 
-										user.getName().getGivenName(), 
+										first, 
 										user.getName().getFamilyName(),	
 										null, 
 										null, 
 										user.getLivingArrangement(), 
-										null,
+										currentLoc,
 										user.getPoliticalViews(), 
 										user.getReligion());
 			} catch (Exception e){

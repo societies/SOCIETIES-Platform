@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Societies - User login</title>
+<title>Societies user login</title>
 <style>
 .error {
 	color: #ff0000;
@@ -32,40 +32,10 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
 <h1>${message}</h1>
-	<h3>please user below user name and password</h3>
+	
 	 
-	<FONT color="blue">
+	
 
-		<h6>User Name="userid" and password="password"</h6>
-
-	</FONT>
-
-<h2>${error}</h2>
-
-<form:form method="POST" action="login.html" commandName="loginForm">
-		<form:errors path="*" cssClass="errorblock" element="div" />
-		<table>
-			<tr>
-				<td>User :</td>
-				<td><form:input path="userName" value="userid"  />
-				</td>
-				<td><form:errors path="userName" cssClass="error" />
-				</td>
-			</tr>
-		
-					
-			<tr>
-				<td>Password :</td>
-				<td><form:password path="password" value="password.societies.local" />
-				</td>
-				<td><form:errors path="password" cssClass="error" />
-				</td>
-			</tr>						
-			<tr>
-				<td colspan="3"><input type="submit" /></td>
-			</tr>
-		</table>
-	</form:form>
 
 <!-- .................END PLACE YOUR CONTENT HERE ................ -->
 	<!-- FOOTER -->

@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,21 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.webapp.controller;
 
+package org.societies.orchestration.cpa.impl;
+
+import org.societies.api.cis.management.ICisParticipant;
+import org.societies.orchestration.api.ICis;
+import org.societies.orchestration.api.ICisProposal;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Describe your class here...
- *
- * @author mmanniox
- *
+ * This
+ * 
+ * 
+ * @author Bjørn Magnus Mathisen, based on work from Fraser Blackmun
+ * @version 0
+ * 
  */
-public class AdminResponseDetails {
-	
-	String userName;
-	String userHost;
-	String userPort;
-	String userStatus;
-	
 
+public class CPACreationPatterns
+{
+	public List<ICisProposal> analyze(List<ICis> cises){
+		ArrayList<ICisProposal> ret = new ArrayList<ICisProposal>();
+		return ret;
+		
+	}
+	private double cooperation(ICisParticipant member){
+		return Math.random();
+	}
 }

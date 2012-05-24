@@ -38,6 +38,9 @@
 <form:form method="POST" action="useradmin.html" commandName="userForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
+		
+		
+	
 		<b>
 		<tr>
 		<td>Name</td>
@@ -61,7 +64,7 @@
 			 </tr>  
 		
   		</xc:forEach>
-			 
+ 
 			 <tr>
 				<td colspan="3"><input type="submit" /></td>
 			</tr>
