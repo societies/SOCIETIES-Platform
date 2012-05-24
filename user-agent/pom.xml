@@ -60,6 +60,7 @@
 		<module>user-agent-Bundle</module>
 		<module>decision-making</module>
 		<module>conflict-resolution</module>
+		<module>UACommsManager</module>
 		<!-- add additional modules here -->
 	</modules>
 </project>
