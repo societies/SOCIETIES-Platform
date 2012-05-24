@@ -524,6 +524,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 			actor.setId(elm.getString(ID));
 			actor.setDisplayName(elm.getString(AUTHOR_NAME));
 			actor.setUrl(imageUrl.replaceAll("FBID", actor.getId()));
+			actor.setObjectType(ISocialData.PERSON);
 		
 		} catch (JSONException e) {
 			e.printStackTrace();
