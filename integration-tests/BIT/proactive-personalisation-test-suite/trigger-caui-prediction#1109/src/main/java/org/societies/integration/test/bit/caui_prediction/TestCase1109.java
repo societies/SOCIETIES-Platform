@@ -34,7 +34,7 @@ public class TestCase1109 extends IntegrationTestCase{
 	public static ICAUIPrediction cauiPrediction;
 	
 	public TestCase1109() {
-		super(1109, new Class[]{ContextStorageTest.class, RetrieveLearnedModelTest.class, PerformPrediction.class});
+		super(1109, new Class[]{ContextStorageTest.class, RetrieveLearnedModelTest.class, PerformPredictionTest.class});
 		System.out.println("Test 1109 started : TestCase1109() ");
 		//UserIntentLearningTest uil = new UserIntentLearningTest(ctxBroker,uam);
 		//uil.createHistorySet();

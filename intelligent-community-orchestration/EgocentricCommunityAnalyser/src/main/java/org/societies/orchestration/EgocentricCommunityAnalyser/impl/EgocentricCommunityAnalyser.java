@@ -149,7 +149,7 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	
 	public void addNewCissToRecords(ArrayList<String> newCissMetadata) {
 		for (int i = 0; i < newCissMetadata.size(); i++) {
-				    if (userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) == null) {
+				    if ((userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) == null)) {
 				        try {
 							userCissMetadata.put(identityManager.fromJid(newCissMetadata.get(i).split("---")[0]), newCissMetadata.get(i));
 						} catch (InvalidFormatException e) {

@@ -186,9 +186,11 @@ public class NewAccountLoginController {
 			// create new account
 			userRecord.setName(userName);
 			userRecord.setId(jid);
-			userRecord.setUrl("");
+			userRecord.setHost("");
+			userRecord.setPort("");
 			userRecord.setStatus("new");
 			userRecord.setUserType("user");
+			userRecord.setPassword(password);
 			
 			daRegistry.addXmppIdentityDetails(userRecord);
 			

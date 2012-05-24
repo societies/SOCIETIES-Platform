@@ -69,12 +69,12 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-     		<artifactId>PubsubClientBundle</artifactId>
-      		<version>${version.comm}</version>
-      		<scope>provided</scope>
-  		</dependency>
+  		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>${version.comm}</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -100,7 +100,8 @@
               				org.societies.api.internal.css.devicemgmt,
               				org.societies.api.css.devicemgmt,
               				org.societies.api.internal.css.devicemgmt.model,
-              				org.springframework.context
+              				org.springframework.context,
+              				org.societies.api.osgi.event
               			</Import-Package> 
           </instructions>
       </configuration>

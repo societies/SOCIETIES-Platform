@@ -63,10 +63,10 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-      		<groupId>org.societies.comm.xmpp.pubsub</groupId>
-      		<artifactId>PubsubClientBundle</artifactId>
-      		<version>${version.comm}</version>
-      		<scope>provided</scope>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>${version.comm}</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -82,11 +82,11 @@
               			<Bundle-Version>${pom.version}</Bundle-Version>
               			<Import-Package>
               				org.slf4j.*,
-              				org.osgi.service.event,
               				org.societies.api.css.devicemgmt,
               				org.osgi.framework,
               				org.osgi.util.tracker,
               				org.springframework.osgi.context,
+              				org.societies.api.osgi.event
               			</Import-Package>
               			<!-- <DynamicImport-Package>
               				org.societies.css.devicemgmt.devicemanager

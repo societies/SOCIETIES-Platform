@@ -144,4 +144,11 @@ public interface IServiceRegistry {
 	 * @throws ServiceUpdateException
 	 */
 	public boolean updateRegisteredService(Service service) throws ServiceUpdateException;
+	
+	/**
+	 * Description: Retrieve the list of CIS where the service is shared.
+	 * @param serviceIdentifier
+	 * @return the list of CIS where the service is shared.
+	 */
+	public List<String> retrieveCISSharedService(ServiceResourceIdentifier serviceIdentifier);
 }
