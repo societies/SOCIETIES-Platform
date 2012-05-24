@@ -76,7 +76,7 @@ public class TesterSN {
 			System.out.println("===================================================");
 			System.out.println("=== START Elaboration");
 			
-			Thread.sleep(60000);
+			Thread.sleep(100000);
 		    System.out.println("Social Profiles:   "+socialData.getSocialProfiles().size());
 		    System.out.println("Social Activities: "+socialData.getSocialActivity().size());
 		    System.out.println("Social Friends:    "+socialData.getSocialPeople().size());
