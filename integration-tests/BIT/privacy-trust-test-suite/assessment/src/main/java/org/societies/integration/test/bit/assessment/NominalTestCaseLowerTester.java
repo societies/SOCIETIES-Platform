@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
@@ -28,6 +29,8 @@ public class NominalTestCaseLowerTester {
 	
 	private static IPrivacyLogAppender privacyLogAppender;
 	private static IIdentityManager identityManager;
+	private static ICtxBroker ctxBrokerExternal;
+	private static org.societies.api.internal.context.broker.ICtxBroker ctxBrokerInternal;
 	
 	/**
 	 * Tools for integration test
@@ -58,9 +61,13 @@ public class NominalTestCaseLowerTester {
 
 		privacyLogAppender = TestCase1055.getPrivacyLogAppender();
 		identityManager = TestCase1055.getIdentityManager();
+		ctxBrokerExternal = TestCase1055.getCtxBrokerExternal();
+		ctxBrokerInternal = TestCase1055.getCtxBrokerInternal();
 		
 		assertNotNull(privacyLogAppender);
 		assertNotNull(identityManager);
+		assertNotNull(ctxBrokerExternal);
+		assertNotNull(ctxBrokerInternal);
 	}
 
 	/**

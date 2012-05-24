@@ -26,6 +26,8 @@
         init-method="run">
   		<property name="privacyLogAppender" ref="PrivacyLogAppender"/>
   		<property name="identityManager" ref="IdentityManager"/>
+  		<property name="ctxBrokerInternal" ref="ctxBrokerInternal"/>
+  		<property name="ctxBrokerExternal" ref="ctxBrokerExternal"/>
     </bean>
     
     <bean
