@@ -2,6 +2,8 @@ package org.societies.personalisation.CAUIDiscovery.impl;
 
 
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -11,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
@@ -51,62 +54,72 @@ public class ConstructUIModel {
 		UserIntentModelData modelData = null;
 		//create all actions and assign context
 		for (String actionTemp : transDictionaryAll.keySet()){
-			String [] action = actionTemp.split("\\/");
-		//	LOG.info("1 paramName: "+action[0]+"paramValue: "+action[1]);
-
-			IUserIntentAction userAction = cauiTaskManager.createAction(null,"ServiceType",action[0],action[1]);
-		//	LOG.info("2 userAction created "+userAction);
+			String [] action = actionTemp.split("\\#");
+			// add here the serviceID /
+			//	LOG.info("1 paramName: "+action[0]+"paramValue: "+action[1]);
+			String serviceId = action[0];
+			System.out.println("serviceId="+serviceId);
+			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+			try {
+				serviceId1.setIdentifier(new URI(serviceId));
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			
+			IUserIntentAction userAction = cauiTaskManager.createAction(serviceId1,"serviceType",action[1],action[2]);
+			//	LOG.info("2 userAction created "+userAction);
 
 			if(ctxActionsMap.get(actionTemp)!=null){
 				List<String> contexValuesStringList = ctxActionsMap.get(actionTemp);
 				HashMap<String,Serializable> context = new HashMap<String,Serializable>();
 				for(String contextTypeValueConc : contexValuesStringList){
 					String [] contextTypeValue = contextTypeValueConc.split("=");
-					LOG.info("constructNewModel "+contextTypeValue);
+					//LOG.info("constructNewModel "+contextTypeValue);
 					if(contextTypeValue.length == 2 ){
-					String contextType = contextTypeValue[0];
-					String contextValue = contextTypeValue[1];
-					LOG.info("constructNewModel type:"+contextType+" value:"+contextValue);
-					context.put(contextType, contextValue);
+						String contextType = contextTypeValue[0];
+						String contextValue = contextTypeValue[1];
+						LOG.info("constructNewModel type:"+contextType+" value:"+contextValue);
+						context.put(contextType, contextValue);
 					}
 				}		
 				userAction.setActionContext(context);	
 			}
-		//	LOG.info("3 act id :"+userAction.getActionID()+" context :"+userAction.getActionContext());
+			//	LOG.info("3 act id :"+userAction.getActionID()+" context :"+userAction.getActionContext());
 		}
 
 		// set links among actions
-	//	LOG.info("4 set links among actions");
+		//	LOG.info("4 set links among actions");
 		for (String sourceActionConc : transDictionaryAll.keySet()){
 
-			String [] sourceAction = sourceActionConc.split("\\/");
-			List<IUserIntentAction> sourceActionList = cauiTaskManager.retrieveActionsByTypeValue(sourceAction[0],sourceAction[1]);
-		//	LOG.info("5 sourceActionList "+ sourceActionList);
+			String [] sourceAction = sourceActionConc.split("\\#");
+			
+			List<IUserIntentAction> sourceActionList = cauiTaskManager.retrieveActionsByTypeValue(sourceAction[1],sourceAction[2]);
+			//	LOG.info("5 sourceActionList "+ sourceActionList);
 			IUserIntentAction sourceActionObj = sourceActionList.get(0);
 
 			HashMap<String,Double> targetActionsMap = transDictionaryAll.get(sourceActionConc);
-		//	LOG.info("6 targetActionsMap "+ targetActionsMap);
+			//	LOG.info("6 targetActionsMap "+ targetActionsMap);
 			for(String targetActionString : targetActionsMap.keySet()){
-				String [] actionStringTarg = targetActionString.split("\\/");
+				String [] actionStringTarg = targetActionString.split("\\#");
 
 				Double transProb = targetActionsMap.get(targetActionString);
-			//	LOG.info("7a actionStringTarg[0] "+ actionStringTarg[0]);
-		//		LOG.info("7b actionStringTarg[1] "+ actionStringTarg[1]);
+				//	LOG.info("7a actionStringTarg[0] "+ actionStringTarg[0]);
+				//		LOG.info("7b actionStringTarg[1] "+ actionStringTarg[1]);
 
-				List<IUserIntentAction> actionObjTargetList = cauiTaskManager.retrieveActionsByTypeValue(actionStringTarg[0],actionStringTarg[1]);
+				List<IUserIntentAction> actionObjTargetList = cauiTaskManager.retrieveActionsByTypeValue(actionStringTarg[1],actionStringTarg[2]);
 				// more than one target action might exist with the same param and value!!
-			//	LOG.info("8 actionObjTargetList "+ actionObjTargetList);
-				
+				//	LOG.info("8 actionObjTargetList "+ actionObjTargetList);
+
 				if(actionObjTargetList.size()>0){
-					
+
 					IUserIntentAction targetActionObj = actionObjTargetList.get(0);
-			//		LOG.info("9 targetActionObj "+ targetActionObj);
+					//		LOG.info("9 targetActionObj "+ targetActionObj);
 					cauiTaskManager.setActionLink(sourceActionObj, targetActionObj, transProb);	
 				}
 			}
 		}		 
 		modelData  = cauiTaskManager.retrieveModel();
-	//	LOG.info("10 modelData action model:"+ modelData.getActionModel());
+		//	LOG.info("10 modelData action model:"+ modelData.getActionModel());
 		return modelData;
 	}
 
