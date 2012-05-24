@@ -24,13 +24,17 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.platform.utilities;
+package org.societies.android.privacytrust.datamanagement.service;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.societies.utilities.DBC.Dbc;
+
+import android.os.Parcelable;
 
 /**
  * This class provides a set of static methods to help make the Service Messenger API calling mechanism
@@ -295,7 +299,7 @@ public class ServiceMethodTranslator {
 			StringBuffer func = new StringBuffer(method.getName()+"(");
 			int parameterNumber = 0;
 			for(Class<?> parameter : method.getParameterTypes()) {
-				func.append((parameterNumber != 0 ? ", " : "")+parameter.getSimpleName()+" param"+parameterNumber);
+				func.append((parameterNumber != 0 ? ", " : "")+parameter.getName()+" param"+parameterNumber);
 				parameterNumber++;
 			}
 			func.append(")");
@@ -315,6 +319,35 @@ public class ServiceMethodTranslator {
 		Dbc.require("A method must be specified", methodSignature != null && methodSignature.length() > 0);
 		Dbc.require("A method must have " + ParameterStart + " and " + ParameterEnd + " characters", methodSignature.contains(ParameterStart) && methodSignature.contains(ParameterEnd));
 		return methodSignature.substring(0, methodSignature.indexOf(ParameterStart));
+	}
+	
+	public static String getGetMethodFromParameter(String paramType) {
+		StringBuffer result = new StringBuffer("get");
+		if (arrayContains(JAVA_PRIMITIVES, paramType)) {
+			result.append(capitaliseString(getPrimitiveClass(paramType).getSimpleName()));
+		} else if (arrayContains(JAVA_LANG_CLASSES, paramType)) {
+			result.append(capitaliseString(paramType));
+		} else {
+			Class paramClassType = null;
+			try {
+				paramClassType = Class.forName(paramType);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			Class[] implementedInterfaces = paramClassType.getInterfaces();
+			for(Class implementedInterface : implementedInterfaces) {
+				System.out.println(implementedInterface.getSimpleName());
+				if (implementedInterface.equals(Parcelable.class)) {
+					result.append("Parcelable");
+					break;
+				}
+				else if (implementedInterface.equals(Serializable.class)) {
+					result.append("Serializable");
+					break;
+				}
+			}
+		}
+		return result.toString();
 	}
 
 	/**

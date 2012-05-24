@@ -5,8 +5,9 @@ package org.societies.android.privacytrust.dataobfuscation.obfuscator.util;
 
 import java.util.Random;
 
+
 /**
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  * @date 7 sept. 2011
  */
 public class RandomBetween extends Random {

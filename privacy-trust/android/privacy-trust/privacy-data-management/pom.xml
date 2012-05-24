@@ -31,7 +31,7 @@
 	<groupId>org.societies.android.privacytrust</groupId>
 	<artifactId>privacydatamanagement</artifactId>
 	<name>Privacy Data Management (Light Client)</name>
-	<packaging>jar</packaging>
+	<packaging>apk</packaging>
 	<version>0.1-SNAPSHOT</version>
 	<developers>
 		<developer>
@@ -55,29 +55,20 @@
 
 	<dependencies>
 		<!-- Societies -->
+		<!-- <dependency> <groupId>org.societies.android.api</groupId> <artifactId>societies-android-api</artifactId> 
+			<version>${release.version}</version> <scope>compile</scope> </dependency> -->
+		<!-- <dependency> <groupId>org.societies.api.schema</groupId> <artifactId>societies-api-schema</artifactId> 
+			<version>${release.version}</version> <scope>compile</scope> </dependency> -->
+		<!-- <dependency> <groupId>org.societies.android.api.internal</groupId> 
+			<artifactId>societies-android-api-internal</artifactId> <version>${release.version}</version> 
+			<scope>compile</scope> </dependency> -->
+		<!-- <dependency> <groupId>org.societies.api.schema.internal</groupId> 
+			<artifactId>societies-api-schema-internal</artifactId> <version>${release.version}</version> 
+			<scope>compile</scope> </dependency> -->
 		<dependency>
-			<groupId>org.societies.android.api</groupId>
-			<artifactId>societies-android-api</artifactId>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>DBC</artifactId>
 			<version>${release.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
-			<version>${release.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.android.api.internal</groupId>
-			<artifactId>societies-android-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.schema.internal</groupId>
-			<artifactId>societies-api-schema-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.android.privacytrust</groupId>
@@ -95,4 +86,16 @@
 			<artifactId>phonegap</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>test</testSourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>

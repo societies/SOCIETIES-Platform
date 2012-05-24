@@ -43,12 +43,14 @@ import org.societies.android.privacytrust.dataobfuscation.obfuscator.PostalLocat
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.StatusObfuscator;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.TemperatureObfuscator;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 
 import android.util.Log;
 
@@ -63,6 +65,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 	
 	public PrivacyDataManager()  {
+		privacyDataManagerInternal = new PrivacyDataManagerInternal();
 	}
 
 
@@ -72,7 +75,36 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 */
 	@Override
 	public ResponseItem checkPermission(RequestorBean requestor, String ownerId, String dataId, Action action) throws PrivacyException {
+		if (null == requestor) {
+			Log.d(TAG, "Requestor null");
+		}
+		else {
+			Log.d(TAG, "Requestor: "+requestor.getRequestorId());
+		}
+		
+		if (null == ownerId) {
+			Log.d(TAG, "ownerId null");
+		}
+		else {
+			Log.d(TAG, "ownerId: "+ownerId);
+		}
+		
+		if (null == dataId) {
+			Log.d(TAG, "dataId null");
+		}
+		else {
+			Log.d(TAG, "dataId: "+dataId);
+		}
+		
+		if (null == action) {
+			Log.d(TAG, "action null");
+		}
+		else {
+			Log.d(TAG, "action: "+action.getActionConstant().name());
+		}
 		// -- Verify parameters
+//		RequestorBean requestorBean = new RequestorServiceBean();
+//		requestorBean.setRequestorId(requestor);
 		verifyParemeters(requestor, ownerId, null, dataId);
 		ResponseItem permission = null;
 		
@@ -135,9 +167,11 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public IDataWrapper obfuscateData(RequestorBean requestor, String ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+	public IDataWrapper obfuscateData(String requestor, String ownerId, IDataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
-		verifyParemeters(requestor, ownerId, dataWrapper, null);
+		RequestorBean requestorBean = new RequestorServiceBean();
+		requestorBean.setRequestorId(requestor);
+		verifyParemeters(requestorBean, ownerId, dataWrapper, null);
 
 //		// -- Retrieve the obfuscation level
 //		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId());
@@ -200,9 +234,11 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public String hasObfuscatedVersion(RequestorBean requestor, String ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+	public String hasObfuscatedVersion(String requestor, String ownerId, IDataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
-		verifyParemeters(requestor, ownerId, dataWrapper, null);
+		RequestorBean requestorBean = new RequestorServiceBean();
+		requestorBean.setRequestorId(requestor);
+		verifyParemeters(requestorBean, ownerId, dataWrapper, null);
 
 		// -- Retrieve the obfuscation level
 		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, owner, dataWrapper.getDataId());
@@ -228,9 +264,11 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	// -- Private methods
 	private void verifyParemeters(RequestorBean requestor, String ownerId, IDataWrapper dataWrapper, String dataId) throws PrivacyException {
 		if (null == requestor || null == ownerId) {
+			Log.e(TAG, "verifyParemeters(): Not enought information: requestor or owner id is missing");
 			throw new NullPointerException("Not enought information: requestor or owner id is missing");
 		}
 		if (null == dataId && (null == dataWrapper || null == dataWrapper.getData())) {
+			Log.e(TAG, "verifyParemeters(): Not enought information: data id is missing");
 			throw new PrivacyException("Not enought information: data id is missing");
 		}
 	}

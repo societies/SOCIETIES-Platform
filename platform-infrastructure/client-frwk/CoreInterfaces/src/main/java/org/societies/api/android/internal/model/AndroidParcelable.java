@@ -92,11 +92,9 @@ public class AndroidParcelable  implements Parcelable {
 	/**
 	 * Parcelable implementation
 	 */
-	@Override
 	public int describeContents() {
 		return 0;
 	}
-	@Override
 	public void writeToParcel(Parcel out, int flags) {
 			out.writeString(getIdentity());
 			out.writeInt(getType());
@@ -105,12 +103,10 @@ public class AndroidParcelable  implements Parcelable {
 	
 	public static final Parcelable.Creator<AndroidParcelable> CREATOR = new Parcelable.Creator<AndroidParcelable>() {
 
-		@Override
 		public AndroidParcelable createFromParcel(Parcel in) {
 			return new AndroidParcelable(in);
 		}
 
-		@Override
 		public AndroidParcelable[] newArray(int size) {
 			return new AndroidParcelable[size];
 		}
