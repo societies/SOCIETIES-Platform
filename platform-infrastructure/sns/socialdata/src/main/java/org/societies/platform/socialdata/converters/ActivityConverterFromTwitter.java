@@ -57,6 +57,7 @@ public class ActivityConverterFromTwitter implements ActivityConverter {
 					}
 				}
 				if (elm.has("created_at")) {
+					System.out.println(elm.getString("created_at"));
 					SimpleDateFormat date = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
 					SimpleDateFormat publishedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 					Date datetemp = null;
