@@ -28,14 +28,17 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.xml.Xml;
 import org.societies.security.policynegotiator.xml.XmlException;
@@ -120,17 +123,23 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				if (requester.getSignatureMgr().verify(sla)) {
 					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
 					LOG.debug("receiveResult(): session = {}, final SLA: {}", sessionId, sla);
+					
+					// Store the SLA into secure storage
 					String key = generateKey();
 					requester.getSecureStorage().putDocument(key, sla.getBytes());
-					// TODO: store the SLA when secure services are implemented
-					if (finalCallback != null) {
-						LOG.debug("receiveResult(): invoking final callback");
-						finalCallback.onNegotiationComplete(key);
-						LOG.info("receiveResult(): negotiation finished, final callback invoked");
-					}
-					else {
-						LOG.info("receiveResult(): negotiation finished");
-					}
+
+					PrivacyPolicyNegotiationListener listener;
+					listener = new PrivacyPolicyNegotiationListener(finalCallback, key);
+					// TODO: subscribe the listener for appropriate event
+					
+					// Invoke privacy policy negotiation
+					// TODO: initialise (ask Eliza)
+					RequestPolicy policy = null;
+					// TODO: ask Eliza to replace serviceIdentifier and serviceIdentity with Requestor that covers also CIS negotiation
+					ServiceResourceIdentifier serviceIdentifier = null;
+					IIdentity serviceIdentity = provider.getRequestorId();
+					requester.getPrivacyPolicyNegotiationClient().startPrivacyPolicyNegotiation(
+							policy, serviceIdentifier, serviceIdentity);
 				}
 				else {
 					LOG.warn("receiveResult(): session = {}, final SLA invalid!", sessionId);
