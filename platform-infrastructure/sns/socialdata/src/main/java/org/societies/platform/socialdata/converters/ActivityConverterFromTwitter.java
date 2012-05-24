@@ -1,6 +1,9 @@
 package org.societies.platform.socialdata.converters;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.shindig.social.core.model.AccountImpl;
@@ -53,9 +56,27 @@ public class ActivityConverterFromTwitter implements ActivityConverter {
 						entry.setActor(aobj);
 					}
 				}
-				entry.setVerb("publish");
+				if (elm.has("created_at")) {
+					SimpleDateFormat date = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
+					SimpleDateFormat publishedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+					Date datetemp = null;
+					try {
+						datetemp = date.parse(elm.getString("created_at"));
+						entry.setPublished(publishedDate.format(datetemp));
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+				entry.setVerb("post");
 				entry.setProvider(providerObj);
+				ActivityObject type = new ActivityObjectImpl();
+				type.setObjectType("note");
+				entry.setObject(type);
+				
 				activities.add(entry);
+				
 			}
 		} 
 		catch (JSONException e) {
