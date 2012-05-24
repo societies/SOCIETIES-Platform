@@ -31,6 +31,7 @@ public class JsonToSocialDataServiceFoursquareTest {
 
 			Person profile = parserP.load(dataPro);
 			System.out.println("profile:"
+					+"\n ID : " + profile.getId()
 					+"\n Name : " + profile.getName().getGivenName()+" "+profile.getName().getFamilyName()
 					+"\n Short description : "+profile.getAboutMe()
 					+"\n Gender : "+profile.getGender().toString()

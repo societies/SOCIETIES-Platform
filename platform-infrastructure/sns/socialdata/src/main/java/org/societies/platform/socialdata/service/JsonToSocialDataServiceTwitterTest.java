@@ -19,8 +19,8 @@ public class JsonToSocialDataServiceTwitterTest {
 
 	public static void main(String[] args){
 		System.out.println("Convert JSON to SocialDATA");
-//		String access_token = "13642262-wzt0KQGjadF1GAK48lUsdigcYHTwn3bjtfnBFWcxh,gbhIavlWyOUBcNY22bWSjextPzPBITJVJ3xPJ7oIliA";
-		String access_token = "468234144-7jBtrulMAriO1yjg2J9POY6aeW2TwnwrEXWeDWYn,1lY5pClLbeJ2MGC8A9995Dlx7gxNqdnLPQarsplwLpU";
+		String access_token = "13642262-wzt0KQGjadF1GAK48lUsdigcYHTwn3bjtfnBFWcxh,gbhIavlWyOUBcNY22bWSjextPzPBITJVJ3xPJ7oIliA";
+//		String access_token = "468234144-7jBtrulMAriO1yjg2J9POY6aeW2TwnwrEXWeDWYn,1lY5pClLbeJ2MGC8A9995Dlx7gxNqdnLPQarsplwLpU";
 //		String access_token = " , ";
 		ISocialConnector c = new TwitterConnectorImpl(access_token,"dingqi");
 
