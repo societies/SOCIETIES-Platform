@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.util.ServiceMethodTranslator;
 import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
@@ -78,14 +79,9 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 					throws PrivacyException {
 		Log.d(TAG, "External call to service checkPermission()");
 		ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
-		Log.d(TAG, "checkPermission(): Permission retrieved: "+(null !=permission));
-		if (null != permission) {
-			Log.d(TAG, "checkPermission(): Decision: "+permission.getDecision().name());
-			Log.d(TAG, "checkPermission(): On resource: "+permission.getRequestItem().getResource().getCtxUriIdentifier());
-		}
 		// -- Create intent to broadcast results to interested receivers
 		Intent intent = new Intent(IPrivacyDataManager.CHECK_PERMISSION);
-		intent.putExtra("permission", permission);
+		intent.putExtra(IPrivacyDataManager.CHECK_PERMISSION_RESULT, permission);
 		this.sendBroadcast(intent);
 
 		return permission;
@@ -101,8 +97,8 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 		Log.d(TAG, "External call to service obfuscateData()");
 		IDataWrapper obfuscatedDataWrapper = privacyDataManager.obfuscateData(requestor, ownerId, dataWrapper);
 		// -- Create intent to broadcast results to interested receivers
-		Intent intent = new Intent(IPrivacyDataManager.CHECK_PERMISSION);
-		intent.putExtra("obfuscatedDataWrapper", obfuscatedDataWrapper);
+		Intent intent = new Intent(IPrivacyDataManager.OBFUSCATE_DATA);
+		intent.putExtra(IPrivacyDataManager.OBFUSCATE_DATA_RESULT, obfuscatedDataWrapper);
 		this.sendBroadcast(intent);
 		return obfuscatedDataWrapper;
 	}
@@ -117,8 +113,8 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 		Log.d(TAG, "External call to service hasObfuscatedVersion()");
 		String dataId = privacyDataManager.hasObfuscatedVersion(requestor, ownerId, dataWrapper);
 		// -- Create intent to broadcast results to interested receivers
-		Intent intent = new Intent(IPrivacyDataManager.CHECK_PERMISSION);
-		intent.putExtra("dataId", dataId);
+		Intent intent = new Intent(IPrivacyDataManager.HAS_OBFUSCATED_VERSION);
+		intent.putExtra(IPrivacyDataManager.HAS_OBFUSCATED_VERSION_RESULT, dataId);
 		this.sendBroadcast(intent);
 		return dataId;
 	}

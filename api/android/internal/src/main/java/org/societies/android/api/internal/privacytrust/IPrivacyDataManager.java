@@ -36,13 +36,12 @@ import org.societies.api.schema.identity.RequestorBean;
  * @created 09-nov.-2011 16:45:26
  */
 public interface IPrivacyDataManager {
-//	String methodsArray [] = {"checkPermission(String requestor, String ownerId, String dataId, String action)",
-//				"obfuscateData(String requestor, String ownerId, IDataWrapper dataWrapper)",
-//				"hasObfuscatedVersion(String requestor, String ownerId, IDataWrapper dataWrapper)"};
-
 	public static final String CHECK_PERMISSION = "org.societies.android.api.internal.privacytrust.checkPermission";
+	public static final String CHECK_PERMISSION_RESULT = "org.societies.android.api.internal.privacytrust.checkPermissionResult";
 	public static final String OBFUSCATE_DATA = "org.societies.android.api.internal.privacytrust.obfuscateData";
+	public static final String OBFUSCATE_DATA_RESULT = "org.societies.android.api.internal.privacytrust.obfuscateDataResult";
 	public static final String HAS_OBFUSCATED_VERSION = "org.societies.android.api.internal.privacytrust.hasObfuscatedVersion";
+	public static final String HAS_OBFUSCATED_VERSION_RESULT = "org.societies.android.api.internal.privacytrust.hasObfuscatedVersionResult";
 
 	/**
 	 * Check permission to access/use/disclose a data

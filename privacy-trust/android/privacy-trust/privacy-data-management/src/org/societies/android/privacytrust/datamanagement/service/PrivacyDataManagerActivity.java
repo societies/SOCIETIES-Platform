@@ -22,17 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement;
+package org.societies.android.privacytrust.datamanagement.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
-import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerExternalService;
-import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService;
+import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.util.ServiceMethodTranslator;
+import org.societies.android.privacytrust.datamanagement.R;
+import org.societies.android.privacytrust.datamanagement.R.id;
+import org.societies.android.privacytrust.datamanagement.R.layout;
 import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService.LocalBinder;
-import org.societies.android.privacytrust.datamanagement.service.ServiceMethodTranslator;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
@@ -95,6 +97,8 @@ public class PrivacyDataManagerActivity extends Activity {
 		// Register the broadcast receiver to retrieve results of an out process service call
 		IntentFilter intentFilter = new IntentFilter() ;
 		intentFilter.addAction(IPrivacyDataManager.CHECK_PERMISSION);
+		intentFilter.addAction(IPrivacyDataManager.HAS_OBFUSCATED_VERSION);
+		intentFilter.addAction(IPrivacyDataManager.OBFUSCATE_DATA);
         this.registerReceiver(new ServiceReceiver(), intentFilter);
 	}
 
@@ -155,7 +159,7 @@ public class PrivacyDataManagerActivity extends Activity {
 				StringBuffer sb = new StringBuffer();
 				sb.append("Permission retrieved: "+(null !=permission));
 				if (null != permission) {
-					sb.append("Decision: "+permission.getDecision().name());
+					sb.append("\nDecision: "+permission.getDecision().name());
 					sb.append("\nOn resource: "+permission.getRequestItem().getResource().getCtxUriIdentifier());
 				}
 				txtLocation.setText(sb.toString());
@@ -245,17 +249,34 @@ public class PrivacyDataManagerActivity extends Activity {
 			// CHECK_PERMISSION
 			if (intent.getAction().equals(IPrivacyDataManager.CHECK_PERMISSION)) {
 				Log.i(TAG, "Out of process real service received intent - CHECK_PERMISSION");
-
+				
 				ResponseItem permission = null;
-				if(intent.hasExtra("permission")) {
-					permission = (ResponseItem) intent.getSerializableExtra("permission");
+				if(intent.hasExtra(IPrivacyDataManager.CHECK_PERMISSION_RESULT)) {
+					permission = (ResponseItem) intent.getSerializableExtra(IPrivacyDataManager.CHECK_PERMISSION_RESULT);
 				}
 				
 				StringBuffer sb = new StringBuffer();
 				sb.append("Permission retrieved: "+(null !=permission));
 				if (null != permission) {
-					sb.append("Decision: "+permission.getDecision().name());
+					sb.append("\nDecision: "+permission.getDecision().name());
 					sb.append("\nOn resource: "+permission.getRequestItem().getResource().getCtxUriIdentifier());
+				}
+				txtLocation.setText(sb.toString());
+			}
+			// OBFUSCATE_DATA
+			if (intent.getAction().equals(IPrivacyDataManager.OBFUSCATE_DATA)) {
+				Log.i(TAG, "Out of process real service received intent - OBFUSCATE_DATA");
+
+				IDataWrapper obfuscatedDataWrapper = null;
+				if(intent.hasExtra(IPrivacyDataManager.OBFUSCATE_DATA_RESULT)) {
+					obfuscatedDataWrapper = (IDataWrapper) intent.getParcelableExtra(IPrivacyDataManager.OBFUSCATE_DATA_RESULT);
+				}
+				
+				StringBuffer sb = new StringBuffer();
+				sb.append("Data obfuscated: "+(null != obfuscatedDataWrapper));
+				if (null != obfuscatedDataWrapper) {
+					sb.append("\nData Id: "+obfuscatedDataWrapper.getDataId());
+					sb.append("\nData type: "+obfuscatedDataWrapper.getData().getClass().getSimpleName());
 				}
 				txtLocation.setText(sb.toString());
 			}
