@@ -47,7 +47,6 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
@@ -60,8 +59,10 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.context.api.event.CtxChangeEventTopic;
@@ -122,15 +123,18 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param userCtxDBMgr
 	 * @param commMgr
+	 * @throws CtxException 
 	 */
 	@Autowired(required=true)
-	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr) {
+	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr) throws CtxException {
 
 		LOG.info(this.getClass() + " instantiated");
 		this.userCtxDBMgr = userCtxDBMgr;
 		this.idMgr = commMgr.getIdManager();
-
-		this.createCssOperator(); // TODO remove
+		final INetworkNode localCssNodeId = this.idMgr.getThisNetworkNode();
+		LOG.info("Found local CSS node ID " + localCssNodeId.toString());
+		this.createCssOperator(); // TODO remove?
+		this.createCssNode(localCssNodeId); // TODO remove?
 	}
 
 	/*
@@ -338,6 +342,33 @@ public class InternalCtxBroker implements ICtxBroker {
 			}
 		}
 		return new AsyncResult<IndividualCtxEntity>(operatorCss);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieveCssNode(org.societies.api.identity.INetworkNode)
+	 */
+	@Override
+	@Async
+	public Future<CtxEntity> retrieveCssNode(final INetworkNode cssNodeId) 
+			throws CtxException {
+		
+		if (cssNodeId == null)
+			throw new NullPointerException("cssNodeId can't be null");
+		
+		CtxEntity cssNode = null; // TODO this.userCtxDBMgr.retrieveCssNode();
+		final List<CtxEntityIdentifier> entIds = this.userCtxDBMgr.lookupEntities(
+				CtxEntityTypes.CSS_NODE, CtxAttributeTypes.ID, cssNodeId.toString(), cssNodeId.toString());
+		if (!entIds.isEmpty()) {
+			
+			try {
+				cssNode = (CtxEntity) this.retrieve(entIds.get(0)).get();
+			} catch (Exception e) {
+			
+				throw new CtxBrokerException("Failed to retrieve CSS node context entity " + cssNodeId
+						+ ": " + e.getLocalizedMessage(), e);
+			}
+		}
+		return new AsyncResult<CtxEntity>(cssNode);
 	}
 
 	/*
@@ -1252,6 +1283,30 @@ public class InternalCtxBroker implements ICtxBroker {
 			e.printStackTrace();
 		}
 	}
+	
+	// TODO remove
+	public void createCssNode(INetworkNode cssNodeId) throws CtxException {
+		
+			try {
+				LOG.info("Checking if CSS node context entity " + cssNodeId + " exists...");
+				CtxEntity cssNodeEnt = this.retrieveCssNode(cssNodeId).get();
+				if (cssNodeEnt != null) {
+
+					LOG.info("Found CSS node context entity " + cssNodeEnt.getId());
+					return;
+				}
+				
+				cssNodeEnt = this.createEntity(CtxEntityTypes.CSS_NODE).get();
+				final CtxAttribute cssNodeIdAttr = this.createAttribute(cssNodeEnt.getId(), CtxAttributeTypes.ID).get();
+				this.updateAttribute(cssNodeIdAttr.getId(), cssNodeId.toString());
+				LOG.info("Created CSS node context entity " + cssNodeEnt.getId());
+				
+			} catch (Exception e) {
+				
+				throw new CtxBrokerException("Could not create CSS node context entity " + cssNodeId
+						+ ": " + e.getLocalizedMessage(), e);
+			}
+		}
 
 	private CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)

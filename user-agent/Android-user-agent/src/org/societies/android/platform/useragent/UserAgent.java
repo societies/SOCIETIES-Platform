@@ -130,7 +130,7 @@ public class UserAgent extends Service implements IAndroidUserAgent{
 				Log.d(LOG_TAG, nextPackage);
 			}
     		ccm.register(ELEMENT_NAMES, callback);
-			ccm.sendIQ(stanza, IQ.Type.GET, uamBean, callback);
+			ccm.sendIQ(stanza, IQ.Type.SET, uamBean, callback);
 			Log.d(LOG_TAG, "Stanza sent!");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, Log.getStackTraceString(e));
