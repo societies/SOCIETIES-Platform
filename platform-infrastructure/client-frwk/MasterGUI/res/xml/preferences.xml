@@ -8,6 +8,29 @@
                 android:title="Alive"
                 android:defaultValue="true"
                 android:summary="Is user alive ?" />
-                
+   		<EditTextPreference 
+   		    	android:title="Float Preference" 
+   	    		android:key="AFloatPref" 
+   	    		android:numeric="decimal"
+   	    		android:defaultValue="89999.9098" 
+   	    		android:summary="A large float"/>
+   		<EditTextPreference 
+   		    	android:title="Integer Preference" 
+   	    		android:numeric="integer"
+   		    	android:key="anInt" 
+   		    	android:defaultValue="132" 
+   		    	android:summary="An Integer value"/>
+   		<EditTextPreference 
+   		    	android:title="A Long preference" 
+   	    		android:numeric="integer"
+   		    	android:key="aLong" 
+   		    	android:defaultValue="100002322" 
+   		    	android:summary="A Long value"/>
+   		<EditTextPreference 
+   		    	android:title="String Preference" 
+   		    	android:key="aString" 
+   		    	android:defaultValue="String Theory" 
+   		    	android:summary="A String value"/>
+        
     </PreferenceCategory>
 </PreferenceScreen>

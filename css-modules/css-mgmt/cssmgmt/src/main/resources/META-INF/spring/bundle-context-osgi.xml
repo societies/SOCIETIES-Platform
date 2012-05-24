@@ -16,6 +16,8 @@
 	<osgi:reference id="cssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote" cardinality="0..1" />
 	<osgi:reference id="serviceDiscoveryRef" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
 	<osgi:reference id="CSSManagerRemote" interface="org.societies.api.internal.css.management.ICSSRemoteManager" cardinality="0..1" />
+    <osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
+	<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 	
 	
 </beans>

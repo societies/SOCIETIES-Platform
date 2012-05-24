@@ -41,8 +41,8 @@ iframe {
 	<table>
 		<tr>
 			<td class="content"><iframe
-				src="${webappurl}" frameborder="0" 
-			<!-- 	src="http://localhost:18080/societies/login.html" frameborder="0" -->
+				  src="${webappurl}" frameborder="0"  
+			 
 					scrolling="no"></iframe></td>
 		</tr>
 	</table>

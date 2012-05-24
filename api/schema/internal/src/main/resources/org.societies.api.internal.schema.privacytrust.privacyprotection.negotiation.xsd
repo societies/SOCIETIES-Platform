@@ -21,7 +21,7 @@
 					minOccurs="0" />
 				<xs:element name="responsePolicy" type="xs:base64Binary"
 					minOccurs="0" />
-				<xs:element name="requestor" type="ns1:RequestorBean" 
+				<xs:element name="requestor" type="ns1:requestorBean" 
 					minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>

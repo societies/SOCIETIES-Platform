@@ -25,7 +25,7 @@ public class TestCase755 extends IntegrationTestCase {
 	
 
 	public TestCase755() {		
-		super(755, new Class[]{NominalTestCaseLowerTester.class});
+		super(755, new Class[]{NominalTestCaseLowerTester.class, SpecificTestCaseUpperTester.class});
 		NominalTestCaseLowerTester.testCaseNumber = 755;
 		
 		if(LOG.isDebugEnabled()) LOG.debug("TestCase755 Constructor");

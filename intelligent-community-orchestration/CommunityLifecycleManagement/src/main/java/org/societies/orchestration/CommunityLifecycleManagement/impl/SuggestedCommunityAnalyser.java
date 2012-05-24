@@ -203,7 +203,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		
 		proximityHistory = new ArrayList<ProximityRecord>();
 			
-		new ProximityRecordingThread().start();
+		//new ProximityRecordingThread().start();
 	}
 	
 	class ProximityRecordingThread extends Thread {
@@ -262,19 +262,22 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     			}
     	}
     	
-    	if (creations != null) {
-    	    abstractCreations = new ArrayList<ArrayList<ICisProposal>>();
-    	    abstractCreations.add(creations);
-    	    convertedRecommendations.put("Create CISs", abstractCreations);
-    	}
+    	ArrayList<String> preferenceConflicts = checkForPreferenceConflicts("Create CISs", abstractCreations);
+		if (preferenceConflicts.size() != 0)
+			for (int i = 0; i < preferenceConflicts.size(); i++) {
+			    creations.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
+			    //cissToCreateMetadata.set(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]), "FAILED");
+			    cissToCreateMetadata.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
+			}
 
-    	if (deletions != null) {
-    	    abstractDeletions = new ArrayList<ArrayList<ICisProposal>>();
-    	    abstractDeletions.add(deletions);
-    	    convertedRecommendations.put("Delete CISs", abstractDeletions);
-    	}
+		ArrayList<String> preferenceConflictsDeletion = checkForPreferenceConflicts("Delete CISs", abstractDeletions);
+		if (preferenceConflictsDeletion.size() != 0)
+			for (int i = 0; i < preferenceConflictsDeletion.size(); i++) {
+			    deletions.remove(Integer.valueOf(preferenceConflictsDeletion.get(i).split("---")[0]));
+			    //cissToDeleteMetadata.set(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]), "FAILED");
+			}
     	
-    	for (int i = 0; i < creations.size(); i++) {
+		/**for (int i = 0; i < creations.size(); i++) {
     		if (checkForPreferenceConflicts("Create CISs", abstractCreations).size() != 0) {
     			creations.remove(i);
     			cissToCreateMetadata.set(i, "FAILED");
@@ -286,7 +289,25 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     			deletions.remove(i);
     		    cissToCreateMetadata.set(i, "FAILED");
     	    }
+    	}*/
+		
+    	if (creations != null) {
+    		if (creations.size() > 0) {
+    	        abstractCreations = new ArrayList<ArrayList<ICisProposal>>();
+    	        abstractCreations.add(creations);
+    	        convertedRecommendations.put("Create CISs", abstractCreations);
+    		}
     	}
+
+    	if (deletions != null) {
+    		if (deletions.size() > 0) {
+    	        abstractDeletions = new ArrayList<ArrayList<ICisProposal>>();
+    	        abstractDeletions.add(deletions);
+    	        convertedRecommendations.put("Delete CISs", abstractDeletions);
+    		}
+    	}
+    	
+    	
     	
     	if (convertedRecommendations.size() != 0) {
     		return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata);
@@ -319,7 +340,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	ArrayList<ArrayList<ICisProposal>> abstractCreations = new ArrayList<ArrayList<ICisProposal>>();
     	ArrayList<ArrayList<ICisProposal>> abstractDeletions = new ArrayList<ArrayList<ICisProposal>>();
     	
-		
+    	ArrayList<ArrayList<ICisProposal>> configurations = new ArrayList<ArrayList<ICisProposal>>();
+    	
 		if (creations != null)
 			if (creations.size() != 0)
 				for (int i = 0; i < creations.size(); i++) {
@@ -456,7 +478,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    		
 	    		
 	    	}
-	
+		
 		for (int i = 0; i < creations.size(); i++) {
 			ICisProposal cisProposal = creations.get(i);
 			List<ICis> userJoinedCissTemp = cisManager.getCisList();
@@ -465,18 +487,43 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				userJoinedCiss.add(userJoinedCissTemp.get(m));
 			}
 			for (int m = 0; m < userJoinedCiss.size(); m++) {
-				//if (userJoinedCiss.get(m).getMembershipCriteria == cisProposal.getMembershipCriteria()) {
-				    //if (userJoinedCiss.get(m).getMembersList() == cisProposal.getMembersList()) {
-				        //creations.remove(i);
+				if (userJoinedCiss.get(m).getMembershipCriteria() == cisProposal.getMembershipCriteria()) {
+				    Set<ICisParticipant> members = null;
+					try {
+						members = userJoinedCiss.get(m).getMembersList().get();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if ((members.size() == cisProposal.getMemberList().size()) &&
+						(members.contains(cisProposal.getMemberList())) &&
+						(cisProposal.getMemberList().contains(members))) {
+						
+				        creations.remove(i);
+				        //if (userJoinedCiss.get(m).getActivityFeed().getLastActivity(linkedCss).getTimestamp() < (new Date().getTime() - (1000 * 60 * 60 * 24 * 21))) {
+				            //configurations.add(userJoinedCiss.get(m), new ICisProposal().populate().removeMember(linkedCss));
+				        //returnStatement = "PERFECT MATCH CIS EXISTS";
+				        //}
+				        //else
 				        //Feedback to CSM Analyser suggesting to either remove this model,
 				        //add another attribute to it (suggest one?), or change one or more
 				        //model attributes (specify them?)
-			        //}
-				    //else if (userJoinedCiss.get(m).getMembersList().size() >= (1.3 * cisProposal.getMembersList().size()) {
-				    //    creations.add(sub-CIS for shared CSSs);
-				    //}
-				//}
-				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion,
+			        }
+				    else if (members.size() >= (1.3 * cisProposal.getMemberList().size()) &&
+				    		(members.contains(cisProposal.getMemberList())) &&
+				    		(cisProposal.getMembershipCriteria() != userJoinedCiss.get(m).getMembershipCriteria())) {
+				        //TODO: alternatively: membership criteria is identical, but CIS activity feed
+				    	//shows greater than average activity for the group, so sub-CIS for cluster.
+				    	//needs activity feed defined to do so
+				    	cisProposal.setParentCis(userJoinedCiss.get(m));
+				    	creations.set(i, cisProposal);
+				    }
+					
+				}
+				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion(?),
 				//may be grounds to delete the old CIS. E.g. the suggestion is based on location,
 				//which is different to the location of an existing CIS, which is known to be short-term temporary.
 			}
@@ -496,9 +543,28 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    
 			//Friends, CSS directory, working colleagues, same address: ongoing
 			//Shared interests, personal attributes like languages spoken and age: sub-CIS.
+			
+			//ArrayList<ICis> unjoinedCiss = cisDirectory.search(creations.get(i));
+			//if (unjoinedCiss != null) {
+			    //for (int m = 0; unjoinedCiss.size(); m++) {
+			    //    if (unjoinedCiss.get(m).size() <= (1.3 * creations.get(m).getMemberList().size())) {
+			              //configurations.add(unjoinedCiss.get(m), new ICisProposal().populate().addMember(linkedCss));
+	                      //returnStatement = "UNJOINED CIS EXISTED";
+			        //}
+			    //}
+			//}
 			ArrayList<ICisProposal> ciss = new ArrayList<ICisProposal>();
 			ciss.add(cisProposal);
-			convertedRecommendations = advancedCisCreationAnalysis(ciss);
+			if (creations.size() > 0)
+			convertedRecommendations = advancedCisCreationAnalysis(creations);
+			
+			if (configurations.size() > 0)
+			    convertedRecommendations.put("Configure CIS", configurations);
+			
+			if (convertedRecommendations.get("Remove from CSM") != null) {
+				if (convertedRecommendations.get("Remove from CSM").size() > 0) {
+				}
+			}
 			
 		}
 	
@@ -570,6 +636,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	        }
 	    }
     	
+    	
+    	
     	//if (convertedRecommendations.size() != 0) {
     	//	ArrayList<String> actionMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
     	//}
@@ -591,6 +659,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     public String processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities) {
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>(); 
+    	
+    	String returnStatement = "";
     	
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		//ICis proposedCis = cisManager.getBlankCisRecord();
@@ -639,6 +709,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	            	abstractCreations.add(it);
 				}
 	
+		ArrayList<ArrayList<ICisProposal>> configurations = new ArrayList<ArrayList<ICisProposal>>();
 		
 			ArrayList<String> preferenceConflicts = checkForPreferenceConflicts("Create CISs", abstractCreations);
 			if (preferenceConflicts.size() != 0)
@@ -759,6 +830,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 						(cisProposal.getMemberList().contains(members))) {
 						
 				        creations.remove(i);
+				        //if (userJoinedCiss.get(m).getActivityFeed().getLastActivity(linkedCss).getTimestamp() < (new Date().getTime() - (1000 * 60 * 60 * 24 * 21))) {
+				            //configurations.add(userJoinedCiss.get(m), new ICisProposal().populate().removeMember(linkedCss));
+				        //returnStatement = "PERFECT MATCH CIS EXISTS";
+				        //}
+				        //else
 				        return "PERFECT MATCH CIS EXISTS";
 				        //Feedback to CSM Analyser suggesting to either remove this model,
 				        //add another attribute to it (suggest one?), or change one or more
@@ -773,6 +849,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				    	cisProposal.setParentCis(userJoinedCiss.get(m));
 				    	creations.set(i, cisProposal);
 				    }
+					
 				}
 				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion(?),
 				//may be grounds to delete the old CIS. E.g. the suggestion is based on location,
@@ -794,9 +871,22 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    
 			//Friends, CSS directory, working colleagues, same address: ongoing
 			//Shared interests, personal attributes like languages spoken and age: sub-CIS.
+			
+			//ArrayList<ICis> unjoinedCiss = cisDirectory.search(creations.get(i));
+			//if (unjoinedCiss != null) {
+			    //for (int m = 0; unjoinedCiss.size(); m++) {
+			    //    if (unjoinedCiss.get(m).size() <= (1.3 * creations.get(m).getMemberList().size())) {
+			              //configurations.add(unjoinedCiss.get(m), new ICisProposal().populate().addMember(linkedCss));
+	                      //returnStatement = "UNJOINED CIS EXISTED";
+			        //}
+			    //}
+			//}
 			ArrayList<ICisProposal> ciss = new ArrayList<ICisProposal>();
 			ciss.add(cisProposal);
-			convertedRecommendations = advancedCisCreationAnalysis(ciss);
+			if (creations.size() > 0)
+			convertedRecommendations = advancedCisCreationAnalysis(creations);
+			
+			convertedRecommendations.put("Configure CIS", configurations);
 			
 			if (convertedRecommendations.get("Remove from CSM") != null) {
 				if (convertedRecommendations.get("Remove from CSM").size() > 0) {

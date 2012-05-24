@@ -5,7 +5,27 @@ import java.util.Map;
 
 public interface ISocialData {
 
-   
+	// verbs
+	public static final String POST = "post";
+	public static final String TAG = "tag";
+	public static final String UPDATE = "update";
+	public static final String LIKE = "like";
+	public static final String SHARE = "share";
+	public static final String MAKE_FRIEND = "make-friend";
+	public static final String ATTEND = "attend";
+
+	// Object types
+	public static final String NOTE = "note";
+	public static final String IMAGE = "image";
+	public static final String PERSON = "person";
+	public static final String BOOKMARK = "bookmark";
+	public static final String COMMENT = "comment";
+	public static final String EVENT = "event";
+	public static final String QUESTION = "question";
+	public static final String COLLECTION = "collection";
+	public static final String PLACE = "places";
+		
+	
     /**
      * Add a new social connector to fetch data from a specific Social network
      * @param socialConnector Interface of the specific connector

@@ -24,16 +24,18 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResult;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
 /**
@@ -48,62 +50,76 @@ public class DataTransferAnalyzer {
 	private static Logger LOG = LoggerFactory.getLogger(DataTransferAnalyzer.class);
 
 	private PrivacyLog privacyLog;
-	private Correlation correlation;
+//	private Correlation correlation;
 	
-	private List<AssessmentResultClassName> assessmentResultClassName = new ArrayList<AssessmentResultClassName>();
-	private List<AssessmentResultIIdentity> assessmentResultIIdentity = new ArrayList<AssessmentResultIIdentity>();
+//	private List<AssessmentResultClassName> assessmentResultClassName = new ArrayList<AssessmentResultClassName>();
+//	private List<AssessmentResultIIdentity> assessmentResultIIdentity = new ArrayList<AssessmentResultIIdentity>();
 	
 	public DataTransferAnalyzer(PrivacyLog privacyLog) {
 		LOG.info("Constructor");
 		this.privacyLog = privacyLog;
-		this.correlation = new Correlation(privacyLog.getDataAccess(), privacyLog.getDataTransmission());
+//		this.correlation = new Correlation(privacyLog.getDataAccess(), privacyLog.getDataTransmission());
 	}
 	
-	public double estimatePrivacyBreach(IIdentity sender) throws AssessmentException {
+	public AssessmentResultIIdentity estimatePrivacyBreach(IIdentity sender) throws AssessmentException {
 		
-		if (sender == null) {
-			throw new AssessmentException("sender must not be null");
+		if (sender == null || sender.getJid() == null) {
+			LOG.warn("estimatePrivacyBreach({}): sender or sender JID is null", sender);
+			throw new AssessmentException("sender or sender JID is null");
 		}
 		
-		double corr = 0;
-		String needle = sender.getJid();
-		String senderInLog;
+		AssessmentResultIIdentity result = new AssessmentResultIIdentity(sender);
+		PrivacyLogFilter filter = new PrivacyLogFilter();
+		filter.setSender(sender);
 		
-		if (needle == null) {
-			LOG.warn("correlation({}): sender JID is null", sender);
-			throw new AssessmentException("sender JID is null");
-		}
+		double corrByAll = 0;
+		double corrBySender = 0;
+		List<DataTransmissionLogEntry> matchedTransmissions = privacyLog.search(filter);
 		
-		for (DataTransmissionLogEntry tr : correlation.getDataTransmission()) {
-			senderInLog = tr.getSender().getJid();
-			if (senderInLog == null) {
-				LOG.warn("correlation(): ignoring null sender in log");
-			}
-			else if (senderInLog.equals(needle)) {
-				corr += tr.getCorrelationWithDataAccess();
-			}
+		for (DataTransmissionLogEntry tr : matchedTransmissions) {
+			corrByAll += tr.getCorrelationWithDataAccess();
+			corrBySender += tr.getCorrelationWithDataAccessBySender();
 		}
-		return corr;
+		fillResult(result, corrByAll, corrBySender, matchedTransmissions);
+		return result;
 	}
 	
-	public double estimatePrivacyBreach(String sender) throws AssessmentException {
+	public AssessmentResultClassName estimatePrivacyBreach(String sender) throws AssessmentException {
 		
 		if (sender == null) {
-			throw new AssessmentException("sender must not be null");
+			LOG.warn("estimatePrivacyBreach({}): sender is null", sender);
+			throw new AssessmentException("sender is null");
 		}
 		
-		double corr = 0;
-		String senderInLog;
+		AssessmentResultClassName result = new AssessmentResultClassName(sender);
+		PrivacyLogFilter filter = new PrivacyLogFilter();
+		filter.setSenderClass(sender);
 		
-		for (DataTransmissionLogEntry tr : correlation.getDataTransmission()) {
-			senderInLog = tr.getSenderClass();
-			if (senderInLog == null) {
-				LOG.warn("correlation(): ignoring null sender in log");
-			}
-			else if (senderInLog.equals(sender)) {
-				corr += tr.getCorrelationWithDataAccess();
-			}
+		double corrByAll = 0;
+		double corrBySender = 0;
+		List<DataTransmissionLogEntry> matchedTransmissions = privacyLog.search(filter);
+		
+		for (DataTransmissionLogEntry tr : matchedTransmissions) {
+			corrByAll += tr.getCorrelationWithDataAccess();
+			corrBySender += tr.getCorrelationWithDataAccessBySenderClass();
 		}
-		return corr;
+		fillResult(result, corrByAll, corrBySender, matchedTransmissions);
+		return result;
+	}
+	
+	private void fillResult(AssessmentResult result, double corrByAll, double corrBySender,
+			List<DataTransmissionLogEntry> matchedTransmissions) {
+		
+		result.setCorrWithDataAccessByAll(corrByAll);
+		result.setCorrWithDataAccessBySender(corrBySender);
+		result.setNumAllPackets(matchedTransmissions.size());
+		if (matchedTransmissions.size() > 0) {
+			result.setNumPacketsPerMonth(0);
+		}
+		else {
+			long timePeriodInMs;
+			timePeriodInMs = new Date().getTime() - matchedTransmissions.get(0).getTimeInMs();
+			result.setNumPacketsPerMonth((double) matchedTransmissions.size() / timePeriodInMs);
+		}
 	}
 }

@@ -28,6 +28,10 @@ import org.societies.api.cis.directory.ICisDirectory;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.css.directory.ICssDirectory;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
+
 /**
  * This is the base client interface for T4.5/SOCIETIES. This interface is implemented
  * for Android and Virgo in the respective client libraries.
@@ -39,6 +43,8 @@ import org.societies.api.css.directory.ICssDirectory;
  * MISSING_ANNOTATION
  * MISSING_JAVADOCS
  */
+
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ISocietiesApp {
     //TODO: Fix this Object.
     public Object getCssManager();

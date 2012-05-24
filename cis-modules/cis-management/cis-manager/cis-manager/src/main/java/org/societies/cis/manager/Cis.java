@@ -25,6 +25,7 @@
 
 package org.societies.cis.manager;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,6 +48,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 //import org.societies.cis.mgmt;
+import org.hibernate.SessionFactory;
+import org.hibernate.classic.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
@@ -61,6 +64,7 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICis;
@@ -98,19 +102,32 @@ import org.springframework.scheduling.annotation.AsyncResult;
 @Entity
 @Table(name = "org_societies_cis_manager_Cis")
 public class Cis implements IFeatureServer, ICisOwned {
-
+	private static final long serialVersionUID = 1L;
+	@Transient
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
 					  		"http://societies.org/api/schema/cis/community"));
 			//.singletonList("http://societies.org/api/schema/cis/community");
+	@Transient
 	private final static List<String> PACKAGES = Collections
 			//.singletonList("org.societies.api.schema.cis.community");
 	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
 		"org.societies.api.schema.cis.community"));
 
+	private SessionFactory sessionFactory;
 	
 	
 	
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
+
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
@@ -120,6 +137,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 // minimun attributes
 	@OneToOne(cascade=CascadeType.ALL)
 	public CisRecord cisRecord;
+	
 	@OneToOne(cascade=CascadeType.ALL)
 	public ActivityFeed activityFeed;
 	//TODO: should this be persisted?
@@ -246,7 +264,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			e.printStackTrace();
 			LOG.info("could not start comm manager!");
 		} // TODO unregister??
-		
 		LOG.info("CIS listener registered");
 		
 		
@@ -485,7 +502,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	}
 
-	// index for hash and equals was only the cisRecord
+
+	
+	// equals comparing only cisRecord
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -507,10 +527,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 		if (cisRecord == null) {
 			if (other.cisRecord != null)
 				return false;
-		} else if (cisRecord.equals(other.cisRecord) == false)
+		} else if (!cisRecord.equals(other.cisRecord))
 			return false;
 		return true;
 	}
+	
+	
+	
 
 	public CisRecord getCisRecord() {
 		return cisRecord;
@@ -765,8 +788,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		n.setDeleteNotification(d);
 		message.setNotification(n);
-
-		
+		Session session = sessionFactory.openSession();
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();
 		
@@ -794,7 +816,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			it.remove();
 	     }
 		
-		
+		session.close();
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
@@ -854,7 +876,21 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public int getMembershipCriteria() {
 		return this.cisRecord.getMembershipCriteria();
 	}
-    
 	
+	@Override
+	public void getInfo(ICisManagerCallback callback){
+		LOG.debug("local client call to get info from this CIS");
+
+		
+		Community c = new Community();
+		c.setCommunityJid(this.getCisId());
+		c.setCommunityName(this.getName());
+		c.setCommunityType(this.getCisType());
+		c.setOwnerJid(this.getOwnerId());
+		c.setDescription(this.getDescription());
+		c.setGetInfo("");
+		
+		callback.receiveResult(c);	
+	}
 	
 }

@@ -30,7 +30,7 @@
 	
 	<bean id="TestCase1083" class="org.societies.integration.test.bit.ctx_identity.Test1083" init-method="run">
 		<property name="ctxBroker" ref ="ctxBroker" />
-		
+		<property name="commMgr" ref="commMgr"/>		
   	</bean>
   	
   	

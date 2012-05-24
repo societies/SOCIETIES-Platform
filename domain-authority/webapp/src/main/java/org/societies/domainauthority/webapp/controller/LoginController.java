@@ -199,31 +199,40 @@ public class LoginController {
 			}
 			
 			
-			@SuppressWarnings("unused")
-			ICommManager newCommManger = getCcmFactory().getNewCommManager(
-					newNodeDetails, password);
+		//	@SuppressWarnings("unused")
+		//	ICommManager newCommManger = getCcmFactory().getNewCommManager(
+		//			newNodeDetails, password);
 			
-			isAuthenticated = true;
+			if (!(userRecord.getPassword().contentEquals(password)))
+			{
+					//account doesn't exist, direct to new user page
+					model.put("error", "incoorect usename or password");
+					return new ModelAndView("login", model);
+			}
+			
+				isAuthenticated = true;
 			// Now get the url details from the registry
-			model.put("webappurl", userRecord.getUrl());
+			String redirectUrl = new String();
+			redirectUrl = String.format("http://%s:%s/societies/login.html", userRecord.getHost(), userRecord.getPort());
+			model.put("webappurl", redirectUrl);
 			
 		} catch (InvalidFormatException e1) {
 			// TODO Auto-generated catch block
 			isAuthenticated = false;
 
-		} catch (CommunicationException e) {
+//		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();
-			isAuthenticated = false;
+//			isAuthenticated = false;
 		}
 
 		model.put("name", userName);
 
 		if (isAuthenticated) {
-			model.put("result", "Login Successfull");
+			model.put("error", "Login Successfull");
 			return new ModelAndView("loginsuccess", model);
 		} else {
-			model.put("result", "Login UnSuccessfull");
+			model.put("error", "Login UnSuccessfull");
 			return new ModelAndView("login", model);
 		}
 	}

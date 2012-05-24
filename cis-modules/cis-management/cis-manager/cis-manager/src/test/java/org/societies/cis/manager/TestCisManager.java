@@ -154,6 +154,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		when(mockIICisId_3.getThisNetworkNode()).thenReturn(testCisId_3);
 		
 		
+		when(mockCISendpoint1.UnRegisterCommManager()).thenReturn(true);
+		when(mockCISendpoint2.UnRegisterCommManager()).thenReturn(true);
+		when(mockCISendpoint3.UnRegisterCommManager()).thenReturn(true);
+		
+		
+		
 		when(mockCcmFactory.getNewCommManager()).thenReturn(mockCISendpoint1,mockCISendpoint2,mockCISendpoint3);
 		
 		
@@ -198,15 +204,17 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		//	sessionFactory.getCurrentSession().disconnect();
 
 	}
+	//@Ignore
 	@Test
 	public void testConstructor() {
 
 		cisManagerUnderTest = new CisManager();
-		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory);
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
 		cisManagerUnderTest.init();
 		
 		assertEquals(TEST_GOOD_JID, cisManagerUnderTest.cisManagerId.getJid());
 	}
+	//@Ignore
 	@Test
 	public void testCreateCIS() {
 		
@@ -219,6 +227,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		try {
 			assertNotNull(testCIS.get());
 			assertNotNull(testCIS.get().getCisId());
+			assertEquals(testCIS.get().getName(), TEST_CIS_NAME_1);
+			assertEquals(testCIS.get().getCisType(), TEST_CIS_TYPW);
+			assertEquals(testCIS.get().getMembershipCriteria(), TEST_CIS_MODE);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -229,11 +240,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 	
 	}
+	//@Ignore
 	@Test
 	public void testListCIS() throws InterruptedException, ExecutionException {
 
 		cisManagerUnderTest = new CisManager();
-		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory);cisManagerUnderTest.setSessionFactory(sessionFactory);
 		cisManagerUnderTest.init();
 		
 		ICisOwned[] ciss = new ICisOwned [3]; 
@@ -271,6 +283,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 }
 	
 	}
+	//@Ignore
 	@Test
 	public void testdeleteCIS() throws InterruptedException, ExecutionException {
 
@@ -287,16 +300,22 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ciss[1] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
 				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
+		
 		List<ICis> l = cisManagerUnderTest.getCisList();
 		Iterator<ICis> it = l.iterator();
 		ICis element = it.next(); 
 		jidTobeDeleted = element.getCisId();
 		
-		cisManagerUnderTest.deleteCis(jidTobeDeleted, "", "");
-		
-		// get a new iterator
-		it = l.iterator();
 		boolean presence = false;
+		
+		presence = cisManagerUnderTest.deleteCis("", "", jidTobeDeleted);
+		assertEquals(true,presence);
+		
+		presence = false;
+		// refresh list and get a new iterator
+		l = cisManagerUnderTest.getCisList();
+		it = l.iterator();
+		
 		int interactions = 0;
 		while(it.hasNext()){
 			 element = it.next();
@@ -305,12 +324,13 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 						presence = true; // found a matching CIS
 	     }
 		
-		//assertEquals(false,presence);
-		//assertEquals(1,interactions);
+		assertEquals(false,presence);
+		assertEquals(1,interactions);
 		
 	
 	}
 	
+	//@Ignore
 	//@Rollback
 	@Test
 	public void testAddMemberToOwnedCIS() throws InterruptedException, ExecutionException {
@@ -333,6 +353,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		} 		
 	
 	}
+	@Ignore
 	@Test
 	public void listdMembersOnOwnedCIS() throws InterruptedException, ExecutionException {
 

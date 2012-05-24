@@ -61,7 +61,7 @@ public class DataWrapper<E> implements IDataWrapper<E> {
 	 * By default, persistence is disabled  
 	 * @param data Data to obfuscate
 	 */
-	public DataWrapper(E data) {
+	protected DataWrapper(E data) {
 		this.data = data;
 	}
 	/**
@@ -70,7 +70,7 @@ public class DataWrapper<E> implements IDataWrapper<E> {
 	 * and the unique ID of the data to obfuscate will be used to retrieve obfuscated version of the data.  
 	 * @param dataId A unique ID of the data to obfuscate is needed to enable persistence
 	 */
-	public DataWrapper(String dataId, E data) {
+	protected DataWrapper(String dataId, E data) {
 		this(data);
 		this.dataId = dataId;
 		setPersistenceEnabled(true);

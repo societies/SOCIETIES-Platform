@@ -7,5 +7,7 @@
 
 	 
 	<osgi:reference id="CSSRemoteManagerBundle" interface="org.societies.api.internal.css.management.ICSSRemoteManager"/>
+    <osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
+	<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 
 </beans>

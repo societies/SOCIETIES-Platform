@@ -104,6 +104,13 @@ public class Tester {
 			changeContext("work", "free");
 			this.helloWorldService.setVolume(userId, "50");
 			changeContext("home", "free");	
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 					
 			Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
@@ -113,6 +120,7 @@ public class Tester {
 			Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
 		
 		
+			this.helloWorldService.setBackgroundColour(userId, "red");
 		
 	}
 	
