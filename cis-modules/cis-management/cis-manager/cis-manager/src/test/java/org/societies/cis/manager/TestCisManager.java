@@ -209,7 +209,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	public void testConstructor() {
 
 		cisManagerUnderTest = new CisManager();
-		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory);
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);
 		cisManagerUnderTest.init();
 		
 		assertEquals(TEST_GOOD_JID, cisManagerUnderTest.cisManagerId.getJid());

@@ -53,9 +53,11 @@ public class DaRegistryRecordEntry implements Serializable {
 
 	private String name;
 	private String id;
-	private String url;
+	private String host;
+	private String port;
 	private String status;
 	private String userType;
+	private String password;
 
 	
 
@@ -76,21 +78,7 @@ public class DaRegistryRecordEntry implements Serializable {
 		this.id = id;
 	}
 
-	/**
-	 * @return the uri
-	 */
-	@Column(name = "Url")
-	public String getUrl() {
-		return url;
-	}
-
-	/**
-	 * @param uri
-	 *            the uri to set
-	 */
-	public void setUrl(String url) {
-		this.url = url;
-	}
+	
 	
 	/**
 	 * @return the status
@@ -141,19 +129,69 @@ public class DaRegistryRecordEntry implements Serializable {
 	}
 
 	/**
+	 * @return the host
+	 */
+	@Column(name = "host")
+	public String getHost() {
+		return host;
+	}
+
+	/**
+	 * @param host the host to set
+	 */
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	/**
+	 * @return the port
+	 */
+	@Column(name = "port")
+	public String getPort() {
+		return port;
+	}
+
+	/**
+	 * @param port the port to set
+	 */
+	public void setPort(String port) {
+		this.port = port;
+	}
+	
+	/**
+	 * @return the password
+	 */
+	@Column(name = "password")
+	public String getPassword() {
+		return password;
+	}
+
+	/**
+	 * @param port the password to set
+	 */
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	/**
+	 * @param name
 	 * @param id
-	 * @param uri
+	 * @param host
+	 * @param port
 	 * @param status
 	 * @param userType
+	 * * @param password
 	 */
-	public DaRegistryRecordEntry(String name, String id, String url, String status,
-			String userType) {
+	public DaRegistryRecordEntry(String name, String id, String host,
+			String port, String status, String userType, String password) {
 		super();
 		this.name = name;
 		this.id = id;
-		this.url = url;
+		this.host = host;
+		this.port = port;
 		this.status = status;
 		this.userType = userType;
+		this.password = password;
 	}
 
 	/**
@@ -162,6 +200,8 @@ public class DaRegistryRecordEntry implements Serializable {
 	public DaRegistryRecordEntry() {
 		super();
 	}
+
+	
 	
 	
 	

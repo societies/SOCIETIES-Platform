@@ -28,7 +28,7 @@ package org.societies.api.context.model;
  * This class is used to identify context attributes. It provides methods
  * that return information about the identified attribute including:
  * <ul>
- * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
+ * <li><tt>OwnerId</tt>: A unique identifier of the CSS or CIS where the 
  * entity containing the identified context attribute was first stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
  * object, i.e. {@link CtxModelType#ATTRIBUTE ATTRIBUTE}.</li>
@@ -75,7 +75,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 	 */
 	public CtxAttributeIdentifier(CtxEntityIdentifier scope, String type, Long objectNumber) {
 		
-		super(scope.getOperatorId(), CtxModelType.ATTRIBUTE, type, objectNumber);
+		super(scope.getOwnerId(), CtxModelType.ATTRIBUTE, type, objectNumber);
 		this.scope = scope;
 	}
 	
@@ -220,6 +220,6 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 			throw new MalformedCtxIdentifierException("'" + input
 					+ "': Malformed context attribute scope", mcie);
 		}
-		super.operatorId = this.scope.getOperatorId();
+		super.ownerId = this.scope.getOwnerId();
 	}
 }
