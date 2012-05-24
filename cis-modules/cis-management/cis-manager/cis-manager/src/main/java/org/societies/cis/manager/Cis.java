@@ -39,6 +39,7 @@ import java.util.concurrent.Future;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -113,7 +114,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			//.singletonList("org.societies.api.schema.cis.community");
 	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
 		"org.societies.api.schema.cis.community"));
-
+	@Transient
 	private SessionFactory sessionFactory;
 	
 	
@@ -149,7 +150,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	private IIdentity cisIdentity;
 	@Transient
 	private PubsubClient psc;
-	@OneToMany(cascade=CascadeType.ALL)
+	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	@Column
 	public String cisType;
@@ -158,7 +159,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 // extra attributes	
 	
-	@Column
+	@Transient
 	public String permaLink; // all those have been moved to the Editor
 	
 	@Column
