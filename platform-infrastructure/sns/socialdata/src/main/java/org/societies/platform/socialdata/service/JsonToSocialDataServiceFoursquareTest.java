@@ -33,6 +33,7 @@ public class JsonToSocialDataServiceFoursquareTest {
 			System.out.println("profile:"
 					+"\n Name : " + profile.getName().getGivenName()+" "+profile.getName().getFamilyName()
 					+"\n Short description : "+profile.getAboutMe()
+					+"\n Gender : "+profile.getGender().toString()
 					+"\n home location : "+profile.getAddresses().get(0).getFormatted()
 					+"\n email : "+profile.getEmails().get(0).getValue());
 			
