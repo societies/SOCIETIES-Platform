@@ -98,22 +98,29 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	
 
-	Set<Cis> ownedCISs; 
+	List<Cis> ownedCISs; 
 	ICISCommunicationMgrFactory ccmFactory;
 	IIdentity cisManagerId;
 	ICommManager iCommMgr;
-	Set<CisSubscribedImp> subscribedCISs;
+	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
-	private Session session;
 //	IPrivacyPolicyManager polManager;
 	
 
 	public void startup(){
 		//ActivityFeed ret = null;
 	
-		if(session == null)
-			session = this.getSession();//sessionFactory.openSession();
-		
+		Session session = sessionFactory.openSession();
+		try{
+			this.ownedCISs = session.createCriteria(Cis.class).list();
+			this.subscribedCISs = session.createCriteria(CisSubscribedImp.class).list();
+		}catch(Exception e){
+			LOG.error("CISManager startup queries failed..");
+			e.printStackTrace();
+		}finally{
+			if(session!=null)
+				session.close();
+		}
 		//ActivityFeed.setSession(session);
 		//getting owned CISes
 		//Query q = session.createQuery("select o from org_societies_cis_manager_Cis o");
@@ -135,26 +142,36 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			.getLogger(CisManager.class);
 
 	public CisManager() {
-			this.ownedCISs = new HashSet<Cis>();	
-			subscribedCISs = new HashSet<CisSubscribedImp>();
+			this.ownedCISs = new ArrayList<Cis>();	
+			this.subscribedCISs = new ArrayList<CisSubscribedImp>();
 			
+
 
 	}
 	public void init(){
-		//ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint
+		while (iCommMgr.getIdManager() ==null)
+			;//just wait untill the XCommanager is ready
+		
 		cisManagerId = iCommMgr.getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
 
 
-			try {
-				iCommMgr.register((IFeatureServer)this);
-			} catch (CommunicationException e) {
-				e.printStackTrace();
-			} // TODO unregister??
-			
-			LOG.info("listener registered");	
-			//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
+
+		try {
+			iCommMgr.register((IFeatureServer)this);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		} // TODO unregister??
+
+		LOG.info("listener registered");	
+		//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
+		startup();
+		LOG.info("CISManager started up with "+this.ownedCISs.size()
+				+" owned CISes and "+this.subscribedCISs.size()+" subscribed CISes");
 	}
+
+
+
 
 
 	
@@ -169,7 +186,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-
+	
 	public ICommManager getICommMgr() {
 		return iCommMgr;
 	}
@@ -179,6 +196,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setICommMgr(ICommManager cSSendpoint) {
 		iCommMgr = cSSendpoint;
 	}
+
+
+
 
 
 
@@ -252,7 +272,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//}
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		
-		Cis cis = new  Cis(cssId, cisName, cisType, mode,this.ccmFactory);
+		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory);
+		cis.setSessionFactory(sessionFactory);
 		this.persist(cis);
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
@@ -608,20 +629,23 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	// session related methods
 
-	public void setSession(Session s){
-		 session = s;
-	}
-	public Session getSession()
-	{
-		if(session == null)
-			session = sessionFactory.openSession();
-		return session;
-	}
 	private void persist(Object o){
-		Session s = getSession();
-		Transaction t = s.beginTransaction();
-		s.save(o);
-		t.commit();
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			session.save(o);
+			t.commit();
+			LOG.info("Saving CIS object succeded!");
+//			Query q = session.createQuery("select o from Cis aso");
+			LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+		}catch(Exception e){
+			e.printStackTrace();
+			t.rollback();
+			LOG.warn("Saving CIS object failed, rolling back");
+		}finally{
+			if(session!=null)
+				session.close();
+		}
 	}
 	
 	public  SessionFactory getSessionFactory() {
@@ -639,11 +663,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	// getters and setters
 	
 	
-	public Set<Cis> getOwnedCISs() {
+	public List<Cis> getOwnedCISs() {
 		return ownedCISs;
 	}
 
-	public Set<CisSubscribedImp> getSubscribedCISs() {
+	public List<CisSubscribedImp> getSubscribedCISs() {
 		return subscribedCISs;
 	}
 

@@ -25,11 +25,17 @@
 
 package org.societies.cis.manager.tester;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
-import org.societies.api.cis.management.IcisManagerClient;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
@@ -51,46 +57,118 @@ public class CisMgmtTester {
 	
 	private String targetCisId = null;
 	
+	int join = 0;
 	
-	public CisMgmtTester(ICisManager cisClient, String targetCisId){
-		LOG.info("starting CIS MGMT tester");
-		this.cisClient = cisClient;
-		LOG.info("got autowired reference, target cisId is " + targetCisId);
+	static int busy = 0;
+	
+	public static int getBusy() {
+		return busy;
+	}
 
+	public static void setBusy(int busy) {
+		CisMgmtTester.busy = busy;
+	}
+
+	public CisMgmtTester(ICisManager cisClient, String targetCisId){
+
+		
+		
 		ICisManagerCallback icall = new ICisManagerCallback()
 		 {
 			public void receiveResult(boolean result){
 				LOG.info("boolean return on CIS Mgmgt tester");
 				LOG.info("Result Status: " + result);
-
+				CisMgmtTester.setBusy(0);
 			}; 
 
-			public void receiveResult(int result) {};
+			public void receiveResult(int result) {CisMgmtTester.setBusy(0);};
 			
-			public void receiveResult(String result){}
+			public void receiveResult(String result){CisMgmtTester.setBusy(0);}
 
 			public void receiveResult(Community communityResultObject) {
 				if(communityResultObject == null){
-					LOG.info("boolean return on CIS Mgmgt tester");
+					LOG.info("null return on CIS Mgmgt tester");
 				}
 				else{
-					LOG.info("boolean return on CIS Mgmgt tester");
-					LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());					
+					LOG.info("good return on CIS Mgmgt tester");
+					LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
+					join = 1;
 				}
-				
+				CisMgmtTester.setBusy(0);
 				
 			};
 			
 		 };
+
 		
-		 LOG.info("created callback");
+		
+		
+		
+		
+		
+		LOG.info("starting CIS MGMT tester");
+		this.cisClient = cisClient;
+		LOG.info("got autowired reference, target cisId is " + targetCisId);
+
+
 	
-	
+		LOG.info("join a remote CIS");
 		this.cisClient.joinRemoteCIS(targetCisId, icall);
-
 		LOG.info("join sent");
-	
-	}
+		CisMgmtTester.setBusy(1);
+		
+		while(CisMgmtTester.getBusy()==1){
+		/*	try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
+			
+		}
+			;
+		
+		if (join == 1){
+			LOG.info("get CIS");
+			ICis icis = this.cisClient.getCis("juca@societies.com", targetCisId);
+			LOG.info("get info from a remote CIS");
+			icis.getInfo(icall);
+			LOG.info("info is supposed to be back");
+			CisMgmtTester.setBusy(1);
+			
+			while(CisMgmtTester.getBusy()==1){
+				/*try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
+				
+			}
+		}
 
+		
+		LOG.info("create a CIS");
+		try {
+			ICisOwned icos =  (this.cisClient.createCis("juca@societies.com", "pwd", "gremio", "futebol", 1)).get();
+			LOG.info("creation done");
+			
+			LOG.info("get local info");
+			icos.getInfo(icall);
+			LOG.info("info is supposed to be back");
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		
+	}
+	
+
+	 
 	
 }

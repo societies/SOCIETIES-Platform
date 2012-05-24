@@ -135,12 +135,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			//LOG.info("5a ctxActionsMap "+ ctxActionsMap);
 			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
 
-			//LOG.info("6. result "+modelData);
+			LOG.info("6. result "+modelData.getActionModel());
 
 			//LOG.info("7. Store UserIntentModelData to ctx DB");
 
 			CtxAttribute ctxAttr = storeModelCtxDB(modelData);
-			//LOG.info("model stored "+ctxAttr.getId());
+			LOG.info("model stored "+ctxAttr.getId());
 
 		}else LOG.info("not enough history data");
 	}
@@ -363,7 +363,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 		TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
 		LinkedHashMap<List<String>,ActionDictObject> dic = transProb.getStepDict(dictionaryFull, 1);
-		System.out.println("dic "+dic);
+		//System.out.println("dic "+dic);
 		String action = "";
 		ActionDictObject dicObj;
 		for(List<String> actList :dic.keySet()){

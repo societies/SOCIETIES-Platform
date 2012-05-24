@@ -22,52 +22,38 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
-package org.societies.android.platform.useragent;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Temperature;
 
-import java.util.Arrays;
-import java.util.List;
+/**
+ * Obfuscator for name
+ *
+ * @author Olivier Maridat (Trialog)
+ *
+ */
+public class TemperatureObfuscator extends DataObfuscator<IDataWrapper<Temperature>> {
+	/**
+	 * @param data
+	 */
+	public TemperatureObfuscator(IDataWrapper<Temperature> data) {
+		super(data);
+		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
+		stepNumber = 1;
+		dataType = Temperature.class;
+	}
 
-import org.societies.api.identity.IIdentity;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
+	 */
+	@Override
+	public IDataWrapper<Temperature> obfuscateData(double obfuscationLevel)
+			throws PrivacyException {
+		return dataWrapper;
+	}
 
-public class UserActionMonitor extends Activity implements OnClickListener {
-	
-	private static final String LOG_TAG = UserActionMonitor.class.getName();
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("userActionMonitorBean");
-    private static final List<String> NAME_SPACES = Arrays.asList(
-    		"http://societies.org/api/schema/useragent/monitoring");
-    private static final List<String> PACKAGES = Arrays.asList(
-		"org.societies.api.schema.useragent.monitoring");
-    
-    private static final String DESTINATION = "xcmanager.societies.local";
-    
-    private final IIdentity toXCManager = null;
-    //private ClientCommunicationMgr ccm;
-	
-	/** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.uam);
-        
-        Button sayHello = (Button)findViewById(R.id.sayHello);
-        sayHello.setOnClickListener(this);
-        
-        Button sayGoodbye = (Button)findViewById(R.id.sayGoodbye);
-        sayGoodbye.setOnClickListener(this);
-    }
-    
-    public void onClick(View v){
-    	if(v.getId() == R.id.sayHello){
-			//send hello message to backend
-		}else if(v.getId() == R.id.sayGoodbye){
-			//send goodbye message to backend
-		}
-    }
 }

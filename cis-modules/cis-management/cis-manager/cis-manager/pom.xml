@@ -171,11 +171,16 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
-			<artifactId>common-data-source</artifactId>
+			<artifactId>data-source</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+				<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-data-source</artifactId>
+			<version>${release.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>		
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>privacydatamanagement</artifactId>
@@ -224,6 +229,24 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset> 
+							<!-- created after mvn test using the Derby DBMS -->
+							<directory>cismanagertestdb</directory>
+						</fileset>
+						<fileset>
+							<directory>.</directory>
+							<includes> 
+								<!-- created after mvn test using the Derby DBMS -->
+								<include>derby.log</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

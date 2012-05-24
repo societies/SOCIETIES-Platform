@@ -26,9 +26,18 @@
 
 package org.societies.cis.manager;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,21 +58,32 @@ import org.societies.api.schema.cis.community.Community;
  * @author Thomas Vilarinho (Sintef)
 */
 
-
+@Entity
+@Table(name = "org_societies_cis_manager_CisSubscribedImp")
 public class CisSubscribedImp implements ICis {
-
-
-
-
+	private static final long serialVersionUID = 1L;
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+	
+	@Transient
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisManagerClient.class);
 	
-	
-	
+	@OneToOne
 	private CisRecord cisRecord;
-	
+	@Transient
 	private CisManager cisManag = null;
 	
+	public CisRecord getCisRecord() {
+		return cisRecord;
+	}
+
+	public void setCisRecord(CisRecord cisRecord) {
+		this.cisRecord = cisRecord;
+	}
+
 	public CisSubscribedImp(CisRecord cisRecord, CisManager cisManag) {
 		super();
 		this.cisRecord = cisRecord;
@@ -91,7 +111,7 @@ public class CisSubscribedImp implements ICis {
 		return this.cisRecord.getMembershipCriteria();
 	}
 
-	
+	@Override
 	public void getInfo(ICisManagerCallback callback){
 		LOG.debug("client call to get info from a RemoteCIS");
 
@@ -118,8 +138,10 @@ public class CisSubscribedImp implements ICis {
 		}	
 	}
 
+
 	
 	//Overriding hash and equals to compare cisRecord only
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -145,7 +167,6 @@ public class CisSubscribedImp implements ICis {
 			return false;
 		return true;
 	}
-	// end of Overriding hash and equals to compare cisRecord only
-	
+
 	
 }

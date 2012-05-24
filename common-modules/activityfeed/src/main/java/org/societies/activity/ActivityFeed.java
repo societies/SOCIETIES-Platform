@@ -1,5 +1,6 @@
 package org.societies.activity;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -9,20 +10,24 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.identity.IIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Table(name = "org_societies_activity_ActivityFeed")
-public class ActivityFeed implements IActivityFeed {
+public class ActivityFeed implements IActivityFeed, Subscriber {
 	@Id
 	private String id;
 	@OneToMany(cascade=CascadeType.ALL)
@@ -51,14 +56,21 @@ public class ActivityFeed implements IActivityFeed {
 
 	@Override
 	public void addCisActivity(IActivity activity) {
-		
+
 		//persist.
-		Session session = ActivityFeed.getSession();//getSessionFactory().openSession();
+		Session session = sessionFactory.openSession();//getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		Activity newact = new Activity(activity);
-		session.save(newact);
-		t.commit();
-		
+		try{
+			session.save(newact);
+			t.commit();
+		}catch(Exception e){
+			t.rollback();
+			log.warn("Saving activity failed, rolling back");
+		}finally{
+			if(session!=null)
+				session.close();
+		}		
 	}
 
 	@Override
@@ -66,20 +78,6 @@ public class ActivityFeed implements IActivityFeed {
 		// TODO Auto-generated method stub
 		
 	}
-	
-	
-	private static Session session;
-	public static void setSession(Session s){
-		 session = s;
-	}
-	public static Session getSession()
-	{
-		if(session == null)
-			session = sessionFactory.openSession();
-		return session;
-	}
-	
-	
 
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
@@ -97,16 +95,23 @@ public class ActivityFeed implements IActivityFeed {
 	
 	public static ActivityFeed startUp(String id){
 		ActivityFeed ret = null;
-		Session session = ActivityFeed.getSession();//sessionFactory.getCurrentSession();
-		
-		Query q = session.createQuery("select a from ActivityFeed a");
-		long l = q.list().size();
-		System.out.println("l: "+l);
-		if(l== 0)
-			return new ActivityFeed(id);
-		q = session.createQuery("select a from ActivityFeed a where a.id = ?");
-		q.setString(0, id);
-		ret = (ActivityFeed) q.uniqueResult();
+		Session session = sessionFactory.openSession();
+		try{
+			List l = session.createCriteria(ActivityFeed.class).add(Property.forName("id").eq(id)).list();
+			if(l.size() == 0)
+				return new ActivityFeed(id);
+			if(l.size() > 1){
+				log.error("activityfeed startup with id: "+id+" gave more than one activityfeed!! ");
+				return null;
+			}
+			ret = (ActivityFeed) l.get(0);
+		}catch(Exception e){
+			log.warn("Query for actitvies failed..");
+
+		}finally{
+			if(session!=null)
+				session.close();
+		}
 		return ret;
 	}
 
@@ -133,5 +138,13 @@ public class ActivityFeed implements IActivityFeed {
 	public void close()
 	{
 		
+	}
+	@Override
+	public void pubsubEvent(IIdentity pubsubService, String node,
+			String itemId, Object item) {
+		if(item.getClass().equals(Activity.class)){
+			Activity act = (Activity)item;
+			this.addCisActivity(act);
+		}
 	}
 }

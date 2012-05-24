@@ -40,6 +40,8 @@
 
 	</FONT>
 
+<h2>${error}</h2>
+
 <form:form method="POST" action="login.html" commandName="loginForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>

@@ -27,7 +27,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -38,12 +41,16 @@ import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserSituation;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTask;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
+import org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTHistoryData;
+import org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery;
 
 public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
+	private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+	
 	private LinkedHashMap<String, Integer> intentModel = null;
-	private LinkedHashMap<String, Integer> situationModel = null;
-	private ArrayList<String> registeredContext = new ArrayList<String>();
+	//private LinkedHashMap<String, Integer> situationModel = null;
+	private ArrayList<String> registeredContext = CRISTHistoryData.getRegisteredContext();
 
 	private HashMap<IIdentity, CRISTUserAction> currentUserActionMap = new HashMap<IIdentity, CRISTUserAction>();
 	private HashMap<IIdentity, CRISTUserSituation> currentUserSituationMap = new HashMap<IIdentity, CRISTUserSituation>();
@@ -52,23 +59,19 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	private ICRISTUserIntentPrediction cristPrediction;
 	private ICRISTUserIntentDiscovery cristDiscovery;
 	private ICtxBroker ctxBroker;
+	private CRISTCtxBrokerContact ctxBrokerContact;
+	
+	private CtxAttributeIdentifier cristIntentModelAttrId;
 
 	private CtxAttribute myCtx;
 	private IIdentity myID;
 
 	private int maxStep = 3;
 
-	private ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
+	private ArrayList<CRISTHistoryData> historyList = new ArrayList<CRISTHistoryData>();
 
 	public CRISTUserIntentTaskManager() {
-		System.out.println("Hello! I'm the CRIST User Intent Manager!");
-		//this.initialiseCRISTUserIntentManager();
-	}
-
-	// how to use this?
-	public CRISTUserIntentTaskManager(ICRISTUserIntentPrediction cristPrediction) {
-		System.out.println("This is the testing class for CRIST Model!");
-		this.setCristPrediction(cristPrediction);
+		LOG.info("Hello! I'm the CRIST User Intent Manager!");
 	}
 
 	public ICRISTUserIntentPrediction getCristPrediction() {
@@ -96,209 +99,26 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	}
 
 	public void initialiseCRISTUserIntentManager() {
-		System.out.println("Yo!! I'm a brand new service and my interface is: "
+
+		if (ctxBroker == null) {
+			LOG.error(this.getClass().getName() + "CtxBroker is null");
+		} 
+
+		LOG.info("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
+		
+		ctxBrokerContact = new CRISTCtxBrokerContact(ctxBroker);
+		
+		/* debug
+		CRISTCtxBrokerContact.initializeHistory(registeredContext, ctxBrokerContact);
+		
+		historyList = CRISTCtxBrokerContact.retrieveHistoryData(ctxBrokerContact);
 
-		ArrayList<String> historyAction = new ArrayList<String>();
-		ArrayList<String> historySituation = new ArrayList<String>();
-		ArrayList<ArrayList<String>> historyContext = new ArrayList<ArrayList<String>>();
-		// Assuming that the following sensors are available: light, sound,
-		// temperature, gps
-		this.registeredContext.add("Light");
-		this.registeredContext.add("Sound");
-		this.registeredContext.add("Temperature");
-		this.registeredContext.add("GPS");
-
-		// Mock history data
-		
-		ArrayList<String> historyContextClique = new ArrayList<String>();
-
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn down volume");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Switch songs");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn off MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Start the GPS navigator");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Input a location name");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Close the GPS navigator");
-		historySituation.add("Shopping Mall");
-		historyContextClique.add("100");
-		historyContextClique.add("80");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn up volume");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Switch songs");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn off MP3 Player");
-		historySituation.add("Office");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("26");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Start the GPS navigator");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Input a location name");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Close the GPS navigator");
-		historySituation.add("Shopping Mall");
-		historyContextClique.add("100");
-		historyContextClique.add("80");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn down volume");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Switch songs");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn off MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn down volume");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-
-		for (int i = 0; i < historyAction.size(); i++) {
-			MockHistoryData currentHisData = new MockHistoryData(
-					historyAction.get(i), historySituation.get(i),
-					historyContext.get(i));
-			this.historyList.add(currentHisData);
+		for (CRISTHistoryData historyData : historyList)
+		{
+			LOG.info("retrieveHistoryData ----- " + historyData.toString());
 		}
+		*/
 	}
 
 	/*
@@ -407,20 +227,20 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	@Override
 	public void updateUserSituation(IIdentity entityID,
 			CtxAttribute ctxAttribute) {
-		// TODO Auto-generated method stub
+
 		// TODO: Identify the user's current situation based on her real-time
 		// context
 		// Retrieve the user's real-time context: How to retrieve a given user's
 		// context
 		// this.ctxBroker.retrieve();
-		int currentPos = this.historyList.size() - 1;// bug fixed --Zhiyong Yu
+		int currentPos = this.historyList.size() - 1;
 		ArrayList<String> lastContextClique = this.historyList.get(currentPos)
 				.getContext();
 		ArrayList<String> currentContextClique = new ArrayList<String>();
 
 		// Generate a new context clique based on the newly received
 		// ctxAttribute
-		String contextID = ctxAttribute.getSourceId(); // how to handle when ctxAttribute is null?
+		String contextID = ctxAttribute.getType(); // how to handle when ctxAttribute is null?
 		for (int i = 0; i < lastContextClique.size(); i++) {
 			String oneContextID = this.registeredContext.get(i);
 			if (oneContextID.equals(contextID)) {
@@ -447,6 +267,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		
 	}
 
+	//only for mocked data? it's OK
 	private CRISTUserSituation inferUserSituation(
 			ArrayList<String> contextClique) {
 		double currentLight = Double.parseDouble(contextClique.get(1));
@@ -489,21 +310,26 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	@Override
 	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID,
 			CtxAttribute ctxAttribute) {
-		// TODO Auto-generated method stub
-		//if (this.intentModel!=null){
-			//where use intentModel?
-			updateUserSituation(entityID, ctxAttribute);
-			CRISTUserAction currentUserAction = getCurrentUserAction(entityID);
-			CRISTUserSituation currentUserSituation = getCurrentUserSituation(entityID);
+
+		updateUserSituation(entityID, ctxAttribute);
+		CRISTUserAction currentUserAction = getCurrentUserAction(entityID);
+		CRISTUserSituation currentUserSituation = getCurrentUserSituation(entityID);
+		ArrayList<String> currentContextClique = getCurrentUserContext(entityID);
+
+		if (currentUserAction != null && currentUserSituation != null && currentContextClique != null)
+		{
+			CRISTHistoryData oneHisData = new CRISTHistoryData(
+					currentUserAction, currentUserSituation.getSituationID(), currentContextClique);
+
+			ctxBrokerContact.storeActionHistory(oneHisData);
+			this.historyList.add(oneHisData); //synchronize mechanism?
+		}
+		
+		// Predict user intent based on one's current action
+		ArrayList<CRISTUserAction> results = getNextActions(entityID,
+				currentUserAction, currentUserSituation);
+		return results;
 	
-			// Predict user intent based on one's current action
-			ArrayList<CRISTUserAction> results = getNextActions(entityID,
-					currentUserAction, currentUserSituation);
-			return results;
-		//}else{
-		//	System.out.println("The CRIST user intent Model is NULL."); //why not build one?
-		//	return null;
-		//}		
 	}
 
 	/*
@@ -518,11 +344,18 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID,
 			CRISTUserAction userAction) {
 		
-		if (userAction == null)
-		{
-			System.out.println("userAction is null.");
+		CRISTUserAction action = userAction;
+		
+		if (entityID == null) {
+			LOG.info("entityID is null, predictUserIntent can not run.");
+			return null;
 		}
-		// TODO Auto-generated method stub
+		
+		if (action == null) {
+			LOG.info("userAction is null, use current action instead.");
+			action = getCurrentUserAction(entityID);
+		}
+
 		// Update the given user's current action
 		if (this.currentUserActionMap.containsKey(entityID)) {
 			this.currentUserActionMap.remove(entityID);
@@ -533,23 +366,24 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		
 
 		String situationID;
-		if (currentUserSituation == null)
-		{
-			System.out.println("getCurrentUserSituation(entityID) is null.");
+		if (currentUserSituation == null) {
+			LOG.info("getCurrentUserSituation(entityID) is null.");
 			situationID = null;
 		}
-		else
-		{
+		else {
 			situationID = currentUserSituation.getSituationID();
 		}
 		
 		ArrayList<String> currentContextClique = getCurrentUserContext(entityID);
-		//why not keep mock and test code separate?
-		MockHistoryData oneHisData = new MockHistoryData(
-				userAction.getActionID(),
-				situationID, currentContextClique);
+		//if there is null para, don't create a new record
+		if (userAction != null && situationID != null && currentContextClique != null)
+		{
+			CRISTHistoryData oneHisData = new CRISTHistoryData(
+					userAction, situationID, currentContextClique);
 
-		this.historyList.add(oneHisData);
+			ctxBrokerContact.storeActionHistory(oneHisData);
+			this.historyList.add(oneHisData); //synchronize mechanism?
+		}
 		// Predict user intent based on one's current action
 		ArrayList<CRISTUserAction> results = getNextActions(entityID,
 				userAction, currentUserSituation);
@@ -569,8 +403,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	 */
 	@Override
 	public CRISTUserAction getCurrentUserIntent(IIdentity entityID,
-			ServiceResourceIdentifier serviceID, String parameterName) {//parameterName no use?
-		// TODO Auto-generated method stub
+			ServiceResourceIdentifier serviceID, String parameterName) {
+
 		CRISTUserAction currentUserAction = null;
 		CRISTUserSituation currentUserSituation = null;
 		CRISTUserAction predictedUserAction = null;
@@ -592,7 +426,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			for(int i = 0;i<results.size();i++){
 				currentServiceID = results.get(i).getServiceID();
 				currentParameterName = results.get(i).getparameterName();
-				if (currentServiceID.equals(serviceID)&&currentParameterName.equalsIgnoreCase(currentParameterName)){
+				if (currentServiceID.equals(serviceID)&&currentParameterName.equalsIgnoreCase(parameterName)){
 					predictedUserAction = results.get(i);
 					break;
 				}
@@ -612,12 +446,12 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	 */
 	@SuppressWarnings({ "unchecked" })
 	@Override
-	public ArrayList<CRISTUserAction> getNextActions(IIdentity entityID,
+	public ArrayList<CRISTUserAction> getNextActions(IIdentity entityID, // this para isn't used
 			CRISTUserAction currentAction, CRISTUserSituation currentSituation) {
-		// TODO Auto-generated method stub
+
 		String actionValue = currentAction.getActionID();
 		if (actionValue == null) {
-			System.out.println("actionValue is null. Set to \"\".");
+			LOG.info("actionValue is null, set to \"\".");
 			actionValue = "";
 		}
 		ArrayList<CRISTUserAction> predictedAction = new ArrayList<CRISTUserAction>();
@@ -625,10 +459,19 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		HashMap<String, Integer> predictionResult = new HashMap<String, Integer>();
 		Integer totalScore = 0;
 
+		if (cristDiscovery == null) {
+			cristDiscovery = new CRISTUserIntentDiscovery();
+			((CRISTUserIntentDiscovery) cristDiscovery).initialiseCRISTDiscovery();
+		}
+		this.cristDiscovery.enableCRISTUIDiscovery(true);
+		this.intentModel = this.cristDiscovery.generateNewCRISTUIModel(this.historyList);
+		
+		
+/*		
+ * update intent model every time, and do not store in DB.
 		if (this.intentModel == null) {
 			// TODO: Retrieve intent model from CtxBroker
-			System.out
-					.println("Trying to retrieve the user's intent model from CtxBroker...");
+			LOG.info("Trying to retrieve the user's intent model from CtxBroker...");
 			// this.ctxBroker.retrieveCRISTUIModel(entityID);
 
 			if (this.intentModel == null) {
@@ -636,7 +479,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 				// new model
 				// TODO: Retrieve the user's history data from CtxBroker
 				// this.historyList = this.ctxBroker.retrieveHistory(entiryID);
-				ArrayList<MockHistoryData> historyData = this.historyList;
+				ArrayList<CRISTHistoryData> historyData = this.historyList;
 
 				this.cristDiscovery.enableCRISTUIDiscovery(true);
 				this.intentModel = this.cristDiscovery
@@ -644,9 +487,9 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 				// TODO: Upload the new intentModel to the CtxBroker
 			}
 		}
-
+*/
 		if (this.intentModel != null) {
-			// TODO: Get the next actions
+			// Get the next actions
 			LinkedHashMap<String, Integer> candidateAction = new LinkedHashMap<String, Integer>();
 			if (currentSituation != null && currentSituation.toString().length() > 0) {
 				// In case the user's current situation is available
@@ -923,4 +766,6 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		// TODO Auto-generated method stub
 
 	}
+	
+	
 }

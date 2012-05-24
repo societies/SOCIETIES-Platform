@@ -20,11 +20,15 @@
 
   <bean id="CSSManager" 
   	class="org.societies.css.mgmt.CSSManager" 
-  	init-method="cssManagerInit">
-  <property name="cssRegistry" ref="CssRegistryBundle"/>
-  <property name="cssDirectoryRemote" ref="cssDirectoryRemote"/>
-  <property name="serviceDiscovery" ref="serviceDiscoveryRef"/>
-  <property name="cssManagerRemote" ref="CSSManagerRemote"/>
+  	init-method="cssManagerInit"
+  	depends-on="PubsubClient">
+	  <property name="cssRegistry" ref="CssRegistryBundle"/>
+	  <property name="cssDirectoryRemote" ref="cssDirectoryRemote"/>
+	  <property name="serviceDiscovery" ref="serviceDiscoveryRef"/>
+	  <property name="cssManagerRemote" ref="CSSManagerRemote"/>
+	  <property name="pubSubManager" ref="PubsubClient"/>
+	  <property name="commManager" ref="CommManager"/>
+ 
   </bean>
 
 </beans>

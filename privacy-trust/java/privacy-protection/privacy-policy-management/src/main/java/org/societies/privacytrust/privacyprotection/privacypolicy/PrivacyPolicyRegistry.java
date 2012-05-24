@@ -109,4 +109,11 @@ public class PrivacyPolicyRegistry implements Serializable{
 		this.policies.put(newRequestor, ctxID);
 	}
 	
+	
+	public void removePolicy(Requestor requestor){
+		
+		if (this.policies.containsKey(requestor)){
+			this.policies.remove(requestor);
+		}
+	}
 }

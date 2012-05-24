@@ -1,19 +1,18 @@
 package org.societies.css.devicemgmt.DeviceDriverSimulator;
 
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
+import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.actions.GetLightLevelAction;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables.LightLevelStateVariable;
 
@@ -42,9 +41,8 @@ public class LightSensor implements IDriverService{
 	private Double lightLevel = new Double (0.0);
 	
 	private boolean state = false;
-	//private EventStream myStream;
 	
-	private EventAdmin eventAdmin;
+	private IEventMgr eventManager;
 	
 	
 	public LightSensor(SampleActivatorDriver activatorDriver, String serviceId, String deviceMacAddress, int deviceCount) {
@@ -56,7 +54,7 @@ public class LightSensor implements IDriverService{
 		
 		this.state = false;
 		
-		eventAdmin = activatorDriver.getEventAdmin();
+		eventManager = activatorDriver.getEventManager();
 		
 		IDeviceStateVariable stateVariable;
 		IAction action;
@@ -84,7 +82,7 @@ public class LightSensor implements IDriverService{
 		
 		this.state = true;
 		
-		eventAdmin = activatorDriver.getEventAdmin();
+		eventManager = activatorDriver.getEventManager();
 		
 		IDeviceStateVariable stateVariable;
 		IAction action;
@@ -169,13 +167,14 @@ public class LightSensor implements IDriverService{
 		}
 		
 		
-		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by eventAdmin");
-		Dictionary<String, Object> eventAdminDic = new Hashtable<String, Object>();
-		
-		eventAdminDic.put("lightLevel", getLightValue());
-		eventAdminDic.put("event_name", DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT);
-		
-		eventAdmin.sendEvent(new Event(EventTypes.DEVICE_MANAGEMENT_EVENT, eventAdminDic));
-		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by eventAdmin");
+		LOG.info("Publish internal event: org/societies/css/device -> Sensor/LightSensorEvent");
+		HashMap<String, Object> payload = new HashMap<String, Object>();
+		payload.put("lightLevel", getLightValue());
+		InternalEvent event = new InternalEvent(EventTypes.DEVICE_MANAGEMENT_EVENT, DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT, deviceId, payload);
+		try {
+			eventManager.publishInternalEvent(event);
+		} catch (EMSException e) {
+			LOG.error("Error when publishing new light level", e);
+		}
 	}
 }

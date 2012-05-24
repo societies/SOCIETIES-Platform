@@ -67,9 +67,6 @@ public class Requestor implements Serializable{
 		return "Identity: "+this.requestorId.getJid();
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -78,9 +75,6 @@ public class Requestor implements Serializable{
 				+ ((requestorId == null) ? 0 : requestorId.hashCode());
 		return result;
 	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -89,11 +83,7 @@ public class Requestor implements Serializable{
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Requestor)) {
-			return false;
-		}
-		
-		if (!(obj.getClass().equals(Requestor.class))){
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		Requestor other = (Requestor) obj;
@@ -106,4 +96,6 @@ public class Requestor implements Serializable{
 		}
 		return true;
 	}
+
+	
 }

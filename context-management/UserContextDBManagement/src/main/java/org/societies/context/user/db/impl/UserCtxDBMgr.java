@@ -122,7 +122,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		final CtxAssociationIdentifier identifier;
 		
 		if (this.idMgr != null) {
-			identifier = new CtxAssociationIdentifier(this.privateId.getJid(), 
+			identifier = new CtxAssociationIdentifier(this.privateId.getBareJid(), 
 					type, CtxModelObjectNumberGenerator.getNextValue());
 		}
 		else {
@@ -194,7 +194,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		final CtxEntityIdentifier identifier;
 		
 		if (this.idMgr != null) {
-			identifier = new CtxEntityIdentifier(this.privateId.getJid(), 
+			identifier = new CtxEntityIdentifier(this.privateId.getBareJid(), 
 					type, CtxModelObjectNumberGenerator.getNextValue());
 		}
 		else {
@@ -228,7 +228,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		CtxEntityIdentifier identifier;
 		
 		if (this.idMgr != null) {
-			identifier = new CtxEntityIdentifier(this.privateId.getJid(),
+			identifier = new CtxEntityIdentifier(this.privateId.getBareJid(),
 					type, CtxModelObjectNumberGenerator.getNextValue());	
 		}
 		else {
