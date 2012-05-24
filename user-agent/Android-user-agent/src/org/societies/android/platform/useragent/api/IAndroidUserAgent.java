@@ -23,44 +23,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.personalisation.dianne;
+package org.societies.android.platform.useragent.api;
 
-import java.util.ArrayList;
-
-import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 
-public class NetworkBuffer 
-{
-	ArrayList<IAction> outcomeUpdates;
-	ArrayList<CtxAttribute> contextUpdates;
+public interface IAndroidUserAgent {
 	
-	public NetworkBuffer()
-	{
-		outcomeUpdates = new ArrayList<IAction>();
-		contextUpdates = new ArrayList<CtxAttribute>();
-	}
-	
-	public synchronized void addContextUpdate(CtxAttribute update)
-	{
-		contextUpdates.add(update);
-	}
-	
-	public synchronized void addOutcomeUpdate(IAction update)
-	{
-		outcomeUpdates.add(update);
-	}
-	
-	public synchronized ArrayList[] getSnapshot()
-	{
-		ArrayList<CtxAttribute> context_ss = contextUpdates;
-		ArrayList<IAction> outcome_ss = outcomeUpdates;
-		
-		contextUpdates = new ArrayList<CtxAttribute>();
-		outcomeUpdates = new ArrayList<IAction>();
-		
-		ArrayList[] snapshot = new ArrayList[]{context_ss, outcome_ss};
-		
-		return snapshot;
-	}
+	public void monitor(IIdentity indentity, IAction action);
+
 }
