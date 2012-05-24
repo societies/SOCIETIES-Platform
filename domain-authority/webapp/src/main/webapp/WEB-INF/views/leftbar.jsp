@@ -6,7 +6,7 @@
 	  <tr><td>&nbsp;</td></tr>
 	  
 	  <tr><td><b>Administration</b></td></tr>
-	  <tr><td align="right"><a href="useradmin.html">User Admin</a></td></tr>
+	  <tr><td align="right"><a href="adminlogin.html">User Admin</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	  
 	  <tr><td><b>User</b></td></tr>
