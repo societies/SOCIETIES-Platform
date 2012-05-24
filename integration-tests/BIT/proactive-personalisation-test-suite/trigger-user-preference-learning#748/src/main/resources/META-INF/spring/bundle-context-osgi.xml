@@ -25,7 +25,7 @@
 	<osgi:reference id="uam" interface="org.societies.api.useragent.monitoring.IUserActionMonitor">
 	</osgi:reference>
 	
-	<osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr">
-	</osgi:reference>
+	<osgi:reference id="persoMgr" interface="org.societies.api.internal.personalisation.IPersonalisationManager">
+ 	</osgi:reference>
 	
 </beans>
