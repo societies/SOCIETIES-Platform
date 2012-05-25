@@ -79,8 +79,9 @@ public class Test implements IPrivacyDataManagerListener {
 			}
 			this.idm = commManager.getIdManager();
 			IIdentity cisId = commManager.getIdManager().fromJid("red@societies.local");
+			Requestor requestor = new Requestor(cisId);
 			boolean result = false;
-			result = privacyPolicyManager.deletePrivacyPolicy(cisId);
+			result = privacyPolicyManager.deletePrivacyPolicy(requestor);
 			LOG.info("************* [Test Resullt] Privacy policy deleted? "+result);
 		} catch (Exception e) {
 			LOG.error("************* [Tests PrivacyPolicyManager] Error Exception: "+e.getMessage()+"\n", e);

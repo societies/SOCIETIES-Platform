@@ -26,11 +26,10 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 
 import java.util.Map;
 
-import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * Interface exposed to Societies components in order to do actions relative
@@ -40,27 +39,18 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  */
 public interface IPrivacyPolicyManager {
 	/**
-	 * Retrieve a CIS privacy policy by the ID of the CIS
+	 * Retrieve a CIS or 3P service privacy policy by the ID of the CIS pr the 3P service
 	 * Example of use:
 	 * - CIS Management, when it sends the CIS data (URI, description and privacy
 	 * policy) to let a user join it.
 	 * - CIS Management, to edit a policy (GUI call)
 	 * 
-	 * @param cisId Id of the CIS
-	 * @return the CIS privacy policy
+	 * @param requestor Id of the CIS or the 3P service
+	 * @return the privacy policy
 	 * @throws PrivacyException
 	 */
-	public RequestPolicy getPrivacyPolicy(IIdentity cisId) throws PrivacyException;
+	public RequestPolicy getPrivacyPolicy(Requestor requestor) throws PrivacyException;
 	
-	/**
-	 * Retrieve a 3P Service privacy policy by the ID of the 3P Service
-	 * 
-	 * @param serviceId Id of the 3P Service
-	 * @return the CIS privacy policy
-	 * @throws PrivacyException
-	 */
-	public RequestPolicy getPrivacyPolicy(ServiceResourceIdentifier serviceId) throws PrivacyException;
-
 	/**
 	 * Store or update a (CIS or 3P Service) privacy policy
 	 * Example of use:
@@ -74,20 +64,12 @@ public interface IPrivacyPolicyManager {
 	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) throws PrivacyException;
 	
 	/**
-	 * Delete a CIS privacy policy by the ID of the Service
+	 * Delete a CIS or 3P service privacy policy by the ID of the CIS or the 3P Service
 	 * 
-	 * @param cisId Id of the CIS
+	 * @param requestor Id of the CIS or the 3P service
 	 * @return True if the privacy policy is successfully deleted
 	 */
-	public boolean deletePrivacyPolicy(IIdentity cisId) throws PrivacyException;
-
-	/**
-	 * Delete a 3P Service privacy policy by the ID of the Service
-	 * 
-	 * @param serviceId Id of the 3P service
-	 * @return True if the privacy policy is successfully deleted
-	 */
-	public boolean deletePrivacyPolicy(ServiceResourceIdentifier serviceId) throws PrivacyException;
+	public boolean deletePrivacyPolicy(Requestor requestor) throws PrivacyException;
 
 	/**
 	 * Help a developer or a user to create a privacy policy by inferring a default
@@ -103,4 +85,19 @@ public interface IPrivacyPolicyManager {
 	 * @return A not complete privacy policy
 	 */
 	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException;
+	
+	/**
+	 * Create a Privacy Policy in an XML format from a Java format Privacy Policy
+	 * @param privacyPolicy Privacy policy
+	 * @return A string containing the XML version the privacy policy
+	 */
+	public String toXMLString(RequestPolicy privacyPolicy);
+	
+	/**
+	 * Create a Privacy Policy in a Java format from a XML format Privacy Policy
+	 * @param privacyPolicy Privacy policy
+	 * @return A Java object containing the privacy policy
+	 * @throws PrivacyException 
+	 */
+	public RequestPolicy fromXMLString(String privacyPolicy) throws PrivacyException;
 }
