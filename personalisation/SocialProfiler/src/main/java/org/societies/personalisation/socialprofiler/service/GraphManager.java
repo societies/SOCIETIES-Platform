@@ -1453,14 +1453,11 @@ public class GraphManager implements Variables{
 		try{
 		
 			logger.debug("creating maniac with name "+name);
-			logger.debug(" verying there is no maniac in the index with the same name");
 			if (getManiac(name, type)!=null){
 				logger.info("unable to create maniac with name "+name+", already exists a Maniac profile with this name");
 				return null;
 			}
 		
-			logger.debug("no maniac found with the same name=>ALLOW-> creating " +
-					"maniac properly");
 			final Node maniacNode=neoService.createNode();
 			maniac=new ProfileImpl(maniacNode, type, name);
 		
@@ -1576,7 +1573,6 @@ public class GraphManager implements Variables{
 	
 	public String getManiacLastTime(String maniacId, Profile.Type ptype) {
 		String lastTime="";;
-		logger.debug("returning Maniac "+maniacId+" lastTime");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			Profile maniac=getManiac(maniacId, ptype);
@@ -1584,7 +1580,6 @@ public class GraphManager implements Variables{
 				logger.error("maniac is null - impossible to return its lastTime");
 			}else{
 				lastTime=maniac.getLastTime();
-				logger.debug("Maniac lastTime was returned successfully");
 			}
 			tx.success();
 		}finally{

@@ -1,9 +1,12 @@
 package org.societies.platform.socialdata.converters;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.shindig.protocol.model.ExtendableBean;
+import org.apache.shindig.protocol.model.ExtendableBeanImpl;
 import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.ActivityEntryImpl;
 import org.apache.shindig.social.core.model.ActivityObjectImpl;
@@ -19,6 +22,11 @@ import org.json.JSONObject;
 
 public class ActivityConverterFromFoursquare implements ActivityConverter {
 
+	
+	final String LOCATION = "location";
+	final String POSITION = "position";
+	
+	
 	@Override
 	public List<ActivityEntry> load(String data) {
 		ArrayList<ActivityEntry> activities = new ArrayList<ActivityEntry>();
@@ -50,19 +58,37 @@ public class ActivityConverterFromFoursquare implements ActivityConverter {
 							entry.setId(elm.getString("id"));
 
 							Date createdTime = new Date(
-									elm.getLong("createdAt"));
+									elm.getLong("createdAt")*1000);
 							JSONObject venue = elm.getJSONObject("venue");
 							JSONObject location = venue
 									.getJSONObject("location");
 
+							SimpleDateFormat publishedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+							entry.setPublished(publishedDate.format(createdTime));
+							
 							String venueName = getVenueName(venue);
 							String locationString = getLocation(location);
 							String gps = getGPS(location);
 							String category = getCategory(venue);
 
-							entry.setContent(venueName + "(" + category + ")"
-									+ "; " + locationString + "; " + gps + "; "
-									+ createdTime.toString());
+							if (elm.has("shout"))
+								entry.setTitle(elm.getString("shout"));
+//							entry.setContent(venueName + "(" + category + ")"
+//									+ "; " + locationString + "; " + gps + "; "
+//									+ createdTime.toString());
+							
+							ActivityObject checkin = new ActivityObjectImpl();
+							checkin.setDisplayName(venueName);
+							checkin.setObjectType("place");
+							checkin.setContent(category);
+							ExtendableBean loc = new ExtendableBeanImpl();
+							loc.put(LOCATION, locationString);
+							loc.put(POSITION, gps);
+							
+							entry.setExtensions(loc);
+							entry.setObject(checkin);
+							
+							
 							entry.setVerb("checkin");
 							entry.setProvider(providerObj);
 							activities.add(entry);

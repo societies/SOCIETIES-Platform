@@ -52,7 +52,7 @@
 	<artifact type="bundle" name="org.societies.personalisation.personalisationBundle"/>
 	
 	<!--artifact type="jar" name="org.societies.integration.test.util.integrationtestutil"/-->
-	<artifact type="bundle" name="org.societies.integration.test.bit.user_intent_learning_749"/>
+	<artifact type="bundle" name="org.societies.integration.test.bit.user_preference_learning_748"/>
 
 	
 </plan>

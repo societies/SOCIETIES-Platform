@@ -142,8 +142,8 @@ public class DaRegistry {
 					.add(Restrictions.eq("name",
 							filterRegistryEntry.getName()).ignoreCase()).list();
 			
-			if (tmpRegistryEntryList != null) {
-				session.delete(tmpRegistryEntryList);
+			if ((tmpRegistryEntryList != null) && tmpRegistryEntryList.size() > 0) {
+				session.delete(tmpRegistryEntryList.get(0));
 			}
 			t.commit();
 			log.debug("removeXmppIdentityDetails Record deleted.");
@@ -272,7 +272,7 @@ public class DaRegistry {
 	@SuppressWarnings("unchecked")
 	public List<DaUserRecord> getXmppIdentityDetails() {
 		Session session = sessionFactory.openSession();
-		DaRegistryRecordEntry tmpEntry = null;
+
 		List<DaUserRecord> userList = new ArrayList<DaUserRecord>();
 		DaUserRecord tmpUserEntry = null;
 		try {

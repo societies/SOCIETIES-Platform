@@ -1,8 +1,8 @@
 /**
-z * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÃ‡ÃƒO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -35,6 +35,7 @@ import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -471,7 +472,7 @@ public class ProfilerEngine implements Variables{
 		
 		Hashtable <String,ArrayList<String>> pages_data = new Hashtable<String, ArrayList<String>>();
 		
-		if (information != null) {
+		if (information != null && information.getTurnOns() != null) {
 			List<String> turnOns = information.getTurnOns();
 			Iterator<String> it =  turnOns.iterator();
 			while(it.hasNext()){
@@ -565,7 +566,19 @@ public class ProfilerEngine implements Variables{
 				ActivityEntry activity=(ActivityEntry) posts.get(j);
 				
 				String viewer=current_id;
-				String source=activity.getActor().getDisplayName();
+				try {
+					Person p = (Person) profiles.get(0);
+					viewer = p.getDisplayName();
+					if (viewer == null)
+						viewer = p.getId();
+				} catch (Exception e) {}
+				String source=null;
+				ActivityObject a = activity.getActor();
+				if (a != null) {
+					source = a.getDisplayName();
+					if (source == null)
+						source = a.getId();
+				}
 				String type="note";
 				try {
 					type = activity.getObject().getObjectType();
@@ -591,19 +604,35 @@ public class ProfilerEngine implements Variables{
 
 		logger.info("----post: viewer "+viewer+" source "+source+" type "+type+" message "+message);
 
-		String lastTime=activity.getUpdated();
+		String lastTime=activity.getPublished();
 		
 		if ("note".equals(type)){ //status message
+			if (activity.getTarget() == null && viewer.equals(source)) // no target, go to wall -> this is consider narcissist			
 				incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
+			else // someone else's activity or wall
+				incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
 		} else if ("image".equals(type)){
 			incrementManiacStatistics(lastTime, current_id, "_PhotoManiac", Profile.Type.PHOTO_MANIAC, PHOTO_PROFILE);
 		} else if ("bookmark".equals(type)){ //link , youtube or others
 			incrementManiacStatistics(lastTime, current_id, "_SurfManiac", Profile.Type.SURF_MANIAC, SURF_PROFILE);
-		} else if ("quiz".equals(type)){  //TODO quiz,applications
-			incrementManiacStatistics(lastTime, current_id, "_QuizManiac", Profile.Type.QUIZ_MANIAC, QUIZ_PROFILE);
 		} else if ("video".equals(type)){   //TODO posts containing movies , mp4 link inside the post 
 			incrementManiacStatistics(lastTime, current_id, "_SurfManiac", Profile.Type.SURF_MANIAC, SURF_PROFILE);
-		} else if ("profile".equals(type)){ //TODO profile photos -> this is consider narcissist
+		} else if ("application".equals(type)){  //TODO quiz, applications
+			incrementManiacStatistics(lastTime, current_id, "_QuizManiac", Profile.Type.QUIZ_MANIAC, QUIZ_PROFILE);
+		} else if ("person".equals(type)){ 
+			if ("update".equals(activity.getVerb()) && viewer.equals(source)) // update profile photos -> this is consider narcissist			
+				incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
+			else { // e.g. "tag" someone or "make-friend". 
+				//TODO this is actually receiving tags, so it is a sign of popularity (as well as the number of likes or comments to own activities)
+				incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+			}
+		} else if ("comment".equals(type)){ // comment someone else's activity
+			incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+		} else if ("event".equals(type)){ // deal with events (e.g. attend). TODO improve
+			incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+		} else if ("question".equals(type)){ // ask a question
+			incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+		} else if ("place".equals(type) && viewer.equals(source)){ // checkin a place			
 			incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
 		} else {
 				logger.info("****WARNING this type is unknown for the engine *** :"+type);
@@ -625,10 +654,10 @@ public class ProfilerEngine implements Variables{
 		try {
 			if (sdf.parse(profile_last_time).
 				before(sdf.parse(lastTime))){
-			logger.debug(maniacType+" interaction");
-			graph.incrementManiacNumber(current_id+maniacType, ptype);
-			updateProfileStatistics(current_id, lastTime, profile_last_time, profile);
-		}
+				logger.debug(maniacType+" interaction");
+				graph.incrementManiacNumber(current_id+maniacType, ptype);
+				updateProfileStatistics(current_id, lastTime, profile_last_time, profile);
+			}
 		} catch (ParseException e){
 			e.printStackTrace();
 		}
@@ -713,13 +742,24 @@ public class ProfilerEngine implements Variables{
 							      user.getAboutMe(),
 								  updatedDateS);
 			try {
+				String first = null;
+				if (user.getName() != null) {
+					first = user.getName().getGivenName();
+					if (first == null)
+						first = user.getName().getFormatted();
+				}
+				
+				String currentLoc = null;
+				if (user.getCurrentLocation() != null)
+					currentLoc = user.getCurrentLocation().getFormatted();
+				
 				graph.updateGeneralInfo(current_id+"_GeneralInfo", 
-										user.getName().getGivenName(), 
+										first, 
 										user.getName().getFamilyName(),	
 										null, 
 										null, 
 										user.getLivingArrangement(), 
-										null,
+										currentLoc,
 										user.getPoliticalViews(), 
 										user.getReligion());
 			} catch (Exception e){

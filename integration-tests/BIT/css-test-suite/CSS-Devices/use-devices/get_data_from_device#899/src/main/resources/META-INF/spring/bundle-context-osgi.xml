@@ -20,5 +20,7 @@
        testing of the bundle outside of an OSGi container -->
 		
 		<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+		
+		<osgi:reference id="EventManager" interface="org.societies.api.osgi.event.IEventMgr"/>
 
 </beans>

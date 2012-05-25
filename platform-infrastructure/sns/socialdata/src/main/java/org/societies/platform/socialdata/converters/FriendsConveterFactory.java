@@ -10,6 +10,8 @@ public class FriendsConveterFactory{
 			return new FriendsConverterFromFacebook();
 		else if (connector.getConnectorName().equals(ISocialConnector.TWITTER_CONN))
 			return new FriendsConverterFromTwitter();
+		else if (connector.getConnectorName().equals(ISocialConnector.FOURSQUARE_CONN))
+			return new FriendsConverterFromFoursquare();
 		else 
 			return new FriendsConverterFromSN();
 		

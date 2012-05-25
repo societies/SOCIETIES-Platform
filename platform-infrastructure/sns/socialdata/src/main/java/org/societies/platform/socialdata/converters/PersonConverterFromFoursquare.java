@@ -108,7 +108,13 @@ public class PersonConverterFromFoursquare implements PersonConverter {
 		Account account = new AccountImpl();
 		try{
 			account.setDomain("foursquare.com");
-			account.setUsername(db.getString(FIRSTNAME)+" "+db.getString(LASTNAME));
+			String name = "";
+			if(db.has(FIRSTNAME))
+				name = name + db.getString(FIRSTNAME);
+			if(db.has(LASTNAME))
+				name = name + " "+db.getString(LASTNAME);
+			
+			account.setUsername(name);
 			account.setUserId(db.getString(ID));
 		}
 		catch (JSONException e) {
