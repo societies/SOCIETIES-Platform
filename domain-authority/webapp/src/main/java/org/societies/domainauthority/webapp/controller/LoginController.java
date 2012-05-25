@@ -193,7 +193,7 @@ public class LoginController {
 		isAuthenticated = true;
 		// Now get the url details from the registry
 		String redirectUrl = new String();
-		redirectUrl = String.format("http://%s:%s/societies/loginviada.html", userRecord.getHost(), userRecord.getPort());
+		redirectUrl = String.format("http://%s:%s/societies/%s/loginviada.html", userRecord.getHost(), userRecord.getPort(), userRecord.getId());
 		model.put("webappurl", redirectUrl);
 
 		model.put("name", userName);

@@ -69,9 +69,8 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		this.rawData = data;
 		
 		ActivityObject providerObj = new ActivityObjectImpl();
-		providerObj.setContent("facebook");
 		providerObj.setUrl("www.facebook.com");
-		providerObj.setId("facebook");
+		providerObj.setId("facebook.com");
 		providerObj.setDisplayName("Facebook");
 		
 		try{
@@ -151,7 +150,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 	}
 
 	private Date getBirthDay(String date) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 		try {
 			return df.parse(date);
 			} catch (ParseException e) {
@@ -259,7 +258,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 	}
 	
 	private Gender gender(String g){
-			if (g.equals("male"))
+			if ("male".equals(g))
 				return Gender.male;
 			else
 				return Gender.female;

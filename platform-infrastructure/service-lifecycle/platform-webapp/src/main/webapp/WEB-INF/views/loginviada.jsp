@@ -32,6 +32,7 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
 <h1>${message}</h1>
+<h2>Parameter was ${paraCssid}</h2>
 	
 	 
 	

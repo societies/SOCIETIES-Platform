@@ -268,7 +268,7 @@ public class ProfilerEngine implements Variables{
 			long end_date=current_time-week_time;
 			long end_date1=end_date*1000;
 			
-			///// ANALIZZARE LE ACTIVITIES
+			// ANALYSE ACTIVITIES
 			generateProfileContent(current_id, activities, end_date1); 		//till one week before , then update
 								
 			for(int i=0;i<friends.size();i++){
@@ -555,7 +555,7 @@ public class ProfilerEngine implements Variables{
 	}
 	
 	public void generateProfileContent(String current_id,List<?> posts,long date ){
-		logger.debug("Generating profile information from stream for user "+current_id+" .....");
+		logger.debug("Generating profile information from stream of "+posts.size() + " activities for user "+current_id+" .....");
 	
 			long date_s=date*1000;
 			Date d = new Date(date_s);
@@ -567,16 +567,17 @@ public class ProfilerEngine implements Variables{
 				
 				String viewer=current_id;
 				try {
+					//TODO improve to match viewer/source over all profiles
 					Person p = (Person) profiles.get(0);
 					viewer = p.getDisplayName();
-					if (viewer == null)
+					if (viewer == null || viewer.equals(""))
 						viewer = p.getId();
 				} catch (Exception e) {}
-				String source=null;
+				String source=viewer;
 				ActivityObject a = activity.getActor();
 				if (a != null) {
 					source = a.getDisplayName();
-					if (source == null)
+					if (source == null || source.equals(""))
 						source = a.getId();
 				}
 				String type="note";
@@ -602,15 +603,17 @@ public class ProfilerEngine implements Variables{
 	
 	private void postFiltering(ActivityEntry activity ,String current_id,String viewer, String source , String type , String message){
 
-		logger.info("----post: viewer "+viewer+" source "+source+" type "+type+" message "+message);
-
 		String lastTime=activity.getPublished();
 		
 		if ("note".equals(type)){ //status message
-			if (activity.getTarget() == null && viewer.equals(source)) // no target, go to wall -> this is consider narcissist			
-				incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
-			else // someone else's activity or wall
-				incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+			if (viewer.equals(source)) {
+				if (activity.getTarget() == null) // no target, go to wall -> this is consider narcissist			
+					incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
+				else // post to someone else's activity or wall
+					incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
+			} else // remote post from someone else. no impact on user behaviour profile
+				logger.info("----(neutral) post: viewer "+viewer+", source: "+source+", type: "+type+", content: "+message+", object: "+activity.getObject().getDisplayName());
+			
 		} else if ("image".equals(type)){
 			incrementManiacStatistics(lastTime, current_id, "_PhotoManiac", Profile.Type.PHOTO_MANIAC, PHOTO_PROFILE);
 		} else if ("bookmark".equals(type)){ //link , youtube or others
@@ -624,6 +627,7 @@ public class ProfilerEngine implements Variables{
 				incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
 			else { // e.g. "tag" someone or "make-friend". 
 				//TODO this is actually receiving tags, so it is a sign of popularity (as well as the number of likes or comments to own activities)
+				logger.info("----(popularity) post: viewer "+viewer+", source: "+source+", type: "+type+", content: "+message+", object: "+activity.getObject().getDisplayName());
 				incrementManiacStatistics(lastTime, current_id, "_SuperActiveManiac", Profile.Type.SUPER_ACTIVE, SUPERACTIVE_PROFILE);
 			}
 		} else if ("comment".equals(type)){ // comment someone else's activity
@@ -635,7 +639,8 @@ public class ProfilerEngine implements Variables{
 		} else if ("place".equals(type) && viewer.equals(source)){ // checkin a place			
 			incrementManiacStatistics(lastTime, current_id, "_NarcissismManiac", Profile.Type.EGO_CENTRIC, NARCISSISM_PROFILE);
 		} else {
-				logger.info("****WARNING this type is unknown for the engine *** :"+type);
+			logger.info("----post: viewer "+viewer+", source: "+source+", type: "+type+", content: "+message+", object: "+activity.getObject().getDisplayName());
+			logger.info("****WARNING this type is unknown for the engine *** :"+type);
 //		} else if ("message".equals(type)){ //TODO
 //				//logger.debug("the user received a direct message- however since no Popularity Profile still available nothing will be done with this post information");
 //		} else if ("message-event".equals(type)){ //TODO
@@ -654,7 +659,6 @@ public class ProfilerEngine implements Variables{
 		try {
 			if (sdf.parse(profile_last_time).
 				before(sdf.parse(lastTime))){
-				logger.debug(maniacType+" interaction");
 				graph.incrementManiacNumber(current_id+maniacType, ptype);
 				updateProfileStatistics(current_id, lastTime, profile_last_time, profile);
 			}
@@ -753,11 +757,19 @@ public class ProfilerEngine implements Variables{
 				if (user.getCurrentLocation() != null)
 					currentLoc = user.getCurrentLocation().getFormatted();
 				
+				String birthday = null;
+				if (user.getBirthday() != null)
+					birthday = user.getBirthday().toString();
+				
+				String gender = null;
+				if (user.getGender() != null)
+					gender = user.getGender().toString();
+				
 				graph.updateGeneralInfo(current_id+"_GeneralInfo", 
 										first, 
 										user.getName().getFamilyName(),	
-										null, 
-										null, 
+										birthday, 
+										gender, 
 										user.getLivingArrangement(), 
 										currentLoc,
 										user.getPoliticalViews(), 
