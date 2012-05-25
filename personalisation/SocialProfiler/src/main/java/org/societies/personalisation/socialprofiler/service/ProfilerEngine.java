@@ -567,6 +567,7 @@ public class ProfilerEngine implements Variables{
 				
 				String viewer=current_id;
 				try {
+					//TODO improve to match viewer/source over all profiles
 					Person p = (Person) profiles.get(0);
 					viewer = p.getDisplayName();
 					if (viewer == null || viewer.equals(""))
@@ -756,11 +757,19 @@ public class ProfilerEngine implements Variables{
 				if (user.getCurrentLocation() != null)
 					currentLoc = user.getCurrentLocation().getFormatted();
 				
+				String birthday = null;
+				if (user.getBirthday() != null)
+					birthday = user.getBirthday().toString();
+				
+				String gender = null;
+				if (user.getGender() != null)
+					gender = user.getGender().toString();
+				
 				graph.updateGeneralInfo(current_id+"_GeneralInfo", 
 										first, 
 										user.getName().getFamilyName(),	
-										null, 
-										null, 
+										birthday, 
+										gender, 
 										user.getLivingArrangement(), 
 										currentLoc,
 										user.getPoliticalViews(), 
