@@ -189,43 +189,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-	@Override
-	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID,
-			ServiceResourceIdentifier serviceID, String userActionType) {
-
-		LOG.info("getCurrentIntentAction "+predictionRequestsCounter+" serviceID"+ serviceID+" identity requestor"+ownerID+" userActionType"+userActionType);
-		predictionRequestsCounter = predictionRequestsCounter +1;
-		IUserIntentAction action = null;
-
-		// initiate caui model discovery
-		if(modelExist == false && enablePrediction == true && cauiDiscovery != null){
-			LOG.info("no model predictionRequestsCounter:" +predictionRequestsCounter);
-			if(predictionRequestsCounter >= 8){
-				LOG.info("this.cauiDiscovery.generateNewUserModel()");
-				this.cauiDiscovery.generateNewUserModel();	
-				predictionRequestsCounter = 0;
-				//time wait for new model generation
-			}
-		}
-		if(modelExist == true && enablePrediction == true){
-			try {
-				ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-				serviceId.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
-				serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
-				action = cauiTaskManager.createAction(serviceId, serviceId.getServiceInstanceIdentifier(), "bgColour", "red");
-
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-
-		}
-		LOG.info("getCurrentIntentAction(IIdentity ownerID,	ServiceResourceIdentifier serviceID, String userActionType)"+action );
-		return new AsyncResult<IUserIntentAction>(action);
-	}
-
-
+	
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			IAction action) {
@@ -280,22 +244,41 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
-	// this method is not complete
-	private IUserIntentAction findNextAction(IUserIntentTask uiTask,IUserIntentAction uiAction ){
-		IUserIntentAction actionResult = null;
-		/*
-		List<IUserIntentAction> actionList = uiTask.getActions();
 
-		int i = 0;
-		for(IUserIntentAction action : actionList){
-			i++;
-			if(action.equals(uiAction) && i+1 < actionList.size()){
-				actionResult = actionList.get(i+1);
+	@Override
+	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID,
+			ServiceResourceIdentifier serviceID, String userActionType) {
+
+		LOG.info("getCurrentIntentAction "+predictionRequestsCounter+" serviceID"+ serviceID+" identity requestor"+ownerID+" userActionType"+userActionType);
+		predictionRequestsCounter = predictionRequestsCounter +1;
+		IUserIntentAction action = null;
+
+		// initiate caui model discovery
+		if(modelExist == false && enablePrediction == true && cauiDiscovery != null){
+			LOG.info("no model predictionRequestsCounter:" +predictionRequestsCounter);
+			if(predictionRequestsCounter >= 8){
+				LOG.info("this.cauiDiscovery.generateNewUserModel()");
+				this.cauiDiscovery.generateNewUserModel();	
+				predictionRequestsCounter = 0;
+				//time wait for new model generation
 			}
 		}
-		 */
-		return actionResult;
+		if(modelExist == true && enablePrediction == true){
+			try {
+				ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+				serviceId.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
+				serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
+				action = cauiTaskManager.createAction(serviceId, serviceId.getServiceInstanceIdentifier(), "bgColour", "red");
+
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+
+		}
+		LOG.info("getCurrentIntentAction(IIdentity ownerID,	ServiceResourceIdentifier serviceID, String userActionType)"+action );
+		return new AsyncResult<IUserIntentAction>(action);
 	}
+
 
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
@@ -338,11 +321,11 @@ public class CAUIPrediction implements ICAUIPrediction{
 		CtxEntity operator;
 		try {
 			operator = this.ctxBroker.retrieveCssOperator().get();
-			Set<CtxAttribute> attrSet = operator.getAttributes(attrType);
+			Set<CtxAttribute> attrSet = operator.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
 			List<CtxAttribute> attrList = new ArrayList<CtxAttribute>(attrSet);
 			if (attrList.size()>0){
 				CtxAttribute attr = attrList.get(0);
-				attrid = attr.getId();	
+				String locationValue = attr.getStringValue();	
 			}
 
 		} catch (InterruptedException e) {
@@ -407,7 +390,26 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 	}
 
+	
+	// this method is not complete
+	private IUserIntentAction findNextAction(IUserIntentTask uiTask,IUserIntentAction uiAction ){
+		IUserIntentAction actionResult = null;
+		/*
+		List<IUserIntentAction> actionList = uiTask.getActions();
 
+		int i = 0;
+		for(IUserIntentAction action : actionList){
+			i++;
+			if(action.equals(uiAction) && i+1 < actionList.size()){
+				actionResult = actionList.get(i+1);
+			}
+		}
+		 */
+		return actionResult;
+	}
+
+	
+	
 	private class MyCtxChangeEventListener implements CtxChangeEventListener {
 
 
