@@ -22,33 +22,48 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.remote;
+package org.societies.api.internal.privacytrust.privacyprotection;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyAgreementManagerListener;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.societies.api.internal.privacytrust.privacyprotection.PrivacyPolicyManagerBean.methodType;
+import org.societies.api.schema.identity.RequestorBean;
 
 /**
- * Interface exposed to Societies components to read remotely the stored privacy policy agreements
  * @author Olivier Maridat (Trialog)
- * @created 17-nov.-2011 11:12:31
+ *
  */
-public interface IPolicyAgreementManagerRemote {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class PrivacyAgreementManagerBean {
+	@XmlElement(required = true)
+	private methodType  method;
+	private RequestorBean requestor;
 	/**
-	 * Remote call to retrieve a CIS privacy agreement by the ID of the CIS
-	 * 
-	 * @param cisId Id of the CIS
-	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
-	 * @param listener The callback object
+	 * @return the method
 	 */
-	public void getAgreement(IIdentity cisId, IIdentity targetedNode, IPrivacyAgreementManagerListener listener);
+	public methodType getMethod() {
+		return method;
+	}
+	/**
+	 * @param method the method to set
+	 */
+	public void setMethod(methodType method) {
+		this.method = method;
+	}
+	/**
+	 * @return the requestor
+	 */
+	public RequestorBean getRequestor() {
+		return requestor;
+	}
+	/**
+	 * @param requestor the requestor to set
+	 */
+	public void setRequestor(RequestorBean requestor) {
+		this.requestor = requestor;
+	}
 	
-	/**
-	 * Remote call to retrieve a 3P service privacy agreement by the ID of the Service
-	 * 
-	 * @param serviceId Id of the Service
-	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
-	 * @param listener The callback object
-	 */
-	public void getAgreement(ServiceResourceIdentifier serviceId, IIdentity targetedNode, IPrivacyAgreementManagerListener listener);
+	
 }

@@ -21,6 +21,18 @@
 
 
 	<!-- Privacy Policy Management Configuration -->
+	
+	<osgi:service ref="PrivacyPolicyManagerCommClient"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote" />
+
+	<osgi:reference id="privacyPolicyManager"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" cardinality="0..1" />
+	
+	<osgi:service ref="PrivacyAgreementManagerCommClient"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyAgreementManagerRemote" />
+
+	<osgi:reference id="privacyAgreementManager"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager" cardinality="0..1" />
 
 
 

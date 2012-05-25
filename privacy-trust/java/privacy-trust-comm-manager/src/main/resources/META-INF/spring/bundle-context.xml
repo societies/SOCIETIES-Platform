@@ -64,6 +64,48 @@
 
 	<!-- Privacy Policy Management Configuration -->
 
+	<bean name="PrivacyPolicyManagerCommClient"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommClient"
+		depends-on="commManager, PrivacyPolicyManagerCommClientCallback, PrivacyTrustCommClientCallback">
+		<property name="commManager" ref="commManager" />
+		<property name="listeners" ref="PrivacyPolicyManagerCommClientCallback" />
+		<property name="privacyTrustCommClientCallback" ref="PrivacyTrustCommClientCallback" />
+	</bean>
+	
+	<bean name="PrivacyPolicyManagerCommClientCallback"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommClientCallback"
+		depends-on="commManager">
+		<property name="commManager" ref="commManager" />
+	</bean>
+
+	<bean name="PrivacyPolicyManagerCommServer"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommServer"
+		depends-on="commManager, privacyPolicyManager">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
+	</bean>
+	
+	
+	<bean name="PrivacyAgreementManagerCommClient"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClient"
+		depends-on="commManager, PrivacyAgreementManagerCommClientCallback, PrivacyTrustCommClientCallback">
+		<property name="commManager" ref="commManager" />
+		<property name="listeners" ref="PrivacyAgreementManagerCommClientCallback" />
+		<property name="privacyTrustCommClientCallback" ref="PrivacyTrustCommClientCallback" />
+	</bean>
+	
+	<bean name="PrivacyAgreementManagerCommClientCallback"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClientCallback">
+	</bean>
+
+	<bean name="PrivacyAgreementManagerCommServer"
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommServer"
+		depends-on="commManager, privacyAgreementManager">
+		<property name="commManager" ref="commManager" />
+		<property name="privacyAgreementManager" ref="privacyAgreementManager" />
+	</bean>
+	
+
 
 
 	<!-- Privacy Preference Management Configuration -->
