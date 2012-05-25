@@ -257,45 +257,50 @@ public void testConvexHull(){
 		p1.x=-1;
 		p1.y=-1;
 		setOfPoints.add(0,p1);
-		ExpectedsetOfConvexHullPoints.add(0,p1);
+		//ExpectedsetOfConvexHullPoints.add(0,p1);
 		
-		p2.x=5;
-		p2.y=-2;
+		p2.x=1;
+		p2.y=-1;
 		setOfPoints.add(1,p2);
-		ExpectedsetOfConvexHullPoints.add(1,p2);
+		//ExpectedsetOfConvexHullPoints.add(1,p2);
 				
-		p3.x=4;
-		p3.y=7;
+		p3.x=1;
+		p3.y=1;
 		setOfPoints.add(2,p3);
-		ExpectedsetOfConvexHullPoints.add(1,p3);
+		//ExpectedsetOfConvexHullPoints.add(2,p3);
 		
-		p4.x=-2;
-		p4.y=3;
+		p4.x=-1;
+		p4.y=1;
 		setOfPoints.add(3,p4);
-		ExpectedsetOfConvexHullPoints.add(2,p4);
-
-//		
+		//ExpectedsetOfConvexHullPoints.add(3,p4);
+	
 		p5.x=0;
 		p5.y=0;
-		setOfPoints.add(3,p5);
-//		
-//		p6.x=8;
-//		p6.y=6;
-//		setOfPoints.add(4,p6);
-//		
-//		p7.x=9;
-//		p7.y=3;
-//		setOfPoints.add(4,p7);
-//		setOfConvexHullPoints.add(2,p7);
-//		
-//		p8.x=10;
-//		p8.y=10;
-//		setOfPoints.add(4,p8);
-//		
-//		p9.x=11;
-//		p9.y=11;
-//		setOfPoints.add(4,p9);
-//		setOfConvexHullPoints.add(3,p9);
+		setOfPoints.add(4,p5);
+				
+		p9.x=-2;
+		p9.y=-2;
+		setOfPoints.add(5,p9);
+				
+		p8.x=-2;
+		p8.y=2;
+		setOfPoints.add(6,p8);
+				
+		p6.x=2;
+		p6.y=2;
+		setOfPoints.add(7,p6);
+		
+		
+		p7.x=2;
+		p7.y=-2;
+		setOfPoints.add(8,p7);
+		
+		ExpectedsetOfConvexHullPoints.add(0,p7);
+		ExpectedsetOfConvexHullPoints.add(1,p9);
+		ExpectedsetOfConvexHullPoints.add(2,p8);
+		ExpectedsetOfConvexHullPoints.add(3,p6);
+	
+
 	System.out.println("size is "+setOfPoints.size());
 //	for (int i=0; i<setOfPoints.size();++i){
 //		System.out.println("Stoixeio "+i+" is "+setOfPoints.get(i).x+", "+setOfPoints.get(i).y);
@@ -305,10 +310,13 @@ public void testConvexHull(){
 	//ArrayList<Point> a = cH.qHull(setOfPoints);
 	ArrayList<Point> a = cce.cceGeomConvexHull(setOfPoints);
 	
+	//ArrayList<Point> a = cH.qHull(setOfPoints);
+	
+	System.out.println("THE CONVEX HULL SIZE IS  : "+a.size());
 			for (int z=0; z<a.size();++z){
-	System.out.println("ConvexHulla["+z+"] = "+a.get(z));
+	System.out.println("ConvexHull a["+z+"] = "+a.get(z));
 }
-	Assert.assertEquals(a,ExpectedsetOfConvexHullPoints);
+	Assert.assertEquals(ExpectedsetOfConvexHullPoints,a);
 
 //	for (int i=0; i<setOfPoints.size();++i){
 //		System.out.println("Stoixeio tou Hull "+i+" is "+a.get(i).x+", "+a.get(i).y);

@@ -233,9 +233,12 @@ public class ConvexHull {
 //		System.out.println("The element is "+set1.get(0));
 		System.out.println("set2 size is"+set2.size());
 //		System.out.println("The element is ");
+	
+	}
+		
 		findHullSet(set1, minPoint, fP, convexHullSet);
 		findHullSet(set2, fP, maxPoint, convexHullSet);
-	}
+		
 		for (int y=0; y<set1.size();++y){
 		System.out.println("Set1 stoixeio  "+y+" = "+set1.get(y));
 	}

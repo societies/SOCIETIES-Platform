@@ -223,8 +223,10 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 			if (relativeDistance > distance_min){			
 				distance_min =relativeDistance;
-				farthestPoint=i;		
+				farthestPoint=i;
+				
 			}
+			
 		}
 		
 		fP=pointsSet.get(farthestPoint);
@@ -234,21 +236,21 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		for (int i=0; i<pointsSet.size(); ++i){
 			rP = pointsSet.get(i);
 			int crossProduct = (fP.x-minPoint.x)*(rP.y-minPoint.y) - (fP.y-minPoint.y)*(rP.x-minPoint.x);
-			if (crossProduct <= 0){
+			if (crossProduct >= 0){
 				set1.add(rP);
 			}
-	
 		}
 			
 		for (int i=0; i<pointsSet.size(); ++i){
 			rP = pointsSet.get(i);
 			int crossProduct = (maxPoint.x-fP.x)*(rP.y-fP.y) - (maxPoint.y-fP.y)*(rP.x-fP.x);
-			if (crossProduct <= 0){
-				set2.add(rP);
-				
+			if (crossProduct >= 0){
+				set2.add(rP);	
 			}
 		}
+		System.out.println("Printing using set1................."+set1.size());
 		singleSideHullSet(set1, minPoint, fP, convexHullSet); 
+		System.out.println("Printing using set2..........................."+set2.size());
 		singleSideHullSet(set2,fP,maxPoint,convexHullSet);	
 	}
 
@@ -593,6 +595,26 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 
 
+	
+	//Based on Cross Product function, if the crossProduct is negative then point P is on the right of AB. Otherwise is on the left
+	public int pointLocation(Point A, Point B, Point P){
+		int crossProduct = (B.x-A.x)*(P.y-A.y) - (B.y-A.y)*(P.x-A.x);
+		return (crossProduct>0 ?1 :-1);
+	}
+	
+	//******************************************************************************************************
+		//******************************************************************************************************
+
+	//Distance calculation between a point P and a segment AB
+	public int distance(Point A, Point B, Point P){
+		int ABx=B.x-A.x;
+		int ABy =B.y-A.y;
+		int num = ABx*(A.y-P.y)-ABy*(A.x-P.x);
+		if (num<0)
+			num = -num;
+		return num;
+	}	
+	
 
 
 	// private void returnListOfDesiredAttributes(List<CtxAttributeIdentifier> listOfMembersOfGivenType) {
