@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
@@ -67,11 +68,11 @@ public class PrivacyPolicyManagerTest {
 	@Test
 	@Ignore
 	public void testGetPrivacyPolicy() {
-		IIdentity cisId = null;
+		Requestor requestor = null;
 		RequestPolicy expected = null;
 		RequestPolicy actual = null;
 		try {
-			actual = privacyPolicyManager.getPrivacyPolicy(cisId);
+			actual = privacyPolicyManager.getPrivacyPolicy(requestor);
 		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -102,11 +103,11 @@ public class PrivacyPolicyManagerTest {
 	@Test
 	@Ignore
 	public void testDeletePrivacyPolicy() {
-		IIdentity cisId = null;
+		Requestor requestor = null;
 		boolean expected = true;
 		boolean actual = false;
 		try {
-			actual = privacyPolicyManager.deletePrivacyPolicy(cisId);
+			actual = privacyPolicyManager.deletePrivacyPolicy(requestor);
 		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

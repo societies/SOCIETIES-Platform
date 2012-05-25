@@ -22,37 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.privacypolicy;
+package org.societies.api.internal.privacytrust.privacyprotection;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.IPolicyAgreementManager;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 
 /**
+ * Interface internal to privacy components to manage privacy agreements
  * @author Olivier Maridat (Trialog)
- * @date 5 déc. 2011
+ * @created 17-nov.-2011 11:12:31
  */
-public class PolicyAgreementManager implements IPolicyAgreementManager {
-
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#getAgreement(org.societies.api.identity.IIdentity)
+public interface IPrivacyAgreementManager {
+	/**
+	 * Retrieve a privacy agreement by the ID of the CIS or the 3P service
+	 * 
+	 * @param requestor Requestor Id
+	 * @return the privacy agreement
+	 * @throws PrivacyException
 	 */
-	@Override
-	public IAgreementEnvelope getAgreement(IIdentity cisId)
-			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#getAgreement(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
-	 */
-	@Override
-	public IAgreementEnvelope getAgreement(ServiceResourceIdentifier serviceId)
-			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public AgreementEnvelope getAgreement(Requestor requestor) throws PrivacyException;
 }

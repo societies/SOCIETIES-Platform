@@ -22,57 +22,35 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.privacypolicy;
+package org.societies.privacytrust.privacyprotection.api;
 
-import org.societies.api.identity.IIdentity;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManagerInternal;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 
 /**
+ * Interface internal to privacy components to manage privacy agreements
  * @author Olivier Maridat (Trialog)
- * @date 5 déc. 2011
+ * @created 17-nov.-2011 11:12:31
  */
-public class PolicyAgreementManagerInternal implements IPolicyAgreementManagerInternal {
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#updateAgreement(org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope)
+public interface IPrivacyAgreementManagerInternal {
+	/**
+	 * Update a privacy agreement by the ID of the CIS or 3P service
+	 * 
+	 * @param requestor Requestor id
+	 * @param agreement Agreement
+	 * @return Success result of the operation
+	 * @throws PrivacyException
 	 */
-	@Override
-	public boolean updateAgreement(IIdentity cisId, IAgreementEnvelope agreement)
-			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	public CtxIdentifier updateAgreement(Requestor requestor, AgreementEnvelope agreement) throws PrivacyException;
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#updateAgreement(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope)
+	/**
+	 * Delete a privacy agreement by the ID of the CIS or 3P service
+	 * 
+	 * @param requestor Requestor Id
+	 * @return Success result of the operation
+	 * @throws PrivacyException
 	 */
-	@Override
-	public boolean updateAgreement(ServiceResourceIdentifier serviceId,
-			IAgreementEnvelope agreement) throws PrivacyException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#deleteAgreement(org.societies.api.identity.IIdentity)
-	 */
-	@Override
-	public IAgreementEnvelope deleteAgreement(IIdentity cisId)
-			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#deleteAgreement(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
-	 */
-	@Override
-	public IAgreementEnvelope deleteAgreement(
-			ServiceResourceIdentifier serviceId) throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	public boolean deleteAgreement(Requestor requestor) throws PrivacyException;
 }

@@ -54,6 +54,7 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.privacytrust.privacyprotection.privacypolicy.registry.PrivacyPolicyRegistry;
 
 /**
  * @author Elizabeth
@@ -63,18 +64,18 @@ public class PrivacyPolicyRegistryManager {
 
 	private PrivacyPolicyRegistry policyRegistry;
 	private ICtxBroker broker;
-		
+
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IIdentity myPublicDPI;
 	private IIdentityManager idm;
-	
+
 	public PrivacyPolicyRegistryManager(ICtxBroker ctxBroker){
 		this.broker = ctxBroker;
 		this.loadPolicies();
 	}
 
 
-	
+
 	/**
 	 * method to add a policy to the registry
 	 * @param requestor	the service id of the service for which the policy is for
@@ -89,7 +90,7 @@ public class PrivacyPolicyRegistryManager {
 		this.policyRegistry.addPolicy(requestor,id);
 		this.storePolicies(); 
 		this.storePolicyToFile(policy);		
-		
+
 
 	}
 
@@ -118,7 +119,7 @@ public class PrivacyPolicyRegistryManager {
 			return policy;
 		} catch (CtxException e) {
 			e.printStackTrace();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -133,6 +134,29 @@ public class PrivacyPolicyRegistryManager {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	/**
+	 * method to delete the policy of a given service
+	 * @param requestor	the serviceid of the service for which the policy is for
+	 * @return	success of the operation 
+	 * @throws CtxException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	public boolean deletePolicy(Requestor requestor) throws InterruptedException, ExecutionException, CtxException{
+		// -- No privacy policy in the registry
+		if (null == policyRegistry){
+			return true;
+		}
+		// -- Retrieve privacy policy id
+		CtxIdentifier privacyPolicyId = policyRegistry.getPolicyStorageID(requestor);
+		// No privacy policy
+		if (null == privacyPolicyId) {
+			return true;
+		}
+		// Remove it
+		broker.remove(privacyPolicyId).get();
+		return true;
 	}
 
 	private CtxIdentifier storePolicyToDB(Requestor requestor, RequestPolicy policy){
@@ -164,17 +188,17 @@ public class PrivacyPolicyRegistryManager {
 					CtxEntity policyEntity = broker.createEntity(CtxEntityTypes.PRIVACY_POLICY).get();
 					assoc.addChildEntity(policyEntity.getId());
 					broker.update(assoc);
-					
+
 					entityIDs.add(policyEntity.getId());
-					
+
 				}
 				CtxAttribute ctxAttr = broker.createAttribute((CtxEntityIdentifier) entityIDs.get(0), "policyOf"+name).get();
 				ctxAttr.setBinaryValue(SerialisationHelper.serialise(policy));
 				broker.update(ctxAttr);
 				this.log("Created attribute: "+ctxAttr.getType());
 				return ctxAttr.getId();
-				
-			
+
+
 			}else{
 				CtxAttribute ctxAttr = (CtxAttribute) broker.retrieve(ctxIDs.get(0)).get();
 				ctxAttr.setBinaryValue(SerialisationHelper.serialise(policy));
@@ -211,7 +235,7 @@ public class PrivacyPolicyRegistryManager {
 					if (this.policyRegistry==null){
 						this.policyRegistry = new PrivacyPolicyRegistry();
 						this.loadPoliciesFromFile();
-						
+
 						this.log("No service privacy policies found in context DB, reading from file");
 					}else if (this.policyRegistry.isEmpty()){
 						this.loadPoliciesFromFile();
@@ -254,24 +278,23 @@ public class PrivacyPolicyRegistryManager {
 	 * method to load the policies from the filesystem
 	 */
 	private void loadPoliciesFromFile(){
-		File dir = new File("./servicePrivacyPolicies");
-		if (dir.isDirectory()){
-			File[] files = dir.listFiles(new Filter("xml"));
-			XMLPolicyReader reader = new XMLPolicyReader(broker, idm);
-			for (int i=0; i<files.length; i++){
-				RequestPolicy request = reader.readPolicyFromFile(files[i]);
-				if (request!=null){
-					this.addPolicy(request.getRequestor(), request);
-					
-				}
-			}
-			
-		}else{
-			this.log("Directory: "+dir.toString()+" doesn't exist");
-		}
-		
+//		File dir = new File("./servicePrivacyPolicies");
+//		if (dir.isDirectory()){
+//			File[] files = dir.listFiles(new Filter("xml"));
+//			XMLPolicyReader reader = new XMLPolicyReader(broker, idm);
+//			for (int i=0; i<files.length; i++){
+//				RequestPolicy request = reader.readPolicyFromFile(files[i]);
+//				if (request!=null){
+//					this.addPolicy(request.getRequestor(), request);
+//
+//				}
+//			}
+//
+//		}else{
+//			this.log("Directory: "+dir.toString()+" doesn't exist");
+//		}
 	}
-	
+
 	/**
 	 * method to set the new public dpi in the registry objects
 	 */
@@ -356,9 +379,9 @@ public class PrivacyPolicyRegistryManager {
 	private class Filter implements FilenameFilter{
 
 		protected String pattern;
-		  public Filter (String str) {
-		    pattern = str;
-		  }
+		public Filter (String str) {
+			pattern = str;
+		}
 
 		/* (non-Javadoc)
 		 * @see java.io.FilenameFilter#accept(java.io.File, java.lang.String)
@@ -367,6 +390,6 @@ public class PrivacyPolicyRegistryManager {
 		public boolean accept(File dir, String name) {
 			return name.toLowerCase().endsWith(pattern.toLowerCase());
 		}
-		
+
 	}
 }
