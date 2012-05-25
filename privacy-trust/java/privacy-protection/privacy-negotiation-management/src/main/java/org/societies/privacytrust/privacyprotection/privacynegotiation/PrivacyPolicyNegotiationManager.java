@@ -44,7 +44,7 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
-import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManagerInternal;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
@@ -72,7 +72,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	//ICommManager!
 	private IIdentityManager idm;
 	
-	private IPolicyAgreementManagerInternal policyAgreementMgr;
+	private IPrivacyAgreementManagerInternal policyAgreementMgr;
 	private IPrivacyDataManagerInternal privacyDataManager;
 	
 	private INegotiationAgent negotiationAgent;
@@ -156,13 +156,13 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	/**
 	 * @return the policyAgreementMgr
 	 */
-	public IPolicyAgreementManagerInternal getPolicyAgreementMgr() {
+	public IPrivacyAgreementManagerInternal getPolicyAgreementMgr() {
 		return policyAgreementMgr;
 	}
 	/**
 	 * @param policyAgreementMgr the policyAgreementMgr to set
 	 */
-	public void setPolicyAgreementMgr(IPolicyAgreementManagerInternal policyAgreementMgr) {
+	public void setPolicyAgreementMgr(IPrivacyAgreementManagerInternal policyAgreementMgr) {
 		this.policyAgreementMgr = policyAgreementMgr;
 	}
 	/**

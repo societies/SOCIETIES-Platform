@@ -33,6 +33,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
@@ -67,13 +68,20 @@ public class NegotiationAgent implements INegotiationAgent{
 	public Future<RequestPolicy> getPolicy(Requestor requestor) {
 		this.log("Returning requested policy for : "+requestor.toString());
 	
-		RequestPolicy requestedPolicy = this.policyMgr.getPolicy(requestor);
-		if (requestedPolicy==null){
-			log("RequestPolicy is NULL");
-		}else{
-			log("FOUND non-null request policy and returning to requestor");
+		RequestPolicy requestedPolicy;
+		try {
+			requestedPolicy = this.policyMgr.getPrivacyPolicy(requestor);
+			if (requestedPolicy==null){
+				log("RequestPolicy is NULL");
+			}else{
+				log("FOUND non-null request policy and returning to requestor");
+			}
+			return new AsyncResult<RequestPolicy>(this.policyMgr.getPrivacyPolicy(requestor));
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return new AsyncResult<RequestPolicy>(this.policyMgr.getPolicy(requestor));
+		return new AsyncResult<RequestPolicy>(null);
 	}
 
 	/* 
@@ -93,14 +101,21 @@ public class NegotiationAgent implements INegotiationAgent{
 	public Future<ResponsePolicy> negotiate(Requestor requestor, ResponsePolicy policy) {
 		log("Received responsePolicy from client");
 		log(policy.toString());
-		RequestPolicy myPolicy = this.policyMgr.getPolicy(requestor);
-		if (myPolicy==null){
-			log("Could not retrieve MY POLICY!");
+		try {
+			RequestPolicy myPolicy = this.policyMgr.getPrivacyPolicy(requestor);
+			if (myPolicy==null){
+				log("Could not retrieve MY POLICY!");
+			}
+			ProviderResponsePolicyGenerator respPolGen = new ProviderResponsePolicyGenerator();
+			ResponsePolicy myResponse = respPolGen.generateResponse(policy, myPolicy);
+			
+			return new AsyncResult<ResponsePolicy>(myResponse);
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		ProviderResponsePolicyGenerator respPolGen = new ProviderResponsePolicyGenerator();
-		ResponsePolicy myResponse = respPolGen.generateResponse(policy, myPolicy);
-		
-		return new AsyncResult<ResponsePolicy>(myResponse);
+
+		return new AsyncResult<ResponsePolicy>(null);
 	}
 	/* (non-Javadoc)
 	 * @see org.personalsmartspace.spm.negotiation.api.platform.INegotiationAgent#acknowledgeAgreement(org.personalsmartspace.spm.negotiation.api.platform.IAgreementEnvelope)
