@@ -49,7 +49,7 @@ public class NegotiationAgent implements INegotiationAgent{
 	private IPrivacyPolicyManager policyMgr;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	
-	public NegotiationAgent(IIdentity myID, PrivacypolicyMgr pprmgr){
+	public NegotiationAgent(IIdentity myID, IPrivacyPolicyManager pprmgr){
 		this.myIdentity = myID;
 		//this.policyMgr = new PrivacypolicyMgr(context);
 		this.policyMgr = pprmgr;
@@ -66,7 +66,7 @@ public class NegotiationAgent implements INegotiationAgent{
 	@Override
 	public Future<RequestPolicy> getPolicy(Requestor requestor) {
 		this.log("Returning requested policy for : "+requestor.toString());
-		RequestPolicy requestedPolicy = this.policyMgr.
+	
 		RequestPolicy requestedPolicy = this.policyMgr.getPolicy(requestor);
 		if (requestedPolicy==null){
 			log("RequestPolicy is NULL");
