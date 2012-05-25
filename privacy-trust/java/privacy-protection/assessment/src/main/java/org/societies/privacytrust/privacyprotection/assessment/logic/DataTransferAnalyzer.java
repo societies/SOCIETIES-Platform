@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -50,15 +51,12 @@ public class DataTransferAnalyzer {
 	private static Logger LOG = LoggerFactory.getLogger(DataTransferAnalyzer.class);
 
 	private PrivacyLog privacyLog;
-//	private Correlation correlation;
-	
-//	private List<AssessmentResultClassName> assessmentResultClassName = new ArrayList<AssessmentResultClassName>();
-//	private List<AssessmentResultIIdentity> assessmentResultIIdentity = new ArrayList<AssessmentResultIIdentity>();
+	private Correlation correlation;
 	
 	public DataTransferAnalyzer(PrivacyLog privacyLog) {
 		LOG.info("Constructor");
 		this.privacyLog = privacyLog;
-//		this.correlation = new Correlation(privacyLog.getDataAccess(), privacyLog.getDataTransmission());
+		correlation = new Correlation(privacyLog);
 	}
 	
 	public AssessmentResultIIdentity estimatePrivacyBreach(IIdentity sender) throws AssessmentException {
@@ -68,6 +66,8 @@ public class DataTransferAnalyzer {
 			throw new AssessmentException("sender or sender JID is null");
 		}
 		
+		correlation.run();
+
 		AssessmentResultIIdentity result = new AssessmentResultIIdentity(sender);
 		PrivacyLogFilter filter = new PrivacyLogFilter();
 		filter.setSender(sender);
@@ -91,6 +91,8 @@ public class DataTransferAnalyzer {
 			throw new AssessmentException("sender is null");
 		}
 		
+		correlation.run();
+
 		AssessmentResultClassName result = new AssessmentResultClassName(sender);
 		PrivacyLogFilter filter = new PrivacyLogFilter();
 		filter.setSenderClass(sender);
