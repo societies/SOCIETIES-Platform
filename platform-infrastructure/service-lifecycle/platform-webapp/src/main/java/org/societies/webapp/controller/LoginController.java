@@ -95,4 +95,20 @@ public class LoginController {
 				return new ModelAndView("login", model);
 			}			
 	}	
+	
+	/**
+	 * This method get called when user request for login page by using
+	 * url http://localhost:8080/societies/login.html
+	 * @return login jsp page and model object
+	 */
+	@RequestMapping(value="/loginviada.html",method = RequestMethod.GET)
+	public ModelAndView loginviada() {
+		//model is nothing but a standard Map object
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("message", "Welcome to your Societies account");
+		
+		/*return modelandview object and passing login (jsp page name) and model object as
+		 constructor */
+		return new ModelAndView("loginviada", model) ;
+	}
 }

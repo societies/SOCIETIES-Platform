@@ -10,6 +10,8 @@ public class PersonConverterFactory{
 			return new PersonConverterFromFacebook();
 		else if (ISocialConnector.TWITTER_CONN.equals(connector.getConnectorName()))
 			return new PersonConverterFromTwitter();
+		else if (ISocialConnector.FOURSQUARE_CONN.equals(connector.getConnectorName()))
+			return new PersonConverterFromFoursquare();
 		else 
 			return new PersonConverterFromSN();
 		
