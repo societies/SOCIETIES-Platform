@@ -184,7 +184,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			else rightPointsSet.add(p);
 		}
 		
-		singleSideHullSet(rightPointsSet,minP,maxP,convexHullSet);
+		singleSideHullSet(leftPointsSet,minP,maxP,convexHullSet);
 		singleSideHullSet(rightPointsSet,maxP,minP,convexHullSet);
 		return convexHullSet;
 	}
@@ -215,7 +215,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		}
 
 		for (int i=0; i<pointsSet.size(); i++){	
-			Point m =pointsSet.get(i);	
+			Point m =pointsSet.get(i);				
 			relativeDistance=(maxPoint.x-minPoint.x)*(minPoint.y-m.y)-(maxPoint.y-minPoint.y)*(minPoint.x-m.x);
 			if (relativeDistance < 0){
 				relativeDistance= -relativeDistance;

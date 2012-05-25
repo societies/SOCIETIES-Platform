@@ -228,12 +228,12 @@ public class CommunityContextEstimationTest{
 @Test	
 public void testConvexHull(){
 	
-	ConvexHull cH = new ConvexHull();
-
+	//ConvexHull cH = new ConvexHull();
+    CommunityContextEstimation cce = new CommunityContextEstimation();
 	Random rand1 = new Random();
 	Random rand2 = new Random();
 	ArrayList<Point> setOfPoints=new ArrayList<Point>();
-	ArrayList<Point> setOfConvexHullPoints = new ArrayList<Point>();
+	ArrayList<Point> ExpectedsetOfConvexHullPoints = new ArrayList<Point>();
 	
 //	for (int i=0; i<1000; ++i){
 //		Point p = new Point();
@@ -253,57 +253,63 @@ public void testConvexHull(){
 		Point p9 = new Point();
 	
 		
-		p2.x=3;
-		p2.y=8;
-		setOfPoints.add(0,p2);
-		setOfConvexHullPoints.add(0,p2);
 		
 		p1.x=-1;
 		p1.y=-1;
-		setOfPoints.add(1,p1);
-		setOfConvexHullPoints.add(1,p1);
+		setOfPoints.add(0,p1);
+		ExpectedsetOfConvexHullPoints.add(0,p1);
 		
+		p2.x=5;
+		p2.y=-2;
+		setOfPoints.add(1,p2);
+		ExpectedsetOfConvexHullPoints.add(1,p2);
+				
 		p3.x=4;
 		p3.y=7;
 		setOfPoints.add(2,p3);
+		ExpectedsetOfConvexHullPoints.add(1,p3);
 		
-		p4.x=5;
-		p4.y=8;
+		p4.x=-2;
+		p4.y=3;
 		setOfPoints.add(3,p4);
-		
-		p5.x=6;
-		p5.y=2;
-		setOfPoints.add(4,p5);
-		
-		p6.x=8;
-		p6.y=6;
-		setOfPoints.add(4,p6);
-		
-		p7.x=9;
-		p7.y=3;
-		setOfPoints.add(4,p7);
-		setOfConvexHullPoints.add(2,p7);
-		
-		p8.x=10;
-		p8.y=10;
-		setOfPoints.add(4,p8);
-		
-		p9.x=11;
-		p9.y=11;
-		setOfPoints.add(4,p9);
-		setOfConvexHullPoints.add(3,p9);
+		ExpectedsetOfConvexHullPoints.add(2,p4);
+
+//		
+		p5.x=0;
+		p5.y=0;
+		setOfPoints.add(3,p5);
+//		
+//		p6.x=8;
+//		p6.y=6;
+//		setOfPoints.add(4,p6);
+//		
+//		p7.x=9;
+//		p7.y=3;
+//		setOfPoints.add(4,p7);
+//		setOfConvexHullPoints.add(2,p7);
+//		
+//		p8.x=10;
+//		p8.y=10;
+//		setOfPoints.add(4,p8);
+//		
+//		p9.x=11;
+//		p9.y=11;
+//		setOfPoints.add(4,p9);
+//		setOfConvexHullPoints.add(3,p9);
 	System.out.println("size is "+setOfPoints.size());
 //	for (int i=0; i<setOfPoints.size();++i){
 //		System.out.println("Stoixeio "+i+" is "+setOfPoints.get(i).x+", "+setOfPoints.get(i).y);
 //	}
 	
 	//ArrayList<Point> a = cH.quickHull(setOfPoints);
-	ArrayList<Point> a = cH.qHull(setOfPoints);
+	//ArrayList<Point> a = cH.qHull(setOfPoints);
+	ArrayList<Point> a = cce.cceGeomConvexHull(setOfPoints);
 	
-	for (int z=0; z<a.size();++z){
+			for (int z=0; z<a.size();++z){
 	System.out.println("ConvexHulla["+z+"] = "+a.get(z));
 }
-	Assert.assertEquals(a,setOfConvexHullPoints) ;
+	Assert.assertEquals(a,ExpectedsetOfConvexHullPoints);
+
 //	for (int i=0; i<setOfPoints.size();++i){
 //		System.out.println("Stoixeio tou Hull "+i+" is "+a.get(i).x+", "+a.get(i).y);
 //	}
