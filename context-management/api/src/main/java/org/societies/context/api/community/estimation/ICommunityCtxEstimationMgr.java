@@ -24,34 +24,51 @@
  */
 package org.societies.context.api.community.estimation;
 
-import java.util.Hashtable;
-import java.util.List;
-
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.context.api.community.estimation.EstimationModels;
+import java.awt.Point;
+import java.util.ArrayList;
 
 /**
  * @author yboul
  * @created 12-Nov-2011 7:15:14 PM
  */
 public interface ICommunityCtxEstimationMgr {
+	
+	
+	
+	public double cceNumMean(ArrayList<Integer> inputValuesList);
+	
+	public double cceNumMedian(ArrayList<Integer> inputValuesList);
+	
+	public ArrayList<Integer> cceNumMode(ArrayList<Integer> inputValuesList);
+	
+	public Integer[] cceNumRange(ArrayList<Integer> inputValuesList);
+	
+	public ArrayList<Point> cceGeomConvexHull(ArrayList<Point> points);
+	
+	public Point[] cceGeomMinBB(ArrayList<Point> points);
+	
+	public ArrayList<String> cceStringMode(ArrayList<String> inputValuesList);
+	
+	public void cceSpecial1();
+	
+	public void cceSpecial2();
+	
+	public void cceSpecial3();
+	
 
-	/**
-	 * 
-	 * @param estimationModel
-	 * @param list
-	 * @return 
-	 * @since 0.0.1
-	 */
-	public Integer estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
-	
-	public Hashtable<String, Integer> calculateStringAttributeStatistics(List<CtxAttribute> list);
-	
-	public void estimateContext(EstimationModels estimationmodel, CtxAttribute type, CtxIdentifier cisId);
-		
+//	/**
+//	 * 
+//	 * @param estimationModel
+//	 * @param list
+//	 * @return 
+//	 * @since 0.0.1
+//	 */
+//	public Integer estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
+//	
+//	public Hashtable<String, Integer> calculateStringAttributeStatistics(List<CtxAttribute> list);
+//	
+//	public void estimateContext(EstimationModels estimationmodel, CtxAttribute type, CtxIdentifier cisId);
+//		
 
 //	/**
 //	 * 
