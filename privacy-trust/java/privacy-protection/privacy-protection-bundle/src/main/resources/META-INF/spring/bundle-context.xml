@@ -76,8 +76,7 @@
 	
 	<bean name="PrivacyPolicyManager"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager"
-		depends-on="ctxBorker"
-		init-method="init">
+		depends-on="ctxBorker">
 		<property name="commManager" ref="CommManagerBundle"/>
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
