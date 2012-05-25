@@ -47,9 +47,7 @@
 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1" />
 		
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
-	
-	<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />
-	
+		
 	<osgi:reference id="privacyDataManagerInternal"
 		interface="org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal" cardinality="0..1" />
 	

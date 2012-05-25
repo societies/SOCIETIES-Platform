@@ -76,7 +76,7 @@
 	
 	<bean name="PrivacyPolicyManager"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager"
-		depends-on="ctxBorker">
+		depends-on="ctxBroker">
 		<property name="commManager" ref="CommManagerBundle"/>
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
@@ -84,14 +84,14 @@
 	
 	<bean name="PrivacyAgreementManager"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManager"
-		depends-on="ctxBorker">
+		depends-on="ctxBroker">
 		<property name="commManager" ref="CommManagerBundle"/>
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
 	
 	<bean name="PrivacyAgreementManagerInternal"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManagerInternal"
-		depends-on="ctxBorker">
+		depends-on="ctxBroker">
 		<property name="commManager" ref="CommManagerBundle"/>
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
