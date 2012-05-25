@@ -24,63 +24,24 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.remote;
 
-import java.util.Map;
-
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyAgreementManagerListener;
 
 /**
- * Interface exposed to Societies components in order to do remote actions relative
- * to a privacy policy
+ * Interface exposed to Societies components to read remotely the stored privacy policy agreements
  * @author Olivier Maridat (Trialog)
- * @created 27 apr. 2012
+ * @created 17-nov.-2011 11:12:31
  */
-public interface IPrivacyPolicyManagerRemote {
+public interface IPrivacyAgreementManagerRemote {
 	/**
-	 * Remote call to retrieve a privacy policy by the ID of the CIS or the 3P service
+	 * Remote call to retrieve a privacy agreement by the ID of the CIS or the 3P service
 	 * 
 	 * @param requestor Id of the CIS or the 3P service
 	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
 	 * @param listener The callback object
 	 * @throws PrivacyException 
 	 */
-	public void getPrivacyPolicy(Requestor requestor, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException;
-	
-	/**
-	 * Remote call to store or update a (CIS or 3P Service) privacy policy
-	 * 
-	 * @param privacyPolicy The privacy policy
-	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
-	 * @param listener The callback object
-	 * @throws PrivacyException 
-	 */
-	public void updatePrivacyPolicy(RequestPolicy privacyPolicy, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException;
-	
-	/**
-	 * Remote call to delete a privacy policy by the ID of the Service or CIS
-	 * 
-	 * @param requestor Id of the CIS or the 3P service
-	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
-	 * @param listener The callback object
-	 * @throws PrivacyException 
-	 */
-	public void deletePrivacyPolicy(Requestor requestor, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException;
-
-	/**
-	 * Remote Call. Help a developer or a user to create a privacy policy by inferring a default
-	 * one using information about the CIS or the service. The privacy policy in
-	 * result will be slighty completed but still need to be filled. E.g. if a CIS
-	 * configuration contains information about geolocation data, the inference engine
-	 * will add geolocation data line to the privacy policy.
-	 * 
-	 * @param privacyPolicyType 1 means CIS privacy policy, 0 means 3P Service privacy policy
-	 * @param configuration Configuration of the CIS or the 3P service
-	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
-	 * @param listener The callback object
-	 * @throws PrivacyException 
-	 */
-	public void inferPrivacyPolicy(int privacyPolicyType, Map configuration, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException;
+	public void getPrivacyAgreement(Requestor requestor, IIdentity targetedNode, IPrivacyAgreementManagerListener listener) throws PrivacyException;
 }
