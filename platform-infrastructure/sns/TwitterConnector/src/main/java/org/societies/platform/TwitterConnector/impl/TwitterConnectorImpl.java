@@ -319,4 +319,13 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		return "{\"data\" : []}";
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.sns.ISocialConnector#post(java.lang.String)
+	 */
+	@Override
+	public void post(String arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
