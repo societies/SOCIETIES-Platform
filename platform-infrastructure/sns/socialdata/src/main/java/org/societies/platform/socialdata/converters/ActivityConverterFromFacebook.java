@@ -319,8 +319,8 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 					activity.setContent(entry.getContent());
 					
 					ActivityObject object1 = new ActivityObjectImpl();
-					object.setDisplayName(user1.name);
-					object.setObjectType(genType(user1.type));
+					object1.setDisplayName(user1.name);
+					object1.setObjectType(genType(user1.type));
 					activity.setObject(object1);
 					activity.setPublished(entry.getPublished());
 					activities.add(activity);					
