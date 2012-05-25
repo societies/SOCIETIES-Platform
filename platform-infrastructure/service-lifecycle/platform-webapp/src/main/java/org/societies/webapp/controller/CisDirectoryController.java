@@ -48,6 +48,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.comm.ICommManagerController;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+
 import javax.validation.Valid;
 
 
@@ -96,7 +98,7 @@ public class CisDirectoryController {
 		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
 		Map<String, String> methods = new LinkedHashMap<String, String>();
 		methods.put("GetCisAdverts", "Get CIS Advertisements");
-		methods.put("GetFindAdvert", "Find Specific CIS Advert");
+		methods.put("AddCisRecord", "Add a CIS Advertisement");
 		model.put("methods", methods);
 		
 		model.put("cisdirectoryresult", "CIS Directory Result :");
@@ -121,6 +123,8 @@ public class CisDirectoryController {
 		
 		String method = cdForm.getMethod();
 		Future<List<CisAdvertisementRecord>> asynchResult = null;
+		//CisAdvertisementRecord record = null;
+
 		List<CisAdvertisementRecord> adverts =  new ArrayList<CisAdvertisementRecord>();
 		
 		String res = null;
@@ -128,15 +132,30 @@ public class CisDirectoryController {
 		try {
 		
 			if (method.equalsIgnoreCase("GetCisAdverts")) {
-				asynchResult=this.getCisDirectory().findAllCisAdvertisementRecords();
+				asynchResult = this.getCisDirectory().findAllCisAdvertisementRecords();
 				res="CIS Directory Result ";
 				
 				adverts = asynchResult.get();
 				model.put("adverts", adverts);
 				
-			}else if (method.equalsIgnoreCase("Find Specific CIS Advert")) {
+			}else if (method.equalsIgnoreCase("AddCisRecord")) {
 				
-				//asynchResult=this.getCisDirectory()
+				//put stuff in here
+				CisAdvertisementRecord record= new CisAdvertisementRecord();
+				
+					record.setName(cdForm.getName()); 
+					record.setUri(cdForm.getUri());
+					record.setType(cdForm.getType());
+					record.setId(cdForm.getId());
+					record.setMode(cdForm.getMode());
+					record.setPassword(cdForm.getPassword());
+					
+				getCisDirectory().addCisAdvertisementRecord(record);
+				model.put("message", "CisAdvertisement added");
+					
+				//cisDirectory.addCisAdvertisementRecord(record);
+								
+				//this.getCisDirectory().addCisAdvertisementRecord(record);
 				
 					
 				//adverts = asynchResult.get();

@@ -22,14 +22,16 @@
 <br/>
 <br/>
 <Table>
-<tr><td><B>CIS Name</B></td><td><B>Uri</B></td><td><B>Type</B></td><td><B>ID</B></td></tr> 
+<tr><td><B>CIS Name</B></td><td><B>Uri</B></td><td><B>Type</B></td><td><B>ID</B></td><td><B>Password</B></td><td><B>Mode</B></td></tr> 
 
 	<xc:forEach var="advert" items="${adverts}">
         <tr>
         	<td>${advert.name}</td>
          	<td>${advert.uri}</td>
             <td>${advert.type}</td>
-            <td>${advert.id}</td>            
+            <td>${advert.id}</td> 
+            <td>${advert.password}</td>
+            <td>${advert.mode}</td>           
         </tr>
     </xc:forEach>
     	

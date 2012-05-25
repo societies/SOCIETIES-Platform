@@ -51,7 +51,41 @@
 			<tr>
 				<td colspan="3"><input type="submit" /></td>
 			</tr>
-		</table>		
+		</table>	
+		Populate the fields below for Adding a CIS Advertisement
+		<br />
+		<table id="CISAdverts">
+			<tr>
+				<td>CIS Name:</td>
+				<td><form:input path="name" /></td>
+				<td><form:errors path="name" cssClass="error" /></td>
+			</tr>
+			<tr>
+				<td>CIS Uri:</td>
+				<td><form:input path="uri" /></td>
+				<td><form:errors path="uri" cssClass="error" /></td>
+			</tr>
+			<tr>
+				<td>CIS Type:</td>
+				<td><form:input path="type" /></td>
+				<td><form:errors path="type" cssClass="error" /></td>
+			</tr>
+			<tr>
+				<td>CIS ID:</td>
+				<td><form:input path="id" /></td>
+				<td><form:errors path="id" cssClass="error" /></td>
+			</tr>
+			<tr>
+				<td>CIS Password:</td>
+				<td><form:input path="password" /></td>
+				<td><form:errors path="password" cssClass="error" /></td>
+			</tr>
+			<tr>
+				<td>CIS Mode:</td>
+				<td><form:input path="mode" /></td>
+				<td><form:errors path="mode" cssClass="error" /></td>
+			</tr>	
+			</table>
 	</form:form>
 	
 <!-- .................END PLACE YOUR CONTENT HERE ................ -->
