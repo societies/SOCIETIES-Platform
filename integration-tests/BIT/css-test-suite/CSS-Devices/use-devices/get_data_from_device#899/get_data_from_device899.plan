@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plan name="org.societies.comm.plan" version="3.0.0" scoped="false" atomic="true" 
+<plan name="get.data.from.device899" version="3.0.0" scoped="false" atomic="true" 
         xmlns="http://www.eclipse.org/virgo/schema/plan" 
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
         xsi:schemaLocation=" 
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-
-	<artifact type="bundle" name="org.societies.api.external.societies-api"/>
-    <artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
-    <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-    <artifact type="bundle" name="org.societies.example.internalAPI"/>
-    <artifact type="bundle" name="org.societies.integration.test.bit.remote_api_calls_711"/>
+    
+     <artifact type="bundle" name="org.societies.integration.test.bit.get_data_from_device_899"/>
+    
     
 </plan>
