@@ -658,7 +658,6 @@ public class ProfilerEngine implements Variables{
 		try {
 			if (sdf.parse(profile_last_time).
 				before(sdf.parse(lastTime))){
-				logger.debug("new "+maniacType+" interaction");
 				graph.incrementManiacNumber(current_id+maniacType, ptype);
 				updateProfileStatistics(current_id, lastTime, profile_last_time, profile);
 			}

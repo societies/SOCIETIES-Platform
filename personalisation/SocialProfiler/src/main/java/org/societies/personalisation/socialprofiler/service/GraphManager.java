@@ -220,7 +220,6 @@ public class GraphManager implements Variables{
 	
 	public String getPersonProfilePercentage(String personId, Profile.Type ptype) {
 		String percentage="";;
-		logger.debug("returning maniac percentage for user "+personId);
 		Transaction tx = getNeoService().beginTx();
 		try{
 			SocialPerson person=getPerson(personId);
@@ -228,7 +227,6 @@ public class GraphManager implements Variables{
 				logger.error(" person is null - impossible to return its maniac percentage");
 			}else{
 				percentage=person.getProfilePercentage(ptype);
-				logger.debug("total maniac percentage was returned successfully");
 			}
 			tx.success();
 		}finally{
@@ -1503,7 +1501,6 @@ public class GraphManager implements Variables{
 	
 	public void updateManiac(String maniacId, Profile.Type ptype,
 			String frequency, String lastTime, String number) {
-		logger.debug("updating maniac information using the latest info found");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			Profile maniac=getManiac(maniacId, ptype);
@@ -1519,8 +1516,6 @@ public class GraphManager implements Variables{
 				if (number!=null){
 					maniac.setNumber(number);
 				}
-				
-				logger.debug("maniac information was updated successfully");
 			}
 			tx.success();
 		}finally{
@@ -1531,7 +1526,7 @@ public class GraphManager implements Variables{
 
 	
 	public void incrementManiacNumber(String maniacId, Profile.Type ptype) {
-		logger.debug("incrementing Maniac "+maniacId+"number");
+		logger.debug("incrementing Maniac "+maniacId+" number");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			Profile maniac=getManiac(maniacId, ptype);
@@ -2319,7 +2314,6 @@ public class GraphManager implements Variables{
 	
 	public void updatePersonPercentages (String personId,String narcissismManiac,String superActiveManiac,
 			String photoManiac,	String surfManiac,String quizManiac,String totalActions){
-		logger.debug("updating person profile percentages ");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			SocialPerson person=getPerson(personId);
@@ -2344,7 +2338,6 @@ public class GraphManager implements Variables{
 				if (totalActions!=null){
 					person.setTotalNumberOfActions(totalActions);
 				}
-				logger.debug("person information was updated successfully");
 			}
 			tx.success();
 		}finally{
