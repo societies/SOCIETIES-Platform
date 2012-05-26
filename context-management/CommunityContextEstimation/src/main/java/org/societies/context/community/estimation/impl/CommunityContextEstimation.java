@@ -147,8 +147,8 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		ArrayList<Point> convexHullSet = new ArrayList<Point>();
 		int minX= Integer.MAX_VALUE;
 		int maxX = Integer.MIN_VALUE;
-		int minPoint = -1;
-		int maxPoint = -1;
+		int minPointIndex = -1;
+		int maxPointIndex = -1;
 		ArrayList<Point> leftPointsSet = new ArrayList<Point>();
 		ArrayList<Point> rightPointsSet = new ArrayList<Point>();
 
@@ -159,16 +159,16 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		for (int i=0; i<points.size(); ++i){
 			if (points.get(i).x < minX){
 				minX=points.get(i).x;
-				minPoint = i;
+				minPointIndex = i;
 			}
 			if (points.get(i).x > maxX){
 				maxX=points.get(i).x;
-				maxPoint =i;
+				maxPointIndex =i;
 			}
 		}
 		
-		Point minP = points.get(minPoint);
-		Point maxP = points.get(maxPoint);	
+		Point minP = points.get(minPointIndex);
+		Point maxP = points.get(maxPointIndex);	
 		Point p = new Point();
 		convexHullSet.add(minP);
 		convexHullSet.add(maxP);
@@ -196,9 +196,9 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		Point fP = new Point();
 		Point rP = new Point();
 
-		int distance_min = Integer.MIN_VALUE;
+		int distance_max = Integer.MIN_VALUE;
 		int relativeDistance = 0;
-		int farthestPoint = -1;
+		int farthestPointIndex = -1;
 		int insertPosition = convexHullSet.indexOf(maxPoint);
 
 		ArrayList<Point> set1 = new ArrayList<Point>();
@@ -221,17 +221,17 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				relativeDistance= -relativeDistance;
 			}
 
-			if (relativeDistance > distance_min){			
-				distance_min =relativeDistance;
-				farthestPoint=i;
+			if (relativeDistance > distance_max){			
+				distance_max =relativeDistance;
+				farthestPointIndex=i;
 				
 			}
 			
 		}
 		
-		fP=pointsSet.get(farthestPoint);
+		fP=pointsSet.get(farthestPointIndex);
 		convexHullSet.add(insertPosition,fP);
-		pointsSet.remove(farthestPoint);
+		pointsSet.remove(farthestPointIndex);
 		
 		for (int i=0; i<pointsSet.size(); ++i){
 			rP = pointsSet.get(i);
@@ -248,10 +248,13 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				set2.add(rP);	
 			}
 		}
-		System.out.println("Printing using set1................."+set1.size());
-		singleSideHullSet(set1, minPoint, fP, convexHullSet); 
-		System.out.println("Printing using set2..........................."+set2.size());
-		singleSideHullSet(set2,fP,maxPoint,convexHullSet);	
+		if (set1.size()!=0){
+			singleSideHullSet(set1, minPoint, fP, convexHullSet); 
+		}
+		if (set2.size()!=0){
+			singleSideHullSet(set2,fP,maxPoint,convexHullSet);
+		}
+			
 	}
 
 	@Override

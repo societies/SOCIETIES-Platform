@@ -432,7 +432,102 @@ public void testCalculateStringStatistics() throws InterruptedException, Executi
 	assertEquals(expectedHashMapTable, res);
 }
 
+@Test
+public void cceGeomMinBBTest(){
+	CommunityContextEstimation cce = new CommunityContextEstimation();
 
+	ArrayList<Point> setOfPoints=new ArrayList<Point>();
+	Point[] ExpectedsetOfBBPoints = new Point[2];
+	
+		Point p1 = new Point();
+		Point p2 =new Point();
+		Point p3 = new Point();
+		Point p4 = new Point();
+		Point p5 = new Point();
+		Point p6 = new Point();
+		Point p7 = new Point();
+		Point p8 = new Point();
+		Point p9 = new Point();
+	
+		
+		
+		p1.x=-1;
+		p1.y=-1;
+		setOfPoints.add(0,p1);
+		//ExpectedsetOfConvexHullPoints.add(0,p1);
+		
+		p2.x=1;
+		p2.y=-1;
+		setOfPoints.add(1,p2);
+		//ExpectedsetOfConvexHullPoints.add(1,p2);
+				
+		p3.x=1;
+		p3.y=1;
+		setOfPoints.add(2,p3);
+		//ExpectedsetOfConvexHullPoints.add(2,p3);
+		
+		p4.x=-1;
+		p4.y=1;
+		setOfPoints.add(3,p4);
+		//ExpectedsetOfConvexHullPoints.add(3,p4);
+	
+		p5.x=0;
+		p5.y=0;
+		setOfPoints.add(4,p5);
+				
+		p9.x=-2;
+		p9.y=-2;
+		setOfPoints.add(5,p9);
+				
+		p8.x=-2;
+		p8.y=2;
+		setOfPoints.add(6,p8);
+				
+		p6.x=7;
+		p6.y=7;
+		setOfPoints.add(7,p6);
+		
+		
+		p7.x=2;
+		p7.y=-2;
+		setOfPoints.add(8,p7);
+		
+		//ExpectedsetOfBBPoints.add(0,p7);
+		ExpectedsetOfBBPoints[0]=p9;
+		//ExpectedsetOfBBPoints[0].y=p9.y;
+		//ExpectedsetOfBBPoints.add(2,p8);
+		ExpectedsetOfBBPoints[1]=p6;
+		//ExpectedsetOfBBPoints[1].x=p6.y;
+	
+
+
+//	for (int i=0; i<setOfPoints.size();++i){
+//		System.out.println("Stoixeio "+i+" is "+setOfPoints.get(i).x+", "+setOfPoints.get(i).y);
+//	}
+	
+	//ArrayList<Point> a = cH.quickHull(setOfPoints);
+	//ArrayList<Point> a = cH.qHull(setOfPoints);
+		
+		System.out.println("Ta POINT EINAI "+setOfPoints.get(0)+ " "+ setOfPoints.get(1));
+	Point[] a = cce.cceGeomMinBB(setOfPoints);
+	for (int i=0; i<a.length; i++){
+		System.out.println("Afto pou bgazei h methodos einai to "+a[i]);
+	}
+	
+	//ArrayList<Point> a = cH.qHull(setOfPoints);
+	
+//	System.out.println("THE CONVEX HULL SIZE IS  : "+a.size());
+//			for (int z=0; z<a.size();++z){
+//	System.out.println("ConvexHull a["+z+"] = "+a.get(z));
+//}
+	Assert.assertEquals(ExpectedsetOfBBPoints,a);
+
+//	for (int i=0; i<setOfPoints.size();++i){
+//		System.out.println("Stoixeio tou Hull "+i+" is "+a.get(i).x+", "+a.get(i).y);
+//	}
+
+	//return setOfPoints;
+}
 }
 
 
