@@ -8,6 +8,20 @@
 	<xs:import namespace="http://societies.org/api/internal/schema/privacytrust/trust/model"
 		schemaLocation="org.societies.api.internal.schema.privacytrust.trust.model.xsd" />
 		
+	<xs:element name="trustBrokerRetrieveBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	
+	<xs:element name="trustBrokerRetrieveResponseBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="return" type="xs:double" nillable="true" minOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
   
 </xs:schema>
