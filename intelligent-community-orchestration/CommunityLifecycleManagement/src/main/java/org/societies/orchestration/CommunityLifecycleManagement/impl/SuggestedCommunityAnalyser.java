@@ -203,6 +203,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		//	this.linkedDomain = linkedEntity;
 		
 		proximityHistory = new ArrayList<ProximityRecord>();
+		recordedMetadata = new HashMap<String, String>();
 			
 		//new ProximityRecordingThread().start();
 	}
@@ -225,7 +226,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     public void initialiseSuggestedCommunityAnalyser() {
     	//getCommManager().register(this);
     	identityManager = commManager.getIdManager();
-    	recordedMetadata = new HashMap<String, String>();
+    	
     	new SuggestedCommunityAnalyser(linkedCss, "CSS");
     }
     
@@ -990,6 +991,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	        	if (recordedMetadata.get(cisIds.get(i)) == null)
 	        		recordedMetadata.put(cisIds.get(i), currentActionsMetadata.get(i));
 	        }
+	    }
+	    
+	    for (int i = 0; i < recordedMetadata.size(); i++) {
+	    	//if (i) activity feed empty for a week, or a day if marked temporary
+	    	    //put "low period" in metadata
 	    }
 	    
 	    return "PASS";

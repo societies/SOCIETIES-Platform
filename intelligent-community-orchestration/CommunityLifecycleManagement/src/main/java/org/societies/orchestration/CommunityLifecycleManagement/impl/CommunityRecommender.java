@@ -88,8 +88,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -117,16 +119,13 @@ public class CommunityRecommender //implements ICommCallback
 
 	private IIdentity linkedCss;
 		
-	private int longestTimeWithoutActivity; //measured in minutes
+	private int longestTimeWithoutActivity;
 	
 	private ICtxBroker userContextBroker;
-	//private IUserCtxDBMgr userContextDatabaseManager;
-	//private IUserCtxBroker userContextBroker;
-	//private ICommunityCtxBroker communityContextBroker;
-	//private IUserCtxBrokerCallback userContextBrokerCallback;
+
 	private ICisManager cisManager;
 	private IUserFeedback userFeedback;
-	//private IUserFeedbackCallback userFeedbackCallback;
+
 	private String userResponse;
 	
 	private ArrayList<ICisProposal> recentRefusals;
@@ -514,49 +513,130 @@ public class CommunityRecommender //implements ICommCallback
 	        if (i < configuresSize) {
 	        	
 	    	    ArrayList<ICisProposal> configurableCisProposals = cissToConfigure.get("Configure CISs").get(i);
-	    	    ArrayList<ICisOwned> configurableCis = new ArrayList<ICisOwned>();
+	    	    //ArrayList<ICisOwned> configurableCis = new ArrayList<ICisOwned>();
+	    	    ArrayList<ICisProposal> configurableCis = new ArrayList<ICisProposal>();
 	    	    Iterator<ICisProposal> it = configurableCisProposals.iterator();
 	    	    while (it.hasNext())
-	    	    	configurableCis.add(((ICisOwned)it.next().getActualCis()));
+	    	    	configurableCis.add(it.next());
+	    	    	//configurableCis.add(((ICisOwned)it.next().getActualCis()));
 	    	    	
                 IIdentity cisID = null;
 	            try {
-				    cisID = identityManager.fromJid(configurableCis.get(0).getCisId());
+				    cisID = identityManager.fromJid(configurableCis.get(0).getActualCis().getCisId());
 			    } catch (InvalidFormatException e) {
 				    // TODO Auto-generated catch block
 				    e.printStackTrace();
 			    }
-	            //Set<ICisParticipant>> participants = cisManager.get(cisID).getMemberList();
-		        //ArrayList<String> members = new ArrayList<String>();
-	            //Iterator<ICisParticipant> partIt = participants.iterator();
-	            //while (partIt.hasNext()) {
-	            //    members.add(it.next().toString());
-	            //}
-	            //if (!(members.contains(configurableCis.get(i).get(1).getMemberList())) {
-	                //if(!(members.contains(linkedCss)) && (configurableCis.get(i).get(1).getMemberList().contains(linkedCss)))
-	                    //cisManager.joinCis(linkedCss, cisID);
-	                //else
-	            //    cisManager.setMembersList(cisID, configurableCis.get(i).get(1).getMembersList();
-	            //}
-	            //if (!(configurableCis.get(i).get(1).getMemberList().contains(members)) {
-                    //if(!(configurableCis.get(i).get(1).getMemberList().contains(linkedCss)) && (members.contains(linkedCss)))
-                        //cisManager.leaveCis(linkedCss, cisID);
-                    //else
-                //    cisManager.setMembersList(cisID, configurableCis.get(i).get(1).getMembersList();
-                //}
-	            //if (cisManager.get(cisID).getMembershipCriteria() != configurableCis.get(i).get(1).getMembershipCriteria())
-	            //    cisManager.setMembershipCriteria(cisID, configurableCis.get(i).get(1).getMembershipCriteria();
-	            //if (cisManager.get(cisID).getOwner() != configurableCis.get(i).get(1).getOwner())
-	            //    cisManager.setOwner(cisID, configurableCis.get(i).get(1).getOwner();
-	            //if (cisManager.get(cisID).getAdministrators() != configurableCis.get(i).get(1).getAdministrators())
-	            //    cisManager.setAdministrators(cisID, configurableCis.get(i).get(1).getAdministrators();
-	            //if "remove members"
-        	    //    attempt to remove members - perhaps SOCIETIES platform itself should have mechanism
-        	    //    where if a user deletion from CIS attempt is made, 
-        	    //    that user will be informed by the system and given a chance to respond?
-        	    //    The admin/owner could have an override option in case e.g. offensive person is being deleted.
 	            
-	            //cissToCreateMetadata.remove(metadataCounter);
+	            ICisOwned ownedCis = (ICisOwned) configurableCis.get(0).getActualCis();
+	            
+	            Set<ICisParticipant> participants = null;
+				try {
+					participants = ownedCis.getMemberList().get();
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ExecutionException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		        ArrayList<String> members = new ArrayList<String>();
+	            Iterator<ICisParticipant> partIt = participants.iterator();
+	            while (partIt.hasNext()) {
+	                members.add(it.next().toString());
+	            }
+	            
+	            if (!(members.contains(configurableCis.get(1).getMemberList()))) {
+	                if(!(members.contains(linkedCss)) && (configurableCis.get(1).getMemberList().contains(linkedCss.getBareJid()))) {
+	                    //cisManager.joinCis(linkedCss, cisID);
+	                	
+	                }
+	                else {
+                    	Set<ICisParticipant> theMembers = new HashSet<ICisParticipant>();
+                    	Set<String> theUltimateMembers = configurableCis.get(1).getMemberList();
+                    	Iterator<String> ultimateMembersIterator = theUltimateMembers.iterator();
+                    	while (ultimateMembersIterator.hasNext()) {
+                    		String thisMember = ultimateMembersIterator.next();
+                    		if (!(members.contains(thisMember))) {
+                    			//cisManager.setMembersList(cisID, configurableCis.get(1).getMemberList());
+                        		
+                        		//ICisAdvertisementRecord cisAdvert = new ICisAdvertisementRecord(configurableCis.get(0).getName(), configurableCis.get(0).getDescription());
+                			    
+                			    //ICssRecord member = cssManager.getCssRecord(ownedCis.getMemberList().get(ownedCis.getParticipant(thisMember)));
+                			    //ICssActivityFeed feed = member.getActivityFeed();
+                			    //feed.addActivity(cisAdvert);
+                		        //
+                    		}
+                    	}
+                        
+                    }
+	                //else {
+	                    //cisManager.setMembersList(cisID, configurableCis.get(1).getMemberList());
+	                //}
+	            }
+	            if (!(configurableCis.get(1).getMemberList().contains(members))) {
+                    if(!(configurableCis.get(1).getMemberList().contains(linkedCss)) && (members.contains(linkedCss))) {
+                        //cisManager.leaveCis(linkedCss, cisID);
+                    }
+                    else {
+                    	Set<ICisParticipant> theMembers = new HashSet<ICisParticipant>();
+                    	Set<String> theUltimateMembers = configurableCis.get(1).getMemberList();
+                    	Iterator<String> membersIterator = members.iterator();
+                    	while (membersIterator.hasNext()) {
+                    		String thisMember = membersIterator.next();
+                    		if (!(theUltimateMembers.contains(thisMember))) {
+                    			//cisManager.removeMember(cisID, thisMember);
+                    		}
+                    	}
+                        
+                    }
+                }
+	            if (ownedCis.getMembershipCriteria() != configurableCis.get(1).getMembershipCriteria()) {
+	                //cisManager.setMembershipCriteria(cisID, configurableCis.get(1).getMembershipCriteria());
+	            }
+	            if (ownedCis.getOwnerId() != configurableCis.get(1).getOwnerId()) {
+	                //cisManager.setOwner(cisID, configurableCis.get(1).getOwnerId());
+	            	
+	            	ownedCis.setOwnerId(configurableCis.get(1).getOwnerId());
+	            	
+	            }
+	            
+	            Set<String> administratorList = configurableCis.get(1).getAdministratorList();
+	            if (ownedCis.getAdministrators() != administratorList) {
+		            
+		            Iterator<String> adminIterator = administratorList.iterator();
+		            while (adminIterator.hasNext()) {
+		            	String next = adminIterator.next();
+		            	Set<ICisParticipant> admins = null;
+						try {
+							admins = ownedCis.getAdministrators().get();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ExecutionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		            	if (!(admins.contains(next))) {
+		            		try {
+								ownedCis.addAdministrator(identityManager.fromJid(next));
+							} catch (InvalidFormatException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+		            	}
+		            }
+	            	for (int m = 0; m < configurableCis.get(1).getAdministratorList().size(); m++) {
+	            		
+	            	}
+	                //cisManager.setAdministrators(cisID, configurableCis.get(1).getAdministratorList());
+	            }
+	            
+	            
+	            
+	            //cisManager.configureCis(cisID, ownedCis);
+	          
+	            cissToCreateMetadata.remove(metadataCounter);
 	        }
 	        if (i < mergesSize) {
 	        	

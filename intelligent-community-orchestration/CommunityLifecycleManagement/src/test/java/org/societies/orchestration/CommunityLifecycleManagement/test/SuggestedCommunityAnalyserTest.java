@@ -52,6 +52,7 @@ import org.societies.orchestration.api.ICisParticipant;
 import org.societies.orchestration.api.ICisProposal;
 //import org.societies.orchestration.api.ICisEditor;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -154,6 +155,7 @@ public class SuggestedCommunityAnalyserTest {
 		userCtxBroker = mock(ICtxBroker.class);
 		communityRecommender = mock(CommunityRecommender.class);
 		IPrivacyDataManager privacyDataManager = mock(IPrivacyDataManager.class);
+		ICommManager commManager = mock(ICommManager.class);
 		
 		IIdentityManager identityManager = mock(IIdentityManager.class);
 		
@@ -243,10 +245,14 @@ public class SuggestedCommunityAnalyserTest {
 		}
 		
     	suggestedCommunityAnalyser = new SuggestedCommunityAnalyser(ownerId, "CSS");
+    	
     	suggestedCommunityAnalyser.setCommunityRecommender(communityRecommender);
     	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
     	suggestedCommunityAnalyser.setIdentityManager(identityManager);
     	suggestedCommunityAnalyser.setPrivacyDataManager(privacyDataManager);
+    	suggestedCommunityAnalyser.setCommManager(commManager);
+    	
+    	//suggestedCommunityAnalyser.initialiseSuggestedCommunityAnalyser();
     	
     	ArrayList<ICis> ciss = new ArrayList<ICis>();
     	//try {
