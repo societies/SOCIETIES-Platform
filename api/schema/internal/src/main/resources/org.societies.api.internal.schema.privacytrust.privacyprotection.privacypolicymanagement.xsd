@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" elementFormDefault="qualified"
+	targetNamespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacypolicymanagement"
+	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacypolicymanagement"
+	xmlns:ns2="http://societies.org/api/schema/identity" xmlns:ns1="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy" schemaLocation="org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.xsd" />
+
+  <xs:import namespace="http://societies.org/api/schema/identity" schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />
+
+  <xs:element name="privacyPolicyManagerBeanResult">
+	<xs:complexType>
+    <xs:sequence>
+      <xs:element name="method" type="tns:methodType"/>
+      <xs:element name="ack" type="xs:boolean"/>
+      <xs:element name="ackMessage" type="xs:string" minOccurs="0"/>
+      <xs:element name="privacyPolicy" type="ns1:requestPolicy" minOccurs="0"/>
+    </xs:sequence>
+  	</xs:complexType>
+	</xs:element>
+
+  <xs:element name="privacyAgreementManagerBeanResult">
+	<xs:complexType>
+    <xs:sequence>
+      <xs:element name="method" type="tns:methodType"/>
+      <xs:element name="ack" type="xs:boolean"/>
+      <xs:element name="ackMessage" type="xs:string" minOccurs="0"/>
+      <xs:element name="privacyAgreement" type="ns1:agreementEnvelope" minOccurs="0"/>
+    </xs:sequence>
+  	</xs:complexType>
+	</xs:element>
+
+  <xs:element name="privacyPolicyManagerBean">
+	<xs:complexType>
+    <xs:sequence>
+      <xs:element name="method" type="tns:methodType"/>
+      <xs:element name="requestor" type="ns2:requestorBean" minOccurs="0"/>
+      <xs:element name="privacyPolicy" type="ns1:requestPolicy" minOccurs="0"/>
+      <xs:element name="privacyPolicyType" type="xs:int"/>
+    </xs:sequence>
+  	</xs:complexType>
+	</xs:element>
+
+  <xs:element name="privacyAgreementManagerBean">
+	<xs:complexType>
+    <xs:sequence>
+      <xs:element name="method" type="tns:methodType"/>
+      <xs:element name="requestor" type="ns2:requestorBean" minOccurs="0"/>
+    </xs:sequence>
+  	</xs:complexType>
+	</xs:element>
+
+  <xs:simpleType name="methodType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="getPrivacyPolicy"/>
+      <xs:enumeration value="updatePrivacyPolicy"/>
+      <xs:enumeration value="deletePrivacyPolicy"/>
+      <xs:enumeration value="inferPrivacyPolicy"/>
+      <xs:enumeration value="getPrivacyAgreement"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

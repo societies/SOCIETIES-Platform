@@ -7,7 +7,7 @@
 		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
-	<groupId>org.societies.privacytrust.privacyprotection</groupId>
+	<groupId>org.societies.privacytrust.privacyprotection.privacypolicymanagement</groupId>
 	<artifactId>schemagenerator</artifactId>
 	<version>0.1</version>
 	<packaging>jar</packaging>
@@ -74,11 +74,11 @@
 		</executions>
 		<configuration>
 			<!-- Namespace define in the CommClient and CommServer of the beans -->
-			<packageName>org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy</packageName>
-			<httpNamespace>http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy</httpNamespace>
+			<packageName>org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement</packageName>
+			<httpNamespace>http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacypolicymanagement</httpNamespace>
 			<!-- Output and input directories -->
 			<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
-			<file>schema3.xsd</file>
+			<file>schema4.xsd</file>
 			<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
 		</configuration>
 	</plugin>
