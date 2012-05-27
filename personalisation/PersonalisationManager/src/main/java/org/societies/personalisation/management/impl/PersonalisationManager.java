@@ -376,9 +376,14 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		Future<IOutcome> futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
 		IAction action;
 		try {
-			IDIANNEOutcome dianneOut = futureDianneOuts.get().get(0);
+			List<IDIANNEOutcome> dianneOutList = futureDianneOuts.get();
+			if (dianneOutList.size()>0){
+			IDIANNEOutcome dianneOut = dianneOutList.get(0);
 			IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
 
+			if (null==prefOut){
+				return new AsyncResult<IAction>(dianneOut);
+			}
 			if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())){
 				action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
 				action.setServiceID(serviceID);
@@ -388,6 +393,11 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			}else{
 				return new AsyncResult<IAction>(this.resolvePreferenceConflicts(dianneOut, prefOut));
 			}
+			
+			}else{
+				IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
+				return new AsyncResult<IAction>(prefOut);
+			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -396,7 +406,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			e.printStackTrace();
 		}
 
-		return null;
+		return new AsyncResult<IAction>(null);
 	}
 
 	/*
@@ -446,6 +456,19 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			IUserIntentAction cauiOut = futureCAUIOuts.get();
 			CRISTUserAction cristOut = futureCRISTOuts.get();
 
+			if (cauiOut==null){
+				if (cristOut==null){
+					return new AsyncResult<IAction>(null);
+				}else{
+					return new AsyncResult<IAction>(cristOut);
+				}
+			}else{
+				if (cristOut==null){
+					return new AsyncResult<IAction>(cauiOut);
+				}
+			}
+			
+			
 			if (cauiOut.getvalue().equalsIgnoreCase(cristOut.getvalue())){
 				action = new Action(serviceID, "", preferenceName, cauiOut.getvalue());
 				return new AsyncResult<IAction>(action);
@@ -459,7 +482,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return new AsyncResult<IAction>(null);
 	}
 
 
@@ -500,6 +523,13 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 					if (preferenceOutcomes.size()==0 && intentOutcomes.size()==0){
 						this.logging.debug("Nothing to send to decisionMaker");
 						return;
+					}else{
+						for (int i =0; i<preferenceOutcomes.size(); i++){
+							this.logging.debug("Pref Outcome "+i+" :"+preferenceOutcomes.get(i));
+						}
+						for (int i =0; i<intentOutcomes.size(); i++){
+							this.logging.debug("Intent Outcome "+i+" :"+intentOutcomes.get(i));
+						}
 					}
 					this.logging.debug("Sending "+preferenceOutcomes.size()+" preference outcomes and "+intentOutcomes.size()+" intent outcomes to decisionMaker");
 					this.decisionMaker.makeDecision(intentOutcomes, preferenceOutcomes);
@@ -897,6 +927,16 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 					prefNonOverlapping.add(this.resolvePreferenceConflicts(dianne, pref));
 				}
 
+				if (intentNonOverlapping.size() ==0 & prefNonOverlapping.size() ==0){
+					this.logging.debug("Action Event-> Nothing to send to decisionMaker");
+				}else{
+					for (int i=0; i<prefNonOverlapping.size(); i++){
+						this.logging.debug("Preference Outcome "+i+" :"+prefNonOverlapping.get(i));
+					}
+					for (int i=0; i<intentNonOverlapping.size(); i++){
+						this.logging.debug("Intent Outcome "+i+" :"+intentNonOverlapping.get(i));
+					}
+				}
 				this.decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping);
 			}else{
 				logging.debug("event: "+event.geteventType()+" not a "+EventTypes.UIM_EVENT);

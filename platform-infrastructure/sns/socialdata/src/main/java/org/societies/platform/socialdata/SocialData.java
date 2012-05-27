@@ -245,14 +245,14 @@ public class SocialData implements ISocialData{
 				
 				case twitter:    
 					// Just for now that we don't have a way to use our persona token
-						return (ISocialConnector) new TwitterConnectorImpl();
-					//    return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), "test");
+						//return (ISocialConnector) new TwitterConnectorImpl();
+					return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), "test");
 				
 				case Foursquare: 
 					
 						// Just for now ...
-					    return (ISocialConnector) new FoursquareConnectorImpl();
-					    //return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
+					   // return (ISocialConnector) new FoursquareConnectorImpl();
+					   return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
 
 				default : return null;
 		}

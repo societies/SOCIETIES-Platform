@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
@@ -68,14 +69,23 @@ public class PersonalisationCommsServer implements IFeatureServer{
 						"org.societies.api.schema.identity",
 						"org.societies.api.schema.servicelifecycle.model"));
 	
-	private ICommManager commManager;
+	private ICommManager commsMgr;
 	private IIdentityManager idm;
-	private IPersonalisationManager personalisationManager;
+	private IPersonalisationManager persoMgr;
 	
 	@Override
 	public List<String> getJavaPackages() {
 		// TODO Auto-generated method stub
 		return PACKAGES;
+	}
+	
+	public void InitService() {
+		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
+		try {
+			commsMgr.register(this); 
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -85,7 +95,7 @@ public class PersonalisationCommsServer implements IFeatureServer{
 				if (((PersonalisationManagerBean) bean).getMethod().equals(PersonalisationMethodType.GET_PREFERENCE)){
 					Requestor requestor = getRequestor(((PersonalisationManagerBean) bean).getRequestor());
 					IIdentity userIdentity = this.idm.fromJid(((PersonalisationManagerBean) bean).getUserIdentity());
-					Future<IAction> futureAction = this.personalisationManager.getPreference(requestor, 
+					Future<IAction> futureAction = this.getPersoMgr().getPreference(requestor, 
 							userIdentity,
 							((PersonalisationManagerBean) bean).getServiceType(), 
 							((PersonalisationManagerBean) bean).getServiceId(),
@@ -158,32 +168,36 @@ public class PersonalisationCommsServer implements IFeatureServer{
 		return null;
 	}
 
+
+
+
 	/**
-	 * @return the commManager
+	 * @return the commsMgr
 	 */
-	public ICommManager getCommManager() {
-		return commManager;
+	public ICommManager getCommsMgr() {
+		return commsMgr;
 	}
 
 	/**
-	 * @param commManager the commManager to set
+	 * @param commsMgr the commsMgr to set
 	 */
-	public void setCommManager(ICommManager commManager) {
-		this.commManager = commManager;
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
+		this.idm = this.commsMgr.getIdManager();
 	}
 
 	/**
-	 * @return the personalisationManager
+	 * @return the persoMgr
 	 */
-	public IPersonalisationManager getPersonalisationManager() {
-		return personalisationManager;
+	public IPersonalisationManager getPersoMgr() {
+		return persoMgr;
 	}
 
 	/**
-	 * @param personalisationManager the personalisationManager to set
+	 * @param persoMgr the persoMgr to set
 	 */
-	public void setPersonalisationManager(IPersonalisationManager personalisationManager) {
-		this.personalisationManager = personalisationManager;
+	public void setPersoMgr(IPersonalisationManager persoMgr) {
+		this.persoMgr = persoMgr;
 	}
 
 }

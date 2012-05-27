@@ -5,7 +5,7 @@
 		<script type="text/javascript" charset="utf-8" src="cordova-1.7.0.js"></script>
 
 		<!-- Uncomment line below to enable PhoneGap desktop and comment out real PhoneGap jS library-->
-		<!--script type="text/javascript" charset="utf-8" src="phonegap-desktop.js"></script-->
+		<!-- script type="text/javascript" charset="utf-8" src="phonegap-desktop.js"></script-->
 		<link rel="stylesheet" href="themes/Kilkenny-1.10.css"/>
 		<link rel="stylesheet" href="jquery.mobile.structure-1.1.0.css" /> 
 		<script type="text/javascript" src="jquery-1.7.1.js"></script>
@@ -16,7 +16,8 @@
 		<!-- Uncomment lines below to enable PhoneGap desktop-->
 		<!-- script type="text/javascript" charset="utf-8" src="pluginjs/cssmanager.js"></script>
 		<script type="text/javascript" charset="utf-8" src="pluginjs/servicemonitor.js"></script>
-		<script type="text/javascript" charset="utf-8" src="pluginjs/devicestatus.js"></script-->
+		<script type="text/javascript" charset="utf-8" src="pluginjs/devicestatus.js"></script>
+		<script type="text/javascript" charset="utf-8" src="pluginjs/preferences.js"></script-->
 
 
 		<!-- Ignore -->
@@ -75,6 +76,7 @@
     	<a href="#activeServices" data-theme="a" data-transition="pop" data-role="button" >Active Services Monitor</a>
     	<a href="#activeTasks" data-theme="a" data-transition="pop" data-role="button" >Active Tasks Monitor</a>
     	<a href="#deviceMonitor" data-theme="a" data-transition="pop" data-role="button" >Device Monitor</a>
+    	<a href="#appPreferences" data-theme="a" data-transition="pop" data-role="button" >App Preferences</a>
 	
 	</div><!-- /content -->
 
@@ -432,6 +434,38 @@
 		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
 	</footer>
 </section>
+<!-- Start of Preferences page -->
+<div data-role="page" id="appPreferences">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;App Preferences</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+		<button id="getPref" data-theme="a">Get Preference Value</button>	
+		
+		<label for="prefType">Name: </label>
+		
+		<select name="preferenceType" id="prefType">
+  			<option value="string" selected="selected">String</option>
+  			<option value="boolean">Boolean</option>
+  			<option value="integer">Integer</option>
+  			<option value="long">Long</option>
+  			<option value="float">Float</option>
+		</select> 
+
+		<label for="prefName">Name: </label>
+		<input type="text" name="preferenceName" id="prefName" value="" />
+
+		<label for="prefValue">Value: </label>
+		<input type="text" name="preferenceValue" id="prefValue" value="" disabled="true"/>
+	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
 
 </body>
 </html>

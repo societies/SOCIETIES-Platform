@@ -1,5 +1,6 @@
 package org.societies.activity;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -9,20 +10,24 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.identity.IIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Table(name = "org_societies_activity_ActivityFeed")
-public class ActivityFeed implements IActivityFeed {
+public class ActivityFeed implements IActivityFeed, Subscriber {
 	@Id
 	private String id;
 	@OneToMany(cascade=CascadeType.ALL)
@@ -90,17 +95,16 @@ public class ActivityFeed implements IActivityFeed {
 	
 	public static ActivityFeed startUp(String id){
 		ActivityFeed ret = null;
-		Session session = sessionFactory.openSession();//sessionFactory.getCurrentSession();
-		log.info("using session: "+session.hashCode());
+		Session session = sessionFactory.openSession();
 		try{
-			Query q = session.createQuery("select a from ActivityFeed a");
-			long l = q.list().size();
-			System.out.println("l: "+l);
-			if(l== 0)
+			List l = session.createCriteria(ActivityFeed.class).add(Property.forName("id").eq(id)).list();
+			if(l.size() == 0)
 				return new ActivityFeed(id);
-			q = session.createQuery("select a from ActivityFeed a where a.id = ?");
-			q.setString(0, id);
-			ret = (ActivityFeed) q.uniqueResult();
+			if(l.size() > 1){
+				log.error("activityfeed startup with id: "+id+" gave more than one activityfeed!! ");
+				return null;
+			}
+			ret = (ActivityFeed) l.get(0);
 		}catch(Exception e){
 			log.warn("Query for actitvies failed..");
 
@@ -134,5 +138,13 @@ public class ActivityFeed implements IActivityFeed {
 	public void close()
 	{
 		
+	}
+	@Override
+	public void pubsubEvent(IIdentity pubsubService, String node,
+			String itemId, Object item) {
+		if(item.getClass().equals(Activity.class)){
+			Activity act = (Activity)item;
+			this.addCisActivity(act);
+		}
 	}
 }

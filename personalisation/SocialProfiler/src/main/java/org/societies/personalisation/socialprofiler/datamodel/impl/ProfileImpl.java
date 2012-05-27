@@ -15,7 +15,7 @@ public class ProfileImpl implements Profile, NodeProperties{
 		super();
 		this.underlyingNode = underlyingNode;
 		this.type = type;
-		underlyingNode.setProperty( NAME_PROPERTY, name);
+		setName(name);
 	}
 
 	
@@ -50,7 +50,11 @@ public class ProfileImpl implements Profile, NodeProperties{
 
 	@Override
 	public long getFrequency() {
-		return Long.parseLong(underlyingNode.getProperty( FREQUENCY_PROPERTY ).toString());
+		try {
+			return Long.parseLong(underlyingNode.getProperty( FREQUENCY_PROPERTY ).toString());
+		} catch (Exception e) {
+			return 0;
+		}
 	}
 
 	
@@ -71,7 +75,11 @@ public class ProfileImpl implements Profile, NodeProperties{
 
 	@Override
 	public int getNumber() {
-		return Integer.parseInt(underlyingNode.getProperty( NUMBER_PROPERTY).toString());
+		try {
+			return Integer.parseInt(underlyingNode.getProperty( NUMBER_PROPERTY).toString());
+		} catch (Exception e){
+			return 0;
+		}
 	}
 
 	@Override

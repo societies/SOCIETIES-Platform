@@ -104,6 +104,13 @@ public class Tester {
 			changeContext("work", "free");
 			this.helloWorldService.setVolume(userId, "50");
 			changeContext("home", "free");	
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 					
 			Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
@@ -113,6 +120,7 @@ public class Tester {
 			Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
 		
 		
+			this.helloWorldService.setBackgroundColour(userId, "red");
 		
 	}
 	
@@ -156,7 +164,8 @@ public class Tester {
 		try {
 			Future<IndividualCtxEntity> futurePerson = this.ctxBroker.retrieveCssOperator();
 			person = futurePerson.get();
-			this.userId = idm.fromJid(person.getId().getOperatorId());
+			this.userId = idm.fromJid(person.getId().getOwnerId());
+			
 			/*Future<List<CtxIdentifier>> futurePersons = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
 			List<CtxIdentifier> persons = futurePersons.get();
 			if (persons.size() == 0){

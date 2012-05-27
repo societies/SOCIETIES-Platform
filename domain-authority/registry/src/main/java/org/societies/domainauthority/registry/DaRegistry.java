@@ -99,10 +99,11 @@ public class DaRegistry {
 			tmpEntry = new DaRegistryRecordEntry();
 			tmpEntry.setName(details.getName());
 			tmpEntry.setId(details.getId());
-			tmpEntry.setUrl(details.getUrl());
+			tmpEntry.setHost(details.getHost());
+			tmpEntry.setPort(details.getPort());
 			tmpEntry.setStatus(details.getStatus());
 			tmpEntry.setUserType(details.getUserType());
-
+			tmpEntry.setPassword(details.getPassword());
 			session.save(tmpEntry);
 
 			t.commit();
@@ -141,8 +142,8 @@ public class DaRegistry {
 					.add(Restrictions.eq("name",
 							filterRegistryEntry.getName()).ignoreCase()).list();
 			
-			if (tmpRegistryEntryList != null) {
-				session.delete(tmpRegistryEntryList);
+			if ((tmpRegistryEntryList != null) && tmpRegistryEntryList.size() > 0) {
+				session.delete(tmpRegistryEntryList.get(0));
 			}
 			t.commit();
 			log.debug("removeXmppIdentityDetails Record deleted.");
@@ -181,17 +182,19 @@ public class DaRegistry {
 					.add(Restrictions.eq("name",
 							filterRegistryEntry.getName()).ignoreCase()).list();
 			
-			if (tmpRegistryEntryList != null) {
-				session.delete(tmpRegistryEntryList);
+			if ((tmpRegistryEntryList != null) && tmpRegistryEntryList.size() > 0) {
+				session.delete(tmpRegistryEntryList.get(0));
 			}
 			
 			tmpEntry = new DaRegistryRecordEntry();
 			tmpEntry.setName(details.getName());
 			tmpEntry.setId(details.getId());
-			tmpEntry.setUrl(details.getUrl());
+			tmpEntry.setHost(details.getHost());
+			tmpEntry.setPort(details.getPort());
 			tmpEntry.setStatus(details.getStatus());
 			tmpEntry.setUserType(details.getUserType());
-
+			tmpEntry.setPassword(details.getPassword());
+			
 			session.save(tmpEntry);
 
 			t.commit();
@@ -240,9 +243,11 @@ public class DaRegistry {
 				tmpEn = tmpRegistryEntryList.get(0);
 				recordDetails.setName(tmpEn.getName());
 				recordDetails.setId(tmpEn.getId());
-				recordDetails.setUrl(tmpEn.getUrl());
+				recordDetails.setHost(tmpEn.getHost());
+				recordDetails.setPort(tmpEn.getPort());
 				recordDetails.setStatus(tmpEn.getStatus());
 				recordDetails.setUserType(tmpEn.getUserType());
+				recordDetails.setPassword(tmpEn.getPassword());
 			}
 
 	
@@ -267,7 +272,7 @@ public class DaRegistry {
 	@SuppressWarnings("unchecked")
 	public List<DaUserRecord> getXmppIdentityDetails() {
 		Session session = sessionFactory.openSession();
-		DaRegistryRecordEntry tmpEntry = null;
+
 		List<DaUserRecord> userList = new ArrayList<DaUserRecord>();
 		DaUserRecord tmpUserEntry = null;
 		try {
@@ -281,9 +286,11 @@ public class DaRegistry {
 
 				tmpUserEntry.setName(tmpEn.getName());
 				tmpUserEntry.setId(tmpEn.getId());
-				tmpUserEntry.setUrl(tmpEn.getUrl());
+				tmpUserEntry.setHost(tmpEn.getHost());
+				tmpUserEntry.setPort(tmpEn.getPort());
 				tmpUserEntry.setStatus(tmpEn.getStatus());
 				tmpUserEntry.setUserType(tmpEn.getUserType());
+				tmpUserEntry.setPassword(tmpEn.getPassword());
 				userList.add(tmpUserEntry);
 			}
 		}

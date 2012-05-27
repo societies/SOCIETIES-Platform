@@ -24,7 +24,7 @@
 	<xs:complexType>
     <xs:sequence>
       <xs:element name="method" type="tns:methodType"/>
-      <xs:element name="requestor" type="ns2:RequestorBean"/>
+      <xs:element name="requestor" type="ns2:requestorBean"/>
       <xs:element name="ownerId" type="xs:string"/>
       <xs:element name="dataId" type="xs:string"/>
       <xs:element name="action" type="ns1:action"/>

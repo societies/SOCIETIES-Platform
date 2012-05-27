@@ -1,12 +1,11 @@
 package org.societies.css.devicemgmt.devicemanagerconsumer;
 
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -18,11 +17,17 @@ import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
 import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.CSSEventConstants;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.springframework.osgi.context.BundleContextAware;
 
 
 
-public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustomizer, BundleContextAware{
+public class DeviceManagerConsumer extends EventListener implements ServiceTrackerCustomizer, BundleContextAware{
 	
 	//TODO For Test
 	private Double ll = new Double(0.0);
@@ -33,6 +38,8 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 	private BundleContext bundleContext;
 	
 	private ServiceTracker serviceTracker;
+	
+	private IEventMgr eventManager;
 	
 	public DeviceManagerConsumer() 
 	{
@@ -50,24 +57,54 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 	{	
 		this.serviceTracker = new ServiceTracker(bundleContext, IDevice.class.getName(), this);
 		this.serviceTracker.open();
-		
+
+		// -- Subscribe to LightSensorEvent
+		// Set filter
+		String lightEventFilter = "(&" + 
+				"(" + CSSEventConstants.EVENT_NAME + "="+DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT+")" + 
+				//"(" + CSSEventConstants.EVENT_SOURCE + "=test_event_source)" + 
+				")";
+		// Subscribe
+		eventManager.subscribeInternalEvent(this, new String[] {EventTypes.DEVICE_MANAGEMENT_EVENT}, lightEventFilter);
+		LOG.info("Subscribe to internal event: org/societies/css/device -> sensor/lightSensorEvent");
+
+
+		// -- Subscribe to Screen event
+		// Set filter
+		String screenEventFilter = "(&" + 
+				"(" + CSSEventConstants.EVENT_NAME + "="+DeviceMgmtEventConstants.SCREEN_EVENT+")" + 
+				//"(" + CSSEventConstants.EVENT_SOURCE + "=test_event_source)" + 
+				")";
+		// Subscribe
+		eventManager.subscribeInternalEvent(this, new String[] {EventTypes.DEVICE_MANAGEMENT_EVENT}, screenEventFilter);
+		LOG.info("Subscribe to internal event: org/societies/css/device -> sensor/lightSensorEvent");	
+	}
+	
+	
+	/* --- Injections --- */
+	public IEventMgr getEventManager() { return eventManager; }
+	public void setEventManager(IEventMgr eventManager) { 
+		if (null == eventManager) {
+			LOG.error("[COMM02] EventManager not available");
+		}
+		this.eventManager = eventManager;
 	}
 
 
-	public void handleEvent(Event event) {
-		
-		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent ");
-		if (event.getProperty("event_name").equals(DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT)) 
-		{
-			ll = (Double)event.getProperty("lightLevel");
-			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent lightLevel: " + ll);
-		}
-		else if (event.getProperty("event_name").equals(DeviceMgmtEventConstants.SCREEN_EVENT))
-		{
-			screenMessage = (String)event.getProperty("screenEvent");
-			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent screenMessage: " + screenMessage);
-		}
-	}
+//	public void handleEvent(Event event) {
+//		
+//		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent ");
+//		if (event.getProperty("event_name").equals(DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT)) 
+//		{
+//			ll = (Double)event.getProperty("lightLevel");
+//			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent lightLevel: " + ll);
+//		}
+//		else if (event.getProperty("event_name").equals(DeviceMgmtEventConstants.SCREEN_EVENT))
+//		{
+//			screenMessage = (String)event.getProperty("screenEvent");
+//			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent screenMessage: " + screenMessage);
+//		}
+//	}
 	
 	
 	@Override
@@ -92,7 +129,7 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 					Dictionary dic = ia.invokeAction(null);
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ ls1.getDeviceName());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls1.getDeviceType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Type: "+ ls1.getDeviceType());
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ ls1.getDeviceId());
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ ls1.getDeviceDescription());
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ ls1.getDeviceProvider());
@@ -112,7 +149,7 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 					Dictionary dic = ia.invokeAction(null);
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ ls2.getDeviceName());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls2.getDeviceType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Type: "+ ls2.getDeviceType());
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ ls2.getDeviceId());
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ ls2.getDeviceDescription());
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ ls2.getDeviceProvider());
@@ -131,7 +168,7 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 					Dictionary dic = ia.invokeAction(null);
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ ls3.getDeviceName());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls3.getDeviceType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Type: "+ ls3.getDeviceType());
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ ls3.getDeviceId());
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ ls3.getDeviceDescription());
 					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ ls3.getDeviceProvider());
@@ -180,5 +217,32 @@ public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustom
 	@Override
 	public void removedService(ServiceReference reference, Object service) {
 
+	}
+
+
+
+	@Override
+	public void handleInternalEvent(InternalEvent event) {
+		LOG.info("*** Internal event received *****");    
+		LOG.info("** event name : "+ event.geteventName());
+		LOG.info("** event source : "+ event.geteventSource());
+		LOG.info("** event type : "+event.geteventType());
+		if (event.geteventName().equals(DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT)) {
+			HashMap<String, Object> payload = (HashMap<String, Object>)event.geteventInfo();
+			LOG.info("DeviceMgmtConsumer %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent lightLevel : "+ payload.get("lightLevel"));
+		}
+		else if (event.geteventName().equals(DeviceMgmtEventConstants.SCREEN_EVENT))
+		{
+			HashMap<String, Object> payload = (HashMap<String, Object>)event.geteventInfo();
+			LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent screenMessage: " + payload.get("screenEvent"));
+		}
+		
+	}
+
+	
+	@Override
+	public void handleExternalEvent(CSSEvent event) {
+		
+		
 	}
 }

@@ -43,6 +43,7 @@ import org.societies.personalisation.CRIST.api.model.CRISTUserTask;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
 import org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTHistoryData;
 import org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
@@ -109,6 +110,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		
 		ctxBrokerContact = new CRISTCtxBrokerContact(ctxBroker);
 		
+		/* debug
 		CRISTCtxBrokerContact.initializeHistory(registeredContext, ctxBrokerContact);
 		
 		historyList = CRISTCtxBrokerContact.retrieveHistoryData(ctxBrokerContact);
@@ -117,6 +119,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		{
 			LOG.info("retrieveHistoryData ----- " + historyData.toString());
 		}
+		*/
 	}
 
 	/*
@@ -265,6 +268,9 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		
 	}
 
+	/*
+	 * needs to be updated. 
+	 */
 	//only for mocked data? it's OK
 	private CRISTUserSituation inferUserSituation(
 			ArrayList<String> contextClique) {
@@ -346,12 +352,13 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		
 		if (entityID == null) {
 			LOG.info("entityID is null, predictUserIntent can not run.");
-			return null;
+			return new ArrayList<CRISTUserAction>();			
 		}
 		
 		if (action == null) {
 			LOG.info("userAction is null, use current action instead.");
-			action = getCurrentUserAction(entityID);
+			return new ArrayList<CRISTUserAction>();
+			//action = getCurrentUserAction(entityID);
 		}
 
 		// Update the given user's current action

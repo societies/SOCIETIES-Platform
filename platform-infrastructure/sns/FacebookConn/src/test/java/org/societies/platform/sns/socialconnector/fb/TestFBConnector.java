@@ -2,11 +2,11 @@ package org.societies.platform.sns.socialconnector.fb;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 
@@ -15,8 +15,7 @@ import com.restfb.json.JsonObject;
 public class TestFBConnector {
 
 	private static ISocialConnector connector = null;
-	private static final Logger logger = Logger.getLogger(TestFBConnector.class
-			.getSimpleName());
+	private static final Logger logger = LoggerFactory.getLogger(TestFBConnector.class);
 
 	@Before
 	public void setUp() {
@@ -30,6 +29,7 @@ public class TestFBConnector {
 
 	@After
 	public void tearDown() throws Exception {
+		logger.info("Facebook test copleted");
 		connector = null;
 	}
 
@@ -70,6 +70,14 @@ public class TestFBConnector {
 			logger.info("Connector return the following activities:\n"
 					+ jactivities.toString(1));
 
+	}
+	
+	
+	@Test
+	public void postTest(){
+		
+		logger.info("Facebook POST test: this method is not yet implemented... please wait!");
+		
 	}
 
 }

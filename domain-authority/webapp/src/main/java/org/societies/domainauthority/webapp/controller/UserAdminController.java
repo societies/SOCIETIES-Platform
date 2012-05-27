@@ -28,26 +28,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import javax.validation.Valid;
+
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.comm.ICommManagerController;
-
-import org.societies.domainauthority.webapp.models.LoginForm;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.validation.BindingResult;
-import javax.validation.Valid;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.domainauthority.registry.DaRegistry;
 import org.societies.domainauthority.registry.DaUserRecord;
+import org.societies.domainauthority.webapp.models.UserAdminForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
 
 /**
  * This class shows the example of annotated controller
@@ -66,6 +63,8 @@ public class UserAdminController {
 	ICISCommunicationMgrFactory ccmFactory;
 	@Autowired
 	DaRegistry daRegistry;
+	
+	
 	
 	/**
 	 * @return the ccmFactory
@@ -114,26 +113,66 @@ public class UserAdminController {
 
 	}
 
+	
 	/**
 	 * This method get called when user request for login page by using url
 	 * http://localhost:8080/societies/login.html
 	 * 
 	 * @return login jsp page and model object
 	 */
-	@RequestMapping(value = "/useradmin.html", method = RequestMethod.GET)
-	public ModelAndView useradmin() {
-		// model is nothing but a standard Map object
-		Map<String, Object> model = new HashMap<String, Object>();
-		List<DaUserRecord> userRecords = daRegistry.getXmppIdentityDetails();
+	@RequestMapping(value = "/adminlogin.html", method = RequestMethod.GET)
+	public ModelAndView adminlogin() {
 		
-		model.put("userrecords", userRecords);
+		// Adminstrator has to log on first
+		// Check to ensure that at least one admin account exists, if it doesn't create a default admin account
+		List<DaUserRecord> userRecords = daRegistry.getXmppIdentityDetails();
+
+		boolean bAdminfound = false;
+		if ((userRecords != null) && (userRecords.size() > 0))
+		{
+			for ( int i = 0; i < userRecords.size(); i++)
+			{
+				if (userRecords.get(i).getUserType() != null)
+				{
+					if (userRecords.get(i).getUserType().contentEquals("admin"))
+						bAdminfound = true;
+				}
+			}
+		}
+		
+	
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+
+		
+		if (bAdminfound == false)
+		{
+			// create default admin account
+			DaUserRecord adminRecord = new DaUserRecord();
+			adminRecord.setName("Administrator");
+			adminRecord.setPassword("Administrator");
+			adminRecord.setUserType("admin");
+			adminRecord.setStatus("active");
+			adminRecord.setHost("");
+			adminRecord.setPort("");
+			adminRecord.setId("admin.societies.local");
+			daRegistry.addXmppIdentityDetails(adminRecord);
+			
+
+		}
+		
+		// model is nothing but a standard Map object
+		
+		UserAdminForm userForm = new UserAdminForm();
+		model.put("loginForm", userForm);
 		
 		/*
 		 * return modelandview object and passing login (jsp page name) and
 		 * model object as constructor
 		 */
-		return new ModelAndView("useradmin", model);
+		return new ModelAndView("adminlogin", model);
 	}
+	
 
 	/**
 	 * This method get called when user submit the login page using submit
@@ -147,78 +186,170 @@ public class UserAdminController {
 	 *            Map object passed to login page.
 	 * @return loginsuccess page if sucess or login page for retry if failed
 	 */
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/useradmin.html", method = RequestMethod.POST)
-	public ModelAndView processLogin(@Valid LoginForm loginForm,
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/adminlogin.html", method = RequestMethod.POST)
+	public ModelAndView processAdminLogin(@Valid UserAdminForm loginForm,
 			BindingResult result, Map model) {
 
 		if (result.hasErrors()) {
 			model.put("result", "Login form error");
-			return new ModelAndView("login", model);
+			return new ModelAndView("error", model);
 		}
 		String userName = loginForm.getUserName();
-		String subDomain = loginForm.getSubDomain();
 		String password = loginForm.getPassword();
-		boolean isAuthenticated = true;
+
 		DaUserRecord userRecord = new DaUserRecord();
 		
 
+		// Check that the account exists
+		userRecord = daRegistry.getXmppIdentityDetails(userName);
+		
+		if (userRecord == null)
+		{
+			//account doesn't exist, direct to new user page
+			model.put("errormsg", "account not found");
+			return new ModelAndView("error", model);
+			
+		}
+		
+		if ((userRecord.getUserType() == null) || (userRecord.getUserType().contentEquals("user") == true))
+		{
+			//account doesn't exist, direct to new user page
+			model.put("errormsg", "access denied");
+			return new ModelAndView("error", model);
+		}
 		
 		
-		//NOTE : Temporary measure until connection to openfire database is in place
-		INetworkNode nodeDetails = getCommManager().getIdManager()
-				.getDomainAuthorityNode();
-
-		String jid = userName + "." + nodeDetails.getDomain();
-		IIdentity newNodeDetails;
-		try {
-			newNodeDetails = getCommManager().getIdManager().fromJid(jid);
-			
-			// Check that the account exists
-			userRecord = daRegistry.getXmppIdentityDetails(jid);
-			
-			if (userRecord == null)
-			{
+		if ((userRecord.getPassword().contentEquals(password)) == false)
+		{
 				//account doesn't exist, direct to new user page
-				model.put("result", "account not found");
-				return new ModelAndView("newuserlogin", model);
+				model.put("errormsg", "incoorect usename or password");
+				return new ModelAndView("error", model);
+		}
+		
+		// model is nothing but a standard Map object
+				Map<String, Object> modelnew = new HashMap<String, Object>();
+				List<DaUserRecord> userRecords = daRegistry.getXmppIdentityDetails();
+				UserAdminForm userForm = new UserAdminForm();
+				userForm.setUserDetails(userRecords);
 				
-			}
-			
-			if (userRecord.getStatus().contentEquals("new"))
-			{
-				//account doesn't exist, direct to new user page
-				model.put("result", "account setup not complete");
-				return new ModelAndView("login", model);
-			}
-			
-			
-			@SuppressWarnings("unused")
-			ICommManager newCommManger = getCcmFactory().getNewCommManager(
-					newNodeDetails, password);
-			
-			isAuthenticated = true;
-			// Now get the url details from the registry
-			model.put("webappurl", userRecord.getUrl());
-			
-		} catch (InvalidFormatException e1) {
-			// TODO Auto-generated catch block
-			isAuthenticated = false;
-
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-			isAuthenticated = false;
-		}
-
-		model.put("name", userName);
-
-		if (isAuthenticated) {
-			model.put("result", "Login Successfull");
-			return new ModelAndView("loginsuccess", model);
-		} else {
-			model.put("result", "Login UnSuccessfull");
-			return new ModelAndView("login", model);
-		}
+				modelnew.put("userForm", userForm);
+				modelnew.put("userrecords", userRecords);
+		
+			return new ModelAndView("useradmin", modelnew);
+		
 	}
+	
+	  
+	/**
+	 * This method get called when user request for login page by using url
+	 * http://localhost:8080/societies/login.html
+	 * 
+	 * @return login jsp page and model object
+	 */
+	@RequestMapping(value = "/useradmin.html", method = RequestMethod.GET)
+	public ModelAndView useradmin() {
+		
+			
+		// model is nothing but a standard Map object
+		Map<String, Object> model = new HashMap<String, Object>();
+		List<DaUserRecord> userRecords = daRegistry.getXmppIdentityDetails();
+		UserAdminForm userForm = new UserAdminForm();
+		userForm.setUserDetails(userRecords);
+		
+		model.put("userForm", userForm);
+		model.put("userrecords", userRecords);
+		
+		/*
+		 * return modelandview object and passing login (jsp page name) and
+		 * model object as constructor
+		 */
+		return new ModelAndView("useradmin", model);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/useradmin.html", method = RequestMethod.POST)
+	public ModelAndView processLogin(@Valid UserAdminForm userForm,
+			BindingResult result, Map model) {
+
+		List<DaUserRecord> userRecords = daRegistry.getXmppIdentityDetails();
+		
+		// check was has changed!
+		DaUserRecord currentDBRec = null;
+		DaUserRecord updatedRec = null;
+		boolean reload = false;
+
+		for(int i=0; i<userRecords.size(); i++){
+			boolean bUpdated = false;
+			
+			 currentDBRec = userRecords.get(i);
+			 updatedRec = userForm.getUserDetails().get(i);
+			 
+			 if (!(currentDBRec.getHost().contentEquals(updatedRec.getHost())))
+			{
+				 currentDBRec.setHost(updatedRec.getHost());
+				 bUpdated = true;
+			}
+			if (!(currentDBRec.getPort().contentEquals(updatedRec.getPort())))
+			{
+				 currentDBRec.setPort(updatedRec.getPort());
+				 bUpdated = true;
+			}			 
+			if (!(currentDBRec.getStatus().contentEquals(updatedRec.getStatus())))
+			{
+				 currentDBRec.setStatus(updatedRec.getStatus());
+				 bUpdated = true;
+			}
+			if (bUpdated)// changed
+			{
+				 daRegistry.updateXmppIdentityDetails(currentDBRec);
+				 reload = true;
+			}
+		 }
+	
+		
+		Map<String, Object> modelnew = new HashMap<String, Object>();
+		if (reload)
+			userRecords = daRegistry.getXmppIdentityDetails();
+		UserAdminForm userFormNew = new UserAdminForm();
+		userFormNew.setUserDetails(userRecords);
+
+		
+		modelnew.put("userForm", userFormNew);
+		modelnew.put("userrecords", userRecords);
+		
+		/*
+		 * return modelandview object and passing login (jsp page name) and
+		 * model object as constructor
+		 */
+		return new ModelAndView("useradmin", modelnew);
+	}
+	
+	
+    @RequestMapping(value="/useradmin_old.html",method=RequestMethod.POST)
+    public @ResponseBody JsonResponse UpdateUserAccount(
+    		@ModelAttribute(value="userName") String userName,
+    		@ModelAttribute(value="userHost") String userHost,
+    		@ModelAttribute(value="userPort") String userPort,
+    		@ModelAttribute(value="userStatus") String userStatus,
+    		BindingResult result ){
+    	JsonResponse res = new JsonResponse();
+              if(!result.hasErrors()){
+            	  DaUserRecord userDetails = new DaUserRecord();
+            	  userDetails = daRegistry.getXmppIdentityDetails(userName);
+            	  userDetails.setHost(userHost);
+            	  userDetails.setPort(userPort);
+            	  userDetails.setStatus(userStatus);
+            	  daRegistry.updateXmppIdentityDetails(userDetails);
+                  res.setStatus("SUCCESS");
+                  res.setResult(userDetails);
+            }else{
+                    res.setStatus("FAIL");
+                    //res.setResult(result.getAllErrors());
+            }
+
+            return res;
+    }
+    
+	
 }

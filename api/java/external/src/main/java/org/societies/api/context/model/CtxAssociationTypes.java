@@ -72,6 +72,12 @@ public class CtxAssociationTypes {
 	 * Directed context association.
 	 */
 	public static final String HAS_PRIVACY_POLICIES = "hasPrivacyPolicies";
+	/**
+	 * Has privacy policy agreement
+	 * To be moved to internal API
+	 */
+	@Deprecated
+	public static final String HAS_PRIVACY_POLICY_AGREEMENTS = "hasPrivacyPolicyAgreements";
 	
 	/**
 	 * Directed context association.
@@ -95,4 +101,5 @@ public class CtxAssociationTypes {
 	 * @since 0.0.8
 	 */
 	public static final String USES_SERVICES = "usesServices";
+
 }

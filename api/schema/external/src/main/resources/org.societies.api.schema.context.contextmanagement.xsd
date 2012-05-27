@@ -51,7 +51,7 @@
 
 	<xs:complexType name="ctxBrokerRetrieveBean">
 		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:RequestorBean"
+			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
 			<xs:element name="id" type="tns:ctxIdentifierBean"
 				minOccurs="0" />
@@ -60,7 +60,7 @@
 
 	<xs:complexType name="ctxBrokerLookupBean">
 		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:RequestorBean"
+			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
 			<xs:element name="modelType" type="tns:ctxModelTypeBean"
 				minOccurs="0" />
@@ -70,7 +70,7 @@
 
 	<xs:complexType name="ctxBrokerCreateEntityBean">
 		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:RequestorBean"
+			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
 			<xs:element name="targetCss" type="xs:string" minOccurs="0" />
 			<xs:element name="type" type="xs:string" minOccurs="0" />
@@ -79,7 +79,7 @@
 
 	<xs:complexType name="ctxBrokerUpdateAttributeBean">
 		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:RequestorBean"
+			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
 			<xs:element name="attrId" type="tns:ctxAttributeIdentifierBean"
 				minOccurs="0" />
@@ -90,7 +90,7 @@
 
 	<xs:complexType name="ctxBrokerCreateAssociationBean">
 		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:RequestorBean"
+			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
 			<xs:element name="targetCss" type="xs:string" minOccurs="0" />
 			<xs:element name="type" type="xs:string" minOccurs="0" />
@@ -99,7 +99,7 @@
 
 	<xs:complexType name="ctxBrokerRemoveBean">
 		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:RequestorBean"
+			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
 			<xs:element name="id" type="tns:ctxIdentifierBean"
 				minOccurs="0" />
@@ -108,7 +108,7 @@
 
 	<xs:complexType name="ctxBrokerUpdateBean">
 		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:RequestorBean"
+			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
 			<xs:element name="id" type="tns:ctxModelObjectBean"
 				minOccurs="0" />
@@ -117,7 +117,7 @@
 
 	<xs:complexType name="ctxBrokerCreateAttributeBean">
 		<xs:sequence>
-			<xs:element name="requestor" type="tnsid:RequestorBean"
+			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
 			<xs:element name="scope" type="tns:ctxEntityIdentifierBean"
 				minOccurs="0" />

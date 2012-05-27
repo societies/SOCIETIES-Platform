@@ -20,5 +20,6 @@
 	<osgi:reference id="ctxBroker"
 		interface="org.societies.api.internal.context.broker.ICtxBroker">
 	</osgi:reference>
+ 	<osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="1..1" />	 
 
 </beans>

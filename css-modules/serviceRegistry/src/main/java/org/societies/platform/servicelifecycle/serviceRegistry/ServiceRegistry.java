@@ -553,6 +553,16 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 		return returnedStatus;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry#retrieveCISSharedService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
+	 */
+	@Override
+	public List<String> retrieveCISSharedService(
+			ServiceResourceIdentifier serviceIdentifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	/* Utility methods */
 	private List<Service> createListService(
@@ -564,6 +574,8 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 		return returnedServiceList;
 	}
+
+	
 
 	
 	

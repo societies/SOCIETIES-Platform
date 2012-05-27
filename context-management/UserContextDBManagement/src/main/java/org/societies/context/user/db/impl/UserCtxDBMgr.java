@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +78,8 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Autowired(required=true)
 	private ICtxEventMgr ctxEventMgr;
 
-	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
+	private final ConcurrentMap<CtxIdentifier, CtxModelObject> modelObjects;
+//	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
 	private final IIdentityManager idMgr;
 	
@@ -89,7 +92,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	UserCtxDBMgr (ICommManager commMgr) {
 
 		LOG.info(this.getClass() + " instantiated");
-		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
+		this.modelObjects =  new ConcurrentHashMap<CtxIdentifier, CtxModelObject>();
 		
 		this.idMgr = commMgr.getIdManager();
 		privateId = idMgr.getThisNetworkNode();
@@ -102,7 +105,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	public UserCtxDBMgr() {
 		
 		LOG.info(this.getClass() + " instantiated - fooId");
-		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
+		this.modelObjects =  new ConcurrentHashMap<CtxIdentifier, CtxModelObject>();
 		
 		// TODO !!!!!! Identity should be instantiated properly
 		this.privateId = null;
@@ -122,7 +125,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		final CtxAssociationIdentifier identifier;
 		
 		if (this.idMgr != null) {
-			identifier = new CtxAssociationIdentifier(this.privateId.getJid(), 
+			identifier = new CtxAssociationIdentifier(this.privateId.getBareJid(), 
 					type, CtxModelObjectNumberGenerator.getNextValue());
 		}
 		else {
@@ -194,7 +197,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		final CtxEntityIdentifier identifier;
 		
 		if (this.idMgr != null) {
-			identifier = new CtxEntityIdentifier(this.privateId.getJid(), 
+			identifier = new CtxEntityIdentifier(this.privateId.getBareJid(), 
 					type, CtxModelObjectNumberGenerator.getNextValue());
 		}
 		else {
@@ -228,7 +231,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		CtxEntityIdentifier identifier;
 		
 		if (this.idMgr != null) {
-			identifier = new CtxEntityIdentifier(this.privateId.getJid(),
+			identifier = new CtxEntityIdentifier(this.privateId.getBareJid(),
 					type, CtxModelObjectNumberGenerator.getNextValue());	
 		}
 		else {
