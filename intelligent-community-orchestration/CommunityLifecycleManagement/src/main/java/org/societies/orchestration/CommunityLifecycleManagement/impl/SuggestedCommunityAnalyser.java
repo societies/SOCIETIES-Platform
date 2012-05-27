@@ -204,6 +204,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		
 		proximityHistory = new ArrayList<ProximityRecord>();
 		recordedMetadata = new HashMap<String, String>();
+		refusals = new ArrayList<ICisProposal>();
 			
 		//new ProximityRecordingThread().start();
 	}
