@@ -145,7 +145,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	//private IUserCtxBroker userContextBroker;
 	//private ICommunityCtxBroker communityContextBroker;
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
-	private ArrayList<ICis> recentRefusals;
+	private ArrayList<ICisProposal> refusals;
 	
 	private IUserFeedback userFeedback;
 	private IUserFeedbackCallback userFeedbackCallback;
@@ -1102,6 +1102,22 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     			    //if (passed == false) conflictingPreferences.add(recommendations.get(i))
     		    //}
     		//}
+    	}
+    	
+    	/**
+    	 * prototype: since no preferences defined yet, check against previous actions
+    	 * and existing CISs to stop action if needed.
+    	 */
+    	for (int i = 0; i < recommendations.size(); i++) {
+    		for (int m = 0; m < refusals.size(); m++) {
+    			if (action.equals("Create CISs")) {
+    			   if (refusals.get(m).getMembershipCriteria() == recommendations.get(i).get(0).getMembershipCriteria()) {
+    				   if (refusals.get(m).getMemberList() == recommendations.get(i).get(0).getMemberList()) {
+        				   conflictingPreferences.add(recommendations.get(i).toString());
+        			   }
+    			   }
+    		   }
+    		}
     	}
     	
     	//personalisationManager.getPreference(arg0, arg1, arg2, arg3, "refuse CIS action with given criteria", arg5)
