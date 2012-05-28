@@ -3,6 +3,7 @@ package org.societies.integration.test.bit.assessment;
 import static org.junit.Assert.*;
 
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -139,7 +141,7 @@ public class NominalTestCaseLowerTester {
 	}
 	
 	@Test
-	public void testContextLogging() {
+	public void testContextLogging() throws CtxException, InterruptedException, ExecutionException {
 
 		CtxBrokerHelper ctx = new CtxBrokerHelper(ctxBrokerInternal);
 		
