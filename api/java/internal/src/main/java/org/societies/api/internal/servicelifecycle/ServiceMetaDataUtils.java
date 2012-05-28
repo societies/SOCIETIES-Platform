@@ -1,7 +1,5 @@
-package org.societies.slm.servicecontrol;
+package org.societies.api.internal.servicelifecycle;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -15,33 +13,10 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 
 public class ServiceMetaDataUtils {
 
-	public ServiceMetaDataUtils() {
+	private ServiceMetaDataUtils() {
 		
 	}
 
-	/**
-	 *  This method generates a ServiceResourceIdentifier given the ServiceBundle
-	 * @param service
-	 * @param serBndl
-	 * @return
-	 */
-	public static ServiceResourceIdentifier generateServiceResourceIdentifier(Service service, Bundle serBndl){
-		// ***** To do ********
-		// some logic to map available meta data and xmpp service identity 
-		// and construct serviceResourceIdentity object
-		// then pass return this object
-		ServiceResourceIdentifier serResId=new ServiceResourceIdentifier();		
-		try {
-			serResId.setIdentifier(new URI("http://" + service.getServiceEndpoint()));
-			//This next line is for solving https://redmine.ict-societies.eu/issues/619
-			serResId.setServiceInstanceIdentifier(String.valueOf(serBndl.getBundleId()));
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return serResId;
-		
-	}
 
 	/**
 	 *  This method generates a Service object that can be used as a filter for the Service Discovery search methods.

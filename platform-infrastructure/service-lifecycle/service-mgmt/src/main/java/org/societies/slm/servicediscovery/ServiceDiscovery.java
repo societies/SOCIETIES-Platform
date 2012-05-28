@@ -260,13 +260,44 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			
 		Service result = null;
 		try{
-			//Are we searching for a local service?
-			
-			
+			// First we check the local repository
+			result = getServiceReg().retrieveService(serviceId);
+
+			// Did we find it there?
+			if(result == null){
+				if(logger.isDebugEnabled()) 
+					logger.debug("Didn't find service on local repository, now checking if it's a remote service!");
+				
+				String myLocalJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+				String serviceJid = new String();
+				
+				// Is it supposed to be local?
+				if(!myLocalJid.equals(serviceJid)){
+					
+					if(logger.isDebugEnabled())
+						logger.debug("It's a remote service from node: " + serviceJid);
+					
+					INetworkNode node = getCommMngr().getIdManager().fromFullJid(serviceJid);
+
+					// We call the other network node to get the information on the service
+					ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
+					getServiceDiscoveryRemote().getService(serviceId, node, callback);
+					List<Service> resultList = callback.getResultList();
+					
+					// Only one service should be returned. If not, we're dealing with some sort of problem
+					if(resultList.size() == 1){
+						result = resultList.get(0);
+						if(logger.isDebugEnabled()) logger.debug("Found service remotely!");
+					}
+					
+				}
+				
+			}
 			
 		} catch(Exception ex){
 			ex.printStackTrace();
 			logger.error("getService():: Exception getting Service: " + ex);
+			throw new ServiceDiscoveryException("getService():: Exception getting Service",ex);
 		}
 			
 		if(result == null)
@@ -292,6 +323,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 				logger.debug("Found "+ result.size() + " services that fulfill the criteria"); 
 			
 		} catch(Exception ex){
+			ex.printStackTrace();
 			logger.error("Searching for services: Exception! : " + ex);
 			throw new ServiceDiscoveryException("Exception while searching for services",ex);
 		}
@@ -304,17 +336,30 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			throws ServiceDiscoveryException {
 
 		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + node.getJid());
+		List<Service> result = new ArrayList<Service>();
 		
-		String myLocalJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
-		String nodeJid = node.getJid();
+		try{
+				
+			String myLocalJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+			
+			if(myLocalJid.equals(node.getJid())){
+				if(logger.isDebugEnabled()) logger.debug("It's the local node, so we do a local call");
+				return searchServices(filter);
+			}
+			
+			if(logger.isDebugEnabled()) logger.debug("Trying to query the remote node...");
+			
+			ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
+			getServiceDiscoveryRemote().searchService(filter, node, callback);
+			result = callback.getResultList();
 		
-		if(myLocalJid.equals(node.getJid())){
-			if(logger.isDebugEnabled()) logger.debug("It's the local node, so we do a local call");
-			return searchServices(filter);
+		} catch(Exception ex){
+			ex.printStackTrace();
+			logger.error("Exception while searching for services!");
+			throw new ServiceDiscoveryException("Exception while searching for services!",ex);
 		}
 		
-
-		return new AsyncResult<List<Service>>(result);;
+		return new AsyncResult<List<Service>>(result);
 	}
 
 	@Override
@@ -324,15 +369,16 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + jid);
 
 		try {
+			
 			INetworkNode node = getCommMngr().getIdManager().fromFullJid(jid);
 			return searchServices(filter,node);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			
+			logger.error("Searching for services: Exception! : " + ex);
+			throw new ServiceDiscoveryException("Exception while searching for services!",ex);
 		}
-		
-		
+			
 	}
 
 
