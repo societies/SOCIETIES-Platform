@@ -6,21 +6,24 @@
 
 	<groupId>org.societies.personalisation</groupId>
 	<artifactId>socialprofiler</artifactId>
-	<version>${release.version}-SNAPSHOT</version>
+	<version>${version-pm}</version>
 	<name>Social Profiler</name>
-	<packaging>jar</packaging>
+	<packaging>bundle</packaging>
 
 	<developers>
 		<developer>
 			<name>Luca Lamorte</name>
 			<email>luca.lamorte@telecomitalia.it</email>
 		</developer>
+		<developer>
+			<name>Laurent Walter Goix</name>
+			<email>laurentwalter.goix@telecomitalia.it</email>
+		</developer>
 	</developers>
 
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 
@@ -71,10 +74,35 @@
 			<groupId>org.apache.shindig</groupId>
 			<artifactId>shindig-social-api</artifactId>
 			<version>3.0.0-beta4</version>
+			<scope>provided</scope>
 		</dependency>
 
-		 
-		 
+      <dependency>
+			<groupId>org.societies.platform</groupId>
+			<artifactId>socialdata</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+      <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+      <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.beans</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+	<!-- Logging -->
+      <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
 	</dependencies>
 
@@ -100,7 +128,9 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
+						<Import-Package>!com.sun.jdmk.comm,!jline,*</Import-Package>
+						<Export-Package></Export-Package>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>

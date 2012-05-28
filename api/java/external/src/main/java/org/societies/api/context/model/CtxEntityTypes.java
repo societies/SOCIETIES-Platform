@@ -63,6 +63,13 @@ public class CtxEntityTypes {
     public static final String PRIVACY_POLICY = "privacyPolicy";
     
     /**
+     * Privacy Policy Agreement
+     * To be moved to the internal API
+     */
+    @Deprecated
+    public static final String PRIVACY_POLICY_AGREEMENT = "privacyPolicyAgreement";
+    
+    /**
      * 
      */
     public static final String PRIVACY_PREFERENCE = "privacyPreference";

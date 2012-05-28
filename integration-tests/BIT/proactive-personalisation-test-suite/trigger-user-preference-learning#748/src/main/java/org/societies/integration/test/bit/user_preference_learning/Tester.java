@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
@@ -35,7 +37,9 @@ public class Tester {
 	private IAction action$2;
 	// private IAction action$3;
 	private ServiceResourceIdentifier id;
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
+	
 	public Tester() {
 
 	}
@@ -44,16 +48,20 @@ public class Tester {
 	public void setUp() {
 		try {
 			this.uam = Test748.getUam();
+			logging.debug("initializing UAM");
 			this.ctxBroker = Test748.getCtxBroker();
 			this.userId = new MockIdentity(IdentityType.CSS, "user",
 					"societies.org");
 			id = new ServiceResourceIdentifier();
 			this.action$1 = new Action(id, "serviceintest", "volume", "0");
 			this.action$2 = new Action(id, "serviceintest", "volume", "10");
+			logging.debug("initializing actions");
 			// this.action$3=new Action(id,"serviceintest","volume","90");
 			this.personMan = Test748.getPersonMan();
 			setupContext();
+			logging.debug("initializing first contexts");
 			changeContext("home", "free", "sleep");
+			logging.debug("changing contexts");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -77,11 +85,16 @@ public class Tester {
 					this.changeContext("office", "free", "cafe");
 				}
 			}
+			logging.debug("iterating context changes");
 			this.changeContext("office", "free", "cafe");
+			logging.debug("final context settings");
 			Future<IAction> value = this.personMan.getPreference(this.userId,
 					"serviceintest", this.id, "volume");
+			logging.debug("query for preference learning");
 			IAction preference = value.get();
+			logging.debug("get preference learning result");
 			Assert.assertTrue(preference.getvalue().equals("10"));
+			logging.debug("check the result");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

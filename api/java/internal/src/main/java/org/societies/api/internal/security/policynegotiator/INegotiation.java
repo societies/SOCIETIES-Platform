@@ -25,6 +25,9 @@
 package org.societies.api.internal.security.policynegotiator;
 
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 
 /**
  * High-level interface for invoking the secure policy negotiator.
@@ -39,9 +42,16 @@ public interface INegotiation {
 	/**
 	 * Start policy negotiation procedure.
 	 * 
-	 * @param provider Includes identity of the service provider and service ID comprehendable by the provider
-	 * @param serviceId Service ID
+	 * @param provider Includes identity of the service provider and service ID comprehendable by the provider.
+	 * This should be an instance of either:<br/>
+	 * - {@link RequestorCis} if this negotiation is about joining a CIS, or<br/>
+	 * - {@link RequestorService} if this negotiation is about using a new service
+	 * 
+	 * @param includePrivacyPolicyNegotiation True to perform also Privacy Policy Negotiation using
+	 * {@link IPrivacyPolicyNegotiationManager}.
+	 * 
 	 * @param callback The callback to be invoked to receive the result of this method
 	 */
-	public void startNegotiation(Requestor provider, INegotiationCallback callback);
+	public void startNegotiation(Requestor provider, boolean includePrivacyPolicyNegotiation,
+			INegotiationCallback callback);
 }

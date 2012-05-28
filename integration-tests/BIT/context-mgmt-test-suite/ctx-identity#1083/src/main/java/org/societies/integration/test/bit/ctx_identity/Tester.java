@@ -98,8 +98,6 @@ public class Tester {
 		assertEquals(operator.getId().getOperatorId(),privateId.getBareJid());
 
 		LOG.info("[#1083] Using equals with getOperatorId() - " + operator.getId().getOperatorId().equals(privateId.getBareJid()));
-
-		LOG.info("[#1083] Using equals - " + operator.getId().equals(privateId));
 	}
 		
 }

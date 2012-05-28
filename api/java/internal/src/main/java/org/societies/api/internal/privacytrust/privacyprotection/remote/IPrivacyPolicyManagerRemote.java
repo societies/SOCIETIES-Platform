@@ -27,9 +27,10 @@ package org.societies.api.internal.privacytrust.privacyprotection.remote;
 import java.util.Map;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * Interface exposed to Societies components in order to do remote actions relative
@@ -39,49 +40,34 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  */
 public interface IPrivacyPolicyManagerRemote {
 	/**
-	 * Remote call to retrieve a CIS privacy policy by the ID of the CIS
+	 * Remote call to retrieve a privacy policy by the ID of the CIS or the 3P service
 	 * 
-	 * @param cisId Id of the CIS.
+	 * @param requestor Id of the CIS or the 3P service
 	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
 	 * @param listener The callback object
+	 * @throws PrivacyException 
 	 */
-	public void getPrivacyPolicy(IIdentity cisId, IIdentity targetedNode, IPrivacyPolicyManagerListener listener);
+	public void getPrivacyPolicy(Requestor requestor, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException;
 	
-	/**
-	 * Remote call to retrieve a 3P Service privacy policy by the ID of the 3P Service
-	 * 
-	 * @param serviceId Id of the 3P Service
-	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
-	 * @param listener The callback object
-	 */
-	public void getPrivacyPolicy(ServiceResourceIdentifier serviceId, IIdentity targetedNode, IPrivacyPolicyManagerListener listener);
-
 	/**
 	 * Remote call to store or update a (CIS or 3P Service) privacy policy
 	 * 
 	 * @param privacyPolicy The privacy policy
 	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
 	 * @param listener The callback object
+	 * @throws PrivacyException 
 	 */
-	public void updatePrivacyPolicy(RequestPolicy privacyPolicy, IIdentity targetedNode, IPrivacyPolicyManagerListener listener);
+	public void updatePrivacyPolicy(RequestPolicy privacyPolicy, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException;
 	
 	/**
-	 * Remote call to delete a CIS privacy policy by the ID of the Service
+	 * Remote call to delete a privacy policy by the ID of the Service or CIS
 	 * 
-	 * @param cisId Id of the CIS
+	 * @param requestor Id of the CIS or the 3P service
 	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
 	 * @param listener The callback object
+	 * @throws PrivacyException 
 	 */
-	public void deletePrivacyPolicy(IIdentity cisId, IIdentity targetedNode, IPrivacyPolicyManagerListener listener);
-
-	/**
-	 * Remote call to delete a 3P Service privacy policy by the ID of the Service
-	 * 
-	 * @param serviceId Id of the 3P service
-	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
-	 * @param listener The callback object
-	 */
-	public void deletePrivacyPolicy(ServiceResourceIdentifier serviceId, IIdentity targetedNode, IPrivacyPolicyManagerListener listener);
+	public void deletePrivacyPolicy(Requestor requestor, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException;
 
 	/**
 	 * Remote Call. Help a developer or a user to create a privacy policy by inferring a default
@@ -94,6 +80,7 @@ public interface IPrivacyPolicyManagerRemote {
 	 * @param configuration Configuration of the CIS or the 3P service
 	 * @param targetedNode CSS ID of the CSS which will receive this remote call.
 	 * @param listener The callback object
+	 * @throws PrivacyException 
 	 */
-	public void inferPrivacyPolicy(int privacyPolicyType, Map configuration, IIdentity targetedNode, IPrivacyPolicyManagerListener listener);
+	public void inferPrivacyPolicy(int privacyPolicyType, Map configuration, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException;
 }

@@ -5,6 +5,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.integration.test.IntegrationTestCase;
 
 /**
@@ -18,25 +19,19 @@ public class TestCase899 extends IntegrationTestCase {
 
 	public static ICommManager commManager;
 	public static IIdentityManager idMgr;
-	private ServiceTracker serviceTracker;
+	public static INetworkNode node;
 	
-	private UpperTester upperTester;
 
 	public TestCase899() {
-		super(711, NominalTestCase.class);
-		
-		upperTester = new UpperTester();
-		
-		this.serviceTracker = new ServiceTracker(upperTester.getBundleContext(), IDevice.class.getName(), upperTester);
-		this.serviceTracker.open();
-		
+		super(711, NominalTestCase.class);	
+
 	}
 
 	
 	//Dependency Injection
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-
 		idMgr = commManager.getIdManager();
+		node = idMgr.getThisNetworkNode();
 	}
 }

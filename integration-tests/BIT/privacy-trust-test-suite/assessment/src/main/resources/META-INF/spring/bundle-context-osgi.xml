@@ -14,6 +14,9 @@
                       	http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
     <osgi:reference id="PrivacyLogAppender" interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender" />
+    <osgi:reference id="Assessment" interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment" />
     <osgi:reference id="IdentityManager" interface="org.societies.api.identity.IIdentityManager" />
-
+    <osgi:reference id="CommsManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />
+	<osgi:reference id="ctxBrokerInternal" interface="org.societies.api.internal.context.broker.ICtxBroker" />
+	<osgi:reference id="ctxBrokerExternal" interface="org.societies.api.context.broker.ICtxBroker" />
 </beans>

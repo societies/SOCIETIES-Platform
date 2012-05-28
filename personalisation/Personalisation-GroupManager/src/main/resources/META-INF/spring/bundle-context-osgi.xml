@@ -22,6 +22,10 @@
 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
 	</osgi:reference>
 
+	<osgi:reference id="persoMgr" interface="org.societies.api.personalisation.mgmt.IPersonalisationManager">
+	    
+	    
+	</osgi:reference>
 	<!-- <osgi:reference id="ComplexBundle" interface="org.societies.example.complexservice.IComplexService"/> -->
 
 </beans>

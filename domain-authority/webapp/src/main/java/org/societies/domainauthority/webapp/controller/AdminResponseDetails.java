@@ -24,7 +24,6 @@
  */
 package org.societies.domainauthority.webapp.controller;
 
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 /**
  * Describe your class here...

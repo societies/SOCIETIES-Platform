@@ -44,6 +44,7 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -53,6 +54,7 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
+import org.societies.api.internal.privacytrust.privacyprotection.INegotiationClient;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
@@ -70,7 +72,7 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManagerInternal;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentityOption;
@@ -100,7 +102,7 @@ public class NegotiationClient implements INegotiationClient {
 	private PrivacyPolicyNegotiationManager policyMgr;
 	private Hashtable<Requestor,ResponsePolicy> myPolicies;
 	private Hashtable<Requestor, IAgreement> agreements;
-	private IPolicyAgreementManagerInternal policyAgreementMgr;
+	private IPrivacyAgreementManagerInternal policyAgreementMgr;
 	private IPrivacyDataManagerInternal privacyDataManager;
 	private IIdentitySelection idS;
 	private IPrivacyPreferenceManager privPrefMgr;
@@ -108,12 +110,16 @@ public class NegotiationClient implements INegotiationClient {
 
 	public NegotiationClient(INegotiationAgent negotiationAgent, PrivacyPolicyNegotiationManager policyMgr){
 		this.negotiationAgent = negotiationAgent;
+		this.policyMgr = policyMgr;
+		this.ctxBroker = policyMgr.getCtxBroker();
 		this.eventMgr = policyMgr.getEventMgr();
 		this.policyAgreementMgr = policyMgr.getPolicyAgreementMgr();
-		this.privacyDataManager = policyMgr.getPrivacyDataManager();
+		this.privacyDataManager = policyMgr.getPrivacyDataManagerInternal();
 		this.idS = policyMgr.getIdentitySelection();
 		this.privPrefMgr = policyMgr.getPrivacyPreferenceManager();
 		this.idm = policyMgr.getIdm();
+		this.myPolicies = new Hashtable<Requestor, ResponsePolicy>();
+		this.agreements = new Hashtable<Requestor, IAgreement>();
 		
 		
 	}
@@ -122,11 +128,6 @@ public class NegotiationClient implements INegotiationClient {
 		this.logging.info(this.getClass().getName()+" : "+message);
 	}
 	
-	@Override
-	public void receiveProviderIdentity(Requestor requestor) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void receiveProviderPolicy(RequestPolicy policy) {
@@ -265,9 +266,12 @@ public class NegotiationClient implements INegotiationClient {
 				AgreementFinaliser finaliser = new AgreementFinaliser();
 				byte[] signature = finaliser.signAgreement(agreement);
 				Key publicKey = finaliser.getPublicKey();
-				IAgreementEnvelope envelope = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
+				AgreementEnvelope envelope = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
 				
 				Future<Boolean> ack = this.negotiationAgent.acknowledgeAgreement(envelope);
+				if (null==ack){
+					JOptionPane.showMessageDialog(null, "ack is null");
+				}
 				this.acknowledgeAgreement(requestor, envelope, ack.get());
 			}else{
 				log("Agreement not found for requestor: "+requestor.toString()+"\nIs this negotiation process obsolete? Ignoring call to setFinalIdentity()");
@@ -287,18 +291,17 @@ public class NegotiationClient implements INegotiationClient {
 	}
 	
 	@Override
-	public void acknowledgeAgreement(Requestor requestor,
-			IAgreementEnvelope envelope, boolean b) {
+	public void acknowledgeAgreement(Requestor requestor, AgreementEnvelope envelope, boolean b) {
 		if (b){
 			log("Acknowledged Agreement - creating access control objects");			
 			try {
 				//TODO: uncomment lines
 				if (requestor instanceof RequestorCis){
 
-					this.policyAgreementMgr.updateAgreement(((RequestorCis) envelope.getAgreement().getRequestor()).getCisRequestorId(), envelope);
+					this.policyAgreementMgr.updateAgreement((envelope.getAgreement().getRequestor()), envelope);
 
 				}else{
-					this.policyAgreementMgr.updateAgreement(((RequestorService) envelope.getAgreement().getRequestor()).getRequestorServiceId(), envelope);
+					this.policyAgreementMgr.updateAgreement(envelope.getAgreement().getRequestor(), envelope);
 				}
 
 				List<ResponseItem> requests = envelope.getAgreement().getRequestedItems();
@@ -323,7 +326,10 @@ public class NegotiationClient implements INegotiationClient {
 
 	}
 	
-	
+	/**
+	 * No need for this step. This should be removed and the negotiation step should commence in the startPrivacyPolicyNegotiation(RequestPolicy,S
+	 * @param requestor
+	 */
 	public void startNegotiation(Requestor requestor){
 		
 		log("Starting negotiation with: "+requestor.toString());
@@ -355,18 +361,8 @@ public class NegotiationClient implements INegotiationClient {
 			if (!item.isOptional()){
 				String contextType = item.getResource().getContextType();
 				try {
-					Future<List<CtxIdentifier>> futurePersonEntities = ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
-					List<CtxIdentifier> personEntities = futurePersonEntities.get();
-					if (personEntities.size()==0){
-						log("Entity Person doesn't exist! Unable to store Policy in CtxDB");
-						return new ArrayList<String>();
-					}
-					CtxEntity person = (CtxEntity) ctxBroker.retrieve(personEntities.get(0)).get();
-					if (person==null){
-						this.log("ERROR in DB. Operator Entity doesn't exist");
-						return new ArrayList<String>();
-					}
-
+					Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveCssOperator();
+					CtxEntity person = futurePerson.get();
 					Set<CtxAttribute> resultSet = person.getAttributes(contextType);
 					if (resultSet.isEmpty()){
 						boolean containsCreate = false;
@@ -436,5 +432,13 @@ public class NegotiationClient implements INegotiationClient {
 
 		return null;
 	}
+
+
+	@Override
+	public void startPrivacyPolicyNegotiation(Requestor requestor, RequestPolicy policy) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

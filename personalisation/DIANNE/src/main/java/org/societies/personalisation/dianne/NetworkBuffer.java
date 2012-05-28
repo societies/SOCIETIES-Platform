@@ -27,20 +27,21 @@ package org.societies.personalisation.dianne;
 
 import java.util.ArrayList;
 
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.personalisation.model.IAction;
 
 public class NetworkBuffer 
 {
 	ArrayList<IAction> outcomeUpdates;
-	ArrayList<IAction> contextUpdates;
+	ArrayList<CtxAttribute> contextUpdates;
 	
 	public NetworkBuffer()
 	{
 		outcomeUpdates = new ArrayList<IAction>();
-		contextUpdates = new ArrayList<IAction>();
+		contextUpdates = new ArrayList<CtxAttribute>();
 	}
 	
-	public synchronized void addContextUpdate(IAction update)
+	public synchronized void addContextUpdate(CtxAttribute update)
 	{
 		contextUpdates.add(update);
 	}
@@ -50,12 +51,12 @@ public class NetworkBuffer
 		outcomeUpdates.add(update);
 	}
 	
-	public synchronized ArrayList<IAction>[] getSnapshot()
+	public synchronized ArrayList[] getSnapshot()
 	{
-		ArrayList<IAction> context_ss = contextUpdates;
+		ArrayList<CtxAttribute> context_ss = contextUpdates;
 		ArrayList<IAction> outcome_ss = outcomeUpdates;
 		
-		contextUpdates = new ArrayList<IAction>();
+		contextUpdates = new ArrayList<CtxAttribute>();
 		outcomeUpdates = new ArrayList<IAction>();
 		
 		ArrayList[] snapshot = new ArrayList[]{context_ss, outcome_ss};

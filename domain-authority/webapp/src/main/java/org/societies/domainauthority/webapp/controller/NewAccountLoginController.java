@@ -27,29 +27,20 @@ package org.societies.domainauthority.webapp.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.domainauthority.registry.DaRegistry;
 import org.societies.domainauthority.registry.DaUserRecord;
 import org.societies.domainauthority.webapp.models.LoginForm;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindingResult;
 import javax.validation.Valid;
-
-
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.internal.comm.ICommManagerController;
 /**
  * This class shows the example of annotated controller 
  * @author Perumal Kuppuudaiyar
@@ -116,18 +107,49 @@ public class NewAccountLoginController {
 	 * url http://localhost:8080/societies/login.html
 	 * @return login jsp page and model object
 	 */
-	@RequestMapping(value="/newaccount.html",method = RequestMethod.GET)
-	public ModelAndView login() {
+	@RequestMapping(value="/{newaccountid}/newaccount.html",method = RequestMethod.GET)
+	public ModelAndView login(@PathVariable(value="newaccountid") String newaccountid) {
 		//model is nothing but a standard Map object
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("message", "Please login to your Societies account");
+		model.put("message", "Please create your Societies account");
 		//data model object to be used for displaying form in html page 
 		LoginForm loginForm = new LoginForm();
+		
+		if (newaccountid != null && newaccountid.length() > 0)
+		{
+			//parse string 
+			int pos = 0;
+			if (newaccountid.contains("@"))
+				pos = newaccountid.indexOf('@');
+			else if (newaccountid.contains("."))
+				pos = newaccountid.indexOf('.');
+			
+			if (pos != 0)
+			{
+				loginForm.setUserName(newaccountid.substring(0, Math.max(pos-1,0)));
+				loginForm.setSubDomain(newaccountid.substring(Math.min(pos+1,newaccountid.length())));
+			}
+		}
 		model.put("loginForm", loginForm);		
 		/*return modelandview object and passing login (jsp page name) and model object as
 		 constructor */
 		return new ModelAndView("newaccount", model) ;
 	}
+	
+	@RequestMapping(value="/newaccount.html",method = RequestMethod.GET)
+	public ModelAndView login() {
+		//model is nothing but a standard Map object
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("message", "Please create your Societies account");
+		//data model object to be used for displaying form in html page 
+		LoginForm loginForm = new LoginForm();
+		
+		model.put("loginForm", loginForm);		
+		/*return modelandview object and passing login (jsp page name) and model object as
+		 constructor */
+		return new ModelAndView("newaccount", model) ;
+	}
+	
 	/**
 	 * This method get called when user submit the login page using submit button	
 	 * @param loginForm java object with data entered by user
@@ -135,7 +157,7 @@ public class NewAccountLoginController {
 	 * @param model Map object passed to login page.
 	 * @return loginsuccess page if sucess or login page for retry if failed
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value="/newaccount.html", method = RequestMethod.POST)
 	public ModelAndView processLogin(@Valid LoginForm loginForm, BindingResult result,
     Map model) {
@@ -147,60 +169,31 @@ public class NewAccountLoginController {
 		String userName = loginForm.getUserName();
 		String subDomain = loginForm.getSubDomain();
 		String password = loginForm.getPassword();
-		boolean isAuthenticated = true;
 		DaUserRecord userRecord  = null;
 		
-
+		// Check that the account exists
+		userRecord = daRegistry.getXmppIdentityDetails(userName);
 		
-		
-		//NOTE : Temporary measure until connection to openfire database is in place
-		INetworkNode nodeDetails = getCommManager().getIdManager()
-				.getDomainAuthorityNode();
-
-		String jid = userName + "." + nodeDetails.getDomain();
-		IIdentity newNodeDetails = null;
-		try {
-			newNodeDetails = getCommManager().getIdManager().fromJid(jid);
-			
-			// Check that the account exists
-			userRecord = daRegistry.getXmppIdentityDetails(userName);
-			
-			if (userRecord != null)
-			{
-				if (userRecord.getId() != null)
-				{	
-					//account alreadt exists exist, direct to new user page
-					model.put("error", "account already exists");
-					return new ModelAndView("newaccount", model);
-				}
-			}
-		/**	if (userRecord.getId().contains(jid))
-			{
+		if (userRecord != null && userRecord.getName() != null)
+		{
 				//account alreadt exists exist, direct to new user page
 				model.put("error", "account already exists");
 				return new ModelAndView("newaccount", model);
-				
-			}
-		*/
-			userRecord = new DaUserRecord();
-			// create new account
-			userRecord.setName(userName);
-			userRecord.setId(jid);
-			userRecord.setHost("");
-			userRecord.setPort("");
-			userRecord.setStatus("new");
-			userRecord.setUserType("user");
-			userRecord.setPassword(password);
-			
-			daRegistry.addXmppIdentityDetails(userRecord);
-			
-			
-			
-		} catch (InvalidFormatException e1) {
-			// TODO Auto-generated catch block
-			isAuthenticated = false;
-
 		}
+		
+		String jid = userName + "." + subDomain;
+
+		userRecord = new DaUserRecord();
+		// create new account
+		userRecord.setName(userName);
+		userRecord.setId(jid);
+		userRecord.setHost("");
+		userRecord.setPort("");
+		userRecord.setStatus("new");
+		userRecord.setUserType("user");
+		userRecord.setPassword(password);
+		
+		daRegistry.addXmppIdentityDetails(userRecord);
 
 		model.put("name", userName);
 

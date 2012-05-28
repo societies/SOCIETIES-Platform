@@ -84,7 +84,7 @@
 		<!--module>../platform-infrastructure/client-frwk/TestIPCServices</module -->
 		
 		<!-- Android User Agent -->
-		<module>../user-agent/Android-user-agent</module>
+		<!-- module>../user-agent/Android-user-agent</module-->
 
 	</modules>
 </project>

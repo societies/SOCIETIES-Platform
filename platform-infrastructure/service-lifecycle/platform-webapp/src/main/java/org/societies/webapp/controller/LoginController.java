@@ -32,9 +32,14 @@ import org.societies.webapp.service.UserAuthentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindingResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.validation.Valid;
+
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 /**
  * This class shows the example of annotated controller 
  * @author Perumal Kuppuudaiyar
@@ -42,6 +47,20 @@ import javax.validation.Valid;
  */
 @Controller
 public class LoginController {
+	
+	
+	@Autowired
+	private ICommManager commManager;
+	
+	
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+	}
+	
 	/**
 	 * Displays login Page
 	 * @return
@@ -95,4 +114,29 @@ public class LoginController {
 				return new ModelAndView("login", model);
 			}			
 	}	
+	
+	/**
+	 * This method get called when user request for login page by using
+	 * url http://localhost:8080/societies/login.html
+	 * @return login jsp page and model object
+	 */
+	@RequestMapping(value="/{cssId}/loginviada.html",method = RequestMethod.GET)
+	public ModelAndView loginviada(@PathVariable(value="cssId") String cssId) {
+		//model is nothing but a standard Map object
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		// check that user was redirected to correct webapp by cloud controller
+		
+		if ((cssId != null) && (cssId.contains(this.getCommManager().getIdManager().getThisNetworkNode().getBareJid())))
+		{
+			//all okay, we're in the correct container
+			model.put("message", "Welcome to your Societies account");
+			model.put("paraCssid", cssId);
+			return new ModelAndView("loginviada", model) ;
+		}
+		/*return modelandview object and passing login (jsp page name) and model object as
+		 constructor */
+		model.put("errormsg", " Problem with account setup, contact administrator");
+		return new ModelAndView("error", model) ;
+	}
 }

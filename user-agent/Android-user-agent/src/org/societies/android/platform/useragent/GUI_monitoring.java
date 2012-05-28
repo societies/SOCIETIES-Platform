@@ -30,8 +30,10 @@ import java.net.URISyntaxException;
 
 import org.societies.android.platform.useragent.UserAgent.LocalBinder;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.identity.IdentityManagerImpl;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -46,72 +48,77 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class GUI_monitoring extends Activity implements OnClickListener{
-	
+
 	private static final String LOG_TAG = GUI_monitoring.class.getName();
 	UserAgent uaService = null;
 	boolean connectedToService = false;
-	
+
 	/** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        //bind to UserAgent service
-        this.bindToService();
-        
-        //set layout
-        setContentView(R.layout.uam);
-        
-        Button sayHello = (Button)findViewById(R.id.sayHello);
-        sayHello.setOnClickListener(this);
-        
-        Button sayGoodbye = (Button)findViewById(R.id.sayGoodbye);
-        sayGoodbye.setOnClickListener(this);
-    }
-    
-    public void onClick(View v){
-    	IIdentity identity = null;
-    	ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-    	try {
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		//bind to UserAgent service
+		this.bindToService();
+
+		//set layout
+		setContentView(R.layout.uam);
+
+		Button sayHello = (Button)findViewById(R.id.sayHello);
+		sayHello.setOnClickListener(this);
+
+		Button sayGoodbye = (Button)findViewById(R.id.sayGoodbye);
+		sayGoodbye.setOnClickListener(this);
+	}
+
+	public void onClick(View v){
+		IIdentity identity;
+		try {
+			identity = IdentityManagerImpl.staticfromJid("sarah.societies.org");
+
+			ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 			serviceId.setIdentifier(new URI("http://test/useragent/activity"));
+			serviceId.setServiceInstanceIdentifier("http://test/useragent/activity");
+			String serviceType = "tester";
+			String paramName = "saying";
+
+			if(v.getId() == R.id.sayHello){
+				if(connectedToService){
+					uaService.monitor(identity, new Action(serviceId, serviceType, paramName, "Hello!!"));
+				}
+			}else if(v.getId() == R.id.sayGoodbye){
+				if(connectedToService){
+					uaService.monitor(identity, new Action(serviceId, serviceType, paramName, "Goodbye!!"));	
+				}		
+			} 
+		}catch (InvalidFormatException e1) {
+			e1.printStackTrace();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-    	serviceId.setServiceInstanceIdentifier("http://test/useragent/activity");
-    	String serviceType = "tester";
-    	String paramName = "saying";
-    	
-    	if(v.getId() == R.id.sayHello){
-    		if(connectedToService){
-    			uaService.monitor(identity, new Action(serviceId, serviceType, paramName, "Hello!!"));
-    		}
-		}else if(v.getId() == R.id.sayGoodbye){
-			if(connectedToService){
-				uaService.monitor(identity, new Action(serviceId, serviceType, paramName, "Goodbye!!"));	
-			}		
-		}
-    }
-    
-    private void bindToService(){
-		//Create intent to select service to bind to
-    	Intent bindIntent = new Intent(this, UserAgent.class);
-    	//bind to service
-        bindService(bindIntent, uaConnection, Context.BIND_AUTO_CREATE);
 	}
-    
-    private ServiceConnection uaConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-              uaService = ((LocalBinder) service).getService();
-              connectedToService = true;
-              Log.d(LOG_TAG, "Monitoring GUI connected to User Agent service");
-          }
 
-          public void onServiceDisconnected(ComponentName className) {
-              // As our service is in the same process, this should never be called
-        	  connectedToService = false;
-        	  Log.d(LOG_TAG, "Monitoring GUI disconnected from User Agent service");
-          }
-      };
+
+	private void bindToService(){
+		//Create intent to select service to bind to
+		Intent bindIntent = new Intent(this, UserAgent.class);
+		//bind to service
+		bindService(bindIntent, uaConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	private ServiceConnection uaConnection = new ServiceConnection() {
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			uaService = ((LocalBinder) service).getService();
+			connectedToService = true;
+			Log.d(LOG_TAG, "Monitoring GUI connected to User Agent service");
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			// As our service is in the same process, this should never be called
+			connectedToService = false;
+			Log.d(LOG_TAG, "Monitoring GUI disconnected from User Agent service");
+		}
+	};
 
 
 }

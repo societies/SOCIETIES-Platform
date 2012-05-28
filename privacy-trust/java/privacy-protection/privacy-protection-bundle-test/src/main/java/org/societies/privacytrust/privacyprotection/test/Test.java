@@ -42,21 +42,25 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class Test implements IPrivacyDataManagerListener {
+public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerListener {
 	private static Logger LOG = LoggerFactory.getLogger(Test.class.getSimpleName());
 	
 	private IPrivacyDataManager privacyDataManager;
 	private IPrivacyDataManagerRemote privacyDataManagerRemote;
 	private IPrivacyPolicyManager privacyPolicyManager;
+	private IPrivacyPolicyManagerRemote privacyPolicyManagerRemote;
 	private ICommManager commManager;
 	private ICtxBroker ctxBroker;
 	private CtxEntity person;
@@ -79,8 +83,9 @@ public class Test implements IPrivacyDataManagerListener {
 			}
 			this.idm = commManager.getIdManager();
 			IIdentity cisId = commManager.getIdManager().fromJid("red@societies.local");
+			Requestor requestor = new Requestor(cisId);
 			boolean result = false;
-			result = privacyPolicyManager.deletePrivacyPolicy(cisId);
+			result = privacyPolicyManager.deletePrivacyPolicy(requestor);
 			LOG.info("************* [Test Resullt] Privacy policy deleted? "+result);
 		} catch (Exception e) {
 			LOG.error("************* [Tests PrivacyPolicyManager] Error Exception: "+e.getMessage()+"\n", e);
@@ -135,6 +140,26 @@ public class Test implements IPrivacyDataManagerListener {
 			//CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			Action action = new Action(ActionConstants.READ);
 			privacyDataManagerRemote.checkPermission(requestor, ownerId, this.statusAttribute.getId(), action, this);
+			LOG.info("************* Permission check remote: launched");
+		} catch (Exception e) {
+			LOG.error("************* [Tests PrivacyDataManagerRemote] Error Exception: "+e.getMessage()+"\n", e);
+		}
+		
+		try {
+			if (null == privacyPolicyManagerRemote) {
+				throw new Exception("privacyPolicyManagerRemote NULL");
+			}
+			if (null == commManager) {
+				throw new Exception("CommManager NULL");
+			}
+			if (null == commManager.getIdManager()) {
+				throw new Exception("IdManager NULL");
+			}
+			IIdentity requestorId = commManager.getIdManager().fromJid("orange@societies.local");
+			//IIdentity ownerId = commManager.getIdManager().fromJid("red@societies.local");
+			IIdentity ownerId = commManager.getIdManager().getThisNetworkNode();
+			Requestor requestor = new Requestor(requestorId);
+			privacyPolicyManagerRemote.getPrivacyPolicy(requestor, ownerId, this);
 			LOG.info("************* Permission check remote: launched");
 		} catch (Exception e) {
 			LOG.error("************* [Tests PrivacyDataManagerRemote] Error Exception: "+e.getMessage()+"\n", e);
@@ -289,6 +314,49 @@ public class Test implements IPrivacyDataManagerListener {
 	 */
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
+	}
+
+	/**
+	 * @param privacyPolicyManagerRemote the privacyPolicyManagerRemote to set
+	 */
+	public void setPrivacyPolicyManagerRemote(
+			IPrivacyPolicyManagerRemote privacyPolicyManagerRemote) {
+		this.privacyPolicyManagerRemote = privacyPolicyManagerRemote;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onPrivacyPolicyRetrieved(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
+	 */
+	@Override
+	public void onPrivacyPolicyRetrieved(RequestPolicy privacyPolicy) {
+		LOG.info("************* onPrivacyPolicyRetrieved "+(null != privacyPolicy));
+		LOG.info("*************"+privacyPolicy.toString());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onOperationSucceed(java.lang.String)
+	 */
+	@Override
+	public void onOperationSucceed(String msg) {
+		LOG.info("************* onOperationSucceed "+msg);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onOperationCancelled(java.lang.String)
+	 */
+	@Override
+	public void onOperationCancelled(String msg) {
+		LOG.info("************* onOperaonOperationCancelledtionAborted "+msg);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onOperationAborted(java.lang.String, java.lang.Exception)
+	 */
+	@Override
+	public void onOperationAborted(String msg, Exception e) {
+		LOG.info("************* onOperationAborted "+msg, e);
 	}	
+	
+	
 	
 }

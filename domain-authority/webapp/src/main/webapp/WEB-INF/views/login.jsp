@@ -52,13 +52,7 @@
 				<td><form:errors path="userName" cssClass="error" />
 				</td>
 			</tr>
-			<tr>
-				<td>Sub Domain :</td>
-				<td><form:input path="subDomain" value="societies.local"  />
-				</td>
-				<td><form:errors path="subDomain" cssClass="error" />
-				</td>
-			</tr>			
+		
 					
 			<tr>
 				<td>Password :</td>
