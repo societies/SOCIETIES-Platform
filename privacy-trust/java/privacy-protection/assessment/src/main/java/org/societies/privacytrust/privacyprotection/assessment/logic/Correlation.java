@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
+import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
 /**
  * Worker class.
@@ -45,16 +47,16 @@ public class Correlation {
 	private static Logger LOG = LoggerFactory.getLogger(Correlation.class);
 
 	private List<DataAccessLogEntry> dataAccess;
-	private List<DataTransmissionLogEntry> dataTransmission;
+	private PrivacyLog privacyLog;
 	
 	private CorrelationInData correlationInData;
 	private CorrelationInTime correlationInTime;
 	
 	private Date lastRun = null;
 	
-	public Correlation(List<DataAccessLogEntry> dataAccess, List<DataTransmissionLogEntry> dataTransmission) {
-		this.dataAccess = dataAccess;
-		this.dataTransmission = dataTransmission;
+	public Correlation(PrivacyLog privacyLog) {
+		this.privacyLog = privacyLog;
+		this.dataAccess = privacyLog.getDataAccess();
 		correlationInData = new CorrelationInData();
 		correlationInTime = new CorrelationInTime();
 	}
@@ -74,8 +76,9 @@ public class Correlation {
 		double corrByAll;
 		double corrBySender;
 		double corrBySenderClass;
+		List<DataTransmissionLogEntry> newDataTransmissions = getNewDataTransmissions();
 		
-		for (DataTransmissionLogEntry tr : dataTransmission) {
+		for (DataTransmissionLogEntry tr : newDataTransmissions) {
 			
 			size2 = tr.getPayloadSize();
 			time2 = tr.getTimeInMs();
@@ -101,6 +104,7 @@ public class Correlation {
 			tr.setCorrelationWithDataAccessBySender(corrBySender);
 			tr.setCorrelationWithDataAccessBySenderClass(corrBySenderClass);
 		}
+		lastRun = new Date();
 	}
 	
 	/**
@@ -112,13 +116,13 @@ public class Correlation {
 	 * 
 	 * @return All data transmissions
 	 */
-	public List<DataTransmissionLogEntry> getDataTransmission() {
-		
-		if (lastRun == null) {
-			run();
-		}
-		return dataTransmission;
-	}
+//	public List<DataTransmissionLogEntry> getDataTransmission() {
+//		
+//		if (lastRun == null) {
+//			run();
+//		}
+//		return dataTransmission;
+//	}
 	
 	/**
 	 * Correlation between a single data transmission and a single data access.
@@ -138,5 +142,16 @@ public class Correlation {
 		cTime = correlationInTime.correlation(dt);
 		
 		return cData * cTime;
+	}
+	
+	private List<DataTransmissionLogEntry> getNewDataTransmissions() {
+		if (lastRun == null) {
+			return privacyLog.getDataTransmission();
+		}
+		else {
+			PrivacyLogFilter filter = new PrivacyLogFilter();
+			filter.setStart(lastRun);
+			return privacyLog.search(filter);
+		}
 	}
 }

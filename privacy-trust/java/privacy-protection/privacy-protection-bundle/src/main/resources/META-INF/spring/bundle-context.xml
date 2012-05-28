@@ -166,6 +166,8 @@
 
 	<bean id="Assessment"
 		class="org.societies.privacytrust.privacyprotection.assessment.logic.Assessment"
+		init-method="init"
+		depends-on="PrivacyLog"
 		>
 		<property name="privacyLog" ref="PrivacyLog"/>
 	</bean>
