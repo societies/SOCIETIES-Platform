@@ -492,12 +492,15 @@ public void cceGeomMinBBTest(){
 		p7.y=-2;
 		setOfPoints.add(8,p7);
 		
-		//ExpectedsetOfBBPoints.add(0,p7);
-		ExpectedsetOfBBPoints[0]=p9;
-		//ExpectedsetOfBBPoints[0].y=p9.y;
-		//ExpectedsetOfBBPoints.add(2,p8);
-		ExpectedsetOfBBPoints[1]=p6;
-		//ExpectedsetOfBBPoints[1].x=p6.y;
+		Point po = new Point();
+		po.x=-2;
+		po.y=7;
+		ExpectedsetOfBBPoints[0]=po;
+
+		Point po2 =  new Point();
+		po2.x=7;
+		po2.y=-2;
+		ExpectedsetOfBBPoints[1]=po2;
 	
 
 
@@ -512,6 +515,7 @@ public void cceGeomMinBBTest(){
 	Point[] a = cce.cceGeomMinBB(setOfPoints);
 	for (int i=0; i<a.length; i++){
 		System.out.println("Afto pou bgazei h methodos einai to "+a[i]);
+		System.out.println("To sosto einai"+ExpectedsetOfBBPoints[i]);
 	}
 	
 	//ArrayList<Point> a = cH.qHull(setOfPoints);
