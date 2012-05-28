@@ -24,8 +24,6 @@
  */
 package org.societies.api.internal.privacytrust.trust.remote;
 
-import java.util.concurrent.Future;
-
 import org.societies.api.internal.privacytrust.trust.TrustException;
 //import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
@@ -45,7 +43,7 @@ public interface ITrustBrokerRemote {
 	 * @param teid
 	 *            the identifier of the entity whose trust value to retrieve.
 	 * @param callback
-	 *            the callback to receive the remote call result.
+	 *            the callback to receive the trust value.
 	 * @return the trust value of the specified entity.
 	 * @throws TrustException 
 	 *             if the trust value of the specified entity cannot be
@@ -53,7 +51,7 @@ public interface ITrustBrokerRemote {
 	 * @throws NullPointerException 
 	 *             if any of the specified parameters is <code>null</code>
 	 */
-	public Future<Double> retrieveTrust(final TrustedEntityId teid, 
+	public void retrieveTrust(final TrustedEntityId teid, 
 			final ITrustBrokerRemoteCallback callback) throws TrustException;
 	
 	/* TODO

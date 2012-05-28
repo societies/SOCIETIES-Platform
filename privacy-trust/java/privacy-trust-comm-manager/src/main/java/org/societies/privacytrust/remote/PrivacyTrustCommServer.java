@@ -63,7 +63,8 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
 			  		"http://societies.org/api/schema/servicelifecycle/model",
-			  		"http://societies.org/api/internal/schema/privacytrust/trust/model"));
+			  		"http://societies.org/api/internal/schema/privacytrust/trust/model",
+			  		"http://societies.org/api/internal/schema/privacytrust/trust/broker"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement",
