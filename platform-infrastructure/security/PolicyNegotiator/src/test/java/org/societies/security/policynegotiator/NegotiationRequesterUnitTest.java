@@ -115,6 +115,6 @@ public class NegotiationRequesterUnitTest {
 				assertNull(agreementKey);
 			}
 		};
-		classUnderTest.startNegotiation(provider, callback);
+		classUnderTest.startNegotiation(provider, false, callback);
 	}
 }

@@ -55,6 +55,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 	private MethodType method;
 	private Requestor provider;
 	private INegotiationCallback finalCallback;
+	boolean includePrivacyPolicyNegotiation;
 	
 //	public ProviderCallback(NegotiationRequester requester, IIdentity provider,
 //			String serviceId, MethodType method) {
@@ -68,7 +69,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 //	}
 	
 	public ProviderCallback(NegotiationRequester requester, Requestor provider,
-			MethodType method, INegotiationCallback callback) {
+			MethodType method, boolean includePrivacyPolicyNegotiation,
+			INegotiationCallback callback) {
 		
 		LOG.debug("ProviderCallback({})", method);
 
@@ -76,6 +78,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		this.method = method;
 		this.provider = provider;
 		this.finalCallback = callback;
+		this.includePrivacyPolicyNegotiation = includePrivacyPolicyNegotiation;
 //		if (method != MethodType.GET_POLICY_OPTIONS) {
 //			LOG.warn("Wrong constructor is used");
 //		}
@@ -102,7 +105,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					// TODO: use real identity when it can be gathered from other components
 					sop = requester.getSignatureMgr().signXml(sop, selectedSop, "identity");
 					ProviderCallback callback = new ProviderCallback(requester, provider,
-							MethodType.ACCEPT_POLICY_AND_GET_SLA, finalCallback); 
+							MethodType.ACCEPT_POLICY_AND_GET_SLA, includePrivacyPolicyNegotiation,
+							finalCallback); 
 					requester.getGroupMgr().acceptPolicyAndGetSla(
 							sessionId,
 							sop,
@@ -130,7 +134,13 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					listener = new PrivacyPolicyNegotiationListener(finalCallback, key);
 					// TODO: subscribe the listener for appropriate event
 					
-					startPrivacyPolicyNegotiation(provider);
+					if (includePrivacyPolicyNegotiation) {
+						startPrivacyPolicyNegotiation(provider);
+					}
+					else {
+						// Notify successful end of negotiation
+						listener.onEvent();
+					}
 				}
 				else {
 					LOG.warn("receiveResult(): session = {}, final SLA invalid!", sessionId);

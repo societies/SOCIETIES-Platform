@@ -103,7 +103,7 @@ public class NominalTestCaseLowerTester {
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setIdentifier(new URI("http://localhost/societies/services/service-1"));
 		Requestor provider = new RequestorService(myId, serviceId);
-		negotiator.startNegotiation(provider, new INegotiationCallback() {
+		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
 			public void onNegotiationComplete(String agreementKey) {
 				LOG.info("onNegotiationComplete({})", agreementKey);
@@ -131,7 +131,7 @@ public class NominalTestCaseLowerTester {
 		IIdentity myId = idMgr.getThisNetworkNode();
 		IIdentity cisId = idMgr.getThisNetworkNode();
 		Requestor provider = new RequestorCis(myId, cisId);
-		negotiator.startNegotiation(provider, new INegotiationCallback() {
+		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
 			public void onNegotiationComplete(String agreementKey) {
 				LOG.info("onNegotiationComplete({})", agreementKey);
@@ -158,7 +158,7 @@ public class NominalTestCaseLowerTester {
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		IIdentity myId = idMgr.getThisNetworkNode();
 		Requestor provider = new Requestor(myId);
-		negotiator.startNegotiation(provider, new INegotiationCallback() {
+		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
 			public void onNegotiationComplete(String agreementKey) {
 				LOG.info("onNegotiationComplete({})", agreementKey);

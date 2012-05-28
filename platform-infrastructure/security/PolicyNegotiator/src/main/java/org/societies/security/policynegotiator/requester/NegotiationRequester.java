@@ -111,7 +111,8 @@ public class NegotiationRequester implements INegotiation {
 	}
 
 	@Override
-	public void startNegotiation(Requestor provider, INegotiationCallback callback) {
+	public void startNegotiation(Requestor provider, boolean includePrivacyPolicyNegotiation,
+			INegotiationCallback callback) {
 
 		String serviceId;
 		
@@ -133,7 +134,7 @@ public class NegotiationRequester implements INegotiation {
 			return;
 		}
 		ProviderCallback providerCallback = new ProviderCallback(this, provider,
-				MethodType.GET_POLICY_OPTIONS, callback);
+				MethodType.GET_POLICY_OPTIONS, includePrivacyPolicyNegotiation, callback);
 		
 		groupMgr.getPolicyOptions(serviceId, provider, providerCallback);
 	}
