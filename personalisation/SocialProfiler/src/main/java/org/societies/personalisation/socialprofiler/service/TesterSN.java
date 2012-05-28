@@ -59,13 +59,13 @@ public class TesterSN {
 			socialData.addSocialConnector(
 					socialData.createConnector(ISocialConnector.SocialNetwork.Facebook, pars));
 
-//			pars.put(ISocialConnector.AUTH_TOKEN, props.getProperty("twitter.token"));
-//			socialData.addSocialConnector(
-//					socialData.createConnector(ISocialConnector.SocialNetwork.twitter, pars));
+			pars.put(ISocialConnector.AUTH_TOKEN, props.getProperty("twitter.token"));
+			socialData.addSocialConnector(
+					socialData.createConnector(ISocialConnector.SocialNetwork.twitter, pars));
 		   
-//			pars.put(ISocialConnector.AUTH_TOKEN, props.getProperty("foursquare.token"));
-//			socialData.addSocialConnector(
-//					socialData.createConnector(ISocialConnector.SocialNetwork.Foursquare, pars));
+			pars.put(ISocialConnector.AUTH_TOKEN, props.getProperty("foursquare.token"));
+			socialData.addSocialConnector(
+					socialData.createConnector(ISocialConnector.SocialNetwork.Foursquare, pars));
 		   
 			System.out.println("===================================================");
 			System.out.println("=== STARTING");
@@ -76,7 +76,7 @@ public class TesterSN {
 			System.out.println("===================================================");
 			System.out.println("=== START Elaboration");
 			
-			Thread.sleep(100000);
+			Thread.sleep(180000);
 		    System.out.println("Social Profiles:   "+socialData.getSocialProfiles().size());
 		    System.out.println("Social Activities: "+socialData.getSocialActivity().size());
 		    System.out.println("Social Friends:    "+socialData.getSocialPeople().size());

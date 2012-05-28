@@ -31,22 +31,23 @@
  */
 package org.societies.privacytrust.remote.trust;
 
-import java.util.concurrent.Future;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public class TrustBrokerCommServer {
+public class TrustBrokerCommServer implements IFeatureServer {
 	
 	/** The logging facility. */
 	private static Logger LOG = LoggerFactory.getLogger(TrustBrokerCommServer.class);
@@ -61,6 +62,52 @@ public class TrustBrokerCommServer {
 		
 		LOG.info(this.getClass() + " instantiated");
 	}
+	
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#getJavaPackages()
+	 */
+	@Override
+	public List<String> getJavaPackages() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#getQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
+	@Override
+	public Object getQuery(Stanza arg0, Object arg1) throws XMPPError {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#getXMLNamespaces()
+	 */
+	@Override
+	public List<String> getXMLNamespaces() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
+	@Override
+	public void receiveMessage(Stanza arg0, Object arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/*
+	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#setQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
+	@Override
+	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 /*
 	public Object getQuery(Stanza stanza, PrivacyDataManagerBean bean){
 		PrivacyDataManagerBeanResult beanResult = new PrivacyDataManagerBeanResult();

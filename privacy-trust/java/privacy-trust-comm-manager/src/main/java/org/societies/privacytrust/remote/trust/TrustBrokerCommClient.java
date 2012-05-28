@@ -25,48 +25,69 @@
 package org.societies.privacytrust.remote.trust;
 
 import org.slf4j.Logger;
-
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote;
+import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
 import org.societies.privacytrust.remote.PrivacyTrustCommClientCallback;
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public class TrustBrokerCommClient /* implements IPrivacyDataManagerRemote */ {
+public class TrustBrokerCommClient implements ITrustBrokerRemote {
 	
 	/** The logging facility. */
 	private static Logger LOG = LoggerFactory.getLogger(TrustBrokerCommClient.class);
 	
 	/** The Communications Mgr service reference. */
-	private ICommManager commManager;
-/*	
-	private PrivacyDataManagerCommClientCallback listeners;
+	private ICommManager commManager; 
 	
 	private PrivacyTrustCommClientCallback privacyTrustCommClientCallback;
-*/
+	
+	private TrustBrokerCommClientCallback trustBrokerCommClientCallback;
+
 	public TrustBrokerCommClient() {
 		
 		LOG.info(this.getClass() + " instantiated");
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote#checkPermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener)
-	 *
+	 * @see org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote#retrieveTrust(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback)
+	 */
 	@Override
-	public void checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action, IPrivacyDataManagerListener listener) throws PrivacyException {
-		LOG.info("#### checkPermission remote called");
-		IIdentity toIdentity = commManager.getIdManager().getThisNetworkNode();
-		Stanza stanza = new Stanza(toIdentity);
-//		Stanza stanza = new Stanza(ownerId);
+	public void retrieveTrust(TrustedEntityId teid,
+			ITrustBrokerRemoteCallback callback) throws TrustException {
 		
-		listeners.privacyDataManagerlisteners.put(stanza.getId(), listener);
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
 		
+		if (LOG.isInfoEnabled()) // TODO change to DEBUG 
+			LOG.info("Retrieving trust for entity " + teid);
+		
+		try {
+			final IIdentity toIdentity = 
+					this.commManager.getIdManager().fromJid(teid.getTrustorId());
+			final Stanza stanza = new Stanza(toIdentity);
+			this.trustBrokerCommClientCallback.addClient(stanza.getId(), callback);
+			// TODO
+		} catch (InvalidFormatException ife) {
+			
+			LOG.error("Could not retrieve trust for entity " + teid
+					+ ": Invalid trustorId IIdentity: " 
+					+ ife.getLocalizedMessage(), ife);
+		}
+	}
+	
+	/*
 		PrivacyDataManagerBean bean = new PrivacyDataManagerBean();
 		bean.setMethod(MethodType.CHECK_PERMISSION);
 		bean.setRequestor(Util.createRequestorBean(requestor));
@@ -80,50 +101,22 @@ public class TrustBrokerCommClient /* implements IPrivacyDataManagerRemote */ {
 			throw new PrivacyException("CommunicationException: "+MethodType.CHECK_PERMISSION, e);
 		}
 		LOG.info("#### checkPermission remote sent");
-	}
-
-	/*
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote#obfuscateData(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener)
-	 *
-	@Override
-	public void obfuscateData(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper, IDataObfuscationListener listener) throws PrivacyException {
-		LOG.info("#### obfuscateData remote called");
-		
-		IIdentity toIdentity = commManager.getIdManager().getThisNetworkNode();
-		Stanza stanza = new Stanza(toIdentity);
-//		Stanza stanza = new Stanza(ownerId);
-		
-		listeners.dataObfuscationlisteners.put(stanza.getId(), listener);
-		
-		PrivacyDataManagerBean bean = new PrivacyDataManagerBean();
-		bean.setMethod(MethodType.OBFUSCATE_DATA);
-		bean.setRequestor(Util.createRequestorBean(requestor));
-		bean.setOwnerId(ownerId.getJid());
-		bean.setDataId(dataWrapper.getDataId().toUriString());
-		try {
-			this.commManager.sendIQGet(stanza, bean, privacyTrustCommClientCallback);
-		} catch (CommunicationException e) {
-			LOG.error("CommunicationException: "+MethodType.OBFUSCATE_DATA, e);
-			throw new PrivacyException("CommunicationException: "+MethodType.OBFUSCATE_DATA, e);
-		}
-		LOG.info("#### obfuscateData remote sent");
-	}
-*/
-	// -- Dependency Injection
+	}*/
 	
 	public void setCommManager(ICommManager commManager) {
 		
 		this.commManager = commManager;
 	}
-/*	
+
 	public void setPrivacyTrustCommClientCallback(
 			PrivacyTrustCommClientCallback privacyTrustCommClientCallback) {
 		
 		this.privacyTrustCommClientCallback = privacyTrustCommClientCallback;
 	}
 	
-	public void setListeners(PrivacyDataManagerCommClientCallback listeners) {
+	public void setTrustBrokerCommClientCallback(
+			TrustBrokerCommClientCallback trustBrokerCommClientCallback) {
 		
-		this.listeners = listeners;
-	}*/
+		this.trustBrokerCommClientCallback = trustBrokerCommClientCallback;
+	}
 }

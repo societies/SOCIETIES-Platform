@@ -31,12 +31,12 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyPolicyNegotiationManager;
 
 /**
  * class that registers and listens for SLM service deployed events and extracts the privacy policy from the bundle of the service that just started
