@@ -136,11 +136,15 @@ public class CisDirectoryController {
 				res="CIS Directory Result ";
 				
 				adverts = asynchResult.get();
+				model.put("result", res);
 				model.put("adverts", adverts);
 				
 			}else if (method.equalsIgnoreCase("AddCisRecord")) {
 				
-				//put stuff in here
+				res="CIS Advertisement added Successfully ";
+				model.put("result", res);
+				
+				
 				CisAdvertisementRecord record= new CisAdvertisementRecord();
 				
 					record.setName(cdForm.getName()); 
@@ -152,14 +156,10 @@ public class CisDirectoryController {
 					
 				getCisDirectory().addCisAdvertisementRecord(record);
 				model.put("message", "CisAdvertisement added");
-					
-				//cisDirectory.addCisAdvertisementRecord(record);
-								
-				//this.getCisDirectory().addCisAdvertisementRecord(record);
+									
+				//adverts = (List<CisAdvertisementRecord>) record;				
 				
-					
-				//adverts = asynchResult.get();
-				//model.put("adverts", adverts);
+				model.put("adverts", adverts);
 					
 			}else{
 				res="error unknown metod";
