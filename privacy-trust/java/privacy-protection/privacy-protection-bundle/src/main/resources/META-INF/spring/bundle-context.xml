@@ -99,7 +99,19 @@
 	
 	
 	<!-- Privacy Policy Negotiation Manager Configuration -->
-
+	<bean name="PrivacyNegotiationManager"
+	    class=" org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager"
+	    init-method="initialisePrivacyPolicyNegotiationManager">
+	    <property name="ctxBroker" ref="ctxBroker"></property>
+	    <property name="eventMgmtRef" ref="eventMgmtRef"></property>
+		<property name="commsMgr" ref="commsMgr"></property>
+		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>		
+		<property name="policyAgreementManager" ref="policyAgreementManager"></property>
+		<property name="negotiationAgent" ref="negotiationAgent"></property>
+		<property name="privacyPolicyManager" ref="privacyPolicyManager"></property>
+		<property name="privacyPreferenceManager" ref="privacyPreferenceManager"></property>
+		<!-- also needs IIdentitySelection -->
+	</bean>
 
 
 	<!-- Privacy Preference Manager Configuration -->

@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
@@ -78,6 +79,9 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	private INegotiationAgent negotiationAgent;
 	
 	private IIdentitySelection identitySelection;
+	
+	private ICommManager commsMgr;
+	
 	
 	/**
 	 * @return the prefMgr
@@ -389,6 +393,19 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	public void handleExternalEvent(CSSEvent arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+	/**
+	 * @return the commsMgr
+	 */
+	public ICommManager getCommsMgr() {
+		return commsMgr;
+	}
+	/**
+	 * @param commsMgr the commsMgr to set
+	 */
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
+		this.idm = commsMgr.getIdManager();
 	}
 
 
