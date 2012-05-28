@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.INegotiationClient;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
@@ -47,7 +47,7 @@ public class NegotiationRequester implements INegotiation {
 	private ISecureStorage secureStorage;
 	private INegotiationProviderRemote groupMgr;
 	private IPersonalisationManager personalizationMgr;
-	private INegotiationClient privacyPolicyNegotiationClient;
+	private IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager;
 
 //	@Autowired
 //	public NegotiationRequester(ISignatureMgr signatureMgr) {
@@ -103,11 +103,11 @@ public class NegotiationRequester implements INegotiation {
 	public void setPersonalizationMgr(IPersonalisationManager personalizationMgr) {
 		this.personalizationMgr = personalizationMgr;
 	}
-	public INegotiationClient getPrivacyPolicyNegotiationClient() {
-		return privacyPolicyNegotiationClient;
+	public IPrivacyPolicyNegotiationManager getPrivacyPolicyNegotiationManager() {
+		return privacyPolicyNegotiationManager;
 	}
-	public void setPrivacyPolicyNegotiationClient(INegotiationClient privacyPolicyNegotiationClient) {
-		this.privacyPolicyNegotiationClient = privacyPolicyNegotiationClient;
+	public void setPrivacyPolicyNegotiationManager(IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager) {
+		this.privacyPolicyNegotiationManager = privacyPolicyNegotiationManager;
 	}
 
 	@Override

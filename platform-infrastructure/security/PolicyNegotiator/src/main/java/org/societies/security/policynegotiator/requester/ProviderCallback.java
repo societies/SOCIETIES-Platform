@@ -28,17 +28,15 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.xml.Xml;
 import org.societies.security.policynegotiator.xml.XmlException;
@@ -132,14 +130,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					listener = new PrivacyPolicyNegotiationListener(finalCallback, key);
 					// TODO: subscribe the listener for appropriate event
 					
-					// Invoke privacy policy negotiation
-					// TODO: initialise (ask Eliza)
-					RequestPolicy policy = null;
-					// TODO: ask Eliza to replace serviceIdentifier and serviceIdentity with Requestor that covers also CIS negotiation
-					ServiceResourceIdentifier serviceIdentifier = null;
-					IIdentity serviceIdentity = provider.getRequestorId();
-					requester.getPrivacyPolicyNegotiationClient().startPrivacyPolicyNegotiation(
-							policy, serviceIdentifier, serviceIdentity);
+					startPrivacyPolicyNegotiation(provider);
 				}
 				else {
 					LOG.warn("receiveResult(): session = {}, final SLA invalid!", sessionId);
@@ -151,6 +142,27 @@ public class ProviderCallback implements INegotiationProviderCallback {
 			// After more tests, the method could be changed back to void to save some bandwidth.
 			LOG.debug("receiveResult(): session = {}, reject success = ", sessionId, result.isSuccess());
 			break;
+		}
+	}
+	
+	private void startPrivacyPolicyNegotiation(Requestor provider) {
+
+		IPrivacyPolicyNegotiationManager ppn = requester.getPrivacyPolicyNegotiationManager();
+		
+		if (provider instanceof RequestorService) {
+			RequestorService providerService = (RequestorService) provider;
+			LOG.debug("startPrivacyPolicyNegotiation([{}; {}])", providerService.getRequestorId(),
+					providerService.getRequestorServiceId());
+			ppn.negotiateServicePolicy(providerService);
+		}
+		else if (provider instanceof RequestorCis) {
+			RequestorCis providerCis = (RequestorCis) provider;
+			LOG.debug("startPrivacyPolicyNegotiation([{}; {}])", providerCis.getRequestorId(),
+					providerCis.getCisRequestorId());
+			ppn.negotiateCISPolicy(providerCis);
+		}
+		else {
+			LOG.warn("startPrivacyPolicyNegotiation(): unrecognized provider type: {}", provider.getClass().getName());
 		}
 	}
 	

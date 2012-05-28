@@ -43,7 +43,7 @@
         <property name="signatureMgr" ref="SignatureMgr"/>
         <property name="secureStorage" ref="SecureStorage"/>
         <property name="personalizationMgr" ref="PersonalizationMgr"/>
-        <property name="privacyPolicyNegotiationClient" ref="PrivacyPolicyNegotiationClient"/>
+        <property name="privacyPolicyNegotiationManager" ref="PrivacyPolicyNegotiationManager"/>
 	</bean>
 
 </beans>
