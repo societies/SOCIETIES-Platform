@@ -50,9 +50,8 @@ public class CtxBrokerHelper {
 
 	private ICtxBroker ctxBrokerInternal;
 	
-	private CtxEntityIdentifier ctxEntityIdentifier = null;
-	private CtxIdentifier ctxAttributeBinaryIdentifier = null;
-	private CtxIdentifier ctxAttributeStringIdentifier = null;
+	private CtxEntityIdentifier ctxEntityIdentifier;
+	private CtxIdentifier ctxAttributeStringIdentifier;
 
 
 	public CtxBrokerHelper(ICtxBroker ctxBrokerInternal) {
@@ -136,9 +135,5 @@ public class CtxBrokerHelper {
 		Future<CtxModelObject> ctxAttributeRetrievedStringFuture = ctxBrokerInternal.retrieve(this.ctxAttributeStringIdentifier);
 		CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
 		LOG.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
-
-		// retrieve ctxAttribute with the binary value
-		Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = ctxBrokerInternal.retrieve(this.ctxAttributeBinaryIdentifier);
-		CtxAttribute ctxAttributeRetrievedBinary = (CtxAttribute) ctxAttributeRetrievedBinaryFuture.get();
 	}
 }
