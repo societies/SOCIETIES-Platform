@@ -22,31 +22,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.security.policynegotiator;
+package org.societies.security.policynegotiator.requester;
 
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
+import org.societies.api.internal.security.storage.ISecureStorage;
 
 /**
- * High-level interface for invoking the secure policy negotiator.
- * Includes high-level interactions with the requester side of policy negotiator.
- * To be used by other components (Service Marketplace ?) locally, from same node.
- *
+ * 
  * @author Mitja Vardjan
  *
  */
-public interface INegotiation {
+public class PrivacyPolicyNegotiationListener {
 
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyNegotiationListener.class);
+	
+	INegotiationCallback finalCallback;
+	String slaKey;
+	
 	/**
-	 * Start policy negotiation procedure.
 	 * 
-	 * @param provider Includes identity of the service provider and service ID comprehendable by the provider
+	 * @param finalCallback The callback to be invoked when both SLA and privacy
+	 * policy negotiations complete.
 	 * 
-	 * @param includePrivacyPolicyNegotiation True to perform also Privacy Policy Negotiation using
-	 * {@link IPrivacyPolicyNegotiationManager}.
-	 * 
-	 * @param callback The callback to be invoked to receive the result of this method
+	 * @param slaKey The key to gather SLA from secure storage using
+	 * {@link ISecureStorage#getDocument(String)}
 	 */
-	public void startNegotiation(Requestor provider, boolean includePrivacyPolicyNegotiation,
-			INegotiationCallback callback);
+	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey) {
+		this.finalCallback = finalCallback;
+		this.slaKey = slaKey;
+	}
+	
+	public void onEvent() {
+		
+		if (finalCallback != null) {
+			LOG.debug("receiveResult(): invoking final callback");
+			finalCallback.onNegotiationComplete(slaKey);
+			LOG.info("receiveResult(): negotiation finished, final callback invoked");
+		}
+		else {
+			LOG.info("receiveResult(): negotiation finished");
+		}
+	}
 }

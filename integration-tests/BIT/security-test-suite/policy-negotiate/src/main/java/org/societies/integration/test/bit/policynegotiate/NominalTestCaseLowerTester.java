@@ -103,15 +103,21 @@ public class NominalTestCaseLowerTester {
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setIdentifier(new URI("http://localhost/societies/services/service-1"));
 		Requestor provider = new RequestorService(myId, serviceId);
-		negotiator.startNegotiation(provider, new INegotiationCallback() {
+		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
 			public void onNegotiationComplete(String agreementKey) {
 				LOG.info("onNegotiationComplete({})", agreementKey);
 				assertNotNull(agreementKey);
 				callbackInvokedService = true;
 			}
+			@Override
+			public void onNegotiationError(String msg) {
+				fail();
+			}
 		});
 		
+		LOG.debug("[#1001] testNegotiationService(): negotiation started");
+
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		LOG.info("[#1001] testNegotiationService(): checking if successful");
 		assertTrue(callbackInvokedService);
@@ -131,14 +137,20 @@ public class NominalTestCaseLowerTester {
 		IIdentity myId = idMgr.getThisNetworkNode();
 		IIdentity cisId = idMgr.getThisNetworkNode();
 		Requestor provider = new RequestorCis(myId, cisId);
-		negotiator.startNegotiation(provider, new INegotiationCallback() {
+		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
 			public void onNegotiationComplete(String agreementKey) {
 				LOG.info("onNegotiationComplete({})", agreementKey);
 				assertNotNull(agreementKey);
 				callbackInvokedCis = true;
 			}
+			@Override
+			public void onNegotiationError(String msg) {
+				fail();
+			}
 		});
+
+		LOG.debug("[#1001] testNegotiationCis(): negotiation started");
 		
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		LOG.info("[#1001] testNegotiationCis(): checking if successful");
@@ -158,15 +170,21 @@ public class NominalTestCaseLowerTester {
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		IIdentity myId = idMgr.getThisNetworkNode();
 		Requestor provider = new Requestor(myId);
-		negotiator.startNegotiation(provider, new INegotiationCallback() {
+		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
 			public void onNegotiationComplete(String agreementKey) {
 				LOG.info("onNegotiationComplete({})", agreementKey);
 				assertNull(agreementKey);
+				fail();
+			}
+			@Override
+			public void onNegotiationError(String msg) {
 				callbackInvokedInvalid = true;
 			}
 		});
 		
+		LOG.debug("[#1001] testNegotiationInvalid(): negotiation started");
+
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		LOG.info("[#1001] testNegotiationInvalid(): checking if successful");
 		assertTrue(callbackInvokedInvalid);

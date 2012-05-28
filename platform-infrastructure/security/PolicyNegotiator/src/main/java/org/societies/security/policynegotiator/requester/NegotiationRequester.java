@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
@@ -46,7 +47,9 @@ public class NegotiationRequester implements INegotiation {
 	private ISecureStorage secureStorage;
 	private INegotiationProviderRemote groupMgr;
 	private IPersonalisationManager personalizationMgr;
-
+	private IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager;
+	private boolean isPrivacyPolicyNegotiationManagerAvailable = false;
+	
 //	@Autowired
 //	public NegotiationRequester(ISignatureMgr signatureMgr) {
 //		this.signatureMgr = signatureMgr;
@@ -101,9 +104,21 @@ public class NegotiationRequester implements INegotiation {
 	public void setPersonalizationMgr(IPersonalisationManager personalizationMgr) {
 		this.personalizationMgr = personalizationMgr;
 	}
+	public IPrivacyPolicyNegotiationManager getPrivacyPolicyNegotiationManager() {
+		return privacyPolicyNegotiationManager;
+	}
+	public void setPrivacyPolicyNegotiationManager(IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager) {
+		this.privacyPolicyNegotiationManager = privacyPolicyNegotiationManager;
+		this.isPrivacyPolicyNegotiationManagerAvailable = true;
+	}
+	
+	public boolean isPrivacyPolicyNegotiationManagerAvailable() {
+		return isPrivacyPolicyNegotiationManagerAvailable;
+	}
 
 	@Override
-	public void startNegotiation(Requestor provider, INegotiationCallback callback) {
+	public void startNegotiation(Requestor provider, boolean includePrivacyPolicyNegotiation,
+			INegotiationCallback callback) {
 
 		String serviceId;
 		
@@ -120,12 +135,13 @@ public class NegotiationRequester implements INegotiation {
 			serviceId = providerCis.getCisRequestorId().getJid();
 		}
 		else {
-			LOG.warn("Terminating: Inappropriate provider: " + provider.getClass().getName());
-			callback.onNegotiationComplete(null);
+			String msg = "Terminating: Inappropriate provider: " + provider.getClass().getName();
+			LOG.warn(msg);
+			callback.onNegotiationError(msg);
 			return;
 		}
 		ProviderCallback providerCallback = new ProviderCallback(this, provider,
-				MethodType.GET_POLICY_OPTIONS, callback);
+				MethodType.GET_POLICY_OPTIONS, includePrivacyPolicyNegotiation, callback);
 		
 		groupMgr.getPolicyOptions(serviceId, provider, providerCallback);
 	}
