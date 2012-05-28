@@ -24,15 +24,22 @@
  */
 package org.societies.privacytrust.remote.trust;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
+import org.societies.api.internal.schema.privacytrust.trust.broker.MethodName;
+import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
+import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 
 /**
  * Describe your class here...
@@ -41,17 +48,35 @@ import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCa
  * @since 0.0.8
  */
 public class TrustBrokerCommClientCallback implements ICommCallback {
+	
+	/** The logging facility. */
+	private static Logger LOG = LoggerFactory.getLogger(TrustBrokerCommClientCallback.class);
 
+	private static final List<String> NAMESPACES = Collections.unmodifiableList(
+			Arrays.asList(
+					"http://societies.org/api/internal/schema/privacytrust/trust/model",
+					"http://societies.org/api/internal/schema/privacytrust/trust/broker"));
+	
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
+			Arrays.asList(
+					"org.societies.api.internal.schema.privacytrust.trust.model",
+					"org.societies.api.internal.schema.privacytrust.trust.broker"));
+	
 	private final Map<String,ITrustBrokerRemoteCallback> clients =
 			new ConcurrentHashMap<String, ITrustBrokerRemoteCallback>();
+
+	TrustBrokerCommClientCallback() {
+		
+		LOG.info(this.getClass() + " instantiated");
+	}
 	
 	/*
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages()
 	 */
 	@Override
 	public List<String> getJavaPackages() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return PACKAGES;
 	}
 
 	/*
@@ -59,8 +84,8 @@ public class TrustBrokerCommClientCallback implements ICommCallback {
 	 */
 	@Override
 	public List<String> getXMLNamespaces() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return NAMESPACES;
 	}
 
 	/*
@@ -103,17 +128,52 @@ public class TrustBrokerCommClientCallback implements ICommCallback {
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveResult(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	public void receiveResult(Stanza arg0, Object arg1) {
-		// TODO Auto-generated method stub
-
+	public void receiveResult(final Stanza stanza, final Object bean) {
+		
+		if (!(bean instanceof TrustBrokerResponseBean))
+			throw new IllegalArgumentException("bean is not instance of TrustBrokerResponseBean");
+		
+		final TrustBrokerResponseBean responseBean = (TrustBrokerResponseBean) bean;
+		
+		if (MethodName.RETRIEVE.equals(responseBean.getMethodName())) {
+			
+			final RetrieveTrustBrokerResponseBean retrieveResponseBean =
+					responseBean.getRetrieve();
+			if (retrieveResponseBean == null) {
+				LOG.error("Invalid TrustBroker remote retrieve response: "
+						+ "RetrieveTrustBrokerResponseBean can't be null");
+				return;
+			}
+			ITrustBrokerRemoteCallback callback = this.clients.remove(stanza.getId());
+			if (callback == null) {
+				LOG.error("Could not find client callback for TrustBroker remote retrieve response: "
+						+ stanza.getId());
+				return;
+			}
+			
+			callback.onRetrieveTrust(retrieveResponseBean.getResult());
+			
+		} else {
+			
+			LOG.error("Unsupported TrustBroker remote response method: " + responseBean.getMethodName());
+		}
 	}
 
-	public void addClient(String id, ITrustBrokerRemoteCallback callback) {
+	/**
+	 * 
+	 * @param id
+	 * @param callback
+	 */
+	void addClient(String id, ITrustBrokerRemoteCallback callback) {
 		
 		this.clients.put(id, callback);
 	}
 	
-	public void removeClient(String id) {
+	/**
+	 * 
+	 * @param id
+	 */
+	void removeClient(String id) {
 		
 		this.clients.remove(id);
 	}
