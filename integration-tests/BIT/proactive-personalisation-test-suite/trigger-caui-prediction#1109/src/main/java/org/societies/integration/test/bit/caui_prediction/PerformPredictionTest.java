@@ -28,15 +28,16 @@ private static Logger LOG = LoggerFactory.getLogger(TestCase1109.class);
 
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		try {
-			serviceId.setIdentifier(new URI("testServiceId"));
+			serviceId.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
+			serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 
 
-	IAction action = new Action(serviceId, "testService", "volume", "high");
+	IAction action = new Action(serviceId, "testServiceType", "volume", "high");
 	LOG.info("CAUI PREDICTION SERVICE SET:"+ TestCase1109.cauiPrediction );
-	LOG.info("CAUI PREDICTION perform prediction :"+ TestCase1109.cauiPrediction.getPrediction(identity, action) );
+	LOG.info("CAUI PREDICTION perform prediction :"+ TestCase1109.cauiPrediction.getPrediction(identity, action));
 	
 	}
 
