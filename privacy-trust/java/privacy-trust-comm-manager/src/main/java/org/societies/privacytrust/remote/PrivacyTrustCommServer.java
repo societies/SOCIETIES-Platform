@@ -46,6 +46,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiat
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
+import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer;
 import org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommServer;
@@ -136,7 +137,9 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		// -- Assessment Management
 
 		// -- Trust Management
-		// TODO
+		/* else */ if (payload instanceof TrustBrokerRequestBean){
+			return this.trustBrokerCommServer.getQuery(stanza, (TrustBrokerRequestBean) payload);
+		}
 		
 		return null;
 	}

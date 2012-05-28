@@ -8,20 +8,39 @@
 	<xs:import namespace="http://societies.org/api/internal/schema/privacytrust/trust/model"
 		schemaLocation="org.societies.api.internal.schema.privacytrust.trust.model.xsd" />
 		
-	<xs:element name="trustBrokerRetrieveBean">
+	<xs:element name="trustBrokerRequestBean">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+				<xs:element name="methodName" type="tns:methodName" nillable="false" minOccurs="1"/>
+				<xs:element name="retrieve" type="tns:retrieveTrustBrokerRequestBean" nillable="false" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	
-	<xs:element name="trustBrokerRetrieveResponseBean">
+	<xs:element name="trustBrokerResponseBean">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="return" type="xs:double" nillable="true" minOccurs="1"/>
+				<xs:element name="retrieve" type="tns:retrieveTrustBrokerResponseBean" nillable="false" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	
+	<xs:simpleType name="methodName">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="RETRIEVE"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="retrieveTrustBrokerRequestBean">
+		<xs:sequence>
+			<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="retrieveTrustBrokerResponseBean">
+		<xs:sequence>
+			<xs:element name="result" type="xs:double" nillable="true" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
   
 </xs:schema>

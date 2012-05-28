@@ -39,7 +39,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRetrieveResponseBean;
+import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClientCallback;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommClientCallback;
@@ -125,8 +125,8 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 		// -- Assessment Management
 
 		// -- Trust Management
-		/* else */ if (payload instanceof TrustBrokerRetrieveResponseBean)
-			this.trustBrokerCommClientCallback.receiveResult(stanza, (TrustBrokerRetrieveResponseBean) payload);
+		/* else */ if (payload instanceof TrustBrokerResponseBean)
+			this.trustBrokerCommClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
 	}		
 
 	/* (non-Javadoc)
