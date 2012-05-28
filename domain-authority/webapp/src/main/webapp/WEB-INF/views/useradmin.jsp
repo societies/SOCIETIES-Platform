@@ -59,9 +59,11 @@
 			 <td><form:input path="userDetails[${userLoop.index}].id" value="${user.id}"/>  </td>
 			 <td><form:input path="userDetails[${userLoop.index}].host" value="${user.host}"/>  </td>
 			 <td><form:input path="userDetails[${userLoop.index}].port" value="${user.port}"/>  </td>
-			 <td><form:input path="userDetails[${userLoop.index}].status" value="${user.status}"/>  </td>
-			 <td><form:input path="userDetails[${userLoop.index}].userType" value="${user.userType}"/>  </td>
-			 </tr>  
+			 <td><form:select path="userDetails[${userLoop.index}].status"  value="${user.status}" >
+					   <form:options items="${userStatusTypes}" /> </form:select></td>
+			 <td><form:select path="userDetails[${userLoop.index}].userType"  value="${user.userType}" >
+					   <form:options items="${userTypes}" /> </form:select></td>
+		 </tr>  
 		
   		</xc:forEach>
  
