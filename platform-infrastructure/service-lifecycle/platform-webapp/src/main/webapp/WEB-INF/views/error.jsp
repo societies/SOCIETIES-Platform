@@ -13,6 +13,10 @@
 	<jsp:include page="header.jsp" />
 	<!-- END HEADER -->
 
+	<!-- LEFTBAR -->
+	<jsp:include page="leftbar-empty.jsp" />
+	<!-- END LEFTBAR -->
+
 
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
 

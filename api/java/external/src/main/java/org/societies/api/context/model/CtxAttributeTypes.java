@@ -34,6 +34,11 @@ public class CtxAttributeTypes {
 
 	/**
      * 
+     */
+    public static final String ACTION = "action";
+    
+	/**
+     * 
      * @since 0.0.8
      */
     public static final String ADDRESS_HOME_CITY = "addressHomeCity";
@@ -66,7 +71,9 @@ public class CtxAttributeTypes {
      * 
      * @since 0.0.8
      */
-    public static final String ADDRESS_WORK_COUNTRY = "addressWorkCountry";
+    public static final String ADDRESS_WORK_COUNTRY = 
+
+"addressWorkCountry";
 	
 	/**
      * 
@@ -80,23 +87,40 @@ public class CtxAttributeTypes {
      */
     public static final String ADDRESS_WORK_STREET_NUMBER = "addressWorkStreetNumber";
 	
+    /**
+     * TODO moved to platform CtxAttributeTypes
+     */
+    @Deprecated
+    public static final String CAUI_MODEL = "caui_model";
+    
+    /**
+     * TODO moved to platform CtxAttributeTypes
+     */
+    @Deprecated
+    public static final String CRIST_MODEL = "crist_model";
+    
 	/**
-     * 
+     * @since 0.0.8
      */
     public static final String ID = "id";
     
     /**
-     * 
+     * @since 0.0.8
+     */
+    public static final String LAST_ACTION = "lastAction";
+    
+    /**
+     * @since 0.0.8
      */
     public static final String LOCATION_COORDINATES = "locationCoordinates";
     
     /**
-     * 
+     * @since 0.0.8
      */
     public static final String LOCATION_SYMBOLIC = "locationSymbolic";
-    
+        
     /**
-     * 
+     * @since 0.0.8
      */
     public static final String NAME = "name";
     
@@ -113,22 +137,27 @@ public class CtxAttributeTypes {
     public static final String NAME_LAST = "nameLast";
     
     /**
-     * 
+
+     */
+    public static final String PARAMETER_NAME = "parameterName";
+    
+    /**
+     * @since 0.0.8
      */
     public static final String STATUS = "status";
     
     /**
-     * 
+     * @since 0.0.8
      */
     public static final String TEMPERATURE = "temperature";
    
     /**
-     * 
+     * @since 0.0.8
      */
-    public static final String ACTION = "action";
-   
+    public static final String WEIGHT = "weight";
+       
     /**
-     * TODO move to platform CtxAttributeTypes
+     * TODO moved to platform CtxAttributeTypes
      */
     @Deprecated
     public static final String PRIVACY_POLICY_REGISTRY = "privacyPolicyRegistry";
@@ -139,27 +168,6 @@ public class CtxAttributeTypes {
      */
     @Deprecated
     public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";
-   
-    /**
-     * TODO move to platform CtxAttributeTypes
-     */
-    @Deprecated
-    public static final String CAUI_MODEL = "caui_model";
-    
-    /**
-     * TODO move to platform CtxAttributeTypes
-     */
-    @Deprecated
-    public static final String CRIST_MODEL = "crist_model";
-       
-    /**
-     * 
-     */
-    public static final String PARAMETER_NAME = "parameterName";
-    
-    /**
-     * 
-     */
-    public static final String LAST_ACTION = "lastAction";
+
     
 }

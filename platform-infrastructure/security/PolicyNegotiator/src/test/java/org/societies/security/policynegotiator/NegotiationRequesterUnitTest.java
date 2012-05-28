@@ -114,7 +114,10 @@ public class NegotiationRequesterUnitTest {
 			public void onNegotiationComplete(String agreementKey) {
 				assertNull(agreementKey);
 			}
+			@Override
+			public void onNegotiationError(String msg) {
+			}
 		};
-		classUnderTest.startNegotiation(provider, callback);
+		classUnderTest.startNegotiation(provider, false, callback);
 	}
 }
