@@ -45,7 +45,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
-
+import org.societies.api.identity.INetworkNode;
 
 /**
  * This interface provides access to current, past and future context data. The
@@ -297,6 +297,23 @@ public interface ICtxBroker {
 	 *             CSS cannot be retrieved
 	 */
 	public Future<IndividualCtxEntity> retrieveCssOperator() throws CtxException;
+	
+	/**
+	 * Retrieves the {@link CtxEntity} which represents the identified CSS
+	 * node. The method return <code>null</code> if there is no CtxEntity
+	 * representing the specified {@link INetworkNode}.
+	 * 
+	 * @param cssNodeId
+	 *            the INetworkNode identifying the CSS Node context entity to
+	 *            retrieve
+	 * @throws CtxException 
+	 *             if the CtxEntity representing the identified CSS Node cannot
+	 *             be retrieved
+	 * @throws NullPointerException if the specified INetworkNode is 
+	 *             <code>null</code>
+	 */
+	public Future<CtxEntity> retrieveCssNode(final INetworkNode cssNodeId)
+			throws CtxException;
 	
 	/**
 	 * Updates a single context model object.

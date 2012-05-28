@@ -58,7 +58,6 @@ public class DeviceManagerConsumer extends EventListener implements ServiceTrack
 		this.serviceTracker = new ServiceTracker(bundleContext, IDevice.class.getName(), this);
 		this.serviceTracker.open();
 
-
 		// -- Subscribe to LightSensorEvent
 		// Set filter
 		String lightEventFilter = "(&" + 

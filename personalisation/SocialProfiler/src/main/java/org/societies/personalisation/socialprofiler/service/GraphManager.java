@@ -145,7 +145,6 @@ public class GraphManager implements Variables{
 		SocialPerson person = null;
 		Transaction tx = getNeoService().beginTx();
 		try{
-			logger.debug("**Reading Lucene Index**  searching for person "+name);
 			Node personNode = luceneIndexService.getSingleNode( NAME_INDEX, name );
 			if ( personNode == null )
 			{
@@ -155,7 +154,6 @@ public class GraphManager implements Variables{
 			
 			if ( personNode != null )
 			{
-				logger.debug("person "+name+" was found on Lucene index => returning it");
 				person = new SocialPersonImpl( personNode );
 				
 				if(person==null){logger.error("ERROR while creating instance of person - to be returned");}
@@ -222,7 +220,6 @@ public class GraphManager implements Variables{
 	
 	public String getPersonProfilePercentage(String personId, Profile.Type ptype) {
 		String percentage="";;
-		logger.debug("returning maniac percentage for user "+personId);
 		Transaction tx = getNeoService().beginTx();
 		try{
 			SocialPerson person=getPerson(personId);
@@ -230,7 +227,6 @@ public class GraphManager implements Variables{
 				logger.error(" person is null - impossible to return its maniac percentage");
 			}else{
 				percentage=person.getProfilePercentage(ptype);
-				logger.debug("total maniac percentage was returned successfully");
 			}
 			tx.success();
 		}finally{
@@ -1453,14 +1449,11 @@ public class GraphManager implements Variables{
 		try{
 		
 			logger.debug("creating maniac with name "+name);
-			logger.debug(" verying there is no maniac in the index with the same name");
 			if (getManiac(name, type)!=null){
 				logger.info("unable to create maniac with name "+name+", already exists a Maniac profile with this name");
 				return null;
 			}
 		
-			logger.debug("no maniac found with the same name=>ALLOW-> creating " +
-					"maniac properly");
 			final Node maniacNode=neoService.createNode();
 			maniac=new ProfileImpl(maniacNode, type, name);
 		
@@ -1508,7 +1501,6 @@ public class GraphManager implements Variables{
 	
 	public void updateManiac(String maniacId, Profile.Type ptype,
 			String frequency, String lastTime, String number) {
-		logger.debug("updating maniac information using the latest info found");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			Profile maniac=getManiac(maniacId, ptype);
@@ -1524,8 +1516,6 @@ public class GraphManager implements Variables{
 				if (number!=null){
 					maniac.setNumber(number);
 				}
-				
-				logger.debug("maniac information was updated successfully");
 			}
 			tx.success();
 		}finally{
@@ -1536,7 +1526,7 @@ public class GraphManager implements Variables{
 
 	
 	public void incrementManiacNumber(String maniacId, Profile.Type ptype) {
-		logger.debug("incrementing Maniac "+maniacId+"number");
+		logger.debug("incrementing Maniac "+maniacId+" number");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			Profile maniac=getManiac(maniacId, ptype);
@@ -1544,7 +1534,6 @@ public class GraphManager implements Variables{
 				logger.error("Maniac is null - impossible to increment it");
 			}else{
 				maniac.incrementNumber();
-				logger.debug("Maniac number was incremented successfully");
 			}
 			tx.success();
 		}finally{
@@ -1556,7 +1545,6 @@ public class GraphManager implements Variables{
 	
 	public long getManiacFrequency(String maniacId, Profile.Type ptype) {
 		long frequency = 0;
-		logger.debug("returning maniac "+maniacId+" frequency");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			Profile maniac=getManiac(maniacId, ptype);
@@ -1564,7 +1552,6 @@ public class GraphManager implements Variables{
 				logger.error("narcissismManiac is null - impossible to return its frequency");
 			}else{
 				frequency=maniac.getFrequency();
-				logger.debug("NarcissismManiac frequency was returned successfully");
 			}
 			tx.success();
 		}finally{
@@ -1576,7 +1563,6 @@ public class GraphManager implements Variables{
 	
 	public String getManiacLastTime(String maniacId, Profile.Type ptype) {
 		String lastTime="";;
-		logger.debug("returning Maniac "+maniacId+" lastTime");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			Profile maniac=getManiac(maniacId, ptype);
@@ -1584,7 +1570,6 @@ public class GraphManager implements Variables{
 				logger.error("maniac is null - impossible to return its lastTime");
 			}else{
 				lastTime=maniac.getLastTime();
-				logger.debug("Maniac lastTime was returned successfully");
 			}
 			tx.success();
 		}finally{
@@ -1596,7 +1581,6 @@ public class GraphManager implements Variables{
 	
 	public int getManiacNumber(String maniacId, Profile.Type ptype) {
 		int number = 0;
-		logger.debug("returning maniac "+maniacId+" number");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			Profile maniac=getManiac(maniacId, ptype);
@@ -1604,7 +1588,6 @@ public class GraphManager implements Variables{
 				logger.error("maniac is null - impossible to return its number");
 			}else{
 				number=maniac.getNumber();
-				logger.debug("maniac number was returned successfully");
 			}
 			tx.success();
 		}finally{
@@ -1700,7 +1683,6 @@ public class GraphManager implements Variables{
 		try{
 		
 			logger.debug("creating Interests with name "+name);
-			logger.debug(" verying there is no Interests in the index with the same name");
 			Interests test=getInterests(name);
 			if (test!=null){
 				logger.info("unable to create Interests with name "+name+", already " +
@@ -1708,13 +1690,10 @@ public class GraphManager implements Variables{
 				return null;
 			}
 		
-			logger.debug("no Interests found with the same name=>ALLOW-> creating " +
-					"Interests properly");
 			final Node interestsNode=neoService.createNode();
 			interests=new InterestsImpl(interestsNode);
 			interests.setName(name);
 		
-			logger.debug("indexing new created Interests to Lucene");
 			luceneIndexService.index(interestsNode,NAME_INDEX,name);
 			tx_active.success();
 		}finally{
@@ -1955,7 +1934,6 @@ public class GraphManager implements Variables{
 	public void updateGeneralInfo(String generalInfoId, String firstName,
 			String lastName, String birthday, String gender, String hometown,
 			String current_location, String political, String religion) {
-		logger.info("updating GeneralInfo information using the latest info found");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			GeneralInfo generalInfo=getGeneralInfo(generalInfoId);
@@ -1987,6 +1965,7 @@ public class GraphManager implements Variables{
 					generalInfo.setReligion(religion);
 				}
 				logger.info("GeneralInfo information was updated successfully");
+				logger.info("--"+ " firstName: " + firstName+ ", lastName: " + lastName+ ", birthday: " + birthday+ ", gender: " + gender+ ", hometown: " + hometown+ ", currentLoc: " + current_location+ ", political: " + political+ ", religion: " + religion);
 			}
 			tx.success();
 		}finally{
@@ -2335,7 +2314,6 @@ public class GraphManager implements Variables{
 	
 	public void updatePersonPercentages (String personId,String narcissismManiac,String superActiveManiac,
 			String photoManiac,	String surfManiac,String quizManiac,String totalActions){
-		logger.debug("updating person profile percentages ");
 		Transaction tx = getNeoService().beginTx();
 		try{
 			SocialPerson person=getPerson(personId);
@@ -2360,7 +2338,6 @@ public class GraphManager implements Variables{
 				if (totalActions!=null){
 					person.setTotalNumberOfActions(totalActions);
 				}
-				logger.debug("person information was updated successfully");
 			}
 			tx.success();
 		}finally{

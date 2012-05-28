@@ -105,12 +105,30 @@ public class ICisOwned extends ICis {
 	public String getOwnerId() {
 		return "";
 	}
+	
+	public void setOwnerId(String ownerId) {
+		return;
+	}
+	
 	public String getCisType() {
 		return "";
 	}
 	public String setCisType(String type) {
 		return "";
 	}
+	
+	public void setAdministrators(ArrayList<IIdentity> administrators) {
+		return;
+	}
+	
+	public void addAdministrator(IIdentity administrator) {
+		return;
+	}
+	
+	public void removeAdministrator(IIdentity administrator) {
+		return;
+	}
+	
 	
 	//public int getMembershipCriteria() {
 	//	return 0;
