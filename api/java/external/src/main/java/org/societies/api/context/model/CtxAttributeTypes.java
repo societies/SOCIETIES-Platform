@@ -32,7 +32,7 @@ package org.societies.api.context.model;
  */
 public class CtxAttributeTypes {
 
-    /**
+	/**
      * 
      */
     public static final String ACTION = "action";
@@ -71,7 +71,9 @@ public class CtxAttributeTypes {
      * 
      * @since 0.0.8
      */
-    public static final String ADDRESS_WORK_COUNTRY = "addressWorkCountry";
+    public static final String ADDRESS_WORK_COUNTRY = 
+
+"addressWorkCountry";
 	
 	/**
      * 
@@ -135,7 +137,7 @@ public class CtxAttributeTypes {
     public static final String NAME_LAST = "nameLast";
     
     /**
-     * @since 0.0.8
+
      */
     public static final String PARAMETER_NAME = "parameterName";
     
@@ -160,10 +162,11 @@ public class CtxAttributeTypes {
     @Deprecated
     public static final String PRIVACY_POLICY_REGISTRY = "privacyPolicyRegistry";
    
-
-       
-
-    
-
+    /**
+     * Privacy Policy Agreement Attribute type
+     * To be moved in internal API
+     */
+    @Deprecated
+    public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";
     
 }
