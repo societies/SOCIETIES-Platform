@@ -32,7 +32,7 @@
 	<artifactId>privacynegotiationmanagement</artifactId>
 	<name>Privacy Negotiation Management</name>
 	<packaging>jar</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>${version.pt}</version>
 	<developers>
 		<!-- To be defined -->
 	</developers>

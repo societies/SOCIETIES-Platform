@@ -56,19 +56,20 @@
         
     </osgi:reference>
 	
-    <osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr">
+    <osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr">
     </osgi:reference>
     
-    <osgi:reference id="policyAgreementManager" interface="org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal">
+    <!-- to be uncommented as soon as they are ready for spring  -->
+<!--     <osgi:reference id="policyAgreementManager" interface="org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal">
         
     </osgi:reference>
         
     <osgi:reference id="negotiationAgent" interface="org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent">
         
-    </osgi:reference>
+    </osgi:reference> 
     
     <osgi:reference id="privacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager">
         
-    </osgi:reference>
+    </osgi:reference> -->
         
 </beans>
