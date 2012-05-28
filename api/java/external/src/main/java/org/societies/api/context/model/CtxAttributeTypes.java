@@ -168,12 +168,6 @@ public class CtxAttributeTypes {
      */
     @Deprecated
     public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";
-   
-    /**
-     * Privacy Policy Agreement Attribute type
-     * To be moved in internal API
-     */
-    @Deprecated
-    public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";
+
     
 }
