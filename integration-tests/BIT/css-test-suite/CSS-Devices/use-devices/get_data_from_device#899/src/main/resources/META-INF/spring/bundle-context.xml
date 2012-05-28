@@ -22,8 +22,18 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
+	<bean id="UpperTester" 
+  		class="org.societies.integration.test.bit.get_data_from_device.UpperTester" init-method="initUpperTester">
+		<property name="eventManager" ref ="EventManager" />
+  	</bean>
+
   	<bean id="TestCase899" 
   		class="org.societies.integration.test.bit.get_data_from_device.TestCase899" init-method="run">
 		<property name="commManager" ref="CommManagerBundle"/>
   	</bean>
+  	
+  	
+  	
+  	
+  	
 </beans>

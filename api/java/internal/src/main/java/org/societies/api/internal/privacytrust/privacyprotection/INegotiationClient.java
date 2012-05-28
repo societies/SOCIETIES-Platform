@@ -27,7 +27,8 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 //TODO : temporary mock package import to solve missing package in API folder
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
+import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -49,7 +50,7 @@ public interface INegotiationClient {
 	 * @param envelope
 	 * @param b
 	 */
-	public void acknowledgeAgreement(ServiceResourceIdentifier serviceID, IIdentity providerIdentity, IAgreementEnvelope envelope, boolean b);
+	public void acknowledgeAgreement(Requestor requestor, AgreementEnvelope envelope, boolean b);
 
 	/**
 	 * 
@@ -57,11 +58,6 @@ public interface INegotiationClient {
 	 */
 	public void receiveNegotiationResponse(ResponsePolicy policy);
 
-	/**
-	 * 
-	 * @param dpi
-	 */
-	public void receiveProviderIdentity(IIdentity dpi);
 
 	/**
 	 * 
@@ -75,6 +71,6 @@ public interface INegotiationClient {
 	 * @param serviceIdentifier
 	 * @param serviceIdentity
 	 */
-	public void startPrivacyPolicyNegotiation(RequestPolicy policy, ServiceResourceIdentifier serviceIdentifier, IIdentity serviceIdentity);
+	public void startPrivacyPolicyNegotiation(Requestor requestor, RequestPolicy policy);
 
 }

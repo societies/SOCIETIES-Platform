@@ -53,6 +53,7 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
+import org.societies.api.internal.privacytrust.privacyprotection.INegotiationClient;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
@@ -70,7 +71,7 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManagerInternal;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentityOption;
@@ -100,7 +101,7 @@ public class NegotiationClient implements INegotiationClient {
 	private PrivacyPolicyNegotiationManager policyMgr;
 	private Hashtable<Requestor,ResponsePolicy> myPolicies;
 	private Hashtable<Requestor, IAgreement> agreements;
-	private IPolicyAgreementManagerInternal policyAgreementMgr;
+	private IPrivacyAgreementManagerInternal policyAgreementMgr;
 	private IPrivacyDataManagerInternal privacyDataManager;
 	private IIdentitySelection idS;
 	private IPrivacyPreferenceManager privPrefMgr;
@@ -122,11 +123,6 @@ public class NegotiationClient implements INegotiationClient {
 		this.logging.info(this.getClass().getName()+" : "+message);
 	}
 	
-	@Override
-	public void receiveProviderIdentity(Requestor requestor) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void receiveProviderPolicy(RequestPolicy policy) {
@@ -265,7 +261,7 @@ public class NegotiationClient implements INegotiationClient {
 				AgreementFinaliser finaliser = new AgreementFinaliser();
 				byte[] signature = finaliser.signAgreement(agreement);
 				Key publicKey = finaliser.getPublicKey();
-				IAgreementEnvelope envelope = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
+				AgreementEnvelope envelope = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
 				
 				Future<Boolean> ack = this.negotiationAgent.acknowledgeAgreement(envelope);
 				this.acknowledgeAgreement(requestor, envelope, ack.get());
@@ -287,18 +283,17 @@ public class NegotiationClient implements INegotiationClient {
 	}
 	
 	@Override
-	public void acknowledgeAgreement(Requestor requestor,
-			IAgreementEnvelope envelope, boolean b) {
+	public void acknowledgeAgreement(Requestor requestor, AgreementEnvelope envelope, boolean b) {
 		if (b){
 			log("Acknowledged Agreement - creating access control objects");			
 			try {
 				//TODO: uncomment lines
 				if (requestor instanceof RequestorCis){
 
-					this.policyAgreementMgr.updateAgreement(((RequestorCis) envelope.getAgreement().getRequestor()).getCisRequestorId(), envelope);
+					this.policyAgreementMgr.updateAgreement((envelope.getAgreement().getRequestor()), envelope);
 
 				}else{
-					this.policyAgreementMgr.updateAgreement(((RequestorService) envelope.getAgreement().getRequestor()).getRequestorServiceId(), envelope);
+					this.policyAgreementMgr.updateAgreement(envelope.getAgreement().getRequestor(), envelope);
 				}
 
 				List<ResponseItem> requests = envelope.getAgreement().getRequestedItems();
@@ -323,7 +318,10 @@ public class NegotiationClient implements INegotiationClient {
 
 	}
 	
-	
+	/**
+	 * No need for this step. This should be removed and the negotiation step should commence in the startPrivacyPolicyNegotiation(RequestPolicy,S
+	 * @param requestor
+	 */
 	public void startNegotiation(Requestor requestor){
 		
 		log("Starting negotiation with: "+requestor.toString());
@@ -436,5 +434,13 @@ public class NegotiationClient implements INegotiationClient {
 
 		return null;
 	}
+
+
+	@Override
+	public void startPrivacyPolicyNegotiation(Requestor requestor, RequestPolicy policy) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

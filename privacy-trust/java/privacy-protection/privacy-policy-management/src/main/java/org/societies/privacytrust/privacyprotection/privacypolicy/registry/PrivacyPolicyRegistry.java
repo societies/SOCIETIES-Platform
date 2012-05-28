@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.privacypolicy;
+package org.societies.privacytrust.privacyprotection.privacypolicy.registry;
 
 import java.io.Serializable;
 import java.util.Hashtable;
@@ -42,7 +42,7 @@ public class PrivacyPolicyRegistry implements Serializable{
 	private Hashtable<Requestor,CtxIdentifier> policies;
 
 	
-	PrivacyPolicyRegistry(){
+	public PrivacyPolicyRegistry(){
 		this.policies = new Hashtable<Requestor, CtxIdentifier>();		
 	}
 	
@@ -51,7 +51,7 @@ public class PrivacyPolicyRegistry implements Serializable{
 	 * @param requestor		the serviceID of the service or Identity of CIS for which the policy is for
 	 * @return				the policy document
 	 */
-	CtxIdentifier getPolicyStorageID(Requestor requestor){
+	public CtxIdentifier getPolicyStorageID(Requestor requestor){
 		if (requestor==null){
 			return null;
 		}
@@ -109,11 +109,11 @@ public class PrivacyPolicyRegistry implements Serializable{
 		this.policies.put(newRequestor, ctxID);
 	}
 	
-	
-	public void removePolicy(Requestor requestor){
+public void removePolicy(Requestor requestor){
 		
 		if (this.policies.containsKey(requestor)){
 			this.policies.remove(requestor);
 		}
 	}
+	
 }

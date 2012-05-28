@@ -24,32 +24,29 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
+
 
 /**
- * Interface internal to privacy components to manage privacy agreements
- * @author Olivier Maridat (Trialog)
- * @created 17-nov.-2011 11:12:31
+ * @author Eliza
+ * @version 1.0
+ * @created 11-Nov-2011 18:57:17
  */
-public interface IPolicyAgreementManager {
+public interface IPrivacyPolicyNegotiationManager {
+
 	/**
-	 * Retrieve a CIS privacy agreement by the ID of the CIS
 	 * 
-	 * @param cisId Id of the CIS
-	 * @return the CIS privacy agreement
-	 * @throws PrivacyException
+	 * @param css_id
+	 * @param cis_id    CIS admin
 	 */
-	public IAgreementEnvelope getAgreement(IIdentity cisId) throws PrivacyException;
-	
+	public void negotiateCISPolicy(RequestorCis requestor);
+
 	/**
-	 * Retrieve a 3P service privacy agreement by the ID of the Service
 	 * 
-	 * @param serviceId Id of the Service
-	 * @return the Service privacy agreement
-	 * @throws PrivacyException
+	 * @param transient_id    temp id
+	 * @param service_id
 	 */
-	public IAgreementEnvelope getAgreement(ServiceResourceIdentifier serviceId) throws PrivacyException;
+	public void negotiateServicePolicy(RequestorService requestor);
+
 }

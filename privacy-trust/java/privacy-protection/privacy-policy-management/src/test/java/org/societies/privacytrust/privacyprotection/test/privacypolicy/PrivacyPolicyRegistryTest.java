@@ -24,10 +24,13 @@
  */
 package org.societies.privacytrust.privacyprotection.test.privacypolicy;
 
+import static org.junit.Assert.*;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import junit.framework.TestCase;
 
@@ -116,6 +119,8 @@ public class PrivacyPolicyRegistryTest {
 			Mockito.when(ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.PRIVACY_POLICY_REGISTRY)).thenReturn(new AsyncResult<CtxAttribute>(this.registryAttribute));
 			Mockito.when(ctxBroker.retrieve(this.cisPolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.cisPolicyAttribute));
 			Mockito.when(ctxBroker.retrieve(this.servicePolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.servicePolicyAttribute));
+			Mockito.when(ctxBroker.remove(this.cisPolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.cisPolicyAttribute));
+			Mockito.when(ctxBroker.remove(this.servicePolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.servicePolicyAttribute));
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -147,7 +152,21 @@ public class PrivacyPolicyRegistryTest {
 		TestCase.assertNotNull(policy);
 		
 		
-		registryMgr.deletePolicy(requestorCis);
+		try {
+			registryMgr.deletePolicy(requestorCis);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail();
+		}
 		
 		policy = registryMgr.getPolicy(requestorCis);
 		
@@ -162,7 +181,21 @@ public class PrivacyPolicyRegistryTest {
 		TestCase.assertNotNull(policy2);
 
 		
-		registryMgr.deletePolicy(requestorService);
+		try {
+			registryMgr.deletePolicy(requestorService);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail();
+		}
 		
 		policy2 = registryMgr.getPolicy(requestorService);
 		TestCase.assertNull(policy2);

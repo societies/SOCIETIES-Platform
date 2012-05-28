@@ -22,23 +22,53 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client;
+package org.societies.privacytrust.remote.privacypolicymanagement;
 
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyAgreementManagerListener;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementEnvelopeUtils;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBeanResult;
 
 /**
- * @author Elizabeth
+ * @author Olivier Maridat (Trialog)
  *
  */
-public interface INegotiationClient {
+public class PrivacyAgreementManagerCommClientCallback {
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyAgreementManagerCommClientCallback.class);
 
-	public void receiveProviderIdentity(Requestor requestor);
-	public void receiveProviderPolicy(RequestPolicy policy);
-	public void receiveNegotiationResponse(ResponsePolicy policy);
-	public void acknowledgeAgreement(Requestor requestor, IAgreementEnvelope envelope, boolean b);
-	
-	
+	// -- Listeners list
+	public Map<String, IPrivacyAgreementManagerListener> privacyAgreementManagerlisteners;
+
+
+	public PrivacyAgreementManagerCommClientCallback() {
+		privacyAgreementManagerlisteners = new HashMap<String, IPrivacyAgreementManagerListener>();
+	}
+
+
+	public void receiveResult(Stanza stanza, PrivacyAgreementManagerBeanResult bean) {
+		// -- Get agreement
+		if (bean.getMethod().equals(MethodType.GET_PRIVACY_AGREEMENT)) {
+			LOG.info("$$$$ agreement response received");
+			IPrivacyAgreementManagerListener listener = privacyAgreementManagerlisteners.get(stanza.getId());
+			privacyAgreementManagerlisteners.remove(stanza.getId());
+			if (bean.isAck()) {
+				listener.onPrivacyAgreementRetrieved(AgreementEnvelopeUtils.toAgreementEnvelope(bean.getPrivacyAgreement()));
+			}
+			else {
+				listener.onOperationCancelled(bean.getAckMessage());
+			}
+			return;
+		}
+	}
+
+
+	// -- Dependency Injection
 }

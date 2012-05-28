@@ -22,31 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
 
+import java.util.List;
+
+import org.societies.api.schema.identity.RequestorBean;
 
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 18:57:17
+ * @author Olivier Maridat (Trialog)
+ *
  */
-public interface IPrivacyPolicyNegotiationManager {
-
+public class Agreement {
+	private RequestorBean requestor;
+	private List<ResponseItem> requestedItems;
+	private String userIdentity;
+	private String userPublicIdentity;
+	
 	/**
-	 * 
-	 * @param css_id
-	 * @param cis_id    CIS admin
+	 * @return the requestor
 	 */
-	public void negotiateCISPolicy(RequestorCis requestor);
-
+	public RequestorBean getRequestor() {
+		return requestor;
+	}
 	/**
-	 * 
-	 * @param transient_id    temp id
-	 * @param service_id
+	 * @param requestor the requestor to set
 	 */
-	public void negotiateServicePolicy(RequestorService requestor);
-
+	public void setRequestor(RequestorBean requestor) {
+		this.requestor = requestor;
+	}
+	/**
+	 * @return the requestedItems
+	 */
+	public List<ResponseItem> getRequestedItems() {
+		return requestedItems;
+	}
+	/**
+	 * @param requestedItems the requestedItems to set
+	 */
+	public void setRequestedItems(List<ResponseItem> requestedItems) {
+		this.requestedItems = requestedItems;
+	}
+	/**
+	 * @return the userIdentity
+	 */
+	public String getUserIdentity() {
+		return userIdentity;
+	}
+	/**
+	 * @param userIdentity the userIdentity to set
+	 */
+	public void setUserIdentity(String userIdentity) {
+		this.userIdentity = userIdentity;
+	}
+	/**
+	 * @return the userPublicIdentity
+	 */
+	public String getUserPublicIdentity() {
+		return userPublicIdentity;
+	}
+	/**
+	 * @param userPublicIdentity the userPublicIdentity to set
+	 */
+	public void setUserPublicIdentity(String userPublicIdentity) {
+		this.userPublicIdentity = userPublicIdentity;
+	}
+	
+	
 }

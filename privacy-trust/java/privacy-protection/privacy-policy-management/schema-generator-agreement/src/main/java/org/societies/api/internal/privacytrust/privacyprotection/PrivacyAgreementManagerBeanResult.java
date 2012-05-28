@@ -22,55 +22,81 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api;
+package org.societies.api.internal.privacytrust.privacyprotection;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.societies.api.internal.privacytrust.privacyprotection.PrivacyAgreementManagerBean.methodType;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 
 /**
- * Interface internal to privacy components to manage privacy agreements
  * @author Olivier Maridat (Trialog)
- * @created 17-nov.-2011 11:12:31
+ *
  */
-public interface IPolicyAgreementManagerInternal {
-	/**
-	 * Update a CIS privacy agreement by the ID of the CIS
-	 * 
-	 * @param cisId Id of the CIS
-	 * @param agreement Agreement
-	 * @return Success result of the operation
-	 * @throws PrivacyException
-	 */
-	public boolean updateAgreement(IIdentity cisId, IAgreementEnvelope agreement) throws PrivacyException;
+@XmlAccessorType(XmlAccessType.FIELD)
+public class PrivacyAgreementManagerBeanResult {
+	@XmlElement(required = true)
+	private methodType  method;
+	
+	@XmlElement(required = true)
+	private boolean ack;
+	
+	private String ackMessage;
+	
+	private RequestPolicy privacyPolicy;
+	
+	
 	
 	/**
-	 * Update a Service privacy agreement by the ID of the Service
-	 * 
-	 * @param serviceId Id of the Service
-	 * @param agreement Agreement
-	 * @return Success result of the operation
-	 * @throws PrivacyException
+	 * @return the ack
 	 */
-	public boolean updateAgreement(ServiceResourceIdentifier serviceId, IAgreementEnvelope agreement) throws PrivacyException;
-	
+	public boolean isAck() {
+		return ack;
+	}
 	/**
-	 * Delete a CIS privacy agreement by the ID of the CIS
-	 * 
-	 * @param cisId Id of the CIS
-	 * @return Success result of the operation
-	 * @throws PrivacyException
+	 * @param ack the ack to set
 	 */
-	public IAgreementEnvelope deleteAgreement(IIdentity cisId) throws PrivacyException;
-	
+	public void setAck(boolean ack) {
+		this.ack = ack;
+	}
 	/**
-	 * Delete a 3P service privacy agreement by the ID of the Service
-	 * 
-	 * @param serviceId Id of the Service
-	 * @return Success result of the operation
-	 * @throws PrivacyException
+	 * @return the ackMessage
 	 */
-	public IAgreementEnvelope deleteAgreement(ServiceResourceIdentifier serviceId) throws PrivacyException;
-
+	public String getAckMessage() {
+		return ackMessage;
+	}
+	/**
+	 * @param ackMessage the ackMessage to set
+	 */
+	public void setAckMessage(String ackMessage) {
+		this.ackMessage = ackMessage;
+	}
+	/**
+	 * @return the method
+	 */
+	public methodType getMethod() {
+		return method;
+	}
+	/**
+	 * @param method the method to set
+	 */
+	public void setMethod(methodType method) {
+		this.method = method;
+	}
+	/**
+	 * @return the privacyPolicy
+	 */
+	public RequestPolicy getPrivacyPolicy() {
+		return privacyPolicy;
+	}
+	/**
+	 * @param privacyPolicy the privacyPolicy to set
+	 */
+	public void setPrivacyPolicy(RequestPolicy privacyPolicy) {
+		this.privacyPolicy = privacyPolicy;
+	}
+	
 }

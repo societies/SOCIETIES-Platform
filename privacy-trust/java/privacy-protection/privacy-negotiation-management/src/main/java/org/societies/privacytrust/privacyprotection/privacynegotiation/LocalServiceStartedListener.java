@@ -39,7 +39,7 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
-import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.provider.PrivacyPolicyRegistryManager;
+//import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.provider.PrivacyPolicyRegistryManager;
 
 
 public class LocalServiceStartedListener extends EventListener{
@@ -47,12 +47,12 @@ public class LocalServiceStartedListener extends EventListener{
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private final IIdentityManager iDM;
 	//private final IIdentity userID;
-	private PrivacyPolicyRegistryManager privacyPolicyRegMgr;
+	//private PrivacyPolicyRegistryManager privacyPolicyRegMgr;
 	
-	public LocalServiceStartedListener(IEventMgr eventMgr, IIdentityManager IDM, PrivacyPolicyRegistryManager privacyPolicyRegMgr){
+	public LocalServiceStartedListener(IEventMgr eventMgr, IIdentityManager IDM /*PrivacyPolicyRegistryManager privacyPolicyRegMgr*/){
 
 		iDM = IDM;
-		this.privacyPolicyRegMgr = privacyPolicyRegMgr;
+		//this.privacyPolicyRegMgr = privacyPolicyRegMgr;
 		/**
 		 * TODO: need local user id!
 		 * this.userID = iDM.getLocalDigitalPersonalIdentifier();

@@ -22,37 +22,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.privacypolicy;
+package org.societies.personalisation.UserPreferenceManagement.test;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.IPolicyAgreementManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
+import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
 
 /**
- * @author Olivier Maridat (Trialog)
- * @date 5 déc. 2011
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
  */
-public class PolicyAgreementManager implements IPolicyAgreementManager {
+public class TestStoreRetrieve {
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#getAgreement(org.societies.api.identity.IIdentity)
-	 */
-	@Override
-	public IAgreementEnvelope getAgreement(IIdentity cisId)
-			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
+	UserPreferenceConditionMonitor pcm ;
+	ICtxBroker ctxBroker = Mockito.mock(ICtxBroker.class);
+	UserPreferenceManagement prefMgr;
+	
+	@Before
+	public void setUp(){
+		pcm = new UserPreferenceConditionMonitor();
+		pcm.setCtxBroker(ctxBroker);
+		pcm.setEventMgr(Mockito.mock(IEventMgr.class));
+		pcm.setPersoMgr(Mockito.mock(IInternalPersonalisationManager.class));
+		pcm.setUserPrefLearning(Mockito.mock(IC45Learning.class));
+		pcm.initialisePreferenceManagement();	
+		this.prefMgr = pcm.getPrefMgr();
 	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#getAgreement(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
-	 */
-	@Override
-	public IAgreementEnvelope getAgreement(ServiceResourceIdentifier serviceId)
-			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
+	
+	@Test
+	public void TestStoreRetrieve(){
+		
+		
+		
 	}
+	
+	
 }
