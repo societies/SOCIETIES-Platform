@@ -135,7 +135,13 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					// TODO: subscribe the listener for appropriate event
 					
 					if (includePrivacyPolicyNegotiation) {
-						startPrivacyPolicyNegotiation(provider);
+						if (requester.isPrivacyPolicyNegotiationManagerAvailable()) {
+							startPrivacyPolicyNegotiation(provider);
+						}
+						else {
+							LOG.warn("Privacy Policy Negotiation Manager not available");
+							finalCallback.onNegotiationError("Privacy Policy Negotiation Manager not available");
+						}
 					}
 					else {
 						// Notify successful end of negotiation

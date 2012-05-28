@@ -48,7 +48,8 @@ public class NegotiationRequester implements INegotiation {
 	private INegotiationProviderRemote groupMgr;
 	private IPersonalisationManager personalizationMgr;
 	private IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager;
-
+	private boolean isPrivacyPolicyNegotiationManagerAvailable = false;
+	
 //	@Autowired
 //	public NegotiationRequester(ISignatureMgr signatureMgr) {
 //		this.signatureMgr = signatureMgr;
@@ -108,6 +109,11 @@ public class NegotiationRequester implements INegotiation {
 	}
 	public void setPrivacyPolicyNegotiationManager(IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager) {
 		this.privacyPolicyNegotiationManager = privacyPolicyNegotiationManager;
+		this.isPrivacyPolicyNegotiationManagerAvailable = true;
+	}
+	
+	public boolean isPrivacyPolicyNegotiationManagerAvailable() {
+		return isPrivacyPolicyNegotiationManagerAvailable;
 	}
 
 	@Override
@@ -129,8 +135,9 @@ public class NegotiationRequester implements INegotiation {
 			serviceId = providerCis.getCisRequestorId().getJid();
 		}
 		else {
-			LOG.warn("Terminating: Inappropriate provider: " + provider.getClass().getName());
-			callback.onNegotiationComplete(null);
+			String msg = "Terminating: Inappropriate provider: " + provider.getClass().getName();
+			LOG.warn(msg);
+			callback.onNegotiationError(msg);
 			return;
 		}
 		ProviderCallback providerCallback = new ProviderCallback(this, provider,

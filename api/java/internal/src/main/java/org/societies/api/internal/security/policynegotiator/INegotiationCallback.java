@@ -44,4 +44,14 @@ public interface INegotiationCallback {
 	 * parameter is null.
 	 */
 	public void onNegotiationComplete(String agreementKey);
+
+	/**
+	 * Async return for
+	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
+	 * String, INegotiationCallback)}
+	 * in case of error.
+	 * 
+	 * @param msg Error message
+	 */
+	public void onNegotiationError(String msg);
 }

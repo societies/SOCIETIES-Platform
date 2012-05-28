@@ -110,8 +110,14 @@ public class NominalTestCaseLowerTester {
 				assertNotNull(agreementKey);
 				callbackInvokedService = true;
 			}
+			@Override
+			public void onNegotiationError(String msg) {
+				fail();
+			}
 		});
 		
+		LOG.debug("[#1001] testNegotiationService(): negotiation started");
+
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		LOG.info("[#1001] testNegotiationService(): checking if successful");
 		assertTrue(callbackInvokedService);
@@ -138,7 +144,13 @@ public class NominalTestCaseLowerTester {
 				assertNotNull(agreementKey);
 				callbackInvokedCis = true;
 			}
+			@Override
+			public void onNegotiationError(String msg) {
+				fail();
+			}
 		});
+
+		LOG.debug("[#1001] testNegotiationCis(): negotiation started");
 		
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		LOG.info("[#1001] testNegotiationCis(): checking if successful");
@@ -163,10 +175,16 @@ public class NominalTestCaseLowerTester {
 			public void onNegotiationComplete(String agreementKey) {
 				LOG.info("onNegotiationComplete({})", agreementKey);
 				assertNull(agreementKey);
+				fail();
+			}
+			@Override
+			public void onNegotiationError(String msg) {
 				callbackInvokedInvalid = true;
 			}
 		});
 		
+		LOG.debug("[#1001] testNegotiationInvalid(): negotiation started");
+
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
 		LOG.info("[#1001] testNegotiationInvalid(): checking if successful");
 		assertTrue(callbackInvokedInvalid);

@@ -21,6 +21,7 @@
 		/>
 	<osgi:reference id="PrivacyPolicyNegotiationManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager"
+		cardinality="0..1"
 		/>
 	
 	<osgi:service ref="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" />
