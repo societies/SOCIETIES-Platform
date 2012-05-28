@@ -106,6 +106,8 @@
 		</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
+		<module>../cis-modules/cis-directory/</module>
+		<module>../cis-modules/cis-directory-client/</module>
 
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
