@@ -21,6 +21,8 @@
     <xs:sequence>
       <xs:element name="method" type="tns:methodType" minOccurs="0"/>
       <xs:element name="serviceId" type="ns1:serviceResourceIdentifier" minOccurs="0" />
+      <xs:element name="service" type="ns1:service" minOccurs="0" />
+      <xs:element name="shareJid" type="xs:string" minOccurs="0"/>
       <xs:element name="URL" type="xs:anyURI" minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
@@ -41,6 +43,8 @@
       <xs:enumeration value="OSGI_PROBLEM"/>
       <xs:enumeration value="COMMUNICATION_ERROR"/>
       <xs:enumeration value="EXCEPTION_ON_REMOTE"/>
+      <xs:enumeration value="CIS_NOT_FOUND"/>
+      <xs:enumeration value="NEGOTIATION_FAILED"/>
     </xs:restriction>
   </xs:simpleType>
   
@@ -51,6 +55,8 @@
 	  <xs:enumeration value="stopService"/>
 	  <xs:enumeration value="installService"/>
 	  <xs:enumeration value="uninstallService"/>
+	  <xs:enumeration value="shareService"/>
+	  <xs:enumeration value="unshareService"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

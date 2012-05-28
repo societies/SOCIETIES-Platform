@@ -167,6 +167,15 @@ public class ServiceControlUnitTest {
 	}
 
 
+	@Test
+	public void testServiceStuff(){
+		
+		ServiceResourceIdentifier testSRI= new ServiceResourceIdentifier();
+		ServiceResourceIdentifier othertestSRI= new ServiceResourceIdentifier();
+		testSRI.setServiceInstanceIdentifier("212");
+		othertestSRI.setServiceInstanceIdentifier("211");
+		testSRI.setIdentifier(new )
+	}
 	/**
 	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
 	 */

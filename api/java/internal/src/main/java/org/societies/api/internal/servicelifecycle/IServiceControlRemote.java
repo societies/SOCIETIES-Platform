@@ -27,6 +27,7 @@ package org.societies.api.internal.servicelifecycle;
 import java.net.URL;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -61,11 +62,21 @@ public interface IServiceControlRemote {
 	/**
 	 * This method install a new service into the container
 	 * 
-	 * @param serviceLocation the URL of the bundle to install
+	 * @param bundleLocation the URL of the bundle to install
 	 * @param node The node where the service is located
 	 * @param callback The callback object
 	 */
 	public void installService(URL bundleLocation, IIdentity node, IServiceControlCallback callback);
+
+	
+	/**
+	 * This method installs a shared service into the container
+	 * 
+	 * @param service the Service to install
+	 * @param node The node where the service should be installed.
+	 * @param callback The callback object
+	 */
+	public void installService(Service service, IIdentity node, IServiceControlCallback callback);
 
 	/**
 	 * This method removes a service from the container.

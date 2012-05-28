@@ -771,4 +771,53 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		 return result;
 		 
 	}
+
+	@Override
+	public Future<ServiceControlResult> shareService(Service service, String nodeJid)
+			throws ServiceControlException {
+		
+		if(logger.isDebugEnabled()) logger.debug("Service Management: shareShared method, String input");
+		
+		try {
+			
+			// We convert to a node, then call the other method...
+			IIdentity node = null;
+			
+			if(nodeJid != null && !nodeJid.isEmpty())
+				node = getCommMngr().getIdManager().fromJid(nodeJid);
+			
+			Future<ServiceControlResult> asyncResult = null;
+			
+			asyncResult = shareService(service,nodeJid);
+			ServiceControlResult result = asyncResult.get();
+			
+			return new AsyncResult<ServiceControlResult>(result);
+					
+		} catch (Exception ex) {
+			logger.error("Exception while attempting to share a service: " + ex.getMessage());
+			throw new ServiceControlException("Exception while attempting to share a service:", ex);
+		}
+
+	}
+
+	@Override
+	public Future<ServiceControlResult> shareService(Service service,
+			IIdentity node) throws ServiceControlException {
+		
+		return null;
+	}
+
+	@Override
+	public Future<ServiceControlResult> unshareService(Service service,
+			String jid) throws ServiceControlException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<ServiceControlResult> unshareService(Service service,
+			IIdentity node) throws ServiceControlException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

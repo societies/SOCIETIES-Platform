@@ -45,6 +45,7 @@ import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -248,6 +249,90 @@ public class ServiceDiscovery implements IServiceDiscovery {
 				
 		return new AsyncResult<List<Service>>(serviceList);
 
+	}
+
+	@Override
+	public Future<Service> getService(ServiceResourceIdentifier serviceId)
+			throws ServiceDiscoveryException {
+
+		if(logger.isDebugEnabled())
+			logger.debug("Service Discovery::getService()");
+			
+		Service result = null;
+		try{
+			//Are we searching for a local service?
+			
+			
+			
+		} catch(Exception ex){
+			ex.printStackTrace();
+			logger.error("getService():: Exception getting Service: " + ex);
+		}
+			
+		if(result == null)
+			return null;
+		else
+			return new AsyncResult<Service>(result);
+
+	}
+
+	@Override
+	public Future<List<Service>> searchServices(Service filter)
+			throws ServiceDiscoveryException {
+		
+		if(logger.isDebugEnabled()) logger.debug("Searching local repository for a given service");
+		
+		List<Service> result;
+		
+		try{
+		
+			result = getServiceReg().findServices(filter);
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Found "+ result.size() + " services that fulfill the criteria"); 
+			
+		} catch(Exception ex){
+			logger.error("Searching for services: Exception! : " + ex);
+			throw new ServiceDiscoveryException("Exception while searching for services",ex);
+		}
+		
+		return new AsyncResult<List<Service>>(result);
+	}
+
+	@Override
+	public Future<List<Service>> searchServices(Service filter, IIdentity node)
+			throws ServiceDiscoveryException {
+
+		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + node.getJid());
+		
+		String myLocalJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+		String nodeJid = node.getJid();
+		
+		if(myLocalJid.equals(node.getJid())){
+			if(logger.isDebugEnabled()) logger.debug("It's the local node, so we do a local call");
+			return searchServices(filter);
+		}
+		
+
+		return new AsyncResult<List<Service>>(result);;
+	}
+
+	@Override
+	public Future<List<Service>> searchServices(Service filter, String jid)
+			throws ServiceDiscoveryException {
+		
+		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + jid);
+
+		try {
+			INetworkNode node = getCommMngr().getIdManager().fromFullJid(jid);
+			return searchServices(filter,node);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			
+		}
+		
+		
 	}
 
 

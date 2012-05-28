@@ -288,7 +288,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		try {
 			
 			if(log.isDebugEnabled()) log.debug("Checking if service is shared with any owned CIS, and removing that");
-			List<String> cisSharedList = new ArrayList<String>();
+			List<String> cisSharedList = getServiceReg().retrieveCISSharedService(serviceToRemove.getServiceIdentifier());
 			
 			if(!cisSharedList.isEmpty()){
 				for(String cisShared: cisSharedList){
