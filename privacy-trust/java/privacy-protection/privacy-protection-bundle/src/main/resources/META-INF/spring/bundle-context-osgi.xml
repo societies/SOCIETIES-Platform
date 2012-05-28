@@ -56,4 +56,19 @@
         
     </osgi:reference>
 	
+    <osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr">
+    </osgi:reference>
+    
+    <osgi:reference id="policyAgreementManager" interface="org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal">
+        
+    </osgi:reference>
+        
+    <osgi:reference id="negotiationAgent" interface="org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent">
+        
+    </osgi:reference>
+    
+    <osgi:reference id="privacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager">
+        
+    </osgi:reference>
+        
 </beans>
