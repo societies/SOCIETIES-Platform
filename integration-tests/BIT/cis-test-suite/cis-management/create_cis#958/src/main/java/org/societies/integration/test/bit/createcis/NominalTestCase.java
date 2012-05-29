@@ -16,8 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 
 
 
@@ -79,15 +82,31 @@ public class NominalTestCase {
 		
 		assertNotNull("cis is not stored", cis2);
 		
+		
+		
+		IIdentity cisJidIdentity = null;
 		try {
-			RequestorCis requestorCis = new RequestorCis(TestCase958.node, TestCase958.idMgr.fromJid(cisId));
+			cisJidIdentity = TestCase958.idMgr.fromJid(cisId);
 		} catch (InvalidFormatException e) {
-
 			e.printStackTrace();
 		}
 		
+		assertNotNull("cisJidIdentity = TestCase958.idMgr.fromJid(cisId) is null", cisJidIdentity);
 		
+		RequestorCis requestorCis = null;
 
+		requestorCis = new RequestorCis(TestCase958.node, cisJidIdentity);
+
+		
+		RequestPolicy requestPolicy = null;
+		
+		try {
+			requestPolicy =  TestCase958.privacyPolicyManager.getPrivacyPolicy(requestorCis);
+		} catch (PrivacyException e) {
+			e.printStackTrace();
+		}
+		
+		assertNotNull("requestPolicy is null, privacy policy not created when ", requestPolicy);
 	}
 	
 

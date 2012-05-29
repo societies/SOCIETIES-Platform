@@ -7,7 +7,7 @@
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
     
-     <artifact type="bundle" name="org.societies.integration.test.bit.get_data_from_device_899"/>
+     <artifact type="bundle" name="org.societies.integration.test.bit.create_cis_958"/>
     
     
 </plan>
