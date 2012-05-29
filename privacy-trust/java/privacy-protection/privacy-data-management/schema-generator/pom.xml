@@ -61,27 +61,27 @@
 				</configuration>
 			</plugin>
 			<plugin>
-		<groupId>org.societies.maven</groupId>
-		<artifactId>societies-xmpp-maven-plugin</artifactId>
-		<version>1.0-SNAPSHOT</version>
-		<executions>
-			<execution>
-				<phase>generate-sources</phase>
-				<goals>
-					<goal>xsd</goal>
-				</goals>
-			</execution>
-		</executions>
-		<configuration>
-			<!-- Namespace define in the CommClient and CommServer of the beans -->
-			<packageName>org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement</packageName>
-			<httpNamespace>http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement</httpNamespace>
-			<!-- Output and input directories -->
-			<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
-			<file>schema4.xsd</file>
-			<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
-		</configuration>
-	</plugin>
+				<groupId>org.societies.maven</groupId>
+				<artifactId>societies-xmpp-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>xsd</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- Namespace define in the CommClient and CommServer of the beans -->
+					<packageName>org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement</packageName>
+					<httpNamespace>http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement</httpNamespace>
+					<!-- Output and input directories -->
+					<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
+					<file>schema4.xsd</file>
+					<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
