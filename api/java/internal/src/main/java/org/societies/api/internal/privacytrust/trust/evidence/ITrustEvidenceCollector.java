@@ -67,6 +67,34 @@ public interface ITrustEvidenceCollector {
 			final double rating, final Date timestamp) throws TrustException;
 	
 	/**
+	 * Assigns the specified trust rating to the identified trustee by the
+	 * supplied trustor. The identified trustee is a service, while the trustor
+	 * must reference a CSS. The trust rating value should be in the range of
+	 * [0,1].
+	 * 
+	 * @param trustor 
+	 *            the CSS that assigns the trust rating
+	 * @param trustee
+	 *            the service to assign the rating to
+	 * @param rating
+	 *            the trust rating [0,1]
+	 * @param timestamp
+	 *            the timestamp of the given rating, or the current time if
+	 *            a <code>null</code> value is specified
+	 * @throws TrustException
+	 *            if the operation fails
+	 * @throws NullPointerException
+	 *            if any of the trustor or trustee parameters are
+	 *            <code>null</code>
+	 * @throws IllegalArgumentException
+	 *            if the trustor does not identify a CSS or the trust rating is
+	 *            not in the range of [0,1] 
+	 */
+	public void addTrustOpinion(final IIdentity trustor, 
+			final ServiceResourceIdentifier trustee, final double rating,
+			final Date timestamp) throws TrustException;
+	
+	/**
 	 * 
 	 * @param trustor
 	 * @param provider

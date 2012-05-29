@@ -32,6 +32,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustOpinion;
@@ -50,6 +52,7 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustEvidenceCollector.class);
 	
+	/** The Trust Evidence Repository service reference. */
 	@Autowired(required = true)
 	private ITrustEvidenceRepository evidenceRepo;
 	
@@ -81,7 +84,42 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 		if (timestamp == null)
 			timestamp = new Date();
 		
-		//this.evidenceRepo.
+		final TrustedEntityType entityType;
+		if (IdentityType.CSS.equals(trustee.getType()))
+			entityType = TrustedEntityType.CSS;
+		else // if (IdentityType.CIS.equals(trustee.getType()))
+			entityType = TrustedEntityType.CIS;
+		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
+		final DirectTrustOpinion opinion = new DirectTrustOpinion(teid, timestamp, new Double(rating));
+		this.evidenceRepo.addEvidence(opinion);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustOpinion(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)
+	 */
+	@Override
+	public void addTrustOpinion(final IIdentity trustor,
+			final ServiceResourceIdentifier trustee, final double rating, 
+			Date timestamp)	throws TrustException {
+		
+		if (trustor == null)
+			throw new NullPointerException("trustor can't be null");
+		if (trustee == null)
+			throw new NullPointerException("trustee can't be null");
+		
+		if (!IdentityType.CSS.equals(trustor.getType()))
+			throw new IllegalArgumentException("trustor is not a CSS");
+		if (rating < 0d || rating > 1d)
+			throw new IllegalArgumentException("rating is not in the range of [0,1]");
+		
+		// if timestamp is null assign current time
+		if (timestamp == null)
+			timestamp = new Date();
+		
+		final TrustedEntityType entityType = TrustedEntityType.SVC;
+		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
+		final DirectTrustOpinion opinion = new DirectTrustOpinion(teid, timestamp, new Double(rating));
+		this.evidenceRepo.addEvidence(opinion);
 	}
 
 	/*
@@ -94,7 +132,7 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addUserInteractionExperience(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, java.lang.String, double, java.util.Date)
 	 */
 	@Override
@@ -102,14 +140,5 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 			IIdentity trustee, String type, double rating, Date timestamp) {
 		// TODO Auto-generated method stub
 
-	}
-	
-	public static void main(String[] args) {
-		
-		int value = 3;
-		
-		if (value != 1 && value != 2)
-			System.out.println("wrong value");
-		
 	}
 }
