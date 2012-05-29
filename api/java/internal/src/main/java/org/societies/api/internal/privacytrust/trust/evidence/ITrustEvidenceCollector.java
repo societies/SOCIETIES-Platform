@@ -22,15 +22,50 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.evidence;
+package org.societies.api.internal.privacytrust.trust.evidence;
 
 import java.util.Date;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
+/**
+ * Describe your class here...
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.2
+ */
 public interface ITrustEvidenceCollector {
 
+	/**
+	 * Assigns the specified trust rating to the identified trustee by the
+	 * supplied trustor. The identified trustee can be either a CSS or a CIS,
+	 * while the trustor must reference a CSS. The trust rating value should be
+	 * in the range of [0,1].
+	 * 
+	 * @param trustor 
+	 *            the CSS that assigns the trust rating
+	 * @param trustee
+	 *            the CSS or CIS to assign the rating to
+	 * @param rating
+	 *            the trust rating [0,1]
+	 * @param timestamp
+	 *            the timestamp of the given rating, or the current time if
+	 *            a <code>null</code> value is specified
+	 * @throws TrustException
+	 *            if the operation fails
+	 * @throws NullPointerException
+	 *            if any of the trustor or trustee parameters are
+	 *            <code>null</code>
+	 * @throws IllegalArgumentException
+	 *            if the trustor does not identify a CSS; the trustee does not
+	 *            identify a CSS or CIS; the trust rating is not in the range
+	 *            of [0,1] 
+	 */
+	public void addTrustOpinion(final IIdentity trustor, final IIdentity trustee,
+			final double rating, final Date timestamp) throws TrustException;
+	
 	/**
 	 * 
 	 * @param trustor
@@ -40,14 +75,6 @@ public interface ITrustEvidenceCollector {
 	 * @param timestamp
 	 */
 	public void addServiceExperience(IIdentity trustor, IIdentity provider, ServiceResourceIdentifier serviceId, double rating, Date timestamp);
-
-	/**
-	 * 
-	 * @param trustor
-	 * @param trustee
-	 * @param value
-	 */
-	public void addTrustOpinion(IIdentity trustor, IIdentity trustee, double value);
 
 	/**
 	 * 
