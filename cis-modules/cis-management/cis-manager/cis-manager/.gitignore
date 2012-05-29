@@ -2,3 +2,5 @@
 derby.log
 cismanagertest/
 .\\cismanagertest/
+cismanagertestdb/
+.\\cismanagertestdb/

@@ -56,6 +56,7 @@
 		<!-- API -->
 		<module>../platform-infrastructure/client-frwk/CoreInterfaces</module>
 		<module>../api/android/external</module>
+		<module>../api/android/internal</module>
 
 		<!-- Client Framework Examples -->
 		<module>../platform-infrastructure/client-frwk/PhoneGapReference
@@ -84,7 +85,10 @@
 		<!--module>../platform-infrastructure/client-frwk/TestIPCServices</module -->
 		
 		<!-- Android User Agent -->
-		<module>../user-agent/Android-user-agent</module>
+		<!-- module>../user-agent/Android-user-agent</module-->
+		
+		<!-- Privacy and Trust -->
+		<module>../privacy-trust/android/privacy-trust</module>
 
 	</modules>
 </project>

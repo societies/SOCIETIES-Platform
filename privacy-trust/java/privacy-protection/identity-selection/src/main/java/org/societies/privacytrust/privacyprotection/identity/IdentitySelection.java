@@ -43,7 +43,7 @@ import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelect
  *
  */
 public class IdentitySelection implements IIdentitySelection {
-	private static Logger log = LoggerFactory.getLogger(IdentitySelection.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(IdentitySelection.class.getSimpleName());
 	
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection#processIdentityContext(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement)

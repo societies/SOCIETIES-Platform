@@ -165,7 +165,7 @@ public class PPNPOutcomeLocator {
 		String contextType = item.getResource().getContextType();
 		
 		List<IPrivacyOutcome> outcomeList = this.privPrefMgr.evaluatePPNPreference(contextType);
-		
+		//JOptionPane.showMessageDialog(null, "PrivPrefMgr returned "+outcomeList.size()+" outcomes for "+contextType);
 		//List<IPrivacyPreferenceTreeModel> modelList = this.privPrefMgr.getPPNPreferences(contextType);
 		Hashtable<SubjectConstant,List<PPNPOutcome>> keyOutcome = new Hashtable<SubjectConstant,List<PPNPOutcome>>(); 
 		
@@ -205,7 +205,12 @@ public class PPNPOutcomeLocator {
 		
 		if (keyOutcome.containsKey(SubjectConstant.IDENTITY_SERVICE_ID)){
 			TimedNotificationGUI gui = new TimedNotificationGUI();
-			boolean response = gui.showGUI(contextType);
+			
+			/*
+			 * remove call to TimedNotifiactionGUI. should be moved to the checkPermissions method in PrivacypreferenceManager
+			 */
+			//boolean response = gui.showGUI(contextType);
+			boolean response = true;
 			if (response){
 				List<PPNPOutcome> temp = keyOutcome.get(SubjectConstant.IDENTITY_SERVICE_ID);
 				if (temp.size()>0){
@@ -220,7 +225,11 @@ public class PPNPOutcomeLocator {
 		
 		if (keyOutcome.containsKey(SubjectConstant.IDENTITY_GENERIC)){
 			TimedNotificationGUI gui = new TimedNotificationGUI();
-			boolean response = gui.showGUI(contextType);
+			/*
+			 * remove call to TimedNotifiactionGUI. should be moved to the checkPermissions method in PrivacypreferenceManager
+			 */
+			//boolean response = gui.showGUI(contextType);
+			boolean response = true;
 			if (response){
 				List<PPNPOutcome> temp = keyOutcome.get(SubjectConstant.IDENTITY_GENERIC);
 				if (temp.size()>0){

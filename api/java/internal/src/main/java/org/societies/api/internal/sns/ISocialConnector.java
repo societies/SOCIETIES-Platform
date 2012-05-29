@@ -141,7 +141,12 @@ public interface ISocialConnector {
      */
     String getUserGroups();
     
-    
+    /**
+     * This method write a message in the social network by using the connector.
+     * 
+     * @param activity MUST be a JSON document to allow the connector to post in the right way the post
+     */
+    void post(String activityEntry);
     
     
 }

@@ -10,7 +10,6 @@ package org.societies.integration.test.bit.caui_prediction;
 import java.util.List;
 
 import org.societies.integration.test.IntegrationTestCase;
-import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -18,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
-
+import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 
 
 public class TestCase1109 extends IntegrationTestCase{
@@ -34,7 +33,7 @@ public class TestCase1109 extends IntegrationTestCase{
 	public static ICAUIPrediction cauiPrediction;
 	
 	public TestCase1109() {
-		super(1109, new Class[]{ContextStorageTest.class, RetrieveLearnedModelTest.class, PerformPrediction.class});
+		super(1109, new Class[]{ContextStorageTest.class, RetrieveLearnedModelTest.class, PerformPredictionTest.class});
 		System.out.println("Test 1109 started : TestCase1109() ");
 		//UserIntentLearningTest uil = new UserIntentLearningTest(ctxBroker,uam);
 		//uil.createHistorySet();

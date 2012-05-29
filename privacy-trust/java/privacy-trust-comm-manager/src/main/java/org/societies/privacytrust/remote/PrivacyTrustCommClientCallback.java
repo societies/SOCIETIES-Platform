@@ -37,7 +37,13 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBeanResult;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
+import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback;
+import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClientCallback;
+import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommClientCallback;
+import org.societies.privacytrust.remote.trust.TrustBrokerCommClientCallback;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -48,18 +54,26 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement",
+					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacypolicymanagement",
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
-					"http://societies.org/api/schema/identity"));
+					"http://societies.org/api/schema/identity",
+					"http://societies.org/api/internal/schema/privacytrust/trust/model",
+					"http://societies.org/api/internal/schema/privacytrust/trust/broker"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement",
+					"org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
-					"org.societies.api.schema.identity"));
+					"org.societies.api.schema.identity",
+					"org.societies.api.internal.schema.privacytrust.trust.model",
+					"org.societies.api.internal.schema.privacytrust.trust.broker"));
 
 	// Dependencies
 	private ICommManager commManager;
 	private PrivacyDataManagerCommClientCallback privacyDataManagerCommClientCallback;
+	private PrivacyPolicyManagerCommClientCallback privacyPolicyManagerCommClientCallback;
+	private PrivacyAgreementManagerCommClientCallback privacyAgreementManagerCommClientCallback;
+	private TrustBrokerCommClientCallback trustBrokerCommClientCallback; 
 
-	
 	public PrivacyTrustCommClientCallback() {
 	}
 
@@ -96,6 +110,13 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 			privacyDataManagerCommClientCallback.receiveResult(stanza, (PrivacyDataManagerBeanResult) payload);
 		}
 		// -- Privacy Policy Management
+		if (payload instanceof PrivacyPolicyManagerBeanResult) {
+			privacyPolicyManagerCommClientCallback.receiveResult(stanza, (PrivacyPolicyManagerBeanResult) payload);
+		}
+		
+		if (payload instanceof PrivacyAgreementManagerBeanResult) {
+			privacyAgreementManagerCommClientCallback.receiveResult(stanza, (PrivacyAgreementManagerBeanResult) payload);
+		}
 
 		// -- Privacy Preference Management
 
@@ -104,8 +125,9 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 		// -- Assessment Management
 
 		// -- Trust Management
-
-	}
+		/* else */ if (payload instanceof TrustBrokerResponseBean)
+			this.trustBrokerCommClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
+	}		
 
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveMessage(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
@@ -215,6 +237,21 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 			PrivacyDataManagerCommClientCallback privacyDataManagerCommClientCallback) {
 		this.privacyDataManagerCommClientCallback = privacyDataManagerCommClientCallback;
 		LOG.info("[DependencyInjection] PrivacyDataManagerCommClientCallback injected");
+	}
+	public void setPrivacyPolicyManagerCommClientCallback(
+			PrivacyPolicyManagerCommClientCallback privacyPolicyManagerCommClientCallback) {
+		this.privacyPolicyManagerCommClientCallback = privacyPolicyManagerCommClientCallback;
+		LOG.info("[DependencyInjection] PrivacyPolicyManagerCommClientCallback injected");
+	}
+	public void setPrivacyAgreementManagerCommClientCallback(
+			PrivacyAgreementManagerCommClientCallback privacyAgreementManagerCommClientCallback) {
+		this.privacyAgreementManagerCommClientCallback = privacyAgreementManagerCommClientCallback;
+		LOG.info("[DependencyInjection] PrivacyAgreementManagerCommClientCallback injected");
+	}
+	public void setTrustBrokerCommClientCallback(
+			TrustBrokerCommClientCallback trustBrokerCommClientCallback) {
+		this.trustBrokerCommClientCallback = trustBrokerCommClientCallback;
+		LOG.info("[DependencyInjection] TrustBrokerCommClientCallback injected");
 	}
 
 

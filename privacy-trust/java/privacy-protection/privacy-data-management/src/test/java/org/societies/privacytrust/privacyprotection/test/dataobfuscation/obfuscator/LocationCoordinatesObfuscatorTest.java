@@ -35,7 +35,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinatesWrapper;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.LocationCoordinatesObfuscator;
 
 /**
@@ -46,7 +45,7 @@ public class LocationCoordinatesObfuscatorTest {
 	private static Logger LOG = LoggerFactory.getLogger(LocationCoordinatesObfuscatorTest.class.getSimpleName());
 
 	public LocationCoordinatesObfuscator obfuscator;
-	public LocationCoordinatesWrapper locationCoordinatesWrapper;
+	public IDataWrapper<LocationCoordinates> locationCoordinatesWrapper;
 
 	/**
 	 * @throws java.lang.Exception
@@ -93,7 +92,7 @@ public class LocationCoordinatesObfuscatorTest {
 	@Parameters({ "0.00001", "2.5" })
 	public void testObfuscateDataOutOfBound(double obfuscationLevel) {
 		LOG.info("[Test begin] testObfuscateDataOutOfBound("+obfuscationLevel+")");
-		LocationCoordinatesWrapper locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
+		IDataWrapper<LocationCoordinates> locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
 		IDataWrapper<LocationCoordinates> obfuscatedDataWrapper = null;
 		try {
 			obfuscatedDataWrapper = obfuscator.obfuscateData(obfuscationLevel);

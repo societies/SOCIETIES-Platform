@@ -28,12 +28,11 @@
 
 <!-- >context:component-scan base-package="org.societies.integration.test.bit.user_intent_learning"></context:component-scan-->
 	
-	<bean id="TestCase1109" class="org.societies.integration.test.bit.caui_prediction.TestCase1109"
-	name="testCase1109" depends-on="ctxBroker, uam, cauiPrediction" init-method="run">
+	<bean id="TestCase1109" class="org.societies.integration.test.bit.caui_prediction.TestCase1109"	init-method="run">
 		
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="uam" ref="uam" />
 		<property name="cauiPrediction" ref="cauiPrediction" />
   	</bean>
-
+	
 </beans>

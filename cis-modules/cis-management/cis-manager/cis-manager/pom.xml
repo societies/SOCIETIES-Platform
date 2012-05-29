@@ -171,11 +171,16 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
-			<artifactId>common-data-source</artifactId>
+			<artifactId>data-source</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+				<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-data-source</artifactId>
+			<version>${release.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>		
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>privacydatamanagement</artifactId>

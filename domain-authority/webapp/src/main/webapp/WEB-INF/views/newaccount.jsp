@@ -47,22 +47,23 @@
 		<table>
 			<tr>
 				<td>User :</td>
-				<td><form:input path="userName" value="userid"  />
+				<td><form:input path="userName"  />
 				</td>
 				<td><form:errors path="userName" cssClass="error" />
 				</td>
 			</tr>
+		
 			<tr>
 				<td>Sub Domain :</td>
-				<td><form:input path="subDomain" value="societies.local"  />
+				<td><form:input path="subDomain" />
 				</td>
 				<td><form:errors path="subDomain" cssClass="error" />
 				</td>
-			</tr>			
+			</tr>	
 					
 			<tr>
 				<td>Password :</td>
-				<td><form:password path="password" value="password.societies.local" />
+				<td><form:password path="password" />
 				</td>
 				<td><form:errors path="password" cssClass="error" />
 				</td>

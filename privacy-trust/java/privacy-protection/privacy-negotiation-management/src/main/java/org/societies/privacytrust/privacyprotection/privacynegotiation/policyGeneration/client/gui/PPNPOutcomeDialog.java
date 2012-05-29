@@ -664,10 +664,10 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		
 		for (Condition c : conditions){
 			for (int i=0; i<this.conditionsModel.getRowCount(); i++){
-				ConditionConstants cc = (ConditionConstants) this.conditionsModel.getValueAt(i,0);
-				if (c.getConditionName().equals(cc)){
+				ConditionConstants conditionConstant = (ConditionConstants) this.conditionsModel.getValueAt(i,0);
+				if (c.getConditionName().equals(conditionConstant)){
 					this.conditionsModel.setValueAt(c.getValueAsString(), i, 1);
-					
+					this.conditionsModel.setValueAt(true, i, 2);
 				}
 			}
 		}

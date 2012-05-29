@@ -14,8 +14,10 @@
 	<!-- END HEADER -->
 
 	<!-- LEFTBAR -->
-	<jsp:include page="leftbar.jsp" />
+	<jsp:include page="leftbar-empty.jsp" />
 	<!-- END LEFTBAR -->
+
+
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
 
 <h3>Opps!  please try again </h3>

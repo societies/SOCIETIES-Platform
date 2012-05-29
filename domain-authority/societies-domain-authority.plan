@@ -14,5 +14,10 @@
 
     <!-- Group Manager -->
     <artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityGroupManager"/>
+    <!--Domain Authoity Registry -->
+    <artifact type="bundle" name="org.societies.data-source"/>
+    <artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityRegistry"/>
+    <!--Admin Web App -->
+    <artifact type="bundle" name="org.societies.domain-authority.domain-authority-webapp"/>
 	
 </plan>

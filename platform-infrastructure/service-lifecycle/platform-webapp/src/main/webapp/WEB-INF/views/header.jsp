@@ -5,7 +5,7 @@
 	<table border="0" align="center">
 	  <tr>
 	    <td>
-		  <center><img src="images/societiesheader.png" /></center>
+		  <center><img src="${pageContext.request.contextPath}/images/societiesheader.png" /></center>
 		 </td>
 	  </tr>
 	</table>

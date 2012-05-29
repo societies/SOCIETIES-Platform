@@ -26,15 +26,15 @@ package org.societies.privacytrust.privacyprotection.assessment.logic;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResult;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
-import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * Parses the log and tries to find potential privacy breaches that occurred in the past.
@@ -51,6 +51,10 @@ public class Assessment implements IAssessment {
 	private static Logger LOG = LoggerFactory.getLogger(Assessment.class);
 
 	private PrivacyLog privacyLog;
+	private DataTransferAnalyzer dataTransferAnalyzer;
+	
+	private List<AssessmentResultIIdentity> assessmentById = new ArrayList<AssessmentResultIIdentity>();
+	private List<AssessmentResultClassName> assessmentByClass = new ArrayList<AssessmentResultClassName>();
 	
 	public Assessment() {
 		LOG.info("Constructor");
@@ -66,24 +70,83 @@ public class Assessment implements IAssessment {
 		this.privacyLog = privacyLog;
 	}
 
+	public void init() {
+		dataTransferAnalyzer = new DataTransferAnalyzer(privacyLog);
+		assessAllNow();
+	}
+	
 	@Override
 	public void setAutoPeriod(int seconds) {
-		
+		LOG.warn("setAutoPeriod({}): not implemented yet", seconds);
+		// TODO
 	}
 	
 	@Override
-	public Future<List<AssessmentResult>> assessNow() {
-		
-		List<AssessmentResult> allResults = new ArrayList<AssessmentResult>();
-		AssessmentResult result = new AssessmentResultClassName("classA");
-		
-		allResults.add(result);
-		
-		return new AsyncResult<List<AssessmentResult>>(allResults);
+	public void assessAllNow() {
+		try {
+			for (IIdentity sender : privacyLog.getSenderIds()) {
+				AssessmentResultIIdentity ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+				assessmentById.add(ass);
+			}
+			for (String sender : privacyLog.getSenderClassNames()) {
+				AssessmentResultClassName ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+				assessmentByClass.add(ass);
+			}
+		}
+		catch (AssessmentException e) {
+			LOG.warn("assessAllNow(): Skipped a sender", e);
+		}
 	}
 	
 	@Override
-	public List<AssessmentResult> getLastResult() {
+	public List<AssessmentResultIIdentity> getAssessmentAllIds() {
+		return assessmentById;
+	}
+	
+	@Override
+	public List<AssessmentResultClassName> getAssessmentAllClasses() {
+		return assessmentByClass;
+	}
+
+	@Override
+	public AssessmentResultIIdentity getAssessment(IIdentity sender) {
+		
+		if (sender == null || sender.getJid() == null) {
+			LOG.warn("getAssessment({}): invalid argument", sender);
+			return null;
+		}
+		
+		for (AssessmentResultIIdentity ass : assessmentById) {
+			if (ass.getSender().getJid().equals(sender.getJid())) {
+				return ass;
+			}
+		}
 		return null;
+	}
+
+	@Override
+	public AssessmentResultClassName getAssessment(String sender) {
+		
+		if (sender == null) {
+			LOG.warn("getAssessment({}): invalid argument", sender);
+			return null;
+		}
+		
+		for (AssessmentResultClassName ass : assessmentByClass) {
+			if (ass.getSender().equals(sender)) {
+				return ass;
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public long getNumDataTransmissionEvents() {
+		return privacyLog.getDataTransmission().size();
+	}
+	
+	@Override
+	public long getNumDataAccessEvents() {
+		return privacyLog.getDataAccess().size();
 	}
 }

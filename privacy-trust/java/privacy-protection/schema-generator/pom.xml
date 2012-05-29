@@ -78,7 +78,7 @@
 			<httpNamespace>http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy</httpNamespace>
 			<!-- Output and input directories -->
 			<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
-			<file>schema1.xsd</file>
+			<file>schema3.xsd</file>
 			<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
 		</configuration>
 	</plugin>

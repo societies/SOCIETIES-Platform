@@ -40,6 +40,8 @@
 
 	</FONT>
 
+<h2>${error}</h2>
+
 <form:form method="POST" action="login.html" commandName="loginForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
@@ -50,13 +52,7 @@
 				<td><form:errors path="userName" cssClass="error" />
 				</td>
 			</tr>
-			<tr>
-				<td>Sub Domain :</td>
-				<td><form:input path="subDomain" value="societies.local"  />
-				</td>
-				<td><form:errors path="subDomain" cssClass="error" />
-				</td>
-			</tr>			
+		
 					
 			<tr>
 				<td>Password :</td>

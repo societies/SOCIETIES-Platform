@@ -34,9 +34,11 @@ public class DaUserRecord {
 	
 	private String name;
 	private String id;
-	private String url;
+	private String host;
+	private String port;
 	private String status;
 	private String userType;
+	private String password;
 	/**
 	 * @return the id
 	 */
@@ -49,18 +51,7 @@ public class DaUserRecord {
 	public void setId(String id) {
 		this.id = id;
 	}
-	/**
-	 * @return the url
-	 */
-	public String getUrl() {
-		return url;
-	}
-	/**
-	 * @param url the url to set
-	 */
-	public void setUrl(String url) {
-		this.url = url;
-	}
+	
 	/**
 	 * @return the status
 	 */
@@ -98,11 +89,70 @@ public class DaUserRecord {
 		this.name = name;
 	}
 	/**
+	 * @return the host
+	 */
+	public String getHost() {
+		return host;
+	}
+	/**
+	 * @param host the host to set
+	 */
+	public void setHost(String host) {
+		this.host = host;
+	}
+	/**
+	 * @return the port
+	 */
+	public String getPort() {
+		return port;
+	}
+	/**
+	 * @param port the port to set
+	 */
+	public void setPort(String port) {
+		this.port = port;
+	}
+	
+	
+	
+	/**
+	 * @return the password
+	 */
+	public String getPassword() {
+		return password;
+	}
+	/**
+	 * @param password the password to set
+	 */
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	/**
+	 * @param name
+	 * @param id
+	 * @param host
+	 * @param port
+	 * @param status
+	 * @param userType
+	 */
+	public DaUserRecord(String name, String id, String host, String port,
+			String status, String userType, String password) {
+		super();
+		this.name = name;
+		this.id = id;
+		this.host = host;
+		this.port = port;
+		this.status = status;
+		this.userType = userType;
+		this.userType = password;
+	}
+	/**
 	 * 
 	 */
 	public DaUserRecord() {
 		super();
 	}
+
 	
 	
 	

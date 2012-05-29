@@ -25,6 +25,7 @@
 
 package org.societies.cis.manager;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -38,6 +39,7 @@ import java.util.concurrent.Future;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,6 +49,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 //import org.societies.cis.mgmt;
+import org.hibernate.SessionFactory;
+import org.hibernate.classic.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
@@ -99,19 +103,32 @@ import org.springframework.scheduling.annotation.AsyncResult;
 @Entity
 @Table(name = "org_societies_cis_manager_Cis")
 public class Cis implements IFeatureServer, ICisOwned {
-
+	private static final long serialVersionUID = 1L;
+	@Transient
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
 					  		"http://societies.org/api/schema/cis/community"));
 			//.singletonList("http://societies.org/api/schema/cis/community");
+	@Transient
 	private final static List<String> PACKAGES = Collections
 			//.singletonList("org.societies.api.schema.cis.community");
 	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
 		"org.societies.api.schema.cis.community"));
+	@Transient
+	private SessionFactory sessionFactory;
+	
+	
+	
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
 
-	
-	
-	
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
+
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
@@ -121,6 +138,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 // minimun attributes
 	@OneToOne(cascade=CascadeType.ALL)
 	public CisRecord cisRecord;
+	
 	@OneToOne(cascade=CascadeType.ALL)
 	public ActivityFeed activityFeed;
 	//TODO: should this be persisted?
@@ -132,7 +150,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	private IIdentity cisIdentity;
 	@Transient
 	private PubsubClient psc;
-	@OneToMany(cascade=CascadeType.ALL)
+	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	@Column
 	public String cisType;
@@ -141,7 +159,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 // extra attributes	
 	
-	@Column
+	@Transient
 	public String permaLink; // all those have been moved to the Editor
 	
 	@Column
@@ -247,7 +265,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			e.printStackTrace();
 			LOG.info("could not start comm manager!");
 		} // TODO unregister??
-		
 		LOG.info("CIS listener registered");
 		
 		
@@ -772,8 +789,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		n.setDeleteNotification(d);
 		message.setNotification(n);
-
-		
+		Session session = sessionFactory.openSession();
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();
 		
@@ -801,7 +817,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			it.remove();
 	     }
 		
-		
+		session.close();
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...

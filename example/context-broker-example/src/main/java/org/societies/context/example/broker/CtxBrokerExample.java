@@ -35,15 +35,21 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -64,23 +70,34 @@ public class CtxBrokerExample 	{
 
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
+	
+	private IIdentity cssOwnerId;
+	private INetworkNode cssNodeId;
 
 	private CtxEntityIdentifier ctxEntityIdentifier = null;
 	private CtxIdentifier ctxAttributeStringIdentifier = null;
 	private CtxIdentifier ctxAttributeBinaryIdentifier = null;
 
 	@Autowired(required=true)
-	public CtxBrokerExample(ICtxBroker internalCtxBroker) {
+	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr) throws InvalidFormatException {
 
 		LOG.info("*** CtxBrokerExample instantiated");
 		this.internalCtxBroker = internalCtxBroker;
+		
+		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
+		LOG.info("*** cssNodeId = " + this.cssNodeId);
+		
+		final String cssOwnerStr = this.cssNodeId.getBareJid();
+		this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
+		LOG.info("*** cssOwnerId = " + this.cssOwnerId);
 
 		LOG.info("*** Starting examples...");
 		this.retrieveCssOperator();
+		this.retrieveCssNode();
 		this.createContext();
+		this.registerForContextChanges();
 		this.retrieveContext();
 		this.lookupContext();
-		this.registerForContextChanges();
 		this.simpleCtxHistoryTest();
 		this.tuplesCtxHistoryTest();
 	}
@@ -91,7 +108,21 @@ public class CtxBrokerExample 	{
 		
 		try {
 			IndividualCtxEntity operator = this.internalCtxBroker.retrieveCssOperator().get();
-			LOG.info("*** operator context entity id: " + operator.getId());
+			LOG.info("*** CSS owner context entity id: " + operator.getId());
+		
+		} catch (Exception e) {
+			
+			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+		}
+	}
+	
+	private void retrieveCssNode() {
+		
+		LOG.info("*** retrieveCssNode");
+		
+		try {
+			CtxEntity cssNodeEnt = this.internalCtxBroker.retrieveCssNode(this.cssNodeId).get();
+			LOG.info("*** CSS node context entity id: " + cssNodeEnt.getId());
 		
 		} catch (Exception e) {
 			
@@ -100,8 +131,8 @@ public class CtxBrokerExample 	{
 	}
 
 	/**
-	 * At this point a CtxEntity of type "Device" is created with an attribute
-	 * of type "DeviceID" with a string value "device1234".
+	 * At this point a CtxEntity of type {@link CtxEntityTypes.DEVICE} is created with an attribute
+	 * of type {@link CtxAttributeTypes.ID} with a string value "device1234".
 	 */
 	private void createContext(){
 
@@ -110,14 +141,14 @@ public class CtxBrokerExample 	{
 		//create ctxEntity of type "Device"
 		Future<CtxEntity> futureEnt;
 		try {
-			futureEnt = this.internalCtxBroker.createEntity("Device");
+			futureEnt = this.internalCtxBroker.createEntity(CtxEntityTypes.DEVICE);
 			CtxEntity ctxEntity = (CtxEntity) futureEnt.get();
 
 			//get the context identifier of the created entity (to be used at the next step)
 			this.ctxEntityIdentifier = ctxEntity.getId();
 
 			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity
-			Future<CtxAttribute> futureCtxAttrString = this.internalCtxBroker.createAttribute(this.ctxEntityIdentifier, "DeviceID");
+			Future<CtxAttribute> futureCtxAttrString = this.internalCtxBroker.createAttribute(this.ctxEntityIdentifier, CtxAttributeTypes.ID);
 			// get the object of the created CtxAttribute
 			CtxAttribute ctxAttributeString = (CtxAttribute) futureCtxAttrString.get();
 
@@ -155,8 +186,8 @@ public class CtxBrokerExample 	{
 				e.printStackTrace();
 			}
 
-			// at this point the ctxEntity of type "device" that is assigned with
-			// a ctxAttribute of type "deviceID" with a string value
+			// at this point the ctxEntity of type CtxEntityTypes.DEVICE that is assigned with
+			// a ctxAttribute of type CtxAttributeTypes.ID with a string value
 			// and a ctxAttribute of type "CustomData" with a binary value
 
 		} catch (Exception e) {
@@ -165,19 +196,17 @@ public class CtxBrokerExample 	{
 		}
 	}
 
-
-
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
 	 */
 	private void lookupContext() {
 		try {
 
-			List<CtxIdentifier> idsEntities =this.internalCtxBroker.lookup(CtxModelType.ENTITY, "Device").get();
-			LOG.info("*** lookup results for Entity type: 'Device' " +idsEntities);
+			List<CtxIdentifier> idsEntities =this.internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
+			LOG.info("*** lookup results for Entity type: '" + CtxEntityTypes.DEVICE + "' " +idsEntities);
 
-			List<CtxIdentifier> idsAttribute =this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "DeviceID").get();
-			LOG.info("*** lookup results for Attribute type: 'DeviceID' " +idsAttribute);
+			List<CtxIdentifier> idsAttribute =this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.ID).get();
+			LOG.info("*** lookup results for Attribute type: '" + CtxAttributeTypes.ID + "' " +idsAttribute);
 
 		} catch (Exception e) {
 			
@@ -404,7 +433,7 @@ public class CtxBrokerExample 	{
 			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxAttributeStringIdentifier);
 
 			// 1b. Register listener by specifying the context attribute scope and type
-			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, "DeviceID");
+			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, CtxAttributeTypes.ID);
 
 			// 2. Update attribute to see some event action
 			this.internalCtxBroker.updateAttribute((CtxAttributeIdentifier) this.ctxAttributeStringIdentifier, "newDeviceIdValue");

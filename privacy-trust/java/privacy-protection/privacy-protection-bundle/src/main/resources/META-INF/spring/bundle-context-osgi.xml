@@ -4,55 +4,83 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
+	<!-- Privacy Data Management Configuration -->
+
 	<osgi:service ref="privacyDataManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager" />
+
+
+	<!-- Privacy Policy Manager Configuration -->
 
 	<osgi:service ref="PrivacyPolicyManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" />
 
+	<osgi:service ref="PrivacyAgreementManager"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager" />
+
+
+	<!-- Privacy Assessment Configuration -->
+
 	<osgi:service ref="PrivacyLogAppender"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender" />
 
-	<!--osgi:service ref="CommsFwTestBean"
-		interface="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean" /-->
+	<!--osgi:service ref="CommsFwTestBean" interface="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean" 
+		/ -->
 	<osgi:service ref="Assessment"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment" />
 
-	
-	    <osgi:service ref="privacyPreferenceManager" >
-        <osgi:interfaces>
-            <value>
+
+	<!-- Privacy Policy Negotiation Manager Configuration -->
+
+
+	<!-- Privacy Preference Manager Configuration -->
+
+	<osgi:service ref="privacyPreferenceManager">
+		<osgi:interfaces>
+			<value>
 				org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager
-            </value>
-        </osgi:interfaces>
-    </osgi:service>
-	
-	
-	<osgi:reference
-        id="commsMgr"
-        interface="org.societies.api.comm.xmpp.interfaces.ICommManager" >
-    </osgi:reference>
-    
-    <osgi:reference
-        id="ctxBroker"
-        interface="org.societies.api.internal.context.broker.ICtxBroker" >
-    </osgi:reference>
-    
-    <osgi:reference
-        id="trustBroker"
-        interface="org.societies.api.internal.privacytrust.trust.ITrustBroker" >
-    </osgi:reference>
-	<osgi:reference id="CommManagerBundle"
-		interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1" />
-		
+			</value>
+		</osgi:interfaces>
+	</osgi:service>
+
+
+	<!-- Needed references -->
+
+	<osgi:reference id="commsMgr"
+		interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
+	</osgi:reference>
+
+	<osgi:reference id="ctxBroker"
+		interface="org.societies.api.internal.context.broker.ICtxBroker">
+	</osgi:reference>
+
+	<osgi:reference id="trustBroker"
+		interface="org.societies.api.internal.privacytrust.trust.ITrustBroker">
+	</osgi:reference>
+
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
-	
+
 	<osgi:reference id="privacyDataManagerInternal"
-		interface="org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal" cardinality="0..1" />
-	
-	
-	<osgi:reference id="privacyPreferenceManager" interface="org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager">
-        
-    </osgi:reference>
-	
+		interface="org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal"
+		cardinality="0..1" />
+
+
+	<osgi:reference id="privacyPreferenceManager"
+		interface="org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager">
+	</osgi:reference>
+
+	<osgi:reference id="CommManagerBundle"
+		interface="org.societies.api.comm.xmpp.interfaces.ICommManager"
+		cardinality="0..1" />
+
+	<osgi:reference id="eventMgr"
+		interface="org.societies.api.osgi.event.IEventMgr">
+	</osgi:reference>
+
+	<!-- to be uncommented as soon as they are ready for spring -->
+	<!-- <osgi:reference id="policyAgreementManager" interface="org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal"> 
+		</osgi:reference> <osgi:reference id="negotiationAgent" interface="org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent"> 
+		</osgi:reference> <osgi:reference id="privacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"> 
+		</osgi:reference> -->
+
 </beans>

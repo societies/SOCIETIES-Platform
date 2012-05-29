@@ -18,6 +18,7 @@
 		<property name="privacyDataManager" ref="privacyDataManager" />
 		<property name="privacyDataManagerRemote" ref="privacyDataManagerRemote" />
 		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
+		<property name="privacyPolicyManagerRemote" ref="privacyPolicyManagerRemote" />
 		<property name="ctxBroker" ref="ctxBroker"/>
 	</bean>
 
