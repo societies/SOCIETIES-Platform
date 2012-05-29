@@ -24,6 +24,9 @@
  */
 package org.societies.context.api.community.estimation;
 
-public class EstimationModels {
 
+	
+public enum EstimationModels {
+		MEAN, MEDIAN
+	
 }
