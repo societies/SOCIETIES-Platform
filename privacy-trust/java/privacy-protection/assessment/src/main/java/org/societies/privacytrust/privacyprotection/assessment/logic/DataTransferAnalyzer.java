@@ -24,7 +24,6 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
