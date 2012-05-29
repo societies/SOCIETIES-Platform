@@ -120,25 +120,25 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		}
 		
 		// -- Privacy Policy Management
-		if (payload instanceof PrivacyPolicyManagerBean) {
+		else if (payload instanceof PrivacyPolicyManagerBean) {
 			return privacyPolicyManagerCommServer.getQuery(stanza, (PrivacyPolicyManagerBean) payload);
 		}
 		
-		if (payload instanceof PrivacyAgreementManagerBean) {
+		else if (payload instanceof PrivacyAgreementManagerBean) {
 			return privacyAgreementManagerCommServer.getQuery(stanza, (PrivacyAgreementManagerBean) payload);
 		}
 		
 		// -- Privacy Preference Management
 
 		// -- Privacy Policy Negotiation Management
-		if (payload instanceof NegotiationAgentBean){
+		else if (payload instanceof NegotiationAgentBean){
 			return privacyNegotiationManagerCommServer.getQuery(stanza, (NegotiationAgentBean) payload);
 		}
 
 		// -- Assessment Management
 
 		// -- Trust Management
-		/* else */ if (payload instanceof TrustBrokerRequestBean){
+		else if (payload instanceof TrustBrokerRequestBean){
 			return this.trustBrokerCommServer.getQuery(stanza, (TrustBrokerRequestBean) payload);
 		}
 		

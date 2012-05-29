@@ -36,7 +36,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinatesWrapper;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.DataObfuscationManager;
 
@@ -68,7 +67,7 @@ public class DataObfuscationManagerTest {
     @Parameters({ "1.0", "0.5", "0.1" })
 	public void testObfuscateData(double obfuscationLevel) {
 		LOG.info("[Test begin] testObfuscateData("+obfuscationLevel+")");
-		LocationCoordinatesWrapper locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
+		IDataWrapper<LocationCoordinates> locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
 		IDataWrapper<LocationCoordinates> obfuscatedDataWrapper = null;
 		try {
 			obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(locationCoordinatesWrapper, obfuscationLevel);
@@ -94,7 +93,7 @@ public class DataObfuscationManagerTest {
 	@Parameters({ "-1", "2.5" })
 	public void testObfuscateDataOutOfBound(double obfuscationLevel) {
 		LOG.info("[Test begin] testObfuscateDataOutOfBound("+obfuscationLevel+")");
-		LocationCoordinatesWrapper locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
+		IDataWrapper<LocationCoordinates> locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);
 		IDataWrapper<LocationCoordinates> obfuscatedDataWrapper = null;
 		try {
 			obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(locationCoordinatesWrapper, obfuscationLevel);

@@ -1,5 +1,6 @@
 package org.societies.integration.test.bit.assessment;
 
+import org.junit.runner.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -17,7 +18,7 @@ public class TestCase1055 extends IntegrationTestCase {
 	 */
 	private static IPrivacyLogAppender privacyLogAppender;
 	private static IIdentityManager identityManager;
-	private static ICommManager commsManager;
+	private static ICommManager commManager;
 	private static ICtxBroker ctxBrokerExternal;
 	private static org.societies.api.internal.context.broker.ICtxBroker ctxBrokerInternal;
 	private static IAssessment assessment;
@@ -31,6 +32,12 @@ public class TestCase1055 extends IntegrationTestCase {
 		NominalTestCaseLowerTester.testCaseNumber = 1055;
 	}
 
+	@Override
+	public Result run() {
+		identityManager = commManager.getIdManager();
+		return super.run();
+	}
+	
 	// Getters and setters for beans
 	protected static IPrivacyLogAppender getPrivacyLogAppender() {
 		return privacyLogAppender;
@@ -42,16 +49,12 @@ public class TestCase1055 extends IntegrationTestCase {
 	protected static IIdentityManager getIdentityManager() {
 		return identityManager;
 	}
-	public void setIdentityManager(IIdentityManager identityManager) {
-		LOG.debug("[#1055] setIdentityManager()");
-		TestCase1055.identityManager = identityManager;
-	}
 	protected static ICommManager getCommManager() {
-		return commsManager;
+		return commManager;
 	}
-	public void setCommManager(ICommManager commsManager) {
+	public void setCommManager(ICommManager commManager) {
 		LOG.debug("[#1055] setCommManager()");
-		TestCase1055.commsManager = commsManager;
+		TestCase1055.commManager = commManager;
 	}
 	protected static ICtxBroker getCtxBrokerExternal() {
 		return ctxBrokerExternal;

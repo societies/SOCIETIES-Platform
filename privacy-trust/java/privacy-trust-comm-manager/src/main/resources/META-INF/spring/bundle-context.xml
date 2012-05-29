@@ -24,6 +24,8 @@
 		init-method="initBean">
 		<property name="commManager" ref="commManager" />
 		<property name="privacyDataManagerCommClientCallback" ref="PrivacyDataManagerCommClientCallback" />
+		<property name="privacyPolicyManagerCommClientCallback" ref="PrivacyPolicyManagerCommClientCallback" />
+		<property name="privacyAgreementManagerCommClientCallback" ref="PrivacyAgreementManagerCommClientCallback" />
 		<property name="trustBrokerCommClientCallback" ref="trustBrokerCommClientCallback" />
 	</bean>
 	
@@ -33,6 +35,8 @@
 		init-method="initBean">
 		<property name="commManager" ref="commManager" />
 		<property name="privacyDataManagerCommServer" ref="PrivacyDataManagerCommServer" />
+		<property name="privacyPolicyManagerCommServer" ref="PrivacyPolicyManagerCommServer" />
+		<property name="privacyAgreementManagerCommServer" ref="PrivacyAgreementManagerCommServer" />
 		<property name="privacyNegotiationManagerCommServer" ref="PrivacyNegotiationManagerCommServer" />
 		<property name="trustBrokerCommServer" ref="trustBrokerCommServer" />
 	</bean>

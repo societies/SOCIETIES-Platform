@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<ScrollView android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+			<LinearLayout
+			    android:id="@+id/linearLayout1"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content" >
+
+			    <Button
+			        android:id="@+id/btnRefreshUsingSameProcess"
+			        android:layout_width="0dp"
+			        android:layout_height="match_parent"
+			        android:layout_weight="1"
+			        android:text="@string/txt_sameprocess"
+			        android:onClick="onButtonRefreshUsingSameProcessClick" />
+
+			    <Button
+			        android:id="@+id/btnRefreshUsingDifferentProcess"
+			        android:layout_width="0dp"
+			        android:layout_height="match_parent"
+			        android:layout_weight="1"
+			        android:text="@string/txt_differentprocess"
+			        android:onClick="onButtonRefreshUsingDifferentProcessClick" />
+			</LinearLayout>
+
+			<Button
+			    android:id="@+id/btnReset"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:layout_weight="1"
+			    android:text="@string/txt_reset"
+				android:onClick="onButtonResetClick" />
+			<TextView android:textAppearance="?android:attr/textAppearanceMedium"
+				android:layout_width="wrap_content" android:id="@+id/textView5"
+				android:layout_height="wrap_content" android:text="@string/title_location"></TextView>
+			<TextView android:layout_width="wrap_content" android:id="@+id/txtLocation"
+				android:layout_height="wrap_content" android:text="@string/txt_nothing"></TextView>
+		</LinearLayout>
+	</ScrollView>
+</LinearLayout>
+
