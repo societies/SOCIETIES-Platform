@@ -28,10 +28,18 @@ import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.privacytrust.api.IPrivacyDataManagerInternal;
+import org.societies.android.privacytrust.datamanagement.accessor.DAOException;
+import org.societies.android.privacytrust.datamanagement.accessor.IPrivacyPermissionDAO;
+import org.societies.android.privacytrust.datamanagement.accessor.sqlite.DBHelper;
+import org.societies.android.privacytrust.datamanagement.accessor.sqlite.PrivacyPermissionDAO;
+import org.societies.android.privacytrust.model.PrivacyPermission;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.RequestorBean;
+
+import android.content.Context;
+import android.util.Log;
 
 
 /**
@@ -40,48 +48,33 @@ import org.societies.api.schema.identity.RequestorBean;
 public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	private final static String TAG = PrivacyDataManagerInternal.class.getSimpleName();
 
+	private IPrivacyPermissionDAO privacyPermissionmanager;
+
+	public PrivacyDataManagerInternal(Context context) {
+		DBHelper dbHelper = new DBHelper(context);
+		privacyPermissionmanager = new PrivacyPermissionDAO(dbHelper.getDbWrite());
+	}
+
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.RequestorBean, org.societies.api.identity.String, org.societies.api.context.model.String)
 	 */
 	@Override
 	public ResponseItem getPermission(RequestorBean requestor, String ownerId, String dataId) throws PrivacyException {
 		ResponseItem permission = null;
-//		Session session = sessionFactory.openSession();
-//		Transaction t = session.beginTransaction();
-//		try {
-//			// -- Retrieve the privacy permission
-//			Criteria criteria = session
-//					.createCriteria(PrivacyPermission.class)
-//					.add(Restrictions.eq("requestorId", requestor.getRequestorBeanId().getJid()))
-//					.add(Restrictions.eq("ownerId", ownerId.getJid()))
-//					.add(Restrictions.eq("dataId", dataId.toUriString()));
-//			if (requestor instanceof RequestorBeanCis) {
-//				criteria.add(Restrictions.eq("cisId", ((RequestorBeanCis) requestor).getCisRequestorBeanId().getJid()));
-//			}
-//			else if (requestor instanceof RequestorBeanService) {
-//				criteria.add(Restrictions.eq("serviceId", ((RequestorBeanService) requestor).getRequestorBeanServiceId().getIdentifier().toString()));
-//			}
-//			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
-//
-//
-//			// -- Generate the response item
-//			// - Privacy Permission doesn't exist
-//			if (null == privacyPermission) {
-//				LOG.info("PrivacyPermission not available");
-//				return null;
-//			}
-//			// - Privacy permission retrieved
-//			LOG.info(privacyPermission.toString());
-//			permission = privacyPermission.createResponseItem();
-//			LOG.info("PrivacyPermission retrieved.");
-//		} catch (Exception e) {
-//			t.rollback();
-//			throw new PrivacyException("Error during the persistance of the privacy permission", e);
-//		} finally {
-//			if (session != null) {
-//				session.close();
-//			}
-//		}
+		try {
+			PrivacyPermission privacyPermission = privacyPermissionmanager.findPrivacyPermission(requestor, ownerId, dataId);
+			if (null == privacyPermission) {
+				Log.i(TAG, "PrivacyPermission not available");
+				return null;
+			}
+			// - Privacy permission retrieved
+			Log.i(TAG, privacyPermission.toString());
+			permission = privacyPermission.createResponseItem();
+		} catch (DAOException e) {
+			Log.e(TAG, "Can't retrieve the privacy permission", e);
+			return null;
+		}
+		Log.i(TAG, "PrivacyPermission retrieved.");
 		return permission;
 	}
 
@@ -89,54 +82,28 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.RequestorBean, org.societies.api.identity.String, org.societies.api.context.model.String, java.util.List, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants)
 	 */
 	@Override
-	public boolean updatePermission(RequestorBean requestor, String ownerId, String dataId, List<Action> actions, Decision permission) throws PrivacyException {
-		boolean result = false;
-//		Session session = sessionFactory.openSession();
-//		Transaction t = session.beginTransaction();
-//		try {
-//			// -- Retrieve the privacy permission
-//			Criteria criteria = session
-//					.createCriteria(PrivacyPermission.class)
-//					.add(Restrictions.eq("requestorId", requestor.getRequestorBeanId().getJid()))
-//					.add(Restrictions.eq("ownerId", ownerId.getJid()))
-//					.add(Restrictions.eq("dataId", dataId.toUriString()));
-//			if (requestor instanceof RequestorBeanCis) {
-//				criteria.add(Restrictions.eq("cisId", ((RequestorBeanCis) requestor).getCisRequestorBeanId().getJid()));
-//			}
-//			else if (requestor instanceof RequestorBeanService) {
-//				criteria.add(Restrictions.eq("serviceId", ((RequestorBeanService) requestor).getRequestorBeanServiceId().getIdentifier().toString()));
-//			}
-//			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
-//
-//
-//			// -- Update this privacy permission
-//			// - Privacy Permission doesn't exist: create a new one
-//			if (null == privacyPermission) {
-//				LOG.info("PrivacyPermission not available: create it");
-//				privacyPermission = new PrivacyPermission(requestor, ownerId, dataId, actions, permission);
-//			}
-//			// - Privacy permission already exists: update it
-//			else {
-//				privacyPermission.setRequestorBean(requestor);
-//				privacyPermission.setOwnerId(ownerId);
-//				privacyPermission.setDataId(dataId);
-//				privacyPermission.setActions(actions);
-//				privacyPermission.setPermission(permission);
-//			}
-//			// - Update
-//			session.save(privacyPermission);
-//			t.commit();
-//			LOG.info("PrivacyPermission saved.");
-//			result = true;
-//		} catch (Exception e) {
-//			t.rollback();
-//			throw new PrivacyException("Error during the persistance of the privacy permission", e);
-//		} finally {
-//			if (session != null) {
-//				session.close();
-//			}
-//		}
-		return result;
+	public boolean updatePermission(RequestorBean requestor, String ownerId, String dataId, List<Action> actions, Decision decision) throws PrivacyException {
+
+		try {
+			// -- Retrieve existing private permission if any
+			PrivacyPermission privacyPermission = privacyPermissionmanager.findPrivacyPermission(requestor, ownerId, dataId);
+			// -- Creation
+			if (null == privacyPermission) {
+				privacyPermission = new PrivacyPermission(requestor, ownerId, dataId, PrivacyPermission.getActionsToJson(actions), decision);
+				privacyPermissionmanager.updatePrivacyPermission(privacyPermission);
+
+			}
+			// -- Update 
+			else {
+				privacyPermission.setActions(actions);
+				privacyPermission.setDecision(decision);
+				privacyPermissionmanager.updatePrivacyPermission(privacyPermission);
+			}
+		} catch (DAOException e) {
+			Log.e(TAG, "Can't retrieve / create / update the privacy permission", e);
+			return false;
+		}
+		return true;
 	}
 
 	/* (non-Javadoc)
@@ -153,45 +120,12 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 */
 	@Override
 	public boolean deletePermission(RequestorBean requestor, String ownerId, String dataId) throws PrivacyException {
-		boolean result = false;
-//		Session session = sessionFactory.openSession();
-//		Transaction t = session.beginTransaction();
-//		try {
-//			// -- Retrieve the privacy permission
-//			Criteria criteria = session
-//					.createCriteria(PrivacyPermission.class)
-//					.add(Restrictions.eq("requestorId", requestor.getRequestorBeanId().getJid()))
-//					.add(Restrictions.eq("ownerId", ownerId.getJid()))
-//					.add(Restrictions.eq("dataId", dataId.toUriString()));
-//			if (requestor instanceof RequestorBeanCis) {
-//				criteria.add(Restrictions.eq("cisId", ((RequestorBeanCis) requestor).getCisRequestorBeanId().getJid()));
-//			}
-//			else if (requestor instanceof RequestorBeanService) {
-//				criteria.add(Restrictions.eq("serviceId", ((RequestorBeanService) requestor).getRequestorBeanServiceId().getIdentifier().toString()));
-//			}
-//			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
-//
-//			// -- Delete the privacy permission
-//			// - Privacy Permission doesn't exist
-//			if (null == privacyPermission) {
-//				LOG.debug("PrivacyPermission not available: no need to delete");
-//			}
-//			// - Privacy permission retrieved: delete it
-//			else {
-//				LOG.info(privacyPermission.toString());
-//				session.delete(privacyPermission);
-//				t.commit();
-//				LOG.debug("PrivacyPermission deleted.");
-//			}
-//			result = true;
-//		} catch (Exception e) {
-//			t.rollback();
-//			throw new PrivacyException("Error during the removal of the privacy permission", e);
-//		} finally {
-//			if (session != null) {
-//				session.close();
-//			}
-//		}
-		return result;
+		try {
+			privacyPermissionmanager.deletePrivacyPermission(requestor, ownerId, dataId);
+		} catch (DAOException e) {
+			Log.e(TAG, "Can't delete the privacy permission", e);
+			return false;
+		}
+		return true;
 	}
 }

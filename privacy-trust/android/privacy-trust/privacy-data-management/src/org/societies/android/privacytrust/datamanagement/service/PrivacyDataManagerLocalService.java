@@ -28,6 +28,7 @@ import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
+import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerExternalService.IncomingHandler;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.RequestorBean;
@@ -36,6 +37,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Messenger;
 import android.util.Log;
 
 
@@ -45,16 +47,21 @@ import android.util.Log;
 public class PrivacyDataManagerLocalService extends Service implements IPrivacyDataManager {
 	private final static String TAG = PrivacyDataManagerLocalService.class.getSimpleName();
 
-	private final IBinder binder;
+	private IBinder binder;
 	private IPrivacyDataManager privacyDataManager;
 	
 	
-	public PrivacyDataManagerLocalService() {
-		super();
+	/* (non-Javadoc)
+	 * @see android.app.Service#onCreate()
+	 */
+	@Override
+	public void onCreate() {
+		super.onCreate();
+
 		// Creation of a binder for the service
 		binder = new LocalBinder();
 		// Creation of an instance of the Java implementation
-		privacyDataManager = new PrivacyDataManager();
+		privacyDataManager = new PrivacyDataManager(this.getApplicationContext());
 	}
 	
 	

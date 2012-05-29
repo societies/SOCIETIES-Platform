@@ -52,6 +52,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.model.pr
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 
+import android.content.Context;
 import android.util.Log;
 
 
@@ -64,8 +65,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 
 	
-	public PrivacyDataManager()  {
-		privacyDataManagerInternal = new PrivacyDataManagerInternal();
+	public PrivacyDataManager(Context context)  {
+		privacyDataManagerInternal = new PrivacyDataManagerInternal(context);
 	}
 
 

@@ -56,19 +56,25 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 	private Messenger inMessenger;
 	private IPrivacyDataManager privacyDataManager;
 
+	/* (non-Javadoc)
+	 * @see android.app.Service#onCreate()
+	 */
+	@Override
+	public void onCreate() {
+		super.onCreate();
 
-	public PrivacyDataManagerExternalService() {
-		super();
 		// Creation of a binder for the service
 		this.inMessenger = new Messenger(new IncomingHandler());
 		// Creation of an instance of the Java implementation
-		privacyDataManager = new PrivacyDataManager();
+		privacyDataManager = new PrivacyDataManager(this.getApplicationContext());
 	}
+
 
 
 	/* ***
 	 * Service Method Implementation
 	 **** */
+
 
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, java.lang.String, java.lang.String, org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action)
@@ -163,7 +169,7 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 						for (int i = 0; i < paramTypeList.length; i++) {
 							Class bundleParam [] = {String.class};
 							Object bundleValue [] = {paramNameList[i]};
-//							Method bundleMethod = Bundle.class.getMethod("get" + ServiceMethodTranslator.getParameterTypeWithoutPackage(paramTypeList[i]), bundleParam);
+							//							Method bundleMethod = Bundle.class.getMethod("get" + ServiceMethodTranslator.getParameterTypeWithoutPackage(paramTypeList[i]), bundleParam);
 							Method bundleMethod = Bundle.class.getMethod(ServiceMethodTranslator.getGetMethodFromParameter(paramTypeList[i]), bundleParam);
 							Bundle test = new Bundle();
 
