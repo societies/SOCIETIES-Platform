@@ -25,6 +25,7 @@
 package org.societies.domainauthority.webapp.controller;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -235,6 +236,18 @@ public class UserAdminController {
 				
 				modelnew.put("userForm", userForm);
 				modelnew.put("userrecords", userRecords);
+				
+				Map<String, String> userTypes = new LinkedHashMap<String, String>();
+				userTypes.put("user", "user");
+				userTypes.put("admin", "admin");
+				modelnew.put("userTypes", userTypes);
+				
+				Map<String, String> userStatusTypes = new LinkedHashMap<String, String>();
+				userStatusTypes.put("new", "new");
+				userStatusTypes.put("active", "active");
+				userStatusTypes.put("deleted", "deleted");
+				modelnew.put("userStatusTypes", userStatusTypes);
+				
 		
 			return new ModelAndView("useradmin", modelnew);
 		
@@ -260,6 +273,16 @@ public class UserAdminController {
 		model.put("userForm", userForm);
 		model.put("userrecords", userRecords);
 		
+		Map<String, String> userTypes = new LinkedHashMap<String, String>();
+		userTypes.put("user", "user");
+		userTypes.put("admin", "admin");
+		model.put("userTypes", userTypes);
+		
+		Map<String, String> userStatusTypes = new LinkedHashMap<String, String>();
+		userStatusTypes.put("new", "new");
+		userStatusTypes.put("active", "active");
+		userStatusTypes.put("deleted", "deleted");
+		model.put("userStatusTypes", userStatusTypes);
 		/*
 		 * return modelandview object and passing login (jsp page name) and
 		 * model object as constructor
@@ -300,6 +323,11 @@ public class UserAdminController {
 				 currentDBRec.setStatus(updatedRec.getStatus());
 				 bUpdated = true;
 			}
+			if (!(currentDBRec.getUserType().contentEquals(updatedRec.getUserType())))
+			{
+				 currentDBRec.setUserType(updatedRec.getUserType());
+				 bUpdated = true;
+			}
 			if (bUpdated)// changed
 			{
 				 daRegistry.updateXmppIdentityDetails(currentDBRec);
@@ -317,6 +345,18 @@ public class UserAdminController {
 		
 		modelnew.put("userForm", userFormNew);
 		modelnew.put("userrecords", userRecords);
+		
+		Map<String, String> userTypes = new LinkedHashMap<String, String>();
+		userTypes.put("user", "user");
+		userTypes.put("admin", "admin");
+		modelnew.put("userTypes", userTypes);
+		
+		Map<String, String> userStatusTypes = new LinkedHashMap<String, String>();
+		userStatusTypes.put("new", "new");
+		userStatusTypes.put("active", "active");
+		userStatusTypes.put("deleted", "deleted");
+		modelnew.put("userStatusTypes", userStatusTypes);
+		
 		
 		/*
 		 * return modelandview object and passing login (jsp page name) and

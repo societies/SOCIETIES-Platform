@@ -20,6 +20,7 @@
 	<xs:element name="trustBrokerResponseBean">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="methodName" type="tns:methodName" nillable="false" minOccurs="1"/>
 				<xs:element name="retrieve" type="tns:retrieveTrustBrokerResponseBean" nillable="false" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>

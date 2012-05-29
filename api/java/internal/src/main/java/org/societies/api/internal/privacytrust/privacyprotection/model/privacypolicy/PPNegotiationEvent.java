@@ -22,66 +22,50 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.webapp.models;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.societies.domainauthority.registry.DaUserRecord;
-
-
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
 /**
- * 
- * @author Maria Mannion
- * 
- *         
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
  */
-public class UserAdminForm {
+public class PPNegotiationEvent {
 
-
-	private String userName;
-	private String password;
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getPassword() {
-		return password;
-	}
+	private IAgreement agreement;
+	private NegotiationStatus negotiationStatus;
 	
-	List<DaUserRecord> userDetails;
-
-
-	/**
-	 * @return the userDetails
-	 */
-	public List<DaUserRecord> getUserDetails() {
-		if (this.userDetails == null)
-			userDetails = new ArrayList<DaUserRecord>();
-		return userDetails;
+	public PPNegotiationEvent(IAgreement agreement, NegotiationStatus negotiationStatus){
+		this.agreement = agreement;
+		this.negotiationStatus = negotiationStatus;
+		
 	}
 
 	/**
-	 * @param userDetails the userDetails to set
+	 * @return the agreement
 	 */
-	public void setUserDetails(List<DaUserRecord> userDetails) {
-		this.userDetails = userDetails;
+	public IAgreement getAgreement() {
+		return agreement;
 	}
 
+	/**
+	 * @param agreement the agreement to set
+	 */
+	public void setAgreement(IAgreement agreement) {
+		this.agreement = agreement;
+	}
 
+	/**
+	 * @return the negotiationStatus
+	 */
+	public NegotiationStatus getNegotiationStatus() {
+		return negotiationStatus;
+	}
 
-
-	
-	
-	
+	/**
+	 * @param negotiationStatus the negotiationStatus to set
+	 */
+	public void setNegotiationStatus(NegotiationStatus negotiationStatus) {
+		this.negotiationStatus = negotiationStatus;
+	}
 }

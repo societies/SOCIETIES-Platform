@@ -22,26 +22,28 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-/**
- * Describe your class here...
- *
- * @author aleckey
- *
- */
 package org.societies.privacytrust.remote.trust;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
+import org.societies.api.internal.schema.privacytrust.trust.broker.MethodName;
+import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
+import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
+import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
@@ -51,14 +53,25 @@ public class TrustBrokerCommServer implements IFeatureServer {
 	
 	/** The logging facility. */
 	private static Logger LOG = LoggerFactory.getLogger(TrustBrokerCommServer.class);
+	
+	private static final List<String> NAMESPACES = Collections.unmodifiableList(
+			Arrays.asList(
+					"http://societies.org/api/internal/schema/privacytrust/trust/model",
+					"http://societies.org/api/internal/schema/privacytrust/trust/broker"));
+	
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
+			Arrays.asList(
+					"org.societies.api.internal.schema.privacytrust.trust.model",
+					"org.societies.api.internal.schema.privacytrust.trust.broker"));
 
 	/** The Communications Mgr service reference. */
+	@SuppressWarnings("unused")
 	private ICommManager commManager;
 	
 	/** The Trust Broker service reference. */
 	private ITrustBroker trustBroker;
 	
-	public TrustBrokerCommServer() {
+	TrustBrokerCommServer() {
 		
 		LOG.info(this.getClass() + " instantiated");
 	}
@@ -68,17 +81,65 @@ public class TrustBrokerCommServer implements IFeatureServer {
 	 */
 	@Override
 	public List<String> getJavaPackages() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return PACKAGES;
 	}
 
 	/*
 	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#getQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	public Object getQuery(Stanza arg0, Object arg1) throws XMPPError {
-		// TODO Auto-generated method stub
-		return null;
+	public Object getQuery(Stanza stanza, Object bean) throws XMPPError {
+		
+		if (!(bean instanceof TrustBrokerRequestBean))
+			throw new IllegalArgumentException("bean is not instance of TrustBrokerRequestBean");
+		
+		final TrustBrokerRequestBean requestBean = (TrustBrokerRequestBean) bean;
+		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
+		
+		if (MethodName.RETRIEVE.equals(requestBean.getMethodName())) {
+			
+			final RetrieveTrustBrokerRequestBean retrieveRequestBean =
+					requestBean.getRetrieve();
+			if (retrieveRequestBean == null)
+				throw new XMPPError(StanzaError.bad_request, 
+						"Invalid TrustBroker remote retrieve request: "
+						+ "RetrieveTrustBrokerRequestBean can't be null");
+			
+			try {
+				final TrustedEntityId teid = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(retrieveRequestBean.getTeid());
+				
+				final Double result = this.trustBroker.retrieveTrust(teid).get();
+				final RetrieveTrustBrokerResponseBean retrieveResponseBean = 
+						new RetrieveTrustBrokerResponseBean();
+				// TODO find way to pass null result 
+				if (result != null)
+					retrieveResponseBean.setResult(result);
+				else
+					retrieveResponseBean.setResult(new Double(0.0d));
+				responseBean.setMethodName(MethodName.RETRIEVE);
+				responseBean.setRetrieve(retrieveResponseBean);
+				
+			} catch (MalformedTrustedEntityIdException mteide) {
+				
+				throw new XMPPError(StanzaError.bad_request, 
+						"Invalid TrustBroker remote retrieve request: "
+						+ mteide.getLocalizedMessage(), mteide);
+			} catch (Exception e) {
+				
+				throw new XMPPError(StanzaError.internal_server_error, 
+						"Could not retrieve trust value: "
+						+ e.getLocalizedMessage(), e);
+			} 
+			
+		} else {
+			
+			throw new XMPPError(StanzaError.unexpected_request, 
+					"Unsupported TrustBroker remote request method: " + requestBean.getMethodName());
+		}
+		
+		return responseBean;
 	}
 
 	/*
@@ -86,8 +147,8 @@ public class TrustBrokerCommServer implements IFeatureServer {
 	 */
 	@Override
 	public List<String> getXMLNamespaces() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return NAMESPACES;
 	}
 
 	/*
@@ -107,81 +168,6 @@ public class TrustBrokerCommServer implements IFeatureServer {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-/*
-	public Object getQuery(Stanza stanza, PrivacyDataManagerBean bean){
-		PrivacyDataManagerBeanResult beanResult = new PrivacyDataManagerBeanResult();
-		boolean ack = true;
-
-		// -- Check Permission
-		if (bean.getMethod().equals(MethodType.CHECK_PERMISSION)) {
-			LOG.info("getQuery(): CheckPermission remote called");
-			beanResult.setMethod(MethodType.CHECK_PERMISSION);
-			ack = checkPermission(bean, beanResult);
-			LOG.info("getQuery(): CheckPermission remote response sending");
-		}
-
-		// -- Obfuscate Data
-		else if (bean.getMethod().equals(MethodType.OBFUSCATE_DATA)) {
-			LOG.info("getQuery(): ObfuscateData remote called");
-			beanResult.setMethod(MethodType.OBFUSCATE_DATA);
-			ack = obfuscateData(bean, beanResult);
-			LOG.info("getQuery(): ObfuscateData remote response sending");
-		}
-		else {
-			LOG.info("getQuery(): Unknown method "+bean.getMethod().name());
-			beanResult.setAckMessage("Error Unknown method "+bean.getMethod().name());
-		}
-
-		beanResult.setAck(ack);
-		return beanResult;
-	}
-	
-	private boolean checkPermission(PrivacyDataManagerBean bean, PrivacyDataManagerBeanResult beanResult) {
-		try {
-			Requestor requestor = Util.getRequestorFromBean(bean.getRequestor(), commManager);
-			IIdentity ownerId = commManager.getIdManager().fromJid(bean.getOwnerId());
-			Action action = ActionUtils.toAction(bean.getAction());
-			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString(bean.getDataId());
-			ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
-			beanResult.setPermission(ResponseItemUtils.toResponseItemBean(permission));
-		} catch (MalformedCtxIdentifierException e) {
-			beanResult.setAckMessage("Error MalformedCtxIdentifierException: "+e.getMessage());
-			return false;
-		}
-		catch (PrivacyException e) {
-			beanResult.setAckMessage("Error PrivacyException: "+e.getMessage());
-			return false;
-		} catch (InvalidFormatException e) {
-			beanResult.setAckMessage("Error InvalidFormatException: "+e.getMessage());
-			return false;
-		}
-		return true;
-	}
-	
-	private boolean obfuscateData(PrivacyDataManagerBean bean, PrivacyDataManagerBeanResult beanResult) {
-		try {
-			Requestor requestor = Util.getRequestorFromBean(bean.getRequestor(), commManager);
-			IIdentity ownerId = commManager.getIdManager().fromJid(bean.getOwnerId());
-			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString(bean.getDataId());
-			Future<IDataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, ownerId, DataWrapperFactory.selectDataWrapper(dataId));
-			beanResult.setAckMessage("Sorry, the obfuscation is available, but not emotely yet.");
-			return false;
-		} catch (MalformedCtxIdentifierException e) {
-			beanResult.setAckMessage("Error MalformedCtxIdentifierException: "+e.getMessage());
-			return false;
-		}
-		catch (PrivacyException e) {
-			beanResult.setAckMessage("Error PrivacyException: "+e.getMessage());
-			return false;
-		} catch (InvalidFormatException e) {
-			beanResult.setAckMessage("Error InvalidFormatException: "+e.getMessage());
-			return false;
-		}
-//		return true;
-	}	
-*/	
-	// -- Dependency Injection
 
 	public void setCommManager(ICommManager commManager) {
 		

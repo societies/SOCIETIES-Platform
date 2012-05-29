@@ -31,5 +31,6 @@ package org.societies.api.internal.privacytrust.trust.remote;
  * @since 0.0.8
  */
 public interface ITrustBrokerRemoteCallback {
-
+	
+	public void onRetrieveTrust(Double value);
 }

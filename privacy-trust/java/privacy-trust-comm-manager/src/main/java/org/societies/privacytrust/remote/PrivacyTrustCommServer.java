@@ -73,7 +73,8 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 					"org.societies.api.schema.identity",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation",
 			  		"org.societies.api.schema.servicelifecycle.model",
-			  		"org.societies.api.internal.schema.privacytrust.trust.model"));
+			  		"org.societies.api.internal.schema.privacytrust.trust.model",
+			  		"org.societies.api.internal.schema.privacytrust.trust.broker"));
 
 	private ICommManager commManager;
 	private PrivacyDataManagerCommServer privacyDataManagerCommServer;
