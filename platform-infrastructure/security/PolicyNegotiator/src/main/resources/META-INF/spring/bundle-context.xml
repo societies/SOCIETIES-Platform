@@ -37,13 +37,14 @@
 	</bean>
 	<bean id="NegotiationRequester"
 		class="org.societies.security.policynegotiator.requester.NegotiationRequester"
-		depends-on="NegotiationProviderRemote,SignatureMgr"
+		depends-on="NegotiationProviderRemote,SignatureMgr,eventMgmtRef">
 		init-method="init" >
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
         <property name="secureStorage" ref="SecureStorage"/>
         <property name="personalizationMgr" ref="PersonalizationMgr"/>
         <property name="privacyPolicyNegotiationManager" ref="PrivacyPolicyNegotiationManager"/>
+        <property name="eventMgr" ref="eventMgmtRef"/>
 	</bean>
 
 </beans>
