@@ -376,9 +376,14 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		Future<IOutcome> futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
 		IAction action;
 		try {
-			IDIANNEOutcome dianneOut = futureDianneOuts.get().get(0);
+			List<IDIANNEOutcome> dianneOutList = futureDianneOuts.get();
+			if (dianneOutList.size()>0){
+			IDIANNEOutcome dianneOut = dianneOutList.get(0);
 			IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
 
+			if (null==prefOut){
+				return new AsyncResult<IAction>(dianneOut);
+			}
 			if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())){
 				action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
 				action.setServiceID(serviceID);
@@ -388,6 +393,11 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			}else{
 				return new AsyncResult<IAction>(this.resolvePreferenceConflicts(dianneOut, prefOut));
 			}
+			
+			}else{
+				IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
+				return new AsyncResult<IAction>(prefOut);
+			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -396,7 +406,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			e.printStackTrace();
 		}
 
-		return null;
+		return new AsyncResult<IAction>(null);
 	}
 
 	/*
@@ -446,6 +456,19 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			IUserIntentAction cauiOut = futureCAUIOuts.get();
 			CRISTUserAction cristOut = futureCRISTOuts.get();
 
+			if (cauiOut==null){
+				if (cristOut==null){
+					return new AsyncResult<IAction>(null);
+				}else{
+					return new AsyncResult<IAction>(cristOut);
+				}
+			}else{
+				if (cristOut==null){
+					return new AsyncResult<IAction>(cauiOut);
+				}
+			}
+			
+			
 			if (cauiOut.getvalue().equalsIgnoreCase(cristOut.getvalue())){
 				action = new Action(serviceID, "", preferenceName, cauiOut.getvalue());
 				return new AsyncResult<IAction>(action);
@@ -459,7 +482,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return new AsyncResult<IAction>(null);
 	}
 
 

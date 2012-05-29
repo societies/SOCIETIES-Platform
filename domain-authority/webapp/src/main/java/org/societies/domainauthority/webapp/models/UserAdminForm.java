@@ -41,8 +41,6 @@ public class UserAdminForm {
 
 
 	private String userName;
-
-
 	private String password;
 
 	public void setUserName(String userName) {
@@ -79,6 +77,8 @@ public class UserAdminForm {
 	public void setUserDetails(List<DaUserRecord> userDetails) {
 		this.userDetails = userDetails;
 	}
+
+
 
 
 	

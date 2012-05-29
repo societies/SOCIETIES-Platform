@@ -120,9 +120,11 @@ public class CommunityRecommenderTest {
 	public void testEgocentricCreationSuggestion() {
 		
 		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		when(ownerId.getIdentifier()).thenReturn("James Jents");
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		cisManager = mock(ICisManager.class);
+		//when(cisManager.createCis(cssId, cssPassword, cisName, cisType, mode))
 		userCtxBroker = mock(ICtxBroker.class);
 		
 		ArrayList<String> metadata = new ArrayList<String>();
@@ -133,6 +135,7 @@ public class CommunityRecommenderTest {
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
 		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
+		oneSuggestion.add(new ICisProposal());
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
@@ -156,6 +159,7 @@ public class CommunityRecommenderTest {
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
 		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
+		oneSuggestion.add(new ICisProposal());
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
@@ -179,6 +183,7 @@ public class CommunityRecommenderTest {
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
 		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
+		oneSuggestion.add(new ICisProposal());
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
@@ -202,6 +207,7 @@ public class CommunityRecommenderTest {
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
 		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
+		oneSuggestion.add(new ICisProposal());
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
@@ -225,6 +231,7 @@ public class CommunityRecommenderTest {
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
 		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
+		oneSuggestion.add(new ICisProposal());
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
@@ -248,6 +255,7 @@ public class CommunityRecommenderTest {
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
 		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
+		oneSuggestion.add(new ICisProposal());
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
@@ -271,6 +279,7 @@ public class CommunityRecommenderTest {
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
 		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
+		oneSuggestion.add(new ICisProposal());
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
@@ -294,6 +303,7 @@ public class CommunityRecommenderTest {
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> suggestions = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		ArrayList<ArrayList<ICisProposal>> theSuggestions = new ArrayList<ArrayList<ICisProposal>>();
 		ArrayList<ICisProposal> oneSuggestion = new ArrayList<ICisProposal>();
+		oneSuggestion.add(new ICisProposal());
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
     	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());

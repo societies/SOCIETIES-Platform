@@ -22,6 +22,15 @@
 			<organization>SINTEF</organization>
 			<organizationUrl>http://www.sintef.com/</organizationUrl>
 		</developer>
+		<developer>
+			<name>Olivier Maridat</name>
+			<email>olivier.maridat@trialog.com</email>
+			<organization>Trialog</organization>
+			<timezone>+1</timezone>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
 
 	<parent>
@@ -32,10 +41,15 @@
 	</parent>
 
 	<dependencies>
-		<!-- add your dependencies here -->
+		<!-- Societies -->
 		<dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>DBC</artifactId>
 			<version>${release.version}</version>
 		</dependency>
 		<!-- Needed for Societies-specific annotations -->
@@ -44,6 +58,7 @@
 			<artifactId>societies-annotations</artifactId>
 			<version>${release.version}</version>
 		</dependency>
+		<!-- Android -->
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>

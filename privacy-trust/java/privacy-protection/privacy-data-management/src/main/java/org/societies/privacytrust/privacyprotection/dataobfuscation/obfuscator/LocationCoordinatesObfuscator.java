@@ -31,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.ObfuscationLevelType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinatesWrapper;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.LocationCoordinates4Obfuscation;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.LocationCoordinatesUtils;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.RandomBetween;
@@ -44,7 +44,7 @@ import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.u
  * @author Olivier Maridat (Trialog)
  *
  */
-public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordinatesWrapper> {
+public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<LocationCoordinates>> {
 	private static Logger LOG = LoggerFactory.getLogger(LocationCoordinatesObfuscator.class.getSimpleName());
 
 	/**
@@ -89,10 +89,10 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordi
 	/**
 	 * @param data
 	 */
-	public LocationCoordinatesObfuscator(LocationCoordinatesWrapper data) {
+	public LocationCoordinatesObfuscator(IDataWrapper<LocationCoordinates> data) {
 		super(data);
 		obfuscationLevelType = ObfuscationLevelType.CONTINUOUS;
-		dataType = LocationCoordinatesWrapper.class;
+		dataType = LocationCoordinates.class;
 		geolocation = data.getData();
 	}
 
@@ -111,7 +111,7 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordi
 		LocationCoordinates obfuscatedLocationCoordinates = obfuscateLocation(geolocation, obfuscationLevel, obfuscationOperation, middleObfuscationLevel, theta);
 
 		// -- Return
-		LocationCoordinatesWrapper dataWrapper = new LocationCoordinatesWrapper(obfuscatedLocationCoordinates);
+		IDataWrapper<LocationCoordinates> dataWrapper = new DataWrapper<LocationCoordinates>(obfuscatedLocationCoordinates);
 		return dataWrapper;
 	}
 

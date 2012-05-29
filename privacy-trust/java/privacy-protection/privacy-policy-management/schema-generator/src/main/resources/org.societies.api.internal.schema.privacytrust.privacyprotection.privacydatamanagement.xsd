@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" elementFormDefault="qualified"
+	targetNamespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement"
+	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement"
+	xmlns:ns2="http://societies.org/api/schema/identity" xmlns:ns1="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy" schemaLocation="org.societies.api.schema.internal.privacytrust.privacyprotection.model.privacypolicy.xsd" />
+
+  <xs:import namespace="http://societies.org/api/schema/identity" schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />
+
+  <xs:element name="privacyDataManagerBeanResult">
+	<xs:complexType>
+    <xs:sequence>
+      <xs:element name="method" type="tns:methodType"/>
+      <xs:element name="ack" type="xs:boolean"/>
+      <xs:element name="ackMessage" type="xs:string" minOccurs="0"/>
+      <xs:element name="permission" type="ns1:responseItem" minOccurs="0"/>
+    </xs:sequence>
+  	</xs:complexType>
+	</xs:element>
+
+  <xs:element name="privacyDataManagerBean">
+	<xs:complexType>
+    <xs:sequence>
+      <xs:element name="method" type="tns:methodType"/>
+      <xs:element name="requestor" type="ns2:RequestorBean"/>
+      <xs:element name="ownerId" type="xs:string"/>
+      <xs:element name="dataId" type="xs:string"/>
+      <xs:element name="action" type="ns1:action"/>
+    </xs:sequence>
+  	</xs:complexType>
+	</xs:element>
+
+  <xs:simpleType name="methodType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="checkPermission"/>
+      <xs:enumeration value="obfuscateData"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

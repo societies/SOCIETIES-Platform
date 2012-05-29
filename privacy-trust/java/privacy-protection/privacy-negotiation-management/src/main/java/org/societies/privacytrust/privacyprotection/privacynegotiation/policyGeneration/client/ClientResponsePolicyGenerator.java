@@ -42,6 +42,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
@@ -127,6 +128,7 @@ public class ClientResponsePolicyGenerator {
 	 */
 	public ResponsePolicy generatePolicy(RequestPolicy providerPolicy){
 
+		//JOptionPane.showMessageDialog(null, "Generating privacy Policy");
 		Requestor requestor = providerPolicy.getRequestor();
 		ResponsePolicy myResponse = new ResponsePolicy(requestor, new ArrayList<ResponseItem>(), NegotiationStatus.ONGOING);
 
@@ -136,19 +138,26 @@ public class ClientResponsePolicyGenerator {
 		
 		for (RequestItem item : requestItems){
 			
-			
+			//if this item DOES NOT have a CREATE action
 			if (!this.hasCreate(item.getActions())){
+				//if this attribute DOES NOT exist in the context DB
 				if (!this.attrExistsInContext(item.getResource().getContextType())){
-					boolean attrCreated = this.createAttribute(requestor,item.getResource().getContextType());
-					if (!attrCreated){
+					
+					//boolean attrCreated = this.createAttribute(requestor,item.getResource().getContextType());
+					//if (!attrCreated){
 
-						myResponse.addResponseItem(new ResponseItem(item, Decision.DENY));
+						myResponse.addResponseItem(new ResponseItem(item, Decision.NOT_APPLICABLE));
 						isExactMatch = false;
 						continue;
-					}
+					//}
 				}
 			}
 			PPNPOutcome outcome = this.locator.getPPNPOutcome(requestor, item);
+/*			if (null==outcome){
+				JOptionPane.showMessageDialog(null, "Retrieved NULL outcome for:"+item.getResource().getContextType());
+			}else{
+				JOptionPane.showMessageDialog(null, "Retrieved outcome for:"+item.getResource().getContextType());
+			}*/
 			//JOptionPane.showMessageDialog(null, outcome.toString());
 			if (outcome.getEffect().equals(PrivacyOutcomeConstants.BLOCK)){
 				if(item.isOptional()){
@@ -303,8 +312,9 @@ public class ClientResponsePolicyGenerator {
 		}else{
 			myResponse.setStatus(NegotiationStatus.ONGOING);
 		}
-		
+		//JOptionPane.showMessageDialog(null, "Created responsePolicy and returning");
 		return myResponse;
+		
 	}
 	private Condition containsIgnoreValue(List<Condition> list, Condition c){
 		for (Condition con : list){
@@ -346,15 +356,9 @@ public class ClientResponsePolicyGenerator {
 	private boolean attrExistsInContext(String type){
 		try {
 			
-			Future<List<CtxIdentifier>> futurePersonEntities = ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
-			List<CtxIdentifier> personEntities = futurePersonEntities.get();
-			if (personEntities.size()==0){
-				logging.debug("Entity Person doesn't exist...");
-			}
-			CtxEntity person = (CtxEntity) ctxBroker.retrieve(personEntities.get(0)).get();
-			if (person==null){
-				this.logging.debug("ERROR in DB. Operator Entity doesn't exist");
-			}
+			Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveCssOperator();
+			CtxEntity person = futurePerson.get();
+			
 
 			Set<CtxAttribute> attrs = person.getAttributes(type);
 			if (attrs.size()>0){
@@ -429,19 +433,15 @@ public class ClientResponsePolicyGenerator {
 	}
 	
 	private CtxEntityIdentifier getPersonEntity(){
-		if (personEntityID==null){
-			Future<List<CtxIdentifier>> futurePersonEntities;
+		
+		if (null==personEntityID){
+			
+			
 			try {
-				futurePersonEntities = ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
-				List<CtxIdentifier> personEntities = futurePersonEntities.get();
-				if (personEntities.size()==0){
-					logging.debug("Entity Person doesn't exist...");
-					return personEntityID;
-				}
-				CtxEntity personEntity = (CtxEntity) ctxBroker.retrieve(personEntities.get(0)).get();
-				if (personEntity==null){
-					this.logging.debug("ERROR in DB. Operator Entity doesn't exist");
-					return personEntityID;
+				Future<IndividualCtxEntity> futurePerson = this.ctxBroker.retrieveCssOperator();
+				IndividualCtxEntity personEntity = futurePerson.get();
+				if (null==personEntity){
+					return null;
 				}
 				personEntityID = personEntity.getId();
 			} catch (CtxException e) {

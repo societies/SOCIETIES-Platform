@@ -27,8 +27,8 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinatesWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.NameWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.LocationCoordinatesObfuscator;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.NameObfuscator;
@@ -95,13 +95,13 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 		return dataWrapper.getDataId();
 	}
 
-	private IDataObfuscator getDataObfuscator(IDataWrapper data) throws PrivacyException {
+	private IDataObfuscator getDataObfuscator(IDataWrapper dataWrapper) throws PrivacyException {
 		IDataObfuscator obfuscator = null;
-		if (data instanceof LocationCoordinatesWrapper) {
-			obfuscator = new LocationCoordinatesObfuscator((LocationCoordinatesWrapper) data);
+		if (dataWrapper.getData() instanceof LocationCoordinates) {
+			obfuscator = new LocationCoordinatesObfuscator((IDataWrapper<LocationCoordinates>) dataWrapper);
 		}
-		else if (data instanceof NameWrapper) {
-			obfuscator = new NameObfuscator((NameWrapper) data);
+		else if (dataWrapper.getData() instanceof Name) {
+			obfuscator = new NameObfuscator((IDataWrapper<Name>) dataWrapper);
 		}
 		else {
 			throw new PrivacyException("Obfuscation aborted: no known obfuscator for this type of data");

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
@@ -54,6 +55,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 	private MethodType method;
 	private Requestor provider;
 	private INegotiationCallback finalCallback;
+	boolean includePrivacyPolicyNegotiation;
 	
 //	public ProviderCallback(NegotiationRequester requester, IIdentity provider,
 //			String serviceId, MethodType method) {
@@ -67,7 +69,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 //	}
 	
 	public ProviderCallback(NegotiationRequester requester, Requestor provider,
-			MethodType method, INegotiationCallback callback) {
+			MethodType method, boolean includePrivacyPolicyNegotiation,
+			INegotiationCallback callback) {
 		
 		LOG.debug("ProviderCallback({})", method);
 
@@ -75,6 +78,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		this.method = method;
 		this.provider = provider;
 		this.finalCallback = callback;
+		this.includePrivacyPolicyNegotiation = includePrivacyPolicyNegotiation;
 //		if (method != MethodType.GET_POLICY_OPTIONS) {
 //			LOG.warn("Wrong constructor is used");
 //		}
@@ -101,7 +105,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					// TODO: use real identity when it can be gathered from other components
 					sop = requester.getSignatureMgr().signXml(sop, selectedSop, "identity");
 					ProviderCallback callback = new ProviderCallback(requester, provider,
-							MethodType.ACCEPT_POLICY_AND_GET_SLA, finalCallback); 
+							MethodType.ACCEPT_POLICY_AND_GET_SLA, includePrivacyPolicyNegotiation,
+							finalCallback); 
 					requester.getGroupMgr().acceptPolicyAndGetSla(
 							sessionId,
 							sop,
@@ -120,16 +125,27 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				if (requester.getSignatureMgr().verify(sla)) {
 					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
 					LOG.debug("receiveResult(): session = {}, final SLA: {}", sessionId, sla);
+					
+					// Store the SLA into secure storage
 					String key = generateKey();
 					requester.getSecureStorage().putDocument(key, sla.getBytes());
-					// TODO: store the SLA when secure services are implemented
-					if (finalCallback != null) {
-						LOG.debug("receiveResult(): invoking final callback");
-						finalCallback.onNegotiationComplete(key);
-						LOG.info("receiveResult(): negotiation finished, final callback invoked");
+
+					PrivacyPolicyNegotiationListener listener;
+					listener = new PrivacyPolicyNegotiationListener(finalCallback, key);
+					// TODO: subscribe the listener for appropriate event
+					
+					if (includePrivacyPolicyNegotiation) {
+						if (requester.isPrivacyPolicyNegotiationManagerAvailable()) {
+							startPrivacyPolicyNegotiation(provider);
+						}
+						else {
+							LOG.warn("Privacy Policy Negotiation Manager not available");
+							finalCallback.onNegotiationError("Privacy Policy Negotiation Manager not available");
+						}
 					}
 					else {
-						LOG.info("receiveResult(): negotiation finished");
+						// Notify successful end of negotiation
+						listener.onEvent();
 					}
 				}
 				else {
@@ -142,6 +158,27 @@ public class ProviderCallback implements INegotiationProviderCallback {
 			// After more tests, the method could be changed back to void to save some bandwidth.
 			LOG.debug("receiveResult(): session = {}, reject success = ", sessionId, result.isSuccess());
 			break;
+		}
+	}
+	
+	private void startPrivacyPolicyNegotiation(Requestor provider) {
+
+		IPrivacyPolicyNegotiationManager ppn = requester.getPrivacyPolicyNegotiationManager();
+		
+		if (provider instanceof RequestorService) {
+			RequestorService providerService = (RequestorService) provider;
+			LOG.debug("startPrivacyPolicyNegotiation([{}; {}])", providerService.getRequestorId(),
+					providerService.getRequestorServiceId());
+			ppn.negotiateServicePolicy(providerService);
+		}
+		else if (provider instanceof RequestorCis) {
+			RequestorCis providerCis = (RequestorCis) provider;
+			LOG.debug("startPrivacyPolicyNegotiation([{}; {}])", providerCis.getRequestorId(),
+					providerCis.getCisRequestorId());
+			ppn.negotiateCISPolicy(providerCis);
+		}
+		else {
+			LOG.warn("startPrivacyPolicyNegotiation(): unrecognized provider type: {}", provider.getClass().getName());
 		}
 	}
 	

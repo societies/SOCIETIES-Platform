@@ -164,7 +164,8 @@ public class Tester {
 		try {
 			Future<IndividualCtxEntity> futurePerson = this.ctxBroker.retrieveCssOperator();
 			person = futurePerson.get();
-			this.userId = idm.fromJid(person.getId().getOperatorId());
+			this.userId = idm.fromJid(person.getId().getOwnerId());
+			
 			/*Future<List<CtxIdentifier>> futurePersons = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
 			List<CtxIdentifier> persons = futurePersons.get();
 			if (persons.size() == 0){

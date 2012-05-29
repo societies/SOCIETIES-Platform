@@ -109,6 +109,11 @@
 			<!--scope>compile</scope-->
 		</dependency>
 		<dependency>
+		    <groupId>org.societies.privacytrust.privacyprotection</groupId>
+		    <artifactId>privacynegotiationmanagement</artifactId>
+		    <version>${version.pt}</version>
+		    </dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.0</version>
@@ -159,7 +164,8 @@
 							privacydatamanagement;scope=compile|runtime,
 							privacypolicymanagement;scope=compile|runtime,
 							privacypreferencemanagement;scope=compile|runtime,
-							assessment;scope=compile|runtime
+							assessment;scope=compile|runtime,
+							privacynegotiationmanagement;scope=compile|runtime
 							</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 
