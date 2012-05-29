@@ -113,9 +113,6 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 			
 			ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, this.symLocAttribute.getId(), action);
 			LOG.info("************* [Test Resullt] Permission checked? "+(null != permission));
-
-	
-
 			if (null != permission) {
 				LOG.info(permission.toString());
 			}
@@ -160,7 +157,7 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 			IIdentity ownerId = commManager.getIdManager().getThisNetworkNode();
 			Requestor requestor = new Requestor(requestorId);
 			privacyPolicyManagerRemote.getPrivacyPolicy(requestor, ownerId, this);
-			LOG.info("************* Permission check remote: launched");
+			LOG.info("************* Get privacy policy remote: launched");
 		} catch (Exception e) {
 			LOG.error("************* [Tests PrivacyDataManagerRemote] Error Exception: "+e.getMessage()+"\n", e);
 		}
