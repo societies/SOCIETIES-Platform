@@ -22,10 +22,6 @@ package org.societies.privacytrust.privacyprotection.test.dataobfuscation.obfusc
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
@@ -39,8 +35,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.NameWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.NameObfuscator;
 
 /**

@@ -22,34 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
+package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.android.api.internal.privacytrust.model.PrivacyException;
+import org.societies.android.api.internal.privacytrust.model.dataobfuscation.ObfuscationLevelType;
+import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Temperature;
+import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
 
 /**
- * Wrapper for location coordinates obfuscation
+ * Obfuscator for name
  *
- * @author Olivier Maridat
+ * @author Olivier Maridat (Trialog)
  *
  */
-public class LocationCoordinatesWrapper extends DataWrapper<LocationCoordinates> {
-	// -- CONSTRUCTOR
+public class TemperatureObfuscator extends DataObfuscator<IDataWrapper<Temperature>> {
 	/**
-	 * @param dataId
 	 * @param data
 	 */
-	public LocationCoordinatesWrapper(LocationCoordinates data) {
+	public TemperatureObfuscator(IDataWrapper<Temperature> data) {
 		super(data);
-	}
-	/**
-	 * DO NOT USE
-	 * @param dataId
-	 * @param data
-	 */
-	private LocationCoordinatesWrapper(String dataId, LocationCoordinates data, boolean persist) {
-		super(data);
+		available = false;
+		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
+		stepNumber = 1;
+		dataType = Temperature.class;
 	}
 
-	
-	// --- GET/SET
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
+	 */
+	@Override
+	public IDataWrapper<Temperature> obfuscateData(double obfuscationLevel)
+			throws PrivacyException {
+		return dataWrapper;
+	}
+
 }
