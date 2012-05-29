@@ -37,7 +37,7 @@
 	</bean>
 	<bean id="NegotiationRequester"
 		class="org.societies.security.policynegotiator.requester.NegotiationRequester"
-		depends-on="NegotiationProviderRemote,SignatureMgr,eventMgmtRef">
+		depends-on="NegotiationProviderRemote,SignatureMgr,eventMgmtRef"
 		init-method="init" >
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
