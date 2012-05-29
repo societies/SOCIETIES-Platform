@@ -3,6 +3,7 @@ package org.societies.integration.test.bit.assessment;
 import static org.junit.Assert.*;
 
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,12 +14,15 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
+import org.societies.api.internal.schema.security.policynegotiator.MethodType;
+import org.societies.api.internal.schema.security.policynegotiator.ProviderBean;
 import org.societies.integration.test.IntegrationTestUtils;
 
 /**
@@ -139,15 +143,24 @@ public class NominalTestCaseLowerTester {
 	}
 	
 	@Test
-	public void testContextLogging() {
+	public void testContextLogging() throws CtxException, InterruptedException, ExecutionException {
+
+		LOG.info("[#1055] testContextLogging()");
 
 		CtxBrokerHelper ctx = new CtxBrokerHelper(ctxBrokerInternal);
 		
 		long num1 = assessment.getNumDataAccessEvents();
+		LOG.debug("[#1055] testContextLogging() 1");
 		ctx.retrieveCssOperator();
+		LOG.debug("[#1055] testContextLogging() 2");
 		ctx.createContext();
+		LOG.debug("[#1055] testContextLogging() 3");
 		ctx.retrieveContext();
+		LOG.debug("[#1055] testContextLogging() 4");
 		long num2 = assessment.getNumDataAccessEvents();
+		
+		LOG.debug("[#1055] testContextLogging(): Number of data access events: before access = " +
+				num1 + ", after access = " + num2);
 		
 		assertEquals(num1 + 3, num2);
 	}
@@ -155,14 +168,37 @@ public class NominalTestCaseLowerTester {
 	@Test
 	public void testCommsManagerLogging() throws CommunicationException {
 		
+		LOG.info("[#1055] testCommsManagerLogging()");
+
 		IIdentity from = identityManager.getThisNetworkNode();
 		IIdentity to = identityManager.getThisNetworkNode();
-		Stanza stanza = new Stanza("001", from, to);
+		Stanza stanza = new Stanza(to);
 		
+		stanza.setId("001");
+		
+		ProviderBean payload = new ProviderBean();
+		payload.setMethod(MethodType.ACCEPT_POLICY_AND_GET_SLA);
+		payload.setServiceId("service-1");
+		payload.setSessionId(1);
+		payload.setSignedPolicyOption("<sla/>");
+		payload.setModified(false);
+
+		LOG.debug("[#1055] testCommsManagerLogging(): from identity = " + stanza.getFrom());
+		LOG.debug("[#1055] testCommsManagerLogging(): to identity = " + stanza.getTo());
+		
+		LOG.debug("[#1055] testCommsManagerLogging() 1");
 		long num1 = assessment.getNumDataTransmissionEvents();
-		commManager.sendMessage(stanza, "payload");
+		LOG.debug("[#1055] testCommsManagerLogging() 2");
+		commManager.sendMessage(stanza, payload);
+		LOG.debug("[#1055] testCommsManagerLogging() 3");
+		commManager.sendIQGet(stanza, payload, null);
+		LOG.debug("[#1055] testCommsManagerLogging() 4");
 		long num2 = assessment.getNumDataTransmissionEvents();
+		LOG.debug("[#1055] testCommsManagerLogging() 5");
 		
-		assertEquals(num1 + 1, num2);
+		LOG.debug("[#1055] testCommsManagerLogging(): Number of data transmission events: before transmission = " +
+				num1 + ", after transmission = " + num2);
+		
+		assertEquals(num1 + 2, num2);
 	}
 }

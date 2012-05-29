@@ -24,10 +24,12 @@
  */
 package org.societies.integration.test.bit.assessment;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -48,9 +50,8 @@ public class CtxBrokerHelper {
 
 	private ICtxBroker ctxBrokerInternal;
 	
-	private CtxEntityIdentifier ctxEntityIdentifier = null;
-	private CtxIdentifier ctxAttributeBinaryIdentifier = null;
-	private CtxIdentifier ctxAttributeStringIdentifier = null;
+	private CtxEntityIdentifier ctxEntityIdentifier;
+	private CtxIdentifier ctxAttributeStringIdentifier;
 
 
 	public CtxBrokerHelper(ICtxBroker ctxBrokerInternal) {
@@ -74,75 +75,65 @@ public class CtxBrokerHelper {
 	/**
 	 * At this point a CtxEntity of type "Device" is created with an attribute
 	 * of type "DeviceID" with a string value "device1234".
+	 * @throws CtxException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
-	public void createContext(){
+	public void createContext() throws CtxException, InterruptedException, ExecutionException {
 
 		LOG.info("*** createContext");
 
 		//create ctxEntity of type "Device"
 		Future<CtxEntity> futureEnt;
-		try {
-			futureEnt = ctxBrokerInternal.createEntity("Device");
-			CtxEntity ctxEntity = (CtxEntity) futureEnt.get();
+		futureEnt = ctxBrokerInternal.createEntity("Device");
+		CtxEntity ctxEntity = (CtxEntity) futureEnt.get();
 
-			//get the context identifier of the created entity (to be used at the next step)
-			this.ctxEntityIdentifier = ctxEntity.getId();
+		//get the context identifier of the created entity (to be used at the next step)
+		this.ctxEntityIdentifier = ctxEntity.getId();
 
-			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity
-			Future<CtxAttribute> futureCtxAttrString = ctxBrokerInternal.createAttribute(this.ctxEntityIdentifier, "DeviceID");
-			// get the object of the created CtxAttribute
-			CtxAttribute ctxAttributeString = (CtxAttribute) futureCtxAttrString.get();
+		//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity
+		Future<CtxAttribute> futureCtxAttrString = ctxBrokerInternal.createAttribute(this.ctxEntityIdentifier, "DeviceID");
+		// get the object of the created CtxAttribute
+		CtxAttribute ctxAttributeString = (CtxAttribute) futureCtxAttrString.get();
 
-			// by setting this flag to true the CtxAttribute values will be stored to Context History Database upon update
-			ctxAttributeString.setHistoryRecorded(true);
+		// by setting this flag to true the CtxAttribute values will be stored to Context History Database upon update
+		ctxAttributeString.setHistoryRecorded(true);
 
-			// set a string value to CtxAttribute
-			ctxAttributeString.setStringValue("device1234");
+		// set a string value to CtxAttribute
+		ctxAttributeString.setStringValue("device1234");
 
-			// with this update the attribute is stored in Context DB
-			Future<CtxModelObject> futureAttrUpdated = ctxBrokerInternal.update(ctxAttributeString);
+		// with this update the attribute is stored in Context DB
+		Future<CtxModelObject> futureAttrUpdated = ctxBrokerInternal.update(ctxAttributeString);
 
-			// get the updated CtxAttribute object and identifier (to be used later for retrieval purposes)
-			ctxAttributeString = (CtxAttribute) futureAttrUpdated.get();
-			this.ctxAttributeStringIdentifier = ctxAttributeString.getId();
-
-		} catch (Exception e) {
-			
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
-		}
+		// get the updated CtxAttribute object and identifier (to be used later for retrieval purposes)
+		ctxAttributeString = (CtxAttribute) futureAttrUpdated.get();
+		this.ctxAttributeStringIdentifier = ctxAttributeString.getId();
 	}
 	
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
+	 * @throws CtxException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
-	public void retrieveContext() {
+	public void retrieveContext() throws CtxException, InterruptedException, ExecutionException {
 
 		LOG.info("*** retrieveContext");
 
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed by using the ctxBroker.retrieve(CtxIdentifier) method
-		try {
-			// retrieve ctxEntity
-			// This retrieval is performed based on the known CtxEntity identifier
-			// Retrieve is also possible to be performed based on the type of the CtxEntity. This will be demonstrated in a later example.
-			Future<CtxModelObject> ctxEntityRetrievedFuture = ctxBrokerInternal.retrieve(this.ctxEntityIdentifier);
-			CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
 
-			LOG.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
+		// retrieve ctxEntity
+		// This retrieval is performed based on the known CtxEntity identifier
+		// Retrieve is also possible to be performed based on the type of the CtxEntity. This will be demonstrated in a later example.
+		Future<CtxModelObject> ctxEntityRetrievedFuture = ctxBrokerInternal.retrieve(this.ctxEntityIdentifier);
+		CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
 
-			// retrieve the CtxAttribute contained in the CtxEntity with the string value
-			// again the retrieval is based on an known identifier, it is possible to retrieve it based on type.This will be demonstrated in a later example.
-			Future<CtxModelObject> ctxAttributeRetrievedStringFuture = ctxBrokerInternal.retrieve(this.ctxAttributeStringIdentifier);
-			CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
-			LOG.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
+		LOG.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
 
-			// retrieve ctxAttribute with the binary value
-			Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = ctxBrokerInternal.retrieve(this.ctxAttributeBinaryIdentifier);
-			CtxAttribute ctxAttributeRetrievedBinary = (CtxAttribute) ctxAttributeRetrievedBinaryFuture.get();
-
-		} catch (Exception e) {
-			
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
-		}
-
+		// retrieve the CtxAttribute contained in the CtxEntity with the string value
+		// again the retrieval is based on an known identifier, it is possible to retrieve it based on type.This will be demonstrated in a later example.
+		Future<CtxModelObject> ctxAttributeRetrievedStringFuture = ctxBrokerInternal.retrieve(this.ctxAttributeStringIdentifier);
+		CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
+		LOG.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
 	}
 }
