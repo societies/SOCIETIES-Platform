@@ -75,36 +75,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 */
 	@Override
 	public ResponseItem checkPermission(RequestorBean requestor, String ownerId, String dataId, Action action) throws PrivacyException {
-		if (null == requestor) {
-			Log.d(TAG, "Requestor null");
-		}
-		else {
-			Log.d(TAG, "Requestor: "+requestor.getRequestorId());
-		}
-		
-		if (null == ownerId) {
-			Log.d(TAG, "ownerId null");
-		}
-		else {
-			Log.d(TAG, "ownerId: "+ownerId);
-		}
-		
-		if (null == dataId) {
-			Log.d(TAG, "dataId null");
-		}
-		else {
-			Log.d(TAG, "dataId: "+dataId);
-		}
-		
-		if (null == action) {
-			Log.d(TAG, "action null");
-		}
-		else {
-			Log.d(TAG, "action: "+action.getActionConstant().name());
-		}
 		// -- Verify parameters
-//		RequestorBean requestorBean = new RequestorServiceBean();
-//		requestorBean.setRequestorId(requestor);
 		verifyParemeters(requestor, ownerId, null, dataId);
 		ResponseItem permission = null;
 		
@@ -118,6 +89,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		resource.setCtxUriIdentifier(dataId);
 		List<Condition> conditions = new ArrayList<Condition>();
 		RequestItem requestItemNull = new RequestItem();
+		// TODO: set list
 		requestItemNull.setResource(resource);
 		requestItemNull.setOptional(false);
 
@@ -129,6 +101,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			if (null != permission.getRequestItem() && containsAction(permission.getRequestItem().getActions(), action)) {
 				Log.i(TAG, "RequestItem NOT NULL and action match");
 				// Return only used actions for this request
+				// TODO: set list
 //				permission.getRequestItem().setActions(actions);
 			}
 			// Actions not available
@@ -145,6 +118,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (null == permission) {
 			Log.e(TAG, "No Permission retrieved: remote call");
 			try {
+				// TODO: remote call
 //				permission = privacyPreferenceManager.checkPermission(requestor, dataAttributeId, actions);
 			} catch (Exception e) {
 				Log.e(TAG, "Error when retrieving permission from PrivacyDataManagerRemote", e);
@@ -174,6 +148,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		verifyParemeters(requestorBean, ownerId, dataWrapper, null);
 
 //		// -- Retrieve the obfuscation level
+		// TODO: remote call
 //		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId());
 //		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
 		double obfuscationLevel = 1;
@@ -241,6 +216,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		verifyParemeters(requestorBean, ownerId, dataWrapper, null);
 
 		// -- Retrieve the obfuscation level
+		// TODO: remote call
 		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, owner, dataWrapper.getDataId());
 		//		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
 		double obfuscationLevel = 1;
