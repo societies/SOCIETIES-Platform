@@ -34,6 +34,8 @@ import org.junit.Test;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
@@ -116,23 +118,49 @@ public class DataTransferAnalyzerTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.assessment.logic.DataTransferAnalyzer#estimatePrivacyBreach(org.societies.api.identity.IIdentity)}.
+	 * Test method for
+	 * {@link DataTransferAnalyzer#estimatePrivacyBreach(IIdentity)}.
 	 * @throws AssessmentException 
 	 */
 	@Test
 	public void testEstimatePrivacyBreachIIdentity() throws AssessmentException {
+
 		IIdentity sender = id1;
-		//dataTransferAnalyzer.estimatePrivacyBreach(sender);
+		AssessmentResultIIdentity result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+		double expected;
+		long numPacketsTransmitted = 11;
+		
+		result.getCorrWithDataAccessByAll();  // TODO
+		result.getCorrWithDataAccessByAllDev();  // TODO
+		result.getCorrWithDataAccessBySender();  // TODO
+		result.getCorrWithDataAccessBySenderDev();  // TODO
+		assertEquals(numPacketsTransmitted, result.getNumAllPackets());
+		expected = numPacketsTransmitted / ((double)(new Date().getTime() - time2.getTime()) / (1000 * 60 * 60 * 24 * 30.5));
+		assertEquals(expected, result.getNumPacketsPerMonth(), 0.05 * expected);
+		assertEquals(sender, result.getSender());
+		assertEquals(sender.getJid(), result.getSender().getJid());
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.assessment.logic.DataTransferAnalyzer#estimatePrivacyBreach(java.lang.String)}.
+	 * Test method for {@link DataTransferAnalyzer#estimatePrivacyBreach(String)}.
 	 * @throws AssessmentException 
 	 */
 	@Test
 	public void testEstimatePrivacyBreachString() throws AssessmentException {
+
 		String sender = class1;
-		//dataTransferAnalyzer.estimatePrivacyBreach(sender);
+		AssessmentResultClassName result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+		double expected;
+		long numPacketsTransmitted = 3;
+
+		result.getCorrWithDataAccessByAll();  // TODO
+		result.getCorrWithDataAccessByAllDev();  // TODO
+		result.getCorrWithDataAccessBySender();  // TODO
+		result.getCorrWithDataAccessBySenderDev();  // TODO
+		assertEquals(numPacketsTransmitted, result.getNumAllPackets());
+		expected = numPacketsTransmitted / ((double)(new Date().getTime() - time2.getTime()) / (1000 * 60 * 60 * 24 * 30.5));
+		assertEquals(expected, result.getNumPacketsPerMonth(), 0.05 * expected);
+		assertEquals(sender, result.getSender());
 	}
 
 }
