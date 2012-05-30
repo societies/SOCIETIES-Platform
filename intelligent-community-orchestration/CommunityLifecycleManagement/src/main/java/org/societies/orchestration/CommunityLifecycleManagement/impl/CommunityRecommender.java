@@ -304,8 +304,12 @@ public class CommunityRecommender //implements ICommCallback
 		
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
-		if (cissToCreateMetadata == null)
+		if (cissToCreateMetadata == null) {
 			cissToCreateMetadata = new ArrayList<String> ();
+			for (int i = 0; i < creatableCiss.size(); i++) {
+				cissToCreateMetadata.add("DESCRIPTION: " + creatableCiss.get(i).getDescription() + "---");
+			}
+		}
 		
 		for (int i = 0; i < creatableCiss.size(); i++) {
 			cissToCreate.put(new Integer(i), creatableCiss.get(i));

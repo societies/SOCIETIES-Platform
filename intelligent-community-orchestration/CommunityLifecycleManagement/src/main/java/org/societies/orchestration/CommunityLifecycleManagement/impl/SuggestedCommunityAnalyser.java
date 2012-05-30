@@ -668,14 +668,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	HashMap<String, ArrayList<ArrayList<ICisProposal>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisProposal>>>();
 		//ICis proposedCis = cisManager.getBlankCisRecord();
     	ICisProposal proposedCis = null;
-    	if (cisManager != null)
-    		proposedCis = new ICisProposal();
-    	
-    	/**	if (cisManager.getCisList().size() > 0)
-    			proposedCis = cisManager.getCisList().get(0);
-    		else
-    			return;
-    	*/
+    	proposedCis = new ICisProposal();
     	
     	if (cssList == null)
     		return "FAILURE";
@@ -992,6 +985,18 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	        	if (recordedMetadata.get(cisIds.get(i)) == null)
 	        		recordedMetadata.put(cisIds.get(i), currentActionsMetadata.get(i));
 	        }
+	    }
+	    if (convertedRecommendations.size() != 0) {
+	    	if (convertedRecommendations.get("Create CISs") != null) {
+	            for (int i = 0; i < convertedRecommendations.get("Create CISs").size(); i++) {
+	    	        for (int m = 0; m < currentActionsMetadata.size(); m++) {
+	    	    	    if ((currentActionsMetadata.get(m).split("DESCRIPTION: ")[1].split("---")[0]).equals(
+	    		    		    convertedRecommendations.get("Create CISs").get(i).get(0).getDescription())) {
+	    		    	    refusals.add(convertedRecommendations.get("Create CISs").get(i).get(0));
+	    		        }
+	    	        }
+	            }
+	    	}
 	    }
 	    
 	    for (int i = 0; i < recordedMetadata.size(); i++) {
