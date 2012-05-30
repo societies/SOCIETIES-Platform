@@ -22,36 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.community.estimation;
+package org.societies.integration.test.bit.automatically-leave-cis;
 
-import java.awt.Point;
-import java.util.ArrayList;
+import org.societies.api.identity.IIdentity;
 
 /**
- * @author yboul
- * @created 12-Nov-2011 7:15:14 PM
+ * A sample service that could be used to populate service-usage data and activities
+ * for the tests. Taken from #751
  */
-public interface ICommunityCtxEstimationMgr {
-		
-	public double cceNumMean(ArrayList<Integer> inputValuesList);
-	
-	public double cceNumMedian(ArrayList<Integer> inputValuesList);
-	
-	public ArrayList<Integer> cceNumMode(ArrayList<Integer> inputValuesList);
-	
-	public Integer[] cceNumRange(ArrayList<Integer> inputValuesList);
-	
-	public ArrayList<Point> cceGeomConvexHull(ArrayList<Point> points);
-	
-	public Point[] cceGeomMinBB(ArrayList<Point> points);
-	
-	public ArrayList<String> cceStringMode(ArrayList<String> inputValuesList);
-	
-	public void cceSpecial1();
-	
-	public void cceSpecial2();
-	
-	public void cceSpecial3();
-	
+public interface IHelloWorld {
 
+	public void setBackgroundColour(IIdentity userId, String colour);
+	public void setVolume(IIdentity userId, String volume);
+	public String getBackgroundColour(IIdentity userId);
+	public String getVolume(IIdentity userId);
 }

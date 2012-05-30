@@ -22,11 +22,50 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.community.estimation;
 
+package org.societies.integration.test.bit.automatically-join-cis;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
-	
-public enum EstimationModels {
-		MEAN, MEDIAN
+import junit.framework.Assert;
+
+import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.useragent.monitoring.IUserActionMonitor;
+
+/**
+* Populate context database, CIS directory, activity feeds and/or CIS manager with
+* data that a new CIS could be based on. Also populate Data Collector component
+* with this data.
+*/
+
+public class CreateUserData {
+	private IUserActionMonitor uam;
+	private IIdentityManager idm;
+	private IHelloWorld helloWorldService;
+	private IIdentity userId;
+	private ICtxBroker ctxBroker;
+	private CtxEntity person;
+	private CtxAttribute symLocAttribute;
+	private CtxAttribute statusAttribute;
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+
+	public CreateUserData(){
+
+	}
 	
 }

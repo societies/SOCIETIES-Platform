@@ -23,58 +23,49 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.context.community.estimation.impl;
+package org.societies.integration.test.bit.automatically-leave-cis;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
-import java.awt.List;
-import java.util.ArrayList;
-import java.util.Hashtable;
+import junit.framework.Assert;
 
+import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
-public class CalculateStringStatistics {
+/**
+* Populate context database, CIS directory, activity feeds and/or CIS manager with
+* data that a new CIS could be based on. Also populate Data Collector component
+* with this data.
+*/
 
-	public void CalculateAttributeStatistics(List attrList) {
-		
-		ArrayList <String> proffesions = new ArrayList<String>();
-		proffesions.add("Engineer");
-		proffesions.add("Engineer");
-		proffesions.add("Engineer");
-		proffesions.add("Engineer");
-		proffesions.add("Engineer");
-		proffesions.add("Chef");
-		proffesions.add("Architect");
-		proffesions.add("Plumber");
-		proffesions.add("Plumber");
-		proffesions.add("Cook");
+public class CreateUserData {
+	private IUserActionMonitor uam;
+	private IIdentityManager idm;
+	private IHelloWorld helloWorldService;
+	private IIdentity userId;
+	private ICtxBroker ctxBroker;
+	private CtxEntity person;
+	private CtxAttribute symLocAttribute;
+	private CtxAttribute statusAttribute;
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
-// Ta parapano einai mono gia testing. Kanonika prepei na pernaei h lista san orisma kai na
-// epistrefetai h lista me th syxnothta emfanishs kathe timhs. Isos akoma na baloume kai ena
-// counter synoliko kai na to "kotsaroume" sto telos tou pinaka gia na mporoume na bgazoume
-// eykola ta pososta meta ...
+	public CreateUserData(){
 
-		Hashtable <String, Integer> frequencyMap = new Hashtable();
-		ArrayList<String> finalList = new ArrayList<String>();
-		
-
-
-		for (int i=0; i<proffesions.size(); i++){			
-				if (finalList.contains(proffesions.get(i)))
-				{
-					int elementCount = 
-							Integer.parseInt(frequencyMap.get(proffesions.get(i)).toString());
-					elementCount++;
-					frequencyMap.put(proffesions.get(i), elementCount);
-				}
-				else
-				{
-					finalList.add(proffesions.get(i));
-					frequencyMap.put(proffesions.get(i), 1);
-				}
-			}
-			System.out.println("CalculateAttributeStatistics"+frequencyMap);
-		}
-}
-	 
-			 
+	}
 	
-	 
+}

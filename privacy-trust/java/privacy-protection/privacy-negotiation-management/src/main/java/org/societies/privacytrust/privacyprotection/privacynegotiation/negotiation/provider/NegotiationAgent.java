@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
@@ -49,11 +50,13 @@ public class NegotiationAgent implements INegotiationAgent{
 	private IIdentity myIdentity;
 	private IPrivacyPolicyManager policyMgr;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private ICommManager commsMgr;
 	
-	public NegotiationAgent(IIdentity myID, IPrivacyPolicyManager pprmgr){
-		this.myIdentity = myID;
-		//this.policyMgr = new PrivacypolicyMgr(context);
-		this.policyMgr = pprmgr;
+	public NegotiationAgent(){
+	}
+	
+	public void initialiseNegotiationAgent(){
+		this.myIdentity = this.commsMgr.getIdManager().getThisNetworkNode();
 	}
 	
 	public void setPublicIdentity(IIdentity identity){
@@ -70,13 +73,13 @@ public class NegotiationAgent implements INegotiationAgent{
 	
 		RequestPolicy requestedPolicy;
 		try {
-			requestedPolicy = this.policyMgr.getPrivacyPolicy(requestor);
+			requestedPolicy = this.getPolicyMgr().getPrivacyPolicy(requestor);
 			if (requestedPolicy==null){
 				log("RequestPolicy is NULL");
 			}else{
 				log("FOUND non-null request policy and returning to requestor");
 			}
-			return new AsyncResult<RequestPolicy>(this.policyMgr.getPrivacyPolicy(requestor));
+			return new AsyncResult<RequestPolicy>(this.getPolicyMgr().getPrivacyPolicy(requestor));
 		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -102,7 +105,7 @@ public class NegotiationAgent implements INegotiationAgent{
 		log("Received responsePolicy from client");
 		log(policy.toString());
 		try {
-			RequestPolicy myPolicy = this.policyMgr.getPrivacyPolicy(requestor);
+			RequestPolicy myPolicy = this.getPolicyMgr().getPrivacyPolicy(requestor);
 			if (myPolicy==null){
 				log("Could not retrieve MY POLICY!");
 			}
@@ -146,6 +149,34 @@ public class NegotiationAgent implements INegotiationAgent{
 	
 	private void log(String message){
 		this.logging.info(this.getClass().getName()+" : "+message);
+	}
+
+	/**
+	 * @return the policyMgr
+	 */
+	public IPrivacyPolicyManager getPolicyMgr() {
+		return policyMgr;
+	}
+
+	/**
+	 * @param policyMgr the policyMgr to set
+	 */
+	public void setPolicyMgr(IPrivacyPolicyManager policyMgr) {
+		this.policyMgr = policyMgr;
+	}
+
+	/**
+	 * @return the commsMgr
+	 */
+	public ICommManager getCommsMgr() {
+		return commsMgr;
+	}
+
+	/**
+	 * @param commsMgr the commsMgr to set
+	 */
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
 	}
 
 }

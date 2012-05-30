@@ -110,7 +110,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	@Override
 	public void generateNewUserModel() {
 
-		LOG.info("start model generation");
+		LOG.debug("start model generation");
 	
 		if (retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION) != null ){
 
@@ -136,12 +136,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			//LOG.info("5a ctxActionsMap "+ ctxActionsMap);
 			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
 
-			LOG.info("6. result "+modelData.getActionModel());
+			LOG.debug("6. result "+modelData.getActionModel());
 
 			//LOG.info("7. Store UserIntentModelData to ctx DB");
 
 			CtxAttribute ctxAttr = storeModelCtxDB(modelData);
-			LOG.info("model stored "+ctxAttr.getId());
+			LOG.debug("model stored "+ctxAttr.getId());
 
 		}else LOG.info("not enough history data");
 	}
@@ -218,7 +218,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	public void clearActiveDictionary(){
 		this.actCtxDictionary = null;
-		System.out.println("model cleared "+this.actCtxDictionary);
+		LOG.info("model cleared "+this.actCtxDictionary);
 	}
 
 
@@ -227,7 +227,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	public LinkedHashMap<List<String>,ActionDictObject>  populateActionCtxDictionary(List<MockHistoryData> historyData){
 
 		int historySize = historyData.size();
-		System.out.println("historySize "+historySize);
+		LOG.debug("historySize "+historySize);
 
 		List<String> currentActPhrase = null;
 		List<String> currentCtxPhraseLocation = null;
@@ -241,7 +241,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				MockHistoryData currentHocData =  historyData.get(i);
 				List<String> actionNameObjTemp = new ArrayList<String>();
 				String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue();
-				System.out.println("action name "+actionName);
+				LOG.info("action name "+actionName);
 				actionNameObjTemp.add(actionName);
 
 				//context
@@ -423,8 +423,8 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	public void printDictionary(LinkedHashMap<List<String>,ActionDictObject> dictionary){
 
-		System.out.println ("**** printing dictionary contents *****");
-		System.out.println ("**** total number of entries:" + dictionary.size());
+		LOG.debug ("**** printing dictionary contents *****");
+		LOG.debug ("**** total number of entries:" + dictionary.size());
 		for(List<String> actions : dictionary.keySet()){
 			ActionDictObject dicObj = dictionary.get(actions);
 			int occurences = dicObj.getTotalOccurences();
@@ -450,8 +450,8 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			int totalOccur = dict.get(act).getTotalOccurences();
 			if( totalOccur > score) results.put(act, dict.get(act));	
 		}
-		System.out.println("total entries in model "+dict.size()); 
-		System.out.println("entries occured more than "+score); 
+		LOG.debug("total entries in model "+dict.size()); 
+		LOG.debug("entries occured more than "+score); 
 		return results;
 	}
 
