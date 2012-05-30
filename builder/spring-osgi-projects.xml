@@ -133,6 +133,7 @@
 
 		<!-- Personalisation -->
 		<module>../personalisation</module>
+		<module>../personalisation/Personalisation-GroupManager</module>
 
 		<!-- Intelligent Community Orchestration -->
 		<module>../intelligent-community-orchestration/API</module>

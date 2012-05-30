@@ -22,44 +22,59 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.comm_ctx_estimation;
+
+package org.societies.context.community.estimation.impl;
+
+import java.awt.List;
+import java.util.ArrayList;
+import java.util.Hashtable;
+
+import org.societies.api.context.model.CtxAttribute;
+
+public class CalculateStringStatistics {
+
+	public void CalculateAttributeStatistics(List attrList) {
+		
+		ArrayList <String> proffesions = new ArrayList<String>();
+		proffesions.add("Engineer");
+		proffesions.add("Engineer");
+		proffesions.add("Engineer");
+		proffesions.add("Engineer");
+		proffesions.add("Engineer");
+		proffesions.add("Chef");
+		proffesions.add("Architect");
+		proffesions.add("Plumber");
+		proffesions.add("Plumber");
+		proffesions.add("Cook");
+
+// Ta parapano einai mono gia testing. Kanonika prepei na pernaei h lista san orisma kai na
+// epistrefetai h lista me th syxnothta emfanishs kathe timhs. Isos akoma na baloume kai ena
+// counter synoliko kai na to "kotsaroume" sto telos tou pinaka gia na mporoume na bgazoume
+// eykola ta pososta meta ...
+
+		Hashtable <String, Integer> frequencyMap = new Hashtable();
+		ArrayList<String> finalList = new ArrayList<String>();
+		
 
 
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.integration.test.IntegrationTestCase;
-
-/**
- * 
- *
- * @author Yiorgos
- *
- */
-public class Test1108 extends IntegrationTestCase{
-
-	
-	public static ICtxBroker ctxBroker;
-	
-	public Test1108(){
-		super(1108, new Class[]{Tester.class});
-	}
-
-	/**
-	 * @return the ctxBroker
-	 */
-	public static ICtxBroker getCtxBroker() {
-		return ctxBroker;
-	}
-
-	/**
-	 * @param ctxBroker the ctxBroker to set
-	 */
-	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
-
-	}
-
-	
-	
-	
-	
+		for (int i=0; i<proffesions.size(); i++){			
+				if (finalList.contains(proffesions.get(i)))
+				{
+					int elementCount = 
+							Integer.parseInt(frequencyMap.get(proffesions.get(i)).toString());
+					elementCount++;
+					frequencyMap.put(proffesions.get(i), elementCount);
+				}
+				else
+				{
+					finalList.add(proffesions.get(i));
+					frequencyMap.put(proffesions.get(i), 1);
+				}
+			}
+			System.out.println("CalculateAttributeStatistics"+frequencyMap);
+		}
 }
+	 
+			 
+	
+	 

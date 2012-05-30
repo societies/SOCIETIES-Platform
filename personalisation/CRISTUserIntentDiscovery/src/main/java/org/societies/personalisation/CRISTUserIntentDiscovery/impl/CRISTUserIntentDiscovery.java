@@ -36,12 +36,13 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
+import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
-	private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-	
-	private ArrayList<CRISTHistoryData> historyList = new ArrayList<CRISTHistoryData>();
+	private static final Logger LOG = LoggerFactory.getLogger(CRISTUserIntentDiscovery.class);
+	public static final int MAX_PREDICTION_STEP = 3;
+
 	private LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 
 	public CRISTUserIntentDiscovery(){
@@ -73,6 +74,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.
 	 * ICRISTUserIntentDiscovery#generateNewCRISTUIModel()
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public LinkedHashMap generateNewCRISTUIModel() {
 		// TODO Auto-generated method stub
@@ -82,77 +84,62 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 * update intentModel at the same time.
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.
 	 * ICRISTUserIntentDiscovery#generateNewCRISTUIModel(java.util.ArrayList)
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public LinkedHashMap generateNewCRISTUIModel(ArrayList historyData) {
 		// TODO Auto-generated method stub
+		//ensure not return null
+		ArrayList<CRISTHistoryData> historyList = historyData;
 
-		this.historyList = historyData;
-		constructModel();
-		
-		return intentModel;
-	}
-
-	// main function is implemented here
-	private void constructModel() {
-		int historySize = this.historyList.size();
+		int historySize = historyList.size();
+		ArrayList<String> behaviorRecords_unique = new ArrayList<String>();
 		ArrayList<String> behaviorRecords = new ArrayList<String>();
-		ArrayList<String> historyRecords = new ArrayList<String>();
-		int maxPredictionStep = 3;
 
 		// TODO
 		// Construct User Intent Model based on one's history data
 		// By mining user behavior patterns
 		// Identify all the possible user behaviors
 		for (int i = 0; i < historySize; i++) {
-			CRISTHistoryData currentHisData = this.historyList.get(i);
-			String currentHisAction = currentHisData.getActionValue();
-			String currentHisSituation = currentHisData.getSituationValue();
+			CRISTHistoryData currentHisData = historyList.get(i);
+			String currentHisAction = ((CRISTUserAction)currentHisData.getAction()).getActionID();
+			String currentHisSituation = currentHisData.getSituation().getSituationID();
 			String currentBehavior = currentHisAction + "@"
 					+ currentHisSituation;
-			if (!behaviorRecords.contains(currentBehavior)) {
-				behaviorRecords.add(currentBehavior);
+			behaviorRecords.add(currentBehavior);
+			if (!behaviorRecords_unique.contains(currentBehavior)) {
+				behaviorRecords_unique.add(currentBehavior);
 			}
 		}
 
-		// Convert history data to the "Action#Situation" format
-		for (int i = 0; i < historySize; i++) {
-			CRISTHistoryData currentHisData = this.historyList.get(i);
-			String currentHisAction = currentHisData.getActionValue();
-			String currentHisSituation = currentHisData.getSituationValue();
-			String currentBehavior = currentHisAction + "@"
-					+ currentHisSituation;
-			historyRecords.add(currentBehavior);
-		}
-
 		// Identify patterns
-		int behaviorNum = behaviorRecords.size();
+		int behaviorNum = behaviorRecords_unique.size();
 		for (int i = 0; i < behaviorNum; i++) {
-			int[] indexList = getAllOccurences(historyRecords,
-					behaviorRecords.get(i));
+			int[] indexList = getAllOccurences(behaviorRecords,
+					behaviorRecords_unique.get(i));
 			ArrayList<String> cadidateActionList = new ArrayList<String>();
 			for (int j = 0; j < indexList.length; j++) {
 				String currentCadidate = "";
-				for (int k = 1; k <= maxPredictionStep; k++) {
+				for (int k = 1; k <= MAX_PREDICTION_STEP; k++) {
 					int currentIndex = indexList[j] + k;
 
-					String situationValue = historyList.get(currentIndex).getSituationValue();
-					if (situationValue == null)
-					{
-						LOG.debug("situationValue is null, set to \"\".");
-						situationValue = "";
+					String situationID = historyList.get(currentIndex).getSituation().getSituationID();
+					if (situationID == null) {
+						LOG.debug("situationID is null. delete it in historyList");
+						historyList.remove(currentIndex);
+						continue;
 					}
 					
 					if (indexList[j] + k < historySize
-							&& behaviorRecords.get(i).endsWith(situationValue)) {
+							&& behaviorRecords_unique.get(i).endsWith(situationID)) {
 						currentCadidate = currentCadidate
-								+ "#"
-								+ this.historyList.get(currentIndex)
-										.getActionValue();
-					} else {
+								+ "#" + 
+						((CRISTUserAction)historyList.get(currentIndex).getAction()).getActionID();
+					} 
+					else {
 						break;
 					}
 				}
@@ -162,7 +149,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 			}
 
 			for (int j = 0; j < cadidateActionList.size(); j++) {
-				String currentActionPattern = behaviorRecords.get(i)
+				String currentActionPattern = behaviorRecords_unique.get(i)
 						+ cadidateActionList.get(j);
 				if (this.intentModel.containsKey(currentActionPattern)) {
 					Integer currentScore = this.intentModel
@@ -174,6 +161,8 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 				}
 			}
 		}
+		
+		return intentModel;
 	}
 
 	private int[] getAllOccurences(ArrayList<String> strList, String str) {
