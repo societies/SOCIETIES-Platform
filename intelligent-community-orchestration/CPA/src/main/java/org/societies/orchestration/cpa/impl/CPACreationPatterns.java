@@ -45,6 +45,8 @@ public class CPACreationPatterns
 {
 	public List<ICisProposal> analyze(List<ICis> cises){
 		ArrayList<ICisProposal> ret = new ArrayList<ICisProposal>();
+		//1. make a graph of interactions, the weight on the links indicates level of interaction, 0 is none. 
+		//2. segment the graph nodes according to weights. suggest
 		return ret;
 		
 	}
