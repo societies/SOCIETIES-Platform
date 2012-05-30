@@ -103,7 +103,7 @@ public class DataTransferAnalyzerTest {
 		privacyLog.append(new DataTransmissionLogEntry(dataType2, time6, id2, id1, class2, -1, ChannelType.XMPP));
 		privacyLog.append(new DataTransmissionLogEntry(dataType3, time7, id3, id1, class4, -1, ChannelType.XMPP));
 		privacyLog.append(new DataTransmissionLogEntry(dataType4, time8, id4, id1, class1, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType1, time8, id1, id1, class4, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType1, time8, id1, id2, class4, -1, ChannelType.XMPP));
 		privacyLog.append(new DataTransmissionLogEntry(dataType2, time9, id2, id1, class1, -1, ChannelType.XMPP));
 		privacyLog.append(new DataTransmissionLogEntry(dataType3, time9, id3, id1, class3, -1, ChannelType.XMPP));
 		
@@ -125,18 +125,34 @@ public class DataTransferAnalyzerTest {
 	@Test
 	public void testEstimatePrivacyBreachIIdentity() throws AssessmentException {
 
-		IIdentity sender = id1;
-		AssessmentResultIIdentity result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+		estimatePrivacyBreachIIdentity(id1, time2, 10);
+		estimatePrivacyBreachIIdentity(id2, time8, 1);
+		estimatePrivacyBreachIIdentity(id3, time2, 0);  // any valid past time for 0 transmissions
+		estimatePrivacyBreachIIdentity(id4, time2, 0);  // any valid past time for 0 transmissions
+	}
+	
+	private void estimatePrivacyBreachIIdentity(IIdentity sender, Date firstTransmission,
+			long numPacketsTransmitted) throws AssessmentException {
+
+		AssessmentResultIIdentity result;
 		double expected;
-		long numPacketsTransmitted = 11;
+
+		result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
 		
+		// Check correlations
 		result.getCorrWithDataAccessByAll();  // TODO
 		result.getCorrWithDataAccessByAllDev();  // TODO
 		result.getCorrWithDataAccessBySender();  // TODO
 		result.getCorrWithDataAccessBySenderDev();  // TODO
+
+		// Check number and frequency of transmissions
 		assertEquals(numPacketsTransmitted, result.getNumAllPackets());
-		expected = numPacketsTransmitted / ((double)(new Date().getTime() - time2.getTime()) / (1000 * 60 * 60 * 24 * 30.5));
+		expected = new Date().getTime() - firstTransmission.getTime();
+		expected /= 1000 * 60 * 60 * 24 * 30.5;
+		expected = numPacketsTransmitted / expected;
 		assertEquals(expected, result.getNumPacketsPerMonth(), 0.05 * expected);
+		
+		// Check sender
 		assertEquals(sender, result.getSender());
 		assertEquals(sender.getJid(), result.getSender().getJid());
 	}
@@ -148,19 +164,34 @@ public class DataTransferAnalyzerTest {
 	@Test
 	public void testEstimatePrivacyBreachString() throws AssessmentException {
 
-		String sender = class1;
-		AssessmentResultClassName result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
-		double expected;
-		long numPacketsTransmitted = 3;
+		estimatePrivacyBreachString(class1, time4, 3);
+		estimatePrivacyBreachString(class2, time2, 2);
+		estimatePrivacyBreachString(class3, time4, 3);
+		estimatePrivacyBreachString(class4, time3, 3);
+	}
+	
+	private void estimatePrivacyBreachString(String sender, Date firstTransmission,
+			long numPacketsTransmitted) throws AssessmentException {
 
+		AssessmentResultClassName result;
+		double expected;
+
+		result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+		
+		// Check correlations
 		result.getCorrWithDataAccessByAll();  // TODO
 		result.getCorrWithDataAccessByAllDev();  // TODO
 		result.getCorrWithDataAccessBySender();  // TODO
 		result.getCorrWithDataAccessBySenderDev();  // TODO
+
+		// Check number and frequency of transmissions
 		assertEquals(numPacketsTransmitted, result.getNumAllPackets());
-		expected = numPacketsTransmitted / ((double)(new Date().getTime() - time2.getTime()) / (1000 * 60 * 60 * 24 * 30.5));
+		expected = new Date().getTime() - firstTransmission.getTime();
+		expected /= 1000 * 60 * 60 * 24 * 30.5;
+		expected = numPacketsTransmitted / expected;
 		assertEquals(expected, result.getNumPacketsPerMonth(), 0.05 * expected);
+		
+		// Check sender
 		assertEquals(sender, result.getSender());
 	}
-
 }
