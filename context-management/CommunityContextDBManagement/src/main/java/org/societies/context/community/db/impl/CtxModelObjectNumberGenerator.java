@@ -22,86 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.community.db.test;
+package org.societies.context.community.db.impl;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+public class CtxModelObjectNumberGenerator {
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+    private static Long nextValue = 0L;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+    public static Long getNextValue() {
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CommunityCtxEntity;
-import org.societies.api.identity.IIdentity;
-import org.societies.context.community.db.impl.CommunityCtxDBMgr;
-
-/**
- * 
- * 
- * @author
- * 
- */
-
-public class CommunityCtxDBMgrTest {
-
-	private static final String OWNER_IDENTITY_STRING = "myFooIIdentity@societies.local";
-
-	private CommunityCtxDBMgr communityDB;
-	CommunityCtxEntity entity;
-
-	private static IIdentity mockIdentity = mock(IIdentity.class);
-	
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-
-		when(mockIdentity.toString()).thenReturn(OWNER_IDENTITY_STRING);
-
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		communityDB = new CommunityCtxDBMgr();
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-		communityDB = null;
-	}
-
-	@Test
- 	public void testCreateCommunityCtxEntity() throws CtxException{
-		System.out.println("---- testCreateCommunityCtxEntity");
-
-		entity = communityDB.createCommunityEntity(mockIdentity);
-
-		assertNotNull(entity);
-		assertEquals(mockIdentity.toString(), entity.getOwnerId());
-	}
-
+        return nextValue++;
+    }
 }
