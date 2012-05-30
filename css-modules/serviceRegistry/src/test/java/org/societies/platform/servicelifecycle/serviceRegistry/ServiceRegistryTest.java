@@ -197,6 +197,9 @@ public class ServiceRegistryTest extends
 		Set<String> expectedResults = new HashSet<String>();
 		expectedResults.add(_cisTestId);expectedResults.add(_cisTestId1);
 		assertTrue(cisIdList.containsAll(expectedResults));
+		s.getServiceIdentifier().setServiceInstanceIdentifier("not_Existing");
+		cisIdList = serReg.retrieveCISSharedService(s.getServiceIdentifier());
+		assertTrue(cisIdList.isEmpty());
 	}
 	
 	@Test
