@@ -44,6 +44,7 @@
 <!-- Privacy Protection & trust-->
 	<artifact type="bundle" name="org.societies.privacytrust.trust"/>
 	<artifact type="bundle" name="org.societies.privacytrust.privacyprotection"/>
+	<artifact type="bundle" name="org.societies.privacytrust.privacytrustcommmanagement"/>
 
 <!-- Context Management -->	
         <artifact type="bundle" name="org.societies.context-management.context-event-mgmt"/>

@@ -96,7 +96,8 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<L
 		geolocation = data.getData();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
 	@Override

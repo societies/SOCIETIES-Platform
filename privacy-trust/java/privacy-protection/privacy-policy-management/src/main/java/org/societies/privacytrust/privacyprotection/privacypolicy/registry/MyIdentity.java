@@ -22,40 +22,62 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.dataobfuscation.listener;
+package org.societies.privacytrust.privacyprotection.privacypolicy.registry;
 
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
+import java.io.Serializable;
+
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+
 
 /**
- * @state skeleton 
- * @author olivierm
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
  */
-public class SampleDataObfuscationListener implements IDataObfuscationListener {
-	@Override
-	public void onObfuscationDone(IDataWrapper data) {
-		System.out.println(data);
+public class MyIdentity implements IIdentity, Serializable{
+
+	
+	private final IdentityType type;
+	private final String identifier;
+	private final String domainIdentifier;
+
+	public MyIdentity(IdentityType type, String identifier,
+			String domainIdentifier) {
+		this.type = type;
+		this.identifier = identifier;
+		this.domainIdentifier = domainIdentifier;
+	}
+	public MyIdentity(IIdentity identity) {
+				this.type = identity.getType();
+				this.identifier = identity.getIdentifier();
+				this.domainIdentifier = identity.getDomain();
 	}
 
 	@Override
-	public void onObfuscationCancelled(String msg) {
-		System.out.println("Cancelled "+msg);
+	public String getJid() {
+		return type+"://"+identifier+"@"+domainIdentifier;
 	}
 
 	@Override
-	public void onObfuscationAborted(String msg, Exception e) {
-		System.out.println("Aborted "+msg);
-		e.printStackTrace();
+	public String getBareJid() {
+		return type+"://"+identifier+"@"+domainIdentifier;
 	}
 
 	@Override
-	public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
-		if (retrieved) {
-			System.out.println("Obfuscated version retrieved: "+dataId);
-		}
-		else {
-			System.out.println("Not obfuscated version retrieved: "+dataId);
-		}
+	public String getDomain() {
+		return domainIdentifier;
 	}
+
+	@Override
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	@Override
+	public IdentityType getType() {
+		return type;
+	}
+
 }

@@ -149,7 +149,7 @@ public class PrivacyPolicyRegistryTest {
 		
 		RequestPolicy policy = registryMgr.getPolicy(requestorCis);
 		
-		TestCase.assertNotNull(policy);
+		TestCase.assertNotNull("Null policy for requestorCis: "+requestorCis.getRequestorId().getJid()+" / "+((RequestorCis)requestorCis).getCisRequestorId().getJid(), policy);
 		
 		
 		try {
@@ -178,7 +178,7 @@ public class PrivacyPolicyRegistryTest {
 		registryMgr.addPolicy(requestorService, servicePolicy);
 		
 		RequestPolicy policy2 = registryMgr.getPolicy(requestorService);
-		TestCase.assertNotNull(policy2);
+		TestCase.assertNotNull("Null policy for requestorService: "+requestorService.getRequestorId().getJid()+" / "+((RequestorService)requestorService).getRequestorServiceId().getServiceInstanceIdentifier().toString(), policy2);
 
 		
 		try {

@@ -63,27 +63,31 @@ public abstract class DataObfuscator<E extends IDataWrapper> implements IDataObf
 	}
 
 	
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getObfuscationType()
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getObfuscationLevelType()
 	 */
 	@Override
 	public ObfuscationLevelType getObfuscationLevelType() {
 		return obfuscationLevelType;
 	}
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getDataWrapper()
 	 */
 	public IDataWrapper getDataWrapper() {
 		return dataWrapper;
 	}
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getDataType()
 	 */
 	@Override
 	public Type getDataType() {
 		return dataType;
 	}
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getStepNumber()
 	 */
 	@Override

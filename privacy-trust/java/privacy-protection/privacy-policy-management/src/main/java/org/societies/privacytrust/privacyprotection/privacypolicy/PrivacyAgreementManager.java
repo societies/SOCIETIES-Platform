@@ -54,8 +54,9 @@ public class PrivacyAgreementManager implements IPrivacyAgreementManager {
 	private ICtxBroker ctxBroker;
 
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPolicyAgreementManager#getAgreement(org.societies.api.identity.Requestor)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager#getAgreement(org.societies.api.identity.Requestor)
 	 */
 	@Override
 	public AgreementEnvelope getAgreement(Requestor requestor) throws PrivacyException {

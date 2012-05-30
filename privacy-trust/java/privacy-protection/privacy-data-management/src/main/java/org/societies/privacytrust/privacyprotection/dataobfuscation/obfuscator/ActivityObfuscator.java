@@ -30,7 +30,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.schema.activity.Activity;
 
 /**
- * Obfuscator for name
+ * Obfuscator for activity from activity feed
  *
  * @author Olivier Maridat (Trialog)
  *
@@ -47,7 +47,8 @@ public class ActivityObfuscator extends DataObfuscator<IDataWrapper<Activity>> {
 	}
 
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
 	@Override
