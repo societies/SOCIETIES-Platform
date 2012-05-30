@@ -24,6 +24,63 @@
  */
 package org.societies.context.community.db.test;
 
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.societies.context.community.db.impl.CommunityCtxDBMgr;
+
+/**
+ * 
+ * 
+ * @author
+ * 
+ */
+
 public class CommunityCtxDBMgrTest {
+
+	private CommunityCtxDBMgr communityDB;
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+		communityDB = new CommunityCtxDBMgr();
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
+		communityDB = null;
+	}
+
 
 }
