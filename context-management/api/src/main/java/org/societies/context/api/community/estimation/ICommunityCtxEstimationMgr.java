@@ -32,9 +32,7 @@ import java.util.ArrayList;
  * @created 12-Nov-2011 7:15:14 PM
  */
 public interface ICommunityCtxEstimationMgr {
-	
-	
-	
+		
 	public double cceNumMean(ArrayList<Integer> inputValuesList);
 	
 	public double cceNumMedian(ArrayList<Integer> inputValuesList);
@@ -55,44 +53,5 @@ public interface ICommunityCtxEstimationMgr {
 	
 	public void cceSpecial3();
 	
-
-//	/**
-//	 * 
-//	 * @param estimationModel
-//	 * @param list
-//	 * @return 
-//	 * @since 0.0.1
-//	 */
-//	public Integer estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
-//	
-//	public Hashtable<String, Integer> calculateStringAttributeStatistics(List<CtxAttribute> list);
-//	
-//	public void estimateContext(EstimationModels estimationmodel, CtxAttribute type, CtxIdentifier cisId);
-//		
-
-//	/**
-//	 * 
-//	 * @param Current
-//	 * @param communityID
-//	 * @param list
-//	 * @since 0.0.1
-//	 */
-//	public void retrieveCurrentCisContext(boolean Current, CtxEntityIdentifier communityID, List<CtxAttribute> list);
-//
-//	/**
-//	 * 
-//	 * @param Current
-//	 * @param communityID
-//	 * @param list
-//	 * @since 0.0.1
-//	 */
-//	public void retrieveHistoryCisContext(boolean Current, CtxEntityIdentifier communityID, List<CtxAttribute> list);
-//
-//	/**
-//	 * 
-//	 * @param estimatedContext
-//	 * @since 0.0.1
-//	 */
-//	public void updateContextModelObject(CtxEntity estimatedContext);
 
 }

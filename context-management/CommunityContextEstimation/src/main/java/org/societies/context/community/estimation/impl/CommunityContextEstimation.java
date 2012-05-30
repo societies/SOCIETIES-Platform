@@ -59,9 +59,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	@Autowired(required = true)
 	private ICtxBroker ctxBroker = null;
 
-	private CtxEntityIdentifier comId;
-	private String entityType;
-	private String attributeType;
+
 
 	@Override
 	public double cceNumMean(ArrayList<Integer> inputValuesList) {
@@ -391,39 +389,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		
 	}
 	
-	public void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
-	}
-
-
-	public CtxEntityIdentifier getComId() {
-		return comId;
-	}
-
-
-	public void setComId(CtxEntityIdentifier comId) {
-		this.comId = comId;
-	}
-
-
-	public String getEntityType() {
-		return entityType;
-	}
-
-
-	public void setEntityType(String entityType) {
-		this.entityType = entityType;
-	}
-
-
-	public String getAttributeType() {
-		return attributeType;
-	}
-
-
-	public void setAttributeType(String attributeType) {
-		this.attributeType = attributeType;
-	}
 
 
 }
