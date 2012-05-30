@@ -83,7 +83,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * @param actionID
 	 */
 	public CRISTUserAction(String actionID) {
-		this.actionID = actionID;
+		setActionID(actionID);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 		this.setServiceType(action.getServiceType());
 		this.setparameterName(action.getparameterName());
 		this.setvalue(action.getvalue());
-
+		this.actionID = getActionID();
 	}
 	
 	
