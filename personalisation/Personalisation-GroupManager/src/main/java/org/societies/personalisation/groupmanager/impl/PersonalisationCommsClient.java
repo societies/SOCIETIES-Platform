@@ -136,6 +136,7 @@ public class PersonalisationCommsClient implements IPersonalisationManager, ICom
 			}
 			
 			this.results.put(getId(action.getServiceID(), action.getparameterName()), action);
+			this.results.notifyAll();
 		}
 		
 	}
@@ -161,10 +162,20 @@ public class PersonalisationCommsClient implements IPersonalisationManager, ICom
 			LOG.warn(e.getMessage());
 		};
 		
+		
 		//waiting for the result to be returned
-		while (null==this.results.get(id).getparameterName()){
+/*		while (null==this.results.get(id).getparameterName()){
 			try {
 				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}*/
+		
+		while (!this.results.containsKey(id)){
+			try {
+				this.results.wait();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -173,6 +184,7 @@ public class PersonalisationCommsClient implements IPersonalisationManager, ICom
 		return new AsyncResult<IAction>(this.results.get(id));
 	}
 
+	
 	@Override
 	public Future<IAction> getPreference(Requestor requestor, IIdentity userIdentity,
 			String serviceType, ServiceResourceIdentifier serviceID, String parameterName) {
