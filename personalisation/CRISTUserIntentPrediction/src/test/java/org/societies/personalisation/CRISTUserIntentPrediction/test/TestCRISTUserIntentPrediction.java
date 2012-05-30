@@ -60,7 +60,7 @@ import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTU
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction;
 import org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager;
-import org.societies.personalisation.CRISTUserIntentTaskManager.impl.MockIdentity;
+
 
 /**
  * This is a JUnit 4 test for CRISTUserIntentPrediction's methods:

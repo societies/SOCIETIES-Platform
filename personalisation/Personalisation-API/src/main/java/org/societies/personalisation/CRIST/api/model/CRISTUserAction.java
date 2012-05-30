@@ -25,6 +25,8 @@
 package org.societies.personalisation.CRIST.api.model;
 
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +83,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * @param actionID
 	 */
 	public CRISTUserAction(String actionID) {
-		this.actionID = actionID;
+		setActionID(actionID);
 	}
 
 	/**
@@ -93,7 +95,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 		this.setServiceType(action.getServiceType());
 		this.setparameterName(action.getparameterName());
 		this.setvalue(action.getvalue());
-
+		this.actionID = getActionID();
 	}
 	
 	
@@ -109,10 +111,14 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 
 	/**
 	 * This method will return the ID of the current action
-	 * 
+	 * this ID contains all information about this action: serviceId, servicetype, paraname, and value. seperated by :
 	 * @return
 	 */
 	public String getActionID() {
+		if (actionID == null)
+		{
+			actionID = this.getServiceID().getIdentifier() + ": " + this.getServiceType()+ ": " + this.getparameterName() + ": " + this.getvalue();
+		}
 		return this.actionID;
 	}
 
@@ -149,6 +155,19 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 */
 	public void setActionID(String actionID) {
 		this.actionID = actionID;
+		if (actionID == null)
+			return;
+		String[] fields = actionID.split(": ");
+		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+		try {
+			serviceId.setIdentifier(new URI(fields[0]));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		this.setServiceID(serviceId);
+		this.setServiceType(fields[1]);
+		this.setparameterName(fields[2]);
+		this.setvalue(fields[3]);
 	}
 
 	/**
