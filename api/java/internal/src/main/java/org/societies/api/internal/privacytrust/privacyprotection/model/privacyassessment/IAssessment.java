@@ -25,7 +25,8 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 import java.util.List;
-import java.util.concurrent.Future;
+
+import org.societies.api.identity.IIdentity;
 
 /**
  * High-level interface for Privacy Assessment.
@@ -44,13 +45,51 @@ public interface IAssessment {
 	public void setAutoPeriod(int seconds);
 	
 	/**
-	 * Perform a-posteriori assessment now
+	 * Perform all assessments and update assessment values. May take a long time.
 	 */
-	public Future<List<AssessmentResult>> assessNow();
+	public void assessAllNow();
 	
 	/**
-	 * 
-	 * @return Result of the most recent assessment
+	 * Get a-posteriori assessment for all sender {@link IIdentity} values.
 	 */
-	public List<AssessmentResult> getLastResult();
+	public List<AssessmentResultIIdentity> getAssessmentAllIds();
+	
+	/**
+	 * Get a-posteriori assessment for all sender class names.
+	 */
+	public List<AssessmentResultClassName> getAssessmentAllClasses();
+
+	/**
+	 * Get a-posteriori assessment for a particular sender {@link IIdentity}.
+	 * 
+	 * @param sender sender identity that was self-reported by the sender
+	 * 
+	 * @return privacy assessment for given sender
+	 */
+	public AssessmentResultIIdentity getAssessment(IIdentity sender);
+
+	/**
+	 * Get a-posteriori assessment for a particular sender class name.
+	 * 
+	 * @param sender class name of the sender as determined by the Privacy Assessment
+	 * 
+	 * @return privacy assessment for given sender
+	 */
+	public AssessmentResultClassName getAssessment(String senderClassName);
+	
+	/**
+	 * Development only.
+	 * TODO: remove from API and implementation
+	 * 
+	 * @return number of all recorded data transmission events
+	 */
+	public long getNumDataTransmissionEvents();
+	
+	/**
+	 * Development only.
+	 * TODO: remove from API and implementation
+	 * 
+	 * @return number of all recorded data access events
+	 */
+	public long getNumDataAccessEvents();
 }

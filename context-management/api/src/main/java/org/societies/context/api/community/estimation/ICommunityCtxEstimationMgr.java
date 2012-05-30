@@ -24,50 +24,75 @@
  */
 package org.societies.context.api.community.estimation;
 
-import java.util.List;
-
-//import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxEntity;
+import java.awt.Point;
+import java.util.ArrayList;
 
 /**
  * @author yboul
  * @created 12-Nov-2011 7:15:14 PM
  */
 public interface ICommunityCtxEstimationMgr {
+	
+	
+	
+	public double cceNumMean(ArrayList<Integer> inputValuesList);
+	
+	public double cceNumMedian(ArrayList<Integer> inputValuesList);
+	
+	public ArrayList<Integer> cceNumMode(ArrayList<Integer> inputValuesList);
+	
+	public Integer[] cceNumRange(ArrayList<Integer> inputValuesList);
+	
+	public ArrayList<Point> cceGeomConvexHull(ArrayList<Point> points);
+	
+	public Point[] cceGeomMinBB(ArrayList<Point> points);
+	
+	public ArrayList<String> cceStringMode(ArrayList<String> inputValuesList);
+	
+	public void cceSpecial1();
+	
+	public void cceSpecial2();
+	
+	public void cceSpecial3();
+	
 
-	/**
-	 * 
-	 * @param estimationModel
-	 * @param list
-	 * @since 0.0.1
-	 */
-	public void estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
+//	/**
+//	 * 
+//	 * @param estimationModel
+//	 * @param list
+//	 * @return 
+//	 * @since 0.0.1
+//	 */
+//	public Integer estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
+//	
+//	public Hashtable<String, Integer> calculateStringAttributeStatistics(List<CtxAttribute> list);
+//	
+//	public void estimateContext(EstimationModels estimationmodel, CtxAttribute type, CtxIdentifier cisId);
+//		
 
-	/**
-	 * 
-	 * @param Current
-	 * @param communityID
-	 * @param list
-	 * @since 0.0.1
-	 */
-	public void retrieveCurrentCisContext(boolean Current, IIdentity communityID, List<CtxAttribute> list);
-
-	/**
-	 * 
-	 * @param Current
-	 * @param communityID
-	 * @param list
-	 * @since 0.0.1
-	 */
-	public void retrieveHistoryCisContext(boolean Current, IIdentity communityID, List<CtxAttribute> list);
-
-	/**
-	 * 
-	 * @param estimatedContext
-	 * @since 0.0.1
-	 */
-	public void updateContextModelObject(CtxEntity estimatedContext);
+//	/**
+//	 * 
+//	 * @param Current
+//	 * @param communityID
+//	 * @param list
+//	 * @since 0.0.1
+//	 */
+//	public void retrieveCurrentCisContext(boolean Current, CtxEntityIdentifier communityID, List<CtxAttribute> list);
+//
+//	/**
+//	 * 
+//	 * @param Current
+//	 * @param communityID
+//	 * @param list
+//	 * @since 0.0.1
+//	 */
+//	public void retrieveHistoryCisContext(boolean Current, CtxEntityIdentifier communityID, List<CtxAttribute> list);
+//
+//	/**
+//	 * 
+//	 * @param estimatedContext
+//	 * @since 0.0.1
+//	 */
+//	public void updateContextModelObject(CtxEntity estimatedContext);
 
 }

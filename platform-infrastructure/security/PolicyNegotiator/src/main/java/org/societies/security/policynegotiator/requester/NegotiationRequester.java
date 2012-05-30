@@ -29,11 +29,13 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.security.digsig.ISignatureMgr;
 
@@ -46,7 +48,10 @@ public class NegotiationRequester implements INegotiation {
 	private ISecureStorage secureStorage;
 	private INegotiationProviderRemote groupMgr;
 	private IPersonalisationManager personalizationMgr;
-
+	private IPrivacyPolicyNegotiationManager privacyPolicyNegotiationMgr;
+	private boolean isPrivacyPolicyNegotiationMgrAvailable = false;
+	private IEventMgr eventMgr;
+	
 //	@Autowired
 //	public NegotiationRequester(ISignatureMgr signatureMgr) {
 //		this.signatureMgr = signatureMgr;
@@ -101,9 +106,27 @@ public class NegotiationRequester implements INegotiation {
 	public void setPersonalizationMgr(IPersonalisationManager personalizationMgr) {
 		this.personalizationMgr = personalizationMgr;
 	}
+	public IPrivacyPolicyNegotiationManager getPrivacyPolicyNegotiationManager() {
+		return privacyPolicyNegotiationMgr;
+	}
+	public void setPrivacyPolicyNegotiationManager(IPrivacyPolicyNegotiationManager privacyPolicyNegotiationMgr) {
+		this.privacyPolicyNegotiationMgr = privacyPolicyNegotiationMgr;
+		this.isPrivacyPolicyNegotiationMgrAvailable = true;
+	}
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
+	}
+	
+	public boolean isPrivacyPolicyNegotiationMgrAvailable() {
+		return isPrivacyPolicyNegotiationMgrAvailable;
+	}
 
 	@Override
-	public void startNegotiation(Requestor provider, INegotiationCallback callback) {
+	public void startNegotiation(Requestor provider, boolean includePrivacyPolicyNegotiation,
+			INegotiationCallback callback) {
 
 		String serviceId;
 		
@@ -120,12 +143,13 @@ public class NegotiationRequester implements INegotiation {
 			serviceId = providerCis.getCisRequestorId().getJid();
 		}
 		else {
-			LOG.warn("Terminating: Inappropriate provider: " + provider.getClass().getName());
-			callback.onNegotiationComplete(null);
+			String msg = "Terminating: Inappropriate provider: " + provider.getClass().getName();
+			LOG.warn(msg);
+			callback.onNegotiationError(msg);
 			return;
 		}
 		ProviderCallback providerCallback = new ProviderCallback(this, provider,
-				MethodType.GET_POLICY_OPTIONS, callback);
+				MethodType.GET_POLICY_OPTIONS, includePrivacyPolicyNegotiation, callback);
 		
 		groupMgr.getPolicyOptions(serviceId, provider, providerCallback);
 	}

@@ -51,10 +51,12 @@ public class FriendsConverterFromFoursquare implements FriendsConverter {
 							p.setId("Foursquare:" + jfriend.getString("id"));
 							p.setRelationshipStatus(jfriend
 									.getString("relationship"));
-							p.setName(new NameImpl(jfriend
-									.getString("firstName")
-									+ " "
-									+ jfriend.getString("lastName")));
+							String name = "";
+							if(jfriend.has("firstName"))
+								name = name + jfriend.getString("firstName");
+							if(jfriend.has("lastName"))
+								name = name + " "+jfriend.getString("lastName");
+							p.setName(new NameImpl(name));
 							p.setAccounts(accounts);
 							// System.out.println(">>> new Friends"+p.getName().getFormatted());
 							friends.add(p);

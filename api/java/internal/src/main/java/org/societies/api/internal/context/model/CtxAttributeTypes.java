@@ -34,27 +34,42 @@ import org.societies.api.context.model.CtxAttribute;
  * @since 0.0.7
  */
 public class CtxAttributeTypes extends
-		org.societies.api.context.model.CtxAttributeTypes {
-	
+org.societies.api.context.model.CtxAttributeTypes {
+
+
 	/**
-     * 
-     */
-    public static final String PARAMETER_NAME = "parameterName";   
+	 * @since 0.0.8
+	 */
+	public static final String CAUI_MODEL = "caui_model";
 
-    /**
-     * @since 0.0.8
-     */
-    public static final String D_NET = "dNet";
+	/**
+	 * 
+	 */
+	public static final String CRIST_MODEL = "crist_model";
 
-    /**
-     * @since 0.0.8
-     */
-    public static final String SERVICE_PRIVACY_POLICY_REGISTRY = "servicePrivacyPolicyRegistry";
-    
-    
-    /**
-     * @since 0.0.8
-     */
-    public static final String SNAPSHOT_REG = "snapshotReg";
-    
+	/**
+	 * @since 0.0.8
+	 */
+	public static final String D_NET = "dNet";
+
+	/**
+	 * 
+	 */
+	public static final String PARAMETER_NAME = "parameterName";   
+
+	/**
+	 *
+	 */
+	public static final String PRIVACY_POLICY_REGISTRY = "privacyPolicyRegistry";
+
+	/**
+	 * @since 0.0.8
+	 */
+	public static final String SERVICE_PRIVACY_POLICY_REGISTRY = "servicePrivacyPolicyRegistry";
+
+	/**
+	 * @since 0.0.8
+	 */
+	public static final String SNAPSHOT_REG = "snapshotReg";
+
 }

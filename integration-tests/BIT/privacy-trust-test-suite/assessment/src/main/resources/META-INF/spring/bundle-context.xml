@@ -25,7 +25,10 @@
 		depends-on="PrivacyLogAppender"
         init-method="run">
   		<property name="privacyLogAppender" ref="PrivacyLogAppender"/>
-  		<property name="identityManager" ref="IdentityManager"/>
+  		<property name="assessment" ref="Assessment"/>
+  		<property name="commManager" ref="CommManager"/>
+  		<property name="ctxBrokerInternal" ref="ctxBrokerInternal"/>
+  		<property name="ctxBrokerExternal" ref="ctxBrokerExternal"/>
     </bean>
     
     <bean

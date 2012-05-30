@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -1357,5 +1358,12 @@ public class InternalCtxBroker implements ICtxBroker {
 			}                		
 		}
 		return areEqual;
+	}
+
+	@Override
+	public Future<CommunityCtxEntity> createCommunityEntity(IIdentity cisId)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

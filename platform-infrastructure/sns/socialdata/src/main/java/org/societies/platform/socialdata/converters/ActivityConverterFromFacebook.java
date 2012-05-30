@@ -185,9 +185,6 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	    	 
 	    	 entry.setVerb(ISocialData.TAG);
 	    	 entry.setObject(entry.getActor());
-		    	
-	    	 System.out.println("TAG Action: "+m1.group());
-	    	 System.out.println("A: "+m1.group(1));
 	    	 
 	    	 ActivityObject aObj = new ActivityObjectImpl();
 	    	 entry.setTarget(aObj);	
@@ -197,7 +194,6 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	    	 if (m1.group(2)!=null){
 	    		aObj.setObjectType(ISocialData.COLLECTION);
 				aObj.setDisplayName(m1.group(2));
-				System.out.println("B: "+m1.group(2));
 	    	 }
 	    	 else{
 	    			aObj.setObjectType(genType(elm.getString(TYPE)));
@@ -223,10 +219,6 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	    	 target.setObjectType(genType(m2.group(2)));
 	    	 entry.setTarget(target);
 	    	 
-	    	 System.out.println("POST: "+m2.group());
-	    	 System.out.println("Content: "+m2.group(1));
-	    	 System.out.println("target : "+m2.group(2));
-	    	 
 	    	 return;
 	     }
 	     
@@ -237,10 +229,6 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	    Pattern p3 = Pattern.compile(".* (is|are) now friends.*.");
 	    Matcher m3 = p3.matcher(story);
 		if (m3.find()){
-			
-			System.out.println("Make friends action:"+m3.group());
-			
-			
 			String story_tags = elm.getString("story_tags");
 			JSONObject jstags = new JSONObject(story_tags);
 			List<fb_user> users = new ArrayList<fb_user>();
@@ -287,8 +275,6 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		Pattern p4 = Pattern.compile(".* likes .*.");
 		Matcher m4 = p4.matcher(story);
 		if (m4.find()){
-			System.out.println("Likes: "+m4.group());
-			
 			String story_tags = elm.getString("story_tags");
 			JSONObject jstags = new JSONObject(story_tags);
 			List<fb_user> users = new ArrayList<fb_user>();
@@ -334,7 +320,6 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		 Pattern p5 = Pattern.compile(".* (?:changed|updated) .* (?:picture|photo).");
 		 Matcher m5 = p5.matcher(story);
 		 if (m5.find()){
-			 System.out.println("Change/Update: "+m5.group());
 			 entry.setVerb(ISocialData.UPDATE);
 			 ActivityObject obj = new ActivityObjectImpl();
 			 obj.setObjectType(ISocialData.PERSON);
@@ -383,12 +368,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		
 			 Pattern p7 = Pattern.compile(".* went to (.*) at (.*).");
 		     Matcher m7 = p7.matcher(story);
-		     if (m7.find()){
-		    	
-		    	 System.out.println("Went to: "+m7.group());
-		    	 System.out.println("A: "+m7.group(1));
-		    	 System.out.println("B: "+m7.group(2));
-		    	 
+		     if (m7.find()){		    	 
 		    	 entry.setVerb(ISocialData.ATTEND);
 		    	 ActivityObject obj = new ActivityObjectImpl();
 		    	 obj.setObjectType(ISocialData.EVENT);
@@ -406,7 +386,6 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		     Pattern p8 = Pattern.compile(".* shared a link.");
 		     Matcher m8 = p8.matcher(story);
 		     if (m8.find()){
-		    	 System.out.println("SHARE: "+m8.group());
 		    	 entry.setVerb(ISocialData.SHARE);
 		    	 ActivityObject obj = new ActivityObjectImpl();
 		    	 obj.setObjectType(ISocialData.BOOKMARK);
@@ -422,9 +401,6 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 			 Pattern p10 = Pattern.compile(".* asked: (.*).");
 		     Matcher m10 = p10.matcher(story);
 		     if (m10.find()){
-		    	 System.out.println("asked: "+m10.group());
-		    	 System.out.println("A: "+m10.group(1));
-		    	 
 		    	 entry.setVerb(ISocialData.POST);
 		    	 entry.setContent(m10.group(1));
 		    	 
@@ -438,11 +414,6 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 			 Pattern p11 = Pattern.compile(".* answered (.*) with (.*).");
 		     Matcher m11 = p11.matcher(story);
 		     if (m11.find()){
-		    	 System.out.println("answered: "+m11.group());
-		    	 System.out.println("A: "+m11.group(1));
-		    	 System.out.println("B: "+m11.group(2));
-		    	 
-		    	 
 		    	 entry.setVerb(ISocialData.POST);
 		    	 entry.setContent(m11.group(2));
 		    	 

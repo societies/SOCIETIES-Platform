@@ -1,0 +1,87 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+		<version>0.1</version>
+	</parent>
+	<groupId>org.societies.privacytrust.privacyprotection.privacyagreementmanagement</groupId>
+	<artifactId>schemagenerator</artifactId>
+	<version>0.1</version>
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.0.3</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>1.3.1</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>schemagen</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<includes>
+						<include>**/*.java</include>
+					</includes>
+					<packageName>org.societies.api.internal.privacytrust.privacyprotection</packageName>
+				</configuration>
+			</plugin>
+			<plugin>
+		<groupId>org.societies.maven</groupId>
+		<artifactId>societies-xmpp-maven-plugin</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<executions>
+			<execution>
+				<phase>generate-sources</phase>
+				<goals>
+					<goal>xsd</goal>
+				</goals>
+			</execution>
+		</executions>
+		<configuration>
+			<!-- Namespace define in the CommClient and CommServer of the beans -->
+			<packageName>org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement</packageName>
+			<httpNamespace>http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacypolicymanagement</httpNamespace>
+			<!-- Output and input directories -->
+			<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
+			<file>schema4.xsd</file>
+			<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
+		</configuration>
+	</plugin>
+		</plugins>
+	</build>
+</project>

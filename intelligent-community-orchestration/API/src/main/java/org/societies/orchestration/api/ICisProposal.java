@@ -310,6 +310,19 @@ public class ICisProposal {
 	 * Set the proposed membership criteria for the CIS proposal.
 	 * 
 	 * @param Set of membership criteria, as strings, involved in the CIS proposal 
+	 * NOTE: The parameter type will probably change depending on how T4.5 chooses to represent
+	 * this. For now though, use the following syntax for each element of the list:
+	 * 
+	 * Each element is a string broken into three parts, with "---" between each part.
+	 * Part 1) is one of: CONTEXT ATTRIBUTE, CONTEXT ASSOCIATION, ACTIVITY, SERVICE USE
+	 * Part 2) is the label type, such as 'address' or 'family', which only applies for context attributes and assocations.
+	 * For other datatypes, it doesn't matter if anything is put in part 2) or if it doesn't get a "---"
+	 * Part 3) is the value of the data, if this is being passed. So an 'address' might have '15 Redding Street'.
+	 * Again this may be left out.
+	 * 
+	 * So a full String element in the list might be:
+	 * 
+	 * "CONTEXT ATTRIBUTE---interest---fishing"
 	 */
 	public void setMembershipCriteria(ArrayList<String> membershipCriteria) {
 		this.membershipCriteria = membershipCriteria;

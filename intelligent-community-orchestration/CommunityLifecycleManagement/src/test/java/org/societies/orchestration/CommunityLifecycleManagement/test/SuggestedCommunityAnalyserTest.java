@@ -52,6 +52,7 @@ import org.societies.orchestration.api.ICisParticipant;
 import org.societies.orchestration.api.ICisProposal;
 //import org.societies.orchestration.api.ICisEditor;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -62,7 +63,10 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.css.management.ICssActivity;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender;
 import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
 
@@ -150,6 +154,12 @@ public class SuggestedCommunityAnalyserTest {
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
 		communityRecommender = mock(CommunityRecommender.class);
+		IPrivacyDataManager privacyDataManager = mock(IPrivacyDataManager.class);
+		ICommManager commManager = mock(ICommManager.class);
+		
+		IIdentityManager identityManager = mock(IIdentityManager.class);
+		
+		
 		
 		CtxAttribute theAttr = null;
 		theAttr = new CtxAttribute(new CtxAttributeIdentifier(entityId, "address", new Long(12345)));
@@ -174,6 +184,7 @@ public class SuggestedCommunityAnalyserTest {
 			e1.printStackTrace();
 		}*/
 		theAttr.setStringValue("15 Fragrance Street");
+		
 		try {
 			userCtxBroker.update(attr);
 		} catch (CtxException e) {
@@ -202,10 +213,46 @@ public class SuggestedCommunityAnalyserTest {
 		csss.add(mock(IIdentity.class));
 		csss.add(mock(IIdentity.class));
 		
+		try {
+			when(identityManager.fromJid(csss.get(0).getIdentifier())).thenReturn(mock(IIdentity.class));
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			when(identityManager.fromJid(csss.get(1).getIdentifier())).thenReturn(mock(IIdentity.class));
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			when(identityManager.fromJid(csss.get(2).getIdentifier())).thenReturn(mock(IIdentity.class));
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			when(identityManager.fromJid(csss.get(3).getIdentifier())).thenReturn(mock(IIdentity.class));
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			when(identityManager.fromJid(csss.get(4).getIdentifier())).thenReturn(mock(IIdentity.class));
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
     	suggestedCommunityAnalyser = new SuggestedCommunityAnalyser(ownerId, "CSS");
+    	
     	suggestedCommunityAnalyser.setCommunityRecommender(communityRecommender);
     	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
+    	suggestedCommunityAnalyser.setIdentityManager(identityManager);
+    	suggestedCommunityAnalyser.setPrivacyDataManager(privacyDataManager);
+    	suggestedCommunityAnalyser.setCommManager(commManager);
     	
+    	//suggestedCommunityAnalyser.initialiseSuggestedCommunityAnalyser();
     	
     	ArrayList<ICis> ciss = new ArrayList<ICis>();
     	//try {

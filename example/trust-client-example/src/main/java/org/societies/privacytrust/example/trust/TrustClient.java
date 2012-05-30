@@ -48,8 +48,8 @@ public class TrustClient {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustClient.class);
 	
-	private static final String TRUSTOR_ID = "aFooTrustorId";
-	private static final String TRUSTED_CSS_ID = "aFooCssIIdentity";
+	private static final String TRUSTOR_ID = "foo.societies.local";
+	private static final String TRUSTED_CSS_ID = "bar.societies.local";
 
 	/** The Internal Context Broker service reference. */
 	private ITrustBroker trustBroker;
