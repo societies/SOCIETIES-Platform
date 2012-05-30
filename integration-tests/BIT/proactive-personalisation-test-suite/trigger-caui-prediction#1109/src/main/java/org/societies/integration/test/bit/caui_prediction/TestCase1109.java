@@ -39,7 +39,7 @@ public class TestCase1109 extends IntegrationTestCase{
 		//uil.createHistorySet();
 		startTest(); 
 	}
-	public void setCAUIPrediction(ICAUIPrediction cauiPrediction){
+	public void setCauiPrediction(ICAUIPrediction cauiPrediction){
 		TestCase1109.cauiPrediction = cauiPrediction;
 	}
 
@@ -51,7 +51,7 @@ public class TestCase1109 extends IntegrationTestCase{
 		TestCase1109.uam = uam;
 	}
 
-	protected static ICAUIPrediction getCAUIPrediction(){
+	protected static ICAUIPrediction getCauiPrediction(){
 		return TestCase1109.cauiPrediction;
 	}
 	

@@ -90,7 +90,7 @@
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
 	
-	<bean name="PrivacyAgreementManagerInternal"
+	<bean name="privacyAgreementManagerInternal"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManagerInternal"
 		depends-on="ctxBroker">
 		<property name="commManager" ref="CommManagerBundle"/>
@@ -108,11 +108,10 @@
 	    <property name="eventMgr" ref="eventMgr"></property>
 		<property name="commsMgr" ref="commsMgr"></property>
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
-		<!-- to be uncommented as soon as they are ready  -->		
-<!-- 		<property name="policyAgreementManager" ref="policyAgreementManager"></property>
-		<property name="negotiationAgent" ref="negotiationAgent"></property>
-		<property name="privacyPolicyManager" ref="privacyPolicyManager"></property> -->
+		<property name="privacyAgreementManagerInternal" ref="privacyAgreementManagerInternal"></property>
+<!-- 		<property name="negotiationAgentRemote" ref="negotiationAgentRemote"></property> -->
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager"></property>
+		<property name="identitySelection" ref="IdentitySelection"></property>
 		<!-- also needs IIdentitySelection -->
 	</bean>
 
@@ -128,7 +127,12 @@
 			<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
 	</bean>
 	
-	
+	<!-- this is the bean for the NegotiationAgent of the current CSS (not the remote one) -->
+	<bean name="NegotiationAgent" class="org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.provider.NegotiationAgent"
+	    init-method="initialiseNegotiationAgent">
+	    <property name="policyMgr" ref="PrivacyPolicyManager"></property>
+		<property name="commsMgr" ref="commsMgr"></property>	    
+	</bean>
 	
 	<!-- Identity Selection Configuration -->
 	

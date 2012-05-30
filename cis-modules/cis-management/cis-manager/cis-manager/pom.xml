@@ -62,7 +62,7 @@
 	      <version>${powermock.version}</version>
 	      <scope>test</scope>
 	   </dependency>
-				<dependency>
+	   <dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>

@@ -73,7 +73,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	//ICommManager!
 	private IIdentityManager idm;
 	
-	private IPrivacyAgreementManagerInternal policyAgreementMgr;
+	private IPrivacyAgreementManagerInternal privacyAgreementManagerInternal;
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
 	private INegotiationAgent negotiationAgent;
@@ -157,18 +157,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	public void setEventMgr(IEventMgr eventMgr) {
 		this.eventMgr = eventMgr;
 	}
-	/**
-	 * @return the policyAgreementMgr
-	 */
-	public IPrivacyAgreementManagerInternal getPolicyAgreementMgr() {
-		return policyAgreementMgr;
-	}
-	/**
-	 * @param policyAgreementMgr the policyAgreementMgr to set
-	 */
-	public void setPolicyAgreementMgr(IPrivacyAgreementManagerInternal policyAgreementMgr) {
-		this.policyAgreementMgr = policyAgreementMgr;
-	}
+
 
 	/**
 	 * @return the privacyDataManagerInternal
@@ -407,6 +396,19 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	public void setCommsMgr(ICommManager commsMgr) {
 		this.commsMgr = commsMgr;
 		this.idm = commsMgr.getIdManager();
+	}
+	/**
+	 * @return the privacyAgreementManagerInternal
+	 */
+	public IPrivacyAgreementManagerInternal getPrivacyAgreementManagerInternal() {
+		return privacyAgreementManagerInternal;
+	}
+	/**
+	 * @param privacyAgreementManagerInternal the privacyAgreementManagerInternal to set
+	 */
+	public void setPrivacyAgreementManagerInternal(
+			IPrivacyAgreementManagerInternal privacyAgreementManagerInternal) {
+		this.privacyAgreementManagerInternal = privacyAgreementManagerInternal;
 	}
 
 
