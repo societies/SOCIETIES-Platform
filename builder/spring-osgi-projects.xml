@@ -140,7 +140,7 @@
 		</module> 
 		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
 		</module>
-		
+		<module>../intelligent-community-orchestration/CPA</module>
 		<!-- Privacy & Trust -->
 		<module>../privacy-trust/java/privacy-protection</module>
 		<module>../privacy-trust/java/trust</module>

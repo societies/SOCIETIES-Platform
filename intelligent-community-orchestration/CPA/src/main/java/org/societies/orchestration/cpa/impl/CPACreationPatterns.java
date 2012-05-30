@@ -50,7 +50,9 @@ public class CPACreationPatterns
 		return ret;
 		
 	}
-	private double cooperation(ICisParticipant member){
-		return Math.random();
+	public double cooperation(ICisParticipant member1,ICisParticipant member2){
+		return 0;
 	}
+	public void init(){}
+	public CPACreationPatterns(){}
 }
