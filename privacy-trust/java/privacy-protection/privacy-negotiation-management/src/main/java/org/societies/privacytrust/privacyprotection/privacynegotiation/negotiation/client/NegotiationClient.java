@@ -113,7 +113,7 @@ public class NegotiationClient implements INegotiationClient {
 		this.policyMgr = policyMgr;
 		this.ctxBroker = policyMgr.getCtxBroker();
 		this.eventMgr = policyMgr.getEventMgr();
-		this.policyAgreementMgr = policyMgr.getPolicyAgreementMgr();
+		this.policyAgreementMgr = policyMgr.getPrivacyAgreementManagerInternal();
 		this.privacyDataManager = policyMgr.getPrivacyDataManagerInternal();
 		this.idS = policyMgr.getIdentitySelection();
 		this.privPrefMgr = policyMgr.getPrivacyPreferenceManager();
