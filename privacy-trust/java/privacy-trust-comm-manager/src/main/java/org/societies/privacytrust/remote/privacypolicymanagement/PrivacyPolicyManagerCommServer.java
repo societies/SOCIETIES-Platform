@@ -105,7 +105,7 @@ public class PrivacyPolicyManagerCommServer {
 		// -- inferPrivacyPolicy
 		else if (bean.getMethod().equals(MethodType.INFER_PRIVACY_POLICY)) {
 			LOG.info("getQuery(): inferPrivacyPolicy remote called");
-			beanResult.setMethod(MethodType.DELETE_PRIVACY_POLICY);
+			beanResult.setMethod(MethodType.INFER_PRIVACY_POLICY);
 			ack = inferPrivacyPolicy(bean, beanResult);
 			LOG.info("getQuery(): inferPrivacyPolicy remote response sending");
 		}
@@ -156,7 +156,7 @@ public class PrivacyPolicyManagerCommServer {
 			}
 			PrivacyPolicyTypeConstants privacyPolicyType = PrivacyPolicyTypeConstants.values()[bean.getPrivacyPolicyType()];
 			RequestPolicy privacyPolicy = privacyPolicyManager.inferPrivacyPolicy(privacyPolicyType, new HashMap());
-				beanResult.setPrivacyPolicy(RequestPolicyUtils.toRequestPolicyBean(privacyPolicy));
+			beanResult.setPrivacyPolicy(RequestPolicyUtils.toRequestPolicyBean(privacyPolicy));
 		} catch (PrivacyException e) {
 			beanResult.setAckMessage("Error PrivacyException: "+e.getMessage());
 			return false;

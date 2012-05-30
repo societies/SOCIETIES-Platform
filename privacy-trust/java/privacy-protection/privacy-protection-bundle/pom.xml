@@ -89,6 +89,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>identityselection</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>privacydatamanagement</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
@@ -161,6 +166,7 @@
 							commons-lang3;scope=compile|runtime,
 							gson;scope=compile|runtime,
 							api;scope=compile|runtime,
+							identityselection;scope=compile|runtime,
 							privacydatamanagement;scope=compile|runtime,
 							privacypolicymanagement;scope=compile|runtime,
 							privacypreferencemanagement;scope=compile|runtime,

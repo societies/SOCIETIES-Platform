@@ -99,6 +99,7 @@
 	
 	
 	<!-- Privacy Policy Negotiation Manager Configuration -->
+	
 	<bean name="PrivacyNegotiationManager"
 	    class=" org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager"
 	    init-method="initialisePrivacyPolicyNegotiationManager">
@@ -116,6 +117,7 @@
 
 
 	<!-- Privacy Preference Manager Configuration -->
+	
 	<bean name="privacyPreferenceManager"
 		class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager" 
 		init-method="initialisePrivacyPreferenceManager">
@@ -123,6 +125,14 @@
 			<property name="commsMgr" ref="commsMgr"></property>
 			<property name="trustBroker" ref="trustBroker"></property>
 			<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
+	</bean>
+	
+	
+	
+	<!-- Identity Selection Configuration -->
+	
+	<bean name="IdentitySelection"
+		class="org.societies.privacytrust.privacyprotection.identity.IdentitySelection">
 	</bean>
 	
 	
