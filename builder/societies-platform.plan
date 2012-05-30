@@ -6,21 +6,23 @@
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
+	<!-- Common Modules -->
+	<artifact type="bundle" name="org.societies.data-source"/>
+
     <!-- Comms Framework -->
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
-    <artifact type="bundle" name="org.societies.comm.event.mgmt"/>
+	<artifact type="bundle" name="org.societies.comm.event.mgmt"/>
 
     <!-- Domain Authority  -->
     <artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityGroupManager"/>
+    <artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityRegistry"/>
 
     <!-- Service Discovery & Registry  -->
-    <artifact type="bundle" name="org.societies.data-source"/>
     <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
     <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
     <artifact type="bundle" name="org.societies.slm.SLMCommsManager"/>
-    <artifact type="bundle" name="societies-webapp"/>
 
 	<!-- Security -->
 	<artifact type="bundle" name="org.societies.security.secur-services"/>
@@ -33,14 +35,15 @@
     <artifact type="bundle" name="org.societies.css.CssRegistry"/>
     <artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
     <artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>
-    <artifact type="bundle" name="org.societies.cis.manager"/>
-
+    <artifact type="bundle" name="org.societies.cis.manager"/> 
+    
 	<!-- Device Management -->
 	<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceCommsMgr"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.deviceregistry"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.RegSynchroniser"/>
-	
-	
+	<!--Web Applications-->
+	<artifact type="bundle" name="societies-webapp"/>
+    <artifact type="bundle" name="DomainAuthorityWebApp"/>
 	
 </plan>

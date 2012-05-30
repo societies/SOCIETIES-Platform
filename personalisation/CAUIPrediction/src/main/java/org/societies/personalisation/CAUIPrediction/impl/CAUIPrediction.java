@@ -471,4 +471,12 @@ public class CAUIPrediction implements ICAUIPrediction{
 			// TODO Auto-generated method stub
 		}
 	}
+
+
+
+	@Override
+	public void receivePredictionFeedback(IAction action) {
+		// TODO Auto-generated method stub
+		
+	}
 }

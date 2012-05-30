@@ -29,19 +29,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.context.api.community.estimation.EstimationModels;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,8 +42,23 @@ import org.springframework.util.Assert;
 @Service("communityCtxEstimation")
 public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	/**
-	 * The CommunityContextEstimation class contains the methods to be called in order to estimate the community context
+	 * The CommunityContextEstimation class contains the methods to be called in order to estimate the community context.
+	 * It has four types of methods. These that contain the letters "Num" in their name and deal with numeric attributes,
+	 * these that contain the letters "Geom" in their name and deal with geometric attributes (e.g. location),
+	 * these containing the letters "Special" and deal with other attributes and these containing the letters "String" in 
+	 * their name that deal with string attributes
 	 */
+	
+
+	public CommunityContextEstimation() {
+		// TODO Auto-generated constructor stub
+
+	}
+	
+	@Autowired(required = true)
+	private ICtxBroker ctxBroker = null;
+
+
 
 	@Override
 	public double cceNumMean(ArrayList<Integer> inputValuesList) {
@@ -101,7 +105,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		/**
 		 * Returns the mode of an integer's ArrayList
 		 * @param an array list of integers
-		 * @return an array representing the mode value of the input integers
+		 * @return an ArrayList of integers representing the mode value of the input integers
 		 */
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		Hashtable <Integer, Integer> frequencyMap = new Hashtable<Integer, Integer>();
@@ -141,7 +145,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		/**
 		 * Returns the range of an integers' ArrayList
 		 * @param an array list of integers
-		 * @return the range of the input integers
+		 * @return the range of the input integers as Integer[]
 		 */		
 			Integer[] r = new Integer[2];
 
@@ -166,9 +170,9 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	@Override
 	public ArrayList<Point> cceGeomConvexHull(ArrayList<Point> points) {
 		/**
-		 * Returns the convex hull of a points' ArrayList
+		 * Returns the convex hull of a points' ArrayList. It recursively uses the singleSideHulSet method
 		 * @param an array list of points.
-		 * @return the convex hull of the input points
+		 * @return an ArrayList of points, representing the convex hull set of the input points
 		 */		
 		ArrayList<Point> convexHullSet = new ArrayList<Point>();
 		int minX= Integer.MAX_VALUE;
@@ -219,7 +223,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	private void singleSideHullSet(ArrayList<Point> pointsSet, Point minPoint,
 			Point maxPoint, ArrayList<Point> convexHullSet) {
 	/**
-	 * This method finds the points of the given pointsSet, that belong to to convex hull and adds them to the given convexHull set. 
+	 * This method finds the points of the given pointsSet, that belong to convex hull and adds them to the given convexHull set. 
 	 * It constructs a segment with the points minPoint and maxPoint and calculates if the points belonging to the pointsSet and are at the left of the segment
 	 * belong to the convexHull set
 	 * @param minPoint, maxPoint the two points that construct the segment
@@ -294,9 +298,9 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	@Override
 	public Point[] cceGeomMinBB(ArrayList<Point> points) {
 		/**
-		 * Returns the minimum boundary box that contains all the given points
+		 * Returns the minimum bounding box that contains all the given points
 		 * @param an array list of integers
-		 * @return the minimum boundary box of the input points
+		 * @return an array of points representing the minimum bounding box of the input points
 		 */
 		Point[] minBB = new Point[2];
 		int minX= Integer.MAX_VALUE;
@@ -326,282 +330,14 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		minBB[1]=bottomRight;
 		return minBB;      
 	}
-
-
-
-	@Override
-	public void cceSpecial1() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void cceSpecial2() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void cceSpecial3() {
-		// TODO Auto-generated method stub
-		
-	}
 	
-	//Constructor
-
-	public CommunityContextEstimation() {
-		// TODO Auto-generated constructor stub
-
-	}
-	
-	@Autowired(required = true)
-	private ICtxBroker ctxBroker = null;
-
-	private CtxEntityIdentifier comId;
-	private String entityType;
-	private String attributeType;
-
-
-	//@Override
-	public Integer estimateContext(EstimationModels estimationModel, List<CtxAttribute> list) {
-		switch (estimationModel) {
-		case MEAN:
-			return estimateMeanValue(list);			
-
-		case MEDIAN:
-			return estimateMedianValue(list);
-
-		default:
-			return 0;
-		}
-
-
-	}
-
-
-
-	//@Override
-	public void estimateContext(EstimationModels estimationmodel, CtxAttribute type, CtxIdentifier cisId) {
-		// TODO Auto-generated method stub
-		Assert.notNull(cisId,"Cannot use estimation without any cmmunity");
-		//b = new InternalCtxBroker();
-		try {
-			CtxEntity retrievedCtxEntity = (CtxEntity) this.ctxBroker.retrieve(cisId).get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-
-	private Integer estimateMeanValue(List<CtxAttribute> list) {
-		Assert.notEmpty(list,"Cannot use estimation without attributes");
-
-		//BigDecimal result = BigDecimal.ZERO;
-		int total = 0; 
-
-		for (CtxAttribute ca : list){
-			total = total + ca.getIntegerValue();
-			//list.iterator().next();
-			System.out.println("Halloooooooo" +" "+total);
-		}
-		int res = total/list.size();
-		return res;
-	}
-
-	private Integer estimateMedianValue(List<CtxAttribute> list) {
-		// TODO Auto-generated method stub
-		Integer med,med1,med2=0;
-
-		if (list.size()%2 == 1 ){
-			med = list.get((list.size()+1)/2-1).getIntegerValue();	
-			System.out.println("Odd number of elements");
-		}
-		else {
-			System.out.println("Even number of elements");
-			med1 = list.get((list.size())/2-1).getIntegerValue();
-			med2 = list.get((list.size()+2)/2-1).getIntegerValue();
-			med = (med1+med2)/2;
-		}
-		// an update is needed here
-		return med;	
-
-	}
-
-	//******************************************NEW***************************************************************************
-	//
-	//
-	//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
-
-	/**
-	 * @param modelType
-	 * @param ctxEntityType
-	 * @param ctxAttr
-	 * @return
-	 * @throws CtxException
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 */
-	public Double estimateMeanValueOfIntegers(CtxModelType modelType, String ctxEntityType, String ctxAttr) throws CtxException, InterruptedException, ExecutionException{
-
-		int total = 0;
-		Double mo = 0.0;
-
-		CommunityContextEstimation cce = new CommunityContextEstimation();
-		List<CtxAttribute> listOfCtxAttributes = cce.retrieveCertainAttributes(modelType, ctxEntityType, ctxAttr);
-
-		//Mean value estimation
-		for (CtxAttribute cA : listOfCtxAttributes) {
-			total = total+cA.getIntegerValue();
-		}
-
-		int noOfCtxEntities = cce.retrieveListOfCtxEntities(modelType, ctxEntityType).size();
-
-		mo = (double) (total/noOfCtxEntities);
-
-		return mo;
-
-	}
-
-	/**
-	 * @param modelType
-	 * @param ctxEntityType
-	 * @param ctxAttr
-	 * @return
-	 * @throws CtxException
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 */
-	public List<CtxAttribute> retrieveCertainAttributes(CtxModelType modelType, String ctxEntityType, String ctxAttr) throws CtxException, InterruptedException, ExecutionException {
-
-		//Retrieve a list of ctxEntitiesIdentifiers, of certain modelType (e.g. entity) and certain ctxEntityType (e.g. "Person")
-		CommunityContextEstimation cce = new CommunityContextEstimation();
-		List<CtxEntity> listOfCtxEntities = cce.retrieveListOfCtxEntities(modelType, ctxEntityType);
-
-		//We iterate on the previous list of ctxEntities in order to retrieve the attributes of each ctxEntity, of the given value (ctxAttr)
-		List<CtxAttribute> listOfCtxAttributes = new ArrayList<CtxAttribute>();
-		for (CtxEntity cE : listOfCtxEntities){
-
-			Set<CtxAttribute> setOfEntityCtxAttributes = cE.getAttributes();
-
-			for (CtxAttribute cA : setOfEntityCtxAttributes) {
-				if (cA.getStringValue() == ctxAttr) {
-					listOfCtxAttributes.add(cA);
-				}
-			}
-		}
-		return listOfCtxAttributes;
-	}
-
-	/**
-	 * @param modelType
-	 * @param ctxEntityType
-	 * @return
-	 * @throws CtxException
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 */
-	public List<CtxEntity> retrieveListOfCtxEntities(CtxModelType modelType, String ctxEntityType) throws CtxException, InterruptedException, ExecutionException {
-
-		Future<List<CtxIdentifier>> ctxEntitiesIdentifiersFutureList = this.ctxBroker.lookup(modelType, ctxEntityType);
-		List<CtxIdentifier> ctxEntitiesIdentifiersList = ctxEntitiesIdentifiersFutureList.get();
-		List<CtxEntity> listOfCtxEntities= new ArrayList<CtxEntity>();
-
-		for (CtxIdentifier id : ctxEntitiesIdentifiersList){
-			CtxEntity ctxEntity = (CtxEntity) this.ctxBroker.retrieve(id);
-			listOfCtxEntities.add(ctxEntity);
-		}
-		return listOfCtxEntities;
-	}
-
-	// Setters and Getters for the private fields ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//^
-
-//	public ICtxBroker getB() {
-//		return b;
-//	}
-
-	public void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
-	}
-
-
-	public CtxEntityIdentifier getComId() {
-		return comId;
-	}
-
-
-	public void setComId(CtxEntityIdentifier comId) {
-		this.comId = comId;
-	}
-
-
-	public String getEntityType() {
-		return entityType;
-	}
-
-
-	public void setEntityType(String entityType) {
-		this.entityType = entityType;
-	}
-
-
-	public String getAttributeType() {
-		return attributeType;
-	}
-
-
-	public void setAttributeType(String attributeType) {
-		this.attributeType = attributeType;
-	}
-
-
-
-	//@Override
-	public Hashtable<String, Integer> calculateStringAttributeStatistics(List<CtxAttribute> list) {
-		
-		//List<CtxAttribute> list = new List<CtxAttribute>;
-		
-		List<String> proffesions = new ArrayList<String>();
-
-		for(int i=0; i<list.size(); ++i){
-			proffesions.add(list.get(i).getStringValue());
-		}
-
-		Hashtable <String, Integer> frequencyMap = new Hashtable();
-		ArrayList<String> finalList = new ArrayList<String>();
-
-		for (int i=0; i<proffesions.size(); i++){
-			if (finalList.contains(proffesions.get(i)))
-			{
-				int elementCount =
-						Integer.parseInt(frequencyMap.get(proffesions.get(i)).toString());
-				elementCount++;
-				frequencyMap.put(proffesions.get(i), elementCount);
-			}
-			else
-			{
-				finalList.add(proffesions.get(i));
-				frequencyMap.put(proffesions.get(i), 1);
-			}
-		}
-		System.out.println(frequencyMap);
-		return frequencyMap;
-	}
-
 	@Override
 	public ArrayList<String> cceStringMode(ArrayList<String> inputValuesList) {
-		// TODO Auto-generated method stub
+		/**
+		 * Returns the range of a strings' ArrayList
+		 * @param an array list of strings
+		 * @return an ArrayList of strings showing the mode of the input strings
+		 */	
 		Hashtable <String, Integer> frequencyMap = new Hashtable<String, Integer>();
 		ArrayList<String> finalList = new ArrayList<String>();
 
@@ -634,105 +370,24 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	}
 
 
+	@Override
+	public void cceSpecial1() {
+		// TODO Auto-generated method stub
+		
+	}
 
-	
-	//Based on Cross Product function, if the crossProduct is negative then point P is on the right of AB. Otherwise is on the left
-	public int pointLocation(Point A, Point B, Point P){
-		int crossProduct = (B.x-A.x)*(P.y-A.y) - (B.y-A.y)*(P.x-A.x);
-		return (crossProduct>0 ?1 :-1);
+	@Override
+	public void cceSpecial2() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cceSpecial3() {
+		// TODO Auto-generated method stub
+		
 	}
 	
-	//******************************************************************************************************
-		//******************************************************************************************************
 
-	//Distance calculation between a point P and a segment AB
-	public int distance(Point A, Point B, Point P){
-		int ABx=B.x-A.x;
-		int ABy =B.y-A.y;
-		int num = ABx*(A.y-P.y)-ABy*(A.x-P.x);
-		if (num<0)
-			num = -num;
-		return num;
-	}	
-	
-
-
-	// private void returnListOfDesiredAttributes(List<CtxAttributeIdentifier> listOfMembersOfGivenType) {
-	// // TODO Auto-generated method stub
-	// // I want to receive the attributes value through the contextIdentifier
-	//
-	// ArrayList<CtxAttribute> listOfAttributes = new ArrayList<CtxAttribute>();
-	// Iterator<CtxAttributeIdentifier> membIterator = listOfMembersOfGivenType.iterator();
-	// while (membIterator.hasNext()){
-	// CtxAttributeIdentifier cEI = membIterator.next();
-	// CtxAttribute ctxAtt;
-	// CtxModelObject ctxModObj;
-	// //if
-	// //(cEI.getModelType().ATTRIBUTE != null)
-	// //ctxModObj.
-	// //listOfAttributes.add(e);
-	//
-	// }
-	//}
-
-	// private List<CtxAttributeIdentifier> returnEntitiesWithGivenEntiryType(List<CtxEntityIdentifier> allMembersList) {
-	// // TODO Auto-generated method stub
-	// //If the modelType is Entity then put in the listCtxEntityIdentifier this ctxEntityIdentifier.
-	// //So at the end I will have a list with Entity ctxEntityIdentifiers of the community under discussion
-	//
-	// List<CtxAttributeIdentifier> listCtxEntityIdentifier = new ArrayList<CtxAttributeIdentifier>();
-	//
-	// Iterator<CtxEntityIdentifier> membIterator = allMembersList.iterator();
-	// while (membIterator.hasNext()){
-	// CtxEntityIdentifier cEI = membIterator.next();
-	// CtxAttributeIdentifier a = new CtxAttributeIdentifier(cEI, cEI.getType(),cEI.getObjectNumber());
-	// {
-	// if
-	// (cEI.getModelType().ENTITY != null && cEI.getType().equals(entityType))
-	// listCtxEntityIdentifier.add(a);
-	// else
-	// System.out.println(cEI.getType());
-	// }
-	//
-	// }
-	// return listCtxEntityIdentifier;
-	//}
-
-	// public void estimateContext_John(EntityIdentifier communityID, List<CtxAttribute> list, Boolean currentDB) throws CtxException{
-	// // TODO Auto-generated method stub
-	//
-	//// CtxAttribute a = new CtxAttribute(null);
-	//// a.getId().getType();
-	//// a.getIntegerValue();
-	//
-	// ArrayList<CtxAttribute> allAttributes = new ArrayList<CtxAttribute>();
-	//
-	// ArrayList<CtxEntity> m = retrieveCisMembersWitPredefinedAttr_John(communityID, list);
-	// // elegxos gia null h oxi (ta members)
-	// for (CtxEntity e:m){
-	// allAttributes.addAll((retrieveMembersAttribute_John(e, list)));
-	// }
-	//
-	// CalculateAlgorithm(allAttributes);
-	// CtxEntityIdentifier community = null;
-	// Identity requester = null;
-	// b.retrieveCommunityMembers(requester, community);
-	//
-	//}
-	//
-	//private ArrayList<CtxEntity> retrieveCisMembersWitPredefinedAttr_John(EntityIdentifier communityID, List<CtxAttribute> hasTheseAttributes) throws CtxException {
-	// // TODO Auto-generated method stub
-	// //b
-	// //return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
-	// return null;
-	//}
-	//
-	//
-	//private ArrayList<CtxAttribute> retrieveMembersAttribute_John(CtxEntity member, List<CtxAttribute> hasTheseAttributes) {
-	// // TODO Auto-generated method stub
-	// //b
-	// //return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
-	// return null;
-	//}
 
 }

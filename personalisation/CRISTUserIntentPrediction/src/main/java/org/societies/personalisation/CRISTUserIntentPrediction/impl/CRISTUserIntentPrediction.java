@@ -56,6 +56,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
 	private ICtxBroker ctxBroker;
 	private ICRISTUserIntentTaskManager cristTaskManager;
+	private IInternalPersonalisationManager persoMgr;
 
 	/*
 	private IIdentity myId;
@@ -85,6 +86,22 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		this.cristTaskManager = cristTaskManager;
 	}
 	
+	/**
+	 * @return the persoMgr
+	 */
+	public IInternalPersonalisationManager getPersoMgr() {
+		return persoMgr;
+	}
+
+
+	/**
+	 * @param persoMgr the persoMgr to set
+	 */
+	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
+		this.persoMgr = persoMgr;
+	}
+
+
 	public void initialiseCRISTPrediction() {
 
 		if (this.ctxBroker == null) {

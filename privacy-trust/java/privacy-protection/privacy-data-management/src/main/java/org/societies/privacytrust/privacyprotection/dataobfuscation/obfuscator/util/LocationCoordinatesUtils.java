@@ -7,7 +7,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 
 
 /**
- * @author Olivier Maridat Trialog
+ * Tools for Location Coordinates computation
+ * @author Olivier Maridat (Trialog)
  * @date 2 sept. 2011
  */
 public class LocationCoordinatesUtils {

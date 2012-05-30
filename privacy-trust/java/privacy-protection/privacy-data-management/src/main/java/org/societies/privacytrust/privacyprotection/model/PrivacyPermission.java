@@ -56,7 +56,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 /**
- * Entity to store privacy permissions for access control management
+ * Entity to store privacy permissions for access control persistence
+ * 
  * @author Olivier Maridat (Trialog)
  *
  */

@@ -38,6 +38,11 @@ import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.N
  * @author Olivier Maridat (Trialog)
  */
 public class DataObfuscationManager implements IDataObfuscationManager {
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double)
+	 */
 	@Override
 	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
 		// TODO : populate this stub function
@@ -80,6 +85,10 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 		return obfuscatedDataWrapper;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double)
+	 */
 	@Override
 	public String hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
 		// TODO : populate this stub function
@@ -95,6 +104,12 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 		return dataWrapper.getDataId();
 	}
 
+	/**
+	 * Retrieve the relevant obfuscator
+	 * @param dataWrapper
+	 * @return
+	 * @throws PrivacyException
+	 */
 	private IDataObfuscator getDataObfuscator(IDataWrapper dataWrapper) throws PrivacyException {
 		IDataObfuscator obfuscator = null;
 		if (dataWrapper.getData() instanceof LocationCoordinates) {
