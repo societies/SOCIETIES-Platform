@@ -18,12 +18,11 @@
 	  <tr><td><b>CIS Management</b></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cismanager.html">CIS Management</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cisfeed.html">Activity Feed</a></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cisdirectory.html">CIS Directory</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	  
-	  <tr><td><p><b>Social Network Data</b></p></td></tr>
+	   <tr><td><p><b>Social Network Data</b></p></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/socialdata.html">SocialData</a></td></tr>
-	  <tr><td><p><b>&nbsp;</b></p></td></tr>
+	   <tr><td><p><b>&nbsp;</b></p></td></tr>
 
 	  <!-- SPACERS -->	  
 	  <tr><td><p><b>&nbsp;</b></p></td></tr>
