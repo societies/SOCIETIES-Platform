@@ -125,13 +125,39 @@ public class DataTransferAnalyzerTest {
 	@Test
 	public void testEstimatePrivacyBreachIIdentity() throws AssessmentException {
 
-		estimatePrivacyBreachIIdentity(id1, time2, 10);
-		estimatePrivacyBreachIIdentity(id2, time8, 1);
-		estimatePrivacyBreachIIdentity(id3, time2, 0);  // any valid past time for 0 transmissions
-		estimatePrivacyBreachIIdentity(id4, time2, 0);  // any valid past time for 0 transmissions
+		AssessmentResultIIdentity[] result = new AssessmentResultIIdentity[4];
+		
+		result[0] = estimatePrivacyBreachIIdentity(id1, time2, 10);
+		result[1] = estimatePrivacyBreachIIdentity(id2, time8, 1);
+		result[2] = estimatePrivacyBreachIIdentity(id3, time2, 0);  // any valid past time for 0 transmissions
+		result[3] = estimatePrivacyBreachIIdentity(id4, time2, 0);  // any valid past time for 0 transmissions
+		
+		// Check correlations with all data access events
+		// - Zero or greater than zero
+		assertTrue(result[0].getCorrWithDataAccessByAll() > 0);
+		assertTrue(result[1].getCorrWithDataAccessByAll() > 0);
+		assertEquals(result[2].getCorrWithDataAccessByAll(), 0, 0);
+		assertEquals(result[3].getCorrWithDataAccessByAll(), 0, 0);
+		// - Relations
+		assertTrue(result[0].getCorrWithDataAccessByAll() > result[1].getCorrWithDataAccessByAll());
+		assertTrue(result[1].getCorrWithDataAccessByAll() > result[2].getCorrWithDataAccessByAll());
+
+		// Check correlations with those data access events that were done by sender
+		// - Zero or greater than zero
+		assertTrue(result[0].getCorrWithDataAccessByAll() > 0);
+		assertTrue(result[1].getCorrWithDataAccessByAll() > 0);
+		assertEquals(result[2].getCorrWithDataAccessBySender(), 0, 0);
+		assertEquals(result[3].getCorrWithDataAccessBySender(), 0, 0);
+		// - Relations
+		assertTrue(result[0].getCorrWithDataAccessBySender() > result[1].getCorrWithDataAccessBySender());
+		assertTrue(result[1].getCorrWithDataAccessBySender() > result[2].getCorrWithDataAccessBySender());
+		
+		// Verify correlation with all data access events is bigger (unless both are 0)
+		assertTrue(result[0].getCorrWithDataAccessByAll() > result[0].getCorrWithDataAccessBySender());
+		assertTrue(result[1].getCorrWithDataAccessByAll() > result[1].getCorrWithDataAccessBySender());
 	}
 	
-	private void estimatePrivacyBreachIIdentity(IIdentity sender, Date firstTransmission,
+	private AssessmentResultIIdentity estimatePrivacyBreachIIdentity(IIdentity sender, Date firstTransmission,
 			long numPacketsTransmitted) throws AssessmentException {
 
 		AssessmentResultIIdentity result;
@@ -139,12 +165,6 @@ public class DataTransferAnalyzerTest {
 
 		result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
 		
-		// Check correlations
-		result.getCorrWithDataAccessByAll();  // TODO
-		result.getCorrWithDataAccessByAllDev();  // TODO
-		result.getCorrWithDataAccessBySender();  // TODO
-		result.getCorrWithDataAccessBySenderDev();  // TODO
-
 		// Check number and frequency of transmissions
 		assertEquals(numPacketsTransmitted, result.getNumAllPackets());
 		expected = new Date().getTime() - firstTransmission.getTime();
@@ -155,6 +175,8 @@ public class DataTransferAnalyzerTest {
 		// Check sender
 		assertEquals(sender, result.getSender());
 		assertEquals(sender.getJid(), result.getSender().getJid());
+		
+		return result;
 	}
 
 	/**
@@ -163,26 +185,49 @@ public class DataTransferAnalyzerTest {
 	 */
 	@Test
 	public void testEstimatePrivacyBreachString() throws AssessmentException {
+		
+		AssessmentResultClassName[] result = new AssessmentResultClassName[4];
 
-		estimatePrivacyBreachString(class1, time4, 3);
-		estimatePrivacyBreachString(class2, time2, 2);
-		estimatePrivacyBreachString(class3, time4, 3);
-		estimatePrivacyBreachString(class4, time3, 3);
+		result[0] = estimatePrivacyBreachString(class1, time4, 3);
+		result[1] = estimatePrivacyBreachString(class2, time2, 2);
+		result[2] = estimatePrivacyBreachString(class3, time4, 3);
+		result[3] = estimatePrivacyBreachString(class4, time3, 3);
+
+		// Check correlations with all data access events
+		// - Zero or greater than zero
+		assertTrue(result[0].getCorrWithDataAccessByAll() > 0);
+		assertTrue(result[1].getCorrWithDataAccessByAll() > 0);
+		assertTrue(result[2].getCorrWithDataAccessByAll() > 0);
+		assertTrue(result[3].getCorrWithDataAccessByAll() > 0);
+		// - Relations
+		assertTrue(result[2].getCorrWithDataAccessByAll() > result[1].getCorrWithDataAccessByAll());
+		assertTrue(result[3].getCorrWithDataAccessByAll() > result[1].getCorrWithDataAccessByAll());
+
+		// Check correlations with those data access events that were done by sender
+		// - Zero or greater than zero
+		assertTrue(result[0].getCorrWithDataAccessBySender() > 0);
+		assertTrue(result[1].getCorrWithDataAccessBySender() > 0);
+		assertTrue(result[2].getCorrWithDataAccessBySender() > 0);
+		assertEquals(result[3].getCorrWithDataAccessBySender(), 0, 0);
+		// - Relations
+		assertTrue(result[0].getCorrWithDataAccessBySender() > result[1].getCorrWithDataAccessBySender());
+		assertTrue(result[2].getCorrWithDataAccessBySender() > result[1].getCorrWithDataAccessBySender());
+		assertTrue(result[1].getCorrWithDataAccessBySender() > result[3].getCorrWithDataAccessBySender());
+		
+		// Verify correlation with all data access events is bigger (unless both are 0)
+		assertTrue(result[0].getCorrWithDataAccessByAll() > result[0].getCorrWithDataAccessBySender());
+		assertTrue(result[1].getCorrWithDataAccessByAll() > result[1].getCorrWithDataAccessBySender());
+		assertTrue(result[2].getCorrWithDataAccessByAll() > result[2].getCorrWithDataAccessBySender());
+		assertTrue(result[3].getCorrWithDataAccessByAll() > result[3].getCorrWithDataAccessBySender());
 	}
 	
-	private void estimatePrivacyBreachString(String sender, Date firstTransmission,
+	private AssessmentResultClassName estimatePrivacyBreachString(String sender, Date firstTransmission,
 			long numPacketsTransmitted) throws AssessmentException {
 
 		AssessmentResultClassName result;
 		double expected;
 
 		result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
-		
-		// Check correlations
-		result.getCorrWithDataAccessByAll();  // TODO
-		result.getCorrWithDataAccessByAllDev();  // TODO
-		result.getCorrWithDataAccessBySender();  // TODO
-		result.getCorrWithDataAccessBySenderDev();  // TODO
 
 		// Check number and frequency of transmissions
 		assertEquals(numPacketsTransmitted, result.getNumAllPackets());
@@ -193,5 +238,7 @@ public class DataTransferAnalyzerTest {
 		
 		// Check sender
 		assertEquals(sender, result.getSender());
+		
+		return result;
 	}
 }
