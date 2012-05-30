@@ -81,7 +81,7 @@ import org.societies.api.identity.IIdentityManager;
 
 public class CPA
 {
-	
+	public CPA(){}
 	private CPACreationPatterns egocentricCreationManager;
 	
 	private Date lastTemporaryCheck;
@@ -146,7 +146,7 @@ public class CPA
     public void setEgocentricCreationManager(CPACreationPatterns egocentricCreationManager) {
     	this.egocentricCreationManager = egocentricCreationManager;
     }
-    
+    public void init(){}
     
     
 }
