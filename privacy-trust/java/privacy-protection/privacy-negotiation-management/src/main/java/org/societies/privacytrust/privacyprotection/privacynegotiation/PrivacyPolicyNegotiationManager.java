@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
@@ -38,26 +39,25 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
-import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManagerInternal;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyPolicyNegotiationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.NegotiationClient;
-import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.provider.PrivacyPolicyRegistryManager;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.provider.PolicyRetriever;
 
 
 public class PrivacyPolicyNegotiationManager extends EventListener implements IPrivacyPolicyNegotiationManager {
 	
 	//private NegotiationClient negClient;
-	private PrivacyPolicyRegistryManager privacyPolicyRegMgr;
+	//private PrivacyPolicyRegistryManager privacyPolicyRegMgr;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IIdentity myPublicDPI;
 	private PolicyRetriever servicePolicyRetriever;
@@ -73,12 +73,15 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	//ICommManager!
 	private IIdentityManager idm;
 	
-	private IPolicyAgreementManagerInternal policyAgreementMgr;
-	private IPrivacyDataManagerInternal privacyDataManager;
+	private IPrivacyAgreementManagerInternal policyAgreementMgr;
+	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
 	private INegotiationAgent negotiationAgent;
 	
 	private IIdentitySelection identitySelection;
+	
+	private ICommManager commsMgr;
+	
 	
 	/**
 	 * @return the prefMgr
@@ -92,18 +95,22 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	public void setPrefMgr(IUserPreferenceManagement prefMgr) {
 		this.prefMgr = prefMgr;
 	}
+	
+	
 
-	public PrivacyPolicyRegistryManager getPrivacyPolicyRegMgr(){
+/*	public PrivacyPolicyRegistryManager getPrivacyPolicyRegMgr(){
 		return this.privacyPolicyRegMgr;
 	}
 	
 
-	/**
+	*//**
 	 * @param privacyPolicyRegMgr the privacyPolicyRegMgr to set
-	 */
+	 *//*
 	public void setPrivacyPolicyRegMgr(PrivacyPolicyRegistryManager privacyPolicyRegMgr) {
 		this.privacyPolicyRegMgr = privacyPolicyRegMgr;
 	}
+	*/
+	
 	public IPrivacyPreferenceManager getPrivacyPreferenceManager() {
 		// TODO Auto-generated method stub
 		return privacyPreferenceManager;
@@ -153,26 +160,27 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	/**
 	 * @return the policyAgreementMgr
 	 */
-	public IPolicyAgreementManagerInternal getPolicyAgreementMgr() {
+	public IPrivacyAgreementManagerInternal getPolicyAgreementMgr() {
 		return policyAgreementMgr;
 	}
 	/**
 	 * @param policyAgreementMgr the policyAgreementMgr to set
 	 */
-	public void setPolicyAgreementMgr(IPolicyAgreementManagerInternal policyAgreementMgr) {
+	public void setPolicyAgreementMgr(IPrivacyAgreementManagerInternal policyAgreementMgr) {
 		this.policyAgreementMgr = policyAgreementMgr;
 	}
+
 	/**
-	 * @return the privacyDataManager
+	 * @return the privacyDataManagerInternal
 	 */
-	public IPrivacyDataManagerInternal getPrivacyDataManager() {
-		return privacyDataManager;
+	public IPrivacyDataManagerInternal getPrivacyDataManagerInternal() {
+		return privacyDataManagerInternal;
 	}
 	/**
-	 * @param privacyDataManager the privacyDataManager to set
+	 * @param privacyDataManagerInternal the privacyDataManagerInternal to set
 	 */
-	public void setPrivacyDataManager(IPrivacyDataManagerInternal privacyDataManager) {
-		this.privacyDataManager = privacyDataManager;
+	public void setPrivacyDataManagerInternal(IPrivacyDataManagerInternal privacyDataManagerInternal) {
+		this.privacyDataManagerInternal = privacyDataManagerInternal;
 	}
 	/**
 	 * @return the negotiationAgent
@@ -210,7 +218,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		*/
 		//Register Negotiation Agent and Client with OSGi so that the ONM-SM can find them
 		
-		this.privacyPolicyRegMgr = new PrivacyPolicyRegistryManager(this.getCtxBroker());
+		//this.privacyPolicyRegMgr = new PrivacyPolicyRegistryManager(this.getCtxBroker());
 		//this.privacyPolicyRegMgr.setPublicDPI(this.myPublicDPI);
 		
 		
@@ -221,7 +229,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		 * this.negAgent = new NegotiationAgent(this.myContext, this.myPublicDPI, this.getPrivacyPolicyRegMgr(), this.adMgr);
 		 * this.myContext.registerService(INegotiationAgent.class.getName(), this.negAgent, new Hashtable<String,Object>());
 		 */
-		this.localServiceStartedListener = new LocalServiceStartedListener(getEventMgr(), getIdm(), this.getPrivacyPolicyRegMgr()); 
+		//this.localServiceStartedListener = new LocalServiceStartedListener(getEventMgr(), getIdm(), this.getPrivacyPolicyRegMgr()); 
 		
 		//JOptionPane.showMessageDiathis.logging.debug(null, "PolicyManager initialised");
 		this.registerForFailedNegotiationEvent();
@@ -386,6 +394,19 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	public void handleExternalEvent(CSSEvent arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+	/**
+	 * @return the commsMgr
+	 */
+	public ICommManager getCommsMgr() {
+		return commsMgr;
+	}
+	/**
+	 * @param commsMgr the commsMgr to set
+	 */
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
+		this.idm = commsMgr.getIdManager();
 	}
 
 

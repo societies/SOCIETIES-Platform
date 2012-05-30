@@ -25,14 +25,20 @@
 package org.societies.privacytrust.trust.impl;
 
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote;
+import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
@@ -62,13 +68,21 @@ public class TrustBroker implements ITrustBroker {
 	/** The Trust Repository Service. */
 	@Autowired(required=true)
 	private ITrustRepository trustRepo;
+	
+	@Autowired(required=false)
+	private ICommManager commMgr;
+	private boolean hasCommMgr = false;
+	
+	@Autowired(required=false)
+	private ITrustBrokerRemote trustBrokerRemote;
+	private boolean hasTrustBrokerRemote = false;
 			
 	TrustBroker() {
 		
 		LOG.info(this.getClass() + " instantiated");
 	}
 	
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Async
@@ -78,7 +92,7 @@ public class TrustBroker implements ITrustBroker {
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
 		
-		final Double trustValue;
+		Double trustValue = null;
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving trust value for entity '"
@@ -88,16 +102,53 @@ public class TrustBroker implements ITrustBroker {
 			throw new TrustBrokerException("Could not retrieve trust value for entity '"
 					+ teid + "': ITrustRepository service is not available");
 		
-		final ITrustedEntity entity = this.trustRepo.retrieveEntity(teid);
-		if (entity != null)
-			trustValue = entity.getUserPerceivedTrust().getValue();
-		else
-			trustValue = null;
+		boolean doLocal;
+		try {
+			doLocal = this.isLocalTeid(teid);
+		} catch (TrustBrokerException tbe) {
+			
+			LOG.error("Could not determine if the retrieve request needs remote handling: "
+					+ tbe.getLocalizedMessage());
+			LOG.warn("Will try local Trust Repository...");
+			doLocal = true;
+		}
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("doLocal for entity " + teid + " is '" + doLocal + "'");
+		if (doLocal) {
+		
+			final ITrustedEntity entity = this.trustRepo.retrieveEntity(teid);
+			if (entity != null)
+				trustValue = entity.getUserPerceivedTrust().getValue();
+
+		} else {
+			
+			if (this.hasTrustBrokerRemote && this.trustBrokerRemote != null) {
+				
+				final RemoteRetrieveCallback callback = new RemoteRetrieveCallback();
+				this.trustBrokerRemote.retrieveTrust(teid, callback);
+				synchronized (callback) {
+					try {
+						callback.wait();
+						trustValue = callback.getResult();
+					} catch (InterruptedException ie) {
+						
+						throw new TrustBrokerException("Interrupted while receiveing trust for entity "
+								+ teid);
+					}
+				}
+				
+			} else {
+				
+				throw new TrustBrokerException("Cannot retrieve trust for entity "
+						+ teid + ": ITrustBrokerRemote service is not available");
+			}
+		}
 			
 		return new AsyncResult<Double>(trustValue);
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
@@ -120,7 +171,7 @@ public class TrustBroker implements ITrustBroker {
 		this.trustEventMgr.registerListener(listener, topics, teid);
 	}
 	
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
@@ -135,5 +186,106 @@ public class TrustBroker implements ITrustBroker {
 		if (this.trustEventMgr == null)
 			throw new TrustBrokerException("Could not unregister trust update listener for entity '"
 					+ teid + "': ITrustEventMgr service is not available");
+	}
+	
+	/**
+	 * This method is called when the {@link ITrustBrokerRemote} service is bound.
+	 * 
+	 * @param trustBrokerRemote
+	 *            the {@link ITrustBrokerRemote} service that was bound
+	 * @param props
+	 *            the set of properties that the {@link ITrustBrokerRemote} service
+	 *            was registered with
+	 */
+	public void bindTrustBrokerRemote(ITrustBrokerRemote trustBrokerRemote, Dictionary<Object,Object> props) {
+		
+		LOG.info("Binding service reference " + trustBrokerRemote);
+		this.hasTrustBrokerRemote = true;
+	}
+	
+	/**
+	 * This method is called when the {@link ITrustBrokerRemote} service is unbound.
+	 * 
+	 * @param TrustBrokerRemote
+	 *            the {@link ITrustBrokerRemote} service that was unbound
+	 * @param props
+	 *            the set of properties that the {@link ITrustBrokerRemote} service
+	 *            was registered with
+	 */
+	public void unbindTrustBrokerRemote(ITrustBrokerRemote trustBrokerRemote, Dictionary<Object,Object> props) {
+		
+		LOG.info("Unbinding service reference " + trustBrokerRemote);
+		this.hasTrustBrokerRemote = false;
+	}
+	
+	/**
+	 * This method is called when the {@link ICommManager} service is bound.
+	 * 
+	 * @param commMgr
+	 *            the {@link ICommManager} service that was bound
+	 * @param props
+	 *            the set of properties that the {@link ICommManager} service
+	 *            was registered with
+	 */
+	public void bindCommMgr(ICommManager commMgr, Dictionary<Object,Object> props) {
+		
+		LOG.info("Binding service reference " + commMgr);
+		this.hasCommMgr = true;
+	}
+	
+	/**
+	 * This method is called when the {@link ICommManager} service is unbound.
+	 * 
+	 * @param commMgr
+	 *            the {@link ICommManager} service that was unbound
+	 * @param props
+	 *            the set of properties that the {@link ICommManager} service
+	 *            was registered with
+	 */
+	public void unbindCommMgr(ICommManager commMgr, Dictionary<Object,Object> props) {
+		
+		LOG.info("Unbinding service reference " + commMgr);
+		this.hasCommMgr = false;
+	}
+	
+	private boolean isLocalTeid(final TrustedEntityId teid) throws TrustBrokerException {
+		
+		if (this.hasCommMgr && this.commMgr != null) {
+			
+			try {
+				final IIdentity trustorId = this.commMgr.getIdManager().fromJid(teid.getTrustorId());
+				return this.commMgr.getIdManager().isMine(trustorId);
+			} catch (InvalidFormatException ife) {
+				
+				throw new TrustBrokerException("Invalid trusteeId IIdentity: "
+						+ ife.getLocalizedMessage(), ife);
+			} 
+			
+		} else {
+			
+			throw new TrustBrokerException("ICommManager service is not available");
+		}
+	}
+	
+	private class RemoteRetrieveCallback implements ITrustBrokerRemoteCallback {
+
+		private Double trustValue;
+		
+		/*
+		 * @see org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback#onRetrieveTrust(java.lang.Double)
+		 */
+		@Override
+		public void onRetrieveTrust(Double value) {
+			
+			this.trustValue = value;
+			synchronized (this) {
+	            notifyAll();
+	        }
+		}
+		
+		private Double getResult() {
+			
+			return this.trustValue;
+		}
 	}
 }

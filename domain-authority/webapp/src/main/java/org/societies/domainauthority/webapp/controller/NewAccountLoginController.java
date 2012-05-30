@@ -35,6 +35,7 @@ import org.societies.domainauthority.registry.DaUserRecord;
 import org.societies.domainauthority.webapp.models.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -106,18 +107,49 @@ public class NewAccountLoginController {
 	 * url http://localhost:8080/societies/login.html
 	 * @return login jsp page and model object
 	 */
-	@RequestMapping(value="/newaccount.html",method = RequestMethod.GET)
-	public ModelAndView login() {
+	@RequestMapping(value="/{newaccountid}/newaccount.html",method = RequestMethod.GET)
+	public ModelAndView login(@PathVariable(value="newaccountid") String newaccountid) {
 		//model is nothing but a standard Map object
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("message", "Please login to your Societies account");
+		model.put("message", "Please create your Societies account");
 		//data model object to be used for displaying form in html page 
 		LoginForm loginForm = new LoginForm();
+		
+		if (newaccountid != null && newaccountid.length() > 0)
+		{
+			//parse string 
+			int pos = 0;
+			if (newaccountid.contains("@"))
+				pos = newaccountid.indexOf('@');
+			else if (newaccountid.contains("."))
+				pos = newaccountid.indexOf('.');
+			
+			if (pos != 0)
+			{
+				loginForm.setUserName(newaccountid.substring(0, Math.max(pos-1,0)));
+				loginForm.setSubDomain(newaccountid.substring(Math.min(pos+1,newaccountid.length())));
+			}
+		}
 		model.put("loginForm", loginForm);		
 		/*return modelandview object and passing login (jsp page name) and model object as
 		 constructor */
 		return new ModelAndView("newaccount", model) ;
 	}
+	
+	@RequestMapping(value="/newaccount.html",method = RequestMethod.GET)
+	public ModelAndView login() {
+		//model is nothing but a standard Map object
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("message", "Please create your Societies account");
+		//data model object to be used for displaying form in html page 
+		LoginForm loginForm = new LoginForm();
+		
+		model.put("loginForm", loginForm);		
+		/*return modelandview object and passing login (jsp page name) and model object as
+		 constructor */
+		return new ModelAndView("newaccount", model) ;
+	}
+	
 	/**
 	 * This method get called when user submit the login page using submit button	
 	 * @param loginForm java object with data entered by user

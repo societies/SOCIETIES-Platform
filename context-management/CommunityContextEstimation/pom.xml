@@ -15,12 +15,95 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-mgmt-api</artifactId>
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-broker</artifactId>
+			<version>${version.cm}</version>
+			<!--<scope>provided</scope> -->
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-db-mgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-history-mgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<version>2.2</version>
+		</dependency>
+
+
+		<!-- Mockito Dependencies -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
+
+
 	</dependencies>
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -28,7 +111,7 @@
 		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
-	<!-- Build Settings -->	
+	<!-- Build Settings -->
 	<build>
 		<plugins>
 			<plugin>
@@ -62,7 +145,7 @@
 						</artifactItem>
 					</artifactItems>
 				</configuration>
-			</plugin>	
+			</plugin>
 		</plugins>
 	</build>
 

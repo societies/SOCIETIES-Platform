@@ -39,6 +39,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
@@ -46,6 +47,7 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IIdentity;
 
 /**
  * This interface provides access to current, past and future context data. The
@@ -103,6 +105,14 @@ public interface ICtxBroker {
 	 */
 	public Future<IndividualCtxEntity> createIndividualEntity(String type) throws CtxException;
 		
+
+	/**
+	 * Creates a {@link CommunityCtxEntity} that represents the specified CIS.
+	 *  
+	 * @param cisId
+	 */
+	public Future<CommunityCtxEntity> createCommunityEntity(IIdentity cisId) throws CtxException;
+	
 	/**
 	 * Disables context monitoring to Context Database
 	 * 

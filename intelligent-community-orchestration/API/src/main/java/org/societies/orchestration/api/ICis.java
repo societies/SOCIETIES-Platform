@@ -90,6 +90,10 @@ public class ICis {
     	return new ArrayList<String>();
     }
     
+    public Future<Set<ICisParticipant>> getAdministrators() {
+    	return null;
+    }
+    
     public Boolean addSubCis(ICis cis) {
     	return new Boolean(true);
     }
