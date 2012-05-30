@@ -47,6 +47,7 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.MethodType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
@@ -280,6 +281,29 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 	@Override
 	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void installService(Service service, IIdentity node,
+			IServiceControlCallback callback) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getService(ServiceResourceIdentifier serviceId, IIdentity node,
+			IServiceDiscoveryCallback callback) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void searchService(Service filter, IIdentity node,
+			IServiceDiscoveryCallback serviceDiscoveryCallback) {
+
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: searchService called");
+
+		
 	}
 
 }

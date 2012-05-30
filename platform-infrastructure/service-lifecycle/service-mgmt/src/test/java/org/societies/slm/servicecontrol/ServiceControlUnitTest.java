@@ -170,11 +170,32 @@ public class ServiceControlUnitTest {
 	@Test
 	public void testServiceStuff(){
 		
-		ServiceResourceIdentifier testSRI= new ServiceResourceIdentifier();
-		ServiceResourceIdentifier othertestSRI= new ServiceResourceIdentifier();
-		testSRI.setServiceInstanceIdentifier("212");
-		othertestSRI.setServiceInstanceIdentifier("211");
-		testSRI.setIdentifier(new )
+		try{
+			
+			ServiceResourceIdentifier testSRI= new ServiceResourceIdentifier();
+			ServiceResourceIdentifier othertestSRI= new ServiceResourceIdentifier();
+			testSRI.setServiceInstanceIdentifier("212");
+			othertestSRI.setServiceInstanceIdentifier("211");
+			testSRI.setIdentifier(new URI("http://manager.local.societies/laptop/CalculatorService"));
+			othertestSRI.setIdentifier(new URI("http://manager.local.societies/laptop/CalculatorService"));
+			
+			if(testSRI.equals(othertestSRI)){
+				System.out.println("true!");
+			} else
+				System.out.println("false!");
+			
+			System.out.println("getHost()" +testSRI.getIdentifier().getHost());
+			System.out.println("getPath()" +testSRI.getIdentifier().getPath());
+			System.out.println("getFragment()" +testSRI.getIdentifier().getFragment());
+			System.out.println("getScheme()" +testSRI.getIdentifier().getScheme());
+			
+			assertTrue(testSRI.equals(othertestSRI));
+			
+		} catch(Exception ex){
+			ex.printStackTrace();
+			fail();
+		}
+
 	}
 	/**
 	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.

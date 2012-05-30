@@ -42,6 +42,7 @@ import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -269,7 +270,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 					logger.debug("Didn't find service on local repository, now checking if it's a remote service!");
 				
 				String myLocalJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
-				String serviceJid = new String();
+				String serviceJid = ServiceModelUtils.getJidFromServiceIdentifier(serviceId);
 				
 				// Is it supposed to be local?
 				if(!myLocalJid.equals(serviceJid)){

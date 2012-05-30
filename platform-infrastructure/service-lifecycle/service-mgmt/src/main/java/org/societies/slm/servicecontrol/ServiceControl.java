@@ -25,6 +25,7 @@
 package org.societies.slm.servicecontrol;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -49,6 +50,7 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -118,7 +120,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					
 			// Our first task is to determine whether the service we're searching for is local or remote
 			
-			String nodeJid = serviceId.getIdentifier().getHost();
+			String nodeJid = ServiceModelUtils.getJidFromServiceIdentifier(serviceId);
 			String localNodeJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
 						
 			if(logger.isDebugEnabled())
@@ -222,7 +224,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			// Our first task is to determine whether the service we're searching for is local or remote
 			
-			String nodeJid = serviceId.getIdentifier().getHost();
+			String nodeJid = ServiceModelUtils.getJidFromServiceIdentifier(serviceId);
 			String localNodeJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
 						
 			if(logger.isDebugEnabled())
@@ -317,7 +319,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		try{
 		
 			if(logger.isDebugEnabled()) 
-				logger.debug("Service Management: installService method, on another node: jid");
+				logger.debug("Service Management: installService method, on our node: jid");
 		
 			
 			// Now install the client!
@@ -366,7 +368,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		try{
 		
 			if(logger.isDebugEnabled()) 
-				logger.debug("Service Management: installService method, on another node: jid");
+				logger.debug("Service Management: install Remote Service method, on another node: jid");
 		
 			// Now install the client!
 			Future<ServiceControlResult> asyncResult = null;
@@ -568,7 +570,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			// Our first task is to determine whether the service we're searching for is local or remote
 			
-			String nodeJid = serviceId.getIdentifier().getHost();
+			String nodeJid = ServiceModelUtils.getJidFromServiceIdentifier(serviceId);
 			String localNodeJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
 						
 			if(logger.isDebugEnabled())
@@ -716,61 +718,6 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		queue.add(newService);
 	}
 	
-	/**
-	 * This method is used to obtain the Service that is exposed by given Bundle
-	 * 
-	 * @param The Bundle that exposes this service
-	 * @return The Service object whose bundle we wish to find
-	 */
-	private Service getServiceFromBundle(Bundle bundle) {
-		
-		if(logger.isDebugEnabled()) logger.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName());
-		
-		// Preparing the search filter
-		Service filter = new Service();
-
-		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
-		filterIdentifier.setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
-		filter.setServiceIdentifier(filterIdentifier);
-		
-		ServiceInstance filterInstance = new ServiceInstance();
-
-		ServiceImplementation filterImplementation = new ServiceImplementation();
-		filterImplementation.setServiceVersion(bundle.getVersion().toString());
-		filterInstance.setServiceImpl(filterImplementation);
-		filter.setServiceInstance(filterInstance);
-		
-		List<Service> listServices;
-		try {
-			listServices = getServiceReg().findServices(filter);
-		} catch (ServiceRetrieveException e) {
-			logger.error("Exception while searching for services:" + e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
-		
-		if(listServices == null)
-			return null;
-		
-		if(listServices.isEmpty()){
-			if(logger.isDebugEnabled()) logger.debug("Couldn't find any services that fulfill the criteria");
-			return null;
-		} 
-		
-		if(listServices.size() > 1){
-			if(logger.isDebugEnabled()) logger.debug("More than one service found... this is not good!");
-		}
-		
-		Service result = listServices.get(0);
-		// First we get the bundleId
-
-		 if(logger.isDebugEnabled()) 
-				logger.debug("The service corresponding to bundle " + bundle.getSymbolicName() + "is "+ result.getServiceName() );
-			
-		// Finally, we return
-		 return result;
-		 
-	}
 
 	@Override
 	public Future<ServiceControlResult> shareService(Service service, String nodeJid)
@@ -788,7 +735,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			Future<ServiceControlResult> asyncResult = null;
 			
-			asyncResult = shareService(service,nodeJid);
+			asyncResult = shareService(service,node);
 			ServiceControlResult result = asyncResult.get();
 			
 			return new AsyncResult<ServiceControlResult>(result);
@@ -801,23 +748,148 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 
 	@Override
-	public Future<ServiceControlResult> shareService(Service service,
-			IIdentity node) throws ServiceControlException {
+	public Future<ServiceControlResult> shareService(Service service, IIdentity node) throws ServiceControlException {
 		
-		return null;
+		if(logger.isDebugEnabled()) logger.debug("Service Management: shareShared method, node input");
+		
+		ServiceControlResult returnResult = new ServiceControlResult();
+		returnResult.setServiceId(service.getServiceIdentifier());
+		
+		try {
+			
+			// First we check if the service is already in the repository
+			Service ourService = getServiceReg().retrieveService(service.getServiceIdentifier());
+			if(ourService==null){
+				if(logger.isDebugEnabled())
+					logger.debug("Service is not in the repository yet, adding it");
+				
+				
+				List<Service> servicesList = new ArrayList<Service>();
+				servicesList.add(service);
+				getServiceReg().registerServiceList(servicesList );
+			}
+			
+			// Now that we've added it, we can share it!
+			
+			switch (node.getType())
+			{
+			case CSS:
+			case CSS_RICH:
+			case CSS_LIGHT:
+				if(logger.isDebugEnabled()) logger.debug("For now, sharing to specific CSS is not supported");
+				break;
+			case CIS:
+				if(logger.isDebugEnabled()) logger.debug("Sharing with a CIS: " + node.getJid());
+				getServiceReg().notifyServiceIsSharedInCIS(service.getServiceIdentifier(), node.getJid());
+				returnResult.setMessage(ResultMessage.SUCCESS);
+				break;
+			default: 
+				if(logger.isDebugEnabled()) logger.debug("Unknown kind of node!");
+				returnResult.setMessage(ResultMessage.EXCEPTION_ON_REMOTE);
+				break;
+			} 
+			
+						
+		} catch (Exception ex) {
+			logger.error("Exception while attempting to share a service: " + ex.getMessage());
+			throw new ServiceControlException("Exception while attempting to share a service:", ex);
+		}
+		
+		return new AsyncResult<ServiceControlResult>(returnResult);
+			
 	}
 
 	@Override
 	public Future<ServiceControlResult> unshareService(Service service,
-			String jid) throws ServiceControlException {
-		// TODO Auto-generated method stub
-		return null;
+			String nodeJid) throws ServiceControlException {
+		
+		if(logger.isDebugEnabled()) logger.debug("Service Management: unshareShared method, String input");
+		
+		try {
+			
+			// We convert to a node, then call the other method...
+			IIdentity node = null;
+			
+			if(nodeJid != null && !nodeJid.isEmpty())
+				node = getCommMngr().getIdManager().fromJid(nodeJid);
+			
+			Future<ServiceControlResult> asyncResult = null;
+			
+			asyncResult = unshareService(service,node);
+			ServiceControlResult result = asyncResult.get();
+			
+			return new AsyncResult<ServiceControlResult>(result);
+					
+		} catch (Exception ex) {
+			logger.error("Exception while attempting to unshare a service: " + ex.getMessage());
+			throw new ServiceControlException("Exception while attempting to unshare a service:", ex);
+		}
 	}
 
 	@Override
 	public Future<ServiceControlResult> unshareService(Service service,
 			IIdentity node) throws ServiceControlException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if(logger.isDebugEnabled()) logger.debug("Service Management: shareShared method, node input");
+		
+		ServiceControlResult returnResult = new ServiceControlResult();
+		returnResult.setServiceId(service.getServiceIdentifier());
+
+		try {
+			
+			// First we check if the service is already in the repository
+			Service ourService = getServiceReg().retrieveService(service.getServiceIdentifier());
+			if(ourService==null){
+				if(logger.isDebugEnabled())
+					logger.debug("Service is not in the repository! It can't be shared!");
+				
+				returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);	
+				return new AsyncResult<ServiceControlResult>(returnResult);
+				
+			}
+			
+			// Now that we've added it, we can unshare it!
+			
+			switch (node.getType())
+			{
+			case CSS:
+			case CSS_RICH:
+			case CSS_LIGHT:
+				if(logger.isDebugEnabled()) logger.debug("For now, sharing to specific CSS is not supported");
+				break;
+			case CIS:
+				if(logger.isDebugEnabled()) logger.debug("Unsharing with a CIS: " + node.getJid());
+				getServiceReg().removeServiceSharingInCIS(service.getServiceIdentifier(), node.getJid());
+				break;
+			default: 
+				if(logger.isDebugEnabled()) logger.debug("");
+				break;
+			} 
+			
+			// Next step, we check if the service is "ours" and delete it from the repository if it's not.
+			
+			IIdentity serviceNode = getCommMngr().getIdManager().fromFullJid(ourService.getServiceInstance().getFullJid());
+			IIdentity ourNode = getCommMngr().getIdManager().getThisNetworkNode();
+			
+			if(!ourNode.equals(serviceNode)){
+				if(logger.isDebugEnabled())
+					logger.debug("Service does not belong to OUR Css, so we remove it!");
+				List<Service> listServices = new ArrayList<Service>();
+				listServices.add(ourService);
+				getServiceReg().unregisterServiceList(listServices);
+			} else{
+				if(logger.isDebugEnabled())
+					logger.debug("Service belongs to OUR Css, so we don't remove it!");
+			}
+			
+			returnResult.setMessage(ResultMessage.SUCCESS);
+			
+			return new AsyncResult<ServiceControlResult>(returnResult);
+			
+		} catch (Exception ex) {
+			logger.error("Exception while attempting to share a service: " + ex.getMessage());
+			throw new ServiceControlException("Exception while attempting to share a service:", ex);
+		}
+
 	}
 }

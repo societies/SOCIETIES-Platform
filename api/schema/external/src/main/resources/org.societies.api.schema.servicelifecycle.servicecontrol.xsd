@@ -43,7 +43,7 @@
       <xs:enumeration value="OSGI_PROBLEM"/>
       <xs:enumeration value="COMMUNICATION_ERROR"/>
       <xs:enumeration value="EXCEPTION_ON_REMOTE"/>
-      <xs:enumeration value="CIS_NOT_FOUND"/>
+      <xs:enumeration value="UNKNOWN_NODE"/>
       <xs:enumeration value="NEGOTIATION_FAILED"/>
     </xs:restriction>
   </xs:simpleType>
