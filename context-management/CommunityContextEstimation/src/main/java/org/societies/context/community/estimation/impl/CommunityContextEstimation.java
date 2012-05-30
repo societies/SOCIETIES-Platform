@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +105,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		/**
 		 * Returns the mode of an integer's ArrayList
 		 * @param an array list of integers
-		 * @return an array representing the mode value of the input integers
+		 * @return an ArrayList of integers representing the mode value of the input integers
 		 */
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		Hashtable <Integer, Integer> frequencyMap = new Hashtable<Integer, Integer>();
@@ -173,7 +172,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		/**
 		 * Returns the convex hull of a points' ArrayList. It recursively uses the singleSideHulSet method
 		 * @param an array list of points.
-		 * @return the convex hull of the input points
+		 * @return an ArrayList of points, representing the convex hull set of the input points
 		 */		
 		ArrayList<Point> convexHullSet = new ArrayList<Point>();
 		int minX= Integer.MAX_VALUE;
@@ -299,9 +298,9 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	@Override
 	public Point[] cceGeomMinBB(ArrayList<Point> points) {
 		/**
-		 * Returns the minimum boundary box that contains all the given points
+		 * Returns the minimum bounding box that contains all the given points
 		 * @param an array list of integers
-		 * @return the minimum boundary box of the input points
+		 * @return an array of points representing the minimum bounding box of the input points
 		 */
 		Point[] minBB = new Point[2];
 		int minX= Integer.MAX_VALUE;
@@ -337,7 +336,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		/**
 		 * Returns the range of a strings' ArrayList
 		 * @param an array list of strings
-		 * @return the range of the input integers as ArrayList<String>
+		 * @return an ArrayList of strings showing the mode of the input strings
 		 */	
 		Hashtable <String, Integer> frequencyMap = new Hashtable<String, Integer>();
 		ArrayList<String> finalList = new ArrayList<String>();
