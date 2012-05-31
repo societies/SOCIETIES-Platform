@@ -64,6 +64,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
@@ -78,6 +79,7 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManager
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
@@ -119,6 +121,8 @@ public class PrivacyNegotiationTest {
 	private ResponsePolicy cisResponsePolicy;
 	private PPNPOutcome locationOutcomeForCis;
 	private PPNPOutcome statusOutcomeForCis;
+	private PPNegotiationEvent successfulEvent;
+	private FailedNegotiationEvent failedEvent;
 
 	@Before
 	public void setUp(){

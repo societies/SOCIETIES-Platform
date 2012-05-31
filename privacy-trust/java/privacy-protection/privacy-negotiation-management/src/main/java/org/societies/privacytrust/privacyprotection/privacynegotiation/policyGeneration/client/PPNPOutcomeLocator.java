@@ -204,7 +204,7 @@ public class PPNPOutcomeLocator {
 		}*/
 		if (theRequestor instanceof RequestorService){
 			if (keyOutcome.containsKey(SubjectConstant.IDENTITY_SERVICE_ID)){
-				JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_SERVICE_ID);
+				//JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_SERVICE_ID);
 				TimedNotificationGUI gui = new TimedNotificationGUI();
 
 				/*
@@ -225,7 +225,7 @@ public class PPNPOutcomeLocator {
 
 
 			if (keyOutcome.containsKey(SubjectConstant.IDENTITY_GENERIC)){
-				JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_GENERIC);
+				//JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_GENERIC);
 
 				TimedNotificationGUI gui = new TimedNotificationGUI();
 				/*
@@ -243,7 +243,7 @@ public class PPNPOutcomeLocator {
 				}
 			}
 			if (keyOutcome.containsKey(SubjectConstant.IDENTITY_OTHER_SERVICE_ID)){
-				JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_OTHER_SERVICE_ID);
+				//JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_OTHER_SERVICE_ID);
 				boolean response = this.showNotificationGUI(contextType);
 				if (response){
 					List<PPNPOutcome> temp = keyOutcome.get(SubjectConstant.IDENTITY_OTHER_SERVICE_ID);
@@ -256,7 +256,7 @@ public class PPNPOutcomeLocator {
 			}
 
 			if (keyOutcome.containsKey(SubjectConstant.GENERIC)){
-				JOptionPane.showMessageDialog(null, SubjectConstant.GENERIC);
+				//JOptionPane.showMessageDialog(null, SubjectConstant.GENERIC);
 				boolean response = this.showNotificationGUI(contextType);
 				if (response){
 					List<PPNPOutcome> temp = keyOutcome.get(SubjectConstant.GENERIC);
@@ -268,7 +268,7 @@ public class PPNPOutcomeLocator {
 				}
 			}
 			if (keyOutcome.containsKey(SubjectConstant.OTHER_IDENTITY_OTHER_SERVICE_ID)){
-				JOptionPane.showMessageDialog(null, SubjectConstant.OTHER_IDENTITY_OTHER_SERVICE_ID);
+				//JOptionPane.showMessageDialog(null, SubjectConstant.OTHER_IDENTITY_OTHER_SERVICE_ID);
 				boolean response = this.showNotificationGUI(contextType);
 				if (response){
 					List<PPNPOutcome> temp = keyOutcome.get(SubjectConstant.OTHER_IDENTITY_OTHER_SERVICE_ID);
@@ -282,7 +282,7 @@ public class PPNPOutcomeLocator {
 		}
 		else if (theRequestor instanceof RequestorCis){
 			if (keyOutcome.containsKey(SubjectConstant.IDENTITY_CIS_ID)){
-				JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_CIS_ID);
+				//JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_CIS_ID);
 
 				TimedNotificationGUI gui = new TimedNotificationGUI();
 
@@ -300,7 +300,7 @@ public class PPNPOutcomeLocator {
 			}
 
 			if (keyOutcome.containsKey(SubjectConstant.IDENTITY_GENERIC)){
-				JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_GENERIC);
+				//JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_GENERIC);
 				TimedNotificationGUI gui = new TimedNotificationGUI();
 
 				//boolean response = gui.showGUI(contextType);
@@ -316,7 +316,7 @@ public class PPNPOutcomeLocator {
 				}
 			}
 			if (keyOutcome.containsKey(SubjectConstant.IDENTITY_OTHER_CIS_ID)){
-				JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_OTHER_CIS_ID);
+				//JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_OTHER_CIS_ID);
 				boolean response = this.showNotificationGUI(contextType);
 				if (response){
 					List<PPNPOutcome> temp = keyOutcome.get(SubjectConstant.IDENTITY_OTHER_CIS_ID);
@@ -329,7 +329,7 @@ public class PPNPOutcomeLocator {
 			}
 
 			if (keyOutcome.containsKey(SubjectConstant.OTHER_IDENTITY_OTHER_CIS_ID)){
-				JOptionPane.showMessageDialog(null, SubjectConstant.OTHER_IDENTITY_OTHER_CIS_ID);
+				//JOptionPane.showMessageDialog(null, SubjectConstant.OTHER_IDENTITY_OTHER_CIS_ID);
 				boolean response = this.showNotificationGUI(contextType);
 				if (response){
 					List<PPNPOutcome> temp = keyOutcome.get(SubjectConstant.OTHER_IDENTITY_OTHER_CIS_ID);
@@ -345,7 +345,7 @@ public class PPNPOutcomeLocator {
 
 
 		if (keyOutcome.containsKey(SubjectConstant.IDENTITY_OTHER_REQUESTOR_TYPE)){
-			JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_OTHER_REQUESTOR_TYPE);
+			//JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_OTHER_REQUESTOR_TYPE);
 			boolean response = this.showNotificationGUI(contextType);
 			if (response){
 				List<PPNPOutcome> temp = keyOutcome.get(SubjectConstant.IDENTITY_OTHER_REQUESTOR_TYPE);
@@ -358,7 +358,7 @@ public class PPNPOutcomeLocator {
 		}
 
 		if (keyOutcome.containsKey(SubjectConstant.OTHER_IDENTITY_OTHER_REQUESTOR_TYPE)){
-			JOptionPane.showMessageDialog(null, SubjectConstant.OTHER_IDENTITY_OTHER_REQUESTOR_TYPE);
+			//JOptionPane.showMessageDialog(null, SubjectConstant.OTHER_IDENTITY_OTHER_REQUESTOR_TYPE);
 			boolean response = this.showNotificationGUI(contextType);
 			if (response){
 				List<PPNPOutcome> temp = keyOutcome.get(SubjectConstant.OTHER_IDENTITY_OTHER_REQUESTOR_TYPE);
