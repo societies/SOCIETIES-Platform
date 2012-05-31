@@ -30,7 +30,8 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
-import org.societies.webapp.models.PrivacyAssessmentForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -42,10 +43,13 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
+import org.societies.webapp.models.PrivacyAssessmentForm;
 
 
 @Controller
 public class PrivacyAssessmentController {
+
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyAssessmentController.class);
 
 	/**
 	 * OSGI service get auto injected
@@ -58,11 +62,14 @@ public class PrivacyAssessmentController {
 	}
 
 	public void setAssessment(IAssessment sdService) {
+		LOG.debug("setAssessment()");
 		this.assessment = sdService;
 	}
 
 	@RequestMapping(value = "/privacyassessment.html", method = RequestMethod.GET)
 	public ModelAndView Privacyassessment() {
+
+		LOG.debug("HTTP GET");
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -88,30 +95,35 @@ public class PrivacyAssessmentController {
 	public ModelAndView privacyAssessment(@Valid PrivacyAssessmentForm assForm,
 			BindingResult result, Map model) {
 
+		LOG.debug("HTTP POST");
+
 		if (result.hasErrors()) {
+			LOG.warn("BindingResult has errors");
 			model.put("result", "privacy assessment form error");
 			return new ModelAndView("privacyassessment", model);
 		}
 
 		if (getAssessment() == null) {
+			LOG.warn("Privacy Assessment Service reference not avaiable");
 			model.put("errormsg", "Privacy Assessment Service reference not avaiable");
 			return new ModelAndView("error", model);
 		}
 
 		String method = assForm.getMethod();
 		String res;
+		LOG.debug("Method = {}", method);
 		
 		try {
 			
 			if (method.equalsIgnoreCase("getAssessmentAllIds")) {
-
+				
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
 				res="Privacy Assessment Result for all identities";
 				model.put("services", assResult.values());
 			}
 			else if (method.equalsIgnoreCase("getAssessmentAllClasses")) {
-				
+
 				HashMap<String, AssessmentResultClassName> assResult;
 				assResult = assessment.getAssessmentAllClasses();
 				res="Privacy Assessment Result for all classes";
