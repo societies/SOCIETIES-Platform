@@ -44,7 +44,7 @@ public class Test1012 extends IntegrationTestCase{
 	
 	public Test1012(){
 		super(1012, new Class[]{Tester.class});
-		createCis();
+		leaveCis();
 	}
 	
 	public void init() {
@@ -53,22 +53,16 @@ public class Test1012 extends IntegrationTestCase{
 	
 	public void createCis() {
 		ArrayList<String> sharedData = sharedAddress();
-		createWithECA();
-		createWithCSCW();
-		createWithCSM();
+		leaveWithECA();
+		leaveWithCSCW();
+		leaveWithCSM();
 	}
 	
-	public void createSubCis() {
-		createWithECA();
-		createWithCSCW();
-		createWithCSM();
-	}
-	
-	public void createCisForSharedAddress() {
+	public void leaveCisForSharedAddress() {
 		ArrayList<String> sharedData = sharedAddress();
-		createWithECA();
-		createWithCSCW();
-		createWithCSM();
+		leaveWithECA();
+		leaveWithCSCW();
+		leaveWithCSM();
 	}
 	
     public ArrayList<String> addSharedAddress() {
@@ -91,18 +85,18 @@ public class Test1012 extends IntegrationTestCase{
     	
     }
 	
-	public void createWithECA(ArrayList<String> sharedData) {
+	public void leaveWithECA(ArrayList<String> sharedData) {
 
 		//EgocentricCommunityAnalyser eca = new EgocentricCommunityAnalyser();
 		//eca.identifyCissToCreate();
 	}
 	
-    public void createWithCSCW(ArrayList<String> sharedData) {
+    public void leaveWithCSCW(ArrayList<String> sharedData) {
     	//CollaborationPatternAnalyser cpa = new CollaborationPatternAnalyser();
     	//cpa.triggerAlgorithm();
 	}
 
-    public void createWithCSM(ArrayList<String> sharedData) {
+    public void leaveWithCSM(ArrayList<String> sharedData) {
 
 		//ContextStateModelsAnalyser csm = new ContextStateModelsAnalyser();
 		//csm.triggerModelChecking();

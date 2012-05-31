@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.automatically-join-cis;
+package org.societies.integration.test.bit.automatically-split-cis;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -35,40 +35,39 @@ import org.societies.orchestration.api.ICisProposal;
  * Test class for automatically creating a CIS via T5.1 components
  *
  */
-public class Test1011 extends IntegrationTestCase{
+public class Test1024 extends IntegrationTestCase{
 
 	private static ICtxBroker ctxBroker;
 	private static IUserActionMonitor uam;
 	private static ICommManager commsMgr;
 	private static IHelloWorld helloWorld;
 	
-	public Test1011(){
-		super(1011, new Class[]{Tester.class});
-		joinCis();
+	public Test1024(){
+		super(1024, new Class[]{Tester.class});
+		splitCis();
 	}
 	
 	public void init() {
 		
 	}
 	
-	public void joinCis() {
+	public void splitCis() {
 		ArrayList<String> sharedData = sharedAddress();
-		joinWithECA();
-		joinWithCSCW();
-		joinWithCSM();
+		splitWithECA();
+		splitWithCSCW();
+		splitWithCSM();
 	}
 	
-	public void joinSubCis() {
-		joinWithECA();
-		joinWithCSCW();
-		joinWithCSM();
-	}
-	
-	public void joinCisForSharedAddress() {
+	/**
+	 * A CIS contains two groups of members that never interact with each-other, e.g.
+	 * no member of one group sends a message over a service to a member of the other group,
+	 * or is ever in proximity with them.
+	 */
+	public void splitCisWithTwoIsolatedGroups() {
 		ArrayList<String> sharedData = sharedAddress();
-		joinWithECA();
-		joinWithCSCW();
-		joinWithCSM();
+		splitWithECA();
+		splitWithCSCW();
+		splitWithCSM();
 	}
 	
     public ArrayList<String> addSharedAddress() {
@@ -91,18 +90,18 @@ public class Test1011 extends IntegrationTestCase{
     	
     }
 	
-	public void joinWithECA(ArrayList<String> sharedData) {
+	public void splitWithECA(ArrayList<String> sharedData) {
 
 		//EgocentricCommunityAnalyser eca = new EgocentricCommunityAnalyser();
 		//eca.identifyCissToCreate();
 	}
 	
-    public void joinWithCSCW(ArrayList<String> sharedData) {
+    public void splitWithCSCW(ArrayList<String> sharedData) {
     	//CollaborationPatternAnalyser cpa = new CollaborationPatternAnalyser();
     	//cpa.triggerAlgorithm();
 	}
 
-    public void joinWithCSM(ArrayList<String> sharedData) {
+    public void splitWithCSM(ArrayList<String> sharedData) {
 
 		//ContextStateModelsAnalyser csm = new ContextStateModelsAnalyser();
 		//csm.triggerModelChecking();
