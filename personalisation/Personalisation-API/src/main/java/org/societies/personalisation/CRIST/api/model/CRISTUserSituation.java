@@ -158,7 +158,7 @@ public class CRISTUserSituation implements ICRISTUserSituation {
 	 * This method will return the contents of this task in a String mode
 	 */
 	public String toString(){
-		return this.toString();
+		return this.situationID;
 	}
 
 	@Override

@@ -25,9 +25,9 @@
 package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util;
 
 /**
- * Describe your class here...
+ * Enumeration of different location obfuscation algorithms
  *
- * @author Olivier Maridat
+ * @author Olivier Maridat (Trialog)
  *
  */
 public enum LocationCoordinatesAlgorithm {

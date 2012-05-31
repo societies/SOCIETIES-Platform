@@ -30,7 +30,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Status;
 
 /**
- * Obfuscator for name
+ * Obfuscator for status
  *
  * @author Olivier Maridat (Trialog)
  *
@@ -47,7 +47,8 @@ public class StatusObfuscator extends DataObfuscator<IDataWrapper<Status>> {
 	}
 
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
 	@Override

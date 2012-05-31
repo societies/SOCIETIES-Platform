@@ -30,7 +30,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.PostalLocation;
 
 /**
- * Obfuscator for name
+ * Obfuscator for postal location
  *
  * @author Olivier Maridat (Trialog)
  *
@@ -47,7 +47,8 @@ public class PostalLocationObfuscator extends DataObfuscator<IDataWrapper<Postal
 	}
 
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
 	@Override

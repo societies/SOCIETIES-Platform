@@ -125,7 +125,9 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 				String currentCadidate = "";
 				for (int k = 1; k <= MAX_PREDICTION_STEP; k++) {
 					int currentIndex = indexList[j] + k;
-
+					if (currentIndex >= historyList.size()) {
+					      break;
+					     }
 					String situationID = historyList.get(currentIndex).getSituation().getSituationID();
 					if (situationID == null) {
 						LOG.debug("situationID is null. delete it in historyList");

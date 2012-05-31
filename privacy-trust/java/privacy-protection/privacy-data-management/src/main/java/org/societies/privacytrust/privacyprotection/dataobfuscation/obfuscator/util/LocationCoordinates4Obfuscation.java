@@ -27,9 +27,10 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
 
 /**
- * Describe your class here...
+ * Internal version of LocationCoordinates wrapper. It contains intermediate values
+ * useful to obfuscate a location
  *
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  *
  */
 public class LocationCoordinates4Obfuscation extends LocationCoordinates {
