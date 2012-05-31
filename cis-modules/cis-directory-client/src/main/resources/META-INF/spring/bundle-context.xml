@@ -13,11 +13,11 @@
 
 	<context:annotation-config />
 
-	<bean id="DomainAuthorityGroupManager" class="org.societies.domainauthority.groupmanager.CommsServer"
+	<tx:annotation-driven />
+
+	<bean id="CssDirectoryRemote" class="org.societies.css.directory.client.CssDirectoryClient"
 		depends-on="CommManagerBundle" init-method="InitService">
 		<property name="commManager" ref="CommManagerBundle" />
-		<property name="cssDirectory" ref="CssDirectory" />
-		<property name="cisDirectory" ref="CisDirectory" />
 	</bean>
-	
+
 </beans>

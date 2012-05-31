@@ -24,16 +24,23 @@
  */
 package org.societies.api.cis.directory;
 
+import java.util.List;
+import java.util.concurrent.Future;
+
 import org.societies.api.cis.directory.ICisAdvertisementRecord;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
 /**
- * MISSING_ANNOTATION
+ * 
  * MISSING_JAVADOCS
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICisDirectory {
 	/*
 	 * Various search methods that return an array of CISAdvertisementRecords.
@@ -64,4 +71,51 @@ public interface ICisDirectory {
 	 */
 	
 	public String getURI();
+	
+	/**
+	 * Description: This method provide interface to add new CiS object to CIS
+	 * directory
+	 * 
+	 * @param cis
+	 *            object to be added to directory
+	 */
+	void addCisAdvertisementRecord(CisAdvertisementRecord cisAdvert);
+
+	/**
+	 * Description: This method allows to delete specific CIS entry from CIS
+	 * Directory
+	 * 
+	 * @param cis
+	 *            object to be deleted from directory
+	 */
+	void deleteCisAdvertisementRecord(CisAdvertisementRecord cisAdvert);
+
+	/**
+	 * Description : This method can be used to update the changes in the CIS
+	 * which is already exists in the CIS directory
+	 * 
+	 * @param cis
+	 *            to be updated or replaced
+	 * @param update
+	 *            new cis object to be placed in the directory
+	 */
+	void updateCisAdvertisementRecord(CisAdvertisementRecord oldCisAdvert,
+			CisAdvertisementRecord updatedCisAdvert);
+
+	/**
+	 * Description : Queries list of CIS available in the CIS directory
+	 * 
+	 * @return list of CisAdvertisementRecord from CIS directory
+	 */
+	Future<List<CisAdvertisementRecord>> findAllCisAdvertisementRecords();
+
+	/**
+	 * Description : Queries list of CIS object with CIS advertisement record
+	 * filter
+	 * 
+	 * @param cisFilter
+	 *            for which list of CIS will retrieved from directory
+	 * @return list of CisAdvertisementRecords
+	 */
+	Future<List<CisAdvertisementRecord>> findForAllCis( CisAdvertisementRecord filteredcis, String filter);
 }

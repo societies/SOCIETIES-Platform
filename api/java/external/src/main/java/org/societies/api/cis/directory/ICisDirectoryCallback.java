@@ -24,28 +24,26 @@
  */
 package org.societies.api.cis.directory;
 
+
+import java.util.List;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * A callback class to handle asynch messaging for  the Cis Directory Client {@link org.societies.api.cis.directory.ICisDirectoryRemote}.
  *
- */
-/**
- * 
- * MISSING_JAVADOCS
+ * @author aleckey
  */
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface ICisAdvertisementRecord {
-	public String getName();
-	public void setName(String name);
-	public String getId();
-	public String getUri();
-	public void setUri(String uri);
-	public String getPassword();
-	public String setPassword(String password);
-	public String getType();
-	public String setType(String type);
-	public String getMode();
-	public String setMode(int mode);
+public interface ICisDirectoryCallback {
+	
+	
+	/**
+	 * Gets the result of the call to the remote CisDirectory.
+	 *
+	 * @param cisAdvertisementRecords a list to be populate with the list of Cis Advertisement records {@link org.societies.api.schema.cis.directory.CisAdvertisementRecord}  
+	 *  returned from the call to the CisDirectory
+	 */
+	public void getResult(List<CisAdvertisementRecord> cisAdvertisementRecords);
 }

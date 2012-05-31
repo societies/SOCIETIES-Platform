@@ -22,19 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.societies.webapp.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.validation.Valid;
-
-import org.societies.webapp.models.DeviceRegistryForm;
+import org.societies.webapp.models.CISDirectoryForm;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,101 +45,136 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-import org.societies.api.schema.servicelifecycle.model.Service;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.comm.ICommManagerController;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+
+import javax.validation.Valid;
+
+
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.cis.directory.ICisAdvertisementRecord;
+import org.societies.api.cis.directory.ICisDirectory;
+
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 @Controller
-public class DeviceRegistryController {
-
+public class CisDirectoryController {
+	
 	/**
 	 * OSGI service get auto injected
 	 */
 	@Autowired
-	private IDeviceRegistry deviceRegistry;
+	private ICisDirectory cisDirectory;
+	@Autowired
+	private ICommManager commManager;
 	
-	public IDeviceRegistry getdeviceRegistry() {
-		return deviceRegistry;
+	@Autowired
+	private ICommManagerController commManagerControl;
+	
+	
+	public ICisDirectory getCisDirectory() {
+		return cisDirectory;
 	}
 
-	public void setDeviceRegistry(IDeviceRegistry deviceRegistry) {
-		this.deviceRegistry = deviceRegistry;
+	public void setCisDirectory(ICisDirectory cisDirectory) {
+		this.cisDirectory = cisDirectory;
 	}
 
-	@RequestMapping(value = "/deviceregistry.html", method = RequestMethod.GET)
-	public ModelAndView DeviceRegistry() {
+	@RequestMapping(value = "/cisdirectory.html", method = RequestMethod.GET)
+	public ModelAndView CISDirectory() {
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("message", "Please input values and submit");
 		
 		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
-		DeviceRegistryForm drForm = new DeviceRegistryForm();
-		model.put("drForm", drForm);
+		CISDirectoryForm cdForm = new CISDirectoryForm();
+		model.put("cdForm", cdForm);
 		
 		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
 		Map<String, String> methods = new LinkedHashMap<String, String>();
-		methods.put("addDevice", "Add a Device");
-		methods.put("findAllDevices", "Find all Devices");
+		methods.put("GetCisAdverts", "Get CIS Advertisements");
+		methods.put("AddCisRecord", "Add a CIS Advertisement");
 		model.put("methods", methods);
 		
-		return new ModelAndView("deviceregistry", model);
+		model.put("cisdirectoryresult", "CIS Directory Result :");
+		return new ModelAndView("cisdirectory", model);
 	}
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/deviceregistry.html", method = RequestMethod.POST)
-	public ModelAndView DeviceRegistry(@Valid DeviceRegistryForm drForm, 
+	@RequestMapping(value = "/cisdirectory.html", method = RequestMethod.POST)
+	public ModelAndView CISDirectory(@Valid CISDirectoryForm cdForm,
 			BindingResult result, Map model) {
 
 		if (result.hasErrors()) {
-			model.put("errormsg", "Device Registry form error");
+			model.put("result", "CIS Directory form error");
+			return new ModelAndView("cisdirectory", model);
+		}
+
+		if (getCisDirectory() == null) {
+			model.put("errormsg", "CIS Directory reference not avaiable");
 			return new ModelAndView("error", model);
 		}
 
-		if (getdeviceRegistry() == null) {
-			model.put("errormsg", "Device Registry reference not avaiable");
-			return new ModelAndView("error", model);
-		}
+		
+		String method = cdForm.getMethod();
+		Future<List<CisAdvertisementRecord>> asynchResult = null;
+		//CisAdvertisementRecord record = null;
 
-		String method = drForm.getMethod();
-		Future<Collection<DeviceCommonInfo>> asynchResult = null;
-		Collection<DeviceCommonInfo> devices =  new ArrayList<DeviceCommonInfo>();
+		List<CisAdvertisementRecord> adverts =  new ArrayList<CisAdvertisementRecord>();
+		
 		String res = null;
+		
 		try {
 		
-			if (method.equalsIgnoreCase("addDevice")) {
-				res="Device Added";
-				DeviceCommonInfo deviceInfo = new DeviceCommonInfo(
-						drForm.getDeviceFamilyIdentity(),
-						drForm.getDeviceName(), 
-						drForm.getDeviceType(),
-						drForm.getDeviceDescription(), 
-						drForm.getDeviceConnectionType(),
-						drForm.getDeviceLocation(), 
-						drForm.getDeviceProvider(), 
-						drForm.getDeviceID(),
-						drForm.isContextSource() );
-				String cssNodeId = drForm.getCssNodeId();
-				res = deviceRegistry.addDevice(deviceInfo, cssNodeId);
+			if (method.equalsIgnoreCase("GetCisAdverts")) {
+				asynchResult = this.getCisDirectory().findAllCisAdvertisementRecords();
+				res="CIS Directory Result ";
 				
-			}else if (method.equalsIgnoreCase("findAllDevices")) {
+				adverts = asynchResult.get();
+				model.put("result", res);
+				model.put("adverts", adverts);
 				
-				//Collection<DeviceCommonInfo> devices = deviceRegistry.findAllDevices();
-				devices = this.getdeviceRegistry().findAllDevices();
-				model.put("devices", devices);
+			}else if (method.equalsIgnoreCase("AddCisRecord")) {
+				
+				res="CIS Advertisement added Successfully ";
+				model.put("result", res);
+				
+				
+				CisAdvertisementRecord record= new CisAdvertisementRecord();
+				
+					record.setName(cdForm.getName()); 
+					record.setUri(cdForm.getUri());
+					record.setType(cdForm.getType());
+					record.setId(cdForm.getId());
+					record.setMode(cdForm.getMode());
+					record.setPassword(cdForm.getPassword());
+					
+				getCisDirectory().addCisAdvertisementRecord(record);
+				model.put("message", "CisAdvertisement added");
+									
+				//adverts = (List<CisAdvertisementRecord>) record;				
+				
+				model.put("adverts", adverts);
 					
 			}else{
-				res="error unknown method";
+				res="error unknown metod";
 			}
 		
 			model.put("result", res);
 			
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
-			res = "Oops!!!! <br/>";
+			res = "Oops!!!!<br/>";
 		};
-		return new ModelAndView("deviceregistryresult", model);
+		
+		
+		return new ModelAndView("cisdirectoryresult", model);
 	}
+
 }

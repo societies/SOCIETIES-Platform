@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Device Registry Result</title>
+<title>Societies CIS Directory Result</title>
 </head>
 <body>
 	<!-- HEADER -->
@@ -22,19 +22,20 @@
 <br/>
 <br/>
 <Table>
-<tr><td><B>Name</B></td><td><B>Description</B></td><td><B>Type</B></td><td><B>Device ID</B></td><td><B>Context Source</B></td></tr> 
+<tr><td><B>CIS Name</B></td><td><B>Uri</B></td><td><B>Type</B></td><td><B>ID</B></td><td><B>Password</B></td><td><B>Mode</B></td></tr> 
 
-	<xc:forEach var="device" items="${devices}">
+	<xc:forEach var="advert" items="${adverts}">
         <tr>
-        	<td>${device.deviceName}</td>
-         	<td>${device.deviceDescription}</td>
-            <td>${device.deviceType}</td>
-            <td>${device.deviceID}</td>
-            <td>${device.contextSource}</td>
+        	<td>${advert.name}</td>
+         	<td>${advert.uri}</td>
+            <td>${advert.type}</td>
+            <td>${advert.id}</td> 
+            <td>${advert.password}</td>
+            <td>${advert.mode}</td>           
         </tr>
     </xc:forEach>
     	
-	</Table>
+	</table>
 	
 <!-- .................END PLACE YOUR CONTENT ................ -->
 	<!-- FOOTER -->

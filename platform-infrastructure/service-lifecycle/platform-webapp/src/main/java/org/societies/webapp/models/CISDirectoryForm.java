@@ -22,30 +22,80 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.directory;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+package org.societies.webapp.models;
 
-/**
- * @author Babak.Farshchian@sintef.no
- *
- */
-/**
- * 
- * MISSING_JAVADOCS
- */
-@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface ICisAdvertisementRecord {
-	public String getName();
-	public void setName(String name);
-	public String getId();
-	public String getUri();
-	public void setUri(String uri);
-	public String getPassword();
-	public String setPassword(String password);
-	public String getType();
-	public String setType(String type);
-	public String getMode();
-	public String setMode(int mode);
+public class CISDirectoryForm {
+	
+	private String method; 
+	
+	private String name;
+	private String uri; 
+	private String type;
+	private String id;
+	private String password;
+	private int mode;
+
+	
+	//name
+	//ID
+	//uri
+	//password
+	//type
+	//mode1
+	
+	
+	public String getMethod() {
+		return method;
+	}
+	public void setMethod(String method) {
+		this.method = method;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getUri() {
+		return uri;
+	}
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+	
+	public String getType() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public int getMode() {
+		return mode;
+	}
+	
+	public void setMode(int mode) {
+		this.mode = mode;
+	}
+
 }

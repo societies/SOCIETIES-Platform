@@ -10,9 +10,10 @@
        in a separate file if you do not want to. The rationale for 
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
-       
+	
+	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
+
+	<osgi:service ref="CssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote" />
 	<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />
-	<osgi:reference id="CssDirectory" interface="org.societies.api.css.directory.ICssDirectory" />
-	<osgi:reference id="CisDirectory" interface="org.societies.api.cis.directory.ICisDirectory" />
 	
 </beans>
