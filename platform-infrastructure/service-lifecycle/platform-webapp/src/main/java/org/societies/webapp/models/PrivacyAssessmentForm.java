@@ -33,8 +33,7 @@ package org.societies.webapp.models;
 public class PrivacyAssessmentForm {
 
 	private String method;
-	private String sender;
-	private double corrByAll; 
+	private int autoReassessmentInSecs; 
 
 	/**
 	 * @return the method
@@ -51,30 +50,16 @@ public class PrivacyAssessmentForm {
 	}
 	
 	/**
-	 * @return the sender
+	 * @return the autoReassessmentInSecs
 	 */
-	public String getSender() {
-		return sender;
+	public int getAutoReassessmentInSecs() {
+		return autoReassessmentInSecs;
 	}
 
 	/**
-	 * @param sender the sender to set
+	 * @param autoReassessmentInSecs the autoReassessmentInSecs to set
 	 */
-	public void setSender(String sender) {
-		this.sender = sender;
-	}
-	
-	/**
-	 * @return the corrByAll
-	 */
-	public double getCorrByAll() {
-		return corrByAll;
-	}
-	
-	/**
-	 * @param corrByAll the corrByAll to set
-	 */
-	public void setCorrByAll(double corrByAll) {
-		this.corrByAll = corrByAll;
+	public void setAutoReassessmentInSecs(int autoReassessmentInSecs) {
+		this.autoReassessmentInSecs = autoReassessmentInSecs;
 	}
 }

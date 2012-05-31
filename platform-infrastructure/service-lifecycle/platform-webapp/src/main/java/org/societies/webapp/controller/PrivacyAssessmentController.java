@@ -67,7 +67,7 @@ public class PrivacyAssessmentController {
 	}
 
 	@RequestMapping(value = "/privacyassessment.html", method = RequestMethod.GET)
-	public ModelAndView Privacyassessment() {
+	public ModelAndView privacyAssessment() {
 
 		LOG.debug("HTTP GET");
 
@@ -84,6 +84,7 @@ public class PrivacyAssessmentController {
 		methods.put("assessAllNow", "Perform assessment for all data transmissions");
 		methods.put("getAssessmentAllIds", "Get a-posteriori assessment for all sender identities");
 		methods.put("getAssessmentAllClasses", "Get a-posteriori assessment for all sender classes");
+		methods.put("setAutoPeriod", "Set time period of automatic re-assessment for all senders");
 		model.put("methods", methods);
 		
 		model.put("privacyassessmentresult", "Privacy Assessment Result :");
@@ -134,6 +135,11 @@ public class PrivacyAssessmentController {
 				assessment.assessAllNow();
 				res="Privacy Assessment Result";
 			}
+			else if (method.equalsIgnoreCase("setAutoPeriod")) {
+				
+				assessment.setAutoPeriod(assForm.getAutoReassessmentInSecs());
+				res="Privacy Assessment Result";
+			}
 			else {
 				res="error unknown metod";
 			}
@@ -142,9 +148,11 @@ public class PrivacyAssessmentController {
 		}
 		catch (Exception ex)
 		{
+			LOG.warn("", ex);
 			res = "Oops!!!! <br/>";
 		};
-		
+
+		LOG.debug("HTTP POST end");
 		return new ModelAndView("privacyassessmentresult", model);
 	}
 }

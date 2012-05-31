@@ -48,10 +48,10 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Sender :</td>
-				<td><form:input path="sender" />
+				<td>Automatic re-assessment period in seconds:</td>
+				<td><form:input path="autoReassessmentInSecs" />
 				</td>
-				<td><form:errors path="sender" cssClass="error" />
+				<td><form:errors path="autoReassessmentInSecs" cssClass="error" />
 				</td>
 			</tr>	
 			<tr>
