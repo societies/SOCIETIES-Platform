@@ -79,4 +79,10 @@ public interface ICAUIPrediction {
 	 */
 	public List<List<String>> getPredictionHistory();
 	
+	/**
+	 * Receives the performed action 
+	 * 
+	 */
+	public void receivePredictionFeedback(IAction action);
+	
 }

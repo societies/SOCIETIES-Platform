@@ -288,6 +288,9 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> ctxHocTuples = ctxBroker
 					.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION,
 							listOfEscortingAttributeIds, null, null).get();
+			if (ctxHocTuples == null || ctxHocTuples.size() == 0) {
+			    return null;
+			   }
 
 			List<CtxHistoryAttribute> primaryHocAttrs = new ArrayList<CtxHistoryAttribute>(ctxHocTuples.keySet());
 			CtxHistoryAttribute primaryHocAttr = primaryHocAttrs.get(primaryHocAttrs.size()-1);//the last one is the current action

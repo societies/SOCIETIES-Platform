@@ -372,8 +372,20 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	@Override
 	public Future<IAction> getPreference(IIdentity ownerID, String serviceType,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
-		Future<List<IDIANNEOutcome>> futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
-		Future<IOutcome> futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+		Future<List<IDIANNEOutcome>> futureDianneOuts;
+		try{
+		futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
+		}catch(Exception e){
+			e.printStackTrace();
+			futureDianneOuts = new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
+		}
+		Future<IOutcome> futurePrefOuts;
+		try{
+		 futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+		}catch(Exception e){
+			e.printStackTrace();
+			 futurePrefOuts = new AsyncResult<IOutcome>(null);
+		}
 		IAction action;
 		try {
 			List<IDIANNEOutcome> dianneOutList = futureDianneOuts.get();
@@ -448,8 +460,20 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	public Future<IAction> getIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
 
-		Future<IUserIntentAction> futureCAUIOuts = this.cauiPrediction.getCurrentIntentAction(ownerID, serviceID, preferenceName);
-		Future<CRISTUserAction> futureCRISTOuts = this.cristPrediction.getCurrentUserIntentAction(ownerID, serviceID, preferenceName);
+		Future<IUserIntentAction> futureCAUIOuts;
+		try{
+			futureCAUIOuts = this.cauiPrediction.getCurrentIntentAction(ownerID, serviceID, preferenceName);
+		}catch(Exception e){
+			e.printStackTrace();
+			futureCAUIOuts = new AsyncResult<IUserIntentAction>(null);
+		}
+		Future<CRISTUserAction> futureCRISTOuts;
+		try{
+		futureCRISTOuts = this.cristPrediction.getCurrentUserIntentAction(ownerID, serviceID, preferenceName);
+		}catch(Exception e){
+			e.printStackTrace();
+			futureCRISTOuts = new AsyncResult<CRISTUserAction>(null);
+		}
 		IAction action;
 
 		try {

@@ -59,6 +59,7 @@
 		name="cristTaskManager" init-method="initialiseCRISTUserIntentManager">
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="cristDiscovery" ref="cristDiscovery"></property>
+		<property name="persoMgr" ref="persoMgr"></property>		
 	</bean>
 
 
