@@ -72,6 +72,7 @@ public class Assessment implements IAssessment {
 	}
 
 	public void init() {
+		LOG.debug("init()");
 		dataTransferAnalyzer = new DataTransferAnalyzer(privacyLog);
 		assessAllNow();
 	}
@@ -84,6 +85,8 @@ public class Assessment implements IAssessment {
 	
 	@Override
 	public void assessAllNow() {
+		
+		LOG.info("assessAllNow()");
 		
 		try {
 			// For each sender identity: calculate result and update value in assessmentById
@@ -104,16 +107,24 @@ public class Assessment implements IAssessment {
 	
 	@Override
 	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds() {
+		
+		LOG.info("getAssessmentAllIds()");
+
 		return assessmentById;
 	}
 	
 	@Override
 	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses() {
+
+		LOG.info("getAssessmentAllClasses()");
+		
 		return assessmentByClass;
 	}
 
 	@Override
 	public AssessmentResultIIdentity getAssessment(IIdentity sender) {
+		
+		LOG.info("getAssessment({})", sender);
 		
 		if (sender == null || sender.getJid() == null) {
 			LOG.warn("getAssessment({}): invalid argument", sender);
@@ -124,7 +135,9 @@ public class Assessment implements IAssessment {
 
 	@Override
 	public AssessmentResultClassName getAssessment(String sender) {
-		
+
+		LOG.info("getAssessment({})", sender);
+
 		if (sender == null) {
 			LOG.warn("getAssessment({}): invalid argument", sender);
 			return null;
@@ -134,11 +147,17 @@ public class Assessment implements IAssessment {
 	
 	@Override
 	public long getNumDataTransmissionEvents() {
+
+		LOG.info("getNumDataTransmissionEvents()");
+		
 		return privacyLog.getDataTransmission().size();
 	}
 	
 	@Override
 	public long getNumDataAccessEvents() {
+
+		LOG.info("getNumDataAccessEvents()");
+		
 		return privacyLog.getDataAccess().size();
 	}
 }

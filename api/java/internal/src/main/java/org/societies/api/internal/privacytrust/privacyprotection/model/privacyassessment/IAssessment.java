@@ -55,7 +55,7 @@ public interface IAssessment {
 	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds();
 	
 	/**
-	 * Get a-posteriori assessment for all sender class names.
+	 * Get a-posteriori assessment for all sender classes.
 	 */
 	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses();
 
