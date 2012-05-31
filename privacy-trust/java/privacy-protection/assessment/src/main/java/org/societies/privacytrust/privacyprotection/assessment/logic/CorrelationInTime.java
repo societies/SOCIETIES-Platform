@@ -54,6 +54,7 @@ public class CorrelationInTime {
 	private final long TIME_SHIFT_DEFAULT = 3000;
 	
 	private double valueAtInf;
+
 	private long timeShift;
 
 	private double normalizationFactor;
@@ -66,6 +67,20 @@ public class CorrelationInTime {
 		valueAtInf = VALUE_AT_INF_DEFAULT;
 		timeShift = TIME_SHIFT_DEFAULT;
 		calculateNormalizationParameters();
+	}
+
+	/**
+	 * @return the valueAtInf
+	 */
+	public double getValueAtInf() {
+		return valueAtInf;
+	}
+
+	/**
+	 * @return the timeShift
+	 */
+	public long getTimeShift() {
+		return timeShift;
 	}
 	
 	/**
