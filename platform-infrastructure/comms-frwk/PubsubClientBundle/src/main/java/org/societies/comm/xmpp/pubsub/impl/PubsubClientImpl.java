@@ -82,9 +82,12 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		subscribers = new HashMap<Subscription, List<Subscriber>>();
 		this.endpoint = endpoint;
 		idm = endpoint.getIdManager();
-		localIdentity = idm.getThisNetworkNode();
-		packagesContextPath = "";
 		try {
+			if (endpoint.isConnected())
+				localIdentity = idm.getThisNetworkNode();
+			else
+				throw new CommunicationException("Injected endpoint is not connected!");
+			packagesContextPath = "";
 			JAXBContext jc = JAXBContext.newInstance();
 			contentUnmarshaller = jc.createUnmarshaller();
 			contentMarshaller = jc.createMarshaller();

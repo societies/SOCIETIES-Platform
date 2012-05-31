@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin>
+    <class>org.societies.da.openfire.plugin.SocietiesPlugin</class>
+    <name>SOCIETIES</name>
+    <description>SOCIETIES Plugin</description>
+    <author>SOCIETIES Project</author>
+    <version>0.1</version>
+    <date>24/05/2012</date>
+    <minServerVersion>3.7.0</minServerVersion>
+    
+    <adminconsole>		
+        <tab id="tab-server">
+            <sidebar id="sidebar-server-settings">
+                <item id="societies" name="SOCIETIES" url="societies.jsp"
+                     description="Click to manage the SOCIETIES plugin" />
+            </sidebar>
+        </tab>
+    </adminconsole>
+
+</plugin>
