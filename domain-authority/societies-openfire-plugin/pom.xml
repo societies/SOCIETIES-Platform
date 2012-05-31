@@ -55,4 +55,19 @@
       </plugin>
     </plugins>
   </build>
+  
+  <pluginRepositories>
+		<pluginRepository>
+			<id>maven-repo</id>
+			<name>maven repo</name>
+			<url>http://repo1.maven.org/maven2/</url>
+		</pluginRepository>
+
+		<!-- Societies repo -->
+		<pluginRepository>
+			<id>societies</id>
+			<name>Societies Maven Repository</name>
+			<url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
