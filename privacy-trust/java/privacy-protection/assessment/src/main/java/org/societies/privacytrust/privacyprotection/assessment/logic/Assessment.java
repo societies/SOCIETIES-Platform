@@ -36,6 +36,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
 /**
+ * A wrapper around {@link DataTransferAnalyzer}
+ * 
  * Parses the log and tries to find potential privacy breaches that occurred in the past.
  * This can be used for the a-posteriori assessment.
  * 
