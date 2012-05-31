@@ -27,8 +27,8 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinatesWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.NameWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
+import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.LocationCoordinatesObfuscator;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.NameObfuscator;
@@ -38,6 +38,11 @@ import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.N
  * @author Olivier Maridat (Trialog)
  */
 public class DataObfuscationManager implements IDataObfuscationManager {
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double)
+	 */
 	@Override
 	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
 		// TODO : populate this stub function
@@ -80,6 +85,10 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 		return obfuscatedDataWrapper;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double)
+	 */
 	@Override
 	public String hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
 		// TODO : populate this stub function
@@ -95,13 +104,19 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 		return dataWrapper.getDataId();
 	}
 
-	private IDataObfuscator getDataObfuscator(IDataWrapper data) throws PrivacyException {
+	/**
+	 * Retrieve the relevant obfuscator
+	 * @param dataWrapper
+	 * @return
+	 * @throws PrivacyException
+	 */
+	private IDataObfuscator getDataObfuscator(IDataWrapper dataWrapper) throws PrivacyException {
 		IDataObfuscator obfuscator = null;
-		if (data instanceof LocationCoordinatesWrapper) {
-			obfuscator = new LocationCoordinatesObfuscator((LocationCoordinatesWrapper) data);
+		if (dataWrapper.getData() instanceof LocationCoordinates) {
+			obfuscator = new LocationCoordinatesObfuscator((IDataWrapper<LocationCoordinates>) dataWrapper);
 		}
-		else if (data instanceof NameWrapper) {
-			obfuscator = new NameObfuscator((NameWrapper) data);
+		else if (dataWrapper.getData() instanceof Name) {
+			obfuscator = new NameObfuscator((IDataWrapper<Name>) dataWrapper);
 		}
 		else {
 			throw new PrivacyException("Obfuscation aborted: no known obfuscator for this type of data");

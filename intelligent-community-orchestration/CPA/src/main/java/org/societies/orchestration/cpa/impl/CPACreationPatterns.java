@@ -45,10 +45,14 @@ public class CPACreationPatterns
 {
 	public List<ICisProposal> analyze(List<ICis> cises){
 		ArrayList<ICisProposal> ret = new ArrayList<ICisProposal>();
+		//1. make a graph of interactions, the weight on the links indicates level of interaction, 0 is none. 
+		//2. segment the graph nodes according to weights. suggest
 		return ret;
 		
 	}
-	private double cooperation(ICisParticipant member){
-		return Math.random();
+	public double cooperation(ICisParticipant member1,ICisParticipant member2){
+		return 0;
 	}
+	public void init(){}
+	public CPACreationPatterns(){}
 }

@@ -26,15 +26,21 @@ package org.societies.security.policynegotiator.requester;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.InternalEvent;
 
 /**
  * 
  * @author Mitja Vardjan
  *
  */
-public class PrivacyPolicyNegotiationListener {
+public class PrivacyPolicyNegotiationListener extends EventListener {
 
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyNegotiationListener.class);
 	
@@ -54,15 +60,53 @@ public class PrivacyPolicyNegotiationListener {
 		this.slaKey = slaKey;
 	}
 	
-	public void onEvent() {
+	@Override
+	public void handleInternalEvent(InternalEvent event) {
+
+		String type = event.geteventType();
 		
+		LOG.info("Internal event received: {}", type);    
+		LOG.debug("*** event name : " + event.geteventName());
+		LOG.debug("*** event source : " + event.geteventSource());
+		PPNegotiationEvent payload = (PPNegotiationEvent) event.geteventInfo();
+		NegotiationStatus status = payload.getNegotiationStatus();
+		LOG.debug("negotiation status : " + status);
+
+		if (type.equals(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT)) {
+			if (status == NegotiationStatus.SUCCESSFUL) {
+				notifySuccess();
+			}
+			else if (status == NegotiationStatus.FAILED) {
+				notifyFailure();
+			}
+		}
+		else if (type.equals(EventTypes.FAILED_NEGOTIATION_EVENT)) {
+			notifyFailure();
+		}
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
+	 */
+	@Override
+	public void handleExternalEvent(CSSEvent event) {
+		LOG.warn("External event received unexpectedly: {}", event.geteventType());    
+	}
+	
+	private void notifySuccess() {
 		if (finalCallback != null) {
-			LOG.debug("receiveResult(): invoking final callback");
+			LOG.debug("invoking final callback");
 			finalCallback.onNegotiationComplete(slaKey);
-			LOG.info("receiveResult(): negotiation finished, final callback invoked");
+			LOG.info("negotiation finished, final callback invoked");
 		}
 		else {
-			LOG.info("receiveResult(): negotiation finished");
+			LOG.info("negotiation finished, but final callback is null");
 		}
+	}
+	
+	private void notifyFailure() {
+		LOG.warn("Privacy policy negotiation failed");
+		finalCallback.onNegotiationError("");
 	}
 }

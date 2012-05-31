@@ -67,8 +67,9 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	}
 
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.identity.IIdentity)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.identity.Requestor)
 	 */
 	@Override
 	public RequestPolicy getPrivacyPolicy(Requestor requestor)
@@ -87,7 +88,8 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return privacyPolicy;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
 	 */
 	@Override
@@ -96,6 +98,9 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		// -- Verify
 		if (null == privacyPolicy) {
 			throw new PrivacyException("The privacy policy to update is empty.");
+		}
+		if (null == policyRegistryManager) {
+			throw new PrivacyException("The privacy policy registry is not ready");
 		}
 		if (null == privacyPolicy.getRequestor() || null == privacyPolicy.getRequestor().getRequestorId()) {
 			throw new PrivacyException("Not enought information to update a privacy policy. Requestor needed.");
@@ -110,8 +115,9 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return privacyPolicy;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#deletePrivacyPolicy(org.societies.api.identity.IIdentity)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#deletePrivacyPolicy(org.societies.api.identity.Requestor)
 	 */
 	@Override
 	public boolean deletePrivacyPolicy(Requestor requestor) throws PrivacyException {
@@ -143,7 +149,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	/*
 	 * Try to infer a privacy policy a configuration map
 	 * At the moment it only returns an empty privacy policy
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#inferPrivacyPolicy(int, java.util.Map)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#inferPrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants, java.util.Map)
 	 */
 	@Override
 	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType,

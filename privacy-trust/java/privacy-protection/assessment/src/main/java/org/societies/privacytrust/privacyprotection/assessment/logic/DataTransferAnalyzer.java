@@ -24,7 +24,6 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -115,13 +114,16 @@ public class DataTransferAnalyzer {
 		result.setCorrWithDataAccessByAll(corrByAll);
 		result.setCorrWithDataAccessBySender(corrBySender);
 		result.setNumAllPackets(matchedTransmissions.size());
-		if (matchedTransmissions.size() > 0) {
+		if (matchedTransmissions.size() < 1) {
 			result.setNumPacketsPerMonth(0);
 		}
 		else {
-			long timePeriodInMs;
-			timePeriodInMs = new Date().getTime() - matchedTransmissions.get(0).getTimeInMs();
-			result.setNumPacketsPerMonth((double) matchedTransmissions.size() / timePeriodInMs);
+			long timePeriod;
+			// Calculate time period in ms
+			timePeriod = new Date().getTime() - matchedTransmissions.get(0).getTimeInMs();
+			// Convert time period to months
+			timePeriod /= 1e3 * 3600 * 24 * 30.5;
+			result.setNumPacketsPerMonth((double) matchedTransmissions.size() / timePeriod);
 		}
 	}
 }

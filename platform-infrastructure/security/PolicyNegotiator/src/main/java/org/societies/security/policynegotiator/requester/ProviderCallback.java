@@ -37,6 +37,7 @@ import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
+import org.societies.api.osgi.event.EventTypes;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.xml.Xml;
 import org.societies.security.policynegotiator.xml.XmlException;
@@ -127,16 +128,12 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					LOG.debug("receiveResult(): session = {}, final SLA: {}", sessionId, sla);
 					
 					// Store the SLA into secure storage
-					String key = generateKey();
-					requester.getSecureStorage().putDocument(key, sla.getBytes());
-
-					PrivacyPolicyNegotiationListener listener;
-					listener = new PrivacyPolicyNegotiationListener(finalCallback, key);
-					// TODO: subscribe the listener for appropriate event
+					String agreementKey = generateKey();
+					requester.getSecureStorage().putDocument(agreementKey, sla.getBytes());
 					
 					if (includePrivacyPolicyNegotiation) {
-						if (requester.isPrivacyPolicyNegotiationManagerAvailable()) {
-							startPrivacyPolicyNegotiation(provider);
+						if (requester.isPrivacyPolicyNegotiationMgrAvailable()) {
+							startPrivacyPolicyNegotiation(provider, agreementKey);
 						}
 						else {
 							LOG.warn("Privacy Policy Negotiation Manager not available");
@@ -145,7 +142,9 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					}
 					else {
 						// Notify successful end of negotiation
-						listener.onEvent();
+						LOG.debug("invoking final callback");
+						finalCallback.onNegotiationComplete(agreementKey);
+						LOG.info("negotiation finished, final callback invoked");
 					}
 				}
 				else {
@@ -161,9 +160,18 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		}
 	}
 	
-	private void startPrivacyPolicyNegotiation(Requestor provider) {
+	private void startPrivacyPolicyNegotiation(Requestor provider, String agreementKey) {
 
 		IPrivacyPolicyNegotiationManager ppn = requester.getPrivacyPolicyNegotiationManager();
+		PrivacyPolicyNegotiationListener listener;
+
+		listener = new PrivacyPolicyNegotiationListener(finalCallback, agreementKey);
+		
+		String[] eventTypes = new String[] {
+				EventTypes.FAILED_NEGOTIATION_EVENT,
+				EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}; 
+		
+		requester.getEventMgr().subscribeInternalEvent(listener, eventTypes, null);
 		
 		if (provider instanceof RequestorService) {
 			RequestorService providerService = (RequestorService) provider;

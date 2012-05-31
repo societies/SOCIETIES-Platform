@@ -30,6 +30,7 @@
 			<xs:element name="location" type="xs:string" minOccurs="0"/>
 			<xs:element name="provider" type="xs:string" minOccurs="0"/>
 			<xs:element name="contextSource" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="senderNetworkNode" type="xs:string" minOccurs="0"/>
 	    </xs:sequence>
   	</xs:complexType>
 

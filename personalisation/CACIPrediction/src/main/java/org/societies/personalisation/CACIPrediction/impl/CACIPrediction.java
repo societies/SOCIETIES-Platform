@@ -79,4 +79,10 @@ public class CACIPrediction implements ICAUIPrediction{
 		return null;
 	}
 
+	@Override
+	public void receivePredictionFeedback(IAction action) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

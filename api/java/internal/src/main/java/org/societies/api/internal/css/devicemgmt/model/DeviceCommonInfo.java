@@ -42,7 +42,7 @@ public class DeviceCommonInfo {
 	private String deviceProvider;
 	private String deviceID;
 	private boolean contextSource;
-	
+	private String devicePhysicalAddress;
 	
 	public DeviceCommonInfo() {
 		super();
@@ -143,7 +143,14 @@ public class DeviceCommonInfo {
 		this.contextSource = contextSource;
 	}
 	
-	
+	public String getDevicePhysicalAddress() {
+		return devicePhysicalAddress;
+	}
+
+	public void setDevicePhysicalAddress(String devicePhysicalAddress) {
+		this.devicePhysicalAddress = devicePhysicalAddress;
+	}
+
 	@Override
 	public String toString() {
 		return "DeviceCommonInfo [deviceFamilyIdentity=" + deviceFamilyIdentity

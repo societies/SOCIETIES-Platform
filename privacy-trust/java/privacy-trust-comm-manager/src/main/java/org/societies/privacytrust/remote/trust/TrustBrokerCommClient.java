@@ -35,6 +35,10 @@ import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote;
 import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
+import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
+import org.societies.api.internal.schema.privacytrust.trust.broker.MethodName;
+import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
+import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.privacytrust.remote.PrivacyTrustCommClientCallback;
 
 /**
@@ -53,7 +57,7 @@ public class TrustBrokerCommClient implements ITrustBrokerRemote {
 	
 	private TrustBrokerCommClientCallback trustBrokerCommClientCallback;
 
-	public TrustBrokerCommClient() {
+	TrustBrokerCommClient() {
 		
 		LOG.info(this.getClass() + " instantiated");
 	}
@@ -70,38 +74,40 @@ public class TrustBrokerCommClient implements ITrustBrokerRemote {
 		if (callback == null)
 			throw new NullPointerException("callback can't be null");
 		
-		if (LOG.isInfoEnabled()) // TODO change to DEBUG 
-			LOG.info("Retrieving trust for entity " + teid);
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Retrieving trust value for entity " + teid);
 		
 		try {
 			final IIdentity toIdentity = 
-					this.commManager.getIdManager().fromJid(teid.getTrustorId());
+					this.commManager.getIdManager().fromJid(teid.getTrustorId()); 
 			final Stanza stanza = new Stanza(toIdentity);
+			// TODO uncomment for testing only (1)
+			//final Stanza stanza = new Stanza(this.commManager.getIdManager().getThisNetworkNode());
 			this.trustBrokerCommClientCallback.addClient(stanza.getId(), callback);
-			// TODO
+			
+			final RetrieveTrustBrokerRequestBean retrieveBean = new RetrieveTrustBrokerRequestBean();
+			retrieveBean.setTeid(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
+			// TODO uncomment for testing only (2)
+			//retrieveBean.getTeid().setTrustorId(this.commManager.getIdManager().getThisNetworkNode().toString());
+			
+			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+			requestBean.setMethodName(MethodName.RETRIEVE);
+			requestBean.setRetrieve(retrieveBean);
+			
+			this.commManager.sendIQGet(stanza, requestBean, this.privacyTrustCommClientCallback);
+			
 		} catch (InvalidFormatException ife) {
 			
-			LOG.error("Could not retrieve trust for entity " + teid
+			throw new TrustBrokerCommException("Could not retrieve trust for entity " + teid
 					+ ": Invalid trustorId IIdentity: " 
 					+ ife.getLocalizedMessage(), ife);
+		} catch (CommunicationException ce) {
+			
+			throw new TrustBrokerCommException("Could not retrieve trust for entity " + teid
+					+ ": " + ce.getLocalizedMessage(), ce);
 		}
 	}
-	
-	/*
-		PrivacyDataManagerBean bean = new PrivacyDataManagerBean();
-		bean.setMethod(MethodType.CHECK_PERMISSION);
-		bean.setRequestor(Util.createRequestorBean(requestor));
-		bean.setOwnerId(ownerId.getJid());
-		bean.setDataId(dataId.toUriString());
-		bean.setAction(ActionUtils.toActionBean(action));
-		try {
-			this.commManager.sendIQGet(stanza, bean, privacyTrustCommClientCallback);
-		} catch (CommunicationException e) {
-			LOG.error("CommunicationException: "+MethodType.CHECK_PERMISSION, e);
-			throw new PrivacyException("CommunicationException: "+MethodType.CHECK_PERMISSION, e);
-		}
-		LOG.info("#### checkPermission remote sent");
-	}*/
 	
 	public void setCommManager(ICommManager commManager) {
 		

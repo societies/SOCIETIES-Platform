@@ -35,6 +35,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.security.digsig.ISignatureMgr;
 
@@ -47,8 +48,9 @@ public class NegotiationRequester implements INegotiation {
 	private ISecureStorage secureStorage;
 	private INegotiationProviderRemote groupMgr;
 	private IPersonalisationManager personalizationMgr;
-	private IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager;
-	private boolean isPrivacyPolicyNegotiationManagerAvailable = false;
+	private IPrivacyPolicyNegotiationManager privacyPolicyNegotiationMgr;
+	private boolean isPrivacyPolicyNegotiationMgrAvailable = false;
+	private IEventMgr eventMgr;
 	
 //	@Autowired
 //	public NegotiationRequester(ISignatureMgr signatureMgr) {
@@ -105,15 +107,21 @@ public class NegotiationRequester implements INegotiation {
 		this.personalizationMgr = personalizationMgr;
 	}
 	public IPrivacyPolicyNegotiationManager getPrivacyPolicyNegotiationManager() {
-		return privacyPolicyNegotiationManager;
+		return privacyPolicyNegotiationMgr;
 	}
-	public void setPrivacyPolicyNegotiationManager(IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager) {
-		this.privacyPolicyNegotiationManager = privacyPolicyNegotiationManager;
-		this.isPrivacyPolicyNegotiationManagerAvailable = true;
+	public void setPrivacyPolicyNegotiationManager(IPrivacyPolicyNegotiationManager privacyPolicyNegotiationMgr) {
+		this.privacyPolicyNegotiationMgr = privacyPolicyNegotiationMgr;
+		this.isPrivacyPolicyNegotiationMgrAvailable = true;
+	}
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
 	}
 	
-	public boolean isPrivacyPolicyNegotiationManagerAvailable() {
-		return isPrivacyPolicyNegotiationManagerAvailable;
+	public boolean isPrivacyPolicyNegotiationMgrAvailable() {
+		return isPrivacyPolicyNegotiationMgrAvailable;
 	}
 
 	@Override

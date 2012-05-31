@@ -30,7 +30,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Temperature;
 
 /**
- * Obfuscator for name
+ * Obfuscator for temprature
  *
  * @author Olivier Maridat (Trialog)
  *
@@ -47,7 +47,8 @@ public class TemperatureObfuscator extends DataObfuscator<IDataWrapper<Temperatu
 	}
 
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
 	@Override

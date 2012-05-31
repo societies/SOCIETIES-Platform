@@ -79,8 +79,10 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	private Boolean enablePrediction = true;  
 	private String [] lastActions = null;
+	
 	int predictionRequestsCounter = 0;
-
+	int discoveryThreshold = 10;
+	
 	public IIdentity identity = null;
 	public CtxAttributeIdentifier locationAttrId;
 	public CtxAttributeIdentifier statusAttrId;
@@ -122,49 +124,49 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 
 	public ICAUIDiscovery getCauiDiscovery() {
-		System.out.println(this.getClass().getName()+": Return cauiDiscovery");
+		LOG.info(this.getClass().getName()+": Return cauiDiscovery");
 		return cauiDiscovery;
 	}
 
 
 	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
-		System.out.println(this.getClass().getName()+": Got cauiDiscovery");
+		LOG.info(this.getClass().getName()+": Got cauiDiscovery");
 		this.cauiDiscovery = cauiDiscovery;
 	}
 
 
 	public ICtxBroker getCtxBroker() {
-		System.out.println(this.getClass().getName()+": Return ctxBroker");
+		LOG.info(this.getClass().getName()+": Return ctxBroker");
 		return ctxBroker;
 	}
 
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		System.out.println(this.getClass().getName()+": Got ctxBroker");
+		LOG.info(this.getClass().getName()+": Got ctxBroker");
 		this.ctxBroker = ctxBroker;
 	}
 
 
 	public IInternalPersonalisationManager getPersoMgr() {
-		System.out.println(this.getClass().getName()+": Return persoMgr");
+		LOG.info(this.getClass().getName()+": Return persoMgr");
 		return persoMgr;
 	}
 
 
 	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
-		System.out.println(this.getClass().getName()+": Got persoMgr");
+		LOG.info(this.getClass().getName()+": Got persoMgr");
 		this.persoMgr = persoMgr;
 	}
 
 
 	public ICAUITaskManager getCauiTaskManager() {
-		System.out.println(this.getClass().getName()+": Return cauiTaskManager");
+		LOG.info(this.getClass().getName()+": Return cauiTaskManager");
 		return cauiTaskManager;
 	}
 
 
 	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
-		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
+		LOG.info(this.getClass().getName()+": Got cauiTaskManager");
 		this.cauiTaskManager = cauiTaskManager;
 	}
 
@@ -200,8 +202,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 		// initiate caui model discovery
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 		if(modelExist == false && enablePrediction == true && cauiDiscovery != null){
-			LOG.info("no model predictionRequestsCounter:" +predictionRequestsCounter);
-			if(predictionRequestsCounter >= 8){
+			LOG.info("no model exists, predictionRequestsCounter:" +predictionRequestsCounter);
+			if(predictionRequestsCounter >= discoveryThreshold){
 				LOG.info("this.cauiDiscovery.generateNewUserModel()");
 				this.cauiDiscovery.generateNewUserModel();	
 				predictionRequestsCounter = 0;
@@ -211,7 +213,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		if(modelExist == true && enablePrediction == true){
 			//LOG.info("1. model exists " +modelExist);
-			LOG.info("START PREDICTION caui modelExist "+modelExist);
+			LOG.debug("START PREDICTION caui modelExist "+modelExist);
 			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
 			//setActiveModel(requestor);
 			String par = action.getparameterName();
@@ -219,9 +221,10 @@ public class CAUIPrediction implements ICAUIPrediction{
 			//	LOG.info("2. action perf par:"+ par+" action val:"+val);
 			// add code here for retrieving current context;
 			HashMap<String,Serializable> currentContext = new HashMap<String,Serializable>();
-			// add current context retrieval code
+			
 
 			//Map<IUserIntentAction, IUserIntentTask> currentActionTask = cauiTaskManager.identifyActionTaskInModel(par, val, currentContext, this.lastActions);
+			// identify performed action in model
 			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
 			//	LOG.info("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 			if(actionsList.size()>0){
@@ -235,7 +238,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 						nextAction.setConfidenceLevel(doubleConf.intValue());
 						//		LOG.info("6. nextActionsMap " +nextAction);
 						results.add(nextAction);
-						LOG.info(" ****** prediction map created "+ results);
+						LOG.debug(" ****** prediction map created "+ results);
 					}
 				}			
 			}
@@ -249,15 +252,15 @@ public class CAUIPrediction implements ICAUIPrediction{
 	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String userActionType) {
 
-		LOG.info("getCurrentIntentAction "+predictionRequestsCounter+" serviceID"+ serviceID+" identity requestor"+ownerID+" userActionType"+userActionType);
+		LOG.debug("getCurrentIntentAction "+predictionRequestsCounter+" serviceID"+ serviceID+" identity requestor"+ownerID+" userActionType"+userActionType);
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		IUserIntentAction action = null;
 
 		// initiate caui model discovery
 		if(modelExist == false && enablePrediction == true && cauiDiscovery != null){
-			LOG.info("no model predictionRequestsCounter:" +predictionRequestsCounter);
-			if(predictionRequestsCounter >= 8){
-				LOG.info("this.cauiDiscovery.generateNewUserModel()");
+			LOG.debug("no model predictionRequestsCounter:" +predictionRequestsCounter);
+			if(predictionRequestsCounter >= discoveryThreshold){
+				LOG.debug("this.cauiDiscovery.generateNewUserModel()");
 				this.cauiDiscovery.generateNewUserModel();	
 				predictionRequestsCounter = 0;
 				//time wait for new model generation
@@ -299,7 +302,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		if(modelExist == false && enablePrediction == true && cauiDiscovery != null){
 			LOG.info("no model predictionRequestsCounter:" +predictionRequestsCounter);
-			if(predictionRequestsCounter >= 8){
+			if(predictionRequestsCounter >= discoveryThreshold){
 				LOG.info("this.cauiDiscovery.generateNewUserModel()");
 				this.cauiDiscovery.generateNewUserModel();	
 				predictionRequestsCounter = 0;
@@ -467,5 +470,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 		public void onRemoval(CtxChangeEvent event) {
 			// TODO Auto-generated method stub
 		}
+	}
+
+
+
+	@Override
+	public void receivePredictionFeedback(IAction action) {
+		// TODO Auto-generated method stub
+		
 	}
 }
