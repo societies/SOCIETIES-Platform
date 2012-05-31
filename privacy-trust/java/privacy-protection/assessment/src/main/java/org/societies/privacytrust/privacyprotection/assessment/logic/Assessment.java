@@ -24,8 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +52,8 @@ public class Assessment implements IAssessment {
 	private PrivacyLog privacyLog;
 	private DataTransferAnalyzer dataTransferAnalyzer;
 	
-	private List<AssessmentResultIIdentity> assessmentById = new ArrayList<AssessmentResultIIdentity>();
-	private List<AssessmentResultClassName> assessmentByClass = new ArrayList<AssessmentResultClassName>();
+	private HashMap<IIdentity, AssessmentResultIIdentity> assessmentById = new HashMap<IIdentity, AssessmentResultIIdentity>();
+	private HashMap<String, AssessmentResultClassName> assessmentByClass = new HashMap<String, AssessmentResultClassName>();
 	
 	public Assessment() {
 		LOG.info("Constructor");
@@ -83,14 +82,17 @@ public class Assessment implements IAssessment {
 	
 	@Override
 	public void assessAllNow() {
+		
 		try {
+			// For each sender identity: calculate result and update value in assessmentById
 			for (IIdentity sender : privacyLog.getSenderIds()) {
 				AssessmentResultIIdentity ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
-				assessmentById.add(ass);
+				assessmentById.put(sender, ass);
 			}
+			// For each sender class: calculate result and update value in assessmentByClass
 			for (String sender : privacyLog.getSenderClassNames()) {
 				AssessmentResultClassName ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
-				assessmentByClass.add(ass);
+				assessmentByClass.put(sender, ass);
 			}
 		}
 		catch (AssessmentException e) {
@@ -99,12 +101,12 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public List<AssessmentResultIIdentity> getAssessmentAllIds() {
+	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds() {
 		return assessmentById;
 	}
 	
 	@Override
-	public List<AssessmentResultClassName> getAssessmentAllClasses() {
+	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses() {
 		return assessmentByClass;
 	}
 
@@ -115,13 +117,7 @@ public class Assessment implements IAssessment {
 			LOG.warn("getAssessment({}): invalid argument", sender);
 			return null;
 		}
-		
-		for (AssessmentResultIIdentity ass : assessmentById) {
-			if (ass.getSender().getJid().equals(sender.getJid())) {
-				return ass;
-			}
-		}
-		return null;
+		return assessmentById.get(sender);
 	}
 
 	@Override
@@ -131,13 +127,7 @@ public class Assessment implements IAssessment {
 			LOG.warn("getAssessment({}): invalid argument", sender);
 			return null;
 		}
-		
-		for (AssessmentResultClassName ass : assessmentByClass) {
-			if (ass.getSender().equals(sender)) {
-				return ass;
-			}
-		}
-		return null;
+		return assessmentByClass.get(sender);
 	}
 	
 	@Override

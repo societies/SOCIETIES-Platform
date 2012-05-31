@@ -51,33 +51,33 @@ import org.societies.privacytrust.privacyprotection.assessment.logic.DataTransfe
  */
 public class DataTransferAnalyzerTest {
 
-	PrivacyLog privacyLog;
-	DataTransferAnalyzer dataTransferAnalyzer;
+	private PrivacyLog privacyLog;
+	private DataTransferAnalyzer dataTransferAnalyzer;
 
-	Date time1 = new Date(1000000);
-	Date time2 = new Date(2000000);
-	Date time3 = new Date(3000000);
-	Date time4 = new Date(4000000);
-	Date time5 = new Date(5000000);
-	Date time6 = new Date(6000000);
-	Date time7 = new Date(7000000);
-	Date time8 = new Date(8000000);
-	Date time9 = new Date(9000000);
+	private Date time1 = new Date(1000000);
+	private Date time2 = new Date(2000000);
+	private Date time3 = new Date(3000000);
+	private Date time4 = new Date(4000000);
+	private Date time5 = new Date(5000000);
+	private Date time6 = new Date(6000000);
+	private Date time7 = new Date(7000000);
+	private Date time8 = new Date(8000000);
+	private Date time9 = new Date(9000000);
 	
-	IIdentity id1 = new IdentityImpl(IdentityType.CSS_RICH, "identifier1", "domain1");
-	IIdentity id2 = new IdentityImpl(IdentityType.CSS_LIGHT, "identifier2", "domain1");
-	IIdentity id3 = new IdentityImpl(IdentityType.CSS, "identifier3", "domain1");
-	IIdentity id4 = new IdentityImpl(IdentityType.CIS, "identifier4", "domain2");
+	private IIdentity id1 = new IdentityImpl(IdentityType.CSS_RICH, "identifier1", "domain1");
+	private IIdentity id2 = new IdentityImpl(IdentityType.CSS_LIGHT, "identifier2", "domain1");
+	private IIdentity id3 = new IdentityImpl(IdentityType.CSS, "identifier3", "domain1");
+	private IIdentity id4 = new IdentityImpl(IdentityType.CIS, "identifier4", "domain2");
 	
-	String class1 = "class1";
-	String class2 = "class2";
-	String class3 = "class3";
-	String class4 = "class4";
+	private String class1 = "class1";
+	private String class2 = "class2";
+	private String class3 = "class3";
+	private String class4 = "class4";
 	
-	String dataType1 = "dataType1";
-	String dataType2 = "dataType2";
-	String dataType3 = "dataType3";
-	String dataType4 = "dataType4";
+	private String dataType1 = "dataType1";
+	private String dataType2 = "dataType2";
+	private String dataType3 = "dataType3";
+	private String dataType4 = "dataType4";
 
 	/**
 	 * @throws java.lang.Exception
