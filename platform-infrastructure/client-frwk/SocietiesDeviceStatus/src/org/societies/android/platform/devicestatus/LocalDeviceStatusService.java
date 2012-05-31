@@ -26,8 +26,8 @@ package org.societies.android.platform.devicestatus;
 
 import java.util.List;
 
-import org.societies.api.android.internal.IDeviceStatus;
-import org.societies.api.android.internal.model.ProviderStatus;
+import org.societies.android.api.internal.devicemonitor.IDeviceStatus;
+
 
 import android.app.Service;
 import android.content.Intent;
