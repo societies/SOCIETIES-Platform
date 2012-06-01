@@ -26,10 +26,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 package org.societies.android.api.external.utilities;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.utilities.DBC.Dbc;
+
+import android.os.Parcelable;
 
 
 /**
@@ -254,6 +258,66 @@ public class ServiceMethodTranslator {
 			
 		}
 
+	}
+	
+	
+	/**
+	 * Retrieve the Bundle "getter" method for this type of data
+	 * get<simple type> for simple types
+	 * or getSerializable or Parcelable for complex types
+	 * @param paramType
+	 * @return the name of the bundle getter method
+	 */
+	public static String getGetMethodFromParameter(String paramType) {
+		StringBuffer result = new StringBuffer("get");
+		if (arrayContains(JAVA_PRIMITIVES, paramType)) {
+			result.append(capitaliseString(getPrimitiveClass(paramType).getSimpleName()));
+		} else if (arrayContains(JAVA_LANG_CLASSES, paramType)) {
+			result.append(capitaliseString(paramType));
+		} else {
+			Class paramClassType = null;
+			try {
+				paramClassType = Class.forName(paramType);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			Class[] implementedInterfaces = paramClassType.getInterfaces();
+			for(Class implementedInterface : implementedInterfaces) {
+				System.out.println(implementedInterface.getSimpleName());
+				if (implementedInterface.equals(Parcelable.class)) {
+					result.append("Parcelable");
+					break;
+				}
+				else if (implementedInterface.equals(Serializable.class)) {
+					result.append("Serializable");
+					break;
+				}
+			}
+		}
+		return result.toString();
+	}
+	
+	/**
+	 * Create an array of the interface method signature
+	 * @param usedInterface
+	 * @return
+	 */
+	public static String[] getMethodsArrayFromInterface(Class usedInterface) {
+		int length = usedInterface.getMethods().length;
+		String[] methods = new String[length];
+		int methodNumber = 0;
+		for(Method method : usedInterface.getMethods()) {
+			StringBuffer func = new StringBuffer(method.getName()+"(");
+			int parameterNumber = 0;
+			for(Class<?> parameter : method.getParameterTypes()) {
+				func.append((parameterNumber != 0 ? ", " : "")+parameter.getName()+" param"+parameterNumber);
+				parameterNumber++;
+			}
+			func.append(")");
+			methods[methodNumber] = func.toString();
+			methodNumber++;
+		}
+		return methods;
 	}
 	
 	/**
