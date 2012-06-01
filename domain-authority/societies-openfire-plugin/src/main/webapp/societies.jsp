@@ -18,6 +18,7 @@
     boolean success = request.getParameter("success") != null;
     String secret = ParamUtils.getParameter(request, "secret");
     String allowedIPs = ParamUtils.getParameter(request, "allowedIPs");
+    String cloudProviderUrls = ParamUtils.getParameter(request, "cloudProviderUrls");
 
     SocietiesPlugin plugin = (SocietiesPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("societies");
 
@@ -27,6 +28,7 @@
         if (errors.size() == 0) {
         	plugin.setSecret(secret);
             plugin.setAllowedIPs(StringUtils.stringToCollection(allowedIPs));
+            plugin.setCloudProviderUrls(StringUtils.stringToCollection(cloudProviderUrls));
             response.sendRedirect("societies.jsp?success=true");
             return;
         }
@@ -34,6 +36,7 @@
 
     secret = plugin.getSecret();
     allowedIPs = StringUtils.collectionToString(plugin.getAllowedIPs());
+    cloudProviderUrls = StringUtils.collectionToString(plugin.getCloudProviderUrls());
 %>
 
 <html>
@@ -77,6 +80,11 @@ Use the form below to configure the secret key.
 
         <label for="text_secret">Allowed IP Addresses:</label>
         <textarea name="allowedIPs" cols="40" rows="3" wrap="virtual"><%= ((allowedIPs != null) ? allowedIPs : "") %></textarea>
+        
+        <br><br>
+        
+        <label for="text_secret">SOCIETIES Cloud Node Provider URLs:</label>
+        <textarea name="cloudProviderUrls" cols="40" rows="3" wrap="virtual"><%= ((cloudProviderUrls != null) ? cloudProviderUrls : "") %></textarea>
     </ul>
     </div>
 </fieldset>

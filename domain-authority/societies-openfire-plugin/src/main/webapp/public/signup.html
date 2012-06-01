@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>SOCIETIES Signup</title>
 <!-- do not remove this meta declaration - it keeps this page from being shown with openfire "graphics" -->
 <meta content="none" name="decorator" />
 <link rel="stylesheet" type="text/css" href="style.css" />
@@ -7,11 +8,12 @@
 <body>
 <div><span><img src="images/societiesheader.png" /></span>
 <p>Welcome to SOCIETIES! If you don't have an account signup here!</p></div>
-<form method="get" action="/plugins/societies/societies">
+<form method="post" action="/plugins/societies/societies">
 <input type="hidden" name="type" value="add" />
 <input type="hidden" name="secret" value="defaultSecret" />
 Username: <input type="text" name="username" /><br/>
-Password: <input type="text" name="password" /><br/>
+Password: <input type="password" name="password" /><br/>
+Repeat Password: <input type="password" name="passwordRepeat" /><br/>
 <input type="hidden" name="name" value="" />
 <input type="hidden" name="email" value="" />
 <div class="aggreement"><h3>SOCIETIES Terms of Use</h3><p>
