@@ -31,12 +31,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.societies.android.api.external.utilities.ServiceMethodTranslator;
+import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
+import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
+import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalBinder;
-import org.societies.android.platform.interfaces.IAndroidCSSManager;
-import org.societies.android.platform.utilities.ServiceMethodTranslator;
-import org.societies.api.android.internal.model.AndroidCSSNode;
-import org.societies.api.android.internal.model.AndroidCSSRecord;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.BroadcastReceiver;

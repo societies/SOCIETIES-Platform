@@ -18,12 +18,13 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.schema.css.devicemanagment.DmEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 
-public class TestCommsMgmt implements Subscriber {
+public class TestCommsMgmt {
 
 	private ICSSRemoteManager remoteCSSManager;
     private PubsubClient pubSubManager;
@@ -68,11 +69,8 @@ public class TestCommsMgmt implements Subscriber {
 		try {
 			//Looks like an OSGi classloader issue here
             List<String> packageList = new ArrayList<String>();
-            packageList.add("java.util.String");
-//            packageList.add("org.societies.api.schema.cssmanagement.CssManagerMessageBean");
-//            packageList.add("org.societies.api.schema.cssmanagement.CssRecord");
-//            packageList.add("org.societies.api.schema.cssmanagement.CssNode");
-//			
+
+            packageList.add("org.societies.api.schema.css.devicemanagment");
             try {
 				pubSubManager.addJaxbPackages(packageList);
 			} catch (JAXBException e) {
@@ -81,9 +79,9 @@ public class TestCommsMgmt implements Subscriber {
 			}
 
 	        LOG.info("Subscribing to pubsub");
-
-	        pubSubManager.subscriberSubscribe(pubsubID, CSSManagerEnums.ADD_CSS_NODE, this);
-			pubSubManager.subscriberSubscribe(pubsubID, CSSManagerEnums.DEPART_CSS_NODE, this);
+	        //try internal class
+	        pubSubManager.subscriberSubscribe(pubsubID, CSSManagerEnums.ADD_CSS_NODE, new pubsubReceiver());
+			pubSubManager.subscriberSubscribe(pubsubID, CSSManagerEnums.DEPART_CSS_NODE, new pubsubReceiver());
 
 	        LOG.info("Querying list of Nodes again");
 
@@ -185,7 +183,7 @@ public class TestCommsMgmt implements Subscriber {
 		return cssProfile;
 	}
 
-	
+
 	//Spring injection methods
 
 	public ICSSRemoteManager getRemoteCSSManager() {
@@ -210,14 +208,19 @@ public class TestCommsMgmt implements Subscriber {
     	this.commManager = commManager;
     }
 
-    //Subscriber implementation
-	@Override
-	public void pubsubEvent(IIdentity identity, String node, String itemId,
-			Object payload) {
-		if (payload instanceof CssManagerMessageBean) {
-			LOG.debug("Received event is :" + ((CssManagerMessageBean) payload).getProfile().getCssIdentity());
+	private class pubsubReceiver implements Subscriber {
+
+	    //Subscriber implementation
+		@Override
+		public void pubsubEvent(IIdentity identity, String node, String itemId,
+				Object payload) {
+			if (payload instanceof DmEvent) {
+				LOG.debug("Received event is :" + ((DmEvent) payload).getName());
+			}
 		}
+		
 	}
+	
 
 
 }
