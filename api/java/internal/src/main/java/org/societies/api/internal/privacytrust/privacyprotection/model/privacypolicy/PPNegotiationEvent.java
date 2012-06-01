@@ -24,13 +24,15 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
+import java.io.Serializable;
+
 /**
  * Describe your class here...
  *
  * @author Eliza
  *
  */
-public class PPNegotiationEvent {
+public class PPNegotiationEvent implements Serializable{
 
 	private IAgreement agreement;
 	private NegotiationStatus negotiationStatus;

@@ -35,9 +35,7 @@ public class TestCase1109 extends IntegrationTestCase{
 	public TestCase1109() {
 		super(1109, new Class[]{ContextStorageTest.class, RetrieveLearnedModelTest.class, PerformPredictionTest.class});
 		System.out.println("Test 1109 started : TestCase1109() ");
-		//UserIntentLearningTest uil = new UserIntentLearningTest(ctxBroker,uam);
-		//uil.createHistorySet();
-		startTest(); 
+		//startTest(); 
 	}
 	public void setCauiPrediction(ICAUIPrediction cauiPrediction){
 		TestCase1109.cauiPrediction = cauiPrediction;
@@ -63,7 +61,7 @@ public class TestCase1109 extends IntegrationTestCase{
 		return TestCase1109.uam;
 	}
 
-	
+/*	
 	private void startTest() {
 		LOG.info("###1109... startTest");
 		jUnitCore = new JUnitCore();
@@ -93,5 +91,5 @@ public class TestCase1109 extends IntegrationTestCase{
 
 		LOG.info("###1109 " + results);
 	}
-	 
+	*/ 
 }

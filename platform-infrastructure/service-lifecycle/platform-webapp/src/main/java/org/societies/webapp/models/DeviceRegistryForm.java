@@ -31,6 +31,7 @@ package org.societies.webapp.models;
  *
  */
 public class DeviceRegistryForm {
+	
 	private String method;
 	private String cssNodeId;
 	private String deviceFamilyIdentity; 
@@ -42,6 +43,7 @@ public class DeviceRegistryForm {
 	private String deviceProvider;
 	private String deviceID;
 	private boolean contextSource;
+	
 	/**
 	 * @return the method
 	 */
@@ -54,6 +56,8 @@ public class DeviceRegistryForm {
 	public void setMethod(String method) {
 		this.method = method;
 	}
+	
+	
 	/**
 	 * @return the cssNodeId
 	 */
