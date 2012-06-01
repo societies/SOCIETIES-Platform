@@ -25,6 +25,7 @@
 package org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -62,6 +63,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
@@ -308,6 +310,15 @@ public class NegotiationClient implements INegotiationClient {
 				for (ResponseItem responseItem : requests){
 					privacyDataManager.updatePermission(requestor, envelope.getAgreement().getUserIdentity(), responseItem);
 				}
+				
+				InternalEvent event = this.createSuccessfulNegotiationEvent(envelope);
+				try {
+					this.eventMgr.publishInternalEvent(event);
+				} catch (EMSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					this.log("Unable to post "+event.geteventType()+" event");
+				}
 			} catch (PrivacyException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -326,6 +337,8 @@ public class NegotiationClient implements INegotiationClient {
 
 	}
 	
+	
+
 	/**
 	 * No need for this step. This should be removed and the negotiation step should commence in the startPrivacyPolicyNegotiation(RequestPolicy,S
 	 * @param requestor
@@ -399,6 +412,11 @@ public class NegotiationClient implements INegotiationClient {
 		return iEvent;
 	}
 
+	private InternalEvent createSuccessfulNegotiationEvent(AgreementEnvelope envelope) {
+		PPNegotiationEvent event = new PPNegotiationEvent(envelope.getAgreement(), NegotiationStatus.SUCCESSFUL);
+		InternalEvent iEvent = new InternalEvent(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT, "", INegotiationClient.class.getName(), event);
+		return iEvent;
+	}
 	private ResponsePolicy findMyResponsePolicy(ResponsePolicy providerPolicy){
 		Requestor requestor = providerPolicy.getRequestor();
 		if (this.myPolicies.containsKey(requestor)){

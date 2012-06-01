@@ -24,10 +24,14 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 /**
- * Disconnect from CSSManager 
- * @param actionFunction function to be called if successful
+ * 
+ * @function Disconnect from CSSManager 
+ * 
  */
+
+
 var disconnectFromLocalCSSManager = function() {
 	console.log("Disconnect from LocalCSSManager");
 		
@@ -116,10 +120,10 @@ function onDeviceReady() {
 		cordova.addPlugin('LocalCSSManagerService', new LocalCSSManagerService());
 		
 		console.log("Register DeviceStatus Service plugin ");
-		cordova.addPlugin("DeviceStatus", DeviceStatus);
+		cordova.addPlugin("DeviceStatus", Societies.DeviceStatus);
 
 		console.log("Register Preferences plugin ");
-		cordova.addPlugin("Preferences", new Preferences);
+		cordova.addPlugin("Preferences", Societies.AppPreferences);
 
 	});
 	
@@ -130,327 +134,438 @@ function onDeviceReady() {
 
 }
 /**
- * DeviceStatus object
+ * Societies namespace
+ * 
+ * @namespace Societies
  */
-var DeviceStatus = {
+
+var Societies = {
+		
 		/**
-		 * To retrieve the connectivity provider status
+		 * Provides an API to access device status indicators
 		 * 
-		 * @param {Object} successCallback The callback which will be called when result is successful.
-		 * Example of JSON result:
-		 * <pre>
-		 * {"isInternetEnabled":true, "providerList":[{"name":"WiFi", "enabled":true}, {"name":"mobile mms", "enabled":false}]}
-		 * </pre>
-		 * Schema of the JSON result:
-		 * <pre>
-		 * {
-		 *  	"name":"ConnectivityProviderStatus",
-		 *  	"properties":{
-		 *  		"isInternetEnabled":{
-		 *  			"required":true,
-		 *  			"type":"boolean",
-		 *  			"description":"To know if Internet is available or not"
-		 *  		},
-		 *  		"providerList":{
-		 *  			"required":false,
-		 *  			"type":"array",
-		 *  			"description":"List of connectivity providers",
-		 *  			"items":{
-		 *  				"name":{
-		 *  					"required":true,
-		 *  					"type":"string",
-		 *  					"description":"Name of the connectivity provider"
-		 *  				},
-		 *  				"enabled":{
-		 *  					"required":true,
-		 *  					"type":"boolean",
-		 *  					"description":"To know if this provider is available or not"
-		 *  				}
-		 *  			}
-		 *  		}
-		 *  	}
-		 * }
-		 * </pre>
-		 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+		 * @memberOf Societies
+		 * @namespace Societies.DeviceStatus
 		 */
-		getConnectivityStatus: function(successCallback, failureCallback){
-			var parameters = null;
-			return cordova.exec(
-					successCallback,
-					failureCallback,
-					'DeviceStatus',
-					'getConnectivityStatus',
-					[parameters]);
-		},
+		DeviceStatus: {
+				/**
+				 * 
+				 * @methodOf Societies.DeviceStatus#
+				 * @description To retrieve the connectivity provider status
+				 * 
+				 * @param {Object} successCallback The callback which will be called when result is successful.
+				 * Example of JSON result:
+				 * <pre>
+				 * {"isInternetEnabled":true, "providerList":[{"name":"WiFi", "enabled":true}, {"name":"mobile mms", "enabled":false}]}
+				 * </pre>
+				 * Schema of the JSON result:
+				 * <pre>
+				 * {
+				 *  	"name":"ConnectivityProviderStatus",
+				 *  	"properties":{
+				 *  		"isInternetEnabled":{
+				 *  			"required":true,
+				 *  			"type":"boolean",
+				 *  			"description":"To know if Internet is available or not"
+				 *  		},
+				 *  		"providerList":{
+				 *  			"required":false,
+				 *  			"type":"array",
+				 *  			"description":"List of connectivity providers",
+				 *  			"items":{
+				 *  				"name":{
+				 *  					"required":true,
+				 *  					"type":"string",
+				 *  					"description":"Name of the connectivity provider"
+				 *  				},
+				 *  				"enabled":{
+				 *  					"required":true,
+				 *  					"type":"boolean",
+				 *  					"description":"To know if this provider is available or not"
+				 *  				}
+				 *  			}
+				 *  		}
+				 *  	}
+				 * }
+				 * </pre>
+				 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+				 */
+				getConnectivityStatus: function(successCallback, failureCallback){
+					var parameters = null;
+					return cordova.exec(
+							successCallback,
+							failureCallback,
+							'DeviceStatus',
+							'getConnectivityStatus',
+							[parameters]);
+				},
 
 
-		/**
-		 * To retrieve the location provider status
-		 * 
-		 * @param {Object} successCallback The callback which will be called when result is successful.
-		 * Example of JSON result:
-		 * <pre>
-		 * {"providerList":[{"name":"gps", "enabled":true}, {"name":"network", "enabled":false}]}
-		 * </pre>
-		 * Schema of the JSON result:
-		 * <pre>
-		 * {
-		 *  	"name":"LocationProviderStatus",
-		 *  	"properties":{
-		 *  		"providerList":{
-		 *  			"required":false,
-		 *  			"type":"array",
-		 *  			"description":"List of location providers",
-		 *  			"items":{
-		 *  				"name":{
-		 *  					"required":true,
-		 *  					"type":"string",
-		 *  					"description":"Name of the location provider"
-		 *  				},
-		 *  				"enabled":{
-		 *  					"required":true,
-		 *  					"type":"boolean",
-		 *  					"description":"To know if this provider is available or not"
-		 *  				}
-		 *  			}
-		 *  		}
-		 *  	}
-		 * }
-		 * </pre>
-		 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
-		 */
-		getLocationStatus: function(successCallback, failureCallback){
-			var parameters = null;
-			return cordova.exec(
-					successCallback,
-					failureCallback,
-					'DeviceStatus',
-					'getLocationStatus',
-					[parameters]);
-		},
+				/**
+				 * @methodOf Societies.DeviceStatus#
+				 * @description To retrieve the location provider status
+				 * 
+				 * @param {Object} successCallback The callback which will be called when result is successful.
+				 * Example of JSON result:
+				 * <pre>
+				 * {"providerList":[{"name":"gps", "enabled":true}, {"name":"network", "enabled":false}]}
+				 * </pre>
+				 * Schema of the JSON result:
+				 * <pre>
+				 * {
+				 *  	"name":"LocationProviderStatus",
+				 *  	"properties":{
+				 *  		"providerList":{
+				 *  			"required":false,
+				 *  			"type":"array",
+				 *  			"description":"List of location providers",
+				 *  			"items":{
+				 *  				"name":{
+				 *  					"required":true,
+				 *  					"type":"string",
+				 *  					"description":"Name of the location provider"
+				 *  				},
+				 *  				"enabled":{
+				 *  					"required":true,
+				 *  					"type":"boolean",
+				 *  					"description":"To know if this provider is available or not"
+				 *  				}
+				 *  			}
+				 *  		}
+				 *  	}
+				 * }
+				 * </pre>
+				 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+				 */
+				getLocationStatus: function(successCallback, failureCallback){
+					var parameters = null;
+					return cordova.exec(
+							successCallback,
+							failureCallback,
+							'DeviceStatus',
+							'getLocationStatus',
+							[parameters]);
+				},
 
-		/**
-		 * To retrieve the battery status
-		 * 
-		 * @param {Object} successCallback The callback which will be called when result is successful.
-		 * Example of JSON result:
-		 * <pre>
-		 * {"scale":100,"plugged":1,"level":50,"status":2,"voltage":0,"temperature":0}
-		 * </pre>
-		 * Schema of the JSON result:
-		 * <pre>
-		 * {
-		 *  	"name":"BatteryStatus",
-		 *  	"properties":{
-		 *  		"scale":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"min":0,
-		 *  			"description":"Scale"
-		 *  		},
-		 *  		"plugged":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"enum": [BATTERY_NOT_PLUGGED, BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB],
-		 *  			"description":"To know if the mobile is plugged or not"
-		 *  		},
-		 *  		"level":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"min":0,
-		 *  			"max":100,
-		 *  			"description":"Level of battery (%)"
-		 *  		},
-		 *  		"status":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"min":1,
-		 *  			"max":5,
-		 *  			"enum": [BATTERY_STATUS_UNKNOWN, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_NOT_CHARGING, BATTERY_STATUS_FULL],
-		 *  			"description":"Level of battery (%)"
-		 *  		},
-		 *  		"voltage":{
-		 *  			"required":false,
-		 *  			"type":"nomber",
-		 *  			"description":"Voltage"
-		 *  		},
-		 *  		"temperature":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"description":"Temperatue (°C)"
-		 *  		}
-		 *  	}
-		 * }
-		 * </pre>
-		 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
-		 */
-		getBatteryStatus: function(successCallback, failureCallback){
-			var parameters = null;
-			return cordova.exec(
-					successCallback,
-					failureCallback,
-					'DeviceStatus',
-					'getBatteryStatus',
-					[parameters]);
-		},
+				/**
+				 * 
+				 * @methodOf Societies.DeviceStatus#
+				 * @description To retrieve the battery status
+				 * @param {Object} successCallback The callback which will be called when result is successful.
+				 * Example of JSON result:
+				 * <pre>
+				 * {"scale":100,"plugged":1,"level":50,"status":2,"voltage":0,"temperature":0}
+				 * </pre>
+				 * Schema of the JSON result:
+				 * <pre>
+				 * {
+				 *  	"name":"BatteryStatus",
+				 *  	"properties":{
+				 *  		"scale":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"min":0,
+				 *  			"description":"Scale"
+				 *  		},
+				 *  		"plugged":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"enum": [BATTERY_NOT_PLUGGED, BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB],
+				 *  			"description":"To know if the mobile is plugged or not"
+				 *  		},
+				 *  		"level":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"min":0,
+				 *  			"max":100,
+				 *  			"description":"Level of battery (%)"
+				 *  		},
+				 *  		"status":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"min":1,
+				 *  			"max":5,
+				 *  			"enum": [BATTERY_STATUS_UNKNOWN, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_NOT_CHARGING, BATTERY_STATUS_FULL],
+				 *  			"description":"Level of battery (%)"
+				 *  		},
+				 *  		"voltage":{
+				 *  			"required":false,
+				 *  			"type":"nomber",
+				 *  			"description":"Voltage"
+				 *  		},
+				 *  		"temperature":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"description":"Temperatue (°C)"
+				 *  		}
+				 *  	}
+				 * }
+				 * </pre>
+				 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+				 */
+				getBatteryStatus: function(successCallback, failureCallback){
+					var parameters = null;
+					return cordova.exec(
+							successCallback,
+							failureCallback,
+							'DeviceStatus',
+							'getBatteryStatus',
+							[parameters]);
+				},
 
+				/**
+				 * 
+				 * @methodOf Societies.DeviceStatus#
+				 * @description To register to battery status
+				 * @param {Object} successCallback The callback which will be called when result is successful.
+				 * Example of JSON result:
+				 * <pre>
+				 * {"scale":100,"plugged":1,"level":50,"status":2,"voltage":0,"temperature":0}
+				 * </pre>
+				 * Schema of the JSON result:
+				 * <pre>
+				 * {
+				 *  	"name":"BatteryStatus",
+				 *  	"properties":{
+				 *  		"scale":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"min":0,
+				 *  			"description":"Scale"
+				 *  		},
+				 *  		"plugged":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"enum": [BATTERY_NOT_PLUGGED, BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB],
+				 *  			"description":"To know if the mobile is plugged or not"
+				 *  		},
+				 *  		"level":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"min":0,
+				 *  			"max":100,
+				 *  			"description":"Level of battery (%)"
+				 *  		},
+				 *  		"status":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"min":1,
+				 *  			"max":5,
+				 *  			"enum": [BATTERY_STATUS_UNKNOWN, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_NOT_CHARGING, BATTERY_STATUS_FULL],
+				 *  			"description":"Level of battery (%)"
+				 *  		},
+				 *  		"voltage":{
+				 *  			"required":false,
+				 *  			"type":"nomber",
+				 *  			"description":"Voltage"
+				 *  		},
+				 *  		"temperature":{
+				 *  			"required":false,
+				 *  			"type":"number",
+				 *  			"description":"Temperatue (°C)"
+				 *  		}
+				 *  	}
+				 * }
+				 * </pre>
+				 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+				 */
+				registerToBatteryStatus: function(successCallback, failureCallback){
+					var parameters = {"register":true};
+					return cordova.exec(
+							successCallback,
+							failureCallback,
+							'DeviceStatus',
+							'getBatteryStatus',
+							[parameters]);
+				}
+		};,
 		/**
-		 * To register to battery status
+		 * Provides an API to retrieve application preferences
 		 * 
-		 * @param {Object} successCallback The callback which will be called when result is successful.
-		 * Example of JSON result:
-		 * <pre>
-		 * {"scale":100,"plugged":1,"level":50,"status":2,"voltage":0,"temperature":0}
-		 * </pre>
-		 * Schema of the JSON result:
-		 * <pre>
-		 * {
-		 *  	"name":"BatteryStatus",
-		 *  	"properties":{
-		 *  		"scale":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"min":0,
-		 *  			"description":"Scale"
-		 *  		},
-		 *  		"plugged":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"enum": [BATTERY_NOT_PLUGGED, BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB],
-		 *  			"description":"To know if the mobile is plugged or not"
-		 *  		},
-		 *  		"level":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"min":0,
-		 *  			"max":100,
-		 *  			"description":"Level of battery (%)"
-		 *  		},
-		 *  		"status":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"min":1,
-		 *  			"max":5,
-		 *  			"enum": [BATTERY_STATUS_UNKNOWN, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_NOT_CHARGING, BATTERY_STATUS_FULL],
-		 *  			"description":"Level of battery (%)"
-		 *  		},
-		 *  		"voltage":{
-		 *  			"required":false,
-		 *  			"type":"nomber",
-		 *  			"description":"Voltage"
-		 *  		},
-		 *  		"temperature":{
-		 *  			"required":false,
-		 *  			"type":"number",
-		 *  			"description":"Temperatue (°C)"
-		 *  		}
-		 *  	}
-		 * }
-		 * </pre>
-		 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+		 * @memberOf Societies
+		 * @namespace Societies.AppPreferences
 		 */
-		registerToBatteryStatus: function(successCallback, failureCallback){
-			var parameters = {"register":true};
-			return cordova.exec(
-					successCallback,
-					failureCallback,
-					'DeviceStatus',
-					'getBatteryStatus',
-					[parameters]);
+
+		AppPreferences: {
+				/**
+				 * @methodOf Societies.AppPreferences#
+				 * @description Retrieve a String preference value for a given preference name
+				 * @param {Object} successCallback The callback which will be called when result is successful
+				 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+				 * @param {String} prefName The name of preference
+				 * @returns value of preference
+				 */
+				getStringPrefValue: function(successCallback, failureCallback, prefName) {
+					console.log("Call Preferences - getStringPrefValue");
+					
+					return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+					failureCallback,     //Callback which will be called when plugin action encounters an error
+					'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+					'getStringPrefValue',          //Telling the plugin, which action we want to perform
+					[prefName]);        //Passing a list of arguments to the plugin
+				},
+
+				/**
+				 * @methodOf Societies.AppPreferences#
+				 * @description Retrieve an Integer preference value for a given preference name
+				 * @param {Object} successCallback The callback which will be called when result is successful
+				 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+				 * @param {String} prefName The name of preference
+				 * @returns value of preference
+				 */
+				getIntegerPrefValue: function(successCallback, failureCallback, prefName) {
+					console.log("Call Preferences - getIntegerPrefValue");
+					
+					return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+					failureCallback,     //Callback which will be called when plugin action encounters an error
+					'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+					'getIntegerPrefValue',          //Telling the plugin, which action we want to perform
+					[prefName]);        //Passing a list of arguments to the plugin
+				},
+				/**
+				 * @methodOf Societies.AppPreferences#
+				 * @description Retrieve a Long preference value for a given preference name
+				 * @param {Object} successCallback The callback which will be called when result is successful
+				 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+				 * @param {String} prefName The name of preference
+				 * @returns value of preference
+				 */
+				getLongPrefValue: function(successCallback, failureCallback, prefName) {
+					console.log("Call Preferences - getLongPrefValue");
+					
+					return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+					failureCallback,     //Callback which will be called when plugin action encounters an error
+					'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+					'getLongPrefValue',          //Telling the plugin, which action we want to perform
+					[prefName]);        //Passing a list of arguments to the plugin
+				},
+				/**
+				 * @methodOf Societies.AppPreferences#
+				 * @description Retrieve a Float preference value for a given preference name
+				 * @param {Object} successCallback The callback which will be called when result is successful
+				 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+				 * @param {String} prefName The name of preference
+				 * @returns value of preference
+				 */
+				getFloatPrefValue: function(successCallback, failureCallback, prefName) {
+					console.log("Call Preferences - getFloatPrefValue");
+					
+					return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+					failureCallback,     //Callback which will be called when plugin action encounters an error
+					'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+					'getFloatPrefValue',          //Telling the plugin, which action we want to perform
+					[prefName]);        //Passing a list of arguments to the plugin
+				}, 
+				/**
+				 * @methodOf Societies.AppPreferences#
+				 * @description Retrieve a Boolean preference value for a given preference name
+				 * @param {Object} successCallback The callback which will be called when result is successful
+				 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+				 * @param {String} prefName The name of preference
+				 * @returns value of preference
+				 */
+				getBooleanPrefValue: function(successCallback, failureCallback, prefName) {
+					console.log("Call Preferences - getBooleanPrefValue");
+					
+					return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+					failureCallback,     //Callback which will be called when plugin action encounters an error
+					'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+					'getBooleanPrefValue',          //Telling the plugin, which action we want to perform
+					[prefName]);        //Passing a list of arguments to the plugin
+				};
 		}
-};
 
-
-/**
- * Preferences object
- */
-var Preferences = function() { 
-};
-
-/**
- * Get a String Preference value
- * 
- * @param successCallback The callback which will be called when Java method is successful
- * @param failureCallback The callback which will be called when Java method has an error
- * @param prefName name of preference to be retrieved
-*/
-Preferences.prototype.getStringPrefValue = function(successCallback, failureCallback, prefName) {
-	console.log("Call Preferences - getStringPrefValue");
 	
-	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-	failureCallback,     //Callback which will be called when plugin action encounters an error
-	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-	'getStringPrefValue',          //Telling the plugin, which action we want to perform
-	[prefName]);        //Passing a list of arguments to the plugin
-};
+}
 
-/**
- * Get a Integer Preference value
- * 
- * @param successCallback The callback which will be called when Java method is successful
- * @param failureCallback The callback which will be called when Java method has an error
- * @param prefName name of preference to be retrieved
-*/
-Preferences.prototype.getIntegerPrefValue = function(successCallback, failureCallback, prefName) {
-	console.log("Call Preferences - getIntegerPrefValue");
-	
-	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-	failureCallback,     //Callback which will be called when plugin action encounters an error
-	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-	'getIntegerPrefValue',          //Telling the plugin, which action we want to perform
-	[prefName]);        //Passing a list of arguments to the plugin
-};
 
-/**
- * Get a Long Preference value
- * 
- * @param successCallback The callback which will be called when Java method is successful
- * @param failureCallback The callback which will be called when Java method has an error
- * @param prefName name of preference to be retrieved
-*/
-Preferences.prototype.getLongPrefValue = function(successCallback, failureCallback, prefName) {
-	console.log("Call Preferences - getLongPrefValue");
-	
-	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-	failureCallback,     //Callback which will be called when plugin action encounters an error
-	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-	'getLongPrefValue',          //Telling the plugin, which action we want to perform
-	[prefName]);        //Passing a list of arguments to the plugin
-};
-
-/**
- * Get a Float Preference value
- * 
- * @param successCallback The callback which will be called when Java method is successful
- * @param failureCallback The callback which will be called when Java method has an error
- * @param prefName name of preference to be retrieved
-*/
-Preferences.prototype.getFloatPrefValue = function(successCallback, failureCallback, prefName) {
-	console.log("Call Preferences - getFloatPrefValue");
-	
-	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-	failureCallback,     //Callback which will be called when plugin action encounters an error
-	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-	'getFloatPrefValue',          //Telling the plugin, which action we want to perform
-	[prefName]);        //Passing a list of arguments to the plugin
-};
-
-/**
- * Get a Boolean Preference value
- * 
- * @param successCallback The callback which will be called when Java method is successful
- * @param failureCallback The callback which will be called when Java method has an error
- * @param prefName name of preference to be retrieved
-*/
-Preferences.prototype.getBooleanPrefValue = function(successCallback, failureCallback, prefName) {
-	console.log("Call Preferences - getBooleanPrefValue");
-	
-	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-	failureCallback,     //Callback which will be called when plugin action encounters an error
-	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-	'getBooleanPrefValue',          //Telling the plugin, which action we want to perform
-	[prefName]);        //Passing a list of arguments to the plugin
-};
+//var Preferences = function() { 
+//};
+//
+///**
+// * Get a String Preference value
+// * 
+// * @param successCallback The callback which will be called when Java method is successful
+// * @param failureCallback The callback which will be called when Java method has an error
+// * @param prefName name of preference to be retrieved
+//*/
+//Preferences.prototype.getStringPrefValue = function(successCallback, failureCallback, prefName) {
+//	console.log("Call Preferences - getStringPrefValue");
+//	
+//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+//	failureCallback,     //Callback which will be called when plugin action encounters an error
+//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+//	'getStringPrefValue',          //Telling the plugin, which action we want to perform
+//	[prefName]);        //Passing a list of arguments to the plugin
+//};
+//
+///**
+// * Get a Integer Preference value
+// * 
+// * @param successCallback The callback which will be called when Java method is successful
+// * @param failureCallback The callback which will be called when Java method has an error
+// * @param prefName name of preference to be retrieved
+//*/
+//Preferences.prototype.getIntegerPrefValue = function(successCallback, failureCallback, prefName) {
+//	console.log("Call Preferences - getIntegerPrefValue");
+//	
+//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+//	failureCallback,     //Callback which will be called when plugin action encounters an error
+//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+//	'getIntegerPrefValue',          //Telling the plugin, which action we want to perform
+//	[prefName]);        //Passing a list of arguments to the plugin
+//};
+//
+///**
+// * Get a Long Preference value
+// * 
+// * @param successCallback The callback which will be called when Java method is successful
+// * @param failureCallback The callback which will be called when Java method has an error
+// * @param prefName name of preference to be retrieved
+//*/
+//Preferences.prototype.getLongPrefValue = function(successCallback, failureCallback, prefName) {
+//	console.log("Call Preferences - getLongPrefValue");
+//	
+//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+//	failureCallback,     //Callback which will be called when plugin action encounters an error
+//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+//	'getLongPrefValue',          //Telling the plugin, which action we want to perform
+//	[prefName]);        //Passing a list of arguments to the plugin
+//};
+//
+///**
+// * Get a Float Preference value
+// * 
+// * @param successCallback The callback which will be called when Java method is successful
+// * @param failureCallback The callback which will be called when Java method has an error
+// * @param prefName name of preference to be retrieved
+//*/
+//Preferences.prototype.getFloatPrefValue = function(successCallback, failureCallback, prefName) {
+//	console.log("Call Preferences - getFloatPrefValue");
+//	
+//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+//	failureCallback,     //Callback which will be called when plugin action encounters an error
+//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+//	'getFloatPrefValue',          //Telling the plugin, which action we want to perform
+//	[prefName]);        //Passing a list of arguments to the plugin
+//};
+//
+///**
+// * Get a Boolean Preference value
+// * 
+// * @param successCallback The callback which will be called when Java method is successful
+// * @param failureCallback The callback which will be called when Java method has an error
+// * @param prefName name of preference to be retrieved
+//*/
+//Preferences.prototype.getBooleanPrefValue = function(successCallback, failureCallback, prefName) {
+//	console.log("Call Preferences - getBooleanPrefValue");
+//	
+//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+//	failureCallback,     //Callback which will be called when plugin action encounters an error
+//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+//	'getBooleanPrefValue',          //Telling the plugin, which action we want to perform
+//	[prefName]);        //Passing a list of arguments to the plugin
+//};
 
 /**
  * LocalCSSManagerService object
@@ -866,19 +981,19 @@ var getAppPref = function() {
 	switch(type)
 	{
 	case "string":
-		window.plugins.Preferences.getStringPrefValue(success, failure, prefName, type);
+		window.plugins.Societies.AppPreferences.getStringPrefValue(success, failure, prefName, type);
 		break;
 	case "integer":
-		window.plugins.Preferences.getIntegerPrefValue(success, failure, prefName, type);
+		window.plugins.Societies.AppPreferences.getIntegerPrefValue(success, failure, prefName, type);
 		break;
 	case "long":
-		window.plugins.Preferences.getLongPrefValue(success, failure, prefName, type);
+		window.plugins.Societies.AppPreferences.getLongPrefValue(success, failure, prefName, type);
 		break;
 	case "float":
-		window.plugins.Preferences.getFloatPrefValue(success, failure, prefName, type);
+		window.plugins.Societies.AppPreferences.getFloatPrefValue(success, failure, prefName, type);
 		break;
 	case "boolean":
-		window.plugins.Preferences.getBooleanPrefValue(success, failure, prefName, type);
+		window.plugins.Societies.AppPreferences.getBooleanPrefValue(success, failure, prefName, type);
 		break;
 	default:
 	  console.log("Error - Preference type is not defined");
@@ -887,7 +1002,7 @@ var getAppPref = function() {
 };
 
 /**
- * Add Javascript functions to various HTML tags using JQuery
+ * @ function Add Javascript functions to various HTML tags using JQuery
  */
 
 jQuery(function() {
@@ -923,18 +1038,18 @@ jQuery(function() {
 	});
 	
 	$('#connectivity').click(function() {
-		window.plugins.DeviceStatus.getConnectivityStatus(onSuccess, onFailure);
+		window.plugins.Societies.DeviceStatus.getConnectivityStatus(onSuccess, onFailure);
 	});
 	
 	$('#location').click(function() {
-		window.plugins.DeviceStatus.getLocationStatus(onSuccess, onFailure);
+		window.plugins.Societies.DeviceStatus.getLocationStatus(onSuccess, onFailure);
 	});
 	
 	$('#battery').click(function() {
-		window.plugins.DeviceStatus.getBatteryStatus(onSuccess, onFailure);
+		window.plugins.Societies.DeviceStatus.getBatteryStatus(onSuccess, onFailure);
 	});
 	$('#registerBattery').click(function() {
-		window.plugins.DeviceStatus.registerToBatteryStatus(onSuccess, onFailure);
+		window.plugins.Societies.DeviceStatus.registerToBatteryStatus(onSuccess, onFailure);
 	});
 
 	$('#getPref').click(function() {

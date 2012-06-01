@@ -30,12 +30,14 @@
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-	</dependency>
-        <dependency>
-			<groupId>org.societies.android.platform</groupId>
-			<artifactId>CoreInterfaces</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api-external</artifactId>
 			<version>${release.version}</version>
-        </dependency>
+		</dependency>
+		
         
     </dependencies>
 

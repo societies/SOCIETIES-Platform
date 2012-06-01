@@ -278,8 +278,8 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public UserIntentModelData createModel() {
-		UserIntentModelData model =  new UserIntentModelData();
-		return model;
+		activeUserIntentModel =  new UserIntentModelData();
+		return activeUserIntentModel;
 	}
 
 

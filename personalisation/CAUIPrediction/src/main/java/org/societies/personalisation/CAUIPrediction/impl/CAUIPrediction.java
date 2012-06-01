@@ -81,7 +81,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	private String [] lastActions = null;
 	
 	int predictionRequestsCounter = 0;
-	int discoveryThreshold = 10;
+	int discoveryThreshold = 20;
 	
 	public IIdentity identity = null;
 	public CtxAttributeIdentifier locationAttrId;
@@ -201,8 +201,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		// initiate caui model discovery
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
-		if(modelExist == false && enablePrediction == true && cauiDiscovery != null){
-			LOG.info("no model exists, predictionRequestsCounter:" +predictionRequestsCounter);
+		if(cauiDiscovery != null){
+			LOG.info("  Model Discovery Counter:" +predictionRequestsCounter);
 			if(predictionRequestsCounter >= discoveryThreshold){
 				LOG.info("this.cauiDiscovery.generateNewUserModel()");
 				this.cauiDiscovery.generateNewUserModel();	
