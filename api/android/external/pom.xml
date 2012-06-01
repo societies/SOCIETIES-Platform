@@ -2,18 +2,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.android.api</groupId>
-	<!-- change the artifactid to your project artifactid -->
-	<artifactId>societies-android-api</artifactId>
-	<name>SOCIETIES API for Android (External/3rd Party)</name>
-	<!-- the api version is the same as the release -->
+
+	<groupId>org.societies.android.api.external</groupId>
+	<artifactId>societies-android-api-external</artifactId>
+	<name>SOCIETIES API Android External</name>
 	<version>${release.version}</version>
-	<!-- the packaging tag enables the creation of the correct manifest using 
-		the maven-bundle-plugin -->
 	<packaging>jar</packaging>
 
 	<description>
-    	This jar file provides the external interfaces of the SOCIETIES platform version XX.
+    	This jar file provides the external interfaces and related classes of the 
+    	SOCIETIES Android platform    
     </description>
 
 	<developers>
@@ -43,36 +41,40 @@
 	<dependencies>
 		<!-- Societies -->
 		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
+			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.utilities</groupId>
-			<artifactId>DBC</artifactId>
+    	<!--dependency>
+		   <groupId>org.societies.api.internal</groupId>
+		   <artifactId>societies-api-internal</artifactId>
+        </dependency-->
+
+    	<!--dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
-		</dependency>
+			<scope>provided</scope>
+		</dependency-->
 		<!-- Needed for Societies-specific annotations -->
-		<dependency>
+		<!--dependency>
 			<groupId>org.societies.utilities</groupId>
 			<artifactId>societies-annotations</artifactId>
 			<version>${release.version}</version>
-		</dependency>
+		</dependency-->
 		<!-- Android -->
-        <dependency>
+       <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-	</dependency>
+            <scope>provided</scope>
+		</dependency>
+		<dependency>
+      		<groupId>junit</groupId>
+      		<artifactId>junit</artifactId>
+      		<version>4.8.2</version>
+      		<scope>test</scope>
+    	</dependency>
 	</dependencies>
 
-	<build>
-        <finalName>${project.artifactId}</finalName>
-        <sourceDirectory>src</sourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
-            </plugin>
-        </plugins>	
-	</build>
 </project>

@@ -4,10 +4,11 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
+
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Societies services - Service Discovery</title>
+<title>Societies Devices - Device Registry</title>
 <style>
 .error {
 	color: #ff0000;
@@ -35,11 +36,11 @@
 
 	<h3>Device Registry</h3>
 		
-<form:form method="POST" action="cisfeed.html" commandName="deviceForm">
+<form:form method="POST" action="deviceregistry.html" commandName="drForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
 			<tr>
-				<td>CIS Activity Methods: </td>
+				<td>Device Registry Methods: </td>
 					<td><form:select path="method" >
 					   <form:option value="NONE" label="--- Select ---" />
 					   <form:options items="${methods}" />
@@ -54,7 +55,7 @@
 		<br />
 		Populate the fields below for Adding a Device
 		<br />
-		<table id="AddFeed">
+		<table id="CSS Devices">
 			<tr>
 				<td>CSS Node ID:</td>
 				<td><form:input path="cssNodeId" /></td>

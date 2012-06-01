@@ -28,9 +28,10 @@ package org.societies.android.platform.servicemonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.platform.interfaces.ICoreServiceMonitor;
-import org.societies.android.platform.utilities.RemoteServiceHandler;
-import org.societies.api.android.internal.model.AndroidParcelable;
+import org.societies.android.api.external.utilities.RemoteServiceHandler;
+import org.societies.android.api.internal.examples.AndroidParcelable;
+import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
+
 
 
 import android.app.ActivityManager;
@@ -266,7 +267,7 @@ public class CoreMonitor extends Service implements ICoreServiceMonitor {
 	}
 
 	@Override
-	public AndroidParcelable getNodeDetails(String client, org.societies.api.android.internal.model.AndroidParcelable node) {
+	public AndroidParcelable getNodeDetails(String client, org.societies.android.api.internal.examples.AndroidParcelable node) {
 		Log.d(LOG_TAG, "getNodeDetails being invoked");
 		Log.d(LOG_TAG, "client: " + client);
 		Log.d(LOG_TAG, "node: " + node.getIdentity());

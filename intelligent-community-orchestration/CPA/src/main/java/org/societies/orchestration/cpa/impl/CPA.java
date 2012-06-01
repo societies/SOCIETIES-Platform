@@ -81,11 +81,10 @@ import org.societies.api.identity.IIdentityManager;
 
 public class CPA
 {
-	
+	public CPA(){}
 	private CPACreationPatterns egocentricCreationManager;
 	
 	private Date lastTemporaryCheck;
-	private Date lastOngoingCheck;
 	private List<ICis> currentCises;
 	/*
      * Constructor for EgocentricCommunityAnalyser
@@ -98,12 +97,7 @@ public class CPA
 	 */
 	
 	public CPA(IIdentity linkedEntity, String linkType) {
-		
 		lastTemporaryCheck = new Date();
-		lastOngoingCheck = new Date();
-		
-		//else
-		//	this.linkedDomain = linkedEntity;
 	}
 	private void sendToCSM(List<ICisProposal> list){
 	}
@@ -152,7 +146,7 @@ public class CPA
     public void setEgocentricCreationManager(CPACreationPatterns egocentricCreationManager) {
     	this.egocentricCreationManager = egocentricCreationManager;
     }
-    
+    public void init(){}
     
     
 }

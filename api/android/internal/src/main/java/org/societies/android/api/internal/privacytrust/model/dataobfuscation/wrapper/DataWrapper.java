@@ -182,7 +182,7 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	
 	private void readFromParcel(Parcel in) {
 		dataId = in.readString();
-		data = in.readParcelable(this.getClass().getClassLoader());
+		data = (E) in.readParcelable(this.getClass().getClassLoader());
 	}
 	
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

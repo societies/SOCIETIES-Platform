@@ -19,6 +19,7 @@
  */
 package org.societies.privacytrust.privacyprotection.test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -44,7 +45,10 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyM
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
@@ -56,7 +60,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacy
  */
 public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerListener {
 	private static Logger LOG = LoggerFactory.getLogger(Test.class.getSimpleName());
-	
+
 	private IPrivacyDataManager privacyDataManager;
 	private IPrivacyDataManagerRemote privacyDataManagerRemote;
 	private IPrivacyPolicyManager privacyPolicyManager;
@@ -66,11 +70,11 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 	private CtxEntity person;
 	private CtxAttribute symLocAttribute;
 	private CtxAttribute statusAttribute;
-	private IIdentityManager idm;
 
 	private IIdentity ownerId;
-	
+
 	public void start() {
+		// -- Privacy Policy Manager usage
 		try {
 			if (null == privacyPolicyManager) {
 				throw new Exception("privacyPolicyManager NULL");
@@ -81,16 +85,30 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 			if (null == commManager.getIdManager()) {
 				throw new Exception("IdManager NULL");
 			}
-			this.idm = commManager.getIdManager();
-			IIdentity cisId = commManager.getIdManager().fromJid("red@societies.local");
-			Requestor requestor = new Requestor(cisId);
-			boolean result = false;
-			result = privacyPolicyManager.deletePrivacyPolicy(requestor);
-			LOG.info("************* [Test Resullt] Privacy policy deleted? "+result);
+			this.getPersonEntity();
+			this.getStatusAttribute();
+			this.getSymLocAttribute();
+			IIdentity requestorId = commManager.getIdManager().fromJid("orange@societies.local");
+			Requestor requestor = new Requestor(requestorId);
+			List<RequestItem> requestItems = new ArrayList<RequestItem>();
+			Resource resource = new Resource(statusAttribute.getId());
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.READ));
+			RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
+			requestItems.add(requestItem);
+			RequestPolicy privacyPolicy = new RequestPolicy(requestItems);
+			privacyPolicy.setRequestor(requestor);
+			privacyPolicy = privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
+			LOG.info("************* [Test Resullt] Privacy policy updated? "+(null != privacyPolicy));
+			if (null != privacyPolicy) {
+				LOG.info(privacyPolicy.toXMLString());
+			}
 		} catch (Exception e) {
 			LOG.error("************* [Tests PrivacyPolicyManager] Error Exception: "+e.getMessage()+"\n", e);
 		}
-		
+
+
+		// -- Privacy Data Manager usage
 		try {
 			if (null == privacyDataManager) {
 				throw new Exception("privacyDataManager NULL");
@@ -102,15 +120,8 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 				throw new Exception("IdManager NULL");
 			}
 			IIdentity requestorId = commManager.getIdManager().fromJid("orange@societies.local");
-			ownerId = commManager.getIdManager().getThisNetworkNode();
 			Requestor requestor = new Requestor(requestorId);
-			//CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
-			this.getPersonEntity();
-			this.getStatusAttribute();
-			this.getSymLocAttribute();
 			Action action = new Action(ActionConstants.READ);
-
-			
 			ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, this.symLocAttribute.getId(), action);
 			LOG.info("************* [Test Resullt] Permission checked? "+(null != permission));
 			if (null != permission) {
@@ -120,6 +131,7 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 			LOG.error("************* [Tests PrivacyDataManager] Error Exception: "+e.getMessage()+"\n", e);
 		}
 
+		// -- Privacy Data Manager Remote Usage
 		try {
 			if (null == privacyDataManagerRemote) {
 				throw new Exception("privacyDataManagerRemote NULL");
@@ -131,17 +143,15 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 				throw new Exception("IdManager NULL");
 			}
 			IIdentity requestorId = commManager.getIdManager().fromJid("orange@societies.local");
-			//IIdentity ownerId = commManager.getIdManager().fromJid("red@societies.local");
-			IIdentity ownerId = commManager.getIdManager().getThisNetworkNode();
 			Requestor requestor = new Requestor(requestorId);
-			//CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			Action action = new Action(ActionConstants.READ);
 			privacyDataManagerRemote.checkPermission(requestor, ownerId, this.statusAttribute.getId(), action, this);
 			LOG.info("************* Permission check remote: launched");
 		} catch (Exception e) {
 			LOG.error("************* [Tests PrivacyDataManagerRemote] Error Exception: "+e.getMessage()+"\n", e);
 		}
-		
+
+		// -- Privacy Policy Manager Remote Usage
 		try {
 			if (null == privacyPolicyManagerRemote) {
 				throw new Exception("privacyPolicyManagerRemote NULL");
@@ -153,8 +163,6 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 				throw new Exception("IdManager NULL");
 			}
 			IIdentity requestorId = commManager.getIdManager().fromJid("orange@societies.local");
-			//IIdentity ownerId = commManager.getIdManager().fromJid("red@societies.local");
-			IIdentity ownerId = commManager.getIdManager().getThisNetworkNode();
 			Requestor requestor = new Requestor(requestorId);
 			privacyPolicyManagerRemote.getPrivacyPolicy(requestor, ownerId, this);
 			LOG.info("************* Get privacy policy remote: launched");
@@ -180,9 +188,9 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 		this.privacyPolicyManager = privacyPolicyManager;
 		LOG.info("************* privacyPolicyManager injected");
 	}
-	
-	
-	
+
+
+
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener#onAccessControlChecked(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
 	 */
@@ -205,43 +213,18 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 		LOG.info("************* onAccessControlAborted "+msg, e);
 	}
 
-	private void getPersonEntity(){
-		try {
-			Future<IndividualCtxEntity> futurePerson = this.getCtxBroker().retrieveCssOperator();
-			person = futurePerson.get();
-			this.ownerId = idm.fromJid(person.getId().getOperatorId());
-			/*Future<List<CtxIdentifier>> futurePersons = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
-			List<CtxIdentifier> persons = futurePersons.get();
-			if (persons.size() == 0){
-				person = this.ctxBroker.createEntity(CtxEntityTypes.PERSON).get();
-				
-			}else{
-				person = (CtxEntity) this.ctxBroker.retrieve(persons.get(0)).get();
-			}*/
-			
-			if (person==null){
-				LOG.debug("Person CtxEntity is null");
-			}else{
-				LOG.debug("Got Person CtxEntity - NOT NULL");
-			}
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private void getPersonEntity() throws Exception{
+		Future<IndividualCtxEntity> futurePerson = this.getCtxBroker().retrieveCssOperator();
+		person = futurePerson.get();
+		if (null == person){
+			throw new Exception("Person CtxEntity is null");
 		}
+		this.ownerId = commManager.getIdManager().fromJid(person.getId().getOwnerId());
 	}
-	
+
 	private void getSymLocAttribute(){
 		try {
-			
+
 			Future<List<CtxIdentifier>> futureAttrs = this.getCtxBroker().lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
 			List<CtxIdentifier> attrs = futureAttrs.get();
 			if (attrs.size() == 0){
@@ -254,7 +237,7 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 			}else{
 				LOG.debug(CtxAttributeTypes.LOCATION_SYMBOLIC+" CtxAttribute - NOT NULL");
 			}
-			
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -268,10 +251,10 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 			e.printStackTrace();
 			this.LOG.debug("EXCEPTION!");
 		}
-			
+
 	}
-	
-	
+
+
 	private void getStatusAttribute(){
 		try {
 			Future<List<CtxIdentifier>> futureAttrs = this.getCtxBroker().lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);
@@ -281,7 +264,7 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 			}else{
 				statusAttribute = (CtxAttribute) this.getCtxBroker().retrieve(attrs.get(0)).get();
 			}
-			
+
 			if (statusAttribute==null){
 				LOG.debug(CtxAttributeTypes.STATUS+" CtxAttribute is null");
 			}else{
@@ -353,7 +336,7 @@ public class Test implements IPrivacyDataManagerListener, IPrivacyPolicyManagerL
 	public void onOperationAborted(String msg, Exception e) {
 		LOG.info("************* onOperationAborted "+msg, e);
 	}	
-	
-	
-	
+
+
+
 }

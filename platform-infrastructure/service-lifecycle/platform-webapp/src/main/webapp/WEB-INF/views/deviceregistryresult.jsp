@@ -22,19 +22,19 @@
 <br/>
 <br/>
 <Table>
-<tr><td><B>Name</B></td><td><B>Description</B></td><td><B>Type</B></td><td><B>Context Source</B></td>
-<td><B>Type</B></td><td><B>Status</B></td></tr> 
+<tr><td><B>Name</B></td><td><B>Description</B></td><td><B>Type</B></td><td><B>Device ID</B></td><td><B>Context Source</B></td></tr> 
 
 	<xc:forEach var="device" items="${devices}">
         <tr>
         	<td>${device.deviceName}</td>
          	<td>${device.deviceDescription}</td>
             <td>${device.deviceType}</td>
+            <td>${device.deviceID}</td>
             <td>${device.contextSource}</td>
         </tr>
     </xc:forEach>
     	
-	</table>
+	</Table>
 	
 <!-- .................END PLACE YOUR CONTENT ................ -->
 	<!-- FOOTER -->

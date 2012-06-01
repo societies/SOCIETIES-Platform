@@ -278,17 +278,10 @@ public class ServiceRegistry implements IServiceRegistry {
 	public List<Service> findServices(Service filter)
 			throws ServiceRetrieveException {
 		
-		//RegistryEntry filterRegistryEntry = this.map2registryEntry(filter);
-				
 		Session session = sessionFactory.openSession();
-		
-		//Example e = Example.create(filterRegistryEntry).enableLike();
-		Criteria c = this.createCriteriaFromService(filter, session);//session.createCriteria(RegistryEntry.class);
-		//c.add(e);
+		Criteria c = this.createCriteriaFromService(filter, session);
 		List<RegistryEntry> tmpRegistryEntryList = c.list();
-		
 		session.close();
-		
 		return createListService(tmpRegistryEntryList);
 	}
 
@@ -310,17 +303,16 @@ public class ServiceRegistry implements IServiceRegistry {
 		try {
 			if (session.get(
 					RegistryEntry.class,
-					new ServiceResourceIdentiferDAO(serviceIdentifier
-							.getIdentifier().toString(), serviceIdentifier
-							.getServiceInstanceIdentifier())) != null) {
-				ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
-						CISID, new ServiceResourceIdentiferDAO(
-								serviceIdentifier.getIdentifier().toString(),
-								serviceIdentifier
-										.getServiceInstanceIdentifier()));
-
-				session.save(tmpSharedInCIS);
-				t.commit();
+					new ServiceResourceIdentiferDAO(serviceIdentifier.getIdentifier().toString(), serviceIdentifier.getServiceInstanceIdentifier())
+				) != null) {
+								ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
+										CISID, new ServiceResourceIdentiferDAO(
+												serviceIdentifier.getIdentifier().toString(),
+												serviceIdentifier
+														.getServiceInstanceIdentifier()));
+				
+								session.save(tmpSharedInCIS);
+								t.commit();
 			} else {
 				throw new ServiceNotFoundException(
 						"The service doesn't exist in the registry.");
@@ -558,10 +550,29 @@ public class ServiceRegistry implements IServiceRegistry {
 	 * @see org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry#retrieveCISSharedService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
 	 */
 	@Override
-	public List<String> retrieveCISSharedService(
-			ServiceResourceIdentifier serviceIdentifier) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<String> retrieveCISSharedService(ServiceResourceIdentifier serviceIdentifier) {
+		List<String> returnedServiceList = new ArrayList<String>();
+		Session session = sessionFactory.openSession();
+		try {
+			Criteria c = session.createCriteria(ServiceSharedInCISDAO.class);
+			//Service Identifier
+			if (serviceIdentifier != null) {
+				if (serviceIdentifier.getIdentifier() != null) {
+					c.add(Restrictions.like("serviceResourceIdentifier.identifier", serviceIdentifier.getIdentifier().toString()));
+				}
+				if (serviceIdentifier.getServiceInstanceIdentifier() != null) {
+					c.add(Restrictions.like("serviceResourceIdentifier.instanceId", serviceIdentifier.getServiceInstanceIdentifier()));
+				}
+			}		
+			List<ServiceSharedInCISDAO> serviceSharedInCISDAOList = c.list();
+
+			for (ServiceSharedInCISDAO serviceSharedInCISDAO : serviceSharedInCISDAOList) {
+				returnedServiceList.add(serviceSharedInCISDAO.getCISId());
+			}
+		} finally {
+			session.close();
+		}
+		return returnedServiceList;
 	}
 
 	/* Utility methods */

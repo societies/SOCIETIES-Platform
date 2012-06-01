@@ -26,11 +26,6 @@
 
 
     <dependencies>
-		<dependency>
-		    <groupId>org.societies.utilities</groupId>
-		    <artifactId>DBC</artifactId>
-		    <version>${release.version}</version>
-		</dependency>
     
 		<dependency>
 		        <groupId>com.google.android</groupId>
@@ -42,11 +37,6 @@
     	</dependency>
 	
 	
-		<dependency>
-	    	<groupId>org.societies.api.external</groupId>
-	    	<artifactId>societies-api</artifactId>
-	    	<version>${release.version}</version>
-		</dependency>
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
@@ -68,11 +58,6 @@
 	    	<artifactId>asmack</artifactId>
 		</dependency>
 	
-		<dependency>
-			<groupId>org.societies.android.platform</groupId>
-			<artifactId>CoreInterfaces</artifactId>
-			<version>${release.version}</version>
-		</dependency>
 	
 		<dependency>
  			<groupId>org.slf4j</groupId>
@@ -179,6 +164,26 @@
 			    </relocations>
 		    </configuration>
 	    </plugin>
+	    <plugin>
+            <groupId>nl.windgazer</groupId>
+            <artifactId>jsdoctk-plugin</artifactId>
+            <version>2.3.2</version>
+            <executions>
+                <execution>
+                    <phase>site</phase>
+                    <goals>
+                        <goal>jsdoc</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <!-- The generated documentation will be put on this directory -->
+                <directory>${project.build.directory}/doc</directory>
+                <!-- JS file(s) of this directory will be used to generate the documentation -->
+                <srcDir>${basedir}/assets/www/reference.js</srcDir>
+            </configuration>
+        </plugin>
+	    
         </plugins>
     </build>
 </project>

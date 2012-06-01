@@ -24,8 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +36,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
 /**
+ * A wrapper around {@link DataTransferAnalyzer}
+ * 
  * Parses the log and tries to find potential privacy breaches that occurred in the past.
  * This can be used for the a-posteriori assessment.
  * 
@@ -53,8 +54,8 @@ public class Assessment implements IAssessment {
 	private PrivacyLog privacyLog;
 	private DataTransferAnalyzer dataTransferAnalyzer;
 	
-	private List<AssessmentResultIIdentity> assessmentById = new ArrayList<AssessmentResultIIdentity>();
-	private List<AssessmentResultClassName> assessmentByClass = new ArrayList<AssessmentResultClassName>();
+	private HashMap<IIdentity, AssessmentResultIIdentity> assessmentById = new HashMap<IIdentity, AssessmentResultIIdentity>();
+	private HashMap<String, AssessmentResultClassName> assessmentByClass = new HashMap<String, AssessmentResultClassName>();
 	
 	public Assessment() {
 		LOG.info("Constructor");
@@ -71,6 +72,7 @@ public class Assessment implements IAssessment {
 	}
 
 	public void init() {
+		LOG.debug("init()");
 		dataTransferAnalyzer = new DataTransferAnalyzer(privacyLog);
 		assessAllNow();
 	}
@@ -83,14 +85,19 @@ public class Assessment implements IAssessment {
 	
 	@Override
 	public void assessAllNow() {
+		
+		LOG.info("assessAllNow()");
+		
 		try {
+			// For each sender identity: calculate result and update value in assessmentById
 			for (IIdentity sender : privacyLog.getSenderIds()) {
 				AssessmentResultIIdentity ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
-				assessmentById.add(ass);
+				assessmentById.put(sender, ass);
 			}
+			// For each sender class: calculate result and update value in assessmentByClass
 			for (String sender : privacyLog.getSenderClassNames()) {
 				AssessmentResultClassName ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
-				assessmentByClass.add(ass);
+				assessmentByClass.put(sender, ass);
 			}
 		}
 		catch (AssessmentException e) {
@@ -99,54 +106,58 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public List<AssessmentResultIIdentity> getAssessmentAllIds() {
+	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds() {
+		
+		LOG.info("getAssessmentAllIds()");
+
 		return assessmentById;
 	}
 	
 	@Override
-	public List<AssessmentResultClassName> getAssessmentAllClasses() {
+	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses() {
+
+		LOG.info("getAssessmentAllClasses()");
+		
 		return assessmentByClass;
 	}
 
 	@Override
 	public AssessmentResultIIdentity getAssessment(IIdentity sender) {
 		
+		LOG.info("getAssessment({})", sender);
+		
 		if (sender == null || sender.getJid() == null) {
 			LOG.warn("getAssessment({}): invalid argument", sender);
 			return null;
 		}
-		
-		for (AssessmentResultIIdentity ass : assessmentById) {
-			if (ass.getSender().getJid().equals(sender.getJid())) {
-				return ass;
-			}
-		}
-		return null;
+		return assessmentById.get(sender);
 	}
 
 	@Override
 	public AssessmentResultClassName getAssessment(String sender) {
-		
+
+		LOG.info("getAssessment({})", sender);
+
 		if (sender == null) {
 			LOG.warn("getAssessment({}): invalid argument", sender);
 			return null;
 		}
-		
-		for (AssessmentResultClassName ass : assessmentByClass) {
-			if (ass.getSender().equals(sender)) {
-				return ass;
-			}
-		}
-		return null;
+		return assessmentByClass.get(sender);
 	}
 	
 	@Override
 	public long getNumDataTransmissionEvents() {
+
+		LOG.info("getNumDataTransmissionEvents()");
+		
 		return privacyLog.getDataTransmission().size();
 	}
 	
 	@Override
 	public long getNumDataAccessEvents() {
+
+		LOG.info("getNumDataAccessEvents()");
+		
 		return privacyLog.getDataAccess().size();
 	}
 }

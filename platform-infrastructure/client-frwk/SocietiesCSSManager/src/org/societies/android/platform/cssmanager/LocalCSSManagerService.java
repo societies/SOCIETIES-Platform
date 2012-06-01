@@ -30,8 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.platform.interfaces.IAndroidCSSManager;
-import org.societies.api.android.internal.model.AndroidCSSRecord;
+import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
+import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;

@@ -98,13 +98,15 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 					/*handler the unknown work*/
 				}
 			}
-			if(conflicts.size()==0)//no unresolved conflicts
+			if(conflicts.size()==0){//no unresolved conflicts
+				logging.debug("no unresolved conflicts");
 				this.implementIAction(action);
-			else{
+			}else{
 				List<String> options=new ArrayList<String>();
 				options.add(intent.toString());
 				for(IOutcome conf:conflicts)
 				options.add(conf.toString());
+				logging.debug("Call Feedback Manager");
 				ExpProposalContent epc=new ExpProposalContent("Conflict Detected!",
 						options.toArray(new String[options.size()]));
 				feedbackHandler.getExplicitFB(ExpProposalType.RADIOLIST, epc, 

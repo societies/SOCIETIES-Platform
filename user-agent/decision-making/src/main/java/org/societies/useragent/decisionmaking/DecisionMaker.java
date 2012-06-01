@@ -33,118 +33,133 @@ package org.societies.useragent.decisionmaking;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import org.slf4j.*;
+
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.framework.BundleContext;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.useragent.conflict.*;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.personalisation.model.IActionConsumer;
-import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.useragent.conflict.ConfidenceTradeoffRule;
 import org.societies.useragent.conflict.ConflictResolutionManager;
 import org.societies.useragent.conflict.IntentPriorRule;
 
 public class DecisionMaker extends AbstractDecisionMaker {
 
+	private BundleContext myContext;
+
 	private IIdentity entityID;
-	
-	private List<IActionConsumer> temporal=null;
-	
-	private IServiceDiscovery SerDiscovery;
+
+	private List<IActionConsumer> temporal = null;
+
+	// private IServiceDiscovery SerDiscovery;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	
-	public IServiceDiscovery getSerDiscovery() {
-		return SerDiscovery;
-	}
-	public void setSerDiscovery(IServiceDiscovery serDiscovery) {
-		SerDiscovery = serDiscovery;
-	}
-	private void refreshServiceLookup(){
-		List<IActionConsumer> lst=new ArrayList<IActionConsumer>();
-		try {
-			List<Service> ls=this.SerDiscovery.getLocalServices().get();
-			for(Service ser:ls){
-				if(ser instanceof IActionConsumer){
-					lst.add((IActionConsumer)ser);
-				}
-				logging.debug("fetch service:\t"+ser);
+
+	// public IServiceDiscovery getSerDiscovery() {
+	// return SerDiscovery;
+	// }
+	// public void setSerDiscovery(IServiceDiscovery serDiscovery) {
+	// SerDiscovery = serDiscovery;
+	// }
+
+	private void refreshServiceLookup() {
+		List<IActionConsumer> lst = new ArrayList<IActionConsumer>();
+		ServiceTracker servTracker = new ServiceTracker(this.myContext,
+				IActionConsumer.class.getName(), null);
+		logging.debug("query for all IActionConsumer");
+		servTracker.open();
+		Object[] ls = servTracker.getServices();
+		// List<Service> ls=this.SerDiscovery.getLocalServices().get();
+		for (Object ser : ls) {
+			if (ser instanceof IActionConsumer) {
+				lst.add((IActionConsumer) ser);
 			}
-		} catch (ServiceDiscoveryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logging.debug("fetch service:\t" + ser);
 		}
-	
-		this.temporal=lst;
+		this.temporal = lst;
 	}
-	
+
+	public BundleContext getMyContext() {
+		return myContext;
+	}
+
+	public void setMyContext(BundleContext myContext) {
+		logging.debug("BundleContext injected:\t"+myContext);
+		this.myContext = myContext;
+	}
+
 	public IIdentity getEntityID() {
 		return entityID;
 	}
+
 	public void setEntityID(IIdentity entityID) {
 		this.entityID = entityID;
 	}
 
-	public DecisionMaker(){
-		ConflictResolutionManager man=new ConflictResolutionManager();
+	public DecisionMaker() {
+		ConflictResolutionManager man = new ConflictResolutionManager();
 		man.addRule(new ConfidenceTradeoffRule());
 		man.addRule(new IntentPriorRule());
-		this.manager=man;
+		this.manager = man;
 		logging.debug("Intialized DM");
 	}
+
 	@Override
 	protected ConflictType detectConflict(IOutcome intent, IOutcome prefernce) {
-		// TODO Auto-generated  method stub
+		// TODO Auto-generated method stub
 		try {
 			if (intent.getServiceID().equals(prefernce.getServiceID())) {
 				if (intent.getparameterName().equals(
 						prefernce.getparameterName())) {
-					if (!intent.getvalue().
-							equalsIgnoreCase(prefernce.getvalue())) {
+					if (!intent.getvalue().equalsIgnoreCase(
+							prefernce.getvalue())) {
+						logging.debug("conflict detected!");
 						return ConflictType.PREFERNCE_INTENT_NOT_MATCH;
 					}
 				}
 			}
-			logging.debug("detecting conflict DM");
 			return ConflictType.NO_CONFLICT;
 		} catch (Exception e) {
 			return ConflictType.UNKNOWN_CONFLICT;
 		}
-		
+
 	}
+
 	@Override
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
+		logging.debug("make decision with\t" + preferences.size()+" preferences"+"\t"+intents.size()+" intents");
 		this.refreshServiceLookup();
+		logging.debug("refresh the list of services and doing decision making...");
 		super.makeDecision(intents, preferences);
+		logging.debug("decision making has been finished");
 	}
 
 	@Override
 	protected void implementIAction(IAction action) {
 		// TODO Auto-generated method stub
-		//@temporal solution depends on the 3rd party-services
-		//System.out.println("****************************************");
-		//System.out.println("implement the Action:\t"+action);
-		//System.out.println("of Type:\t"+action.getServiceType());
-		//System.out.println("with Parameter:\t"+action.getparameterName());
-		//System.out.println("with Parameter:\t"+action.getvalue());
-		//System.out.println("****************************************");
-		logging.debug( "implement IAction DM");
-		for(IActionConsumer consumer:this.temporal){
-			if(consumer.getServiceIdentifier().equals(action.getServiceID())){
+		// @temporal solution depends on the 3rd party-services
+		logging.debug("****************************************");
+		logging.debug("implement the Action for Service ID:\t"+action.getServiceID());
+		logging.debug("Service Type:\t"+action.getServiceType());
+		logging.debug("Parameter Name of IAction:\t"+action.getparameterName());
+		logging.debug("Parameter Value of IAction:\t"+action.getvalue());
+		logging.debug("****************************************");
+		logging.debug("implementing IAction DM");
+		boolean found=false;
+		for (IActionConsumer consumer : this.temporal) {
+			if (consumer.getServiceIdentifier().equals(action.getServiceID())) {
 				consumer.setIAction(this.entityID, action);
-				logging.debug("set IAction DM");
+				logging.debug("Service has been matched. IAction has been sent to the service");
+				found=true;
 			}
 		}
-		
+		if(!found){
+			logging.debug("No services have been founded to implement the IAction");
+		}
+
 	}
 
 }

@@ -29,9 +29,9 @@ package org.societies.android.platform.servicemonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.platform.interfaces.ICoreServiceExample;
-import org.societies.android.platform.interfaces.ICoreServiceMonitor;
-import org.societies.api.android.internal.model.AndroidParcelable;
+import org.societies.android.api.internal.examples.AndroidParcelable;
+import org.societies.android.api.internal.examples.ICoreServiceExample;
+import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.utilities.DBC.Dbc;
 
 import android.app.ActivityManager;
@@ -189,7 +189,7 @@ public class SameProcessService extends Service implements ICoreServiceExample, 
 	}
 
 	@Override
-	public AndroidParcelable getNodeDetails(String client, org.societies.api.android.internal.model.AndroidParcelable arg1) {
+	public AndroidParcelable getNodeDetails(String client, org.societies.android.api.internal.examples.AndroidParcelable arg1) {
 		// TODO Auto-generated method stub
 		return null;
 	}

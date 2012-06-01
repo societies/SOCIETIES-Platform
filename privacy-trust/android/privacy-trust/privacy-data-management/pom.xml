@@ -56,8 +56,8 @@
 	<dependencies>
 		<!-- Societies -->
 		<dependency>
-			<groupId>org.societies.android.api</groupId>
-			<artifactId>societies-android-api</artifactId>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api-external</artifactId>
 			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>

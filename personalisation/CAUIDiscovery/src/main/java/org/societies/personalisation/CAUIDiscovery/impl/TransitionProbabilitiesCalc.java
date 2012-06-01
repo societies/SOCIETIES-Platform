@@ -66,10 +66,7 @@ public class TransitionProbabilitiesCalc {
 				
 		return results;
 	}
-	
-	
-	
-	
+		
 	public List<LinkedHashMap<String,HashMap<String,Double>>> calcTrans2ProbTasks(LinkedHashMap<List<String>,ActionDictObject> dictionary){
 
 		// {A--> [B, 0.5],[A,0.4],[C,0.1]}

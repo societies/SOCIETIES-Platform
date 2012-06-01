@@ -30,12 +30,12 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONTokener;
-import org.societies.android.platform.interfaces.ICoreServiceMonitor;
+import org.societies.android.api.external.utilities.ServiceMethodTranslator;
+import org.societies.android.api.internal.servicemonitor.AndroidActiveServices;
+import org.societies.android.api.internal.servicemonitor.AndroidActiveTasks;
+import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor.LocalBinder;
-import org.societies.android.platform.utilities.ServiceMethodTranslator;
-import org.societies.api.android.internal.model.AndroidActiveServices;
-import org.societies.api.android.internal.model.AndroidActiveTasks;
 
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;

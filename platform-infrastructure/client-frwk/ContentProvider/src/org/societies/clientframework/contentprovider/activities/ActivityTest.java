@@ -2,11 +2,12 @@ package org.societies.clientframework.contentprovider.activities;
 
 import java.util.List;
 
-import org.societies.api.android.internal.tables.CredentialTable;
-import org.societies.api.android.internal.tables.CssNodeTable;
-import org.societies.api.android.internal.tables.CssUtils;
-import org.societies.api.android.internal.tables.ServiceTable;
-import org.societies.api.internal.css.management.CSSNode;
+import org.societies.android.api.internal.contentproviders.CredentialTable;
+import org.societies.android.api.internal.contentproviders.CssNodeTable;
+import org.societies.android.api.internal.contentproviders.CssUtils;
+import org.societies.android.api.internal.contentproviders.ServiceTable;
+import org.societies.api.schema.cssmanagement.CssNode;
+
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -68,7 +69,7 @@ public class ActivityTest extends Activity {
 		
 		Log.w("ContentProvider", "Uri is "+result.toString());
 		Uri nodeURI = Uri.parse(CssNodeTable.CSS_NODE_URI);
-		CSSNode node = new CSSNode();
+		CssNode node = new CssNode();
 		node.setIdentity("luca");
 		node.setStatus(200);
 		node.setType(1);
@@ -79,9 +80,9 @@ public class ActivityTest extends Activity {
 		
 		
 	    
-		List<CSSNode> list = CssUtils.cursor2Node(getContentResolver().query(nodeURI, null, null, null, null));
+		List<CssNode> list = CssUtils.cursor2Node(getContentResolver().query(nodeURI, null, null, null, null));
 	    
-		for (CSSNode n: list){
+		for (CssNode n: list){
 	    	
 	    	Log.v("ContentProvider" , "Android CSSNODE:" + n.getIdentity() + " stauts:"+n.getStatus() + " - type:"+n.getType());
 	    }

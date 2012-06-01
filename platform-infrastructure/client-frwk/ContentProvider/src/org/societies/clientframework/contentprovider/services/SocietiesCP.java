@@ -1,11 +1,12 @@
 package org.societies.clientframework.contentprovider.services;
 
-import org.societies.android.platform.interfaces.IContentProvider;
-import org.societies.api.android.internal.tables.CredentialTable;
-import org.societies.api.android.internal.tables.CssNodeTable;
-import org.societies.api.android.internal.tables.CssNodesTable;
-import org.societies.api.android.internal.tables.CssProfileTable;
-import org.societies.api.android.internal.tables.ServiceTable;
+
+import org.societies.android.api.internal.contentproviders.CredentialTable;
+import org.societies.android.api.internal.contentproviders.CssNodeTable;
+import org.societies.android.api.internal.contentproviders.CssNodesTable;
+import org.societies.android.api.internal.contentproviders.CssProfileTable;
+import org.societies.android.api.internal.contentproviders.IContentProvider;
+import org.societies.android.api.internal.contentproviders.ServiceTable;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;

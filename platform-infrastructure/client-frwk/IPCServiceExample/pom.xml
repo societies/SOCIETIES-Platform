@@ -25,18 +25,12 @@
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
         </dependency>
-        <dependency>
-          	<groupId>org.societies.android.platform</groupId>
-  			<artifactId>CoreInterfaces</artifactId>
-  			<version>${release.version}</version>
-  			<scope>compile</scope>
-        </dependency>
-        <dependency>
-			<groupId>org.societies.utilities</groupId>
-			<artifactId>DBC</artifactId>
-  			<version>${release.version}</version>
-  			<scope>compile</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api-external</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+
         
     </dependencies>
 

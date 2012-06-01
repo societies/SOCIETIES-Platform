@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+    <!-- Servlets -->
+    <servlet>
+        <servlet-name>SocietiesServlet</servlet-name>
+        <servlet-class>org.societies.da.openfire.plugin.SocietiesServlet</servlet-class>
+    </servlet>
+
+    <!-- Servlet mappings -->
+    <servlet-mapping>
+        <servlet-name>SocietiesServlet</servlet-name>
+        <url-pattern>/societies</url-pattern>
+    </servlet-mapping>
+	
+</web-app>
