@@ -22,7 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.automatically-configure-cis;
+package org.societies.integration.test.bit.automatically_configure_cis;
+
+import java.util.ArrayList;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -43,7 +45,7 @@ public class Test1026 extends IntegrationTestCase{
 	private static IHelloWorld helloWorld;
 	
 	public Test1026(){
-		super(1026, new Class[]{Tester.class});
+		super(1026, new Class[]{CreateUserData.class});
 		configureCis();
 	}
 	
@@ -52,23 +54,24 @@ public class Test1026 extends IntegrationTestCase{
 	}
 	
 	public void configureCis() {
-		ArrayList<String> sharedData = sharedAddress();
-		configureWithECA();
-		configureWithCSCW();
-		configureWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		configureWithECA(sharedData);
+		configureWithCSCW(sharedData);
+		configureWithCSM(sharedData);
 	}
 	
 	public void configureSubCis() {
-		configureWithECA();
-		configureWithCSCW();
-		configureWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		configureWithECA(sharedData);
+		configureWithCSCW(sharedData);
+		configureWithCSM(sharedData);
 	}
 	
 	public void configureCisForSharedAddress() {
-		ArrayList<String> sharedData = sharedAddress();
-		configureWithECA();
-		configureWithCSCW();
-		configureWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		configureWithECA(sharedData);
+		configureWithCSCW(sharedData);
+		configureWithCSM(sharedData);
 	}
 	
     public ArrayList<String> addSharedAddress() {

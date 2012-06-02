@@ -22,7 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.automatically-merge-ciss;
+package org.societies.integration.test.bit.automatically_merge_ciss;
+
+import java.util.ArrayList;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -43,7 +45,7 @@ public class Test1023 extends IntegrationTestCase{
 	private static IHelloWorld helloWorld;
 	
 	public Test1023(){
-		super(1023, new Class[]{Tester.class});
+		super(1023, new Class[]{CreateUserData.class});
 		mergeCiss();
 	}
 	
@@ -52,18 +54,18 @@ public class Test1023 extends IntegrationTestCase{
 	}
 	
 	public void mergeCiss() {
-		ArrayList<String> sharedData = sharedAddress();
-		mergeWithECA();
-		mergeWithCSCW();
-		mergeWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		mergeWithECA(sharedData);
+		mergeWithCSCW(sharedData);
+		mergeWithCSM(sharedData);
 	}
 	
 	
 	public void mergeCissForSharedAddress() {
-		ArrayList<String> sharedData = sharedAddress();
-		mergeWithECA();
-		mergeWithCSCW();
-		mergeWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		mergeWithECA(sharedData);
+		mergeWithCSCW(sharedData);
+		mergeWithCSM(sharedData);
 	}
 	
     public ArrayList<String> addSharedAddress() {

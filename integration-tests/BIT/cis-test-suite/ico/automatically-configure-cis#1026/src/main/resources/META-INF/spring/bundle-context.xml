@@ -22,7 +22,7 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-	<bean id="TestCase1026" class="org.societies.integration.test.bit.automatically-configure-cis.Test1026" init-method="init">
+	<bean id="TestCase1026" class="org.societies.integration.test.bit.automatically_configure_cis.Test1026" init-method="init">
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="uam" ref="uam" />
 		<property name="commsMgr" ref="commsMgr"/>

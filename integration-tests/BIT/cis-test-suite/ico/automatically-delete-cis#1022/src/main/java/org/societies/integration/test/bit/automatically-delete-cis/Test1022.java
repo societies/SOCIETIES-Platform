@@ -22,7 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.automatically-delete-cis;
+package org.societies.integration.test.bit.automatically_delete_cis;
+
+import java.util.ArrayList;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -43,32 +45,33 @@ public class Test1022 extends IntegrationTestCase{
 	private static IHelloWorld helloWorld;
 	
 	public Test1022(){
-		super(1022, new Class[]{Tester.class});
-		createCis();
+		super(1022, new Class[]{CreateUserData.class});
+		deleteCis();
 	}
 	
 	public void init() {
 		
 	}
 	
-	public void createCis() {
-		ArrayList<String> sharedData = sharedAddress();
-		createWithECA();
-		createWithCSCW();
-		createWithCSM();
+	public void deleteCis() {
+		ArrayList<String> sharedData = addSharedAddress();
+		deleteWithECA(sharedData);
+		deleteWithCSCW(sharedData);
+		deleteWithCSM(sharedData);
 	}
 	
 	public void createSubCis() {
-		createWithECA();
-		createWithCSCW();
-		createWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		deleteWithECA(sharedData);
+		deleteWithCSCW(sharedData);
+		deleteWithCSM(sharedData);
 	}
 	
 	public void createCisForSharedAddress() {
-		ArrayList<String> sharedData = sharedAddress();
-		createWithECA();
-		createWithCSCW();
-		createWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		deleteWithECA(sharedData);
+		deleteWithCSCW(sharedData);
+		deleteWithCSM(sharedData);
 	}
 	
     public ArrayList<String> addSharedAddress() {
@@ -91,18 +94,18 @@ public class Test1022 extends IntegrationTestCase{
     	
     }
 	
-	public void createWithECA(ArrayList<String> sharedData) {
+	public void deleteWithECA(ArrayList<String> sharedData) {
 
 		//EgocentricCommunityAnalyser eca = new EgocentricCommunityAnalyser();
 		//eca.identifyCissToCreate();
 	}
 	
-    public void createWithCSCW(ArrayList<String> sharedData) {
+    public void deleteWithCSCW(ArrayList<String> sharedData) {
     	//CollaborationPatternAnalyser cpa = new CollaborationPatternAnalyser();
     	//cpa.triggerAlgorithm();
 	}
 
-    public void createWithCSM(ArrayList<String> sharedData) {
+    public void deleteWithCSM(ArrayList<String> sharedData) {
 
 		//ContextStateModelsAnalyser csm = new ContextStateModelsAnalyser();
 		//csm.triggerModelChecking();

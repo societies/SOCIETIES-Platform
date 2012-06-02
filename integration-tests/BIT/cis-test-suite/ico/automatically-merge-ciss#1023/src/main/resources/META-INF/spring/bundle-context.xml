@@ -22,14 +22,14 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-	<bean id="TestCase1023" class="org.societies.integration.test.bit.automatically-merge-ciss.Test1023" init-method="init">
+	<bean id="TestCase1023" class="org.societies.integration.test.bit.automatically_merge_ciss.Test1023" init-method="init">
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="uam" ref="uam" />
 		<property name="commsMgr" ref="commsMgr"/>
 		<property name="HelloWorld" ref="HelloWorld"></property>
   	</bean>
   	
-  	<bean id="HelloWorld" class="org.societies.integration.test.bit.automatically-merge-ciss.HelloWorld">
+  	<bean id="HelloWorld" class="org.societies.integration.test.bit.automatically_merge_ciss.HelloWorld">
   		<property name="uam" ref="uam"/>
   	</bean>
   	

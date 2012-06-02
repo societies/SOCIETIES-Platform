@@ -22,7 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.automatically-join-cis;
+package org.societies.integration.test.bit.automatically_join_cis;
+
+import java.util.ArrayList;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -43,7 +45,7 @@ public class Test1011 extends IntegrationTestCase{
 	private static IHelloWorld helloWorld;
 	
 	public Test1011(){
-		super(1011, new Class[]{Tester.class});
+		super(1011, new Class[]{CreateUserData.class});
 		joinCis();
 	}
 	
@@ -52,23 +54,24 @@ public class Test1011 extends IntegrationTestCase{
 	}
 	
 	public void joinCis() {
-		ArrayList<String> sharedData = sharedAddress();
-		joinWithECA();
-		joinWithCSCW();
-		joinWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		joinWithECA(sharedData);
+		joinWithCSCW(sharedData);
+		joinWithCSM(sharedData);
 	}
 	
 	public void joinSubCis() {
-		joinWithECA();
-		joinWithCSCW();
-		joinWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		joinWithECA(sharedData);
+		joinWithCSCW(sharedData);
+		joinWithCSM(sharedData);
 	}
 	
 	public void joinCisForSharedAddress() {
-		ArrayList<String> sharedData = sharedAddress();
-		joinWithECA();
-		joinWithCSCW();
-		joinWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		joinWithECA(sharedData);
+		joinWithCSCW(sharedData);
+		joinWithCSM(sharedData);
 	}
 	
     public ArrayList<String> addSharedAddress() {

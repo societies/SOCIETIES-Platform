@@ -22,7 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.automatically-leave-cis;
+package org.societies.integration.test.bit.automatically_leave_cis;
+
+import java.util.ArrayList;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -43,7 +45,7 @@ public class Test1012 extends IntegrationTestCase{
 	private static IHelloWorld helloWorld;
 	
 	public Test1012(){
-		super(1012, new Class[]{Tester.class});
+		super(1012, new Class[]{CreateUserData.class});
 		leaveCis();
 	}
 	
@@ -51,18 +53,18 @@ public class Test1012 extends IntegrationTestCase{
 		
 	}
 	
-	public void createCis() {
-		ArrayList<String> sharedData = sharedAddress();
-		leaveWithECA();
-		leaveWithCSCW();
-		leaveWithCSM();
+	public void leaveCis() {
+		ArrayList<String> sharedData = addSharedAddress();
+		leaveWithECA(sharedData);
+		leaveWithCSCW(sharedData);
+		leaveWithCSM(sharedData);
 	}
 	
 	public void leaveCisForSharedAddress() {
-		ArrayList<String> sharedData = sharedAddress();
-		leaveWithECA();
-		leaveWithCSCW();
-		leaveWithCSM();
+		ArrayList<String> sharedData = addSharedAddress();
+		leaveWithECA(sharedData);
+		leaveWithCSCW(sharedData);
+		leaveWithCSM(sharedData);
 	}
 	
     public ArrayList<String> addSharedAddress() {
