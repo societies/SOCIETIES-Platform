@@ -284,8 +284,8 @@ public class CommunityRecommender //implements ICommCallback
 		
 	}
 	
-    public ArrayList<String> identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities) {
-    	return identifyAndPerformCisActions(cisPossibilities, null);
+    public ArrayList<String> identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities, ArrayList<String> metadata) {
+    	return identifyAndPerformCisActions(cisPossibilities, metadata);
 	}
 	
 	/*

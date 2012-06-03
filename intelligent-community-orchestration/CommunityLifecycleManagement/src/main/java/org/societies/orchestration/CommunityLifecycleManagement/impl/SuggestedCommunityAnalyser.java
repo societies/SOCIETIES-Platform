@@ -992,7 +992,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    }*/
 	
 	    if (convertedRecommendations.size() != 0) {
-	    	currentActionsMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
+	    	currentActionsMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations, currentActionsMetadata);
 	    	ArrayList<String> cisIds = new ArrayList<String>();
 	        for (int i = 0; i < currentActionsMetadata.size(); i++) {
 	        	cisIds.add(currentActionsMetadata.get(i).split("---")[0].split("CIS ID: ")[1]);
@@ -1225,7 +1225,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
     			CtxIdentifier theCriteriaId = null;
 				try {
-					Future<List<CtxIdentifier>> futureList = userContextBroker.lookup(CtxModelType.ATTRIBUTE, thisCis.getMembershipCriteria().get(m));
+					Future<List<CtxIdentifier>> futureList = userContextBroker.lookup(CtxModelType.ASSOCIATION, thisCis.getMembershipCriteria().get(m));
 					List<CtxIdentifier> list = futureList.get();
 					if (list != null) {
 						if (list.size() > 0) {
@@ -1271,9 +1271,23 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		            if (thisCis.getMembershipCriteria().contains("friends")) {
     		            //Put address as sub-CIS of friends CIS
     		            proposedActionsWithMetadata.add(i);
+    		            ICisProposal friendsCis = thisCis;
+    		            ArrayList<String> newCrit = friendsCis.getMembershipCriteria();
+    		            newCrit.remove("address");
+    		            ArrayList<String> addressCrit = thisCis.getMembershipCriteria();
+    		            friendsCis.setMembershipCriteria(newCrit);
+    		            thisCis.setMembershipCriteria(addressCrit);
+    		            friendsCis.addSubCis(thisCis);
+    		            thisCis.setParentCis(friendsCis);
     		            ArrayList<ICisProposal> temp = new ArrayList<ICisProposal>();
     		            temp.add(thisCis);
     		            creations.add(temp);
+    		            temp = new ArrayList<ICisProposal>();
+    		            temp.add(friendsCis);
+    		            creations.add(temp);
+    		            
+    		            //add metadata
+    		            currentActionsMetadata.add("ongoing");
     		            
     		            
     	            }
