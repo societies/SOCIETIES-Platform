@@ -40,11 +40,8 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-//import org.societies.api.internal.cis.management.ICisActivityFeed;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-//import org.societies.api.internal.cis.management.ICisActivity;
-//import org.societies.api.internal.cis.management.ICis;
-//import org.societies.api.internal.cis.management.ICisManager;
+
 
 /**import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
@@ -58,27 +55,14 @@ import org.societies.orchestration.api.ICisOwned;
 import org.societies.orchestration.api.ICisParticipant;
 import org.societies.orchestration.api.ICisProposal;
 
-//import org.societies.orchestration.api.ICisEditor;
-//import org.societies.api.cis.management.ICisSubscribed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 
-//import org.societies.api.cis.management.ICis;
-
-//import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
-
-//import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
-
-//import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
-
-//import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
-
-//import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.context.broker.ICtxBroker;
-//import org.societies.api.internal.context.broker.ICommunityCtxBroker;
-//import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
+
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -86,6 +70,7 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
@@ -102,10 +87,14 @@ import org.societies.api.context.model.CtxQuality;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+
 import org.societies.api.css.management.ICssActivity;
+
 import org.societies.api.identity.IIdentityManager;
+
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
@@ -117,14 +106,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-
-
-
-//import org.societies.api.comm.xmpp.datatypes.Identity;
-//import org.societies.comm.examples.commsmanager.impl.CommsServer; 
-//import org.societies.comm.xmpp.interfaces.ICommCallback;
-
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -144,10 +127,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	private IIdentity linkedCss;
 	
 	private ICtxBroker userContextBroker;
-	//private IUserCtxDBMgr userContextDatabaseManager;
-	//private IUserCtxBroker userContextBroker;
-	//private ICommunityCtxBroker communityContextBroker;
-	//private IUserCtxBrokerCallback userContextBrokerCallback;
+
 	private ArrayList<ICisProposal> refusals;
 	
 	private IUserFeedback userFeedback;
@@ -168,15 +148,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	private IPrivacyDataManager privacyDataManager;
 	
 	private IPersonalisationManager personalisationManager;
-	//Eliza commented: (this doesn't exist anymore:
-	//private IPersonalisationCallback personalisationCallback;
 	
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
 	private IDeviceManager deviceManager;
 	
-	//private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
 	private SuggestedCommunityAnalyserResultBean suggestedCommunityAnalyserResultBean;
 	private SuggestedCommunityAnalyserMethodType suggestedCommunityAnalyserMethodType;
@@ -208,6 +185,25 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		proximityHistory = new ArrayList<ProximityRecord>();
 		recordedMetadata = new HashMap<String, String>();
 		refusals = new ArrayList<ICisProposal>();
+		
+		try {
+			List<CtxIdentifier> ctxMetadata = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "hasCLM").get();
+			
+			for (int i = 0; i < ctxMetadata.size(); i++) {
+				CtxAttribute thisMetadata = (CtxAttribute) userContextBroker.retrieve(ctxMetadata.get(i)).get();
+				String thisMetadataValue = thisMetadata.getStringValue();
+				recordedMetadata.put(thisMetadataValue.split("---")[0].split("CIS ID: ")[1], thisMetadataValue.split("---")[1]); 
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 			
 		//new ProximityRecordingThread().start();
 	}
