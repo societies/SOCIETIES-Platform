@@ -126,7 +126,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	
 	private IIdentity linkedCss;
 	
-	private ICtxBroker userContextBroker;
+	private org.societies.api.internal.context.broker.ICtxBroker userContextBroker;
+	private org.societies.api.context.broker.ICtxBroker externalContextBroker;
 
 	private ArrayList<ICisProposal> refusals;
 	
@@ -1127,6 +1128,31 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		    		            //else if (userContextBroker.get(thisMember, thisAttribute).equals("Access refused"))
     		    		            //    conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
     							}
+    							
+    							response = null;
+    							try {
+    								//org.societies.api.context.broker.ICtxBroker externalBroker = ;
+    								thisRequestor = new Requestor(linkedCss);
+    								List<CtxIdentifier> theResult = externalContextBroker.lookup(thisRequestor, thisMember, CtxModelType.ATTRIBUTE, id2.get(0).toString()).get();
+    								if (theResult == null)
+    									conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
+    								else if (theResult.size() == 0)
+    									conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
+    							} catch (NullPointerException e) {
+    								e.printStackTrace();
+    								
+    							} catch (CtxException e) {
+									conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
+
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (ExecutionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
     						}
     		    		}
     				}
@@ -1486,6 +1512,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     public void setUserContextBroker(ICtxBroker userContextBroker) {
     	System.out.println("GOT user context broker" + userContextBroker);
     	this.userContextBroker = userContextBroker;
+    }
+    
+    public void setExternalContextBroker(org.societies.api.context.broker.ICtxBroker externalContextBroker) {
+    	System.out.println("GOT user context broker" + userContextBroker);
+    	this.externalContextBroker = externalContextBroker;
     }
     
     /**public void setUserContextBrokerCallback(ICtxBrokerCallback userContextBrokerCallback) {
