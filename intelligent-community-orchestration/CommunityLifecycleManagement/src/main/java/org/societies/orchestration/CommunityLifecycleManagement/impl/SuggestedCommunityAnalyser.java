@@ -195,13 +195,15 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				recordedMetadata.put(thisMetadataValue.split("---")[0].split("CIS ID: ")[1], thisMetadataValue.split("---")[1]); 
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (CtxException e) {
-			// TODO Auto-generated catch block
+			
+			e.printStackTrace();
+		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
 			
