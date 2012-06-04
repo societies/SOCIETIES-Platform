@@ -25,9 +25,26 @@
 package org.societies.context.location.management.impl;
 
 
-import java.util.*; 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class MockPZWrapperImpl  {
+import org.societies.context.api.user.location.ITag;
+import org.societies.context.api.user.location.IUserLocation;
+import org.societies.context.api.user.location.IZone;
+import org.societies.context.api.user.location.IZoneId;
+import org.societies.context.api.user.location.impl.CoordinateImpl;
+import org.societies.context.api.user.location.impl.TagImpl;
+import org.societies.context.api.user.location.impl.UserLocationImpl;
+import org.societies.context.api.user.location.impl.ZoneIdImpl;
+import org.societies.context.api.user.location.impl.ZoneImpl;
+import org.societies.context.location.management.PZWrapper;
+
+
+public class MockPZWrapperImpl implements PZWrapper {
 	
 	public MockPZWrapperImpl() {
 		fillMockActiveZones();
@@ -85,8 +102,15 @@ public class MockPZWrapperImpl  {
 		private String description;
 	}
 	
- 	public static class ExZone extends Zone {
-		public ExZone() {
+ 	private class ExZone extends Zone {
+		public ExZone(Zone zone){
+			this.setDescription(zone.getDescription());
+			this.setName(zone.getName());
+			this.setType(zone.getType());
+			this.setZoneId(zone.getZoneId());
+		}
+ 		
+ 		public ExZone() {
 			tags = new HashSet<String>();
 		}
 
@@ -134,7 +158,7 @@ public class MockPZWrapperImpl  {
 		private String personalTag;
 	}
 	
-	public static class Location {
+	private class Location {
 		public Location() {
 			zones = new ArrayList<MockPZWrapperImpl.ExZone>();
 		}
@@ -198,30 +222,124 @@ public class MockPZWrapperImpl  {
 	/**************************************************************/
 	/* http://ta-proj02:9082/QueriesGatewayREST/RT/allActiveZones */
 	/**************************************************************/
-	public Collection<Zone> getActiveZones() {
-		return mockActiveZones.values();
+	public Collection<IZone> getActiveZones() {
+		Collection<MockPZWrapperImpl.Zone> mockZones;
+		synchronized (this) {
+			mockZones = mockActiveZones.values();	
+		}
+		
+		Collection<IZone> zones = new ArrayList<IZone>();
+		
+		IZone zone;
+		for (MockPZWrapperImpl.Zone mockZone : mockZones){
+			zone = convert(mockZone);
+			zones.add(zone);
+		}
+		return zones;
 	}
 
 	/********************************************************************************/
 	/* http://ta-proj02:9082/QueriesGatewayREST/RT/activeEntitiesIdsInZone/{zoneId} */
 	/********************************************************************************/
-	public Set<String> getActiveEntitiesIdsInZone(int zoneId) {
-		Set<String> entities = mockActiveEntitiesIdsInZones.get(zoneId);
+	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId) {
+		Set<String> entities;
+		synchronized (this) {
+			entities = mockActiveEntitiesIdsInZones.get(zoneId.getId());	
+		}
 		if (entities == null) {
 			entities = new HashSet<String>();
 		}
 		return entities;
 	}
 
+	
+	
 	/*******************************************************************************/
 	/* http://ta-proj02:9082/QueriesGatewayREST/RT/location/full/entity/{entityId} */
 	/*******************************************************************************/
-	public Location getEntityFullLocation(String entityId) {
-		Location location = mockEntitiesLocations.get(entityId);
-		if (location == null) {
-			location = new Location();
+	public IUserLocation getEntityFullLocation(String entityId) {
+		Location location;
+		synchronized (this) {
+			location = mockEntitiesLocations.get(entityId);	
+			if (location == null) {
+				location = new Location();
+				location = generateRandomLocation(location);
+				mockEntitiesLocations.put(entityId,location);	
+			}
 		}
+		
+		location.setX(location.getX()+1);
+		location.setY(location.getY()+1);
+		
+		IUserLocation userLocation = new UserLocationImpl();
+		List<IZone> zones = convert(location.getZones());
+		userLocation.setZones(zones);
+		userLocation.setXCoordinate(new CoordinateImpl(location.getX()));
+		userLocation.setYCoordinate(new CoordinateImpl(location.getY()));
+		userLocation.setId(entityId);
+		return userLocation;
+	}
+	
+	
+	/*
+	 * Helpers methods
+	 * 
+	 */
+	
+	private Location generateRandomLocation(Location location){
+		location.setX(generateRand());
+		location.setY(generateRand());
+		location.setZ(generateRand());
+		
+		int zoneID = (int) Math.ceil( (Math.random()*100)%6); 
+		Zone zone = mockActiveZones.get(Integer.valueOf(zoneID));
+		ExZone exZone = new ExZone(zone);
+		exZone.setPersonalTag("Personal Tag: "+zoneID);
+		location.getZones().add(exZone);
 		return location;
+	}
+	
+	private double generateRand(){
+		double rand = Math.random()*1000;
+		return Math.ceil(rand);
+	}
+	
+	private List<IZone> convert(List<ExZone> mockZones){
+		List<IZone> zones = new ArrayList<IZone>();
+		
+		IZone zone;
+		for (ExZone exZone : mockZones){
+			zone = convert(exZone);
+			zones.add(zone);
+		}
+		return zones;
+	}
+	
+	private IZone convert(MockPZWrapperImpl.ExZone mockZone){
+		IZone zone = convert((MockPZWrapperImpl.Zone)mockZone);
+		zone.setPersonalTag(new TagImpl(mockZone.getPersonalTag()));
+		
+		List<ITag> tags = new ArrayList<ITag>();
+		for (String tag : mockZone.getTags()){
+			tags.add(new TagImpl(tag));
+		}
+		zone.setTags(tags);
+		
+		return zone;
+		
+	}
+	
+	private IZone convert(MockPZWrapperImpl.Zone mockZone){
+		IZone zone = new ZoneImpl();
+		
+		IZoneId zoneId = new ZoneIdImpl(); 
+		zoneId.setId(mockZone.getZoneId());
+		
+		zone.setDescription(mockZone.getDescription());
+		zone.setName(mockZone.getName());
+		zone.setType(mockZone.getType());
+		
+		return zone;
 	}
 	
 	// Mock Data
@@ -413,4 +531,5 @@ public class MockPZWrapperImpl  {
 
 		mockEntitiesLocations.put(entityId, location);
 	}
+
 }

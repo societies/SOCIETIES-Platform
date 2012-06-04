@@ -284,8 +284,8 @@ public class CommunityRecommender //implements ICommCallback
 		
 	}
 	
-    public ArrayList<String> identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities) {
-    	return identifyAndPerformCisActions(cisPossibilities, null);
+    public ArrayList<String> identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisPossibilities, ArrayList<String> metadata) {
+    	return identifyAndPerformCisActions(cisPossibilities, metadata);
 	}
 	
 	/*
@@ -778,7 +778,7 @@ public class CommunityRecommender //implements ICommCallback
 			    //options[i] = "Change the CIS " + thisCis.getId() + thisCis.getName() + " to remove the following members: " + members;
 		    //}
 			//if (thisCis.getMembersList().size() == thisCisConfigured.getMembersList().size())
-				options[i] = cissToConfigure.get("Configure CISs").get(i).get(1).toString();
+				options[i] = "Change CIS " + thisCis.getCisId() + " to have these attributes: " + cissToConfigure.get("Configure CISs").get(i).get(1).toString();
 		}
         for (int i = 0; i < cissToConfigure.get("Merge CISs").size(); i++) {
 			

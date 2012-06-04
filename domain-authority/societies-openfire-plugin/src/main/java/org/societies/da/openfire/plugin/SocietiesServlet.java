@@ -69,7 +69,7 @@ public class SocietiesServlet extends HttpServlet {
         //No defaults, add, delete, update only
         //type = type == null ? "image" : type;
        
-        // Check this request is authorised
+        // Check this request is authorized
         if (secret == null || !secret.equals(plugin.getSecret())){
             Log.warn("An unauthorised user service request was received: " + request.getQueryString());
             replyError("RequestNotAuthorised",response, out);
@@ -131,16 +131,12 @@ public class SocietiesServlet extends HttpServlet {
         }
     }
 
-    private void replyMessage(String message,HttpServletResponse response, PrintWriter out){
-        response.setContentType("text/xml");        
-        out.println("<result>" + message + "</result>");
-        out.flush();
+    private void replyMessage(String message,HttpServletResponse response, PrintWriter out) throws IOException{
+        response.sendRedirect("public/signup-result.jsp?success=true");
     }
 
-    private void replyError(String error,HttpServletResponse response, PrintWriter out){
-        response.setContentType("text/xml");        
-        out.println("<error>" + error + "</error>");
-        out.flush();
+    private void replyError(String error,HttpServletResponse response, PrintWriter out) throws IOException{
+    	response.sendRedirect("public/signup-result.jsp?error="+error);
     }
     
     @Override

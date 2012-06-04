@@ -93,6 +93,7 @@ public class Test {
 		System.out.println("****************************");
 		System.out.println("Active Zones");
 		System.out.println("------------");
+		/*
 		Collection<MockPZWrapperImpl.Zone> zones = pz.getActiveZones();
 		System.out.println("[");
 		int count = zones.size();
@@ -100,10 +101,11 @@ public class Test {
 			count--;
 			System.out.println(zone + (count > 0 ? ", " : ""));
 		}
-		System.out.println("]");
+		System.out.println("]");*/
 	}
 	
 	private static void activeEntitiesIdsInZone() throws IOException {
+		/*
 		System.out.println("****************************");
 		System.out.println("Active Entities In Zone");
 		System.out.println("-----------------------");
@@ -124,6 +126,7 @@ public class Test {
 			System.out.println("\"" + entityId + "\"" + (count > 0 ? ", " : ""));
 		}
 		System.out.println("]");
+		*/
 	}
 	
 	private static void entityFullLocation() throws IOException {
@@ -132,8 +135,8 @@ public class Test {
 		System.out.println("--------------------");
 		System.out.print("Enter Entity ID: ");
 		String entityId = br.readLine();
-		MockPZWrapperImpl.Location location = pz.getEntityFullLocation(entityId);
-		System.out.println(location);
+		//MockPZWrapperImpl.Location location = pz.getEntityFullLocation(entityId);
+		//System.out.println(location);
 	}
 
 }

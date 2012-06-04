@@ -30,7 +30,7 @@
 	</osgi:reference>
 	
 	
-	<osgi:service ref="HelloWorld" interface="org.societies.integration.test.bit.automatically-create-cis.IHelloWorld">
+	<osgi:service ref="HelloWorld" interface="org.societies.integration.test.bit.automatically_create_cis.IHelloWorld">
 		<osgi:service-properties>
 			<entry key="TargetPlatform" value="SOCIETIES" />
 			<entry key="ServiceProvider" value="ICT-SOCIETIES" />
@@ -46,7 +46,7 @@
 	</bean>
 	
 	
-	<osgi:reference id="HelloWorld" interface="org.societies.integration.test.bit.automatically-create-cis.IHelloWorld">
+	<osgi:reference id="HelloWorld" interface="org.societies.integration.test.bit.automatically_create_cis.IHelloWorld">
 	 	<osgi:listener bind-method="setHelloWorld" ref="TestCase1010"></osgi:listener>
 	</osgi:reference>
 </beans>

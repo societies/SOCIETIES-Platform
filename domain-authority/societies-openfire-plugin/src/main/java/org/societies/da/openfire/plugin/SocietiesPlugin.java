@@ -26,6 +26,7 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
 
     private String secret;
     private Collection<String> allowedIPs;
+    private Collection<String> cloudProviderUrls;
 
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
         server = XMPPServer.getInstance();
@@ -40,7 +41,8 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
 
         // Get the list of IP addresses that can use this service. An empty list means that this filter is disabled.
         allowedIPs = StringUtils.stringToCollection(JiveGlobals.getProperty("plugin.societies.allowedIPs", ""));
-
+        cloudProviderUrls = StringUtils.stringToCollection(JiveGlobals.getProperty("plugin.societies.cloudProviderUrls", ""));
+        
         // Listen to system property events
         PropertyEventDispatcher.addListener(this);
     }
@@ -188,12 +190,24 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
         this.allowedIPs = allowedIPs;
     }
     
-    public void propertySet(String property, Map<String, Object> params) {
-        if (property.equals("plugin.userservice.secret")) {
+    public Collection<String> getCloudProviderUrls() {
+		return cloudProviderUrls;
+	}
+
+	public void setCloudProviderUrls(Collection<String> cloudProviderUrls) {
+		JiveGlobals.setProperty("plugin.societies.allowedIPs", StringUtils.collectionToString(cloudProviderUrls));
+		this.cloudProviderUrls = cloudProviderUrls;
+	}
+
+	public void propertySet(String property, Map<String, Object> params) {
+        if (property.equals("plugin.societies.secret")) {
             this.secret = (String)params.get("value");
         }
-        else if (property.equals("plugin.userservice.allowedIPs")) {
+        else if (property.equals("plugin.societies.allowedIPs")) {
             this.allowedIPs = StringUtils.stringToCollection((String)params.get("value"));
+        }
+        else if (property.equals("plugin.societies.cloudProviderUrls")) {
+            this.cloudProviderUrls = StringUtils.stringToCollection((String)params.get("value"));
         }
     }
 
@@ -203,6 +217,9 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
         }
         else if (property.equals("plugin.societies.allowedIPs")) {
             this.allowedIPs = Collections.emptyList();
+        }
+        else if (property.equals("plugin.societies.cloudProviderUrls")) {
+            this.cloudProviderUrls = Collections.emptyList();
         }
     }
 
