@@ -86,10 +86,11 @@ public class CommAdapterImpl implements DmCommManager{
 		dmEvent.setDeviceId(deviceId);
 		dmEvent.setDescription(deviceCommonInfo.getDeviceDescription());
 		dmEvent.setType(deviceCommonInfo.getDeviceType());
-		dmEvent.setSenderNetworkNode(commManager.getIdManager().getThisNetworkNode().getNodeIdentifier());
+		dmEvent.setSenderNetworkNode(commManager.getIdManager().getThisNetworkNode().getJid());
 		return dmEvent;
 	}
 	
+	@SuppressWarnings("unused")
 	@PostConstruct
 	private void init(){
 		idManager = commManager.getIdManager();
