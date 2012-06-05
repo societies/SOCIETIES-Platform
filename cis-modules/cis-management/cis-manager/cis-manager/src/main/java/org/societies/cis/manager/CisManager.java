@@ -762,6 +762,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}
 	}
 
+	
+	public void UnRegisterCisManager(){
+		//TODO
+		//this.ccmFactory.
+	}
 
 
 }

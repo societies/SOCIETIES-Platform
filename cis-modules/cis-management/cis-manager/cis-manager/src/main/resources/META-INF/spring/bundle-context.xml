@@ -74,7 +74,8 @@
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
-    <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" init-method="init">
+    <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" init-method="init"
+    destroy-method="UnRegisterCisManager">
         <property name="sessionFactory" ref="sessionFactory" />
         <property name="ccmFactory" ref="cisCommMgrFactory"/>
         <property name="iCommMgr" ref="xcCommunication"/>
