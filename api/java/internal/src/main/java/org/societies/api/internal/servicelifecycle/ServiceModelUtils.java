@@ -182,7 +182,7 @@ public class ServiceModelUtils {
 		identity.getJid();
 		
 		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
-		result.setServiceInstanceIdentifier(value);
+		//result.setServiceInstanceIdentifier(value);
 		
 		return null;
 	}

@@ -39,6 +39,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.security.policynegotiator.INegotiation;
+import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -73,6 +77,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	
 	private final long TIMEOUT = 5;
+
+	private INegotiation policyNegotiator;
 	
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
@@ -86,10 +92,18 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		this.commMngr = commMngr;
 	}
 	
+	public void setPolicyNegotiatior(INegotiation policyNegotiator){
+		this.policyNegotiator = policyNegotiator;
+	}
+	
 	public ICommManager getCommMngr() {
 		return commMngr;
 	}
 
+	public INegotiation getPolicyNegotiator(){
+		return policyNegotiator;
+	}
+	
 	public void setServiceControlRemote(IServiceControlRemote serviceControlRemote){
 		this.serviceControlRemote = serviceControlRemote;
 	}
@@ -321,7 +335,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(logger.isDebugEnabled()) 
 				logger.debug("Service Management: installService method, on our node: jid");
 		
-			
+
+			if(){
+				
+			}
 			// Now install the client!
 			Future<ServiceControlResult> asyncResult = null;
 			URL bundleLocation = null;
@@ -679,6 +696,23 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 	}
 
+	private boolean serviceNegotiation(Service service) throws InvalidFormatException{
+		
+		boolean result = true;
+		
+		IIdentity providerNode = getCommMngr().getIdManager().fromJid(service.getServiceInstance().getFullJid());
+
+		if(logger.isDebugEnabled())
+			logger.debug("Got the provider IIdentity, now creating the Requestor");
+		
+		RequestorService provider = new RequestorService(providerNode, service.getServiceIdentifier());
+	
+		boolean includePrivacyPolicyNegotiation = false;
+		INegotiationCallback negotiationCallback = new ServiceNegotiationCallback();
+		getPolicyNegotiator().startNegotiation(provider, includePrivacyPolicyNegotiation, negotiationCallback);
+		return result;
+	}
+	
 	/**
 	 * This method is used to obtain the Bundle that corresponds to a given a Service
 	 * 
