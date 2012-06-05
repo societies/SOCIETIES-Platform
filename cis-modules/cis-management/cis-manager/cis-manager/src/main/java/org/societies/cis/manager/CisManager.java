@@ -123,12 +123,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}
 		for(Cis cis : ownedCISs)
 			cis.setSessionFactory(sessionFactory);
-		//ActivityFeed.setSession(session);
-		//getting owned CISes
-		//Query q = session.createQuery("select o from org_societies_cis_manager_Cis o");
-		//this.ownedCISs = (Set<Cis>) q.list();
-		//q = session.createQuery("select s from org_societies_cis_manager_CisRecord s");
-		//this.subscribedCISs = (Set<CisSubscribedImp>) q.list();
 	}
 
 	private final static List<String> NAMESPACES = Collections

@@ -20,6 +20,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:complexType >
     <xs:sequence>
       <xs:element name="calendarId" type="xs:string" minOccurs="0"/>
+      <xs:element name="CISId" type="xs:string" minOccurs="0"/>
       <xs:element name="eventId" type="xs:string" minOccurs="0"/>
       <xs:element name="keyWord" type="xs:string" minOccurs="0"/>
       <xs:element name="method" type="tns:methodType" minOccurs="0"/>
@@ -57,7 +58,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <xs:simpleType name="methodType">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="retrieveCalendarList"/>
+      <xs:enumeration value="retrieveCISCalendarList"/>
       <xs:enumeration value="retrieveCalendarEvents"/>
       <xs:enumeration value="subscribeToEvent"/>
       <xs:enumeration value="findEvents"/>
