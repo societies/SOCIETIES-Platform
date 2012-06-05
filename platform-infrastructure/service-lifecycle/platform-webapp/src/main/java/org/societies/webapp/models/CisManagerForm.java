@@ -38,6 +38,8 @@ public class CisManagerForm {
 	private String cisName;
 	private String cisType;
 	private Integer cisMode;
+	private String cisJid;
+
 	/**
 	 * @return the method
 	 */
@@ -111,4 +113,10 @@ public class CisManagerForm {
 		this.cisMode = cisMode;
 	}
 	
+	public String getCisJid() {
+		return cisJid;
+	}
+	public void setCisJid(String cisJid) {
+		this.cisJid = cisJid;
+	}
 }
