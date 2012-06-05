@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.activity.ActivityFeed;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
@@ -77,6 +78,7 @@ import org.springframework.stereotype.Component;
 
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.manager.Communities;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
@@ -104,8 +106,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	ICommManager iCommMgr;
 	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
+	ICisDirectoryRemote iCisDirRemote;
 //	IPrivacyPolicyManager polManager;
 	
+
 
 	public void startup(){
 		//ActivityFeed ret = null;
@@ -200,7 +204,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-
+	public ICisDirectoryRemote getiCisDirRemote() {
+		return iCisDirRemote;
+	}
+	public void setiCisDirRemote(ICisDirectoryRemote iCisDirRemote) {
+		this.iCisDirRemote = iCisDirRemote;
+	}
 
 
 
@@ -275,6 +284,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		
 		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory);
+		
+		if(cis == null)
+			return cis;
+		
+		// advertising the CIS to global CIS directory
+		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
+		cisAd.setMode(cis.getMembershipCriteria());
+		cisAd.setName(cis.getName());
+		cisAd.setUri(cis.getCisId());
+		cisAd.setType(cis.getCisType());
+		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
 		
 		LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
 		this.persist(cis);

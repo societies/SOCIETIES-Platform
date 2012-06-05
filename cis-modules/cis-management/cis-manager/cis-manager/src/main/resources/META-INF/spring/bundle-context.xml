@@ -78,6 +78,7 @@
         <property name="sessionFactory" ref="sessionFactory" />
         <property name="ccmFactory" ref="cisCommMgrFactory"/>
         <property name="iCommMgr" ref="xcCommunication"/>
+        <property name="iCisDirRemote" ref="CisDirectoryRemote"/>
     </bean>
     
    <!-- <bean id="CisClientService" 
