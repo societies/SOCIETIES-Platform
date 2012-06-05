@@ -18,6 +18,10 @@
 	<osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
 	
 	
+	<!--  <osgi:reference id="PZWrapper" interface="org.societies.context.location.management.PZWrapper"/>  -->
+	
+	
+	
 	<osgi:service ref="LMAdapterBean" interface="org.societies.context.api.user.location.ILocationManagementAdapter"/>
 	
 </beans>

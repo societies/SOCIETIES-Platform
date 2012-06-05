@@ -24,11 +24,7 @@
  */
 package org.societies.context.location.management.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
@@ -38,6 +34,7 @@ import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.comm.EventsType;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.schema.css.devicemanagment.DmEvent;
+import org.societies.context.api.user.location.ILocationManagementAdapter;
 import org.societies.context.api.user.location.ILocationManagementConfigurator;
 
 
@@ -46,61 +43,35 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 	private PubsubClient pubSubManager; 
 	private ICommManager commManager;
 	private IDeviceRegistry deviceRegistry;
-	
-	private static final Set<String> entityIds = new HashSet<String>();
-	
-	public LMConfiguratorImpl(){
-		
-		//TODO change - for testing
-		synchronized (entityIds) {
-			entityIds.add("1");
-			entityIds.add("2");	
-		}
-	}
-	
-	public Collection<String> getEntityIds(){
-		List<String> lEntityIds = new ArrayList<String>();
-		synchronized (entityIds) {
-			lEntityIds.addAll(entityIds);
-		}
-		return lEntityIds;
-	}
-	
-	public void init(){
+	private ILocationManagementAdapter iLocationManagementAdapter; 
+	 
+	public void init(PubsubClient pubSubManager,ICommManager commManager, IDeviceRegistry deviceRegistry, ILocationManagementAdapter callback){
+		this.iLocationManagementAdapter = callback;
+		this.deviceRegistry = deviceRegistry;
+		this.pubSubManager = pubSubManager;
+		this.commManager = commManager;
+		this.deviceRegistry = deviceRegistry;
 		register();
 	}
 
-	public PubsubClient getPubSubManager() {
-		return pubSubManager;
-	}
-
-	public void setPubSubManager(PubsubClient pubSubManager) {
-		this.pubSubManager = pubSubManager;
-	}
-	
-	public ICommManager getCommManager() {
-		return commManager;
-	}
-
-	public void setCommManager(ICommManager commManager) {
-		this.commManager = commManager;
-	}
-
-	
 	private DeviceConnected deviceConnected = new DeviceConnected();
 	private DeviceDisconnected deviceDisconnected = new DeviceDisconnected();
 	
 	private void register(){
 		try {
 			IIdentity identity = commManager.getIdManager().getThisNetworkNode();
-			pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_CONNECTED, deviceConnected);
-			pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_DISCONNECTED, deviceDisconnected);
+			
+			
+			//pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_CONNECTED, deviceConnected);
+			//pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_DISCONNECTED, deviceDisconnected);
 		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}catch (Error e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		}
-		
 	}
 	
 	private class DeviceConnected implements Subscriber{
@@ -112,8 +83,10 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 				dmEvent = (DmEvent)item;
 				
 				DeviceCommonInfo deviceCommonInfo = deviceRegistry.findDevice(dmEvent.getDeviceId());
-				
 				String macAddress = deviceCommonInfo.getDevicePhysicalAddress();
+				String senderNodeId = dmEvent.getSenderNetworkNode();
+				
+				iLocationManagementAdapter.registerCSSdevice(senderNodeId, dmEvent.getDeviceId(), macAddress);
 				
 				
 			}catch (Exception e) {
@@ -131,6 +104,11 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 			try{
 				dmEvent = (DmEvent)item;
 				
+				DeviceCommonInfo deviceCommonInfo = deviceRegistry.findDevice(dmEvent.getDeviceId());
+				String macAddress = deviceCommonInfo.getDevicePhysicalAddress();
+				String senderNodeId = dmEvent.getSenderNetworkNode();
+				
+				iLocationManagementAdapter.removeCSSdevice(senderNodeId, dmEvent.getDeviceId(), macAddress);
 				
 			}catch (Exception e) {
 				e.printStackTrace();
@@ -146,6 +124,12 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 
 	public void setDeviceRegistry(IDeviceRegistry deviceRegistry) {
 		this.deviceRegistry = deviceRegistry;
+	}
+
+	@Override
+	public Collection<String> getEntityIds() {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 
 }

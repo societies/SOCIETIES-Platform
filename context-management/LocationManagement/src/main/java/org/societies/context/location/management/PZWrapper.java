@@ -37,5 +37,4 @@ public interface PZWrapper {
 	public Collection<IZone> getActiveZones();
 	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
 	public IUserLocation getEntityFullLocation(String entityId); 
-	
 }

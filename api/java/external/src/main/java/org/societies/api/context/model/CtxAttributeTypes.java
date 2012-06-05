@@ -33,7 +33,12 @@ package org.societies.api.context.model;
 public class CtxAttributeTypes {
 
 	/**
-     * 
+     *  @since 0.0.8
+     */
+    public static final String ABOUT = "aboutMe";
+	 
+	/**
+     *  @since 0.0.8
      */
     public static final String ACTION = "action";
     
@@ -88,6 +93,18 @@ public class CtxAttributeTypes {
     public static final String ADDRESS_WORK_STREET_NUMBER = "addressWorkStreetNumber";
 	
     /**
+     * 
+     * @since 0.0.8
+     */
+    public static final String BIRTHDAY = "birthday";
+   
+    /**
+     * 
+     * @since 0.0.8
+     */
+    public static final String BOOKS = "books";
+   
+   /**
      * TODO moved to platform CtxAttributeTypes
      */
     @Deprecated
@@ -98,12 +115,22 @@ public class CtxAttributeTypes {
      */
     @Deprecated
     public static final String CRIST_MODEL = "crist_model";
-    
+        
+    /**
+     * @since 0.0.8
+     */
+    public static final String FAVOURITE_QUOTES = "favoriteQuotes";
+        
 	/**
      * @since 0.0.8
      */
     public static final String ID = "id";
     
+    /**
+     * @since 0.0.8
+     */
+    public static final String INTERESTS = "interests";
+
     /**
      * @since 0.0.8
      */
@@ -122,6 +149,16 @@ public class CtxAttributeTypes {
     /**
      * @since 0.0.8
      */
+    public static final String MOVIES = "movies";
+   
+    /**
+     * @since 0.0.8
+     */
+    public static final String MUSIC = "music";
+    
+    /**
+     * @since 0.0.8
+     */
     public static final String NAME = "name";
     
     /**
@@ -137,10 +174,25 @@ public class CtxAttributeTypes {
     public static final String NAME_LAST = "nameLast";
     
     /**
-
+     * @since 0.0.8
      */
     public static final String PARAMETER_NAME = "parameterName";
     
+    /**
+     * @since 0.0.8
+     */
+    public static final String POLITICAL_VIEWS = "politicalViews";
+ 
+    /**
+     * @since 0.0.8
+     */
+    public static final String RELIGIOUS_VIEWS = "religiouslViews";
+ 
+    /**
+     * @since 0.0.8
+     */
+    public static final String SEX = "sex";
+  
     /**
      * @since 0.0.8
      */

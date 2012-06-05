@@ -40,11 +40,8 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-//import org.societies.api.internal.cis.management.ICisActivityFeed;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-//import org.societies.api.internal.cis.management.ICisActivity;
-//import org.societies.api.internal.cis.management.ICis;
-//import org.societies.api.internal.cis.management.ICisManager;
+
 
 /**import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
@@ -58,27 +55,14 @@ import org.societies.orchestration.api.ICisOwned;
 import org.societies.orchestration.api.ICisParticipant;
 import org.societies.orchestration.api.ICisProposal;
 
-//import org.societies.orchestration.api.ICisEditor;
-//import org.societies.api.cis.management.ICisSubscribed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 
-//import org.societies.api.cis.management.ICis;
-
-//import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
-
-//import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
-
-//import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
-
-//import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
-
-//import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.context.broker.ICtxBroker;
-//import org.societies.api.internal.context.broker.ICommunityCtxBroker;
-//import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
+
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -86,23 +70,31 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxQuality;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+
 import org.societies.api.css.management.ICssActivity;
+
 import org.societies.api.identity.IIdentityManager;
+
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
@@ -114,14 +106,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-
-
-
-//import org.societies.api.comm.xmpp.datatypes.Identity;
-//import org.societies.comm.examples.commsmanager.impl.CommsServer; 
-//import org.societies.comm.xmpp.interfaces.ICommCallback;
-
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -140,11 +126,9 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	
 	private IIdentity linkedCss;
 	
-	private ICtxBroker userContextBroker;
-	//private IUserCtxDBMgr userContextDatabaseManager;
-	//private IUserCtxBroker userContextBroker;
-	//private ICommunityCtxBroker communityContextBroker;
-	//private IUserCtxBrokerCallback userContextBrokerCallback;
+	private org.societies.api.internal.context.broker.ICtxBroker userContextBroker;
+	private org.societies.api.context.broker.ICtxBroker externalContextBroker;
+
 	private ArrayList<ICisProposal> refusals;
 	
 	private IUserFeedback userFeedback;
@@ -165,15 +149,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	private IPrivacyDataManager privacyDataManager;
 	
 	private IPersonalisationManager personalisationManager;
-	//Eliza commented: (this doesn't exist anymore:
-	//private IPersonalisationCallback personalisationCallback;
 	
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
 	private IDeviceManager deviceManager;
 	
-	//private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
 	private SuggestedCommunityAnalyserResultBean suggestedCommunityAnalyserResultBean;
 	private SuggestedCommunityAnalyserMethodType suggestedCommunityAnalyserMethodType;
@@ -205,6 +186,27 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		proximityHistory = new ArrayList<ProximityRecord>();
 		recordedMetadata = new HashMap<String, String>();
 		refusals = new ArrayList<ICisProposal>();
+		
+		try {
+			List<CtxIdentifier> ctxMetadata = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "hasCLM").get();
+			
+			for (int i = 0; i < ctxMetadata.size(); i++) {
+				CtxAttribute thisMetadata = (CtxAttribute) userContextBroker.retrieve(ctxMetadata.get(i)).get();
+				String thisMetadataValue = thisMetadata.getStringValue();
+				recordedMetadata.put(thisMetadataValue.split("---")[0].split("CIS ID: ")[1], thisMetadataValue.split("---")[1]); 
+			}
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			
+			e.printStackTrace();
+		} catch (CtxException e) {
+			
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 			
 		//new ProximityRecordingThread().start();
 	}
@@ -564,10 +566,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			if (configurations.size() > 0)
 			    convertedRecommendations.put("Configure CIS", configurations);
 			
-			if (convertedRecommendations.get("Remove from CSM") != null) {
-				if (convertedRecommendations.get("Remove from CSM").size() > 0) {
-				}
-			}
+			
 			
 		}
 	
@@ -637,6 +636,19 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	        	if (recordedMetadata.get(cisIds.get(i)) == null)
 	        		recordedMetadata.put(cisIds.get(i), currentActionsMetadata.get(i));
 	        }
+	    }
+    	
+    	if (convertedRecommendations.size() != 0) {
+	    	if (convertedRecommendations.get("Create CISs") != null) {
+	            for (int i = 0; i < convertedRecommendations.get("Create CISs").size(); i++) {
+	    	        for (int m = 0; m < currentActionsMetadata.size(); m++) {
+	    	    	    if ((currentActionsMetadata.get(m).split("DESCRIPTION: ")[1].split("---")[0]).equals(
+	    		    		    convertedRecommendations.get("Create CISs").get(i).get(0).getDescription())) {
+	    		    	    refusals.add(convertedRecommendations.get("Create CISs").get(i).get(0));
+	    		        }
+	    	        }
+	            }
+	    	}
 	    }
     	
     	
@@ -838,6 +850,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    		
 	    		
 	    }
+        
+        
 			
 		/**for (int i = 0; i < creations.size(); i++) {
 	
@@ -978,7 +992,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    }*/
 	
 	    if (convertedRecommendations.size() != 0) {
-	    	currentActionsMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
+	    	currentActionsMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations, currentActionsMetadata);
 	    	ArrayList<String> cisIds = new ArrayList<String>();
 	        for (int i = 0; i < currentActionsMetadata.size(); i++) {
 	        	cisIds.add(currentActionsMetadata.get(i).split("---")[0].split("CIS ID: ")[1]);
@@ -1003,6 +1017,34 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    	//if (i) activity feed empty for a week, or a day if marked temporary
 	    	    //put "low period" in metadata
 	    }
+	    
+	    //userContextBroker.createAttribute(linkedCss, "")
+	    CtxAttributeIdentifier x = null;
+	    
+		try {
+			List<CtxIdentifier> listX = null;
+			if ((userContextBroker.lookup(CtxModelType.ATTRIBUTE, "hasCLM")) != null) {
+			    listX = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "hasCLM").get();
+			}
+			if (listX != null)
+				if (listX.size() > 0)
+			        x = (CtxAttributeIdentifier)userContextBroker.lookup(CtxModelType.ATTRIBUTE, "hasCLM").get().get(0);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    try {
+			userContextBroker.updateAttribute(x, recordedMetadata.toString());
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	    
 	    return "PASS";
 	    
@@ -1086,6 +1128,31 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		    		            //else if (userContextBroker.get(thisMember, thisAttribute).equals("Access refused"))
     		    		            //    conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
     							}
+    							
+    							response = null;
+    							try {
+    								//org.societies.api.context.broker.ICtxBroker externalBroker = ;
+    								thisRequestor = new Requestor(linkedCss);
+    								List<CtxIdentifier> theResult = externalContextBroker.lookup(thisRequestor, thisMember, CtxModelType.ATTRIBUTE, id2.get(0).toString()).get();
+    								if (theResult == null)
+    									conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
+    								else if (theResult.size() == 0)
+    									conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
+    							} catch (NullPointerException e) {
+    								e.printStackTrace();
+    								
+    							} catch (CtxException e) {
+									conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
+
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (ExecutionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
     						}
     		    		}
     				}
@@ -1158,7 +1225,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
     			CtxIdentifier theCriteriaId = null;
 				try {
-					Future<List<CtxIdentifier>> futureList = userContextBroker.lookup(CtxModelType.ATTRIBUTE, thisCis.getMembershipCriteria().get(m));
+					Future<List<CtxIdentifier>> futureList = userContextBroker.lookup(CtxModelType.ASSOCIATION, thisCis.getMembershipCriteria().get(m));
 					List<CtxIdentifier> list = futureList.get();
 					if (list != null) {
 						if (list.size() > 0) {
@@ -1204,9 +1271,25 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		            if (thisCis.getMembershipCriteria().contains("friends")) {
     		            //Put address as sub-CIS of friends CIS
     		            proposedActionsWithMetadata.add(i);
+    		            ICisProposal friendsCis = thisCis;
+    		            ArrayList<String> newCrit = friendsCis.getMembershipCriteria();
+    		            newCrit.remove("address");
+    		            ArrayList<String> addressCrit = thisCis.getMembershipCriteria();
+    		            friendsCis.setMembershipCriteria(newCrit);
+    		            thisCis.setMembershipCriteria(addressCrit);
+    		            friendsCis.addSubCis(thisCis);
+    		            thisCis.setParentCis(friendsCis);
     		            ArrayList<ICisProposal> temp = new ArrayList<ICisProposal>();
     		            temp.add(thisCis);
     		            creations.add(temp);
+    		            temp = new ArrayList<ICisProposal>();
+    		            temp.add(friendsCis);
+    		            creations.add(temp);
+    		            
+    		            //add metadata
+    		            currentActionsMetadata.add("ongoing");
+    		            
+    		            
     	            }
     		        else {
     		            //Put address first, and other attributes as sub-CISs.
@@ -1221,6 +1304,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	        }
     		}
     		for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
+    			boolean worthyOfCis = false;
     			CtxIdentifier theCriteriaId = null;
 				try {
 					theCriteriaId = userContextBroker.lookup(CtxModelType.ATTRIBUTE, thisCis.getMembershipCriteria().get(m)).get().get(0);
@@ -1255,10 +1339,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				}
     			if (theCriteriaObject instanceof CtxAssociation) {
     		        CtxAssociation theCriteria = (CtxAssociation)theCriteriaObject;
-    		        if (theCriteria.getId().getType().equals("proximity")) {
-    		    //        //need access to proximity on other CSSs and
-    		              //timestamp on proximity associations
-    		        }
+    		        
+    	
+    		    }
+    			else if (theCriteriaObject == null && thisCis.getMembershipCriteria().get(m).split("---")[0].contains("ACTIVITY")) {
+    		        CtxAssociation theCriteria = (CtxAssociation)theCriteriaObject;
+    		        
     	
     		    }
     		    else if (theCriteriaObject instanceof CtxAttribute) {
@@ -1272,6 +1358,134 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		            }
     		            
 		            }
+    		        if (theCriteria.getId().getType().equals("proximity")) {
+    	    		    //        //need access to proximity on other CSSs and
+    	    		              //timestamp on proximity associations
+    	    		        	worthyOfCis = true;
+    	    		        	
+    	    		            Date oldDate = new Date();
+    	    		            oldDate.setTime(oldDate.getTime() - (1000 * 60 * 5));
+    	    		            List<CtxHistoryAttribute> history = null;
+								try {
+									history = userContextBroker.retrieveHistory(theCriteria.getId(), oldDate, new Date()).get();
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								} catch (ExecutionException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								} catch (CtxException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+    	    		            Iterator<CtxHistoryAttribute> it = history.iterator();
+    	    		            Iterator<String> membersIt = thisCis.getMemberList().iterator();
+    	    		            while (membersIt.hasNext()) {
+    	    		            	int counter = 0;
+    	    		            	while (it.hasNext()) {
+    	    		            		String member = membersIt.next();
+        	    		            	CtxHistoryAttribute x = it.next();
+        	    		            	if (x.getStringValue().contains(member)) {
+        	    		            		counter++;
+        	    		            	}
+        	    		            	
+        	    		            	if (counter > 3) {
+        	    		            		
+        	    		            	}
+        	    		            	else {
+        	    		            		try {
+												thisCis.removeMember(member);
+											} catch (CommunicationException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											}
+        	    		            	}
+    	    		            	}
+    	    		            	
+    	    		            }
+    	    		            if (thisCis.getMemberList().size() < 2) {
+    	    		            	worthyOfCis = false;
+    	    		            }
+    	    		            else
+    	    		            	currentActionsMetadata.set(i, currentActionsMetadata + "---" + "Temporary medium-term");
+    	    		         
+    	    		            if (worthyOfCis == true) {
+    	    		            	ArrayList<ICisProposal> temp = new ArrayList<ICisProposal>();
+        	    		        	thisCis.setDescription("CSSs in proximity also with: "+ thisCis.getMembershipCriteria());
+        	    		            temp.add(thisCis);
+        	    		            if (!creations.contains(temp))
+        	    		                creations.add(temp);
+        	    		            
+    	    		            }
+    	    		            
+    	    		            //CtxQuality quality = theCriteria.getQuality();
+    	    		            //quality.
+    	    		            
+    	    	    }
+    		        else if (theCriteria.getId().getType().equals("location")) {
+    	    		    //        //need access to proximity on other CSSs and
+    	    		              //timestamp on proximity associations
+    	    		        	worthyOfCis = true;
+    	    		        	
+    	    		            Date oldDate = new Date();
+    	    		            oldDate.setTime(oldDate.getTime() - (1000 * 60 * 5));
+    	    		            List<CtxHistoryAttribute> history = null;
+								try {
+									history = userContextBroker.retrieveHistory(theCriteria.getId(), oldDate, new Date()).get();
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								} catch (ExecutionException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								} catch (CtxException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+    	    		            Iterator<CtxHistoryAttribute> it = history.iterator();
+    	    		            Iterator<String> membersIt = thisCis.getMemberList().iterator();
+    	    		            while (membersIt.hasNext()) {
+    	    		            	int counter = 0;
+    	    		            	while (it.hasNext()) {
+    	    		            		String member = membersIt.next();
+        	    		            	CtxHistoryAttribute x = it.next();
+        	    		            	if (x.getStringValue().contains(member)) {
+        	    		            		counter++;
+        	    		            	}
+        	    		            	
+        	    		            	if (counter > 3) {
+        	    		            		
+        	    		            	}
+        	    		            	else {
+        	    		            		try {
+												thisCis.removeMember(member);
+											} catch (CommunicationException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											}
+        	    		            	}
+    	    		            	}
+    	    		            	
+    	    		            }
+    	    		            if (thisCis.getMemberList().size() < 2) {
+    	    		            	worthyOfCis = false;
+    	    		            }
+    	    		            else
+    	    		            	currentActionsMetadata.set(i, currentActionsMetadata + "---" + "Temporary medium-term");
+    	    		         
+    	    		            if (worthyOfCis == true) {
+    	    		            	ArrayList<ICisProposal> temp = new ArrayList<ICisProposal>();
+        	    		        	thisCis.setDescription("CSSs in proximity also with: "+ thisCis.getMembershipCriteria());
+        	    		            temp.add(thisCis);
+        	    		            if (!creations.contains(temp))
+        	    		                creations.add(temp);
+        	    		            
+    	    		            }
+    	    		            
+    	    		            //CtxQuality quality = theCriteria.getQuality();
+    	    		            //quality.
+    	    		            
+    	    	    }
 		        }
     		}
     	}
@@ -1312,6 +1526,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     public void setUserContextBroker(ICtxBroker userContextBroker) {
     	System.out.println("GOT user context broker" + userContextBroker);
     	this.userContextBroker = userContextBroker;
+    }
+    
+    public void setExternalContextBroker(org.societies.api.context.broker.ICtxBroker externalContextBroker) {
+    	System.out.println("GOT user context broker" + userContextBroker);
+    	this.externalContextBroker = externalContextBroker;
     }
     
     /**public void setUserContextBrokerCallback(ICtxBrokerCallback userContextBrokerCallback) {
