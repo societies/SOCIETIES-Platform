@@ -8,12 +8,25 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.shindig.social.core.model.ActivityEntryImpl;
+import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivity;
 
 @Entity
 @Table(name = "org_societies_cis_activity_model_Activity")
 public class Activity implements IActivity {
+	/**
+	 * Serializable .. 
+	 */
+	private static final long serialVersionUID = 1L;
+	private ActivityEntryImpl act;
+	private String verb;
+	private String actor;
+	private String object;
+	private String subject;
+	private String target;
+	private long time;
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
@@ -32,53 +45,47 @@ public class Activity implements IActivity {
 	@Column(name = "Verb")
 	@Override
 	public String getVerb() {
-		// TODO Auto-generated method stub
-		return null;
+		return verb;
 	}
 
 	@Override
 	public void setVerb(String verb) {
-		// TODO Auto-generated method stub
+		this.verb = verb;
 		
 	}
 	
 	@Column(name = "Actor")
 	@Override
 	public String getActor() {
-		// TODO Auto-generated method stub
-		return null;
+		return actor;
 	}
 
 	@Override
 	public void setActor(String actor) {
-		// TODO Auto-generated method stub
-		
+		this.actor = actor;
 	}
 
 	@Column(name = "Object")
 	@Override
 	public String getObject() {
-		// TODO Auto-generated method stub
-		return null;
+		return object;
 	}
 
 	@Override
 	public void setObject(String object) {
-		// TODO Auto-generated method stub
+		this.object = object;
 		
 	}
 
 	@Column(name = "Target")
 	@Override
 	public String getTarget() {
-		// TODO Auto-generated method stub
-		return null;
+		return target;
 	}
 
 	@Override
 	public void setTarget(String target) {
-		// TODO Auto-generated method stub
-		
+		this.target = target;
 	}
 	public ActivityFeed getFeed() {
 		return feed;
@@ -92,5 +99,18 @@ public class Activity implements IActivity {
 	public void setId(String id) {
 		this.id = id;
 	}
-
+	public ActivityEntryImpl getAct() {
+		return act;
+	}
+	public void setAct(ActivityEntryImpl act) {
+		this.act = act;
+	}
+	@Override
+	public long getTime() {
+		return time;
+	}
+	@Override
+	public void setTime(long time) {
+		this.time = time;
+	}
 }

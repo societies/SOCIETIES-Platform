@@ -1,5 +1,6 @@
 package org.societies.activity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +11,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
+import org.apache.shindig.social.core.model.ActivityEntryImpl;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -28,6 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Entity
 @Table(name = "org_societies_activity_ActivityFeed")
 public class ActivityFeed implements IActivityFeed, Subscriber {
+	/**
+	 * 
+	 */
+	
 	@Id
 	private String id;
 	@OneToMany(cascade=CascadeType.ALL)
@@ -41,17 +47,40 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	private static SessionFactory sessionFactory;
 	private static Logger log = LoggerFactory.getLogger(ActivityFeed.class);
 	
-	
+	//timeperiod: "millisecondssinceepoch millisecondssinceepoch+n" 
+	//where n has to be equal to or greater than 0
 	@Override
-	public void getActivities(String CssId, String timePeriod) {
-		// TODO Auto-generated method stub
+	public List<IActivity> getActivities(String timePeriod) {
+		ArrayList<IActivity> ret = new ArrayList<IActivity>();
+		String times[] = timePeriod.split(" ",2);
+		if(times.length < 2){
+			//throw exception ?
+			return ret;
+		}
+		long fromTime = 0;long toTime = 0;
+		try{
+			fromTime = Long.parseLong(times[0]);
+			toTime = Long.parseLong(times[0]);
+		}catch(Exception e){
+			
+		}
 		
+		for(Activity act : list){
+			if(act.getTime()>=fromTime && act.getTime()<=toTime){
+				ret.add(act);
+			}
+		}
+		return ret;
 	}
-
+	//query can be e.g. 'object,contains,"programming"'
 	@Override
-	public void getActivities(String CssId, String query, String timePeriod) {
-		// TODO Auto-generated method stub
-		
+	public List<IActivity> getActivities(String query, String timePeriod) {
+		ArrayList<IActivity> ret = new ArrayList<IActivity>();
+//		if()
+//		for(Activity act : list){
+//			if(act)
+//		}
+		return ret;
 	}
 
 	@Override
@@ -137,7 +166,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	
 	public void close()
 	{
-		
+		log.info("in activityfeed close");
 	}
 	@Override
 	public void pubsubEvent(IIdentity pubsubService, String node,
@@ -146,5 +175,10 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			Activity act = (Activity)item;
 			this.addCisActivity(act);
 		}
+	}
+	@Override
+	public List<IActivity> getActivities(String CssId, String query,
+			String timePeriod) {
+		return this.getActivities(query,timePeriod);
 	}
 }
