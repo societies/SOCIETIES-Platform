@@ -18,6 +18,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserSituation;
 
 
@@ -39,7 +40,7 @@ public class CRISTHistoryData {
 			
 		this.action = action;
 		this.situation = situation;
-		LOG.info("New CRISTHistoryData: " + this.toString());
+		LOG.info("New CRISTHistoryData: " + ((CRISTUserAction) this.action).getActionID() + ", " + this.situation.getSituationID());
 	}
 
 	public IAction getAction() {
