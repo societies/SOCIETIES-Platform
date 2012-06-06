@@ -14,5 +14,10 @@
     <osgi:service ref="trustClient" interface="org.societies.privacytrust.example.trust.TrustClient" />   
     
 	<osgi:reference id="trustBroker" interface="org.societies.api.internal.privacytrust.trust.ITrustBroker" cardinality="1..1" />
+	
+	<!-- Required to test trust update events -->
 	<osgi:reference id="trustEventMgr" interface="org.societies.privacytrust.trust.api.event.ITrustEventMgr" cardinality="1..1" />
+	
+	<!-- Required to get the local IIdentity -->
+	<osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="1..1" />
 </beans>

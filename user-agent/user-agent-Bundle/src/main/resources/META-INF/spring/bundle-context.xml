@@ -22,10 +22,9 @@
 	</bean>
 	
 	<bean id="dm" class="org.societies.useragent.decisionmaking.DecisionMaker"
-		name="dm" depends-on="conflict,feedback,servicedis">
+		name="dm" depends-on="conflict,feedback">
 		<property name="manager" ref="conflict"></property>
 		<property name="feedbackHandler" ref="feedback"></property>
-		<property name="serDiscovery" ref="servicedis"></property>
 	</bean>
 	<bean id="conflict" class="org.societies.useragent.conflict.ConflictResolutionManager"
 	      name="conflict">
