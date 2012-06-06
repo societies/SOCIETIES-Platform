@@ -129,6 +129,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	INetworkNode testCisId_1;
 	INetworkNode testCisId_2;
 	INetworkNode testCisId_3;
+	INetworkNode testDelCSSId;
 	IIdentityManager mockIICisId_1;
 	IIdentityManager mockIICisId_2;
 	IIdentityManager mockIICisId_3;
@@ -180,7 +181,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		when(mockCISendpoint2.UnRegisterCommManager()).thenReturn(true);
 		when(mockCISendpoint3.UnRegisterCommManager()).thenReturn(true);
 		
-		
+		//testDelCSSId = new NetworkNodeImpl("delCss@societies.org");
+		doNothing().when(mockCISendpoint1).sendMessage(any(org.societies.api.comm.xmpp.datatypes.Stanza.class), any(Object.class)); // for the delete
+		//when(mockIICisId_1.fromJid(anyString())).thenReturn(testDelCSSId);// for the delete
+		when(mockIICisId_2.fromJid(TEST_CSSID)).thenReturn(testCisManagerId);// for the delete
+		when(mockIICisId_1.fromJid(TEST_CSSID)).thenReturn(testCisManagerId);// for the delete
+		when(mockIICisId_3.fromJid(TEST_CSSID)).thenReturn(testCisManagerId);// for the delete
 		
 		when(mockCcmFactory.getNewCommManager()).thenReturn(mockCISendpoint1,mockCISendpoint2,mockCISendpoint3);
 		
@@ -305,9 +311,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 }
 	
 	}
-	//TODO: this tests fails on line 802 in Cis.java: 				IIdentity targetCssIdentity = this.CISendpoint.getIdManager().fromJid(element.getMembersJid());//new IdentityImpl(element.getMembersJid());
-	//TODO: needs more mocking thomas?
-	@Ignore
+
+	//@Ignore
 	@Test
 	public void testdeleteCIS() throws InterruptedException, ExecutionException {
 
