@@ -81,6 +81,7 @@ public class CisDirectory implements ICisDirectory {
 	@Override
 	public void addCisAdvertisementRecord(CisAdvertisementRecord cisAdRec) {
 		
+		log.info("addCisAdvertisementRecord called.");
 		System.out.println("+++++++++++++++++++++++ Name is  = " + cisAdRec.getName());
 		System.out.println("+++++++++++++++++++++++ ID is  = " + cisAdRec.getId());
 		System.out.println("+++++++++++++++++++++++ Uri is  = " + cisAdRec.getUri());

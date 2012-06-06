@@ -18,6 +18,7 @@
 
   	<osgi:service ref="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
   	 <!--<osgi:service ref="CisClientService" interface="org.societies.api.cis.management.IcisManagerClient"/>-->
+		<osgi:reference id="CisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote"/>
 		<osgi:reference id="dataSource" interface="javax.sql.DataSource"/>
 	 <!--<osgi:reference id="PrivacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"/>-->	
 		

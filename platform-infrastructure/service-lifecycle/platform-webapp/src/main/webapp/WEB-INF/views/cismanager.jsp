@@ -86,6 +86,12 @@
 				<td><form:errors path="cisMode" cssClass="error" /></td>
 				<td>Integer</td>
 			</tr>
+			<tr>
+				<td>Cis Jid:</td>
+				<td><form:input path="cisJid" /></td>
+				<td><form:errors path="cisJid" cssClass="error" /></td>
+				<td>Not used for create</td>
+			</tr>
 		</table>
 
 	</form:form>

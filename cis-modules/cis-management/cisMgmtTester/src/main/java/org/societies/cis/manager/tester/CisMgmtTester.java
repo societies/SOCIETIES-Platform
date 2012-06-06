@@ -73,36 +73,9 @@ public class CisMgmtTester {
 
 		
 		
-		ICisManagerCallback icall = new ICisManagerCallback()
-		 {
-			public void receiveResult(boolean result){
-				LOG.info("boolean return on CIS Mgmgt tester");
-				LOG.info("Result Status: " + result);
-				CisMgmtTester.setBusy(0);
-			}; 
-
-			public void receiveResult(int result) {CisMgmtTester.setBusy(0);};
-			
-			public void receiveResult(String result){CisMgmtTester.setBusy(0);}
-
-			public void receiveResult(Community communityResultObject) {
-				if(communityResultObject == null){
-					LOG.info("null return on CIS Mgmgt tester");
-				}
-				else{
-					LOG.info("good return on CIS Mgmgt tester");
-					LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
-					join = 1;
-				}
-				CisMgmtTester.setBusy(0);
-				
-			};
-			
-		 };
 
 		
-		
-		
+		JoinCallBack icall = new JoinCallBack(cisClient);
 		
 		
 		
@@ -115,60 +88,97 @@ public class CisMgmtTester {
 		LOG.info("join a remote CIS");
 		this.cisClient.joinRemoteCIS(targetCisId, icall);
 		LOG.info("join sent");
-		CisMgmtTester.setBusy(1);
-		
-		while(CisMgmtTester.getBusy()==1){
-		/*	try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-			
-		}
-			;
-		
-		if (join == 1){
-			LOG.info("get CIS");
-			ICis icis = this.cisClient.getCis("juca@societies.com", targetCisId);
-			LOG.info("get info from a remote CIS");
-			icis.getInfo(icall);
-			LOG.info("info is supposed to be back");
-			CisMgmtTester.setBusy(1);
-			
-			while(CisMgmtTester.getBusy()==1){
-				/*try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
-				
-			}
-		}
 
 		
-		LOG.info("create a CIS");
-		try {
-			ICisOwned icos =  (this.cisClient.createCis("juca@societies.com", "pwd", "gremio", "futebol", 1)).get();
-			LOG.info("creation done");
-			
-			LOG.info("get local info");
-			icos.getInfo(icall);
-			LOG.info("info is supposed to be back");
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		
 		
 	}
 	
+	public class JoinCallBack implements ICisManagerCallback{
+		
+		ICisManager cisClient;
+		
+		public JoinCallBack(ICisManager cisClient){
+			this.cisClient = cisClient;
+		}
+		
+		public void receiveResult(boolean result){
+			LOG.info("boolean return on CIS Mgmgt tester");
+		}; 
 
-	 
+		public void receiveResult(int result) {;};
+		
+		public void receiveResult(String result){;}
+
+		public void receiveResult(Community communityResultObject) {
+			 
+			if(communityResultObject == null){
+				LOG.info("null return on JoinCallBack");
+				return;
+			}
+			else{
+				LOG.info("good return on JoinCallBack");
+				LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
+				join = 1;
+				try {
+					ICisOwned i = cisClient.createCis("xcmanager1.thomas.local", "", "santos", "futebol", 1).get();
+					GetInfoCallBack g = new GetInfoCallBack();
+					LOG.info("calling local get info");
+					i.getInfo(g);
+					LOG.info("local get info done");
+					ICis icis = cisClient.getCis("xcmanager1.thomas.local", communityResultObject.getCommunityJid());
+					GetInfoCallBack h = new GetInfoCallBack();
+					LOG.info("calling remote get info");
+					icis.getInfo(h);
+					LOG.info("remote get info done");
+					
+					
+				 } catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ExecutionException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			
+				
+			}
+
+			
+			
+		}
+			
+
+	}
+	
+	public class GetInfoCallBack implements ICisManagerCallback{
+		
+		
+		public void receiveResult(boolean result){
+			LOG.info("boolean return on CIS Mgmgt tester");
+		}; 
+
+		public void receiveResult(int result) {;};
+		
+		public void receiveResult(String result){;}
+
+		public void receiveResult(Community communityResultObject) {
+			if(communityResultObject == null){
+				LOG.info("null return on JoinCallBack");
+				return;
+			}
+			else{
+				LOG.info("good return on GetInfo Callback");
+				LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
+			}
+			
+		}
+
+
+	}
+	
+
+
 	
 }
