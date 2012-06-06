@@ -15,7 +15,7 @@
 
 	<tx:annotation-driven />
 
-	<bean id="CssDirectoryRemote" class="org.societies.css.directory.client.CssDirectoryClient"
+	<bean id="CisDirectoryRemote" class="org.societies.cis.directory.client.CisDirectoryClient"
 		depends-on="CommManagerBundle" init-method="InitService">
 		<property name="commManager" ref="CommManagerBundle" />
 	</bean>
