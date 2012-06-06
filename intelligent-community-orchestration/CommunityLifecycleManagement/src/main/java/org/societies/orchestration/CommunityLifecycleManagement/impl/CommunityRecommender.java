@@ -28,9 +28,9 @@ package org.societies.orchestration.CommunityLifecycleManagement.impl;
 import static org.mockito.Mockito.*;
 
 import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
-import org.societies.api.internal.css.directory.ICssDirectory;
+import org.societies.api.css.directory.ICssDirectory;
 
-import org.societies.api.internal.css.discovery.ICssDiscovery;
+//import org.societies.api.css.discovery.ICssDiscovery;
 
 //import org.societies.api.internal.cis.management.ICisActivityFeed;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
