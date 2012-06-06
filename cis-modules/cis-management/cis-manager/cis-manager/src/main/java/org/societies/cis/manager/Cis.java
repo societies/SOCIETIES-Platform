@@ -682,7 +682,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 					
 				}
 				
-				
+				result.setAddResponse(ar);
 				return result;
 				// END OF ADD
 			}
