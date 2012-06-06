@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
+import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICis;
@@ -62,6 +63,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Participant;
 import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -376,7 +379,78 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		} 		
 	
 	}
-	@Ignore
+	
+	@Test
+	public void listdMembersOnOwnedCISwithCallback() throws InterruptedException, ExecutionException {
+
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
+		cisManagerUnderTest.init();
+		ICisOwned Iciss =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				
+		try {
+			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get();
+			Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2).get();
+			Iciss.addMember(MEMBER_JID_3, MEMBER_ROLE_3).get();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// callback that will do the real test
+
+		 class GetListCallBack implements ICisManagerCallback{
+			public void receiveResult(boolean result){fail("should have received a Communy obj");}
+			public void receiveResult(int result) {fail("should have received a Communy obj");}
+			public void receiveResult(String result){fail("should have received a Communy obj");}
+
+			public void receiveResult(Community communityResultObject) {
+				if(communityResultObject == null){
+					fail("Communy obj is null");
+					return;
+				}
+				else{
+					List<Participant> l = communityResultObject.getWho().getParticipant();
+					int[] memberCheck = {0,0,0};
+					
+					Iterator<Participant> it = l.iterator();
+					
+					while(it.hasNext()){
+						Participant element = it.next();
+						if(element.getJid().equals(MEMBER_JID_1) && element.getRole().toString().equalsIgnoreCase(MEMBER_ROLE_1))
+							memberCheck[0] = 1;
+						if(element.getJid().equals(MEMBER_JID_2) && element.getRole().toString().equalsIgnoreCase(MEMBER_ROLE_2))
+							memberCheck[1] = 1;	
+						if(element.getJid().equals(MEMBER_JID_3) && element.getRole().toString().equalsIgnoreCase(MEMBER_ROLE_3))
+							memberCheck[2] = 1;	
+
+				     }
+					
+					// check if it found all matching CISs
+					 for(int i=0;i<memberCheck.length;i++){
+						 assertEquals(memberCheck[i], 1);
+					 }
+				}
+				
+			}
+
+
+		}
+		
+		// end of callback
+		
+
+		// call and wait for callback
+		Iciss.getListOfMembers(new GetListCallBack());
+
+	
+	
+	}
+	
+	
+	
+	
 	@Test
 	public void listdMembersOnOwnedCIS() throws InterruptedException, ExecutionException {
 
@@ -403,11 +477,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 
 		while(it.hasNext()){
 			ICisParticipant element = it.next();
-			if(element.getMembersJid().equals(MEMBER_JID_1) && element.getMembershipType().equals(MEMBER_ROLE_1))
+			if(element.getMembersJid().equals(MEMBER_JID_1) && element.getMembershipType().equalsIgnoreCase(MEMBER_ROLE_1))
 				memberCheck[0] = 1;
-			if(element.getMembersJid().equals(MEMBER_JID_2) && element.getMembershipType().equals(MEMBER_ROLE_2))
+			if(element.getMembersJid().equals(MEMBER_JID_2) && element.getMembershipType().equalsIgnoreCase(MEMBER_ROLE_2))
 				memberCheck[1] = 1;	
-			if(element.getMembersJid().equals(MEMBER_JID_3) && element.getMembershipType().equals(MEMBER_ROLE_3))
+			if(element.getMembersJid().equals(MEMBER_JID_3) && element.getMembershipType().equalsIgnoreCase(MEMBER_ROLE_3))
 				memberCheck[2] = 1;	
 
 	     }

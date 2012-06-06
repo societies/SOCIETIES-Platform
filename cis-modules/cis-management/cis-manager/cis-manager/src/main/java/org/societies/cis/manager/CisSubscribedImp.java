@@ -27,9 +27,12 @@
 package org.societies.cis.manager;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -53,6 +56,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.community.ParticipantRole;
+import org.societies.api.schema.cis.community.Who;
 
 /**
  * @author Thomas Vilarinho (Sintef)
@@ -138,6 +144,11 @@ public class CisSubscribedImp implements ICis {
 		}	
 	}
 
+	
+	@Override
+	public void getListOfMembers(ICisManagerCallback callback){
+
+	}
 
 	
 	//Overriding hash and equals to compare cisRecord only
