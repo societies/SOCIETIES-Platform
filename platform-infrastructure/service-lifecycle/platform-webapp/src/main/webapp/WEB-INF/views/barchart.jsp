@@ -4,11 +4,10 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
-
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Bar chart page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Societies services - Privacy Assessment</title>
 <style>
 .error {
 	color: #ff0000;
@@ -32,6 +31,7 @@
 	<!-- LEFTBAR -->
 	<jsp:include page="leftbar.jsp" />
 	<!-- END LEFTBAR -->
+<!-- .................PLACE YOUR CONTENT HERE ................ -->
 
 <h3>Privacy Assessment</h3>
 
@@ -49,8 +49,7 @@
   }
  %>
 </ul>
-
     	Hey, it works:
-        <img src="barchart.png" width="600" height="400" usemap="#map"/>
+        <img src="${pageContext.request.contextPath}/images/barchart.png" border="0" width="600" height="400" usemap="#map"/>
     </body>
 </html>
