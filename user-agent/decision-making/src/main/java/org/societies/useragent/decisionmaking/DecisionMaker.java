@@ -37,7 +37,7 @@ import org.slf4j.*;
 
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.framework.BundleContext;
-
+import org.springframework.osgi.context.BundleContextAware;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.useragent.conflict.*;
