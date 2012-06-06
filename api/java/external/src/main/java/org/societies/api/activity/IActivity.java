@@ -42,4 +42,6 @@ public interface IActivity {
 	public void setObject(String object);
 	public String getTarget();
 	public void setTarget(String target);
+	public long getTime();
+	public void setTime(long time);
 }

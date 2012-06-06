@@ -738,7 +738,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 						String[] candidates = candidateArray[j].toString()
 								.substring(1).split("#");
 						Integer historyScore = candidateAction
-								.get(candidateArray[j]);
+								.get(candidateArray[j].toString());
 						if (candidates.length > i) {
 							if (currentCandidate.containsKey(candidates[i])) {
 								Integer currentScore = currentCandidate
@@ -756,7 +756,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 				if (currentCandidate.size() > 0) {
 					Set<String> currentCandidateKeys = currentCandidate
 							.keySet();
-					String[] currentCandidateArray = (String[])currentCandidateKeys
+					Object[] currentCandidateArray = currentCandidateKeys
 							.toArray();
 					Integer[] currentCandidateScore = new Integer[currentCandidate
 							.size()];
@@ -774,7 +774,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 					}
 
 					predictionResult.put(
-							currentCandidateArray[maxIndex], maxScore);
+							currentCandidateArray[maxIndex].toString(), maxScore);
 					totalScore += maxScore;
 					currentPrediction = currentPrediction + "#"
 							+ currentCandidateArray[maxIndex];

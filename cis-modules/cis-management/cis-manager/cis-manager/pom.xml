@@ -199,7 +199,7 @@
 				<configuration>
 					<instructions>
 						<Bundle-Activator></Bundle-Activator>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<!-- 							org.societies.activity.*, -->
 <!-- 							org.societies.activity.model.*, -->
@@ -220,8 +220,8 @@
 							!com.sun.msv.*,
 							*;resolution:=optional</Import-Package>
 						<Export-Package>
-							org.societies.api.schema.cis.community,
-							org.societies.api.schema.cis.manager
+<!-- 							org.societies.api.schema.cis.community, -->
+<!-- 							org.societies.api.schema.cis.manager -->
 						</Export-Package> 
 					</instructions>
 				</configuration>

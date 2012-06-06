@@ -24,7 +24,12 @@
  */
 package org.societies.api.activity;
 
+import java.util.List;
+
 import org.societies.api.activity.IActivity;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * @author Babak.Farshchian@sintef.no
@@ -34,10 +39,41 @@ import org.societies.api.activity.IActivity;
  * MISSING_ANNOTATION
  * MISSING_JAVADOCS
  */
-
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IActivityFeed {
-	public void getActivities(String CssId, String timePeriod);
-	public void getActivities(String CssId, String query, String timePeriod);
+//	@Deprecated //cannot deprecate at the method signature matches the signature of getActivities(String query, String timePeriod);
+//	public List<IActivity> getActivities(String CssId, String timePeriod);
+	/**
+	 * This method will parse a timeperiod and return a subset of the actitvies
+	 *  in this activityfeed that is within the given timeperiod
+	 *  
+	 * @param {@link String} timeperiod can be: "millisecondssinceepoch millisecondssinceepoch+n" 
+	 * @return a @List of {@link IActivity} 
+	 * or a empty list if the parameters are wrong or the  timeperiod did not match any activties
+	 */
+	public List<IActivity> getActivities(String timePeriod);
+	@Deprecated
+	public List<IActivity> getActivities(String CssId, String query, String timePeriod);
+	/**
+	 * This method will parse a query and a timeperiod and return a subset of the actitvies
+	 *  in this activityfeed that matches the query constraints and is within the given timeperiod
+	 *  
+	 * @param {@link String} query can be e.g. 'object,contains,"programming"'
+	 * @param {@link String} timeperiod can be: "millisecondssinceepoch millisecondssinceepoch+n" 
+	 * @return a @List of {@link IActivity} 
+	 * or a empty list if the parameters are wrong or the query and/or timeperiod did not match any activties
+	 */
+	public List<IActivity> getActivities(String query, String timePeriod);
+	/**
+	 * This method will add a activity and post it on the associated pubsub service.
+	 *  
+	 * @param {@link IActivity} activity, the activity that will be added.
+	 */
 	public void addCisActivity(IActivity activity);
+	/**
+	 * This method will parse a criteria and delete the activities that match the criteria
+	 *  
+	 * @param {@link String} criteria TODO:define this
+	 */
 	public void cleanupFeed(String criteria);
 }
