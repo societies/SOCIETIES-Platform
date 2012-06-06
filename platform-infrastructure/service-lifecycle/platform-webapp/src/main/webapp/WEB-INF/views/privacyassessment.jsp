@@ -33,7 +33,7 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
 
-	<h3>Privacy Assessment Service</h3>
+	<h3>Privacy Assessment</h3>
 		
 <form:form method="POST" action="privacyassessment.html" commandName="assForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
