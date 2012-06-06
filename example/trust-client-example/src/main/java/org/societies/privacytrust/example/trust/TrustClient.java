@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
@@ -48,8 +49,10 @@ public class TrustClient {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustClient.class);
 	
-	private static final String TRUSTOR_ID = "foo.societies.local";
-	private static final String TRUSTED_CSS_ID = "bar.societies.local";
+	private static final String TRUSTED_CSS_ID = "fooIIdentity.societies.local";
+	
+	/** The String representation of my IIdentity. */
+	private final String trustorId;
 
 	/** The Internal Context Broker service reference. */
 	private ITrustBroker trustBroker;
@@ -58,11 +61,12 @@ public class TrustClient {
 	private ITrustEventMgr trustEventMgr;
 
 	@Autowired(required=true)
-	public TrustClient(ITrustBroker trustBroker, ITrustEventMgr trustEventMgr) {
+	public TrustClient(ITrustBroker trustBroker, ICommManager commMgr, ITrustEventMgr trustEventMgr) {
 
 		LOG.info("*** " + this.getClass() + " instantiated");
 		this.trustBroker = trustBroker;
 		this.trustEventMgr = trustEventMgr;
+		this.trustorId = commMgr.getIdManager().getThisNetworkNode().getBareJid();
 		
 		LOG.info("*** Starting examples...");
 		this.retrieveTrust();
@@ -78,7 +82,7 @@ public class TrustClient {
 
 		try {
 			Double trustValue = this.trustBroker.retrieveTrust(
-					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID)).get();
+					new TrustedEntityId(this.trustorId, TrustedEntityType.CSS, TRUSTED_CSS_ID)).get();
 			LOG.info("*** retrieved trust value = " + trustValue);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -100,7 +104,7 @@ public class TrustClient {
 		LOG.info("*** registerForTrustChanges");
 
 		try {
-			final TrustedEntityId teid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID); 
+			final TrustedEntityId teid = new TrustedEntityId(this.trustorId, TrustedEntityType.CSS, TRUSTED_CSS_ID); 
 			// 1. Register listener by specifying the context attribute identifier
 			this.trustBroker.registerTrustUpdateEventListener(new MyTrustUpdateEventListener(),
 					teid);

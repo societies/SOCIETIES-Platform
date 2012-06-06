@@ -82,7 +82,7 @@ import org.societies.api.identity.IIdentityManager;
 public class CPA
 {
 	public CPA(){}
-	private CPACreationPatterns egocentricCreationManager;
+	private CPACreationPatterns cpaCreationPatterns;
 	
 	private Date lastTemporaryCheck;
 	private List<ICis> currentCises;
@@ -103,7 +103,7 @@ public class CPA
 	}
 	private void process() {
 		
-		sendToCSM(egocentricCreationManager.analyze(currentCises));
+		sendToCSM(cpaCreationPatterns.analyze(currentCises));
 
 	}
 	
@@ -135,16 +135,16 @@ public class CPA
 	}
 	
     
-    public void initialiseEgocentricCommunityAnalyser() {
+    public void initialiseCPA() {
     	loop();
     }
     
-    public CPACreationPatterns getEgocentricCreationManager() {
-    	return egocentricCreationManager;
+    public CPACreationPatterns getCPACreationPatterns() {
+    	return cpaCreationPatterns;
     }
     
-    public void setEgocentricCreationManager(CPACreationPatterns egocentricCreationManager) {
-    	this.egocentricCreationManager = egocentricCreationManager;
+    public void setCPACreationPatterns(CPACreationPatterns cpaCreationPatterns) {
+    	this.cpaCreationPatterns = cpaCreationPatterns;
     }
     public void init(){}
     

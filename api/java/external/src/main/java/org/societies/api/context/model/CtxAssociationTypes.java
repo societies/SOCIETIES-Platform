@@ -82,6 +82,11 @@ public class CtxAssociationTypes {
 	/**
 	 * Directed context association.
 	 */
+	public static final String IS_CONNECTED_TO_SNS = "isConnectedToSns";
+	
+	/**
+	 * Directed context association.
+	 */
 	public static final String OWNS_SERVICES = "ownsServices";
 	
 	/**
