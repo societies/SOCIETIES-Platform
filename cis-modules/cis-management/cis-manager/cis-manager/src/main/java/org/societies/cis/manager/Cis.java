@@ -26,6 +26,7 @@
 package org.societies.cis.manager;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -682,7 +683,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 					
 				}
 				
-				
+				result.setAddResponse(ar);
 				return result;
 				// END OF ADD
 			}
@@ -744,6 +745,39 @@ public class Cis implements IFeatureServer, ICisOwned {
 		Set<ICisParticipant> s = new  HashSet<ICisParticipant>();
 		s.addAll(this.getMembersCss());
 		return new AsyncResult<Set<ICisParticipant>>(s);
+	}
+	
+	@Override
+	public void getListOfMembers(ICisManagerCallback callback){
+		LOG.debug("local client call to get list of members");
+
+		
+		Community c = new Community();
+		c.setCommunityJid(this.getCisId());
+		c.setCommunityName(this.getName());
+		c.setCommunityType(this.getCisType());
+		c.setOwnerJid(this.getOwnerId());
+		c.setDescription(this.getDescription());
+		c.setGetInfo("");
+		
+		Who w = new Who();
+		c.setWho(w);
+		
+		Set<CisParticipant> s = this.getMembersCss();
+		Iterator<CisParticipant> it = s.iterator();
+		
+		List<Participant> l = new  ArrayList<Participant>();
+		while(it.hasNext()){
+			CisParticipant element = it.next();
+			Participant p = new Participant();
+			p.setJid(element.getMembersJid());
+			p.setRole( ParticipantRole.fromValue(element.getMtype().toString())   );
+			l.add(p);
+	     }
+		
+		w.setParticipant(l);
+		
+		callback.receiveResult(c);	
 	}
 	
 	@Override

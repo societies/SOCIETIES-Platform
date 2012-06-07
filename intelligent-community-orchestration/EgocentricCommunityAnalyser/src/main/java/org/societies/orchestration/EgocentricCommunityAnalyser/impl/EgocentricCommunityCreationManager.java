@@ -74,12 +74,19 @@ import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 //import org.societies.api.cis.management.ICis;t
 
+import org.societies.api.css.management.ICssRecord;
+import org.societies.api.css.management.ICssActivity;
+import org.societies.api.css.management.ICssActivityFeed;
+import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
+import org.societies.api.schema.cssmanagement.CssManagerResultBean;
+
+/**
 import org.societies.api.internal.css.management.CSSRecord;
 import org.societies.api.internal.css.management.ICssActivity;
 import org.societies.api.internal.css.management.ICssActivityFeed;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
-import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.internal.css.management.ICSSRemoteManager;*/
 //import org.societies.api.internal.css.management.ICssManagerCloud;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -150,7 +157,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ICisManager cisManager;
-	private ICSSLocalManager cssManager;
+	private CssManagerMessageBean cssManager;
     
 	private ArrayList<CtxEntity> availableContextData;
 	
