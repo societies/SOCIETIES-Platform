@@ -118,8 +118,8 @@ public class CSSManager implements ICSSLocalManager {
         
         // mm : Temporarily removing the pubsub stuff
         // as it is causing issues on virgo deployment
-        this.createPubSubNodes();
-        this.subscribeToPubSubNodes();
+ //       this.createPubSubNodes();
+ //       this.subscribeToPubSubNodes();
         
         this.randomGenerator = new Random();
 
