@@ -1149,7 +1149,7 @@ public class InternalCtxBrokerTest {
 			ctxAttribute2.setBinaryValue(SerialisationHelper.serialise(binaryValue2));
 			internalCtxBroker.update(ctxAttribute2);
 			CtxAttribute ctxAttribute21 = internalCtxBroker.createAttribute(entity2.getId(), "stringValue").get();
-			ctxAttribute11.setStringValue("StringB");
+			ctxAttribute21.setStringValue("StringB");
 			internalCtxBroker.update(ctxAttribute21);
 
 
