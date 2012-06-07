@@ -148,6 +148,12 @@
 			<version>3.0.0-beta4</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.cis</groupId>
+	        <artifactId>CisDirectoryClient</artifactId>
+	         <version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		
 		
 		<!-- 
