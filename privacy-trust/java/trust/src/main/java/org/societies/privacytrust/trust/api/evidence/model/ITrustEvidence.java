@@ -46,6 +46,20 @@ public interface ITrustEvidence extends Serializable {
 	/**
 	 * 
 	 * @return
+	 * @since 0.3
+	 */
+	public TrustEvidenceType getType();
+	
+	/**
+	 * 
+	 * @return
 	 */
 	public Date getTimestamp();
+	
+	/**
+	 * 
+	 * @return
+	 * @since 0.3
+	 */
+	public Serializable getInfo();
 }

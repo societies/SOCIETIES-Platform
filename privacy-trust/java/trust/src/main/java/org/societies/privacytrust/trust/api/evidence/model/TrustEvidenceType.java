@@ -28,13 +28,27 @@ package org.societies.privacytrust.trust.api.evidence.model;
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.3
  */
-public interface IDirectTrustOpinion extends IDirectTrustEvidence {
+public enum TrustEvidenceType {
 
 	/**
-	 * 
-	 * @return
+	 * The enum constant for trust ratings.
 	 */
-	public Double getTrustRating();
+	RATED,
+	
+	/**
+	 * 
+	 */
+	JOINED_COMMUNITY,
+	
+	/**
+	 * 
+	 */
+	LEFT_COMMUNITY,
+	
+	/**
+	 * 
+	 */
+	USED_SERVICE,
 }
