@@ -33,35 +33,33 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
 
-	<h3>Privacy Assessment Service</h3>
-		
-<form:form method="POST" action="privacyassessment.html" commandName="assForm">
+	<h3>Privacy Assessment</h3>
+
+	<form:form method="POST" action="privacyassessment.html"
+		commandName="assForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
-		<a href="barchart.html">Bar chart</a> 
+		<a href="barchart.html">Bar chart</a>
 		<table>
 			<tr>
 				<td>Privacy Assessment Methods :</td>
-					<td><form:select path="method" >
-					   <form:option value="NONE" label="--- Select ---" />
-					   <form:options items="${methods}" />
+				<td><form:select path="method">
+						<form:option value="NONE" label="--- Select ---" />
+						<form:options items="${methods}" />
 					</form:select></td>
-				<td><form:errors path="method" cssClass="error" />
-				</td>
+				<td><form:errors path="method" cssClass="error" /></td>
 			</tr>
 			<tr>
 				<td>Automatic re-assessment period in seconds:</td>
-				<td><form:input path="autoReassessmentInSecs" />
-				</td>
-				<td><form:errors path="autoReassessmentInSecs" cssClass="error" />
-				</td>
-			</tr>	
+				<td><form:input path="autoReassessmentInSecs" /></td>
+				<td><form:errors path="autoReassessmentInSecs" cssClass="error" /></td>
+			</tr>
 			<tr>
 				<td colspan="3"><input type="submit" /></td>
 			</tr>
-		</table>		
+		</table>
 	</form:form>
-	
-<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+
+	<!-- .................END PLACE YOUR CONTENT HERE ................ -->
 	<!-- FOOTER -->
 	<jsp:include page="footer.jsp" />
 	<!-- END FOOTER -->
