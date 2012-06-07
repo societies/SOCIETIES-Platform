@@ -161,7 +161,7 @@ public class CisDirectory implements ICisDirectory {
 		List<CisAdvertisementRecord> returnList = new ArrayList<CisAdvertisementRecord>();
 		CisAdvertisementRecord record = null;
 
-		Transaction t = session.beginTransaction();
+	
 		try {
 
 			tmpAdvertList = session.createCriteria(
@@ -181,7 +181,6 @@ public class CisDirectory implements ICisDirectory {
 			}
 
 		} catch (Exception e) {
-			t.rollback();
 			e.printStackTrace();
 		} finally {
 			if (session != null) {
@@ -210,7 +209,6 @@ public class CisDirectory implements ICisDirectory {
 		List<CisAdvertisementRecord> returnList = new ArrayList<CisAdvertisementRecord>();
 		CisAdvertisementRecord record = null;
 
-		Transaction t = session.beginTransaction();
 		try {
 
 			tmpAdvertList = session.createCriteria(
@@ -233,7 +231,6 @@ public class CisDirectory implements ICisDirectory {
 			}
 
 		} catch (Exception e) {
-			t.rollback();
 			e.printStackTrace();
 		} finally {
 			if (session != null) {
