@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
+import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICis;
@@ -62,6 +63,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Participant;
 import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -94,8 +97,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private ICommManager mockCISendpoint2;
 	private ICommManager mockCISendpoint3;
 	
-	public static final String TEST_GOOD_JID = "testXcmanager.societies.local";
-	public static final String TEST_CSSID = "juca@societies.local";
+	public static final String CIS_MANAGER_CSS_ID = "testXcmanager.societies.local";
+	//public static final String TEST_CSSID = "juca@societies.local";
 	public static final String TEST_CSS_PWD = "password";
 	public static final String TEST_CIS_NAME_1 = "Flamengo Futebol Clube";
 	public static final String TEST_CIS_TYPW = "futebol";
@@ -126,6 +129,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	INetworkNode testCisId_1;
 	INetworkNode testCisId_2;
 	INetworkNode testCisId_3;
+	INetworkNode testDelCSSId;
 	IIdentityManager mockIICisId_1;
 	IIdentityManager mockIICisId_2;
 	IIdentityManager mockIICisId_3;
@@ -164,6 +168,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		testCisId_1 = new NetworkNodeImpl(TEST_CISID_1);
 		testCisId_2 = new NetworkNodeImpl(TEST_CISID_2);
 		testCisId_3 = new NetworkNodeImpl(TEST_CISID_3);
+		//testCisId_3 = new NetworkNodeImpl(TEST_CISID_3);
 		when(mockCISendpoint1.getIdManager()).thenReturn(mockIICisId_1);
 		when(mockCISendpoint2.getIdManager()).thenReturn(mockIICisId_2);
 		when(mockCISendpoint3.getIdManager()).thenReturn(mockIICisId_3);
@@ -177,7 +182,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		when(mockCISendpoint2.UnRegisterCommManager()).thenReturn(true);
 		when(mockCISendpoint3.UnRegisterCommManager()).thenReturn(true);
 		
-		
+		//testDelCSSId = new NetworkNodeImpl("delCss@societies.org");
+		doNothing().when(mockCISendpoint1).sendMessage(any(org.societies.api.comm.xmpp.datatypes.Stanza.class), any(Object.class)); // for the delete
+		//when(mockIICisId_1.fromJid(anyString())).thenReturn(testDelCSSId);// for the delete
+		when(mockIICisId_2.fromJid(CIS_MANAGER_CSS_ID)).thenReturn(testCisManagerId);// for the delete
+		when(mockIICisId_1.fromJid(CIS_MANAGER_CSS_ID)).thenReturn(testCisManagerId);// for the delete
+		when(mockIICisId_3.fromJid(CIS_MANAGER_CSS_ID)).thenReturn(testCisManagerId);// for the delete
 		
 		when(mockCcmFactory.getNewCommManager()).thenReturn(mockCISendpoint1,mockCISendpoint2,mockCISendpoint3);
 		
@@ -193,7 +203,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		mockIICisManagerId = mock (IIdentityManager.class);
 		
-		testCisManagerId = new NetworkNodeImpl(TEST_GOOD_JID);
+		testCisManagerId = new NetworkNodeImpl(CIS_MANAGER_CSS_ID);
 		
 		// mocking the CISManager
 		when(mockCSSendpoint.getIdManager()).thenReturn(mockIICisManagerId);
@@ -231,7 +241,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
 		cisManagerUnderTest.init();
 		
-		assertEquals(TEST_GOOD_JID, cisManagerUnderTest.cisManagerId.getJid());
+		assertEquals(CIS_MANAGER_CSS_ID, cisManagerUnderTest.cisManagerId.getJid());
 	}
 	//@Ignore
 	@Test
@@ -241,7 +251,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
 		cisManagerUnderTest.init();
 		
-		Future<ICisOwned> testCIS = cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+		Future<ICisOwned> testCIS = cisManagerUnderTest.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE);
 		try {
 			assertNotNull(testCIS.get());
@@ -270,11 +280,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ICisOwned[] ciss = new ICisOwned [3]; 
 		int[] cissCheck = {0,0,0};
 		
-		ciss[0] =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+		ciss[0] =  (cisManagerUnderTest.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1+"aa", TEST_CIS_TYPW , TEST_CIS_MODE)).get();
-		ciss[1] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+		ciss[1] = (cisManagerUnderTest.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
-		ciss[2] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+		ciss[2] = (cisManagerUnderTest.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_3, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 
 		List<ICisOwned> l = cisManagerUnderTest.getListOfOwnedCis();
@@ -282,7 +292,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 
 		while(it.hasNext()){
 			ICisOwned element = it.next();
-			 assertEquals(element.getOwnerId(),TEST_CSSID);
+			 assertEquals(element.getOwnerId(),CIS_MANAGER_CSS_ID);
 			 for(int i=0;i<ciss.length;i++){
 				 if(element.getName().equals(ciss[i].getName()) 
 				&& 	element.getCisId().equals(ciss[i].getCisId())
@@ -302,8 +312,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 }
 	
 	}
-	//TODO: this tests fails on line 802 in Cis.java: 				IIdentity targetCssIdentity = this.CISendpoint.getIdManager().fromJid(element.getMembersJid());//new IdentityImpl(element.getMembersJid());
-	//TODO: needs more mocking thomas?
+
 	@Ignore
 	@Test
 	public void testdeleteCIS() throws InterruptedException, ExecutionException {
@@ -317,9 +326,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ICisOwned[] ciss = new ICisOwned [2]; 
 		String jidTobeDeleted = "";
 		
-		ciss[0] =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+		ciss[0] =  (cisManagerUnderTest.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
-		ciss[1] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+		ciss[1] = (cisManagerUnderTest.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
 		LOG.info("cis 1 sessionfactory:"+((Cis)ciss[0]).getSessionFactory().hashCode());
@@ -362,7 +371,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
 		cisManagerUnderTest.init();
 		
-		ICisOwned Iciss =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+		ICisOwned Iciss =  (cisManagerUnderTest.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 
 		try {
@@ -376,14 +385,85 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		} 		
 	
 	}
-	@Ignore
+	
+	@Test
+	public void listdMembersOnOwnedCISwithCallback() throws InterruptedException, ExecutionException {
+
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
+		cisManagerUnderTest.init();
+		ICisOwned Iciss =  (cisManagerUnderTest.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				
+		try {
+			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get();
+			Iciss.addMember(MEMBER_JID_2, MEMBER_ROLE_2).get();
+			Iciss.addMember(MEMBER_JID_3, MEMBER_ROLE_3).get();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// callback that will do the real test
+
+		 class GetListCallBack implements ICisManagerCallback{
+			public void receiveResult(boolean result){fail("should have received a Communy obj");}
+			public void receiveResult(int result) {fail("should have received a Communy obj");}
+			public void receiveResult(String result){fail("should have received a Communy obj");}
+
+			public void receiveResult(Community communityResultObject) {
+				if(communityResultObject == null){
+					fail("Communy obj is null");
+					return;
+				}
+				else{
+					List<Participant> l = communityResultObject.getWho().getParticipant();
+					int[] memberCheck = {0,0,0};
+					
+					Iterator<Participant> it = l.iterator();
+					
+					while(it.hasNext()){
+						Participant element = it.next();
+						if(element.getJid().equals(MEMBER_JID_1) && element.getRole().toString().equalsIgnoreCase(MEMBER_ROLE_1))
+							memberCheck[0] = 1;
+						if(element.getJid().equals(MEMBER_JID_2) && element.getRole().toString().equalsIgnoreCase(MEMBER_ROLE_2))
+							memberCheck[1] = 1;	
+						if(element.getJid().equals(MEMBER_JID_3) && element.getRole().toString().equalsIgnoreCase(MEMBER_ROLE_3))
+							memberCheck[2] = 1;	
+
+				     }
+					
+					// check if it found all matching CISs
+					 for(int i=0;i<memberCheck.length;i++){
+						 assertEquals(memberCheck[i], 1);
+					 }
+				}
+				
+			}
+
+
+		}
+		
+		// end of callback
+		
+
+		// call and wait for callback
+		Iciss.getListOfMembers(new GetListCallBack());
+
+	
+	
+	}
+	
+	
+	
+	
 	@Test
 	public void listdMembersOnOwnedCIS() throws InterruptedException, ExecutionException {
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
 		cisManagerUnderTest.init();
-		ICisOwned Iciss =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+		ICisOwned Iciss =  (cisManagerUnderTest.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 				
 		try {
@@ -403,11 +483,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 
 		while(it.hasNext()){
 			ICisParticipant element = it.next();
-			if(element.getMembersJid().equals(MEMBER_JID_1) && element.getMembershipType().equals(MEMBER_ROLE_1))
+			if(element.getMembersJid().equals(MEMBER_JID_1) && element.getMembershipType().equalsIgnoreCase(MEMBER_ROLE_1))
 				memberCheck[0] = 1;
-			if(element.getMembersJid().equals(MEMBER_JID_2) && element.getMembershipType().equals(MEMBER_ROLE_2))
+			if(element.getMembersJid().equals(MEMBER_JID_2) && element.getMembershipType().equalsIgnoreCase(MEMBER_ROLE_2))
 				memberCheck[1] = 1;	
-			if(element.getMembersJid().equals(MEMBER_JID_3) && element.getMembershipType().equals(MEMBER_ROLE_3))
+			if(element.getMembersJid().equals(MEMBER_JID_3) && element.getMembershipType().equalsIgnoreCase(MEMBER_ROLE_3))
 				memberCheck[2] = 1;	
 
 	     }
