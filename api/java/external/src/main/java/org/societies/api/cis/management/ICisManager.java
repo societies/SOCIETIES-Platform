@@ -50,8 +50,11 @@ public interface ICisManager {
 	 * same as the CSS password (at the moment this is not checked).
 	 * 
 	 * 
-	 * The CSS who creates the CIS will be the owner. Ownership should be possible to be changed
-	 * later, but it is not right now.
+	 * The CSS who creates the CIS will be added as a meber to the CIS and with the owner role.
+	 *  Ownership should be possible to be changed later, but it is not right now. 
+	 * 
+	 * At the moment, the creation of the CIS triggers and advertisement record of it to be sent to
+	 * the global cis directory 
 	 * 
 	 * TODO: define what values mode can have and what each means.
 	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
@@ -69,6 +72,8 @@ public interface ICisManager {
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
 	 * method of {@link ICisOwned} representing the CIS to be deleted. This method
 	 * will delete only one CIS with the ID passed as cisId.
+	 * 
+	 * But it will trigger a delete notification to be sent to all the members of the CIS
 	 * 
 	 * 
 	 * @param cssId and cssPassword of the owner of the CIS.
@@ -103,7 +108,7 @@ public interface ICisManager {
 	/**
 	 * Return an array of all the CISs that the user own or participates. 
 	 * 
-	 * @return Array of {@linkICisRecord} .
+	 * @return Array of {@link ICis} .
 	 */
 	List<ICis> getCisList();
 

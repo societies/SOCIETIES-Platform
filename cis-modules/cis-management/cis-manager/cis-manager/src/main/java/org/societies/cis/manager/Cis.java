@@ -337,7 +337,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
 			// and the GUI can be updated with that new member
 			Stanza sta;
-/*			LOG.info("new member added, going to notify community");
+			LOG.info("new member added, going to notify community");
 			
 			// 1) Notifying the added user
 
@@ -353,10 +353,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.info("finished building notification");
 
 
-			Stanza sta = new Stanza(targetCssIdentity);
+			sta = new Stanza(targetCssIdentity);
 			CISendpoint.sendMessage(sta, cMan);
 					
-			LOG.info("notification sent to the new user");*/
+			LOG.info("notification sent to the new user");
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a pubsub notification
 			
@@ -447,12 +447,34 @@ public class Cis implements IFeatureServer, ICisOwned {
 			if (membersCss.remove( new CisParticipant(jid)) == false)
 				return false;
 			
-			// should we send a notification to the user here?
+			// 2) Notification to deleted user here
 			
 			
-			//2) Sending a notification to all the other users (maybe replace with pubsub later)
+			CommunityManager message = new CommunityManager();
+			Notification n = new Notification();
+			DeleteNotification d = new DeleteNotification();
+			d.setCommunityJid(this.getCisId());
 			
-			CommunityManager cMan = new CommunityManager();
+			n.setDeleteNotification(d);
+			message.setNotification(n);
+
+			IIdentity targetCssIdentity;
+			try {
+				targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
+				Stanza sta = new Stanza(targetCssIdentity);			
+				LOG.info("stanza created");
+				this.CISendpoint.sendMessage(sta, message);
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			
+			
+			
+			//3) Sending a notification to all the other users (maybe replace with pubsub later)
+			
+/*			CommunityManager cMan = new CommunityManager();
 			Notification n = new Notification();
 			DeleteMemberNotification s = new DeleteMemberNotification();
 			s.setCommunityJid(this.getCisId());
@@ -480,7 +502,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 				
 		     }
-			LOG.info("notification sents to the existing user");
+			LOG.info("notification sents to the existing user");*/
 			
 
 			return true;

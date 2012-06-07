@@ -267,7 +267,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			e.printStackTrace();
 		}
 		
-	
+	// TODO: double check that the owner has been added as participant
+		
+		
 	}
 	//@Ignore
 	@Test
