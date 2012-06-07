@@ -116,6 +116,8 @@ public class CSSManager implements ICSSLocalManager {
 //		  Supposedly, the correct way to obtain the identity
         IIdentity pubsubID = idManager.getThisNetworkNode();
         
+        // mm : Temporarily removing the pubsub stuff
+        // as it is causing issues on virgo deployment
         this.createPubSubNodes();
         this.subscribeToPubSubNodes();
         
