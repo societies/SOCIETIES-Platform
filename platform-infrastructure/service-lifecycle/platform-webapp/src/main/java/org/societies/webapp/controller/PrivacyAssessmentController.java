@@ -193,7 +193,7 @@ public class PrivacyAssessmentController {
             renderer = new BarRenderer();
 
             plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
-            plot.setOrientation(PlotOrientation.VERTICAL);
+            plot.setOrientation(PlotOrientation.HORIZONTAL);
             chart = new JFreeChart("Srore Bord", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
             chart.setBackgroundPaint(new Color(249, 231, 236));
@@ -210,8 +210,10 @@ public class PrivacyAssessmentController {
 
             try {
                 final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
-                //final File file1 = new File("../webapps/jspchart/web/barchart.png");
-                final File file1 = new File("webapps/barchart.png");
+                // FIXME
+                String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
+                		"global/bundle/societies-webapp/1.0.0.SNAPSHOT/societies-webapp.war/";
+                final File file1 = new File(contextPath + "images/barchart.png");
                 ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
             } catch (Exception e) {
                 LOG.warn("barchart(): ", e);

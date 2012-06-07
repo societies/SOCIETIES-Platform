@@ -14,6 +14,7 @@
 
     <!-- CSS / CIS Directory -->
     <artifact type="bundle" name="org.societies.css.CssDirectory"/>
+    <artifact type="bundle" name="org.societies.cis.CisDirectory"/>
 
     <!-- Group Manager -->
     <artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityGroupManager"/>

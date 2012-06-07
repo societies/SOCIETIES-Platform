@@ -50,22 +50,26 @@ import org.societies.api.schema.cis.directory.CisDirectoryBeanResult;
 public class CisDirectoryClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/schema/cis/direcory"));
+			  Arrays.asList("http://societies.org/api/schema/cis/directory"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			  Arrays.asList("org.societies.api.schema.cis.directory"));
 
 
 	private static Logger logger = LoggerFactory.getLogger(CisDirectoryClientCallback.class);
+	
+	
 
 	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
 	private static final Map<String, ICisDirectoryCallback> cisDirectoryClients = new HashMap<String, ICisDirectoryCallback>();
-
+	
 	/** Constructor for callback
 	 * @param clientID unique ID of send request to comms framework
 	 * @param serviceDiscoveryClient callback from originating client
 	 */
 	public CisDirectoryClientCallback(String clientID, ICisDirectoryCallback cisDirectoryClient) {
 		//STORE THIS CALLBACK WITH THIS REQUEST ID
+		logger.info("CIS DIRECTORY CALLBACK ClientID = @@@@@@@@@@: "+clientID);
+		logger.info("CIS DIRECTORY CALLBACK cisDirectoryClient = @@@@@@@@@@: "+cisDirectoryClient);
 		cisDirectoryClients.put(clientID, cisDirectoryClient);
 	}
 
@@ -96,6 +100,7 @@ public class CisDirectoryClientCallback implements ICommCallback {
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object) */
 	@Override
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
+		logger.info("");
 
 		if(logger.isDebugEnabled()) logger.debug("CIS Directory Callback called!");
 
