@@ -37,6 +37,7 @@
 		
 <form:form method="POST" action="privacyassessment.html" commandName="assForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
+		<a href="barchart.html">Bar chart</a> 
 		<table>
 			<tr>
 				<td>Privacy Assessment Methods :</td>
