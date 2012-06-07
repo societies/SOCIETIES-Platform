@@ -44,6 +44,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.api.identity.IIdentity;
@@ -133,7 +134,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<CtxAttribute> ctxAttribute = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(scope.getOperatorId());
+			targetCss = this.idMgr.fromJid(scope.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -179,7 +180,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<CtxModelObject> obj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(identifier.getOperatorId());
+			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -199,12 +200,12 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<CtxModelObject> obj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(identifier.getOperatorId());
+			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
 			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
-					+ identifier.getOperatorId() + "':" + ife.getLocalizedMessage(), ife);
+					+ identifier.getOwnerId() + "':" + ife.getLocalizedMessage(), ife);
 		}
 		if (idMgr.isMine(targetCss)) {
 			obj = internalCtxBroker.retrieve(identifier);
@@ -214,6 +215,16 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return obj;
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieveIndividualEntity(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public Future<IndividualCtxEntity> retrieveIndividualEntity(
+			final Requestor requestor, final IIdentity cssId) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	@Override
 	@Async
 	public Future<List<CtxAttribute>> retrieveFuture(
@@ -222,12 +233,12 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<List<CtxAttribute>> futureObj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
+			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
 			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
-					+ attrId.getOperatorId() + "': " + ife.getLocalizedMessage(), ife);
+					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
 		if (idMgr.isMine(targetCss)) {
 			futureObj = internalCtxBroker.retrieveFuture(attrId, date);
@@ -246,12 +257,12 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<List<CtxAttribute>> futureObj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
+			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
 			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
-					+ attrId.getOperatorId() + "': " + ife.getLocalizedMessage(), ife);
+					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
 		if (idMgr.isMine(targetCss)) {
 			futureObj = internalCtxBroker.retrieveFuture(attrId, modificationIndex);
@@ -270,12 +281,12 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<List<CtxHistoryAttribute>> hocObj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
+			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
 			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
-					+ attrId.getOperatorId() + "': " + ife.getLocalizedMessage(), ife);
+					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
 		if (idMgr.isMine(targetCss)) {
 			hocObj = internalCtxBroker.retrieveHistory(attrId, modificationIndex);
@@ -295,12 +306,12 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<List<CtxHistoryAttribute>> hocObj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(attrId.getOperatorId());
+			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
 			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
-					+ attrId.getOperatorId() + "': " + ife.getLocalizedMessage(), ife);
+					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
 		if (idMgr.isMine(targetCss)) {
 			hocObj = internalCtxBroker.retrieveHistory(attrId, startDate, endDate);
@@ -319,7 +330,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<CtxModelObject> obj = null;
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(object.getId().getOperatorId());
+			targetCss = this.idMgr.fromJid(object.getId().getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -351,7 +362,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		
 		IIdentity targetCis;
 		try {
-			targetCis = this.idMgr.fromJid(community.getOperatorId());
+			targetCis = this.idMgr.fromJid(community.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -373,7 +384,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		
 		IIdentity targetCis;
 		try {
-			targetCis = this.idMgr.fromJid(community.getOperatorId());
+			targetCis = this.idMgr.fromJid(community.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -438,7 +449,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(ctxId.getOperatorId());
+			targetCss = this.idMgr.fromJid(ctxId.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -468,7 +479,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(ctxId.getOperatorId());
+			targetCss = this.idMgr.fromJid(ctxId.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -500,7 +511,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(scope.getOperatorId());
+			targetCss = this.idMgr.fromJid(scope.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -531,7 +542,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		IIdentity targetCss;
 		try {
-			targetCss = this.idMgr.fromJid(scope.getOperatorId());
+			targetCss = this.idMgr.fromJid(scope.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -551,7 +562,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		
 		IIdentity targetCis;
 		try {
-			targetCis = this.idMgr.fromJid(community.getOperatorId());
+			targetCis = this.idMgr.fromJid(community.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
@@ -574,7 +585,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		
 		IIdentity targetCis;
 		try {
-			targetCis = this.idMgr.fromJid(community.getOperatorId());
+			targetCis = this.idMgr.fromJid(community.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}

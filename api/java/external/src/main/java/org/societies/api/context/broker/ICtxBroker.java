@@ -42,6 +42,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
@@ -254,6 +255,32 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxModelObject> retrieve(final Requestor requestor, 
 			final CtxIdentifier identifier) throws CtxException;
+	
+	/**
+	 * Retrieves the {@link IndividualCtxEntity} which represents the owner
+	 * of the specified CSS. IndividualCtxEntities are most commonly of type
+	 * CtxEntityTypes.PERSON; however they can also be organisations, smart
+	 * space infrastructures, autonomous or semi-autonomous agents, etc. The
+	 * method returns <code>null</code> if there is no IndividualCtxEntity
+	 * representing the identified CSS. 
+	 * 
+	 * @param requestor
+	 *            the entity requesting to retrieve the CSS owner context 
+	 *            entity
+	 * @param cssId
+	 *            the {@link IIdentity} identifying the CSS whose 
+	 *            IndividualCtxEntity to retrieve
+	 * @return the {@link IndividualCtxEntity} which represents the owner of
+	 *         the specified CSS
+	 * @throws CtxException 
+	 *             if the IndividualCtxEntity representing the owner of the 
+	 *             specified CSS exists but cannot be retrieved
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.3
+	 */
+	public Future<IndividualCtxEntity> retrieveIndividualEntity(
+			final Requestor requestor, final IIdentity cssId) throws CtxException;
 
 	/**
 	 * Predicts a future context attribute for the specified time.

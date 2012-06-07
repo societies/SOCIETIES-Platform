@@ -48,14 +48,11 @@ import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
-import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -66,6 +63,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.broker.test.util.MockBlobClass;
@@ -95,7 +95,9 @@ public class InternalCtxBrokerTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
-		//when(mockIdentityMgr.getThisNetworkNode()).thenReturn((INetworkNode) mockIdentity);
+		when(mockIdentityMgr.getThisNetworkNode()).thenReturn(mockNetworkNode);
+		when(mockNetworkNode.getBareJid()).thenReturn(OWNER_IDENTITY_STRING);
+		when(mockIdentityMgr.fromJid(OWNER_IDENTITY_STRING)).thenReturn(mockIdentity);
 		when(mockIdentity.toString()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockNetworkNode.toString()).thenReturn(NETWORK_NODE_STRING);
 	}
@@ -117,7 +119,7 @@ public class InternalCtxBrokerTest {
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 		internalCtxBroker.setIdentityMgr(mockIdentityMgr);
-		internalCtxBroker.createCssOperator(); // TODO remove?
+		internalCtxBroker.createIndividualEntity(mockIdentity, CtxEntityTypes.PERSON); // TODO remove?
 		internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
 	}
 
@@ -132,7 +134,7 @@ public class InternalCtxBrokerTest {
 
 
 	/**
-	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#retrieveCssOperator()}.
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#retrieveIndividualEntity(IIdentity)}.
 	 * 
 	 * @throws CtxException 
 	 * @throws ExecutionException 
@@ -140,11 +142,15 @@ public class InternalCtxBrokerTest {
 	 * @throws InvalidFormatException 
 	 */
 	@Test
-	public void testRetrieveCssOperator() throws Exception {
+	public void testRetrieveIndividualEntity() throws Exception {
 		
-		final IndividualCtxEntity operatorEnt = internalCtxBroker.retrieveCssOperator().get();
-		assertNotNull(operatorEnt);
-		assertEquals(OWNER_IDENTITY_STRING, operatorEnt.getId().getOwnerId());
+		final IndividualCtxEntity ownerEnt = 
+				internalCtxBroker.retrieveIndividualEntity(mockIdentity).get();
+		assertNotNull(ownerEnt);
+		assertEquals(OWNER_IDENTITY_STRING, ownerEnt.getId().getOwnerId());
+		assertEquals(CtxEntityTypes.PERSON, ownerEnt.getType());
+		assertFalse(ownerEnt.getAttributes(CtxAttributeTypes.ID).isEmpty());
+		assertEquals(1, ownerEnt.getAttributes(CtxAttributeTypes.ID).size());
 	}
 
 	/**
@@ -220,21 +226,22 @@ public class InternalCtxBrokerTest {
 
 
 	/**
-	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createEntity(java.lang.String)}.
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createIndividualEntity(IIdentity, String)}.
 	 * 
 	 * @throws CtxException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testcreateIndividualCtxEntity() throws CtxException, InterruptedException, ExecutionException {
+	public void testCreateIndividualEntity() throws CtxException, InterruptedException, ExecutionException {
 
-		final IndividualCtxEntity individualCtxEnt ;
-
-		final Future<IndividualCtxEntity> futureIndividualCtxEntity = internalCtxBroker.createIndividualEntity("Person");
-		individualCtxEnt = futureIndividualCtxEntity.get();
-		assertNotNull(individualCtxEnt);
-		assertTrue(individualCtxEnt.getType().equalsIgnoreCase("Person"));
+		final IndividualCtxEntity ownerEnt = 
+				internalCtxBroker.createIndividualEntity(mockIdentity, CtxEntityTypes.PERSON).get();
+		assertNotNull(ownerEnt);
+		assertEquals(OWNER_IDENTITY_STRING, ownerEnt.getId().getOwnerId());
+		assertEquals(CtxEntityTypes.PERSON, ownerEnt.getType());
+		assertFalse(ownerEnt.getAttributes(CtxAttributeTypes.ID).isEmpty());
+		assertEquals(1, ownerEnt.getAttributes(CtxAttributeTypes.ID).size());
 	}
 
 
