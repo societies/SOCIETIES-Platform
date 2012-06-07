@@ -307,8 +307,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	// TODO: review
 	public boolean subscribeToCis(CisRecord i) {
 
-		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid()),this));
-		return true;
+		if(! this.subscribedCISs.contains(new Cis(i))){
+			this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid()),this));
+			return true;
+		}
+		return false;
 		
 	}
 	
