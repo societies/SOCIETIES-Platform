@@ -133,27 +133,19 @@ public class CisDirectoryController {
 		try {
 		
 			if (method.equalsIgnoreCase("GetCisAdverts")) {
-				//asynchResult = this.getCisDirectoryRemote().findAllCisAdvertisementRecords();
 				res="CIS Directory Result ";
 				
-				List<CisAdvertisementRecord> recordList = new ArrayList<CisAdvertisementRecord>();
-
 				CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
 
 				getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
-				recordList = callback.getResultList();
+				adverts = callback.getResultList();
 				
-				asynchResult = (Future<List<CisAdvertisementRecord>>) (recordList);
-				
-				adverts = asynchResult.get();
 				model.put("result", res);
 				model.put("adverts", adverts);
 				
 			}else if (method.equalsIgnoreCase("AddCisRecord")) {
 				
 				res="CIS Advertisement added Successfully ";
-				model.put("result", res);
-				
 				
 				CisAdvertisementRecord record= new CisAdvertisementRecord();
 				
@@ -167,7 +159,14 @@ public class CisDirectoryController {
 				getCisDirectoryRemote().addCisAdvertisementRecord(record);
 				model.put("message", "CisAdvertisement added");
 									
-				//adverts = (List<CisAdvertisementRecord>) record;				
+				// Go a read all the records again so we can display all after
+				// a new record is added
+				CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
+				getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
+				adverts = callback.getResultList();
+				
+				model.put("result", res);
+				model.put("adverts", adverts);
 				
 				model.put("adverts", adverts);
 					
