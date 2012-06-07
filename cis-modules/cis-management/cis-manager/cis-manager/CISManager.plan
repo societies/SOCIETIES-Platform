@@ -11,9 +11,10 @@
 	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
 <!-- 	<artifact type="bundle" name="org.societies.hibernate_classes"/> -->
-	<artifact type="bundle" name="org.societies.data-source"/>
 
+	<artifact type="bundle" name="org.societies.data-source"/>
 	<artifact type="bundle" name="org.societies.cis.CisDirectoryClient"/>
+
     <artifact type="bundle" name="org.societies.cis.manager"/>
 
 

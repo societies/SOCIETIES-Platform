@@ -137,7 +137,7 @@ public interface ICisManager {
 	/**
 	 * Leave a CIS, most likely hosted remotely.
 	 * The callback must be able to retrieve a community object
-	 * containg a leave response
+	 * contnaing a leave response
 	 * defined at org.societies.api.schema.cis.community 
 	 * it has the result of the leave plus some complimentary info from the CIS
 	 *  
@@ -149,7 +149,7 @@ public interface ICisManager {
 	
 	// END of API implementing client functionality
 
-	
+		
 	
 	// API which is not yet properly defined
 	
