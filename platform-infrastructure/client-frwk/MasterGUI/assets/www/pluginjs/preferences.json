@@ -1,6 +1,8 @@
 {
 	"Preferences" : {
 		"exceptionThreshold" : 0,
-		"getStringPref" : "A string value"
-	}
+		"getStringPrefValue" : {
+			"value" : "A string value"
+			}
+		}
 }
