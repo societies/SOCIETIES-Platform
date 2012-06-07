@@ -28,17 +28,26 @@
 	<!-- Required for Async processing -->
 	<tx:annotation-driven />
 	
+	<bean id="ProviderServiceMgr"
+		class="org.societies.security.policynegotiator.provider.ProviderServiceMgr"
+	>
+	</bean>
+	
 	<bean id="NegotiationProvider"
 		class="org.societies.security.policynegotiator.provider.NegotiationProvider"
 		depends-on="NegotiationProviderRemote,SignatureMgr"
-		init-method="init" >
+		init-method="init"
+	>
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
+        <property name="providerServiceMgr" ref="NegotiationProviderSM"/>
 	</bean>
+
 	<bean id="NegotiationRequester"
 		class="org.societies.security.policynegotiator.requester.NegotiationRequester"
 		depends-on="NegotiationProviderRemote,SignatureMgr,eventMgmtRef"
-		init-method="init" >
+		init-method="init"
+	>
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
         <property name="secureStorage" ref="SecureStorage"/>

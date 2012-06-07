@@ -26,39 +26,33 @@ package org.societies.api.internal.security.policynegotiator;
 
 import java.net.URI;
 
-import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * Callback for {@link INegotiation}
+ * Interface for notifying Policy Negotiation on the provider side about any changes
+ * in services that are available for sharing to others.
  *
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationCallback {
-	
-	/**
-	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
-	 * 
-	 * @param agreementKey The key to get Service Level Agreement (SLA) from
-	 * {@link ISecureStorage}. If negotiation has not been successful, this
-	 * parameter is null.
-	 * 
-	 * @param jar Location of the client jar if applicable (e.g. in case of
-	 * a service that provides a client), or null if not applicable
-	 * (e.g. in case of a service that does not provide a client, or in case of
-	 * a CIS)
-	 */
-	public void onNegotiationComplete(String agreementKey, URI jar);
+public interface INegotiationProviderServiceMgmt {
 
 	/**
-	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
-	 * in case of error.
+	 * Tells Policy Negotiator that a new service is available for sharing to others.
 	 * 
-	 * @param msg Error message
+	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
+	 * 
+	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
+	 * 
+	 * @param clientJar Location of the JAR file for service client, if the service provides a client.
+	 * If the service does not provide a client, this parameter should be null
 	 */
-	public void onNegotiationError(String msg);
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar);
+	
+	/**
+	 * Tells Policy Negotiator that a service is not available for sharing to others anymore.
+	 * 
+	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
+	 */
+	public void removeService(ServiceResourceIdentifier serviceId);
 }

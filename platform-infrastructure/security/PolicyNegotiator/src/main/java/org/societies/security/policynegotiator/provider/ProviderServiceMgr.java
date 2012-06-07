@@ -22,43 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.security.policynegotiator;
+package org.societies.security.policynegotiator.provider;
 
 import java.net.URI;
+import java.util.HashMap;
 
-import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * Callback for {@link INegotiation}
+ * 
  *
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationCallback {
-	
-	/**
-	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
-	 * 
-	 * @param agreementKey The key to get Service Level Agreement (SLA) from
-	 * {@link ISecureStorage}. If negotiation has not been successful, this
-	 * parameter is null.
-	 * 
-	 * @param jar Location of the client jar if applicable (e.g. in case of
-	 * a service that provides a client), or null if not applicable
-	 * (e.g. in case of a service that does not provide a client, or in case of
-	 * a CIS)
-	 */
-	public void onNegotiationComplete(String agreementKey, URI jar);
+public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
-	/**
-	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
-	 * in case of error.
-	 * 
-	 * @param msg Error message
-	 */
-	public void onNegotiationError(String msg);
+	private HashMap<URI, Service> services = new HashMap<URI, Service>();
+	
+	@Override
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar) {
+		Service s = new Service(serviceId, slaXml, clientJar);
+		services.put(serviceId.getIdentifier(), s);
+	}
+
+	@Override
+	public void removeService(ServiceResourceIdentifier serviceId) {
+		services.remove(serviceId.getIdentifier());
+	}
+
+	protected HashMap<URI, Service> getServices() {
+		return services;
+	}
+	
+	protected Service getService(ServiceResourceIdentifier id) {
+		return services.get(id.getIdentifier());
+	}
+
+	protected URI getClientJarUri(ServiceResourceIdentifier id) {
+		return services.get(id.getIdentifier()).getClientJarUri();
+	}
+
+	protected String getSlaXmlOptions(ServiceResourceIdentifier id) {
+		return services.get(id.getIdentifier()).getSlaXmlOptions();
+	}
+
 }

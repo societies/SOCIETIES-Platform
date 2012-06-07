@@ -50,6 +50,7 @@ public class NegotiationProvider implements INegotiationProvider {
 	
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;
+	private ProviderServiceMgr providerServiceMgr;
 	
 	/**
 	 * Negotiation sessions
@@ -89,6 +90,12 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 	public void setSignatureMgr(ISignatureMgr signatureMgr) {
 		this.signatureMgr = signatureMgr;
+	}
+	public ProviderServiceMgr getProviderServiceMgr() {
+		return providerServiceMgr;
+	}
+	public void setProviderServiceMgr(ProviderServiceMgr providerServiceMgr) {
+		this.providerServiceMgr = providerServiceMgr;
 	}
 	
 	private SlaBean createSlaBean(boolean success, int sessionId, String sla) {

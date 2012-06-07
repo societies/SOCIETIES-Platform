@@ -143,7 +143,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					else {
 						// Notify successful end of negotiation
 						LOG.debug("invoking final callback");
-						finalCallback.onNegotiationComplete(agreementKey);
+						finalCallback.onNegotiationComplete(agreementKey, );
 						LOG.info("negotiation finished, final callback invoked");
 					}
 				}

@@ -22,43 +22,57 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.security.policynegotiator;
+package org.societies.security.policynegotiator;
+
+import static org.junit.Assert.*;
 
 import java.net.URI;
 
-import org.societies.api.internal.security.storage.ISecureStorage;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.societies.security.policynegotiator.requester.ServiceJarUri;
 
 /**
- * Callback for {@link INegotiation}
+ * 
  *
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationCallback {
+public class ServiceJarUriTest {
+
+	ServiceJarUri classUnderTest;
+	String serviceBaseUri = "http://www.example.com/service1";
 	
 	/**
-	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
-	 * 
-	 * @param agreementKey The key to get Service Level Agreement (SLA) from
-	 * {@link ISecureStorage}. If negotiation has not been successful, this
-	 * parameter is null.
-	 * 
-	 * @param jar Location of the client jar if applicable (e.g. in case of
-	 * a service that provides a client), or null if not applicable
-	 * (e.g. in case of a service that does not provide a client, or in case of
-	 * a CIS)
+	 * @throws java.lang.Exception
 	 */
-	public void onNegotiationComplete(String agreementKey, URI jar);
+	@Before
+	public void setUp() throws Exception {
+		URI service = new URI(serviceBaseUri);
+		classUnderTest = new ServiceJarUri(service);
+	}
 
 	/**
-	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
-	 * in case of error.
-	 * 
-	 * @param msg Error message
+	 * @throws java.lang.Exception
 	 */
-	public void onNegotiationError(String msg);
+	@After
+	public void tearDown() throws Exception {
+	}
+
+	/**
+	 * Test method for {@link org.societies.security.policynegotiator.requester.ServiceJarUri#getFullUri()}.
+	 */
+	@Test
+	public void testGenerateFullUri() {
+		URI result = classUnderTest.generateFullUri();
+		String resultStr = result.toString();
+		String addon = "?" + ServiceJarUri.KEY + "=";
+		
+		assertTrue(resultStr.startsWith(serviceBaseUri));
+		assertTrue(resultStr.contains(addon));
+		assertTrue(resultStr.startsWith(serviceBaseUri + addon));
+		assertTrue(resultStr.length() > serviceBaseUri.length() + addon.length());
+	}
+
 }

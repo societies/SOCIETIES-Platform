@@ -22,43 +22,56 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.security.policynegotiator;
+package org.societies.security.policynegotiator.requester;
 
 import java.net.URI;
+import java.util.Random;
 
-import org.societies.api.internal.security.storage.ISecureStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Callback for {@link INegotiation}
+ * 
  *
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationCallback {
-	
-	/**
-	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
-	 * 
-	 * @param agreementKey The key to get Service Level Agreement (SLA) from
-	 * {@link ISecureStorage}. If negotiation has not been successful, this
-	 * parameter is null.
-	 * 
-	 * @param jar Location of the client jar if applicable (e.g. in case of
-	 * a service that provides a client), or null if not applicable
-	 * (e.g. in case of a service that does not provide a client, or in case of
-	 * a CIS)
-	 */
-	public void onNegotiationComplete(String agreementKey, URI jar);
+public class ServiceJarUri {
+
+	private static Logger LOG = LoggerFactory.getLogger(ServiceJarUri.class);
 
 	/**
-	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
-	 * in case of error.
-	 * 
-	 * @param msg Error message
+	 * URL parameter keyword for the service session key
 	 */
-	public void onNegotiationError(String msg);
+	public static final String KEY = "key";
+	
+	URI baseUri;
+	
+	public ServiceJarUri(URI service) {
+		this.baseUri = service;
+	}
+	
+	public URI generateFullUri() {
+		
+		String fullUri;
+		
+		fullUri = addParameter(baseUri.toString(), KEY, generateKey());
+		LOG.debug("generateFullUri(): {}", fullUri);
+		
+		return URI.create(fullUri);
+	}
+	
+	private String generateKey() {
+		Random rand = new Random();
+		String key = String.valueOf(rand.nextInt());
+		return key;
+	}
+	
+	private String addParameter(String base, String key, String value) {
+		
+		if (base.contains("?")) {
+			base += "&";
+		}
+		return base + "?" + key + "=" + value;
+	}
 }

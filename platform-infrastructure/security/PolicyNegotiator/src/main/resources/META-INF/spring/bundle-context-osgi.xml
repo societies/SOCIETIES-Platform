@@ -26,6 +26,7 @@
 	<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr" />
 	
 	<osgi:service ref="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" />
+	<osgi:service ref="NegotiationProviderSM"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt" />
 	<osgi:service ref="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiation" />
 	
 </beans>
