@@ -98,13 +98,15 @@ public interface ICtxBroker {
 	 * specified CSS. The type of the CSS owner (e.g. CtxEntityTypes.PERSON) is
 	 * also supplied. The created <code>IndividualCtxEntity</code> can be
 	 * associated to zero or more {@link CommunityCtxEntity CommunityCtxEntities}.
+	 * If the Context DB already contains the entity, the call leaves the
+	 * database unchanged and returns the existing IndividualCtxEntity.
 	 *  
 	 * @param cssId
 	 *            the {@link IIdentity} of the CSS whose IndividualCtxEntity to
 	 *            create  
 	 * @param ownerType
-	 *            the type of the CSS owner whose IndividualCtxEntity to create
-	 *            e.g.   
+	 *            the type of the CSS owner whose IndividualCtxEntity to create,
+	 *            e.g. CtxEntityTypes.PERSON  
 	 * @return the IndividualCtxEntity that represents the owner of the
 	 *         specified CSS
 	 * @throws CtxException

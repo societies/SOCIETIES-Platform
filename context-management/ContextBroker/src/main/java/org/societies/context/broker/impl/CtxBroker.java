@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 /**
@@ -219,10 +220,23 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	 * @see org.societies.api.context.broker.ICtxBroker#retrieveIndividualEntity(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
 	 */
 	@Override
+	@Async
 	public Future<IndividualCtxEntity> retrieveIndividualEntity(
 			final Requestor requestor, final IIdentity cssId) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (cssId == null)
+			throw new NullPointerException("cssId can't be null");
+		
+		if (this.idMgr.isMine(cssId)) {
+			// TODO access control
+			return this.internalCtxBroker.retrieveIndividualEntity(cssId);
+		} else {
+		
+			LOG.warn("remote call");
+			return new AsyncResult<IndividualCtxEntity>(null);
+		}
 	}
 	
 	@Override
