@@ -189,6 +189,8 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 */
 	@Override
 	public void addCisAdvertisementRecord(CisAdvertisementRecord cisAdvert) {
+		
+		LOG.info("addCisAdvertisementRecord called");
 		// We want to send all messages for CisDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
@@ -200,9 +202,12 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 		CisDirectoryBean cisDir = new CisDirectoryBean();
 		cisDir.setCisA(cisAdvert);
 		cisDir.setMethod(MethodType.ADD_CIS_ADVERTISEMENT_RECORD);
+		LOG.info("going to send stanza");
 		try {
 			commManager.sendMessage(stanza, cisDir);
+			LOG.info("msg sent");
 		} catch (CommunicationException e) {
+			LOG.info("exception at addCisAdvertisementRecord");
 			LOG.warn(e.getMessage());
 		}
 		;

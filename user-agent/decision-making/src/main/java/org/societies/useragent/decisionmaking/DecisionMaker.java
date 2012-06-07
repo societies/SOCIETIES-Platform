@@ -37,7 +37,7 @@ import org.slf4j.*;
 
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.framework.BundleContext;
-
+import org.springframework.osgi.context.BundleContextAware;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.useragent.conflict.*;
@@ -47,17 +47,22 @@ import org.societies.useragent.conflict.ConfidenceTradeoffRule;
 import org.societies.useragent.conflict.ConflictResolutionManager;
 import org.societies.useragent.conflict.IntentPriorRule;
 
-public class DecisionMaker extends AbstractDecisionMaker {
+public class DecisionMaker extends AbstractDecisionMaker  implements BundleContextAware{
 
 	private BundleContext myContext;
 
 	private IIdentity entityID;
 
 	private List<IActionConsumer> temporal = null;
-
+	
 	// private IServiceDiscovery SerDiscovery;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
+	public void setBundleContext(BundleContext bundleContext) 
+    {   
+        this.myContext = bundleContext;    
+    }
+	
 	// public IServiceDiscovery getSerDiscovery() {
 	// return SerDiscovery;
 	// }

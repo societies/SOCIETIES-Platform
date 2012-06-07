@@ -28,9 +28,9 @@ package org.societies.orchestration.CommunityLifecycleManagement.impl;
 import static org.mockito.Mockito.*;
 
 import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
-import org.societies.api.internal.css.directory.ICssDirectory;
+import org.societies.api.css.directory.ICssDirectory;
 
-import org.societies.api.internal.css.discovery.ICssDiscovery;
+//import org.societies.api.css.discovery.ICssDiscovery;
 
 //import org.societies.api.internal.cis.management.ICisActivityFeed;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -79,6 +79,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.css.management.ICssActivityFeed;
+import org.societies.api.css.management.ICssRecord;
 
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
@@ -304,15 +306,19 @@ public class CommunityRecommender //implements ICommCallback
 		
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
-		if (cissToCreateMetadata == null) {
-			cissToCreateMetadata = new ArrayList<String> ();
-			for (int i = 0; i < creatableCiss.size(); i++) {
-				cissToCreateMetadata.add("DESCRIPTION: " + creatableCiss.get(i).getDescription() + "---");
-			}
-		}
 		
 		for (int i = 0; i < creatableCiss.size(); i++) {
 			cissToCreate.put(new Integer(i), creatableCiss.get(i));
+		}
+		
+		if (cissToCreateMetadata == null) {
+			cissToCreateMetadata = new ArrayList<String> ();
+			Set<Integer> keys = cissToCreate.keySet();
+			Iterator<Integer> keysIt = keys.iterator();
+			while (keysIt.hasNext()) {
+				Integer cisAccepted = keysIt.next();
+				cissToCreateMetadata.add("CIS ID: " + cissToCreate.get(cisAccepted).getActualCis().getCisId() + "---" + "DESCRIPTION: " + cissToCreate.get(cisAccepted).getDescription() + "---");
+			}
 		}
 		
 		if (cissToCreate != null) {
@@ -320,7 +326,7 @@ public class CommunityRecommender //implements ICommCallback
 		    for (int i = 0; i < cissToCreate.size(); i++) {
 		    	Future<ICisOwned> createdCisFuture = null;
 			    try {
-		    	    createdCisFuture = cisManager.createCis(linkedCss.getIdentifier(), null, null, null, 0);
+		    	    createdCisFuture = cisManager.createCis(linkedCss.getIdentifier(), null, cissToCreate.get(i).getName(), null, 0);
 			    } catch (NullPointerException e) {
 			    	e.printStackTrace();
 			    }
@@ -350,9 +356,9 @@ public class CommunityRecommender //implements ICommCallback
 					}
 				}
 			    
-			    //ICisAdvertisementRecord createdCisAdvert = new ICisAdvertisementRecord(createdCis.get().getName(), createdCis.getDescription(), createdCis.getCisEditor().getURI());
-			    //for (int m = 0; m < cissToCreate.get(i).getMembersList(); m++) {
-			    //    ICssRecord member = cssManager.getCssRecord(cissToCreate.get(i).getMembersList().get(m));
+			    //ICisAdvertisementRecord createdCisAdvert = new ICisAdvertisementRecord(createdCis.getName(), createdCis.getDescription(), createdCis.getCisEditor().getURI());
+			    //for (int m = 0; m < cissToCreate.get(i).getMemberList().size(); m++) {
+			    //    ICssRecord member = cssManager.getCssRecord(cissToCreate.get(i).getMemberList().get(m));
 			    //    ICssActivityFeed feed = member.getActivityFeed();
 			    //    feed.addActivity(createdCisAdvert);
 		        //}

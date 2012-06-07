@@ -25,8 +25,7 @@
 
 package org.societies.api.internal.css.management;
 
-import org.societies.api.internal.cis.directory.ICisDirectory;
-import org.societies.api.internal.cis.management.ICisManager;
+
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 /**
@@ -42,8 +41,6 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 @Deprecated
 public interface ISocietiesApp {
     Object getCssManager();
-    ICisManager getCisManager();
     ICssDirectory getCssDirectory();
-    ICisDirectory getCisDirectory();
 
 }

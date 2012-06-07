@@ -24,12 +24,28 @@ package org.societies.webapp.controller;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Paint;
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.jfree.chart.ChartRenderingInfo;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.entity.StandardEntityCollection;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.general.DatasetUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +85,7 @@ public class PrivacyAssessmentController {
 	@RequestMapping(value = "/privacyassessment.html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessment() {
 
-		LOG.debug("HTTP GET");
+		LOG.debug("privacyassessment HTTP GET");
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -96,7 +112,7 @@ public class PrivacyAssessmentController {
 	public ModelAndView privacyAssessment(@Valid PrivacyAssessmentForm assForm,
 			BindingResult result, Map model) {
 
-		LOG.debug("HTTP POST");
+		LOG.debug("privacyassessment HTTP POST");
 
 		if (result.hasErrors()) {
 			LOG.warn("BindingResult has errors");
@@ -154,5 +170,72 @@ public class PrivacyAssessmentController {
 
 		LOG.debug("HTTP POST end");
 		return new ModelAndView("privacyassessmentresult", model);
+	}
+	
+	@RequestMapping(value = "/barchart.html", method = RequestMethod.GET)
+	public ModelAndView barchart() {
+
+		LOG.debug("barchart HTTP GET");
+        final double[][] data = new double[][]{
+                {210, 300, 320, 265, 299},
+                {200, 304, 201, 201, 340}
+            };
+
+            final CategoryDataset dataset = DatasetUtilities.createCategoryDataset(
+                    "Team ", "", data);
+
+            JFreeChart chart = null;
+            BarRenderer renderer = null;
+            CategoryPlot plot = null;
+
+            final CategoryAxis categoryAxis = new CategoryAxis("Match");
+            final ValueAxis valueAxis = new NumberAxis("Run");
+            renderer = new BarRenderer();
+
+            plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
+            plot.setOrientation(PlotOrientation.HORIZONTAL);
+            chart = new JFreeChart("Srore Bord", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+
+            chart.setBackgroundPaint(new Color(249, 231, 236));
+
+            Paint p1 = new GradientPaint(
+                    0.0f, 0.0f, new Color(16, 89, 172), 0.0f, 0.0f, new Color(201, 201, 244));
+            renderer.setSeriesPaint(1, p1);
+
+            Paint p2 = new GradientPaint(
+                    0.0f, 0.0f, new Color(255, 35, 35), 0.0f, 0.0f, new Color(255, 180, 180));
+            renderer.setSeriesPaint(2, p2);
+
+            plot.setRenderer(renderer);
+
+            try {
+                final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
+                // FIXME
+                String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
+                		"global/bundle/societies-webapp/1.0.0.SNAPSHOT/societies-webapp.war/";
+                final File file1 = new File(contextPath + "images/barchart.png");
+                ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
+            } catch (Exception e) {
+                LOG.warn("barchart(): ", e);
+            }
+
+		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
+		Map<String, Object> model = new HashMap<String, Object>();
+//		model.put("message", "Please input values and submit");
+//		
+//		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
+//		PrivacyAssessmentForm assForm = new PrivacyAssessmentForm();
+//		model.put("assForm", assForm);
+//		
+//		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
+//		Map<String, String> methods = new LinkedHashMap<String, String>();
+//		methods.put("assessAllNow", "Perform assessment for all data transmissions");
+//		methods.put("getAssessmentAllIds", "Get a-posteriori assessment for all sender identities");
+//		methods.put("getAssessmentAllClasses", "Get a-posteriori assessment for all sender classes");
+//		methods.put("setAutoPeriod", "Set time period of automatic re-assessment for all senders");
+//		model.put("methods", methods);
+//		
+//		model.put("privacyassessmentresult", "Privacy Assessment Result :");
+		return new ModelAndView("barchart", model);
 	}
 }

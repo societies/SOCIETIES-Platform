@@ -24,6 +24,7 @@
  */
 package org.societies.webapp.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,8 +42,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
+import org.societies.api.schema.cis.community.Community;
+
 
 @Controller
 public class CisManagerController {
@@ -65,6 +69,13 @@ public class CisManagerController {
 		this.cisManager = cisManager;
 	}
 
+	// store the interfaces of remote and local CISs
+	private ArrayList<ICis> remoteCISs;
+	private ArrayList<ICisOwned> localCISs;
+
+	//for the callback
+	private String resultCallback;
+	
 	@RequestMapping(value = "/cismanager.html", method = RequestMethod.GET)
 	public ModelAndView cssManager() {
 
@@ -76,9 +87,15 @@ public class CisManagerController {
 		Map<String, String> methods = new LinkedHashMap<String, String>();
 		methods.put("CreateCis", "Create a CIS ");
 		methods.put("GetCisList", "Search my CIS's");
+		methods.put("JoinRemoteCIS", "Join a remote CIS");
 		model.put("methods", methods);
 		
 		model.put("cmForm", cisForm);
+		remoteCISs = new ArrayList<ICis>();
+		localCISs = new ArrayList<ICisOwned>();
+		model.put("remoteCISsArray", remoteCISs);
+		model.put("localCISsArray", localCISs);
+		
 		model.put("cismanagerResult", "CIS Management Result :");
 		return new ModelAndView("cismanager", model);
 	}
@@ -115,6 +132,7 @@ public class CisManagerController {
 
 				res = "Successfully created CIS: " + cisResult.get().getCisId();
 				model.put("res", res);
+				localCISs.add(cisResult.get());
 
 			} else if (method.equalsIgnoreCase("GetCisList")) {
 				model.put("methodcalled", "GetCisList");
@@ -123,6 +141,13 @@ public class CisManagerController {
 				//ICisRecord[] records = this.getCisManager().getCisList(searchRecord);
 				List<ICis> records = this.getCisManager().getCisList();
 				model.put("cisrecords", records);
+
+			} else if (method.equalsIgnoreCase("JoinRemoteCIS")) {
+				model.put("methodcalled", "JoinRemoteCIS");
+
+				this.getCisManager().joinRemoteCIS(cisForm.getCisJid(), icall);
+				ICis i = getCisManager().getCis(cisForm.getCssId(), cisForm.getCisJid());
+//				model.put("cisrecords", records);
 
 			} else {
 				model.put("methodcalled", "Unknown");
@@ -135,4 +160,32 @@ public class CisManagerController {
 		model.put("cmForm", cisForm);
 		return new ModelAndView("cismanagerresult", model);
 	}
+	
+	
+	
+	// callback
+	
+	ICisManagerCallback icall = new ICisManagerCallback()
+	 {
+		public void receiveResult(boolean result){
+
+		}; 
+
+		public void receiveResult(int result) {};
+		
+		public void receiveResult(String result){}
+
+		public void receiveResult(Community communityResultObject) {
+			if(communityResultObject == null){
+				resultCallback = "failure";
+				
+			}
+			else{
+				resultCallback = "join worked in CIS " + communityResultObject.getCommunityJid();
+			}
+			
+		};
+		
+	 };
+	
 }
