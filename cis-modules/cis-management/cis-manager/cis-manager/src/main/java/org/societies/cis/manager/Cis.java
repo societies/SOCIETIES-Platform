@@ -940,14 +940,52 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 		
 		Community c = new Community();
+		GetInfoResponse r = new GetInfoResponse();
+		r.setResult(true);
 		c.setCommunityJid(this.getCisId());
 		c.setCommunityName(this.getName());
 		c.setCommunityType(this.getCisType());
 		c.setOwnerJid(this.getOwnerId());
 		c.setDescription(this.getDescription());
-		c.setGetInfo("");
+		c.setGetInfoResponse(r);
 		
 		callback.receiveResult(c);	
+	}
+
+	
+	@Override
+	public void setInfo(Community c, ICisManagerCallback callback) {
+		// TODO Auto-generated method stub
+		LOG.debug("local client call to set info from this CIS");
+
+		SetInfoResponse r = new SetInfoResponse();
+
+		//check if he is not trying to set things which cant be set
+		if( ( (!c.getCommunityJid().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisId()))  ) &&
+				( (!c.getCommunityName().isEmpty()) && (! c.getCommunityName().equalsIgnoreCase(this.getName()))  ) &&
+				 //( (!c.getCommunityType().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisType()))  ) &&
+				 ( (c.getMembershipMode() != null) && ( c.getMembershipMode() != this.getMembershipCriteria())  )
+				
+				){
+			r.setResult(true);
+			if(c.getDescription() != null &&  !c.getDescription().isEmpty())
+				this.description = c.getDescription();
+			if(c.getCommunityType() != null &&  !c.getCommunityType().isEmpty())
+				this.cisType = c.getCommunityType();
+		}
+		else{
+			r.setResult(false);
+		}
+				
+		Community resp = new Community();
+		resp.setCommunityJid(this.getCisId());
+		resp.setCommunityName(this.getName());
+		resp.setCommunityType(this.getCisType());
+		resp.setOwnerJid(this.getOwnerId());
+		resp.setDescription(this.getDescription());
+		resp.setSetInfoResponse(r);
+		
+		callback.receiveResult(resp);	
 	}
 	
 }
