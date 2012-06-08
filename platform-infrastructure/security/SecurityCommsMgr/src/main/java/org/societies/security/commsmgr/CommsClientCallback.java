@@ -159,8 +159,8 @@ public class CommsClientCallback implements ICommCallback {
 			String sla = result.getSla();
 			boolean success = result.isSuccess();
 
-			LOG.debug("receiveResult(): success = {}, sessionId = {}, sla = " + sla,
-					success, sessionId);
+			LOG.debug("receiveResult(): success = {}, sessionId = {}, sla size = " +
+					(sla == null ? null : sla.length()), success, sessionId);
 			
 			INegotiationProviderCallback cb = callbacks.get(stanzaId);
 			if (cb != null) {

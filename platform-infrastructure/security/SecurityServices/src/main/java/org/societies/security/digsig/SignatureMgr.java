@@ -15,7 +15,7 @@ public class SignatureMgr implements ISignatureMgr {
 	@Override
 	public String signXml(String xml, String xmlNodeId, String identity) {
 		
-		LOG.debug("signXml(" + xml + ", " + xmlNodeId + ", " + identity + ")");
+		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
 
 		/*
 		SecurityManager sm = new SecurityManager();
@@ -44,7 +44,7 @@ public class SignatureMgr implements ISignatureMgr {
 
 	@Override
 	public boolean verify(String xml) {
-		LOG.debug("verify({})", xml);
+		LOG.debug("verify()");
 		return true;  // FIXME
 	}
 }
