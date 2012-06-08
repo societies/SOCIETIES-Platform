@@ -28,10 +28,14 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.identity.IIdentity;
 
 /**
@@ -42,6 +46,16 @@ import org.societies.api.identity.IIdentity;
  */
 public interface ICommunityCtxDBMgr {
 
+	
+	/**
+	 * Creates a community Context Attribute
+	 * 
+	 * @param scope
+	 * @param enum
+	 * @param type
+	 */
+	public CtxAttribute createCommunityAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumeration, String type) throws CtxException;
+
 	/**
 	  * Creates a community Context Entity. 
 	  * @param cisId
@@ -50,6 +64,15 @@ public interface ICommunityCtxDBMgr {
 	  */
 	public CommunityCtxEntity createCommunityEntity(IIdentity cisId) throws CtxException;
 
+	////////////////////////////
+	/**
+	 * Retrieves the specified context model object.
+	 * 
+	 * @param identifier
+	 */
+	public CtxModelObject retrieve(CtxEntityIdentifier identifier) throws CtxException;
+	
+	
 	/**
 	  * Retrieves the specidied community Context Entity. 
 	  * @param ctxId

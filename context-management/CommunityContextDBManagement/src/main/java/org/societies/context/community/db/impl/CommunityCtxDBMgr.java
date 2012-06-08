@@ -24,6 +24,7 @@
  */
 package org.societies.context.community.db.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +36,10 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -47,6 +52,7 @@ import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
+import org.societies.context.user.db.impl.CtxModelObjectNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +83,39 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 	}
 
 	@Override
+	public CtxAttribute createCommunityAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumeration, String type)
+			throws CtxException {
+	
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+
+		final CommunityCtxEntity entity = (CommunityCtxEntity) modelObjects.get(scope);
+		
+		/**************************/
+		if (entity == null)
+			// F A I L (callback should throw an exception!!)
+			System.err.println("No such context entity: " + scope); // TEMP SOLUTION
+		/**************************/
+
+		CtxAttributeIdentifier attrIdentifier = new CtxAttributeIdentifier(scope, type, CtxModelObjectNumberGenerator.getNextValue());
+		final CtxAttribute attribute = new CtxAttribute(attrIdentifier);
+
+		this.modelObjects.put(attribute.getId(), attribute);
+		entity.addAttribute(attribute);
+		
+		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(attribute.getId()), 
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
+		} else {
+			LOG.warn("Could not send context change event to topics '" 
+					+ CtxChangeEventTopic.CREATED 
+					+ "' with scope '" + CtxEventScope.LOCAL + "': "
+					+ "ICtxEventMgr service is not available");
+		}
+
+		return attribute;
+	}
+	@Override
 	public CommunityCtxEntity createCommunityEntity(IIdentity cisId)
 			throws CtxException {
 
@@ -88,7 +127,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		final CommunityCtxEntity entity = new CommunityCtxEntity(identifier);
 		
 		this.modelObjects.put(entity.getId(), entity);		
-
+		
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(entity.getId()), 
 					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
@@ -98,12 +137,11 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 					+ "' with scope '" + CtxEventScope.LOCAL + "': "
 					+ "ICtxEventMgr service is not available");
 		}
-		
 		return entity;
 	}
 
 	@Override
-	public CommunityCtxEntity removeCommunityEntity(CtxEntityIdentifier arg0)
+	public CommunityCtxEntity removeCommunityEntity(CtxEntityIdentifier ctxId)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -111,29 +149,32 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 
 	@Override
 	public IndividualCtxEntity retrieveAdministratingCss(
-			CtxEntityIdentifier arg0) throws CtxException {
+			CtxEntityIdentifier id) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
+
 	}
 
 	@Override
-	public CtxBond retrieveBonds(CtxEntityIdentifier arg0) throws CtxException {
+	public CtxBond retrieveBonds(CtxEntityIdentifier ctxId) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<CtxEntityIdentifier> retrieveChildCommunities(
-			CtxEntityIdentifier arg0) throws CtxException {
+			CtxEntityIdentifier ctxId) throws CtxException {
+
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CommunityCtxEntity retrieveCommunityEntity(CtxEntityIdentifier arg0)
+	public CommunityCtxEntity retrieveCommunityEntity(CtxEntityIdentifier ctxId)
 			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		final CommunityCtxEntity entity = new CommunityCtxEntity(ctxId);		
+		return entity;
 	}
 
 	@Override
@@ -158,10 +199,32 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 	}
 
 	@Override
-	public CommunityCtxEntity updateCommunityEntity(CommunityCtxEntity arg0)
+	public CommunityCtxEntity updateCommunityEntity(CommunityCtxEntity entity)
 			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (this.modelObjects.keySet().contains(entity.getId())) {
+			this.modelObjects.put(entity.getId(), entity);
+		
+			final String[] topics = new String[] { CtxChangeEventTopic.UPDATED, CtxChangeEventTopic.MODIFIED };
+			if (this.ctxEventMgr != null) {
+				this.ctxEventMgr.post(new CtxChangeEvent(entity.getId()), 
+						topics, CtxEventScope.LOCAL);
+			} else {
+				LOG.warn("Could not send context change event to topics '" 
+						+ Arrays.toString(topics) 
+						+ "' with scope '" + CtxEventScope.LOCAL 
+						+ "': ICtxEventMgr service is not available");
+			}
+		}
+					      
+		return entity;
+	}
+
+	@Override
+	public CtxModelObject retrieve(CtxEntityIdentifier ctxId)
+			throws CtxException {
+
+		return this.modelObjects.get(ctxId);
 	}
 
 	
