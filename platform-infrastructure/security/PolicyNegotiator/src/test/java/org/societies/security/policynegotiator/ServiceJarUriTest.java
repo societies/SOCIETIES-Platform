@@ -31,7 +31,7 @@ import java.net.URI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.societies.security.policynegotiator.requester.ServiceJarUri;
+import org.societies.security.policynegotiator.provider.ServiceJarUri;
 
 /**
  * 
@@ -61,7 +61,7 @@ public class ServiceJarUriTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.policynegotiator.requester.ServiceJarUri#getFullUri()}.
+	 * Test method for {@link org.societies.security.policynegotiator.provider.ServiceJarUri#getFullUri()}.
 	 */
 	@Test
 	public void testGenerateFullUri() {

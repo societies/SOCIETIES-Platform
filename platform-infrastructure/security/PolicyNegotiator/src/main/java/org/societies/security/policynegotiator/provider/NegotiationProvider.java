@@ -24,6 +24,7 @@
  */
 package org.societies.security.policynegotiator.provider;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -119,6 +120,8 @@ public class NegotiationProvider implements INegotiationProvider {
 		String slaStr = null;
 		Document doc;
 		
+		session.setServiceId(serviceId);
+		
 		try {
 			doc = SopResource.getSop("PrintService.xml");  // TODO: Get from Marketplace
 			if (doc != null) {
@@ -152,14 +155,22 @@ public class NegotiationProvider implements INegotiationProvider {
 
 		LOG.debug("acceptPolicyAndGetSla({})", sessionId + ", ..., " + modified);
 
+		Session session = sessions.get(sessionId);
 		SlaBean sla = new SlaBean();
 		String finalSla;
+		URI jarUri;
+		String serviceId;
 		
 		sla.setSessionId(sessionId);
 		finalSla = signedPolicyOption;  //TODO: add provider's signature
 		
-		if (signatureMgr.verify(signedPolicyOption)) {
+		if (session != null && signatureMgr.verify(signedPolicyOption)) {
+			
 			sla.setSla(finalSla);
+			serviceId = session.getServiceId();
+			jarUri = providerServiceMgr.getClientJarUri(serviceId);
+			sla.setJarUrl(jarUri.toString());
+
 			sla.setSuccess(true);
 		}
 		else {

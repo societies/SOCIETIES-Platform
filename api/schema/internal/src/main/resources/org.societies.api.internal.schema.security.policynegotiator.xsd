@@ -2,7 +2,11 @@
 <xs:schema  elementFormDefault="qualified" version="1.0" 
 			targetNamespace="http://societies.org/api/internal/schema/security/policynegotiator"
 			xmlns:tns="http://societies.org/api/internal/schema/security/policynegotiator"
-            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+			xmlns:ns1="http://societies.org/api/schema/servicelifecycle/model"
+			xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+	schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd" />
 
 	<!-- Message bean and result bean require the additional "element" node -->
 	<xs:element name="providerBean">
@@ -11,6 +15,7 @@
 				<xs:element name="method" type="tns:methodType" minOccurs="0"/>
 				<xs:element name="modified" type="xs:boolean"/>
 				<xs:element name="sessionId" type="xs:int"/>
+				<!--xs:element name="serviceId" type="ns1:serviceResourceIdentifier" minOccurs="0"/-->
 				<xs:element name="serviceId" type="xs:string" minOccurs="0"/>
 				<xs:element name="signedPolicyOption" type="xs:string" minOccurs="0"/>
 			</xs:sequence>
@@ -32,6 +37,7 @@
 			<xs:element name="success" type="xs:boolean"/>
 			<xs:element name="sessionId" type="xs:int"/>
 			<xs:element name="sla" type="xs:string" minOccurs="0"/>
+			<xs:element name="jarUrl" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	

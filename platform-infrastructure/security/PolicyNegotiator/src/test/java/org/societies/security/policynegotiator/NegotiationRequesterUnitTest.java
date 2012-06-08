@@ -27,6 +27,8 @@ package org.societies.security.policynegotiator;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.net.URI;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,7 +113,7 @@ public class NegotiationRequesterUnitTest {
 		provider = mock(Requestor.class);
 		callback = new INegotiationCallback() {
 			@Override
-			public void onNegotiationComplete(String agreementKey) {
+			public void onNegotiationComplete(String agreementKey, URI jar) {
 				assertNull(agreementKey);
 			}
 			@Override

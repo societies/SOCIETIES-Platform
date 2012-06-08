@@ -24,6 +24,8 @@
  */
 package org.societies.security.policynegotiator.requester;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -56,18 +58,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 	private MethodType method;
 	private Requestor provider;
 	private INegotiationCallback finalCallback;
-	boolean includePrivacyPolicyNegotiation;
-	
-//	public ProviderCallback(NegotiationRequester requester, IIdentity provider,
-//			String serviceId, MethodType method) {
-//		
-//		LOG.debug("ProviderCallback({})", method);
-//
-//		this.requester = requester;
-//		this.method = method;
-//		this.provider = provider;
-//		this.serviceId = serviceId;
-//	}
+	private boolean includePrivacyPolicyNegotiation;
 	
 	public ProviderCallback(NegotiationRequester requester, Requestor provider,
 			MethodType method, boolean includePrivacyPolicyNegotiation,
@@ -131,9 +122,12 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					String agreementKey = generateKey();
 					requester.getSecureStorage().putDocument(agreementKey, sla.getBytes());
 					
+					// Get service URL if applicable
+					URI jar = getJarUri(result);
+					
 					if (includePrivacyPolicyNegotiation) {
 						if (requester.isPrivacyPolicyNegotiationMgrAvailable()) {
-							startPrivacyPolicyNegotiation(provider, agreementKey);
+							startPrivacyPolicyNegotiation(provider, agreementKey, jar);
 						}
 						else {
 							LOG.warn("Privacy Policy Negotiation Manager not available");
@@ -143,7 +137,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					else {
 						// Notify successful end of negotiation
 						LOG.debug("invoking final callback");
-						finalCallback.onNegotiationComplete(agreementKey, );
+						finalCallback.onNegotiationComplete(agreementKey, jar);
 						LOG.info("negotiation finished, final callback invoked");
 					}
 				}
@@ -160,12 +154,12 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		}
 	}
 	
-	private void startPrivacyPolicyNegotiation(Requestor provider, String agreementKey) {
+	private void startPrivacyPolicyNegotiation(Requestor provider, String agreementKey, URI jar) {
 
 		IPrivacyPolicyNegotiationManager ppn = requester.getPrivacyPolicyNegotiationManager();
 		PrivacyPolicyNegotiationListener listener;
 
-		listener = new PrivacyPolicyNegotiationListener(finalCallback, agreementKey);
+		listener = new PrivacyPolicyNegotiationListener(finalCallback, agreementKey, jar);
 		
 		String[] eventTypes = new String[] {
 				EventTypes.FAILED_NEGOTIATION_EVENT,
@@ -228,5 +222,23 @@ public class ProviderCallback implements INegotiationProviderCallback {
 			key = "policy-unknown-" + Long.toString(r.nextLong());
 		}
 		return key;
+	}
+	
+	private URI getJarUri(SlaBean result) {
+		
+		String jarUrlStr = result.getJarUrl();
+		URI jar;
+		if (jarUrlStr != null) {
+			try {
+				jar = new URI(jarUrlStr);
+				return jar;
+			} catch (URISyntaxException e) {
+				LOG.warn("getJarUri()", e);
+				return null;
+			}
+		}
+		else {
+			return null;
+		}
 	}
 }

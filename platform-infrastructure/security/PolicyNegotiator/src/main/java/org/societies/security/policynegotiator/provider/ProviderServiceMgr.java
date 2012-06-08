@@ -38,33 +38,39 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  */
 public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
-	private HashMap<URI, Service> services = new HashMap<URI, Service>();
+	private HashMap<String, Service> services = new HashMap<String, Service>();
 	
 	@Override
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar) {
-		Service s = new Service(serviceId, slaXml, clientJar);
-		services.put(serviceId.getIdentifier(), s);
+		
+		String idStr = serviceId.getIdentifier().toString();
+		Service s = new Service(idStr, slaXml, clientJar);
+		
+		services.put(idStr, s);
 	}
 
 	@Override
 	public void removeService(ServiceResourceIdentifier serviceId) {
-		services.remove(serviceId.getIdentifier());
+		
+		String idStr = serviceId.getIdentifier().toString();
+		
+		services.remove(idStr);
 	}
 
-	protected HashMap<URI, Service> getServices() {
+	protected HashMap<String, Service> getServices() {
 		return services;
 	}
 	
-	protected Service getService(ServiceResourceIdentifier id) {
-		return services.get(id.getIdentifier());
+	protected Service getService(String id) {
+		return services.get(id);
 	}
 
-	protected URI getClientJarUri(ServiceResourceIdentifier id) {
-		return services.get(id.getIdentifier()).getClientJarUri();
+	protected URI getClientJarUri(String id) {
+		return services.get(id).getClientJarUri();
 	}
 
-	protected String getSlaXmlOptions(ServiceResourceIdentifier id) {
-		return services.get(id.getIdentifier()).getSlaXmlOptions();
+	protected String getSlaXmlOptions(String id) {
+		return services.get(id).getSlaXmlOptions();
 	}
 
 }
