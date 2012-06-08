@@ -148,6 +148,12 @@
 			<version>3.0.0-beta4</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.cis</groupId>
+	        <artifactId>CisDirectoryClient</artifactId>
+	         <version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		
 		
 		<!-- 
@@ -167,6 +173,28 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jfree.chart</groupId>
+			<artifactId>org.jfree.chart-library</artifactId>
+			<type>libd</type>
+			<version>1.0.9</version>
+			<!--scope>provided</scope-->
+		</dependency>
+		<dependency>
+			<groupId>org.jfree.chart</groupId>
+			<artifactId>com.springsource.org.jfree.chart</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>com.springsource.org.jfree</artifactId>
+			<version>1.0.12</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>com.springsource.javax.servlet</artifactId>
+			<version>2.5.0</version>
 		</dependency>
 	</dependencies>
 
@@ -248,6 +276,15 @@
 							org.apache.taglibs.standard.tei; version="[1.2.0,2)",
 							org.apache.taglibs.standard.tlv; version="[1.2.0,2)",
 							org.osgi.framework,
+							org.jfree.chart,
+							org.jfree.chart.axis,
+							org.jfree.chart.entity,
+							org.jfree.chart.labels,
+							org.jfree.chart.plot,
+							org.jfree.chart.renderer.category,
+							org.jfree.chart.urls,
+							org.jfree.data.category,
+							org.jfree.data.general,
 							<!-- Form validation -->
 							javax.validation,*;resolution:=optional
 						</Import-Package>
@@ -300,6 +337,29 @@
 									<artifactId>org.springframework.osgi.web</artifactId>
 									<version>1.2.1</version>
 									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.jfree.chart</groupId>
+									<artifactId>org.jfree.chart-library</artifactId>
+									<version>1.0.9</version>
+									<type>libd</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.jfree.chart</groupId>
+									<artifactId>com.springsource.org.jfree.chart</artifactId>
+									<version>1.0.9</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.jfree</groupId>
+									<artifactId>com.springsource.org.jfree</artifactId>
+									<version>1.0.12</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>javax.servlet</groupId>
+									<artifactId>com.springsource.javax.servlet</artifactId>
+									<version>2.5.0</version>
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>

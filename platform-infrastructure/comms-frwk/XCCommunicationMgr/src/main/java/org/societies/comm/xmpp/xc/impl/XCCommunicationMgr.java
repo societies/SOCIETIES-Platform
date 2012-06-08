@@ -87,6 +87,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 			thisIdentity = idm.getThisNetworkNode();
 			
 			probePresence();
+			log.info("Connected to '"+host+"' as '"+subDomain+"'!");
 		} catch (ComponentException e) {
 			log.warn("Could not connect to '"+host+"' as '"+subDomain+"': "+e.getMessage());
 			e.printStackTrace();
@@ -94,7 +95,6 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 			log.warn("Could not connect to '"+host+"' as '"+subDomain+"': "+e.getMessage());
 			e.printStackTrace();
 		}
-		log.info("Connected to '"+host+"' as '"+subDomain+"'!");
 	}
 
 	private void probePresence() {

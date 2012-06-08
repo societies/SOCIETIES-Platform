@@ -26,6 +26,7 @@
 package org.societies.cis.manager;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -336,7 +337,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
 			// and the GUI can be updated with that new member
 			Stanza sta;
-/*			LOG.info("new member added, going to notify community");
+			LOG.info("new member added, going to notify community");
 			
 			// 1) Notifying the added user
 
@@ -352,10 +353,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.info("finished building notification");
 
 
-			Stanza sta = new Stanza(targetCssIdentity);
+			sta = new Stanza(targetCssIdentity);
 			CISendpoint.sendMessage(sta, cMan);
 					
-			LOG.info("notification sent to the new user");*/
+			LOG.info("notification sent to the new user");
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a pubsub notification
 			
@@ -446,12 +447,34 @@ public class Cis implements IFeatureServer, ICisOwned {
 			if (membersCss.remove( new CisParticipant(jid)) == false)
 				return false;
 			
-			// should we send a notification to the user here?
+			// 2) Notification to deleted user here
 			
 			
-			//2) Sending a notification to all the other users (maybe replace with pubsub later)
+			CommunityManager message = new CommunityManager();
+			Notification n = new Notification();
+			DeleteNotification d = new DeleteNotification();
+			d.setCommunityJid(this.getCisId());
 			
-			CommunityManager cMan = new CommunityManager();
+			n.setDeleteNotification(d);
+			message.setNotification(n);
+
+			IIdentity targetCssIdentity;
+			try {
+				targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
+				Stanza sta = new Stanza(targetCssIdentity);			
+				LOG.info("stanza created");
+				this.CISendpoint.sendMessage(sta, message);
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			
+			
+			
+			//3) Sending a notification to all the other users (maybe replace with pubsub later)
+			
+/*			CommunityManager cMan = new CommunityManager();
 			Notification n = new Notification();
 			DeleteMemberNotification s = new DeleteMemberNotification();
 			s.setCommunityJid(this.getCisId());
@@ -479,7 +502,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 				
 		     }
-			LOG.info("notification sents to the existing user");
+			LOG.info("notification sents to the existing user");*/
 			
 
 			return true;
@@ -682,7 +705,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 					
 				}
 				
-				
+				result.setAddResponse(ar);
 				return result;
 				// END OF ADD
 			}
@@ -744,6 +767,39 @@ public class Cis implements IFeatureServer, ICisOwned {
 		Set<ICisParticipant> s = new  HashSet<ICisParticipant>();
 		s.addAll(this.getMembersCss());
 		return new AsyncResult<Set<ICisParticipant>>(s);
+	}
+	
+	@Override
+	public void getListOfMembers(ICisManagerCallback callback){
+		LOG.debug("local client call to get list of members");
+
+		
+		Community c = new Community();
+		c.setCommunityJid(this.getCisId());
+		c.setCommunityName(this.getName());
+		c.setCommunityType(this.getCisType());
+		c.setOwnerJid(this.getOwnerId());
+		c.setDescription(this.getDescription());
+		c.setGetInfo("");
+		
+		Who w = new Who();
+		c.setWho(w);
+		
+		Set<CisParticipant> s = this.getMembersCss();
+		Iterator<CisParticipant> it = s.iterator();
+		
+		List<Participant> l = new  ArrayList<Participant>();
+		while(it.hasNext()){
+			CisParticipant element = it.next();
+			Participant p = new Participant();
+			p.setJid(element.getMembersJid());
+			p.setRole( ParticipantRole.fromValue(element.getMtype().toString())   );
+			l.add(p);
+	     }
+		
+		w.setParticipant(l);
+		
+		callback.receiveResult(c);	
 	}
 	
 	@Override

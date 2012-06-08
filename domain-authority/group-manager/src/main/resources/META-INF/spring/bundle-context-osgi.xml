@@ -13,5 +13,6 @@
        
 	<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />
 	<osgi:reference id="CssDirectory" interface="org.societies.api.css.directory.ICssDirectory" />
+	<osgi:reference id="CisDirectory" interface="org.societies.api.cis.directory.ICisDirectory" />
 	
 </beans>

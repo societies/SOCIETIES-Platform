@@ -805,6 +805,12 @@ PhoneGap.addConstructor = function(func) {
     console.log("Dummy PhoneGap constructor");
 };
 
+var cordova = {};
+
+cordova.addConstructor = function(func) {
+    console.log("Dummy cordova constructor");
+};
+
 
 // NOTE: Storage functions should be provided by the browser
 
@@ -827,7 +833,8 @@ navigator.app = {
     }
 };
 
-window.plugins = {};
+window.plugins = {
+};
 
 
 

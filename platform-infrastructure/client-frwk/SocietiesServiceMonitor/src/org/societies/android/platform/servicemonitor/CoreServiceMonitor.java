@@ -28,9 +28,10 @@ package org.societies.android.platform.servicemonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.platform.interfaces.ICoreServiceMonitor;
-import org.societies.api.android.internal.model.AndroidParcelable;
+import org.societies.android.api.internal.examples.AndroidParcelable;
+import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.utilities.DBC.Dbc;
+
 
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.ActivityManager.RunningTaskInfo;

@@ -24,7 +24,7 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
-import java.util.List;
+import java.util.HashMap;
 
 import org.societies.api.identity.IIdentity;
 
@@ -52,12 +52,12 @@ public interface IAssessment {
 	/**
 	 * Get a-posteriori assessment for all sender {@link IIdentity} values.
 	 */
-	public List<AssessmentResultIIdentity> getAssessmentAllIds();
+	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds();
 	
 	/**
-	 * Get a-posteriori assessment for all sender class names.
+	 * Get a-posteriori assessment for all sender classes.
 	 */
-	public List<AssessmentResultClassName> getAssessmentAllClasses();
+	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses();
 
 	/**
 	 * Get a-posteriori assessment for a particular sender {@link IIdentity}.

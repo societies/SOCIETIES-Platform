@@ -47,6 +47,9 @@ public class CorrelationInTimeTest {
 	private CorrelationInTime correlationInTimeDefault;
 	private CorrelationInTime correlationInTimeCustom;
 	
+	double valueAtInf = 0.43921;
+	long timeShift = 7927;
+
 	// Octave plot:
 	// dt = 0:100:10000; a = 0.2; b = 3; plot(dt, (1 - 1 ./ (1 + exp(-(dt/1000-b)))) * (1-a) / (1 - 1 ./ (1 + exp(-(0-b)))) + a); grid
 	
@@ -59,9 +62,21 @@ public class CorrelationInTimeTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		
 		LOG.debug("setUp()");
+
 		correlationInTimeDefault = new CorrelationInTime();
-		correlationInTimeCustom = new CorrelationInTime(0.43921, 7927);
+		correlationInTimeCustom = new CorrelationInTime(valueAtInf, timeShift);
+	}
+	
+	@Test
+	public void testConstructorParameters() {
+		
+		assertEquals(valueAtInf, correlationInTimeCustom.getValueAtInf(), 1e-5 * valueAtInf);
+		assertEquals(timeShift, correlationInTimeCustom.getTimeShift());
+		
+		assertTrue(correlationInTimeDefault.getTimeShift() != correlationInTimeCustom.getTimeShift());
+		assertTrue(correlationInTimeDefault.getValueAtInf() != correlationInTimeCustom.getValueAtInf());
 	}
 
 	/**
@@ -71,6 +86,27 @@ public class CorrelationInTimeTest {
 	public void tearDown() throws Exception {
 		correlationInTimeDefault = null;
 		correlationInTimeCustom = null;
+	}
+	
+	@Test
+	public void testInvalidConstructorParameter() {
+		
+		CorrelationInTime correlationInTime;
+		
+		correlationInTime = new CorrelationInTime(1, timeShift);
+		assertTrue(correlationInTime.getValueAtInf() < 1);
+		assertTrue(correlationInTime.getValueAtInf() > 0);
+		assertEquals(correlationInTime.getTimeShift(), timeShift);
+
+		correlationInTime = new CorrelationInTime(1 + valueAtInf, timeShift);
+		assertTrue(correlationInTime.getValueAtInf() < 1);
+		assertTrue(correlationInTime.getValueAtInf() > 0);
+		assertEquals(correlationInTime.getTimeShift(), timeShift);
+
+		correlationInTime = new CorrelationInTime(-0.5641, timeShift);
+		assertTrue(correlationInTime.getValueAtInf() < 1);
+		assertTrue(correlationInTime.getValueAtInf() > 0);
+		assertEquals(correlationInTime.getTimeShift(), timeShift);
 	}
 
 	@Test

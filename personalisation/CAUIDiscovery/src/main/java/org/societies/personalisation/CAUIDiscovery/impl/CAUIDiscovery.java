@@ -66,7 +66,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	public ICAUITaskManager cauiTaskManager;
 	private ICtxBroker ctxBroker;
 
-	LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
+	//LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
 	LinkedHashMap<String,HashMap<String,Double>> transProb = null;
 	HashMap<String,List<String>> contextActionsMap = new HashMap<String,List<String>>();
 
@@ -75,7 +75,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	//List<MockHistoryData> historyList = null;
 
 	public CAUIDiscovery(){
-		actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 		//remove after testing
 	//cauiTaskManager = new CAUITaskManager();
 
@@ -104,7 +104,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	// constructor
 	public void initialiseCAUIDiscovery(){
-		actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 	}
 
 	@Override
@@ -205,6 +205,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		return actCtxDictionaryAll;
 	}
 
+	/*
 	public LinkedHashMap<List<String>,ActionDictObject> getDictionary(){
 		return this.actCtxDictionary;
 	}
@@ -220,12 +221,14 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		this.actCtxDictionary = null;
 		LOG.info("model cleared "+this.actCtxDictionary);
 	}
-
+*/
 
 
 
 	public LinkedHashMap<List<String>,ActionDictObject>  populateActionCtxDictionary(List<MockHistoryData> historyData){
 
+		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+		
 		int historySize = historyData.size();
 		LOG.debug("historySize "+historySize);
 
@@ -442,28 +445,28 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		}
 	}
 
-	public LinkedHashMap<List<String>,ActionDictObject> getSeqs(int score){
+	public LinkedHashMap<List<String>,ActionDictObject> getSeqs(LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary, int score){
 		LinkedHashMap<List<String>,ActionDictObject> results = new LinkedHashMap<List<String>,ActionDictObject>();
-		LinkedHashMap<List<String>,ActionDictObject> dict = getDictionary();
+		//LinkedHashMap<List<String>,ActionDictObject> dict = getDictionary();
 
-		for (List<String> act : dict.keySet()){
-			int totalOccur = dict.get(act).getTotalOccurences();
-			if( totalOccur > score) results.put(act, dict.get(act));	
+		for (List<String> act : actCtxDictionary.keySet()){
+			int totalOccur = actCtxDictionary.get(act).getTotalOccurences();
+			if( totalOccur > score) results.put(act, actCtxDictionary.get(act));	
 		}
-		LOG.debug("total entries in model "+dict.size()); 
+		LOG.debug("total entries in model "+actCtxDictionary.size()); 
 		LOG.debug("entries occured more than "+score); 
 		return results;
 	}
 
 
 	// steps are string characters and will change to real actions
-	private Integer retrieveTransNum(int steps){
+	private Integer retrieveTransNum(LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary, int steps){
 		int total2Trans = 0; 
-		LinkedHashMap<List<String>,ActionDictObject> dict = getDictionary();
+		//LinkedHashMap<List<String>,ActionDictObject> dict = getDictionary();
 
-		for (List<String> act : dict.keySet()){
+		for (List<String> act : actCtxDictionary.keySet()){
 			if(act.size() == steps){
-				ActionDictObject actDictObj = dict.get(act);	
+				ActionDictObject actDictObj = actCtxDictionary.get(act);	
 				total2Trans = total2Trans+actDictObj.getTotalOccurences();
 			}
 		}		
@@ -606,7 +609,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	public void storeDictionary(LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary ){
 
 		System.out.println("storing to file 'taskModel' ");
-		this.actCtxDictionary = actCtxDictionary;
+		//this.actCtxDictionary = actCtxDictionary;
 		File file = new File("taskModel");  
 		FileOutputStream f;
 		try {

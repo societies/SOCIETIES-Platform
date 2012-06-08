@@ -94,6 +94,31 @@ public interface ICtxBroker {
 	public Future<CtxEntity> createEntity(String type) throws CtxException;
 
 	/**
+	 * Creates an {@link IndividualCtxEntity} that represents the owner of the
+	 * specified CSS. The type of the CSS owner (e.g. CtxEntityTypes.PERSON) is
+	 * also supplied. The created <code>IndividualCtxEntity</code> can be
+	 * associated to zero or more {@link CommunityCtxEntity CommunityCtxEntities}.
+	 * If the Context DB already contains the entity, the call leaves the
+	 * database unchanged and returns the existing IndividualCtxEntity.
+	 *  
+	 * @param cssId
+	 *            the {@link IIdentity} of the CSS whose IndividualCtxEntity to
+	 *            create  
+	 * @param ownerType
+	 *            the type of the CSS owner whose IndividualCtxEntity to create,
+	 *            e.g. CtxEntityTypes.PERSON  
+	 * @return the IndividualCtxEntity that represents the owner of the
+	 *         specified CSS
+	 * @throws CtxException
+	 *             if the IndividualCtxEntity cannot be created
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>            
+	 * @since 0.3
+	 */
+	public Future<IndividualCtxEntity> createIndividualEntity(
+			final IIdentity cssId, final String ownerType) throws CtxException;
+	
+	/**
 	 * Creates an individual Context Entity that is possible to join or to form a community. 
 	 * The  created <code>IndividualCtxEntity</code> is used to represent a single participant 
 	 * (CSS) of a {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may 
@@ -102,7 +127,9 @@ public interface ICtxBroker {
 	 * infrastructures, autonomous or semi-autonomous agents, etc.
 	 *  
 	 * @param type
+	 * @deprecated As of 0.3, use {@link #createIndividualEntity(IIdentity, String)} 
 	 */
+	@Deprecated
 	public Future<IndividualCtxEntity> createIndividualEntity(String type) throws CtxException;
 		
 
@@ -297,6 +324,29 @@ public interface ICtxBroker {
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException;
 	
 	/**
+	 * Retrieves the {@link IndividualCtxEntity} which represents the owner
+	 * of the specified CSS. IndividualCtxEntities are most commonly of type
+	 * CtxEntityTypes.PERSON; however they can also be organisations, smart
+	 * space infrastructures, autonomous or semi-autonomous agents, etc. The
+	 * method returns <code>null</code> if there is no IndividualCtxEntity
+	 * representing the identified CSS. 
+	 * 
+	 * @param cssId
+	 *            the {@link IIdentity} identifying the CSS whose 
+	 *            IndividualCtxEntity to retrieve
+	 * @return the {@link IndividualCtxEntity} which represents the owner of
+	 *         the specified CSS
+	 * @throws CtxException 
+	 *             if the IndividualCtxEntity representing the owner of the 
+	 *             specified CSS exists but cannot be retrieved
+	 * @throws NullPointerException
+	 *             if the specified CSS IIdentity is <code>null</code>
+	 * @since 0.3
+	 */
+	public Future<IndividualCtxEntity> retrieveIndividualEntity(
+			final IIdentity cssId) throws CtxException;
+	
+	/**
 	 * Retrieves the {@link IndividualCtxEntity} which represents the operator
 	 * of the CSS. IndividualCtxEntities are most commonly of type "person";
 	 * however they can also be organisations, smart space infrastructures, 
@@ -305,7 +355,9 @@ public interface ICtxBroker {
 	 * @throws CtxException 
 	 *             if the IndividualCtxEntity representing the operator of the
 	 *             CSS cannot be retrieved
+	 * @deprecated As of 0.3, use {@link #retrieveIndividualEntity(IIdentity)}
 	 */
+	@Deprecated
 	public Future<IndividualCtxEntity> retrieveCssOperator() throws CtxException;
 	
 	/**

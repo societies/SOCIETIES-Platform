@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.societies.da.openfire.plugin</groupId>
+  <artifactId>societies-openfire-plugin</artifactId>
+  <packaging>openfire-plugin</packaging>
+  <version>0.1-SNAPSHOT</version>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.igniterealtime.openfire</groupId>
+      <artifactId>openfire</artifactId>
+      <version>3.7.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.igniterealtime.openfire</groupId>
+      <artifactId>servlet</artifactId>
+      <version>3.7.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+		<groupId>org.igniterealtime.openfire</groupId>
+		<artifactId>jasper-runtime</artifactId>
+		<version>3.7.0</version>
+		<scope>provided</scope>
+	</dependency>
+  </dependencies>
+  
+  <build>
+  	<finalName>societies</finalName>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.reucon.maven.plugins</groupId>
+        <artifactId>maven-openfire-plugin</artifactId>
+        <version>1.0.3</version>
+        <extensions>true</extensions>
+        <configuration>
+          <jspPackageName>org.societies.openfire.plugin.societies.jsp</jspPackageName>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+            <version>1.5.0</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <pluginRepositories>
+		<pluginRepository>
+			<id>maven-repo</id>
+			<name>maven repo</name>
+			<url>http://repo1.maven.org/maven2/</url>
+		</pluginRepository>
+
+		<!-- Societies repo -->
+		<pluginRepository>
+			<id>societies</id>
+			<name>Societies Maven Repository</name>
+			<url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
+		</pluginRepository>
+	</pluginRepositories>
+</project>

@@ -35,7 +35,7 @@ import java.util.concurrent.Future;
 import javax.validation.Valid;
 
 import org.societies.webapp.models.DeviceRegistryForm;
-import org.societies.webapp.models.ServiceDiscoveryForm;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -45,8 +45,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 
 
@@ -63,20 +61,20 @@ public class DeviceRegistryController {
 		return deviceRegistry;
 	}
 
-	public void getSDService(IDeviceRegistry deviceRegistry) {
+	public void setDeviceRegistry(IDeviceRegistry deviceRegistry) {
 		this.deviceRegistry = deviceRegistry;
 	}
 
 	@RequestMapping(value = "/deviceregistry.html", method = RequestMethod.GET)
-	public ModelAndView Servicediscovery() {
+	public ModelAndView DeviceRegistry() {
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("message", "Please input values and submit");
 		
 		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
-		DeviceRegistryForm deviceForm = new DeviceRegistryForm();
-		model.put("deviceForm", deviceForm);
+		DeviceRegistryForm drForm = new DeviceRegistryForm();
+		model.put("drForm", drForm);
 		
 		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
 		Map<String, String> methods = new LinkedHashMap<String, String>();
@@ -89,44 +87,48 @@ public class DeviceRegistryController {
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/deviceregistry.html", method = RequestMethod.POST)
-	public ModelAndView serviceDiscovery(@Valid DeviceRegistryForm deviceForm, BindingResult result, Map model) {
+	public ModelAndView DeviceRegistry(@Valid DeviceRegistryForm drForm, 
+			BindingResult result, Map model) {
 
 		if (result.hasErrors()) {
-			model.put("result", "Device Registry form error");
-			return new ModelAndView("deviceregistry", model);
-		}
-
-		if (getdeviceRegistry() == null) {
-			model.put("errormsg", "Device Registry Service reference not avaiable");
+			model.put("errormsg", "Device Registry form error");
 			return new ModelAndView("error", model);
 		}
 
-		String method = deviceForm.getMethod();
+		if (getdeviceRegistry() == null) {
+			model.put("errormsg", "Device Registry reference not avaiable");
+			return new ModelAndView("error", model);
+		}
+
+		String method = drForm.getMethod();
+		Future<Collection<DeviceCommonInfo>> asynchResult = null;
+		Collection<DeviceCommonInfo> devices =  new ArrayList<DeviceCommonInfo>();
 		String res = null;
 		try {
 		
 			if (method.equalsIgnoreCase("addDevice")) {
 				res="Device Added";
 				DeviceCommonInfo deviceInfo = new DeviceCommonInfo(
-						deviceForm.getDeviceFamilyIdentity(),
-						deviceForm.getDeviceName(), 
-						deviceForm.getDeviceType(),
-						deviceForm.getDeviceDescription(), 
-						deviceForm.getDeviceConnectionType(),
-						deviceForm.getDeviceLocation(), 
-						deviceForm.getDeviceProvider(), 
-						deviceForm.getDeviceID(),
-						deviceForm.isContextSource() );
-				String cssNodeId = deviceForm.getCssNodeId();
+						drForm.getDeviceFamilyIdentity(),
+						drForm.getDeviceName(), 
+						drForm.getDeviceType(),
+						drForm.getDeviceDescription(), 
+						drForm.getDeviceConnectionType(),
+						drForm.getDeviceLocation(), 
+						drForm.getDeviceProvider(), 
+						drForm.getDeviceID(),
+						drForm.isContextSource() );
+				String cssNodeId = drForm.getCssNodeId();
 				res = deviceRegistry.addDevice(deviceInfo, cssNodeId);
 				
 			}else if (method.equalsIgnoreCase("findAllDevices")) {
 				
-				Collection<DeviceCommonInfo> devices = deviceRegistry.findAllDevices();
+				//Collection<DeviceCommonInfo> devices = deviceRegistry.findAllDevices();
+				devices = this.getdeviceRegistry().findAllDevices();
 				model.put("devices", devices);
 					
 			}else{
-				res="error unknown metod";
+				res="error unknown method";
 			}
 		
 			model.put("result", res);
@@ -136,6 +138,6 @@ public class DeviceRegistryController {
 		{
 			res = "Oops!!!! <br/>";
 		};
-		return new ModelAndView("deviceregistry", model);
+		return new ModelAndView("deviceregistryresult", model);
 	}
 }
