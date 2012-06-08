@@ -40,7 +40,7 @@
 	>
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
-        <property name="providerServiceMgr" ref="NegotiationProviderSM"/>
+        <property name="providerServiceMgr" ref="ProviderServiceMgr"/>
 	</bean>
 
 	<bean id="NegotiationRequester"
