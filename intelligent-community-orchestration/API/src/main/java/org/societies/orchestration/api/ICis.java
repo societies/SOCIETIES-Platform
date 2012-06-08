@@ -76,6 +76,10 @@ public class ICis {
    // public String getUserDefineName();
     //public String getCisType();
     
+    public String getDescription() {
+    	return "";
+    }
+    
     public Future<Set<ICisParticipant>> getMembersList() {
     	return null;
     }

@@ -58,6 +58,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		<name>Societies Maven Repository</name>
 		<url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
 	</pluginRepository>
+   <!-- JSDOC -->
+    <pluginRepository>
+        <id>jsdoctk2</id>
+        <url>http://jsdoctk-plugin.googlecode.com/svn/repo</url>
+    </pluginRepository>
+
   </pluginRepositories>
 
 

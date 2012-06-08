@@ -60,12 +60,12 @@ public class CAUITaskManager implements ICAUITaskManager{
 	UserIntentModelData activeUserIntentModel = new UserIntentModelData();
 
 	public ICtxBroker getCtxBroker() {
-		System.out.println(this.getClass().getName()+": Return ctxBroker");
+		LOG.debug(this.getClass().getName()+": Return ctxBroker");
 		return ctxBroker;
 	}
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		System.out.println(this.getClass().getName()+": Got ctxBroker");
+		LOG.debug(this.getClass().getName()+": Got ctxBroker");
 		this.ctxBroker = ctxBroker;
 	}
 
@@ -278,8 +278,8 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public UserIntentModelData createModel() {
-		UserIntentModelData model =  new UserIntentModelData();
-		return model;
+		activeUserIntentModel =  new UserIntentModelData();
+		return activeUserIntentModel;
 	}
 
 

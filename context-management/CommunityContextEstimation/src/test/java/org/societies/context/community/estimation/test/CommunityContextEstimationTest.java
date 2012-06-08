@@ -24,8 +24,6 @@
  */
 package org.societies.context.community.estimation.test;
 
-import static org.junit.Assert.assertEquals;
-
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -46,10 +44,8 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.context.api.community.estimation.EstimationModels;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.community.estimation.impl.CommunityContextEstimation;
-//import org.societies.context.community.estimation.impl.ConvexHull;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,7 +96,7 @@ public class CommunityContextEstimationTest{
 	}
 		
 
-	//@Test
+//@Test
 	public void estimationTestMedian() throws Exception, ExecutionException, CtxException{
 
 		//List<CtxEntity> personList = new ArrayList<CtxEntity>();
@@ -135,9 +131,9 @@ public class CommunityContextEstimationTest{
 		person3Age.setIntegerValue(50);
 		attrList.add(person3Age);
 
-		CommunityContextEstimation cce = new CommunityContextEstimation();
-		Integer res = cce.estimateContext(EstimationModels.MEDIAN, attrList);
-		assertEquals(40, res);
+//		CommunityContextEstimation cce = new CommunityContextEstimation();
+//		Integer res = cce.estimateContext(EstimationModels.MEDIAN, attrList);
+//		assertEquals(40, res);
 	}
 	
 	//@Test
@@ -176,53 +172,12 @@ public class CommunityContextEstimationTest{
 		attrList.add(person3Age);
 
 		//Run the tests!!
-		CommunityContextEstimation cce = new CommunityContextEstimation();
-		Integer res = cce.estimateContext(EstimationModels.MEAN, attrList);
-		assertEquals(40, res);
+//		CommunityContextEstimation cce = new CommunityContextEstimation();
+//		Integer res = cce.estimateContext(EstimationModels.MEAN, attrList);
+//		assertEquals(40, res);
 	}
-	
-	//@Test
-	public void estimateContextWithoutEnteringAttributes() {
-		CommunityContextEstimation cce = new CommunityContextEstimation();
-		try{
-			cce.estimateContext(EstimationModels.MEAN, null);
-		}catch (IllegalArgumentException e) {
-			//throw new RuntimeException();
-		}
-	}
-	
-	
-	public void est1imateContexEnteringAttributes() {
-		try{
-			estimateContextWithoutEnteringAttributes();
-		}catch (RuntimeException e) {
-			// TODO: handle exception
-		}
-	}
-	
-//	@Test
-//	public void convexHullTest() {
-//		ConvexHull cH = new ConvexHull();
-//		float[][] setOfPoints = new float[4][2];
-//		Random rG = new Random();
-//		for (int i=0; i<4; ++i){
-//			for (int j=0; j<2; ++j){
-//				Float randNum = rG.nextFloat();
-//				setOfPoints[i][j] = 100*randNum;
-//				System.out.println("Stoixeio ["+ i +"], ["+ j + "] is :"+setOfPoints[i][j]);
-//			}			
-//		}
-//		float[][] a = ConvexHull.findConvexHull(setOfPoints);
-//		System.out.println("To megethos einai:"+a.length);
-//		for (int i = 0; i<a.length; ++i){
-//			for(int j=0; j<a[i].length; ++j){
-//				System.out.println("To apotelesma einai:" +a[i][j]);	
-//			}
-//		
-//		}
-		
-//	}
-	
+
+
 	
 @Test	
 public void testConvexHull(){
@@ -250,9 +205,7 @@ public void testConvexHull(){
 		Point p7 = new Point();
 		Point p8 = new Point();
 		Point p9 = new Point();
-	
-		
-		
+			
 		p1.x=-1;
 		p1.y=-1;
 		setOfPoints.add(0,p1);
@@ -298,137 +251,130 @@ public void testConvexHull(){
 		ExpectedsetOfConvexHullPoints.add(1,p9);
 		ExpectedsetOfConvexHullPoints.add(2,p8);
 		ExpectedsetOfConvexHullPoints.add(3,p6);
-	
 
-	System.out.println("size is "+setOfPoints.size());
-//	for (int i=0; i<setOfPoints.size();++i){
-//		System.out.println("Stoixeio "+i+" is "+setOfPoints.get(i).x+", "+setOfPoints.get(i).y);
-//	}
-	
-	//ArrayList<Point> a = cH.quickHull(setOfPoints);
-	//ArrayList<Point> a = cH.qHull(setOfPoints);
 	ArrayList<Point> a = cce.cceGeomConvexHull(setOfPoints);
 	
-	//ArrayList<Point> a = cH.qHull(setOfPoints);
-	
-	System.out.println("THE CONVEX HULL SIZE IS  : "+a.size());
-			for (int z=0; z<a.size();++z){
-	System.out.println("ConvexHull a["+z+"] = "+a.get(z));
-}
+
 	Assert.assertEquals(ExpectedsetOfConvexHullPoints,a);
-
-//	for (int i=0; i<setOfPoints.size();++i){
-//		System.out.println("Stoixeio tou Hull "+i+" is "+a.get(i).x+", "+a.get(i).y);
-//	}
-
-	//return setOfPoints;
 }
 
 @Test
 public void testCalculateStringStatistics() throws InterruptedException, ExecutionException, CtxException{
 	
 	List<CtxAttribute> attrList = new ArrayList<CtxAttribute>();
+	ArrayList<String> stringList = new ArrayList<String>();
 	
 	//Create a person entity 1
 	CtxEntity person1 = iB.createEntity("person1").get();				
 	CtxEntityIdentifier pId1 = person1.getId();
-	CtxAttribute person1Age = this.iB.createAttribute(pId1, "profession").get(); 
-	person1Age.setValueType(CtxAttributeValueType.STRING);
-	person1Age = (CtxAttribute) iB.update(person1Age).get();
-	person1Age.setStringValue("Engineer");
-	attrList.add(person1Age);
+	CtxAttribute person1Profession = this.iB.createAttribute(pId1, "profession").get(); 
+	person1Profession.setValueType(CtxAttributeValueType.STRING);
+	person1Profession = (CtxAttribute) iB.update(person1Profession).get();
+	person1Profession.setStringValue("Engineer");
+	attrList.add(person1Profession);
+	stringList.add(person1Profession.getStringValue());
 
 	//Create a person entity 2
 	CtxEntity person2 = iB.createEntity("person2").get();
 	CtxEntityIdentifier pId2 = person2.getId();
 	System.out.println("PID2 = "+pId2);
-	CtxAttribute person2Age = iB.createAttribute(pId2, "profession").get(); 
-	person2Age.setValueType(CtxAttributeValueType.STRING);
-	person2Age = (CtxAttribute) iB.update(person2Age).get();
-	person2Age.setStringValue("Chef");
-	attrList.add(person2Age);
-
+	CtxAttribute person2Profession= iB.createAttribute(pId2, "profession").get(); 
+	person2Profession.setValueType(CtxAttributeValueType.STRING);
+	person2Profession = (CtxAttribute) iB.update(person2Profession).get();
+	person2Profession.setStringValue("Chef");
+	attrList.add(person2Profession);
+	stringList.add(person2Profession.getStringValue());
+	
 	//Create a person entity 3
 	CtxEntity person3 = iB.createEntity("person3").get();
 	CtxEntityIdentifier pId3 = person3.getId();
-	CtxAttribute person3Age = this.iB.createAttribute(pId3, "age").get(); 
-	person3Age.setValueType(CtxAttributeValueType.STRING);
-	person3Age = (CtxAttribute) iB.update(person3Age).get();
-	person3Age.setStringValue("Cook");
-	attrList.add(person3Age);
+	CtxAttribute person3Profession = this.iB.createAttribute(pId3, "profession").get(); 
+	person3Profession.setValueType(CtxAttributeValueType.STRING);
+	person3Profession = (CtxAttribute) iB.update(person3Profession).get();
+	person3Profession.setStringValue("Cook");
+	attrList.add(person3Profession);
+	stringList.add(person3Profession.getStringValue());
 	
 	//Create a person entity 4
 	CtxEntity person4 = iB.createEntity("person4").get();				
 	CtxEntityIdentifier pId4 = person4.getId();
-	CtxAttribute person4Age = this.iB.createAttribute(pId4, "profession").get(); 
-	person4Age.setValueType(CtxAttributeValueType.STRING);
-	person4Age = (CtxAttribute) iB.update(person4Age).get();
-	person4Age.setStringValue("Engineer");
-	attrList.add(person4Age);
+	CtxAttribute person4Profession = this.iB.createAttribute(pId4, "profession").get(); 
+	person4Profession.setValueType(CtxAttributeValueType.STRING);
+	person4Profession = (CtxAttribute) iB.update(person4Profession).get();
+	person4Profession.setStringValue("Engineer");
+	attrList.add(person4Profession);
+	stringList.add(person4Profession.getStringValue());
 	
 	//Create a person entity 5
 	CtxEntity person5 = iB.createEntity("person5").get();				
 	CtxEntityIdentifier pId5 = person5.getId();
-	CtxAttribute person5Age = this.iB.createAttribute(pId5, "profession").get(); 
-	person5Age.setValueType(CtxAttributeValueType.STRING);
-	person5Age = (CtxAttribute) iB.update(person5Age).get();
-	person5Age.setStringValue("Plumber");
-	attrList.add(person5Age);
+	CtxAttribute person5Profession = this.iB.createAttribute(pId5, "profession").get(); 
+	person5Profession.setValueType(CtxAttributeValueType.STRING);
+	person5Profession = (CtxAttribute) iB.update(person5Profession).get();
+	person5Profession.setStringValue("Plumber");
+	attrList.add(person5Profession);
+	stringList.add(person5Profession.getStringValue());
 	
 	//Create a person entity 6
 	CtxEntity person6 = iB.createEntity("person6").get();				
 	CtxEntityIdentifier pId6 = person1.getId();
-	CtxAttribute person6Age = this.iB.createAttribute(pId6, "profession").get(); 
-	person6Age.setValueType(CtxAttributeValueType.STRING);
-	person6Age = (CtxAttribute) iB.update(person6Age).get();
-	person6Age.setStringValue("Engineer");
-	attrList.add(person6Age);
+	CtxAttribute person6Profession = this.iB.createAttribute(pId6, "profession").get(); 
+	person6Profession.setValueType(CtxAttributeValueType.STRING);
+	person6Profession = (CtxAttribute) iB.update(person6Profession).get();
+	person6Profession.setStringValue("Engineer");
+	attrList.add(person6Profession);
+	stringList.add(person6Profession.getStringValue());
 	
 	//Create a person entity 7
 	CtxEntity person7 = iB.createEntity("person7").get();				
 	CtxEntityIdentifier pId7 = person7.getId();
-	CtxAttribute person7Age = this.iB.createAttribute(pId7, "profession").get(); 
-	person7Age.setValueType(CtxAttributeValueType.STRING);
-	person7Age = (CtxAttribute) iB.update(person7Age).get();
-	person7Age.setStringValue("Engineer");
-	attrList.add(person7Age);
+	CtxAttribute person7Profession = this.iB.createAttribute(pId7, "profession").get(); 
+	person7Profession.setValueType(CtxAttributeValueType.STRING);
+	person7Profession = (CtxAttribute) iB.update(person7Profession).get();
+	person7Profession.setStringValue("Engineer");
+	attrList.add(person7Profession);
+	stringList.add(person7Profession.getStringValue());
 	
 	//Create a person entity 8
 	CtxEntity person8 = iB.createEntity("person8").get();				
 	CtxEntityIdentifier pId8 = person8.getId();
-	CtxAttribute person8Age = this.iB.createAttribute(pId8, "profession").get(); 
-	person8Age.setValueType(CtxAttributeValueType.STRING);
-	person8Age = (CtxAttribute) iB.update(person8Age).get();
-	person8Age.setStringValue("Engineer");
-	attrList.add(person8Age);
+	CtxAttribute person8Profession = this.iB.createAttribute(pId8, "profession").get(); 
+	person8Profession.setValueType(CtxAttributeValueType.STRING);
+	person8Profession = (CtxAttribute) iB.update(person8Profession).get();
+	person8Profession.setStringValue("Engineer");
+	attrList.add(person8Profession);
+	stringList.add(person8Profession.getStringValue());
 	
 	//Create a person entity 9
 	CtxEntity person9 = iB.createEntity("person9").get();				
 	CtxEntityIdentifier pId9 = person1.getId();
-	CtxAttribute person9Age = this.iB.createAttribute(pId9, "profession").get(); 
-	person9Age.setValueType(CtxAttributeValueType.STRING);
-	person9Age = (CtxAttribute) iB.update(person9Age).get();
-	person9Age.setStringValue("Plumber");
-	attrList.add(person9Age);
+	CtxAttribute person9Profession = this.iB.createAttribute(pId9, "profession").get(); 
+	person9Profession.setValueType(CtxAttributeValueType.STRING);
+	person9Profession = (CtxAttribute) iB.update(person9Profession).get();
+	person9Profession.setStringValue("Plumber");
+	attrList.add(person9Profession);
+	stringList.add(person9Profession.getStringValue());
 	
 	//Create a person entity 10
 	CtxEntity person10 = iB.createEntity("person10").get();				
 	CtxEntityIdentifier pId10 = person1.getId();
-	CtxAttribute person10Age = this.iB.createAttribute(pId10, "profession").get(); 
-	person10Age.setValueType(CtxAttributeValueType.STRING);
-	person10Age = (CtxAttribute) iB.update(person10Age).get();
-	person10Age.setStringValue("Chef");
-	attrList.add(person10Age);
+	CtxAttribute person10Profession = this.iB.createAttribute(pId10, "profession").get(); 
+	person10Profession.setValueType(CtxAttributeValueType.STRING);
+	person10Profession = (CtxAttribute) iB.update(person10Profession).get();
+	person10Profession.setStringValue("Chef");
+	attrList.add(person10Profession);
+	stringList.add(person10Profession.getStringValue());
 
 	//Run the tests!!
 	CommunityContextEstimation cce = new CommunityContextEstimation();
-	Hashtable<String, Integer> res = cce.calculateStringAttributeStatistics(attrList);
+	//Hashtable<String, Integer> res = cce.cceStringMode(stringList);
+	//ArrayList<String> res = cce.cceStringMode(stringList);
 	Hashtable<String, Integer> expectedHashMapTable = new Hashtable<String, Integer>();
 	expectedHashMapTable.put("Engineer", 5);
 	expectedHashMapTable.put("Plumber", 2);
 	expectedHashMapTable.put("Cook", 1);
 	expectedHashMapTable.put("Chef", 2);
-	assertEquals(expectedHashMapTable, res);
+	//assertEquals(expectedHashMapTable, res);
 }
 
 //@Test
@@ -447,8 +393,6 @@ public void cceGeomMinBBTest(){
 		Point p7 = new Point();
 		Point p8 = new Point();
 		Point p9 = new Point();
-	
-		
 		
 		p1.x=-1;
 		p1.y=-1;
@@ -501,14 +445,6 @@ public void cceGeomMinBBTest(){
 		po2.y=-2;
 		ExpectedsetOfBBPoints[1]=po2;
 	
-
-
-//	for (int i=0; i<setOfPoints.size();++i){
-//		System.out.println("Stoixeio "+i+" is "+setOfPoints.get(i).x+", "+setOfPoints.get(i).y);
-//	}
-	
-	//ArrayList<Point> a = cH.quickHull(setOfPoints);
-	//ArrayList<Point> a = cH.qHull(setOfPoints);
 		
 		System.out.println("Ta POINT EINAI "+setOfPoints.get(0)+ " "+ setOfPoints.get(1));
 	Point[] a = cce.cceGeomMinBB(setOfPoints);
@@ -517,33 +453,13 @@ public void cceGeomMinBBTest(){
 		System.out.println("To sosto einai"+ExpectedsetOfBBPoints[i]);
 	}
 	
-	//ArrayList<Point> a = cH.qHull(setOfPoints);
-	
-//	System.out.println("THE CONVEX HULL SIZE IS  : "+a.size());
-//			for (int z=0; z<a.size();++z){
-//	System.out.println("ConvexHull a["+z+"] = "+a.get(z));
-//}
+
 	Assert.assertEquals(ExpectedsetOfBBPoints,a);
 
-//	for (int i=0; i<setOfPoints.size();++i){
-//		System.out.println("Stoixeio tou Hull "+i+" is "+a.get(i).x+", "+a.get(i).y);
-//	}
-
-	//return setOfPoints;
 }
 }
 
 
-
-//@Test
-//public void estimateContexEnteringAttributes() {
-//	List<CtxAttribute> atrsList = new ArrayList<CtxAttribute>();
-//	CtxAttribute e = new CtxAttribute(null);
-//	atrsList.add(e);
-//	CommunityContextEstimation cce = new CommunityContextEstimation();		
-//	Integer actual = cce.estimateContext(EstimationModels.MEAN, null);
-//	Assert.assertEquals(5, actual.intValue());
-//}
 
 
 

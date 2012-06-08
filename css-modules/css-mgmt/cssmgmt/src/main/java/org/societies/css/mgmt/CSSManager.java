@@ -46,6 +46,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.schema.css.devicemanagment.DmEvent;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
@@ -115,8 +116,10 @@ public class CSSManager implements ICSSLocalManager {
 //		  Supposedly, the correct way to obtain the identity
         IIdentity pubsubID = idManager.getThisNetworkNode();
         
-        this.createPubSubNodes();
-        this.subscribeToPubSubNodes();
+        // mm : Temporarily removing the pubsub stuff
+        // as it is causing issues on virgo deployment
+ //       this.createPubSubNodes();
+ //       this.subscribeToPubSubNodes();
         
         this.randomGenerator = new Random();
 
@@ -143,7 +146,7 @@ public class CSSManager implements ICSSLocalManager {
         try {
         	
             List<String> packageList = new ArrayList<String>();
-            packageList.add("org.societies.api.schema.cssmanagement.CssManagerMessageBean");
+            packageList.add("org.societies.api.schema.css.devicemanagment");
 			pubSubManager.addJaxbPackages(packageList);
 
 			pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
@@ -299,8 +302,10 @@ public class CSSManager implements ICSSLocalManager {
 
 			result.setProfile(this.cssRecord);
 			result.setResultStatus(true);
+			DmEvent event = new DmEvent();
+			event.setName("lan");
 			
-			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, this.cssRecord);
+			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
 		}
 		
 		return new AsyncResult<CssInterfaceResult>(result);
@@ -345,7 +350,7 @@ public class CSSManager implements ICSSLocalManager {
 				result.setProfile(this.cssRecord);
 				result.setResultStatus(true);
 				
-				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, this.cssRecord);
+//				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, this.cssRecord);
 
 		} 
 	
@@ -618,17 +623,19 @@ public class CSSManager implements ICSSLocalManager {
 	 * 
 	 * @param pubsubNodeName
 	 */
-	private void publishEvent(String pubsubNodeName, CssRecord cssRecord) {
+	private void publishEvent(String pubsubNodeName, DmEvent event) {
 	    LOG.debug("Publish event node: " + pubsubNodeName);
-	    CssManagerMessageBean messageBean = new CssManagerMessageBean();
-	    messageBean.setProfile(cssRecord);
+//	    CssManagerMessageBean messageBean = new CssManagerMessageBean();
+//	    messageBean.setProfile(cssRecord);
 	    try {
-			LOG.debug("Event published: " + this.pubSubManager.publisherPublish(pubsubID, pubsubNodeName, Integer.toString(this.randomGenerator.nextInt()), pubsubNodeName));
+			LOG.debug("Event published: " + this.pubSubManager.publisherPublish(pubsubID, pubsubNodeName, Integer.toString(this.randomGenerator.nextInt()), event));
 		} catch (XMPPError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		

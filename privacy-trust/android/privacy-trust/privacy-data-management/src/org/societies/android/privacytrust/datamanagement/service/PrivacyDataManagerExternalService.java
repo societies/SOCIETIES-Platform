@@ -27,10 +27,10 @@ package org.societies.android.privacytrust.datamanagement.service;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.societies.android.api.external.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.api.util.ServiceMethodTranslator;
 import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;

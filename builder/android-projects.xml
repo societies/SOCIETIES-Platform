@@ -54,7 +54,7 @@
 		<module>../platform-infrastructure/client-frwk/AndroidPubsub</module>
 
 		<!-- API -->
-		<module>../platform-infrastructure/client-frwk/CoreInterfaces</module>
+		<!--module>../platform-infrastructure/client-frwk/CoreInterfaces</module-->
 		<module>../api/android/external</module>
 		<module>../api/android/internal</module>
 
@@ -63,7 +63,7 @@
 		</module>
 		<module>../platform-infrastructure/client-frwk/IPCServiceExample
 		</module>
-		<module>../platform-infrastructure/client-frwk/devicestatusgui</module>
+		<!--module>../platform-infrastructure/client-frwk/devicestatusgui</module-->
 
 		<!-- Client Framework -->
 

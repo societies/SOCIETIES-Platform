@@ -29,7 +29,9 @@ import static org.junit.Assert.assertTrue;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
@@ -157,6 +159,9 @@ public class ServiceRegistryTest extends
 		
 	}
 	
+	
+	
+	
 	@Test
 	@Rollback(false)
 	public void updateService() throws Exception{
@@ -181,6 +186,20 @@ public class ServiceRegistryTest extends
 			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), _cisTestId);
 			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), _cisTestId1);
 		}
+	}
+	
+	@Test
+	@Rollback(false)
+	public void testRetrieveCISSharedService() throws Exception{
+		Service s = servicesList.get(0);
+		List<String> cisIdList = serReg.retrieveCISSharedService(s.getServiceIdentifier());
+		assertTrue(cisIdList.size()==2);
+		Set<String> expectedResults = new HashSet<String>();
+		expectedResults.add(_cisTestId);expectedResults.add(_cisTestId1);
+		assertTrue(cisIdList.containsAll(expectedResults));
+		s.getServiceIdentifier().setServiceInstanceIdentifier("not_Existing");
+		cisIdList = serReg.retrieveCISSharedService(s.getServiceIdentifier());
+		assertTrue(cisIdList.isEmpty());
 	}
 	
 	@Test

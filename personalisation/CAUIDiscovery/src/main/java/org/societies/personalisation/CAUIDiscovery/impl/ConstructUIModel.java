@@ -51,14 +51,15 @@ public class ConstructUIModel {
 
 	public UserIntentModelData constructNewModel(LinkedHashMap<String,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap){
 
-		UserIntentModelData modelData = null;
+		UserIntentModelData modelData = cauiTaskManager.createModel();
+		
 		//create all actions and assign context
 		for (String actionTemp : transDictionaryAll.keySet()){
 			String [] action = actionTemp.split("\\#");
 			// add here the serviceID /
 			//	LOG.info("1 paramName: "+action[0]+"paramValue: "+action[1]);
 			String serviceId = action[0];
-			System.out.println("serviceId="+serviceId);
+			//System.out.println("serviceId="+serviceId);
 			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 			try {
 				serviceId1.setIdentifier(new URI(serviceId));
@@ -78,7 +79,7 @@ public class ConstructUIModel {
 					if(contextTypeValue.length == 2 ){
 						String contextType = contextTypeValue[0];
 						String contextValue = contextTypeValue[1];
-						LOG.info("constructNewModel type:"+contextType+" value:"+contextValue);
+						//LOG.info("constructNewModel type:"+contextType+" value:"+contextValue);
 						context.put(contextType, contextValue);
 					}
 				}		
@@ -118,6 +119,7 @@ public class ConstructUIModel {
 				}
 			}
 		}		 
+		
 		modelData  = cauiTaskManager.retrieveModel();
 		//	LOG.info("10 modelData action model:"+ modelData.getActionModel());
 		return modelData;

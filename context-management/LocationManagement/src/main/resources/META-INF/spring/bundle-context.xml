@@ -8,6 +8,22 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
+
+  <!--  Mock PZ Wrapper -->
+   <bean id="PZWrapperBean" 
+       		 class="org.societies.context.location.management.impl.MockPZWrapperImpl" >
+   </bean>
+   
+   
+   <!--  PZ Wrapper will be connected using REST to the location server   -->
+   <!-- 
+   <bean id="PZWrapperBean" 
+       		 class="org.societies.context.location.management.impl.PZWrapperImpl" >
+   </bean>
+   -->
+   
+   
+   
    <bean id="LMAdapterBean" 
        		 class="org.societies.context.location.management.impl.LMAdapterImpl" 
        		 depends-on="ContextSourceManagement,ContextBroker,CommManager,DeviceRegistry" init-method="init">
@@ -16,6 +32,9 @@
 			<property name="commManager" ref="CommManager" />
 			<property name="deviceRegistry" ref="DeviceRegistry" />
 			<property name="pubSubManager" ref="PubsubClient"/>
+			<!--  <property name="pzWrapper" ref="PZWrapper"/> -->
    </bean>
-
+   
+   
+ 
 </beans>

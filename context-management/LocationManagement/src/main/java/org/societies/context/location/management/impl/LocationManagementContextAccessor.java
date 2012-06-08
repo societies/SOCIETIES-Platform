@@ -24,27 +24,28 @@
  */
 package org.societies.context.location.management.impl;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
-import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.source.ICtxSourceMgr;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.Requestor;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.location.IUserLocation;
 import org.societies.context.api.user.location.IZone;
 
@@ -55,7 +56,6 @@ import org.societies.context.api.user.location.IZone;
  * 1) The CSM API has to be changed to be able to update atrr on a specific CSS node
  * 2) Find a way to maintain the JID corresponds to a mac address
  * 3) Who creates the GPS attributes in the CSM ? 
- * 4) Waiting for Nikollas to create a method that gets a JID and returns the CtxEntityIdentifier
  * Describe your class here...
  *
  * @author Guy Feigenblat (guyf@il.ibm.com)
@@ -73,9 +73,7 @@ public class LocationManagementContextAccessor {
 	private ICommManager commManager;
 	
 	
-	String csmLocationTypeGlobal_internalId = null;
-	String csmLocationTypeSymbolic_internalId = null;
-	
+	private final static Map<String,DeviceInternalObject> deviceMapping = new HashMap<String,DeviceInternalObject>(); 
 	
 	public void init(ICtxSourceMgr contextSourceManagement, ICtxBroker contextBroker, ICommManager commManager){
 		if (contextSourceManagement == null || contextBroker == null || commManager == null){
@@ -84,23 +82,23 @@ public class LocationManagementContextAccessor {
 		this.contextSourceManagement = contextSourceManagement;
 		this.contextBroker = contextBroker; 
 		this.commManager = commManager;
-		
+	}
+	
+	public void addDevice(INetworkNode cssNodeId,String macAddress){
 		try {
-			Future<String> id = contextSourceManagement.register(CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_COORDINATES);
-			csmLocationTypeGlobal_internalId = id.get();
-			id = contextSourceManagement.register(CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_SYMBOLIC);
-			csmLocationTypeSymbolic_internalId = id.get();
-					
-			createInferredLocationAttribute();
+			CtxEntity ctxEntity = getCtxEntity(cssNodeId);
 			
-			try {
-				//TODO example
-				//contextBroker.registerForChanges(new MyCtxChangeEventListener(),"Blue method",CtxAttributeTypes.LOCATION_COORDINATES);
-				contextBroker.registerForChanges(new MyCtxChangeEventListener(),null,CtxAttributeTypes.LOCATION_COORDINATES);
-			} catch (CtxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			Future<String> id = contextSourceManagement.register(CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_COORDINATES);
+			String csmLocationTypeGlobal_internalId = id.get();
+			id = contextSourceManagement.register(CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_SYMBOLIC);
+			String csmLocationTypeSymbolic_internalId = id.get();
+			
+			addToDeviceMapping(macAddress,cssNodeId,csmLocationTypeGlobal_internalId,csmLocationTypeSymbolic_internalId);
+			
+			createInferredLocationAttribute(ctxEntity);
+			
+			contextBroker.registerForChanges(new MyCtxChangeEventListener(),ctxEntity.getId(),CtxAttributeTypes.LOCATION_COORDINATES);
+			contextBroker.registerForChanges(new MyCtxChangeEventListener(),ctxEntity.getId(),CtxAttributeTypes.LOCATION_SYMBOLIC);
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -108,9 +106,15 @@ public class LocationManagementContextAccessor {
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
+	public void removeDevice(String macAddress){
+		removeFromDeviceMapping(macAddress);
+	}
 	
 	private CtxAttribute getAttribute(String attrName, String attrSourceId,CtxOriginType ctxOriginType){
 		Future<CtxModelObject> futureCtxModelObject;
@@ -161,32 +165,38 @@ public class LocationManagementContextAccessor {
 		}
 	}
 	
-	
-	public void updateCSM(IUserLocation userLocation){
-		String locationString= "";
-		String symbolicLocationString= "";
+	public void updateCSM(IUserLocation userLocation,String macAddress){
 		
-		locationString = gpsToString(userLocation);
-		//CtxAttributeTypes.LOCATION_COORDINATES
-		contextSourceManagement.sendUpdate(csmLocationTypeGlobal_internalId,locationString, null,false , 0, 0);
-		
-		symbolicLocationString = zonesToStringEncoding(userLocation);
-		contextSourceManagement.sendUpdate(csmLocationTypeSymbolic_internalId,symbolicLocationString, null,false , 0, 0);
+		String locationString = gpsToString(userLocation);
+		String symbolicLocationString = zonesToStringEncoding(userLocation);
+
+		try{
+			DeviceInternalObject deviceInternalObject = getNetworkNodeByDevice(macAddress);
+			
+			CtxEntity ctxEntity = getCtxEntity(deviceInternalObject.getCssNodeId());
+			
+			String csmLocationTypeGlobal = deviceInternalObject.getCsmLocationTypeGlobal_internalId();
+			String csmLocationTypeSymbolic = deviceInternalObject.getCsmLocationTypeSymbolic_internalId();
+			
+			contextSourceManagement.sendUpdate(csmLocationTypeGlobal,locationString, ctxEntity,false , 0, 0);
+			contextSourceManagement.sendUpdate(csmLocationTypeSymbolic,symbolicLocationString, ctxEntity,false , 0, 0);
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
-
-	private void createInferredLocationAttribute(){
+	
+	
+	
+	private void createInferredLocationAttribute(CtxEntity ctxEntity){
 		try {
-			//TODO sending the ID instead of null -the ID should be retrieved using a method that will generate it from the JID 
-			//CtxAttribute deviceTempAttr = contextBroker.createAttribute("blue method",LOCATION_TYPE_FUSED).get();
-			CtxAttribute deviceTempAttr = contextBroker.createAttribute(null,LOCATION_TYPE_FUSED).get();
+			CtxAttribute deviceTempAttr = contextBroker.createAttribute(ctxEntity.getId(),LOCATION_TYPE_FUSED).get();
 			deviceTempAttr.setValueType(CtxAttributeValueType.STRING);
 			deviceTempAttr.getQuality().setOriginType(CtxOriginType.INFERRED);
 			deviceTempAttr.setStringValue("");
 			deviceTempAttr.setSourceId("");
-			
 			contextBroker.update(deviceTempAttr);
-			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -254,6 +264,72 @@ public class LocationManagementContextAccessor {
 	}
 
 	/***** Helper methods *****/
+	
+	private DeviceInternalObject getNetworkNodeByDevice(String macAddress){
+		synchronized (deviceMapping) {
+			return deviceMapping.get(macAddress);
+		}
+	}
+	
+	private void addToDeviceMapping(String macAddress, INetworkNode networkNodeId, String csmLocationTypeGlobal_internalId, String csmLocationTypeSymbolic_internalId){
+		synchronized (deviceMapping) {
+			
+			DeviceInternalObject deviceObject = new DeviceInternalObject();
+			deviceObject.setCsmLocationTypeGlobal_internalId(csmLocationTypeGlobal_internalId);
+			deviceObject.setCsmLocationTypeSymbolic_internalId(csmLocationTypeSymbolic_internalId);
+			deviceObject.setCssNodeId(networkNodeId);
+			deviceObject.setMacAddress(macAddress);
+			
+			deviceMapping.put(macAddress,deviceObject);
+		}
+	}
+	
+	private void removeFromDeviceMapping(String macAddress){
+		synchronized (deviceMapping) {
+			deviceMapping.remove(macAddress);
+		}
+	}
+	
+	public Collection<String> getAllRegisteredDevices(){
+		Collection<String> registeredDevices = null;
+		synchronized (deviceMapping) {
+			registeredDevices =  deviceMapping.keySet();
+		}
+		return registeredDevices;
+	}
+	
+	
+	private class DeviceInternalObject{
+		private INetworkNode cssNodeId;
+		private String macAddress;
+		private String csmLocationTypeGlobal_internalId;
+		private String csmLocationTypeSymbolic_internalId;
+		public INetworkNode getCssNodeId() {
+			return cssNodeId;
+		}
+		public void setCssNodeId(INetworkNode cssNodeId) {
+			this.cssNodeId = cssNodeId;
+		}
+		public void setMacAddress(String macAddress) {
+			this.macAddress = macAddress;
+		}
+		public String getCsmLocationTypeGlobal_internalId() {
+			return csmLocationTypeGlobal_internalId;
+		}
+		public void setCsmLocationTypeGlobal_internalId(
+				String csmLocationTypeGlobal_internalId) {
+			this.csmLocationTypeGlobal_internalId = csmLocationTypeGlobal_internalId;
+		}
+		public String getCsmLocationTypeSymbolic_internalId() {
+			return csmLocationTypeSymbolic_internalId;
+		}
+		public void setCsmLocationTypeSymbolic_internalId(
+				String csmLocationTypeSymbolic_internalId) {
+			this.csmLocationTypeSymbolic_internalId = csmLocationTypeSymbolic_internalId;
+		}
+		
+	}
+	
 	private String zonesToStringEncoding(IUserLocation userLocation){
 		String symbolicLocationString = "";
 		for (IZone zone : userLocation.getZones()){
@@ -266,15 +342,21 @@ public class LocationManagementContextAccessor {
 	}
 	
 	private String gpsToString(IUserLocation userLocation){
-		return userLocation.getXCoordinate().toString()+","+userLocation.getYCoordinate().toString();
+		return userLocation.getXCoordinate().getCoordinate()+","+userLocation.getYCoordinate().getCoordinate();
 		
 	}
+	
+	private CtxEntity getCtxEntity(INetworkNode cssNodeId) throws CtxException, InterruptedException, ExecutionException{
+		Future<CtxEntity> futureCtxEntity = contextBroker.retrieveCssNode(cssNodeId);
+		CtxEntity ctxEntity = futureCtxEntity.get();
+		return ctxEntity;
+	}
+
 	/*
 	private Requestor getRequestor(){
 		IIdentity identity = getIIdentity();
 		return new Requestor(identity);
-	}*/
-	
+	}
 	
 	private IIdentity getIIdentity(){
 		IIdentityManager iIdentityManager;
@@ -282,4 +364,8 @@ public class LocationManagementContextAccessor {
 		return iIdentityManager.getThisNetworkNode();
 	}
 
+	
+	*/
+	
+	
 }

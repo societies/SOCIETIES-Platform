@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.xml.bind.JAXBException;
 
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -37,14 +36,10 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
 import org.societies.api.internal.css.devicemgmt.comm.EventsType;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.schema.css.devicemanagment.DmEvent;
-import org.societies.comm.xmpp.event.PubsubEvent;
-import org.societies.comm.xmpp.event.PubsubEventFactory;
-import org.societies.comm.xmpp.event.PubsubEventStream;
 
 /**
  * 
@@ -91,9 +86,11 @@ public class CommAdapterImpl implements DmCommManager{
 		dmEvent.setDeviceId(deviceId);
 		dmEvent.setDescription(deviceCommonInfo.getDeviceDescription());
 		dmEvent.setType(deviceCommonInfo.getDeviceType());
+		dmEvent.setSenderNetworkNode(commManager.getIdManager().getThisNetworkNode().getJid());
 		return dmEvent;
 	}
 	
+	@SuppressWarnings("unused")
 	@PostConstruct
 	private void init(){
 		idManager = commManager.getIdManager();

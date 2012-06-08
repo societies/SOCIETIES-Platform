@@ -115,5 +115,22 @@ public void removePolicy(Requestor requestor){
 			this.policies.remove(requestor);
 		}
 	}
+
+/**
+ * @return the policies
+ */
+public Hashtable<Requestor, CtxIdentifier> getPolicies() {
+	return policies;
+}
+
+/**
+ * @param policies the policies to set
+ */
+public void setPolicies(Hashtable<Requestor, CtxIdentifier> policies) {
+	this.policies = policies;
+}
+
+
+
 	
 }

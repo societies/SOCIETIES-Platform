@@ -153,7 +153,6 @@ public class CssDirectory implements ICssDirectory {
 		List<CssAdvertisementRecord> returnList = new ArrayList<CssAdvertisementRecord>();
 		CssAdvertisementRecord record = null;
 
-		Transaction t = session.beginTransaction();
 		try {
 
 			tmpAdvertList = session.createCriteria(
@@ -170,7 +169,6 @@ public class CssDirectory implements ICssDirectory {
 			}
 
 		} catch (Exception e) {
-			t.rollback();
 			e.printStackTrace();
 		} finally {
 			if (session != null) {
@@ -200,7 +198,6 @@ public class CssDirectory implements ICssDirectory {
 		List<CssAdvertisementRecord> returnList = new ArrayList<CssAdvertisementRecord>();
 		CssAdvertisementRecord record = null;
 
-		Transaction t = session.beginTransaction();
 		try {
 
 			tmpAdvertList = session.createCriteria(
@@ -217,7 +214,6 @@ public class CssDirectory implements ICssDirectory {
 			}
 
 		} catch (Exception e) {
-			t.rollback();
 			e.printStackTrace();
 		} finally {
 			if (session != null) {

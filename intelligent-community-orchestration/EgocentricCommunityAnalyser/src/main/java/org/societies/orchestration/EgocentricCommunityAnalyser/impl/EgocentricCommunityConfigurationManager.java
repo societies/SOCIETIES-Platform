@@ -54,12 +54,15 @@ import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 //import org.societies.api.cis.management.ICis;
 
-import org.societies.api.internal.css.management.CSSRecord;
-import org.societies.api.internal.css.management.ICssActivity;
-import org.societies.api.internal.css.management.ICssActivityFeed;
-import org.societies.api.internal.css.management.ICSSLocalManager;
-import org.societies.api.internal.css.management.ICSSManagerCallback;
-import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.css.management.ICssRecord;
+import org.societies.api.css.management.ICssActivity;
+import org.societies.api.css.management.ICssActivityFeed;
+import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
+import org.societies.api.schema.cssmanagement.CssManagerResultBean;
+
+//import org.societies.api.internal.css.management.ICSSLocalManager;
+//import org.societies.api.internal.css.management.ICSSManagerCallback;
+//import org.societies.api.internal.css.management.ICSSRemoteManager;
 
 import java.util.concurrent.Future;
 
@@ -153,7 +156,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	private SuggestedCommunityAnalyserMethodType suggestedCommunityAnalyserMethodType;
 	
 	private ICisManager cisManager;
-	private ICSSLocalManager cssManager;
+	private CssManagerMessageBean cssManager;
 	private ICssActivityFeed activityFeed;
 	
 	private ICommManager commManager;

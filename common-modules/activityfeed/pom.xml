@@ -52,7 +52,12 @@
 	</parent>
 
 	<dependencies>
-			<dependency>
+		<dependency>
+			<groupId>org.apache.shindig</groupId>
+			<artifactId>shindig-social-api</artifactId>
+			<version>3.0.0-beta4</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>

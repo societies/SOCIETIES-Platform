@@ -90,4 +90,11 @@ public class CtxEntityTypes {
      * 
      */
     public static final String SERVICE_PARAMETER = "serviceParameter";
+    
+    /**
+     * 
+     */
+    public static final String SOCIAL_NETWORK = "socialNetwork";
+    
+    
 }

@@ -17,6 +17,7 @@
 		depends-on="CommManagerBundle" init-method="InitService">
 		<property name="commManager" ref="CommManagerBundle" />
 		<property name="cssDirectory" ref="CssDirectory" />
+		<property name="cisDirectory" ref="CisDirectory" />
 	</bean>
 	
 </beans>

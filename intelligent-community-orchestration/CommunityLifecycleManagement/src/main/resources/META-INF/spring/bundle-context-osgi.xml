@@ -34,6 +34,7 @@
 		<osgi:reference id="UserCtxHistoryMgr" interface="org.societies.api.internal.context.user.history.IUserCtxHistoryMgr"/> -->
 		<osgi:reference id="IIdentity" interface="org.societies.api.identity.IIdentity"/>
 		<osgi:reference id="ICtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>
+		<osgi:reference id="ExternalICtxBroker" interface="org.societies.api.context.broker.ICtxBroker"/>
 		<!-- <osgi:reference id="CommunityCtxBroker" interface="org.societies.api.internal.context.broker.ICommunityCtxBroker"/> -->
 		<osgi:reference id="IUserFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback"/>
 		<osgi:reference id="IUserFeedbackCallback" interface="org.societies.api.internal.useragent.feedback.IUserFeedbackCallback"/>

@@ -64,6 +64,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
@@ -78,6 +79,7 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManager
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
@@ -114,8 +116,13 @@ public class PrivacyNegotiationTest {
 	private ResponsePolicy serviceResponsePolicy;
 	private AgreementEnvelope negotiationAgreementEnvelope;
 	private IAgreement agreement;
-	private PPNPOutcome locationOutcome;
-	private PPNPOutcome statusOutcome;
+	private PPNPOutcome locationOutcomeForService;
+	private PPNPOutcome statusOutcomeForService;
+	private ResponsePolicy cisResponsePolicy;
+	private PPNPOutcome locationOutcomeForCis;
+	private PPNPOutcome statusOutcomeForCis;
+	private PPNegotiationEvent successfulEvent;
+	private FailedNegotiationEvent failedEvent;
 
 	@Before
 	public void setUp(){
@@ -125,6 +132,7 @@ public class PrivacyNegotiationTest {
 		this.servicePolicy = this.getServicePolicy();
 		this.cisPolicy = this.getCisPolicy();
 		this.serviceResponsePolicy = this.getServiceResponsePolicy();
+		this.cisResponsePolicy = this.getCisResponsePolicy();
 		this.createNegotiationAgreement();
 		this.setupPPNPOutcomes();
 		this.negotiationMgr = new PrivacyPolicyNegotiationManager();
@@ -134,7 +142,7 @@ public class PrivacyNegotiationTest {
 		this.negotiationMgr.setIdm(Mockito.mock(IIdentityManager.class));
 		this.negotiationMgr.setPrefMgr(prefMgr);
 		this.negotiationMgr.setPrivacyDataManagerInternal(privacyDataManager);
-		this.negotiationMgr.setPolicyAgreementMgr(policyAgreementMgr );
+		this.negotiationMgr.setPrivacyAgreementManagerInternal(policyAgreementMgr );
 		this.negotiationMgr.setNegotiationAgent(negAgent);
 		this.negotiationMgr.setPrivacyPreferenceManager(privacyPreferenceManager);
 		
@@ -144,9 +152,14 @@ public class PrivacyNegotiationTest {
 	}
 	
 	
+
+
+
 	private void setupPPNPOutcomes() {
-		List<Requestor> subjects = new ArrayList<Requestor>();
-		subjects.add(requestorService);		
+		List<Requestor> subjectsService = new ArrayList<Requestor>();
+		subjectsService.add(requestorService);		
+		List<Requestor> subjectsCis = new ArrayList<Requestor>();
+		subjectsCis.add(requestorCis);	
 		Resource rLocation = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
@@ -156,16 +169,22 @@ public class PrivacyNegotiationTest {
 		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
 		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
 		
-		RuleTarget targetLocation = new RuleTarget(subjects, rLocation, actions);
+		RuleTarget targetLocationForService = new RuleTarget(subjectsService, rLocation, actions);
 		
 		
 		Resource rStatus = new Resource(CtxAttributeTypes.STATUS);
 		
-		RuleTarget targetStatus = new RuleTarget(subjects, rStatus, actions);
+		RuleTarget targetStatusForService = new RuleTarget(subjectsService, rStatus, actions);
 		
+		RuleTarget targetLocationForCis = new RuleTarget(subjectsCis, rLocation, actions);
+		
+		RuleTarget targetStatusForCis = new RuleTarget(subjectsCis, rStatus, actions);
 		try {
-			locationOutcome = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetLocation, conditions);
-			statusOutcome = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetStatus, conditions);
+			locationOutcomeForService = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetLocationForService, conditions);
+			
+			locationOutcomeForCis = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetLocationForCis, conditions);
+			statusOutcomeForService = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetStatusForService, conditions);
+			statusOutcomeForCis = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetStatusForCis, conditions);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -187,7 +206,15 @@ public class PrivacyNegotiationTest {
 		}
 	}
 
-
+	private ResponsePolicy getCisResponsePolicy() {
+		List<ResponseItem> responses = new ArrayList<ResponseItem>();
+		for (RequestItem requestItem : this.cisPolicy.getRequests()){
+			ResponseItem responseItem = new ResponseItem(requestItem, Decision.PERMIT);
+			responses.add(responseItem);
+		}
+		ResponsePolicy response = new ResponsePolicy(this.requestorCis, responses, NegotiationStatus.SUCCESSFUL);
+		return response;
+	}
 	private ResponsePolicy getServiceResponsePolicy() {
 		
 		List<ResponseItem> responses = new ArrayList<ResponseItem>();
@@ -208,12 +235,15 @@ public class PrivacyNegotiationTest {
 		try {
 			Mockito.when(ctxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(userCtxEntity));
 			List<IPrivacyOutcome> locationOutcomes = new ArrayList<IPrivacyOutcome>();
-			locationOutcomes.add(locationOutcome);
+			locationOutcomes.add(locationOutcomeForService);
+			locationOutcomes.add(locationOutcomeForCis);
 			List<IPrivacyOutcome> statusOutcomes = new ArrayList<IPrivacyOutcome>();
-			statusOutcomes.add(statusOutcome);
+			statusOutcomes.add(statusOutcomeForService);
+			statusOutcomes.add(statusOutcomeForCis);
 			Mockito.when(privacyPreferenceManager.evaluatePPNPreference(CtxAttributeTypes.LOCATION_SYMBOLIC)).thenReturn(locationOutcomes);
 			Mockito.when(privacyPreferenceManager.evaluatePPNPreference(CtxAttributeTypes.STATUS)).thenReturn(statusOutcomes);
 			Mockito.when(negAgent.negotiate(Mockito.eq(requestorService), (ResponsePolicy) Mockito.anyObject())).thenReturn(new AsyncResult<ResponsePolicy>(serviceResponsePolicy));
+			Mockito.when(negAgent.negotiate(Mockito.eq(requestorCis), (ResponsePolicy) Mockito.anyObject())).thenReturn(new AsyncResult<ResponsePolicy>(cisResponsePolicy));
 			Mockito.when(negAgent.acknowledgeAgreement((IAgreementEnvelope) Mockito.anyObject())).thenReturn(new AsyncResult<Boolean>(true));
 			
 			
@@ -228,7 +258,7 @@ public class PrivacyNegotiationTest {
 	public void TestStartNegotiation(){
 
 		this.negotiationMgr.negotiateServicePolicy(requestorService);
-		//this.negotiationMgr.negotiateCISPolicy(requestorCis);
+		this.negotiationMgr.negotiateCISPolicy(requestorCis);
 	}
 	
 	

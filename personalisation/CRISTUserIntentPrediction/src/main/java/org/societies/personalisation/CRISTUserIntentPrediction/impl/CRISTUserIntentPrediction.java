@@ -47,15 +47,16 @@ import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.common.api.model.PersonalisationTypes;
 
 // @Component
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
-	private Logger LOG = LoggerFactory.getLogger(this.getClass());
-	 
-	private IInternalPersonalisationManager persoMgr;
+	private static Logger LOG = LoggerFactory.getLogger(CRISTUserIntentPrediction.class);
+
 	private ICtxBroker ctxBroker;
 	private ICRISTUserIntentTaskManager cristTaskManager;
+	private IInternalPersonalisationManager persoMgr;
 
 	/*
 	private IIdentity myId;
@@ -67,14 +68,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	public CRISTUserIntentPrediction() {
 		LOG.info("Hello! I'm the CRIST User Intent Prediction!");
 	}
-	
-	public IInternalPersonalisationManager getPersoMgr() {
-		return persoMgr;
-	}
 
-	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
-		this.persoMgr = persoMgr;
-	}
 
 	public ICtxBroker getCtxBroker() {
 		return ctxBroker;
@@ -92,33 +86,35 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		this.cristTaskManager = cristTaskManager;
 	}
 	
+	/**
+	 * @return the persoMgr
+	 */
+	public IInternalPersonalisationManager getPersoMgr() {
+		return persoMgr;
+	}
+
+
+	/**
+	 * @param persoMgr the persoMgr to set
+	 */
+	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
+		this.persoMgr = persoMgr;
+	}
+
+
 	public void initialiseCRISTPrediction() {
 
-		/*
-		if (this.getPersoMgr() == null) {
-			LOG.error(this.getClass().getName() + "PersoMgr is null");
-		} else {
-			LOG.info(this.getClass().getName() + "PersoMgr is NOT null");
-		}
-		if (this.getCtxBroker() == null) {
+		if (this.ctxBroker == null) {
 			LOG.error(this.getClass().getName() + "CtxBroker is null");
-		} else {
-			LOG.info(this.getClass().getName() + "CtxBroker is NOT null");
-		}
-		if (this.cristTaskManager == null)
-		{
-			LOG.info("The CRIST Taks Manager is NULL. Initiating a new mananger...");
-			cristTaskManager = new CRISTUserIntentTaskManager();
-			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();
-		} else {
-			LOG.info(this.getClass().getName() + "CristTaskManager is NOT null");
-		}
-		*/
+		} 
+		if (this.cristTaskManager == null){
+			LOG.error("The CRIST Taks Manager is NULL. ");
+		} 
+		
 
 		LOG.info("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
 		
-		//registerForContextUpdate(myId, myCtxId);
 
 	}
 	
@@ -172,7 +168,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		
 		if (this.cristTaskManager == null)
 		{
-			LOG.info("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+			LOG.info("The CRIST Taks Manager is NULL. ");
 /*			cristTaskManager = new CRISTUserIntentTaskManager();
 			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();*/
 			return new AsyncResult<List<CRISTUserAction>>(new ArrayList<CRISTUserAction>());			
@@ -201,7 +197,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		
 		if (this.cristTaskManager == null)
 		{
-			LOG.info("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+			LOG.info("The CRIST Taks Manager is NULL. ");
 /*			cristTaskManager = new CRISTUserIntentTaskManager();
 			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();*/
 			return new AsyncResult<List<CRISTUserAction>>(new ArrayList<CRISTUserAction>());			

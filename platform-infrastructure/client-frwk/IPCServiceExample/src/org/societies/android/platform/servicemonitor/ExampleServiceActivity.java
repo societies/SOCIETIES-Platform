@@ -28,11 +28,12 @@ package org.societies.android.platform.servicemonitor;
 
 import java.util.List;
 
-import org.societies.android.platform.interfaces.ICoreServiceExample;
-import org.societies.android.platform.interfaces.ICoreServiceMonitor;
+import org.societies.android.api.external.utilities.ServiceMethodTranslator;
+import org.societies.android.api.internal.examples.AndroidParcelable;
+import org.societies.android.api.internal.examples.ICoreServiceExample;
+import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.SameProcessService.LocalBinder;
-import org.societies.android.platform.utilities.ServiceMethodTranslator;
-import org.societies.api.android.internal.model.AndroidParcelable;
+
 
 import android.app.Activity;
 import android.app.ActivityManager;

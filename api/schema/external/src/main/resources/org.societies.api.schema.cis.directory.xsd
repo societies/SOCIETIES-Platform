@@ -1,0 +1,51 @@
+<xs:schema elementFormDefault="qualified" version="1.0"
+	xmlns="http://societies.org/api/schema/cis/directory" targetNamespace="http://societies.org/api/schema/cis/directory"
+	xmlns:tns="http://societies.org/api/schema/cis/directory" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+
+
+	<xs:element name="cisDirectoryBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="cisA" type="tns:cisAdvertisementRecord"
+					minOccurs="0" />
+				<xs:element name="cisB" type="tns:cisAdvertisementRecord"
+					minOccurs="0" />
+				<xs:element name="method" type="tns:methodType"
+					minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="cisAdvertisementRecord">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" minOccurs="0" />
+			<xs:element name="id" type="xs:string" minOccurs="0" />
+			<xs:element name="uri" type="xs:string" minOccurs="0" />
+			<xs:element name="password" type="xs:string" minOccurs="0" />
+			<xs:element name="type" type="xs:string" minOccurs="0" />
+			<xs:element name="mode" type="xs:int" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="cisDirectoryBeanResult">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="resultCis" type="tns:cisAdvertisementRecord"
+					nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="methodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="addCisAdvertisementRecord" />
+			<xs:enumeration value="deleteCisAdvertisementRecord" />
+			<xs:enumeration value="updateCisAdvertisementRecord" />
+			<xs:enumeration value="findAllCisAdvertisementRecords" />
+			<xs:enumeration value="findForAllCis" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
+

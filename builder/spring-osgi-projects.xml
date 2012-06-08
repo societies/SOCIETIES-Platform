@@ -106,6 +106,8 @@
 		</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
+		<module>../cis-modules/cis-directory/</module>
+		<module>../cis-modules/cis-directory-client/</module>
 
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
@@ -141,10 +143,11 @@
 		</module> 
 		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
 		</module>
-		
+		<module>../intelligent-community-orchestration/CPA</module>      
 		<!-- Privacy & Trust -->
 		<module>../privacy-trust/java/privacy-protection</module>
 		<module>../privacy-trust/java/trust</module>
+		<module>../privacy-trust/java/privacy-trust-comm-manager</module>
 
 		<!-- PlatForm Web App -->
 		<module>../platform-infrastructure/service-lifecycle/platform-webapp/

@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.activity.ActivityFeed;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
@@ -77,6 +78,7 @@ import org.springframework.stereotype.Component;
 
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.manager.Communities;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
@@ -104,8 +106,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	ICommManager iCommMgr;
 	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
+	ICisDirectoryRemote iCisDirRemote;
 //	IPrivacyPolicyManager polManager;
 	
+
 
 	public void startup(){
 		//ActivityFeed ret = null;
@@ -123,12 +127,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}
 		for(Cis cis : ownedCISs)
 			cis.setSessionFactory(sessionFactory);
-		//ActivityFeed.setSession(session);
-		//getting owned CISes
-		//Query q = session.createQuery("select o from org_societies_cis_manager_Cis o");
-		//this.ownedCISs = (Set<Cis>) q.list();
-		//q = session.createQuery("select s from org_societies_cis_manager_CisRecord s");
-		//this.subscribedCISs = (Set<CisSubscribedImp>) q.list();
 	}
 
 	private final static List<String> NAMESPACES = Collections
@@ -200,7 +198,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-
+	public ICisDirectoryRemote getiCisDirRemote() {
+		return iCisDirRemote;
+	}
+	public void setiCisDirRemote(ICisDirectoryRemote iCisDirRemote) {
+		this.iCisDirRemote = iCisDirRemote;
+	}
 
 
 
@@ -276,6 +279,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory);
 		
+		if(cis == null)
+			return cis;
+		
+		// advertising the CIS to global CIS directory
+		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
+		cisAd.setMode(cis.getMembershipCriteria());
+		cisAd.setName(cis.getName());
+		cisAd.setUri(cis.getCisId());
+		cisAd.setType(cis.getCisType());
+		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
+		
 		LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
 		this.persist(cis);
 		cis.setSessionFactory(sessionFactory);
@@ -293,8 +307,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	// TODO: review
 	public boolean subscribeToCis(CisRecord i) {
 
-		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid()),this));
-		return true;
+		if(! this.subscribedCISs.contains(new Cis(i))){
+			this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid()),this));
+			return true;
+		}
+		return false;
 		
 	}
 	
@@ -556,6 +573,31 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 	
 	@Override
+	public List<ICis> searchMyCisByName(String name){
+		// add subscribed CIS to the list to be returned
+		List<ICis> l = new ArrayList<ICis>();
+		Iterator<Cis> it = getOwnedCISs().iterator();
+		 
+		while(it.hasNext()){
+			 Cis element = it.next();
+			 if(element.getName().contains(name))
+			 l.add(element);
+			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+	     }
+		
+		Iterator<CisSubscribedImp> it2 = this.getSubscribedCISs().iterator();
+		while(it2.hasNext()){
+			CisSubscribedImp element = it2.next();
+			 if(element.getName().contains(name))
+			 l.add(element);
+			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+	     }
+		
+		return l;
+		
+	}
+	
+	@Override
 	public List<ICisOwned> getListOfOwnedCis(){
 		
 		// add subscribed CIS to the list to be returned
@@ -742,6 +784,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}
 	}
 
+	
+	public void UnRegisterCisManager(){
+		//TODO
+		//this.ccmFactory.
+	}
 
 
 }

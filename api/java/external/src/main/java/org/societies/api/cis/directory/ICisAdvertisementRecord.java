@@ -24,19 +24,28 @@
  */
 package org.societies.api.cis.directory;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
 /**
- * MISSING_ANNOTATION
+ * 
  * MISSING_JAVADOCS
  */
-
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICisAdvertisementRecord {
 	public String getName();
 	public void setName(String name);
 	public String getId();
 	public String getUri();
 	public void setUri(String uri);
+	public String getPassword();
+	public String setPassword(String password);
+	public String getType();
+	public String setType(String type);
+	public String getMode();
+	public String setMode(int mode);
 }

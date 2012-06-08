@@ -6,7 +6,9 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.
 import java.util.Random;
 
 /**
- * @author olivierm
+ * Tools to manage more useful random values
+ * 
+ * @author Olivier Maridat (Trialog)
  * @date 7 sept. 2011
  */
 public class RandomBetween extends Random {

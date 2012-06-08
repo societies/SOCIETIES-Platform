@@ -11,11 +11,12 @@
        for integration testing outside of an OSGi environment -->
    
    <bean id="SuggestedCommunityAnalyser" class="org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser" 
-   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback, CommunityRecommender, ICommCallback, IIdentityManager, IDeviceManager,  ISuggestedCommunityAnalyser, SuggestedCommunityAnalyserBean, SuggestedCommunityAnalyserResultBean, SuggestedCommunityAnalyserMethodType" init-method="initialiseSuggestedCommunityAnalyser">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback, CommunityRecommender, ICommCallback, IIdentityManager, IDeviceManager,  ISuggestedCommunityAnalyser, SuggestedCommunityAnalyserBean, SuggestedCommunityAnalyserResultBean, SuggestedCommunityAnalyserMethodType, ExternalICtxBroker" init-method="initialiseSuggestedCommunityAnalyser">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="ICisManager"></property>
    <!-- <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>-->
    <property name="userContextBroker" ref="ICtxBroker"></property>
+   <property name="externalContextBroker" ref="ExternalICtxBroker"></property>
    <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
    <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
    <property name="commManager" ref="ICommManager"></property>
