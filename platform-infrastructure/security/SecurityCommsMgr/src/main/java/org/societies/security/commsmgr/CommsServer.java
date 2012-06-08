@@ -146,7 +146,7 @@ public class CommsServer implements IFeatureServer {
 			
 			LOG.debug("getQuery(): NegotiationProvider. Method: " + method);
 			LOG.debug("getQuery(): NegotiationProvider. Params: " + serviceId + ", " +
-					isModified + ", " +	sessionId + ", " + signedPolicyOption);
+					isModified + ", " +	sessionId);
 
 				switch (method) {
 				case GET_POLICY_OPTIONS:

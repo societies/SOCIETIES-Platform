@@ -22,11 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.sla;
-
-import java.util.Random;
-
-import org.societies.api.identity.IIdentity;
+package org.societies.security.policynegotiator.exception;
 
 /**
  * 
@@ -34,76 +30,18 @@ import org.societies.api.identity.IIdentity;
  * @author Mitja Vardjan
  *
  */
-public class Session {
-
-	private static Random rnd = new Random();
-	
-	private int sessionId;
-	private IIdentity requester;
-	private IIdentity provider;
-	private SLA sla;
-	private String serviceId;
+public class NegotiationException extends Exception {
 
 	/**
-	 * Constructor. Session ID is generated automatically.
-	 */
-	public Session() {
-		sessionId = rnd.nextInt();
-	}
-	
-	/**
-	 * Constructor. Session ID is generated automatically.
-	 */
-	public Session(int sessionId) {
-		this.sessionId = sessionId;
-	}
-
-	/**
-	 * @return Session ID
-	 */
-	public int getId() {
-		return sessionId;
-	}
-
-	/**
-	 * Get Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
 	 * 
-	 * @return SOP or SLA
 	 */
-	public SLA getSla() {
-		return sla;
-	}
-	
-	/**
-	 * Set Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
-	 * 
-	 * @param sla SOP or SLA
-	 */
-	public void setSla(SLA sla) {
-		this.sla = sla;
+	private static final long serialVersionUID = 7351926310875810825L;
+
+	public NegotiationException() {
+		super();
 	}
 
-	public IIdentity getRequester() {
-		return requester;
-	}
-	
-	public void setRequester(IIdentity requester) {
-		this.requester = requester;
-	}
-
-	public IIdentity getProvider() {
-		return provider;
-	}
-	
-	public void setProvider(IIdentity provider) {
-		this.provider = provider;
-	}
-
-	public String getServiceId() {
-		return serviceId;
-	}
-
-	public void setServiceId(String serviceId) {
-		this.serviceId = serviceId;
+	public NegotiationException(String msg) {
+		super(msg);
 	}
 }

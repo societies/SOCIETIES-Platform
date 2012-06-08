@@ -182,7 +182,8 @@ public class CisMgmtTester {
 				return;
 			}
 			else{
-				LOG.info("good return on GetInfo Callback");
+				if(communityResultObject.getGetInfoResponse().isResult())
+					LOG.info("good return on GetInfo Callback");
 				LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
 			}
 			

@@ -22,11 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.sla;
+package org.societies.security.policynegotiator;
 
-import java.util.Random;
+import static org.junit.Assert.*;
 
-import org.societies.api.identity.IIdentity;
+import java.net.URI;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.societies.security.policynegotiator.provider.ServiceJarUri;
 
 /**
  * 
@@ -34,76 +39,40 @@ import org.societies.api.identity.IIdentity;
  * @author Mitja Vardjan
  *
  */
-public class Session {
+public class ServiceJarUriTest {
 
-	private static Random rnd = new Random();
-	
-	private int sessionId;
-	private IIdentity requester;
-	private IIdentity provider;
-	private SLA sla;
-	private String serviceId;
-
-	/**
-	 * Constructor. Session ID is generated automatically.
-	 */
-	public Session() {
-		sessionId = rnd.nextInt();
-	}
+	ServiceJarUri classUnderTest;
+	String serviceBaseUri = "http://www.example.com/service1";
 	
 	/**
-	 * Constructor. Session ID is generated automatically.
+	 * @throws java.lang.Exception
 	 */
-	public Session(int sessionId) {
-		this.sessionId = sessionId;
+	@Before
+	public void setUp() throws Exception {
+		URI service = new URI(serviceBaseUri);
+		classUnderTest = new ServiceJarUri(service);
 	}
 
 	/**
-	 * @return Session ID
+	 * @throws java.lang.Exception
 	 */
-	public int getId() {
-		return sessionId;
+	@After
+	public void tearDown() throws Exception {
 	}
 
 	/**
-	 * Get Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
-	 * 
-	 * @return SOP or SLA
+	 * Test method for {@link org.societies.security.policynegotiator.provider.ServiceJarUri#getFullUri()}.
 	 */
-	public SLA getSla() {
-		return sla;
-	}
-	
-	/**
-	 * Set Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
-	 * 
-	 * @param sla SOP or SLA
-	 */
-	public void setSla(SLA sla) {
-		this.sla = sla;
-	}
-
-	public IIdentity getRequester() {
-		return requester;
-	}
-	
-	public void setRequester(IIdentity requester) {
-		this.requester = requester;
+	@Test
+	public void testGenerateFullUri() {
+		URI result = classUnderTest.generateFullUri();
+		String resultStr = result.toString();
+		String addon = "?" + ServiceJarUri.KEY + "=";
+		
+		assertTrue(resultStr.startsWith(serviceBaseUri));
+		assertTrue(resultStr.contains(addon));
+		assertTrue(resultStr.startsWith(serviceBaseUri + addon));
+		assertTrue(resultStr.length() > serviceBaseUri.length() + addon.length());
 	}
 
-	public IIdentity getProvider() {
-		return provider;
-	}
-	
-	public void setProvider(IIdentity provider) {
-		this.provider = provider;
-	}
-
-	public String getServiceId() {
-		return serviceId;
-	}
-
-	public void setServiceId(String serviceId) {
-		this.serviceId = serviceId;
-	}
 }

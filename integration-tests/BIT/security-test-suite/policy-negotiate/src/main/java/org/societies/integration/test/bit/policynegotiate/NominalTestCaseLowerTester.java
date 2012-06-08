@@ -105,7 +105,7 @@ public class NominalTestCaseLowerTester {
 		Requestor provider = new RequestorService(myId, serviceId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
-			public void onNegotiationComplete(String agreementKey) {
+			public void onNegotiationComplete(String agreementKey, URI jar) {
 				LOG.info("onNegotiationComplete({})", agreementKey);
 				assertNotNull(agreementKey);
 				callbackInvokedService = true;
@@ -139,7 +139,7 @@ public class NominalTestCaseLowerTester {
 		Requestor provider = new RequestorCis(myId, cisId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
-			public void onNegotiationComplete(String agreementKey) {
+			public void onNegotiationComplete(String agreementKey, URI jar) {
 				LOG.info("onNegotiationComplete({})", agreementKey);
 				assertNotNull(agreementKey);
 				callbackInvokedCis = true;
@@ -172,7 +172,7 @@ public class NominalTestCaseLowerTester {
 		Requestor provider = new Requestor(myId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override
-			public void onNegotiationComplete(String agreementKey) {
+			public void onNegotiationComplete(String agreementKey, URI jar) {
 				LOG.info("onNegotiationComplete({})", agreementKey);
 				assertNull(agreementKey);
 				fail();

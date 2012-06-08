@@ -22,64 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.security.policynegotiator;
+package org.societies.context.community.db.impl;
 
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+public class CtxModelObjectNumberGenerator {
 
-/**
- * Temporary bean to hold the name of the method and each of the parameters.
- * The return type is held in a separate bean.
- */
-public class ProviderBean {
+    private static Long nextValue = 0L;
 
-	// Methods
-	public enum MethodType {
-		acceptPolicyAndGetSla,
-		getPolicyOptions,
-		reject
-	};
+    public static Long getNextValue() {
 
-	private MethodType method;
-	
-	// Parameters
-	private int sessionId;
-	private boolean modified;
-	private String signedPolicyOption;
-	private ServiceResourceIdentifier serviceId;
-
-	// Getter and setter for the method
-	
-	public MethodType getMethod() {
-		return method;
-	}
-	public void setMethod(MethodType method) {
-		this.method = method;
-	}
-
-	// Getters and setters for the parameters
-	
-	public int getSessionId() {
-		return sessionId;
-	}
-	public void setSessionId(int sessionId) {
-		this.sessionId = sessionId;
-	}
-	public boolean getModified() {
-		return modified;
-	}
-	public void setModified(boolean modified) {
-		this.modified = modified;
-	}
-	public String getSignedPolicyOption() {
-		return signedPolicyOption;
-	}
-	public void setSignedPolicyOption(String signedPolicyOption) {
-		this.signedPolicyOption = signedPolicyOption;
-	}
-	public ServiceResourceIdentifier getServiceId() {
-		return serviceId;
-	}
-	public void setServiceId(ServiceResourceIdentifier serviceId) {
-		this.serviceId = serviceId;
-	}
+        return nextValue++;
+    }
 }

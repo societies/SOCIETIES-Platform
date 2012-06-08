@@ -22,88 +22,37 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.sla;
+package org.societies.api.internal.security.policynegotiator;
 
-import java.util.Random;
+import java.net.URI;
 
-import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * 
+ * Interface for notifying Policy Negotiation on the provider side about any changes
+ * in services that are available for sharing to others.
  *
  * @author Mitja Vardjan
  *
  */
-public class Session {
-
-	private static Random rnd = new Random();
-	
-	private int sessionId;
-	private IIdentity requester;
-	private IIdentity provider;
-	private SLA sla;
-	private String serviceId;
+public interface INegotiationProviderServiceMgmt {
 
 	/**
-	 * Constructor. Session ID is generated automatically.
-	 */
-	public Session() {
-		sessionId = rnd.nextInt();
-	}
-	
-	/**
-	 * Constructor. Session ID is generated automatically.
-	 */
-	public Session(int sessionId) {
-		this.sessionId = sessionId;
-	}
-
-	/**
-	 * @return Session ID
-	 */
-	public int getId() {
-		return sessionId;
-	}
-
-	/**
-	 * Get Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
+	 * Tells Policy Negotiator that a new service is available for sharing to others.
 	 * 
-	 * @return SOP or SLA
+	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
+	 * 
+	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
+	 * 
+	 * @param clientJar Location of the JAR file for service client, if the service provides a client.
+	 * If the service does not provide a client, this parameter should be null
 	 */
-	public SLA getSla() {
-		return sla;
-	}
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar);
 	
 	/**
-	 * Set Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
+	 * Tells Policy Negotiator that a service is not available for sharing to others anymore.
 	 * 
-	 * @param sla SOP or SLA
+	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
 	 */
-	public void setSla(SLA sla) {
-		this.sla = sla;
-	}
-
-	public IIdentity getRequester() {
-		return requester;
-	}
-	
-	public void setRequester(IIdentity requester) {
-		this.requester = requester;
-	}
-
-	public IIdentity getProvider() {
-		return provider;
-	}
-	
-	public void setProvider(IIdentity provider) {
-		this.provider = provider;
-	}
-
-	public String getServiceId() {
-		return serviceId;
-	}
-
-	public void setServiceId(String serviceId) {
-		this.serviceId = serviceId;
-	}
+	public void removeService(ServiceResourceIdentifier serviceId);
 }

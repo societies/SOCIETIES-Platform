@@ -24,6 +24,8 @@
  */
 package org.societies.security.policynegotiator.requester;
 
+import java.net.URI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
@@ -46,6 +48,7 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	
 	INegotiationCallback finalCallback;
 	String slaKey;
+	URI jar;
 	
 	/**
 	 * 
@@ -55,9 +58,10 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	 * @param slaKey The key to gather SLA from secure storage using
 	 * {@link ISecureStorage#getDocument(String)}
 	 */
-	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey) {
+	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey, URI jar) {
 		this.finalCallback = finalCallback;
 		this.slaKey = slaKey;
+		this.jar = jar;
 	}
 	
 	@Override
@@ -97,7 +101,7 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	private void notifySuccess() {
 		if (finalCallback != null) {
 			LOG.debug("invoking final callback");
-			finalCallback.onNegotiationComplete(slaKey);
+			finalCallback.onNegotiationComplete(slaKey, jar);
 			LOG.info("negotiation finished, final callback invoked");
 		}
 		else {

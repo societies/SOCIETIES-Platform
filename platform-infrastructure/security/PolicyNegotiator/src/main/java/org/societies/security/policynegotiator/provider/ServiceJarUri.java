@@ -22,11 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.sla;
+package org.societies.security.policynegotiator.provider;
 
+import java.net.URI;
 import java.util.Random;
 
-import org.societies.api.identity.IIdentity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -34,76 +36,42 @@ import org.societies.api.identity.IIdentity;
  * @author Mitja Vardjan
  *
  */
-public class Session {
+public class ServiceJarUri {
 
-	private static Random rnd = new Random();
-	
-	private int sessionId;
-	private IIdentity requester;
-	private IIdentity provider;
-	private SLA sla;
-	private String serviceId;
+	private static Logger LOG = LoggerFactory.getLogger(ServiceJarUri.class);
 
 	/**
-	 * Constructor. Session ID is generated automatically.
+	 * URL parameter keyword for the service session key
 	 */
-	public Session() {
-		sessionId = rnd.nextInt();
+	public static final String KEY = "key";
+	
+	URI baseUri;
+	
+	public ServiceJarUri(URI service) {
+		this.baseUri = service;
 	}
 	
-	/**
-	 * Constructor. Session ID is generated automatically.
-	 */
-	public Session(int sessionId) {
-		this.sessionId = sessionId;
-	}
-
-	/**
-	 * @return Session ID
-	 */
-	public int getId() {
-		return sessionId;
-	}
-
-	/**
-	 * Get Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
-	 * 
-	 * @return SOP or SLA
-	 */
-	public SLA getSla() {
-		return sla;
+	public URI generateFullUri() {
+		
+		String fullUri;
+		
+		fullUri = addParameter(baseUri.toString(), KEY, generateKey());
+		LOG.debug("generateFullUri(): {}", fullUri);
+		
+		return URI.create(fullUri);
 	}
 	
-	/**
-	 * Set Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
-	 * 
-	 * @param sla SOP or SLA
-	 */
-	public void setSla(SLA sla) {
-		this.sla = sla;
-	}
-
-	public IIdentity getRequester() {
-		return requester;
+	private String generateKey() {
+		Random rand = new Random();
+		String key = String.valueOf(rand.nextInt());
+		return key;
 	}
 	
-	public void setRequester(IIdentity requester) {
-		this.requester = requester;
-	}
-
-	public IIdentity getProvider() {
-		return provider;
-	}
-	
-	public void setProvider(IIdentity provider) {
-		this.provider = provider;
-	}
-
-	public String getServiceId() {
-		return serviceId;
-	}
-
-	public void setServiceId(String serviceId) {
-		this.serviceId = serviceId;
+	private String addParameter(String base, String key, String value) {
+		
+		if (base.contains("?")) {
+			base += "&";
+		}
+		return base + "?" + key + "=" + value;
 	}
 }

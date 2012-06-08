@@ -121,6 +121,17 @@ public interface ICisManager {
 	public List<ICisOwned> getListOfOwnedCis();
 
 	
+	
+	
+	/**
+	 * Return the list of CISs (subscribed or owned) where the CIS name contains the input string
+	 * if no CIS is found, it returns an empty list 
+	 * 
+	 * @param String name input to search for cis
+	 * @return Array of {@link ICis} that contains the name string .
+	 */
+	public List<ICis> searchMyCisByName(String name);
+	
 
 	// END OF API implementing server functionality
 	

@@ -22,11 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.sla;
+package org.societies.security.policynegotiator.provider;
 
-import java.util.Random;
+import java.net.URI;
+import java.util.HashMap;
 
-import org.societies.api.identity.IIdentity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.security.policynegotiator.exception.NegotiationException;
 
 /**
  * 
@@ -34,76 +39,77 @@ import org.societies.api.identity.IIdentity;
  * @author Mitja Vardjan
  *
  */
-public class Session {
+public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
-	private static Random rnd = new Random();
+	private static Logger LOG = LoggerFactory.getLogger(INegotiationProviderServiceMgmt.class);
+
+	private HashMap<String, Service> services = new HashMap<String, Service>();
 	
-	private int sessionId;
-	private IIdentity requester;
-	private IIdentity provider;
-	private SLA sla;
-	private String serviceId;
+	@Override
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar) {
+		
+		String idStr = serviceId.getIdentifier().toString();
+		Service s = new Service(idStr, slaXml, clientJar);
+		
+		services.put(idStr, s);
+	}
 
-	/**
-	 * Constructor. Session ID is generated automatically.
-	 */
-	public Session() {
-		sessionId = rnd.nextInt();
+	@Override
+	public void removeService(ServiceResourceIdentifier serviceId) {
+		
+		String idStr = serviceId.getIdentifier().toString();
+		
+		services.remove(idStr);
+	}
+
+	protected HashMap<String, Service> getServices() {
+		return services;
 	}
 	
-	/**
-	 * Constructor. Session ID is generated automatically.
-	 */
-	public Session(int sessionId) {
-		this.sessionId = sessionId;
+	protected Service getService(String id) {
+		
+		Service s = services.get(id);
+		
+		if (s == null) {
+			LOG.warn("getService({}): service not found", id);
+		}
+		
+		return s;
 	}
 
 	/**
-	 * @return Session ID
-	 */
-	public int getId() {
-		return sessionId;
-	}
-
-	/**
-	 * Get Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
 	 * 
-	 * @return SOP or SLA
+	 * @param id
+	 * @return
+	 * @throws NegotiationException When service is not found
 	 */
-	public SLA getSla() {
-		return sla;
+	protected URI getClientJarUri(String id) throws NegotiationException {
+		
+		Service s = getService(id);
+		
+		if (s != null) {
+			return s.getClientJarUri();
+		}
+		else {
+			throw new NegotiationException("Service " + id + " not found");
+		}
 	}
-	
+
 	/**
-	 * Set Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
 	 * 
-	 * @param sla SOP or SLA
+	 * @param id
+	 * @return
+	 * @throws NegotiationException When service is not found
 	 */
-	public void setSla(SLA sla) {
-		this.sla = sla;
-	}
-
-	public IIdentity getRequester() {
-		return requester;
-	}
-	
-	public void setRequester(IIdentity requester) {
-		this.requester = requester;
-	}
-
-	public IIdentity getProvider() {
-		return provider;
-	}
-	
-	public void setProvider(IIdentity provider) {
-		this.provider = provider;
-	}
-
-	public String getServiceId() {
-		return serviceId;
-	}
-
-	public void setServiceId(String serviceId) {
-		this.serviceId = serviceId;
+	protected String getSlaXmlOptions(String id) throws NegotiationException {
+		
+		Service s = getService(id);
+		
+		if (s != null) {
+			return s.getSlaXmlOptions();
+		}
+		else {
+			throw new NegotiationException("Service " + id + " not found");
+		}
 	}
 }

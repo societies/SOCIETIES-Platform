@@ -22,11 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.sla;
+package org.societies.security.policynegotiator.provider;
 
-import java.util.Random;
-
-import org.societies.api.identity.IIdentity;
+import java.net.URI;
 
 /**
  * 
@@ -34,76 +32,36 @@ import org.societies.api.identity.IIdentity;
  * @author Mitja Vardjan
  *
  */
-public class Session {
-
-	private static Random rnd = new Random();
+public class Service {
 	
-	private int sessionId;
-	private IIdentity requester;
-	private IIdentity provider;
-	private SLA sla;
-	private String serviceId;
+	private String id;
+	private String slaXmlOptions;
+	private URI clientJarUri;
 
-	/**
-	 * Constructor. Session ID is generated automatically.
-	 */
-	public Session() {
-		sessionId = rnd.nextInt();
+	public Service(String id, String slaXmlOptions, URI clientJarUri) {
+		this.id = id;
+		this.slaXmlOptions = slaXmlOptions;
+		this.clientJarUri = clientJarUri;
 	}
 	
 	/**
-	 * Constructor. Session ID is generated automatically.
+	 * @return the id
 	 */
-	public Session(int sessionId) {
-		this.sessionId = sessionId;
-	}
-
-	/**
-	 * @return Session ID
-	 */
-	public int getId() {
-		return sessionId;
-	}
-
-	/**
-	 * Get Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
-	 * 
-	 * @return SOP or SLA
-	 */
-	public SLA getSla() {
-		return sla;
+	public String getId() {
+		return id;
 	}
 	
 	/**
-	 * Set Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
-	 * 
-	 * @param sla SOP or SLA
+	 * @return the slaXmlOptions
 	 */
-	public void setSla(SLA sla) {
-		this.sla = sla;
+	public String getSlaXmlOptions() {
+		return slaXmlOptions;
 	}
 
-	public IIdentity getRequester() {
-		return requester;
-	}
-	
-	public void setRequester(IIdentity requester) {
-		this.requester = requester;
-	}
-
-	public IIdentity getProvider() {
-		return provider;
-	}
-	
-	public void setProvider(IIdentity provider) {
-		this.provider = provider;
-	}
-
-	public String getServiceId() {
-		return serviceId;
-	}
-
-	public void setServiceId(String serviceId) {
-		this.serviceId = serviceId;
+	/**
+	 * @return The base URL, without the key parameter
+	 */
+	public URI getClientJarUri() {
+		return clientJarUri;
 	}
 }
