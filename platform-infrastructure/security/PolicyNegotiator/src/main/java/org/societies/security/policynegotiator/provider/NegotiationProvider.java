@@ -38,6 +38,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.policynegotiator.exception.NegotiationException;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.sla.Session;
 import org.societies.security.policynegotiator.sla.SopResource;
@@ -168,8 +169,12 @@ public class NegotiationProvider implements INegotiationProvider {
 			
 			sla.setSla(finalSla);
 			serviceId = session.getServiceId();
-			jarUri = providerServiceMgr.getClientJarUri(serviceId);
-			sla.setJarUrl(jarUri.toString());
+			try {
+				jarUri = providerServiceMgr.getClientJarUri(serviceId);
+				sla.setJarUrl(jarUri.toString());
+			} catch (NegotiationException e) {
+				LOG.warn("acceptPolicyAndGetSla()", e);
+			}
 
 			sla.setSuccess(true);
 		}

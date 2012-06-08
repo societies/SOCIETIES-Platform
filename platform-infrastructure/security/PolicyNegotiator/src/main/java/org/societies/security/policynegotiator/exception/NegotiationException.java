@@ -22,16 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.provider;
-
-import java.net.URI;
-import java.util.HashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.security.policynegotiator.exception.NegotiationException;
+package org.societies.security.policynegotiator.exception;
 
 /**
  * 
@@ -39,77 +30,18 @@ import org.societies.security.policynegotiator.exception.NegotiationException;
  * @author Mitja Vardjan
  *
  */
-public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
-
-	private static Logger LOG = LoggerFactory.getLogger(INegotiationProviderServiceMgmt.class);
-
-	private HashMap<String, Service> services = new HashMap<String, Service>();
-	
-	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar) {
-		
-		String idStr = serviceId.getIdentifier().toString();
-		Service s = new Service(idStr, slaXml, clientJar);
-		
-		services.put(idStr, s);
-	}
-
-	@Override
-	public void removeService(ServiceResourceIdentifier serviceId) {
-		
-		String idStr = serviceId.getIdentifier().toString();
-		
-		services.remove(idStr);
-	}
-
-	protected HashMap<String, Service> getServices() {
-		return services;
-	}
-	
-	protected Service getService(String id) {
-		
-		Service s = services.get(id);
-		
-		if (s == null) {
-			LOG.warn("getService({}): service not found", id);
-		}
-		
-		return s;
-	}
+public class NegotiationException extends Exception {
 
 	/**
 	 * 
-	 * @param id
-	 * @return
-	 * @throws NegotiationException When service is not found
 	 */
-	protected URI getClientJarUri(String id) throws NegotiationException {
-		
-		Service s = getService(id);
-		
-		if (s != null) {
-			return s.getClientJarUri();
-		}
-		else {
-			throw new NegotiationException("Service " + id + " not found");
-		}
+	private static final long serialVersionUID = 7351926310875810825L;
+
+	public NegotiationException() {
+		super();
 	}
 
-	/**
-	 * 
-	 * @param id
-	 * @return
-	 * @throws NegotiationException When service is not found
-	 */
-	protected String getSlaXmlOptions(String id) throws NegotiationException {
-		
-		Service s = getService(id);
-		
-		if (s != null) {
-			return s.getSlaXmlOptions();
-		}
-		else {
-			throw new NegotiationException("Service " + id + " not found");
-		}
+	public NegotiationException(String msg) {
+		super(msg);
 	}
 }

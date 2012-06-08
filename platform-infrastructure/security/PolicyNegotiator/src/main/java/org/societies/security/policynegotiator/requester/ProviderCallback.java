@@ -116,7 +116,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				sla = result.getSla();
 				if (requester.getSignatureMgr().verify(sla)) {
 					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
-					LOG.debug("receiveResult(): session = {}, final SLA: {}", sessionId, sla);
+					LOG.debug("receiveResult(): final SLA size: {}", sessionId, sla == null ? null : sla.length());
 					
 					// Store the SLA into secure storage
 					String agreementKey = generateKey();
