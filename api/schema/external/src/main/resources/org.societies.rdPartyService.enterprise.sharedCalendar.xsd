@@ -73,16 +73,20 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <xs:simpleType name="methodType">
     <xs:restriction base="xs:string">
+    <xs:enumeration value="createCISCalendar"/>
       <xs:enumeration value="deleteCISCalendar"/>
       <xs:enumeration value="retrieveCISCalendarList"/>
-      <xs:enumeration value="retrieveCalendarEvents"/>
+      <xs:enumeration value="retrieveCISCalendarEvents"/>
+      <xs:enumeration value="createEventOnCISCalendar"/>
+      <xs:enumeration value="deleteEventOnCISCalendar"/>
       <xs:enumeration value="subscribeToEvent"/>
       <xs:enumeration value="findEvents"/>
       <xs:enumeration value="unsubscribeFromEvent"/>
       <xs:enumeration value="createPrivateCalendar"/>
       <xs:enumeration value="deletePrivateCalendar"/>
       <xs:enumeration value="createEventOnPrivateCalendar"/>
-      <xs:enumeration value="retrieveEventsPrivateCalendar"/>
+      <xs:enumeration value="retrieveEventsOnPrivateCalendar"/>
+      <xs:enumeration value="deleteEventOnPrivateCalendar"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

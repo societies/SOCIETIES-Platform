@@ -59,14 +59,12 @@ import org.societies.api.schema.cis.directory.CisDirectoryBeanResult;
 public class CommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/schema/css/directory"));
+			  Arrays.asList("http://societies.org/api/schema/css/directory",
+					  "http://societies.org/api/schema/cis/directory"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.schema.css.directory"));
+			  Arrays.asList("org.societies.api.schema.css.directory",
+					  "org.societies.api.schema.cis.directory"));
 	
-	private static final List<String> NAMESPACES1 = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/schema/cis/directory"));
-	private static final List<String> PACKAGES1 = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.schema.cis.directory"));
 	
 	//PRIVATE VARIABLES
 	private ICommManager commManager;

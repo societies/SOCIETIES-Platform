@@ -307,8 +307,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	// TODO: review
 	public boolean subscribeToCis(CisRecord i) {
 
-		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid()),this));
-		return true;
+		if(! this.subscribedCISs.contains(new Cis(i))){
+			this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid()),this));
+			return true;
+		}
+		return false;
 		
 	}
 	
@@ -567,6 +570,31 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		l.addAll(ownedCISs);
 		
 		return l;
+	}
+	
+	@Override
+	public List<ICis> searchMyCisByName(String name){
+		// add subscribed CIS to the list to be returned
+		List<ICis> l = new ArrayList<ICis>();
+		Iterator<Cis> it = getOwnedCISs().iterator();
+		 
+		while(it.hasNext()){
+			 Cis element = it.next();
+			 if(element.getName().contains(name))
+			 l.add(element);
+			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+	     }
+		
+		Iterator<CisSubscribedImp> it2 = this.getSubscribedCISs().iterator();
+		while(it2.hasNext()){
+			CisSubscribedImp element = it2.next();
+			 if(element.getName().contains(name))
+			 l.add(element);
+			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+	     }
+		
+		return l;
+		
 	}
 	
 	@Override

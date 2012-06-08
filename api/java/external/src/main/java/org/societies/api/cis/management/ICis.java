@@ -24,6 +24,7 @@
  */
 package org.societies.api.cis.management;
 
+import org.societies.api.schema.cis.community.Community;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -89,5 +90,22 @@ public interface ICis {
 	 */
     public void getListOfMembers(ICisManagerCallback callback);
 
+    
+	/**
+	 * 
+	 * AT THE MOMENT YOU MUST BE THE OWNER OF THE CIS IN ORDER TO SET INFO in it
+	 * 
+	 * Set info into a CIS. 
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 * it has the  info from the CIS
+	 * 
+	 * @param c org.societies.api.schema.cis.community marshalled object containing information
+	 * to be set at the CIS. However, it is worth to mention that at the moment, we are allowing
+	 * to set only the CIS description and type.
+	 * @param callback callback function
+	 */
+    public void setInfo(Community c, ICisManagerCallback callback);
+    
     
 }

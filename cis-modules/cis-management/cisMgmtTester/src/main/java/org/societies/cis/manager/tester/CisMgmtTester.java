@@ -25,6 +25,8 @@
 
 package org.societies.cis.manager.tester;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
@@ -38,6 +40,7 @@ import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -132,7 +135,17 @@ public class CisMgmtTester {
 					LOG.info("calling remote get info");
 					icis.getInfo(h);
 					LOG.info("remote get info done");
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					
+					LOG.info("calling list members");
+					GetListMembersCallBack gl = new GetListMembersCallBack();
+					icis.getListOfMembers(gl);
+					LOG.info("remote list members done");
 					
 				 } catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
@@ -165,11 +178,12 @@ public class CisMgmtTester {
 
 		public void receiveResult(Community communityResultObject) {
 			if(communityResultObject == null){
-				LOG.info("null return on JoinCallBack");
+				LOG.info("null return on GetInfoCallBack");
 				return;
 			}
 			else{
-				LOG.info("good return on GetInfo Callback");
+				if(communityResultObject.getGetInfoResponse().isResult())
+					LOG.info("good return on GetInfo Callback");
 				LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
 			}
 			
@@ -178,7 +192,41 @@ public class CisMgmtTester {
 
 	}
 	
+	public class GetListMembersCallBack implements ICisManagerCallback{
+		
+		
+		public void receiveResult(boolean result){
+			LOG.info("boolean return on GetListMembersCallBack");
+		}; 
 
+		public void receiveResult(int result) {;};
+		
+		public void receiveResult(String result){;}
+
+		public void receiveResult(Community communityResultObject) {
+			if(communityResultObject == null){
+				LOG.info("null return on GetListMembersCallBack");
+				return;
+			}
+			else{
+				LOG.info("good return on GetListMembersCallBack Callback");
+				LOG.info("Result Status: GetListMembersCallBack from CIS " + communityResultObject.getCommunityJid());
+				List<Participant> l = communityResultObject.getWho().getParticipant();
+				int[] memberCheck = {0,0,0};
+				
+				Iterator<Participant> it = l.iterator();
+				
+				while(it.hasNext()){
+					Participant element = it.next();
+					LOG.info("member " + element.getJid() + " with role " + element.getRole().toString());
+			     }
+				
+			}
+			
+		}
+
+
+	}
 
 	
 }
