@@ -33,7 +33,8 @@ package org.societies.webapp.models;
 public class PrivacyAssessmentForm {
 
 	private String method;
-	private int autoReassessmentInSecs; 
+	private int autoReassessmentInSecs;
+	private boolean assessNow;
 
 	/**
 	 * @return the method
@@ -61,5 +62,19 @@ public class PrivacyAssessmentForm {
 	 */
 	public void setAutoReassessmentInSecs(int autoReassessmentInSecs) {
 		this.autoReassessmentInSecs = autoReassessmentInSecs;
+	}
+
+	/**
+	 * @return the assessNow
+	 */
+	public boolean isAssessNow() {
+		return assessNow;
+	}
+
+	/**
+	 * @param assessNow the assessNow to set
+	 */
+	public void setAssessNow(boolean assessNow) {
+		this.assessNow = assessNow;
 	}
 }

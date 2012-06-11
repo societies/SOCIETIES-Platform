@@ -120,7 +120,7 @@ public class PrivacyAssessmentController {
 			return new ModelAndView("privacy-assessment", model);
 		}
 
-		if (getAssessment() == null) {
+		if (assessment == null) {
 			LOG.warn("Privacy Assessment Service reference not avaiable");
 			model.put("errormsg", "Privacy Assessment Service reference not avaiable");
 			return new ModelAndView("error", model);
@@ -237,5 +237,63 @@ public class PrivacyAssessmentController {
 //		
 //		model.put("privacy-assessment-result", "Privacy Assessment Result :");
 		return new ModelAndView("privacy-assessment-barchart", model);
+	}
+
+	@RequestMapping(value = "/privacy-assessment-settings.html", method = RequestMethod.GET)
+	public ModelAndView privacyAssessmentSettings() {
+
+		LOG.debug("privacyAssessmentSettings HTTP GET");
+
+		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("message", "Please input values and submit");
+		
+		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
+		PrivacyAssessmentForm assForm = new PrivacyAssessmentForm();
+		assForm.setAssessNow(false);
+		int autoReassessmentInSecs = assessment.getAutoPeriod();
+		assForm.setAutoReassessmentInSecs(autoReassessmentInSecs);
+		model.put("assForm", assForm);
+		
+		model.put("privacy-assessment-result", "Privacy Assessment Result :");
+		return new ModelAndView("privacy-assessment-settings", model);
+	}
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/privacy-assessment-settings.html", method = RequestMethod.POST)
+	public ModelAndView privacyAssessmentSettings(@Valid PrivacyAssessmentForm assForm,
+			BindingResult result, Map model) {
+
+		LOG.debug("privacyAssessmentSettings HTTP POST");
+
+		if (result.hasErrors()) {
+			LOG.warn("BindingResult has errors");
+			model.put("result", "privacy assessment form error");
+			return new ModelAndView("error", model);
+		}
+
+		if (assessment == null) {
+			LOG.warn("Privacy Assessment Service reference not avaiable");
+			model.put("errormsg", "Privacy Assessment Service reference not avaiable");
+			return new ModelAndView("error", model);
+		}
+
+		int autoAssessmentPeriod = assForm.getAutoReassessmentInSecs();
+		boolean assessNow = assForm.isAssessNow();
+		LOG.debug("autoReassessmentInSecs = {}, assessNow = {}", autoAssessmentPeriod, assessNow);
+		
+		try {
+			if (assessNow) {
+				assessment.assessAllNow();
+			}
+			assessment.setAutoPeriod(autoAssessmentPeriod);
+		}
+		catch (Exception ex)
+		{
+			LOG.warn("", ex);
+		};
+
+		LOG.debug("privacyAssessmentSettings HTTP POST end");
+		return new ModelAndView("privacy-assessment");
 	}
 }
