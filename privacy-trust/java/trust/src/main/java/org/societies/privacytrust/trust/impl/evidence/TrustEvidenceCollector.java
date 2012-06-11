@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.evidence;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -32,12 +33,13 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.trust.api.evidence.model.TrustEvidenceType;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -91,9 +93,7 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 		else // if (IdentityType.CIS.equals(trustee.getType()))
 			entityType = TrustedEntityType.CIS;
 		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
-		final DirectTrustEvidence evidence = new DirectTrustEvidence(
-				teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
-		this.evidenceRepo.addEvidence(evidence);
+		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
 	}
 	
 	/*
@@ -120,28 +120,47 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 		
 		final TrustedEntityType entityType = TrustedEntityType.SVC;
 		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
+		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
+	}
+
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 */
+	@Override
+	public void addDirectEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info) throws TrustException {
+		
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
 		final DirectTrustEvidence evidence = new DirectTrustEvidence(
-				teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
+				teid, type, timestamp, info);
 		this.evidenceRepo.addEvidence(evidence);
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addServiceExperience(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(java.lang.String, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
 	 */
 	@Override
-	public void addServiceExperience(IIdentity trustor, IIdentity provider,
-			ServiceResourceIdentifier serviceId, double rating, Date timestamp) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addUserInteractionExperience(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, java.lang.String, double, java.util.Date)
-	 */
-	@Override
-	public void addUserInteractionExperience(IIdentity trustor,
-			IIdentity trustee, String type, double rating, Date timestamp) {
-		// TODO Auto-generated method stub
-
+	public void addIndirectEvidence(final String source, final TrustedEntityId teid,
+			final TrustEvidenceType type, final Date timestamp, final Serializable info)
+			throws TrustException {
+		
+		if (source == null)
+			throw new NullPointerException("source can't be null");
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
+		final IndirectTrustEvidence evidence = new IndirectTrustEvidence(
+				teid, type, timestamp, info, source);
+		this.evidenceRepo.addEvidence(evidence);
 	}
 }

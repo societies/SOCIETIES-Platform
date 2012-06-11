@@ -27,6 +27,7 @@ package org.societies.privacytrust.trust.api.evidence.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 
 /**
