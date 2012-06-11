@@ -18,9 +18,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
-import org.societies.api.schema.css.devicemanagment.DmEvent;
+import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
-import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 
@@ -62,15 +61,14 @@ public class TestCommsMgmt {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-		//Supposedly, the correct way to obtain the identity
+
         IIdentity pubsubID = idManager.getThisNetworkNode();
         
         List<String> listTopics;
 		try {
-			//Looks like an OSGi classloader issue here
             List<String> packageList = new ArrayList<String>();
 
-            packageList.add("org.societies.api.schema.css.devicemanagment");
+            packageList.add("org.societies.api.schema.cssmanagement");
             try {
 				pubSubManager.addJaxbPackages(packageList);
 			} catch (JAXBException e) {
@@ -214,8 +212,10 @@ public class TestCommsMgmt {
 		@Override
 		public void pubsubEvent(IIdentity identity, String node, String itemId,
 				Object payload) {
-			if (payload instanceof DmEvent) {
-				LOG.debug("Received event is :" + ((DmEvent) payload).getName());
+			LOG.debug("Received Pubsub event: " + node + " itemId: " + itemId);
+
+			if (payload instanceof CssEvent) {
+				LOG.debug("Received event is :" + ((CssEvent) payload).getType());
 			}
 		}
 		

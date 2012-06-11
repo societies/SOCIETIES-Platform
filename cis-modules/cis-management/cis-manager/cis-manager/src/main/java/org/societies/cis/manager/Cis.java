@@ -337,7 +337,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
 			// and the GUI can be updated with that new member
 			Stanza sta;
-/*			LOG.info("new member added, going to notify community");
+			LOG.info("new member added, going to notify community");
 			
 			// 1) Notifying the added user
 
@@ -353,10 +353,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.info("finished building notification");
 
 
-			Stanza sta = new Stanza(targetCssIdentity);
+			sta = new Stanza(targetCssIdentity);
 			CISendpoint.sendMessage(sta, cMan);
 					
-			LOG.info("notification sent to the new user");*/
+			LOG.info("notification sent to the new user");
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a pubsub notification
 			
@@ -447,12 +447,34 @@ public class Cis implements IFeatureServer, ICisOwned {
 			if (membersCss.remove( new CisParticipant(jid)) == false)
 				return false;
 			
-			// should we send a notification to the user here?
+			// 2) Notification to deleted user here
 			
 			
-			//2) Sending a notification to all the other users (maybe replace with pubsub later)
+			CommunityManager message = new CommunityManager();
+			Notification n = new Notification();
+			DeleteNotification d = new DeleteNotification();
+			d.setCommunityJid(this.getCisId());
 			
-			CommunityManager cMan = new CommunityManager();
+			n.setDeleteNotification(d);
+			message.setNotification(n);
+
+			IIdentity targetCssIdentity;
+			try {
+				targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
+				Stanza sta = new Stanza(targetCssIdentity);			
+				LOG.info("stanza created");
+				this.CISendpoint.sendMessage(sta, message);
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			
+			
+			
+			//3) Sending a notification to all the other users (maybe replace with pubsub later)
+			
+/*			CommunityManager cMan = new CommunityManager();
 			Notification n = new Notification();
 			DeleteMemberNotification s = new DeleteMemberNotification();
 			s.setCommunityJid(this.getCisId());
@@ -480,7 +502,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 				
 		     }
-			LOG.info("notification sents to the existing user");
+			LOG.info("notification sents to the existing user");*/
 			
 
 			return true;
@@ -918,14 +940,52 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 		
 		Community c = new Community();
+		GetInfoResponse r = new GetInfoResponse();
+		r.setResult(true);
 		c.setCommunityJid(this.getCisId());
 		c.setCommunityName(this.getName());
 		c.setCommunityType(this.getCisType());
 		c.setOwnerJid(this.getOwnerId());
 		c.setDescription(this.getDescription());
-		c.setGetInfo("");
+		c.setGetInfoResponse(r);
 		
 		callback.receiveResult(c);	
+	}
+
+	
+	@Override
+	public void setInfo(Community c, ICisManagerCallback callback) {
+		// TODO Auto-generated method stub
+		LOG.debug("local client call to set info from this CIS");
+
+		SetInfoResponse r = new SetInfoResponse();
+
+		//check if he is not trying to set things which cant be set
+		if( ( (!c.getCommunityJid().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisId()))  ) &&
+				( (!c.getCommunityName().isEmpty()) && (! c.getCommunityName().equalsIgnoreCase(this.getName()))  ) &&
+				 //( (!c.getCommunityType().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisType()))  ) &&
+				 ( (c.getMembershipMode() != null) && ( c.getMembershipMode() != this.getMembershipCriteria())  )
+				
+				){
+			r.setResult(true);
+			if(c.getDescription() != null &&  !c.getDescription().isEmpty())
+				this.description = c.getDescription();
+			if(c.getCommunityType() != null &&  !c.getCommunityType().isEmpty())
+				this.cisType = c.getCommunityType();
+		}
+		else{
+			r.setResult(false);
+		}
+				
+		Community resp = new Community();
+		resp.setCommunityJid(this.getCisId());
+		resp.setCommunityName(this.getName());
+		resp.setCommunityType(this.getCisType());
+		resp.setOwnerJid(this.getOwnerId());
+		resp.setDescription(this.getDescription());
+		resp.setSetInfoResponse(r);
+		
+		callback.receiveResult(resp);	
 	}
 	
 }

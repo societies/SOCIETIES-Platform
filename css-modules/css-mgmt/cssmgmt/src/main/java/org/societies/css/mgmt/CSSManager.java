@@ -27,6 +27,7 @@ package org.societies.css.mgmt;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -40,16 +41,16 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
-import org.societies.api.schema.css.devicemanagment.DmEvent;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
-import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
@@ -86,6 +87,7 @@ public class CSSManager implements ICSSLocalManager {
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
 	private static final String THIS_NODE = "XCManager.societies.local";
+	private static final String CSS_MGMT_PACKAGE = "org.societies.api.schema.cssmanagement";
 	
 	private ICssRegistry cssRegistry;
 	private ICssDirectoryRemote cssDirectoryRemote;
@@ -106,6 +108,7 @@ public class CSSManager implements ICSSLocalManager {
 		
         
         this.idManager = commManager.getIdManager();
+        
 //        
 //        try {
 //			pubsubID = idManager.fromJid(THIS_NODE);
@@ -114,7 +117,7 @@ public class CSSManager implements ICSSLocalManager {
 //			e.printStackTrace();
 //		}
 //		  Supposedly, the correct way to obtain the identity
-        IIdentity pubsubID = idManager.getThisNetworkNode();
+        this.pubsubID = idManager.getThisNetworkNode();
         
         this.createPubSubNodes();
         this.subscribeToPubSubNodes();
@@ -144,24 +147,23 @@ public class CSSManager implements ICSSLocalManager {
         try {
         	
             List<String> packageList = new ArrayList<String>();
-            packageList.add("org.societies.api.schema.css.devicemanagment");
+            packageList.add(CSS_MGMT_PACKAGE);
 			pubSubManager.addJaxbPackages(packageList);
 
 			pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
 	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.DEPART_CSS_NODE);
 	        
 		} catch (XMPPError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-	        LOG.debug(CSSManagerEnums.ADD_CSS_NODE + "PubsubNode created for CSSManager");
-	        LOG.debug(CSSManagerEnums.DEPART_CSS_NODE + "PubsubNode created for CSSManager");
+	        LOG.debug(CSSManagerEnums.ADD_CSS_NODE + " PubsubNode created for CSSManager");
+	        LOG.debug(CSSManagerEnums.DEPART_CSS_NODE + " PubsubNode created for CSSManager");
 		}
 	}
 
@@ -300,8 +302,9 @@ public class CSSManager implements ICSSLocalManager {
 
 			result.setProfile(this.cssRecord);
 			result.setResultStatus(true);
-			DmEvent event = new DmEvent();
-			event.setName("lan");
+			CssEvent event = new CssEvent();
+			event.setType(CSSManagerEnums.ADD_CSS_NODE);
+			event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
 			
 			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
 		}
@@ -348,7 +351,11 @@ public class CSSManager implements ICSSLocalManager {
 				result.setProfile(this.cssRecord);
 				result.setResultStatus(true);
 				
-//				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, this.cssRecord);
+				CssEvent event = new CssEvent();
+				event.setType(CSSManagerEnums.DEPART_CSS_NODE);
+				event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
+				
+				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
 
 		} 
 	
@@ -621,12 +628,34 @@ public class CSSManager implements ICSSLocalManager {
 	 * 
 	 * @param pubsubNodeName
 	 */
-	private void publishEvent(String pubsubNodeName, DmEvent event) {
+	private void publishEvent(String pubsubNodeName, CssEvent event) {
+		Dbc.require("Pubsub Node name must be valid", pubsubNodeName != null && pubsubNodeName.length() > 0);
+		Dbc.require("Pubsub event must be valid", event !=  null);
+		
 	    LOG.debug("Publish event node: " + pubsubNodeName);
-//	    CssManagerMessageBean messageBean = new CssManagerMessageBean();
-//	    messageBean.setProfile(cssRecord);
+
+	    
 	    try {
-			LOG.debug("Event published: " + this.pubSubManager.publisherPublish(pubsubID, pubsubNodeName, Integer.toString(this.randomGenerator.nextInt()), event));
+			Map <IIdentity, SubscriptionState> subscribers = this.pubSubManager.ownerGetSubscriptions(pubsubID, CSSManagerEnums.DEPART_CSS_NODE);
+			for (IIdentity identity : subscribers.keySet()) {
+				LOG.debug("Subscriber : " + identity + " subscribed to: " + CSSManagerEnums.DEPART_CSS_NODE);
+			}
+			subscribers = this.pubSubManager.ownerGetSubscriptions(pubsubID, CSSManagerEnums.ADD_CSS_NODE);
+			for (IIdentity identity : subscribers.keySet()) {
+				LOG.debug("Subscriber : " + identity + " subscribed to: " + CSSManagerEnums.ADD_CSS_NODE);
+			}
+		} catch (XMPPError e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (CommunicationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	    
+	    
+	    try {
+	    	String status = this.pubSubManager.publisherPublish(pubsubID, pubsubNodeName, Integer.toString(this.randomGenerator.nextInt()), event);
+			LOG.debug("Event published: " + status);
 		} catch (XMPPError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

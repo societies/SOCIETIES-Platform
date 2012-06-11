@@ -1,9 +1,11 @@
 package org.societies.identity;
 
+import java.io.Serializable;
+
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 
-public class NetworkNodeImpl extends IdentityImpl implements INetworkNode {
+public class NetworkNodeImpl extends IdentityImpl implements INetworkNode, Serializable {
 
 	protected String nodeIdentifier;
 	

@@ -24,6 +24,7 @@
  */
 package org.societies.security.policynegotiator.provider;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -37,6 +38,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.policynegotiator.exception.NegotiationException;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.sla.Session;
 import org.societies.security.policynegotiator.sla.SopResource;
@@ -50,6 +52,7 @@ public class NegotiationProvider implements INegotiationProvider {
 	
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;
+	private ProviderServiceMgr providerServiceMgr;
 	
 	/**
 	 * Negotiation sessions
@@ -90,6 +93,12 @@ public class NegotiationProvider implements INegotiationProvider {
 	public void setSignatureMgr(ISignatureMgr signatureMgr) {
 		this.signatureMgr = signatureMgr;
 	}
+	public ProviderServiceMgr getProviderServiceMgr() {
+		return providerServiceMgr;
+	}
+	public void setProviderServiceMgr(ProviderServiceMgr providerServiceMgr) {
+		this.providerServiceMgr = providerServiceMgr;
+	}
 	
 	private SlaBean createSlaBean(boolean success, int sessionId, String sla) {
 		
@@ -111,6 +120,8 @@ public class NegotiationProvider implements INegotiationProvider {
 		boolean success;
 		String slaStr = null;
 		Document doc;
+		
+		session.setServiceId(serviceId);
 		
 		try {
 			doc = SopResource.getSop("PrintService.xml");  // TODO: Get from Marketplace
@@ -145,14 +156,26 @@ public class NegotiationProvider implements INegotiationProvider {
 
 		LOG.debug("acceptPolicyAndGetSla({})", sessionId + ", ..., " + modified);
 
+		Session session = sessions.get(sessionId);
 		SlaBean sla = new SlaBean();
 		String finalSla;
+		URI jarUri;
+		String serviceId;
 		
 		sla.setSessionId(sessionId);
 		finalSla = signedPolicyOption;  //TODO: add provider's signature
 		
-		if (signatureMgr.verify(signedPolicyOption)) {
+		if (session != null && signatureMgr.verify(signedPolicyOption)) {
+			
 			sla.setSla(finalSla);
+			serviceId = session.getServiceId();
+			try {
+				jarUri = providerServiceMgr.getClientJarUri(serviceId);
+				sla.setJarUrl(jarUri.toString());
+			} catch (NegotiationException e) {
+				LOG.warn("acceptPolicyAndGetSla()", e);
+			}
+
 			sla.setSuccess(true);
 		}
 		else {

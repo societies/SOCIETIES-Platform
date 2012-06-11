@@ -42,6 +42,6 @@
 <osgi:reference id="SocialDataBundle"       interface="org.societies.api.internal.sns.ISocialData" cardinality="0..1" /> 
 <osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1"/>
 <osgi:reference id="commMngrController" interface="org.societies.api.internal.comm.ICommManagerController" cardinality="0..1"/>
-<osgi:reference id="CisDirectoryBundle" interface="org.societies.api.cis.directory.ICisDirectory" cardinality="0..1" /> 
+<osgi:reference id="CisDirectoryClientBundle" interface="org.societies.api.cis.directory.ICisDirectoryRemote" cardinality="0..1" /> 
 <osgi:reference id="PrivacyAssessment" interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment" cardinality="0..1"/>
 </beans>

@@ -52,11 +52,12 @@ import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 import javax.validation.Valid;
 
-
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisDirectory;
+import org.societies.cis.directory.client.CisDirectoryRemoteClient;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -68,7 +69,7 @@ public class CisDirectoryController {
 	 * OSGI service get auto injected
 	 */
 	@Autowired
-	private ICisDirectory cisDirectory;
+	private ICisDirectoryRemote cisDirectoryRemote;
 	@Autowired
 	private ICommManager commManager;
 	
@@ -76,12 +77,12 @@ public class CisDirectoryController {
 	private ICommManagerController commManagerControl;
 	
 	
-	public ICisDirectory getCisDirectory() {
-		return cisDirectory;
+	public ICisDirectoryRemote getCisDirectoryRemote() {
+		return cisDirectoryRemote;
 	}
 
-	public void setCisDirectory(ICisDirectory cisDirectory) {
-		this.cisDirectory = cisDirectory;
+	public void setCisDirectoryRemote(ICisDirectoryRemote cisDirectoryRemote) {
+		this.cisDirectoryRemote = cisDirectoryRemote;
 	}
 
 	@RequestMapping(value = "/cisdirectory.html", method = RequestMethod.GET)
@@ -115,7 +116,7 @@ public class CisDirectoryController {
 			return new ModelAndView("cisdirectory", model);
 		}
 
-		if (getCisDirectory() == null) {
+		if (getCisDirectoryRemote() == null) {
 			model.put("errormsg", "CIS Directory reference not avaiable");
 			return new ModelAndView("error", model);
 		}
@@ -132,18 +133,19 @@ public class CisDirectoryController {
 		try {
 		
 			if (method.equalsIgnoreCase("GetCisAdverts")) {
-				asynchResult = this.getCisDirectory().findAllCisAdvertisementRecords();
 				res="CIS Directory Result ";
 				
-				adverts = asynchResult.get();
+				CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
+
+				getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
+				adverts = callback.getResultList();
+				
 				model.put("result", res);
 				model.put("adverts", adverts);
 				
 			}else if (method.equalsIgnoreCase("AddCisRecord")) {
 				
 				res="CIS Advertisement added Successfully ";
-				model.put("result", res);
-				
 				
 				CisAdvertisementRecord record= new CisAdvertisementRecord();
 				
@@ -154,10 +156,17 @@ public class CisDirectoryController {
 					record.setMode(cdForm.getMode());
 					record.setPassword(cdForm.getPassword());
 					
-				getCisDirectory().addCisAdvertisementRecord(record);
+				getCisDirectoryRemote().addCisAdvertisementRecord(record);
 				model.put("message", "CisAdvertisement added");
 									
-				//adverts = (List<CisAdvertisementRecord>) record;				
+				// Go a read all the records again so we can display all after
+				// a new record is added
+				CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
+				getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
+				adverts = callback.getResultList();
+				
+				model.put("result", res);
+				model.put("adverts", adverts);
 				
 				model.put("adverts", adverts);
 					

@@ -128,19 +128,19 @@ public class NegotiationRequester implements INegotiation {
 	public void startNegotiation(Requestor provider, boolean includePrivacyPolicyNegotiation,
 			INegotiationCallback callback) {
 
-		String serviceId;
+		String serviceOrCisId;
 		
 		if (provider instanceof RequestorService) {
 			RequestorService providerService = (RequestorService) provider;
 			LOG.info("startNegotiation([{}; {}])", providerService.getRequestorId(),
 					providerService.getRequestorServiceId());
-			serviceId = providerService.getRequestorServiceId().getIdentifier().toString();
+			serviceOrCisId = providerService.getRequestorServiceId().getIdentifier().toString();
 		}
 		else if (provider instanceof RequestorCis) {
 			RequestorCis providerCis = (RequestorCis) provider;
 			LOG.info("startNegotiation([{}; {}])", providerCis.getRequestorId(),
 					providerCis.getCisRequestorId());
-			serviceId = providerCis.getCisRequestorId().getJid();
+			serviceOrCisId = providerCis.getCisRequestorId().getJid();
 		}
 		else {
 			String msg = "Terminating: Inappropriate provider: " + provider.getClass().getName();
@@ -151,6 +151,6 @@ public class NegotiationRequester implements INegotiation {
 		ProviderCallback providerCallback = new ProviderCallback(this, provider,
 				MethodType.GET_POLICY_OPTIONS, includePrivacyPolicyNegotiation, callback);
 		
-		groupMgr.getPolicyOptions(serviceId, provider, providerCallback);
+		groupMgr.getPolicyOptions(serviceOrCisId, provider, providerCallback);
 	}
 }
