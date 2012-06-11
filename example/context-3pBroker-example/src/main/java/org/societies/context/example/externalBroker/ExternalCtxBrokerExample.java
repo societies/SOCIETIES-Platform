@@ -107,7 +107,7 @@ public class ExternalCtxBrokerExample 	{
 		LOG.info("*** Starting examples...");
 		retrieveCssOperator();
 		createDeviceEntity();
-		//createCtxAssociation();
+		createCtxAssociation();
 		registerForContextChanges();
 		lookupContextEntities();
 		retrieveContext();

@@ -373,7 +373,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			    // Add association to child entities
 			    Set<CtxEntityIdentifier> entIds = ((CtxAssociation) modelObject).getChildEntities();
 			    for (CtxEntityIdentifier entIdent : entIds) {
-			    	entIdent = ((CtxAssociation) modelObject).getParentEntity();
+			    	//entIdent = ((CtxAssociation) modelObject).getParentEntity();
 			    	ent = (CtxEntity) this.retrieve(entIdent);
 			    	if (ent != null)
 			    		ent.addAssociation(((CtxAssociation) modelObject).getId());
