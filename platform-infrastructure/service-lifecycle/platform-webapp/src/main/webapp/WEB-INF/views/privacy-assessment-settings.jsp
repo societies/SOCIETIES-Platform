@@ -39,6 +39,11 @@
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
 			<tr>
+				<td>Enable periodic automatic assessment</td>
+				<td><form:checkbox path="autoReassessment" /></td>
+				<td><form:errors path="autoReassessment" cssClass="error" /></td>
+			</tr>
+			<tr>
 				<td>Automatic assessment every</td>
 				<td><form:input path="autoReassessmentInSecs" /></td>
 				<td><form:errors path="autoReassessmentInSecs" cssClass="error" /></td>

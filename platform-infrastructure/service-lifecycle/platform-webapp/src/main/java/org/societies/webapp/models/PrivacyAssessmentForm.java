@@ -33,8 +33,16 @@ package org.societies.webapp.models;
 public class PrivacyAssessmentForm {
 
 	private String method;
+	
+	// Settings and control
+	private boolean autoReassessment;
 	private int autoReassessmentInSecs;
 	private boolean assessNow;
+	
+	// Showing assessment results
+	private String assessmentSubjectType;
+	private String presentationFormat;
+	private String assessmentSubject;
 
 	/**
 	 * @return the method
@@ -50,6 +58,20 @@ public class PrivacyAssessmentForm {
 		this.method = method;
 	}
 	
+	/**
+	 * @return the autoReassessment
+	 */
+	public boolean isAutoReassessment() {
+		return autoReassessment;
+	}
+
+	/**
+	 * @param autoReassessment the autoReassessment to set
+	 */
+	public void setAutoReassessment(boolean autoReassessment) {
+		this.autoReassessment = autoReassessment;
+	}
+
 	/**
 	 * @return the autoReassessmentInSecs
 	 */
@@ -76,5 +98,47 @@ public class PrivacyAssessmentForm {
 	 */
 	public void setAssessNow(boolean assessNow) {
 		this.assessNow = assessNow;
+	}
+
+	/**
+	 * @return the assessmentSubjectType
+	 */
+	public String getAssessmentSubjectType() {
+		return assessmentSubjectType;
+	}
+
+	/**
+	 * @param assessmentSubjectType the assessmentSubjectType to set
+	 */
+	public void setAssessmentSubjectType(String assessmentSubjectType) {
+		this.assessmentSubjectType = assessmentSubjectType;
+	}
+
+	/**
+	 * @return the presentationFormat
+	 */
+	public String getPresentationFormat() {
+		return presentationFormat;
+	}
+
+	/**
+	 * @param presentationFormat the presentationFormat to set
+	 */
+	public void setPresentationFormat(String presentationFormat) {
+		this.presentationFormat = presentationFormat;
+	}
+
+	/**
+	 * @return the assessmentSubject
+	 */
+	public String getAssessmentSubject() {
+		return assessmentSubject;
+	}
+
+	/**
+	 * @param assessmentSubject the assessmentSubject to set
+	 */
+	public void setAssessmentSubject(String assessmentSubject) {
+		this.assessmentSubject = assessmentSubject;
 	}
 }

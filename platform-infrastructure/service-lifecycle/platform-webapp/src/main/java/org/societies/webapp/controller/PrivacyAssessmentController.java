@@ -96,13 +96,21 @@ public class PrivacyAssessmentController {
 		model.put("assForm", assForm);
 		
 		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
-		Map<String, String> methods = new LinkedHashMap<String, String>();
-		methods.put("assessAllNow", "Perform assessment for all data transmissions");
-		methods.put("getAssessmentAllIds", "Get a-posteriori assessment for all sender identities");
-		methods.put("getAssessmentAllClasses", "Get a-posteriori assessment for all sender classes");
-		methods.put("setAutoPeriod", "Set time period of automatic re-assessment for all senders");
-		model.put("methods", methods);
-		
+		Map<String, String> assessmentSubjectTypes = new LinkedHashMap<String, String>();
+		assessmentSubjectTypes.put("receiverId", "Receiver identities");
+		assessmentSubjectTypes.put("senderId", "Sender identities");
+		assessmentSubjectTypes.put("senderClass", "Sender classes");
+		model.put("assessmentSubjectTypes", assessmentSubjectTypes);
+
+		Map<String, String> presentationFormats = new LinkedHashMap<String, String>();
+		presentationFormats.put("table", "Table");
+		presentationFormats.put("chart", "Chart");
+		model.put("presentationFormats", presentationFormats);
+
+		Map<String, String> assessmentSubjects = new LinkedHashMap<String, String>();
+		assessmentSubjects.put("all", "All");
+		model.put("assessmentSubjects", assessmentSubjects);
+
 		model.put("privacy-assessment-result", "Privacy Assessment Result :");
 		return new ModelAndView("privacy-assessment", model);
 	}
@@ -252,6 +260,7 @@ public class PrivacyAssessmentController {
 		PrivacyAssessmentForm assForm = new PrivacyAssessmentForm();
 		assForm.setAssessNow(false);
 		int autoReassessmentInSecs = assessment.getAutoPeriod();
+		assForm.setAutoReassessment(autoReassessmentInSecs >= 0);
 		assForm.setAutoReassessmentInSecs(autoReassessmentInSecs);
 		model.put("assForm", assForm);
 		
@@ -286,6 +295,10 @@ public class PrivacyAssessmentController {
 			if (assessNow) {
 				assessment.assessAllNow();
 			}
+			
+			if (!assForm.isAutoReassessment()) {
+				autoAssessmentPeriod = -1;
+			}
 			assessment.setAutoPeriod(autoAssessmentPeriod);
 		}
 		catch (Exception ex)
@@ -294,6 +307,6 @@ public class PrivacyAssessmentController {
 		};
 
 		LOG.debug("privacyAssessmentSettings HTTP POST end");
-		return new ModelAndView("privacy-assessment");
+		return privacyAssessment();
 	}
 }
