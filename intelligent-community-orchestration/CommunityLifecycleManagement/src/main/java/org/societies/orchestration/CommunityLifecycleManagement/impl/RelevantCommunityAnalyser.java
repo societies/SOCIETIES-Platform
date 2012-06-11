@@ -64,7 +64,7 @@ import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
+
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -133,7 +133,6 @@ public class RelevantCommunityAnalyser implements IRelevantCommunityAnalyser
 	private ArrayList<ICisProposal> refusals;
 	
 	private IUserFeedback userFeedback;
-	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ICisManager cisManager;
     
@@ -297,14 +296,6 @@ public class RelevantCommunityAnalyser implements IRelevantCommunityAnalyser
     
     public void setUserFeedback(IUserFeedback userFeedback) {
     	this.userFeedback = userFeedback;
-    }
-    
-    public IUserFeedbackCallback getUserFeedbackCallback() {
-    	return userFeedbackCallback;
-    }
-    
-    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
-    	this.userFeedbackCallback = userFeedbackCallback;
     }
     
     public CommunityRecommender getCommunityRecommender() {

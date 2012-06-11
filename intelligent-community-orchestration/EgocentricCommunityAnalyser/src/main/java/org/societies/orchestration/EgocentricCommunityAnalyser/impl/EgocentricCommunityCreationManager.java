@@ -94,7 +94,6 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 
 import org.societies.api.context.CtxException;
@@ -154,7 +153,6 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
 	private ArrayList<ICis> recentRefusals;
 	private IUserFeedback userFeedback;
-	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ICisManager cisManager;
 	private CssManagerMessageBean cssManager;
@@ -1230,7 +1228,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		options[0] = "options";
 		String userResponse = null;
 		boolean responded = false;
-		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options), userFeedbackCallback);
+		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options));
 		for (int i = 0; i < 300; i++) {
 		    if (userResponse == null)
 				try {
@@ -1677,14 +1675,6 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     
     public void setUserFeedback(IUserFeedback userFeedback) {
     	this.userFeedback = userFeedback;
-    }
-    
-    public IUserFeedbackCallback getUserFeedbackCallback() {
-    	return userFeedbackCallback;
-    }
-    
-    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
-    	this.userFeedbackCallback = userFeedbackCallback;
     }
     
     public ICommManager getCommManager() {
