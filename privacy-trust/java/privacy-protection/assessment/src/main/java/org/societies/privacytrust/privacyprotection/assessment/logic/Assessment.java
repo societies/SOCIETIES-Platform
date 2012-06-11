@@ -57,6 +57,8 @@ public class Assessment implements IAssessment {
 	private HashMap<IIdentity, AssessmentResultIIdentity> assessmentById = new HashMap<IIdentity, AssessmentResultIIdentity>();
 	private HashMap<String, AssessmentResultClassName> assessmentByClass = new HashMap<String, AssessmentResultClassName>();
 	
+	private int autoPeriod = -1;
+	
 	public Assessment() {
 		LOG.info("Constructor");
 	}
@@ -78,9 +80,14 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
+	public int getAutoPeriod() {
+		return autoPeriod;
+	}
+	
+	@Override
 	public void setAutoPeriod(int seconds) {
-		LOG.warn("setAutoPeriod({}): not implemented yet", seconds);
-		// TODO
+		LOG.info("setAutoPeriod({})", seconds);
+		this.autoPeriod = seconds;
 	}
 	
 	@Override
