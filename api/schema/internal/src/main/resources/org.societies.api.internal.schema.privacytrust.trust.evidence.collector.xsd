@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" 
+	targetNamespace="http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"   
+	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector" 
+	xmlns:tnsm="http://societies.org/api/internal/schema/privacytrust/trust/model"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:import namespace="http://societies.org/api/internal/schema/privacytrust/trust/model"
+		schemaLocation="org.societies.api.internal.schema.privacytrust.trust.model.xsd" />
+		
+	<xs:element name="trustEvidenceCollectorRequestBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="methodName" type="tns:methodName" nillable="false" minOccurs="1"/>
+				<xs:element name="addDirectEvidence" type="tns:addDirectEvidenceRequestBean" nillable="false" minOccurs="0"/>
+				<xs:element name="addIndirectEvidence" type="tns:addIndirectEvidenceRequestBean" nillable="false" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="trustEvidenceCollectorResponseBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="methodName" type="tns:methodName" nillable="false" minOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:simpleType name="methodName">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ADD_DIRECT_EVIDENCE"/>
+			<xs:enumeration value="ADD_INDIRECT_EVIDENCE"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="addDirectEvidenceRequestBean">
+		<xs:sequence>
+			<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="type" type="tns:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
+			<xs:element name="timestamp" type="xs:dateTime" nillable="false" minOccurs="1"/>
+			<xs:element name="info" type="xs:base64Binary" nillable="true" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="addIndirectEvidenceRequestBean">
+		<xs:sequence>
+			<xs:element name="source" type="xs:string" nillable="false" minOccurs="1"/>
+			<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="type" type="tns:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
+			<xs:element name="timestamp" type="xs:dateTime" nillable="false" minOccurs="1"/>
+			<xs:element name="info" type="xs:base64Binary" nillable="true" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:simpleType name="trustEvidenceTypeBean">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="RATED"/>
+			<xs:enumeration value="JOINED_COMMUNITY"/>
+			<xs:enumeration value="LEFT_COMMUNITY"/>
+			<xs:enumeration value="USED_SERVICE"/>
+		</xs:restriction>
+	</xs:simpleType>
+  
+</xs:schema>
