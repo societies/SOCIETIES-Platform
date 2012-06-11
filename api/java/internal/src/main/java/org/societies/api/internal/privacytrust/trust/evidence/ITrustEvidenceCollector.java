@@ -63,7 +63,7 @@ public interface ITrustEvidenceCollector {
 	 *            identify a CSS or CIS; the trust rating is not in the range
 	 *            of [0,1] 
 	 */
-	public void addTrustOpinion(final IIdentity trustor, final IIdentity trustee,
+	public void addTrustRating(final IIdentity trustor, final IIdentity trustee,
 			final double rating, final Date timestamp) throws TrustException;
 	
 	/**
@@ -90,7 +90,7 @@ public interface ITrustEvidenceCollector {
 	 *            if the trustor does not identify a CSS or the trust rating is
 	 *            not in the range of [0,1] 
 	 */
-	public void addTrustOpinion(final IIdentity trustor, 
+	public void addTrustRating(final IIdentity trustor, 
 			final ServiceResourceIdentifier trustee, final double rating,
 			final Date timestamp) throws TrustException;
 	

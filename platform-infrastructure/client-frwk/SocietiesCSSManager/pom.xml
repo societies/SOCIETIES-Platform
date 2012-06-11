@@ -26,7 +26,6 @@
 
 
     <dependencies>
-      <!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
@@ -35,6 +34,11 @@
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api-external</artifactId>
 			<version>${release.version}</version>
+		</dependency>
+        <dependency>
+			<groupId>org.societies.comm.android</groupId>
+			<artifactId>AndroidPubsubApi</artifactId>
+			<version>${version.comm}</version>
 		</dependency>
         
         <dependency>
@@ -52,6 +56,11 @@
 					<artifactId>jaxb-android-societies</artifactId>
 	 	   		</exclusion>
 			</exclusions-->
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
 		</dependency>
 		
         

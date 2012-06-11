@@ -27,6 +27,7 @@ package org.societies.context.example.externalBroker;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -42,9 +43,12 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxAttributeValueMetrics;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -73,10 +77,13 @@ public class ExternalCtxBrokerExample 	{
 	private IIdentity cssOwnerId;
 	private INetworkNode cssNodeId;
 
-	private CtxEntityIdentifier ctxEntityIdentifier = null;
-	private CtxIdentifier ctxAttributeStringIdentifier = null;
-	private CtxIdentifier ctxAttributeBinaryIdentifier = null;
-	private IIdentity targetCss = null;
+	private static IndividualCtxEntity owner = null;
+	private static CtxEntity deviceCtxEntity;
+	private static CtxAssociation usesServiceAssoc;
+	
+	private static CtxAttributeIdentifier weightAttrIdentifier = null;
+	private static CtxAttributeIdentifier ctxAttributeDeviceIDIdentifier = null;
+	
 	private Requestor requestor = null;
 
 
@@ -85,123 +92,150 @@ public class ExternalCtxBrokerExample 	{
 
 		this.externalCtxBroker = externalCtxBroker;
 		LOG.info("*** CtxBrokerExample instantiated "+ this.externalCtxBroker);
-		
+
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
 
 		final String cssOwnerStr = this.cssNodeId.getBareJid();
 		this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
 		LOG.info("*** cssOwnerId = " + this.cssOwnerId);
-		this.targetCss = new MockIdentity(IdentityType.CSS, "user", "societies.org");
-		this.requestor = new Requestor(this.targetCss);
-
+				
+		IIdentity reqIdentity = commMgr.getIdManager().fromJid("foo@societies.local");
+		this.requestor = new Requestor(reqIdentity);
+		LOG.info("*** requestor = " + this.requestor);  
+		
 		LOG.info("*** Starting examples...");
-		//this.retrieveCssOperator();
-		//this.retrieveCssNode();
-		this.createContext();
-		//this.registerForContextChanges();
-		this.retrieveContext();
-		this.lookupContext();
-		this.simpleCtxHistoryTest();
-		//this.tuplesCtxHistoryTest();
+		retrieveCssOperator();
+		createDeviceEntity();
+		//createCtxAssociation();
+		registerForContextChanges();
+		lookupContextEntities();
+		retrieveContext();
+		simpleCtxHistoryTest();
 	}
 
-	private void retrieveAdministratingCSS() {
+	private void retrieveCssOperator() {
 
 		LOG.info("*** retrieveCssOperator");
 		try {
-			CtxEntity ctxentity = this.externalCtxBroker.createEntity(requestor, targetCss, "device").get();
-			LOG.info("*** CSS Operator context entity id: " + ctxentity.getId());
-
+			owner = this.externalCtxBroker.retrieveIndividualEntity(requestor, cssOwnerId).get();
+			LOG.info("*** CSS owner context entity id: " + owner.getId());
 		} catch (Exception e) {
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
 
-
 	/**
 	 */
-	private void createContext(){
+	private void createDeviceEntity(){
 
-		LOG.info("*** createContext");
-
+		LOG.info("*** createDeviceEntity");
 		//create ctxEntity of type "Device"
-		CtxEntity ctxEntity;
 		try {
-			ctxEntity = this.externalCtxBroker.createEntity(requestor, targetCss,CtxEntityTypes.DEVICE).get();
-
+			deviceCtxEntity = this.externalCtxBroker.createEntity(requestor, cssOwnerId, CtxEntityTypes.DEVICE).get();
 			//get the context identifier of the created entity (to be used at the next step)
-			this.ctxEntityIdentifier = ctxEntity.getId();
-
+			CtxEntityIdentifier deviceCtxEntityIdentifier = deviceCtxEntity.getId();
+			
 			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity
-			CtxAttribute ctxAttributeString = this.externalCtxBroker.createAttribute(requestor, this.ctxEntityIdentifier, CtxAttributeTypes.ID).get();
-
+			CtxAttribute ctxAttributeDeviceID = this.externalCtxBroker.createAttribute(requestor, deviceCtxEntityIdentifier, CtxAttributeTypes.ID).get();
+			
 			// by setting this flag to true the CtxAttribute values will be stored to Context History Database upon update
-			ctxAttributeString.setHistoryRecorded(true);
+			ctxAttributeDeviceID.setHistoryRecorded(true);
 
 			// set a string value to CtxAttribute
-			ctxAttributeString.setStringValue("device1234");
+			ctxAttributeDeviceID.setStringValue("device1234");
 
 			// with this update the attribute is stored in Context DB
-			ctxAttributeString = (CtxAttribute) this.externalCtxBroker.update(requestor,ctxAttributeString).get();
+			ctxAttributeDeviceID = (CtxAttribute) this.externalCtxBroker.update(requestor, ctxAttributeDeviceID).get();
 
 			// get the updated CtxAttribute object and identifier (to be used later for retrieval purposes)
-			this.ctxAttributeStringIdentifier = ctxAttributeString.getId();
+		
+			ctxAttributeDeviceIDIdentifier = ctxAttributeDeviceID.getId();
+			LOG.info("*** Device attribute identifier "+ctxAttributeDeviceIDIdentifier.toString());
 			
-			//create a ctxAttribute with a Binary value that is assigned to the same CtxEntity
-			CtxAttribute ctxAttrBinary = this.externalCtxBroker.createAttribute(requestor,ctxEntity.getId(),CtxAttributeTypes.WEIGHT).get();
-
+			//create a ctxAttribute with a Binary value that is assigned to the deviceCtxEntity
+			CtxAttribute ctxAttrWeight = this.externalCtxBroker.createAttribute(requestor, deviceCtxEntity.getId(),CtxAttributeTypes.WEIGHT).get();
 
 			// this is a mock blob class that contains the value "999"
 			MockBlobClass blob = new MockBlobClass(999);
 			byte[] blobBytes;
 			try {
 				blobBytes = SerialisationHelper.serialise(blob);
-				ctxAttrBinary.setBinaryValue(blobBytes);
-				ctxAttrBinary = (CtxAttribute) this.externalCtxBroker.update(requestor, ctxAttrBinary).get();
-
+				ctxAttrWeight.setBinaryValue(blobBytes);
+				ctxAttrWeight = (CtxAttribute) this.externalCtxBroker.update(requestor, ctxAttrWeight).get();
 				// TODO create updateAttribute(requestor,modelObject,value);
-
-				this.ctxAttributeBinaryIdentifier = ctxAttrBinary.getId();
-				
-				
-				
+				weightAttrIdentifier = ctxAttrWeight.getId();
+				LOG.info("*** Weight attribute identifier "+ctxAttrWeight.getId().toString());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			// create an attribute to model the temperature of the device
+			CtxAttribute deviceTempAttr = this.externalCtxBroker.createAttribute(requestor, deviceCtxEntity.getId(), CtxAttributeTypes.TEMPERATURE).get();
 
-			// at this point the ctxEntity of type CtxEntityTypes.DEVICE that is assigned with
-			// a ctxAttribute of type CtxAttributeTypes.ID with a string value
-			// and a ctxAttribute of type "CustomData" with a binary value
-			LOG.info("*** created attribute toString "+ctxAttrBinary.toString());
+			// assign a double value and set value type and metric
+			deviceTempAttr.setDoubleValue(25.0);
+			deviceTempAttr.setValueType(CtxAttributeValueType.DOUBLE);
+			deviceTempAttr.setValueMetric(CtxAttributeValueMetrics.CELSIUS);
+
+			// update the attribute in the Context DB
+			deviceTempAttr = (CtxAttribute) this.externalCtxBroker.update(requestor, deviceTempAttr).get();
+					
+			// at this point the ctxEntity of type CtxEntityTypes.DEVICE is assigned with CtxAttributes of type : ID, WEIGHT, TEMPERATURE
+			LOG.info("*** created attribute toString "+deviceTempAttr.toString());
 		} catch (Exception e) {
-
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
-	
-		
 	}
 
+	
+	/**
+	 * This method demonstrates how to create an association among context entities
+	 */
+	private void createCtxAssociation(){
+		System.out.println("usesServiceAssoc 1 "+usesServiceAssoc);
+		try {
+			usesServiceAssoc = this.externalCtxBroker.createAssociation(requestor, cssOwnerId, CtxAssociationTypes.USES_SERVICES).get();
+			System.out.println("usesServiceAssoc 2 "+usesServiceAssoc);
+			System.out.println("usesServiceAssoc 3 "+owner);
+			System.out.println("usesServiceAssoc 4 "+deviceCtxEntity);
+			
+			usesServiceAssoc.addChildEntity(owner.getId());
+			usesServiceAssoc.addChildEntity(deviceCtxEntity.getId());
+		
+			System.out.println("usesServiceAssoc 3 "+usesServiceAssoc);
+			
+			this.externalCtxBroker.update(requestor, usesServiceAssoc);
+			System.out.println("usesServiceAssoc 4 "+usesServiceAssoc);
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+		} 
+	}	
+	
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
 	 */
-	private void lookupContext() {
+	private void lookupContextEntities() {
 		try {
-
-			List<CtxIdentifier> idsEntities =this.externalCtxBroker.lookup(requestor, targetCss, CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
+			// search for ctxEntity Ids of type device
+			List<CtxIdentifier> idsEntities = this.externalCtxBroker.lookup(requestor, cssOwnerId, CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
 			LOG.info("*** lookup results for Entity type: '" + CtxEntityTypes.DEVICE + "' " +idsEntities);
 
-			List<CtxIdentifier> idsAttribute =this.externalCtxBroker.lookup(requestor, targetCss,CtxModelType.ATTRIBUTE, CtxAttributeTypes.ID).get();
+			// search for ctxAttribute Ids of type ID
+			List<CtxIdentifier> idsAttribute =this.externalCtxBroker.lookup(requestor, cssOwnerId,CtxModelType.ATTRIBUTE, CtxAttributeTypes.ID).get();
 			LOG.info("*** lookup results for Attribute type: '" + CtxAttributeTypes.ID + "' " +idsAttribute);
-
 		} catch (Exception e) {
-
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
-
-
 
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
@@ -209,39 +243,37 @@ public class ExternalCtxBrokerExample 	{
 	private void retrieveContext() {
 
 		LOG.info("*** retrieveContext");
-
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed by using the ctxBroker.retrieve(CtxIdentifier) method
+		// alternatively context identifiers can be retrieved with the help of lookup mehtods
+		CtxEntityIdentifier deviceCtxEntIdentifier = null;
 		try {
-			// retrieve ctxEntity
-			// This retrieval is performed based on the known CtxEntity identifier
-			// Retrieve is also possible to be performed based on the type of the CtxEntity. This will be demonstrated in a later example.
-			Future<CtxModelObject> ctxEntityRetrievedFuture = this.externalCtxBroker.retrieve(requestor,this.ctxEntityIdentifier);
-			CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
-
-			LOG.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
-
-			// retrieve the CtxAttribute contained in the CtxEntity with the string value
-			// again the retrieval is based on an known identifier, it is possible to retrieve it based on type.This will be demonstrated in a later example.
-			CtxAttribute retrievedCtxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, this.ctxAttributeStringIdentifier).get();
+			List<CtxIdentifier> idsEntities = this.externalCtxBroker.lookup(requestor, cssOwnerId, CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
+			if(idsEntities.size()>0){
+				deviceCtxEntIdentifier = (CtxEntityIdentifier) idsEntities.get(0);
+			}
+			// the retrieved identifier is used in order to retrieve the context model object (CtxEntity)
+			CtxEntity retrievedCtxEntity = (CtxEntity) this.externalCtxBroker.retrieve(requestor, deviceCtxEntIdentifier).get();
 			
-			LOG.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
-
-			// retrieve ctxAttribute with the binary value
-			Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = this.externalCtxBroker.retrieve(requestor, this.ctxAttributeBinaryIdentifier);
-			CtxAttribute ctxAttributeRetrievedBinary = (CtxAttribute) ctxAttributeRetrievedBinaryFuture.get();
-
+			LOG.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
+			
+			// Retrieve CtxAttributes assigned to retrievedCtxEntity 
+			Set<CtxAttribute> ctxAttrSet = retrievedCtxEntity.getAttributes(CtxAttributeTypes.ID);
+			
+			if( ctxAttrSet.size()>0 ){
+				List<CtxAttribute> 	ctxAttrList = new ArrayList(ctxAttrSet);
+				CtxAttribute ctxAttr = ctxAttrList.get(0);
+				LOG.info("Resoleved ctxAttribute id " +ctxAttr.getId()+ " and value: "+ctxAttr.getStringValue()+" initial value was device1234");
+			}
+			// retrieve ctxAttribute with the binary value based on a known identifier
+			CtxAttribute ctxAttributeWeight = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, weightAttrIdentifier).get();
+			
 			//deserialise object
-			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeRetrievedBinary.getBinaryValue(), this.getClass().getClassLoader());
-			LOG.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
-
+			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeWeight.getBinaryValue(), this.getClass().getClassLoader());
+			LOG.info("Retrieved ctxAttribute id " +ctxAttributeWeight.getId()+ "and value: "+ retrievedBlob.getSeed()+" initial value was 999 ");
 		} catch (Exception e) {
-
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
-
 	}
-
-
 
 	/**
 	 * This method demonstrates how to create and retrieve context history data
@@ -249,12 +281,10 @@ public class ExternalCtxBrokerExample 	{
 	private void simpleCtxHistoryTest() {
 
 		CtxAttribute ctxAttribute;
-
 		final CtxEntity ctxDevEntity;
 		// Create the attribute's scope
-
 		try {
-			ctxDevEntity = this.externalCtxBroker.createEntity(requestor,targetCss, CtxEntityTypes.DEVICE).get();
+			ctxDevEntity = this.externalCtxBroker.createEntity(requestor,cssOwnerId, CtxEntityTypes.DEVICE).get();
 
 			// Create the attribute to be tested
 			ctxAttribute = this.externalCtxBroker.createAttribute(requestor, ctxDevEntity.getId(), "attrType").get();
@@ -272,9 +302,8 @@ public class ExternalCtxBrokerExample 	{
 			List<CtxHistoryAttribute> history = this.externalCtxBroker.retrieveHistory(requestor, ctxAttribute.getId(), null, null).get();
 
 			for(CtxHistoryAttribute hocAttr: history){
-				System.out.println("history List id:"+hocAttr.getId()+" getLastMod:"+hocAttr.getLastModified() +" hocAttr value:"+hocAttr.getIntegerValue());		
+				LOG.info("history List id:"+hocAttr.getId()+" getLastMod:"+hocAttr.getLastModified() +" hocAttr value:"+hocAttr.getIntegerValue());		
 			}
-
 			//test createHistory methods
 			CtxAttribute fakeAttribute = this.externalCtxBroker.createAttribute(requestor, ctxDevEntity.getId(), "historyAttribute").get();
 			List<CtxHistoryAttribute> historyList = new ArrayList<CtxHistoryAttribute>();
@@ -283,9 +312,8 @@ public class ExternalCtxBrokerExample 	{
 			if(historyListRetrieved.equals(historyListRetrieved)) System.out.println("Succesfull Retrieval of created hoc Attributes");
 
 			for (CtxHistoryAttribute ctxHistAttr : historyListRetrieved){
-				System.out.println("Hoc attribute value:" +ctxHistAttr.getStringValue()+" time:"+ctxHistAttr.getLastModified().getTime());
+				LOG.info("Hoc attribute value:" +ctxHistAttr.getStringValue()+" time:"+ctxHistAttr.getLastModified().getTime());
 			}
-
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -299,112 +327,6 @@ public class ExternalCtxBrokerExample 	{
 	}
 
 	/**
-	 * This method demonstrates how to create and retrieve context history data in tuples, and how to update the tuple types.
-	 */
-
-	
-	private void tuplesCtxHistoryTest() {
-
-		final CtxEntity ctxEntity;
-		CtxAttribute primaryAttribute;
-		CtxAttribute escortingAttribute1;
-		CtxAttribute escortingAttribute2;
-		CtxAttribute escortingAttribute3;
-
-		/*
-		try {
-			ctxEntity = (CtxEntity) this.externalCtxBroker.createEntity(requestor,targetCss,"entType").get();
-
-			// Create the attribute to be tested
-			primaryAttribute = (CtxAttribute) this.externalCtxBroker.createAttribute(requestor,ctxEntity.getId(), "primaryAttribute").get();
-			primaryAttribute.setHistoryRecorded(true);
-			primaryAttribute.setStringValue("fistValue");
-			this.externalCtxBroker.update(primaryAttribute);
-
-			escortingAttribute1 = (CtxAttribute) this.externalCtxBroker.createAttribute(requestor,ctxEntity.getId(), "escortingAttribute1").get();
-			escortingAttribute2 = (CtxAttribute) this.externalCtxBroker.createAttribute(requestor,ctxEntity.getId(), "escortingAttribute2").get();
-
-			
-			escortingAttribute1 =  this.externalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_firstValue").get();
-			escortingAttribute2 =  this.externalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_firstValue").get();
-
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
-			listOfEscortingAttributeIds.add(escortingAttribute1.getId());
-			listOfEscortingAttributeIds.add(escortingAttribute2.getId());
-			internalCtxBroker.setHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds).get();	
-
-			//this update stores also the attributes in tuples
-			internalCtxBroker.update(primaryAttribute);
-
-			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_secondValue").get();
-			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_secondValue").get();
-			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"secondValue").get();
-
-			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_thirdValue").get();
-			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_thirdValue").get();
-			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"thirdValue").get();
-
-			//primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"forthValue").get();
-			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
-			printHocTuples(tupleResults);
-			System.out.println("add new attribute in an existing tuple");
-
-			escortingAttribute3 = (CtxAttribute) internalCtxBroker.createAttribute(ctxEntity.getId(),"escortingAttribute3").get();
-			//escortingAttribute3.setHistoryRecorded(true);
-			List<CtxAttributeIdentifier> newlistOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
-			newlistOfEscortingAttributeIds.add(escortingAttribute1.getId());
-			newlistOfEscortingAttributeIds.add(escortingAttribute2.getId());
-			newlistOfEscortingAttributeIds.add(escortingAttribute3.getId());
-			internalCtxBroker.updateHistoryTuples(primaryAttribute.getId(), newlistOfEscortingAttributeIds);
-
-			// newly add attribute doesn't contain any value yet, a null ref should be added in tuple
-			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_forthValue").get();
-			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_forthValue").get();
-			//escortingAttribute3 =  internalCtxBroker.updateAttribute(escortingAttribute3.getId(),(Serializable)"escortingValue3_forthValue").get();
-			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"forthValue").get();
-
-			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_fifthValue").get();
-			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_fifthValue").get();
-			escortingAttribute3 =  internalCtxBroker.updateAttribute(escortingAttribute3.getId(),(Serializable)"escortingAttribute3_fifthValue").get();
-			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"fifthValue").get();
-
-			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> updatedTupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
-			printHocTuples(updatedTupleResults);
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-*/
-	}
-
-	
-
-	/*
-	protected void printHocTuples(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults){
-
-		int i = 0;
-		for (CtxHistoryAttribute primary : tupleResults.keySet()){
-			String primaryValue = null;
-			if (primary.getStringValue() != null) primaryValue =primary.getStringValue();
-			String escValueTotal = "";
-			for(CtxHistoryAttribute escortingAttr: tupleResults.get(primary)){
-				String escValue = "";
-				if (escortingAttr.getStringValue() != null )  escValue =escortingAttr.getStringValue();	
-				escValueTotal = escValueTotal+" "+escValue; 
-			}
-			System.out.println(i+ " primaryValue: "+primaryValue+ " escValues: "+escValueTotal);
-			i++;
-		}
-	}	
-	 */
-	/**
 	 * This method demonstrates how to register for context change events in the context database
 	 */
 	private void registerForContextChanges() {
@@ -413,19 +335,18 @@ public class ExternalCtxBrokerExample 	{
 
 		try {
 			// 1a. Register listener by specifying the context attribute identifier
-			this.externalCtxBroker.registerForChanges(requestor, new MyCtxChangeEventListener(), this.ctxAttributeStringIdentifier);
+			this.externalCtxBroker.registerForChanges(requestor, new MyCtxChangeEventListener(), ctxAttributeDeviceIDIdentifier);
 
 			// 1b. Register listener by specifying the context attribute scope and type
-			this.externalCtxBroker.registerForChanges(requestor,new MyCtxChangeEventListener(), this.ctxEntityIdentifier, CtxAttributeTypes.ID);
+			this.externalCtxBroker.registerForChanges(requestor,new MyCtxChangeEventListener(), deviceCtxEntity.getId(), CtxAttributeTypes.ID);
 
 			// 2. Update attribute to see some event action
-			CtxAttribute ctxAttr = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, this.ctxAttributeStringIdentifier).get();
+			CtxAttribute ctxAttr = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, ctxAttributeDeviceIDIdentifier).get();
 
 			ctxAttr.setStringValue("newDeviceIdValue");
 			ctxAttr = (CtxAttribute) this.externalCtxBroker.update(requestor,ctxAttr).get();
 
 		} catch (CtxException ce) {
-
 			LOG.error("*** CM sucks " + ce.getLocalizedMessage(), ce);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

@@ -40,7 +40,8 @@
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCss</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCis</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedService</value>
-				<value>org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustOpinion</value>
+				<value>org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence</value>
+				<value>org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence</value>
 			</list>
 		</property>
 

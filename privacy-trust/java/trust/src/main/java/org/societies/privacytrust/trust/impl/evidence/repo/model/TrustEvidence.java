@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -35,6 +36,7 @@ import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.TrustEvidenceType;
 
 /**
  * Describe your class here...
@@ -56,21 +58,30 @@ public abstract class TrustEvidence implements ITrustEvidence {
 	
 	/** The identifier of the trusted entity this evidence refers to. */
 	@Columns(columns={
-			@Column(name = "trustor_id", nullable = false, updatable = false, length = 256),
+			@Column(name = "trustor_id", nullable = false, updatable = false, length = 255),
 			@Column(name = "entity_type", nullable = false, updatable = false, length = 3),
-			@Column(name = "trustee_id", nullable = false, updatable = false, length = 256)
+			@Column(name = "trustee_id", nullable = false, updatable = false, length = 255)
 	})
 	@Type(type = "org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
+	
+	@Column(name = "type", nullable = false, updatable = false)
+	private final TrustEvidenceType type;
 	
 	@Column(name = "timestamp", nullable = false, updatable = false)
 	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
 	private final Date timestamp;
 	
-	TrustEvidence(final TrustedEntityId teid, final Date timestamp) {
+	@Column(name = "info", length = 1023)
+	private final Serializable info;
+	
+	TrustEvidence(final TrustedEntityId teid, final TrustEvidenceType type, 
+			final Date timestamp, final Serializable info) {
 		
 		this.teid = teid;
+		this.type = type;
 		this.timestamp = timestamp;
+		this.info = info;
 	}
 	
 	/*
@@ -83,12 +94,30 @@ public abstract class TrustEvidence implements ITrustEvidence {
 	}
 	
 	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getType()
+	 */
+	@Override
+	public TrustEvidenceType getType() {
+		
+		return this.type;
+	}
+	
+	/*
 	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getTimestamp()
 	 */
 	@Override
 	public Date getTimestamp() {
 		
 		return this.timestamp;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getInfo()
+	 */
+	@Override
+	public Serializable getInfo() {
+		
+		return this.info;
 	}
 
 	/*
@@ -100,9 +129,14 @@ public abstract class TrustEvidence implements ITrustEvidence {
 		final int prime = 31;
 		
 		int result = 1;
-		result = prime * result + ((this.teid == null) ? 0 : this.teid.hashCode());
+		result = prime * result 
+				+ ((this.teid == null) ? 0 : this.teid.hashCode());
+		result = prime * result
+				+ ((this.type == null) ? 0 : this.type.hashCode());
 		result = prime * result
 				+ ((this.timestamp == null) ? 0 : this.timestamp.hashCode());
+		result = prime * result
+				+ ((this.info == null) ? 0 : this.info.hashCode());
 		
 		return result;
 	}
@@ -127,10 +161,20 @@ public abstract class TrustEvidence implements ITrustEvidence {
 				return false;
 		} else if (!this.teid.equals(other.teid))
 			return false;
+		if (this.type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!this.type.equals(other.type))
+			return false;
 		if (this.timestamp == null) {
 			if (other.timestamp != null)
 				return false;
 		} else if (!this.timestamp.equals(other.timestamp))
+			return false;
+		if (this.info == null) {
+			if (other.info != null)
+				return false;
+		} else if (!this.info.equals(other.info))
 			return false;
 		
 		return true;
@@ -146,7 +190,11 @@ public abstract class TrustEvidence implements ITrustEvidence {
 		sb.append("{");
 		sb.append("teid=" + this.teid);
 		sb.append(",");
+		sb.append("type=" + this.type);
+		sb.append(",");
 		sb.append("timestamp=" + this.timestamp);
+		sb.append(",");
+		sb.append("info=" + this.info);
 		sb.append("}");
 		
 		return sb.toString();

@@ -45,7 +45,7 @@ import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
 import org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustOpinion;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdUserType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,7 +133,7 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving direct trust evidence between dates '"
 					+ startDate + "' and '" + endDate + "' for TEID " + teid + " from the Trust Evidence Repository...");
-		result.addAll(this.retrieve(teid, DirectTrustOpinion.class, startDate, endDate));
+		result.addAll(this.retrieve(teid, DirectTrustEvidence.class, startDate, endDate));
 		
 		return result;
 	}
@@ -202,7 +202,7 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Removing direct trust evidence between dates '"
 					+ startDate + "' and '" + endDate + "' for TEID " + teid + " from the Trust Evidence Repository...");
-		this.remove(teid, DirectTrustOpinion.class, startDate, endDate);
+		this.remove(teid, DirectTrustEvidence.class, startDate, endDate);
 	}
 
 	/*

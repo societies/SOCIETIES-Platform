@@ -52,6 +52,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.context.broker.api.CtxBrokerException;
+import org.societies.context.broker.impl.comm.CtxBrokerClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +93,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	private ICtxBroker internalCtxBroker;
 
 	/**
+	 * The Ctx Broker client Service reference.
+	 *
+	 * @see {@link #setCtxBrokerClient(CtxBrokerClient)}
+	 */
+	@Autowired(required=true)
+	private CtxBrokerClient ctxBrokerClient;
+
+	/**
 	 * Instantiates the external Context Broker in Spring.
 	 * 
 	 * @param commMgr
@@ -108,8 +117,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	 * Used for JUnit testing only.
 	 */
 	public CtxBroker() {
-
-		LOG.info(this.getClass() + " instantiated");
+		//LOG.info(this.getClass() + " instantiated");
 	}
 
 	/*
@@ -119,13 +127,15 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		this.internalCtxBroker  = internalCtxBroker;
 		LOG.info(this.getClass() + " instantiated " +internalCtxBroker);
 	}
+
 	@Override
 	@Async
 	public Future<CtxEntity> createEntity(final Requestor requestor, 
 			final IIdentity targetCss, final String type) throws CtxException {
 
 		Future<CtxEntity> entity = null;
-
+		// ctxBrokerClient service retrieved
+		LOG.info(this.getClass() + " createEntity CtxBroker client service: "+ctxBrokerClient);
 		if (idMgr.isMine(targetCss)) {
 			entity = internalCtxBroker.createEntity(type);
 		} else {

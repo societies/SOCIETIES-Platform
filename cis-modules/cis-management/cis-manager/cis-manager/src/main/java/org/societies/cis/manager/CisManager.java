@@ -288,6 +288,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		cisAd.setName(cis.getName());
 		cisAd.setUri(cis.getCisId());
 		cisAd.setType(cis.getCisType());
+		cisAd.setId(cis.getCisId());
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
 		
 		LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());

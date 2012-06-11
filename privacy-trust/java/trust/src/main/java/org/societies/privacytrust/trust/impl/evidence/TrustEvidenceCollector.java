@@ -35,8 +35,9 @@ import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceColl
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.trust.api.evidence.model.TrustEvidenceType;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustOpinion;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,10 +63,10 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustOpinion(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)
 	 */
 	@Override
-	public void addTrustOpinion(final IIdentity trustor, final IIdentity trustee,
+	public void addTrustRating(final IIdentity trustor, final IIdentity trustee,
 			final double rating, Date timestamp) throws TrustException {
 		
 		if (trustor == null)
@@ -90,15 +91,16 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 		else // if (IdentityType.CIS.equals(trustee.getType()))
 			entityType = TrustedEntityType.CIS;
 		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
-		final DirectTrustOpinion opinion = new DirectTrustOpinion(teid, timestamp, new Double(rating));
-		this.evidenceRepo.addEvidence(opinion);
+		final DirectTrustEvidence evidence = new DirectTrustEvidence(
+				teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
+		this.evidenceRepo.addEvidence(evidence);
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustOpinion(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)
 	 */
 	@Override
-	public void addTrustOpinion(final IIdentity trustor,
+	public void addTrustRating(final IIdentity trustor,
 			final ServiceResourceIdentifier trustee, final double rating, 
 			Date timestamp)	throws TrustException {
 		
@@ -118,8 +120,9 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 		
 		final TrustedEntityType entityType = TrustedEntityType.SVC;
 		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
-		final DirectTrustOpinion opinion = new DirectTrustOpinion(teid, timestamp, new Double(rating));
-		this.evidenceRepo.addEvidence(opinion);
+		final DirectTrustEvidence evidence = new DirectTrustEvidence(
+				teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
+		this.evidenceRepo.addEvidence(evidence);
 	}
 
 	/*
