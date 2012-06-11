@@ -23,66 +23,74 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.feedback;
+package org.societies.useragent.comms;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ExpProposalType;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalType;
-import org.societies.useragent.feedback.guis.AckNackGUI;
-import org.societies.useragent.feedback.guis.CheckBoxGUI;
-import org.societies.useragent.feedback.guis.RadioGUI;
-import org.societies.useragent.feedback.guis.TimedGUI;
-import org.springframework.scheduling.annotation.AsyncResult;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
+import org.societies.useragent.api.remote.feedback.IUserFeedbackCallback;
 
-public class UserFeedback implements IUserFeedback{
-	
-	Logger LOG = LoggerFactory.getLogger(UserFeedback.class);
-	
-	public void initialiseUserFeedback(){
-		LOG.debug("User Feedback initialised!!");
-	}
-	
-	@Override
-	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content) {
-		LOG.debug("Returning explicit feedback");
-		List<String> result = null;
-		String proposalText = content.getProposalText();
-		String[] options = content.getOptions();
-		if(type == ExpProposalType.RADIOLIST){
-			LOG.debug("Radio list GUI");
-			RadioGUI gui = new RadioGUI();
-			result = gui.displayGUI(proposalText, options);
-		}else if(type == ExpProposalType.CHECKBOXLIST){
-			LOG.debug("Check box list GUI");
-			CheckBoxGUI gui = new CheckBoxGUI();
-			result = gui.displayGUI(proposalText, options);
-		}else{ //ACK-NACK
-			LOG.debug("ACK/NACK GUI");
-			result = AckNackGUI.displayGUI(proposalText, options);
-		}
-		
-		return new AsyncResult<List<String>>(result);
+public class UACommsCallback implements ICommCallback{
+
+	private Logger LOG = LoggerFactory.getLogger(UACommsCallback.class);
+	private IUserFeedbackCallback sourceCallback = null;
+
+	public UACommsCallback(IUserFeedbackCallback sourceCallback){
+		this.sourceCallback = sourceCallback;
 	}
 
 	@Override
-	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
-		LOG.debug("Returning implicit feedback");
-		Boolean result = null;
-		String proposalText = content.getProposalText();
-		int timeout = content.getTimeout();
-		if(type == ImpProposalType.TIMED_ABORT){
-			LOG.debug("Timed Abort GUI");
-			TimedGUI gui = new TimedGUI();
-			result = gui.displayGUI(proposalText, timeout);
+	public List<String> getJavaPackages() {
+		return UACommsServer.PACKAGES;
+	}
+
+	@Override
+	public List<String> getXMLNamespaces() {
+		return UACommsServer.NAMESPACES;
+	}
+
+	@Override
+	public void receiveError(Stanza arg0, XMPPError arg1) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void receiveMessage(Stanza arg0, Object arg1) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void receiveResult(Stanza stanza, Object result) {
+		if (result instanceof ImpFeedbackResultBean) {
+			LOG.debug("Implicit user feedback result received!");
+			ImpFeedbackResultBean resultBean = (ImpFeedbackResultBean) result;
+			//this.sourceCallback.handleImpFeedback(resultBean.getFeedback());
+		}else if (result instanceof ExpFeedbackResultBean){
+			LOG.debug("Explicit user feedback result received!");
+			ExpFeedbackResultBean resultBean = (ExpFeedbackResultBean) result;
+			//this.sourceCallback.handleExpFeedback(resultBean.getFeedback());
 		}
-		
-		return new AsyncResult<Boolean>(result);
-	}	
+	}
+
 }

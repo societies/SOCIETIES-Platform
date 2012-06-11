@@ -23,36 +23,28 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.feedback.guis;
+package org.societies.api.schema.useragent.feedback;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-
-
-public class AckNackGUI{
-		
-	public static List<String> displayGUI(String proposalText, String[] options){
-		List<String> feedback = new ArrayList<String>();
-		int n = JOptionPane.showOptionDialog(null,
-			    proposalText,
-			    "TEST - Ack/Nack Feedback GUI",
-			    JOptionPane.YES_NO_CANCEL_OPTION,
-			    JOptionPane.QUESTION_MESSAGE,
-			    null,
-			    options,
-			    options[0]);
-		feedback.add(options[n]);
-		return feedback;
+public class ExpFeedbackCallbackBean {
+	
+	private enum methodType {handleExpFeedback};
+	private methodType method;
+	private String[] feedback;
+	
+	public methodType getMethodType(){
+		return this.method;
+	}
+	
+	public void setMethodType(methodType method){
+		this.method = method;
+	}
+	
+	public String[] getFeedbackList(){
+		return this.feedback;
+	}
+	
+	public void setFeedback(String[] feedback){
+		this.feedback = feedback;
 	}
 
-	public static void main(String[] args){
-		String[] options = {"yes", "no"};
-		List<String> result = AckNackGUI.displayGUI("Are you OK??", options);
-		System.out.println("Selected feedback: ");
-		for(String output: result){
-			System.out.println(output);
-		}
-	}
 }
