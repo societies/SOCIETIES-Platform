@@ -8,13 +8,14 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
+<!--
 	<bean id="test" 
   		class="org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterTestImpl"
   		 depends-on="CommManager,PubsubClient" init-method="init">
   		 <property name="commManager" ref="CommManager" />
   		 <property name="pubSubManager" ref="PubsubClient"/>
   	</bean>
-  
+ -->
   
    <bean id="DmCommManager" 
        		 class="org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterImpl" 
