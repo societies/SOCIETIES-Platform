@@ -72,7 +72,7 @@ public class Screen implements IDriverService{
 		this.physicalDeviceId = physicalDeviceId;
 		this.deviceId = deviceId;
 		
-		eventManager = activatorDriver.getEventManager();
+		eventManager = this.activatorDriver.getEventManager();
 		
 		IDeviceStateVariable stateVariable;
 		IAction action;
@@ -144,12 +144,18 @@ public class Screen implements IDriverService{
 	
 	
 	public  void sendMessageToScreen (String message)
-	{			
+	{
+		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% screen: " + message);
 		
 		HashMap<String, Object> payload = new HashMap<String, Object>();
 		payload.put("screenEvent", message);
-		InternalEvent event = new InternalEvent(EventTypes.DEVICE_MANAGEMENT_EVENT, DeviceMgmtEventConstants.SCREEN_EVENT, deviceId, payload);
+		InternalEvent event = new InternalEvent(EventTypes.DEVICE_MANAGEMENT_EVENT, DeviceMgmtEventConstants.SCREEN_EVENT, "screenId", payload);
 		try {
+			
+			if (eventManager == null) {
+				LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% screen: eventManager = null");
+			}
+			
 			eventManager.publishInternalEvent(event);
 		} catch (EMSException e) {
 			LOG.error("Error when publishing new screen", e);
