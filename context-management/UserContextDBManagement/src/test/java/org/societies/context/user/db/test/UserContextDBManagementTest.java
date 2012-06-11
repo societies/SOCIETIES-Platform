@@ -145,6 +145,7 @@ public class UserContextDBManagementTest {
 		final CtxEntityIdentifier entId3 = userDB.createEntity("person").getId();
 		association.addChildEntity(entId2);
 		association.addChildEntity(entId3);
+		userDB.update(association);
 		assertTrue(association.getChildEntities().contains(entId2));
 		assertTrue(association.getChildEntities().contains(entId3));
 		assertTrue(association.getChildEntities("person").contains(entId2));
