@@ -35,10 +35,10 @@
 
 	<h3>Privacy Assessment</h3>
 
-	<form:form method="POST" action="privacyassessment.html"
+	<form:form method="POST" action="privacy-assessment.html"
 		commandName="assForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
-		<a href="barchart.html">Bar chart</a>
+		<a href="privacy-assessment-barchart.html">Bar chart</a>
 		<table>
 			<tr>
 				<td>Privacy Assessment Methods :</td>

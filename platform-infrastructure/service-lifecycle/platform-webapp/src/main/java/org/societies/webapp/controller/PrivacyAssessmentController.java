@@ -82,7 +82,7 @@ public class PrivacyAssessmentController {
 		this.assessment = sdService;
 	}
 
-	@RequestMapping(value = "/privacyassessment.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/privacy-assessment.html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessment() {
 
 		LOG.debug("privacyassessment HTTP GET");
@@ -103,12 +103,12 @@ public class PrivacyAssessmentController {
 		methods.put("setAutoPeriod", "Set time period of automatic re-assessment for all senders");
 		model.put("methods", methods);
 		
-		model.put("privacyassessmentresult", "Privacy Assessment Result :");
-		return new ModelAndView("privacyassessment", model);
+		model.put("privacy-assessment-result", "Privacy Assessment Result :");
+		return new ModelAndView("privacy-assessment", model);
 	}
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/privacyassessment.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/privacy-assessment.html", method = RequestMethod.POST)
 	public ModelAndView privacyAssessment(@Valid PrivacyAssessmentForm assForm,
 			BindingResult result, Map model) {
 
@@ -117,7 +117,7 @@ public class PrivacyAssessmentController {
 		if (result.hasErrors()) {
 			LOG.warn("BindingResult has errors");
 			model.put("result", "privacy assessment form error");
-			return new ModelAndView("privacyassessment", model);
+			return new ModelAndView("privacy-assessment", model);
 		}
 
 		if (getAssessment() == null) {
@@ -169,10 +169,10 @@ public class PrivacyAssessmentController {
 		};
 
 		LOG.debug("HTTP POST end");
-		return new ModelAndView("privacyassessmentresult", model);
+		return new ModelAndView("privacy-assessment-result", model);
 	}
 	
-	@RequestMapping(value = "/barchart.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/privacy-assessment-barchart.html", method = RequestMethod.GET)
 	public ModelAndView barchart() {
 
 		LOG.debug("barchart HTTP GET");
@@ -235,7 +235,7 @@ public class PrivacyAssessmentController {
 //		methods.put("setAutoPeriod", "Set time period of automatic re-assessment for all senders");
 //		model.put("methods", methods);
 //		
-//		model.put("privacyassessmentresult", "Privacy Assessment Result :");
-		return new ModelAndView("barchart", model);
+//		model.put("privacy-assessment-result", "Privacy Assessment Result :");
+		return new ModelAndView("privacy-assessment-barchart", model);
 	}
 }
