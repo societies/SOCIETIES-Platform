@@ -18,26 +18,32 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT BELOW HERE ................ -->
 
-<h4>${result}</h4>
-<br/>
-<br/>
-<Table>
-<tr><td><B>Sender</B></td><td><B>CorrWithDataAccessByAll</B></td><td><B>CorrWithDataAccessBySender</B></td><td><B>Sender</B></td>
-<td><B>Sender</B></td><td><B>Sender</B></td></tr> 
+	<h4>${result}</h4>
+	<br />
+	<br />
+	<table>
+		<tr>
+			<td><B>Sender</B></td>
+			<td><B>CorrWithDataAccessByAll</B></td>
+			<td><B>CorrWithDataAccessBySender</B></td>
+			<td><B>Sender</B></td>
+			<td><B>Sender</B></td>
+			<td><B>Sender</B></td>
+		</tr>
 
-	<xc:forEach var="assessmentResult" items="${assessmentResults}">
-        <tr>
-        	<td>${assessmentResult.sender}</td>
-         	<td>${assessmentResult.corrWithDataAccessByAll}</td>
-            <td>${assessmentResult.corrWithDataAccessBySender}</td>
-            <td>${assessmentResult.sender}</td>            
-            <td>${assessmentResult.sender}</td>
-            <td>${assessmentResult.sender}</td>
-        </tr>
-    </xc:forEach>
-    	
+		<xc:forEach var="assessmentResult" items="${assessmentResults}">
+			<tr>
+				<td>${assessmentResult.sender}</td>
+				<td>${assessmentResult.corrWithDataAccessByAll}</td>
+				<td>${assessmentResult.corrWithDataAccessBySender}</td>
+				<td>${assessmentResult.sender}</td>
+				<td>${assessmentResult.sender}</td>
+				<td>${assessmentResult.sender}</td>
+			</tr>
+		</xc:forEach>
+
 	</table>
-	
+
 <!-- .................END PLACE YOUR CONTENT ................ -->
 	<!-- FOOTER -->
 	<jsp:include page="footer.jsp" />
