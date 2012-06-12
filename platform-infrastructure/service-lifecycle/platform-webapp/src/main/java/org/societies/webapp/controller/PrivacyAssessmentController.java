@@ -217,16 +217,22 @@ public class PrivacyAssessmentController {
 				return privacyAssessment();
 			}
 			//model.put("assessmentResults", assValues);
+			
+			double[][] data = new double[][] {
+					{210, 300, 320, 265, 299},
+					{200, 304, 201, 201, 340}
+					};
+
 			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
 			form1.setAssessmentSubject("Subject 1");
 			String chart1 = "chart-1.png";
-			createBarchart(chart1);
+			createBarchart(null, "Class", "Packets per month", data, chart1);
 			form1.setChart(chart1);
 			charts.add(form1);
 			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
 			form2.setAssessmentSubject("Subject 2");
 			String chart2 = "chart-2.png";
-			createBarchart(chart2);
+			createBarchart(null, "Identity", "Correlation with data access by same identity", data, chart2);
 			form2.setChart(chart2);
 			charts.add(form2);
 			model.put("assessmentResults", charts);
@@ -248,39 +254,62 @@ public class PrivacyAssessmentController {
 			return privacyAssessment();
 		}
 	}
-	
-	private void createBarchart(String filename) {
 
-		LOG.debug(PageNames.PRIVACY_ASSESSMENT_CHART + " HTTP GET");
-		final double[][] data = new double[][] {
-				{210, 300, 320, 265, 299},
-				{200, 304, 201, 201, 340}
-		};
+	/**
+	 * 
+	 * @param title
+	 * @param categoryLabel
+	 * @param valueLabel
+	 * @param data The data to be displayed. Example: <br/>
+	 *        new double[][] { <br/>
+	 *        {210, 300, 320, 265, 299}, <br/>
+	 *        {200, 304, 201, 201, 340} <br/>
+	 *        };
+	 * @param filename
+	 */
+	private void createBarchart(String title, String categoryLabel, String valueLabel, double[][] data, String filename) {
 
+		LOG.debug("createBarchart({}, ..., {})", title, filename);
+		
 		final CategoryDataset dataset = DatasetUtilities.createCategoryDataset(
-				"Team ", "", data);
+				categoryLabel + " ", "", data);
 
-		JFreeChart chart = null;
-		BarRenderer renderer = null;
-		CategoryPlot plot = null;
+		JFreeChart chart;
+		BarRenderer renderer;
+		CategoryPlot plot;
 
-		final CategoryAxis categoryAxis = new CategoryAxis("Match");
-		final ValueAxis valueAxis = new NumberAxis("Run");
+		CategoryAxis categoryAxis;
+		ValueAxis valueAxis;
+		
+		if (categoryLabel == null) {
+			categoryAxis = new CategoryAxis();
+		}
+		else {
+			categoryAxis = new CategoryAxis(categoryLabel);
+		}
+//		categoryAxis.setTickLabelsVisible(false);
+//		categoryAxis.setVisible(false);
+		if (valueLabel == null) {
+			valueAxis = new NumberAxis();
+		}
+		else {
+			valueAxis = new NumberAxis(valueLabel);
+		}
 		renderer = new BarRenderer();
 
 		plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
 		plot.setOrientation(PlotOrientation.HORIZONTAL);
-		chart = new JFreeChart("Srore Bord", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+		chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
-		chart.setBackgroundPaint(new Color(249, 231, 236));
-
-		Paint p1 = new GradientPaint(
-				0.0f, 0.0f, new Color(16, 89, 172), 0.0f, 0.0f, new Color(201, 201, 244));
-		renderer.setSeriesPaint(1, p1);
-
-		Paint p2 = new GradientPaint(
-				0.0f, 0.0f, new Color(255, 35, 35), 0.0f, 0.0f, new Color(255, 180, 180));
-		renderer.setSeriesPaint(2, p2);
+//		chart.setBackgroundPaint(new Color(255, 255, 255));
+//
+//		Paint p1 = new GradientPaint(
+//				0.0f, 0.0f, new Color(16, 89, 172), 0.0f, 0.0f, new Color(201, 201, 244));
+//		renderer.setSeriesPaint(1, p1);
+//
+//		Paint p2 = new GradientPaint(
+//				0.0f, 0.0f, new Color(255, 35, 35), 0.0f, 0.0f, new Color(255, 180, 180));
+//		renderer.setSeriesPaint(2, p2);
 
 		plot.setRenderer(renderer);
 
@@ -292,7 +321,7 @@ public class PrivacyAssessmentController {
 			final File file1 = new File(contextPath + filename);
 			ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
 		} catch (Exception e) {
-			LOG.warn("barchart(): ", e);
+			LOG.warn("createBarchart(): ", e);
 		}
 	}
 
