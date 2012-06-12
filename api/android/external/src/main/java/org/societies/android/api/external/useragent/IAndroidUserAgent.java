@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.platform.useragent.api;
+package org.societies.android.api.external.useragent;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
