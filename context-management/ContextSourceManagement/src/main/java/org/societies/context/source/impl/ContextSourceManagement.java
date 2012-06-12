@@ -108,6 +108,16 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	@Override
 	@Async
 	public Future<String> register(String name, String contextType) {
+		return register(null, name, contextType);
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.source.ICtxSourceMgr#register(org.societies.api.context.model.CtxEntity, java.lang.String, java.lang.String)
+	 */
+	@Override
+	@Async
+	public Future<String> register(CtxEntity contextOwner, String name, String contextType) {
 		if (ctxBroker == null) {
 			LOG.error("Could not register " + contextType
 					+ ": Context Broker cannot be found");
