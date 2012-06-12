@@ -1,29 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc"%>
-
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"
+	import="java.util.*" %>
+<%@ taglib prefix="c" uri="http://www.springframework.org/tags/form"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc" %> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Societies services - Privacy Assessment</title>
-<style>
-.error {
-	color: #ff0000;
-}
-
-.errorblock {
-	color: #000;
-	background-color: #ffEEEE;
-	border: 3px solid #ff0000;
-	padding: 8px;
-	margin: 16px;
-}
-</style>
+<title>Societies Privacy Assessment Result</title>
 </head>
-
 <body>
 	<!-- HEADER -->
 	<jsp:include page="header.jsp" />
@@ -32,27 +16,28 @@
 	<!-- LEFTBAR -->
 	<jsp:include page="leftbar.jsp" />
 	<!-- END LEFTBAR -->
-	<!-- .................PLACE YOUR CONTENT HERE ................ -->
+<!-- .................PLACE YOUR CONTENT BELOW HERE ................ -->
 
-	<h3>Privacy Assessment</h3>
+	<h3>Privacy Assessment Results</h3>
+	<br />
+	<table>
+		<xc:forEach var="assessmentResult" items="${assessmentResults}">
+			<tr>
+				<td><b>${assessmentResult.assessmentSubject}</b></td>
+			</tr>
+			<tr>
+				<td><img src="${pageContext.request.contextPath}/${assessmentResult.chart}" border="0" /></td>
+			</tr>
+			<tr>
+				<td><br /></td>
+			</tr>
+		</xc:forEach>
 
-	<%
-		java.io.File f = new java.io.File(".");
-	%>
+	</table>
 
-	<p>
-		Current directory is
-		<%=f.getCanonicalPath()%>
-	<p>Listing:
-	<ul>
-		<%
-			String[] list = f.list();
-			for (int i = 0; i < list.length; i++) {
-				out.print("<li>" + list[i]);
-			}
-		%>
-	</ul>
-	<img src="${pageContext.request.contextPath}/images/barchart.png"
-		border="0" width="600" height="400" usemap="#map" />
+<!-- .................END PLACE YOUR CONTENT ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER -->
 </body>
 </html>

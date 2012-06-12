@@ -18,17 +18,16 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT BELOW HERE ................ -->
 
-	<h4>${result}</h4>
-	<br />
+	<h3>Privacy Assessment Results</h3>
 	<br />
 	<table>
 		<tr>
-			<td><B>Sender</B></td>
-			<td><B>CorrWithDataAccessByAll</B></td>
-			<td><B>CorrWithDataAccessBySender</B></td>
-			<td><B>Sender</B></td>
-			<td><B>Sender</B></td>
-			<td><B>Sender</B></td>
+			<td><b>Sender</b></td>
+			<td><b>CorrWithDataAccessByAll</b></td>
+			<td><b>CorrWithDataAccessBySender</b></td>
+			<td><b>Sender</b></td>
+			<td><b>Sender</b></td>
+			<td><b>Sender</b></td>
 		</tr>
 
 		<xc:forEach var="assessmentResult" items="${assessmentResults}">

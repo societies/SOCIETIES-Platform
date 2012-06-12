@@ -26,8 +26,11 @@ package org.societies.webapp.controller;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
+import java.awt.List;
 import java.awt.Paint;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -65,6 +68,8 @@ import org.springframework.web.servlet.ModelAndView;
 public class PrivacyAssessmentController {
 
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyAssessmentController.class);
+	
+	private static final String RESULT = "result";
 
 	/**
 	 * URL parts without prefix and suffix
@@ -173,7 +178,7 @@ public class PrivacyAssessmentController {
 
 		if (result.hasErrors()) {
 			LOG.warn("BindingResult has errors");
-			model.put("result", "privacy assessment form error");
+			model.put(RESULT, "privacy assessment form error");
 			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT, model);
 		}
 
@@ -187,6 +192,7 @@ public class PrivacyAssessmentController {
 		String subjectType = assForm.getAssessmentSubjectType();
 		LOG.debug("presentationFormat = {}, subjectType = {}", presentationFormat, subjectType);
 		Object assValues;
+		Collection<PrivacyAssessmentForm> charts = new ArrayList<PrivacyAssessmentForm>();
 		
 		if (presentationFormat.equalsIgnoreCase(Presentation.Format.CHART)) {
 			
@@ -210,7 +216,20 @@ public class PrivacyAssessmentController {
 				LOG.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
 				return privacyAssessment();
 			}
-			model.put("assessmentResults", assValues);
+			//model.put("assessmentResults", assValues);
+			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
+			form1.setAssessmentSubject("Subject 1");
+			String chart1 = "chart-1.png";
+			createBarchart(chart1);
+			form1.setChart(chart1);
+			charts.add(form1);
+			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
+			form2.setAssessmentSubject("Subject 2");
+			String chart2 = "chart-2.png";
+			createBarchart(chart2);
+			form2.setChart(chart2);
+			charts.add(form2);
+			model.put("assessmentResults", charts);
 
 			LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
 			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_CHART, model);
@@ -230,8 +249,7 @@ public class PrivacyAssessmentController {
 		}
 	}
 	
-	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_CHART + ".html", method = RequestMethod.GET)
-	public ModelAndView barchart() {
+	private void createBarchart(String filename) {
 
 		LOG.debug(PageNames.PRIVACY_ASSESSMENT_CHART + " HTTP GET");
 		final double[][] data = new double[][] {
@@ -268,32 +286,14 @@ public class PrivacyAssessmentController {
 
 		try {
 			final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
-			// FIXME
+			// FIXME: The path should not depend on Virgo version, etc.
 			String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
 					"global/bundle/societies-webapp/1.0.0.SNAPSHOT/societies-webapp.war/";
-			final File file1 = new File(contextPath + "images/barchart.png");
+			final File file1 = new File(contextPath + filename);
 			ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
 		} catch (Exception e) {
 			LOG.warn("barchart(): ", e);
 		}
-
-		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
-		Map<String, Object> model = new HashMap<String, Object>();
-//		model.put("message", "Please input values and submit");
-//		
-//		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
-//		PrivacyAssessmentForm assForm = new PrivacyAssessmentForm();
-//		model.put("assForm", assForm);
-//		
-//		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
-//		Map<String, String> methods = new LinkedHashMap<String, String>();
-//		methods.put("assessAllNow", "Perform assessment for all data transmissions");
-//		methods.put("getAssessmentAllIds", "Get a-posteriori assessment for all sender identities");
-//		methods.put("getAssessmentAllClasses", "Get a-posteriori assessment for all sender classes");
-//		methods.put("setAutoPeriod", "Set time period of automatic re-assessment for all senders");
-//		model.put("methods", methods);
-//		
-		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_CHART, model);
 	}
 
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_SETTINGS + ".html", method = RequestMethod.GET)
@@ -325,7 +325,7 @@ public class PrivacyAssessmentController {
 
 		if (result.hasErrors()) {
 			LOG.warn("BindingResult has errors");
-			model.put("result", "privacy assessment form error");
+			model.put(RESULT, "privacy assessment form error");
 			return new ModelAndView("error", model);
 		}
 

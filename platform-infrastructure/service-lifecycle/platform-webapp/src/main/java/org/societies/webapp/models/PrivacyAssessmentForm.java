@@ -43,6 +43,8 @@ public class PrivacyAssessmentForm {
 	private String assessmentSubjectType;
 	private String presentationFormat;
 	private String assessmentSubject;
+	
+	private String chart;
 
 	/**
 	 * @return the method
@@ -140,5 +142,19 @@ public class PrivacyAssessmentForm {
 	 */
 	public void setAssessmentSubject(String assessmentSubject) {
 		this.assessmentSubject = assessmentSubject;
+	}
+
+	/**
+	 * @return the chart
+	 */
+	public String getChart() {
+		return chart;
+	}
+
+	/**
+	 * @param chart the chart to set
+	 */
+	public void setChart(String chart) {
+		this.chart = chart;
 	}
 }
