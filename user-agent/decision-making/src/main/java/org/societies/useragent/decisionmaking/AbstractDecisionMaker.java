@@ -109,8 +109,15 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 				logging.debug("Call Feedback Manager");
 				ExpProposalContent epc=new ExpProposalContent("Conflict Detected!",
 						options.toArray(new String[options.size()]));
-				feedbackHandler.getExplicitFB(ExpProposalType.RADIOLIST, epc, 
-						new DecisionMakingCallback(this,intent,conflicts));
+				List<String> reply;
+				try {
+					reply = feedbackHandler.getExplicitFB(ExpProposalType.RADIOLIST, epc).get();
+					new DecisionMakingCallback(this,intent,conflicts).handleExpFeedback(reply);
+				} catch (InterruptedException | ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}//, 
+					//	new DecisionMakingCallback(this,intent,conflicts));
 			}
 			conflicts.clear();
 		}

@@ -4,9 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 
-public class DecisionMakingCallback implements IUserFeedbackCallback{
+public class DecisionMakingCallback{
 
 	private AbstractDecisionMaker maker;
 	private IOutcome intent;
@@ -21,7 +20,6 @@ public class DecisionMakingCallback implements IUserFeedbackCallback{
 		this.preference=preference;
 	}
 
-	@Override
 	public void handleExpFeedback(List<String> feedback) {
 		// TODO Auto-generated method stub
 		if(feedback.get(0).equals(intent.toString()))
@@ -34,7 +32,6 @@ public class DecisionMakingCallback implements IUserFeedbackCallback{
 		}
 	}
 
-	@Override
 	public void handleImpFeedback(Boolean feedback) {
 		// TODO Auto-generated method stub
 		
