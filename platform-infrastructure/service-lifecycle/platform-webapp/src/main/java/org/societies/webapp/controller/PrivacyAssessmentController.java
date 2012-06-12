@@ -66,11 +66,55 @@ public class PrivacyAssessmentController {
 
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyAssessmentController.class);
 
+	/**
+	 * URL parts without prefix and suffix
+	 */
 	public class PageNames {
 		public static final String PRIVACY_ASSESSMENT = "privacy-assessment";
 		public static final String PRIVACY_ASSESSMENT_SETTINGS = "privacy-assessment-settings";
 		public static final String PRIVACY_ASSESSMENT_CHART = "privacy-assessment-chart";
 		public static final String PRIVACY_ASSESSMENT_TABLE = "privacy-assessment-table";
+	}
+	
+	/**
+	 * Parameters for presentation of results. These affect the view.
+	 */
+	public class Presentation {
+		
+		/**
+		 * Types or categories of subjects of privacy assessment to be shown
+		 */
+		public class SubjectTypes {
+			
+			// Values
+			public static final String RECEIVER_IDS = "Receiver identities";
+			public static final String SENDER_IDS = "Sender identities";
+			public static final String SENDER_CLASSES = "Sender classes";
+
+			// Keys
+			public static final String RECEIVER_IDS_KEY = "receiverIds";
+			public static final String SENDER_IDS_KEY = "senderIds";
+			public static final String SENDER_CLASSES_KEY = "senderClasses";
+		}
+		
+		/**
+		 * Subjects of privacy assessment to be shown
+		 */
+		public class Subjects {
+			
+			// Keys and values
+			public static final String ALL = "All";
+		}
+		
+		/**
+		 * Format of presentation
+		 */
+		public class Format {
+
+			// Keys and values
+			public static final String CHART = "Chart";
+			public static final String TABLE = "Table";
+		}
 	}
 	
 	/**
@@ -103,18 +147,18 @@ public class PrivacyAssessmentController {
 		
 		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
 		Map<String, String> assessmentSubjectTypes = new LinkedHashMap<String, String>();
-		assessmentSubjectTypes.put("receiverId", "Receiver identities");
-		assessmentSubjectTypes.put("senderId", "Sender identities");
-		assessmentSubjectTypes.put("senderClass", "Sender classes");
+		assessmentSubjectTypes.put(Presentation.SubjectTypes.RECEIVER_IDS_KEY, Presentation.SubjectTypes.RECEIVER_IDS);
+		assessmentSubjectTypes.put(Presentation.SubjectTypes.SENDER_IDS_KEY, Presentation.SubjectTypes.SENDER_IDS);
+		assessmentSubjectTypes.put(Presentation.SubjectTypes.SENDER_CLASSES_KEY, Presentation.SubjectTypes.SENDER_CLASSES);
 		model.put("assessmentSubjectTypes", assessmentSubjectTypes);
 
 		Map<String, String> presentationFormats = new LinkedHashMap<String, String>();
-		presentationFormats.put("table", "Table");
-		presentationFormats.put("chart", "Chart");
+		presentationFormats.put(Presentation.Format.TABLE, Presentation.Format.TABLE);
+		presentationFormats.put(Presentation.Format.CHART, Presentation.Format.CHART);
 		model.put("presentationFormats", presentationFormats);
 
 		Map<String, String> assessmentSubjects = new LinkedHashMap<String, String>();
-		assessmentSubjects.put("all", "All");
+		assessmentSubjects.put(Presentation.Subjects.ALL, Presentation.Subjects.ALL);
 		model.put("assessmentSubjects", assessmentSubjects);
 
 		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT, model);
@@ -139,79 +183,99 @@ public class PrivacyAssessmentController {
 			return new ModelAndView("error", model);
 		}
 
-		String method = assForm.getMethod();
-		LOG.debug("Method = {}", method);
+		String presentationFormat = assForm.getPresentationFormat();
+		String subjectType = assForm.getAssessmentSubjectType();
+		LOG.debug("presentationFormat = {}, subjectType = {}", presentationFormat, subjectType);
+		Object assValues;
 		
-		try {
+		if (presentationFormat.equalsIgnoreCase(Presentation.Format.CHART)) {
 			
-			if (method.equalsIgnoreCase("getAssessmentAllIds")) {
-				
+			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
-				model.put("services", assResult.values());
+				assValues = assResult.values();
 			}
-			else {
-
+			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
+				// FIXME
+				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
+				assResult = assessment.getAssessmentAllIds();
+				assValues = assResult.values();
+			}
+			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_CLASSES_KEY)) {
 				HashMap<String, AssessmentResultClassName> assResult;
 				assResult = assessment.getAssessmentAllClasses();
-				model.put("services", assResult.values());
+				assValues = assResult.values();
 			}
-		
-		}
-		catch (Exception ex) {
-			LOG.warn("", ex);
-		};
+			else {
+				LOG.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
+				return privacyAssessment();
+			}
+			model.put("assessmentResults", assValues);
 
-		LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
-		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_TABLE, model);
+			LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
+			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_CHART, model);
+		}
+		else if (presentationFormat.equalsIgnoreCase(Presentation.Format.TABLE)) {
+
+			HashMap<String, AssessmentResultClassName> assResult;
+			assResult = assessment.getAssessmentAllClasses();
+			model.put("assessmentResults", assResult.values());
+
+			LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
+			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_TABLE, model);
+		}
+		else {
+			LOG.warn("Unexpected {}: {}", Presentation.Format.class.getSimpleName(), presentationFormat);
+			return privacyAssessment();
+		}
 	}
 	
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_CHART + ".html", method = RequestMethod.GET)
 	public ModelAndView barchart() {
 
 		LOG.debug(PageNames.PRIVACY_ASSESSMENT_CHART + " HTTP GET");
-        final double[][] data = new double[][] {
-                {210, 300, 320, 265, 299},
-                {200, 304, 201, 201, 340}
-            };
+		final double[][] data = new double[][] {
+				{210, 300, 320, 265, 299},
+				{200, 304, 201, 201, 340}
+		};
 
-            final CategoryDataset dataset = DatasetUtilities.createCategoryDataset(
-                    "Team ", "", data);
+		final CategoryDataset dataset = DatasetUtilities.createCategoryDataset(
+				"Team ", "", data);
 
-            JFreeChart chart = null;
-            BarRenderer renderer = null;
-            CategoryPlot plot = null;
+		JFreeChart chart = null;
+		BarRenderer renderer = null;
+		CategoryPlot plot = null;
 
-            final CategoryAxis categoryAxis = new CategoryAxis("Match");
-            final ValueAxis valueAxis = new NumberAxis("Run");
-            renderer = new BarRenderer();
+		final CategoryAxis categoryAxis = new CategoryAxis("Match");
+		final ValueAxis valueAxis = new NumberAxis("Run");
+		renderer = new BarRenderer();
 
-            plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
-            plot.setOrientation(PlotOrientation.HORIZONTAL);
-            chart = new JFreeChart("Srore Bord", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+		plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
+		plot.setOrientation(PlotOrientation.HORIZONTAL);
+		chart = new JFreeChart("Srore Bord", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
-            chart.setBackgroundPaint(new Color(249, 231, 236));
+		chart.setBackgroundPaint(new Color(249, 231, 236));
 
-            Paint p1 = new GradientPaint(
-                    0.0f, 0.0f, new Color(16, 89, 172), 0.0f, 0.0f, new Color(201, 201, 244));
-            renderer.setSeriesPaint(1, p1);
+		Paint p1 = new GradientPaint(
+				0.0f, 0.0f, new Color(16, 89, 172), 0.0f, 0.0f, new Color(201, 201, 244));
+		renderer.setSeriesPaint(1, p1);
 
-            Paint p2 = new GradientPaint(
-                    0.0f, 0.0f, new Color(255, 35, 35), 0.0f, 0.0f, new Color(255, 180, 180));
-            renderer.setSeriesPaint(2, p2);
+		Paint p2 = new GradientPaint(
+				0.0f, 0.0f, new Color(255, 35, 35), 0.0f, 0.0f, new Color(255, 180, 180));
+		renderer.setSeriesPaint(2, p2);
 
-            plot.setRenderer(renderer);
+		plot.setRenderer(renderer);
 
-            try {
-                final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
-                // FIXME
-                String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
-                		"global/bundle/societies-webapp/1.0.0.SNAPSHOT/societies-webapp.war/";
-                final File file1 = new File(contextPath + "images/barchart.png");
-                ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
-            } catch (Exception e) {
-                LOG.warn("barchart(): ", e);
-            }
+		try {
+			final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
+			// FIXME
+			String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
+					"global/bundle/societies-webapp/1.0.0.SNAPSHOT/societies-webapp.war/";
+			final File file1 = new File(contextPath + "images/barchart.png");
+			ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
+		} catch (Exception e) {
+			LOG.warn("barchart(): ", e);
+		}
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();

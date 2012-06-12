@@ -25,14 +25,14 @@
 <tr><td><B>Sender</B></td><td><B>CorrWithDataAccessByAll</B></td><td><B>CorrWithDataAccessBySender</B></td><td><B>Sender</B></td>
 <td><B>Sender</B></td><td><B>Sender</B></td></tr> 
 
-	<xc:forEach var="service" items="${services}">
+	<xc:forEach var="assessmentResult" items="${assessmentResults}">
         <tr>
-        	<td>${service.sender}</td>
-         	<td>${service.corrWithDataAccessByAll}</td>
-            <td>${service.corrWithDataAccessBySender}</td>
-            <td>${service.sender}</td>            
-            <td>${service.sender}</td>
-            <td>${service.sender}</td>
+        	<td>${assessmentResult.sender}</td>
+         	<td>${assessmentResult.corrWithDataAccessByAll}</td>
+            <td>${assessmentResult.corrWithDataAccessBySender}</td>
+            <td>${assessmentResult.sender}</td>            
+            <td>${assessmentResult.sender}</td>
+            <td>${assessmentResult.sender}</td>
         </tr>
     </xc:forEach>
     	
