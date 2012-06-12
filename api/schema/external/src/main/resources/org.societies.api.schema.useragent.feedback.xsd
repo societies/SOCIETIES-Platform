@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	xmlns="http://societies.org/api/schema/useragent/feedback"
+	targetNamespace="http://societies.org/api/schema/useragent/feedback"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="userFeedbackBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="method" type="methodType" minOccurs="0" />
+				<xs:element name="type" type="xs:int" />
+				<xs:element name="options" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element name="proposalText" type="xs:string" minOccurs="0" />
+				<xs:element name="timeout" type="xs:int" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	
+	<xs:element name="expFeedbackResultBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="feedback" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="impFeedbackResultBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="feedback" type="xs:boolean" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:simpleType name="methodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="getExplicitFB" />
+			<xs:enumeration value="getImplicitFB" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
+

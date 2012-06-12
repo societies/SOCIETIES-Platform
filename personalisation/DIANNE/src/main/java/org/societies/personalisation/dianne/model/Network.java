@@ -29,11 +29,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 public class Network implements Serializable
 {
+	private Logger LOG = LoggerFactory.getLogger(Network.class);
+	private static final long serialVersionUID = 1L;
 	private ArrayList<ContextGroup> contextGroups;
 	private ArrayList<OutcomeGroup> outcomeGroups;
 	private ArrayList<Synapse> synapses;
@@ -59,7 +63,7 @@ public class Network implements Serializable
 	
 	public ContextGroup getContextGroup(String groupName){
 		ContextGroup requestedGroup = null;
-		Iterator<ContextGroup> list_it = contextGroups.iterator();
+		Iterator<ContextGroup> list_it = this.getContextGroups().iterator();
 		while(list_it.hasNext())
 		{
 			ContextGroup group = (ContextGroup)list_it.next();
@@ -75,11 +79,13 @@ public class Network implements Serializable
 	public OutcomeGroup getOutcomeGroup(ServiceResourceIdentifier serviceId, String groupName){
 		OutcomeGroup requestedGroup = null;
 
-		Iterator <OutcomeGroup>list_it = outcomeGroups.iterator();
+		Iterator <OutcomeGroup>list_it = this.getOutcomeGroups().iterator();
+		LOG.debug("Number of outcome groups = "+this.getOutcomeGroups().size());
 		while(list_it.hasNext())
 		{
 			OutcomeGroup group = (OutcomeGroup)list_it.next();
-			if(group.getServiceId().equals(serviceId)){
+			LOG.debug("Checking if "+group.getServiceId().getServiceInstanceIdentifier()+" equals "+serviceId.getServiceInstanceIdentifier());
+			if(group.getServiceId().getServiceInstanceIdentifier().equals(serviceId.getServiceInstanceIdentifier())){
 				if(group.getGroupName().equals(groupName))
 				{
 					requestedGroup = group;
@@ -95,10 +101,62 @@ public class Network implements Serializable
 	}
 	
 	public void addOutcomeGroup(OutcomeGroup newOutcomeGroup){
+		LOG.debug("Adding new outcome group: "+newOutcomeGroup.getServiceId().getServiceInstanceIdentifier()+"->"+newOutcomeGroup.getGroupName());
 		outcomeGroups.add(newOutcomeGroup);
 	}
 	
 	public void addSynapse(Synapse newSynapse){
 		synapses.add(newSynapse);
 	}
+	
+	public void printNetwork()
+	 {
+	  System.out.println();
+	  System.out.println("**************Context Groups************");
+	  Iterator contextGroups_it = contextGroups.iterator();
+	  while(contextGroups_it.hasNext())
+	  {
+	   Group nextGroup = (Group)contextGroups_it.next();
+	   System.out.println("Group - "+nextGroup.getGroupName());
+	   ArrayList groupNodes = nextGroup.getGroupNodes();
+	   Iterator groupNodes_it = groupNodes.iterator();
+	   while(groupNodes_it.hasNext())
+	   {
+	    Node nextNode = (Node)groupNodes_it.next();
+	    System.out.println(nextNode.getNodeName()+
+	      ": active("+nextNode.getActive()+")");
+	   }
+	  }
+	  
+	  System.out.println();
+	  System.out.println("*************Outcome Groups**************");
+	  Iterator outcomeGroups_it = outcomeGroups.iterator();
+	  while(outcomeGroups_it.hasNext())
+	  {
+	   Group nextGroup = (Group)outcomeGroups_it.next();
+	   System.out.println("Group - "+nextGroup.getGroupName());
+	   ArrayList groupNodes = nextGroup.getGroupNodes();
+	   Iterator groupNodes_it = groupNodes.iterator();
+	   while(groupNodes_it.hasNext())
+	   {
+	    OutcomeNode nextNode = (OutcomeNode)groupNodes_it.next();
+	    System.out.println(nextNode.getNodeName()+
+	      ": active("+nextNode.getActive()+
+	      ") potential("+nextNode.getPotential()+")");
+	   }
+	  }
+	  
+	  System.out.println();
+	  System.out.println("***************Synapses*******************");
+	  Iterator synapses_it = synapses.iterator();
+	  while(synapses_it.hasNext())
+	  {
+	   Synapse nextSynapse = (Synapse)synapses_it.next();
+	   System.out.println(nextSynapse.getId()+
+	     ": preNode("+nextSynapse.getPreNode().getNodeName()+
+	     ") postNode("+nextSynapse.getPostNode().getNodeName()+
+	     ") weight("+nextSynapse.getWeight()+")");
+	  }
+	  System.out.println();
+	 }
 }

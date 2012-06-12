@@ -82,7 +82,6 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -148,8 +147,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 
 	private IUserFeedback userFeedback;
 
-	private IUserFeedbackCallback userFeedbackCallback;
-    
+	
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
 	private SuggestedCommunityAnalyserResultBean suggestedCommunityAnalyserResultBean;
@@ -348,7 +346,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		options[0] = "options";
 		String userResponse = null;
 		boolean responded = false;
-		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs should be configured as described. If you approve these actions for one or more of these CISs, please check them.", options), userFeedbackCallback);
+		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs should be configured as described. If you approve these actions for one or more of these CISs, please check them.", options));
 		for (int i = 0; i < 300; i++) {
 		    if (userResponse == null)
 				try {
@@ -426,13 +424,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
     	this.userFeedback = userFeedback;
     }
     
-    public IUserFeedbackCallback getUserFeedbackCallback() {
-    	return userFeedbackCallback;
-    }
     
-    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
-    	this.userFeedbackCallback = userFeedbackCallback;
-    }
     
     public ISuggestedCommunityAnalyser getSuggestedCommunityAnalyser() {
     	return suggestedCommunityAnalyser;

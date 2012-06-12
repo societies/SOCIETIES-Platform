@@ -103,8 +103,6 @@ import java.util.concurrent.Future;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
-
 
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 
@@ -132,7 +130,6 @@ public class CommunityRecommender //implements ICommCallback
 	
 	private ArrayList<ICisProposal> recentRefusals;
 
-	private IUserFeedbackCallback userFeedbackCallback;
 	
 	//private ArrayList<ICis> cissToCreate;
 	//private HashMap<String, ArrayList<ArrayList<ICis>>> cissToConfigure;
@@ -376,7 +373,7 @@ public class CommunityRecommender //implements ICommCallback
 		}
 		String userResponse = "";
 		boolean responded = false;
-		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options), userFeedbackCallback);
+		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options));
 		for (int i = 0; i < 300; i++) {
 		    if (userResponse.equals(""))
 				try {
@@ -796,7 +793,7 @@ public class CommunityRecommender //implements ICommCallback
         }
 	    String userResponse = null;
 	    boolean responded = false;
-	    userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs should be configured as described. If you approve these actions for one or more of these CISs, please check them.", options), userFeedbackCallback);
+	    userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs should be configured as described. If you approve these actions for one or more of these CISs, please check them.", options));
 	    while (userResponse == null) {
 	        if (userResponse == null)
 			    try {
@@ -868,14 +865,6 @@ public class CommunityRecommender //implements ICommCallback
     
     public void setUserFeedback(IUserFeedback userFeedback) {
     	this.userFeedback = userFeedback;
-    }
-    
-    public IUserFeedbackCallback getUserFeedbackCallback() {
-    	return userFeedbackCallback;
-    }
-    
-    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
-    	this.userFeedbackCallback = userFeedbackCallback;
     }
     
     public void getUserResponse(String userResponse) {

@@ -23,14 +23,28 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.feedback;
+package org.societies.api.schema.useragent.feedback;
 
-import java.util.List;
-
-public interface IUserFeedbackCallback {
+public class ImpFeedbackCallbackBean {
 	
-	public void handleExpFeedback(List<String> feedback);
+	private enum methodType {handleImpFeedback};
+	private methodType method;
+	private boolean feedback;
 	
-	public void handleImpFeedback(Boolean feedback);
+	public methodType getMethodType(){
+		return this.method;
+	}
+	
+	public void setMethodType(methodType method){
+		this.method = method;
+	}
+	
+	public boolean getFeedback(){
+		return this.feedback;
+	}
+	
+	public void setFeedback(boolean feedback){
+		this.feedback = feedback;
+	}
 
 }

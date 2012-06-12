@@ -23,36 +23,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.feedback.guis;
+package org.societies.personalisation.dianne.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
+import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 
+public interface IOutcomeListener {
 
-public class AckNackGUI{
-		
-	public static List<String> displayGUI(String proposalText, String[] options){
-		List<String> feedback = new ArrayList<String>();
-		int n = JOptionPane.showOptionDialog(null,
-			    proposalText,
-			    "TEST - Ack/Nack Feedback GUI",
-			    JOptionPane.YES_NO_CANCEL_OPTION,
-			    JOptionPane.QUESTION_MESSAGE,
-			    null,
-			    options,
-			    options[0]);
-		feedback.add(options[n]);
-		return feedback;
-	}
-
-	public static void main(String[] args){
-		String[] options = {"yes", "no"};
-		List<String> result = AckNackGUI.displayGUI("Are you OK??", options);
-		System.out.println("Selected feedback: ");
-		for(String output: result){
-			System.out.println(output);
-		}
-	}
+	public void handleOutcomes(List<IDIANNEOutcome> outcomes);
 }

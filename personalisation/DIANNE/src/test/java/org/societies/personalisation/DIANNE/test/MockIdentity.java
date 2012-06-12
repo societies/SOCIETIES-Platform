@@ -23,36 +23,53 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.feedback.guis;
+package org.societies.personalisation.DIANNE.test;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
 
-import javax.swing.JOptionPane;
+public class MockIdentity implements IIdentity, INetworkNode{
+	
+	IdentityType type;
+	String identifier;
+	String domainIdentifier;
 
-
-public class AckNackGUI{
-		
-	public static List<String> displayGUI(String proposalText, String[] options){
-		List<String> feedback = new ArrayList<String>();
-		int n = JOptionPane.showOptionDialog(null,
-			    proposalText,
-			    "TEST - Ack/Nack Feedback GUI",
-			    JOptionPane.YES_NO_CANCEL_OPTION,
-			    JOptionPane.QUESTION_MESSAGE,
-			    null,
-			    options,
-			    options[0]);
-		feedback.add(options[n]);
-		return feedback;
+	public MockIdentity(IdentityType type, String identifier,
+			String domainIdentifier) {
+		this.type = type;
+		this.identifier = identifier;
+		this.domainIdentifier = domainIdentifier;
 	}
 
-	public static void main(String[] args){
-		String[] options = {"yes", "no"};
-		List<String> result = AckNackGUI.displayGUI("Are you OK??", options);
-		System.out.println("Selected feedback: ");
-		for(String output: result){
-			System.out.println(output);
-		}
+	@Override
+	public String getJid() {
+		return null;
 	}
+
+	@Override
+	public String getBareJid() {
+		return identifier+"@"+domainIdentifier;
+	}
+
+	@Override
+	public String getDomain() {
+		return domainIdentifier;
+	}
+
+	@Override
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	@Override
+	public IdentityType getType() {
+		return type;
+	}
+
+	@Override
+	public String getNodeIdentifier() {
+		return null;
+	}
+
 }

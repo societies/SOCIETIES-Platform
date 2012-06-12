@@ -23,20 +23,14 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.remote;
+package org.societies.useragent.api.remote.feedback;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
 
-public interface IUserAgentRemoteMgr{
+public interface IUserFeedbackRemote {
 
-	/**
-	 * 
-	 * @param serviceId  ID of monitored service
-	 * @param owner  Identity of user where action originated from
-	 * @param parameterName  Parameter name of action
-	 * @param value  Value of action
-	 */
-	public void monitor(IIdentity owner, ServiceResourceIdentifier serviceId, String serviceType, String parameterName, String value);
+	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback);
 	
+	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback);
 }
