@@ -133,7 +133,7 @@ public class Jaxb2Simple extends AbstractMojo
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//@XmlJavaTypeAdapter(Adapter1 .class) -> @Convert(URIConverter.class)
-		textToFind = "@XmlJavaTypeAdapter\\(Adapter1 .class?\\)";
+		textToFind = "@XmlJavaTypeAdapter\\(Adapter1.*\\.class?\\)";
 		textToReplace = "@Convert(URIConverter.class)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
@@ -160,7 +160,7 @@ public class Jaxb2Simple extends AbstractMojo
 		
 		//@XmlElement(required = true, type = Integer.class, nillable = true)
 		//textToFind = "(@XmlElement\\(.*)nillable = true|false?\\)";
-		textToFind = ", nillable = true|false";
+		textToFind = ", nillable = (true|false)";
 		textToReplace = "";		//"$1)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
@@ -243,7 +243,7 @@ public class Jaxb2Simple extends AbstractMojo
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//REMOVE @XmlSchemaType(name = "anyURI")
-		textToFind = "@XmlSchemaType\\(name = \".*\"\\)";
+		textToFind = "@XmlSchemaType\\(name = \".*\"\\)\n    ";
 		textToReplace = "";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
