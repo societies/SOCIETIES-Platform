@@ -109,7 +109,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 				try {
 					reply = feedbackHandler.getExplicitFB(ExpProposalType.RADIOLIST, epc).get();
 					new DecisionMakingCallback(this,intent,conflicts).handleExpFeedback(reply);
-				} catch (InterruptedException | ExecutionException e) {
+				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}//, 
