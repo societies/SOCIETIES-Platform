@@ -91,7 +91,7 @@ public class PrivacyAssessmentController {
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT + ".html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessment() {
 
-		LOG.debug("privacyassessment HTTP GET");
+		LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP GET");
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -125,7 +125,7 @@ public class PrivacyAssessmentController {
 	public ModelAndView privacyAssessment(@Valid PrivacyAssessmentForm assForm,
 			BindingResult result, Map model) {
 
-		LOG.debug("privacyassessment HTTP POST");
+		LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST");
 
 		if (result.hasErrors()) {
 			LOG.warn("BindingResult has errors");
@@ -140,7 +140,6 @@ public class PrivacyAssessmentController {
 		}
 
 		String method = assForm.getMethod();
-		String res;
 		LOG.debug("Method = {}", method);
 		
 		try {
@@ -149,47 +148,29 @@ public class PrivacyAssessmentController {
 				
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
-				res="Privacy Assessment Result for all identities";
 				model.put("services", assResult.values());
 			}
-			else if (method.equalsIgnoreCase("getAssessmentAllClasses")) {
+			else {
 
 				HashMap<String, AssessmentResultClassName> assResult;
 				assResult = assessment.getAssessmentAllClasses();
-				res="Privacy Assessment Result for all classes";
 				model.put("services", assResult.values());
 			}
-			else if (method.equalsIgnoreCase("assessAllNow")) {
-				
-				assessment.assessAllNow();
-				res="Privacy Assessment Result";
-			}
-			else if (method.equalsIgnoreCase("setAutoPeriod")) {
-				
-				assessment.setAutoPeriod(assForm.getAutoReassessmentInSecs());
-				res="Privacy Assessment Result";
-			}
-			else {
-				res="error unknown metod";
-			}
 		
-			model.put("result", res);
 		}
-		catch (Exception ex)
-		{
+		catch (Exception ex) {
 			LOG.warn("", ex);
-			res = "Oops!!!! <br/>";
 		};
 
-		LOG.debug("HTTP POST end");
+		LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
 		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_TABLE, model);
 	}
 	
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_CHART + ".html", method = RequestMethod.GET)
 	public ModelAndView barchart() {
 
-		LOG.debug("barchart HTTP GET");
-        final double[][] data = new double[][]{
+		LOG.debug(PageNames.PRIVACY_ASSESSMENT_CHART + " HTTP GET");
+        final double[][] data = new double[][] {
                 {210, 300, 320, 265, 299},
                 {200, 304, 201, 201, 340}
             };
@@ -254,7 +235,7 @@ public class PrivacyAssessmentController {
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_SETTINGS + ".html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessmentSettings() {
 
-		LOG.debug("privacyAssessmentSettings HTTP GET");
+		LOG.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP GET");
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -276,7 +257,7 @@ public class PrivacyAssessmentController {
 	public ModelAndView privacyAssessmentSettings(@Valid PrivacyAssessmentForm assForm,
 			BindingResult result, Map model) {
 
-		LOG.debug("privacyAssessmentSettings HTTP POST");
+		LOG.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP POST");
 
 		if (result.hasErrors()) {
 			LOG.warn("BindingResult has errors");
@@ -309,7 +290,7 @@ public class PrivacyAssessmentController {
 			LOG.warn("", ex);
 		};
 
-		LOG.debug("privacyAssessmentSettings HTTP POST end");
+		LOG.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP POST end");
 		return privacyAssessment();
 	}
 }
