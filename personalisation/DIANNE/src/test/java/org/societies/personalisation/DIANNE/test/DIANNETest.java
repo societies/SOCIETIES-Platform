@@ -151,7 +151,7 @@ public class DIANNETest extends TestCase{
 		try {
 			when(mockCommsMgr.getIdManager()).thenReturn(mockIdManager);
 			when(mockIdManager.getThisNetworkNode()).thenReturn((INetworkNode)mockIdentity);
-			when(mockCtxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(mockPersonEntity));
+			when(mockCtxBroker.retrieveIndividualEntity(mockIdentity)).thenReturn(new AsyncResult<IndividualCtxEntity>(mockPersonEntity));
 		} catch (CtxException e) {
 			e.printStackTrace();
 		}
@@ -159,7 +159,7 @@ public class DIANNETest extends TestCase{
 		try {
 			verify(mockCommsMgr).getIdManager();
 			verify(mockIdManager).getThisNetworkNode();
-			verify(mockCtxBroker).retrieveCssOperator();
+			verify(mockCtxBroker).retrieveIndividualEntity(mockIdentity);
 		} catch (CtxException e) {
 			e.printStackTrace();
 		}

@@ -77,7 +77,7 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 	private IInternalPersonalisationManager persoMgr;
 	private ICtxBroker ctxBroker;
 	private ICommManager commsMgr;
-	private IIdentity personID;
+	private IIdentity cssID;
 
 	public DIANNE(){
 		d_nets = new HashMap<IIdentity, Network>();
@@ -186,7 +186,7 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 				String nextType = defaultContext[i];
 				List<CtxIdentifier> attrIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, nextType).get();
 				if(attrIDs.size() > 0){
-					persoMgr.registerForContextUpdate(personID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attrIDs.get(0));
+					persoMgr.registerForContextUpdate(cssID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attrIDs.get(0));
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -197,9 +197,14 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 			}	
 		}
 	}
+	
+	@Override
+	public void receiveDIANNEFeedback(IIdentity ownerId, IAction action){
+		this.getOutcome(ownerId, action);
+	}
 
 	public void initialiseDIANNELearning(){
-		personID = commsMgr.getIdManager().getThisNetworkNode();
+		cssID = commsMgr.getIdManager().getThisNetworkNode();
 		retrieveNetworks();  //get Networks from context
 		initialiseNetworks();  //start runners for each network
 		//start DIANNE storage thread - store DIANNEs every 1?/5? minute(s)
@@ -210,7 +215,7 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 	
 	private void retrieveNetworks(){
 		try {
-			IndividualCtxEntity person = ctxBroker.retrieveCssOperator().get();
+			IndividualCtxEntity person = ctxBroker.retrieveIndividualEntity(cssID).get();
 			Set<CtxAssociationIdentifier> hasDianneAssocIDs = person.getAssociations(CtxAssociationTypes.HAS_DIANNE);
 			
 			if(hasDianneAssocIDs.size() > 0){// HAS_DIANNE association found in context
