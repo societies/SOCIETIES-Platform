@@ -35,7 +35,7 @@
 
 	<h3>Privacy Assessment</h3>
 	
-	<h4>Results</h4>
+	<h4>View Results</h4>
 
 	<form:form method="POST" action="privacy-assessment.html"
 		commandName="assForm">
