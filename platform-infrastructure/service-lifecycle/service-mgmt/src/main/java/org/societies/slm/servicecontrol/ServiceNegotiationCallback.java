@@ -24,40 +24,133 @@
  */
 package org.societies.slm.servicecontrol;
 
+import java.net.URI;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 
 /**
- * Describe your class here...
+ * The callback object for the Negotiation procedure
  *
- * @author Sancho
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
 public class ServiceNegotiationCallback implements INegotiationCallback {
 
+	static final Logger logger = LoggerFactory.getLogger(ServiceNegotiationCallback.class);
+
+	private final long TIMEOUT = 5;
+	private BlockingQueue<ServiceNegotiationResult> resultList;
 	
 	/**
 	 * 
 	 */
 	public ServiceNegotiationCallback() {
-		// TODO Auto-generated constructor stub
+		
+		if(logger.isDebugEnabled())
+			logger.debug("ServiceNegotiationCallback created!");
+		
+		resultList = new ArrayBlockingQueue<ServiceNegotiationResult>(1);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.security.policynegotiator.INegotiationCallback#onNegotiationComplete(java.lang.String)
-	 */
-	@Override
-	public void onNegotiationComplete(String agreementKey) {
-		// TODO Auto-generated method stub
 
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.security.policynegotiator.INegotiationCallback#onNegotiationError(java.lang.String)
-	 */
 	@Override
 	public void onNegotiationError(String msg) {
-		// TODO Auto-generated method stub
-
+		if(logger.isDebugEnabled())
+			logger.debug("Service negotiation complete: Error: " + msg);
+		
+		try {
+			resultList.put(new ServiceNegotiationResult(false, null, msg));
+		} catch (InterruptedException e) {
+			logger.error("Error putting result in List");
+			e.printStackTrace();
+		}
 	}
 
+
+	@Override
+	public void onNegotiationComplete(String agreementKey, URI jar) {
+		if(logger.isDebugEnabled())
+			logger.debug("Service negotiation complete: agreementKey: " + agreementKey);
+		
+		if(agreementKey == null){
+			if(logger.isDebugEnabled())
+				logger.debug("AgreementKey came back null! This means that negotiation failed");
+			
+			try {
+				resultList.put(new ServiceNegotiationResult(false, jar, agreementKey));
+			} catch (InterruptedException e) {
+				logger.error("Error putting result in List");
+				e.printStackTrace();
+			}
+				
+		} else{
+			
+			if(logger.isDebugEnabled())
+				logger.debug("AgreementKey came back normal, so we proceed!");
+			
+			try {
+				resultList.put(new ServiceNegotiationResult(true, jar, agreementKey));
+			} catch (InterruptedException e) {
+				logger.error("Error putting result in List");
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+
+	public ServiceNegotiationResult getResult() {
+		try {
+			return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			logger.error("Error getting result in List");
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	protected class ServiceNegotiationResult{
+		
+		boolean success;
+		URI serviceUri;
+		String agreementKey;
+		
+		public ServiceNegotiationResult(){}
+		
+		public ServiceNegotiationResult(boolean success, URI serviceUri, String agreementKey){
+			this.success = success;
+			this.serviceUri = serviceUri;
+			this.agreementKey = agreementKey;
+		}
+		
+		public void setServiceUri(URI serviceUri){
+			this.serviceUri = serviceUri;
+		}
+		
+		public void setSuccess(boolean success){
+			this.success = success;
+		}
+		
+		public void setAgreementKey(String agreementKey){
+			this.agreementKey = agreementKey;
+		}
+		
+		public URI getServiceUri(){
+			return serviceUri;
+		}
+		
+		public boolean getSuccess(){
+			return success;
+		}
+		
+		public String getAgreementKey(){
+			return agreementKey;
+		}
+		
+	}
 }

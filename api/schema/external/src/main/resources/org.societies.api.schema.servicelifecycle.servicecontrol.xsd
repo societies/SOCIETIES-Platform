@@ -45,6 +45,7 @@
       <xs:enumeration value="EXCEPTION_ON_REMOTE"/>
       <xs:enumeration value="UNKNOWN_NODE"/>
       <xs:enumeration value="NEGOTIATION_FAILED"/>
+      <xs:enumeration value="NEGOTIATION_ERROR"/>
     </xs:restriction>
   </xs:simpleType>
   

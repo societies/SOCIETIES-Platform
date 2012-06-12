@@ -159,7 +159,6 @@ public class CommsServer implements IFeatureServer {
 						returnList = serviceDiscovery.getLocalServices();
 						resultList =  returnList.get();
 						
-			
 						
 						if (resultList != null)
 						{
@@ -168,27 +167,40 @@ public class CommsServer implements IFeatureServer {
 								resultBeanList.add(resultList.get(i));
 							}
 						}
-					}		
+						break;
+					}
+					
+					case GET_SERVICE:
+					{
+						Future<Service> futureFoundService = serviceDiscovery.getService(serviceMessage.getServiceId());
+						Service foundService = futureFoundService.get();
+						if(foundService != null)
+							resultBeanList.add(foundService);
+						
+						break;
+					}
+					
+					case SEARCH_SERVICE:
+					{
+						returnList = serviceDiscovery.getLocalServices();
+						resultList =  returnList.get();
+							
+						if (resultList != null)
+						{
+							for (int i = 0; i < resultList.size(); i++)
+							{
+								resultBeanList.add(resultList.get(i));
+							}
+						}
+						break;
+					}
 				}
 			}catch (ServiceDiscoveryException e) {
 					e.printStackTrace();
 			} catch (Exception e) {
 					e.printStackTrace();
 			};
-				
-			//			Service tempService = new Service();
-			//			tempService.setServiceName("pretendService");
-						
-			//			resultBeanList.add(tempService);
-						
-			//			break;
-			//			}
-			//		}
-			//	}
-			//	catch (Exception e) {
-			//		e.printStackTrace();
-			//	};
-					
+									
 			//RETURN MESSAGEBEAN RESULT
 			return serviceResult;
 			
@@ -254,6 +266,30 @@ public class CommsServer implements IFeatureServer {
 						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: UNINSTALL SERVICE");
 								
 						controlResult = getServiceControl().uninstallService(serviceMessage.getServiceId());
+						ServiceControlResult result = controlResult.get();
+						
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						
+						serviceResult.setControlResult(result);
+						break;
+					}
+					case SHARE_SERVICE:
+					{
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: SHARE SERVICE");
+								
+						controlResult = getServiceControl().shareService(serviceMessage.getService(), serviceMessage.getShareJid());
+						ServiceControlResult result = controlResult.get();
+						
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						
+						serviceResult.setControlResult(result);
+						break;
+					}
+					case UNSHARE_SERVICE:
+					{
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: UNSHARE SERVICE");
+								
+						controlResult = getServiceControl().unshareService(serviceMessage.getService(), serviceMessage.getShareJid());
 						ServiceControlResult result = controlResult.get();
 						
 						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);

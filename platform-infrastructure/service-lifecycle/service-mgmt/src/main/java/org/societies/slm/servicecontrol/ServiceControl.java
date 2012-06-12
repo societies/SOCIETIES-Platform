@@ -24,6 +24,7 @@
  */
 package org.societies.slm.servicecontrol;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,12 +38,16 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -55,6 +60,7 @@ import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.slm.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -73,12 +79,16 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
 	private IServiceControlRemote serviceControlRemote;
+	private INegotiation policyNegotiation;
+	private ICisManager cisManager;
 
 	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	
 	private final long TIMEOUT = 5;
 
-	private INegotiation policyNegotiator;
+	public ICisManager getCisManager(){
+		return cisManager;
+	}
 	
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
@@ -92,16 +102,21 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		this.commMngr = commMngr;
 	}
 	
-	public void setPolicyNegotiatior(INegotiation policyNegotiator){
-		this.policyNegotiator = policyNegotiator;
+	public void setCisManager(ICisManager cisManager){
+		this.cisManager = cisManager;
 	}
+	
+	public void setPolicyNegotiaton(INegotiation policyNegotiation){
+		this.policyNegotiation = policyNegotiation;
+	}
+	
 	
 	public ICommManager getCommMngr() {
 		return commMngr;
 	}
 
-	public INegotiation getPolicyNegotiator(){
-		return policyNegotiator;
+	public INegotiation getPolicyNegotiation(){
+		return policyNegotiation;
 	}
 	
 	public void setServiceControlRemote(IServiceControlRemote serviceControlRemote){
@@ -335,18 +350,59 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(logger.isDebugEnabled()) 
 				logger.debug("Service Management: installService method, on our node: jid");
 		
+			// First up, we need to do the negotiation check
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Trying to do policy negotiation!");
+			
+			IIdentity providerNode = getCommMngr().getIdManager().fromJid(serviceToInstall.getServiceInstance().getFullJid());
 
-			if(){
+			if(logger.isDebugEnabled())
+				logger.debug("Got the provider IIdentity, now creating the Requestor");
+			
+			RequestorService provider = new RequestorService(providerNode, serviceToInstall.getServiceIdentifier());
+		
+			boolean includePrivacyPolicyNegotiation = false;
+			
+			if(logger.isDebugEnabled())
+				logger.debug("For now, PrivacyPolicyNegotiation is: " + includePrivacyPolicyNegotiation);
+			
+			ServiceNegotiationCallback negotiationCallback = new ServiceNegotiationCallback();
+			getPolicyNegotiation().startNegotiation(provider, includePrivacyPolicyNegotiation, negotiationCallback);
+			ServiceNegotiationResult negotiationResult = negotiationCallback.getResult();
+			
+			if(negotiationResult == null){
+				if(logger.isDebugEnabled()) logger.debug("Problem doing negotiation!");
+				return false;
+			} 
+			
+			if(negotiationResult.getSuccess()){
+				if(logger.isDebugEnabled())
+					logger.debug("Negotiation was successful! URI returned is: " + negotiationResult.getServiceUri());
+			
+				// Now install the client!
+				Future<ServiceControlResult> asyncResult = null;
+				URL bundleLocation = negotiationResult.getServiceUri().toURL();
 				
+				asyncResult = installService(bundleLocation);
+				ServiceControlResult result = asyncResult.get();
+				
+				return new AsyncResult<ServiceControlResult>(result);
+				
+			} else{
+				if(logger.isDebugEnabled())
+					logger.debug("Negotiation was not successful!");
+				
+				return new AsyncResult<ServiceControlResult>(result);
 			}
-			// Now install the client!
-			Future<ServiceControlResult> asyncResult = null;
-			URL bundleLocation = null;
 			
-			asyncResult = installService(bundleLocation);
-			ServiceControlResult result = asyncResult.get();
+	
 			
-			return new AsyncResult<ServiceControlResult>(result);
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Now installing the service!");
+			
+
 		
 		} catch (Exception ex) {
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
@@ -486,6 +542,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		returnResult.setServiceId(null);
 		
 		try {
+			// First we verify if we are installing in our own CSS
 			
 			// Our first task is to verify if we're installing in the right node..
 
@@ -696,22 +753,6 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 	}
 
-	private boolean serviceNegotiation(Service service) throws InvalidFormatException{
-		
-		boolean result = true;
-		
-		IIdentity providerNode = getCommMngr().getIdManager().fromJid(service.getServiceInstance().getFullJid());
-
-		if(logger.isDebugEnabled())
-			logger.debug("Got the provider IIdentity, now creating the Requestor");
-		
-		RequestorService provider = new RequestorService(providerNode, service.getServiceIdentifier());
-	
-		boolean includePrivacyPolicyNegotiation = false;
-		INegotiationCallback negotiationCallback = new ServiceNegotiationCallback();
-		getPolicyNegotiator().startNegotiation(provider, includePrivacyPolicyNegotiation, negotiationCallback);
-		return result;
-	}
 	
 	/**
 	 * This method is used to obtain the Bundle that corresponds to a given a Service
@@ -792,17 +833,18 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		try {
 			
 			// First we check if the service is already in the repository
+			//TODO a check to see if the service is "ours"? And then only add it if it's not?
+			
 			Service ourService = getServiceReg().retrieveService(service.getServiceIdentifier());
 			if(ourService==null){
 				if(logger.isDebugEnabled())
 					logger.debug("Service is not in the repository yet, adding it");
 				
-				
 				List<Service> servicesList = new ArrayList<Service>();
 				servicesList.add(service);
 				getServiceReg().registerServiceList(servicesList );
 			}
-			
+					
 			// Now that we've added it, we can share it!
 			
 			switch (node.getType())
@@ -811,15 +853,57 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			case CSS_RICH:
 			case CSS_LIGHT:
 				if(logger.isDebugEnabled()) logger.debug("For now, sharing to specific CSS is not supported");
-				break;
+				//break;
 			case CIS:
 				if(logger.isDebugEnabled()) logger.debug("Sharing with a CIS: " + node.getJid());
-				getServiceReg().notifyServiceIsSharedInCIS(service.getServiceIdentifier(), node.getJid());
-				returnResult.setMessage(ResultMessage.SUCCESS);
+				
+				// First we need to check if we own the CIS. If so, then we can add it, if not then we need to tell the respective CIS
+				ICisOwned myCIS = getCisManager().getOwnedCis(node.getJid());
+				
+				if(myCIS!= null) {
+					if(logger.isDebugEnabled())
+						logger.debug("We are dealing with a CIS that we own: " + myCIS.getName());
+					
+					//Adding service to repository
+					if(logger.isDebugEnabled())
+						logger.debug("Adding service-cis association to repository");
+					getServiceReg().notifyServiceIsSharedInCIS(service.getServiceIdentifier(), node.getJid());
+
+					returnResult.setMessage(ResultMessage.SUCCESS);
+				} else {
+					
+					if(logger.isDebugEnabled())
+						logger.debug("We need to send the message to the remote CIS!");
+					
+					ServiceControlRemoteClient callback = new ServiceControlRemoteClient();
+					getServiceControlRemote().shareService(service, node, callback);
+					
+					if(logger.isDebugEnabled())
+						logger.debug("Remote call complete, now we need to wait for the result...");
+					
+					ServiceControlResult result = callback.getResult();
+					
+					if(result == null){
+						if(logger.isDebugEnabled())
+							logger.debug("Error with communication to remote client");
+						
+						returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+					} else{
+						if(logger.isDebugEnabled())
+							logger.debug("Result of operation was: " + result);
+						
+						if(result.getMessage() == ResultMessage.SUCCESS && ServiceModelUtils.isServiceOurs(service,getCommMngr())){
+								
+							// And we add it to the table
+							getServiceReg().notifyServiceIsSharedInCIS(service.getServiceIdentifier(), node.getJid());
+						}	
+					}				
+				}					
 				break;
+				
 			default: 
 				if(logger.isDebugEnabled()) logger.debug("Unknown kind of node!");
-				returnResult.setMessage(ResultMessage.EXCEPTION_ON_REMOTE);
+				returnResult.setMessage(ResultMessage.UNKNOWN_NODE);
 				break;
 			} 
 			
@@ -868,21 +952,23 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 		ServiceControlResult returnResult = new ServiceControlResult();
 		returnResult.setServiceId(service.getServiceIdentifier());
-
+		
 		try {
 			
-			// First we check if the service is already in the repository
+			// First we check if the service is already in the repository. If it's not, then there's something wrong!
+			//TODO a check to see if the service is "ours"? And then only add it if it's not?
+			
 			Service ourService = getServiceReg().retrieveService(service.getServiceIdentifier());
 			if(ourService==null){
 				if(logger.isDebugEnabled())
-					logger.debug("Service is not in the repository! It can't be shared!");
+					logger.debug("Service is not in the repository yet, then how can we unshare it?");
 				
-				returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);	
+				returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);
 				return new AsyncResult<ServiceControlResult>(returnResult);
-				
+
 			}
 			
-			// Now that we've added it, we can unshare it!
+			// Now we unshare it!
 			
 			switch (node.getType())
 			{
@@ -890,40 +976,82 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			case CSS_RICH:
 			case CSS_LIGHT:
 				if(logger.isDebugEnabled()) logger.debug("For now, sharing to specific CSS is not supported");
-				break;
+				//break;
 			case CIS:
-				if(logger.isDebugEnabled()) logger.debug("Unsharing with a CIS: " + node.getJid());
-				getServiceReg().removeServiceSharingInCIS(service.getServiceIdentifier(), node.getJid());
+				if(logger.isDebugEnabled()) logger.debug("Removing sharing with a CIS: " + node.getJid());
+				
+				// First we need to check if we own the CIS. If so, then we can remove it, if not then we need to tell the respective CIS
+				ICisOwned myCIS = getCisManager().getOwnedCis(node.getJid());
+				
+				if(myCIS!= null) {
+					if(logger.isDebugEnabled())
+						logger.debug("We are dealing with a CIS that we own: " + myCIS.getName());
+					
+					//Removing service from repository
+					if(logger.isDebugEnabled())
+						logger.debug("Removing service from sharing");
+					getServiceReg().removeServiceSharingInCIS(service.getServiceIdentifier(), node.getJid());
+					
+					//Checking if the service is ours, if so then add it to the negotiation provider
+					if(!ServiceModelUtils.isServiceOurs(service,getCommMngr())){
+						if(logger.isDebugEnabled())
+							logger.debug("Service isn't ours, removing it from the service repository!");
+						
+						List<Service> servicesList = new ArrayList<Service>();
+						servicesList.add(service);
+						getServiceReg().unregisterServiceList(servicesList);
+					}
+		
+					returnResult.setMessage(ResultMessage.SUCCESS);
+				} else {
+					
+					if(logger.isDebugEnabled())
+						logger.debug("We need to send the message to the remote CIS!");
+					
+					ServiceControlRemoteClient callback = new ServiceControlRemoteClient();
+					getServiceControlRemote().shareService(service, node, callback);
+					
+					if(logger.isDebugEnabled())
+						logger.debug("Remote call complete, now we need to wait for the result...");
+					
+					ServiceControlResult result = callback.getResult();
+					
+					if(result == null){
+						if(logger.isDebugEnabled())
+							logger.debug("Error with communication to remote client");
+						
+						returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+					} else{
+						if(logger.isDebugEnabled())
+							logger.debug("Result of operation was: " + result);
+						
+						if(result.getMessage() == ResultMessage.SUCCESS){
+
+							if(!ServiceModelUtils.isServiceOurs(ourService, getCommMngr())){
+								if(logger.isDebugEnabled())
+									logger.debug("Service isn't ours, removing it from the service repository!");
+								
+								List<Service> servicesList = new ArrayList<Service>();
+								servicesList.add(service);
+								getServiceReg().unregisterServiceList(servicesList);
+							}
+						}
+					}
+				}
+					
 				break;
 			default: 
-				if(logger.isDebugEnabled()) logger.debug("");
+				if(logger.isDebugEnabled()) logger.debug("Unknown kind of node!");
+				returnResult.setMessage(ResultMessage.UNKNOWN_NODE);
 				break;
 			} 
 			
-			// Next step, we check if the service is "ours" and delete it from the repository if it's not.
-			
-			IIdentity serviceNode = getCommMngr().getIdManager().fromFullJid(ourService.getServiceInstance().getFullJid());
-			IIdentity ourNode = getCommMngr().getIdManager().getThisNetworkNode();
-			
-			if(!ourNode.equals(serviceNode)){
-				if(logger.isDebugEnabled())
-					logger.debug("Service does not belong to OUR Css, so we remove it!");
-				List<Service> listServices = new ArrayList<Service>();
-				listServices.add(ourService);
-				getServiceReg().unregisterServiceList(listServices);
-			} else{
-				if(logger.isDebugEnabled())
-					logger.debug("Service belongs to OUR Css, so we don't remove it!");
-			}
-			
-			returnResult.setMessage(ResultMessage.SUCCESS);
-			
-			return new AsyncResult<ServiceControlResult>(returnResult);
-			
+						
 		} catch (Exception ex) {
 			logger.error("Exception while attempting to share a service: " + ex.getMessage());
 			throw new ServiceControlException("Exception while attempting to share a service:", ex);
 		}
-
+		
+		return new AsyncResult<ServiceControlResult>(returnResult);
 	}
 }

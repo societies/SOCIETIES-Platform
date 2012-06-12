@@ -126,6 +126,59 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 	
 	@Override
 	@Async
+	public void getService(ServiceResourceIdentifier serviceId, IIdentity node,
+			IServiceDiscoveryCallback serviceDiscoveryCallback) {
+		
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: getService called");
+		
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceDiscoveryCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceDiscoveryMsgBean bean = new ServiceDiscoveryMsgBean();
+		bean.setMethod(MethodName.GET_SERVICE);
+		bean.setServiceId(serviceId);
+		
+		try {
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+	}
+
+	@Override
+	@Async
+	public void searchService(Service filter, IIdentity node,
+			IServiceDiscoveryCallback serviceDiscoveryCallback) {
+
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: searchService called");
+		
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceDiscoveryCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceDiscoveryMsgBean bean = new ServiceDiscoveryMsgBean();
+		bean.setMethod(MethodName.GET_SERVICE);
+		bean.setService(filter);
+		
+		try {
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+	}
+	@Override
+	@Async
 	public void startService(ServiceResourceIdentifier serviceId,
 			IIdentity node, IServiceControlCallback serviceControlCallback) {
 	
@@ -248,6 +301,68 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 		
 	}
 
+	@Override
+	@Async
+	public void shareService(Service service, IIdentity node,
+			IServiceControlCallback serviceControlCallback) {
+		
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: shareService called");
+
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceControlCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceControlMsgBean bean = new ServiceControlMsgBean();
+		bean.setMethod(MethodType.SHARE_SERVICE);
+		bean.setService(service);
+		bean.setShareJid(node.getJid());
+		
+		try {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
+
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+		
+	}
+
+	@Override
+	@Async
+	public void unshareService(Service service, IIdentity node,
+			IServiceControlCallback serviceControlCallback) {
+		
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: unshareService called");
+
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceControlCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceControlMsgBean bean = new ServiceControlMsgBean();
+		bean.setMethod(MethodType.UNSHARE_SERVICE);
+		bean.setService(service);
+		bean.setShareJid(node.getJid());
+		
+		try {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
+
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+			
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages() */
@@ -290,20 +405,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 		
 	}
 
-	@Override
-	public void getService(ServiceResourceIdentifier serviceId, IIdentity node,
-			IServiceDiscoveryCallback callback) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void searchService(Service filter, IIdentity node,
-			IServiceDiscoveryCallback serviceDiscoveryCallback) {
 
-		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: searchService called");
-
-		
-	}
 
 }

@@ -63,7 +63,7 @@ public interface IServiceControlRemote {
 	 * This method install a new service into the container
 	 * 
 	 * @param bundleLocation the URL of the bundle to install
-	 * @param node The node where the service is located
+	 * @param node The node where the service should be installed
 	 * @param callback The callback object
 	 */
 	public void installService(URL bundleLocation, IIdentity node, IServiceControlCallback callback);
@@ -87,6 +87,24 @@ public interface IServiceControlRemote {
 	 */
 	public void uninstallService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
 
+
+	/**
+	 * This method shares a service with a given CSS or CIS
+	 * 
+	 * @param service the Service to share
+	 * @param node The node we are sharing with
+	 * @param callback The callback object
+	 */
+	public void shareService(Service service, IIdentity node, IServiceControlCallback callback);
+
+	/**
+	 * This method removes the sharing of a service with a given CSS or CIS
+	 * 
+	 * @param service the Service to share
+	 * @param node The node we are sharing with
+	 * @param callback The callback object
+	 */
+	public void unshareService(Service service, IIdentity node, IServiceControlCallback callback);
 	
 	
 }

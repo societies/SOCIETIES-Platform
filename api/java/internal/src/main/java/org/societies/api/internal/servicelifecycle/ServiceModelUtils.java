@@ -9,7 +9,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
@@ -209,5 +211,14 @@ public class ServiceModelUtils {
 		}
 		return serResId;
 		
+	}
+	
+	public static boolean isServiceOurs(Service service, ICommManager commManager) throws InvalidFormatException{
+		
+		IIdentity ourNode = commManager.getIdManager().getThisNetworkNode();
+		IIdentity serviceNode = commManager.getIdManager().fromFullJid(service.getServiceInstance().getFullJid());
+			
+		return ourNode.equals(serviceNode);
+
 	}
 }

@@ -40,6 +40,7 @@ public class ServiceDiscoveryForm {
 	public String getNode() {
 		return node;
 	}
+	
 	public void setNode(String node) {
 		this.node = node;
 	}
@@ -47,6 +48,7 @@ public class ServiceDiscoveryForm {
 	public String getMethod() {
 		return method;
 	}
+	
 	public void setMethod(String method) {
 		this.method = method;
 	}

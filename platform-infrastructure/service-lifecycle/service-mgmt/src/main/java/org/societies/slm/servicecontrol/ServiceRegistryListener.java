@@ -24,6 +24,7 @@
  */
 package org.societies.slm.servicecontrol;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,8 @@ import org.osgi.framework.ServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
@@ -71,8 +74,25 @@ public class ServiceRegistryListener implements BundleContextAware,
 	private static Logger log = LoggerFactory.getLogger(ServiceRegistryListener.class);
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
-	
+	private INegotiationProviderServiceMgmt negotiationProvider;
+	private IServiceControl serviceControl;
 
+	public IServiceControl getServiceControl(){
+		return serviceControl;
+	}
+	
+	public void setServiceControl(IServiceControl serviceControl){
+		this.serviceControl = serviceControl;
+	}
+	
+	public INegotiationProviderServiceMgmt getNegotiationProvider(){
+		return negotiationProvider;
+	}
+	
+	public void setNegotiationProvider(INegotiationProviderServiceMgmt negotiationProvider){
+		this.negotiationProvider = negotiationProvider;
+	}
+	
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
 	}
@@ -81,16 +101,10 @@ public class ServiceRegistryListener implements BundleContextAware,
 		this.serviceReg = serviceReg;
 	}
 
-	/**
-	 * @return the commMngr
-	 */
 	public ICommManager getCommMngr() {
 		return commMngr;
 	}
 	
-	/**
-	 * @param commMngr the commMngr to set
-	 */
 	public void setCommMngr(ICommManager commMngr) {
 		this.commMngr = commMngr;
 	}
@@ -228,6 +242,14 @@ public class ServiceRegistryListener implements BundleContextAware,
 				if(existService == null){
 					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
 					this.getServiceReg().registerServiceList(serviceList);
+					
+					if(ServiceModelUtils.isServiceOurs(service, getCommMngr())){
+						if(log.isDebugEnabled())
+							log.debug("Adding the shared service to the policy provider!");
+						String slaXml = null;
+						URI clientJar = null;
+						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
+					}
 					
 					//The service is now registered, so we update the hashmap
 					if(ServiceControl.installingBundle(serBndl.getBundleId())){
