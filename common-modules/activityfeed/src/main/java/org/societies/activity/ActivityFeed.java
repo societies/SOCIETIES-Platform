@@ -73,6 +73,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		return ret;
 	}
 	//query can be e.g. 'object,contains,"programming"'
+	//TODO: Needs to support specifying that a attribute needs to empty!
 	@Override
 	public List<IActivity> getActivities(String query, String timePeriod) {
 		ArrayList<IActivity> ret = new ArrayList<IActivity>();

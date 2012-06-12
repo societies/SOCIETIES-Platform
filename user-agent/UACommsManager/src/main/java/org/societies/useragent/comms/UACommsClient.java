@@ -25,6 +25,7 @@
 
 package org.societies.useragent.comms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -127,7 +128,11 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 		UserFeedbackBean ufBean = new UserFeedbackBean();
 		ufBean.setType(type);
 		ufBean.setProposalText(content.getProposalText());
-		//ufBean.setOptions(content.getOptions());
+		List<String> optionsList = new ArrayList<String>();
+		for(String nextOption: content.getOptions()){
+			optionsList.add(nextOption);
+		}
+		ufBean.setOptions(optionsList);
 		try {
 			LOG.info("Sending Feedback message to UACommsServer");
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
