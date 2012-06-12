@@ -48,6 +48,11 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.DatasetUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
+import org.societies.webapp.models.PrivacyAssessmentForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -55,18 +60,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
-import org.societies.webapp.models.PrivacyAssessmentForm;
-
 
 @Controller
 public class PrivacyAssessmentController {
 
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyAssessmentController.class);
 
+	public class PageNames {
+		public static final String PRIVACY_ASSESSMENT = "privacy-assessment";
+		public static final String PRIVACY_ASSESSMENT_SETTINGS = "privacy-assessment-settings";
+		public static final String PRIVACY_ASSESSMENT_CHART = "privacy-assessment-chart";
+		public static final String PRIVACY_ASSESSMENT_TABLE = "privacy-assessment-table";
+	}
+	
 	/**
 	 * OSGI service get auto injected
 	 */
@@ -82,7 +88,7 @@ public class PrivacyAssessmentController {
 		this.assessment = sdService;
 	}
 
-	@RequestMapping(value = "/privacy-assessment.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT + ".html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessment() {
 
 		LOG.debug("privacyassessment HTTP GET");
@@ -111,12 +117,11 @@ public class PrivacyAssessmentController {
 		assessmentSubjects.put("all", "All");
 		model.put("assessmentSubjects", assessmentSubjects);
 
-		model.put("privacy-assessment-result", "Privacy Assessment Result :");
-		return new ModelAndView("privacy-assessment", model);
+		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT, model);
 	}
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/privacy-assessment.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT + ".html", method = RequestMethod.POST)
 	public ModelAndView privacyAssessment(@Valid PrivacyAssessmentForm assForm,
 			BindingResult result, Map model) {
 
@@ -125,7 +130,7 @@ public class PrivacyAssessmentController {
 		if (result.hasErrors()) {
 			LOG.warn("BindingResult has errors");
 			model.put("result", "privacy assessment form error");
-			return new ModelAndView("privacy-assessment", model);
+			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT, model);
 		}
 
 		if (assessment == null) {
@@ -177,10 +182,10 @@ public class PrivacyAssessmentController {
 		};
 
 		LOG.debug("HTTP POST end");
-		return new ModelAndView("privacy-assessment-result", model);
+		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_TABLE, model);
 	}
 	
-	@RequestMapping(value = "/privacy-assessment-barchart.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_CHART + ".html", method = RequestMethod.GET)
 	public ModelAndView barchart() {
 
 		LOG.debug("barchart HTTP GET");
@@ -243,11 +248,10 @@ public class PrivacyAssessmentController {
 //		methods.put("setAutoPeriod", "Set time period of automatic re-assessment for all senders");
 //		model.put("methods", methods);
 //		
-//		model.put("privacy-assessment-result", "Privacy Assessment Result :");
-		return new ModelAndView("privacy-assessment-barchart", model);
+		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_CHART, model);
 	}
 
-	@RequestMapping(value = "/privacy-assessment-settings.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_SETTINGS + ".html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessmentSettings() {
 
 		LOG.debug("privacyAssessmentSettings HTTP GET");
@@ -264,12 +268,11 @@ public class PrivacyAssessmentController {
 		assForm.setAutoReassessmentInSecs(autoReassessmentInSecs);
 		model.put("assForm", assForm);
 		
-		model.put("privacy-assessment-result", "Privacy Assessment Result :");
-		return new ModelAndView("privacy-assessment-settings", model);
+		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_SETTINGS, model);
 	}
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/privacy-assessment-settings.html", method = RequestMethod.POST)
+	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_SETTINGS + ".html", method = RequestMethod.POST)
 	public ModelAndView privacyAssessmentSettings(@Valid PrivacyAssessmentForm assForm,
 			BindingResult result, Map model) {
 

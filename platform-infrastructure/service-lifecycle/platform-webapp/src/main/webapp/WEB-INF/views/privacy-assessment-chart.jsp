@@ -1,6 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -12,7 +13,7 @@
 .error {
 	color: #ff0000;
 }
- 
+
 .errorblock {
 	color: #000;
 	background-color: #ffEEEE;
@@ -31,25 +32,27 @@
 	<!-- LEFTBAR -->
 	<jsp:include page="leftbar.jsp" />
 	<!-- END LEFTBAR -->
-<!-- .................PLACE YOUR CONTENT HERE ................ -->
+	<!-- .................PLACE YOUR CONTENT HERE ................ -->
 
-<h3>Privacy Assessment</h3>
+	<h3>Privacy Assessment</h3>
 
-<%
-  java.io.File f = new java.io.File(".");
-%>
+	<%
+		java.io.File f = new java.io.File(".");
+	%>
 
-<p>Current directory is <%= f.getCanonicalPath() %>
-<p>Listing:
-<ul>
-<% 
-  String[] list = f.list();
-  for (int i=0; i<list.length; i++) {
-    out.print("<li>" + list[i]);
-  }
- %>
-</ul>
-    	Hey, it works:
-        <img src="${pageContext.request.contextPath}/images/barchart.png" border="0" width="600" height="400" usemap="#map"/>
-    </body>
+	<p>
+		Current directory is
+		<%=f.getCanonicalPath()%>
+	<p>Listing:
+	<ul>
+		<%
+			String[] list = f.list();
+			for (int i = 0; i < list.length; i++) {
+				out.print("<li>" + list[i]);
+			}
+		%>
+	</ul>
+	<img src="${pageContext.request.contextPath}/images/barchart.png"
+		border="0" width="600" height="400" usemap="#map" />
+</body>
 </html>
