@@ -140,8 +140,8 @@
 		    <unpackDependencies>false</unpackDependencies>
 		    <fileToUnpack>${project.artifactId}.${project.version}-shaded.apk</fileToUnpack>
 		    <jvmArguments>
-			    <jvmArgument>-Xms256m</jvmArgument>
-			    <jvmArgument>-Xmx512m</jvmArgument>
+			    <jvmArgument>-Xms512m</jvmArgument>
+			    <jvmArgument>-Xmx1024m</jvmArgument>
 		    </jvmArguments>
                 </configuration>
             </plugin>

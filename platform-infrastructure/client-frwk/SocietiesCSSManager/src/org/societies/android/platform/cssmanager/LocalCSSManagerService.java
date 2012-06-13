@@ -33,6 +33,7 @@ import java.util.List;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
+import org.societies.android.platform.content.CssRecordDAO;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -117,9 +118,19 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //	private Messenger inMessenger;
 	private AndroidCSSRecord cssRecord;
 	
+	private CssRecordDAO cssRecordDAO;
+	
+	
 
 	@Override
 	public void onCreate () {
+
+		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
+		this.registerForPubsub();
+		
+		Log.d(LOG_TAG, "CSSManager opening database");
+		this.cssRecordDAO = new CssRecordDAO(this);
+
 //		this.inMessenger = new Messenger(new RemoteServiceHandler(this.getClass(), this));
 		
 		this.binder = new LocalBinder();
@@ -134,11 +145,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
 			throw new RuntimeException(e);
 		}     
-
-		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
-    	//Register for CSSManager Pubsub events
-    	this.registerForPubsub();
-    	
+		
 		Log.d(LOG_TAG, "CSSManager service starting");
 	}
 
@@ -387,6 +394,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		@Override
 		public void receiveResult(Stanza arg0, Object retValue) {
 			Log.d(LOG_TAG, "Callback receiveResult");
+			
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);
 				CssManagerResultBean resultBean = (CssManagerResultBean) retValue;
@@ -403,15 +411,29 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				LocalCSSManagerService.this.sendBroadcast(intent);
 				
 				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
-		        	
+		        
+				if (this.returnIntent.equals(LOGIN_CSS)) {
+					LocalCSSManagerService.this.updateDatabase(aRecord);
+				}
 			}
 		}
 	}
 	
 	/**
+	 * Insert or update the database with the new version of the CSS Record
+	 * 
+	 * @param aRecord
+	 */
+	private void updateDatabase(AndroidCSSRecord aRecord) {
+		this.cssRecordDAO.insertRow(aRecord);
+	}
+	/**
 	 * Register for Pubsub events
 	 */
 	private void registerForPubsub() {
+		
+		Log.d(LOG_TAG, "Starting Pubsub registration: " + System.currentTimeMillis());
+		
 		PubsubClientAndroid pubsubClient = new PubsubClientAndroid(this);
 
     	List<String> packageList = new ArrayList<String>();
@@ -422,7 +444,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			pubsubClient.addJaxbPackages(packageList);
 			
 	        Log.i(LOG_TAG, "Subscribing to pubsub");
-
+	        
+	        
 			this.asynchTask = new SubscribeToPubsub(); 
 			this.asynchTask.execute(pubsubClient);
 
@@ -451,9 +474,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
      * Async task to register for CSSManager Pubsub events
      *
      */
-    private class SubscribeToPubsub extends AsyncTask<PubsubClientAndroid, Void, Void> {
+    private class SubscribeToPubsub extends AsyncTask<PubsubClientAndroid, Void, Boolean> {
+		private boolean resultStatus = true;
     	
-    	protected Void doInBackground(PubsubClientAndroid... args) {
+    	protected Boolean doInBackground(PubsubClientAndroid... args) {
     		
     		PubsubClientAndroid pubsubAndClient = args[0];	    	
 
@@ -464,15 +488,23 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     			
     		} catch (InvalidFormatException e) {
     			Log.e(LOG_TAG, "Unable to obtain CSS node identity", e);
+    			this.resultStatus = false;
     		}
 
     		try {
     			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, subscriber);
     			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, subscriber);
+    			Log.d(LOG_TAG, "Pubsub subscription created");
+    			Log.d(LOG_TAG, "Finishing Pubsub registration: " + System.currentTimeMillis());
+
+
+    			
 			} catch (Exception e) {
+    			this.resultStatus = false;
 				Log.e(LOG_TAG, "Unable to register for CSSManager events", e);
+
 			}
-    		return null;
+    		return resultStatus;
     	}
     }
 

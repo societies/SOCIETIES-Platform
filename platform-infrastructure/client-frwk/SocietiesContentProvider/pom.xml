@@ -9,9 +9,9 @@
         <relativePath>../../../parent/android.xml</relativePath>
    </parent>
 
-   <groupId>org.societies.android.platform.cssmanager</groupId>
-   <artifactId>SocietiesCSSManager</artifactId>
-   <name>CSSManager</name>
+   <groupId>org.societies.android.platform.content</groupId>
+   <artifactId>SocietiesContent</artifactId>
+   <name>ContentProvider</name>
    <version>${release.version}</version>
    <packaging>apklib</packaging>
 
@@ -30,45 +30,17 @@
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.android.api.external</groupId>
-			<artifactId>societies-android-api-external</artifactId>
-			<version>${release.version}</version>
-		</dependency>
-        <dependency>
-			<groupId>org.societies.comm.android</groupId>
-			<artifactId>AndroidPubsubApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
-        <dependency>
-   			<groupId>org.societies.android.platform.content</groupId>
-   			<artifactId>SocietiesContent</artifactId>
-   			<version>${release.version}</version>
-   			<type>apklib</type>
-		</dependency>
-        
-        <dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
-			<!--exclusions>
-		   		<exclusion>
-					<groupId>org.societies.android.jaxb</groupId>
-					<artifactId>jaxb-android-societies</artifactId>
-	 	   		</exclusion>
-			</exclusions-->
-		</dependency>
+
 		<dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api-external</artifactId>
+			<version>${release.version}</version>
+		</dependency>
         
     </dependencies>
 
