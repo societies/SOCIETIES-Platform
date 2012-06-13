@@ -53,6 +53,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
+			<artifactId>community-context-db-mgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
 			<artifactId>user-context-history-mgmt</artifactId>
 			<version>${version.cm}</version>
 			<scope>test</scope>
