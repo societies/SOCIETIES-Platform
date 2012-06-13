@@ -90,9 +90,7 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			session.save(evidence);
 			session.flush();
 			transaction.commit();
-		} catch (ConstraintViolationException cve) {
-			LOG.warn("Could not add evidence " + evidence + ": " + cve.getLocalizedMessage());
-			transaction.rollback();
+	
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for trust evidence " + evidence);
 			transaction.rollback();

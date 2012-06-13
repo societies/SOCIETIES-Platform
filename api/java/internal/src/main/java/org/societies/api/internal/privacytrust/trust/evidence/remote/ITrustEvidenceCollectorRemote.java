@@ -55,6 +55,9 @@ public interface ITrustEvidenceCollectorRemote {
 	 * @param info
 	 *            supplementary information if applicable; <code>null</code>
 	 *            otherwise
+	 * @param callback
+	 *            the callback to acknowledge the addition of the direct trust
+	 *            evidence
 	 * @throws TrustException
 	 *            if the specified piece of direct trust evidence cannot be 
 	 *            added
@@ -62,8 +65,11 @@ public interface ITrustEvidenceCollectorRemote {
 	 *            if any of the teid, type or timestamp parameter is
 	 *            <code>null</code>
 	 */
-	public void addDirectEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
-			final Date timestamp, final Serializable info) throws TrustException;
+	public void addDirectEvidence(final TrustedEntityId teid, 
+			final TrustEvidenceType type, final Date timestamp,
+			final Serializable info, 
+			final ITrustEvidenceCollectorRemoteCallback callback) 
+					throws TrustException;
 	
 	/**
 	 * Adds the specified piece of indirect trust evidence which originates
@@ -83,6 +89,9 @@ public interface ITrustEvidenceCollectorRemote {
 	 * @param info
 	 *            supplementary information if applicable; <code>null</code>
 	 *            otherwise
+	 * @param callback
+	 *            the callback to acknowledge the addition of the indirect 
+	 *            trust evidence
 	 * @throws TrustException
 	 *            if the specified piece of indirect trust evidence cannot be 
 	 *            added
@@ -90,7 +99,9 @@ public interface ITrustEvidenceCollectorRemote {
 	 *            if any of the source, teid, type or timestamp parameter is
 	 *            <code>null</code>
 	 */
-	public void addIndirectEvidence(final String source, final TrustedEntityId teid,
-			final TrustEvidenceType type, final Date timestamp, final Serializable info)
+	public void addIndirectEvidence(final String source, 
+			final TrustedEntityId teid,	final TrustEvidenceType type,
+			final Date timestamp, final Serializable info,
+			final ITrustEvidenceCollectorRemoteCallback callback)
 					throws TrustException;
 }

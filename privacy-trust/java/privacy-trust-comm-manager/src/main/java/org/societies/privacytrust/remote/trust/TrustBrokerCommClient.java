@@ -81,14 +81,15 @@ public class TrustBrokerCommClient implements ITrustBrokerRemote {
 			final IIdentity toIdentity = 
 					this.commManager.getIdManager().fromJid(teid.getTrustorId()); 
 			final Stanza stanza = new Stanza(toIdentity);
-			// TODO uncomment for testing only (1)
+			// uncomment for testing only (1)
 			//final Stanza stanza = new Stanza(this.commManager.getIdManager().getThisNetworkNode());
+			
 			this.trustBrokerCommClientCallback.addClient(stanza.getId(), callback);
 			
 			final RetrieveTrustBrokerRequestBean retrieveBean = new RetrieveTrustBrokerRequestBean();
 			retrieveBean.setTeid(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
-			// TODO uncomment for testing only (2)
+			// uncomment for testing only (2)
 			//retrieveBean.getTeid().setTrustorId(this.commManager.getIdManager().getThisNetworkNode().toString());
 			
 			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();

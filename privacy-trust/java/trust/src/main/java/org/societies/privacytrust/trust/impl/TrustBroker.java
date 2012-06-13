@@ -272,10 +272,10 @@ public class TrustBroker implements ITrustBroker {
 		private Double trustValue;
 		
 		/*
-		 * @see org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback#onRetrieveTrust(java.lang.Double)
+		 * @see org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback#onRetrievedTrust(java.lang.Double)
 		 */
 		@Override
-		public void onRetrieveTrust(Double value) {
+		public void onRetrievedTrust(Double value) {
 			
 			this.trustValue = value;
 			synchronized (this) {

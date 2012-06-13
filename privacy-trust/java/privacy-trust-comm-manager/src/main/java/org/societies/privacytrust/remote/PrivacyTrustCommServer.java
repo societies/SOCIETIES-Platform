@@ -47,11 +47,13 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyd
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
 import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer;
 import org.societies.privacytrust.remote.privacynegotiationmanagement.PrivacyNegotiationManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommServer;
 import org.societies.privacytrust.remote.trust.TrustBrokerCommServer;
+import org.societies.privacytrust.remote.trust.evidence.TrustEvidenceCollectorCommServer;
 
 
 public class PrivacyTrustCommServer implements IFeatureServer {
@@ -65,7 +67,8 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
 			  		"http://societies.org/api/schema/servicelifecycle/model",
 			  		"http://societies.org/api/internal/schema/privacytrust/trust/model",
-			  		"http://societies.org/api/internal/schema/privacytrust/trust/broker"));
+			  		"http://societies.org/api/internal/schema/privacytrust/trust/broker",
+			  		"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement",
@@ -74,7 +77,8 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation",
 			  		"org.societies.api.schema.servicelifecycle.model",
 			  		"org.societies.api.internal.schema.privacytrust.trust.model",
-			  		"org.societies.api.internal.schema.privacytrust.trust.broker"));
+			  		"org.societies.api.internal.schema.privacytrust.trust.broker",
+			  		"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
 
 	private ICommManager commManager;
 	private PrivacyDataManagerCommServer privacyDataManagerCommServer;
@@ -82,6 +86,7 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 	private PrivacyAgreementManagerCommServer privacyAgreementManagerCommServer;
 	private PrivacyNegotiationManagerCommServer privacyNegotiationManagerCommServer;
 	private TrustBrokerCommServer trustBrokerCommServer;
+	private TrustEvidenceCollectorCommServer trustEvidenceCollectorCommServer;
 	
 	public PrivacyTrustCommServer() {
 	}
@@ -138,8 +143,12 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		// -- Assessment Management
 
 		// -- Trust Management
-		else if (payload instanceof TrustBrokerRequestBean){
-			return this.trustBrokerCommServer.getQuery(stanza, (TrustBrokerRequestBean) payload);
+		else if (payload instanceof TrustBrokerRequestBean) {
+			return this.trustBrokerCommServer.getQuery(stanza, payload);
+		}
+		
+		else if (payload instanceof TrustEvidenceCollectorRequestBean) {
+			return this.trustEvidenceCollectorCommServer.getQuery(stanza, payload);
 		}
 		
 		return null;
@@ -215,10 +224,6 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 		this.privacyNegotiationManagerCommServer = privacyNegotiationManagerCommServer;
 		LOG.info("[DependencyInjection] PrivacyNegotiationManagerCommServer injected");
 	}
-	public void setTrustBrokerCommServer(TrustBrokerCommServer trustBrokerCommServer) {
-		this.trustBrokerCommServer = trustBrokerCommServer;
-		LOG.info("[DependencyInjection] TrustBrokerCommServer injected");
-	}
 	public void setPrivacyPolicyManagerCommServer(
 			PrivacyPolicyManagerCommServer privacyPolicyManagerCommServer) {
 		this.privacyPolicyManagerCommServer = privacyPolicyManagerCommServer;
@@ -228,6 +233,16 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 			PrivacyAgreementManagerCommServer privacyAgreementManagerCommServer) {
 		this.privacyAgreementManagerCommServer = privacyAgreementManagerCommServer;
 		LOG.info("[DependencyInjection] PrivacyAgreementManagerCommServer injected");
+	}
+	
+	public void setTrustBrokerCommServer(TrustBrokerCommServer trustBrokerCommServer) {
+		this.trustBrokerCommServer = trustBrokerCommServer;
+		LOG.info("[DependencyInjection] TrustBrokerCommServer injected");
+	}
+	
+	public void setTrustEvidenceCollectorCommServer(TrustEvidenceCollectorCommServer trustEvidenceCollectorCommServer) {
+		this.trustEvidenceCollectorCommServer = trustEvidenceCollectorCommServer;
+		LOG.info("[DependencyInjection] TrustEvidenceCollectorCommServer injected");
 	}
 
 	// -- Getters / Setters
