@@ -24,81 +24,13 @@
  */
 package org.societies.android.platform;
 
-import org.societies.android.api.external.cis.management.ICisRecord;
-
-
 /**
- * @author Babak.Farshchian@sintef.no
+ * This is the interface to implement for the {@link SocialProvider}
+ * in order to receive information changes in the social data.
+ * 
+ * @author Babak.Farshchian at sintef dot no
  *
  */
-public class CisRecord implements ICisRecord{
-    
-    private String cisId;
-    private String name;
-    private String ownerId;
-    private String creationDate;
-    private String userDefinedName;
-
-    public CisRecord(String _cisId, String _name, String _ownerId, String _creationDate, String _udn){
-	cisId = _cisId;
-	name = _name;
-	ownerId = _ownerId;
-	creationDate = _creationDate;
-	userDefinedName = _udn;
-    }
-    public CisRecord(String _cisId, String _name, String _ownerId, String _creationDate){
-	cisId = _cisId;
-	name = _name;
-	ownerId = _ownerId;
-	creationDate = _creationDate;
-    }
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getCisId()
-     */
-    public String getCisId() {
-	// TODO Auto-generated method stub
-	return cisId;
-    }
-
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getName()
-     */
-    public String getName() {
-	// TODO Auto-generated method stub
-	return name;
-    }
-
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getOwnerId()
-     */
-    public String getOwnerId() {
-	// TODO Auto-generated method stub
-	return ownerId;
-    }
-
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getCreationDate()
-     */
-    public String getCreationDate() {
-	// TODO Auto-generated method stub
-	return creationDate;
-    }
-
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#setUserDefinedName(java.lang.String)
-     */
-    public String setUserDefinedName(String _name) {
-	// TODO Auto-generated method stub
-	userDefinedName = _name;
-	return userDefinedName;
-    }
-
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getUserDefineName()
-     */
-    public String getUserDefineName() {
-	// TODO Auto-generated method stub
-	return userDefinedName;
-    }
+public interface ISocialAdapterListener {
 
 }
