@@ -93,7 +93,8 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for trust evidence " + evidence);
 			transaction.rollback();
-			throw new TrustEvidenceRepositoryException("Could not add evidence " + evidence, e);
+			throw new TrustEvidenceRepositoryException("Could not add evidence " 
+					+ evidence + ": " + e.getLocalizedMessage(), e);
 		} finally {
 			if (session != null)
 				session.close();
