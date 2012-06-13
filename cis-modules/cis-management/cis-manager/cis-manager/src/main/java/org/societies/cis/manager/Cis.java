@@ -51,6 +51,7 @@ import javax.persistence.Transient;
 
 //import org.societies.cis.mgmt;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.classic.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +152,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	private IIdentity cisIdentity;
 	@Transient
 	private PubsubClient psc;
-	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER,orphanRemoval=true)
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	@Column
 	public String cisType;
@@ -163,9 +164,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	public String permaLink; // all those have been moved to the Editor
 	
-	@Column
+	@Transient
 	private String password = "none";
-	@Column
+	@Transient
 	private String host = "none";
 	
 
@@ -215,6 +216,19 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 	}
 
+	// internal method
+	public CisParticipant getMember(String cssJid){	
+		Set<CisParticipant> se = this.getMembersCss();
+		Iterator<CisParticipant> it = se.iterator();
+		
+		while(it.hasNext()){
+			CisParticipant element = it.next();
+			if (element.getMembersJid().equals(cssJid))
+					return element;
+		}
+		return null;
+		
+	}
 
 
 	// maximum constructor of a CIS without a pre-determined ID or host
@@ -289,6 +303,41 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	}
 	
+	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory){
+		
+		sharedServices = new HashSet<IServiceSharingRecord>();
+		// first Ill try without members
+
+		try {
+			CISendpoint = ccmFactory.getNewCommManager(this.getCisId());
+		} catch (CommunicationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		LOG.info("retrieved COM manager");
+	
+		try {
+		cisIdentity = CISendpoint.getIdManager().getThisNetworkNode();//CISendpoint.getIdManager().fromJid(CISendpoint.getIdManager().getThisNetworkNode().getJid());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+			
+		LOG.info("CIS endpoint created");
+				
+		try {
+			CISendpoint.register(this);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+			LOG.info("could not start comm manager!");
+		} // TODO unregister??
+		LOG.info("CIS listener registered");
+		
+		this.setSessionFactory(sessionFactory);
+		
+		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
+		
+	}
+	
 
 	public Set<CisParticipant> getMembersCss() {
 		return membersCss;
@@ -333,6 +382,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			role = MembershipType.participant; // default role is participant
 		
 		if (membersCss.add(new CisParticipant(jid, role))){
+			
+			//persist in database
+			this.updatePersisted(this);
+			
 			// should we send a XMPP notification to all the users to say that the new member has been added to the group
 			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
 			// and the GUI can be updated with that new member
@@ -411,21 +464,28 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		if (!this.removeMember(jid))
 			return new AsyncResult<Boolean>(new Boolean(false));
-		// if the user has been removed we must send him back a notification
 		
-		//2) Sending a notification to all the other users (maybe replace with pubsub later)
+		// 2) Notification to deleted user here
 		
-		CommunityManager cMan = new CommunityManager();
+		
+		CommunityManager message = new CommunityManager();
 		Notification n = new Notification();
-		DeleteMemberNotification s = new DeleteMemberNotification();
-		s.setCommunityJid(this.getCisId());
-		s.setMemberJid(jid);
-		n.setDeleteMemberNotification(s);
-		cMan.setNotification(n);
+		DeleteNotification d = new DeleteNotification();
+		d.setCommunityJid(this.getCisId());
 		
+		n.setDeleteNotification(d);
+		message.setNotification(n);
+
+		try {
+			targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
+			Stanza sta = new Stanza(targetCssIdentity);			
+			LOG.info("stanza created");
+			this.CISendpoint.sendMessage(sta, message);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		Stanza sta = new Stanza(targetCssIdentity);
-		CISendpoint.sendMessage(sta, cMan);
 		
 		return new AsyncResult<Boolean>(new Boolean(true));
 		
@@ -439,37 +499,26 @@ public class Cis implements IFeatureServer, ICisOwned {
 		//TODO: add a check if it is a valid JID
 		
 		LOG.info("remove member invoked");
+
 		
 		if (membersCss.contains(new CisParticipant(jid))){
 			LOG.info("user is a participant of the community");
+			
+			// for database update
+			
+			CisParticipant temp;
+			temp = this.getMember(jid);
 			
 			// 1) Removing the user
 			if (membersCss.remove( new CisParticipant(jid)) == false)
 				return false;
 			
-			// 2) Notification to deleted user here
+			// updating the database database
+			this.updatePersisted(this);
+			this.deletePersisted(temp);
 			
 			
-			CommunityManager message = new CommunityManager();
-			Notification n = new Notification();
-			DeleteNotification d = new DeleteNotification();
-			d.setCommunityJid(this.getCisId());
-			
-			n.setDeleteNotification(d);
-			message.setNotification(n);
-
-			IIdentity targetCssIdentity;
-			try {
-				targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
-				Stanza sta = new Stanza(targetCssIdentity);			
-				LOG.info("stanza created");
-				this.CISendpoint.sendMessage(sta, message);
-			} catch (InvalidFormatException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			
+	
 			
 			
 			//3) Sending a notification to all the other users (maybe replace with pubsub later)
@@ -629,14 +678,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 				String jid = stanza.getFrom().getBareJid();
 				boolean b = false;
 				try{
-					b = this.removeMemberFromCIS(jid).get().booleanValue();
+					b = this.removeMember(jid);
 				}catch(CommunicationException e){
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} 
@@ -732,9 +775,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 				Community result = new Community();
 				SetInfoResponse r = new SetInfoResponse();
 				String senderJid = stanza.getFrom().getBareJid();
-				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
-					r.setResult(false);
-				}else{
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
 					if( (c.getCommunityType() != null) &&  (!c.getCommunityType().isEmpty()) && 
 							(!c.getCommunityType().equals(this.getCisType()))) // if is not empty and is different from current value
@@ -742,8 +785,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 					if( (c.getDescription() != null) &&  (!c.getDescription().isEmpty()) && 
 							(!c.getDescription().equals(this.getDescription()))) // if is not empty and is different from current value
 						this.setDescription(c.getDescription());
-					r.setResult(true);						
-				}
+					r.setResult(true);	
+					
+					// updating at DB
+					this.updatePersisted(this);
+					
+				//}
 				
 				result.setMembershipMode(this.getMembershipCriteria());
 				result.setOwnerJid(this.getOwnerId());
@@ -824,7 +871,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	public String getCisId() {
 	
-		return this.cisRecord.getCisJid();
+		return this.cisRecord.getCisJID();
 	}
 
 
@@ -835,6 +882,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public boolean deleteCIS(){
 		boolean ret = true;
 
+		
+		
 		// TODO: do we need to make sure that at this point we are not taking any other XMPP input or api call?
 
 		//**** delete all members and send them a xmpp notification that the community has been deleted
@@ -845,9 +894,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		n.setDeleteNotification(d);
 		message.setNotification(n);
-		Session session = sessionFactory.openSession();
+		//Session session = sessionFactory.openSession();
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();
+
+		// deleting from DB
+		this.deletePersisted(this);
 		
 		while(it.hasNext()){
 			CisParticipant element = it.next();
@@ -873,7 +925,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			it.remove();
 	     }
 		
-		session.close();
+		
+
+		
+		//session.close();
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
@@ -972,6 +1027,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 				this.description = c.getDescription();
 			if(c.getCommunityType() != null &&  !c.getCommunityType().isEmpty())
 				this.cisType = c.getCommunityType();
+			
+			// commit in database
+			this.updatePersisted(this);
 		}
 		else{
 			r.setResult(false);
@@ -987,5 +1045,93 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		callback.receiveResult(resp);	
 	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+	
+	
+	
+	
+	// session related methods
+
+	private void persist(Object o){
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			session.save(o);
+			t.commit();
+			LOG.info("Saving CIS object succeded!");
+//			Query q = session.createQuery("select o from Cis aso");
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			t.rollback();
+			LOG.warn("Saving CIS object failed, rolling back");
+		}finally{
+			if(session!=null){
+				session.close();
+				session = sessionFactory.openSession();
+				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				session.close();
+			}
+			
+		}
+	}
+	
+	
+	private void deletePersisted(Object o){
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			session.delete(o);
+			t.commit();
+			LOG.info("Deleting object in CisManager succeded!");
+//			Query q = session.createQuery("select o from Cis aso");
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			t.rollback();
+			LOG.warn("Deleting object in CisManager failed, rolling back");
+		}finally{
+			if(session!=null){
+				session.close();
+				session = sessionFactory.openSession();
+				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				session.close();
+			}
+			
+		}
+	}
+	
+	private void updatePersisted(Object o){
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			session.update(o);
+			t.commit();
+			LOG.info("Updated CIS object succeded!");
+//			Query q = session.createQuery("select o from Cis aso");
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			t.rollback();
+			LOG.warn("Updating CIS object failed, rolling back");
+		}finally{
+			if(session!=null){
+				session.close();
+				session = sessionFactory.openSession();
+				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				session.close();
+			}
+			
+		}
+	}
+	
+	
 	
 }
