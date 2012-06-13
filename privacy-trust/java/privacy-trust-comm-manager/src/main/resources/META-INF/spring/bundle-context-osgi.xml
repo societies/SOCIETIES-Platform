@@ -60,5 +60,11 @@
 		
 	<osgi:reference id="trustBroker"
 		interface="org.societies.api.internal.privacytrust.trust.ITrustBroker" cardinality="0..1" />
+		
+	<osgi:service ref="trustEvidenceCollectorCommClient"
+		interface="org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote" />
+		
+	<osgi:reference id="trustEvidenceCollector"
+		interface="org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector" cardinality="0..1" />
 
 </beans>

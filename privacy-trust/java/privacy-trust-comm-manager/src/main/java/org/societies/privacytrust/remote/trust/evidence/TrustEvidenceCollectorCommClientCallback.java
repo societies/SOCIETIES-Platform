@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.remote.trust;
+package org.societies.privacytrust.remote.trust.evidence;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,36 +36,38 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback;
 import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
-import org.societies.api.internal.schema.privacytrust.trust.broker.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
 import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
+import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
+import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.3
  */
-public class TrustBrokerCommClientCallback implements ICommCallback {
+public class TrustEvidenceCollectorCommClientCallback implements ICommCallback {
 	
 	/** The logging facility. */
-	private static Logger LOG = LoggerFactory.getLogger(TrustBrokerCommClientCallback.class);
+	private static Logger LOG = LoggerFactory.getLogger(TrustEvidenceCollectorCommClientCallback.class);
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
 					"http://societies.org/api/internal/schema/privacytrust/trust/model",
-					"http://societies.org/api/internal/schema/privacytrust/trust/broker"));
+					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
 					"org.societies.api.internal.schema.privacytrust.trust.model",
-					"org.societies.api.internal.schema.privacytrust.trust.broker"));
+					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
 	
-	private final Map<String,ITrustBrokerRemoteCallback> clients =
-			new ConcurrentHashMap<String, ITrustBrokerRemoteCallback>();
+	private final Map<String, ITrustEvidenceCollectorRemoteCallback> clients =
+			new ConcurrentHashMap<String, ITrustEvidenceCollectorRemoteCallback>();
 
-	TrustBrokerCommClientCallback() {
+	TrustEvidenceCollectorCommClientCallback() {
 		
 		LOG.info(this.getClass() + " instantiated");
 	}
@@ -94,7 +96,7 @@ public class TrustBrokerCommClientCallback implements ICommCallback {
 	@Override
 	public void receiveError(Stanza arg0, XMPPError arg1) {
 		// TODO Auto-generated method stub
-
+	
 	}
 
 	/*
@@ -133,30 +135,24 @@ public class TrustBrokerCommClientCallback implements ICommCallback {
 		if (!(bean instanceof TrustBrokerResponseBean))
 			throw new IllegalArgumentException("bean is not instance of TrustBrokerResponseBean");
 		
-		final TrustBrokerResponseBean responseBean = (TrustBrokerResponseBean) bean;
+		final TrustEvidenceCollectorResponseBean responseBean = (TrustEvidenceCollectorResponseBean) bean;
 		
-		ITrustBrokerRemoteCallback callback = this.clients.remove(stanza.getId());
+		ITrustEvidenceCollectorRemoteCallback callback = this.clients.remove(stanza.getId());
 		if (callback == null) {
-			LOG.error("Could not find client callback for TrustBroker remote retrieve response: "
+			LOG.error("Could not find client callback for TrustEvidenceCollector remote addDirectEvidence response: "
 					+ stanza.getId());
 			return;
 		}
 		
-		if (MethodName.RETRIEVE.equals(responseBean.getMethodName())) {
+		if (MethodName.ADD_DIRECT_EVIDENCE.equals(responseBean.getMethodName())) {	
 			
-			final RetrieveTrustBrokerResponseBean retrieveResponseBean =
-					responseBean.getRetrieve();
-			if (retrieveResponseBean == null) {
-				LOG.error("Invalid TrustBroker remote retrieve response: "
-						+ "RetrieveTrustBrokerResponseBean can't be null");
-				return;
-			}
-			
-			callback.onRetrievedTrust(retrieveResponseBean.getResult());
-			
+			callback.onAddedDirectEvidence();
+		} else if (MethodName.ADD_INDIRECT_EVIDENCE.equals(responseBean.getMethodName())) {	
+				
+			callback.onAddedIndirectEvidence();	
 		} else {
 			
-			LOG.error("Unsupported TrustBroker remote response method: " + responseBean.getMethodName());
+			LOG.error("Unsupported TrustEvidenceCollector remote response method: " + responseBean.getMethodName());
 		}
 	}
 
@@ -165,7 +161,7 @@ public class TrustBrokerCommClientCallback implements ICommCallback {
 	 * @param id
 	 * @param callback
 	 */
-	void addClient(String id, ITrustBrokerRemoteCallback callback) {
+	void addClient(String id, ITrustEvidenceCollectorRemoteCallback callback) {
 		
 		this.clients.put(id, callback);
 	}
