@@ -25,7 +25,7 @@
 package org.societies.android.platform;
 
 //import org.societies.android.platform.cis.CisRecord;
-import org.societies.android.api.cis.management.ICisRecord;
+import org.societies.android.api.external.cis.management.ICisRecord;
 
 import android.content.ContentValues;
 import android.content.Context;
