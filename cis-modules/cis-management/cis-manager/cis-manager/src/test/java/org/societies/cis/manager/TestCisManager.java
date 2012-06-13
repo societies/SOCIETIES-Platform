@@ -81,7 +81,7 @@ import static org.mockito.Mockito.*;
  *
  */
 //@RunWith(PowerMockRunner.class)
-  
+@RunWith(org.springframework.test.context.junit4.SpringJUnit4ClassRunner.class)  
 @PrepareForTest( { ActivityFeed.class })
 @ContextConfiguration(locations = { "../../../../CisManagerTest-context.xml" })
 public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTests {
@@ -227,6 +227,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockCcmFactory = null;
 		mockCSSendpoint = null;
 		testCisManagerId = null;
+
+//		this.deleteFromTables(new String[] { "org_societies_cis_manager_Cis"});
+//		this.deleteFromTables(new String[] { "org_societies_cis_manager_CisParticipant"});
+//		this.deleteFromTables(new String[] { "org_societies_cis_manager_CisRecord"});
 		
 		//sessionFactory.getCurrentSession().close();
 		//if(sessionFactory.getCurrentSession()!=null)
@@ -234,6 +238,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 	}
 	//@Ignore
+	//@Rollback(true)
 	@Test
 	public void testConstructor() {
 
@@ -242,8 +247,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest.init();
 		
 		assertEquals(CIS_MANAGER_CSS_ID, cisManagerUnderTest.cisManagerId.getJid());
+		
+		
 	}
 	//@Ignore
+	//@Rollback(true)
 	@Test
 	public void testCreateCIS() {
 		
@@ -259,6 +267,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			assertEquals(testCIS.get().getName(), TEST_CIS_NAME_1);
 			assertEquals(testCIS.get().getCisType(), TEST_CIS_TYPW);
 			assertEquals(testCIS.get().getMembershipCriteria(), TEST_CIS_MODE);
+
+			// CLEANING UP
+			cisManagerUnderTest.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, testCIS.get().getCisId());
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -269,9 +281,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 	// TODO: double check that the owner has been added as participant
 		
+		//this.deleteFromTables(new String[] { "org_societies_cis_manager_Cis"});
+		
 		
 	}
 	//@Ignore
+	//@Rollback(true)
 	@Test
 	public void testListCIS() throws InterruptedException, ExecutionException {
 
@@ -313,9 +328,15 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			 assertEquals(cissCheck[i], 1);
 		 }
 	
+		// CLEANING UP
+
+		 for(int i=0;i<ciss.length;i++){
+			 cisManagerUnderTest.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, ciss[i].getCisId());
+		 }
+
 	}
 
-	@Ignore
+	//@Rollback(true)
 	@Test
 	public void testdeleteCIS() throws InterruptedException, ExecutionException {
 
@@ -361,6 +382,16 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		assertEquals(false,presence);
 		assertEquals(1,interactions);
 		
+		
+		// CLEANING UP
+		l = cisManagerUnderTest.getCisList();
+		it = l.iterator();
+		
+		while(it.hasNext()){
+			element = it.next();
+	 		cisManagerUnderTest.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, element.getCisId());
+	     }
+
 	
 	}
 	
@@ -386,6 +417,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			e.printStackTrace();
 		} 		
 	
+		
+		// CLEANING UP
+		cisManagerUnderTest.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
+
+		
 	}
 	
 	@Test
@@ -440,6 +476,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 						 assertEquals(memberCheck[i], 1);
 					 }
 				}
+				
+				
+				// CLEANING UP
+				cisManagerUnderTest.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, communityResultObject.getCommunityJid());
 				
 			}
 
@@ -499,6 +539,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			 assertEquals(memberCheck[i], 1);
 		 }	
 	
+	 
+		// CLEANING UP
+		cisManagerUnderTest.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
 	}
 	
 }
