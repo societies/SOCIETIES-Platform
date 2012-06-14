@@ -43,6 +43,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class Jaxb2Simple extends AbstractMojo
 { 
 	private final String FOLDER_PATH = "src/main/java"; //"target/generated-sources/xjc/"
+	private final String TO_STRING_CODE = "    }\n\n    @Override\n    public String toString() {\n    	return this.value();\n    }\n}\n";
 	
 	/**
 	 * Output directory for schemas
@@ -104,7 +105,13 @@ public class Jaxb2Simple extends AbstractMojo
 			schemaContent.append(scanner.nextLine()+"\n");
 		}
 		newSchemaContent = findReplacePatterns(schemaContent);
-		
+
+		//ENUM NEEDS TO BE SERIALIZED WITH "VALUE", NOT "NAME"
+		if (newSchemaContent.indexOf("public enum ") > 0) {
+			String textToFind = ".*}\n\n}\n";
+			String textToReplace = TO_STRING_CODE;
+			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace); 
+		}
 		return newSchemaContent;
 	}
 
