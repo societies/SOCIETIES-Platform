@@ -75,7 +75,8 @@ import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
-import org.societies.api.schema.cis.community.AddResponse;
+import org.societies.api.schema.cis.community.AddMemberResponse;
+import org.societies.api.schema.cis.community.DeleteMemberResponse;
 import org.societies.api.schema.cis.community.GetInfoResponse;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
@@ -84,7 +85,7 @@ import org.societies.api.schema.cis.community.Who;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
-import org.societies.api.schema.cis.community.Add;
+import org.societies.api.schema.cis.community.AddMember;
 import org.societies.api.schema.cis.community.Subscription;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
@@ -384,7 +385,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		Notification n = new Notification();
 		SubscribedTo s = new SubscribedTo();
 		s.setCisJid(this.getCisId());
-		s.setCisRole(role.toString());
+		s.setRole(role.toString());
 		n.setSubscribedTo(s);
 		cMan.setNotification(n);
 		
@@ -481,10 +482,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		CommunityManager message = new CommunityManager();
 		Notification n = new Notification();
-		DeleteNotification d = new DeleteNotification();
+		DeleteMemberNotification d = new DeleteMemberNotification();
 		d.setCommunityJid(this.getCisId());
+		d.setMemberJid(jid);
 		
-		n.setDeleteNotification(d);
+		n.setDeleteMemberNotification(d);
 		message.setNotification(n);
 
 		try {
@@ -719,13 +721,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 				return result;
 				// END OF WHO
 			}
-			if (c.getAdd() != null) {
+			if (c.getAddMember() != null) {
 				// ADD
 				Community result = new Community();
-				AddResponse ar = new AddResponse();
+				AddMemberResponse ar = new AddMemberResponse();
 				result.setCommunityJid(this.getCisId());
 				String senderJid = stanza.getFrom().getBareJid();
-				Participant p = c.getAdd().getParticipant();
+				Participant p = c.getAddMember().getParticipant();
 				ar.setParticipant(p);			
 				
 				
@@ -755,11 +757,43 @@ public class Cis implements IFeatureServer, ICisOwned {
 					
 //				}
 				
-				result.setAddResponse(ar);
+				result.setAddMemberResponse(ar);
 				return result;
 				// END OF ADD
 			}
 
+			if (c.getDeleteMember() != null) {
+				// DELETE MEMBER
+				Community result = new Community();
+				DeleteMemberResponse dr = new DeleteMemberResponse();
+				result.setCommunityJid(this.getCisId());
+				String senderJid = stanza.getFrom().getBareJid();
+				Participant p = c.getDeleteMember().getParticipant();
+				dr.setParticipant(p);			
+				
+				
+//				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+					//requester is not the owner
+//					dr.setResult(false);
+//				}else{
+					try{
+						dr.setResult(this.removeMemberFromCIS(p.getJid()).get());
+					}
+					catch(Exception e){
+						e.printStackTrace();
+						dr.setResult(false);
+					}
+					
+//				}
+				
+				result.setDeleteMemberResponse(dr);
+				return result;
+				// END OF DELETE MEMBER
+			}
+
+			
+			
+			
 			// get Info
 			if (c.getGetInfo()!= null) {
 				Community result = new Community();

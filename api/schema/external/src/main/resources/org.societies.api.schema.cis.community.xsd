@@ -74,15 +74,15 @@
 				<xs:element ref='leave'/>
 				<xs:element ref='invite'/>
 				<xs:element ref='who'/>
-				<xs:element ref='add'/>
+				<xs:element ref='addMember'/>
 				<xs:element ref='subscription'/>
-				<xs:element ref='delete'/>
+				<xs:element ref='deleteMember'/>
 				<xs:element ref='getInfo'/>
 				<xs:element ref='setInfo'/>
 				<xs:element ref='joinResponse'/>
 				<xs:element ref='leaveResponse'/>
-				<xs:element ref='addResponse'/>
-				<xs:element ref='deleteResponse'/>
+				<xs:element ref='addMemberResponse'/>
+				<xs:element ref='deleteMemberResponse'/>
 				<xs:element ref='getInfoResponse'/>
 				<xs:element ref='setInfoResponse'/>
 			</xs:choice>
@@ -120,7 +120,7 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name='addResponse'>
+	<xs:element name='addMemberResponse'>
 		<xs:complexType>
 			<xs:sequence minOccurs='1' maxOccurs='1'>
 				<xs:element ref='participant'/>
@@ -128,7 +128,7 @@
 			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name='deleteResponse'>
+	<xs:element name='deleteMemberResponse'>
 		<xs:complexType>
 			<xs:sequence minOccurs='1' maxOccurs='1'>
 				<xs:element ref='participant'/>
@@ -198,14 +198,14 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name='add'>
+	<xs:element name='addMember'>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref='participant'/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name='delete'>
+	<xs:element name='deleteMember'>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref='participant'/>
