@@ -33,7 +33,6 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.identity.IIdentity;
 
 /**
@@ -44,7 +43,6 @@ import org.societies.api.identity.IIdentity;
  */
 public interface ICommunityCtxDBMgr {
 
-	
 	/**
 	 * Creates a community Context Attribute
 	 * 
@@ -52,7 +50,7 @@ public interface ICommunityCtxDBMgr {
 	 * @param enum
 	 * @param type
 	 */
-	public CtxAttribute createCommunityAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumeration, String type) throws CtxException;
+	public CtxAttribute createCommunityAttribute(CtxEntityIdentifier scope, String type) throws CtxException;
 
 	/**
 	  * Creates a community Context Entity. 

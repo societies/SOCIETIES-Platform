@@ -27,24 +27,16 @@ package org.societies.context.community.db.test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CommunityMemberCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
 import org.societies.context.community.db.impl.CommunityCtxDBMgr;
@@ -55,7 +47,6 @@ import org.societies.context.community.db.impl.CommunityCtxDBMgr;
  * @author
  * 
  */
-
 public class CommunityCtxDBMgrTest {
 
 	private static final String OWNER_IDENTITY_STRING = "myFooIIdentity@societies.local";
@@ -117,7 +108,7 @@ public class CommunityCtxDBMgrTest {
 		System.out.println("---- testCreateCommunityCtxAttribute");
 
 		entity = communityDB.createCommunityEntity(mockIdentity);
-		attribute = communityDB.createCommunityAttribute(entity.getId(), CtxAttributeValueType.EMPTY, "name");
+		attribute = communityDB.createCommunityAttribute(entity.getId(), "name");
 		
 		assertNotNull(attribute);
 		assertEquals("name", attribute.getType());
@@ -139,7 +130,7 @@ public class CommunityCtxDBMgrTest {
 	   System.out.println("updated entities members " + entity.getMembers());
 	   
 	   // Add Attribute
-	   attribute = communityDB.createCommunityAttribute(entity.getId(), CtxAttributeValueType.EMPTY, "name");
+	   attribute = communityDB.createCommunityAttribute(entity.getId(), "name");
 	   entity.addAttribute(attribute);
 	   communityDB.updateCommunityEntity(entity);
 	   System.out.println("updated entities attributes " + entity.getAttributes());

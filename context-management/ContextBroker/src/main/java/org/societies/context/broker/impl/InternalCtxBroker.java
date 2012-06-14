@@ -186,12 +186,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
 			String type) throws CtxException {
-		// TODO ICommunityCtxDBMgr should provide createAttribute(CtxEntityIdentifier scope, String type)
 		
 		CtxAttribute attribute = null;
 		try {
 			IIdentity scopeID = this.idMgr.fromJid(scope.getOwnerId());
-			
 			
 			if (IdentityType.CSS.equals(scopeID.getType())){
 				
@@ -199,7 +197,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				
 			} else if (IdentityType.CIS.equals(scopeID.getType())){
 				
-				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, null, type);
+				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, type);
 				
 			} 
 		} catch (InvalidFormatException ife) {
