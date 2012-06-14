@@ -23,12 +23,10 @@ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVI
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.external.utilities;
+package org.societies.android.api.utilities;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,27 +36,35 @@ import android.util.Log;
 
 public class RemoteServiceHandler extends Handler {
 	private static final String LOG_TAG = RemoteServiceHandler.class.getName();
-	private Class container;
+	private Class <?> container;
 	private Object containerObject;
+	private String [] methodsArray;
 		
-	public RemoteServiceHandler(Class container, Object containerObject) {
+	/**
+	 * Default constructor 
+	 * @param container class of object which will be using the handler
+	 * @param containerObject object which will be using the handler
+	 * @param methodsArray methods array from interface being implemented by object
+	 */
+	public RemoteServiceHandler(Class <?> container, Object containerObject, String [] methodsArray) {
 		super();
 		this.container = container;
 		this.containerObject = containerObject;
+		this.methodsArray = methodsArray;
 	}
 
 	@Override
 	public void handleMessage(Message message) {
 		String targetMethod = ServiceMethodTranslator.getMethodSignature(
-				ICoreServiceMonitor.methodsArray, message.what);
+				this.methodsArray, message.what);
 
 		if (targetMethod != null) {
 			try {
 				Log.d(LOG_TAG, "Target method: " + targetMethod);
 
-				Class parameterClasses[] = ServiceMethodTranslator
+				Class <?> parameterClasses[] = ServiceMethodTranslator
 						.getParameterClasses(targetMethod);
-				for (Class element : parameterClasses) {
+				for (Class <?> element : parameterClasses) {
 					Log.d(LOG_TAG,
 							"Target method param types: " + element.getName());
 
@@ -66,7 +72,7 @@ public class RemoteServiceHandler extends Handler {
 
 				Method method = this.container.getMethod(
 								ServiceMethodTranslator.getMethodName(
-										ICoreServiceMonitor.methodsArray,
+										this.methodsArray,
 										message.what), parameterClasses);
 				Log.d(LOG_TAG, "Found method: " + method.getName());
 				try {
@@ -89,7 +95,7 @@ public class RemoteServiceHandler extends Handler {
 					bundle.setClassLoader(this.container.getClassLoader());
 
 					for (int i = 0; i < paramTypeList.length; i++) {
-						Class bundleParam[] = { String.class };
+						Class <?> bundleParam[] = { String.class };
 						Log.d(LOG_TAG, "param list: " + paramNameList[i]);
 						Object bundleValue[] = { paramNameList[i] };
 
@@ -138,11 +144,11 @@ public class RemoteServiceHandler extends Handler {
 	 * @param clazz
 	 * @return boolean
 	 */
-	private boolean implementsParcelable(Class clazz) {
+	private boolean implementsParcelable(Class <?> clazz) {
 		boolean retValue = false;
 
-		Class interfaces[] = clazz.getInterfaces();
-		for (Class interfaze : interfaces) {
+		Class <?> interfaces[] = clazz.getInterfaces();
+		for (Class <?> interfaze : interfaces) {
 			Log.d(LOG_TAG, "interface: " + interfaze.getSimpleName());
 			if (interfaze.getSimpleName().equals("Parcelable")) {
 				retValue = true;

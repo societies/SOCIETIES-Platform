@@ -1,10 +1,11 @@
-package org.societies.android.api.external.utilities;
+package org.societies.android.api.utilities;
 
 import static org.junit.Assert.*;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 
 public class TestServiceMethodTranslator {
 	private static String methodsArray [] = {"getGreeting()", 

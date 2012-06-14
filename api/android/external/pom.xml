@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.societies.android.api.external</groupId>
-	<artifactId>societies-android-api-external</artifactId>
+	<artifactId>societies-android-api</artifactId>
 	<name>SOCIETIES API Android External</name>
 	<version>${release.version}</version>
 	<packaging>jar</packaging>
@@ -39,42 +39,30 @@
 	</parent>
 
 	<dependencies>
-		<!-- Societies -->
-		<dependency>
-			<groupId>org.societies.android.api.internal</groupId>
-			<artifactId>societies-android-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>compile</scope>
-		</dependency>
-    	<!--dependency>
-		   <groupId>org.societies.api.internal</groupId>
-		   <artifactId>societies-api-internal</artifactId>
-        </dependency-->
-
-    	<!--dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency-->
-		<!-- Needed for Societies-specific annotations -->
-		<!--dependency>
-			<groupId>org.societies.utilities</groupId>
-			<artifactId>societies-annotations</artifactId>
-			<version>${release.version}</version>
-		</dependency-->
-		<!-- Android -->
-       <dependency>
+       	<dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
             <scope>provided</scope>
 		</dependency>
 		<dependency>
-      		<groupId>junit</groupId>
-      		<artifactId>junit</artifactId>
-      		<version>4.8.2</version>
-      		<scope>test</scope>
+      			<groupId>junit</groupId>
+      			<artifactId>junit</artifactId>
+      			<version>4.8.2</version>
+      			<scope>test</scope>
     	</dependency>
+    	<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+    	
+    	<dependency>
+  			<groupId>org.societies.utilities</groupId>
+  			<artifactId>DBC</artifactId>
+  			<version>${release.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    	
 	</dependencies>
 
 </project>

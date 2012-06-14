@@ -22,15 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.external.cis.management;
-
+package org.societies.android.api.cis.collaboration;
 
 /**
- * This interface represents the CISs that are owned by this CSS.
- * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface ICisOwned extends ICisRecord {
+
+public interface ICisSubscriptionManager {
+	Boolean addSubscriptionRecord(ICisSubscriptionRecord record);
+	Boolean updateSubscriptionRecord(ICisSubscriptionRecord record);
+	Boolean deleteSubscriptionRecord(ICisSubscriptionRecord record);
+	ICisSubscriptionRecord getSubscriptionRecord(String cssId, String cisId);
+	ICisSubscriptionRecord[] getSubscriptionRecords(String cssId);
 
 }

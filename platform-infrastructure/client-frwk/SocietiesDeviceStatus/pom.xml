@@ -31,8 +31,8 @@
             <artifactId>android</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.android.api.external</groupId>
-			<artifactId>societies-android-api-external</artifactId>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
 		</dependency>
     </dependencies>

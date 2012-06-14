@@ -35,6 +35,11 @@
                 <groupId>com.phonegap</groupId>
                 <artifactId>cordova</artifactId>
     	</dependency>
+		<dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api</artifactId>
+			<version>${release.version}</version>
+		</dependency>
 	
 	
 		<dependency>

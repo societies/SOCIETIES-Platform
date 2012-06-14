@@ -22,18 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.external.cis.collaboration;
+package org.societies.android.api.cis.directory;
 
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
-
-public interface ICisSubscriptionManager {
-	Boolean addSubscriptionRecord(ICisSubscriptionRecord record);
-	Boolean updateSubscriptionRecord(ICisSubscriptionRecord record);
-	Boolean deleteSubscriptionRecord(ICisSubscriptionRecord record);
-	ICisSubscriptionRecord getSubscriptionRecord(String cssId, String cisId);
-	ICisSubscriptionRecord[] getSubscriptionRecords(String cssId);
-
+public interface ICisAdvertisementRecord {
+	public String getName();
+	public void setName(String name);
+	public String getId();
+	public String getUri();
+	public void setUri(String uri);
 }

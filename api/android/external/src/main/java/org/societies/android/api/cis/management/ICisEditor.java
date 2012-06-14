@@ -22,41 +22,35 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.external.cis.directory;
+package org.societies.android.api.cis.management;
 
 
 /**
+ * We need to remove this from the API. It is implementation specific.
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface ICisDirectory {
-	/*
-	 * Various search methods that return an array of CISAdvertisementRecords.
-	 */
-	ICisAdvertisementRecord[] searchByName(String cisName);
-	ICisAdvertisementRecord[] searchByOwner(String ownerId);
-	ICisAdvertisementRecord[] searchByUri(String uri);
-	
-	Boolean RegisterCis (ICisAdvertisementRecord cis);
-	Boolean UnregisterCis (ICisAdvertisementRecord cis);
-	/*
-	 * This method is used to add CIS Directories that reside on other nodes.
-	 * 
-	 * @param directoryURI URI for the directory to be added.
-	 * @param cssId ID for the CSS where the new directory resides.
-	 * @param synchMode One of several modes for synchronizing with the new directory. E.g. pull or push.
-	 * 
-	 */
-	Integer AddPeerDirectory(String directoryURI, String cssId, Integer synchMode);
-	
-	/*
-	 * Ping method for checking whether this Directory is alive.
-	 */
-	Boolean ping();
-	/*
-	 * A method that will return the current URI for this Directory. This URI might be fetched
-	 * from XMPP name-space or be a web service.
-	 */
-	
-	public String getURI();
+@Deprecated
+public interface ICisEditor {
+
+    /**
+     * Returns the CISActivityFeed for a specific CIS.
+     * 
+     * @param cssId The ID of the owner CSS.
+     * @param cisId The ID of the CIS.
+     * @return The CISActivityFeed of the CIS.
+     */
+    ICisActivityFeed getActivityFeed(String cssId, String cisId);
+    String getCisId();
+    /**
+     * Updates an existing CIS with the data in the newCis. Update is done canonical. If it fails, the old CIS is
+     * not changed at all.
+     * 
+     * @param cssId The ID of the owner CSS
+     * @param newCis the data to be updated is specified in this CISRecord.
+     * @param oldCisId The ID of the CIS that needs to be updated.
+     * @return true if update was successful, 
+     */
+    Boolean update(String cssId, ICisRecord newCis, String oldCisId);
+
 }

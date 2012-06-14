@@ -22,35 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.external.cis.management;
-
+package org.societies.android.api.cis.collaboration;
 
 /**
- * We need to remove this from the API. It is implementation specific.
  * @author Babak.Farshchian@sintef.no
  *
  */
-@Deprecated
-public interface ICisEditor {
-
-    /**
-     * Returns the CISActivityFeed for a specific CIS.
-     * 
-     * @param cssId The ID of the owner CSS.
-     * @param cisId The ID of the CIS.
-     * @return The CISActivityFeed of the CIS.
-     */
-    ICisActivityFeed getActivityFeed(String cssId, String cisId);
-    String getCisId();
-    /**
-     * Updates an existing CIS with the data in the newCis. Update is done canonical. If it fails, the old CIS is
-     * not changed at all.
-     * 
-     * @param cssId The ID of the owner CSS
-     * @param newCis the data to be updated is specified in this CISRecord.
-     * @param oldCisId The ID of the CIS that needs to be updated.
-     * @return true if update was successful, 
-     */
-    Boolean update(String cssId, ICisRecord newCis, String oldCisId);
-
+public interface ICisSubscriptionRecord {
+	public String getSubscriptionMode();
+	public void setSubscriptionMode(String subscriptionMode);
+	public String getCssId();
+	public String getCisId();
 }

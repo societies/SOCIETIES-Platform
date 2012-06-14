@@ -22,12 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.external.cis.collaboration;
-
+package org.societies.android.api.cis.collaboration;
 /**
+ * This is an interface to be implemented by any class who wants to be informed about 
+ * changes in a particular CIS.
+ * 
  * @author Babak.Farshchian@sintef.no
- *
+ * @version 0
  */
-public interface IServiceSharingRecord {
+public interface ICisSubscriber {
 
 }

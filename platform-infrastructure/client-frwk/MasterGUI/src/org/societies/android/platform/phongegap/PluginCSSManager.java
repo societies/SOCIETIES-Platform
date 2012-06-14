@@ -31,7 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.societies.android.api.external.utilities.ServiceMethodTranslator;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;

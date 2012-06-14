@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.external.useragent.IAndroidUserAgent;
+import org.societies.android.api.useragent.IAndroidUserAgent;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;

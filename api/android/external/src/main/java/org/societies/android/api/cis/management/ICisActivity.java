@@ -22,16 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.external.cis.management;
-
+package org.societies.android.api.cis.management;
 
 /**
- * This interfacerepresents CISs that are not owned by this CSS but that this
- * CIS subscribes to (is a member of).
- * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface ICisSubscribed extends ICisRecord {
-
+public interface ICisActivity {
+	public String getVerb();
+	public void setVerb(String verb);
+	public String getActor();
+	public void setActor(String actor);
+	public String getObject();
+	public void setObject(String object);
+	public String getTarget();
+	public void setTarget(String target);
 }

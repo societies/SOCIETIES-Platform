@@ -22,9 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.external.cis.management;
+package org.societies.android.api.cis.management;
 
-import org.societies.android.api.external.cis.management.ICisActivity;
+import org.societies.android.api.cis.management.ICisActivity;
 
 /**
  * @author Babak.Farshchian@sintef.no
