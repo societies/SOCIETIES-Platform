@@ -25,13 +25,11 @@
 package org.societies.context.api.community.db;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
