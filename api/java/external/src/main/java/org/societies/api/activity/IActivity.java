@@ -42,6 +42,10 @@ public interface IActivity {
 	public void setObject(String object);
 	public String getTarget();
 	public void setTarget(String target);
+	@Deprecated
 	public long getTime();
+	@Deprecated
 	public void setTime(long time);
+	public String getPublished();
+	public void setPublished(String published);
 }

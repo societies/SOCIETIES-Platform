@@ -73,7 +73,15 @@ public interface IActivityFeed {
 	/**
 	 * This method will parse a criteria and delete the activities that match the criteria
 	 *  
-	 * @param {@link String} criteria TODO:define this
+	 * @param {@link String} criteria which has the same definition as the query of "getActivities(String query.."
+	 * @return {@link int} number of deleted activities.
 	 */
-	public void cleanupFeed(String criteria);
+	public int cleanupFeed(String criteria);
+	/**
+	 * 
+	 * 
+	 * @param {@link IAcitivty} activity the activity that should be deleted.
+	 * @return {@link boolean} true if the the activity was found and deleted, false if not.
+	 */
+	public boolean deleteActivity(IActivity activity);
 }

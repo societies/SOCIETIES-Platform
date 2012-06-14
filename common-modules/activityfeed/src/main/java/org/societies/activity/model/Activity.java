@@ -11,8 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.shindig.social.core.model.ActivityEntryImpl;
-import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivity;
 
@@ -23,7 +21,6 @@ public class Activity implements IActivity {
 	 * Serializable .. 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ActivityEntryImpl act;
 	@Transient
 	private HashMap<String,String> data = null;
 	private long time;
@@ -41,6 +38,7 @@ public class Activity implements IActivity {
 		this.setObject(icis.getObject());
 		this.setTarget(icis.getTarget());
 		this.setVerb(icis.getVerb());
+		this.setPublished(icis.getPublished());
 	}
 	
 	@Column(name="verb")
@@ -98,12 +96,6 @@ public class Activity implements IActivity {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public ActivityEntryImpl getAct() {
-		return act;
-	}
-	public void setAct(ActivityEntryImpl act) {
-		this.act = act;
-	}
 	@Override
 	public long getTime() {
 		return time;
@@ -111,5 +103,14 @@ public class Activity implements IActivity {
 	@Override
 	public void setTime(long time) {
 		this.time = time;
+	}
+	@Override
+	public String getPublished() {
+		return data.get("published");
+	}
+	@Override
+	public void setPublished(String published) {
+		data.put("publised", published);
+		
 	}
 }

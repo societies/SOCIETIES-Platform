@@ -77,10 +77,14 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	@Override
 	public List<IActivity> getActivities(String query, String timePeriod) {
 		ArrayList<IActivity> ret = new ArrayList<IActivity>();
-//		if()
-//		for(Activity act : list){
-//			if(act)
-//		}
+		List<IActivity> tmp = this.getActivities(timePeriod);
+		if(tmp.size()==0) return ret;
+		//start parsing query..
+		
+		//filter..
+		for(IActivity act : tmp){
+			
+		}
 		return ret;
 	}
 
@@ -104,9 +108,22 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	}
 
 	@Override
-	public void cleanupFeed(String criteria) {
-		// TODO Auto-generated method stub
-		
+	public int cleanupFeed(String criteria) {
+		int ret = 0;
+		String forever = "0 "+Long.toString(System.currentTimeMillis());
+		List<IActivity> toBeDeleted = getActivities(criteria,forever);
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			for(IActivity act : toBeDeleted){
+				this.list.remove(act);
+				session.delete((Activity)act);
+			}
+		}catch(Exception e){
+			t.rollback();
+			log.warn("deleting activities failed, rolling back");
+		}
+		return ret;
 	}
 
 	public SessionFactory getSessionFactory() {
@@ -181,5 +198,10 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	public List<IActivity> getActivities(String CssId, String query,
 			String timePeriod) {
 		return this.getActivities(query,timePeriod);
+	}
+	@Override
+	public boolean deleteActivity(IActivity activity) {
+		// x
+		return false;
 	}
 }
