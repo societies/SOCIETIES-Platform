@@ -1,3 +1,5 @@
+
+
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -23,42 +25,33 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.api;
+package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import org.societies.api.activity.IActivity;
-//import org.societies.api.cis.management.ICisRecord;
-//import org.societies.orchestration.CommunityLifecycleManagement.impl.ICisRecord;
-import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.css.management.ICssActivity;
-import org.societies.api.identity.IIdentity;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-/**
- * This is the interface for the Suggested Community Analyser component,
- * and acts as the gateway to Community Lifecycle Management, which
- * the Egocentric Community Analyser, CSCW, and CSM Analyser send their
- * CIS recommendations to for it to analyse further and take action if 
- * deemed appropriate, either via user feedback or fully automated action.
- * 
- * @author Fraser Blackmun
- * @version 1
- * 
- */
-
-public interface IRelevantCommunityAnalyser {
+public class ProximityRecord {
 	
+	private Timestamp timestamp;
+	private ArrayList<String> deviceIDs;
+	private ArrayList<String> cssIDs;
 	
-	/** 
-     * Identify and return relevant existing CISs for the user to join.
-     * 
-     * @return ArrayList of the identities of the CISs
-     */
-    public ArrayList<IIdentity> processRelevanceRecommendations();
-    
-   
+	public ProximityRecord(Timestamp timestamp, ArrayList<String> deviceIDs, ArrayList<String> cssIDs) {
+		this.timestamp = timestamp;
+		this.deviceIDs = deviceIDs;
+		this.cssIDs = cssIDs;
+	}
+	
+	public Timestamp getTimestamp() {
+		return timestamp;
+	}
+	
+	public ArrayList<String> getDeviceIDs() {
+		return deviceIDs;
+	}
+	
+	public ArrayList<String> getCssIDs() {
+		return cssIDs;
+	}
+	
 }

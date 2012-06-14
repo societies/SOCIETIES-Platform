@@ -53,9 +53,11 @@ import java.util.HashMap;
 public interface IRelevantCommunityAnalyser {
 	
 	
-   /** 
-    * 
-    */
+	/** 
+     * Identify and return relevant existing CISs for the user to join.
+     * 
+     * @return ArrayList of the identities of the CISs
+     */
     public ArrayList<IIdentity> processRelevanceRecommendations();
     
    
