@@ -110,7 +110,7 @@ public class InternalCtxBrokerTest {
 
 		when(cisMockIdentity.getType()).thenReturn(IdentityType.CIS);
 		when(cisMockIdentity.toString()).thenReturn(CIS_IDENTITY_STRING);
-		
+
 		//IIdentity scopeID = this.idMgr.fromJid(communityCtxEnt.getOwnerId());
 		when(mockIdentityMgr.fromJid(CIS_IDENTITY_STRING)).thenReturn(cisMockIdentity);
 	}
@@ -220,7 +220,7 @@ public class InternalCtxBrokerTest {
 		assertTrue(ctxAttribute.getType().equalsIgnoreCase("attrType"));
 	}
 
-	
+
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAttribute(org.societies.api.context.model.CtxCommunityEntityIdentifier, java.lang.String)}.
 	 * 
@@ -235,7 +235,7 @@ public class InternalCtxBrokerTest {
 		final CommunityCtxEntity communityCtxEnt = internalCtxBroker.createCommunityEntity(cisMockIdentity).get();
 		// Create the attribute to be tested
 		final CtxAttribute ctxAttribute = internalCtxBroker.createAttribute(communityCtxEnt.getId(), CtxAttributeTypes.POLITICAL_VIEWS).get();
-	
+
 		assertNotNull(ctxAttribute);
 		assertNotNull(ctxAttribute.getId());
 		assertEquals(ctxAttribute.getId().getScope(), communityCtxEnt.getId());
@@ -243,7 +243,49 @@ public class InternalCtxBrokerTest {
 		assertTrue(ctxAttribute.getType().equalsIgnoreCase(CtxAttributeTypes.POLITICAL_VIEWS));
 	}
 
-	
+	@Test
+	public void testLookupCommunityCtxAttr() throws CtxException, InterruptedException, ExecutionException {
+		/*
+		// Create the attribute's scope		
+		final CommunityCtxEntity communityCtxEnt = internalCtxBroker.createCommunityEntity(cisMockIdentity).get();
+		System.out.println("communityCtxEnt type :" + communityCtxEnt.getType());
+		// Create the attribute to be tested
+		CtxAttribute commCtxAttributeComm = internalCtxBroker.createAttribute(communityCtxEnt.getId(), CtxAttributeTypes.POLITICAL_VIEWS).get();
+		commCtxAttributeComm.setStringValue("foo");
+		commCtxAttributeComm = (CtxAttribute) internalCtxBroker.update(commCtxAttributeComm).get();
+		System.out.println("commCtxAttributeComm:" + commCtxAttributeComm);
+		
+		// test lookup and retrieve
+		List<CtxEntityIdentifier> commListResults = internalCtxBroker.lookupEntities("community", CtxAttributeTypes.POLITICAL_VIEWS, "foo", "foo").get();
+		System.out.println(" commListResults size :"+commListResults.size());
+	*/
+	}
+
+	@Test
+	public void testRetrieveCommunityCtxAttr() throws CtxException, InterruptedException, ExecutionException {
+		
+		/*
+		// Create the attribute's scope		
+		final CommunityCtxEntity communityCtxEnt = internalCtxBroker.createCommunityEntity(cisMockIdentity).get();
+		System.out.println("communityCtxEnt type :" + communityCtxEnt.getType());
+		System.out.println(" commEntResults  :"+communityCtxEnt.getId());
+		System.out.println(" commEntResults  :"+communityCtxEnt.getId().getOwnerId());
+		// den kseroume an einai css i cis ... opote den kseroume pia vasi na kalesei
+		if(communityCtxEnt.getId().getOwnerId().compareToIgnoreCase("cis")>1) System.out.println(communityCtxEnt.getId().getOwnerId().compareToIgnoreCase("cis"));
+		// Create the attribute to be tested
+		
+			CtxAttribute commCtxAttributeComm = internalCtxBroker.createAttribute(communityCtxEnt.getId(), CtxAttributeTypes.POLITICAL_VIEWS).get();
+		commCtxAttributeComm.setStringValue("foo");
+		commCtxAttributeComm = (CtxAttribute) internalCtxBroker.update(commCtxAttributeComm).get();
+		System.out.println("commCtxAttributeComm:" + commCtxAttributeComm);
+		
+		// test lookup and retrieve
+		CommunityCtxEntity commEntResults = (CommunityCtxEntity) internalCtxBroker.retrieve(commCtxAttributeComm.getId()).get();
+		System.out.println(" commEntResults  :"+commEntResults);
+	*/
+	}
+
+
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createEntity(java.lang.String)}.
 	 * 

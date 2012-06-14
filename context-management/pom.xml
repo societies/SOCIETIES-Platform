@@ -46,6 +46,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>api</module>
 		<module>context-event-mgmt</module>
 		<module>UserContextDBManagement</module>
+		<module>CommunityContextDBManagement</module>
 		<module>UserContextHistoryManagement</module>
 		<module>ContextBroker</module>
 		<module>ContextSourceManagement</module>
