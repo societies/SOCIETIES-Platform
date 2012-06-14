@@ -24,6 +24,7 @@
  */
 package org.societies.context.source.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -31,12 +32,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.CtxQuality;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.context.source.ICtxSourceMgr;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
@@ -124,8 +129,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			return null;
 		}
 
-		String id = name + counter++; // TODO interface with IDs provided by
-										// Device Manager
+		String id = name + counter++; // TODO interface with IDs provided by DeviceManager
 
 		try {
 			Future<List<CtxEntityIdentifier>> shadowEntitiesFuture = ctxBroker
@@ -133,6 +137,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			List<CtxEntityIdentifier> shadowEntities = shadowEntitiesFuture
 					.get();
 			
+			
+			//Check if ID composed before does already exist... Sense?
 			if (shadowEntities.size() > 0) {
 				for (CtxEntityIdentifier cei : shadowEntities) {
 					Set<CtxAttribute> sourceIDs = ((CtxEntity) ctxBroker
@@ -159,6 +165,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			Future<CtxEntity> fooEntFuture;
 			fooEntFuture = ctxBroker.createEntity(sensor);
 			CtxEntity fooEnt = fooEntFuture.get();
+			
+			
 			Future<CtxAttribute> nameAttrFuture = ctxBroker.createAttribute(fooEnt.getId(),
 					"CtxSourceId");
 			CtxAttribute nameAttr = nameAttrFuture.get();
@@ -169,6 +177,13 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 					"CtxType");
 			CtxAttribute ctxTypeAttr = ctxTypeAttrFuture.get();
 			ctxBroker.updateAttribute(ctxTypeAttr.getId(), contextType);
+			
+			if (contextOwner!=null){
+				Future<CtxAssociation> futAssociationToContextOwnerEntity = ctxBroker.createAssociation("providesUpdatesFor");
+				CtxAssociation associationToContextOwnerEntity = futAssociationToContextOwnerEntity.get();
+				associationToContextOwnerEntity.setParentEntity(fooEnt.getId());
+				associationToContextOwnerEntity.addChildEntity(contextOwner.getId());
+			}
 
 			LOG.debug("Created entity: " + fooEnt);
 		} catch (CtxException e) {
@@ -182,23 +197,25 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 		return new AsyncResult<String> (id);
 	}
-
-	@Override
-	@Async
-	public Future<Boolean> sendUpdate(String identifier, Serializable data, CtxEntity owner) {
+	
+	private Future<Boolean> completeSendUpdate(String identifier, Serializable data, CtxEntity owner, boolean inferred, double precision, double frequency, boolean USE_QOC) {
+		
         if (this.ctxBroker == null) {
         	LOG.error("Could not handle update from " + identifier
                     + ": Context Broker is not available");
             return new AsyncResult<Boolean>(false);
         }
-        if (LOG.isTraceEnabled())
-        	LOG.debug("Sending update: id=" + identifier+ ", data=" + data + ", ownerEntity=" + owner);
 
-    	Future<List<CtxEntityIdentifier>> shadowEntitiesFuture;
-    	List<CtxEntityIdentifier> shadowEntities;
-    	CtxEntityIdentifier shadowEntityID = null;
-    	Set<CtxAttribute> attrs = null;
-    	CtxEntity shadowEntity =null;
+        if (LOG.isTraceEnabled())
+        	LOG.debug("Sending update: id=" + identifier + ", data=" + data
+                    + ", ownerEntity=" + owner + ", inferred=" + inferred
+                    + ", precision=" + precision + ", frequency=" + frequency);
+        
+        Future<List<CtxEntityIdentifier>> shadowEntitiesFuture;
+        List<CtxEntityIdentifier> shadowEntities;
+        CtxEntityIdentifier shadowEntityID = null;
+        Set<CtxAttribute> attrs = null;
+        CtxEntity shadowEntity = null;
 
         try {
             String type = "";
@@ -222,14 +239,17 @@ public class ContextSourceManagement implements ICtxSourceMgr {
                 // Exception("Sending failure due to missing Registration.");
             } else {
                 shadowEntityID = shadowEntities.get(0);
-                shadowEntity = (CtxEntity) ctxBroker.retrieve(shadowEntityID);
+                shadowEntity = (CtxEntity) ctxBroker.retrieve(shadowEntityID).get();
             }
-
+            
+ 
             attrs = shadowEntity.getAttributes("CtxType");
             if (attrs != null && attrs.size() > 0)
                 type = attrs.iterator().next().getStringValue();
             else
                 type = "data";
+            if (LOG.isDebugEnabled())
+            	LOG.debug("type is " + type);
 
 	        /* update Context Information at Context Source Shadow Entity */
             attrs = shadowEntity.getAttributes("data");
@@ -240,24 +260,50 @@ public class ContextSourceManagement implements ICtxSourceMgr {
             	dataAttr = dataAttrFuture.get();
             }
 
-            if (data instanceof String) updateData((String)data,dataAttr);
-            //else dataAttr.setBlobValue(data);
-        	//TODO BLOB handling
-            
+            updateData(data,dataAttr);
+
             dataAttr.setSourceId(identifier);
-            //dataAttr.setHistoryRecorded(true);
+            dataAttr.setHistoryRecorded(true);
 
             quality = dataAttr.getQuality();
 	        quality.setOriginType(CtxOriginType.SENSED);
+	        
+            if (USE_QOC){
+	            dataAttr.setSourceId(identifier);
+	            dataAttr.setHistoryRecorded(true);
+	
+	            if (inferred) quality.setOriginType(CtxOriginType.INFERRED);
+	            quality.setPrecision(precision);
+	            quality.setUpdateFrequency(frequency);
+            }	        
 
 	        ctxBroker.update(dataAttr);
 
 	        /* update Context Information with Information Owner Entity */
             if (owner == null) {
                 try {
+                	//Check if the shadow entity has an association to an ctxEntity
+                	List<CtxIdentifier> assocIdentifierList = ctxBroker.lookup(CtxModelType.ASSOCIATION, "providesUpdatesFor").get();
+                	CtxAssociation temp;
+    				CtxEntity parent;
+    				CtxEntity child;
+        			for (CtxIdentifier ctxId: assocIdentifierList){
+        				temp = (CtxAssociation) ctxBroker.retrieve(ctxId).get();
+        				if (temp.parentEntity==null) continue;
+        				parent = (CtxEntity) ctxBroker.retrieve(temp.parentEntity).get();
+        				if (parent!= shadowEntity) continue;
+        				if( temp.childEntities==null || temp.childEntities.size()==0) continue;
+        				child = (CtxEntity) ctxBroker.retrieve(temp.childEntities.iterator().next()).get();
+        				if (child!=null){
+        					owner = child;
+        					break;
+        				}
+        			}
+                	
                 	//TODO retrieve the device owner!
-                	owner = ctxBroker.createEntity("CSS").get();
-//                    owner = ctxBroker.retrieveDevice();
+                	//owner = ctxBroker.createEntity("CSS").get();
+                    owner = ctxBroker.retrieveCssOperator().get();
+                    
                 } catch (CtxException e) {
                 	LOG.error("Could not handle update from " + identifier
                             + ": Could not retrieve device entity: "
@@ -276,13 +322,25 @@ public class ContextSourceManagement implements ICtxSourceMgr {
             }
             if (LOG.isDebugEnabled())
             	LOG.debug("dataAttr=" + dataAttr);
+            
+            
             // Update QoC information.
             quality = dataAttr.getQuality();
             quality.setOriginType(CtxOriginType.SENSED);
+            
+            if (USE_QOC){
+	            if (inferred)
+	                quality.setOriginType(CtxOriginType.INFERRED);
+	            quality.setPrecision(precision);
+	            quality.setUpdateFrequency(frequency);
+            }
+            
+
             // Set history recorded flag.
             dataAttr.setHistoryRecorded(true);
             // Update attribute.
-            updateData(data, dataAttr);
+            updateData(data, dataAttr);        
+            
         } catch (CtxException e) {
         	LOG.error("Could not handle update from " + identifier
                     + ": " + e.getLocalizedMessage(), e);
@@ -296,162 +354,72 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		}
 
         return new AsyncResult<Boolean>(true);
+	
+	}
+
+	@Override
+	@Async
+	public Future<Boolean> sendUpdate(String identifier, Serializable data, CtxEntity owner) {
+		return completeSendUpdate(identifier, data, owner, false, 0, 0, false);
     }
 
 	@Override
 	@Async
     public Future<Boolean> sendUpdate(String identifier, Serializable data, CtxEntity owner, 
             boolean inferred, double precision, double frequency) {
-        if (this.ctxBroker == null) {
-        	LOG.error("Could not handle update from " + identifier
-                    + ": Context Broker is not available");
-            return new AsyncResult<Boolean>(false);
-        }
-        if (LOG.isTraceEnabled())
-        	LOG.debug("Sending update: id=" + identifier + ", data=" + data
-                    + ", ownerEntity=" + owner + ", inferred=" + inferred
-                    + ", precision=" + precision + ", frequency=" + frequency);
-        Future<List<CtxEntityIdentifier>> shadowEntitiesFuture;
-        List<CtxEntityIdentifier> shadowEntities;
-        CtxEntityIdentifier shadowEntityID = null;
-        Set<CtxAttribute> attrs = null;
-        CtxEntity shadowEntity = null;
 
-        try {
-            shadowEntitiesFuture = ctxBroker.lookupEntities(sensor, "CtxSourceId",
-                    identifier, identifier);
-            shadowEntities = shadowEntitiesFuture.get();
-            if (shadowEntities.size() > 1) {
-                if (LOG.isDebugEnabled())
-                	LOG.debug("Sensor-ID " + identifier + " is not unique. No information stored.");
-                return new AsyncResult<Boolean>(false);
-                // throw new
-                // Exception("Unregistering failure due to ambiguity.");
-            } else if (shadowEntities.isEmpty()) {
-                if (LOG.isDebugEnabled())
-                	LOG.debug("Sensor-ID " + identifier + " is not available. No information stored.");
-                return new AsyncResult<Boolean>(false);
-                // throw new
-                // Exception("Unregistering failure due to missing Registration.");
-            } else {
-                shadowEntityID = shadowEntities.get(0);
-                shadowEntity = (CtxEntity) ctxBroker.retrieve(shadowEntityID);
-            }
-
-            String type = "";
-            attrs = shadowEntity.getAttributes("CtxType");
-            if (attrs != null && attrs.size() > 0)
-                type = attrs.iterator().next().getStringValue();
-            else
-                type = "data";
-            if (LOG.isDebugEnabled())
-            	LOG.debug("type is " + type);
-
-            Future<CtxAttribute> dataAttrFuture;
-            CtxAttribute dataAttr;
-            CtxQuality quality;
-            
-	        /* update Context Information at Context Source Shadow Entity */
-	    	attrs = shadowEntity.getAttributes("data");
-            if (attrs != null && attrs.size()>0)
-            	dataAttr = attrs.iterator().next();
-            else{
-            	dataAttrFuture = ctxBroker.createAttribute(shadowEntityID, "data");
-            	dataAttr = dataAttrFuture.get();
-            }
-
-            if (data instanceof String) updateData((String)data,dataAttr);
-            //else dataAttr.setBlobValue(data);
-        	//TODO BLOB handling
-            
-            dataAttr.setSourceId(identifier);
-            dataAttr.setHistoryRecorded(true);
-
-            quality = dataAttr.getQuality();
-            if (inferred) quality.setOriginType(CtxOriginType.INFERRED);
-            else quality.setOriginType(CtxOriginType.SENSED);
-            quality.setPrecision(precision);
-            quality.setUpdateFrequency(frequency);
-
-            ctxBroker.update(dataAttr);
-	        
-	        
-            /* update Context Information with Information Owner Entity */
-            if (owner == null) {
-                try {
-                	//TODO retrieve the device owner!
-                	owner = ctxBroker.createEntity("CSS").get();
-//                    owner = ctxBroker.retrieveDevice();
-                } catch (CtxException e) {
-                	LOG.error("Could not handle update from " + identifier
-                            + ": Could not retrieve device entity: "
-                            + e.getLocalizedMessage(), e);
-                    return new AsyncResult<Boolean>(false);
-                }
-            }
-            attrs = owner.getAttributes(type);
-            if (attrs.size() > 0)
-                dataAttr = attrs.iterator().next();
-            else {
-            	dataAttrFuture = ctxBroker.createAttribute(owner.getId(), type);
-            	dataAttr = dataAttrFuture.get();
-                dataAttr.setSourceId(identifier);
-            }
-            if (LOG.isDebugEnabled())
-            	LOG.debug("dataAttr=" + dataAttr);
-            
-            
-            
-            // Update QoC information.
-            quality = dataAttr.getQuality();
-            if (inferred)
-                quality.setOriginType(CtxOriginType.INFERRED);
-            else
-                quality.setOriginType(CtxOriginType.SENSED);
-            quality.setPrecision(precision);
-            quality.setUpdateFrequency(frequency);
-            // Set history recorded flag.
-            dataAttr.setHistoryRecorded(true);
-            // Update attribute.
-            updateData(data, dataAttr);
-        } catch (CtxException e) {
-            LOG.error("Could not handle update from " + identifier
-                    + ": " + e.getLocalizedMessage(), e);
-        } catch (InterruptedException e) {
-        	LOG.error(e.getMessage());
-            return new AsyncResult<Boolean>(false);
-		} catch (ExecutionException e) {
-        	LOG.error(e.getMessage());
-            return new AsyncResult<Boolean>(false);
-		}
-		return new AsyncResult<Boolean>(true);
+		return completeSendUpdate(identifier, data, owner, inferred, precision, frequency, true);
     }
 
     private void updateData(Serializable value, CtxAttribute attr)
             throws CtxException {
-    	//TODO BLOB handling
-        if (value instanceof String)
+        if (value instanceof String){
             attr.setStringValue((String) value);
-        else if (value instanceof Integer)
+        	attr.setValueType(CtxAttributeValueType.STRING);
+        }
+        else if (value instanceof Integer){
             attr.setIntegerValue((Integer) value);
-        else if (value instanceof Double)
+        	attr.setValueType(CtxAttributeValueType.INTEGER);
+        }
+        else if (value instanceof Double){
             attr.setDoubleValue((Double) value);
-//        else
-//            attr.setBlobValue(value);
-//
-//        try {
-            ctxBroker.update(attr);
-//        } catch (CtxException cde) {
-//            // If the value is a String attempt to store it as a blob.
-//            if (value instanceof String) {
-//                if (LOG.isDebugEnabled())
-//                	LOG.debug("Attempting to store String value as a blob");
-//                attr.setBlobValue(value);
-//                ctxBroker.update(attr);
-//            } else {
-//                throw cde;
-//            }
-//        }
+        	attr.setValueType(CtxAttributeValueType.DOUBLE);
+        }
+        else{
+        	byte[] blobBytes = null;
+			try {
+				blobBytes = SerialisationHelper.serialise(value);
+			} catch (IOException e) {
+				LOG.error(e.getMessage());
+			}
+        	attr.setBinaryValue(blobBytes);
+        	attr.setValueType(CtxAttributeValueType.BINARY);
+        }
+
+        try {
+            attr = (CtxAttribute) ctxBroker.update(attr).get();
+        } catch (CtxException cde) {
+            // If the value is a String attempt to store it as a blob. As the String might just be too long.
+            if (value instanceof String) {
+                if (LOG.isDebugEnabled())
+                	LOG.debug("Attempting to store String value as a blob");
+            	byte[] blobBytes = null;
+    			try {
+    				blobBytes = SerialisationHelper.serialise(value);
+    			} catch (IOException e) {
+    				LOG.error(e.getMessage());
+    			}
+            	attr.setBinaryValue(blobBytes);
+            	attr.setValueType(CtxAttributeValueType.BINARY);
+                ctxBroker.update(attr);
+            } else {
+                throw cde;
+            }
+        } catch (InterruptedException e) {
+			LOG.error(e.getMessage());
+		} catch (ExecutionException e) {
+			LOG.error(e.getMessage());
+		}
     }
 
 	@Override
