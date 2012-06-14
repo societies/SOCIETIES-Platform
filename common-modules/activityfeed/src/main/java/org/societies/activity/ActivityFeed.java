@@ -1,5 +1,6 @@
 package org.societies.activity;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -18,9 +19,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Property;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.model.Activity;
+import org.societies.activity.model.ActivityString;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
@@ -80,10 +85,47 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		List<IActivity> tmp = this.getActivities(timePeriod);
 		if(tmp.size()==0) return ret;
 		//start parsing query..
-		
+		JSONObject arr = null;
+		try {
+			arr = new JSONObject(query);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return ret;
+		}
+		String methodName; String filterBy; String filterValue;
+		try {
+			methodName = arr.getString("filterOp");
+			filterBy = arr.getString("filterBy");
+			filterValue = arr.getString("filterValue");
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+			return ret;
+		}
+
+		java.lang.reflect.Method method = null;
+		try {
+			method = ActivityString.class.getMethod(methodName, String.class);
+		} catch (SecurityException e) {
+			return ret;
+		} catch (NoSuchMethodException e) {
+			return ret;
+		}
 		//filter..
-		for(IActivity act : tmp){
-			
+		try {
+			for(IActivity act : tmp){
+				if((Boolean)method.invoke(((Activity)act).getValue(filterBy),filterValue) ){
+					ret.add(act);
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return ret;
 	}

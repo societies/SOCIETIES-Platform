@@ -22,7 +22,7 @@ public class Activity implements IActivity {
 	 */
 	private static final long serialVersionUID = 1L;
 	@Transient
-	private HashMap<String,String> data = null;
+	private HashMap<String,ActivityString> data = null;
 	private long time;
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -30,10 +30,10 @@ public class Activity implements IActivity {
 	
 	@ManyToOne
 	private ActivityFeed feed;
-	public Activity(){data = new HashMap<String,String>();}
+	public Activity(){data = new HashMap<String,ActivityString>();}
 	public Activity(IActivity icis)
 	{
-		data = new HashMap<String,String>();
+		data = new HashMap<String,ActivityString>();
 		this.setActor(icis.getActor());
 		this.setObject(icis.getObject());
 		this.setTarget(icis.getTarget());
@@ -44,45 +44,45 @@ public class Activity implements IActivity {
 	@Column(name="verb")
 	@Override
 	public String getVerb() {
-		return data.get("verb");
+		return data.get("verb").toString();
 	}
 
 	@Column(name="verb")
 	@Override
 	public void setVerb(String verb) {
-		data.put("verb", verb);
+		data.put("verb", new ActivityString(verb));
 		
 	}
 	@Column(name="actor")
 	@Override
 	public String getActor() {
-		return data.get("actor");
+		return data.get("actor").toString();
 	}
 	@Column(name="actor")
 	@Override
 	public void setActor(String actor) {
-		data.put("actor", actor);
+		data.put("actor", new ActivityString(actor));
 	}
 	@Column(name="object")
 	@Override
 	public String getObject() {
-		return data.get("object");
+		return data.get("object").toString();
 	}
 	@Column(name="object")
 	@Override
 	public void setObject(String object) {
-		data.put("object", object);
+		data.put("object", new ActivityString(object));
 		
 	}
 	@Column(name="target")
 	@Override
 	public String getTarget() {
-		return data.get("target");
+		return data.get("target").toString();
 	}
 	@Column(name="target")
 	@Override
 	public void setTarget(String target) {
-		data.put("target", target);
+		data.put("target", new ActivityString(target));
 	}
 	public ActivityFeed getFeed() {
 		return feed;
@@ -106,11 +106,14 @@ public class Activity implements IActivity {
 	}
 	@Override
 	public String getPublished() {
-		return data.get("published");
+		return data.get("published").toString();
 	}
 	@Override
 	public void setPublished(String published) {
-		data.put("publised", published);
+		data.put("publised", new ActivityString(published));
 		
+	}
+	public ActivityString getValue(String key){
+		return data.get(key);
 	}
 }
