@@ -56,6 +56,7 @@ import org.hibernate.classic.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
+import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -75,8 +76,11 @@ import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
+import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.cis.community.AddActivityResponse;
 import org.societies.api.schema.cis.community.AddMemberResponse;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
+import org.societies.api.schema.cis.community.GetActivitiesResponse;
 import org.societies.api.schema.cis.community.GetInfoResponse;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
@@ -299,8 +303,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 		
-		
+
 		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
+		//activityFeed.getActivities("0 1339689547000");
 
 	}
 	
@@ -334,9 +339,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("CIS listener registered");
 		
 		this.setSessionFactory(sessionFactory);
+
 		
 		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
-		
+		//activityFeed.getActivities("0 1339689547000");
 	}
 	
 
@@ -844,6 +850,70 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}				// END OF GET INFO
 
 			
+			// get Activities
+			if (c.getGetActivities() != null) {
+				Community result = new Community();
+				GetActivitiesResponse r = new GetActivitiesResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				List<IActivity> iActivityList;
+				List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+					if(c.getGetActivities().getQuery()!=null  &&  c.getGetActivities().getQuery().isEmpty())
+						iActivityList = activityFeed.getActivities(c.getGetActivities().getTimePeriod());
+					else
+						iActivityList = activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod());										
+				//}
+				
+
+				Iterator<IActivity> it = iActivityList.iterator();
+				
+				while(it.hasNext()){
+					IActivity element = it.next();
+					Activity a = new org.societies.api.schema.activity.Activity();
+					a.setActor(element.getActor());
+					a.setObject(a.getObject());
+					a.setTime(a.getTime());
+					a.setVerb(a.getVerb());
+					marshalledActivList.add(a);
+			     }
+				
+				r.setActivity(marshalledActivList);
+				result.setGetActivitiesResponse(r);		
+				return result;
+
+			}				// END OF get ACTIVITIES
+			
+			// add Activity
+
+			if (c.getAddActivity() != null) {
+				Community result = new Community();
+				AddActivityResponse r = new AddActivityResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+				IActivity iActivity = new org.societies.activity.model.Activity();
+				iActivity.setActor(c.getAddActivity().getActivity().getActor());
+				iActivity.setObject(c.getAddActivity().getActivity().getObject());
+				iActivity.setTarget(c.getAddActivity().getActivity().getTarget());
+				iActivity.setTime(c.getAddActivity().getActivity().getTime());
+				iActivity.setVerb(c.getAddActivity().getActivity().getVerb());
+
+				activityFeed.addCisActivity(iActivity);
+				
+				r.setResult(true); //TODO. add a return on the activity feed method
+				
+				
+				result.setAddActivityResponse(r);		
+				return result;
+
+			}				// END OF add Activity
 			
 		}
 		return null;

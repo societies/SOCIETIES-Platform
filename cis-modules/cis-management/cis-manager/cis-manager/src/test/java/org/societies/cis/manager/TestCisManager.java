@@ -211,7 +211,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		doNothing().when(mockCSSendpoint).register(any(org.societies.api.comm.xmpp.interfaces.IFeatureServer.class));
 		
 		// mocking the activity feed static methods
-		PowerMockito.mockStatic(ActivityFeed.class);
+		//PowerMockito.mockStatic(ActivityFeed.class);
 		//this.session = sessionFactory.openSession();
 		System.out.println("in setup! cisManagerUnderTest.getSessionFactory(): "+sessionFactory);
 		ActivityFeed.setStaticSessionFactory(sessionFactory);

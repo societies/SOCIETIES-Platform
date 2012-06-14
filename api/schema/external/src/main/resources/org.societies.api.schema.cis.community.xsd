@@ -27,13 +27,14 @@
 <xs:schema targetNamespace='http://societies.org/api/schema/cis/community'
 	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"  
 			xmlns:tns="http://societies.org/api/schema/cis/community" 
-	xmlns="http://societies.org/api/schema/cis/community">
+	xmlns="http://societies.org/api/schema/cis/community"
+	
+	xmlns:ins="http://societies.org/api/schema/activity"
+	>
 
-	<xs:annotation>
-		<xs:documentation>
-			The protocol documented by this schema is defined in XEP-SOC1.
-		</xs:documentation>
-	</xs:annotation>
+<xs:import namespace="http://societies.org/api/schema/activity" 
+           schemaLocation="org.societies.api.schema.activity.xsd"/>
+
 
 <!--  	<xs:element name='community' type='community-type'></xs:element>
 	
@@ -85,6 +86,10 @@
 				<xs:element ref='deleteMemberResponse'/>
 				<xs:element ref='getInfoResponse'/>
 				<xs:element ref='setInfoResponse'/>
+				<xs:element ref='getActivities'/>
+				<xs:element ref='getActivitiesResponse'/>
+				<xs:element ref='addActivity'/>
+				<xs:element ref='addActivityResponse'/>
 			</xs:choice>
 		  <xs:attribute name='owner-jid' type='xs:string'/> 
           <xs:attribute name='community-jid' type='xs:string'/> 
@@ -96,6 +101,40 @@
           <xs:attribute name='description' type='xs:string'/> 
 	</xs:complexType>
 </xs:element>
+
+
+	<xs:element name='getActivities'>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='empty'>
+					<xs:attribute name='timePeriod' type='xs:string' use='required'/>
+					<xs:attribute name='query' type='xs:string'/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name='getActivitiesResponse'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element ref='ins:Activity'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name='addActivity'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='ins:Activity'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name='addActivityResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>
 
 	<xs:element name='subscription'>
 		<xs:complexType>

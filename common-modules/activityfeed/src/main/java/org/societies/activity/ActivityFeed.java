@@ -60,14 +60,16 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		long fromTime = 0;long toTime = 0;
 		try{
 			fromTime = Long.parseLong(times[0]);
-			toTime = Long.parseLong(times[0]);
+			//toTime = Long.parseLong(times[0]);
+			toTime = Long.parseLong(times[1]);
 		}catch(Exception e){
 			
 		}
-		
-		for(Activity act : list){
-			if(act.getTime()>=fromTime && act.getTime()<=toTime){
-				ret.add(act);
+		if(list != null){
+			for(Activity act : list){
+				if(act.getTime()>=fromTime && act.getTime()<=toTime){
+					ret.add(act);
+				}
 			}
 		}
 		return ret;
