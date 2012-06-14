@@ -586,28 +586,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	//***********************************************
 	//     Context Update Events Methods  
 	//***********************************************
-	@Override
-	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void unregisterForUpdates(CtxEntityIdentifier scope,
-			String attributeType) throws CtxException {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void registerForUpdates(CtxEntityIdentifier scope,
-			String attrType) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
+		// TODO remove DEPRECATED
 
 	}
 
