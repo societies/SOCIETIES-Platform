@@ -27,6 +27,7 @@ package org.societies.context.api.user.inference;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 //import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.identity.IIdentity;
@@ -109,6 +110,13 @@ public interface IUserCtxInferenceMgr {
 	 * @param ctxAttrId
 	 * @since 0.0.1
 	 */
-	public void refineContext(CtxAttributeIdentifier ctxAttrId);
+	public CtxAttribute refineContext(CtxAttributeIdentifier ctxAttrId);
 
+	/**
+	 * Refines context for an indicate Context Attribute. 
+	 * 
+	 *  @return Set of ctxAttributeTypes
+	 *  @since 0.0.8
+	 */
+	public Set<String> getInferrableTypes();
 }

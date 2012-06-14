@@ -27,6 +27,7 @@ package org.societies.context.user.inference.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -40,7 +41,7 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	@Override
 	public void checkQuality(CtxModelObject arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -60,26 +61,36 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	@Override
 	public void inheritContext(CtxAttributeIdentifier arg0,
 			CtxAttributeValueType arg1, IIdentity arg2) {
-		// TODO Auto-generated method stub
 		
+
 	}
 
 	@Override
 	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, Date arg1) {
-		// TODO Auto-generated method stub
-		return null;
+		CtxAttribute ctxAttribute = null;
+
+		return ctxAttribute;
 	}
 
 	@Override
 	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, int arg1) {
-		// TODO Auto-generated method stub
-		return null;
+		CtxAttribute ctxAttribute = null;
+	
+		return ctxAttribute;
 	}
 
 	@Override
-	public void refineContext(CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public CtxAttribute refineContext(CtxAttributeIdentifier arg0) {
+		CtxAttribute ctxAttribute = null;
 
+		return ctxAttribute;
+
+	}
+	
+	@Override
+	public Set<String> getInferrableTypes(){
+		Set<String> inferableTypes = null;
+		
+		return inferableTypes;
+	}
 }
