@@ -27,4 +27,5 @@
 	<osgi:reference id="trustBrokerRemote" interface="org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote" cardinality="0..1">
 		<osgi:listener ref="trustBroker" bind-method="bindTrustBrokerRemote" unbind-method="unbindTrustBrokerRemote" />
 	</osgi:reference>
+	<osgi:reference id="trustEvidenceCollectorRemote" interface="org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote" cardinality="0..1" />
 </beans>
