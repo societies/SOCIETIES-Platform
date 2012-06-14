@@ -110,7 +110,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
 					  		"http://societies.org/api/schema/cis/community"));
-			//.singletonList("http://societies.org/api/schema/cis/community");
+	//		.singletonList("http://societies.org/api/schema/cis/community");
 	@Transient
 	private final static List<String> PACKAGES = Collections
 			//.singletonList("org.societies.api.schema.cis.community");
@@ -350,7 +350,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 
 	@Override
-	public Future<Boolean> addMember(String jid, String role) throws  CommunicationException{
+	public Future<Boolean> addMember(String jid, String role){
 		MembershipType typedRole;
 		try{
 			typedRole = MembershipType.valueOf(role);
@@ -360,22 +360,56 @@ public class Cis implements IFeatureServer, ICisOwned {
 		catch( NullPointerException e) {
 			return new AsyncResult<Boolean>(new Boolean(false)); //the string was not valid
 		}
-		return new AsyncResult<Boolean>(this.addMember(jid, typedRole));
+		boolean ret;
+		ret = this.insertMember(jid, typedRole);
+
 		
+		
+		// should we send a XMPP notification to all the users to say that the new member has been added to the group
+		// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
+		// and the GUI can be updated with that new member
+		Stanza sta;
+		LOG.info("new member added, going to notify the user");
+		IIdentity targetCssIdentity = null;
+		try {
+			targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
+		} catch (InvalidFormatException e) {
+			LOG.info("could not send addd notification");
+			e.printStackTrace();
+		}		
+		// 1) Notifying the added user
+
+		
+		CommunityManager cMan = new CommunityManager();
+		Notification n = new Notification();
+		SubscribedTo s = new SubscribedTo();
+		s.setCisJid(this.getCisId());
+		s.setCisRole(role.toString());
+		n.setSubscribedTo(s);
+		cMan.setNotification(n);
+		
+		LOG.info("finished building notification");
+
+
+		sta = new Stanza(targetCssIdentity);
+		try {
+			CISendpoint.sendMessage(sta, cMan);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			LOG.info("problem sending notification to cis");
+			e.printStackTrace();
+		}
+				
+		LOG.info("notification sent to the new user");
+		
+		return new AsyncResult<Boolean>(new Boolean(ret));
 	}
 	
 	
 	// internal implementation of the method above
-	private boolean addMember(String jid, MembershipType role) throws  CommunicationException{
+	private boolean insertMember(String jid, MembershipType role) {
 		
-		IIdentity targetCssIdentity;
-		try {
-			targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
-		} catch (InvalidFormatException e) {
-			LOG.info("bad jid as input to addMember method");
-			e.printStackTrace();
-			return false;
-		}
+
 		
 		LOG.info("add member invoked");
 		if (role == null)
@@ -386,35 +420,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 			//persist in database
 			this.updatePersisted(this);
 			
-			// should we send a XMPP notification to all the users to say that the new member has been added to the group
-			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
-			// and the GUI can be updated with that new member
-			Stanza sta;
-			LOG.info("new member added, going to notify community");
-			
-			// 1) Notifying the added user
-
-			
-			CommunityManager cMan = new CommunityManager();
-			Notification n = new Notification();
-			SubscribedTo s = new SubscribedTo();
-			s.setCisJid(this.getCisId());
-			s.setCisRole(role.toString());
-			n.setSubscribedTo(s);
-			cMan.setNotification(n);
-			
-			LOG.info("finished building notification");
-
-
-			sta = new Stanza(targetCssIdentity);
-			CISendpoint.sendMessage(sta, cMan);
-					
-			LOG.info("notification sent to the new user");
+	
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a pubsub notification
 			
 			//creating payload
-			Participant p = new Participant();
+/*			Participant p = new Participant();
 			p.setJid(jid);
 			p.setRole( ParticipantRole.fromValue(role.toString())  );
 			Community c = new Community();
@@ -441,7 +452,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 		     }
 			LOG.info("notification sents to the existing user");
-
+			*/
 			return true;
 		}else{
 			return false;
@@ -638,12 +649,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 				LOG.info("join received");
 				String senderjid = stanza.getFrom().getBareJid();
 				boolean addresult = false; 
-				try {
-					addresult = this.addMember(senderjid, MembershipType.participant);
-				} catch (CommunicationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				addresult = this.insertMember(senderjid, MembershipType.participant);
+				
 				
 				Community result = new Community();
 				
@@ -722,17 +729,17 @@ public class Cis implements IFeatureServer, ICisOwned {
 				ar.setParticipant(p);			
 				
 				
-				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+//				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 					//requester is not the owner
-					ar.setResult(false);
-				}else{
+//					ar.setResult(false);
+//				}else{
 					if(p!= null && p.getJid() != null){
 						String role = "";
 						if (p.getRole() != null)				
 							role = p.getRole().value();
 						
 						try{
-							if(this.addMember(p.getJid(), MembershipType.valueOf(role))){
+							if(this.addMember(p.getJid(), role).get()){
 								ar.setParticipant(p);
 								ar.setResult(true);
 							}
@@ -746,7 +753,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 						}
 					}					
 					
-				}
+//				}
 				
 				result.setAddResponse(ar);
 				return result;
