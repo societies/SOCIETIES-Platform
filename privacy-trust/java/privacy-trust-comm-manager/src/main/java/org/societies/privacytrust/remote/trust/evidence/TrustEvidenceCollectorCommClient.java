@@ -102,9 +102,9 @@ public class TrustEvidenceCollectorCommClient implements
 		try {
 			final IIdentity toIdentity = 
 					this.commManager.getIdManager().fromJid(teid.getTrustorId()); 
-			//final Stanza stanza = new Stanza(toIdentity);
-			// TODO uncomment for testing only (1)
-			final Stanza stanza = new Stanza(this.commManager.getIdManager().getThisNetworkNode());
+			final Stanza stanza = new Stanza(toIdentity);
+			// uncomment for local testing only (1)
+			//final Stanza stanza = new Stanza(this.commManager.getIdManager().getThisNetworkNode());
 			
 			this.trustEvidenceCollectorCommClientCallback.addClient(stanza.getId(), callback);
 			
@@ -112,8 +112,8 @@ public class TrustEvidenceCollectorCommClient implements
 			// 1. teid
 			addEvidenceBean.setTeid(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
-			// TODO uncomment for testing only (2)
-			addEvidenceBean.getTeid().setTrustorId(this.commManager.getIdManager().getThisNetworkNode().toString());
+			// uncomment for local testing only (2)
+			//addEvidenceBean.getTeid().setTrustorId(this.commManager.getIdManager().getThisNetworkNode().toString());
 			// 2. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 3. timestamp
