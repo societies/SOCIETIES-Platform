@@ -48,6 +48,7 @@ import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvide
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
+import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
@@ -173,7 +174,62 @@ public class TrustEvidenceCollectorCommClient implements
 		if (callback == null)
 			throw new NullPointerException("callback can't be null");
 		
-		// TODO
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Adding indirect trust evidence for entity " + teid);
+		
+		try {
+			final IIdentity toIdentity = 
+					this.commManager.getIdManager().fromJid(teid.getTrustorId()); 
+			final Stanza stanza = new Stanza(toIdentity);
+			// uncomment for local testing only (1)
+			//final Stanza stanza = new Stanza(this.commManager.getIdManager().getThisNetworkNode());
+			
+			this.trustEvidenceCollectorCommClientCallback.addClient(stanza.getId(), callback);
+			
+			final AddIndirectEvidenceRequestBean addEvidenceBean = new AddIndirectEvidenceRequestBean();
+			// 1. source
+			addEvidenceBean.setSource(source);
+			// 2. teid
+			addEvidenceBean.setTeid(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
+			// uncomment for local testing only (2)
+			//addEvidenceBean.getTeid().setTrustorId(this.commManager.getIdManager().getThisNetworkNode().toString());
+			// 3. type
+			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
+			// 4. timestamp
+			final GregorianCalendar gregCal = new GregorianCalendar();
+			gregCal.setTime(timestamp);
+			addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+			// 5. info
+			if (TrustEvidenceType.RATED.equals(type))
+				addEvidenceBean.setInfo(serialise(info));
+			
+			final TrustEvidenceCollectorRequestBean requestBean = new TrustEvidenceCollectorRequestBean();
+			requestBean.setMethodName(MethodName.ADD_INDIRECT_EVIDENCE);
+			requestBean.setAddIndirectEvidence(addEvidenceBean);
+			
+			this.commManager.sendIQGet(stanza, requestBean, this.privacyTrustCommClientCallback);
+		
+		} catch (InvalidFormatException ife) {
+			
+			throw new TrustEvidenceCollectorCommException("Could not add indirect trust evidence for entity " + teid
+					+ ": Invalid trustorId IIdentity: " 
+					+ ife.getLocalizedMessage(), ife);
+		} catch (CommunicationException ce) {
+			
+			throw new TrustEvidenceCollectorCommException("Could not add indirect trust evidence for entity " + teid
+					+ ": " + ce.getLocalizedMessage(), ce);
+			
+		} catch (DatatypeConfigurationException dce) {
+			
+			throw new TrustEvidenceCollectorCommException("Could not add indirect trust evidence for entity " + teid
+					+ ": " + dce.getLocalizedMessage(), dce);
+		} catch (IOException ioe) {
+		
+			throw new TrustEvidenceCollectorCommException("Could not add indirect trust evidence for entity " + teid
+					+ ": Could not serialise info object into byte[]: " 
+					+ ioe.getLocalizedMessage(), ioe);
+		}
 	}
 	
 	public void setCommManager(ICommManager commManager) {

@@ -49,6 +49,7 @@ import org.societies.api.internal.privacytrust.trust.model.MalformedTrustedEntit
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
+import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
@@ -107,9 +108,9 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 		
 		if (MethodName.ADD_DIRECT_EVIDENCE.equals(requestBean.getMethodName())) {
 			
-			final AddDirectEvidenceRequestBean addDirectEvidenceRequestBean =
+			final AddDirectEvidenceRequestBean addEvidenceRequestBean =
 					requestBean.getAddDirectEvidence();
-			if (addDirectEvidenceRequestBean == null)
+			if (addEvidenceRequestBean == null)
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustEvidenceCollector remote addDirectEvidence request: "
 						+ "AddDirectEvidenceRequestBean can't be null");
@@ -117,21 +118,21 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 			try {
 				// 1. teid
 				final TrustedEntityId teid = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(addDirectEvidenceRequestBean.getTeid());
+						fromTrustedEntityIdBean(addEvidenceRequestBean.getTeid());
 				// 2. type
 				final TrustEvidenceType type = TrustEvidenceType.valueOf(
-						addDirectEvidenceRequestBean.getType().toString());
+						addEvidenceRequestBean.getType().toString());
 				// 3. timestamp
-				final Date timestamp = addDirectEvidenceRequestBean.
+				final Date timestamp = addEvidenceRequestBean.
 						getTimestamp().toGregorianCalendar().getTime();
 				// 4. info
 				final Serializable info;
 				if (TrustEvidenceType.RATED.equals(type)) {
-					if (addDirectEvidenceRequestBean.getInfo() == null)
+					if (addEvidenceRequestBean.getInfo() == null)
 						throw new XMPPError(StanzaError.bad_request, 
 								"Invalid TrustEvidenceCollector remote addDirectEvidence request: "
 								+ "info is null");
-					info = deserialise(addDirectEvidenceRequestBean.getInfo(), this.getClass().getClassLoader());
+					info = deserialise(addEvidenceRequestBean.getInfo(), this.getClass().getClassLoader());
 				} else {
 					info = null;
 				}
@@ -163,7 +164,62 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 			
 		} else if (MethodName.ADD_INDIRECT_EVIDENCE.equals(requestBean.getMethodName())) {
 			
-			// TODO
+			final AddIndirectEvidenceRequestBean addEvidenceRequestBean =
+					requestBean.getAddIndirectEvidence();
+			if (addEvidenceRequestBean == null)
+				throw new XMPPError(StanzaError.bad_request,
+						"Invalid TrustEvidenceCollector remote addIndirectEvidence request: "
+						+ "AddIndirectEvidenceRequestBean can't be null");
+			
+			try {
+				// 1. source
+				final String source = addEvidenceRequestBean.getSource(); 
+				// 2. teid
+				final TrustedEntityId teid = TrustModelBeanTranslator.getInstance().
+						fromTrustedEntityIdBean(addEvidenceRequestBean.getTeid());
+				// 3. type
+				final TrustEvidenceType type = TrustEvidenceType.valueOf(
+						addEvidenceRequestBean.getType().toString());
+				// 4. timestamp
+				final Date timestamp = addEvidenceRequestBean.
+						getTimestamp().toGregorianCalendar().getTime();
+				// 5. info
+				final Serializable info;
+				if (TrustEvidenceType.RATED.equals(type)) {
+					if (addEvidenceRequestBean.getInfo() == null)
+						throw new XMPPError(StanzaError.bad_request, 
+								"Invalid TrustEvidenceCollector remote addIndirectEvidence request: "
+								+ "info is null");
+					info = deserialise(addEvidenceRequestBean.getInfo(), this.getClass().getClassLoader());
+				} else {
+					info = null;
+				}
+				
+				this.trustEvidenceCollector.addIndirectEvidence(source, teid, type, timestamp, info);
+				
+				responseBean.setMethodName(MethodName.ADD_INDIRECT_EVIDENCE);
+				
+			} catch (MalformedTrustedEntityIdException mteide) {
+				
+				throw new XMPPError(StanzaError.bad_request, 
+						"Invalid TrustEvidenceCollector remote addIndirectEvidence request: "
+						+ "Invalid teid: " + mteide.getLocalizedMessage(), mteide);
+			} catch (IOException ioe) {
+				
+				throw new XMPPError(StanzaError.bad_request, 
+						"Invalid TrustEvidenceCollector remote addIndirectEvidence request: "
+						+ "Could not deserialise info: " + ioe.getLocalizedMessage(), ioe);
+			} catch (ClassNotFoundException cnfe) {
+				
+				throw new XMPPError(StanzaError.bad_request, 
+						"Invalid TrustEvidenceCollector remote addIndirectEvidence request: "
+						+ "Could not deserialise info: " + cnfe.getLocalizedMessage(), cnfe);
+			} catch (TrustException te) {
+				
+				throw new XMPPError(StanzaError.internal_server_error,
+						te.getLocalizedMessage(), te);
+			}
+			
 		} else {
 			
 			throw new XMPPError(StanzaError.unexpected_request, 
