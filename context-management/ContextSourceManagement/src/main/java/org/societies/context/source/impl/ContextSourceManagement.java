@@ -239,7 +239,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
                 // Exception("Sending failure due to missing Registration.");
             } else {
                 shadowEntityID = shadowEntities.get(0);
-                shadowEntity = (CtxEntity) ctxBroker.retrieve(shadowEntityID);
+                shadowEntity = (CtxEntity) ctxBroker.retrieve(shadowEntityID).get();
             }
             
  
