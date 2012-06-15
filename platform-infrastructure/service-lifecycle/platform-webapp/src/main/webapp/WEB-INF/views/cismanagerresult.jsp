@@ -33,6 +33,20 @@
     	
 	</table>
 	
+	
+<table>
+<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
+
+	<xc:forEach var="record" items="${memberRecords}">
+        <tr>
+        	<td>${record.getMembersJid()}&nbsp;</td>
+        	<td>${record.getMembershipType()}&nbsp;</td>
+        </tr>
+    </xc:forEach>
+    	
+	</table>
+	
+	
 	<h4>${res}</h4>
 	
 <!-- .................END PLACE YOUR CONTENT ................ -->
