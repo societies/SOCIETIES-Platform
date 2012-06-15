@@ -97,6 +97,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			session.save(newact);
 			t.commit();
 		}catch(Exception e){
+			e.printStackTrace();
 			t.rollback();
 			log.warn("Saving activity failed, rolling back");
 		}finally{
