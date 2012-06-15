@@ -27,6 +27,7 @@ package org.societies.context.api.community.db;
 import java.util.List;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
@@ -60,13 +61,24 @@ public interface ICommunityCtxDBMgr {
 	  */
 	public CommunityCtxEntity createCommunityEntity(IIdentity cisId) throws CtxException;
 
-	////////////////////////////
 	/**
-	 * Retrieves the specified context model object.
+	 * Retrieves the context model object identified by the specified
+	 * {@link CtxIdentifier}. The method returns <code>null</code> if the
+	 * identified CtxModelObject is not present in the Community Context DB.
 	 * 
-	 * @param identifier
+	 * @param ctxId
+	 *            the {@link CtxIdentifier} of the context model object to
+	 *            retrieve
+	 * @return the context model object identified by the specified
+	 *         {@link CtxIdentifier}.
+	 * @throws CtxException
+	 *             if there is a problem accessing the Community Context DB
+	 * @throws NullPointerException
+	 *             if the specified ctxId is <code>null</code>
+	 * @since 0.3
 	 */
-	public CtxModelObject retrieve(CtxEntityIdentifier identifier) throws CtxException;
+	public CtxModelObject retrieve(final CtxIdentifier ctxId) 
+			throws CtxException;
 	
 	/**
 	  * Retrieves the {@link CommunityCtxEntity} which represents the specified

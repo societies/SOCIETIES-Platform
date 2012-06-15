@@ -230,12 +230,13 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		return entity;
 	}
 
+	/*
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier)
+	 */
 	@Override
-	public CtxModelObject retrieve(CtxEntityIdentifier ctxId)
+	public CtxModelObject retrieve(final CtxIdentifier ctxId)
 			throws CtxException {
 
 		return this.modelObjects.get(ctxId);
 	}
-
-	
 }

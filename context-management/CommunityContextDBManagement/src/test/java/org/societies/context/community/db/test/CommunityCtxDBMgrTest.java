@@ -39,6 +39,7 @@ import org.societies.api.context.model.CommunityMemberCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.context.community.db.impl.CommunityCtxDBMgr;
 
 /**
@@ -150,8 +151,7 @@ public class CommunityCtxDBMgrTest {
 	}
 
    @Test
-   public void testRetrieveCommunityEntity() throws CtxException{
-	   //System.out.println("---- testRetrieveEntity");
+   public void testRetrieveCommunityEntity() throws CtxException {
 
 	   entity = communityDB.createCommunityEntity(mockCisIdentity);
 
@@ -159,6 +159,23 @@ public class CommunityCtxDBMgrTest {
 	   retrEntity = communityDB.retrieveCommunityEntity(mockCisIdentity);
 	   assertNotNull(retrEntity);
 	   assertEquals(entity, retrEntity);
+   }
+   
+   @Test
+   public void testRetrieve() throws CtxException {
+
+	   entity = communityDB.createCommunityEntity(mockCisIdentity);
+	   attribute = communityDB.createCommunityAttribute(entity.getId(), CtxAttributeTypes.NAME);
+
+	   CommunityCtxEntity retrEntity;
+	   retrEntity = (CommunityCtxEntity) communityDB.retrieve(entity.getId());
+	   assertNotNull(retrEntity);
+	   assertEquals(entity, retrEntity);
+	   
+	   CtxAttribute retrAttribute;
+	   retrAttribute = (CtxAttribute) communityDB.retrieve(attribute.getId());
+	   assertNotNull(retrAttribute);
+	   assertEquals(attribute, retrAttribute);
 	}
 
 }
