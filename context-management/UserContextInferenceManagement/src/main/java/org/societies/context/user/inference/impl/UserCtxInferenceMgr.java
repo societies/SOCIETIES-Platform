@@ -48,17 +48,19 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(UserCtxInferenceMgr.class);
 		
-	@Autowired(required=true)
+	
 	private ICtxBroker internalCtxBroker;
 
 	List<String> inferableTypes = new ArrayList<String>();
 	
-	UserCtxInferenceMgr(){
+	@Autowired(required=true)
+	UserCtxInferenceMgr(ICtxBroker internalCtxBroker){
 		
+		this.internalCtxBroker = internalCtxBroker;
 		LOG.info(this.getClass() + " instantiated");
 		inferableTypes.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		this.setInferrableTypes(inferableTypes);
-		LOG.info(this.getClass() + " instantiated " +internalCtxBroker);	
+		LOG.info(this.getClass() + " instantiated broker " +internalCtxBroker);	
 	}
 	
 	
