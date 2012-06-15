@@ -22,74 +22,42 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+package org.societies.webapp.models;
 
-
-
-import java.io.IOException;
-import java.io.Serializable;
-
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
-
 
 /**
- * The Action class represents an operation that can be performed on a Resource. 
- * The Action can be "READ", "WRITE", "CREATE", "DELETE" as listed in the ActionConstants enumeration. 
- * @author Elizabeth
+ * Describe your class here...
+ *
+ * @author olivierm
  *
  */
-public class Action implements Serializable{
+public class PrivacyActionForm extends Action {
 
-	protected ActionConstants action;
-	private boolean optional;
-	
-	private Action(){
-		
+	public PrivacyActionForm() {
+		this(ActionConstants.READ, true);
 	}
-	public Action(ActionConstants action){
+	/**
+	 * @param action
+	 */
+	public PrivacyActionForm(ActionConstants action) {
+		super(action);
+		// TODO Auto-generated constructor stub
+	}
+	/**
+	 * @param read
+	 * @param b
+	 */
+	public PrivacyActionForm(ActionConstants action, boolean optional) {
+		super(action, optional);
+	}
+	
+	public ActionConstants getAction() {
+		return super.getActionType();
+	}
+	public void setAction(ActionConstants action) {
 		this.action = action;
-		this.optional = false;
 	}
-	
-	public Action(ActionConstants action, boolean isOptional){
-		this.action = action;
-		this.optional = isOptional;
-	}
-	
-	public void setOptional(boolean isOptional){
-		this.optional = isOptional;
-	}
-	public boolean isOptional(){
-		return this.optional;
-	}
-	public ActionConstants getActionType(){
-		return this.action;
-	}
-	public TargetMatchConstants getType(){
-		return TargetMatchConstants.ACTION;
-	}
-	
-	public String toXMLString(){
-		String str = "\n<Action>";
-		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" " +
-				"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">");
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.action.toString());
-		str = str.concat("</AttributeValue>");
-		str = str.concat("\n\t</Attribute>");
-		str = str.concat(this.printOptional());
-		str = str.concat("\n</Action>");
-		return str;
-	}
-	private String printOptional(){
-		return "\n<optional>"+this.optional+"</optional>";
-	}
-	public String toString(){
-		return this.toXMLString();
-	}
-	public static void main(String[] args) throws IOException{
-		Action action = new Action(ActionConstants.READ);
-		System.out.println(action.toXMLString());
-	}
+
 }

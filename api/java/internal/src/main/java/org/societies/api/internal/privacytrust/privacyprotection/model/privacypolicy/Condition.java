@@ -103,5 +103,31 @@ public class Condition implements Serializable{
 
 
 	}
+	/**
+	 * @return the value
+	 */
+	public String getValue() {
+		return value;
+	}
+	/**
+	 * @param value the value to set
+	 */
+	public void setValue(String value) {
+		this.value = value;
+	}
+	/**
+	 * @return the theCondition
+	 */
+	public ConditionConstants getTheCondition() {
+		return theCondition;
+	}
+	/**
+	 * @param theCondition the theCondition to set
+	 */
+	public void setTheCondition(ConditionConstants theCondition) {
+		this.theCondition = theCondition;
+	}
+	
+	
 
 }
