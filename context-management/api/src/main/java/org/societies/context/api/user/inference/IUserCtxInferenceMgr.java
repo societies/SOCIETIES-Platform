@@ -113,10 +113,18 @@ public interface IUserCtxInferenceMgr {
 	public CtxAttribute refineContext(CtxAttributeIdentifier ctxAttrId);
 
 	/**
-	 * Refines context for an indicate Context Attribute. 
+	 * Returns a list of CtxAttributeTypes that can be inferred. 
 	 * 
 	 *  @return Set of ctxAttributeTypes
 	 *  @since 0.0.8
 	 */
-	public Set<String> getInferrableTypes();
+	public List<String> getInferrableTypes();
+	
+	/**
+	 * Sets a list of CtxAttributeTypes that can be inferred. 
+	 * 
+	 *  @param Set of ctxAttributeTypes
+	 *  @since 0.0.8
+	 */
+	public void setInferrableTypes(List<String> inferableTypes);
 }

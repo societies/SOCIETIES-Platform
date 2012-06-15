@@ -24,20 +24,38 @@
  */
 package org.societies.context.user.inference.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 
+		
+	@Autowired(required=true)
+	private ICtxBroker internalCtxBroker;
+
+	List<String> inferableTypes = new ArrayList<String>();
+	
+	UserCtxInferenceMgr(){
+		
+		inferableTypes.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		this.setInferrableTypes(inferableTypes);
+	}
+	
+	
 	@Override
 	public void checkQuality(CtxModelObject arg0) {
 		// TODO Auto-generated method stub
@@ -84,12 +102,16 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		CtxAttribute ctxAttribute = null;
 
 		return ctxAttribute;
-
 	}
 	
 	@Override
-	public Set<String> getInferrableTypes(){
-		Set<String> inferableTypes = null;
+	public void setInferrableTypes(List<String> inferableTypes){
+		 this.inferableTypes = inferableTypes;
+	}
+	
+	@Override
+	public List<String> getInferrableTypes(){
+		List<String> inferableTypes = null;
 		
 		return inferableTypes;
 	}
