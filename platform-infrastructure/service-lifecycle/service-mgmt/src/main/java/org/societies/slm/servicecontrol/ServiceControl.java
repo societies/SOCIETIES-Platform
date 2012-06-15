@@ -53,7 +53,9 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
+import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
@@ -358,7 +360,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		try{
 		
 			if(logger.isDebugEnabled()) 
-				logger.debug("Service Management: installService method, on our node: jid");
+				logger.debug("Service Management: installService method, trying to install a remote service!");
 		
 			// First up, we need to do the negotiation check
 			
@@ -383,30 +385,70 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			if(negotiationResult == null){
 				if(logger.isDebugEnabled()) logger.debug("Problem doing negotiation!");
-				//return false;
+				returnResult.setMessage(ResultMessage.NEGOTIATION_ERROR);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			} 
 			
-			if(negotiationResult.getSuccess()){
-				if(logger.isDebugEnabled())
-					logger.debug("Negotiation was successful! URI returned is: " + negotiationResult.getServiceUri());
-			
-				// Now install the client!
-				Future<ServiceControlResult> asyncResult = null;
-				URL bundleLocation = negotiationResult.getServiceUri().toURL();
-				
-				asyncResult = installService(bundleLocation);
-				ServiceControlResult result = asyncResult.get();
-				
-				return new AsyncResult<ServiceControlResult>(result);
-				
-			} else{
+			if(!negotiationResult.getSuccess()){
+	
 				if(logger.isDebugEnabled())
 					logger.debug("Negotiation was not successful!");
-				
+				returnResult.setMessage(ResultMessage.NEGOTIATION_FAILED);
 				return new AsyncResult<ServiceControlResult>(returnResult);
-			}
-					
+			}	
+			
+			if(logger.isDebugEnabled())
+					logger.debug("Negotiation was successful! URI returned is: " + negotiationResult.getServiceUri());
+			
+			// Now install the client!
+			if(serviceToInstall.getServiceType().equals(ServiceType.THIRD_PARTY_WEB)){
+				if(logger.isDebugEnabled()) logger.debug("This is a web-type service, no client to install!");
+				serviceToInstall.setServiceLocation(ServiceLocation.REMOTE);
+				serviceToInstall.setServiceEndpoint(negotiationResult.getServiceUri().toString());
+				List<Service> addServices = new ArrayList<Service>();
+				addServices.add(serviceToInstall);
+				getServiceReg().registerServiceList(addServices);
 
+				logger.info("Installed web-type third-party service.");
+				returnResult.setMessage(ResultMessage.SUCCESS);
+				
+			
+			} else{
+				if(logger.isDebugEnabled()) logger.debug("This is a client-based service, we need to install it");
+				
+				Future<ServiceControlResult> asyncResult = null;
+				URL bundleLocation = negotiationResult.getServiceUri().toURL();
+					
+				asyncResult = installService(bundleLocation);
+				ServiceControlResult result = asyncResult.get();
+
+				if(result == null){
+					if(logger.isDebugEnabled())
+						logger.debug("Error with communication to remote client");
+					
+					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+					return new AsyncResult<ServiceControlResult>(returnResult);	
+				} 
+				
+				if(result.getMessage() == ResultMessage.SUCCESS){
+					
+					// We get the service from the registry
+					Service newService = getServiceReg().retrieveService(result.getServiceId());
+					
+					//
+					logger.info("Installed shared third-party service client!");
+					returnResult.setServiceId(result.getServiceId());
+					returnResult.setMessage(result.getMessage());
+				} else{
+					if(logger.isDebugEnabled())
+						logger.debug("Installation of client was not successful");
+					returnResult.setMessage(result.getMessage());
+				}
+			}
+			
+
+			return new AsyncResult<ServiceControlResult>(returnResult);	
+			
 		
 		} catch (Exception ex) {
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
@@ -653,7 +695,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						
 			if(logger.isDebugEnabled())
 				logger.debug("The JID of the node where the Service is: " + nodeJid + " and the local JID: " + localNodeJid);
-				
+			
 			if(!nodeJid.equals(localNodeJid)){
 				
 				if(logger.isDebugEnabled())

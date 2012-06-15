@@ -26,7 +26,6 @@
 	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
-		<property name="cisManager" ref="cisManagerRef" />
 		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />					
 	</bean>
 

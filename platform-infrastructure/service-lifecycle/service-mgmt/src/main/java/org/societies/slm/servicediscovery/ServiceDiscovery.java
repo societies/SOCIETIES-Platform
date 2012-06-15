@@ -34,8 +34,6 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
@@ -65,15 +63,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
 	private IServiceDiscoveryRemote serviceDiscoveryRemote;
-	private ICisManager cisManager;
 
-	public ICisManager getCisManager(){
-		return cisManager;
-	}
-	
-	public void setCisManager(ICisManager cisManager){
-		this.cisManager = cisManager;
-	}
 	
 	/**
 	 * @return the commMngr
@@ -207,17 +197,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 				break;
 			case CIS:
 				if(logger.isDebugEnabled()) logger.debug("Retrieving services of a CIS");
-				//Check if CIS is ours, if so check it, if not, nothing
-				ICisOwned myCIS = getCisManager().getOwnedCis(node.getJid());
-				if(myCIS!=null){
-					if(logger.isDebugEnabled())
-						logger.debug("We are dealing with a CIS that we own: " + myCIS.getName());
-					serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
-				} else{
-					if(logger.isDebugEnabled())
-						logger.debug("We do not own this CIS, no local cone done!");
-				}
-				
+				serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());			
 				break;
 			default: 
 				logger.warn("Unknown node!");

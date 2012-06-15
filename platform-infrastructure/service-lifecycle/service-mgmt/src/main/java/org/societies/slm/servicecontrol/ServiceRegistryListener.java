@@ -25,6 +25,7 @@
 package org.societies.slm.servicecontrol;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +40,11 @@ import org.osgi.framework.ServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
@@ -147,8 +151,6 @@ public class ServiceRegistryListener implements BundleContextAware,
 	@Override
 	public void serviceChanged(ServiceEvent event) {
 
-		// Map<String, Object> serviceMeteData = new HashMap<String, Object>();
-
 		if(log.isDebugEnabled())
 			log.debug("Service Listener event received");
 		
@@ -176,21 +178,36 @@ public class ServiceRegistryListener implements BundleContextAware,
 			return;
 		}
 		
-		
 		service.setServiceLocation(ServiceLocation.LOCAL);
-		service.setServiceType(ServiceType.THIRD_PARTY_SERVICE);
-		
+	
+		//TODO DEAL WITH THIS
 		service.setServiceEndpoint(commMngr.getIdManager().getThisNetworkNode().getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
 
 		//TODO: Do this properly!
 		ServiceInstance si = new ServiceInstance();
-		si.setFullJid(commMngr.getIdManager().getThisNetworkNode().getJid());
-		si.setXMPPNode(commMngr.getIdManager().getThisNetworkNode().getJid());
+		
+		INetworkNode myNode = commMngr.getIdManager().getThisNetworkNode();
+		si.setFullJid(myNode.getJid());
+		si.setCssJid(myNode.getBareJid());
+		si.setXMPPNode(myNode.getNodeIdentifier());
 		
 		ServiceImplementation servImpl = new ServiceImplementation();
 		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
 		servImpl.setServiceNameSpace(serBndl.getSymbolicName());
 		servImpl.setServiceProvider((String) event.getServiceReference().getProperty("ServiceProvider"));
+		try {
+			String serviceClient = (String) event.getServiceReference().getProperty("ServiceClient");
+			if(serviceClient != null){
+				if(log.isDebugEnabled()) log.debug("There's a service client!");
+				servImpl.setServiceClient(new URI(serviceClient));
+			} else
+			{
+				servImpl.setServiceClient(null);
+			}
+		} catch (URISyntaxException e1) {
+			log.warn("Problem with service client!");
+			e1.printStackTrace();
+		}
 		
 		si.setServiceImpl(servImpl);
 		service.setServiceInstance(si);
@@ -204,9 +221,11 @@ public class ServiceRegistryListener implements BundleContextAware,
 			log.debug("Service Endpoint: "+service.getServiceEndpoint());
 			log.debug("Service Provider: "+service.getServiceInstance().getServiceImpl().getServiceProvider());
 			log.debug("Service Namespace: "+service.getServiceInstance().getServiceImpl().getServiceNameSpace());
+			log.debug("Service ServiceClient: "+service.getServiceInstance().getServiceImpl().getServiceClient());
 			log.debug("Service Version: "+service.getServiceInstance().getServiceImpl().getServiceVersion());
 			log.debug("Service XMPPNode: "+service.getServiceInstance().getXMPPNode());
 			log.debug("Service FullJid: "+service.getServiceInstance().getFullJid());
+			log.debug("Service CssJid: "+service.getServiceInstance().getCssJid());
 		}
 		
 		service.setServiceStatus(ServiceStatus.STARTED);
@@ -248,6 +267,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
 						URI clientJar = null;
+						
 						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
 					}
 					
@@ -302,34 +322,36 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		if(log.isDebugEnabled())
 			log.debug("Uninstalled bundle that had service: " + serviceToRemove.getServiceEndpoint());
-			
-			
+				
 		List<Service> servicesToRemove = new ArrayList<Service>();
 		servicesToRemove.add(serviceToRemove);
-			
-			
+					
 		try {
 			
-			if(log.isDebugEnabled()) log.debug("Checking if service is shared with any owned CIS, and removing that");
+			if(log.isDebugEnabled()) log.debug("Checking if service is shared with any CIS, and removing that");
 			List<String> cisSharedList = getServiceReg().retrieveCISSharedService(serviceToRemove.getServiceIdentifier());
 			
 			if(!cisSharedList.isEmpty()){
 				for(String cisShared: cisSharedList){
 					if(log.isDebugEnabled()) log.debug("Removing sharing to CIS: " + cisShared);
 					try {
-						getServiceReg().removeServiceSharingInCIS(serviceToRemove.getServiceIdentifier(), cisShared);
-					} catch (ServiceSharingNotificationException e) {
+						getServiceControl().unshareService(serviceToRemove, cisShared);
+					} catch (ServiceControlException e) {
 						e.printStackTrace();
-						log.error("Exception while removing sharing to CIS: " + e.getMessage());
+						log.error("Couldn't unshare from that CIS!");
 					}
 				}
 			}
+			
+			if(log.isDebugEnabled())
+					log.debug("Removing the shared service from the policy provider!");
+			getNegotiationProvider().removeService(serviceToRemove.getServiceIdentifier());
 			
 			if(log.isDebugEnabled()) log.debug("Removing service: " + serviceToRemove.getServiceName() + " from SOCIETIES Registry");
 
 			getServiceReg().unregisterServiceList(servicesToRemove);
 			log.info("Service " + serviceToRemove.getServiceName() + " has been uninstalled");
-
+			
 		} catch (ServiceRegistrationException e) {
 			e.printStackTrace();
 			log.error("Exception while unregistering service: " + e.getMessage());
