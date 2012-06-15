@@ -150,7 +150,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// Our first task is to determine whether the service we're searching for is local or remote
 			
 			String nodeJid = ServiceModelUtils.getJidFromServiceIdentifier(serviceId);
-			String localNodeJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+			INetworkNode myNode = getCommMngr().getIdManager().getThisNetworkNode();
+			String localNodeJid = myNode.getJid();
 						
 			if(logger.isDebugEnabled())
 				logger.debug("The JID of the node where the Service is: " + nodeJid + " and the local JID: " + localNodeJid);
@@ -161,6 +162,12 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					logger.debug("We're dealing with a different node! Need to do a remote call!");
 				
 				IIdentity node = getCommMngr().getIdManager().fromJid(nodeJid);
+				
+				// Does this node belong to our CSS?
+				if(!node.equals((IIdentity) myNode)){
+					if(logger.isDebugEnabled()) logger.debug("This is not our CSS!");
+				}
+				
 				ServiceControlRemoteClient callback = new ServiceControlRemoteClient();
 				getServiceControlRemote().startService(serviceId, node, callback);
 				
@@ -345,6 +352,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public Future<ServiceControlResult> installService(Service serviceToInstall) 
 			throws ServiceControlException {
 		
+		ServiceControlResult returnResult = new ServiceControlResult();
+		returnResult.setServiceId(serviceToInstall.getServiceIdentifier());
+		
 		try{
 		
 			if(logger.isDebugEnabled()) 
@@ -373,7 +383,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			if(negotiationResult == null){
 				if(logger.isDebugEnabled()) logger.debug("Problem doing negotiation!");
-				return false;
+				//return false;
 			} 
 			
 			if(negotiationResult.getSuccess()){
@@ -393,15 +403,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled())
 					logger.debug("Negotiation was not successful!");
 				
-				return new AsyncResult<ServiceControlResult>(result);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
-			
-	
-			
-			
-			if(logger.isDebugEnabled())
-				logger.debug("Now installing the service!");
-			
+					
 
 		
 		} catch (Exception ex) {
@@ -918,8 +922,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 
 	@Override
-	public Future<ServiceControlResult> unshareService(Service service,
-			String nodeJid) throws ServiceControlException {
+	public Future<ServiceControlResult> unshareService(Service service, String nodeJid) throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: unshareShared method, String input");
 		
@@ -945,8 +948,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	}
 
 	@Override
-	public Future<ServiceControlResult> unshareService(Service service,
-			IIdentity node) throws ServiceControlException {
+	public Future<ServiceControlResult> unshareService(Service service, IIdentity node) throws ServiceControlException {
 
 		if(logger.isDebugEnabled()) logger.debug("Service Management: shareShared method, node input");
 		
