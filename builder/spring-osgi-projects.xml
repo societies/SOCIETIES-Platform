@@ -44,6 +44,7 @@
 
 		<!-- Utilities -->
 		<module>../utilities/DBC</module>
+		<module>../utilities/common-mock</module>
 		<module>../utilities/societies-annotations</module>
 		<module>../common-modules/common-data-source</module>
 		<module>../common-modules/data-source</module>
@@ -154,6 +155,7 @@
 		</module>
 		
 		<module>../domain-authority/webapp</module>
+		<module>../domain-authority/webapp-rest</module>
 
 	</modules>
 </project>

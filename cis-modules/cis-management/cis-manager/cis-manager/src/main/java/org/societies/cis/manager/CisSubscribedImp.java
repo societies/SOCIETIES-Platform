@@ -103,7 +103,7 @@ public class CisSubscribedImp implements ICis {
 
 	@Override
 	public String getCisId() {
-		return this.cisRecord.getCisJid();
+		return this.cisRecord.getCisJID();
 	}
 
 	@Override
@@ -117,6 +117,14 @@ public class CisSubscribedImp implements ICis {
 		return this.cisRecord.getMembershipCriteria();
 	}
 
+	
+	public void startAfterDBretrieval(CisManager cisManag){
+		this.cisManag = cisManag;
+	}
+	
+	
+	
+	
 	@Override
 	public void getInfo(ICisManagerCallback callback){
 		LOG.debug("client call to get info from a RemoteCIS");

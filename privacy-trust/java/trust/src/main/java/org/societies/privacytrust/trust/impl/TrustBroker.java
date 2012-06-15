@@ -61,18 +61,20 @@ public class TrustBroker implements ITrustBroker {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(TrustBroker.class);
 	
-	/** The Trust Event Mgr service. */
+	/** The Trust Event Mgr service reference. */
 	@Autowired(required=true)
 	private ITrustEventMgr trustEventMgr;
 	
-	/** The Trust Repository Service. */
+	/** The Trust Repository service reference. */
 	@Autowired(required=true)
 	private ITrustRepository trustRepo;
 	
+	/** The Communications Mgr service reference. */
 	@Autowired(required=false)
 	private ICommManager commMgr;
 	private boolean hasCommMgr = false;
 	
+	/** The Remote Trust Broker service reference. */
 	@Autowired(required=false)
 	private ITrustBrokerRemote trustBrokerRemote;
 	private boolean hasTrustBrokerRemote = false;
@@ -206,7 +208,7 @@ public class TrustBroker implements ITrustBroker {
 	/**
 	 * This method is called when the {@link ITrustBrokerRemote} service is unbound.
 	 * 
-	 * @param TrustBrokerRemote
+	 * @param trustBrokerRemote
 	 *            the {@link ITrustBrokerRemote} service that was unbound
 	 * @param props
 	 *            the set of properties that the {@link ITrustBrokerRemote} service
@@ -257,7 +259,7 @@ public class TrustBroker implements ITrustBroker {
 				return this.commMgr.getIdManager().isMine(trustorId);
 			} catch (InvalidFormatException ife) {
 				
-				throw new TrustBrokerException("Invalid trusteeId IIdentity: "
+				throw new TrustBrokerException("Invalid trustorId IIdentity: "
 						+ ife.getLocalizedMessage(), ife);
 			} 
 			
@@ -272,10 +274,10 @@ public class TrustBroker implements ITrustBroker {
 		private Double trustValue;
 		
 		/*
-		 * @see org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback#onRetrieveTrust(java.lang.Double)
+		 * @see org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback#onRetrievedTrust(java.lang.Double)
 		 */
 		@Override
-		public void onRetrieveTrust(Double value) {
+		public void onRetrievedTrust(Double value) {
 			
 			this.trustValue = value;
 			synchronized (this) {

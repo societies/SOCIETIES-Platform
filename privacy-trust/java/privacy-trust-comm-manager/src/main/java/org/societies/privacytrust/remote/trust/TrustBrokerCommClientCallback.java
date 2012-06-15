@@ -135,6 +135,13 @@ public class TrustBrokerCommClientCallback implements ICommCallback {
 		
 		final TrustBrokerResponseBean responseBean = (TrustBrokerResponseBean) bean;
 		
+		ITrustBrokerRemoteCallback callback = this.clients.remove(stanza.getId());
+		if (callback == null) {
+			LOG.error("Could not find client callback for TrustBroker remote retrieve response: "
+					+ stanza.getId());
+			return;
+		}
+		
 		if (MethodName.RETRIEVE.equals(responseBean.getMethodName())) {
 			
 			final RetrieveTrustBrokerResponseBean retrieveResponseBean =
@@ -144,14 +151,8 @@ public class TrustBrokerCommClientCallback implements ICommCallback {
 						+ "RetrieveTrustBrokerResponseBean can't be null");
 				return;
 			}
-			ITrustBrokerRemoteCallback callback = this.clients.remove(stanza.getId());
-			if (callback == null) {
-				LOG.error("Could not find client callback for TrustBroker remote retrieve response: "
-						+ stanza.getId());
-				return;
-			}
 			
-			callback.onRetrieveTrust(retrieveResponseBean.getResult());
+			callback.onRetrievedTrust(retrieveResponseBean.getResult());
 			
 		} else {
 			

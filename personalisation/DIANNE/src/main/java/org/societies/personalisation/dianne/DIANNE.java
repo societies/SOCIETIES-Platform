@@ -40,8 +40,8 @@ import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
+import org.societies.personalisation.dianne.model.IOutcomeListener;
 import org.societies.personalisation.dianne.model.Network;
-import org.societies.personalisation.dianne.model.OutcomeNode;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -62,11 +62,12 @@ import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.springframework.scheduling.annotation.AsyncResult;
 
-public class DIANNE implements IDIANNE{
+public class DIANNE implements IDIANNE, IOutcomeListener{
 
 	private Logger LOG = LoggerFactory.getLogger(DIANNE.class);
 	private HashMap<IIdentity, Network> d_nets;  //IIdentity - Network mappings
-	private HashMap<IIdentity, NetworkRunner> runnerMappings;  //IIdentity - runner mappings
+	private HashMap<String, NetworkRunner> runnerMappings;  //IIdentity(bareJid) - runner mappings
+	private List<IDIANNEOutcome> outcomes;
 	private String[] defaultContext = {
 			CtxAttributeTypes.LOCATION_SYMBOLIC, 
 			CtxAttributeTypes.STATUS,
@@ -76,63 +77,74 @@ public class DIANNE implements IDIANNE{
 	private IInternalPersonalisationManager persoMgr;
 	private ICtxBroker ctxBroker;
 	private ICommManager commsMgr;
-	private IIdentity personID;
+	private IIdentity cssID;
 
 	public DIANNE(){
 		d_nets = new HashMap<IIdentity, Network>();
-		runnerMappings = new HashMap<IIdentity, NetworkRunner>();
+		runnerMappings = new HashMap<String, NetworkRunner>();
+		outcomes = null;
 	}
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName) {
 		//no updates received - just return current outcome
 		List<IDIANNEOutcome> results = new ArrayList<IDIANNEOutcome>();
-		if(runnerMappings.containsKey(ownerId)){
-			NetworkRunner runner = runnerMappings.get(ownerId);
+		if(runnerMappings.containsKey(ownerId.getBareJid())){
+			LOG.info("Network Runner already exists for this ownerId: "+ownerId.getBareJid());
+			NetworkRunner runner = runnerMappings.get(ownerId.getBareJid());
 			IDIANNEOutcome outcome = runner.getPrefOutcome(serviceId, preferenceName);
-			results.add(outcome);
+			if(outcome!=null){
+				results.add(outcome);
+			}
 		}else{
-			LOG.error("No DIANNE exists for this identity: "+ownerId.getBareJid());
+			LOG.info("No DIANNE exists for this identity: "+ownerId.getBareJid());
 		}
-		
 		return new AsyncResult<List<IDIANNEOutcome>>(results);
 	}
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute) {
-		LOG.info("Received request for outcome with new context update");
+		LOG.info("Received request for outcome with new context update");		
 		List<IDIANNEOutcome> results = new ArrayList<IDIANNEOutcome>();
 		// Context update received!!!
-		if(runnerMappings.containsKey(ownerId)){
-			LOG.debug("Network runner already exists for this ownerId: "+ownerId.getBareJid());
-			NetworkRunner runner = runnerMappings.get(ownerId);
-			runner.contextUpdate(attribute);
+		if(runnerMappings.containsKey(ownerId.getBareJid())){
+			LOG.info("Network runner already exists for this ownerId: "+ownerId.getBareJid());
+			runnerMappings.get(ownerId.getBareJid()).contextUpdate(attribute);
 		}else{
-			LOG.debug("Network runner does not exist for this ownerId: "+ownerId.getBareJid());
+			LOG.info("Network runner does not exist for this ownerId: "+ownerId.getBareJid());
 			Network newD_net = new Network();
-			NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net);
+			NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net, this);
 			d_nets.put(ownerId, newD_net);
-			runnerMappings.put(ownerId, newRunner);
+			runnerMappings.put(ownerId.getBareJid(), newRunner);
 			newRunner.contextUpdate(attribute);
 		}
 		
-		//query DIANNE for new outcomes
+		//wait for new outcomes
+		while(outcomes == null){
+			try {
+				LOG.info("waiting for output response...");
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		results = outcomes;
+		outcomes = null;
 		
 		return new AsyncResult<List<IDIANNEOutcome>>(results);
 	}
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, IAction action){
-		LOG.info("Received request for outcome with new action update");
+		LOG.info("Received request for outcome with new action update");		
 		// Action update received!!!
-		if(runnerMappings.containsKey(ownerId)){
-			NetworkRunner runner = runnerMappings.get(ownerId);
-			runner.actionUpdate(action);
+		if(runnerMappings.containsKey(ownerId.getBareJid())){
+			runnerMappings.get(ownerId.getBareJid()).actionUpdate(action);
 		}else{
 			Network newD_net = new Network();
-			NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net);
+			NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net, this);
 			d_nets.put(ownerId, newD_net);
-			runnerMappings.put(ownerId, newRunner);
+			runnerMappings.put(ownerId.getBareJid(), newRunner);
 			newRunner.actionUpdate(action);
 		}		
 		//No new outcomes will be provided after action updates - return empty list
@@ -142,23 +154,23 @@ public class DIANNE implements IDIANNE{
 	
 	@Override
 	public void enableDIANNELearning(IIdentity ownerId) {
-		System.out.println("Enabling incremental learning for identity: "+ ownerId);
-		if(runnerMappings.containsKey(ownerId)){
-			NetworkRunner network = runnerMappings.get(ownerId);
+		LOG.info("Enabling incremental learning for identity: "+ ownerId.getBareJid());
+		if(runnerMappings.containsKey(ownerId.getBareJid())){
+			NetworkRunner network = runnerMappings.get(ownerId.getBareJid());
 			network.play();
 		}else{
-			System.out.println("No networks exist for this identity");
+			LOG.info("No networks exist for this identity");
 		}
 	}
 
 	@Override
 	public void disableDIANNELearning(IIdentity ownerId) {
-		System.out.println("Disabling incremental learning for identity: "+ ownerId);	
-		if(runnerMappings.containsKey(ownerId)){
-			NetworkRunner network = runnerMappings.get(ownerId);
+		LOG.info("Disabling incremental learning for identity: "+ ownerId.getBareJid());	
+		if(runnerMappings.containsKey(ownerId.getBareJid())){
+			NetworkRunner network = runnerMappings.get(ownerId.getBareJid());
 			network.pause();
 		}else{
-			System.out.println("No networks exist for this identity");
+			LOG.info("No networks exist for this identity");
 		}
 	}
 	
@@ -174,7 +186,7 @@ public class DIANNE implements IDIANNE{
 				String nextType = defaultContext[i];
 				List<CtxIdentifier> attrIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, nextType).get();
 				if(attrIDs.size() > 0){
-					persoMgr.registerForContextUpdate(personID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attrIDs.get(0));
+					persoMgr.registerForContextUpdate(cssID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attrIDs.get(0));
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -185,9 +197,14 @@ public class DIANNE implements IDIANNE{
 			}	
 		}
 	}
+	
+	@Override
+	public void receiveDIANNEFeedback(IIdentity ownerId, IAction action){
+		this.getOutcome(ownerId, action);
+	}
 
 	public void initialiseDIANNELearning(){
-		personID = commsMgr.getIdManager().getThisNetworkNode();
+		cssID = commsMgr.getIdManager().getThisNetworkNode();
 		retrieveNetworks();  //get Networks from context
 		initialiseNetworks();  //start runners for each network
 		//start DIANNE storage thread - store DIANNEs every 1?/5? minute(s)
@@ -198,7 +215,7 @@ public class DIANNE implements IDIANNE{
 	
 	private void retrieveNetworks(){
 		try {
-			IndividualCtxEntity person = ctxBroker.retrieveCssOperator().get();
+			IndividualCtxEntity person = ctxBroker.retrieveIndividualEntity(cssID).get();
 			Set<CtxAssociationIdentifier> hasDianneAssocIDs = person.getAssociations(CtxAssociationTypes.HAS_DIANNE);
 			
 			if(hasDianneAssocIDs.size() > 0){// HAS_DIANNE association found in context
@@ -243,8 +260,8 @@ public class DIANNE implements IDIANNE{
 		while(e.hasNext()){
 			IIdentity nextIdentity = e.next();
 			Network nextNetwork = d_nets.get(nextIdentity);
-			NetworkRunner nextRunner = new NetworkRunner(nextIdentity, nextNetwork);
-			runnerMappings.put(nextIdentity, nextRunner);
+			NetworkRunner nextRunner = new NetworkRunner(nextIdentity, nextNetwork, this);
+			runnerMappings.put(nextIdentity.getBareJid(), nextRunner);
 		}
 	}
 
@@ -280,5 +297,14 @@ public class DIANNE implements IDIANNE{
 	
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
+	}
+
+	@Override
+	public void handleOutcomes(List<IDIANNEOutcome> outcomes) {
+		LOG.info("Received output response");
+		for(IDIANNEOutcome nextOutcome : outcomes){
+			LOG.info(nextOutcome.getServiceID().getServiceInstanceIdentifier()+": "+nextOutcome.getparameterName()+"="+nextOutcome.getvalue());
+		}
+		this.outcomes = outcomes;
 	}
 }

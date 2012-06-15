@@ -25,8 +25,12 @@
 
 package org.societies.useragent.feedback;
 
+import java.util.List;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
@@ -35,50 +39,50 @@ import org.societies.useragent.feedback.guis.AckNackGUI;
 import org.societies.useragent.feedback.guis.CheckBoxGUI;
 import org.societies.useragent.feedback.guis.RadioGUI;
 import org.societies.useragent.feedback.guis.TimedGUI;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 public class UserFeedback implements IUserFeedback{
 	
+	Logger LOG = LoggerFactory.getLogger(UserFeedback.class);
+	
 	public void initialiseUserFeedback(){
-		System.out.println("User Feedback initialised!!");
+		LOG.debug("User Feedback initialised!!");
 	}
 	
 	@Override
-	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback) {
-		System.out.println("Returning explicit feedback");
+	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content) {
+		LOG.debug("Returning explicit feedback");
+		List<String> result = null;
 		String proposalText = content.getProposalText();
 		String[] options = content.getOptions();
 		if(type == ExpProposalType.RADIOLIST){
-			System.out.println("Radio list GUI");
-			new RadioGUI(proposalText, options, callback);
+			LOG.debug("Radio list GUI");
+			RadioGUI gui = new RadioGUI();
+			result = gui.displayGUI(proposalText, options);
 		}else if(type == ExpProposalType.CHECKBOXLIST){
-			System.out.println("Check box list GUI");
-			new CheckBoxGUI(proposalText, options, callback);
+			LOG.debug("Check box list GUI");
+			CheckBoxGUI gui = new CheckBoxGUI();
+			result = gui.displayGUI(proposalText, options);
 		}else{ //ACK-NACK
-			System.out.println("ACK/NACK GUI");
-			new AckNackGUI(proposalText, options, callback);
+			LOG.debug("ACK/NACK GUI");
+			result = AckNackGUI.displayGUI(proposalText, options);
 		}
+		
+		return new AsyncResult<List<String>>(result);
 	}
 
 	@Override
-	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback) {
-		System.out.println("Returning implicit feedback");
+	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
+		LOG.debug("Returning implicit feedback");
+		Boolean result = null;
 		String proposalText = content.getProposalText();
 		int timeout = content.getTimeout();
 		if(type == ImpProposalType.TIMED_ABORT){
-			System.out.println("Timed Abort GUI");
-			new TimedGUI(proposalText, timeout, callback);
+			LOG.debug("Timed Abort GUI");
+			TimedGUI gui = new TimedGUI();
+			result = gui.displayGUI(proposalText, timeout);
 		}
-	}
-	
-	
-	@Override
-	public String getExplicitFB(int arg0, ExpProposalContent arg1) {
-		return "";
-	}
-
-	@Override
-	public boolean getImplicitFB(int arg0, ImpProposalContent arg1) {
-		return false;
-	}
-	
+		
+		return new AsyncResult<Boolean>(result);
+	}	
 }

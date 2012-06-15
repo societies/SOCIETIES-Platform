@@ -47,6 +47,21 @@ public interface ICtxSourceMgr {
 	public Future<String> register(String name, String contextType);
 
 	/**
+	 * Registers a context source with the context source manager. This is necessary
+	 * in order to be able to send updates, i.e. new context information.
+	 * The return type is a String serving as identifier of this context source 
+	 * which is valid until the unregistration. Other than the method above, it can specify
+	 * another CtxEntity as data owner. Otherwise the CSS owner would be assumed to be the
+	 * data owner.
+	 * 
+	 * @param contextOwner owner of the context which shall be provided
+	 * @param name self-chosen name of the context source
+	 * @param contextType type of the context information which shall be provided by the updates
+	 * @return identifier to be used in the sendUpdate method
+	 */
+	public Future<String> register(CtxEntity contextOwner, String name, String contextType);
+
+	/**
 	 * Sends modified context information to the CSM which stores it in the context data base.
 	 * This is only possible after a registration.
 	 * The data thereby can be specified as belonging to a different user than the node-owner.

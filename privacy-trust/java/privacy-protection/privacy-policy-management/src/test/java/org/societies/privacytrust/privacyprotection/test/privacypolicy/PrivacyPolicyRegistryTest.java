@@ -66,6 +66,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyRegistryManager;
+import org.societies.util.commonmock.MockIdentity;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
@@ -83,17 +84,17 @@ public class PrivacyPolicyRegistryTest {
 	private RequestPolicy cisPolicy;
 	private RequestPolicy servicePolicy;
 	private CtxEntity personEntity;
-	private org.societies.privacytrust.privacyprotection.test.privacypolicy.MyIdentity mockId;
+	private IIdentity mockId;
 	private CtxAssociation hasPrivacyPolicies;
 	private CtxEntity policyEntity;
 	private CtxAttribute cisPolicyAttribute;
 	private CtxAttribute servicePolicyAttribute;
 	private CtxAttribute registryAttribute;
-	
+
 	@Before
 	public void setUp(){
-		
-		
+
+
 		requestorCis = this.getRequestorCis();
 		cisPolicy = this.getRequestPolicy(requestorCis);
 		requestorService = this.getRequestorService();
@@ -103,7 +104,7 @@ public class PrivacyPolicyRegistryTest {
 		registryMgr = new PrivacyPolicyRegistryManager(ctxBroker);
 	}
 
-	
+
 	private void setupMockito() {
 		try {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
@@ -125,10 +126,10 @@ public class PrivacyPolicyRegistryTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 	private void createPersonEntity() {
-		mockId = new MyIdentity(IdentityType.CSS, "myId", "domain");
+		mockId = new MockIdentity(IdentityType.CSS, "myId", "domain");
 		CtxEntityIdentifier ctxPersonId = new CtxEntityIdentifier(mockId.getJid(), "Person", new Long(1));
 		personEntity = new CtxEntity(ctxPersonId);
 		hasPrivacyPolicies = new CtxAssociation(new CtxAssociationIdentifier(mockId.getJid(), CtxAssociationTypes.HAS_PRIVACY_POLICIES, new Long(3)));
@@ -140,18 +141,18 @@ public class PrivacyPolicyRegistryTest {
 		servicePolicyAttribute = new CtxAttribute(servicePolicyAttributeId);
 		CtxAttributeIdentifier registryAttrId = new CtxAttributeIdentifier(ctxPersonId, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY, new Long(2));
 		registryAttribute = new CtxAttribute(registryAttrId);
-		
+
 	}
 
 	@Test
 	public void testRegistryStoreRetrieve(){
 		registryMgr.addPolicy(requestorCis, cisPolicy);
-		
+
 		RequestPolicy policy = registryMgr.getPolicy(requestorCis);
-		
+
 		TestCase.assertNotNull("Null policy for requestorCis: "+requestorCis.getRequestorId().getJid()+" / "+((RequestorCis)requestorCis).getCisRequestorId().getJid(), policy);
-		
-		
+
+
 		try {
 			registryMgr.deletePolicy(requestorCis);
 		} catch (InterruptedException e) {
@@ -167,20 +168,20 @@ public class PrivacyPolicyRegistryTest {
 			e.printStackTrace();
 			fail();
 		}
-		
+
 		policy = registryMgr.getPolicy(requestorCis);
-		
+
 		TestCase.assertNull(policy);
-		
-		
-		
-		
+
+
+
+
 		registryMgr.addPolicy(requestorService, servicePolicy);
-		
+
 		RequestPolicy policy2 = registryMgr.getPolicy(requestorService);
 		TestCase.assertNotNull("Null policy for requestorService: "+requestorService.getRequestorId().getJid()+" / "+((RequestorService)requestorService).getRequestorServiceId().getServiceInstanceIdentifier().toString(), policy2);
 
-		
+
 		try {
 			registryMgr.deletePolicy(requestorService);
 		} catch (InterruptedException e) {
@@ -196,39 +197,39 @@ public class PrivacyPolicyRegistryTest {
 			e.printStackTrace();
 			fail();
 		}
-		
+
 		policy2 = registryMgr.getPolicy(requestorService);
 		TestCase.assertNull(policy2);
 
-		
+
 	}
-	
-	
+
+
 	private RequestPolicy getRequestPolicy(Requestor requestor) {
 		RequestPolicy requestPolicy;
-		
-		
+
+
 		List<RequestItem> requestItems = this.getRequestItems();
 		requestPolicy = new RequestPolicy(requestor, requestItems);
-		
-		
+
+
 		return requestPolicy;
 	}
 
-	
+
 	private List<RequestItem> getRequestItems() {
 		List<RequestItem> items = new ArrayList<RequestItem>();
-		
+
 		Resource locationResource = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Condition> conditions = new ArrayList<Condition>();
 		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		RequestItem rItem = new RequestItem(locationResource, actions, conditions, false);
-		
+
 		items.add(rItem);
-		
-		
+
+
 		Resource someResource = new Resource("someResource");
 		List<Condition> extendedConditions = new ArrayList<Condition>();
 		extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
@@ -239,12 +240,12 @@ public class PrivacyPolicyRegistryTest {
 		extendedActions.add(new Action(ActionConstants.WRITE));
 		extendedActions.add(new Action(ActionConstants.DELETE));
 		RequestItem someItem = new RequestItem(someResource, extendedActions, extendedConditions, false);
-		
+
 		items.add(someItem);
 		return items;
-		
-		
-		
+
+
+
 	}
 
 	private RequestorService getRequestorService(){
@@ -259,13 +260,13 @@ public class PrivacyPolicyRegistryTest {
 		}
 		return new RequestorService(requestorId, serviceId);
 	}
-	
+
 	private RequestorCis getRequestorCis(){
 		IIdentity requestorId = new MyIdentity(IdentityType.CSS, "me","domain.com");
 		IIdentity cisId = new MyIdentity(IdentityType.CIS, "Holidays", "domain.com");
 		return new RequestorCis(requestorId, cisId);
 	}
-	
+
 	private String getCtxType(Requestor requestor){
 		if (requestor instanceof RequestorService){
 			return ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString();

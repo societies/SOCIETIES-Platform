@@ -1,5 +1,7 @@
 package org.societies.activity.model;
 
+import java.util.HashMap;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,9 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
-import org.apache.shindig.social.core.model.ActivityEntryImpl;
-import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivity;
 
@@ -20,72 +21,76 @@ public class Activity implements IActivity {
 	 * Serializable .. 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ActivityEntryImpl act;
-	private String verb;
-	private String actor;
-	private String object;
-	private String subject;
-	private String target;
+	@Transient
+	private HashMap<String,ActivityString> data = null;
 	private long time;
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private String id;
+	private Long id;
 	
 	@ManyToOne
 	private ActivityFeed feed;
-	public Activity(){}
+	public Activity()
+	{
+		data = new HashMap<String,ActivityString>();
+		this.setActor("");
+		this.setObject("");
+		this.setTarget("");
+		this.setVerb("");
+		this.setPublished("");
+	}
 	public Activity(IActivity icis)
 	{
+		data = new HashMap<String,ActivityString>();
 		this.setActor(icis.getActor());
 		this.setObject(icis.getObject());
 		this.setTarget(icis.getTarget());
 		this.setVerb(icis.getVerb());
+		this.setPublished(icis.getPublished());
 	}
 	
-	@Column(name = "Verb")
+	@Column(name="verb")
 	@Override
 	public String getVerb() {
-		return verb;
+		return data.get("verb").toString();
 	}
 
+	@Column(name="verb")
 	@Override
 	public void setVerb(String verb) {
-		this.verb = verb;
+		data.put("verb", new ActivityString(verb));
 		
 	}
-	
-	@Column(name = "Actor")
+	@Column(name="actor")
 	@Override
 	public String getActor() {
-		return actor;
+		return data.get("actor").toString();
 	}
-
+	@Column(name="actor")
 	@Override
 	public void setActor(String actor) {
-		this.actor = actor;
+		data.put("actor", new ActivityString(actor));
 	}
-
-	@Column(name = "Object")
+	@Column(name="object")
 	@Override
 	public String getObject() {
-		return object;
+		return data.get("object").toString();
 	}
-
+	@Column(name="object")
 	@Override
 	public void setObject(String object) {
-		this.object = object;
+		data.put("object", new ActivityString(object));
 		
 	}
-
-	@Column(name = "Target")
+	@Column(name="target")
 	@Override
 	public String getTarget() {
-		return target;
+		return data.get("target").toString();
 	}
-
+	@Column(name="target")
 	@Override
 	public void setTarget(String target) {
-		this.target = target;
+		data.put("target", new ActivityString(target));
 	}
 	public ActivityFeed getFeed() {
 		return feed;
@@ -93,17 +98,11 @@ public class Activity implements IActivity {
 	public void setFeed(ActivityFeed feed) {
 		this.feed = feed;
 	}
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
-	}
-	public ActivityEntryImpl getAct() {
-		return act;
-	}
-	public void setAct(ActivityEntryImpl act) {
-		this.act = act;
 	}
 	@Override
 	public long getTime() {
@@ -112,5 +111,17 @@ public class Activity implements IActivity {
 	@Override
 	public void setTime(long time) {
 		this.time = time;
+	}
+	@Override
+	public String getPublished() {
+		return data.get("published").toString();
+	}
+	@Override
+	public void setPublished(String published) {
+		data.put("published", new ActivityString(published));
+		
+	}
+	public ActivityString getValue(String key){
+		return data.get(key);
 	}
 }

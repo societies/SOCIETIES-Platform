@@ -26,27 +26,35 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 package org.societies.android.platform.cssmanager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
+import org.societies.android.platform.content.CssRecordDAO;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.css.management.CSSManagerEnums;
+import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
+import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import javax.xml.bind.JAXBException;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.Parcelable;
@@ -62,6 +70,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	//Logging tag
 	private static final String LOG_TAG = LocalCSSManagerService.class.getName();
 
+	//Pubsub packages
+	private static final String CSS_MGMT_PACKAGE = "org.societies.api.schema.cssmanagement";
 	//XMPP Communication namespaces and associated entities
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("cssManagerMessageBean", "cssManagerResultBean");
     private static final List<String> NAME_SPACES = Arrays.asList(
@@ -71,6 +81,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     //currently hard coded destination of communication
     private static final String DESTINATION = "xcmanager.societies.local";
     
+	private SubscribeToPubsub asynchTask;
+
 	/**
 	 * CSS Manager intents
 	 * Used to create to create Intents to signal return values of a called method
@@ -105,9 +117,20 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     
 //	private Messenger inMessenger;
 	private AndroidCSSRecord cssRecord;
+	
+	private CssRecordDAO cssRecordDAO;
+	
+	
 
 	@Override
 	public void onCreate () {
+
+		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
+		this.registerForPubsub();
+		
+		Log.d(LOG_TAG, "CSSManager opening database");
+		this.cssRecordDAO = new CssRecordDAO(this);
+
 //		this.inMessenger = new Messenger(new RemoteServiceHandler(this.getClass(), this));
 		
 		this.binder = new LocalBinder();
@@ -119,11 +142,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     	try {
 			toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
 		} catch (InvalidFormatException e) {
-			Log.e(LOG_TAG, e.getMessage(), e);
+			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
 			throw new RuntimeException(e);
 		}     
-
-
+		
 		Log.d(LOG_TAG, "CSSManager service starting");
 	}
 
@@ -181,7 +203,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
 		} catch (Exception e) {
-			Log.e(this.getClass().getName(), e.getMessage());
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
         } 
 
 		return null;
@@ -235,7 +257,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
 		} catch (Exception e) {
-			Log.e(this.getClass().getName(), e.getMessage());
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
         } 
 		return null;
 	}
@@ -372,6 +394,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		@Override
 		public void receiveResult(Stanza arg0, Object retValue) {
 			Log.d(LOG_TAG, "Callback receiveResult");
+			
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);
 				CssManagerResultBean resultBean = (CssManagerResultBean) retValue;
@@ -388,8 +411,102 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				LocalCSSManagerService.this.sendBroadcast(intent);
 				
 				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
-		        	
+		        
+				if (this.returnIntent.equals(LOGIN_CSS)) {
+					LocalCSSManagerService.this.updateDatabase(aRecord);
+				}
 			}
 		}
 	}
+	
+	/**
+	 * Insert or update the database with the new version of the CSS Record
+	 * 
+	 * @param aRecord
+	 */
+	private void updateDatabase(AndroidCSSRecord aRecord) {
+		this.cssRecordDAO.insertRow(aRecord);
+	}
+	/**
+	 * Register for Pubsub events
+	 */
+	private void registerForPubsub() {
+		
+		Log.d(LOG_TAG, "Starting Pubsub registration: " + System.currentTimeMillis());
+		
+		PubsubClientAndroid pubsubClient = new PubsubClientAndroid(this);
+
+    	List<String> packageList = new ArrayList<String>();
+
+        packageList.add(CSS_MGMT_PACKAGE);
+
+        try {
+			pubsubClient.addJaxbPackages(packageList);
+			
+	        Log.i(LOG_TAG, "Subscribing to pubsub");
+	        
+	        
+			this.asynchTask = new SubscribeToPubsub(); 
+			this.asynchTask.execute(pubsubClient);
+
+
+		} catch (JAXBException e) {
+			Log.e(LOG_TAG, "Error while adding namespace package to Pubsub", e);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Error while adding namespace package to Pubsub", e);
+		}
+
+	}
+
+	private static Subscriber subscriber = new Subscriber() {
+		@Override
+		public void pubsubEvent(IIdentity identity, String node, String itemId,
+				Object payload) {
+			Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
+			if (payload instanceof CssEvent) {
+				Log.d(LOG_TAG, "Received event is :" + ((CssEvent) payload).getType());
+			}
+		}
+    };
+    
+    /**
+     * 
+     * Async task to register for CSSManager Pubsub events
+     *
+     */
+    private class SubscribeToPubsub extends AsyncTask<PubsubClientAndroid, Void, Boolean> {
+		private boolean resultStatus = true;
+    	
+    	protected Boolean doInBackground(PubsubClientAndroid... args) {
+    		
+    		PubsubClientAndroid pubsubAndClient = args[0];	    	
+
+    		IIdentity pubsubService = null;
+    		
+    		try {
+    	    	pubsubService = IdentityManagerImpl.staticfromJid(DESTINATION);
+    			
+    		} catch (InvalidFormatException e) {
+    			Log.e(LOG_TAG, "Unable to obtain CSS node identity", e);
+    			this.resultStatus = false;
+    		}
+
+    		try {
+    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, subscriber);
+    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, subscriber);
+    			Log.d(LOG_TAG, "Pubsub subscription created");
+    			Log.d(LOG_TAG, "Finishing Pubsub registration: " + System.currentTimeMillis());
+
+
+    			
+			} catch (Exception e) {
+    			this.resultStatus = false;
+				Log.e(LOG_TAG, "Unable to register for CSSManager events", e);
+
+			}
+    		return resultStatus;
+    	}
+    }
+
+
 }

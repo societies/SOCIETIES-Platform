@@ -195,7 +195,7 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
 	}
 
 	public void setCloudProviderUrls(Collection<String> cloudProviderUrls) {
-		JiveGlobals.setProperty("plugin.societies.allowedIPs", StringUtils.collectionToString(cloudProviderUrls));
+		JiveGlobals.setProperty("plugin.societies.cloudProviderUrls", StringUtils.collectionToString(cloudProviderUrls));
 		this.cloudProviderUrls = cloudProviderUrls;
 	}
 

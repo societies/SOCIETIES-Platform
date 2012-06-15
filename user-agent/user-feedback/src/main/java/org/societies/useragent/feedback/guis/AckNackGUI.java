@@ -27,13 +27,13 @@ package org.societies.useragent.feedback.guis;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JOptionPane;
 
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 
 public class AckNackGUI{
-
-	public AckNackGUI(String proposalText, String[] options, IUserFeedbackCallback callback){
+		
+	public static List<String> displayGUI(String proposalText, String[] options){
 		List<String> feedback = new ArrayList<String>();
 		int n = JOptionPane.showOptionDialog(null,
 			    proposalText,
@@ -44,14 +44,15 @@ public class AckNackGUI{
 			    options,
 			    options[0]);
 		feedback.add(options[n]);
-		for(String output: feedback){
-			System.out.println("Feedback = "+output);
-		}
-		callback.handleExpFeedback(feedback);
+		return feedback;
 	}
 
 	public static void main(String[] args){
 		String[] options = {"yes", "no"};
-		new AckNackGUI("Are you OK??", options, null);
+		List<String> result = AckNackGUI.displayGUI("Are you OK??", options);
+		System.out.println("Selected feedback: ");
+		for(String output: result){
+			System.out.println(output);
+		}
 	}
 }

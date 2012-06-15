@@ -29,9 +29,8 @@ package org.societies.android.platform.servicemonitor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.societies.android.api.external.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.examples.ICoreServiceExample;
-
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 
 import android.app.Service;
 import android.content.Intent;

@@ -24,10 +24,14 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 
@@ -37,14 +41,26 @@ import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-@MappedSuperclass
-public abstract class DirectTrustEvidence extends TrustEvidence implements
+@Entity
+@Table(
+		name = TableName.DIRECT_TRUST_EVIDENCE, 
+		uniqueConstraints = { @UniqueConstraint(columnNames = {
+				"trustor_id", "trustee_id", "type", "timestamp", "info" }) }
+)
+public class DirectTrustEvidence extends TrustEvidence implements
 		IDirectTrustEvidence {
 
 	private static final long serialVersionUID = 1470145009236839996L;
 
-	DirectTrustEvidence(final TrustedEntityId teid, final Date timestamp) {
+	/* Empty constructor required by Hibernate */
+	private DirectTrustEvidence() {
 		
-		super(teid, timestamp);
+		super(null, null, null, null);
+	}
+	
+	public DirectTrustEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info) {
+		
+		super(teid, type, timestamp, info);
 	}
 }

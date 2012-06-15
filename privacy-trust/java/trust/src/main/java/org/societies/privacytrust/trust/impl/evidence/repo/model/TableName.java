@@ -32,5 +32,15 @@ package org.societies.privacytrust.trust.impl.evidence.repo.model;
  */
 public class TableName {
 
-	public static final String DIRECT_TRUST_OPINION = "t_direct_trust_opinions";
+	/**
+	 * 
+	 * @since 0.3
+	 */
+	public static final String DIRECT_TRUST_EVIDENCE = "t_direct_trust_evidence";
+	
+	/**
+	 * 
+	 * @since 0.3
+	 */
+	public static final String INDIRECT_TRUST_EVIDENCE = "t_indirect_trust_evidence";
 }

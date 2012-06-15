@@ -25,6 +25,9 @@
 
 package org.societies.api.internal.useragent.feedback;
 
+import java.util.List;
+import java.util.concurrent.Future;
+
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 
@@ -35,13 +38,7 @@ import org.societies.api.internal.useragent.model.ImpProposalContent;
  */
 public interface IUserFeedback
 {
-	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback);
+	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
 	
-	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback);
-	
-	@Deprecated
-	public String getExplicitFB(int type, ExpProposalContent content);
-	
-	@Deprecated
-	public boolean getImplicitFB(int type, ImpProposalContent content);
+	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
 }

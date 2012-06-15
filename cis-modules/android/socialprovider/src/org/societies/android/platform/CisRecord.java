@@ -24,7 +24,8 @@
  */
 package org.societies.android.platform;
 
-import org.societies.android.api.cis.management.ICisRecord;
+import org.societies.android.api.external.cis.management.ICisRecord;
+
 
 /**
  * @author Babak.Farshchian@sintef.no

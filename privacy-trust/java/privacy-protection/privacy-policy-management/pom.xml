@@ -97,6 +97,12 @@
 			<version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.util</groupId>
+			<artifactId>commonmock</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

@@ -203,41 +203,6 @@ public interface ICtxBroker {
 	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException;
 	
 	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param attrId
-	 * @throws CtxException 
-	 * @deprecated As of 0.0.3, use {@link #unregisterFromChanges(CtxChangeEventListener, CtxIdentifier)}
-	 */
-	@Deprecated
-	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException;
-	
-	/**
-	 * Registers the specified EventListener for value modification events of context
-	 * attribute(s) with the supplied scope and type.
-	 * 
-	 * @param scope
-	 * @param attrType
-	 * @throws CtxException
-	 * @deprecated As of 0.0.3, use {@link #registerForChanges(CtxChangeEventListener, CtxEntityIdentifier, String)} 
-	 */
-	@Deprecated
-	public void registerForUpdates(CtxEntityIdentifier scope, String attrType) throws CtxException;
-	
-	/**
-	 * Unregisters the specified EventListener for value modification events of
-	 * context attribute(s) with the supplied scope and type.
-	 * 
-	 * @param scope
-	 * @param attributeType
-	 * @throws CtxException
-	 * @deprecated As of 0.0.3, use {@link #unregisterFromChanges(CtxChangeEventListener, CtxEntityIdentifier, String)} 
-	 */
-	@Deprecated
-	public void unregisterForUpdates(CtxEntityIdentifier scope, String attributeType) throws CtxException;
-
-	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
 	 * related to the context model object referenced by the specified identifier.
 	 * 

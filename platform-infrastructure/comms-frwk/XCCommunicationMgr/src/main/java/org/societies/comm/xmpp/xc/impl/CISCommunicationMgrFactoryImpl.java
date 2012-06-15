@@ -80,6 +80,22 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		return null;
 	}
 	
+	public ICommManager getNewCommManager(String jid) throws CommunicationException {
+		try {
+			// TODO verify if exists one with same JID logged int
+			IIdentity cisIdentity = idm.fromJid(jid);
+			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword, this.idm.getDomainAuthorityNode().getJid());
+			commMgr.loginFromConfig();
+			if (commMgr.getIdManager()==null)
+				throw new CommunicationException("Unable to connect!");
+			cisCommManagers.put(cisIdentity, commMgr);
+			return commMgr;
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public void destroyAllConnections() {
 		for (ICommManager cm : cisCommManagers.values()) {
 			LOG.info("Disconnecting CIS '"+cm.getIdManager().getThisNetworkNode().getJid()+"'");

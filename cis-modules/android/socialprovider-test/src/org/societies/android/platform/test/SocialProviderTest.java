@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druï¿½be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAï¿½ï¿½O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -102,7 +102,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		initialValues.put(SocialContract.Community.CREATION_DATE , "today");
 		
 		//2- Call insert in SocialProvider to initiate insertion
-		Uri newGroupUri= resolver.insert(SocialContract.Community.CONTENT_URI , 
+		Uri newCommunityUri= resolver.insert(SocialContract.Community.CONTENT_URI , 
 				initialValues);
 		
 		//3- Get the newly inserted CIS from SocialProvider.
@@ -114,7 +114,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 			};
 		//WHERE _id = ID of the newly created CIS:
 		String selection = SocialContract.Community._ID + " = " +
-			newGroupUri.getLastPathSegment();
+			newCommunityUri.getLastPathSegment();
 		Cursor cursor = resolver.query(SocialContract.Community.CONTENT_URI,
 				projection, selection, null, null);
 		
@@ -131,6 +131,11 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		assertEquals(returnedValues,initialValues);
 
 	}
+	
+	public void testQueryCommunity(){
+		
+	}
+	
 //	public void testUpdate(){
 //	//TODO 
 //		assertFalse(true);

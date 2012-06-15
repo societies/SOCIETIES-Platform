@@ -61,11 +61,13 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
+import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
@@ -120,17 +122,28 @@ public class InternalCtxBroker implements ICtxBroker {
 	private IUserCtxDBMgr userCtxDBMgr;
 
 	/**
+	 * The Community Context DB Mgmt service reference.
+	 * 
+	 * @see {@link #setCommunityCtxDBMgr(ICommunityCtxDBMgr)}
+	 */
+	private ICommunityCtxDBMgr communityCtxDBMgr;
+	
+	/**
 	 * Instantiates the platform Context Broker in Spring.
 	 * 
 	 * @param userCtxDBMgr
 	 * @param commMgr
+	 * @param communityCtxDBMgr
 	 * @throws CtxException 
 	 */
 	@Autowired(required=true)
-	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr) throws Exception {
+	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr,ICommunityCtxDBMgr communityCtxDBMgr) throws Exception {
 
 		LOG.info(this.getClass() + " instantiated");
 		this.userCtxDBMgr = userCtxDBMgr;
+		this.communityCtxDBMgr = communityCtxDBMgr;
+		LOG.info("Found ICommunityCtxDBMgr " + communityCtxDBMgr);
+		
 		this.idMgr = commMgr.getIdManager();
 		final INetworkNode localCssNodeId = this.idMgr.getThisNetworkNode();
 		LOG.info("Found local CSS node ID " + localCssNodeId);
@@ -173,11 +186,27 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
 			String type) throws CtxException {
-
-		// TODO IUserCtxDBMgr should provide createAttribute(CtxEntityIdentifier scope, String type) 
-		final CtxAttribute attribute = 
-				this.userCtxDBMgr.createAttribute(scope, null, type);
-
+		
+		CtxAttribute attribute = null;
+		try {
+			IIdentity scopeID = this.idMgr.fromJid(scope.getOwnerId());
+			
+			if (IdentityType.CSS.equals(scopeID.getType())){
+				
+				attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
+				
+			} else if (IdentityType.CIS.equals(scopeID.getType())){
+				
+				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, type);
+				
+			} 
+		} catch (InvalidFormatException ife) {
+			
+			throw new CtxBrokerException(scope.getOwnerId()
+					+ ": Invalid owner IIdentity String: " 
+					+ ife.getLocalizedMessage(), ife);
+		}
+		
 		return new AsyncResult<CtxAttribute>(attribute);
 	}
 
@@ -219,8 +248,9 @@ public class InternalCtxBroker implements ICtxBroker {
 			} else {
 
 				cssOwnerEnt = this.userCtxDBMgr.createIndividualCtxEntity(ownerType); 
-				final CtxAttribute cssIdAttr = this.createAttribute(
-						cssOwnerEnt.getId(), CtxAttributeTypes.ID).get(); // TODO use userCtxDBMgr
+				final CtxAttribute cssIdAttr = this.userCtxDBMgr.createAttribute(
+						cssOwnerEnt.getId(), CtxAttributeTypes.ID); 
+					
 				this.updateAttribute(cssIdAttr.getId(), cssId.toString());
 				LOG.info("Created CSS owner context entity " + cssOwnerEnt.getId());
 			}
@@ -248,8 +278,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CommunityCtxEntity> createCommunityEntity(IIdentity cisId)
 			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+	
+		CommunityCtxEntity communityCtxEnt = communityCtxDBMgr.createCommunityEntity(cisId);
+	
+		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
 	}
 
 	@Override
@@ -554,28 +586,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	//***********************************************
 	//     Context Update Events Methods  
 	//***********************************************
-	@Override
-	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void unregisterForUpdates(CtxEntityIdentifier scope,
-			String attributeType) throws CtxException {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void registerForUpdates(CtxEntityIdentifier scope,
-			String attrType) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
+		// TODO remove DEPRECATED
 
 	}
 
@@ -1291,6 +1305,17 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.userCtxDBMgr = userDB;
 	}
 
+	/**
+	 * Sets the Community Context DB Mgmt service reference.
+	 * 
+	 * @param userDB
+	 *            the User Context DB Mgmt service reference to set.
+	 */
+	public void setCommunityCtxDBMgr(ICommunityCtxDBMgr communityCtxDBMgr) {
+
+		this.communityCtxDBMgr = communityCtxDBMgr;
+	}
+	
 	/**
 	 * Sets the User Context History Mgmt service reference.
 	 * 
