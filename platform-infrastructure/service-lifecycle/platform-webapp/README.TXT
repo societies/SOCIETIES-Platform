@@ -12,6 +12,10 @@ follow the few lines of guidelines as below.
 	service-lifecycle.plan 
 	societies-webapp.plan
 	
+3. to get the privasy & trust (and assessment) webapp experience
+	privacy and trust plan (privacy-trust/java/privacy-protection)
+	context broker plan
+	
 	Then go to web browser and type http://localhost:8080/societies/login.html to start the web app
 	 
 	

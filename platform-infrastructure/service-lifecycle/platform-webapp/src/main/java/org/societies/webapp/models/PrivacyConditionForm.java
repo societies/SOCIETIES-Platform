@@ -22,62 +22,28 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.privacypolicy.registry;
+package org.societies.webapp.models;
 
-import java.io.Serializable;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 
 
 /**
  * Describe your class here...
  *
- * @author Eliza
+ * @author olivierm
  *
  */
-public class MyIdentity implements IIdentity, Serializable{
+public class PrivacyConditionForm extends Condition {
 
+	public PrivacyConditionForm() {
+		this(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "0");
+	}
+	public PrivacyConditionForm(ConditionConstants conditionName, String value){
+		super(conditionName, value);
+	}
 	
-	private final IdentityType type;
-	private final String identifier;
-	private final String domainIdentifier;
-
-	public MyIdentity(IdentityType type, String identifier,
-			String domainIdentifier) {
-		this.type = type;
-		this.identifier = identifier;
-		this.domainIdentifier = domainIdentifier;
+	public PrivacyConditionForm(ConditionConstants conditionName, String value, boolean isOptional){
+		super(conditionName, value, isOptional);
 	}
-	public MyIdentity(IIdentity identity) {
-				this.type = identity.getType();
-				this.identifier = identity.getIdentifier();
-				this.domainIdentifier = identity.getDomain();
-	}
-
-	@Override
-	public String getJid() {
-		return type+"://"+identifier+"@"+domainIdentifier;
-	}
-
-	@Override
-	public String getBareJid() {
-		return type+"://"+identifier+"@"+domainIdentifier;
-	}
-
-	@Override
-	public String getDomain() {
-		return domainIdentifier;
-	}
-
-	@Override
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	@Override
-	public IdentityType getType() {
-		return type;
-	}
-
 }

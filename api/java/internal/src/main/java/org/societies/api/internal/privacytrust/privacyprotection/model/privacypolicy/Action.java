@@ -29,6 +29,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
 
@@ -41,11 +42,10 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
  */
 public class Action implements Serializable{
 
-	private ActionConstants action;
+	protected ActionConstants action;
 	private boolean optional;
 	
 	private Action(){
-		
 	}
 	public Action(ActionConstants action){
 		this.action = action;
@@ -91,5 +91,25 @@ public class Action implements Serializable{
 	public static void main(String[] args) throws IOException{
 		Action action = new Action(ActionConstants.READ);
 		System.out.println(action.toXMLString());
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		Action rhs = (Action) obj;
+		return new EqualsBuilder()
+			.append(this.getActionType().name(), rhs.getActionType().name())
+			.append(this.isOptional(), rhs.isOptional())
+			.isEquals();
 	}
 }
