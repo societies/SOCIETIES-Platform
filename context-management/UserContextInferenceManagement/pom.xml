@@ -20,7 +20,7 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-mgmt-api</artifactId>
@@ -28,7 +28,7 @@
 			<scope>provided</scope>
 			<type>bundle</type>
 		</dependency>
-			<dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.context</artifactId>
 		</dependency>
@@ -36,11 +36,14 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.beans</artifactId>
 		</dependency>
-	
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
-	
-	
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -85,11 +88,11 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<!-- More Project Information -->
 	<name>User Context Inference Mgmt</name>
 	<developers>
-	    <developer>
+		<developer>
 			<id>pkosmides</id>
 			<name>Pavlos Kosmides</name>
 			<email>pkosmidi@central.ntua.gr</email>
@@ -112,5 +115,5 @@
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
-	</developers>	
+	</developers>
 </project>

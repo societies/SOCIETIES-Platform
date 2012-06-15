@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -43,6 +45,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(UserCtxInferenceMgr.class);
 		
 	@Autowired(required=true)
 	private ICtxBroker internalCtxBroker;
@@ -51,8 +55,10 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	
 	UserCtxInferenceMgr(){
 		
+		LOG.info(this.getClass() + " instantiated");
 		inferableTypes.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		this.setInferrableTypes(inferableTypes);
+		LOG.info(this.getClass() + " instantiated " +internalCtxBroker);	
 	}
 	
 	
@@ -106,13 +112,15 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	
 	@Override
 	public void setInferrableTypes(List<String> inferableTypes){
-		 this.inferableTypes = inferableTypes;
+		
+		LOG.info("setInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
+		this.inferableTypes = inferableTypes;
 	}
 	
 	@Override
 	public List<String> getInferrableTypes(){
-		List<String> inferableTypes = null;
-		
-		return inferableTypes;
+	
+		LOG.info("getInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
+		return this.inferableTypes;
 	}
 }
