@@ -38,8 +38,8 @@ import org.societies.api.identity.IIdentity;
 /**
  * ICommunityCtxDBMgr platform interface. This interface provides access to community context database. 
  * 
- * @author nlia
- * @created 12-Nov-2011 7:15:14 PM
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.2
  */
 public interface ICommunityCtxDBMgr {
 
@@ -68,14 +68,22 @@ public interface ICommunityCtxDBMgr {
 	 */
 	public CtxModelObject retrieve(CtxEntityIdentifier identifier) throws CtxException;
 	
-	
 	/**
-	  * Retrieves the specidied community Context Entity. 
-	  * @param ctxId
-	  * @throws CtxException 
-	  * @since 0.2
+	  * Retrieves the {@link CommunityCtxEntity} which represents the specified
+	  * CIS. The method returns <code>null</code> if the entity is not present
+	  * in the Community Context DB.
+	  *  
+	  * @param cisId
+	  *            the {@IIdentity} of the CIS whose CommunityCtxEntity to retrieve
+	  * @return the {@link CommunityCtxEntity} which represents the specified
+	  *         CIS.
+	  * @throws CtxException
+	  * @throws NullPointerException
+	  *             if the specified cisId is <code>null</code>
+	  * @since 0.3
 	  */
-	public CommunityCtxEntity retrieveCommunityEntity(CtxEntityIdentifier ctxId) throws CtxException;
+	public CommunityCtxEntity retrieveCommunityEntity(final IIdentity cisId)
+			throws CtxException;
 
 	/**
 	  * Updates a community Context Entity. 

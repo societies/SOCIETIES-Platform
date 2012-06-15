@@ -166,12 +166,24 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
+	/*
+	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#retrieveCommunityEntity(org.societies.api.identity.IIdentity)
+	 */
 	@Override
-	public CommunityCtxEntity retrieveCommunityEntity(CtxEntityIdentifier ctxId)
+	public CommunityCtxEntity retrieveCommunityEntity(final IIdentity cisId)
 			throws CtxException {
 
-		final CommunityCtxEntity entity = new CommunityCtxEntity(ctxId);		
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		
+		CommunityCtxEntity entity = null;
+		
+		for (final CtxModelObject foundEntity : this.modelObjects.values())
+			if (cisId.toString().equals(foundEntity.getOwnerId())
+					&& CtxEntityTypes.COMMUNITY.equals(foundEntity.getType()))
+				entity = (CommunityCtxEntity) foundEntity;
+			
 		return entity;
 	}
 
