@@ -188,6 +188,10 @@ public class InternalCtxBroker implements ICtxBroker {
 			String type) throws CtxException {
 		
 		CtxAttribute attribute = null;
+		
+		attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
+		//TODO uncomment following lines when id manager is complete
+		/*
 		try {
 			IIdentity scopeID = this.idMgr.fromJid(scope.getOwnerId());
 			
@@ -206,7 +210,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ ": Invalid owner IIdentity String: " 
 					+ ife.getLocalizedMessage(), ife);
 		}
-		
+		*/
 		return new AsyncResult<CtxAttribute>(attribute);
 	}
 
