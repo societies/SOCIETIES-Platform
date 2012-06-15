@@ -45,13 +45,24 @@ import org.societies.api.identity.IIdentity;
 public interface ICommunityCtxDBMgr {
 
 	/**
-	 * Creates a community Context Attribute
+	 * Creates a {@link CtxAttribute} of the specified type which is associated
+	 * to the identified community context entity (scope). 
 	 * 
 	 * @param scope
-	 * @param enum
+	 *            the identifier of the community context entity to associate
+	 *            with the new attribute
 	 * @param type
+	 *            the type of the community context attribute to create
+	 * @return the newly created community context attribute
+	 * @throws CtxException
+	 *             if the community context attribute cannot be persisted in
+	 *             the Community Context DB
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.3
 	 */
-	public CtxAttribute createCommunityAttribute(CtxEntityIdentifier scope, String type) throws CtxException;
+	public CtxAttribute createCommunityAttribute(final CtxEntityIdentifier scope,
+			final String type) throws CtxException;
 
 	/**
 	  * Creates a community Context Entity. 
