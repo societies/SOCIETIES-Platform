@@ -26,11 +26,19 @@ public class Activity implements IActivity {
 	private long time;
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private String id;
+	private Long id;
 	
 	@ManyToOne
 	private ActivityFeed feed;
-	public Activity(){data = new HashMap<String,ActivityString>();}
+	public Activity()
+	{
+		data = new HashMap<String,ActivityString>();
+		this.setActor("");
+		this.setObject("");
+		this.setTarget("");
+		this.setVerb("");
+		this.setPublished("");
+	}
 	public Activity(IActivity icis)
 	{
 		data = new HashMap<String,ActivityString>();
@@ -90,10 +98,10 @@ public class Activity implements IActivity {
 	public void setFeed(ActivityFeed feed) {
 		this.feed = feed;
 	}
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	@Override
@@ -110,7 +118,7 @@ public class Activity implements IActivity {
 	}
 	@Override
 	public void setPublished(String published) {
-		data.put("publised", new ActivityString(published));
+		data.put("published", new ActivityString(published));
 		
 	}
 	public ActivityString getValue(String key){
