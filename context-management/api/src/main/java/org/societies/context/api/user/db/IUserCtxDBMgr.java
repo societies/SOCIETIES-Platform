@@ -32,7 +32,6 @@ import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -53,13 +52,23 @@ public interface IUserCtxDBMgr {
 	public CtxAssociation createAssociation(String type) throws CtxException;
 
 	/**
-	 * Creates a Context Attribute
+	 * Creates a {@link CtxAttribute} of the specified type which is associated to
+	 * the identified context entity (scope). 
 	 * 
 	 * @param scope
-	 * @param enum
+	 *            the identifier of the context entity to associate with the new
+	 *            attribute
 	 * @param type
+	 *            the type of the context attribute to create
+	 * @throws CtxException
+	 *             if the context attribute cannot be persisted in the Context
+	 *             DB
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
+	 * @since 0.3
 	 */
-	public CtxAttribute createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumeration, String type) throws CtxException;
+	public CtxAttribute createAttribute(final CtxEntityIdentifier scope, 
+			final String type) throws CtxException;
 
 	/**
 	 * Creates a Context Entity of a generic type. The created <code>CtxEntity</code> 

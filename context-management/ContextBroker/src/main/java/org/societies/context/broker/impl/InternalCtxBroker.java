@@ -186,25 +186,25 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
 			String type) throws CtxException {
-		// TODO IUserCtxDBMgr should provide createAttribute(CtxEntityIdentifier scope, String type)
 		
 		CtxAttribute attribute = null;
 		try {
 			IIdentity scopeID = this.idMgr.fromJid(scope.getOwnerId());
 			
-			
 			if (IdentityType.CSS.equals(scopeID.getType())){
 				
-				attribute =	this.userCtxDBMgr.createAttribute(scope, null, type);	
+				attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
 				
 			} else if (IdentityType.CIS.equals(scopeID.getType())){
 				
-				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, null, type);
+				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, type);
 				
 			} 
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (InvalidFormatException ife) {
+			
+			throw new CtxBrokerException(scope.getOwnerId()
+					+ ": Invalid owner IIdentity String: " 
+					+ ife.getLocalizedMessage(), ife);
 		}
 		
 		return new AsyncResult<CtxAttribute>(attribute);
@@ -248,8 +248,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			} else {
 
 				cssOwnerEnt = this.userCtxDBMgr.createIndividualCtxEntity(ownerType); 
-				final CtxAttribute cssIdAttr = this.createAttribute(
-						cssOwnerEnt.getId(), CtxAttributeTypes.ID).get(); // TODO use userCtxDBMgr
+				final CtxAttribute cssIdAttr = this.userCtxDBMgr.createAttribute(
+						cssOwnerEnt.getId(), CtxAttributeTypes.ID); 
 					
 				this.updateAttribute(cssIdAttr.getId(), cssId.toString());
 				LOG.info("Created CSS owner context entity " + cssOwnerEnt.getId());
@@ -586,28 +586,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	//***********************************************
 	//     Context Update Events Methods  
 	//***********************************************
-	@Override
-	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void unregisterForUpdates(CtxEntityIdentifier scope,
-			String attributeType) throws CtxException {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void registerForUpdates(CtxEntityIdentifier scope,
-			String attrType) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
+		// TODO remove DEPRECATED
 
 	}
 

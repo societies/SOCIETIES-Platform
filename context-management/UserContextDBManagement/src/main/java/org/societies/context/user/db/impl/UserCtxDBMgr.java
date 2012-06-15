@@ -150,24 +150,22 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	}
 	
 	/*
-	 * (non-Javadoc)
-	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxAttributeValueType, java.lang.String)
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
-	public CtxAttribute createAttribute(CtxEntityIdentifier scope,
-			CtxAttributeValueType valueType, String type) throws CtxException {
+	public CtxAttribute createAttribute(final CtxEntityIdentifier scope,
+			final String type) throws CtxException {
 		
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
 
 		final CtxEntity entity = (CtxEntity) modelObjects.get(scope);
 		
-		/**************************/
-		if (entity == null)
-			// F A I L (callback should throw an exception!!)
-			System.err.println("No such context entity: " + scope); // TEMP SOLUTION
-		/**************************/
-
+		if (entity == null)	
+			throw new UserCtxDBMgrException("Scope not found: " + scope);
+		
 		CtxAttributeIdentifier attrIdentifier = new CtxAttributeIdentifier(scope, type, CtxModelObjectNumberGenerator.getNextValue());
 		final CtxAttribute attribute = new CtxAttribute(attrIdentifier);
 

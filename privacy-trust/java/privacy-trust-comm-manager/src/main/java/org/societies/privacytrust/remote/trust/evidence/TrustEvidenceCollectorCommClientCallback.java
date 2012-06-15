@@ -37,9 +37,6 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback;
-import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
-import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 
@@ -132,8 +129,8 @@ public class TrustEvidenceCollectorCommClientCallback implements ICommCallback {
 	@Override
 	public void receiveResult(final Stanza stanza, final Object bean) {
 		
-		if (!(bean instanceof TrustBrokerResponseBean))
-			throw new IllegalArgumentException("bean is not instance of TrustBrokerResponseBean");
+		if (!(bean instanceof TrustEvidenceCollectorResponseBean))
+			throw new IllegalArgumentException("bean is not instance of TrustEvidenceCollectorResponseBean");
 		
 		final TrustEvidenceCollectorResponseBean responseBean = (TrustEvidenceCollectorResponseBean) bean;
 		

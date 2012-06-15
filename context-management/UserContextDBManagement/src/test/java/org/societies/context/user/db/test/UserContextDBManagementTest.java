@@ -28,13 +28,11 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
@@ -50,9 +48,7 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.societies.context.user.db.impl.CtxModelObjectNumberGenerator;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 
@@ -62,9 +58,6 @@ import org.societies.context.user.db.impl.UserCtxDBMgr;
  * @author
  * 
  */
-
-
-
 public class UserContextDBManagementTest {
 
     private static final String ENT_TYPE_1 = "entType1";
@@ -178,7 +171,7 @@ public class UserContextDBManagementTest {
 	public void testCreateAttribute() throws CtxException{
 	   System.out.println("---- testCreateAttribute");
 	   indEntity = userDB.createIndividualCtxEntity("house");
-	   modObj = userDB.createAttribute(indEntity.getId(), CtxAttributeValueType.EMPTY, "name");
+	   modObj = userDB.createAttribute(indEntity.getId(), "name");
 	   attribute = (CtxAttribute) modObj;
 
 	   assertNotNull(attribute);
@@ -191,7 +184,7 @@ public class UserContextDBManagementTest {
 	   System.out.println("---- testRetrieveAttribute");
 	   ////////////////
 	   indEntity = userDB.createIndividualCtxEntity("house");
-	   attribute = userDB.createAttribute(indEntity.getId(), CtxAttributeValueType.EMPTY, "name");
+	   attribute = userDB.createAttribute(indEntity.getId(), "name");
 	   
 	   modObj = userDB.retrieve(attribute.getId());
 	   attribute = (CtxAttribute) modObj;
@@ -204,7 +197,7 @@ public class UserContextDBManagementTest {
 	   System.out.println("---- testUpdateAttribute");
 
 	   indEntity = userDB.createIndividualCtxEntity("house");
-	   attribute = userDB.createAttribute(indEntity.getId(), CtxAttributeValueType.EMPTY, "name");
+	   attribute = userDB.createAttribute(indEntity.getId(), "name");
 
 	   modObj = userDB.retrieve(attribute.getId());
 	   attribute = (CtxAttribute) modObj;
@@ -233,9 +226,9 @@ public class UserContextDBManagementTest {
        final CtxEntityIdentifier entId3 = userDB.createEntity("Bar").getId();
       
        // Create test attributes.
-       final CtxAttributeIdentifier attrId1 = userDB.createAttribute(entId1, CtxAttributeValueType.EMPTY, "FooBar").getId();
-       final CtxAttributeIdentifier attrId2 = userDB.createAttribute(entId1, CtxAttributeValueType.EMPTY, "Foo").getId();
-       final CtxAttributeIdentifier attrId3 = userDB.createAttribute(entId1, CtxAttributeValueType.EMPTY, "Bar").getId();
+       final CtxAttributeIdentifier attrId1 = userDB.createAttribute(entId1, "FooBar").getId();
+       final CtxAttributeIdentifier attrId2 = userDB.createAttribute(entId1, "Foo").getId();
+       final CtxAttributeIdentifier attrId3 = userDB.createAttribute(entId1, "Bar").getId();
        
        // Create test attributes.
        final CtxAssociationIdentifier assocId1 = userDB.createAssociation("FooBar").getId();
@@ -300,9 +293,9 @@ public class UserContextDBManagementTest {
        CtxEntityIdentifier entityId;
 
        entity = userDB.createEntity("PERSON");
-       attribute = userDB.createAttribute((CtxEntityIdentifier)entity.getId(), CtxAttributeValueType.EMPTY, "NAME");
+       attribute = userDB.createAttribute((CtxEntityIdentifier)entity.getId(), "NAME");
        entity2 = userDB.createEntity("PERSON");
-       attribute2 = userDB.createAttribute((CtxEntityIdentifier)entity2.getId(), CtxAttributeValueType.EMPTY, "NAME");
+       attribute2 = userDB.createAttribute((CtxEntityIdentifier)entity2.getId(), "NAME");
        
        // lookup by name attribute
        System.out.println("Paul".compareTo("Lora"));
@@ -339,9 +332,9 @@ public class UserContextDBManagementTest {
        CtxEntityIdentifier entityId;
 
        entity = userDB.createEntity("NUMBER");
-       attribute = userDB.createAttribute((CtxEntityIdentifier)entity.getId(), CtxAttributeValueType.EMPTY, "BOOKS");
+       attribute = userDB.createAttribute((CtxEntityIdentifier)entity.getId(), "BOOKS");
        entity2 = userDB.createEntity("NUMBER");
-       attribute2 = userDB.createAttribute((CtxEntityIdentifier)entity2.getId(), CtxAttributeValueType.EMPTY, "BOOKS");
+       attribute2 = userDB.createAttribute((CtxEntityIdentifier)entity2.getId(), "BOOKS");
        
        // lookup by name attribute
        identifiers = userDB.lookupEntities("NUMBER", "BOOKS", 1, 10);
@@ -375,9 +368,9 @@ public class UserContextDBManagementTest {
        CtxEntityIdentifier entityId;
 
        entity = userDB.createEntity("NUMBER");
-       attribute = userDB.createAttribute((CtxEntityIdentifier)entity.getId(), CtxAttributeValueType.EMPTY, "BOOKS");
+       attribute = userDB.createAttribute((CtxEntityIdentifier)entity.getId(), "BOOKS");
        entity2 = userDB.createEntity("NUMBER");
-       attribute2 = userDB.createAttribute((CtxEntityIdentifier)entity2.getId(), CtxAttributeValueType.EMPTY, "BOOKS");
+       attribute2 = userDB.createAttribute((CtxEntityIdentifier)entity2.getId(), "BOOKS");
        
        byte[] byteArray = new byte[2];
        byteArray[0] = 0x11;
