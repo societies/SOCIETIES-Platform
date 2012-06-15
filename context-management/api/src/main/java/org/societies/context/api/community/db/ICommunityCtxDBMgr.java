@@ -25,28 +25,25 @@
 package org.societies.context.api.community.db;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.identity.IIdentity;
 
 /**
  * ICommunityCtxDBMgr platform interface. This interface provides access to community context database. 
  * 
- * @author nlia
- * @created 12-Nov-2011 7:15:14 PM
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.2
  */
 public interface ICommunityCtxDBMgr {
 
-	
 	/**
 	 * Creates a community Context Attribute
 	 * 
@@ -54,7 +51,7 @@ public interface ICommunityCtxDBMgr {
 	 * @param enum
 	 * @param type
 	 */
-	public CtxAttribute createCommunityAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumeration, String type) throws CtxException;
+	public CtxAttribute createCommunityAttribute(CtxEntityIdentifier scope, String type) throws CtxException;
 
 	/**
 	  * Creates a community Context Entity. 
@@ -64,22 +61,41 @@ public interface ICommunityCtxDBMgr {
 	  */
 	public CommunityCtxEntity createCommunityEntity(IIdentity cisId) throws CtxException;
 
-	////////////////////////////
 	/**
-	 * Retrieves the specified context model object.
+	 * Retrieves the context model object identified by the specified
+	 * {@link CtxIdentifier}. The method returns <code>null</code> if the
+	 * identified CtxModelObject is not present in the Community Context DB.
 	 * 
-	 * @param identifier
+	 * @param ctxId
+	 *            the {@link CtxIdentifier} of the context model object to
+	 *            retrieve
+	 * @return the context model object identified by the specified
+	 *         {@link CtxIdentifier}.
+	 * @throws CtxException
+	 *             if there is a problem accessing the Community Context DB
+	 * @throws NullPointerException
+	 *             if the specified ctxId is <code>null</code>
+	 * @since 0.3
 	 */
-	public CtxModelObject retrieve(CtxEntityIdentifier identifier) throws CtxException;
-	
+	public CtxModelObject retrieve(final CtxIdentifier ctxId) 
+			throws CtxException;
 	
 	/**
-	  * Retrieves the specidied community Context Entity. 
-	  * @param ctxId
-	  * @throws CtxException 
-	  * @since 0.2
+	  * Retrieves the {@link CommunityCtxEntity} which represents the specified
+	  * CIS. The method returns <code>null</code> if the entity is not present
+	  * in the Community Context DB.
+	  *  
+	  * @param cisId
+	  *            the {@IIdentity} of the CIS whose CommunityCtxEntity to retrieve
+	  * @return the {@link CommunityCtxEntity} which represents the specified
+	  *         CIS.
+	  * @throws CtxException
+	  * @throws NullPointerException
+	  *             if the specified cisId is <code>null</code>
+	  * @since 0.3
 	  */
-	public CommunityCtxEntity retrieveCommunityEntity(CtxEntityIdentifier ctxId) throws CtxException;
+	public CommunityCtxEntity retrieveCommunityEntity(final IIdentity cisId)
+			throws CtxException;
 
 	/**
 	  * Updates a community Context Entity. 

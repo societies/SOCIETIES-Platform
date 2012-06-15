@@ -1,7 +1,9 @@
 package org.societies.activity;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -44,13 +46,16 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	@OneToMany(cascade=CascadeType.ALL)
 	private
 	Set<Activity> list;
-	public ActivityFeed(){}
+	public ActivityFeed()
+	{
+		list = new HashSet<Activity>();
+	}
 	public ActivityFeed(String id){
 		this.id = id;
 	}
 	@Autowired 
 	private static SessionFactory sessionFactory;
-	private static Logger log = LoggerFactory.getLogger(ActivityFeed.class);
+	private static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
 	
 	//timeperiod: "millisecondssinceepoch millisecondssinceepoch+n" 
 	//where n has to be equal to or greater than 0
@@ -59,19 +64,20 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		ArrayList<IActivity> ret = new ArrayList<IActivity>();
 		String times[] = timePeriod.split(" ",2);
 		if(times.length < 2){
-			//throw exception ?
+			LOG.error("timeperiod string was malformed: "+timePeriod);
 			return ret;
 		}
 		long fromTime = 0;long toTime = 0;
 		try{
 			fromTime = Long.parseLong(times[0]);
-			toTime = Long.parseLong(times[0]);
+			toTime = Long.parseLong(times[1]);
 		}catch(Exception e){
-			
+			LOG.error("timeperiod string was malformed, could not parse long");
+			return ret;
 		}
 		
 		for(Activity act : list){
-			if(act.getTime()>=fromTime && act.getTime()<=toTime){
+			if(Long.parseLong(act.getPublished())>=fromTime && Long.parseLong(act.getPublished())<=toTime){
 				ret.add(act);
 			}
 		}
@@ -83,33 +89,45 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	public List<IActivity> getActivities(String query, String timePeriod) {
 		ArrayList<IActivity> ret = new ArrayList<IActivity>();
 		List<IActivity> tmp = this.getActivities(timePeriod);
-		if(tmp.size()==0) return ret;
+		if(tmp.size()==0) {
+			LOG.error("time period did not contain any activities");
+			return ret;
+			}
 		//start parsing query..
 		JSONObject arr = null;
 		try {
 			arr = new JSONObject(query);
 		} catch (JSONException e) {
+			LOG.error("Error parsing JSON");
 			e.printStackTrace();
 			return ret;
 		}
+		LOG.info("loaded JSON");
 		String methodName; String filterBy; String filterValue;
 		try {
-			methodName = arr.getString("filterOp");
-			filterBy = arr.getString("filterBy");
-			filterValue = arr.getString("filterValue");
+			methodName = (new JSONArray(arr.getString("filterOp"))).getString(0);
+			filterBy = (new JSONArray(arr.getString("filterBy"))).getString(0);
+			filterValue = (new JSONArray(arr.getString("filterValue"))).getString(0);
 		} catch (JSONException e1) {
+			LOG.error("Error parsing JSON");
 			e1.printStackTrace();
 			return ret;
 		}
-
-		java.lang.reflect.Method method = null;
+		LOG.info("loaded JSON values");
+		Method method = null;
 		try {
 			method = ActivityString.class.getMethod(methodName, String.class);
 		} catch (SecurityException e) {
+			LOG.error("Security error getting filtering method for string");
 			return ret;
 		} catch (NoSuchMethodException e) {
+			LOG.error("No such filterOp: "+methodName+ " we do however have: ");
+			for(Method m : ActivityString.class.getMethods()){
+				LOG.error(m.getName());
+			}
 			return ret;
 		}
+		LOG.info("created method");
 		//filter..
 		try {
 			for(IActivity act : tmp){
@@ -118,13 +136,13 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 				}
 			}
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
+			LOG.error("Illegal argument for the filterOp");
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
+			LOG.error("Illegal access for the filterOp");
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
+			LOG.error("Invocation target exception for the filterOp");
 			e.printStackTrace();
 		}
 		return ret;
@@ -142,8 +160,10 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			t.commit();
 		}catch(Exception e){
 			t.rollback();
-			log.warn("Saving activity failed, rolling back");
+			LOG.warn("Saving activity failed, rolling back");
+			e.printStackTrace();
 		}finally{
+			list.add(newact);
 			if(session!=null)
 				session.close();
 		}		
@@ -163,7 +183,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			}
 		}catch(Exception e){
 			t.rollback();
-			log.warn("deleting activities failed, rolling back");
+			LOG.warn("deleting activities failed, rolling back");
 		}
 		return ret;
 	}
@@ -190,12 +210,12 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			if(l.size() == 0)
 				return new ActivityFeed(id);
 			if(l.size() > 1){
-				log.error("activityfeed startup with id: "+id+" gave more than one activityfeed!! ");
+				LOG.error("activityfeed startup with id: "+id+" gave more than one activityfeed!! ");
 				return null;
 			}
 			ret = (ActivityFeed) l.get(0);
 		}catch(Exception e){
-			log.warn("Query for actitvies failed..");
+			LOG.warn("Query for actitvies failed..");
 
 		}finally{
 			if(session!=null)
@@ -221,12 +241,12 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	}
 	public void init()
 	{
-		log.info("in activityfeed init");
+		LOG.info("in activityfeed init");
 	}
 	
 	public void close()
 	{
-		log.info("in activityfeed close");
+		LOG.info("in activityfeed close");
 	}
 	@Override
 	public void pubsubEvent(IIdentity pubsubService, String node,
