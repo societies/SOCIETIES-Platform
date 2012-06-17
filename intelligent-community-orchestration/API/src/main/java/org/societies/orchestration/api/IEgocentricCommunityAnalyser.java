@@ -41,26 +41,27 @@ import java.util.HashMap;
 import java.util.concurrent.Future;
 
 /**
- * This is the interface for the Suggested Community Analyser component,
- * and acts as the gateway to Community Lifecycle Management, which
- * the Egocentric Community Analyser, CSCW, and CSM Analyser send their
- * CIS recommendations to for it to analyse further and take action if 
- * deemed appropriate, either via user feedback or fully automated action.
+ * This is the interface for the Egocentric Community Analyser component, which
+ * allows some parameters for the component to be updated from a light client Android
+ * device.
  * 
  * @author Fraser Blackmun
  * @version 1
  * 
  */
 
-public interface IRelevantCommunityAnalyser {
+public interface IEgocentricCommunityAnalyser {
 	
 	
 	/** 
-     * Identify and return relevant existing CISs for the user to join.
-     * 
-     * @return ArrayList of the identities of the CISs
+     * Set the short-term check time.
+     *
      */
-    public Future<ArrayList<IIdentity>> processRelevanceRecommendations();
+    public void setShortTermCheckTime(int minutes);
     
-   
+    /** 
+     * Set the long-term check time.
+     *
+     */
+    public void setLongTermCheckTime(int hours);
 }

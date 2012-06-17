@@ -38,6 +38,8 @@ import org.societies.api.identity.IIdentity;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import java.util.concurrent.Future;
+
 /**
  * This is the interface for the Suggested Community Analyser component,
  * and acts as the gateway to Community Lifecycle Management, which

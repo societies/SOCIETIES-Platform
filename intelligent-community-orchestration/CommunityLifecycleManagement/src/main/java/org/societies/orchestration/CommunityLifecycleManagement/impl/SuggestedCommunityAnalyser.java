@@ -110,7 +110,9 @@ import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
 import java.util.concurrent.Future;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * This is the class for the Suggested Community Analyser component.
@@ -232,7 +234,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     }
     
     @Override
-    public ArrayList<String> processEgocentricRecommendations(HashMap<String, ArrayList<ICisProposal>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
+    public Future<ArrayList<String>> processEgocentricRecommendations(HashMap<String, ArrayList<ICisProposal>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
     	//go straight to Community Recommender
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>();
@@ -313,18 +315,18 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     	
     	if (convertedRecommendations.size() != 0) {
-    		return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata);
+    		return new AsyncResult<ArrayList<String>>(communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata));
     	}
     	else return null;
     	
     }
     
-    public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
+    public Future<ArrayList<String>> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisProposal>>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
     	//go straight to Community Recommender
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>();
     	
-    	return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(cisRecommendations, cissToCreateMetadata);
+    	return new AsyncResult<ArrayList<String>>(communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(cisRecommendations, cissToCreateMetadata));
     	
     }
     
@@ -669,7 +671,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     
     
     @Override
-    public String processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities) {
+    public Future<String> processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities) {
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>(); 
     	
@@ -681,9 +683,9 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	proposedCis = new ICisProposal();
     	
     	if (cssList == null)
-    		return "FAILURE";
+    		return new AsyncResult<String>("FAILURE");
     	else if (!(cssList.size() > 0))
-    		return "FAILURE";
+    		return new AsyncResult<String>("FAILURE");
     	
     	Iterator<IIdentity> cssListIterator = cssList.iterator();
     	
@@ -904,7 +906,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				        //returnStatement = "PERFECT MATCH CIS EXISTS";
 				        //}
 				        //else
-				        return "PERFECT MATCH CIS EXISTS";
+				        return new AsyncResult<String>("PERFECT MATCH CIS EXISTS");
 				        //Feedback to CSM Analyser suggesting to either remove this model,
 				        //add another attribute to it (suggest one?), or change one or more
 				        //model attributes (specify them?)
@@ -963,7 +965,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			
 			if (convertedRecommendations.get("Remove from CSM") != null) {
 				if (convertedRecommendations.get("Remove from CSM").size() > 0) {
-					return "DELETE MODEL";
+					return new AsyncResult<String>("DELETE MODEL");
 				}
 			}
 			
@@ -1044,7 +1046,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			e.printStackTrace();
 		}
 	    
-	    return "PASS";
+	    return new AsyncResult<String>("PASS");
 	    
     }
     
