@@ -22,61 +22,42 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.test.privacypolicy;
+package org.societies.webapp.models;
 
-import java.io.Serializable;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
-
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 
 /**
  * Describe your class here...
  *
- * @author Eliza
+ * @author olivierm
  *
  */
-public class MyIdentity implements IIdentity, Serializable{
+public class PrivacyActionForm extends Action {
 
-	
-	private final IdentityType type;
-	private final String identifier;
-	private final String domainIdentifier;
-
-	public MyIdentity(IdentityType type, String identifier,
-			String domainIdentifier) {
-				this.type = type;
-				this.identifier = identifier;
-				this.domainIdentifier = domainIdentifier;
-		
-		
+	public PrivacyActionForm() {
+		this(ActionConstants.READ, true);
+	}
+	/**
+	 * @param action
+	 */
+	public PrivacyActionForm(ActionConstants action) {
+		super(action);
 		// TODO Auto-generated constructor stub
 	}
-
-	@Override
-	public String getJid() {
-		return type+"://"+identifier+"@"+domainIdentifier;
+	/**
+	 * @param read
+	 * @param b
+	 */
+	public PrivacyActionForm(ActionConstants action, boolean optional) {
+		super(action, optional);
 	}
-
-	@Override
-	public String getBareJid() {
-		// TODO Auto-generated method stub
-		return "";
+	
+	public ActionConstants getAction() {
+		return super.getActionType();
 	}
-
-	@Override
-	public String getDomain() {
-		return domainIdentifier;
-	}
-
-	@Override
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	@Override
-	public IdentityType getType() {
-		return type;
+	public void setAction(ActionConstants action) {
+		this.action = action;
 	}
 
 }

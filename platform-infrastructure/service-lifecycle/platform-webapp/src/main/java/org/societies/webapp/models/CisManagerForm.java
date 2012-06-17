@@ -39,7 +39,14 @@ public class CisManagerForm {
 	private String cisType;
 	private Integer cisMode;
 	private String cisJid;
+	private String role;
 
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
 	/**
 	 * @return the method
 	 */

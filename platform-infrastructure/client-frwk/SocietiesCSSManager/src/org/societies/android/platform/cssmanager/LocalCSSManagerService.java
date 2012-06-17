@@ -56,6 +56,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Debug;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
@@ -69,6 +70,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	//Logging tag
 	private static final String LOG_TAG = LocalCSSManagerService.class.getName();
+	
+	private static final String ANDROID_PROFILING_NAME = "SocietiesCSSManager";
 
 	//Pubsub packages
 	private static final String CSS_MGMT_PACKAGE = "org.societies.api.schema.cssmanagement";
@@ -125,6 +128,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	@Override
 	public void onCreate () {
 
+		Debug.startMethodTracing(ANDROID_PROFILING_NAME);
+		
 		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
 		this.registerForPubsub();
 		
@@ -152,6 +157,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "CSSManager service terminating");
+		Debug.stopMethodTracing();
 	}
 
 	/**
@@ -425,7 +431,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	 * @param aRecord
 	 */
 	private void updateDatabase(AndroidCSSRecord aRecord) {
-		this.cssRecordDAO.insertRow(aRecord);
+		this.cssRecordDAO.insertCSSRecord(aRecord);
 	}
 	/**
 	 * Register for Pubsub events

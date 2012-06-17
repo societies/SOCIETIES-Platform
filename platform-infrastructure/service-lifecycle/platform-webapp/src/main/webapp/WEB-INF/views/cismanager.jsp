@@ -60,7 +60,7 @@
 				<td>CsS ID:</td>
 				<td><form:input path="cssId" /></td>
 				<td><form:errors path="cssId" cssClass="error" /></td>
-				<td>Users CSS jid eg: paul@societies.com</td>
+				<td>Users CSS jid eg: paul@societies.com  -- Used for Add member, Remove Member</td>
 			</tr>
 			<tr>
 				<td>password:</td>
@@ -90,9 +90,17 @@
 				<td>Cis Jid:</td>
 				<td><form:input path="cisJid" /></td>
 				<td><form:errors path="cisJid" cssClass="error" /></td>
-				<td>Not used for create</td>
+				<td>Used for Join, List member, Add member, Remove Member</td>
+			</tr>
+			<tr>
+				<td>Role:</td>
+				<td><form:input path="role" /></td>
+				<td><form:errors path="role" cssClass="error" /></td>
+				<td>admin, owner or participant. Used Add member, Remove Member</td>
 			</tr>
 		</table>
+
+<h4>${log}</h4>
 
 	</form:form>
 

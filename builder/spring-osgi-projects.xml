@@ -155,6 +155,7 @@
 		</module>
 		
 		<module>../domain-authority/webapp</module>
+		<module>../domain-authority/webapp-rest</module>
 
 	</modules>
 </project>

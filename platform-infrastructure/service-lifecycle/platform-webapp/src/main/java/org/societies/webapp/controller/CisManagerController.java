@@ -26,9 +26,12 @@ package org.societies.webapp.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import javax.validation.Valid;
@@ -45,6 +48,7 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.schema.cis.community.Community;
 
 
@@ -86,16 +90,32 @@ public class CisManagerController {
 		//LIST METHODS AVAIABLE TO TEST
 		Map<String, String> methods = new LinkedHashMap<String, String>();
 		methods.put("CreateCis", "Create a CIS ");
-		methods.put("GetCisList", "Search my CIS's");
+		methods.put("GetCisList", "List my CISs");
 		methods.put("JoinRemoteCIS", "Join a remote CIS");
+		methods.put("GetMemberList", "Get list of members of a CIS");
+		methods.put("AddMember", "Add member to a CIS");
+		methods.put("RemoveMemberFromCIS", "Remove member from a CIS");
 		model.put("methods", methods);
 		
 		model.put("cmForm", cisForm);
 		remoteCISs = new ArrayList<ICis>();
 		localCISs = new ArrayList<ICisOwned>();
+		
+		localCISs.addAll(this.getCisManager().getListOfOwnedCis());
+		
+		
+		Iterator<ICisOwned> it = localCISs.iterator();
+		ICisOwned thisCis = null;
+		String res = "";
+		String log = "Log ";
+		while(it.hasNext() && thisCis != null){
+			ICisOwned element = it.next();
+			log.concat(("CIS initially added with jid = " + element.getCisId()));
+	     }
+
 		model.put("remoteCISsArray", remoteCISs);
 		model.put("localCISsArray", localCISs);
-		
+		model.put("log", log);
 		model.put("cismanagerResult", "CIS Management Result :");
 		return new ModelAndView("cismanager", model);
 	}
@@ -117,7 +137,7 @@ public class CisManagerController {
 		}
 
 		String method = cisForm.getMethod();
-		String res;
+		String res = "";
 
 		try {
 			if (method.equalsIgnoreCase("CreateCis")) {
@@ -149,7 +169,65 @@ public class CisManagerController {
 				ICis i = getCisManager().getCis(cisForm.getCssId(), cisForm.getCisJid());
 //				model.put("cisrecords", records);
 
-			} else {
+			} 
+	
+		 else if (method.equalsIgnoreCase("GetMemberList")) {
+			model.put("methodcalled", "GetMemberList");
+			Iterator<ICisOwned> it = localCISs.iterator();
+			ICisOwned thisCis = null;
+			while(it.hasNext() && thisCis != null){
+				ICisOwned element = it.next();
+				 if (element.getCisId().equalsIgnoreCase(cisForm.getCisJid()))
+					 thisCis = element;
+				 else
+					  res.concat("CIS being compared = " + element.getCisId() + "and form = " + cisForm.getCssId());
+		     }
+			if(thisCis == null){
+				res.concat("CIS not found: " + cisForm.getCssId());
+				model.put("res", res);
+			}else{
+				Set<ICisParticipant> records = thisCis.getMemberList().get();
+				model.put("memberRecords", records);
+			}
+
+		}
+		
+		 else if (method.equalsIgnoreCase("AddMember")) {
+			model.put("methodcalled", "AddMember");
+			// TODO
+			Iterator<ICisOwned> it = localCISs.iterator();
+			ICisOwned thisCis = null;
+			while(it.hasNext() && thisCis != null){
+				ICisOwned element = it.next();
+				 if (element.getCisId().equalsIgnoreCase(cisForm.getCssId()))
+					 thisCis = element;
+				 else
+					  res.concat("CIS being compared = " + element.getCisId() + "and form = " + cisForm.getCssId());
+		     }
+			if(thisCis == null){
+				res.concat("CIS not found: " + cisForm.getCssId());
+			}else{
+				if (thisCis.addMember(cisForm.getCssId(), cisForm.getRole()).get())
+					res = "member added ";
+				else
+					res = "error when adding member";					
+			}
+			model.put("res", res);
+
+		}
+		 else if (method.equalsIgnoreCase("RemoveMemberFromCIS")) {
+			model.put("methodcalled", "RemoveMemberFromCIS");
+			// TODO
+//			model.put("cisrecords", records);
+
+		}
+		
+			
+			
+			
+			
+			
+			else {
 				model.put("methodcalled", "Unknown");
 				res = "error unknown metod";
 			}

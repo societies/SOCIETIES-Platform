@@ -84,7 +84,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android-test</artifactId>
-            <version>2.2.1</version>
+            <version>4.0.1.2</version>
             <scope>provided</scope>
         </dependency>
 

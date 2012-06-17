@@ -228,6 +228,7 @@ public class InternalCtxBrokerTest {
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
+	@Ignore
 	@Test
 	public void testCreateAttributeByCtxCommunityEntityIdentifierString() throws CtxException, InterruptedException, ExecutionException {
 
@@ -242,7 +243,7 @@ public class InternalCtxBrokerTest {
 		assertEquals(ctxAttribute.getOwnerId(), CIS_IDENTITY_STRING);
 		assertTrue(ctxAttribute.getType().equalsIgnoreCase(CtxAttributeTypes.POLITICAL_VIEWS));
 	}
-
+	@Ignore
 	@Test
 	public void testLookupCommunityCtxAttr() throws CtxException, InterruptedException, ExecutionException {
 		/*
@@ -260,7 +261,7 @@ public class InternalCtxBrokerTest {
 		System.out.println(" commListResults size :"+commListResults.size());
 	*/
 	}
-
+	@Ignore
 	@Test
 	public void testRetrieveCommunityCtxAttr() throws CtxException, InterruptedException, ExecutionException {
 		
@@ -311,6 +312,7 @@ public class InternalCtxBrokerTest {
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
+	@Ignore
 	@Test
 	public void testCreateCommunityEntityByString() throws CtxException, InterruptedException, ExecutionException {
 

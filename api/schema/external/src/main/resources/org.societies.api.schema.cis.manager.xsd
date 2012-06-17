@@ -162,7 +162,7 @@
 	      <xs:simpleContent>
 	        <xs:extension base='empty'>
 	          <xs:attribute name='cis-jid' type='xs:string' use='required'/> 
-	          <xs:attribute name='cis-role' type='xs:string' use='required'/> 
+	          <xs:attribute name='role' type='xs:string' use='required'/> 
 	        </xs:extension>
 	      </xs:simpleContent>
 	    </xs:complexType>

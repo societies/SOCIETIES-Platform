@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.test.privacypolicy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,7 +37,6 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
@@ -57,6 +56,7 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
@@ -249,7 +249,7 @@ public class PrivacyPolicyRegistryTest {
 	}
 
 	private RequestorService getRequestorService(){
-		IIdentity requestorId = new MyIdentity(IdentityType.CSS, "eliza","societies.org");
+		IIdentity requestorId = new MockIdentity(IdentityType.CSS, "eliza","societies.org");
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
 		try {
@@ -262,8 +262,8 @@ public class PrivacyPolicyRegistryTest {
 	}
 
 	private RequestorCis getRequestorCis(){
-		IIdentity requestorId = new MyIdentity(IdentityType.CSS, "me","domain.com");
-		IIdentity cisId = new MyIdentity(IdentityType.CIS, "Holidays", "domain.com");
+		IIdentity requestorId = new MockIdentity(IdentityType.CSS, "me","domain.com");
+		IIdentity cisId = new MockIdentity(IdentityType.CIS, "Holidays", "domain.com");
 		return new RequestorCis(requestorId, cisId);
 	}
 
