@@ -10,11 +10,19 @@
 	<artifact type="bundle" name="org.societies.api.external.societies-api"/>
 	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-<!-- 	<artifact type="bundle" name="org.societies.hibernate_classes"/> -->
+    <artifact type="bundle" name="org.societies.data-source"/>
+    
+    
+	<!-- from services -->     
+    <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
+    <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
+    <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
+    <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
+    <artifact type="bundle" name="org.societies.slm.SLMCommsManager"/>
+    
 
-	<artifact type="bundle" name="org.societies.data-source"/>
+	<!-- from cis manager --> 
 	<artifact type="bundle" name="org.societies.cis.CisDirectoryClient"/>
-
     <artifact type="bundle" name="org.societies.cis.manager"/>
 
 

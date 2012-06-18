@@ -2,11 +2,12 @@ package org.societies.personalisation.socialprofiler.service;
 
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SocialTimerTask extends TimerTask {
 
-	private static final Logger 		logger = Logger.getLogger(SocialTimerTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SocialTimerTask.class);
 	private DatabaseConnection		databaseConnection;
 	private ProfilerEngine				engine;
 	
