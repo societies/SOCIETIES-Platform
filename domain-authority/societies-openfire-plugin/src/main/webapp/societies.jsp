@@ -48,7 +48,10 @@
 
 
 <p>
-Use the form below to configure the secret key.
+Use the form below to configure the secret key, the external IP addresses allowed to use the plugin HTTP API, and the URLs for the Cloud Node Providers recommended by this Domain Authority.
+</p>
+<p>
+<strong>For the IPs and URLs use commas to separate between entries.</strong>
 </p>
 
 <%  if (success) { %>
@@ -70,22 +73,16 @@ Use the form below to configure the secret key.
 <fieldset>
     <legend>SOCIETIES</legend>
     <div>
-    <p>
-    Blabla
-    </p>
-    <ul>
-        <label for="text_secret">Secret key:</label>
+        Secret key:
         <input type="text" name="secret" value="<%= secret %>" id="text_secret">
         <br><br>
 
-        <label for="text_secret">Allowed IP Addresses:</label>
-        <textarea name="allowedIPs" cols="40" rows="3" wrap="virtual"><%= ((allowedIPs != null) ? allowedIPs : "") %></textarea>
-        
+        Allowed IP Addresses:
+        <input type="text" name="allowedIPs" value="<%= ((allowedIPs != null) ? allowedIPs : "") %>" size="100">
         <br><br>
         
-        <label for="text_secret">SOCIETIES Cloud Node Provider URLs:</label>
-        <textarea name="cloudProviderUrls" cols="40" rows="3" wrap="virtual"><%= ((cloudProviderUrls != null) ? cloudProviderUrls : "") %></textarea>
-    </ul>
+        SOCIETIES Cloud Node Provider URLs:
+        <input type="text" name="cloudProviderUrls" value="<%= ((cloudProviderUrls != null) ? cloudProviderUrls : "") %>" size="100">
     </div>
 </fieldset>
 

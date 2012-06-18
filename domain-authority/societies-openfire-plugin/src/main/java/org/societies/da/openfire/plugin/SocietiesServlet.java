@@ -4,6 +4,8 @@ import gnu.inet.encoding.Stringprep;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -52,7 +54,8 @@ public class SocietiesServlet extends HttpServlet {
                     }
                 }
             }
-            if (!plugin.getAllowedIPs().contains(ipAddress)) {
+            
+            if (!ipAddress.equals("127.0.0.1") && !plugin.getAllowedIPs().contains(ipAddress)) {
                 Log.warn("User service rejected service to IP address: " + ipAddress);
                 replyError("RequestNotAuthorised",response, out);
                 return;
