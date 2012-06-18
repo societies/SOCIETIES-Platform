@@ -46,6 +46,7 @@ import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceReposito
 import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
 import org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdUserType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +114,8 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			throw new NullPointerException("teid can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving all direct trust evidence for TEID " + teid + " from the Trust Evidence Repository...");		
+			LOG.debug("Retrieving all direct trust evidence for TEID " + teid 
+					+ " from the Trust Evidence Repository...");		
 		return this.retrieveDirectEvidence(teid, null, null, null);
 	}
 
@@ -150,7 +152,8 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			throw new NullPointerException("teid can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving all indirect trust evidence for TEID " + teid + " from the Trust Evidence Repository...");		
+			LOG.debug("Retrieving all indirect trust evidence for TEID " + teid 
+					+ " from the Trust Evidence Repository...");		
 		return this.retrieveIndirectEvidence(teid, null, null, null);
 	}
 
@@ -169,8 +172,10 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		final Set<IIndirectTrustEvidence> result = new HashSet<IIndirectTrustEvidence>();
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving indirect trust evidence between dates '"
-					+ startDate + "' and '" + endDate + "' for TEID " + teid + " from the Trust Evidence Repository...");
-		// TODO result.addAll(this.retrieve(teid, X.class, startDate, endDate));
+					+ startDate + "' and '" + endDate + "' of type " + type
+					+ " for TEID " + teid + " from the Trust Evidence Repository...");
+		result.addAll(this.retrieve(teid, IndirectTrustEvidence.class, type,
+				startDate, endDate));
 		
 		return result;
 	}
@@ -186,7 +191,8 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			throw new NullPointerException("teid can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Removing all direct trust evidence for TEID " + teid + " from the Trust Evidence Repository...");
+			LOG.debug("Removing all direct trust evidence for TEID " + teid 
+					+ " from the Trust Evidence Repository...");
 		this.removeDirectEvidence(teid, null, null, null);
 	}
 
@@ -203,7 +209,8 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Removing direct trust evidence between dates '"
-					+ startDate + "' and '" + endDate + "' for TEID " + teid + " from the Trust Evidence Repository...");
+					+ startDate + "' and '" + endDate + "' of type " + type
+					+ " for TEID " + teid + " from the Trust Evidence Repository...");
 		this.remove(teid, DirectTrustEvidence.class, type, startDate, endDate);
 	}
 
@@ -218,7 +225,8 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			throw new NullPointerException("teid can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Removing all indirect trust evidence for TEID " + teid + " from the Trust Evidence Repository...");
+			LOG.debug("Removing all indirect trust evidence for TEID " + teid 
+					+ " from the Trust Evidence Repository...");
 		this.removeIndirectEvidence(teid, null, null, null);
 	}
 
@@ -235,8 +243,9 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Removing indirect trust evidence between dates '"
-					+ startDate + "' and '" + endDate + "' for TEID " + teid + " from the Trust Evidence Repository...");
-		// TODO this.remove(teid, X.class, startDate, endDate);
+					+ startDate + "' and '" + endDate + "' of type " + type
+					+ " for TEID " + teid + " from the Trust Evidence Repository...");
+		this.remove(teid, IndirectTrustEvidence.class, type, startDate, endDate);
 	}
 	
 	@SuppressWarnings("unchecked")
