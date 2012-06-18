@@ -72,6 +72,7 @@ import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
+import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -106,6 +107,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Autowired(required=true)
 	private ICtxEventMgr ctxEventMgr;
 
+	
 	/**
 	 * The User Context History Mgmt service reference. 
 	 * 
@@ -127,6 +129,14 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * @see {@link #setCommunityCtxDBMgr(ICommunityCtxDBMgr)}
 	 */
 	private ICommunityCtxDBMgr communityCtxDBMgr;
+
+	/**
+	 * The User Inference Mgmt service reference.
+	 * 
+	 * @see {@link #setUserCtxInferenceMgr(IUserCtxInferenceMgr)}
+	 */
+	@Autowired(required=true)
+	private IUserCtxInferenceMgr userCtxInferenceMgr;
 	
 	/**
 	 * Instantiates the platform Context Broker in Spring.
@@ -224,7 +234,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		final CtxEntity entity = 
 				this.userCtxDBMgr.createEntity(type);
-
+		
 		return new AsyncResult<CtxEntity>(entity);
 	}
 
