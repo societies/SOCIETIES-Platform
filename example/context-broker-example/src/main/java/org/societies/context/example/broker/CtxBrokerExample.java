@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -70,7 +71,7 @@ public class CtxBrokerExample 	{
 
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
-	
+
 	private IIdentity cssOwnerId;
 	private INetworkNode cssNodeId;
 
@@ -83,10 +84,10 @@ public class CtxBrokerExample 	{
 
 		LOG.info("*** CtxBrokerExample instantiated");
 		this.internalCtxBroker = internalCtxBroker;
-		
+
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
-		
+
 		final String cssOwnerStr = this.cssNodeId.getBareJid();
 		this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
 		LOG.info("*** cssOwnerId = " + this.cssOwnerId);
@@ -101,31 +102,38 @@ public class CtxBrokerExample 	{
 		this.simpleCtxHistoryTest();
 		this.tuplesCtxHistoryTest();
 	}
-	
+
 	private void retrieveIndividualEntity() {
-		
+
 		LOG.info("*** retrieveIndividualEntity");
-		
+
 		try {
 			final IndividualCtxEntity operator = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 			LOG.info("*** CSS owner context entity id: " + operator.getId());
-		
-		} catch (Exception e) {
+
+			Set<CtxAttribute> attributes = operator.getAttributes();
+			if(attributes.size()>0){
+				for(CtxAttribute ctxAttr : attributes){
+					LOG.info("CtxAttribute "+ctxAttr.getId());
+				}	
+			}
 			
+		} catch (Exception e) {
+
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
-	
+
 	private void retrieveCssNode() {
-		
+
 		LOG.info("*** retrieveCssNode");
-		
+
 		try {
 			CtxEntity cssNodeEnt = this.internalCtxBroker.retrieveCssNode(this.cssNodeId).get();
 			LOG.info("*** CSS node context entity id: " + cssNodeEnt.getId());
-		
+
 		} catch (Exception e) {
-			
+
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
@@ -191,7 +199,7 @@ public class CtxBrokerExample 	{
 			// and a ctxAttribute of type "CustomData" with a binary value
 
 		} catch (Exception e) {
-			
+
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
@@ -209,7 +217,7 @@ public class CtxBrokerExample 	{
 			LOG.info("*** lookup results for Attribute type: '" + CtxAttributeTypes.ID + "' " +idsAttribute);
 
 		} catch (Exception e) {
-			
+
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
@@ -248,7 +256,7 @@ public class CtxBrokerExample 	{
 			LOG.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
 
 		} catch (Exception e) {
-			
+
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 
@@ -262,7 +270,7 @@ public class CtxBrokerExample 	{
 	private void simpleCtxHistoryTest() {
 
 		CtxAttribute ctxAttribute;
-		
+
 		final CtxEntity ctxEntity;
 		// Create the attribute's scope
 
@@ -287,11 +295,11 @@ public class CtxBrokerExample 	{
 			for(CtxHistoryAttribute hocAttr: history){
 				System.out.println("history List id:"+hocAttr.getId()+" getLastMod:"+hocAttr.getLastModified() +" hocAttr value:"+hocAttr.getIntegerValue());		
 			}
-			
+
 			//test createHistory methods
 			CtxAttribute fakeAttribute = internalCtxBroker.createAttribute(ctxEntity.getId(), "historyAttribute").get();
 			List<CtxHistoryAttribute> historyList = new ArrayList<CtxHistoryAttribute>();
-			
+
 			Date date = new Date();
 			date.setTime(1000);
 			CtxHistoryAttribute hocAttr1 = internalCtxBroker.createHistoryAttribute(fakeAttribute.getId(), date, "one", CtxAttributeValueType.STRING).get();
@@ -302,14 +310,14 @@ public class CtxBrokerExample 	{
 			historyList.add(hocAttr1);
 			historyList.add(hocAttr2);
 			historyList.add(hocAttr3);
-			
+
 			List<CtxHistoryAttribute> historyListRetrieved = internalCtxBroker.retrieveHistory(fakeAttribute.getId(), null, null).get();
 			if(historyListRetrieved.equals(historyListRetrieved)) System.out.println("Succesfull Retrieval of created hoc Attributes");
-			
+
 			for (CtxHistoryAttribute ctxHistAttr : historyListRetrieved){
 				System.out.println("Hoc attribute value:" +ctxHistAttr.getStringValue()+" time:"+ctxHistAttr.getLastModified().getTime());
 			}
-			
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
