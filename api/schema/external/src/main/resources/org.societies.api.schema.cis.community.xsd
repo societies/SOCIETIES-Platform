@@ -90,6 +90,10 @@
 				<xs:element ref='getActivitiesResponse'/>
 				<xs:element ref='addActivity'/>
 				<xs:element ref='addActivityResponse'/>
+				<xs:element ref='cleanUpActivityFeed'/>
+				<xs:element ref='cleanUpActivityFeedResponse'/>
+				<xs:element ref='deleteActivity'/>
+				<xs:element ref='deleteActivityResponse'/>
 			</xs:choice>
 		  <xs:attribute name='owner-jid' type='xs:string'/> 
           <xs:attribute name='community-jid' type='xs:string'/> 
@@ -135,6 +139,37 @@
 			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
 	</xs:element>
+
+
+	<xs:element name='deleteActivity'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='ins:Activity'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name='deleteActivityResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='cleanUpActivityFeed'>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='empty'>
+					<xs:attribute name='criteria' type='xs:string' use='required'/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name='cleanUpActivityFeedResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:int'/>
+		</xs:complexType>
+	</xs:element>
+
 
 	<xs:element name='subscription'>
 		<xs:complexType>

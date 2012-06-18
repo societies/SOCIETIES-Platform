@@ -79,6 +79,8 @@ import org.societies.identity.IdentityImpl;
 import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.cis.community.AddActivityResponse;
 import org.societies.api.schema.cis.community.AddMemberResponse;
+import org.societies.api.schema.cis.community.CleanUpActivityFeedResponse;
+import org.societies.api.schema.cis.community.DeleteActivityResponse;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
 import org.societies.api.schema.cis.community.GetActivitiesResponse;
 import org.societies.api.schema.cis.community.GetInfoResponse;
@@ -915,6 +917,53 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 			}				// END OF add Activity
 			
+			
+			// delete Activity
+
+			if (c.getDeleteActivity() != null) {
+				Community result = new Community();
+				DeleteActivityResponse r = new DeleteActivityResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+				IActivity iActivity = new org.societies.activity.model.Activity();
+				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
+				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
+				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
+				iActivity.setTime(c.getDeleteActivity().getActivity().getTime());
+				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
+
+				r.setResult(activityFeed.deleteActivity(iActivity));
+
+				result.setDeleteActivityResponse(r);		
+				return result;
+
+			}				// END OF delete Activity
+			
+			
+			// cleanup activities
+			if (c.getCleanUpActivityFeed() != null) {
+				Community result = new Community();
+				CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+
+				
+				r.setResult(activityFeed.cleanupFeed(c.getCleanUpActivityFeed().getCriteria())); //TODO. add a return on the activity feed method
+				
+				
+				result.setCleanUpActivityFeedResponse(r);		
+				return result;
+
+			}				// END OF cleanup activities
+			
 		}
 		return null;
 	}
@@ -1112,6 +1161,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		c.setCommunityName(this.getName());
 		c.setCommunityType(this.getCisType());
 		c.setOwnerJid(this.getOwnerId());
+		c.setMembershipMode(this.getMembershipCriteria());
 		c.setDescription(this.getDescription());
 		c.setGetInfoResponse(r);
 		
@@ -1127,12 +1177,16 @@ public class Cis implements IFeatureServer, ICisOwned {
 		SetInfoResponse r = new SetInfoResponse();
 
 		//check if he is not trying to set things which cant be set
-		if( ( (!c.getCommunityJid().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisId()))  ) &&
-				( (!c.getCommunityName().isEmpty()) && (! c.getCommunityName().equalsIgnoreCase(this.getName()))  ) &&
-				 //( (!c.getCommunityType().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisType()))  ) &&
+		if( ( (c.getCommunityJid() !=null) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisId()))  ) ||
+				(( (c.getCommunityName() !=null)) && (! c.getCommunityName().equalsIgnoreCase(this.getName()))  ) ||
+				 //( (!c.getCommunityType().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisType()))  ) ||
 				 ( (c.getMembershipMode() != null) && ( c.getMembershipMode() != this.getMembershipCriteria())  )
 				
 				){
+			r.setResult(false);
+			
+		}
+		else{
 			r.setResult(true);
 			if(c.getDescription() != null &&  !c.getDescription().isEmpty())
 				this.description = c.getDescription();
@@ -1141,15 +1195,14 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			// commit in database
 			this.updatePersisted(this);
-		}
-		else{
-			r.setResult(false);
+			
 		}
 				
 		Community resp = new Community();
 		resp.setCommunityJid(this.getCisId());
 		resp.setCommunityName(this.getName());
 		resp.setCommunityType(this.getCisType());
+		resp.setMembershipMode(this.getMembershipCriteria());
 		resp.setOwnerJid(this.getOwnerId());
 		resp.setDescription(this.getDescription());
 		resp.setSetInfoResponse(r);
