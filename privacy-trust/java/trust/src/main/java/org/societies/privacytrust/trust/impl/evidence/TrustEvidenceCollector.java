@@ -24,20 +24,29 @@
  */
 package org.societies.privacytrust.trust.impl.evidence;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Dictionary;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote;
+import org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustOpinion;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,8 +62,13 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	private static final Logger LOG = LoggerFactory.getLogger(TrustEvidenceCollector.class);
 	
 	/** The Trust Evidence Repository service reference. */
-	@Autowired(required = true)
-	private ITrustEvidenceRepository evidenceRepo;
+	private ITrustEvidenceRepository trustEvidenceRepository;
+	
+	/** The remote Trust Evidence Collector service reference. */
+	private ITrustEvidenceCollectorRemote trustEvidenceCollectorRemote;
+	
+	/** The Communications Mgr service reference. */
+	private ICommManager commMgr;
 	
 	TrustEvidenceCollector() {
 		
@@ -62,10 +76,10 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustOpinion(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)
 	 */
 	@Override
-	public void addTrustOpinion(final IIdentity trustor, final IIdentity trustee,
+	public void addTrustRating(final IIdentity trustor, final IIdentity trustee,
 			final double rating, Date timestamp) throws TrustException {
 		
 		if (trustor == null)
@@ -90,15 +104,14 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 		else // if (IdentityType.CIS.equals(trustee.getType()))
 			entityType = TrustedEntityType.CIS;
 		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
-		final DirectTrustOpinion opinion = new DirectTrustOpinion(teid, timestamp, new Double(rating));
-		this.evidenceRepo.addEvidence(opinion);
+		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustOpinion(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)
 	 */
 	@Override
-	public void addTrustOpinion(final IIdentity trustor,
+	public void addTrustRating(final IIdentity trustor,
 			final ServiceResourceIdentifier trustee, final double rating, 
 			Date timestamp)	throws TrustException {
 		
@@ -118,27 +131,155 @@ public class TrustEvidenceCollector implements ITrustEvidenceCollector {
 		
 		final TrustedEntityType entityType = TrustedEntityType.SVC;
 		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
-		final DirectTrustOpinion opinion = new DirectTrustOpinion(teid, timestamp, new Double(rating));
-		this.evidenceRepo.addEvidence(opinion);
+		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addServiceExperience(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
 	 */
 	@Override
-	public void addServiceExperience(IIdentity trustor, IIdentity provider,
-			ServiceResourceIdentifier serviceId, double rating, Date timestamp) {
-		// TODO Auto-generated method stub
-
+	public void addDirectEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info) throws TrustException {
+		
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
+		if (this.isLocalTeid(teid)) {
+		
+			final DirectTrustEvidence evidence = new DirectTrustEvidence(
+					teid, type, timestamp, info);
+			try {
+				this.trustEvidenceRepository.addEvidence(evidence);
+			} catch (ServiceUnavailableException sue) {
+				throw new TrustEvidenceCollectorException(
+						"Could not add direct evidence for entity " + teid 
+						+ ": ITrustEvidenceRepository service is not available");
+			}
+		} else {
+			
+			final TrustEvidenceCollectorRemoteCallback callback = 
+					new TrustEvidenceCollectorRemoteCallback();
+			try {
+				this.trustEvidenceCollectorRemote.addDirectEvidence(
+						teid, type, timestamp, info, callback);
+				synchronized (callback) {
+					callback.wait();
+				}
+			} catch (InterruptedException ie) {
+				throw new TrustEvidenceCollectorException(
+						"Interrupted while adding direct trust evidence for entity "
+						+ teid);
+			} catch (ServiceUnavailableException sue) {
+				throw new TrustEvidenceCollectorException(
+						"Could not add direct evidence for entity " + teid
+						+ ": ITrustEvidenceCollectorRemote service is not available");
+			}
+		}
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addUserInteractionExperience(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, java.lang.String, double, java.util.Date)
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(java.lang.String, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
 	 */
 	@Override
-	public void addUserInteractionExperience(IIdentity trustor,
-			IIdentity trustee, String type, double rating, Date timestamp) {
-		// TODO Auto-generated method stub
+	public void addIndirectEvidence(final String source, final TrustedEntityId teid,
+			final TrustEvidenceType type, final Date timestamp, final Serializable info)
+			throws TrustException {
+		
+		if (source == null)
+			throw new NullPointerException("source can't be null");
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
+		final IndirectTrustEvidence evidence = new IndirectTrustEvidence(
+				teid, type, timestamp, info, source);
+		this.trustEvidenceRepository.addEvidence(evidence);
+		
+		// TODO remote
+	}
+	
+	/**
+	 * Sets the {@link ITrustEvidenceRepository} service reference.
+	 * 
+	 * @param trustEvidenceRepository
+	 *            the {@link ITrustEvidenceRepository} service reference to set
+	 */
+	@Autowired(required=false)
+	public void bindTrustEvidenceRepository(ITrustEvidenceRepository trustEvidenceRepository, Dictionary<Object,Object> props) {
+		
+		this.trustEvidenceRepository = trustEvidenceRepository;
+	}
+	
+	/**
+	 * Sets the {@link ITrustEvidenceCollectorRemote} service reference.
+	 * 
+	 * @param trustEvidenceCollectorRemote
+	 *            the {@link ITrustEvidenceCollectorRemote} service reference to set
+	 */
+	@Autowired(required=false)
+	public void setTrustEvidenceCollectorRemote(ITrustEvidenceCollectorRemote trustEvidenceCollectorRemote) {
+		
+		this.trustEvidenceCollectorRemote = trustEvidenceCollectorRemote;
+	}
+	
+	/**
+	 * Sets the {@link ICommManager} service reference.
+	 * 
+	 * @param commMgr
+	 *            the {@link ICommManager} service reference to set
+	 */
+	@Autowired(required=false)
+	public void setCommMgr(ICommManager commMgr) {
+		
+		this.commMgr = commMgr;
+	}
+	
+	private boolean isLocalTeid(final TrustedEntityId teid) throws TrustEvidenceCollectorException {
+			
+		try {
+			final IIdentity trustorId = this.commMgr.getIdManager().fromJid(teid.getTrustorId());
+			return this.commMgr.getIdManager().isMine(trustorId);
+		} catch (InvalidFormatException ife) {		
+			throw new TrustEvidenceCollectorException(teid
+					+ ": Could not determine if the TrustedEntityId is local" 
+					+ ": Invalid trustorId IIdentity String: "
+					+ ife.getLocalizedMessage(), ife);
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustEvidenceCollectorException(teid
+					+ ": Could not determine if the TrustedEntityId is local"
+					+ "ICommManager service is not available");
+		}
+	}
+	
+	private class TrustEvidenceCollectorRemoteCallback implements ITrustEvidenceCollectorRemoteCallback {
 
+		/*
+		 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback#onAddedDirectEvidence()
+		 */
+		@Override
+		public void onAddedDirectEvidence() {
+			
+			synchronized (this) {
+	            notifyAll();
+	        }
+		}
+
+		/*
+		 * @see org.societies.api.internal.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemoteCallback#onAddedIndirectEvidence()
+		 */
+		@Override
+		public void onAddedIndirectEvidence() {
+			
+			synchronized (this) {
+	            notifyAll();
+	        }
+		}
 	}
 }

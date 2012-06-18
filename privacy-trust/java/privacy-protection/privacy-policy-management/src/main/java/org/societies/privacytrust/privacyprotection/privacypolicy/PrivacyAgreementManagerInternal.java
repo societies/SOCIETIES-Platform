@@ -51,7 +51,6 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
-import org.societies.privacytrust.privacyprotection.privacypolicy.registry.MyIdentity;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -115,11 +114,6 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 			}
 
 			// - Save the agreement
-			// Change Iidentity to MyIdentity (serializable)
-			MyIdentity userIdentity = new MyIdentity(agreement.getAgreement().getUserIdentity());
-			agreement.getAgreement().setUserIdentity(userIdentity);
-			MyIdentity userPublicIdentity = new MyIdentity(agreement.getAgreement().getUserPublicIdentity());
-			agreement.getAgreement().setUserPublicIdentity(userPublicIdentity);
 			agreementData.setBinaryValue(SerialisationHelper.serialise(agreement));
 			ctxBroker.update(agreementData);
 		} catch (CtxException e) {

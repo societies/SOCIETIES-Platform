@@ -92,5 +92,9 @@ public interface IDIANNE {
 	 */
 	public void registerContext();
 	
+	/**
+	 * This method returns feedback from the personalisation application components
+	 */
+	public void receiveDIANNEFeedback(IIdentity ownerId, IAction action);
 
 }

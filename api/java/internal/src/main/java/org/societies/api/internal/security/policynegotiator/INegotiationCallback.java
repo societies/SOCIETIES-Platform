@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.security.policynegotiator;
 
+import java.net.URI;
+
 import org.societies.api.internal.security.storage.ISecureStorage;
 
 /**
@@ -42,8 +44,13 @@ public interface INegotiationCallback {
 	 * @param agreementKey The key to get Service Level Agreement (SLA) from
 	 * {@link ISecureStorage}. If negotiation has not been successful, this
 	 * parameter is null.
+	 * 
+	 * @param jar Location of the client jar if applicable (e.g. in case of
+	 * a service that provides a client), or null if not applicable
+	 * (e.g. in case of a service that does not provide a client, or in case of
+	 * a CIS)
 	 */
-	public void onNegotiationComplete(String agreementKey);
+	public void onNegotiationComplete(String agreementKey, URI jar);
 
 	/**
 	 * Async return for

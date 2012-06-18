@@ -37,10 +37,18 @@ import org.societies.api.identity.IIdentity;
 public interface IAssessment {
 
 	/**
+	 * Get time interval after which the Privacy Assessment automatically
+	 * evaluates past events and performs assessment.
+	 * 
+	 * @return seconds period in seconds, negative value for no auto update
+	 */
+	public int getAutoPeriod();
+
+	/**
 	 * Set time interval after which the Privacy Assessment will automatically
 	 * evaluate past events and perform assessment.
 	 * 
-	 * @param seconds period in seconds
+	 * @param seconds period in seconds, negative value for no auto update
 	 */
 	public void setAutoPeriod(int seconds);
 	

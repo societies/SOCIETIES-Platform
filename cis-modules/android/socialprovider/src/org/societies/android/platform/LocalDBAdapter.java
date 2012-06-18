@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druï¿½be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAï¿½ï¿½O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -125,26 +125,58 @@ public class LocalDBAdapter implements ISocialAdapter {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
+		// TODO Do a case on uri and call proper private method:
+		
+		return queryCommunities(projection, selection, selectionArgs, sortOrder);
+	}
+
+	private Cursor queryCommunities(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder) {
 		// TODO Auto-generated method stub
 		return db.query(GROUP_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 	}
-
 	/* (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#insert(android.net.Uri, android.content.ContentValues)
 	 */
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
+		// TODO Make a case and call proper private method with values.
+		
+		return uri.withAppendedPath(uri, Long.toString(insertCommunity(values)));
+	}
+	
+	private long insertCommunity(ContentValues values) {
 		// TODO Auto-generated method stub
-		long rowNumber = db.insert(GROUP_TABLE_NAME, null, values);
+		return db.insert(GROUP_TABLE_NAME, null, values);
+		//return uri.withAppendedPath(uri, Long.toString(rowNumber));
+		
+	}
+	
+	private Uri insertPerson(Uri uri, ContentValues values) {
+		// TODO Auto-generated method stub
+		long rowNumber = db.insert(PEOPLE_TABLE_NAME, null, values);
 		return uri.withAppendedPath(uri, Long.toString(rowNumber));
 		
 	}
 
+	private Uri insertService(Uri uri, ContentValues values) {
+		// TODO Auto-generated method stub
+		long rowNumber = db.insert(SERVICES_TABLE_NAME, null, values);
+		return uri.withAppendedPath(uri, Long.toString(rowNumber));
+		
+	}
 	/* (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
 	 */
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
+			String[] selectionArgs) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+
+	private int updateCommunity(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
 		// TODO Auto-generated method stub
 		return 0;

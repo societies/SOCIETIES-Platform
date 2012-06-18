@@ -30,6 +30,7 @@
 	    <xs:enumeration value="processCSCWConfigurationRecommendations"/>
 	    <xs:enumeration value="processCSMRecommendations"/>
 	    <xs:enumeration value="processCSMConfigurationRecommendations"/>
+	    <xs:enumeration value="processRelevanceRecommendations"/>
 	  </xs:restriction>
 	</xs:simpleType>
 	
@@ -53,6 +54,22 @@
       <!-- <xs:element name="cisRecord" type="tns:cisRecord" minOccurs="1"/>-->
     </xs:sequence>
   </xs:complexType>
+	
+  <xs:element name="relevantCommunityAnalyserBean">
+	  <xs:complexType >
+	    <xs:sequence>
+	      <xs:element name="method" type="tns:methodType" minOccurs="0"/>
+	    </xs:sequence>
+	  </xs:complexType>
+	</xs:element>
+	
+	<xs:element name="relevantCommunityAnalyserBeanResult">
+	  <xs:complexType >
+	    <xs:sequence>
+	      <xs:element name="ciss" type="tns:arrayList" />
+	    </xs:sequence>
+	  </xs:complexType>
+	</xs:element>
 	
 </xs:schema>
 

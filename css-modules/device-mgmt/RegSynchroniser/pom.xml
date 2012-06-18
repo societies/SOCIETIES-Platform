@@ -148,7 +148,7 @@
               				org.springframework.osgi.context,
               				org.slf4j.*,
               				org.societies.api.schema.css.devicemanagment,
-              				org.societies.api.internal.css.devicemgmt,
+              				org.societies.api.internal.css.devicemgmt.*,
               				org.societies.api.internal.css.devicemgmt.model,
               				org.societies.css.devicemgmt.deviceregistry
               			</Import-Package> 

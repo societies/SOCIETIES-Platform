@@ -25,6 +25,7 @@
 
 package org.societies.useragent.comms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -40,10 +41,15 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.useragent.remote.IUserAgentRemoteMgr;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.useragent.monitoring.MethodType;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+import org.societies.useragent.api.remote.IUserAgentRemoteMgr;
+import org.societies.useragent.api.remote.feedback.IUserFeedbackCallback;
 
 public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{	
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
@@ -55,6 +61,7 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 	private ICommManager commsMgr;
 	private IIdentityManager idManager;
 	private Logger LOG = LoggerFactory.getLogger(UACommsClient.class);
+	IIdentity toIdentity = null;
 
 	//PROPERTIES
 	public ICommManager getCommsMgr() {
@@ -77,36 +84,66 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 			e.printStackTrace();
 		}
 		idManager = commsMgr.getIdManager();
-	}
-
-	@Override
-	public void monitor(IIdentity owner, ServiceResourceIdentifier serviceId, String serviceType,
-			String parameterName, String value) {
-		LOG.info("monitor method called in UACommsClient");
-		IIdentity toIdentity = null;
+		
+		//Hard coded destination - temporary
 		try {
 			toIdentity = idManager.fromJid("XCManager.societies.local");
 		} catch (InvalidFormatException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+	@Override
+	public void monitor(IIdentity owner, IAction action) {
+		LOG.info("monitor method called in UACommsClient");
+		
 		Stanza stanza = new Stanza(toIdentity);
 
 		//CREATE MESSAGE BEAN
 		LOG.info("Creating message to send to UACommsServer");
-		UserActionMonitorBean uaBean = new UserActionMonitorBean();
-		uaBean.setIdentity(owner.getJid());
-		uaBean.setServiceResourceIdentifier(serviceId);
-		uaBean.setServiceType(serviceType);
-		uaBean.setParameterName(parameterName);
-		uaBean.setValue(value);
-		uaBean.setMethod(MethodType.MONITOR);
+		UserActionMonitorBean uamBean = new UserActionMonitorBean();
+		uamBean.setIdentity(owner.getJid());
+		uamBean.setServiceResourceIdentifier(action.getServiceID());
+		uamBean.setServiceType(action.getServiceType());
+		uamBean.setParameterName(action.getparameterName());
+		uamBean.setValue(action.getvalue());
+		uamBean.setMethod(MethodType.MONITOR);
 		try {
-			LOG.info("Sending message to UACommsServer");
+			LOG.info("Sending UAM message to UACommsServer");
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
-			commsMgr.sendMessage(stanza, uaBean);
+			commsMgr.sendMessage(stanza, uamBean);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		};
+	}
+	
+	@Override
+	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback){
+		LOG.info("getExplicitFB method called in UACommsClient");
+		
+		Stanza stanza = new Stanza(toIdentity);
+		
+		//CREATE MESSAGE BEAN
+		LOG.info("Creating message to send to UACommsServer");
+		UserFeedbackBean ufBean = new UserFeedbackBean();
+		ufBean.setType(type);
+		ufBean.setProposalText(content.getProposalText());
+		List<String> optionsList = new ArrayList<String>();
+		for(String nextOption: content.getOptions()){
+			optionsList.add(nextOption);
+		}
+		ufBean.setOptions(optionsList);
+		try {
+			LOG.info("Sending Feedback message to UACommsServer");
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
+			commsMgr.sendMessage(stanza, ufBean);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		};
+	}
+	
+	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback){
+		
 	}
 
 	/*@Override

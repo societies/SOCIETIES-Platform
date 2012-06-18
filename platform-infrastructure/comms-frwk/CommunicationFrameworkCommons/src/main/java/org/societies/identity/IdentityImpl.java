@@ -26,6 +26,7 @@
 
 package org.societies.identity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,7 @@ import org.societies.api.identity.IdentityType;
  * 
  */
 
-public class IdentityImpl implements IIdentity {
+public class IdentityImpl implements IIdentity, Serializable {
 	
 	protected IdentityType type;
 	protected String identifier;

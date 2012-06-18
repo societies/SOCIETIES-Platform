@@ -35,6 +35,8 @@
     <artifact type="bundle" name="org.societies.css.CssRegistry"/>
     <artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
     <artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>
+    <artifact type="bundle" name="org.societies.cis.CisDirectory"/>
+    <artifact type="bundle" name="org.societies.cis.CisDirectoryClient"/>
     <artifact type="bundle" name="org.societies.cis.manager"/> 
     
 	<!-- Device Management -->
@@ -42,8 +44,10 @@
 	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.deviceregistry"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.RegSynchroniser"/>
+	
 	<!--Web Applications-->
-	<artifact type="bundle" name="societies-webapp"/>
+	<artifact type="bundle" name="societies-webapp"/> 
     <artifact type="bundle" name="DomainAuthorityWebApp"/>
+    <artifact type="bundle" name="DomainAuthorityRest"/>
 	
 </plan>

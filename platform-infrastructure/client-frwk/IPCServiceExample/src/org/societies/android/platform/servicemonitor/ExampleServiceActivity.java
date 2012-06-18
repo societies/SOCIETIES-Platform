@@ -28,7 +28,7 @@ package org.societies.android.platform.servicemonitor;
 
 import java.util.List;
 
-import org.societies.android.api.external.utilities.ServiceMethodTranslator;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.examples.AndroidParcelable;
 import org.societies.android.api.internal.examples.ICoreServiceExample;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;

@@ -30,6 +30,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
@@ -38,7 +39,6 @@ import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
-import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustOpinion;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
@@ -102,8 +102,8 @@ public class DirectTrustEngine extends TrustEngine {
 				final Set<IDirectTrustEvidence> evidenceSet = trustEvidenceRepo.retrieveDirectEvidence(teid, lastTrustUpdate, null);
 				for (final IDirectTrustEvidence evidence : evidenceSet) {
 					
-					if (evidence instanceof IDirectTrustOpinion)
-						newTrust = ((IDirectTrustOpinion) evidence).getTrustRating();
+					if (TrustEvidenceType.RATED.equals(evidence.getType()))
+						newTrust = (Double) evidence.getInfo();
 				}
 				css.getDirectTrust().setValue(newTrust);
 				trustRepo.updateEntity(css);

@@ -37,6 +37,7 @@ public class OutcomeGroup extends Group
 	private OutcomeNode previousWinner;
 	private ServiceResourceIdentifier serviceId;
 	private String serviceType;
+	public boolean newOutput;
 
 	//gradient variables
 	private double gradient;
@@ -70,6 +71,7 @@ public class OutcomeGroup extends Group
 		boost = null;
 		unboost = null;
 		winnerNode = null;
+		newOutput = false;
 	}
 
 	/*
@@ -183,7 +185,8 @@ public class OutcomeGroup extends Group
 
 	public void sendOutput()
 	{
-		System.out.println("******DIANNE sending new outcome: "+winnerNode.getGroupName()+" = "+winnerNode.getNodeName());
+		System.out.println("******DIANNE setting new outcome: "+activeNode.getGroupName()+" = "+activeNode.getNodeName());
+		newOutput = true;
 	}
 
 
@@ -304,10 +307,14 @@ public class OutcomeGroup extends Group
 
 	/* 
 	 * Getter methods
-	 */
-	public OutcomeNode getWinnerNode()
-	{
+	 */	
+	public OutcomeNode getWinnerNode(){
 		return winnerNode;
+	}
+	
+	public Node getNewOutput(){
+		newOutput = false;
+		return activeNode;
 	}
 	
 	public ServiceResourceIdentifier getServiceId(){

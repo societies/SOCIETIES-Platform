@@ -24,11 +24,15 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 
@@ -38,8 +42,13 @@ import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidenc
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-@MappedSuperclass
-public abstract class IndirectTrustEvidence extends TrustEvidence implements
+@Entity
+@Table(
+		name = TableName.INDIRECT_TRUST_EVIDENCE, 
+		uniqueConstraints = { @UniqueConstraint(columnNames = { 
+				"trustor_id", "trustee_id", "type", "timestamp", "info", "source" }) }
+)
+public class IndirectTrustEvidence extends TrustEvidence implements
 		IIndirectTrustEvidence {
 
 	private static final long serialVersionUID = 1470145009236839996L;
@@ -48,10 +57,17 @@ public abstract class IndirectTrustEvidence extends TrustEvidence implements
 	@Column(name = "source", nullable = false, updatable = false)
 	private final String source;
 
-	IndirectTrustEvidence(final TrustedEntityId teid, final Date timestamp,
-			final String source) {
+	/* Empty constructor required by Hibernate */
+	private IndirectTrustEvidence() {
 		
-		super(teid, timestamp);
+		super(null, null, null, null);
+		this.source = null;
+	}
+	
+	public IndirectTrustEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info, final String source) {
+		
+		super(teid, type, timestamp, info);
 		this.source = source;
 	}
 	

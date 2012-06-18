@@ -28,7 +28,6 @@ package org.societies.useragent.feedback;
 import java.util.List;
 
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
@@ -37,7 +36,7 @@ import org.societies.api.internal.useragent.model.ImpProposalType;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-public class TestUserFeedback extends TestCase implements IUserFeedbackCallback{
+public class TestUserFeedback extends TestCase{
 
 	IUserFeedback userFeedback;
 	List<String> expFeedback;
@@ -153,17 +152,5 @@ public class TestUserFeedback extends TestCase implements IUserFeedbackCallback{
 		Assert.assertNotNull(impFeedback);
 		Assert.assertEquals(true, impFeedback.booleanValue());
 	}*/
-
-	
-	
-	@Override
-	public void handleExpFeedback(List<String> results) {
-		expFeedback = results;
-	}
-
-	@Override
-	public void handleImpFeedback(Boolean result) {
-		impFeedback = result;
-	}
 
 }

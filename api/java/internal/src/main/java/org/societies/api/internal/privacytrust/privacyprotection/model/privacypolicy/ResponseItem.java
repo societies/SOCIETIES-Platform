@@ -27,6 +27,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 /**
  * The ResponseItem class represents the response to a RequestItem contained in the RequestPolicy of a service provider. 
  * It is constructed after the privacy preference evaluation has been performed and the system can decide to permit or deny the request. 
@@ -80,5 +82,25 @@ public class ResponseItem implements Serializable{
 	}
 	public String toString(){
 		return this.toXMLString();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		ResponseItem rhs = (ResponseItem) obj;
+		return new EqualsBuilder()
+			.append(this.getDecision().name(), rhs.getDecision().name())
+			.append(this.getRequestItem(), rhs.getRequestItem())
+			.isEquals();
 	}
 }

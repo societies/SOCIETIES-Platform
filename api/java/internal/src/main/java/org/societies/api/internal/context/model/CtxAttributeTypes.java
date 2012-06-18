@@ -71,5 +71,10 @@ org.societies.api.context.model.CtxAttributeTypes {
 	 * @since 0.0.8
 	 */
 	public static final String SNAPSHOT_REG = "snapshotReg";
+	
+	/**
+	 * @since 0.0.8
+	 */
+	public static final String UID = "uid";
 
 }

@@ -24,6 +24,8 @@
  */
 package org.societies.api.schema.security.policynegotiator;
 
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 /**
  * Temporary bean to hold the name of the method and each of the parameters.
  * The return type is held in a separate bean.
@@ -43,6 +45,7 @@ public class ProviderBean {
 	private int sessionId;
 	private boolean modified;
 	private String signedPolicyOption;
+	private ServiceResourceIdentifier serviceId;
 
 	// Getter and setter for the method
 	
@@ -72,5 +75,11 @@ public class ProviderBean {
 	}
 	public void setSignedPolicyOption(String signedPolicyOption) {
 		this.signedPolicyOption = signedPolicyOption;
+	}
+	public ServiceResourceIdentifier getServiceId() {
+		return serviceId;
+	}
+	public void setServiceId(ServiceResourceIdentifier serviceId) {
+		this.serviceId = serviceId;
 	}
 }

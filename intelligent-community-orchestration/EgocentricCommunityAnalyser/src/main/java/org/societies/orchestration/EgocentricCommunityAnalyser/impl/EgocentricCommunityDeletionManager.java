@@ -113,7 +113,6 @@ import java.util.List;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 
 
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -162,7 +161,6 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	
 	private ArrayList<ICis> recentRefusals;
 
-	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
@@ -442,13 +440,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
     	this.userFeedback = userFeedback;
     }
     
-    public IUserFeedbackCallback getUserFeedbackCallback() {
-    	return userFeedbackCallback;
-    }
     
-    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
-    	this.userFeedbackCallback = userFeedbackCallback;
-    }
     
     public void getUserResponse(String userResponse) {
     	this.userResponse = userResponse;

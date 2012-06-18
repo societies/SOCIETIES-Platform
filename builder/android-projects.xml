@@ -70,7 +70,7 @@
 		<module>../platform-infrastructure/client-frwk/SocietiesServiceMonitor</module>
                 <module>../platform-infrastructure/client-frwk/SocietiesCSSManager</module>
                 <module>../platform-infrastructure/client-frwk/SocietiesDeviceStatus</module>
-
+		<module>../platform-infrastructure/client-frwk/SocietiesContentProvider</module>
 		<!--	
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
 		-->

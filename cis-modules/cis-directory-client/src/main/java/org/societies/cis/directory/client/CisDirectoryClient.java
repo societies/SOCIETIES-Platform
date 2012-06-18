@@ -194,6 +194,9 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 		// We want to send all messages for CisDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
+		
+		LOG.info("CISDirectory Client ADD RECORD >>>>>>>>>>>>>>>>>>>");
+		LOG.info("CISDirectory Client Advertisement: ----- "+cisAdvert);
 
 		// CREATE MESSAGE BEAN
 		CisDirectoryBean cisDir = new CisDirectoryBean();
@@ -223,6 +226,8 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 		// We want to send all messages for CisDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
+		
+		LOG.info("CISDirectory Client DELETE RECORD >>>>>>>>>>>>>>>>>>>");
 
 		// CREATE MESSAGE BEAN
 		CisDirectoryBean cisDir = new CisDirectoryBean();
@@ -250,7 +255,10 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 		// We want to send all messages for CisDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
-
+		
+		
+		LOG.info("CISDirectory Client FIND ALL RECORDs >>>>>>>>>>>>>>>>>>>");
+		LOG.info("CISDirectory Client FIND ALL RECORDs cisDirCallback: ====== "+cisDirCallback);
 		// SETUP CisDirectory CLIENT RETURN STUFF
 		CisDirectoryClientCallback callback = new CisDirectoryClientCallback(stanza.getId(),
 				cisDirCallback);
@@ -258,7 +266,12 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 		// CREATE MESSAGE BEAN
 		CisDirectoryBean cisDirBean = new CisDirectoryBean();
 
+		LOG.info("CISDirectory Client FIND ALL RECORDs CALLBACK: ----- "+callback);
+		LOG.info("CISDirectory Client FIND ALL RECORDs stanzaID: ----- "+stanza.getId());
+		LOG.info("CISDirectory Client FIND ALL RECORDs NameSpace: ----- "+callback.getXMLNamespaces());
+		LOG.info("CISDirectory Client FIND ALL RECORDs cisDirBean before: ----- "+cisDirBean.getMethod());
 		cisDirBean.setMethod(MethodType.FIND_ALL_CIS_ADVERTISEMENT_RECORDS);
+		LOG.info("CISDirectory Client FIND ALL RECORDs cisDirBean: ----- "+cisDirBean.getMethod());
 		try {
 			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
 			// "callback.RecieveMessage()"

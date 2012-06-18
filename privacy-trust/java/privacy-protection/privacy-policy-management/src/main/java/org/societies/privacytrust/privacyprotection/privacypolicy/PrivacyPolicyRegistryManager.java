@@ -56,7 +56,6 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.privacytrust.privacyprotection.privacypolicy.registry.MyIdentity;
 import org.societies.privacytrust.privacyprotection.privacypolicy.registry.PrivacyPolicyRegistry;
 
 /**
@@ -90,22 +89,6 @@ public class PrivacyPolicyRegistryManager {
 			this.policyRegistry = new PrivacyPolicyRegistry();
 		}
 
-		// Change Iidentity to MyIdentity (serializable)
-//		CtxIdentifier id = null;
-//		MyIdentity requestorIdentity = new MyIdentity(policy.getRequestor().getRequestorId());
-//		if (requestor instanceof RequestorService) {
-//			RequestorService requestor2 = new RequestorService(requestorIdentity, ((RequestorService) requestor).getRequestorServiceId());
-//			// Store
-//			policy.setRequestor(requestor2);
-//			id = this.storePolicyToDB(requestor2, policy);
-//		}
-//		else if (requestor instanceof RequestorCis){
-//			MyIdentity requestorCisIdentity = new MyIdentity(((RequestorCis)policy.getRequestor()).getCisRequestorId());
-//			RequestorCis requestor2 = new RequestorCis(requestorIdentity,requestorCisIdentity);
-//			// Store
-//			policy.setRequestor(requestor2);
-//			id = this.storePolicyToDB(requestor2, policy);
-//		}
 		// Global store
 		CtxIdentifier id = this.storePolicyToDB(requestor, policy);
 		this.policyRegistry.addPolicy(requestor,id);
@@ -332,21 +315,6 @@ public class PrivacyPolicyRegistryManager {
 	private void storePolicies(){
 		try {
 			List<CtxIdentifier> attrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY).get();
-//			// Change Iidentity to MyIdentity (serializable)
-//			Hashtable<Requestor, CtxIdentifier> newPolicyRegistry = new Hashtable<Requestor, CtxIdentifier>();	
-//			for (Entry<Requestor, CtxIdentifier> policyEntry : policyRegistry.getPolicies().entrySet()) {
-//				Requestor newRequestor = null;
-//				if (policyEntry.getKey() instanceof RequestorService) {
-//					MyIdentity requestorIdentity = new MyIdentity(policyEntry.getKey().getRequestorId());
-//					newRequestor = new RequestorService(requestorIdentity, ((RequestorService) policyEntry.getKey()).getRequestorServiceId());
-//				}else if (policyEntry.getKey() instanceof RequestorCis){
-//					MyIdentity requestorIdentity = new MyIdentity(policyEntry.getKey().getRequestorId());
-//					MyIdentity requestorCisIdentity = new MyIdentity(((RequestorCis)policyEntry.getKey()).getCisRequestorId());
-//					newRequestor = new RequestorCis(requestorIdentity,requestorCisIdentity);
-//				}
-//				newPolicyRegistry.put(newRequestor, policyEntry.getValue());
-//			}
-
 			if (attrList.size()>0){
 				CtxIdentifier identifier = attrList.get(0);
 				CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier);

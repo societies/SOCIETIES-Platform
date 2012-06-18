@@ -5,11 +5,7 @@
 	xsi:schemaLocation="http://www.eclipse.org/virgo/schema/plan 
 		http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-	<artifact type="bundle" name="org.societies.api.external.societies-api" />
-	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal" />
-	
-	<artifact type="bundle" name="org.societies.data-source"/>
-	
+	<artifact type="bundle" name="org.societies.privacytrust.trust" />
 	<artifact type="bundle" name="org.societies.privacytrust.privacyprotection" />
-	<artifact type="bundle" name="org.societies.privacytrust.privacyprotectiontest" />
+
 </plan>

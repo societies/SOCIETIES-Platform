@@ -38,10 +38,16 @@
             <version>2.2.1</version>
             <scope>provided</scope>
         </dependency-->
+<!--         <dependency> -->
+<!--             <groupId>android</groupId> -->
+<!--             <artifactId>android</artifactId> -->
+<!--         </dependency> -->
+ 		
         <dependency>
-            <groupId>android</groupId>
+            <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-        </dependency>
+            <scope>provided</scope>
+		</dependency>
 		<dependency>
 	    	<groupId>org.societies.api.external</groupId>
 	    	<artifactId>societies-api</artifactId>
@@ -52,8 +58,8 @@
 		   <artifactId>societies-api-internal</artifactId>
         </dependency>
 		<dependency>
-	    	<groupId>org.societies.android.api</groupId>
-	    	<artifactId>societies-android-api</artifactId>
+	    	<groupId>org.societies.android.api.external</groupId>
+	    	<artifactId>societies-android-api-external</artifactId>
 	    	<version>${release.version}</version>
 		</dependency>
     	<dependency>

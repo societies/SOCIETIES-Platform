@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.cpa.impl;
 
+import org.societies.api.activity.IActivity;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisProposal;
@@ -43,15 +45,69 @@ import java.util.List;
 
 public class CPACreationPatterns
 {
-	public List<ICisProposal> analyze(List<ICis> cises){
+	private long lastTime = 0L;
+	private SocialGraph graph = new SocialGraph();
+	public List<ICisProposal> analyze(List<ICisOwned> cises){
 		ArrayList<ICisProposal> ret = new ArrayList<ICisProposal>();
+		ArrayList<IActivity> actDiff = new ArrayList<IActivity>();
+		String lastTimeStr = Long.toString(lastTime);
+		String nowStr = Long.toString(System.currentTimeMillis());
 		//1. make a graph of interactions, the weight on the links indicates level of interaction, 0 is none. 
 		//2. segment the graph nodes according to weights. suggest
+		for(ICisOwned icis : cises){
+			actDiff.addAll(icis.getActivityFeed().getActivities(lastTimeStr+" "+nowStr)); //getting the diff.
+		}
+		//creating the vertices
+		//this make take a while the first time..
+		for(IActivity act : actDiff){
+			if(graph.hasVertex(act.getActor()) == null){
+				graph.getVertices().add(new SocialGraphVertex(act.getActor()));
+			}
+			if(graph.hasVertex(act.getTarget()) == null){
+				graph.getVertices().add(new SocialGraphVertex(act.getTarget()));
+			}
+		}
+		//creating the edges..
+		//this aswell !
+		SocialGraphEdge edge = null; SocialGraphEdge searchEdge = null;
+		for(SocialGraphVertex vertex1 : graph.getVertices()){
+			for(SocialGraphVertex vertex2 : graph.getVertices()){
+				edge = new SocialGraphEdge(vertex1,vertex2);
+				searchEdge = graph.hasEdge(edge);
+				if(searchEdge == null){
+					edge.setWeight(cooperation(vertex1,vertex2,actDiff));
+					graph.getEdges().add(edge);
+				}else
+					searchEdge.addToWeight(cooperation(vertex1,vertex2,actDiff));
+			}
+		}
+		//TADA, the social graph should be created, phew
+		//Now for the NP-complete analysis..
+		
 		return ret;
 		
 	}
-	public double cooperation(ICisParticipant member1,ICisParticipant member2){
-		return 0;
+	//activityDiff should be a diff, the social graph should be persistant.
+	public double cooperation(SocialGraphVertex member1,SocialGraphVertex member2, List<IActivity> activityDiff){
+		double ret = 0;
+		for(IActivity act: activityDiff){
+			if(contains(member1,act) && contains(member2,act)){
+				//add new link (or add weight to an old link)
+				ret += 1.0;
+			}
+				
+		}
+		
+		return ret;
+	}
+	public boolean contains(SocialGraphVertex participant, IActivity act){
+		if(act.getActor().contains(participant.getName()))
+			return true;
+		if(act.getObject().contains(participant.getName()))
+			return true;
+		if(act.getTarget().contains(participant.getName()))
+			return true;
+		return false;
 	}
 	public void init(){}
 	public CPACreationPatterns(){}

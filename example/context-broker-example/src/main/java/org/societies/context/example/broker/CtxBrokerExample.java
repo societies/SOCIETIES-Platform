@@ -92,7 +92,7 @@ public class CtxBrokerExample 	{
 		LOG.info("*** cssOwnerId = " + this.cssOwnerId);
 
 		LOG.info("*** Starting examples...");
-		this.retrieveCssOperator();
+		this.retrieveIndividualEntity();
 		this.retrieveCssNode();
 		this.createContext();
 		this.registerForContextChanges();
@@ -102,12 +102,12 @@ public class CtxBrokerExample 	{
 		this.tuplesCtxHistoryTest();
 	}
 	
-	private void retrieveCssOperator() {
+	private void retrieveIndividualEntity() {
 		
-		LOG.info("*** retrieveCssOperator");
+		LOG.info("*** retrieveIndividualEntity");
 		
 		try {
-			IndividualCtxEntity operator = this.internalCtxBroker.retrieveCssOperator().get();
+			final IndividualCtxEntity operator = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 			LOG.info("*** CSS owner context entity id: " + operator.getId());
 		
 		} catch (Exception e) {

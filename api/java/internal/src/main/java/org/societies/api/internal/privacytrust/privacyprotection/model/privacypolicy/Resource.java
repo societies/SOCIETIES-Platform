@@ -26,6 +26,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
 /**
@@ -108,6 +109,26 @@ public class Resource implements Serializable{
 	
 	public String toString(){
 		return this.toXMLString();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		Resource rhs = (Resource) obj;
+		return new EqualsBuilder()
+			.append(this.getContextType(), rhs.getContextType())
+			.append(this.getCtxIdentifier(), rhs.getCtxIdentifier())
+			.isEquals();
 	}
 }
 

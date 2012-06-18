@@ -46,16 +46,14 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
-import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -65,10 +63,15 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.broker.test.util.MockBlobClass;
+import org.societies.context.community.db.impl.CommunityCtxDBMgr;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
 
@@ -82,11 +85,13 @@ public class InternalCtxBrokerTest {
 
 	private static final String OWNER_IDENTITY_STRING = "myFooIIdentity@societies.local";
 	private static final String NETWORK_NODE_STRING = "myFooIIdentity@societies.local/node";
-	
+	private static final String CIS_IDENTITY_STRING = "FooCISIIdentity@societies.local";
+
 	private InternalCtxBroker internalCtxBroker;
-	
+
 	private static IIdentityManager mockIdentityMgr = mock(IIdentityManager.class);
-	private static IIdentity mockIdentity = mock(IIdentity.class);
+	private static IIdentity cssMockIdentity = mock(IIdentity.class);
+	private static IIdentity cisMockIdentity = mock(IIdentity.class);
 	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);
 
 	/**
@@ -94,10 +99,20 @@ public class InternalCtxBrokerTest {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		
-		//when(mockIdentityMgr.getThisNetworkNode()).thenReturn((INetworkNode) mockIdentity);
-		when(mockIdentity.toString()).thenReturn(OWNER_IDENTITY_STRING);
+
+		when(mockIdentityMgr.getThisNetworkNode()).thenReturn(mockNetworkNode);
+		when(mockNetworkNode.getBareJid()).thenReturn(OWNER_IDENTITY_STRING);
+		when(mockIdentityMgr.fromJid(OWNER_IDENTITY_STRING)).thenReturn(cssMockIdentity);
 		when(mockNetworkNode.toString()).thenReturn(NETWORK_NODE_STRING);
+
+		when(cssMockIdentity.toString()).thenReturn(OWNER_IDENTITY_STRING);
+		when(cssMockIdentity.getType()).thenReturn(IdentityType.CSS);
+
+		when(cisMockIdentity.getType()).thenReturn(IdentityType.CIS);
+		when(cisMockIdentity.toString()).thenReturn(CIS_IDENTITY_STRING);
+
+		//IIdentity scopeID = this.idMgr.fromJid(communityCtxEnt.getOwnerId());
+		when(mockIdentityMgr.fromJid(CIS_IDENTITY_STRING)).thenReturn(cisMockIdentity);
 	}
 
 	/**
@@ -112,12 +127,13 @@ public class InternalCtxBrokerTest {
 	 */
 	@Before
 	public void setUp() throws Exception { 
-		
+
 		internalCtxBroker = new InternalCtxBroker();
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
+		internalCtxBroker.setCommunityCtxDBMgr(new CommunityCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 		internalCtxBroker.setIdentityMgr(mockIdentityMgr);
-		internalCtxBroker.createCssOperator(); // TODO remove?
+		internalCtxBroker.createIndividualEntity(cssMockIdentity, CtxEntityTypes.PERSON); // TODO remove?
 		internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
 	}
 
@@ -126,13 +142,13 @@ public class InternalCtxBrokerTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
-		
+
 		internalCtxBroker = null;
 	}
 
 
 	/**
-	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#retrieveCssOperator()}.
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#retrieveIndividualEntity(IIdentity)}.
 	 * 
 	 * @throws CtxException 
 	 * @throws ExecutionException 
@@ -140,11 +156,15 @@ public class InternalCtxBrokerTest {
 	 * @throws InvalidFormatException 
 	 */
 	@Test
-	public void testRetrieveCssOperator() throws Exception {
-		
-		final IndividualCtxEntity operatorEnt = internalCtxBroker.retrieveCssOperator().get();
-		assertNotNull(operatorEnt);
-		assertEquals(OWNER_IDENTITY_STRING, operatorEnt.getId().getOwnerId());
+	public void testRetrieveIndividualEntity() throws Exception {
+
+		final IndividualCtxEntity ownerEnt = 
+				internalCtxBroker.retrieveIndividualEntity(cssMockIdentity).get();
+		assertNotNull(ownerEnt);
+		assertEquals(OWNER_IDENTITY_STRING, ownerEnt.getId().getOwnerId());
+		assertEquals(CtxEntityTypes.PERSON, ownerEnt.getType());
+		assertFalse(ownerEnt.getAttributes(CtxAttributeTypes.ID).isEmpty());
+		assertEquals(1, ownerEnt.getAttributes(CtxAttributeTypes.ID).size());
 	}
 
 	/**
@@ -157,7 +177,7 @@ public class InternalCtxBrokerTest {
 	 */
 	@Test
 	public void testRetrieveCssNode() throws Exception {
-		
+
 		final CtxEntity cssNodeEnt = internalCtxBroker.retrieveCssNode(mockNetworkNode).get();
 		assertNotNull(cssNodeEnt);
 		assertEquals(CtxEntityTypes.CSS_NODE, cssNodeEnt.getType());
@@ -200,6 +220,73 @@ public class InternalCtxBrokerTest {
 		assertTrue(ctxAttribute.getType().equalsIgnoreCase("attrType"));
 	}
 
+
+	/**
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAttribute(org.societies.api.context.model.CtxCommunityEntityIdentifier, java.lang.String)}.
+	 * 
+	 * @throws CtxException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Ignore
+	@Test
+	public void testCreateAttributeByCtxCommunityEntityIdentifierString() throws CtxException, InterruptedException, ExecutionException {
+
+		// Create the attribute's scope		
+		final CommunityCtxEntity communityCtxEnt = internalCtxBroker.createCommunityEntity(cisMockIdentity).get();
+		// Create the attribute to be tested
+		final CtxAttribute ctxAttribute = internalCtxBroker.createAttribute(communityCtxEnt.getId(), CtxAttributeTypes.POLITICAL_VIEWS).get();
+
+		assertNotNull(ctxAttribute);
+		assertNotNull(ctxAttribute.getId());
+		assertEquals(ctxAttribute.getId().getScope(), communityCtxEnt.getId());
+		assertEquals(ctxAttribute.getOwnerId(), CIS_IDENTITY_STRING);
+		assertTrue(ctxAttribute.getType().equalsIgnoreCase(CtxAttributeTypes.POLITICAL_VIEWS));
+	}
+	@Ignore
+	@Test
+	public void testLookupCommunityCtxAttr() throws CtxException, InterruptedException, ExecutionException {
+		/*
+		// Create the attribute's scope		
+		final CommunityCtxEntity communityCtxEnt = internalCtxBroker.createCommunityEntity(cisMockIdentity).get();
+		System.out.println("communityCtxEnt type :" + communityCtxEnt.getType());
+		// Create the attribute to be tested
+		CtxAttribute commCtxAttributeComm = internalCtxBroker.createAttribute(communityCtxEnt.getId(), CtxAttributeTypes.POLITICAL_VIEWS).get();
+		commCtxAttributeComm.setStringValue("foo");
+		commCtxAttributeComm = (CtxAttribute) internalCtxBroker.update(commCtxAttributeComm).get();
+		System.out.println("commCtxAttributeComm:" + commCtxAttributeComm);
+		
+		// test lookup and retrieve
+		List<CtxEntityIdentifier> commListResults = internalCtxBroker.lookupEntities("community", CtxAttributeTypes.POLITICAL_VIEWS, "foo", "foo").get();
+		System.out.println(" commListResults size :"+commListResults.size());
+	*/
+	}
+	@Ignore
+	@Test
+	public void testRetrieveCommunityCtxAttr() throws CtxException, InterruptedException, ExecutionException {
+		
+		/*
+		// Create the attribute's scope		
+		final CommunityCtxEntity communityCtxEnt = internalCtxBroker.createCommunityEntity(cisMockIdentity).get();
+		System.out.println("communityCtxEnt type :" + communityCtxEnt.getType());
+		System.out.println(" commEntResults  :"+communityCtxEnt.getId());
+		System.out.println(" commEntResults  :"+communityCtxEnt.getId().getOwnerId());
+		// den kseroume an einai css i cis ... opote den kseroume pia vasi na kalesei
+		if(communityCtxEnt.getId().getOwnerId().compareToIgnoreCase("cis")>1) System.out.println(communityCtxEnt.getId().getOwnerId().compareToIgnoreCase("cis"));
+		// Create the attribute to be tested
+		
+			CtxAttribute commCtxAttributeComm = internalCtxBroker.createAttribute(communityCtxEnt.getId(), CtxAttributeTypes.POLITICAL_VIEWS).get();
+		commCtxAttributeComm.setStringValue("foo");
+		commCtxAttributeComm = (CtxAttribute) internalCtxBroker.update(commCtxAttributeComm).get();
+		System.out.println("commCtxAttributeComm:" + commCtxAttributeComm);
+		
+		// test lookup and retrieve
+		CommunityCtxEntity commEntResults = (CommunityCtxEntity) internalCtxBroker.retrieve(commCtxAttributeComm.getId()).get();
+		System.out.println(" commEntResults  :"+commEntResults);
+	*/
+	}
+
+
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createEntity(java.lang.String)}.
 	 * 
@@ -218,23 +305,39 @@ public class InternalCtxBrokerTest {
 		assertTrue(ctxEntity.getType().equalsIgnoreCase("entType"));
 	}
 
+	/**
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createCommunityEntity(java.lang.String)}.
+	 * 
+	 * @throws CtxException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Ignore
+	@Test
+	public void testCreateCommunityEntityByString() throws CtxException, InterruptedException, ExecutionException {
+
+		final CommunityCtxEntity communityCtxEnt = internalCtxBroker.createCommunityEntity(cssMockIdentity).get();
+		assertNotNull(communityCtxEnt);
+		assertTrue(communityCtxEnt.getType().equalsIgnoreCase("community"));
+	}
 
 	/**
-	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createEntity(java.lang.String)}.
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createIndividualEntity(IIdentity, String)}.
 	 * 
 	 * @throws CtxException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testcreateIndividualCtxEntity() throws CtxException, InterruptedException, ExecutionException {
+	public void testCreateIndividualEntity() throws CtxException, InterruptedException, ExecutionException {
 
-		final IndividualCtxEntity individualCtxEnt ;
-
-		final Future<IndividualCtxEntity> futureIndividualCtxEntity = internalCtxBroker.createIndividualEntity("Person");
-		individualCtxEnt = futureIndividualCtxEntity.get();
-		assertNotNull(individualCtxEnt);
-		assertTrue(individualCtxEnt.getType().equalsIgnoreCase("Person"));
+		final IndividualCtxEntity ownerEnt = 
+				internalCtxBroker.createIndividualEntity(cssMockIdentity, CtxEntityTypes.PERSON).get();
+		assertNotNull(ownerEnt);
+		assertEquals(OWNER_IDENTITY_STRING, ownerEnt.getId().getOwnerId());
+		assertEquals(CtxEntityTypes.PERSON, ownerEnt.getType());
+		assertFalse(ownerEnt.getAttributes(CtxAttributeTypes.ID).isEmpty());
+		assertEquals(1, ownerEnt.getAttributes(CtxAttributeTypes.ID).size());
 	}
 
 
@@ -267,11 +370,11 @@ public class InternalCtxBrokerTest {
 
 	@Test
 	public void testStoreRetrieveServiceParameters2() {
-		
-		
+
+
 		//	ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
-//		serviceId2.setIdentifier(new URI("http://testService2"));
-		
+		//		serviceId2.setIdentifier(new URI("http://testService2"));
+
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 		try {
 			serviceId1.setIdentifier(new URI("http://testService1"));
@@ -279,7 +382,7 @@ public class InternalCtxBrokerTest {
 			e.printStackTrace();
 		}
 		System.out.println("testStoreRetrieveServiceParameters service created :"+ serviceId1);
-		
+
 		try {
 			IndividualCtxEntity operator = (IndividualCtxEntity) this.internalCtxBroker.createIndividualEntity("Person").get();
 			//IndividualCtxEntity operator = this.internalCtxBroker.retrieveCssOperator().get();
@@ -293,12 +396,12 @@ public class InternalCtxBrokerTest {
 			List<CtxIdentifier> listAttrs = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "service").get();
 			CtxIdentifier serviceAttrID = listAttrs.get(0);
 			CtxAttribute ctxAttrRetrieved = (CtxAttribute) this.internalCtxBroker.retrieve(serviceAttrID).get();
-						
+
 			ServiceResourceIdentifier ctxAttrRetrievedValue = (ServiceResourceIdentifier) SerialisationHelper.deserialise(ctxAttrRetrieved.getBinaryValue(), this.getClass().getClassLoader());
-			
+
 			System.out.println("testStoreRetrieveServiceParameters service retrieved :"+ ctxAttrRetrievedValue);
-			
-			
+
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -780,12 +883,12 @@ public class InternalCtxBrokerTest {
 	@Test
 	public void testRetrieveHistoryCtxAttributeIdentifierDateDate() {
 
-		
+
 		final CtxAttribute emptyAttribute;
 		CtxAttribute initialisedAttribute;
 		final CtxEntity scope;
 		System.out.println("testRetrieveHistoryCtxAttributeIdentifierDateDate");
-		
+
 		// Create the attribute's scope
 		Future<CtxEntity> futureEntity;
 		try {
@@ -826,7 +929,7 @@ public class InternalCtxBrokerTest {
 				System.out.println("history List id:"+hocAttr.getId()+" getLastMod:"+hocAttr.getLastModified() +" hocAttr value:"+hocAttr.getIntegerValue());		
 			}
 
-			
+
 			CtxHistoryAttribute hocAttr1 = history.get(0);
 			CtxHistoryAttribute hocAttr2 = history.get(1);
 			CtxHistoryAttribute hocAttr3 = history.get(2);
@@ -1142,7 +1245,7 @@ public class InternalCtxBrokerTest {
 			ctxAttribute2.setBinaryValue(SerialisationHelper.serialise(binaryValue2));
 			internalCtxBroker.update(ctxAttribute2);
 			CtxAttribute ctxAttribute21 = internalCtxBroker.createAttribute(entity2.getId(), "stringValue").get();
-			ctxAttribute11.setStringValue("StringB");
+			ctxAttribute21.setStringValue("StringB");
 			internalCtxBroker.update(ctxAttribute21);
 
 
@@ -1201,8 +1304,8 @@ public class InternalCtxBrokerTest {
 
 	@Test
 	public void testHistoryTupleDataRetrievalByType() throws CtxException, InterruptedException, ExecutionException {
-		
-		
+
+
 		System.out.println("testHistoryTupleDataRetrievalByType");
 		final CtxEntity scope1;
 		final CtxEntity scope2;
@@ -1216,13 +1319,13 @@ public class InternalCtxBrokerTest {
 		primaryAttribute1 = (CtxAttribute) internalCtxBroker.createAttribute(scope1.getId(), "primaryAttribute").get();
 		primaryAttribute1.setStringValue("fistValue");
 		primaryAttribute1.setHistoryRecorded(true);
-		
+
 		scope2 = (CtxEntity)internalCtxBroker.createEntity("entType").get();
 		// Create the attribute to be tested
 		primaryAttribute2 = (CtxAttribute) internalCtxBroker.createAttribute(scope2.getId(), "primaryAttribute").get();
 		primaryAttribute2.setStringValue("fistValue2");
 		primaryAttribute2.setHistoryRecorded(true);
-		
+
 		//1.
 		internalCtxBroker.update(primaryAttribute1);
 		try {
@@ -1231,8 +1334,8 @@ public class InternalCtxBrokerTest {
 			e1.printStackTrace();
 		}
 		internalCtxBroker.update(primaryAttribute2);
-		
-				
+
+
 		escortingAttribute1 = (CtxAttribute)internalCtxBroker.createAttribute(scope1.getId(), "escortingAttribute1").get();
 		escortingAttribute1.setHistoryRecorded(true);
 		escortingAttribute2 = (CtxAttribute)internalCtxBroker.createAttribute(scope1.getId(), "escortingAttribute2").get();
@@ -1261,7 +1364,7 @@ public class InternalCtxBrokerTest {
 			e1.printStackTrace();
 		}
 		internalCtxBroker.update(primaryAttribute2);
-		
+
 		primaryAttribute1 =  internalCtxBroker.updateAttribute(primaryAttribute1.getId(),(Serializable)"secondValue1").get();
 		try {
 			Thread.sleep(200);
@@ -1286,7 +1389,7 @@ public class InternalCtxBrokerTest {
 			e1.printStackTrace();
 		}
 		primaryAttribute2 =  internalCtxBroker.updateAttribute(primaryAttribute2.getId(),(Serializable)"thirdValue").get();
-		
+
 		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1_oo").get();
 		try {
 			Thread.sleep(200);
@@ -1294,7 +1397,7 @@ public class InternalCtxBrokerTest {
 			e1.printStackTrace();
 		}
 		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2_tt").get();
-		
+
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e1) {
@@ -1311,7 +1414,7 @@ public class InternalCtxBrokerTest {
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = internalCtxBroker.retrieveHistoryTuples("primaryAttribute", listOfEscortingAttributeIds, null, null).get();
 		System.out.println("testHistoryTupleDataRetrievalByType tupleResults "+ tupleResults);
-		
+
 	}
 
 	@Test

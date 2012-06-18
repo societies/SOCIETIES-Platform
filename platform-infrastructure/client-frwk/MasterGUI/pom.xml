@@ -35,6 +35,11 @@
                 <groupId>com.phonegap</groupId>
                 <artifactId>cordova</artifactId>
     	</dependency>
+		<dependency>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api</artifactId>
+			<version>${release.version}</version>
+		</dependency>
 	
 	
 		<dependency>
@@ -140,8 +145,8 @@
 		    <unpackDependencies>false</unpackDependencies>
 		    <fileToUnpack>${project.artifactId}.${project.version}-shaded.apk</fileToUnpack>
 		    <jvmArguments>
-			    <jvmArgument>-Xms256m</jvmArgument>
-			    <jvmArgument>-Xmx512m</jvmArgument>
+			    <jvmArgument>-Xms512m</jvmArgument>
+			    <jvmArgument>-Xmx1024m</jvmArgument>
 		    </jvmArguments>
                 </configuration>
             </plugin>

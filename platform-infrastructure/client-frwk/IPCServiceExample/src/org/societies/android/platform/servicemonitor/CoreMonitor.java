@@ -28,10 +28,9 @@ package org.societies.android.platform.servicemonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.api.external.utilities.RemoteServiceHandler;
 import org.societies.android.api.internal.examples.AndroidParcelable;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
-
+import org.societies.android.api.utilities.RemoteServiceHandler;
 
 
 import android.app.ActivityManager;
@@ -55,7 +54,7 @@ public class CoreMonitor extends Service implements ICoreServiceMonitor {
 	
 	@Override
 	public void onCreate () {
-		this.inMessenger = new Messenger(new RemoteServiceHandler(this.getClass(), this));
+		this.inMessenger = new Messenger(new RemoteServiceHandler(this.getClass(), this, ICoreServiceMonitor.methodsArray));
 		Log.i(LOG_TAG, "Service starting");
 	}
 	
