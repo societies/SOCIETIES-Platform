@@ -127,8 +127,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	@Override
 	public void onCreate () {
-
-		Debug.startMethodTracing(ANDROID_PROFILING_NAME);
+//		Traceview 
+//		Debug.startMethodTracing(ANDROID_PROFILING_NAME);
 		
 		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
 		this.registerForPubsub();
@@ -157,7 +157,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "CSSManager service terminating");
-		Debug.stopMethodTracing();
+//		Traceview 
+//		Debug.stopMethodTracing();
 	}
 
 	/**
