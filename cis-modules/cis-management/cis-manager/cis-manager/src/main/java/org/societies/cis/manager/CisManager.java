@@ -71,6 +71,8 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.Cis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -109,6 +111,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
 	ICisDirectoryRemote iCisDirRemote;
+	
+	IServiceDiscoveryRemote iServDiscRemote;
+	IServiceControlRemote iServCtrlRemote;
+	
+	
 //	IPrivacyPolicyManager polManager;
 	
 
@@ -133,6 +140,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		while(it.hasNext()){
 			 Cis element = it.next();
 			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory());
+			 element.setiServCtrlRemote(this.iServCtrlRemote);
+			 element.setiServDiscRemote(this.iServDiscRemote);
 	     }
 		
 	//	for(Cis cis : ownedCISs){
@@ -186,6 +195,18 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
+	public IServiceDiscoveryRemote getiServDiscRemote() {
+		return iServDiscRemote;
+	}
+	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
+		this.iServDiscRemote = iServDiscRemote;
+	}
+	public IServiceControlRemote getiServCtrlRemote() {
+		return iServCtrlRemote;
+	}
+	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
+		this.iServCtrlRemote = iServCtrlRemote;
+	}
 
 
 
@@ -292,7 +313,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//}
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		
-		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory);
+		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote);
 		
 		if(cis == null)
 			return cis;
