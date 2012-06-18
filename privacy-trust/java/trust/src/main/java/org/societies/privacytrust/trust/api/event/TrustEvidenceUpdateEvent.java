@@ -25,6 +25,7 @@
 package org.societies.privacytrust.trust.api.event;
 
 import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 
 /**
@@ -34,7 +35,7 @@ import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
  * <p>
  * TrustEvidenceUpdateEvents are accompanied by the source, i.e. the 
  * {@link TrustedEntityId identifier} of the entity whose trust evidence was
- * updated. 
+ * updated, as well as, the type of this evidence. 
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
@@ -42,32 +43,47 @@ import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 public class TrustEvidenceUpdateEvent extends TrustEvent {
 
 	private static final long serialVersionUID = 569610138360162405L;
+	
+	private final TrustEvidenceType type;
 
 	/**
 	 * Constructs a <code>TrustEvidenceUpdateEvent</code> object with the
-	 * specified source.
+	 * specified source and type.
 	 *  
 	 * @param source
 	 *            the identifier of the entity whose trust evidence was updated
+	 * @param type
+	 *            the type of the new trust evidence
 	 */
-	public TrustEvidenceUpdateEvent(TrustedEntityId source) {
+	public TrustEvidenceUpdateEvent(final TrustedEntityId source, 
+			final TrustEvidenceType type) {
 		
 		super(source);
+		this.type = type;
 	}
 	
 	/**
 	 * Returns the identifier of the entity whose trust evidence was updated.
 	 * 
 	 * @return the identifier of the entity whose trust evidence was updated.
-	 * @since 0.0.7
 	 */
 	public TrustedEntityId getId() {
 		
 		return (TrustedEntityId) super.getSource();
 	}
 	
+	/**
+	 * Returns the type of the new trust evidence.
+	 * 
+	 * @return the type of the new trust evidence.
+	 * @since 0.3
+	 */
+	public TrustEvidenceType getType() {
+		
+		return this.type;
+	}
+	
 	/*
-	 * (non-Javadoc)
 	 * @see java.util.EventObject#toString()
 	 */
 	@Override
@@ -76,6 +92,8 @@ public class TrustEvidenceUpdateEvent extends TrustEvent {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("{");
 		sb.append("id=" + this.getId());
+		sb.append(",");
+		sb.append("type=" + this.getType());
 		sb.append("}");
 		
 		return sb.toString();
