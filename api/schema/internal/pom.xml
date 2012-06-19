@@ -52,9 +52,22 @@
 				<version>0.8.0</version>
 				<executions>
 					<execution>
+						<id>global-generate</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>
+						<configuration>
+							<schemaExcludes>
+								<exclude>dataforms.xsd</exclude>
+								<exclude>pubsub.xsd</exclude>
+								<exclude>pubsub#errors.xsd</exclude>
+								<exclude>pubsub#owner.xsd</exclude>
+								<exclude>pubsub#event.xsd</exclude>
+							</schemaExcludes>
+							<args>
+								<arg>-Xcollection-setter-injector</arg>
+							</args>
+						</configuration>
 					</execution>
 				</executions>
 				<configuration>
@@ -64,6 +77,13 @@
 					<readOnly>yes</readOnly>
 					<removeOldOutput>true</removeOldOutput>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>net.java.dev.vcc.thirdparty</groupId>
+						<artifactId>collection-setter-injector</artifactId>
+						<version>0.5.0-1</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
