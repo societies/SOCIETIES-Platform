@@ -64,6 +64,7 @@ import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 //import org.societies.api.internal.css.management.ICSSManagerCallback;
 //import org.societies.api.internal.css.management.ICSSRemoteManager;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
@@ -336,8 +337,20 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	        	//
 		       // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
 	   }
-		return suggestedCommunityAnalyser.processEgocentricConfigurationRecommendations(null, null);
-		
+		try {
+			return suggestedCommunityAnalyser.processEgocentricConfigurationRecommendations(null, null).get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public ArrayList<ICis> getUserFeedbackOnConfiguration(ArrayList<ICis> cissToConfigure) {

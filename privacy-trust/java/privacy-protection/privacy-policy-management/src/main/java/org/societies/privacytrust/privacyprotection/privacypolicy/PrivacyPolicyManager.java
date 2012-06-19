@@ -59,11 +59,11 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 
 	ICommManager commManager;
 	ICtxBroker ctxBroker;
-	PrivacyPolicyRegistryManager policyRegistryManager;
+	public PrivacyPolicyRegistryManager policyRegistryManager;
 
 
 	public void init() {
-		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker);
+		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker,commManager.getIdManager());
 	}
 
 
@@ -164,7 +164,10 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	 */
 	@Override
 	public String toXMLString(RequestPolicy privacyPolicy) {
-		return privacyPolicy.toXMLString();
+		if (null == privacyPolicy) {
+			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+		}
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+privacyPolicy.toXMLString();
 	}
 
 	/* (non-Javadoc)

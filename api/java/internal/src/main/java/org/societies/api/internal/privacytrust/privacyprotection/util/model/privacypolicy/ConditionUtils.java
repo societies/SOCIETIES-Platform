@@ -61,8 +61,9 @@ public class ConditionUtils {
 			return null;
 		}
 		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition conditionBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Condition();
-		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ConditionConstants conditionConstant = org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ConditionConstants.valueOf(condition.getConditionName().name());
+		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ConditionConstants conditionConstant = org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ConditionConstants.fromValue(condition.getConditionName().name());
 		conditionBean.setConditionConstant(conditionConstant);
+		conditionBean.setValue(condition.getValueAsString());
 		conditionBean.setOptional(condition.isOptional());
 		return conditionBean;
 	}

@@ -61,7 +61,8 @@ public class RequestItemUtils {
 		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem requestItemBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem();
 		requestItemBean.setResource(ResourceUtils.toResourceBean(requestItem.getResource()));
 		requestItemBean.setOptional(requestItem.isOptional());
-		// TODO: manage list
+		requestItemBean.setActions(ActionUtils.toActionBeans(requestItem.getActions()));
+		requestItemBean.setConditions(ConditionUtils.toConditionBeans(requestItem.getConditions()));
 		return requestItemBean;
 	}
 	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestItem> toRequestItemBeans(List<RequestItem> requestItems)

@@ -1,6 +1,6 @@
 <%@ page import="java.util.*,
                  org.jivesoftware.openfire.XMPPServer,
-                 org.jivesoftware.util.*,
+                 org.jivesoftware.util.ParamUtils,
                  org.societies.da.openfire.plugin.SocietiesPlugin"
     errorPage="error.jsp"
 %>
@@ -35,7 +35,7 @@
     <div class="">
     	<p>You can now choose a SOCIETIES Cloud Container Provider:</p>
     	<% for (String url : cloudProviderUrls) {%>
-    		<p><a href="<%= url %>" /></p>
+    		<p><a href="<%= url %>" ><%= url %></a></p>
     	<% } %>
     </div>
 <% }  else  { %>

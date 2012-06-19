@@ -75,11 +75,14 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			LOG.error("timeperiod string was malformed, could not parse long");
 			return ret;
 		}
-		
-		for(Activity act : list){
-			if(Long.parseLong(act.getPublished())>=fromTime && Long.parseLong(act.getPublished())<=toTime){
-				ret.add(act);
+
+		if(list != null){
+			for(Activity act : list){
+				if(Long.parseLong(act.getPublished())>=fromTime && Long.parseLong(act.getPublished())<=toTime){
+					ret.add(act);
+				}
 			}
+				
 		}
 		return ret;
 	}
@@ -159,6 +162,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			session.save(newact);
 			t.commit();
 		}catch(Exception e){
+			e.printStackTrace();
 			t.rollback();
 			LOG.warn("Saving activity failed, rolling back");
 			e.printStackTrace();

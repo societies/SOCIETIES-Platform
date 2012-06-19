@@ -221,7 +221,7 @@ public class RelevantCommunityAnalyser implements IRelevantCommunityAnalyser
     }
         
     @Override
-    public ArrayList<IIdentity> processRelevanceRecommendations() {
+    public Future<ArrayList<IIdentity>> processRelevanceRecommendations() {
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>(); 
     	

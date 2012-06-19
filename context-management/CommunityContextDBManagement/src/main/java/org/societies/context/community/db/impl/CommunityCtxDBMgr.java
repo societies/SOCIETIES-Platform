@@ -70,7 +70,7 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 
 	private final ConcurrentMap<CtxIdentifier, CtxModelObject> modelObjects;
 	
-	@Autowired(required=true)
+	
 	public CommunityCtxDBMgr () {
 
 		LOG.info(this.getClass() + " instantiated");

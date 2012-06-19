@@ -1,8 +1,10 @@
+
+
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,61 +24,34 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.test.privacypolicy;
 
-import java.io.Serializable;
+package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 
-
-/**
- * Describe your class here...
- *
- * @author Eliza
- *
- */
-public class MyIdentity implements IIdentity, Serializable{
-
+public class ProximityRecord {
 	
-	private final IdentityType type;
-	private final String identifier;
-	private final String domainIdentifier;
-
-	public MyIdentity(IdentityType type, String identifier,
-			String domainIdentifier) {
-				this.type = type;
-				this.identifier = identifier;
-				this.domainIdentifier = domainIdentifier;
-		
-		
-		// TODO Auto-generated constructor stub
+	private Timestamp timestamp;
+	private ArrayList<String> deviceIDs;
+	private ArrayList<String> cssIDs;
+	
+	public ProximityRecord(Timestamp timestamp, ArrayList<String> deviceIDs, ArrayList<String> cssIDs) {
+		this.timestamp = timestamp;
+		this.deviceIDs = deviceIDs;
+		this.cssIDs = cssIDs;
 	}
-
-	@Override
-	public String getJid() {
-		return type+"://"+identifier+"@"+domainIdentifier;
+	
+	public Timestamp getTimestamp() {
+		return timestamp;
 	}
-
-	@Override
-	public String getBareJid() {
-		// TODO Auto-generated method stub
-		return "";
+	
+	public ArrayList<String> getDeviceIDs() {
+		return deviceIDs;
 	}
-
-	@Override
-	public String getDomain() {
-		return domainIdentifier;
+	
+	public ArrayList<String> getCssIDs() {
+		return cssIDs;
 	}
-
-	@Override
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	@Override
-	public IdentityType getType() {
-		return type;
-	}
-
+	
 }

@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
 
-import org.apache.log4j.Logger;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.personalisation.ISocialProfiler;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
@@ -25,7 +26,7 @@ import org.societies.personalisation.socialprofiler.service.SocialTimerTask;
 
 public class SocialProfiler implements ISocialProfiler {
 
-	private static final Logger 	logger 			= Logger.getLogger(ISocialProfiler.class);
+	private static final Logger logger = LoggerFactory.getLogger(SocialProfiler.class);
 	private Properties 				props 			= new Properties();
 	private String 					configFileName	= "config.properties";
 	private GraphManager	 		graph;
@@ -63,7 +64,7 @@ public class SocialProfiler implements ISocialProfiler {
 		String neoDBPath = props.getProperty("neo4j.dbPath");
 		
 		if (neoDBPath==null || neoDBPath.isEmpty()){
-			logger.fatal("NeoDB path has not been set in config.properties (neo4j.dbPath)");
+			logger.error("NeoDB path has not been set in config.properties (neo4j.dbPath)");
    		 	return;
 		}
 		
@@ -276,11 +277,11 @@ public class SocialProfiler implements ISocialProfiler {
 	    	user_number_actions.add(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.QUIZ_PROFILE, personId));
 	    	user_number_actions.add(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.SURF_PROFILE, personId));
 	    	
-	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.NARCISSISM_PROFILE, personId));
-	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.PHOTO_PROFILE, personId));
-	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.SUPERACTIVE_PROFILE, personId));
-	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.QUIZ_PROFILE, personId));
-	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.SURF_PROFILE, personId));
+	    	logger.debug(""+databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.NARCISSISM_PROFILE, personId));
+	    	logger.debug(""+databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.PHOTO_PROFILE, personId));
+	    	logger.debug(""+databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.SUPERACTIVE_PROFILE, personId));
+	    	logger.debug(""+databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.QUIZ_PROFILE, personId));
+	    	logger.debug(""+databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.SURF_PROFILE, personId));
 	    }
 	    return user_number_actions;
 	}

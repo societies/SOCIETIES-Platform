@@ -38,6 +38,8 @@ import org.societies.api.identity.IIdentity;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import java.util.concurrent.Future;
+
 /**
  * This is the interface for the Suggested Community Analyser component,
  * and acts as the gateway to Community Lifecycle Management, which
@@ -53,10 +55,12 @@ import java.util.HashMap;
 public interface IRelevantCommunityAnalyser {
 	
 	
-   /** 
-    * 
-    */
-    public ArrayList<IIdentity> processRelevanceRecommendations();
+	/** 
+     * Identify and return relevant existing CISs for the user to join.
+     * 
+     * @return ArrayList of the identities of the CISs
+     */
+    public Future<ArrayList<IIdentity>> processRelevanceRecommendations();
     
    
 }

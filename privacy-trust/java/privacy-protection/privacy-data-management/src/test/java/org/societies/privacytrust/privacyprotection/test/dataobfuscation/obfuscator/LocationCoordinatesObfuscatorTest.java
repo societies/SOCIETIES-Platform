@@ -89,7 +89,7 @@ public class LocationCoordinatesObfuscatorTest {
 	}
 
 	@Test
-	@Parameters({ "0.00001", "2.5" })
+	@Parameters({ "-1", "2.5" })
 	public void testObfuscateDataOutOfBound(double obfuscationLevel) {
 		LOG.info("[Test begin] testObfuscateDataOutOfBound("+obfuscationLevel+")");
 		IDataWrapper<LocationCoordinates> locationCoordinatesWrapper = DataWrapperFactory.getLocationCoordinatesWrapper(48.856666, 2.350987, 542.0);

@@ -18,22 +18,75 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT BELOW HERE ................ -->
 
-<h4>${result}</h4>
-<br/>
-<br/>
-<Table>
-<tr><td><B>Name</B></td><td><B>ID</B></td></tr>
+<%
+//GET THE METHOD CALLED FROM THE FORM
+Map model = request.getParameterMap();
+String[] methodCalledArr = (String[]) model.get("method");
+String methodCalled = methodCalledArr[0];
+%>
 
-	<xc:forEach var="record" items="${cisrecords}">
-        <tr>
-        	<td>${record.getName()}&nbsp;</td>
-        	<td>${record.getCisId()}&nbsp;</td>
-        </tr>
-    </xc:forEach>
-    	
+<h4>${res}</h4>
+<br/>
+<br/>
+   <p><b>CIS's I own or am a member of </b></p>
+	<table>
+		<tr><td><B>Name</B></td><td><B>ID</B></td></tr>
+		<xc:forEach var="record" items="${cisrecords}">
+	        <tr>
+	        	<td>${record.getName()}&nbsp;</td>
+	        	<td>${record.getCisId()}&nbsp;</td>
+	        </tr>
+	    </xc:forEach>
+	</table>	
+
+<%
+if (methodCalled.equals("GetMemberList")) {
+%>
+    <p><b>Member list:</b></p>
+	<table>
+		<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
+		<xc:forEach var="record" items="${memberRecords}">
+	        <tr>
+	        	<td>${record.getMembersJid()}&nbsp;</td>
+	        	<td>${record.getMembershipType()}&nbsp;</td>
+	        </tr>
+	    </xc:forEach>
 	</table>
+<%
+} //END IF
+
+if (methodCalled.equals("GetMemberListRemote")) {
+	%>
+	<p>Checking with hosting CIS...</p>
+	<form id="myform" name="myform" action="cismanager.html" method="post">
+	<input type="hidden" name="method" value="RefreshRemoteMembers">
+	</form>
+	<script language="javascript">
+	setTimeout(continueExecution, 15000) 
+	//wait ten seconds before continuing  
 	
-	<h4>${res}</h4>
+	function continueExecution() {    
+		document.forms["myform"].submit(); 
+	} 
+	</script>
+	<%
+}
+//remoteCommunity.getOwnerJid()
+if (methodCalled.equals("RefreshRemoteMembers")) {
+%>
+    <p><b>Membership List from remote CIS:</b></p>
+	<table>
+		<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
+		<xc:forEach var="record" items="${remoteCommunity.getWho().getParticipant()}">
+	        <tr>
+	        	<td>${record.getMembersJid()}&nbsp;</td>
+	        	<td>${record.getMembershipType()}&nbsp;</td>
+	        </tr>
+	    </xc:forEach>
+	</table>
+<%
+} //END IF
+%>	
 	
 <!-- .................END PLACE YOUR CONTENT ................ -->
 	<!-- FOOTER -->

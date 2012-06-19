@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,62 +22,46 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.privacypolicy.registry;
 
-import java.io.Serializable;
+package org.societies.orchestration.api;
 
+import java.util.ArrayList;
+
+import org.societies.api.activity.IActivity;
+//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.orchestration.CommunityLifecycleManagement.impl.ICisRecord;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.css.management.ICssActivity;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import java.util.concurrent.Future;
 
 /**
- * Describe your class here...
- *
- * @author Eliza
- *
+ * This is the interface for the Egocentric Community Analyser component, which
+ * allows some parameters for the component to be updated from a light client Android
+ * device.
+ * 
+ * @author Fraser Blackmun
+ * @version 1
+ * 
  */
-public class MyIdentity implements IIdentity, Serializable{
 
+public interface IEgocentricCommunityAnalyser {
 	
-	private final IdentityType type;
-	private final String identifier;
-	private final String domainIdentifier;
-
-	public MyIdentity(IdentityType type, String identifier,
-			String domainIdentifier) {
-		this.type = type;
-		this.identifier = identifier;
-		this.domainIdentifier = domainIdentifier;
-	}
-	public MyIdentity(IIdentity identity) {
-				this.type = identity.getType();
-				this.identifier = identity.getIdentifier();
-				this.domainIdentifier = identity.getDomain();
-	}
-
-	@Override
-	public String getJid() {
-		return type+"://"+identifier+"@"+domainIdentifier;
-	}
-
-	@Override
-	public String getBareJid() {
-		return type+"://"+identifier+"@"+domainIdentifier;
-	}
-
-	@Override
-	public String getDomain() {
-		return domainIdentifier;
-	}
-
-	@Override
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	@Override
-	public IdentityType getType() {
-		return type;
-	}
-
+	
+	/** 
+     * Set the short-term check time.
+     *
+     */
+    public void setShortTermCheckTime(int minutes);
+    
+    /** 
+     * Set the long-term check time.
+     *
+     */
+    public void setLongTermCheckTime(int hours);
 }

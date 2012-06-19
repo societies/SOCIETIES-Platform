@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,36 +23,44 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package org.societies.orchestration.api;
+
+import java.util.ArrayList;
+
+import org.societies.api.activity.IActivity;
+//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.orchestration.CommunityLifecycleManagement.impl.ICisRecord;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.css.management.ICssActivity;
+import org.societies.api.identity.IIdentity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import java.util.concurrent.Future;
+
 /**
- * Is a feed of activities that are collected from CIS members and their shared services.
+ * This is the interface for the Suggested Community Analyser component,
+ * and acts as the gateway to Community Lifecycle Management, which
+ * the Egocentric Community Analyser, CSCW, and CSM Analyser send their
+ * CIS recommendations to for it to analyse further and take action if 
+ * deemed appropriate, either via user feedback or fully automated action.
  * 
- * @link CISActivity
- * @author Babak.Farshchian@sintef.no
- * @version 0
+ * @author Fraser Blackmun
+ * @version 1
+ * 
  */
-package org.societies.cis.manager;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.societies.activity.ActivityFeed;
-
-
-public class OldActivityFeed {
-	public Set<CisActivity> activitySet;
-	public void getActivities(String CssId, String timePeriod){};
-	public void getActivities(String CssId, String query, String timePeriod){};
-	public void addCisActivity(CisActivity activity){};
-	public void cleanupFeed(String criteria){}
-	
-	String activityFeedUri;
-	
-	public OldActivityFeed() {
-		activityFeedUri = "";
-		activitySet = new HashSet<CisActivity>();
-		
-	};
+public interface IRelevantCommunityAnalyser {
 	
 	
-
+	/** 
+     * Identify and return relevant existing CISs for the user to join.
+     * 
+     * @return ArrayList of the identities of the CISs
+     */
+    public Future<ArrayList<IIdentity>> processRelevanceRecommendations();
+    
+   
 }

@@ -112,18 +112,66 @@ public class Jaxb2Simple extends AbstractMojo
 			String textToReplace = TO_STRING_CODE;
 			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace); 
 		}
+		
+		//ADD IMPORT ElementList
+		if (newSchemaContent.indexOf("@ElementList") > 0) {
+			String textToFind = "(import org.simpleframework.xml.Element;)";
+			String textToReplace = "$1\nimport org.simpleframework.xml.ElementList;";
+			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace); 
+		}
 		return newSchemaContent;
 	}
 
 	private String findReplacePatterns(StringBuffer schemaContent) {
 		String newSchemaContent; String textToFind; String textToReplace;
-
+		newSchemaContent = schemaContent.toString();
+		
 		//import javax.xml.bind.annotation.* -> import org.simpleframework.xml.*
-		//s/^\(import javax.xml.bind.annotation.\w*;\n\)*import javax.xml.bind.annotation.\w*;/import org.simpleframework.xml.*;/
-		textToFind = "import javax.xml.bind.annotation.*import javax.xml.bind.annotation.\\w*;";
-		textToReplace = "import org.simpleframework.xml.*;";
-		newSchemaContent = findReplacePattern(schemaContent.toString(), textToFind, textToReplace, Pattern.DOTALL|Pattern.CASE_INSENSITIVE);
-				
+		//textToFind = "import javax.xml.bind.annotation.*import javax.xml.bind.annotation.\\w*;";
+		//textToReplace = "import org.simpleframework.xml.*;";
+		//newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace, Pattern.DOTALL|Pattern.CASE_INSENSITIVE);
+			
+		//import javax\.xml\.bind\.annotation\.XmlAccessType/import org.simpleframework.xml.DefaultType 
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlAccessType;";
+		textToReplace = "import org.simpleframework.xml.DefaultType;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlAccessorType/import org.simpleframework.xml.Default/ 
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlAccessorType;\n";
+		//textToReplace = "import org.simpleframework.xml.Default;";
+		textToReplace = "";  //PubSub has a class called Default also! Need to refer to xml.default by FQ name
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlAttribute;/import org.simpleframework.xml.Attribute;
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlAttribute;";
+		textToReplace = "import org.simpleframework.xml.Attribute;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+
+		//import javax\.xml\.bind\.annotation\.XmlElement;/import org.simpleframework.xml.Element;/
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlElement;";
+		textToReplace = "import org.simpleframework.xml.Element;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlType;/import org.simpleframework.xml.Element;\nimport org.simpleframework.xml.Order;/ 
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlType;";
+		textToReplace = "import org.simpleframework.xml.Order;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlRootElement/import org.simpleframework.xml.Root/ 
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlRootElement;";
+		textToReplace = "import org.simpleframework.xml.Root;\nimport org.simpleframework.xml.Namespace;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlValue/import org.simpleframework.xml.Text
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlValue;";
+		textToReplace = "import org.simpleframework.xml.Text;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlElements/import org.simpleframework.xml.ElementList 
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlElements;";
+		textToReplace = "import org.simpleframework.xml.ElementList;";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
 		//import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter -> import org.simpleframework.xml.convert.Convert;
 		textToFind = "import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;";
 		textToReplace = "import org.simpleframework.xml.convert.Convert;";
@@ -166,9 +214,9 @@ public class Jaxb2Simple extends AbstractMojo
 		//2) remove nillable=true|false
 		
 		//@XmlElement(required = true, type = Integer.class, nillable = true)
-		//textToFind = "(@XmlElement\\(.*)nillable = true|false?\\)";
+		//textToFind = "(@XmlElement\\(.*)nillable = true|false\\)";
 		textToFind = ", nillable = (true|false)";
-		textToReplace = "";		//"$1)";
+		textToReplace = "";	//"$1)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//@XmlElement(required = true, type = Integer.class, nillable = true)
@@ -273,10 +321,39 @@ public class Jaxb2Simple extends AbstractMojo
 		textToFind = "@XmlAnyElement.*?\n";
 		textToReplace = "";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+
+		//import javax\.xml\.bind\.annotation\.XmlAnyElement;/d
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlAnyElement;";
+		textToReplace = "\n";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlAnyAttribute;/d
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlAnyAttribute;";
+		textToReplace = "\n";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlSeeAlso;/d
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlSeeAlso;";
+		textToReplace = "\n";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlSchemaType;/d 
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlSchemaType;";
+		textToReplace = "\n";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlEnum;/d 
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlEnum;";
+		textToReplace = "\n";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		//import javax\.xml\.bind\.annotation\.XmlEnumValue;/d
+		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlEnumValue;";
+		textToReplace = "\n";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		// /@XmlSchemaType.*/d 
 		// /@XmlAnyAttribute.*/d 
-		
 		
 		return newSchemaContent;
 	}

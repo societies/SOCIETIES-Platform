@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.apache.shindig.social.opensocial.model.Person;
@@ -41,6 +40,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.personalisation.socialprofiler.Variables;
 import org.societies.personalisation.socialprofiler.datamodel.Interests;
@@ -53,7 +54,7 @@ import org.societies.personalisation.socialprofiler.exception.NeoException;
 
 public class ProfilerEngine implements Variables{
 
-	private static final Logger 			logger 							= Logger.getLogger(ProfilerEngine.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProfilerEngine.class);
 	private GraphManager					graph;
 	private DatabaseConnection 				databaseConnection;
 	private ISocialData						socialData;
