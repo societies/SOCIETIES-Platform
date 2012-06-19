@@ -33,6 +33,7 @@ import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
 import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
 import org.societies.api.internal.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.osgi.event.CSSEvent;
@@ -157,8 +158,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 		for (int i = 0; i < topics.length; ++i) {
 			
 			final InternalEvent internalEvent = new InternalEvent(
-					// TODO temp? topics[i], event.getId().toString(), source, null);
-					topics[i], event.getId().toString(), source, event.getId());
+					topics[i], event.getId().toString(), source, event.getType());
 
 			if (this.eventMgr == null)
 				throw new TrustEventMgrException("Could not send TrustEvidenceUpdateEvent '"
@@ -246,7 +246,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 				LOG.debug("Received internal event"
 					+ ": type=" + internalEvent.geteventType()
 					+ ", name=" + internalEvent.geteventName()
-					+ ", source=" + internalEvent.geteventSource());
+					+ ", source=" + internalEvent.geteventSource()
+					+ ", info=" + internalEvent.geteventInfo());
 			
 			if (!(internalEvent.geteventInfo() instanceof TrustUpdateEventInfo))
 				LOG.error("Cannot handle internal event"
@@ -311,7 +312,6 @@ public class TrustEventMgr implements ITrustEventMgr {
 		}
 		
 		/*
-		 * (non-Javadoc)
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
@@ -348,12 +348,21 @@ public class TrustEventMgr implements ITrustEventMgr {
 				LOG.debug("Received internal event"
 					+ ": type=" + internalEvent.geteventType()
 					+ ", name=" + internalEvent.geteventName()
-					+ ", source=" + internalEvent.geteventSource());
+					+ ", source=" + internalEvent.geteventSource()
+					+ ", info=" + internalEvent.geteventInfo());
 			
+			if (!(internalEvent.geteventInfo() instanceof TrustEvidenceType))
+				LOG.error("Cannot handle internal event"
+						+ ": type=" + internalEvent.geteventType()
+						+ ", name=" + internalEvent.geteventName()
+						+ ", source=" + internalEvent.geteventSource()
+						+ ": Unexpected eventInfo: " + internalEvent.geteventInfo());
 			TrustedEntityId teid;
 			try {
 				teid = new TrustedEntityId(internalEvent.geteventName());
-				final TrustEvidenceUpdateEvent event = new TrustEvidenceUpdateEvent(teid);
+				final TrustEvidenceUpdateEvent event = 
+						new TrustEvidenceUpdateEvent(teid, 
+								(TrustEvidenceType) internalEvent.geteventInfo());
 				if (LOG.isDebugEnabled())
 					LOG.debug("Forwarding TrustEvidenceUpdateEvent " + event + " to listener");
 				this.listener.onUpdate(event);

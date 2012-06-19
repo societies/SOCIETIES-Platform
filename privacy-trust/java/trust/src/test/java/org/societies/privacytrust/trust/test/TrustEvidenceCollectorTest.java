@@ -163,7 +163,8 @@ public class TrustEvidenceCollectorTest {
 		final TrustedEntityId teid = new TrustedEntityId(TRUSTOR_ID, 
 				TrustedEntityType.CSS, TRUSTED_CSS_ID);
 		final Set<IDirectTrustEvidence> evidenceSet = 
-				this.trustEvidenceRepo.retrieveDirectEvidence(teid, now, null);
+				this.trustEvidenceRepo.retrieveDirectEvidence(teid, 
+						TrustEvidenceType.RATED, now, null);
 		assertFalse(evidenceSet.isEmpty());
 		IDirectTrustEvidence directEvidence = evidenceSet.iterator().next();
 		assertEquals(TrustEvidenceType.RATED, directEvidence.getType());
@@ -219,7 +220,8 @@ public class TrustEvidenceCollectorTest {
 		final TrustedEntityId teid = new TrustedEntityId(TRUSTOR_ID, 
 				TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
 		final Set<IDirectTrustEvidence> evidenceSet = 
-				this.trustEvidenceRepo.retrieveDirectEvidence(teid, now, null);
+				this.trustEvidenceRepo.retrieveDirectEvidence(teid, 
+						TrustEvidenceType.RATED, now, null);
 		assertFalse(evidenceSet.isEmpty());
 		IDirectTrustEvidence directEvidence = evidenceSet.iterator().next();
 		assertEquals(TrustEvidenceType.RATED, directEvidence.getType());

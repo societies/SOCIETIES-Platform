@@ -99,7 +99,7 @@ public class DirectTrustEngine extends TrustEngine {
 				} else {
 					lastTrustUpdate = css.getDirectTrust().getLastUpdated();
 				}
-				final Set<IDirectTrustEvidence> evidenceSet = trustEvidenceRepo.retrieveDirectEvidence(teid, lastTrustUpdate, null);
+				final Set<IDirectTrustEvidence> evidenceSet = trustEvidenceRepo.retrieveDirectEvidence(teid, null, lastTrustUpdate, null);
 				for (final IDirectTrustEvidence evidence : evidenceSet) {
 					
 					if (TrustEvidenceType.RATED.equals(evidence.getType()))
