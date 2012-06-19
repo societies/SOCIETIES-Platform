@@ -53,7 +53,7 @@ import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
 
-
+@Deprecated
 public class CisManagerClient implements IcisManagerClient {
 
 	IIdentity cssManagerId;

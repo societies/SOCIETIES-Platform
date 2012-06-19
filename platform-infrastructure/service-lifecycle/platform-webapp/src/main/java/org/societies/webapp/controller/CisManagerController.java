@@ -103,6 +103,7 @@ public class CisManagerController {
 		methods.put("CreateCis", "Create a CIS ");
 		methods.put("GetCisList", "List my CISs");
 		methods.put("JoinRemoteCIS", "Join a remote CIS");
+		methods.put("LeaveRemoteCIS", "Leave a remote CIS");
 		methods.put("GetMemberList", "Get list of members of a CIS");
 		methods.put("GetMemberListRemote", "Get list of members from remote CIS");
 		methods.put("AddMember", "Add member to a CIS");
@@ -184,6 +185,14 @@ public class CisManagerController {
 				model.put("joinStatus", resultCallback);
 				ICis i = getCisManager().getCis(cisForm.getCssId(), cisForm.getCisJid());
 				model.put("cis", i);
+
+			} else if (method.equalsIgnoreCase("LeaveRemoteCIS")) {
+				model.put("methodcalled", "LeaveRemoteCIS");
+
+				this.getCisManager().leaveRemoteCIS(cisForm.getCisJid(), icall);
+				res = "left CIS: ";
+				model.put("res", res);
+
 
 			} else if (method.equalsIgnoreCase("GetMemberList")) {
 				model.put("methodcalled", "GetMemberList");

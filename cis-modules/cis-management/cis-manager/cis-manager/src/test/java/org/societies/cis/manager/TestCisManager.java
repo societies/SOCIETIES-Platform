@@ -50,6 +50,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
+import org.societies.api.activity.IActivity;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -577,6 +578,63 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 }	
 	
 	 
+		// CLEANING UP
+		 cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
+	}
+	
+	@Ignore
+	@Test
+	public void addActivity() throws InterruptedException, ExecutionException {
+
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.init();
+		
+		
+		cisManagerUnderTestInterface = cisManagerUnderTest;
+		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+
+		IActivity iActivity = new org.societies.activity.model.Activity();
+		iActivity.setActor("act");
+		iActivity.setObject("obj");
+		iActivity.setTarget("tgt");
+		iActivity.setPublished((System.currentTimeMillis() -55) + "");
+		iActivity.setVerb("verb");
+
+		IActivity iActivity2 = new org.societies.activity.model.Activity();
+		iActivity.setActor("act2");
+		iActivity.setObject("obj2");
+		iActivity.setTarget("tgt2");
+		iActivity.setPublished((System.currentTimeMillis() -500) + "");
+		iActivity.setVerb("verb2");
+
+		
+		Iciss.getActivityFeed().addCisActivity(iActivity);
+		Iciss.getActivityFeed().addCisActivity(iActivity2);
+		System.out.println((System.currentTimeMillis() -20000) + " " + System.currentTimeMillis());
+		List <IActivity> l = Iciss.getActivityFeed().getActivities((System.currentTimeMillis() -20000) + " " + System.currentTimeMillis());
+		
+		
+		int[] check = {0,0};
+		
+		Iterator<IActivity> it = l.iterator();
+		
+		while(it.hasNext()){
+			IActivity element = it.next();
+			if(element.getActor().equals("act") )
+				check[0] = 1;
+			if(element.getActor().equals("act2") )
+				check[1] = 1;
+
+	     }
+		
+		// check if it found all matching CISs
+		 for(int i=0;i<check.length;i++){
+			 assertEquals(check[i], 1);
+		 }
+
 		// CLEANING UP
 		 cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
 	}
