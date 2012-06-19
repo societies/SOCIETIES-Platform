@@ -29,8 +29,8 @@
 </script>
 
 <form id="cisDirectory" name="cisDirectory" method="post" action="cismanager.html">
-<input type="hidden" name="cisJid">
-<input type="hidden" name="method" value="JoinRemoteCIS">
+<input type="hidden" name="cisJid" id="cisJid">
+<input type="hidden" name="method" id="method" value="JoinRemoteCIS">
 
 <Table border="1">
 <tr><td><B>CIS Name</B></td><td><B>Uri</B></td><td><B>Action</B></td><!-- <td><B>ID</B></td><td><B>Password</B></td><td><B>Mode</B></td> -->

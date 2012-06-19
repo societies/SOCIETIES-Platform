@@ -108,15 +108,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		this.cisManager = cisManager;
 	}
 	
-	public void setPolicyNegotiaton(INegotiation policyNegotiation){
-		this.policyNegotiation = policyNegotiation;
-	}
-	
-	
 	public ICommManager getCommMngr() {
 		return commMngr;
 	}
 
+	public void setPolicyNegotiation(INegotiation policyNegotiation){
+		this.policyNegotiation = policyNegotiation;
+	}
+	
 	public INegotiation getPolicyNegotiation(){
 		return policyNegotiation;
 	}
