@@ -24,6 +24,14 @@
  */
 package org.societies.context.source.test;
 
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -31,23 +39,117 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.source.ICtxSourceMgr;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxQuality;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.source.impl.ContextSourceManagement;
 
 public class ContextSourceManagementTest {
-    private static ICtxSourceMgr csm;
+    private static ContextSourceManagement csm;
 	private static Logger LOG = LoggerFactory
 			.getLogger(ContextSourceManagementTest.class);
+	private static ICtxBroker mockBroker = mock(ICtxBroker.class);
+	private static ICommManager mockCommMgr = mock(ICommManager.class);
+	
 
+	private static Future<List<CtxEntityIdentifier>> mockFutureEntityIDs = mock(Future.class);
+	private static Future<List<CtxEntityIdentifier>> mockFutureEntityIDsEmpty = mock(Future.class);
+	private static Future<List<CtxIdentifier>> mockFutureIDs = mock(Future.class);
+	private static List<CtxEntityIdentifier> mockEntityIDs = mock(List.class);
+	private static List<CtxEntityIdentifier> mockEntityIDsEmpty = mock(List.class);
+	private static List<CtxIdentifier> mockAssocIdentifierList = mock(List.class);
+	private static CtxEntityIdentifier mockEntityID = mock(CtxEntityIdentifier.class);
+	private static CtxIdentifier mockCtxID = mock(CtxIdentifier.class);
+	private static Future<CtxModelObject> mockFutureModelObject = mock(Future.class);
+	private static Future<CtxEntity> mockFutureEntity = mock(Future.class);
+	private static Future<CtxModelObject> mockFutureModelObjectAttribute = mock(Future.class);
+	private static CtxModelObject mockModelObject = mock(CtxModelObject.class);
+	private static CtxEntity mockCtxEntity = null;
+	private static Future<CtxAttribute> mockFutureAttribute = mock(Future.class);
+	private static CtxAttribute mockAttribute = mock(CtxAttribute.class);
+	private static CtxQuality mockQuality = mock(CtxQuality.class);
+	private static Future<CtxAssociation> mockFutureAssociation = mock(Future.class);
+	private static CtxAssociation mockAssociation = mock(CtxAssociation.class);
+	
+	private static IIdentityManager mockIdManager = mock(IIdentityManager.class);;
+	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);;
+
+	/**
+	 * @throws java.lang.Exception
+	 */
 	@BeforeClass
-    public static void setUpClass() throws Exception {
+	public static void setUpBeforeClass() throws Exception {
+		mockCtxEntity = mock(CtxEntity.class);
+
+		when(mockBroker.lookupEntities("CONTEXT_SOURCE", "CtxSourceId", null, null)).thenReturn(mockFutureEntityIDs);
+		when(mockBroker.lookupEntities("CONTEXT_SOURCE", "CtxSourceId", "TemperatureSensor0", "TemperatureSensor0")).thenReturn(mockFutureEntityIDs);
+		when(mockBroker.lookupEntities("CONTEXT_SOURCE", "CtxSourceId", "IamAnewID", "IamAnewID")).thenReturn(mockFutureEntityIDsEmpty);
+		when(mockBroker.lookup(CtxModelType.ASSOCIATION, "providesUpdatesFor")).thenReturn(mockFutureIDs);
+		when(mockFutureEntityIDs.get()).thenReturn(mockEntityIDs);
+		when(mockEntityIDs.get(0)).thenReturn(mockEntityID);
+		
+		when(mockFutureEntityIDsEmpty.get()).thenReturn(mockEntityIDsEmpty);
+		when(mockEntityIDsEmpty.isEmpty()).thenReturn(true);
+
+
+		when(mockBroker.retrieve(mockEntityID)).thenReturn(mockFutureModelObject);
+		when(mockFutureModelObject.get()).thenReturn(mockCtxEntity);
+
+		when(mockBroker.createAttribute(mockEntityID, "data")).thenReturn(mockFutureAttribute);
+		when(mockBroker.createAttribute(mockEntityID, "CtxSourceId")).thenReturn(mockFutureAttribute);
+		when(mockBroker.createAttribute(mockEntityID, "CtxType")).thenReturn(mockFutureAttribute);
+		when(mockFutureAttribute.get()).thenReturn(mockAttribute);
+
+		when(mockBroker.createEntity("CONTEXT_SOURCE")).thenReturn(mockFutureEntity);
+		when(mockFutureEntity.get()).thenReturn(mockCtxEntity);
+		when(mockCtxEntity.getId()).thenReturn(mockEntityID);
+
+		when(mockBroker.createAssociation("providesUpdatesFor")).thenReturn(mockFutureAssociation);
+		when(mockFutureAssociation.get()).thenReturn(mockAssociation);
+
+		when(mockBroker.update(mockAttribute)).thenReturn(mockFutureModelObjectAttribute);
+		when(mockFutureModelObjectAttribute.get()).thenReturn(mockAttribute);
+		when(mockAttribute.getQuality()).thenReturn(mockQuality);
+		
+
+		when(mockFutureIDs.get()).thenReturn(mockAssocIdentifierList);
+		when(mockAssocIdentifierList.size()).thenReturn(0);
+		
+		
+
+		when(mockCommMgr.getIdManager()).thenReturn(mockIdManager);
+		when(mockIdManager.getThisNetworkNode()).thenReturn(mockNetworkNode);
+		when(mockBroker.retrieveCssNode(mockNetworkNode)).thenReturn(mockFutureEntity);
+		when(mockFutureEntity.get()).thenReturn(mockCtxEntity);		
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+
+
     	csm = new ContextSourceManagement();
-    }
- 
-    @Before
-    public void setUp() throws Exception {
-        // Code executed before each test    
-    }
+    	csm.setCtxBroker(mockBroker);
+    	csm.setCommManager(mockCommMgr);
+	}
  
     @Test
     public void testWithoutRegistration() {
@@ -55,6 +157,61 @@ public class ContextSourceManagementTest {
     	
     	LOG.info("There must have been an error message");
     	assert(true);
+    }
+ 
+    @Test
+    public void testWithRegistrationPure() {
+    	boolean result =false;
+    	try {
+			String id = csm.register("TemperatureSensor", "Temperature").get();
+
+	    	result = csm.sendUpdate(id, "Temperature").get();
+	    	
+	    	
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+    	
+    	assert(result);
+    }
+ 
+    @Test
+    public void testWithRegistrationWithEntity() {
+    	boolean result =false;
+    	try {
+			String id = csm.register(mockCtxEntity, "TemperatureSensor", "Temperature").get();
+
+	    	result = csm.sendUpdate(id, "Temperature",mockCtxEntity).get();
+	    	
+	    	
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+    	
+    	assert(result);
+    }
+ 
+    @Test
+    public void testWithRegistrationAndFullQoC() {
+    	boolean result =false;
+    	try {
+			String id = csm.register("TemperatureSensor", "Temperature").get();
+			LOG.info("ID is: "+id);
+			
+	    	result = csm.sendUpdate(id, "Temperature",mockCtxEntity, true, 1.0, 2.0).get();
+	    	
+	    	
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+    	
+    	assert(result);
     }
     
     @After

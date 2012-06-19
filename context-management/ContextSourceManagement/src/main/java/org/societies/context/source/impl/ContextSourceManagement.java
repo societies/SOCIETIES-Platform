@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -38,6 +39,7 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.CtxQuality;
@@ -59,6 +61,22 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 	private static Logger LOG = LoggerFactory
 			.getLogger(ContextSourceManagement.class);
+
+	/**
+	 * The Communication Manager service reference.
+	 * 
+	 * @see {@link #setCommMgr(ICommManager)}
+	 */
+	@Autowired(required = true)
+	private ICommManager commMgr = null;
+	
+	public ICommManager getCommManager() {
+		return commMgr;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		this.commMgr = commManager;
+	}
 
 	/**
 	 * The Context Broker service reference.
@@ -133,9 +151,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 		try {
 			Future<List<CtxEntityIdentifier>> shadowEntitiesFuture = ctxBroker
-					.lookupEntities(sensor, "CtxSourceId", null, null);
-			List<CtxEntityIdentifier> shadowEntities = shadowEntitiesFuture
-					.get();
+					.lookupEntities(sensor, "CtxSourceId", null, null);//TODO Check if min or max values are necessary
+			List<CtxEntityIdentifier> shadowEntities = shadowEntitiesFuture.get();
 			
 			
 			//Check if ID composed before does already exist... Sense?
@@ -226,22 +243,21 @@ public class ContextSourceManagement implements ICtxSourceMgr {
             shadowEntitiesFuture = ctxBroker.lookupEntities(sensor, "CtxSourceId", identifier, identifier);
             shadowEntities = shadowEntitiesFuture.get();
             if (shadowEntities.size() > 1) {
-                if (LOG.isDebugEnabled())
-                	LOG.debug("Sensor-ID " + identifier + " is not unique. No information stored.");
+                if (LOG.isErrorEnabled())
+                	LOG.error("Sensor-ID " + identifier + " is not unique. No information stored.");
                 return new AsyncResult<Boolean>(false);
                 // throw new
                 // Exception("Ambiguity: more than one context source with this identifier exists.");
             } else if (shadowEntities.isEmpty()) {
-                if (LOG.isDebugEnabled())
-                	LOG.debug("Sensor-ID " + identifier + " is not available. No information stored.");
+                if (LOG.isErrorEnabled())
+                	LOG.error("Sensor-ID " + identifier + " is not available. No information stored.");
                 return new AsyncResult<Boolean>(false);
                 // throw new
                 // Exception("Sending failure due to missing Registration.");
             } else {
-                shadowEntityID = shadowEntities.get(0);
+                shadowEntityID = shadowEntities.get(0); 
                 shadowEntity = (CtxEntity) ctxBroker.retrieve(shadowEntityID).get();
             }
-            
  
             attrs = shadowEntity.getAttributes("CtxType");
             if (attrs != null && attrs.size() > 0)
@@ -287,22 +303,24 @@ public class ContextSourceManagement implements ICtxSourceMgr {
                 	CtxAssociation temp;
     				CtxEntity parent;
     				CtxEntity child;
-        			for (CtxIdentifier ctxId: assocIdentifierList){
-        				temp = (CtxAssociation) ctxBroker.retrieve(ctxId).get();
-        				if (temp.parentEntity==null) continue;
-        				parent = (CtxEntity) ctxBroker.retrieve(temp.parentEntity).get();
-        				if (parent!= shadowEntity) continue;
-        				if( temp.childEntities==null || temp.childEntities.size()==0) continue;
-        				child = (CtxEntity) ctxBroker.retrieve(temp.childEntities.iterator().next()).get();
-        				if (child!=null){
-        					owner = child;
-        					break;
-        				}
-        			}
-                	
-                	//TODO retrieve the device owner!
-                	//owner = ctxBroker.createEntity("CSS").get();
-                    owner = ctxBroker.retrieveCssOperator().get();
+    				
+    				if (assocIdentifierList.size()!=0)
+	        			for (CtxIdentifier ctxId: assocIdentifierList){
+	        				temp = (CtxAssociation) ctxBroker.retrieve(ctxId).get();
+	        				if (temp.parentEntity==null) continue;
+	        				parent = (CtxEntity) ctxBroker.retrieve(temp.parentEntity).get();
+	        				if (parent!= shadowEntity) continue;
+	        				if( temp.childEntities==null || temp.childEntities.size()==0) continue;
+	        				child = (CtxEntity) ctxBroker.retrieve(temp.childEntities.iterator().next()).get();
+	        				if (child!=null){
+	        					owner = child;
+	        					break;
+	        				}
+	        			}
+
+                	//owner = ctxBroker.retrieveCssOperator().get();
+                    owner = ctxBroker.retrieveCssNode(commMgr.getIdManager().getThisNetworkNode()).get();
+                    		
                     
                 } catch (CtxException e) {
                 	LOG.error("Could not handle update from " + identifier
