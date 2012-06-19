@@ -32,6 +32,8 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
         userManager = server.getUserManager();
 
         secret = JiveGlobals.getProperty("plugin.societies.secret", "");
+        secret = ""; // TODO remove this that is forcing the secret to be "defaultSecret"
+        
         // If no secret key has been assigned to the user service yet, assign "defaultSecret" to it.
         if (secret.equals("")){
             secret = "defaultSecret";
