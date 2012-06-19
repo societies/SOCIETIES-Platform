@@ -65,15 +65,12 @@ public class CisManagerClientCallback implements ICommCallback {
 					// updates the list of CIS where I belong
 					cisManag.subscribeToCis(new CisRecord(c.getMembershipMode(),c.getCommunityName(),c.getCommunityJid()));
 					LOG.info("subscription worked");
-					// return callback
-					this.sourceCallback.receiveResult(c);
-					
-					
-					
+	
 				}
 				else{ // there is no result field
 					LOG.warn("join response had no result tag");
 					this.sourceCallback.receiveResult( (Community)null);
+					return;
 				}
 			}
 			// end of join response
@@ -86,16 +83,14 @@ public class CisManagerClientCallback implements ICommCallback {
 					// updates the list of CIS where I belong
 					if (!cisManag.unsubscribeToCis(c.getCommunityJid()))
 						LOG.info("unsubscription did not worked");
-					LOG.info("unsubscription worked");
-					// return callback
-					this.sourceCallback.receiveResult(c);
-					
-					
+						LOG.info("unsubscription worked");
+
 					
 				}
 				else{ // there is no result field
 					LOG.warn("unsubscription response was mallformed");
 					this.sourceCallback.receiveResult( (Community)null);
+					return;
 				}
 			}
 			// end of join response
@@ -105,18 +100,19 @@ public class CisManagerClientCallback implements ICommCallback {
 				LOG.info("Get info response received");
 				if(c.getGetInfoResponse().isResult()  ){
 					LOG.info("get info arrived fine");
-					// return callback
-					this.sourceCallback.receiveResult(c);
-					
-					
-					
+	
 				}
 				else{ // there is no result field
 					LOG.warn("get info failed");
 					this.sourceCallback.receiveResult( (Community)null);
+					return;
 				}
 			}
-			// end of get info response
+
+			// return callback for all cases
+			this.sourceCallback.receiveResult(c);
+			
+			
 			
 			
 		}
