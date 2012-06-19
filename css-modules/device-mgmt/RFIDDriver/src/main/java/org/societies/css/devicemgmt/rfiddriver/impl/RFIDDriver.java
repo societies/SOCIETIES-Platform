@@ -29,7 +29,11 @@ import java.util.Hashtable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
+import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
 import org.societies.api.css.devicemgmt.rfid.IRfidDriver;
+import org.societies.api.internal.css.devicemgmt.IDeviceManager;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.osgi.event.IEventMgr;
 
 /**
@@ -42,6 +46,10 @@ public class RFIDDriver implements IRfidDriver {
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	Hashtable<String, SocketClient> sockets;
+	private final String DEVICE_FAMILY_IDENTITY = "org.societies.css.devicemgmt.RFIDDriver";
+	private final String DEVICE_NAME = "RFID_READER";
+	private final String DEVICE_DESCR = "RFID Location Management System";
+	private final String DEVICE_PROVIDER = "HWU";
 	
 	public void initialiseRFIDDriver() {
 		
@@ -49,6 +57,7 @@ public class RFIDDriver implements IRfidDriver {
 	}
 	
 	private IEventMgr eventMgr;
+	private IDeviceManager deviceMgr;
 	/* (non-Javadoc)
 	 * @see org.societies.api.css.devicemgmt.rfid.IRfidDriver#connect(java.lang.String)
 	 */
@@ -63,6 +72,16 @@ public class RFIDDriver implements IRfidDriver {
 		if (socketClient.checkIp(ipAddress)){
 			socketClient.setEventMgr(eventMgr);
 			socketClient.start();
+			DeviceCommonInfo deviceCommonInfo = new DeviceCommonInfo(DEVICE_FAMILY_IDENTITY, 
+					DEVICE_NAME,
+					DeviceTypeConstants.RFID_READER,
+					DEVICE_DESCR, 
+					"ETHERNET", 
+					"LearningZone", 
+					DEVICE_PROVIDER, 
+					null, 
+					false);
+			this.deviceMgr.fireNewDeviceConnected(ipAddress, deviceCommonInfo, new String[]{DeviceMgmtDriverServiceNames.RFID_READER_DRIVER_SERVICE});
 			this.sockets.put(ipAddress, socketClient);
 		}else{
 			this.logging.error(ipAddress+" not valid. ignoring request");
@@ -80,6 +99,18 @@ public class RFIDDriver implements IRfidDriver {
 	 */
 	public void setEventMgr(IEventMgr eventMgr) {
 		this.eventMgr = eventMgr;
+	}
+	/**
+	 * @return the deviceMgr
+	 */
+	public IDeviceManager getDeviceMgr() {
+		return deviceMgr;
+	}
+	/**
+	 * @param deviceMgr the deviceMgr to set
+	 */
+	public void setDeviceMgr(IDeviceManager deviceMgr) {
+		this.deviceMgr = deviceMgr;
 	}
 
 }
