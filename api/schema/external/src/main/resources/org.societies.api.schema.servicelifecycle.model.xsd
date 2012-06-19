@@ -23,6 +23,7 @@
   <xs:complexType name="service">
     <xs:sequence>
       <xs:element name="authorSignature" type="xs:string" minOccurs="0"/>
+      <xs:element name="privacyPolicy" type="xs:string" minOccurs="0"/>
       <xs:element name="serviceDescription" type="xs:string" minOccurs="0"/>
       <xs:element name="serviceEndpoint" type="xs:string" minOccurs="0"/>
       <xs:element name="serviceIdentifier" type="tns:serviceResourceIdentifier" minOccurs="0"/>

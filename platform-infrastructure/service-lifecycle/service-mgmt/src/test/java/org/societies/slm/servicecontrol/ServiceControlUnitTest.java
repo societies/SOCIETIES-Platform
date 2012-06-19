@@ -105,7 +105,7 @@ public class ServiceControlUnitTest {
 		testService.setServiceDescription("Description");
 		testService.setServiceLocation(ServiceLocation.LOCAL);
 		testService.setServiceName("ServiceName");
-		testService.setServiceType(ServiceType.THIRD_PARTY_SERVICE);
+		testService.setServiceType(ServiceType.THIRD_PARTY_SERVER);
 		hostJid = new String("testnode.societies.local");
 		remoteJid = new String("remotenode.societies.local");
 		testService.setServiceEndpoint(hostJid+"/"+testService.getServiceName().replaceAll(" ", ""));
@@ -811,6 +811,33 @@ public class ServiceControlUnitTest {
 			result.setServiceId(serviceId);
 			result.setMessage(ResultMessage.SUCCESS);
 			callback.setResult(result);
+			
+		}
+
+		@Override
+		public void installService(Service service, IIdentity node,
+				IServiceControlCallback callback) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void shareService(Service service, IIdentity node,
+				IServiceControlCallback callback) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void unshareService(Service service, IIdentity node,
+				IServiceControlCallback callback) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void registerCISEndpoint(ICommManager endpoint) {
+			// TODO Auto-generated method stub
 			
 		}
 		

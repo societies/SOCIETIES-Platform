@@ -42,6 +42,7 @@ public class ServiceModelUtils {
 		filter.setServiceName(null);
 		filter.setServiceStatus(null);
 		filter.setServiceType(null);
+		filter.setPrivacyPolicy(null);
 		
 		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
 		filterIdentifier.setIdentifier(null);
@@ -51,11 +52,13 @@ public class ServiceModelUtils {
 		ServiceInstance filterInstance = new ServiceInstance();
 		filterInstance.setFullJid(null);
 		filterInstance.setXMPPNode(null);
+		filterInstance.setCssJid(null);
 		
 		ServiceImplementation filterImplementation = new ServiceImplementation();
 		filterImplementation.setServiceVersion(null);
 		filterImplementation.setServiceNameSpace(null);
 		filterImplementation.setServiceProvider(null);
+		filterImplementation.setServiceClient(null);
 		
 		filterInstance.setServiceImpl(filterImplementation);
 		filter.setServiceInstance(filterInstance);
@@ -139,7 +142,7 @@ public class ServiceModelUtils {
 	
 	public static String getJidFromServiceIdentifier(ServiceResourceIdentifier serviceId){
 		
-		return serviceId.getIdentifier().getHost();
+		return serviceId.getIdentifier().toString();
 	}
 	
 	/**
@@ -168,6 +171,7 @@ public class ServiceModelUtils {
 		// First we get the calling Bundle
 		Bundle serviceBundle = FrameworkUtil.getBundle(callingClass);
 
+		/*
 		// Then we get the serviceReference
 		ServiceReference<?>[] serviceReferenceList = serviceBundle.getRegisteredServices();
 		ServiceReference ourService = null;
@@ -178,12 +182,19 @@ public class ServiceModelUtils {
 				break;
 			}
 		}
-		
+		*/
 		// We now have the right ServiceReference, the Bundle and the local IIdentity. Time to generate the ServiceResourceIdentifier
 		
-		identity.getJid();
+		
 		
 		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
+		try {
+			result.setIdentifier(new URI(identity.getJid()));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		result.setServiceInstanceIdentifier(String.valueOf(serviceBundle.getBundleId()));
 		//result.setServiceInstanceIdentifier(value);
 		
 		return null;
@@ -202,7 +213,7 @@ public class ServiceModelUtils {
 		// then pass return this object
 		ServiceResourceIdentifier serResId=new ServiceResourceIdentifier();		
 		try {
-			serResId.setIdentifier(new URI("http://" + service.getServiceEndpoint()));
+			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()));
 			//This next line is for solving https://redmine.ict-societies.eu/issues/619
 			serResId.setServiceInstanceIdentifier(String.valueOf(serBndl.getBundleId()));
 		} catch (URISyntaxException e) {

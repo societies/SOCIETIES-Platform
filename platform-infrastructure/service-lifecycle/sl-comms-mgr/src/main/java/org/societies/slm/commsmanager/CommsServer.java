@@ -330,5 +330,15 @@ public class CommsServer implements IFeatureServer {
 		return null;
 	}
 	
+	protected void registerCISendpoint(ICommManager endpoint){
+		if(LOG.isDebugEnabled())
+			LOG.debug("New CIS created, so we need to register to its endpoint!");
+		try{
+			endpoint.register(this);
+		} catch(Exception ex){
+			ex.printStackTrace();
+			LOG.error("Error / Exception when registering new endpoint!");
+		}
+	}
 	
 }

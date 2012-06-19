@@ -44,7 +44,7 @@ public interface IServiceDiscoveryRemote {
     public void getService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceDiscoveryCallback callback);
     
     public void searchService(Service filter, IIdentity node, IServiceDiscoveryCallback callback);
-
+	
 }
 
 
