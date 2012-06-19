@@ -30,6 +30,7 @@ package org.societies.android.api.cis.collaboration;
  * @author Babak.Farshchian@sintef.no
  * @version 0
  */
+@Deprecated
 public interface ICisSubscriber {
 
 }

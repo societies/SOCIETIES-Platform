@@ -24,6 +24,8 @@
  */
 package org.societies.android.platform;
 
+import org.societies.android.api.cis.SocialContract;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.MatrixCursor;
