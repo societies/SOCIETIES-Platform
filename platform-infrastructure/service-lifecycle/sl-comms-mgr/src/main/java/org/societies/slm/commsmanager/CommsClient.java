@@ -74,7 +74,16 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 	private ICommManager commManager;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 	private IIdentityManager idMgr;
+	private CommsServer slmCommManager;
 
+	public CommsServer getSlmCommManager(){
+		return slmCommManager;	
+	}
+	
+	public void setSlmCommManager(CommsServer slmCommManager){
+		this.slmCommManager = slmCommManager;	
+	}
+	
 	//PROPERTIES
 	public ICommManager getCommManager() {
 		return commManager;
@@ -409,10 +418,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 	public void registerCISEndpoint(ICommManager endpoint) {
 		if(LOG.isDebugEnabled())
 			LOG.debug("New CIS created, so we need to register to its endpoint!");
-		
+		getSlmCommManager().registerCISendpoint(endpoint);
 	}
-
-
-
 
 }
