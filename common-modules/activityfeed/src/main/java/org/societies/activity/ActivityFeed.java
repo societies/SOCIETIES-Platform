@@ -52,6 +52,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	}
 	public ActivityFeed(String id){
 		this.id = id;
+		list = new HashSet<Activity>();// from Thomas
 	}
 	@Autowired 
 	private static SessionFactory sessionFactory;

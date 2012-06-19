@@ -908,10 +908,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 				while(it.hasNext()){
 					IActivity element = it.next();
-					Activity a = new org.societies.api.schema.activity.Activity();
+					org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
 					a.setActor(element.getActor());
 					a.setObject(a.getObject());
-					a.setTime(a.getTime());
+					a.setPublished(a.getPublished());
 					a.setVerb(a.getVerb());
 					marshalledActivList.add(a);
 			     }
@@ -937,7 +937,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				iActivity.setActor(c.getAddActivity().getActivity().getActor());
 				iActivity.setObject(c.getAddActivity().getActivity().getObject());
 				iActivity.setTarget(c.getAddActivity().getActivity().getTarget());
-				iActivity.setTime(c.getAddActivity().getActivity().getTime());
+				iActivity.setPublished(c.getAddActivity().getActivity().getPublished());
 				iActivity.setVerb(c.getAddActivity().getActivity().getVerb());
 
 				activityFeed.addCisActivity(iActivity);
@@ -966,7 +966,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
 				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
 				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
-				iActivity.setTime(c.getDeleteActivity().getActivity().getTime());
+				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
 				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
 
 				r.setResult(activityFeed.deleteActivity(iActivity));
