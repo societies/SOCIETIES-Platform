@@ -156,8 +156,14 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		// Comm Manager
 		ICommManager commManager = Mockito.mock(ICommManager.class);
 		IIdentityManager idManager = Mockito.mock(IIdentityManager.class);
+		IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
+		IIdentity cisId = new MockIdentity(IdentityType.CIS, "onecis", "societies.local");
+		Mockito.when(idManager.fromJid(otherCssId.getJid())).thenReturn(otherCssId);
+		Mockito.when(idManager.fromJid(cisId.getJid())).thenReturn(cisId);
 		Mockito.when(idManager.fromJid("onecis.societies.local")).thenReturn(new MockIdentity("onecis.societies.local"));
+		Mockito.when(idManager.fromJid("onecis@societies.local")).thenReturn(new MockIdentity("onecis@societies.local"));
 		Mockito.when(idManager.fromJid("othercss@societies.local")).thenReturn(new MockIdentity("othercss@societies.local"));
+		Mockito.when(idManager.fromJid("red@societies.local")).thenReturn(new MockIdentity("red@societies.local"));
 		Mockito.when(idManager.fromJid("eliza@societies.local")).thenReturn(new MockIdentity("eliza@societies.local"));
 		Mockito.when(commManager.getIdManager()).thenReturn(idManager);
 
@@ -204,10 +210,13 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			LOG.info("[Test PrivacyException] testGetCisPrivacyPolicy: add and retrieve a privacy policy", e);
 			fail("[Error testGetCisPrivacyPolicy] Privacy error");
 		} catch (Exception e) {
+			LOG.error("[Test PrivacyException] testGetCisPrivacyPolicy: add and retrieve a privacy policy", e);
 			fail("[Error testDeletePrivacyPolicy] error");
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
+		LOG.info(privacyPolicy.toString());
+		LOG.info(addedPrivacyPolicy.toString());
 		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}

@@ -37,6 +37,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
@@ -52,7 +53,9 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
@@ -79,6 +82,7 @@ public class PrivacyPolicyRegistryTest {
 
 	ICtxBroker ctxBroker = Mockito.mock(ICtxBroker.class);
 	PrivacyPolicyRegistryManager registryMgr;
+	IIdentityManager idManager;
 	private Requestor requestorService;
 	private Requestor requestorCis;
 	private RequestPolicy cisPolicy;
@@ -101,7 +105,7 @@ public class PrivacyPolicyRegistryTest {
 		servicePolicy = this.getRequestPolicy(requestorService);
 		this.createPersonEntity();
 		this.setupMockito();
-		registryMgr = new PrivacyPolicyRegistryManager(ctxBroker);
+		registryMgr = new PrivacyPolicyRegistryManager(ctxBroker, idManager);
 	}
 
 
@@ -122,7 +126,22 @@ public class PrivacyPolicyRegistryTest {
 			Mockito.when(ctxBroker.retrieve(this.servicePolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.servicePolicyAttribute));
 			Mockito.when(ctxBroker.remove(this.cisPolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.cisPolicyAttribute));
 			Mockito.when(ctxBroker.remove(this.servicePolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.servicePolicyAttribute));
+			
+			// Comm Manager
+			idManager = Mockito.mock(IIdentityManager.class);
+			IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
+			IIdentity cisId = new MockIdentity(IdentityType.CIS, "onecis", "societies.local");
+			Mockito.when(idManager.fromJid(otherCssId.getJid())).thenReturn(otherCssId);
+			Mockito.when(idManager.fromJid(cisId.getJid())).thenReturn(cisId);
+			Mockito.when(idManager.fromJid("onecis.societies.local")).thenReturn(new MockIdentity("onecis.societies.local"));
+			Mockito.when(idManager.fromJid("onecis@societies.local")).thenReturn(new MockIdentity("onecis@societies.local"));
+			Mockito.when(idManager.fromJid("othercss@societies.local")).thenReturn(new MockIdentity("othercss@societies.local"));
+			Mockito.when(idManager.fromJid("red@societies.local")).thenReturn(new MockIdentity("red@societies.local"));
+			Mockito.when(idManager.fromJid("eliza@societies.local")).thenReturn(new MockIdentity("eliza@societies.local"));
 		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
