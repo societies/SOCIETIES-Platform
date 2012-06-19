@@ -179,9 +179,9 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 
 		// -- Retrieve the obfuscation level
-		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, owner, dataWrapper.getDataId());
-		//		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
-		double obfuscationLevel = 1;
+		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId());
+		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
+		//		double obfuscationLevel = 1;
 
 		// -- Check if an obfuscated version is available
 		return dataObfuscationManager.hasObfuscatedVersion(dataWrapper, obfuscationLevel);

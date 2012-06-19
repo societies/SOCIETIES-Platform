@@ -54,7 +54,7 @@ public class TestCase1244 extends IntegrationTestCase {
 		// and test case classes to run
 		super(1244, new Class[]{PrivacyAgreementManagerTest.class, PrivacyPolicyManagerTest.class});
 		PrivacyPolicyManagerTest.testCaseNumber = this.testCaseNumber;
-		PrivacyAgreementManagerTest.testCaseNumber = 1245;
+		PrivacyAgreementManagerTest.testCaseNumber = this.testCaseNumber;
 	}
 	
 	
