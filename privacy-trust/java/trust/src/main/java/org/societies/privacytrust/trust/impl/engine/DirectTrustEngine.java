@@ -26,6 +26,7 @@ package org.societies.privacytrust.trust.impl.engine;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class DirectTrustEngine extends TrustEngine {
 	private ITrustEvidenceRepository trustEvidenceRepo;
 	
 	@Autowired
-	DirectTrustEngine(ITrustEventMgr trustEventMgr) throws TrustEventMgrException {
+	public DirectTrustEngine(ITrustEventMgr trustEventMgr) throws TrustEventMgrException {
 		
 		super(trustEventMgr);
 		LOG.info(this.getClass() + " instantiated");
@@ -81,8 +82,10 @@ public class DirectTrustEngine extends TrustEngine {
 	public void evaluate(final ITrustedCss css, 
 			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException {
 		
+		final TreeSet<ITrustEvidence> sortedEvidenceSet = new TreeSet<ITrustEvidence>(evidenceSet);
+		
 		Double newValue = null;
-		for (final ITrustEvidence evidence : evidenceSet) {
+		for (final ITrustEvidence evidence : sortedEvidenceSet) {
 			if (TrustEvidenceType.RATED.equals(evidence.getType())) {
 				newValue = (Double) evidence.getInfo();
 			}
