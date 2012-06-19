@@ -24,19 +24,26 @@
  */
 package org.societies.privacytrust.trust.impl.engine;
 
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.engine.TrustEngineException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
+import org.societies.privacytrust.trust.api.model.ITrust;
+import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,6 +72,36 @@ public class DirectTrustEngine extends TrustEngine {
 		super.trustEventMgr.registerListener(
 				new DirectTrustEvidenceUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED }, null);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCss, java.util.Set)
+	 */
+	@Override
+	public ITrust evaluate(ITrustedCss css, Set<ITrustEvidence> evidenceSet)
+			throws TrustEngineException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCis, java.util.Set)
+	 */
+	@Override
+	public ITrust evaluate(ITrustedCis cis, Set<ITrustEvidence> evidenceSet)
+			throws TrustEngineException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedService, java.util.Set)
+	 */
+	@Override
+	public ITrust evaluate(ITrustedService service,
+			Set<ITrustEvidence> evidenceSet) throws TrustEngineException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	private class CssDirectTrustEngine implements Runnable {

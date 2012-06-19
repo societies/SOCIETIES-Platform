@@ -22,66 +22,76 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.impl.engine;
+package org.societies.privacytrust.trust.api.engine;
 
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.privacytrust.trust.api.engine.TrustEngineException;
-import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrust;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
+ * This interface provides methods to evaluate the trustworthiness of 
+ * {@link ITrustedEntity} objects.
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.3
  */
-@Service
-public class IndirectTrustEngine extends TrustEngine {
+public interface ITrustEngine {
 
-	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(IndirectTrustEngine.class);
+	/**
+	 * Evaluates the trustworthiness of the specified {@link ITrustedCss} based
+	 * on the supplied set of {@link ITrustEvidence}.
+	 *  
+	 * @param css
+	 *            the {@link ITrustedCss} whose trust value to evaluate
+	 * @param evidenceSet
+	 *            the set of {@link ITrustEvidence} based on which to evaluate
+	 *            the trust value
+	 * @return the evaluated {@link ITrust} of the specified CSS 
+	 * @throws TrustEngineException
+	 *            if there is an error during trust evaluation
+	 * @throw NullPointerException
+	 *            if any of the specified parameters is <code>null</code>
+	 */
+	public ITrust evaluate(final ITrustedCss css, 
+			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException;
 	
-	@Autowired
-	IndirectTrustEngine(ITrustEventMgr trustEventMgr) {
-		
-		super(trustEventMgr);
-		LOG.info(this.getClass() + " instantiated");
-	}
-
-	/*
-	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCss, java.util.Set)
+	/**
+	 * Evaluates the trustworthiness of the specified {@link ITrustedCis} based
+	 * on the supplied set of {@link ITrustEvidence}.
+	 *  
+	 * @param cis
+	 *            the {@link ITrustedCis} whose trust value to evaluate
+	 * @param evidenceSet
+	 *            the set of {@link ITrustEvidence} based on which to evaluate
+	 *            the trust value
+	 * @return the evaluated {@link ITrust} of the specified CIS 
+	 * @throws TrustEngineException
+	 *            if there is an error during trust evaluation
+	 * @throw NullPointerException
+	 *            if any of the specified parameters is <code>null</code>
 	 */
-	@Override
-	public ITrust evaluate(ITrustedCss css, Set<ITrustEvidence> evidenceSet)
-			throws TrustEngineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCis, java.util.Set)
+	public ITrust evaluate(final ITrustedCis cis, 
+			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException;
+	
+	/**
+	 * Evaluates the trustworthiness of the specified {@link ITrustedService}
+	 * based on the supplied set of {@link ITrustEvidence}.
+	 *  
+	 * @param service
+	 *            the {@link ITrustedService} whose trust value to evaluate
+	 * @param evidenceSet
+	 *            the set of {@link ITrustEvidence} based on which to evaluate
+	 *            the trust value
+	 * @return the evaluated {@link ITrust} of the specified service 
+	 * @throws TrustEngineException
+	 *            if there is an error during trust evaluation
+	 * @throw NullPointerException
+	 *            if any of the specified parameters is <code>null</code>
 	 */
-	@Override
-	public ITrust evaluate(ITrustedCis cis, Set<ITrustEvidence> evidenceSet)
-			throws TrustEngineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedService, java.util.Set)
-	 */
-	@Override
-	public ITrust evaluate(ITrustedService service,
-			Set<ITrustEvidence> evidenceSet) throws TrustEngineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public ITrust evaluate(final ITrustedService service, 
+			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException;
 }

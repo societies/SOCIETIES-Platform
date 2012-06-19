@@ -22,66 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.impl.engine;
+package org.societies.privacytrust.trust.api.engine;
 
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.privacytrust.trust.api.engine.TrustEngineException;
-import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
-import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
-import org.societies.privacytrust.trust.api.model.ITrust;
-import org.societies.privacytrust.trust.api.model.ITrustedCis;
-import org.societies.privacytrust.trust.api.model.ITrustedCss;
-import org.societies.privacytrust.trust.api.model.ITrustedService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.societies.api.internal.privacytrust.trust.TrustException;
 
 /**
+ * Thrown to indicate Trust Engine exceptions.
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.3
  */
-@Service
-public class IndirectTrustEngine extends TrustEngine {
+public class TrustEngineException extends TrustException {
 
-	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(IndirectTrustEngine.class);
-	
-	@Autowired
-	IndirectTrustEngine(ITrustEventMgr trustEventMgr) {
-		
-		super(trustEventMgr);
-		LOG.info(this.getClass() + " instantiated");
-	}
+	private static final long serialVersionUID = -1083082713557112148L;
 
-	/*
-	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCss, java.util.Set)
-	 */
-	@Override
-	public ITrust evaluate(ITrustedCss css, Set<ITrustEvidence> evidenceSet)
-			throws TrustEngineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	/**
+     * Constructs a <code>TrustEngineException</code> with no detail message.
+     */
+    public TrustEngineException() {
+    	
+        super();
+    }
 
-	/*
-	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCis, java.util.Set)
-	 */
-	@Override
-	public ITrust evaluate(ITrustedCis cis, Set<ITrustEvidence> evidenceSet)
-			throws TrustEngineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Constructs a <code>TrustEngineException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustEngineException(String message) {
+    	
+        super(message);
+    }
 
-	/*
-	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedService, java.util.Set)
-	 */
-	@Override
-	public ITrust evaluate(ITrustedService service,
-			Set<ITrustEvidence> evidenceSet) throws TrustEngineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Creates a <code>TrustEngineException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustEngineException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustEngineException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustEngineException(Throwable cause) {
+    	
+        super(cause);
+    }
 }
