@@ -24,9 +24,8 @@
  */
 package org.societies.android.platform.test;
 
-import org.societies.android.platform.CisRecord;
-import org.societies.android.platform.SocialContract;
 import org.societies.android.platform.SocialProvider;
+import org.societies.android.api.cis.SocialContract;
 
 import android.content.ContentValues;
 import android.database.Cursor;

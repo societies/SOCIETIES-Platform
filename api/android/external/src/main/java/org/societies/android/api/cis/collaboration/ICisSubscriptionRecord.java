@@ -28,6 +28,7 @@ package org.societies.android.api.cis.collaboration;
  * @author Babak.Farshchian@sintef.no
  *
  */
+@Deprecated
 public interface ICisSubscriptionRecord {
 	public String getSubscriptionMode();
 	public void setSubscriptionMode(String subscriptionMode);
