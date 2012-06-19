@@ -19,7 +19,7 @@
         <osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr">
         </osgi:reference>
 
-		
+		<osgi:reference id="deviceMgr" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager"></osgi:reference>
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
 		
 </beans>
