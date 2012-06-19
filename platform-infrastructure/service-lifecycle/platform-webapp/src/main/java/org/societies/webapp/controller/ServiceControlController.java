@@ -134,6 +134,7 @@ public class ServiceControlController {
 	public ModelAndView serviceControlPost(@Valid ServiceControlForm scForm,
 			BindingResult result, Map model) {
 
+		String returnPage = "servicecontrolresult";
 		if (result.hasErrors()) {
 			model.put("result", "service control form error");
 			return new ModelAndView("servicecontrol", model);
@@ -268,7 +269,7 @@ public class ServiceControlController {
 				model.put("serviceResult", scresult.getMessage());
 				
 				res="Started service: " + serviceId;
-
+				returnPage = "servicediscoveryresult";
 				
 			} else if (method.equalsIgnoreCase("StopService")){
 				
@@ -279,6 +280,7 @@ public class ServiceControlController {
 				model.put("serviceResult", scresult.getMessage());
 				
 				res="Stopped service: " + serviceId;
+				returnPage = "servicediscoveryresult";
 	
 			} else if (method.equalsIgnoreCase("UninstallService")){
 				
@@ -289,12 +291,17 @@ public class ServiceControlController {
 				model.put("serviceResult", scresult.getMessage());
 				
 				res="Uninstall service: " + serviceId;
+				returnPage = "servicediscoveryresult";
 	
 			} else {
 				res="error unknown metod";
 			}
 		
-			//model.put("result", res);
+			if (returnPage.equals("servicediscoveryresult")) {
+				Future<List<Service>> asynchServices = this.getSDService().getLocalServices();
+				List<Service> services = asynchServices.get();
+				model.put("services", services);	
+			}
 			
 		}
 		catch (ServiceControlException e)
@@ -309,7 +316,7 @@ public class ServiceControlController {
 		
 		model.put("result", res);
 		
-		return new ModelAndView("servicecontrolresult", model);
+		return new ModelAndView(returnPage, model);
 		
 
 	}

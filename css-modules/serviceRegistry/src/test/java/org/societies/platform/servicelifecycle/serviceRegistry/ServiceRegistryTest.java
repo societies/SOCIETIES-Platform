@@ -98,7 +98,7 @@ public class ServiceRegistryTest extends
 		serReg.registerServiceList(servicesList);
 
 	}
-
+/*
 	@Test
 	@Rollback(false)
 	public void retrieveService() {
@@ -280,7 +280,7 @@ public class ServiceRegistryTest extends
 				result.setServiceDescription("serviceDescription" + i);
 				result.setServiceEndpoint("serviceEndPoint");
 				result.setServiceName("serviceName" + i);
-				result.setServiceType(ServiceType.CORE_SERVICE);
+				result.setServiceType(ServiceType.THIRD_PARTY_SERVER);
 				result.setServiceLocation(ServiceLocation.LOCAL);
 				result.setServiceStatus(ServiceStatus.STARTED);
 				si = new ServiceInstance();

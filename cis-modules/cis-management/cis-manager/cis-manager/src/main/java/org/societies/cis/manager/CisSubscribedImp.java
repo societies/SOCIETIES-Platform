@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -81,7 +82,7 @@ public class CisSubscribedImp implements ICis {
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisManagerClient.class);
 	
-	@OneToOne
+	@OneToOne(cascade=CascadeType.ALL)
 	private CisRecord cisRecord;
 	@Transient
 	private CisManager cisManag = null;
@@ -94,6 +95,9 @@ public class CisSubscribedImp implements ICis {
 		this.cisRecord = cisRecord;
 	}
 
+	public CisSubscribedImp() {
+	}
+	
 	public CisSubscribedImp(CisRecord cisRecord, CisManager cisManag) {
 		super();
 		this.cisRecord = cisRecord;

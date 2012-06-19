@@ -58,6 +58,7 @@ import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Participant;
 
 
 @Controller
@@ -110,10 +111,11 @@ public class CisManagerController {
 		
 		model.put("cmForm", cisForm);
 		remoteCISs = new ArrayList<ICis>();
+		
 		localCISs = new ArrayList<ICisOwned>();
 		
 		localCISs.addAll(this.getCisManager().getListOfOwnedCis());
-		
+		remoteCISs.addAll(this.getCisManager().getRemoteCis());
 		
 		Iterator<ICisOwned> it = localCISs.iterator();
 		ICisOwned thisCis = null;
@@ -185,6 +187,7 @@ public class CisManagerController {
 
 			} else if (method.equalsIgnoreCase("GetMemberList")) {
 				model.put("methodcalled", "GetMemberList");
+				//model.put("res", cisForm.getCisJid());
 				
 				localCISs.addAll(this.getCisManager().getListOfOwnedCis());
 				Iterator<ICisOwned> it = localCISs.iterator();
@@ -197,8 +200,12 @@ public class CisManagerController {
 						  res.concat("CIS being compared = " + element.getCisId() + "and form = " + cisForm.getCssId());
 			     }
 				if(thisCis == null){
-					res.concat("CIS not found: " + cisForm.getCssId());
-					model.put("res", res);
+					//res.concat("CIS not found: " + cisForm.getCssId());
+					//model.put("res", res);
+					//NOT LOCAL CIS, SO CALL REMOTE
+					ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid());
+					remoteCIS.getListOfMembers(icall);
+					model.put("methodcalled", "GetMemberListRemote");
 				} else {
 					Set<ICisParticipant> records = thisCis.getMemberList().get();
 					model.put("memberRecords", records);
@@ -208,7 +215,7 @@ public class CisManagerController {
 				model.put("methodcalled", "GetMemberListRemote");
 				
 				//CALL REMOTE
-				ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCssId());
+				ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid().trim());
 				remoteCIS.getListOfMembers(icall);
 				
 				model.put("res", res);
@@ -278,10 +285,19 @@ public class CisManagerController {
 				resultCallback = "Failure getting result from remote node!";
 			}
 			else{
-				resultCallback = "Joined CIS: " + communityResultObject.getCommunityJid();
+				if(communityResultObject.getJoinResponse() != null){
+					resultCallback = "Joined CIS: " + communityResultObject.getCommunityJid();
+	
+					remoteCommunity = communityResultObject;
+					m_session.setAttribute("community", remoteCommunity);
+				}
+				if(communityResultObject.getWho() != null){
+					
 
-				remoteCommunity = communityResultObject;
-				m_session.setAttribute("community", remoteCommunity);
+					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWho().getParticipant();					
+					m_session.setAttribute("memberRecords", l);
+				}
+
 			}
 		}
 	};
