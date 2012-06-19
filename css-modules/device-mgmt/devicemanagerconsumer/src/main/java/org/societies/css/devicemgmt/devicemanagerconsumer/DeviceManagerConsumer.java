@@ -204,12 +204,13 @@ public class DeviceManagerConsumer extends EventListener implements ServiceTrack
 				
 			}
 		}
-		return null;
+		return iDevice;
 	}
 
 
 	@Override
 	public void modifiedService(ServiceReference reference, Object service) {
+		
 		
 	}
 
@@ -217,6 +218,9 @@ public class DeviceManagerConsumer extends EventListener implements ServiceTrack
 	@Override
 	public void removedService(ServiceReference reference, Object service) {
 
+		IDevice iDevice = (IDevice) service;
+		
+		bundleContext.ungetService(reference);
 	}
 
 

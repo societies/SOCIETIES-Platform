@@ -67,7 +67,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	
 	private Map<String, String []> deviceServiceNamesContainer;
 	
-	private BundleContext bundleContext;
+	public static BundleContext bundleContext;
 	
 	private BidiMap deviceIdBindingTable;
 	
@@ -92,7 +92,6 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 		deviceIdBindingTable = new DualHashBidiMap();
 		
 		serviceRegistrationConatainer = new HashMap<String, ServiceRegistration>();
-		
 	}
 	
 	
@@ -134,7 +133,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			
 			DeviceCommonInfo deviceCommon = new DeviceCommonInfo(
 					deviceFamily, deviceImpl.getDeviceName(), deviceImpl.getDeviceType(), deviceImpl.getDeviceDescription(), 
-					deviceImpl.getDeviceConnetionType(), deviceImpl.getDeviceLocation(), deviceImpl.getDeviceProvider(), 
+					deviceImpl.getDeviceConnectionType(), deviceImpl.getDeviceLocation(), deviceImpl.getDeviceProvider(), 
 					deviceImpl.getDeviceId(), deviceImpl.isContextSource());
 			
 			deviceCommManager.fireDeviceDisconnected(deviceId, deviceCommon);
@@ -223,9 +222,10 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			
 			properties = new Hashtable<String, String>();
 			
+			properties.put(DeviceMgmtConstants.DEVICE_NODE_ID, nodeId.getJid());
+			properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
 			properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
 			properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
-			properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
 			properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
 			properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
 			properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
@@ -243,7 +243,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			//Object lock = new Object();
 
 			//create a new IDevice implementation
-			deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
+			deviceImpl = new DeviceImpl(this, nodeId.getJid(),deviceId, deviceCommonInfo);
 			
 			deviceInstanceContainer.put(deviceId, deviceImpl);
 			deviceServiceNamesContainer.put(deviceId, serviceNames);
@@ -286,9 +286,10 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 
 				properties = new Hashtable<String, String>();
 				
+				properties.put(DeviceMgmtConstants.DEVICE_NODE_ID, nodeId.getJid());
+				properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
 				properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
 				properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
-				properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
 				properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
 				properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
 				properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
@@ -306,7 +307,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 				//Object lock = new Object();
 
 				//create a new IDevice implementation
-				deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
+				deviceImpl = new DeviceImpl(this, nodeId.getJid(), deviceId, deviceCommonInfo);
 				
 				deviceInstanceContainer.put(deviceId, deviceImpl);
 				deviceServiceNamesContainer.put(deviceId, serviceNames);
@@ -342,9 +343,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 		}
 	}
 
-	/**
-	 *
-	 */
+
 	@Override
 	public String fireDeviceDisconnected(String deviceFamily, String physicalDeviceId)
 	{

@@ -22,48 +22,37 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.devicemgmt;
+package org.societies.css.devicemgmt.devicemanager.registry;
 
-import java.util.Dictionary;
-
+import org.societies.api.internal.css.devicemgmt.IDeviceManagerRegistry;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+
 /**
- * Interface used by the device deriver bundles to inform the device manager about a state of devices
+ * Describe your class here...
  *
  * @author Rafik
  *
  */
-public interface IDeviceManager {
+public class DeviceRegistryManager /*implements IDeviceManagerRegistry*/ {
 	
-
-
-	/**
-	 * 
-	 * @param physicalDeviceId
-	 * @param deviceCommonInfo
-	 * @param serviceIds
-	 * @return a deviceId
-	 */
-	public String fireNewDeviceConnected (String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceNames);
+	
 	
 	/**
-	 * Method used to inform the Device Manager about disconnection of a device
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
+	 * This method is used to register a new device to the registry or to update an existing device information
 	 */
-	public String fireDeviceDisconnected (String deviceFamily, String physicalDeviceId);
+	public void registerDevice(String nodeId, DeviceCommonInfo deviceCommonInfo) {
+			
+
+	}
+	
 	
 	/**
-	 * 
-	 * Method used to inform the Device Manager about new data received for a given device
-	 * @param deviceFamily
-	 * @param physicalDeviceId
-	 * @param data is a dictionary that can contains information about battery level change, device location change, value change and so on
+	 * This method is used to unregister a device from the registry
 	 */
-	public String fireNewDataReceived (String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data);
-	
-	
+	public void unregisterDevice(String nodeId, String deviceId) {
+
+	}
 	
 
+	
 }

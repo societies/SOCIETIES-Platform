@@ -24,46 +24,42 @@
  */
 package org.societies.api.internal.css.devicemgmt;
 
-import java.util.Dictionary;
-
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 /**
- * Interface used by the device deriver bundles to inform the device manager about a state of devices
+ * Internal interface used to let a user to control access to a its devices. enable/disable, share/unshare
  *
  * @author Rafik
  *
  */
-public interface IDeviceManager {
+public interface IDeviceControl {
 	
 
+	/**
+	 * Method used to enable a device.This will give a full access to the device
+	 * @param nodeId
+	 * @param deviceId
+	 */
+	void enable(String nodeId, String deviceId);
+	
 
 	/**
-	 * 
-	 * @param physicalDeviceId
-	 * @param deviceCommonInfo
-	 * @param serviceIds
-	 * @return a deviceId
+	 * Method used to disable a device.This will forbid the access to the device.
+	 * @param nodeId
+	 * @param deviceId
 	 */
-	public String fireNewDeviceConnected (String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceNames);
-	
-	/**
-	 * Method used to inform the Device Manager about disconnection of a device
-	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
-	 */
-	public String fireDeviceDisconnected (String deviceFamily, String physicalDeviceId);
+	public void disable(String nodeId, String deviceId);
 	
 	/**
 	 * 
-	 * Method used to inform the Device Manager about new data received for a given device
-	 * @param deviceFamily
-	 * @param physicalDeviceId
-	 * @param data is a dictionary that can contains information about battery level change, device location change, value change and so on
+	 * @param nodeId
+	 * @param deviceId
 	 */
-	public String fireNewDataReceived (String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data);
+	public void share(String nodeId, String deviceId);
 	
-	
-	
+	/**
+	 * 
+	 * @param nodeId
+	 * @param deviceId
+	 */
+	public void unshare(String nodeId, String deviceId);
 
 }
