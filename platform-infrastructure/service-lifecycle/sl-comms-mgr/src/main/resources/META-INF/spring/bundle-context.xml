@@ -21,7 +21,7 @@
   
   <bean id="SLMCommsManager" 
   		class="org.societies.slm.commsmanager.CommsServer"
-  		depends-on="CommManagerBundle,ServiceDiscoveryBundle,ServiceControlBundle" 
+  		depends-on="CommManagerBundle" 
   		init-method="InitService">
   		<property name="commManager" ref="CommManagerBundle"/>
   		<property name="serviceDiscovery" ref="ServiceDiscoveryBundle"/> 

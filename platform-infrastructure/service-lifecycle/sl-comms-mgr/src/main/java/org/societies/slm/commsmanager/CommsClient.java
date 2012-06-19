@@ -47,6 +47,7 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.MethodType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
@@ -73,7 +74,7 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 	private ICommManager commManager;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 	private IIdentityManager idMgr;
-	
+
 	//PROPERTIES
 	public ICommManager getCommManager() {
 		return commManager;
@@ -123,6 +124,59 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 		};
 	}
 	
+	@Override
+	@Async
+	public void getService(ServiceResourceIdentifier serviceId, IIdentity node,
+			IServiceDiscoveryCallback serviceDiscoveryCallback) {
+		
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: getService called");
+		
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceDiscoveryCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceDiscoveryMsgBean bean = new ServiceDiscoveryMsgBean();
+		bean.setMethod(MethodName.GET_SERVICE);
+		bean.setServiceId(serviceId);
+		
+		try {
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+	}
+
+	@Override
+	@Async
+	public void searchService(Service filter, IIdentity node,
+			IServiceDiscoveryCallback serviceDiscoveryCallback) {
+
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: searchService called");
+		
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceDiscoveryCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceDiscoveryMsgBean bean = new ServiceDiscoveryMsgBean();
+		bean.setMethod(MethodName.GET_SERVICE);
+		bean.setService(filter);
+		
+		try {
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+	}
 	@Override
 	@Async
 	public void startService(ServiceResourceIdentifier serviceId,
@@ -247,6 +301,68 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 		
 	}
 
+	@Override
+	@Async
+	public void shareService(Service service, IIdentity node,
+			IServiceControlCallback serviceControlCallback) {
+		
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: shareService called");
+
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceControlCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceControlMsgBean bean = new ServiceControlMsgBean();
+		bean.setMethod(MethodType.SHARE_SERVICE);
+		bean.setService(service);
+		bean.setShareJid(node.getJid());
+		
+		try {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
+
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+		
+	}
+
+	@Override
+	@Async
+	public void unshareService(Service service, IIdentity node,
+			IServiceControlCallback serviceControlCallback) {
+		
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: unshareService called");
+
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceControlCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceControlMsgBean bean = new ServiceControlMsgBean();
+		bean.setMethod(MethodType.UNSHARE_SERVICE);
+		bean.setService(service);
+		bean.setShareJid(node.getJid());
+		
+		try {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
+
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+			
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages() */
@@ -281,5 +397,22 @@ public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemo
 	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
 		// TODO Auto-generated method stub
 	}
+
+	@Override
+	public void installService(Service service, IIdentity node,
+			IServiceControlCallback callback) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerCISEndpoint(ICommManager endpoint) {
+		if(LOG.isDebugEnabled())
+			LOG.debug("New CIS created, so we need to register to its endpoint!");
+		
+	}
+
+
+
 
 }

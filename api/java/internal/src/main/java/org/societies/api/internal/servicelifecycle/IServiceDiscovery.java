@@ -29,8 +29,7 @@ import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.Service;
-
-
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * 
@@ -39,6 +38,13 @@ import org.societies.api.schema.servicelifecycle.model.Service;
  */
 public interface IServiceDiscovery {
 	
+	/**
+	 * Description: This method returns a service given its ServiceResourceIdentifier
+	 * @return the Service that was requested, null if nothing was found
+	 * @throws ServiceDiscoveryException
+	 */
+	public Future<Service> getService(ServiceResourceIdentifier serviceId) throws ServiceDiscoveryException;
+
 	/**
 	 * Description: Based on a identify this method returns all services shared by 
 	 * the specified CSS/CIS to other CSS's or CIS;s 
@@ -51,18 +57,46 @@ public interface IServiceDiscovery {
 	/**
 	 * Description: Based on a jid this method returns all services shared by 
 	 * the specified CSS/CIS to other CSS's or CIS;s 
-	 * @param String jib 		  
+	 * @param String jid 		  
 	 * @return a List of services retrieved
 	 * @throws ServiceDiscoveryException
 	 */
 	public Future<List<Service>> getServices(String jid) throws ServiceDiscoveryException;
 
-	
 	/**
 	 * Description: This method returns all services for the current node 
 	 * @return a List of services retrieved
 	 * @throws ServiceDiscoveryException
 	 */
 	public Future<List<Service>> getLocalServices() throws ServiceDiscoveryException;
-	
+
+	/**
+	 * Description: Searches all known services, given a certain criteria filter
+	 * 
+	 * @param filter the filter to search  
+	 * @return a List of services retrieved
+	 * @throws ServiceDiscoveryException
+	 */
+	public Future<List<Service>> searchServices(Service filter) throws ServiceDiscoveryException;
+
+	/**
+	 * Description: Searches all known services in a given CSS/CIS, given a certain criteria filter.
+	 * 
+	 * @param filter the filter to search  
+	 * @param node IIdentity 
+	 * @return a List of services retrieved
+	 * @throws ServiceDiscoveryException
+	 */
+	public Future<List<Service>> searchServices(Service filter, IIdentity node) throws ServiceDiscoveryException;
+
+	/**
+	 * Description: Searches all known services in a given CSS/CIS, given a certain criteria filter.
+	 * 
+	 * @param filter the filter to search  
+	 * @param String jib  
+	 * @return a List of services retrieved
+	 * @throws ServiceDiscoveryException
+	 */
+	public Future<List<Service>> searchServices(Service filter, String jid) throws ServiceDiscoveryException;
+
 }
