@@ -76,7 +76,7 @@ if (methodCalled.equals("GetMemberListRemote")) {
 	%>
 	<p>Checking with hosting CIS...</p>
 	<form id="myform" name="myform" action="cismanager.html" method="post">
-	<input type="hidden" name="method" value="RefreshRemoteMembers">
+	<input type="hidden" name="method" id="method" value="RefreshRemoteMembers">
 	</form>
 	<script language="javascript">
 	setTimeout(continueExecution, 10000); 
