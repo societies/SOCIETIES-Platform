@@ -281,12 +281,22 @@ public interface ICtxBroker {
 	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException;
 
 	/**
-	 * Retrieves the specified context model object.
+	 * Retrieves the specified context model object. Automatically enables inference for Context Attributes
+	 * that does not fulfill QoC requirements or contain a null value.
 	 * 
 	 * @param identifier
 	 * @throws CtxException 
 	 */
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException;
+	
+	/**
+	 * Retrieves the specified CtxAttribute. Inference is enabled according to parameter enableInference.
+	 * 
+	 * @param identifier
+	 * @param enableInference
+	 * @throws CtxException 
+	 */
+	 public Future<CtxAttribute> retrieveAttribute(CtxAttributeIdentifier identifier, boolean enableInference) throws CtxException;
 	
 	/**
 	 * Retrieves the {@link IndividualCtxEntity} which represents the owner

@@ -101,6 +101,7 @@ public class CtxBrokerExample 	{
 		this.lookupContext();
 		this.simpleCtxHistoryTest();
 		this.tuplesCtxHistoryTest();
+		this.triggerInferenceTest();
 	}
 
 	private void retrieveIndividualEntity() {
@@ -117,7 +118,7 @@ public class CtxBrokerExample 	{
 					LOG.info("CtxAttribute "+ctxAttr.getId());
 				}	
 			}
-			
+
 		} catch (Exception e) {
 
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
@@ -208,8 +209,9 @@ public class CtxBrokerExample 	{
 	 * This method demonstrates how to retrieve context data from the context database
 	 */
 	private void lookupContext() {
+		
+		LOG.info("*** lookupContext");
 		try {
-
 			List<CtxIdentifier> idsEntities =this.internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
 			LOG.info("*** lookup results for Entity type: '" + CtxEntityTypes.DEVICE + "' " +idsEntities);
 
@@ -236,15 +238,15 @@ public class CtxBrokerExample 	{
 			// retrieve ctxEntity
 			// This retrieval is performed based on the known CtxEntity identifier
 			// Retrieve is also possible to be performed based on the type of the CtxEntity. This will be demonstrated in a later example.
-			Future<CtxModelObject> ctxEntityRetrievedFuture = this.internalCtxBroker.retrieve(this.ctxEntityIdentifier);
-			CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
+
+			CtxEntity retrievedCtxEntity = (CtxEntity) this.internalCtxBroker.retrieve(this.ctxEntityIdentifier).get();
 
 			LOG.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
 
 			// retrieve the CtxAttribute contained in the CtxEntity with the string value
 			// again the retrieval is based on an known identifier, it is possible to retrieve it based on type.This will be demonstrated in a later example.
-			Future<CtxModelObject> ctxAttributeRetrievedStringFuture = this.internalCtxBroker.retrieve(this.ctxAttributeStringIdentifier);
-			CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
+			CtxAttribute retrievedCtxAttribute = (CtxAttribute) this.internalCtxBroker.retrieve(this.ctxAttributeStringIdentifier).get();
+
 			LOG.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
 
 			// retrieve ctxAttribute with the binary value
@@ -256,19 +258,16 @@ public class CtxBrokerExample 	{
 			LOG.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
 
 		} catch (Exception e) {
-
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
-
 	}
-
-
 
 	/**
 	 * This method demonstrates how to create and retrieve context history data
 	 */
 	private void simpleCtxHistoryTest() {
 
+		LOG.info("*** simpleCtxHistoryTest");
 		CtxAttribute ctxAttribute;
 
 		final CtxEntity ctxEntity;
@@ -335,6 +334,8 @@ public class CtxBrokerExample 	{
 	 */
 	private void tuplesCtxHistoryTest() {
 
+		LOG.info("*** tuplesCtxHistoryTest");
+		
 		final CtxEntity ctxEntity;
 		CtxAttribute primaryAttribute;
 		CtxAttribute escortingAttribute1;
@@ -428,6 +429,37 @@ public class CtxBrokerExample 	{
 			i++;
 		}
 	}	
+
+
+	private void triggerInferenceTest() {
+		LOG.info("*** triggerInferenceTest");
+		try {
+			IndividualCtxEntity ownerEnt = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
+
+			Set<CtxAttribute> locationSet = ownerEnt.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
+			List<CtxAttribute> locList = new ArrayList<CtxAttribute>(locationSet);
+			CtxAttribute locAttr = null;
+			if(locList.size()>0){
+				locAttr = locList.get(0);
+				System.out.println("trigger inference for attr: "+locAttr);
+				
+				locAttr = (CtxAttribute) this.internalCtxBroker.retrieve(locAttr.getId()).get();
+				System.out.println("after inference " + locAttr);
+			}
+
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 
 	/**
 	 * This method demonstrates how to register for context change events in the context database

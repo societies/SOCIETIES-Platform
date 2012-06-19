@@ -63,6 +63,10 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	private ICtxBroker internalCtxBroker;
 	ICommManager commMgr;
 
+	UserCtxInferenceMgr(){
+		
+	}
+	
 	@Autowired(required=true)
 	UserCtxInferenceMgr(ICtxBroker internalCtxBroker, ICommManager commMgr){
 
@@ -155,9 +159,25 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	}
 
 	@Override
-	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, Date arg1) {
+	public CtxAttribute predictContext(CtxAttributeIdentifier attrID, Date date) {
 		CtxAttribute ctxAttribute = null;
-
+		LOG.info("predict context " +date);
+		LOG.info("no value predict context " +ctxAttribute);
+		try {
+			ctxAttribute = this.internalCtxBroker.retrieveAttribute(attrID, false).get();
+			ctxAttribute.setStringValue("HOME");
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		LOG.info("with value predict context return " +ctxAttribute);
 		return ctxAttribute;
 	}
 
