@@ -71,7 +71,7 @@ Use the form below to configure the secret key and the URLs for the Cloud Node P
     <legend>SOCIETIES</legend>
     <div>
         Secret key:
-        <input type="text" name="secret" value="<%= secret %>" id="text_secret">
+        <input type="text" name="secret" value="<%= secret %>" id="text_secret" contenteditable="false">
         <br><br>
         
         SOCIETIES Cloud Node Provider URLs:
