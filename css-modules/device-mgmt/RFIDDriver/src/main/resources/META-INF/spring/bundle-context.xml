@@ -14,6 +14,7 @@
 		class="org.societies.css.devicemgmt.rfiddriver.impl.RFIDDriver"
 		name="RFIDDriver" init-method="initialiseRFIDDriver">
 		<property name="eventMgr" ref="eventMgmtRef"></property>
+		<property name="deviceMgr" ref="deviceMgr"></property>
 	</bean>
 
 	<!-- <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->
