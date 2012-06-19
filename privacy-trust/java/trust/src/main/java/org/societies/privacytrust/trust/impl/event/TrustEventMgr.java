@@ -33,7 +33,6 @@ import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
 import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
 import org.societies.api.internal.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
-import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.osgi.event.CSSEvent;
@@ -46,6 +45,7 @@ import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -158,7 +158,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 		for (int i = 0; i < topics.length; ++i) {
 			
 			final InternalEvent internalEvent = new InternalEvent(
-					topics[i], event.getId().toString(), source, event.getType());
+					topics[i], event.getSource().getTeid().toString(), source, event.getSource());
 
 			if (this.eventMgr == null)
 				throw new TrustEventMgrException("Could not send TrustEvidenceUpdateEvent '"
@@ -333,7 +333,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 		/** The listener to forward TrustUpdateEvents. */
 		private final ITrustEvidenceUpdateEventListener listener;
 		
-		private TrustEvidenceUpdateEventHandler(final ITrustEvidenceUpdateEventListener listener) {
+		private TrustEvidenceUpdateEventHandler(
+				final ITrustEvidenceUpdateEventListener listener) {
 			
 			this.listener = listener;
 		}
@@ -342,7 +343,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 		 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
 		 */
 		@Override
-		public void handleInternalEvent(InternalEvent internalEvent) {
+		public void handleInternalEvent(final InternalEvent internalEvent) {
 			
 			if (LOG.isDebugEnabled())
 				LOG.debug("Received internal event"
@@ -351,27 +352,21 @@ public class TrustEventMgr implements ITrustEventMgr {
 					+ ", source=" + internalEvent.geteventSource()
 					+ ", info=" + internalEvent.geteventInfo());
 			
-			if (!(internalEvent.geteventInfo() instanceof TrustEvidenceType))
+			if (!(internalEvent.geteventInfo() instanceof ITrustEvidence)) {
 				LOG.error("Cannot handle internal event"
 						+ ": type=" + internalEvent.geteventType()
 						+ ", name=" + internalEvent.geteventName()
 						+ ", source=" + internalEvent.geteventSource()
 						+ ": Unexpected eventInfo: " + internalEvent.geteventInfo());
-			TrustedEntityId teid;
-			try {
-				teid = new TrustedEntityId(internalEvent.geteventName());
-				final TrustEvidenceUpdateEvent event = 
-						new TrustEvidenceUpdateEvent(teid, 
-								(TrustEvidenceType) internalEvent.geteventInfo());
-				if (LOG.isDebugEnabled())
-					LOG.debug("Forwarding TrustEvidenceUpdateEvent " + event + " to listener");
-				this.listener.onUpdate(event);
-			} catch (MalformedTrustedEntityIdException mteide) {
-				
-				LOG.error("Cannot forward TrustEvidenceUpdateEvent to listener:"
-						+ " Failed to create TrustedEntityId from internal event name:"
-						+ internalEvent.geteventName(), mteide);
-			}	
+				return;
+			}
+			final ITrustEvidence evidence = 
+					(ITrustEvidence) internalEvent.geteventInfo(); 
+			final TrustEvidenceUpdateEvent event = 
+					new TrustEvidenceUpdateEvent(evidence);
+			if (LOG.isDebugEnabled())
+				LOG.debug("Forwarding TrustEvidenceUpdateEvent " + event + " to listener");
+			this.listener.onNew(event);
 		}
 
 		/*

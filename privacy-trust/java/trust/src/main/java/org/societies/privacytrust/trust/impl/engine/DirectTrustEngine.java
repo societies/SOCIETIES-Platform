@@ -24,14 +24,10 @@
  */
 package org.societies.privacytrust.trust.impl.engine;
 
-import java.util.Date;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener;
@@ -73,11 +69,11 @@ public class DirectTrustEngine extends TrustEngine {
 	
 	private class CssDirectTrustEngine implements Runnable {
 
-		private final TrustedEntityId teid;
+		private final IDirectTrustEvidence evidence;
 		
-		private CssDirectTrustEngine(final TrustedEntityId teid) {
+		private CssDirectTrustEngine(final IDirectTrustEvidence evidence) {
 			
-			this.teid = teid;
+			this.evidence = evidence;
 		}
 		
 		/*
@@ -87,41 +83,33 @@ public class DirectTrustEngine extends TrustEngine {
 		public void run() {
 			// TODO Auto-generated method stub
 			if (LOG.isDebugEnabled())
-				LOG.debug("Running CssDirectTrustEngine for entity " + teid);
+				LOG.debug("Running CssDirectTrustEngine with evidence "
+						+ this.evidence);
 			
 			try {
 				Double newTrust = null;
-				ITrustedCss css = (ITrustedCss) trustRepo.retrieveEntity(teid);
-				final Date lastTrustUpdate;
-				if (css == null) {
-					css = new TrustedCss(teid);
-					lastTrustUpdate = null;
-				} else {
-					lastTrustUpdate = css.getDirectTrust().getLastUpdated();
-				}
-				final Set<IDirectTrustEvidence> evidenceSet = trustEvidenceRepo.retrieveDirectEvidence(teid, null, lastTrustUpdate, null);
-				for (final IDirectTrustEvidence evidence : evidenceSet) {
-					
-					if (TrustEvidenceType.RATED.equals(evidence.getType()))
-						newTrust = (Double) evidence.getInfo();
-				}
+				ITrustedCss css = (ITrustedCss) trustRepo.retrieveEntity(this.evidence.getTeid());
+				if (css == null)
+					css = new TrustedCss(this.evidence.getTeid());
+				if (TrustEvidenceType.RATED.equals(evidence.getType()))
+					newTrust = (Double) evidence.getInfo();
 				css.getDirectTrust().setValue(newTrust);
 				trustRepo.updateEntity(css);
 			} catch (TrustException te) {
 				
 				LOG.error("Could not (re)evaluate direct trust for entity "
-						+ teid + ": " + te.getLocalizedMessage(), te);
+						+ evidence.getTeid() + ": " + te.getLocalizedMessage(), te);
 			}
 		} 
 	}
 	
 	private class CisDirectTrustEngine implements Runnable {
 
-		private final TrustedEntityId teid;
+		private final IDirectTrustEvidence evidence;
 		
-		private CisDirectTrustEngine(final TrustedEntityId teid) {
+		private CisDirectTrustEngine(final IDirectTrustEvidence evidence) {
 			
-			this.teid = teid;
+			this.evidence = evidence;
 		}
 		
 		/*
@@ -131,17 +119,18 @@ public class DirectTrustEngine extends TrustEngine {
 		public void run() {
 			// TODO Auto-generated method stub
 			if (LOG.isDebugEnabled())
-				LOG.debug("Running CisDirectTrustEngine for entity " + teid);
+				LOG.debug("Running CisDirectTrustEngine with evidence " 
+						+ this.evidence);
 		} 
 	}
 	
 	private class ServiceDirectTrustEngine implements Runnable {
 
-		private final TrustedEntityId teid;
+		private final IDirectTrustEvidence evidence;
 		
-		private ServiceDirectTrustEngine(final TrustedEntityId teid) {
+		private ServiceDirectTrustEngine(final IDirectTrustEvidence evidence) {
 			
-			this.teid = teid;
+			this.evidence = evidence;
 		}
 		
 		/*
@@ -151,31 +140,36 @@ public class DirectTrustEngine extends TrustEngine {
 		public void run() {
 			// TODO Auto-generated method stub
 			if (LOG.isDebugEnabled())
-				LOG.debug("Running ServiceDirectTrustEngine for entity " + teid);
+				LOG.debug("Running ServiceDirectTrustEngine with evidence "	
+						+ this.evidence);
 		} 
 	}
 	
 	private class DirectTrustEvidenceUpdateListener implements ITrustEvidenceUpdateEventListener {
 
 		/*
-		 * @see org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener#onUpdate(org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent)
+		 * @see org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener#onNew(org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent)
 		 */
 		@Override
-		public void onUpdate(TrustEvidenceUpdateEvent evt) {
+		public void onNew(TrustEvidenceUpdateEvent evt) {
 			
 			if (LOG.isDebugEnabled())
 				LOG.debug("Received direct TrustEvidenceUpdateEvent " + evt);
 			
-			final TrustedEntityId teid = evt.getId();
-			final TrustedEntityType entityType = teid.getEntityType();
+			if (!(evt.getSource() instanceof IDirectTrustEvidence)) {
+				LOG.error("TrustEvidenceUpdateEvent source is not instance of IDirectTrustEvidence");
+				return;
+			}
+			final IDirectTrustEvidence evidence = (IDirectTrustEvidence) evt.getSource();
+			final TrustedEntityType entityType = evidence.getTeid().getEntityType();
 			if (TrustedEntityType.CSS.equals(entityType))
-				executorService.execute(new CssDirectTrustEngine(teid));
+				executorService.execute(new CssDirectTrustEngine(evidence));
 			else if (TrustedEntityType.CIS.equals(entityType))
-				executorService.execute(new CisDirectTrustEngine(teid));
+				executorService.execute(new CisDirectTrustEngine(evidence));
 			else if (TrustedEntityType.SVC.equals(entityType))
-				executorService.execute(new ServiceDirectTrustEngine(teid));
+				executorService.execute(new ServiceDirectTrustEngine(evidence));
 			else
-				LOG.warn("Unsupported trusted entity type: " + entityType);
+				LOG.error("Unsupported trusted entity type: " + entityType);
 		}
 	}
 }
