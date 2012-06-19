@@ -79,5 +79,7 @@ public class EventTypes {
 	/** Used by the device drivers to publish events about device (sensors/actuators) data change*/
 	public static final String DEVICE_MANAGEMENT_EVENT = "org/societies/css/device";
 	
+	/**	Published by the RFIDDriver to notify a change in the location of an RFID tag */
+	public static final String RFID_UPDATE_EVENT = "org/societies/css/device/rfidUpdate";
 	
 }
