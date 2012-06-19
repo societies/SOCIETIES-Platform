@@ -17,7 +17,6 @@
     boolean save = request.getParameter("save") != null;
     boolean success = request.getParameter("success") != null;
     String secret = ParamUtils.getParameter(request, "secret");
-    String allowedIPs = ParamUtils.getParameter(request, "allowedIPs");
     String cloudProviderUrls = ParamUtils.getParameter(request, "cloudProviderUrls");
 
     SocietiesPlugin plugin = (SocietiesPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("societies");
@@ -27,7 +26,6 @@
     if (save) {
         if (errors.size() == 0) {
         	plugin.setSecret(secret);
-            plugin.setAllowedIPs(StringUtils.stringToCollection(allowedIPs));
             plugin.setCloudProviderUrls(StringUtils.stringToCollection(cloudProviderUrls));
             response.sendRedirect("societies.jsp?success=true");
             return;
@@ -35,7 +33,6 @@
     }
 
     secret = plugin.getSecret();
-    allowedIPs = StringUtils.collectionToString(plugin.getAllowedIPs());
     cloudProviderUrls = StringUtils.collectionToString(plugin.getCloudProviderUrls());
 %>
 
@@ -48,10 +45,10 @@
 
 
 <p>
-Use the form below to configure the secret key, the external IP addresses allowed to use the plugin HTTP API, and the URLs for the Cloud Node Providers recommended by this Domain Authority.
+Use the form below to configure the secret key and the URLs for the Cloud Node Providers recommended by this Domain Authority.
 </p>
 <p>
-<strong>For the IPs and URLs use commas to separate between entries.</strong>
+<strong>For the URLs use commas to separate between entries.</strong>
 </p>
 
 <%  if (success) { %>
@@ -75,10 +72,6 @@ Use the form below to configure the secret key, the external IP addresses allowe
     <div>
         Secret key:
         <input type="text" name="secret" value="<%= secret %>" id="text_secret">
-        <br><br>
-
-        Allowed IP Addresses:
-        <input type="text" name="allowedIPs" value="<%= ((allowedIPs != null) ? allowedIPs : "") %>" size="100">
         <br><br>
         
         SOCIETIES Cloud Node Provider URLs:

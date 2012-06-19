@@ -25,7 +25,6 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
     private XMPPServer server;
 
     private String secret;
-    private Collection<String> allowedIPs;
     private Collection<String> cloudProviderUrls;
 
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
@@ -40,7 +39,6 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
         }
 
         // Get the list of IP addresses that can use this service. An empty list means that this filter is disabled.
-        allowedIPs = StringUtils.stringToCollection(JiveGlobals.getProperty("plugin.societies.allowedIPs", ""));
         cloudProviderUrls = StringUtils.stringToCollection(JiveGlobals.getProperty("plugin.societies.cloudProviderUrls", ""));
         
         // Listen to system property events
@@ -180,15 +178,6 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
         JiveGlobals.setProperty("plugin.societies.secret", secret);
         this.secret = secret;
     }
-
-    public Collection<String> getAllowedIPs() {
-        return allowedIPs;
-    }
-
-    public void setAllowedIPs(Collection<String> allowedIPs) {
-        JiveGlobals.setProperty("plugin.societies.allowedIPs", StringUtils.collectionToString(allowedIPs));
-        this.allowedIPs = allowedIPs;
-    }
     
     public Collection<String> getCloudProviderUrls() {
 		return cloudProviderUrls;
@@ -203,9 +192,6 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
         if (property.equals("plugin.societies.secret")) {
             this.secret = (String)params.get("value");
         }
-        else if (property.equals("plugin.societies.allowedIPs")) {
-            this.allowedIPs = StringUtils.stringToCollection((String)params.get("value"));
-        }
         else if (property.equals("plugin.societies.cloudProviderUrls")) {
             this.cloudProviderUrls = StringUtils.stringToCollection((String)params.get("value"));
         }
@@ -214,9 +200,6 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
     public void propertyDeleted(String property, Map<String, Object> params) {
         if (property.equals("plugin.societies.secret")) {
             this.secret = "";
-        }
-        else if (property.equals("plugin.societies.allowedIPs")) {
-            this.allowedIPs = Collections.emptyList();
         }
         else if (property.equals("plugin.societies.cloudProviderUrls")) {
             this.cloudProviderUrls = Collections.emptyList();
