@@ -98,7 +98,7 @@ public class ServiceRegistryTest extends
 		serReg.registerServiceList(servicesList);
 
 	}
-
+/*
 	@Test
 	@Rollback(false)
 	public void retrieveService() {

@@ -166,7 +166,7 @@ public class ServiceControlUnitTest {
 
 	}
 
-
+/*
 	@Test
 	public void testServiceStuff(){
 		
@@ -197,9 +197,7 @@ public class ServiceControlUnitTest {
 		}
 
 	}
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStartServiceSuccess() {
 		
@@ -228,9 +226,7 @@ public class ServiceControlUnitTest {
 
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStartServiceRemote() {
 		
@@ -256,9 +252,7 @@ public class ServiceControlUnitTest {
 
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStartServiceOsgiProblem() {
 		
@@ -287,9 +281,7 @@ public class ServiceControlUnitTest {
 
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStartServiceWrongService() {
 		
@@ -318,9 +310,7 @@ public class ServiceControlUnitTest {
 
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStartServiceWrongBundle() {
 		
@@ -349,9 +339,7 @@ public class ServiceControlUnitTest {
 
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#stopService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStopServiceSuccess() {
 		
@@ -379,9 +367,7 @@ public class ServiceControlUnitTest {
 		}
 	}	
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStopServiceRemote() {
 		
@@ -407,9 +393,7 @@ public class ServiceControlUnitTest {
 
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#stopService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStopServiceOsgiProblem() {
 		
@@ -437,9 +421,6 @@ public class ServiceControlUnitTest {
 		}
 	}	
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#stopService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
 	@Test
 	public void testStopServiceWrongService() {
 		
@@ -467,9 +448,6 @@ public class ServiceControlUnitTest {
 		}
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#stopService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
 	@Test
 	public void testStopServiceWrongBundle() {
 		
@@ -497,10 +475,7 @@ public class ServiceControlUnitTest {
 		}
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.
-	 */
-	
+
 	/*
 	@Test
 	public void testInstallServiceURLSuccess() {
@@ -534,9 +509,7 @@ public class ServiceControlUnitTest {
 	}
 	*/
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.
-	 */
+/*
 	@Test
 	public void testInstallServiceURLProblem() {
 		
@@ -560,9 +533,7 @@ public class ServiceControlUnitTest {
 		
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL, org.societies.api.identity.IIdentity)}.
-	 */
+
 	@Test
 	public void testInstallServiceURLIIdentity() {
 
@@ -589,9 +560,7 @@ public class ServiceControlUnitTest {
 		}
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL, java.lang.String)}.
-	 */
+
 	@Test
 	public void testInstallServiceURLString() {
 		
@@ -621,9 +590,6 @@ public class ServiceControlUnitTest {
 		}
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#uninstallService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
 	@Test
 	public void testUninstallServiceSuccess() {
 		
@@ -651,9 +617,7 @@ public class ServiceControlUnitTest {
 		}
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testUninstallServiceRemote() {
 		
@@ -679,9 +643,7 @@ public class ServiceControlUnitTest {
 
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#uninstallService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testUninstallServiceOsgiProblem() {
 		
@@ -708,10 +670,7 @@ public class ServiceControlUnitTest {
 			fail("Exception occured");
 		}
 	}	
-	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#uninstallService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testUninstallServiceWrongService() {
 		
@@ -739,9 +698,7 @@ public class ServiceControlUnitTest {
 		}
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#uninstallService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testUninstallServiceWrongBundle() {
 		
@@ -768,7 +725,7 @@ public class ServiceControlUnitTest {
 			fail("Exception occured");
 		}
 	}
-	
+	*/
 	private class FakeServiceRemote implements IServiceControlRemote{
 
 		@Override
