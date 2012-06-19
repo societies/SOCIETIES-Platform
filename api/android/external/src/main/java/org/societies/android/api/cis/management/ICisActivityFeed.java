@@ -30,6 +30,7 @@ import org.societies.android.api.cis.management.ICisActivity;
  * @author Babak.Farshchian@sintef.no
  *
  */
+@Deprecated
 public interface ICisActivityFeed {
 	public void getActivities(String CssId, String timePeriod);
 	public void getActivities(String CssId, String query, String timePeriod);

@@ -22,83 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform;
+package org.societies.privacytrust.trust.api.engine;
 
-import org.societies.android.api.external.cis.management.ICisRecord;
-
+import org.societies.api.internal.privacytrust.trust.TrustException;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * Thrown to indicate Trust Engine exceptions.
  *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.3
  */
-public class CisRecord implements ICisRecord{
-    
-    private String cisId;
-    private String name;
-    private String ownerId;
-    private String creationDate;
-    private String userDefinedName;
+public class TrustEngineException extends TrustException {
 
-    public CisRecord(String _cisId, String _name, String _ownerId, String _creationDate, String _udn){
-	cisId = _cisId;
-	name = _name;
-	ownerId = _ownerId;
-	creationDate = _creationDate;
-	userDefinedName = _udn;
-    }
-    public CisRecord(String _cisId, String _name, String _ownerId, String _creationDate){
-	cisId = _cisId;
-	name = _name;
-	ownerId = _ownerId;
-	creationDate = _creationDate;
-    }
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getCisId()
+	private static final long serialVersionUID = -1083082713557112148L;
+
+	/**
+     * Constructs a <code>TrustEngineException</code> with no detail message.
      */
-    public String getCisId() {
-	// TODO Auto-generated method stub
-	return cisId;
+    public TrustEngineException() {
+    	
+        super();
     }
 
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getName()
+    /**
+     * Constructs a <code>TrustEngineException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
      */
-    public String getName() {
-	// TODO Auto-generated method stub
-	return name;
+    public TrustEngineException(String message) {
+    	
+        super(message);
     }
 
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getOwnerId()
+    /**
+     * Creates a <code>TrustEngineException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
      */
-    public String getOwnerId() {
-	// TODO Auto-generated method stub
-	return ownerId;
+    public TrustEngineException(String message, Throwable cause) {
+    	
+        super(message, cause);
     }
 
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getCreationDate()
+    /**
+     * Creates a <code>TrustEngineException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
      */
-    public String getCreationDate() {
-	// TODO Auto-generated method stub
-	return creationDate;
+    public TrustEngineException(Throwable cause) {
+    	
+        super(cause);
     }
-
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#setUserDefinedName(java.lang.String)
-     */
-    public String setUserDefinedName(String _name) {
-	// TODO Auto-generated method stub
-	userDefinedName = _name;
-	return userDefinedName;
-    }
-
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisRecord#getUserDefineName()
-     */
-    public String getUserDefineName() {
-	// TODO Auto-generated method stub
-	return userDefinedName;
-    }
-
 }

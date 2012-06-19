@@ -27,6 +27,8 @@ package org.societies.api.internal.servicelifecycle;
 
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  *  Each method requires a callback to receive the result
@@ -39,6 +41,10 @@ public interface IServiceDiscoveryRemote {
     
     public void getServices(IIdentity node, IServiceDiscoveryCallback callback);
     
+    public void getService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceDiscoveryCallback callback);
+    
+    public void searchService(Service filter, IIdentity node, IServiceDiscoveryCallback callback);
+	
 }
 
 

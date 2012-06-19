@@ -406,10 +406,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		ret = this.insertMember(jid, typedRole);
 
 		
-		
-		// should we send a XMPP notification to all the users to say that the new member has been added to the group
-		// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
-		// and the GUI can be updated with that new member
 		Stanza sta;
 		LOG.info("new member added, going to notify the user");
 		IIdentity targetCssIdentity = null;
@@ -442,7 +438,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 			e.printStackTrace();
 		}
 				
-		LOG.info("notification sent to the new user");
+		LOG.info("notification sent to the new user");		
+
 		
 		return new AsyncResult<Boolean>(new Boolean(ret));
 	}
@@ -462,7 +459,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			//persist in database
 			this.updatePersisted(this);
 			
-	
+			// should we send a XMPP notification to all the users to say that the new member has been added to the group
+			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
+			// and the GUI can be updated with that new member
+
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a pubsub notification
 			
@@ -1004,6 +1004,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	@Override 
 	public Future<Set<ICisParticipant>> getMemberList(){
+		LOG.debug("local get member list WITH CALLBACK called");
 		Set<ICisParticipant> s = new  HashSet<ICisParticipant>();
 		s.addAll(this.getMembersCss());
 		return new AsyncResult<Set<ICisParticipant>>(s);
@@ -1011,7 +1012,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
-		LOG.debug("local client call to get list of members");
+		LOG.debug("local get member list WITHOUT CALLBACK called");
 
 		
 		Community c = new Community();

@@ -59,11 +59,11 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 
 	ICommManager commManager;
 	ICtxBroker ctxBroker;
-	PrivacyPolicyRegistryManager policyRegistryManager;
+	public PrivacyPolicyRegistryManager policyRegistryManager;
 
 
 	public void init() {
-		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker);
+		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker,commManager.getIdManager());
 	}
 
 

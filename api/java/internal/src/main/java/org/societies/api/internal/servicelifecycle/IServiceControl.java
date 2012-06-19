@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
@@ -60,28 +61,72 @@ public interface IServiceControl {
 	 * @return the result of the operation
 	 */
 	public Future<ServiceControlResult> stopService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
-	
+
 	/**
-	 * This method install a new service into the container
+	 * This shares a Service with a given CSS or CIS
 	 * 
-	 * @param serviceLocation the URL of the bundle to install
+	 * @param service The Service to be shared
+	 * @param jid The jid of the node we are sharing the service with
+	 * @return the result of the operation
+	 */
+	public Future<ServiceControlResult> shareService(Service service, String jid) throws ServiceControlException;
+
+	/**
+	 * This shares a Service with a given CSS or CIS
+	 * 
+	 * @param service The Service to be shared
+	 * @param node The node we are sharing the service with
+	 * @return the result of the operation
+	 */
+	public Future<ServiceControlResult> shareService(Service service, IIdentity node) throws ServiceControlException;
+
+	/**
+	 * This method installs a shared service into the container
+	 * 
+	 * @param service the Remote Service to install
+	 * @return the result of the operation
+	 */
+	public Future<ServiceControlResult> installService(Service service) throws ServiceControlException;
+
+	/**
+	 * This method installs a new service into the container present on a given node
+	 * 
+	 * @param service the Remote Service to install
+	 * @param node The node where we wish to install the service
+	 * @return the result of the operation
+	 */
+	public Future<ServiceControlResult> installService(Service service, IIdentity node) throws ServiceControlException;
+
+	/**
+	 * This method installs a new service into the container present on a given node, given by the jid
+	 * 
+	 * @param service the Remote Service to install
+	 * @param jid The node where we wish to install the service
+	 * @return the result of the operation
+	 */
+	public Future<ServiceControlResult> installService(Service service, String jid) throws ServiceControlException;
+
+	/**
+	 * This method installs a new service into the container
+	 * 
+	 * @param bundleLocation the URL of the bundle to install
 	 * @return the result of the operation
 	 */
 	public Future<ServiceControlResult> installService(URL bundleLocation) throws ServiceControlException;
 
 	/**
-	 * This method install a new service into the container present on a given node
+	 * This method installs a new service into the container present on a given node
 	 * 
-	 * @param serviceLocation the URL of the bundle to install
+	 * @param bundleLocation the URL of the bundle to install
 	 * @param node The node where we wish to install the service
 	 * @return the result of the operation
 	 */
 	public Future<ServiceControlResult> installService(URL bundleLocation, IIdentity node) throws ServiceControlException;
 
 	/**
-	 * This method install a new service into the container present on a given node, given by the jid
+	 * This method installs a new service into the container present on a given node, given by the jid
 	 * 
-	 * @param serviceLocation the URL of the bundle to install
+	 * @param bundleLocation the URL of the bundle to install
 	 * @param jid The node where we wish to install the service
 	 * @return the result of the operation
 	 */
@@ -95,5 +140,22 @@ public interface IServiceControl {
 	 */
 	public Future<ServiceControlResult> uninstallService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
 
+	/**
+	 * This unshares a Service with a given CSS or CIS
+	 * 
+	 * @param service The Service to be unshared
+	 * @param jid The jid of the node we are unsharing the service with
+	 * @return the result of the operation
+	 */
+	public Future<ServiceControlResult> unshareService(Service service, String jid) throws ServiceControlException;
+
+	/**
+	 * This unshares a Service with a given CSS or CIS
+	 * 
+	 * @param service The Service to be unshared
+	 * @param node The node we are unsharing the service with
+	 * @return the result of the operation
+	 */
+	public Future<ServiceControlResult> unshareService(Service service, IIdentity node) throws ServiceControlException;
 	
 }

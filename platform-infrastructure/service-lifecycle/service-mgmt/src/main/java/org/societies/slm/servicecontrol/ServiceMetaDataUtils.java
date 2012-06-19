@@ -2,8 +2,11 @@ package org.societies.slm.servicecontrol;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.concurrent.Future;
 
 import org.osgi.framework.Bundle;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
@@ -16,6 +19,12 @@ public class ServiceMetaDataUtils {
 		
 	}
 
+	/**
+	 *  This method generates a ServiceResourceIdentifier given the ServiceBundle
+	 * @param service
+	 * @param serBndl
+	 * @return
+	 */
 	public static ServiceResourceIdentifier generateServiceResourceIdentifier(Service service, Bundle serBndl){
 		// ***** To do ********
 		// some logic to map available meta data and xmpp service identity 
@@ -33,37 +42,5 @@ public class ServiceMetaDataUtils {
 		return serResId;
 		
 	}
-	
-	public static Service generateEmptyFilter(){
-		
-		Service filter = new Service();
 
-		// Preparing the search filter
-		filter.setAuthorSignature(null);
-		filter.setServiceDescription(null);
-		filter.setServiceEndpoint(null);
-		filter.setServiceName(null);
-		filter.setServiceStatus(null);
-		filter.setServiceType(null);
-		
-		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
-		filterIdentifier.setIdentifier(null);
-		filterIdentifier.setServiceInstanceIdentifier(null);
-		filter.setServiceIdentifier(filterIdentifier);
-		
-		ServiceInstance filterInstance = new ServiceInstance();
-		filterInstance.setFullJid(null);
-		filterInstance.setXMPPNode(null);
-		
-		ServiceImplementation filterImplementation = new ServiceImplementation();
-		filterImplementation.setServiceVersion(null);
-		filterImplementation.setServiceNameSpace(null);
-		filterImplementation.setServiceProvider(null);
-		
-		filterInstance.setServiceImpl(filterImplementation);
-		filter.setServiceInstance(filterInstance);
-		
-		return filter;
-	}
-	
 }

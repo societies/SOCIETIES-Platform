@@ -96,6 +96,7 @@ public class CssRecordDAO {
 	 */
 	public boolean cssRecordExists() {
 		int recordCount = 0;
+		boolean retValue = false;
 		
 		SQLiteDatabase database = this.openReadable();
 
@@ -104,54 +105,62 @@ public class CssRecordDAO {
 		
 		Cursor cursor = database.query(DBHelper.CSS_RECORD_TABLE, columns, null, null, null, null, null);
 		recordCount = cursor.getCount();
-		Dbc.invariant("Can only be one CSSRecord row", 1 == recordCount);
+
+		if (recordCount >= 1) {
+			Dbc.invariant("Can only be one CSSRecord row", 1 == recordCount);
+			retValue = true;
+		}
 		
 		cursor.close();
 		
 		this.close();
 		
-		return 1 == recordCount ? true : false;
+		return retValue;
 	}
 	
 	/**
 	 * Read the CSS Record
 	 * 
-	 * @return AndroidCSSRecord
+	 * @return AndroidCSSRecord if database contains CSSRecord, null otherwise
 	 */
 	public AndroidCSSRecord readCSSrecord() {
-		AndroidCSSRecord record  = new AndroidCSSRecord();
+		AndroidCSSRecord record  = null;
 		
-		SQLiteDatabase database = this.openReadable();
-		
-		Cursor cursor = database.query(DBHelper.CSS_RECORD_TABLE, DBHelper.ALL_CSSRECORD_COLUMNS, null, null, null, null, null);
-		cursor.moveToFirst();
-		
-		record.setCssHostingLocation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_CSS_HOSTING_LOCATION)));
-		record.setCssIdentity(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_CSS_IDENTITY)));
-		record.setCssInactivation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_INACTIVATION)));
-		record.setCssRegistration(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_REGISTRATION)));
-		record.setCssUpTime(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_UPTIME)));
-		record.setDomainServer(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_DOMAIN_SERVER)));
-		record.setEmailID(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_EMAILID)));
-		record.setEntity(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_ENTITY)));
-		record.setForeName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_FORENAME)));
-		record.setHomeLocation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_HOME_LOCATION)));
-		record.setIdentityName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_IDENTITY_NAME)));
-		record.setImID(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_IMID)));
-		record.setName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_NAME)));
-		record.setPassword(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_PASSWORD)));
-		record.setSex(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_SEX)));
-		record.setSocialURI(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_SOCIALURI)));
-		record.setStatus(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_STATUS)));
+		if (this.cssRecordExists()) {
+			record  = new AndroidCSSRecord();
+			
+			SQLiteDatabase database = this.openReadable();
+			
+			Cursor cursor = database.query(DBHelper.CSS_RECORD_TABLE, DBHelper.ALL_CSSRECORD_COLUMNS, null, null, null, null, null);
+			cursor.moveToFirst();
+			
+			record.setCssHostingLocation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_CSS_HOSTING_LOCATION)));
+			record.setCssIdentity(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_CSS_IDENTITY)));
+			record.setCssInactivation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_INACTIVATION)));
+			record.setCssRegistration(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_REGISTRATION)));
+			record.setCssUpTime(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_UPTIME)));
+			record.setDomainServer(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_DOMAIN_SERVER)));
+			record.setEmailID(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_EMAILID)));
+			record.setEntity(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_ENTITY)));
+			record.setForeName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_FORENAME)));
+			record.setHomeLocation(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_HOME_LOCATION)));
+			record.setIdentityName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_IDENTITY_NAME)));
+			record.setImID(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_IMID)));
+			record.setName(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_NAME)));
+			record.setPassword(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_PASSWORD)));
+			record.setSex(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_SEX)));
+			record.setSocialURI(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_RECORD_SOCIALURI)));
+			record.setStatus(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_RECORD_STATUS)));
 
-		cursor.close();
-		
-		record.setCSSNodes(readNodes(DBHelper.CURRENT_NODE_TABLE, false, database));
-		record.setArchiveCSSNodes(readNodes(DBHelper.ARCHIVED_NODE_TABLE, false, database));
-		
-		Dbc.invariant("Can only be one CSSRecord row", 1 == cursor.getCount());
-		
-		this.close();
+			cursor.close();
+			
+			record.setCSSNodes(readNodes(DBHelper.CURRENT_NODE_TABLE, false, database));
+			record.setArchiveCSSNodes(readNodes(DBHelper.ARCHIVED_NODE_TABLE, false, database));
+			
+			Dbc.invariant("Can only be one CSSRecord row", 1 == cursor.getCount());
+			
+			this.close();
+		}
 		
 		return record;
 		
@@ -201,22 +210,33 @@ public class CssRecordDAO {
 		
 		return node;
 	}
+	
 	/**
-	 * Update a row
+	 * Update CSRecord
 	 * 
 	 * @param record
+	 * @return boolean true id original CSSrecord found
 	 */
-	public void updateCSSRecord(AndroidCSSRecord record) {
-		SQLiteDatabase database = this.openWriteable();
-	
-		String whereValues [] = new String [1];
-		whereValues[0] = Long.toString(this.cssRowId);
+	public boolean updateCSSRecord(AndroidCSSRecord record) {
+		boolean retValue = false;
 		
-		database.update(DBHelper.CSS_RECORD_TABLE, this.populateCSSRecord(record), "where _id = " , whereValues);
+		if (this.cssRecordExists()) {
+			retValue = true;
+
+			SQLiteDatabase database = this.openWriteable();
+			
+			String whereValues [] = new String [1];
+			whereValues[0] = Long.toString(this.cssRowId);
+			
+			database.update(DBHelper.CSS_RECORD_TABLE, this.populateCSSRecord(record), DBHelper.ROW_ID + " = ?"  , whereValues);
+			
+			this.updateNodes(record, database);
+			
+			this.close();
+		}
+
 		
-		this.updateNodes(record, database);
-		
-		this.close();
+		return retValue;
 	}
 	
 	private void updateNodes(AndroidCSSRecord record, SQLiteDatabase database) {
@@ -233,19 +253,27 @@ public class CssRecordDAO {
 	}
 	
 	/**
-	 * Insert a row 
+	 * Insert the CSSRecord 
 	 * 
-	 * @param record
+	 * @param record AndroidCSSRecord object
+	 * @return boolean true if CSSRecord table is empty
 	 */
-	public void insertCSSRecord(AndroidCSSRecord record) {
-		SQLiteDatabase database = this.openWriteable();
+	public boolean insertCSSRecord(AndroidCSSRecord record) {
+		boolean retValue = false;
 		
+		if (!this.cssRecordExists()) {
+			retValue = true;
+			SQLiteDatabase database = this.openWriteable();
+			
 
-		this.cssRowId = database.insert(DBHelper.CSS_RECORD_TABLE, null, this.populateCSSRecord(record));
-		
-		this.insertNodes(record, database);
-		
-		this.close();
+			this.cssRowId = database.insert(DBHelper.CSS_RECORD_TABLE, null, this.populateCSSRecord(record));
+			
+			this.insertNodes(record, database);
+			
+			this.close();
+			
+		}
+		return retValue;
 		
 	}
 	
