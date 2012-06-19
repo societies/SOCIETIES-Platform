@@ -94,10 +94,10 @@ if (methodCalled.equals("RefreshRemoteMembers")) {
     <p><b>Membership List from remote CIS:</b></p>
 	<table>
 		<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
-		<xc:forEach var="record" items="${remoteCommunity.getWho().getParticipant()}">
+		<xc:forEach var="record" items="${memberRecords}">
 	        <tr>
-	        	<td>${record.getMembersJid()}&nbsp;</td>
-	        	<td>${record.getMembershipType()}&nbsp;</td>
+	        	<td>${record.getJid()}&nbsp;</td>
+	        	<td>${record.getRole().toString()}&nbsp;</td>
 	        </tr>
 	    </xc:forEach>
 	</table>

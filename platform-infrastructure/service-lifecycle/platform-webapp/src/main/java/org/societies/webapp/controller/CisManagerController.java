@@ -58,6 +58,7 @@ import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Participant;
 
 
 @Controller
@@ -110,10 +111,11 @@ public class CisManagerController {
 		
 		model.put("cmForm", cisForm);
 		remoteCISs = new ArrayList<ICis>();
+		
 		localCISs = new ArrayList<ICisOwned>();
 		
 		localCISs.addAll(this.getCisManager().getListOfOwnedCis());
-		
+		remoteCISs.addAll(this.getCisManager().getRemoteCis());
 		
 		Iterator<ICisOwned> it = localCISs.iterator();
 		ICisOwned thisCis = null;
@@ -283,10 +285,19 @@ public class CisManagerController {
 				resultCallback = "Failure getting result from remote node!";
 			}
 			else{
-				resultCallback = "Joined CIS: " + communityResultObject.getCommunityJid();
+				if(communityResultObject.getJoinResponse() != null){
+					resultCallback = "Joined CIS: " + communityResultObject.getCommunityJid();
+	
+					remoteCommunity = communityResultObject;
+					m_session.setAttribute("community", remoteCommunity);
+				}
+				if(communityResultObject.getWho() != null){
+					
 
-				remoteCommunity = communityResultObject;
-				m_session.setAttribute("community", remoteCommunity);
+					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWho().getParticipant();					
+					m_session.setAttribute("memberRecords", l);
+				}
+
 			}
 		}
 	};
