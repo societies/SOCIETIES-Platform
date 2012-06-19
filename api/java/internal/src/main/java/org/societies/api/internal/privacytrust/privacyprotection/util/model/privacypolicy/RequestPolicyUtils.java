@@ -62,7 +62,7 @@ public class RequestPolicyUtils {
 		}
 		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy requestPolicyBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy();
 		requestPolicyBean.setRequestor(RequestorUtils.toRequestorBean(requestPolicy.getRequestor()));
-		// TODO: manage list
+		requestPolicyBean.setRequestItems(RequestItemUtils.toRequestItemBeans(requestPolicy.getRequests()));
 		return requestPolicyBean;
 	}
 	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy> toRequestPolicyBeans(List<RequestPolicy> requestPolicys)

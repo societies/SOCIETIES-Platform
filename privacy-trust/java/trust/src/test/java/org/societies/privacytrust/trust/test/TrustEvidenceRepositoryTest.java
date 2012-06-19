@@ -40,8 +40,10 @@ import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -64,14 +66,11 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 	
 	private static final String TRUSTED_CSS_ID = BASE_ID + "CssIIdentity";
 	
-	@SuppressWarnings("unused")
 	private static final String TRUSTED_CIS_ID = BASE_ID + "CisIIdentity";
 	
-	@SuppressWarnings("unused")
 	private static final String TRUSTED_SERVICE_ID = BASE_ID + "ServiceResourceIdentifier";
 	
-	@SuppressWarnings("unused")
-	private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
+	private static final String SOURCE_ID = BASE_ID + "Source";
 	
 	@Autowired
 	private ITrustEvidenceRepository trustEvidenceRepo;
@@ -105,12 +104,12 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 	}
 
 	/**
-	 * Tests the creation, retrieval, update and removal of trusted CSSs.
+	 * Tests the creation, retrieval, update and removal of Direct Trust Evidence.
 	 * 
 	 * @throws TrustException
 	 */
 	@Test
-	public void testDirectTrustRatingCRUD() throws TrustException {
+	public void testDirectTrustEvidenceCRUD() throws TrustException {
 		
 		// test params
 		// TEID1
@@ -121,7 +120,7 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 		final Date startDate = new Date();
 		// endDate
 		final Date endDate = new Date(startDate.getTime() + 1000);
-		// DirectTrustOpinion on teid1 at startDate
+		
 		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(
 				teid1, TrustEvidenceType.RATED, startDate, new Double(0.5d));
 		final IDirectTrustEvidence evidence2 = new DirectTrustEvidence(
@@ -153,63 +152,73 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 		assertTrue(directEvidence.contains(evidence2));
 		
 		// retrieve evidence for teid1 between startDate and endDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1, startDate, endDate);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1, 
+				TrustEvidenceType.RATED, startDate, endDate);
 		assertNotNull(directEvidence);
 		assertEquals(2, directEvidence.size());
 		assertTrue(directEvidence.contains(evidence1));
 		assertTrue(directEvidence.contains(evidence3));
 		
 		// retrieve evidence for teid2 between startDate and endDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2, startDate, endDate);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2,
+				TrustEvidenceType.RATED, startDate, endDate);
 		assertNotNull(directEvidence);
 		assertEquals(1, directEvidence.size());
 		assertTrue(directEvidence.contains(evidence2));
 		
 		// retrieve evidence for teid1 after startDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1, startDate, null);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1,
+				TrustEvidenceType.RATED, startDate, null);
 		assertNotNull(directEvidence);
 		assertEquals(2, directEvidence.size());
 		assertTrue(directEvidence.contains(evidence1));
 		assertTrue(directEvidence.contains(evidence3));
 				
 		// retrieve evidence for teid2 after startDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2, startDate, null);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2,
+				TrustEvidenceType.RATED, startDate, null);
 		assertNotNull(directEvidence);
 		assertEquals(1, directEvidence.size());
 		assertTrue(directEvidence.contains(evidence2));
 		
 		// retrieve evidence for teid1 after endDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1, endDate, null);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1,
+				TrustEvidenceType.RATED, endDate, null);
 		assertNotNull(directEvidence);
 		assertEquals(1, directEvidence.size());
 		assertTrue(directEvidence.contains(evidence3));
 						
 		// retrieve evidence for teid2 after endDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2, endDate, null);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2,
+				TrustEvidenceType.RATED, endDate, null);
 		assertNotNull(directEvidence);
 		assertEquals(0, directEvidence.size());
 		
 		// retrieve evidence for teid1 before startDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1, null, startDate);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1,
+				TrustEvidenceType.RATED, null, startDate);
 		assertNotNull(directEvidence);
 		assertEquals(1, directEvidence.size());
 		assertTrue(directEvidence.contains(evidence1));
 						
 		// retrieve evidence for teid2 before startDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2, null, startDate);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2,
+				TrustEvidenceType.RATED, null, startDate);
 		assertNotNull(directEvidence);
 		assertEquals(1, directEvidence.size());
 		assertTrue(directEvidence.contains(evidence2));
 				
 		// retrieve evidence for teid1 before endDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1, null, endDate);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid1,
+				TrustEvidenceType.RATED, null, endDate);
 		assertNotNull(directEvidence);
 		assertEquals(2, directEvidence.size());
 		assertTrue(directEvidence.contains(evidence1));
 		assertTrue(directEvidence.contains(evidence3));
 								
 		// retrieve evidence for teid2 before endDate (inclusive)
-		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2, null, endDate);
+		directEvidence = this.trustEvidenceRepo.retrieveDirectEvidence(teid2,
+				TrustEvidenceType.RATED, null, endDate);
 		assertNotNull(directEvidence);
 		assertEquals(1, directEvidence.size());
 		assertTrue(directEvidence.contains(evidence2));
@@ -237,7 +246,8 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 		this.trustEvidenceRepo.addEvidence(evidence3);
 		
 		// remove evidence for teid1 before startDate (inclusive)
-		this.trustEvidenceRepo.removeDirectEvidence(teid1, null, startDate);
+		this.trustEvidenceRepo.removeDirectEvidence(teid1, 
+				TrustEvidenceType.RATED, null, startDate);
 		// verify
 		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
 		assertEquals(1, directEvidence.size());
@@ -247,7 +257,8 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 		assertTrue(directEvidence.contains(evidence2));
 						
 		// remove evidence for teid1 after startDate (inclusive)
-		this.trustEvidenceRepo.removeDirectEvidence(teid1, startDate, null);
+		this.trustEvidenceRepo.removeDirectEvidence(teid1,
+				TrustEvidenceType.RATED, startDate, null);
 		// verify
 		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
 		assertTrue(directEvidence.isEmpty());
@@ -256,11 +267,187 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 		assertTrue(directEvidence.contains(evidence2));
 		
 		// remove evidence for teid2 between startDate and endDate (inclusive)
-		this.trustEvidenceRepo.removeDirectEvidence(teid2, startDate, endDate);
+		this.trustEvidenceRepo.removeDirectEvidence(teid2,
+				TrustEvidenceType.RATED, startDate, endDate);
 		// verify
 		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
 		assertTrue(directEvidence.isEmpty());
 		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid2);
 		assertTrue(directEvidence.isEmpty());
+	}
+	
+	/**
+	 * Tests the creation, retrieval, update and removal of Indirect Trust Evidence.
+	 * 
+	 * @throws TrustException
+	 */
+	@Test
+	public void testIndirectTrustEvidenceCRUD() throws TrustException {
+		
+		// test params
+		// TEID1
+		final TrustedEntityId teid1 = new TrustedEntityId(
+				TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID);
+		// TEID2
+		final TrustedEntityId teid2 = new TrustedEntityId(
+				TRUSTOR_ID2, TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
+		// startDate
+		final Date startDate = new Date();
+		// endDate
+		final Date endDate = new Date(startDate.getTime() + 1000);
+		
+		final IIndirectTrustEvidence evidence1 = new IndirectTrustEvidence(
+				teid1, TrustEvidenceType.RATED, startDate, new Double(0.5d), SOURCE_ID);
+		final IIndirectTrustEvidence evidence2 = new IndirectTrustEvidence(
+				teid2, TrustEvidenceType.RATED, startDate, new Double(0.5d), SOURCE_ID); 
+		final IIndirectTrustEvidence evidence3 = new IndirectTrustEvidence(
+				teid1, TrustEvidenceType.RATED, endDate, new Double(1.0d), SOURCE_ID); 
+		
+		Set<IIndirectTrustEvidence> indirectEvidence;
+		
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid1);
+		assertNotNull(indirectEvidence);
+		assertTrue(indirectEvidence.isEmpty());
+		
+		this.trustEvidenceRepo.addEvidence(evidence1);
+		this.trustEvidenceRepo.addEvidence(evidence2);
+		this.trustEvidenceRepo.addEvidence(evidence3);
+		
+		// retrieve ALL evidence for teid1
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid1);
+		assertNotNull(indirectEvidence);
+		assertEquals(2, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence1));
+		assertTrue(indirectEvidence.contains(evidence3));
+		
+		// retrieve ALL evidence for teid2
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid2);
+		assertNotNull(indirectEvidence);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence2));
+		
+		// retrieve evidence for teid1 between startDate and endDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid1, 
+				TrustEvidenceType.RATED, startDate, endDate);
+		assertNotNull(indirectEvidence);
+		assertEquals(2, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence1));
+		assertTrue(indirectEvidence.contains(evidence3));
+		
+		// retrieve evidence for teid2 between startDate and endDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid2,
+				TrustEvidenceType.RATED, startDate, endDate);
+		assertNotNull(indirectEvidence);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence2));
+		
+		// retrieve evidence for teid1 after startDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid1,
+				TrustEvidenceType.RATED, startDate, null);
+		assertNotNull(indirectEvidence);
+		assertEquals(2, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence1));
+		assertTrue(indirectEvidence.contains(evidence3));
+				
+		// retrieve evidence for teid2 after startDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid2,
+				TrustEvidenceType.RATED, startDate, null);
+		assertNotNull(indirectEvidence);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence2));
+		
+		// retrieve evidence for teid1 after endDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid1,
+				TrustEvidenceType.RATED, endDate, null);
+		assertNotNull(indirectEvidence);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence3));
+						
+		// retrieve evidence for teid2 after endDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid2,
+				TrustEvidenceType.RATED, endDate, null);
+		assertNotNull(indirectEvidence);
+		assertEquals(0, indirectEvidence.size());
+		
+		// retrieve evidence for teid1 before startDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid1,
+				TrustEvidenceType.RATED, null, startDate);
+		assertNotNull(indirectEvidence);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence1));
+						
+		// retrieve evidence for teid2 before startDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid2,
+				TrustEvidenceType.RATED, null, startDate);
+		assertNotNull(indirectEvidence);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence2));
+				
+		// retrieve evidence for teid1 before endDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid1,
+				TrustEvidenceType.RATED, null, endDate);
+		assertNotNull(indirectEvidence);
+		assertEquals(2, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence1));
+		assertTrue(indirectEvidence.contains(evidence3));
+								
+		// retrieve evidence for teid2 before endDate (inclusive)
+		indirectEvidence = this.trustEvidenceRepo.retrieveIndirectEvidence(teid2,
+				TrustEvidenceType.RATED, null, endDate);
+		assertNotNull(indirectEvidence);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence2));
+		
+		// remove ALL evidence for teid1
+		this.trustEvidenceRepo.removeAllIndirectEvidence(teid1);
+		// verify
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid1);
+		assertTrue(indirectEvidence.isEmpty());
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid2);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence2));
+		
+		// remove ALL evidence for teid2
+		this.trustEvidenceRepo.removeAllIndirectEvidence(teid2);
+		// verify
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid1);
+		assertTrue(indirectEvidence.isEmpty());
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid2);
+		assertTrue(indirectEvidence.isEmpty());
+		
+		// re-add evidence
+		this.trustEvidenceRepo.addEvidence(evidence1);
+		this.trustEvidenceRepo.addEvidence(evidence2);
+		this.trustEvidenceRepo.addEvidence(evidence3);
+		
+		// remove evidence for teid1 before startDate (inclusive)
+		this.trustEvidenceRepo.removeIndirectEvidence(teid1, 
+				TrustEvidenceType.RATED, null, startDate);
+		// verify
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid1);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence3));
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid2);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence2));
+						
+		// remove evidence for teid1 after startDate (inclusive)
+		this.trustEvidenceRepo.removeIndirectEvidence(teid1,
+				TrustEvidenceType.RATED, startDate, null);
+		// verify
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid1);
+		assertTrue(indirectEvidence.isEmpty());
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid2);
+		assertEquals(1, indirectEvidence.size());
+		assertTrue(indirectEvidence.contains(evidence2));
+		
+		// remove evidence for teid2 between startDate and endDate (inclusive)
+		this.trustEvidenceRepo.removeIndirectEvidence(teid2,
+				TrustEvidenceType.RATED, startDate, endDate);
+		// verify
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid1);
+		assertTrue(indirectEvidence.isEmpty());
+		indirectEvidence = this.trustEvidenceRepo.retrieveAllIndirectEvidence(teid2);
+		assertTrue(indirectEvidence.isEmpty());
 	}
 } 
