@@ -11,10 +11,10 @@ import org.slf4j.LoggerFactory;
 
 /** Example resource class hosted at the URI path "/myresource"
  */
-@Path("/myresource")
-public class MyResource {
+@Path("/serviceclient")
+public class ServiceClientJar {
     
-	private static Logger LOG = LoggerFactory.getLogger(MyResource.class);
+	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJar.class);
 
 	/**
 	 * URL parameter
