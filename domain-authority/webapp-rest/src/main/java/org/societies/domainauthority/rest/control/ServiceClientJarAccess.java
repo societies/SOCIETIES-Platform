@@ -24,13 +24,21 @@
  */
 package org.societies.domainauthority.rest.control;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.domainauth.IClinetJarServer;
+import org.societies.api.internal.domainauthority.IClinetJarServer;
+import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
+import org.societies.domainauthority.rest.server.Path;
+import org.societies.domainauthority.rest.server.ServiceClientJar;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * 
@@ -53,8 +61,13 @@ public class ServiceClientJarAccess implements IClinetJarServer {
 	}
 	
 	@Override
-	public void addKey(String filePath, String key) {
+	public Future<UrlBean> addKey(String hostname, String filePath) {
 		
+		String key = generateKey();
+		UrlBean result = new UrlBean();
+		URI url;
+		String urlStr;
+
 		List<String> fileKeys = keys.get(filePath);
 		
 		if (fileKeys == null) {
@@ -72,8 +85,37 @@ public class ServiceClientJarAccess implements IClinetJarServer {
 				fileKeys.add(key);
 			}
 		}
+		urlStr = hostname + Path.BASE + ServiceClientJar.PATH + "/" + filePath +
+				"?" + ServiceClientJar.URL_PARAM_KEY + "=" + key;
+		try {
+			url = new URI(urlStr);
+			result.setUrl(url);
+			result.setSuccess(true);
+		} catch (URISyntaxException e) {
+			LOG.warn("Could not create URI from {}", urlStr, e);
+			result.setSuccess(false);
+		}
+		
+		return new AsyncResult<UrlBean>(result);
 	}
 	
+	private String generateKey() {
+		
+		Random rnd = new Random();
+		int num;
+		String key;
+		
+		num = rnd.nextInt();
+		if (num < 0) {
+			num = -num;
+		}
+		key = String.valueOf(num);
+		if (key.length() > 5) {
+			key = key.substring(0, 5);
+		}
+		return key;
+	}
+
 	public static boolean isKeyValid(String filePath, String key) {
 		
 		List<String> fileKeys = keys.get(filePath);

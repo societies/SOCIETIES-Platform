@@ -94,6 +94,12 @@
 			<version>3.2.0</version>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
 			<version>${jersey-version}</version>
@@ -240,6 +246,9 @@
 							com.sun.jersey.spi.container.servlet,
 							javax.ws.rs,
 							org.objectweb.asm,
+							org.springframework.beans.factory.annotation*;version="0",
+							org.springframework.stereotype*;version="0",
+							javax.annotation;version="0",
 							*;resolution:=optional
 						</Import-Package>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>

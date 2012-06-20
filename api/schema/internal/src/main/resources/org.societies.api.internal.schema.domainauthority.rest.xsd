@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema  elementFormDefault="qualified" version="1.0" 
+			targetNamespace="http://societies.org/api/internal/schema/domainauthority/rest"
+			xmlns:tns="http://societies.org/api/internal/schema/domainauthority/rest"
+			xmlns:ns1="http://societies.org/api/schema/servicelifecycle/model"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0" 
+            xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+            jaxb:extensionBindingPrefixes="xjc"
+			xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<!--xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+	schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd" /-->
+
+	<!-- Message bean and result bean require the additional "element" node -->
+	<xs:element name="clientJarBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="method" type="tns:methodType" minOccurs="0"/>
+				<xs:element name="url" type="xs:anyURI" minOccurs="0" />
+				<xs:element name="filePath" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- Message bean and result bean require the additional "element" node -->
+	<xs:element name="clientJarBeanResult">
+		<xs:complexType >
+			<xs:sequence>
+				<xs:element name="urlBean" type="tns:urlBean" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- Other datatypes do not require the additional "element" node -->
+	<xs:complexType name="urlBean">
+		<xs:sequence>
+			<xs:element name="success" type="xs:boolean"/>
+			<xs:element name="sessionId" type="xs:int"/>
+			<xs:element name="url" type="xs:anyURI" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- Other datatypes do not require the additional "element" node -->
+	<xs:simpleType name="methodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="addKey"/>
+			<xs:enumeration value="removeKey"/>
+			<xs:enumeration value="removeFile"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>

@@ -19,7 +19,7 @@ import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
 /**
  * Class for hosting jar files for clients of 3rd party services.
  */
-@Path("/serviceclient")
+@Path(ServiceClientJar.PATH)
 public class ServiceClientJar {
     
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJar.class);
@@ -27,7 +27,9 @@ public class ServiceClientJar {
 	/**
 	 * URL parameter
 	 */
-	public static final String KEY = "key";
+	public static final String URL_PARAM_KEY = "key";
+	
+	public static final String PATH = "/serviceclient";
 	
 	public ServiceClientJar() {
 		LOG.info("Constructor");
@@ -44,7 +46,7 @@ public class ServiceClientJar {
 	@Path("{name}.jar")
     @GET 
     @Produces("application/java-archive")
-    public byte[] getIt(@PathParam("name") String name, @QueryParam(KEY) String key) {
+    public byte[] getIt(@PathParam("name") String name, @QueryParam(URL_PARAM_KEY) String key) {
 
 		LOG.debug("HTTP GET: name = {}, key = {}", name, key);
 		

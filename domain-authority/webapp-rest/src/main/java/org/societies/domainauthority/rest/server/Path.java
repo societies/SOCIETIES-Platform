@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.domainauth;
+package org.societies.domainauthority.rest.server;
 
 /**
  * 
@@ -30,15 +30,7 @@ package org.societies.api.internal.domainauth;
  * @author Mitja Vardjan
  *
  */
-public interface IClinetJarServer {
+public class Path {
 
-	/**
-	 * Add a key for given file.
-	 * Any jar file can have multiple keys associated and this method may be
-	 * called multiple times to add more keys for same jar file.
-	 * 
-	 * @param path Local path to the jar file to be served
-	 * @param key The key to authenticate jar file downloads in future
-	 */
-	public void addKey(String path, String key);
+	public static final String BASE = "/rest/webresources";
 }
