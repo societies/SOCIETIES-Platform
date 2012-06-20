@@ -132,15 +132,17 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 	}
 	
 	public void testQueryCommunity(){
+		assert(false);
 		
 	}
 	
 	/**
 	 * Test to see if information about the user is retrievable
 	 * from {@link SocialProvider}.
+	 * 
 	 * 1- create ContentValues for this CSS
-	 * 2- add ContentValues to {@link SocialProvider}
-	 * 3- read ContentValues from {@link SocialProvider}
+	 * 2- add ContentValues to {@link SocialProvider} at row 0 of Me
+	 * 3- read ContentValues from {@link SocialProvider} row 0 of Me
 	 * 4- check to see if it is the same as added
 	 * 
 	 *  TODO: Maybe insertion can be added to setup method?
@@ -148,14 +150,11 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 	public void testQueryMe(){
 
 		 // 1- create ContentValues for this CSS
+
 		ContentValues initialValues = new ContentValues();
 		initialValues.put(SocialContract.Me.GLOBAL_ID , "babak@societies.org");
 		initialValues.put(SocialContract.Me.NAME , "Babak Farshchian");
 		initialValues.put(SocialContract.Me.DISPLAY_NAME , "Babak F");
-
-		//2- Call insert in SocialProvider to initiate insertion
-		Uri newCommunityUri= resolver.insert(SocialContract.Me.CONTENT_URI , 
-				initialValues);
 
 		 // 3- read ContentValues from {@link SocialProvider}
 		String[] projection ={
@@ -163,9 +162,8 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 				SocialContract.Me.NAME,
 				SocialContract.Me.DISPLAY_NAME
 			};
-		//WHERE _id = ID of the newly created CIS:
-		String selection = SocialContract.Me._ID + " = " +
-			newCommunityUri.getLastPathSegment();
+		//I should always be the row 0 in Me:
+		String selection = SocialContract.Me._ID + " = 0";
 		Cursor cursor = resolver.query(SocialContract.Me.CONTENT_URI,
 				projection, selection, null, null);
 		
@@ -176,9 +174,9 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		//5- Fail if the CIS data are not correct:
 		//Create new ContentValues object based on returned CIS:
 		ContentValues returnedValues = new ContentValues();
-		returnedValues.put(SocialContract.Me.GLOBAL_ID , cursor.getString(1));
-		returnedValues.put(SocialContract.Me.NAME , cursor.getString(1));
-		returnedValues.put(SocialContract.Me.DISPLAY_NAME , cursor.getString(1));
+		returnedValues.put(SocialContract.Me.GLOBAL_ID , cursor.getString(0));
+		returnedValues.put(SocialContract.Me.NAME , cursor.getString(0));
+		returnedValues.put(SocialContract.Me.DISPLAY_NAME , cursor.getString(2));
 		assertEquals(returnedValues,initialValues);
 	}
 	
