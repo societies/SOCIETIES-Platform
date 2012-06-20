@@ -582,7 +582,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void addActivity() throws InterruptedException, ExecutionException {
 
@@ -604,11 +604,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		iActivity.setVerb("verb");
 
 		IActivity iActivity2 = new org.societies.activity.model.Activity();
-		iActivity.setActor("act2");
-		iActivity.setObject("obj2");
-		iActivity.setTarget("tgt2");
-		iActivity.setPublished((System.currentTimeMillis() -500) + "");
-		iActivity.setVerb("verb2");
+		iActivity2.setActor("act2");
+		iActivity2.setObject("obj2");
+		iActivity2.setTarget("tgt2");
+		iActivity2.setPublished((System.currentTimeMillis() -500) + "");
+		iActivity2.setVerb("verb2");
 
 		
 		Iciss.getActivityFeed().addCisActivity(iActivity);

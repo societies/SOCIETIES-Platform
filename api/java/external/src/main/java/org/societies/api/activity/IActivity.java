@@ -34,6 +34,8 @@ package org.societies.api.activity;
  */
 
 public interface IActivity {
+	public Long getId();
+	public void setId(Long id);
 	public String getVerb();
 	public void setVerb(String verb);
 	public String getActor();
