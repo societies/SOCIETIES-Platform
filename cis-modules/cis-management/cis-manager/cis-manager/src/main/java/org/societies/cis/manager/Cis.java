@@ -312,6 +312,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		try {
 			CISendpoint.register(this);
+			//iServCtrlRemote.registerCISEndpoint(CISendpoint);
 //			CISendpoint.register((IFeatureServer) iServCtrlRemote);
 //			CISendpoint.register((IFeatureServer) iServDiscRemote);
 		} catch (CommunicationException e) {
@@ -365,6 +366,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 		try {
 			CISendpoint.register(this);
+			//iServCtrlRemote.registerCISEndpoint(CISendpoint);
 //			CISendpoint.register((IFeatureServer) iServCtrlRemote);
 //			CISendpoint.register((IFeatureServer) iServDiscRemote);
 		} catch (CommunicationException e) {

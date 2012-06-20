@@ -336,6 +336,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		//mockICisDirRemote3 = mock (ICisDirectoryRemote.class);
 		
 		doNothing().when(mockICisDirRemote1).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
+		doNothing().when(mockIServCtrlRemote).registerCISEndpoint(any(org.societies.api.comm.xmpp.interfaces.ICommManager.class));
+		
 		//doNothing().when(mockICisDirRemote2).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
 		//doNothing().when(mockICisDirRemote3).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
 		
@@ -732,7 +734,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
 	}
 	
-	//@Ignore
+	@Ignore
 	@Test
 	public void addActivity() throws InterruptedException, ExecutionException {
 
