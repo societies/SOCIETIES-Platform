@@ -23,7 +23,7 @@
 
         <!--init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.societies.domainauthority.webapp.rest</param-value>
+            <param-value>org.societies.domainauthority.rest.server</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup-->
     </servlet>

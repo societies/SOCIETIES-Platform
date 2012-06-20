@@ -1,4 +1,4 @@
-package org.societies.domainauthority.webapp.rest;
+package org.societies.domainauthority.rest.server;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +14,7 @@ import javax.ws.rs.WebApplicationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.domainauthority.webapp.control.ServiceClientJarAccess;
+import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
 
 /**
  * Class for hosting jar files for clients of 3rd party services.
