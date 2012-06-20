@@ -47,6 +47,7 @@ public class ServiceClientJar {
 		LOG.debug("HTTP GET: name = {}, key = {}", name, key);
 		
 		String path = name + ".jar";
+		byte[] file;
 		
 		if (!ServiceClientJarAccess.isKeyValid(path, key)) {
 			LOG.warn("Invalid filename or key");
@@ -55,12 +56,15 @@ public class ServiceClientJar {
 		}
 		
 		try {
-			return getBytesFromFile(path);
+			file = getBytesFromFile(path);
 		} catch (IOException e) {
 			LOG.warn("Could not open file {}", path, e);
 			// Return HTTP code 500 - Internal Server Error
 			throw new WebApplicationException(500);
 		}
+		
+		LOG.info("Serving {}", path);
+		return file;
     }
 	
 	private byte[] getBytesFromFile(String path) throws IOException {
