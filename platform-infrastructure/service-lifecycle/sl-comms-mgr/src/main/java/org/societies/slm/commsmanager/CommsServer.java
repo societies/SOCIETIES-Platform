@@ -81,13 +81,13 @@ public class CommsServer implements IFeatureServer {
 		this.commManager = commManager;
 	}
 	
-	public IServiceDiscovery getServiceDiscovery() {
-		return serviceDiscovery;
-		
-	}
-	
 	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
 		this.serviceDiscovery = serviceDiscovery;
+		
+	}
+
+	public IServiceDiscovery getServiceDiscovery() {
+		return serviceDiscovery;
 		
 	}
 	
@@ -156,9 +156,8 @@ public class CommsServer implements IFeatureServer {
 					case GET_LOCAL_SERVICES :
 					{
 						
-						returnList = serviceDiscovery.getLocalServices();
-						resultList =  returnList.get();
-						
+						returnList = serviceDiscovery.getServices(stanza.getTo());
+						resultList =  returnList.get();						
 						
 						if (resultList != null)
 						{
