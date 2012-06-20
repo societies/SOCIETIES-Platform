@@ -37,7 +37,9 @@ public class ServiceClientJar {
 	/**
      * Method processing HTTP GET requests, producing "application/java-archive" MIME media type.
      * 
-     * @return Service client in form of jar file
+     * @return Service client in form of jar file.
+     * Error 401 if file or key not valid.
+     * Error 500 on server error.
      */
 	@Path("{name}.jar")
     @GET 
@@ -51,8 +53,8 @@ public class ServiceClientJar {
 		
 		if (!ServiceClientJarAccess.isKeyValid(path, key)) {
 			LOG.warn("Invalid filename or key");
-			// Return HTTP code 404 - File not found
-			throw new WebApplicationException(404);
+			// Return HTTP code 401 - Unauthorized
+			throw new WebApplicationException(401);
 		}
 		
 		try {
