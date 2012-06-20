@@ -27,46 +27,64 @@ package org.societies.api.identity;
 import java.io.Serializable;
 
 /**
- * This class is used to represent a CIS requesting access to resources.
+ * This class is used to represent a CIS requesting resources
  *
  * @author Nicolas, Olivier, Eliza
  *
  */
-public class RequestorCis extends Requestor implements Serializable{
-
+public class RequestorCis extends Requestor implements Serializable {
+	private static final long serialVersionUID = 4071746215222120394L;
 	private final IIdentity cisRequestorId;
 	
+	
+	/**
+	 * Create a CIS requestor from the CSS and CIS identities
+	 * @param requestorId Identity of the CSS ownerof the CIS
+	 * @param cisRequestorId CIS identity
+	 */
 	public RequestorCis(IIdentity requestorId, IIdentity cisRequestorId) {
-		
 		super(requestorId);
 		this.cisRequestorId = cisRequestorId;
-		// TODO Auto-generated constructor stub
 	}
 
+	
 	/**
-	 * @return the cisRequestorId
+	 * Identity of the CIS requestor
+	 * @return the CIS identity
 	 */
 	public IIdentity getCisRequestorId() {
 		return cisRequestorId;
 	}
+	
+	
+	/* *************************
+	 *         Tools           *
+	 ************************* */
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.identity.Requestor#toString()
+	 */
 	@Override
-	public String toString(){
-		return super.toString()+"\n"+"CIS Id: "+this.cisRequestorId.getJid();
+	public String toString() {
+		return super.toString()+", [CIS Identity: "+cisRequestorId.getJid()+"]";
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.identity.Requestor#toXMLString()
+	 */
 	@Override
-	public String toXMLString(){
-		String parent = super.toXMLString();
-		String str = "";
-		str = str.concat("\n\t<Attribute AttributeId=\"CisId\"" +
-		"\n \t\t\tDataType=\"org.societies.api.identity.IIdentity\">");
-
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.cisRequestorId.toString());
-		str = str.concat("</AttributeValue>");
-
-		str = str.concat("\n\t</Attribute>");
-		return parent.concat("\n"+str);
+	public String toXMLString() {
+		String cisIdType = new String("CisId");
+		StringBuilder str = new StringBuilder(super.toXMLString());
+		str.append("\n\t<Attribute AttributeId=\""+cisIdType+"\"");
+		str.append("\n\t\t\tDataType=\""+IIdentity.class.getCanonicalName()+"\">");
+		str.append("\n\t\t<AttributeValue>");
+		str.append(cisRequestorId.getJid());
+		str.append("</AttributeValue>");
+		str.append("\n\t</Attribute>");
+		return str.toString();
 	}
 	
 

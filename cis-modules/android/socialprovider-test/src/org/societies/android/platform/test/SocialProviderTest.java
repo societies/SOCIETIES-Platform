@@ -25,7 +25,7 @@
 package org.societies.android.platform.test;
 
 import org.societies.android.platform.SocialProvider;
-import org.societies.android.api.cis.SocialContract;
+import org.societies.android.platform.SocialContract;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -124,15 +124,60 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		//5- Fail if the CIS data are not correct:
 		//Create new ContentValues object based on returned CIS:
 		ContentValues returnedValues = new ContentValues();
-		returnedValues.put(SocialContract.Community.NAME , cursor.getString(0));
+		returnedValues.put(SocialContract.Community.NAME , cursor.getString(1));
 		returnedValues.put(SocialContract.Community.OWNER_ID , cursor.getString(1));
-		returnedValues.put(SocialContract.Community.CREATION_DATE , cursor.getString(2));
+		returnedValues.put(SocialContract.Community.CREATION_DATE , cursor.getString(1));
 		assertEquals(returnedValues,initialValues);
 
 	}
 	
 	public void testQueryCommunity(){
+		assert(false);
 		
+	}
+	
+	/**
+	 * Test to see if information about the user is retrievable
+	 * from {@link SocialProvider}.
+	 * 
+	 * 1- create ContentValues for this CSS
+	 * 2- add ContentValues to {@link SocialProvider} at row 0 of Me
+	 * 3- read ContentValues from {@link SocialProvider} row 0 of Me
+	 * 4- check to see if it is the same as added
+	 * 
+	 *  TODO: Maybe insertion can be added to setup method?
+	 */
+	public void testQueryMe(){
+
+		 // 1- create ContentValues for this CSS
+
+		ContentValues initialValues = new ContentValues();
+		initialValues.put(SocialContract.Me.GLOBAL_ID , "babak@societies.org");
+		initialValues.put(SocialContract.Me.NAME , "Babak Farshchian");
+		initialValues.put(SocialContract.Me.DISPLAY_NAME , "Babak F");
+
+		 // 3- read ContentValues from {@link SocialProvider}
+		String[] projection ={
+				SocialContract.Me.GLOBAL_ID,
+				SocialContract.Me.NAME,
+				SocialContract.Me.DISPLAY_NAME
+			};
+		//I should always be the row 0 in Me:
+		String selection = SocialContract.Me._ID + " = 0";
+		Cursor cursor = resolver.query(SocialContract.Me.CONTENT_URI,
+				projection, selection, null, null);
+		
+		//4- Fail if the CIS was not returned.
+		assertFalse(cursor == null);
+		if (cursor == null)	return;
+		if (!cursor.moveToFirst()) return;
+		//5- Fail if the CIS data are not correct:
+		//Create new ContentValues object based on returned CIS:
+		ContentValues returnedValues = new ContentValues();
+		returnedValues.put(SocialContract.Me.GLOBAL_ID , cursor.getString(0));
+		returnedValues.put(SocialContract.Me.NAME , cursor.getString(0));
+		returnedValues.put(SocialContract.Me.DISPLAY_NAME , cursor.getString(2));
+		assertEquals(returnedValues,initialValues);
 	}
 	
 //	public void testUpdate(){

@@ -42,26 +42,6 @@ public class SocietiesServlet extends HttpServlet {
         // Printwriter for writing out responses to browser
         PrintWriter out = response.getWriter();
 
-        if (!plugin.getAllowedIPs().isEmpty()) {
-            // Get client's IP address
-            String ipAddress = request.getHeader("x-forwarded-for");
-            if (ipAddress == null) {
-                ipAddress = request.getHeader("X_FORWARDED_FOR");
-                if (ipAddress == null) {
-                    ipAddress = request.getHeader("X-Forward-For");
-                    if (ipAddress == null) {
-                        ipAddress = request.getRemoteAddr();
-                    }
-                }
-            }
-            
-            if (!ipAddress.equals("127.0.0.1") && !plugin.getAllowedIPs().contains(ipAddress)) {
-                Log.warn("User service rejected service to IP address: " + ipAddress);
-                replyError("RequestNotAuthorised",response, out);
-                return;
-            }
-        }
-
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String name = request.getParameter("name");
@@ -73,9 +53,9 @@ public class SocietiesServlet extends HttpServlet {
         //type = type == null ? "image" : type;
        
         // Check this request is authorized
-        if (secret == null || !secret.equals(plugin.getSecret())){
+        if ((plugin.getSecret() != null || !plugin.getSecret().equals("")) && (secret == null || !secret.equals(plugin.getSecret()))) {
             Log.warn("An unauthorised user service request was received: " + request.getQueryString());
-            replyError("RequestNotAuthorised",response, out);
+            replyError("RequestNotAuthorised: Provided secret '"+secret+"' did not match",response, out);
             return;
          }
 

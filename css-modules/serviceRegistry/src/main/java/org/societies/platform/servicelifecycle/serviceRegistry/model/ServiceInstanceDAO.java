@@ -44,6 +44,7 @@ public class ServiceInstanceDAO {
 	
 	private long id;
 	private String fullJid;
+	private String cssJid;
 	private String XMPPNode;
 	private ServiceImplementationDAO serviceImpl;
 	
@@ -53,12 +54,13 @@ public class ServiceInstanceDAO {
 	 * @param xMPPNode
 	 * @param serviceImpl
 	 */
-	public ServiceInstanceDAO(String fullJid, String xMPPNode,
+	public ServiceInstanceDAO(String fullJid, String cssJid, String xMPPNode,
 			ServiceImplementationDAO serviceImpl) {
 		super();
 		
 		this.fullJid = fullJid;
-		XMPPNode = xMPPNode;
+		this.cssJid = cssJid;
+		this.XMPPNode = xMPPNode;
 		this.serviceImpl = serviceImpl;
 	}
 	
@@ -76,6 +78,13 @@ public class ServiceInstanceDAO {
 	}
 	public void setFullJid(String fullJid) {
 		this.fullJid = fullJid;
+	}
+	@Column(name = "CssJid")
+	public String getCssJid() {
+		return cssJid;
+	}
+	public void setCssJid(String cssJid) {
+		this.cssJid = cssJid;
 	}
 	@Column(name = "XMPPNode")
 	public String getXMPPNode() {

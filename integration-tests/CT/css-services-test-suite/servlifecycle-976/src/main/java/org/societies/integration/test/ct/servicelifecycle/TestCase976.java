@@ -33,7 +33,7 @@ import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.integration.test.IntegrationTestCase;
 
 /**
- * Test case 714 aims to test the start and stop operations of Service Control.
+ * Test case 976 aims to test the remote operations of Service Lifecycle
  * 
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
@@ -85,6 +85,7 @@ public class TestCase976 extends IntegrationTestCase {
 	protected static ICommManager getCommManager() {
 		return commManager;
 	}
+	
 	protected static IServiceControl getServiceControl() {
 		return serviceControl;
 	}

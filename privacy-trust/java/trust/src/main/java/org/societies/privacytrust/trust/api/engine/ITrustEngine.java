@@ -27,7 +27,6 @@ package org.societies.privacytrust.trust.api.engine;
 import java.util.Set;
 
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
-import org.societies.privacytrust.trust.api.model.ITrust;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
@@ -49,14 +48,13 @@ public interface ITrustEngine {
 	 *            the {@link ITrustedCss} whose trust value to evaluate
 	 * @param evidenceSet
 	 *            the set of {@link ITrustEvidence} based on which to evaluate
-	 *            the trust value
-	 * @return the evaluated {@link ITrust} of the specified CSS 
+	 *            the trust value 
 	 * @throws TrustEngineException
 	 *            if there is an error during trust evaluation
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public ITrust evaluate(final ITrustedCss css, 
+	public void evaluate(final ITrustedCss css, 
 			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException;
 	
 	/**
@@ -67,14 +65,13 @@ public interface ITrustEngine {
 	 *            the {@link ITrustedCis} whose trust value to evaluate
 	 * @param evidenceSet
 	 *            the set of {@link ITrustEvidence} based on which to evaluate
-	 *            the trust value
-	 * @return the evaluated {@link ITrust} of the specified CIS 
+	 *            the trust value 
 	 * @throws TrustEngineException
 	 *            if there is an error during trust evaluation
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public ITrust evaluate(final ITrustedCis cis, 
+	public void evaluate(final ITrustedCis cis, 
 			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException;
 	
 	/**
@@ -85,13 +82,12 @@ public interface ITrustEngine {
 	 *            the {@link ITrustedService} whose trust value to evaluate
 	 * @param evidenceSet
 	 *            the set of {@link ITrustEvidence} based on which to evaluate
-	 *            the trust value
-	 * @return the evaluated {@link ITrust} of the specified service 
+	 *            the trust value 
 	 * @throws TrustEngineException
 	 *            if there is an error during trust evaluation
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public ITrust evaluate(final ITrustedService service, 
+	public void evaluate(final ITrustedService service, 
 			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException;
 }

@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.engine;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -40,7 +41,6 @@ import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
-import org.societies.privacytrust.trust.api.model.ITrust;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
@@ -78,30 +78,34 @@ public class DirectTrustEngine extends TrustEngine {
 	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCss, java.util.Set)
 	 */
 	@Override
-	public ITrust evaluate(ITrustedCss css, Set<ITrustEvidence> evidenceSet)
-			throws TrustEngineException {
-		// TODO Auto-generated method stub
-		return null;
+	public void evaluate(final ITrustedCss css, 
+			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException {
+		
+		Double newValue = null;
+		for (final ITrustEvidence evidence : evidenceSet) {
+			if (TrustEvidenceType.RATED.equals(evidence.getType())) {
+				newValue = (Double) evidence.getInfo();
+			}
+		}
+		css.getDirectTrust().setValue(newValue);
 	}
 
 	/*
 	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCis, java.util.Set)
 	 */
 	@Override
-	public ITrust evaluate(ITrustedCis cis, Set<ITrustEvidence> evidenceSet)
+	public void evaluate(ITrustedCis cis, Set<ITrustEvidence> evidenceSet)
 			throws TrustEngineException {
 		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/*
 	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedService, java.util.Set)
 	 */
 	@Override
-	public ITrust evaluate(ITrustedService service,
+	public void evaluate(ITrustedService service,
 			Set<ITrustEvidence> evidenceSet) throws TrustEngineException {
 		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	private class CssDirectTrustEngine implements Runnable {
@@ -118,19 +122,18 @@ public class DirectTrustEngine extends TrustEngine {
 		 */
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
+		
 			if (LOG.isDebugEnabled())
 				LOG.debug("Running CssDirectTrustEngine with evidence "
 						+ this.evidence);
 			
 			try {
-				Double newTrust = null;
 				ITrustedCss css = (ITrustedCss) trustRepo.retrieveEntity(this.evidence.getTeid());
 				if (css == null)
 					css = new TrustedCss(this.evidence.getTeid());
-				if (TrustEvidenceType.RATED.equals(evidence.getType()))
-					newTrust = (Double) evidence.getInfo();
-				css.getDirectTrust().setValue(newTrust);
+				final Set<ITrustEvidence> evidenceSet = new HashSet<ITrustEvidence>();
+				evidenceSet.add(this.evidence);
+				evaluate(css, evidenceSet);
 				trustRepo.updateEntity(css);
 			} catch (TrustException te) {
 				

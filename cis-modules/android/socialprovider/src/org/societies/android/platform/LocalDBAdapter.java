@@ -25,7 +25,7 @@
 package org.societies.android.platform;
 
 
-import org.societies.android.api.cis.SocialContract;
+import org.societies.android.platform.SocialContract;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -47,7 +47,8 @@ import android.net.Uri;
 public class LocalDBAdapter implements ISocialAdapter {
 	//Constants for DB names and table names:
 	private static final String DB_NAME = "societies_social.db";
-	private static final String GROUP_TABLE_NAME = "communities";
+	private static final String ME_TABLE_NAME = "me";
+	private static final String COMMUNITIES_TABLE_NAME = "communities";
 	private static final String PEOPLE_TABLE_NAME = "people";
 	private static final String SERVICES_TABLE_NAME = "services";
 	private static final String MEMBERSHIP_TABLE_NAME = "membership";
@@ -67,7 +68,14 @@ public class LocalDBAdapter implements ISocialAdapter {
 	private static class SocialDBOpenHelper extends SQLiteOpenHelper {
 		
 		//SQL query for creating the Community table:
-		private static final String GROUP_DB_CREAT = "create table " + GROUP_TABLE_NAME
+		private static final String ME_DB_CREAT = "create table " + ME_TABLE_NAME
+				+ " (" + 
+				SocialContract.Me._ID + " integer primary key autoincrement, " +
+				SocialContract.Me.GLOBAL_ID + " text not null, " +
+				SocialContract.Me.NAME + " text not null," +
+				SocialContract.Me.DISPLAY_NAME + " text not null);";
+
+		private static final String GROUP_DB_CREAT = "create table " + COMMUNITIES_TABLE_NAME
 				+ " (" + 
 				SocialContract.Community._ID + " integer primary key autoincrement, " +
 				SocialContract.Community.GLOBAL_ID + " text not null, " +
@@ -78,7 +86,8 @@ public class LocalDBAdapter implements ISocialAdapter {
 				SocialContract.Community.CREATION_DATE + " text not null, " +
 				SocialContract.Community.MEMBERSHIP_TYPE + " text not null, " +
 				SocialContract.Community.DIRTY + " text not null);";
-		//TODO: Need the same for other DBs, e.g. people.
+
+//TODO: Need the same for other DBs, e.g. people.
 
 		
 		/**
@@ -99,6 +108,7 @@ public class LocalDBAdapter implements ISocialAdapter {
 		@Override
 		public void onCreate(SQLiteDatabase _db) {
 			_db.execSQL(GROUP_DB_CREAT);
+			_db.execSQL(ME_DB_CREAT);
 			//TODO: Do the same for all other tables.
 		}
 
@@ -108,7 +118,8 @@ public class LocalDBAdapter implements ISocialAdapter {
 		@Override
 		public void onUpgrade(SQLiteDatabase _db, int _oldVersion, int _newVersion) {
 			// Drop the old table:
-			_db.execSQL("drop table if exists " + GROUP_TABLE_NAME);
+			_db.execSQL("drop table if exists " + COMMUNITIES_TABLE_NAME);
+			_db.execSQL("drop table if exists " + ME_TABLE_NAME);
 			//TODO: Do the same for all other tables.
 			// Create a new table:
 			onCreate(_db);
@@ -131,11 +142,16 @@ public class LocalDBAdapter implements ISocialAdapter {
 		
 		return queryCommunities(projection, selection, selectionArgs, sortOrder);
 	}
+	
+	protected Cursor queryMe(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder) {
+		return db.query(ME_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);		
+	}
 
-	private Cursor queryCommunities(String[] projection, String selection,
+	protected Cursor queryCommunities(String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
 		// TODO Auto-generated method stub
-		return db.query(GROUP_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+		return db.query(COMMUNITIES_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 	}
 	/* (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#insert(android.net.Uri, android.content.ContentValues)
@@ -144,27 +160,34 @@ public class LocalDBAdapter implements ISocialAdapter {
 	public Uri insert(Uri uri, ContentValues values) {
 		// TODO Make a case and call proper private method with values.
 		
-		return uri.withAppendedPath(uri, Long.toString(insertCommunity(values)));
+		Uri withAppendedPath = uri.withAppendedPath(uri, Long.toString(insertCommunity(values)));
+		return withAppendedPath;
 	}
 	
-	private long insertCommunity(ContentValues values) {
+	protected Uri insertMe(ContentValues _values){
+		//TODO: We cannot have multiple Me's so this method needs to
+		// update after first insert. Or use only update?
+		//return Uri.withAppendedPath(SocialContract.Me.CONTENT_URI, Long.toString(db.insert(ME_TABLE_NAME, null, values)));
+		//Never insert me always update me on row 0:
+		return Uri.withAppendedPath(SocialContract.Me.CONTENT_URI, Long.toString(updateMe(_values, SocialContract.Me._ID + "= 0", null)));
+	}
+	
+	protected long insertCommunity(ContentValues values) {
 		// TODO Auto-generated method stub
-		return db.insert(GROUP_TABLE_NAME, null, values);
+		return db.insert(COMMUNITIES_TABLE_NAME, null, values);
 		//return uri.withAppendedPath(uri, Long.toString(rowNumber));
 		
 	}
 	
-	private Uri insertPerson(Uri uri, ContentValues values) {
+	protected long insertPerson(ContentValues values) {
 		// TODO Auto-generated method stub
-		long rowNumber = db.insert(PEOPLE_TABLE_NAME, null, values);
-		return uri.withAppendedPath(uri, Long.toString(rowNumber));
+		return db.insert(PEOPLE_TABLE_NAME, null, values);
 		
 	}
 
-	private Uri insertService(Uri uri, ContentValues values) {
+	protected long insertService(ContentValues values) {
 		// TODO Auto-generated method stub
-		long rowNumber = db.insert(SERVICES_TABLE_NAME, null, values);
-		return uri.withAppendedPath(uri, Long.toString(rowNumber));
+		return db.insert(SERVICES_TABLE_NAME, null, values);
 		
 	}
 	/* (non-Javadoc)
@@ -178,7 +201,12 @@ public class LocalDBAdapter implements ISocialAdapter {
 	}
 	
 
-	private int updateCommunity(Uri uri, ContentValues values, String selection,
+	protected int updateMe(ContentValues values, String selection,
+			String[] selectionArgs) {
+		return db.update(ME_TABLE_NAME, values, selection, selectionArgs);
+	}
+
+	protected int updateCommunity(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
 		// TODO Auto-generated method stub
 		return 0;

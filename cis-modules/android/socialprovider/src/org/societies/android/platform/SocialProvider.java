@@ -24,7 +24,7 @@
  */
 package org.societies.android.platform;
 
-import org.societies.android.api.cis.SocialContract;
+import org.societies.android.platform.SocialContract;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -68,11 +68,16 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 	//TODO: to be used in later versions with local caching.
 	dbAdapter = new LocalDBAdapter(context);
 	dbAdapter.connect();
+	populateMe();
+	populateMyCommunities();
+	populateMyServices();
+	populateMyPeople();
 	
 	//TODO: Add Edgar's CommunicationAdapter initialization here.
 	
 	//Construct all the legal query URIs:
 	//TODO replace with constants or move to SocialContract.
+	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me", 0);
 	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", 1);
 	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", 2);
 	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities", 3);
@@ -82,6 +87,98 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 
 	return dbAdapter.isConnected();
     }
+
+    private void populateMe(){
+		ContentValues initialValues = new ContentValues();
+		initialValues.put(SocialContract.Me.GLOBAL_ID , "babak@societies.org");
+		initialValues.put(SocialContract.Me.NAME , "Babak Farshchian");
+		initialValues.put(SocialContract.Me.DISPLAY_NAME , "Babak F");
+
+		//2- Call insert in SocialProvider to initiate insertion
+		dbAdapter.insertMe(initialValues);
+    	
+    }
+    private void populateMyCommunities(){
+		ContentValues initialValues = new ContentValues();
+		initialValues.put(SocialContract.Community.GLOBAL_ID , "community1.societies.org");
+		initialValues.put(SocialContract.Community.NAME , "Community 1");
+		initialValues.put(SocialContract.Community.DISPLAY_NAME , "Football");
+		initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
+		initialValues.put(SocialContract.Community.OWNER_ID, "babak@societies.org");
+		dbAdapter.insertCommunity(initialValues);
+		initialValues.clear();
+		initialValues.put(SocialContract.Community.GLOBAL_ID , "community2.societies.org");
+		initialValues.put(SocialContract.Community.NAME , "Community 2");
+		initialValues.put(SocialContract.Community.DISPLAY_NAME , "Baseball");
+		initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Closed");
+		initialValues.put(SocialContract.Community.OWNER_ID, "babak@societies.org");
+		dbAdapter.insertCommunity(initialValues);
+		initialValues.clear();
+		initialValues.put(SocialContract.Community.GLOBAL_ID , "community3.societies.org");
+		initialValues.put(SocialContract.Community.NAME , "Community 3");
+		initialValues.put(SocialContract.Community.DISPLAY_NAME , "Basketball");
+		initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Closed");
+		initialValues.put(SocialContract.Community.OWNER_ID, "babak@societies.org");
+		dbAdapter.insertCommunity(initialValues);
+		initialValues.clear();
+		initialValues.put(SocialContract.Community.GLOBAL_ID , "community4.societies.org");
+		initialValues.put(SocialContract.Community.NAME , "Community 4");
+		initialValues.put(SocialContract.Community.DISPLAY_NAME , "Handball");
+		initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
+		initialValues.put(SocialContract.Community.OWNER_ID, "babak@societies.org");
+		dbAdapter.insertCommunity(initialValues);
+
+
+		
+
+		//2- Call insert in SocialProvider to initiate insertion
+		dbAdapter.insertMe(initialValues);
+    	
+    }
+    private void populateMyServices(){
+		ContentValues initialValues = new ContentValues();
+		initialValues.put(SocialContract.Service.GLOBAL_ID , "service1@babak@societies.org");
+		initialValues.put(SocialContract.Service.NAME , "Service 1");
+		initialValues.put(SocialContract.Service.DISPLAY_NAME , "Some service");
+		dbAdapter.insertService(initialValues);
+		initialValues.clear();
+		initialValues.put(SocialContract.Service.GLOBAL_ID , "service2@babak@societies.org");
+		initialValues.put(SocialContract.Service.NAME , "Service 2");
+		initialValues.put(SocialContract.Service.DISPLAY_NAME , "Some other service");
+		dbAdapter.insertService(initialValues);
+		initialValues.clear();
+		initialValues.put(SocialContract.Service.GLOBAL_ID , "service3@babak@societies.org");
+		initialValues.put(SocialContract.Service.NAME , "Service 3");
+		initialValues.put(SocialContract.Service.DISPLAY_NAME , "Another service");
+		dbAdapter.insertService(initialValues);
+
+		//2- Call insert in SocialProvider to initiate insertion
+    	
+    }
+    private void populateMyPeople(){
+		ContentValues initialValues = new ContentValues();
+		initialValues.put(SocialContract.Person.GLOBAL_ID , "jacqueline@societies.org");
+		initialValues.put(SocialContract.Person.NAME , "Jacqueline Floch");
+		initialValues.put(SocialContract.Me.DISPLAY_NAME , "Jacqueline F");
+		dbAdapter.insertPerson(initialValues);
+		initialValues.clear();
+		initialValues.put(SocialContract.Person.GLOBAL_ID , "thomas@societies.org");
+		initialValues.put(SocialContract.Person.NAME , "ThomasVilarinho");
+		initialValues.put(SocialContract.Me.DISPLAY_NAME , "Thomas V");
+		dbAdapter.insertPerson(initialValues);
+		initialValues.clear();
+		initialValues.put(SocialContract.Person.GLOBAL_ID , "bjorn-magnus@societies.org");
+		initialValues.put(SocialContract.Person.NAME , "Bjørn Magnus Mathisen");
+		initialValues.put(SocialContract.Me.DISPLAY_NAME , " Bjørn Magnus M");
+		dbAdapter.insertPerson(initialValues);
+		initialValues.clear();
+
+
+		//2- Call insert in SocialProvider to initiate insertion
+		dbAdapter.insertMe(initialValues);
+    	
+    }
+
 
     /* (non-Javadoc)
      * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
@@ -108,9 +205,16 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 
     @Override
     public Uri insert(Uri _uri, ContentValues _values) {
-	// TODO Auto-generated method stub
+
+    	//Switch on the name of the path used in the query:
+    	switch (sUriMatcher.match(_uri)){
+    	case 0: //Me
+    		return dbAdapter.insertMe(_values);
+    	case 1:
+    		break;
+    		
+    	}
     	return dbAdapter.insert(_uri, _values);
-	//long id = dbAdapter.insertCis(_values);
     }
 
     /* 
@@ -120,19 +224,31 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
      * @see android.content.ContentProvider#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
      */
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
-	    String[] selectionArgs, String sortOrder) {
-    	return dbAdapter.query(uri, projection, selection, selectionArgs, sortOrder);
+    public Cursor query(Uri _uri, String[] _projection, String _selection,
+	    String[] _selectionArgs, String _sortOrder) {
+    	//Switch on the name of the path used in the query:
+    	switch (sUriMatcher.match(_uri)){
+    	case 0: //Me
+    		return dbAdapter.queryMe(_projection, _selection, _selectionArgs, _sortOrder);
+    	case 1:
+    		break;	
+    	}
+    	return dbAdapter.query(_uri, _projection, _selection, _selectionArgs, _sortOrder);
     }
 
     /* (non-Javadoc)
      * @see android.content.ContentProvider#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
      */
     @Override
-    public int update(Uri uri, ContentValues values, String selection,
-	    String[] selectionArgs) {
-	// TODO Auto-generated method stub
-    	return dbAdapter.update(uri, values, selection, selectionArgs);
+    public int update(Uri _uri, ContentValues _values, String _selection,
+	    String[] _selectionArgs) {
+    	switch (sUriMatcher.match(_uri)){
+    	case 0: //Me
+    		return dbAdapter.updateMe(_values, _selection, _selectionArgs);
+    	case 1:
+    		break;	
+    	}
+    	return dbAdapter.update(_uri, _values, _selection, _selectionArgs);
     }
     /**
      * 
