@@ -32,41 +32,65 @@ import java.io.Serializable;
  * @author Eliza, Nicolas, Olivier
  *
  */
-public class Requestor implements Serializable{
-
+public class Requestor implements Serializable {
+	private static final long serialVersionUID = -4907392226764120739L;
 	private final IIdentity requestorId;
 
+	
+	/**
+	 * Create a CSS requestor from the CSS identity
+	 * @param requestorId CSS identity
+	 */
 	public Requestor(IIdentity requestorId){
 		this.requestorId = requestorId;
 		
 	}
+	
+	
 	/**
-	 * @return the requestorId
+	 * Identity of the resource requestor
+	 * @return the CSS identity
 	 */
 	public IIdentity getRequestorId() {
 		return requestorId;
 	}
 
-
-
-	public String toXMLString(){
-		String str = "";
-		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\"" +
-		"\n \t\t\tDataType=\"org.societies.api.identity.IIdentity\">");
-
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.requestorId.toString());
-		str = str.concat("</AttributeValue>");
-
-		str = str.concat("\n\t</Attribute>");
-		return str;
-	}
 	
+	/* *************************
+	 *         Tools           *
+	 ************************* */
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
-	public String toString(){
-		return "Identity: "+this.requestorId.getJid();
+	public String toString() {
+		return "Requestor: [CSS Identity: "+requestorId.getJid()+"]";
 	}
 	
+	/**
+	 * Return a string (XML formatted) representing the object.
+	 * This string doesn't contain the XML header, but represents exactly
+	 * all data containing in this object. The generated string can be used
+	 * to regenerate this Java object.
+	 * @return a XML string representation of the object
+	 */
+	public String toXMLString() {
+		String subjectIdType = new String("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+		StringBuilder str = new StringBuilder("\n\t<Attribute AttributeId=\""+subjectIdType+"\"");
+		str.append("\n\t\t\tDataType=\""+IIdentity.class.getCanonicalName()+"\">");
+		str.append("\n\t\t<AttributeValue>");
+		str.append(requestorId.getJid());
+		str.append("</AttributeValue>");
+		str.append("\n\t</Attribute>");
+		return str.toString();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -75,6 +99,11 @@ public class Requestor implements Serializable{
 				+ ((requestorId == null) ? 0 : requestorId.hashCode());
 		return result;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -96,6 +125,4 @@ public class Requestor implements Serializable{
 		}
 		return true;
 	}
-
-	
 }
