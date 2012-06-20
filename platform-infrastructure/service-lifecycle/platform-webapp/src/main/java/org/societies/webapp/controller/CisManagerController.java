@@ -299,7 +299,7 @@ public class CisManagerController {
 					m_session.setAttribute("community", remoteCommunity);
 				}
 				if(communityResultObject.getWho() != null){
-					LOG.info("### " + communityResultObject.getWho().getParticipant().size());
+					LOG.debug("### " + communityResultObject.getWho().getParticipant().size());
 
 					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWho().getParticipant();					
 					m_session.setAttribute("memberRecords", l);
