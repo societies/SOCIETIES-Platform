@@ -28,6 +28,7 @@ String methodCalled = methodCalledArr[0];
 <script language="javascript">
 function updateForm(cisId, toDo, where) {    
 	document.all.cisJid.value = cisId;
+	document.forms["cmForm"]["node"].value = cisId;
 	document.forms["cmForm"]["method"].value = toDo;
 	document.forms["cmForm"].action = where;
 	document.forms["cmForm"].submit();
@@ -42,6 +43,7 @@ function updateForm(cisId, toDo, where) {
 <form id="cmForm" name="cmForm" id="cmForm" method="post" action="cismanager.html">
 <input type="hidden" name="cisJid" id="cisJid">
 <input type="hidden" name="method" id="method">
+<input type="hidden" name="node" id="node">
 
 	<table>
 		<tr><td><B>Name</B></td><td><B>ID</B></td></tr>
@@ -50,7 +52,7 @@ function updateForm(cisId, toDo, where) {
 	        	<td>${record.getName()}&nbsp;</td>
 	        	<td>${record.getCisId()}&nbsp;</td>
 	        	<td><input type="button" value="Members" onclick="updateForm('${record.getCisId()}', 'GetMemberList', 'cismanager.html')" ></td>
-	        	<td><input type="button" value="Services" onclick="updateForm('${record.getCisId()}', 'GetServices', 'servicediscovery.html')" ></td>
+	        	<td><input type="button" value="Services" onclick="updateForm('${record.getCisId()}', 'GetServicesCis', 'servicediscovery.html')" ></td>
 	        </tr>
 	    </xc:forEach>
 	</table>	

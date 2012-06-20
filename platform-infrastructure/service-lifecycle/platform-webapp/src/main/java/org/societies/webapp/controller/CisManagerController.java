@@ -24,7 +24,6 @@
  */
 package org.societies.webapp.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,16 +33,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.webapp.models.CisManagerForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -90,6 +84,7 @@ public class CisManagerController {
 	private String resultCallback;
 	private Community remoteCommunity;
 	private HttpSession m_session;
+	private static Logger LOG = LoggerFactory.getLogger(CisManagerController.class);
 	
 	@RequestMapping(value = "/cismanager.html", method = RequestMethod.GET)
 	public ModelAndView cssManager() {
@@ -203,21 +198,22 @@ public class CisManagerController {
 				ICisOwned thisCis = null;
 				while(it.hasNext() && thisCis == null){
 					ICisOwned element = it.next();
-					 if (element.getCisId().equalsIgnoreCase(cisForm.getCisJid()))
+					 if (element.getCisId().equalsIgnoreCase(cisForm.getCisJid())) {
 						 thisCis = element;
-					 else
-						  res.concat("CIS being compared = " + element.getCisId() + "and form = " + cisForm.getCssId());
-			     }
+						 //break;
+					 }
+			    }
 				if(thisCis == null){
-					//res.concat("CIS not found: " + cisForm.getCssId());
-					//model.put("res", res);
 					//NOT LOCAL CIS, SO CALL REMOTE
 					ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid());
 					remoteCIS.getListOfMembers(icall);
+					cisForm.setMethod("GetMemberListRemote");
 					model.put("methodcalled", "GetMemberListRemote");
+					model.put("res", "CIS==null: " + cisForm.getMethod());
 				} else {
 					Set<ICisParticipant> records = thisCis.getMemberList().get();
 					model.put("memberRecords", records);
+					model.put("res", "CIS is not null");
 				}
 				
 			} else if (method.equalsIgnoreCase("GetMemberListRemote")) {
@@ -233,6 +229,8 @@ public class CisManagerController {
 				model.put("methodcalled", "RefreshRemoteMembers");
 				
 				Community remoteCommunity = (Community)m_session.getAttribute("community");
+				List<Participant> membersRemote = (List<Participant>) m_session.getAttribute("memberRecords");					
+				model.put("memberRecords", membersRemote);				
 				model.put("community", remoteCommunity);				
 				model.put("res", res);
 				
@@ -293,7 +291,7 @@ public class CisManagerController {
 			if(communityResultObject == null){
 				resultCallback = "Failure getting result from remote node!";
 			}
-			else{
+			else {
 				if(communityResultObject.getJoinResponse() != null){
 					resultCallback = "Joined CIS: " + communityResultObject.getCommunityJid();
 	
@@ -301,7 +299,7 @@ public class CisManagerController {
 					m_session.setAttribute("community", remoteCommunity);
 				}
 				if(communityResultObject.getWho() != null){
-					
+					LOG.debug("### " + communityResultObject.getWho().getParticipant().size());
 
 					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWho().getParticipant();					
 					m_session.setAttribute("memberRecords", l);
