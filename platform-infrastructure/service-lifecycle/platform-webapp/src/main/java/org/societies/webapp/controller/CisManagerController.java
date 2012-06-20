@@ -281,11 +281,6 @@ public class CisManagerController {
 	// callback
 	ICisManagerCallback icall = new ICisManagerCallback(){
 
-		public void receiveResult(boolean result) {} 
-
-		public void receiveResult(int result) {};
-		
-		public void receiveResult(String result){}
 
 		public void receiveResult(Community communityResultObject) {
 			if(communityResultObject == null){
