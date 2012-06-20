@@ -28,6 +28,8 @@ package org.societies.useragent.comms;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,22 +41,31 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
+import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class UACommsServer implements IFeatureServer{
 
-	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			Arrays.asList("http://societies.org/api/schema/useragent/monitoring"));
-	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			Arrays.asList("org.societies.api.schema.useragent.monitoring"));
+	public static final List<String> NAMESPACES = Collections.unmodifiableList(
+			Arrays.asList("http://societies.org/api/schema/useragent/monitoring",
+					"http://societies.org/api/schema/useragent/feedback"));
+	public static final List<String> PACKAGES = Collections.unmodifiableList(
+			Arrays.asList("org.societies.api.schema.useragent.monitoring",
+					"org.societies.api.schema.ueragent.feedback"));
 
 	//PRIVATE VARIABLES
 	private ICommManager commsMgr;
 	private IUserActionMonitor uam;
+	private IUserFeedback userFeedback;
 	private IIdentityManager idManager;
 	private Logger LOG = LoggerFactory.getLogger(UACommsServer.class);
 
@@ -94,15 +105,16 @@ public class UACommsServer implements IFeatureServer{
 	}
 
 	public void receiveMessage(Stanza stanza, Object payload) {
-		LOG.info("UACommsServer received message!!!");
+		LOG.info("UACommsServer received message with no return type!!!");
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
-		if (payload instanceof UserActionMonitorBean){ this.receiveMessage(stanza, (UserActionMonitorBean)payload);}	
+		if (payload instanceof UserActionMonitorBean){ 
+			this.receiveMessage(stanza, (UserActionMonitorBean)payload);
+		}
 	}
 
-	public void receiveMessage(Stanza stanza, UserActionMonitorBean payload){
+	private void receiveMessage(Stanza stanza, UserActionMonitorBean monitorBean){
 		//---- UAM Bundle ---
 		LOG.info("Message received for UAM - processing");
-		UserActionMonitorBean monitorBean = (UserActionMonitorBean) payload;
 
 		switch(monitorBean.getMethod()){
 		case MONITOR:
@@ -124,10 +136,51 @@ public class UACommsServer implements IFeatureServer{
 
 
 
-	public Object getQuery(Stanza arg0, Object arg1) throws XMPPError {
-		//PUT FUNCTIONALITY HERE FOR IF THERE IS A RETURN TYPE
+	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
+		LOG.info("UACommsServer received message with a return type!!!");
+		if (payload instanceof UserFeedbackBean){
+			Object result = this.getQuery(stanza, (UserFeedbackBean)payload);
+		}
 		return null;
 	}
+
+	private Object getQuery(Stanza stanza, UserFeedbackBean feedbackBean){
+		//---- User Feedback Bundle ----
+		LOG.info("Message received for User Feedback - processing");
+
+		Object resultBean = null;
+
+		switch(feedbackBean.getMethod()){
+		case GET_EXPLICIT_FB:
+			try {
+				int expType = feedbackBean.getType();
+				String expProposalText = feedbackBean.getProposalText();
+				String[] options = null; //= feedbackBean.getOptions();
+				LOG.debug("Sending remote message to local User Feedback - explicit");
+				ExpProposalContent expContent = new ExpProposalContent(expProposalText, options);
+				List<String> result = userFeedback.getExplicitFB(expType, expContent).get();
+				ExpFeedbackResultBean expResultBean = new ExpFeedbackResultBean();
+				//expResultBean.setFeedback();
+				
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+			break;
+		case GET_IMPLICIT_FB:
+			int impType = feedbackBean.getType();
+			String impProposalText = feedbackBean.getProposalText();
+			int timeout = feedbackBean.getTimeout();
+			LOG.debug("Sending remote message to local User Feedback - implicit");
+			ImpProposalContent impContent = new ImpProposalContent(impProposalText, timeout);
+			userFeedback.getImplicitFB(impType, impContent);
+			break;
+		}
+
+		return resultBean;
+	}
+
 
 	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
 		return null;

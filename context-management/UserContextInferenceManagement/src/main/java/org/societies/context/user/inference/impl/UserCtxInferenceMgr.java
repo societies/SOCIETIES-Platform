@@ -24,23 +24,50 @@
  */
 package org.societies.context.user.inference.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(UserCtxInferenceMgr.class);
+		
+	
+	private ICtxBroker internalCtxBroker;
+
+	List<String> inferableTypes = new ArrayList<String>();
+	
+	@Autowired(required=true)
+	UserCtxInferenceMgr(ICtxBroker internalCtxBroker){
+		
+		this.internalCtxBroker = internalCtxBroker;
+		LOG.info(this.getClass() + " instantiated");
+		inferableTypes.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		this.setInferrableTypes(inferableTypes);
+		LOG.info(this.getClass() + " instantiated broker " +internalCtxBroker);	
+	}
+	
+	
 	@Override
 	public void checkQuality(CtxModelObject arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -60,26 +87,42 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	@Override
 	public void inheritContext(CtxAttributeIdentifier arg0,
 			CtxAttributeValueType arg1, IIdentity arg2) {
-		// TODO Auto-generated method stub
 		
+
 	}
 
 	@Override
 	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, Date arg1) {
-		// TODO Auto-generated method stub
-		return null;
+		CtxAttribute ctxAttribute = null;
+
+		return ctxAttribute;
 	}
 
 	@Override
 	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, int arg1) {
-		// TODO Auto-generated method stub
-		return null;
+		CtxAttribute ctxAttribute = null;
+	
+		return ctxAttribute;
 	}
 
 	@Override
-	public void refineContext(CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public CtxAttribute refineContext(CtxAttributeIdentifier arg0) {
+		CtxAttribute ctxAttribute = null;
 
+		return ctxAttribute;
+	}
+	
+	@Override
+	public void setInferrableTypes(List<String> inferableTypes){
+		
+		LOG.info("setInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
+		this.inferableTypes = inferableTypes;
+	}
+	
+	@Override
+	public List<String> getInferrableTypes(){
+	
+		LOG.info("getInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
+		return this.inferableTypes;
+	}
 }

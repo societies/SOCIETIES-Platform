@@ -42,6 +42,7 @@ public class Session {
 	private IIdentity requester;
 	private IIdentity provider;
 	private SLA sla;
+	private String serviceId;
 
 	/**
 	 * Constructor. Session ID is generated automatically.
@@ -96,5 +97,13 @@ public class Session {
 	
 	public void setProvider(IIdentity provider) {
 		this.provider = provider;
+	}
+
+	public String getServiceId() {
+		return serviceId;
+	}
+
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
 	}
 }

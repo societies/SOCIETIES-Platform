@@ -68,8 +68,7 @@ public class AgreementUtils {
 		if (null != iAgreement.getUserPublicIdentity()) {
 			agreementBean.setUserPublicIdentity(iAgreement.getUserPublicIdentity().getJid());
 		}
-		// TODO: manage list
-//		agreementBean.setRequestedItems(ResponseItemUtils.toResponseItemBeans(agreement.getRequestedItems()));
+		agreementBean.setRequestedItems(ResponseItemUtils.toResponseItemBeans(iAgreement.getRequestedItems()));
 		return agreementBean;
 	}
 	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement> toAgreementBeans(List<NegotiationAgreement> agreements)

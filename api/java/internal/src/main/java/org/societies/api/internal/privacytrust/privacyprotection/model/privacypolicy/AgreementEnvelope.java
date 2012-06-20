@@ -35,6 +35,8 @@ import java.security.Key;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 /**
  * This class is used after the negotiation succeeds to seal the contract between the negotiating parties. 
  * The envelope contains the negotiation agreement in encrypted format, the user's signature and the public 
@@ -47,11 +49,11 @@ public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 
 	private IAgreement agreement;
 	private byte[] signature;
-	private Checksum agreementCheckSum;
+	private transient Checksum agreementCheckSum;
 	private byte[] publicKey;
-	
+
 	AgreementEnvelope(){
-		
+
 	}
 	public AgreementEnvelope(IAgreement agreement, byte[] publickey, byte[] signature){
 		this.agreement = agreement;
@@ -59,8 +61,8 @@ public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 		this.publicKey = publickey;
 		this.calculateChecksum();
 	}
-	
-	
+
+
 	private void calculateChecksum(){
 		agreementCheckSum = new CRC32();
 		byte[] byteArray;
@@ -74,19 +76,19 @@ public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 			e.printStackTrace();
 		}
 	}
-	
-	  private byte[] getBytes(Object obj) throws java.io.IOException{
-	      ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-	      ObjectOutputStream oos = new ObjectOutputStream(bos); 
-	      oos.writeObject(obj);
-	      oos.flush(); 
-	      oos.close(); 
-	      bos.close();
-	      byte [] data = bos.toByteArray();
-	      return data;
-	  }
 
-	
+	private byte[] getBytes(Object obj) throws java.io.IOException{
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+		ObjectOutputStream oos = new ObjectOutputStream(bos); 
+		oos.writeObject(obj);
+		oos.flush(); 
+		oos.close(); 
+		bos.close();
+		byte [] data = bos.toByteArray();
+		return data;
+	}
+
+
 	/* (non-Javadoc)
 	 * @see org.personalsmartspace.spm.negotiation.api.platform.IAgreementEnvelope#getAgreement()
 	 */
@@ -125,9 +127,9 @@ public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 	public String getPublicKeyAsString(){
 		return this.getObject(publicKey).toString();
 	}
-	  public Object getObject(byte[] bytes){
-		  ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-		  try {
+	public Object getObject(byte[] bytes){
+		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+		try {
 			ObjectInputStream ois = new ObjectInputStream(bis);
 			return ois.readObject();
 		} catch (IOException e) {
@@ -138,5 +140,26 @@ public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 			e.printStackTrace();
 		}
 		return null;
-	  }
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		AgreementEnvelope rhs = (AgreementEnvelope) obj;
+		return new EqualsBuilder()
+			.append(this.getAgreement(), rhs.getAgreement())
+			.append(this.getSignature(), rhs.getSignature())
+			.append(this.getPublicKeyAsString(), rhs.getPublicKeyAsString())
+			.isEquals();
+	}
 }

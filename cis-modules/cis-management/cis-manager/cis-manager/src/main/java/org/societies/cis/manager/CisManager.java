@@ -42,10 +42,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +72,8 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.Cis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -84,6 +88,7 @@ import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.CisCommunity;
 import org.societies.api.schema.cis.manager.Delete;
+import org.societies.api.schema.cis.manager.DeleteMemberNotification;
 import org.societies.api.schema.cis.manager.DeleteNotification;
 import org.societies.api.schema.cis.manager.SubscribedTo;
 
@@ -107,6 +112,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
 	ICisDirectoryRemote iCisDirRemote;
+	
+	IServiceDiscoveryRemote iServDiscRemote;
+	IServiceControlRemote iServCtrlRemote;
+	
+	
 //	IPrivacyPolicyManager polManager;
 	
 
@@ -116,8 +126,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 		Session session = sessionFactory.openSession();
 		try{
-			this.ownedCISs = session.createCriteria(Cis.class).list();
-			this.subscribedCISs = session.createCriteria(CisSubscribedImp.class).list();
+			this.ownedCISs = session.createCriteria(Cis.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+			Criteria crit = session.createCriteria(CisSubscribedImp.class);
+			crit.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+			this.subscribedCISs = crit.list();
+			LOG.info("Nb of subscri CIS is " + this.subscribedCISs.size());
 		}catch(Exception e){
 			LOG.error("CISManager startup queries failed..");
 			e.printStackTrace();
@@ -125,8 +138,26 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			if(session!=null)
 				session.close();
 		}
-		for(Cis cis : ownedCISs)
-			cis.setSessionFactory(sessionFactory);
+		
+		Iterator<Cis> it = ownedCISs.iterator();
+		 
+		while(it.hasNext()){
+			 Cis element = it.next();
+			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory());
+			 element.setiServCtrlRemote(this.iServCtrlRemote);
+			 element.setiServDiscRemote(this.iServDiscRemote);
+	     }
+		
+	//	for(Cis cis : ownedCISs){
+	//		cis.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory());
+	//	}
+		Iterator<CisSubscribedImp> i = this.subscribedCISs.iterator();
+		 
+		while(i.hasNext()){
+			CisSubscribedImp element = i.next();
+			 element.startAfterDBretrieval(this);
+	     }
+				
 	}
 
 	private final static List<String> NAMESPACES = Collections
@@ -134,7 +165,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 						  		"http://societies.org/api/schema/cis/community"));
 			//.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
-			//.singletonList("org.societies.api.schema.cis.manager");
+		//	.singletonList("org.societies.api.schema.cis.manager");
 			.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
 					"org.societies.api.schema.cis.community"));
 
@@ -171,6 +202,18 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
+	public IServiceDiscoveryRemote getiServDiscRemote() {
+		return iServDiscRemote;
+	}
+	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
+		this.iServDiscRemote = iServDiscRemote;
+	}
+	public IServiceControlRemote getiServCtrlRemote() {
+		return iServCtrlRemote;
+	}
+	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
+		this.iServCtrlRemote = iServCtrlRemote;
+	}
 
 
 
@@ -242,7 +285,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		 
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 if (element.getCisRecord().getCisJid().equals(jid))
+			 if (element.getCisRecord().getCisJID().equals(jid))
 				 return element;
 	     }
 		return null;
@@ -277,7 +320,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//}
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		
-		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory);
+		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote);
 		
 		if(cis == null)
 			return cis;
@@ -288,6 +331,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		cisAd.setName(cis.getName());
 		cisAd.setUri(cis.getCisId());
 		cisAd.setType(cis.getCisType());
+		cisAd.setId(cis.getCisId());
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
 		
 		LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
@@ -308,7 +352,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public boolean subscribeToCis(CisRecord i) {
 
 		if(! this.subscribedCISs.contains(new Cis(i))){
-			this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid()),this));
+			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisJID()));
+			this.subscribedCISs.add(csi);
+			this.persist(csi);
 			return true;
 		}
 		return false;
@@ -321,7 +367,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public boolean unsubscribeToCis(String cisjid) {
 
 		if(subscribedCISs.contains(new CisSubscribedImp(new CisRecord(cisjid)))){
-			return subscribedCISs.remove(new CisSubscribedImp(new CisRecord(cisjid)));
+			
+			CisSubscribedImp temp = new CisSubscribedImp(new CisRecord(cisjid));
+			temp = subscribedCISs.get(subscribedCISs.indexOf(temp)); // temp now is the real object
+			
+			if(this.subscribedCISs.remove(temp)) {// removing it from the list
+				this.deletePersisted(temp); // removing it from the database
+				return true;
+			}
+			else{
+				return false;
+			}
 		}else{
 			return false;
 		}
@@ -425,7 +481,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					while(it.hasNext()){
 						CisRecord element = it.next().getCisRecord();
 						CisCommunity community = new CisCommunity();
-						community.setCommunityJid(element.getCisJid());
+						community.setCommunityJid(element.getCisJID());
 						com.getCisCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
@@ -501,18 +557,55 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating getSubscribedTo notifications
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				SubscribedTo s = (SubscribedTo) c.getNotification().getSubscribedTo();
-				CisRecord r = new CisRecord(s.getCisJid());
-				this.subscribeToCis(r);
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()));
+				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){
+						LOG.info("CIS is already part of the list of subscribed CISs");
+					}
+					else{
+						SubscribedTo s = (SubscribedTo) c.getNotification().getSubscribedTo();
+						CisRecord r = new CisRecord(s.getCisJid());
+						this.subscribeToCis(r);
+					}*/
 				return;
 			}
 			
-			// treating delete notifications
+			// treating delete CIS notifications
 			if (c.getNotification().getDeleteNotification() != null) {
 				LOG.info("delete notification received");
-				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
-				if (!this.subscribedCISs.remove(new CisRecord(d.getCommunityJid())))
+				this.unsubscribeToCis(c.getNotification().getSubscribedTo().getCisJid());
+/*				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
+				if(!this.subscribedCISs.contains(new CisRecord(d.getCommunityJid()))){
 					LOG.info("CIS is not part of the list of subscribed CISs");
+				}
+				else{
+					CisSubscribedImp temp = new CisSubscribedImp(new CisRecord(d.getCommunityJid()));
+					temp = subscribedCISs.get(subscribedCISs.indexOf(temp)); // temp now is the real object
+
+					
+					this.subscribedCISs.remove(temp);// removing it from the list
+					this.deletePersisted(temp); // removing it from the database
+				}
+				return;*/
+			}
+			
+			// treating deleteMember notifications
+			if (c.getNotification().getDeleteMemberNotification() != null) {
+				LOG.info("delete member notification received");
+				DeleteMemberNotification d = (DeleteMemberNotification) c.getNotification().getDeleteMemberNotification();
+				if(d.getMemberJid() != this.cisManagerId.getBareJid()){
+					LOG.warn("delete member notification had a different member than me...");
+				}
+				if(!this.subscribedCISs.contains(new CisRecord(d.getCommunityJid()))){
+					LOG.info("CIS is not part of the list of subscribed CISs");
+				}
+				else{
+					CisSubscribedImp temp = new CisSubscribedImp(new CisRecord(d.getCommunityJid()));
+					temp = subscribedCISs.get(subscribedCISs.indexOf(temp)); // temp now is the real object
+
+					
+					this.subscribedCISs.remove(temp);// removing it from the list
+					this.deletePersisted(temp); // removing it from the database
+				}
 				return;
 			}
 		}
@@ -573,6 +666,31 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 	
 	@Override
+	public List<ICis> searchMyCisByName(String name){
+		// add subscribed CIS to the list to be returned
+		List<ICis> l = new ArrayList<ICis>();
+		Iterator<Cis> it = getOwnedCISs().iterator();
+		 
+		while(it.hasNext()){
+			 Cis element = it.next();
+			 if(element.getName().contains(name))
+			 l.add(element);
+			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+	     }
+		
+		Iterator<CisSubscribedImp> it2 = this.getSubscribedCISs().iterator();
+		while(it2.hasNext()){
+			CisSubscribedImp element = it2.next();
+			 if(element.getName().contains(name))
+			 l.add(element);
+			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+	     }
+		
+		return l;
+		
+	}
+	
+	@Override
 	public List<ICisOwned> getListOfOwnedCis(){
 		
 		// add subscribed CIS to the list to be returned
@@ -582,7 +700,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		return l;
 	}
 
-
+	@Override
+	public List<ICis> getRemoteCis(){
+			List<ICis> l = new ArrayList<ICis>();
+			l.addAll(subscribedCISs);
+			
+			return l;
+	}
 
 	@Override
 	public ICis[] getCisList(ICis arg0) {
@@ -663,6 +787,54 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			e.printStackTrace();
 			t.rollback();
 			LOG.warn("Saving CIS object failed, rolling back");
+		}finally{
+			if(session!=null){
+				session.close();
+				session = sessionFactory.openSession();
+				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				session.close();
+			}
+			
+		}
+	}
+	
+	private void updatePersisted(Object o){
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			session.update(o);
+			t.commit();
+			LOG.info("Updated CIS object succeded!");
+//			Query q = session.createQuery("select o from Cis aso");
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			t.rollback();
+			LOG.warn("Updating CIS object failed, rolling back");
+		}finally{
+			if(session!=null){
+				session.close();
+				session = sessionFactory.openSession();
+				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
+				session.close();
+			}
+			
+		}
+	}
+	
+	private void deletePersisted(Object o){
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			session.delete(o);
+			t.commit();
+			LOG.info("Deleting object in CisManager succeded!");
+//			Query q = session.createQuery("select o from Cis aso");
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			t.rollback();
+			LOG.warn("Deleting object in CisManager failed, rolling back");
 		}finally{
 			if(session!=null){
 				session.close();

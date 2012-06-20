@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druï¿½be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAï¿½ï¿½O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -24,9 +24,8 @@
  */
 package org.societies.android.platform.test;
 
-import org.societies.android.platform.CisRecord;
-import org.societies.android.platform.SocialContract;
 import org.societies.android.platform.SocialProvider;
+import org.societies.android.platform.SocialContract;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -102,7 +101,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		initialValues.put(SocialContract.Community.CREATION_DATE , "today");
 		
 		//2- Call insert in SocialProvider to initiate insertion
-		Uri newGroupUri= resolver.insert(SocialContract.Community.CONTENT_URI , 
+		Uri newCommunityUri= resolver.insert(SocialContract.Community.CONTENT_URI , 
 				initialValues);
 		
 		//3- Get the newly inserted CIS from SocialProvider.
@@ -114,7 +113,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 			};
 		//WHERE _id = ID of the newly created CIS:
 		String selection = SocialContract.Community._ID + " = " +
-			newGroupUri.getLastPathSegment();
+			newCommunityUri.getLastPathSegment();
 		Cursor cursor = resolver.query(SocialContract.Community.CONTENT_URI,
 				projection, selection, null, null);
 		
@@ -125,12 +124,64 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		//5- Fail if the CIS data are not correct:
 		//Create new ContentValues object based on returned CIS:
 		ContentValues returnedValues = new ContentValues();
-		returnedValues.put(SocialContract.Community.NAME , cursor.getString(0));
+		returnedValues.put(SocialContract.Community.NAME , cursor.getString(1));
 		returnedValues.put(SocialContract.Community.OWNER_ID , cursor.getString(1));
-		returnedValues.put(SocialContract.Community.CREATION_DATE , cursor.getString(2));
+		returnedValues.put(SocialContract.Community.CREATION_DATE , cursor.getString(1));
 		assertEquals(returnedValues,initialValues);
 
 	}
+	
+	public void testQueryCommunity(){
+		
+	}
+	
+	/**
+	 * Test to see if information about the user is retrievable
+	 * from {@link SocialProvider}.
+	 * 1- create ContentValues for this CSS
+	 * 2- add ContentValues to {@link SocialProvider}
+	 * 3- read ContentValues from {@link SocialProvider}
+	 * 4- check to see if it is the same as added
+	 * 
+	 *  TODO: Maybe insertion can be added to setup method?
+	 */
+	public void testQueryMe(){
+
+		 // 1- create ContentValues for this CSS
+		ContentValues initialValues = new ContentValues();
+		initialValues.put(SocialContract.Me.GLOBAL_ID , "babak@societies.org");
+		initialValues.put(SocialContract.Me.NAME , "Babak Farshchian");
+		initialValues.put(SocialContract.Me.DISPLAY_NAME , "Babak F");
+
+		//2- Call insert in SocialProvider to initiate insertion
+		Uri newCommunityUri= resolver.insert(SocialContract.Me.CONTENT_URI , 
+				initialValues);
+
+		 // 3- read ContentValues from {@link SocialProvider}
+		String[] projection ={
+				SocialContract.Me.GLOBAL_ID,
+				SocialContract.Me.NAME,
+				SocialContract.Me.DISPLAY_NAME
+			};
+		//WHERE _id = ID of the newly created CIS:
+		String selection = SocialContract.Me._ID + " = " +
+			newCommunityUri.getLastPathSegment();
+		Cursor cursor = resolver.query(SocialContract.Me.CONTENT_URI,
+				projection, selection, null, null);
+		
+		//4- Fail if the CIS was not returned.
+		assertFalse(cursor == null);
+		if (cursor == null)	return;
+		if (!cursor.moveToFirst()) return;
+		//5- Fail if the CIS data are not correct:
+		//Create new ContentValues object based on returned CIS:
+		ContentValues returnedValues = new ContentValues();
+		returnedValues.put(SocialContract.Me.GLOBAL_ID , cursor.getString(1));
+		returnedValues.put(SocialContract.Me.NAME , cursor.getString(1));
+		returnedValues.put(SocialContract.Me.DISPLAY_NAME , cursor.getString(1));
+		assertEquals(returnedValues,initialValues);
+	}
+	
 //	public void testUpdate(){
 //	//TODO 
 //		assertFalse(true);

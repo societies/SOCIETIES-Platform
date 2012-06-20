@@ -15,7 +15,7 @@
        for integration testing outside of an OSGi environment -->
 
   <bean name="RegSynchroniser" class="org.societies.css.devicemgmt.RegSynchroniser.impl.RegManager"
-  			depends-on="CommManager,PubsubClient" init-method="init">
+  			depends-on="CommManager, PubsubClient,DMCommManager" init-method="init">
        		<property name="pubSubManager" ref="PubsubClient"/>
   			<property name="commManager" ref="CommManager"/>
   </bean>

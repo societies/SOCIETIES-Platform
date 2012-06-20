@@ -31,10 +31,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.societies.android.api.external.utilities.ServiceMethodTranslator;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
+import org.societies.android.platform.content.CssRecordDAO;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalBinder;
 import org.societies.utilities.DBC.Dbc;
@@ -74,6 +75,10 @@ public class PluginCSSManager extends Plugin {
 	 */
 	private static final String CONNECT_SERVICE = "connectService";
 	private static final String DISCONNECT_SERVICE = "disconnectService";
+	/**
+	 * Ancilliary functionality
+	 */
+	private static final String READ_CSSRECORD = "readCSSRecord";
 	
 	//Required to match method calls with callbackIds (used by PhoneGap)
 	private HashMap<String, String> methodCallbacks;
@@ -159,7 +164,22 @@ public class PluginCSSManager extends Plugin {
             return result;
 		} 
 
+		//uses synchronous call to current local cached CSSRecord
+		if (action.equals(READ_CSSRECORD)) {
+			CssRecordDAO cssRecordDAO = new CssRecordDAO(this.ctx.getContext());
+			
+			AndroidCSSRecord record = cssRecordDAO.readCSSrecord();
+			if (null != record) {
+	            result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecordDAO.readCSSrecord()));
+			} else {
+	            result = new PluginResult(PluginResult.Status.ERROR, "no CSS Record");
+			}
+            result.setKeepCallback(false);
 
+            return result;
+			
+		}
+		
 		//uses asynchronous calls
 		if (this.validRemoteCall(action) && this.connectedtoCSSManager) {
 

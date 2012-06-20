@@ -24,6 +24,8 @@
  */
 package org.societies.privacytrust.trust.impl.engine;
 
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.TrustException;
@@ -31,9 +33,11 @@ import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventList
 import org.societies.api.internal.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.engine.TrustEngineException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
@@ -63,6 +67,33 @@ public class UserPerceivedTrustEngine extends TrustEngine {
 				new TrustUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
 					TrustEventTopic.INDIRECT_TRUST_UPDATED }, null);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCss, java.util.Set)
+	 */
+	@Override
+	public void evaluate(ITrustedCss css, Set<ITrustEvidence> evidenceSet)
+			throws TrustEngineException {
+		// TODO Auto-generated method stub
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCis, java.util.Set)
+	 */
+	@Override
+	public void evaluate(ITrustedCis cis, Set<ITrustEvidence> evidenceSet)
+			throws TrustEngineException {
+		// TODO Auto-generated method stub
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedService, java.util.Set)
+	 */
+	@Override
+	public void evaluate(ITrustedService service,
+			Set<ITrustEvidence> evidenceSet) throws TrustEngineException {
+		// TODO Auto-generated method stub
 	}
 	
 	private class CssUserPerceivedTrustEngine implements Runnable {

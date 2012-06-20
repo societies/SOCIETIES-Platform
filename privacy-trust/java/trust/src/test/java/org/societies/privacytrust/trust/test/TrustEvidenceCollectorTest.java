@@ -34,19 +34,21 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
-import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustOpinion;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
+import org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -74,6 +76,9 @@ public class TrustEvidenceCollectorTest {
 	private static final String TRUSTED_SERVICE_ID = BASE_ID + "ServiceResourceIdentifier";
 	private static final String TRUSTED_SERVICE_ID2 = BASE_ID + "ServiceResourceIdentifier2";
 	
+	private static ICommManager mockCommMgr = mock(ICommManager.class);
+	private static IIdentityManager mockIdentityMgr = mock(IIdentityManager.class);
+	
 	private static IIdentity mockTrustorCssIdentity = mock(IIdentity.class);
 	
 	private static IIdentity mockTrustedCssIdentity = mock(IIdentity.class);
@@ -96,6 +101,10 @@ public class TrustEvidenceCollectorTest {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		
+		when(mockCommMgr.getIdManager()).thenReturn(mockIdentityMgr);
+		when(mockIdentityMgr.fromJid(TRUSTOR_ID)).thenReturn(mockTrustorCssIdentity);;
+		when(mockIdentityMgr.isMine(mockTrustorCssIdentity)).thenReturn(true);
 		
 		when(mockTrustorCssIdentity.toString()).thenReturn(TRUSTOR_ID);
 		when(mockTrustorCssIdentity.getType()).thenReturn(IdentityType.CSS);
@@ -129,6 +138,8 @@ public class TrustEvidenceCollectorTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		
+		((TrustEvidenceCollector) this.trustEvidenceCollector).setCommMgr(mockCommMgr);
 	}
 
 	/**
@@ -139,38 +150,38 @@ public class TrustEvidenceCollectorTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustOpinion(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)}.
+	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)}.
 	 * @throws TrustException 
 	 */
 	@Test
-	public void testAddTrustOpinion() throws TrustException {
+	public void testAddTrustRating() throws TrustException {
 		
 		final Date now = new Date();
-		this.trustEvidenceCollector.addTrustOpinion(mockTrustorCssIdentity, 
+		this.trustEvidenceCollector.addTrustRating(mockTrustorCssIdentity, 
 				mockTrustedCssIdentity, 0.5d, null);
 		// verify
 		final TrustedEntityId teid = new TrustedEntityId(TRUSTOR_ID, 
 				TrustedEntityType.CSS, TRUSTED_CSS_ID);
 		final Set<IDirectTrustEvidence> evidenceSet = 
-				this.trustEvidenceRepo.retrieveDirectEvidence(teid, now, null);
+				this.trustEvidenceRepo.retrieveDirectEvidence(teid, 
+						TrustEvidenceType.RATED, now, null);
 		assertFalse(evidenceSet.isEmpty());
 		IDirectTrustEvidence directEvidence = evidenceSet.iterator().next();
-		assertTrue(directEvidence instanceof IDirectTrustOpinion);
-		IDirectTrustOpinion directOpinion = (IDirectTrustOpinion) directEvidence;
-		assertEquals(new Double(0.5d), directOpinion.getTrustRating());
-		assertTrue(directOpinion.getTimestamp().compareTo(now) >= 0);
+		assertEquals(TrustEvidenceType.RATED, directEvidence.getType());
+		assertEquals(new Double(0.5d), (Double) directEvidence.getInfo());
+		assertTrue(directEvidence.getTimestamp().compareTo(now) >= 0);
 	}
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustOpinion(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)}.
+	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, double, java.util.Date)}.
 	 * @throws TrustException 
 	 */
 	@Test
-	public void testAddTrustOpinionWithIllegalParams() throws TrustException {
+	public void testAddTrustRatingWithIllegalParams() throws TrustException {
 		
 		// non-CSS trustor
 		try {
-			this.trustEvidenceCollector.addTrustOpinion(mockTrustedCisIdentity, mockTrustedCssIdentity, 0.5d, null);
+			this.trustEvidenceCollector.addTrustRating(mockTrustedCisIdentity, mockTrustedCssIdentity, 0.5d, null);
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException ile) {	
 			assertTrue(ile.getMessage().indexOf("trustor") != -1);
@@ -180,7 +191,7 @@ public class TrustEvidenceCollectorTest {
 		final IIdentity mockInvalidTrusteeIdentity = mock(IIdentity.class);
 		when(mockInvalidTrusteeIdentity.getType()).thenReturn(IdentityType.CSS_LIGHT);
 		try {
-			this.trustEvidenceCollector.addTrustOpinion(mockTrustorCssIdentity, mockInvalidTrusteeIdentity, 0.5d, null);
+			this.trustEvidenceCollector.addTrustRating(mockTrustorCssIdentity, mockInvalidTrusteeIdentity, 0.5d, null);
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException ile) {	
 			assertTrue(ile.getMessage().indexOf("trustee") != -1);
@@ -188,7 +199,7 @@ public class TrustEvidenceCollectorTest {
 		 
 		// rating out of range
 		try {
-			this.trustEvidenceCollector.addTrustOpinion(mockTrustorCssIdentity, mockTrustedCssIdentity, -0.5d, null);
+			this.trustEvidenceCollector.addTrustRating(mockTrustorCssIdentity, mockTrustedCssIdentity, -0.5d, null);
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException ile) {	
 			assertTrue(ile.getMessage().indexOf("rating") != -1);
@@ -196,38 +207,38 @@ public class TrustEvidenceCollectorTest {
 	}
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustOpinion(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)}.
+	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)}.
 	 * @throws TrustException 
 	 */
 	@Test
-	public void testAddServiceTrustOpinion() throws TrustException {
+	public void testAddServiceTrustRating() throws TrustException {
 		
 		final Date now = new Date();
-		this.trustEvidenceCollector.addTrustOpinion(mockTrustorCssIdentity, 
+		this.trustEvidenceCollector.addTrustRating(mockTrustorCssIdentity, 
 				mockServiceResourceIdentifier, 0.5d, null);
 		// verify
 		final TrustedEntityId teid = new TrustedEntityId(TRUSTOR_ID, 
 				TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
 		final Set<IDirectTrustEvidence> evidenceSet = 
-				this.trustEvidenceRepo.retrieveDirectEvidence(teid, now, null);
+				this.trustEvidenceRepo.retrieveDirectEvidence(teid, 
+						TrustEvidenceType.RATED, now, null);
 		assertFalse(evidenceSet.isEmpty());
 		IDirectTrustEvidence directEvidence = evidenceSet.iterator().next();
-		assertTrue(directEvidence instanceof IDirectTrustOpinion);
-		IDirectTrustOpinion directOpinion = (IDirectTrustOpinion) directEvidence;
-		assertEquals(new Double(0.5d), directOpinion.getTrustRating());
-		assertTrue(directOpinion.getTimestamp().compareTo(now) >= 0);
+		assertEquals(TrustEvidenceType.RATED, directEvidence.getType());
+		assertEquals(new Double(0.5d), (Double) directEvidence.getInfo());
+		assertTrue(directEvidence.getTimestamp().compareTo(now) >= 0);
 	}
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustOpinion(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)}.
+	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addTrustRating(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)}.
 	 * @throws TrustException 
 	 */
 	@Test
-	public void testAddServiceTrustOpinionWithIllegalParams() throws TrustException {
+	public void testAddServiceTrustRatingWithIllegalParams() throws TrustException {
 		
 		// non-CSS trustor
 		try {
-			this.trustEvidenceCollector.addTrustOpinion(mockTrustedCisIdentity, mockServiceResourceIdentifier, 0.5d, null);
+			this.trustEvidenceCollector.addTrustRating(mockTrustedCisIdentity, mockServiceResourceIdentifier, 0.5d, null);
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException ile) {	
 			assertTrue(ile.getMessage().indexOf("trustor") != -1);
@@ -235,29 +246,10 @@ public class TrustEvidenceCollectorTest {
 		 
 		// rating out of range
 		try {
-			this.trustEvidenceCollector.addTrustOpinion(mockTrustorCssIdentity, mockServiceResourceIdentifier, 1.5d, null);
+			this.trustEvidenceCollector.addTrustRating(mockTrustorCssIdentity, mockServiceResourceIdentifier, 1.5d, null);
 			fail("Expected IllegalArgumentException");
 		} catch (IllegalArgumentException ile) {	
 			assertTrue(ile.getMessage().indexOf("rating") != -1);
 		}
 	}
-
-	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addServiceExperience(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, double, java.util.Date)}.
-	 */
-	@Ignore
-	@Test
-	public void testAddServiceExperience() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.TrustEvidenceCollector#addUserInteractionExperience(org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, java.lang.String, double, java.util.Date)}.
-	 */
-	@Ignore
-	@Test
-	public void testAddUserInteractionExperience() {
-		fail("Not yet implemented");
-	}
-
 }

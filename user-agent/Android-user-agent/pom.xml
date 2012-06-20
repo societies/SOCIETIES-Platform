@@ -53,6 +53,11 @@
 			<version>${release.version}</version>
 		</dependency>
 		<dependency>
+   			<groupId>org.societies.android.api.external</groupId>
+   			<artifactId>societies-android-api</artifactId>
+  			<version>${release.version}</version>
+		</dependency> 
+		<dependency>
  			<groupId>org.slf4j</groupId>
   			<artifactId>slf4j-api</artifactId>
 			<version>1.6.2</version>

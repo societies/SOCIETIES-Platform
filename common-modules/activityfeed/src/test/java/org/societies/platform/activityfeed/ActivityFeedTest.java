@@ -25,11 +25,20 @@
 package org.societies.platform.activityfeed;
 
 
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
+import org.societies.activity.model.Activity;
+import org.societies.api.activity.IActivity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -44,6 +53,8 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 @ContextConfiguration(locations = { "../../../../META-INF/ActivityFeedTest-context.xml" })
 public class ActivityFeedTest extends
 		AbstractTransactionalJUnit4SpringContextTests {
+	private static Logger LOG = LoggerFactory
+			.getLogger(ActivityFeedTest.class);
 	@Autowired
 	private ActivityFeed actFeed;
 	
@@ -105,7 +116,28 @@ public class ActivityFeedTest extends
 		}
 		
 	}
-
+	@Ignore // this test runs when running on junit in eclipse but fails when testing with maven
+	@Test
+	@Rollback(false)
+	public void testFilter(){
+		ActivityFeed actfeed = new ActivityFeed();
+		Activity act1 = new Activity(); act1.setActor("user1"); act1.setPublished(Long.toString(System.currentTimeMillis()-100));
+		String timeSeries = Long.toString(System.currentTimeMillis()-1000)+" "+Long.toString(System.currentTimeMillis());
+		actfeed.addCisActivity(act1);
+		JSONObject searchQuery = new JSONObject();
+		try {
+			searchQuery.append("filterBy", "actor");
+			searchQuery.append("filterOp", "equals");
+			searchQuery.append("filterValue", "user1");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		LOG.info("sending timeSeries: "+timeSeries+ " act published: "+act1.getPublished());
+		List<IActivity> results = actfeed.getActivities(searchQuery.toString(), timeSeries);
+		LOG.info("testing filtering filter result: "+results.size());
+		assert(results.size() > 1);
+	}
+	
 	@Test
 	@Rollback(false)
 	public void testBootStrap(){

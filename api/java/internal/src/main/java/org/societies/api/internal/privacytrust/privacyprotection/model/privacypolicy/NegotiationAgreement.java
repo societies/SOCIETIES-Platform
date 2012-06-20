@@ -29,9 +29,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * The NegotiationAgreement class represents the agreement reached between the user and the service provider. 
@@ -114,6 +114,28 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	public Requestor getRequestor() {
 		// TODO Auto-generated method stub
 		return this.requestor;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		NegotiationAgreement rhs = (NegotiationAgreement) obj;
+		return new EqualsBuilder()
+			.append(this.getRequestor(), rhs.getRequestor())
+			.append(this.getUserIdentity(), rhs.getUserIdentity())
+			.append(this.getUserPublicIdentity(), rhs.getUserPublicIdentity())
+			.append(this.getRequestedItems(), rhs.getRequestedItems())
+			.isEquals();
 	}
 
 }

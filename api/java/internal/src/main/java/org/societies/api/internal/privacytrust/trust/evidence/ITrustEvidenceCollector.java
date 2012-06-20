@@ -24,10 +24,12 @@
  */
 package org.societies.api.internal.privacytrust.trust.evidence;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -37,7 +39,64 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @since 0.2
  */
 public interface ITrustEvidenceCollector {
-
+	
+	/**
+	 * Adds the specified piece of direct trust evidence. The
+	 * {@link TrustedEntityId} this evidence refers to, its type, as well as,
+	 * the time the evidence was recorded are also supplied. Finally, depending
+	 * on the evidence type, the method allows specifying supplementary
+	 * information.
+	 *  
+	 * @param teid
+	 *            the {@link TrustedEntityId} the evidence refers to
+	 * @param type
+	 *            the type of the evidence to be added
+	 * @param timestamp
+	 *            the time the evidence was recorded
+	 * @param info
+	 *            supplementary information if applicable; <code>null</code>
+	 *            otherwise
+	 * @throws TrustException
+	 *            if the specified piece of direct trust evidence cannot be 
+	 *            added
+	 * @throws NullPointerException
+	 *            if any of the teid, type or timestamp parameter is
+	 *            <code>null</code>
+	 * @since 0.3
+	 */
+	public void addDirectEvidence(final TrustedEntityId teid, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info) throws TrustException;
+	
+	/**
+	 * Adds the specified piece of indirect trust evidence which originates
+	 * from the given source. The {@link TrustedEntityId} this evidence refers
+	 * to, its type, as well as, the time the evidence was recorded are also
+	 * supplied. Finally, depending on the evidence type, the method allows
+	 * specifying supplementary information. 
+	 *  
+	 * @param source
+	 *            the source this evidence originates from
+	 * @param teid
+	 *            the {@link TrustedEntityId} this evidence refers to
+	 * @param type
+	 *            the type of the evidence to be added
+	 * @param timestamp
+	 *            the time the evidence was recorded
+	 * @param info
+	 *            supplementary information if applicable; <code>null</code>
+	 *            otherwise
+	 * @throws TrustException
+	 *            if the specified piece of indirect trust evidence cannot be 
+	 *            added
+	 * @throws NullPointerException
+	 *            if any of the source, teid, type or timestamp parameter is
+	 *            <code>null</code>
+	 * @since 0.3
+	 */
+	public void addIndirectEvidence(final String source, final TrustedEntityId teid,
+			final TrustEvidenceType type, final Date timestamp, final Serializable info)
+					throws TrustException;
+	
 	/**
 	 * Assigns the specified trust rating to the identified trustee by the
 	 * supplied trustor. The identified trustee can be either a CSS or a CIS,
@@ -63,9 +122,9 @@ public interface ITrustEvidenceCollector {
 	 *            identify a CSS or CIS; the trust rating is not in the range
 	 *            of [0,1] 
 	 */
-	public void addTrustOpinion(final IIdentity trustor, final IIdentity trustee,
+	public void addTrustRating(final IIdentity trustor, final IIdentity trustee,
 			final double rating, final Date timestamp) throws TrustException;
-	
+
 	/**
 	 * Assigns the specified trust rating to the identified trustee by the
 	 * supplied trustor. The identified trustee is a service, while the trustor
@@ -90,27 +149,7 @@ public interface ITrustEvidenceCollector {
 	 *            if the trustor does not identify a CSS or the trust rating is
 	 *            not in the range of [0,1] 
 	 */
-	public void addTrustOpinion(final IIdentity trustor, 
+	public void addTrustRating(final IIdentity trustor, 
 			final ServiceResourceIdentifier trustee, final double rating,
 			final Date timestamp) throws TrustException;
-	
-	/**
-	 * 
-	 * @param trustor
-	 * @param provider
-	 * @param serviceId
-	 * @param rating
-	 * @param timestamp
-	 */
-	public void addServiceExperience(IIdentity trustor, IIdentity provider, ServiceResourceIdentifier serviceId, double rating, Date timestamp);
-
-	/**
-	 * 
-	 * @param trustor
-	 * @param trustee
-	 * @param type
-	 * @param rating
-	 * @param timestamp
-	 */
-	public void addUserInteractionExperience(IIdentity trustor, IIdentity trustee, String type, double rating, Date timestamp);
 }

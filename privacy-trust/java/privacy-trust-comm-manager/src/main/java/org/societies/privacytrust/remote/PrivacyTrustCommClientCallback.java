@@ -40,10 +40,12 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyd
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBeanResult;
 import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
+import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommClientCallback;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClientCallback;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommClientCallback;
 import org.societies.privacytrust.remote.trust.TrustBrokerCommClientCallback;
+import org.societies.privacytrust.remote.trust.evidence.TrustEvidenceCollectorCommClientCallback;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -58,21 +60,24 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 					"http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy",
 					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/internal/schema/privacytrust/trust/model",
-					"http://societies.org/api/internal/schema/privacytrust/trust/broker"));
+					"http://societies.org/api/internal/schema/privacytrust/trust/broker",
+					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement",
 					"org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy",
 					"org.societies.api.schema.identity",
 					"org.societies.api.internal.schema.privacytrust.trust.model",
-					"org.societies.api.internal.schema.privacytrust.trust.broker"));
+					"org.societies.api.internal.schema.privacytrust.trust.broker",
+					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
 
 	// Dependencies
 	private ICommManager commManager;
 	private PrivacyDataManagerCommClientCallback privacyDataManagerCommClientCallback;
 	private PrivacyPolicyManagerCommClientCallback privacyPolicyManagerCommClientCallback;
 	private PrivacyAgreementManagerCommClientCallback privacyAgreementManagerCommClientCallback;
-	private TrustBrokerCommClientCallback trustBrokerCommClientCallback; 
+	private TrustBrokerCommClientCallback trustBrokerCommClientCallback;
+	private TrustEvidenceCollectorCommClientCallback trustEvidenceCollectorCommClientCallback;
 
 	public PrivacyTrustCommClientCallback() {
 	}
@@ -127,6 +132,9 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 		// -- Trust Management
 		/* else */ if (payload instanceof TrustBrokerResponseBean)
 			this.trustBrokerCommClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
+		
+		/* else */ if (payload instanceof TrustEvidenceCollectorResponseBean)
+			this.trustEvidenceCollectorCommClientCallback.receiveResult(stanza, (TrustEvidenceCollectorResponseBean) payload);
 	}		
 
 	/* (non-Javadoc)
@@ -248,10 +256,17 @@ public class PrivacyTrustCommClientCallback implements ICommCallback {
 		this.privacyAgreementManagerCommClientCallback = privacyAgreementManagerCommClientCallback;
 		LOG.info("[DependencyInjection] PrivacyAgreementManagerCommClientCallback injected");
 	}
+	
 	public void setTrustBrokerCommClientCallback(
 			TrustBrokerCommClientCallback trustBrokerCommClientCallback) {
 		this.trustBrokerCommClientCallback = trustBrokerCommClientCallback;
 		LOG.info("[DependencyInjection] TrustBrokerCommClientCallback injected");
+	}
+	
+	public void setTrustEvidenceCollectorCommClientCallback(
+			TrustEvidenceCollectorCommClientCallback trustEvidenceCollectorCommClientCallback) {
+		this.trustEvidenceCollectorCommClientCallback = trustEvidenceCollectorCommClientCallback;
+		LOG.info("[DependencyInjection] TrustEvidenceCollectorCommClientCallback injected");
 	}
 
 

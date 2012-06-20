@@ -27,6 +27,7 @@
 		<property name="privacyPolicyManagerCommClientCallback" ref="PrivacyPolicyManagerCommClientCallback" />
 		<property name="privacyAgreementManagerCommClientCallback" ref="PrivacyAgreementManagerCommClientCallback" />
 		<property name="trustBrokerCommClientCallback" ref="trustBrokerCommClientCallback" />
+		<property name="trustEvidenceCollectorCommClientCallback" ref="trustEvidenceCollectorCommClientCallback" />
 	</bean>
 	
 	<bean name="PrivacyTrustCommServer"
@@ -39,6 +40,7 @@
 		<property name="privacyAgreementManagerCommServer" ref="PrivacyAgreementManagerCommServer" />
 		<property name="privacyNegotiationManagerCommServer" ref="PrivacyNegotiationManagerCommServer" />
 		<property name="trustBrokerCommServer" ref="trustBrokerCommServer" />
+		<property name="trustEvidenceCollectorCommServer" ref="trustEvidenceCollectorCommServer" />
 	</bean>
 	
 	
@@ -140,7 +142,8 @@
 
 
 	<!-- Trust Management Configuration -->
-
+	
+	<!-- Trust Broker Configuration -->
 	<bean name="trustBrokerCommClient"
 		class="org.societies.privacytrust.remote.trust.TrustBrokerCommClient"
 		depends-on="commManager, PrivacyTrustCommClientCallback, trustBrokerCommClientCallback">	
@@ -158,6 +161,26 @@
 		depends-on="commManager, trustBroker">
 		<property name="commManager" ref="commManager" />
 		<property name="trustBroker" ref="trustBroker" />
+	</bean>
+	
+	<!-- Trust Evidence Collector Configuration -->
+	<bean name="trustEvidenceCollectorCommClient"
+		class="org.societies.privacytrust.remote.trust.evidence.TrustEvidenceCollectorCommClient"
+		depends-on="commManager, PrivacyTrustCommClientCallback, trustEvidenceCollectorCommClientCallback">	
+		<property name="commManager" ref="commManager" />
+		<property name="privacyTrustCommClientCallback" ref="PrivacyTrustCommClientCallback" />
+		<property name="trustEvidenceCollectorCommClientCallback" ref="trustEvidenceCollectorCommClientCallback" />
+	</bean>
+
+	<bean name="trustEvidenceCollectorCommClientCallback"
+		class="org.societies.privacytrust.remote.trust.evidence.TrustEvidenceCollectorCommClientCallback">
+	</bean>
+
+	<bean name="trustEvidenceCollectorCommServer"
+		class="org.societies.privacytrust.remote.trust.evidence.TrustEvidenceCollectorCommServer"
+		depends-on="commManager, trustEvidenceCollector">
+		<property name="commManager" ref="commManager" />
+		<property name="trustEvidenceCollector" ref="trustEvidenceCollector" />
 	</bean>
 
 </beans>

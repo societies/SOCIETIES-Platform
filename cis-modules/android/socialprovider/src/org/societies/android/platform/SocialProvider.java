@@ -24,6 +24,8 @@
  */
 package org.societies.android.platform;
 
+import org.societies.android.platform.SocialContract;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -43,7 +45,7 @@ import android.net.Uri;
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class SocialProvider extends ContentProvider {
+public class SocialProvider extends ContentProvider implements ISocialAdapterListener {
 
     //will contain all the legal URIs:
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);

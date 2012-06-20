@@ -28,6 +28,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 
 
@@ -78,8 +79,8 @@ public class Condition implements Serializable{
 		String str = "\n<Condition>";
 		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" " +
 				"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">");
-		str = str.concat("\n\t\t<AttributeValue DataType=\""+this.theCondition.toString()+"\">");
-		str = str.concat(this.value);
+		str = str.concat("\n\t\t<AttributeValue DataType=\""+getConditionName().name()+"\">");
+		str = str.concat(getValueAsString());
 		str = str.concat("</AttributeValue>");
 		str = str.concat("\n\t</Attribute>");
 		str = str.concat(this.printOptional()); 
@@ -102,6 +103,52 @@ public class Condition implements Serializable{
 		System.out.println(sharecon.toXMLString());
 
 
+	}
+
+	/**
+	 * @return the value
+	 */
+	public String getValue() {
+		return value;
+	}
+	/**
+	 * @param value the value to set
+	 */
+	public void setValue(String value) {
+		this.value = value;
+	}
+	/**
+	 * @return the theCondition
+	 */
+	public ConditionConstants getTheCondition() {
+		return theCondition;
+	}
+	/**
+	 * @param theCondition the theCondition to set
+	 */
+	public void setTheCondition(ConditionConstants theCondition) {
+		this.theCondition = theCondition;
+	}
+	
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		Condition rhs = (Condition) obj;
+		return new EqualsBuilder()
+			.append(this.getConditionName().name(), rhs.getConditionName().name())
+			.append(this.isOptional(), rhs.isOptional())
+			.isEquals();
 	}
 
 }

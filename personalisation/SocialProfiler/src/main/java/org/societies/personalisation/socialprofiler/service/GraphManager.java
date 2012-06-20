@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.neo4j.graphalgo.impl.centrality.BetweennessCentrality;
 import org.neo4j.graphalgo.impl.centrality.ClosenessCentrality;
 import org.neo4j.graphalgo.impl.centrality.EigenvectorCentralityArnoldi;
@@ -20,6 +19,8 @@ import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.Traverser;
 import org.neo4j.index.lucene.LuceneIndexService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.personalisation.socialprofiler.Variables;
 import org.societies.personalisation.socialprofiler.datamodel.GeneralInfo;
 import org.societies.personalisation.socialprofiler.datamodel.Interests;
@@ -34,8 +35,8 @@ import org.societies.personalisation.socialprofiler.datamodel.impl.InterestsImpl
 import org.societies.personalisation.socialprofiler.datamodel.impl.ProfileImpl;
 import org.societies.personalisation.socialprofiler.datamodel.impl.RelTypes;
 import org.societies.personalisation.socialprofiler.datamodel.impl.RelationshipDescriptionImpl;
-import org.societies.personalisation.socialprofiler.datamodel.impl.SocialPageImpl;
 import org.societies.personalisation.socialprofiler.datamodel.impl.SocialPageCategoryImpl;
+import org.societies.personalisation.socialprofiler.datamodel.impl.SocialPageImpl;
 import org.societies.personalisation.socialprofiler.datamodel.impl.SocialPersonImpl;
 import org.societies.personalisation.socialprofiler.datamodel.utils.IntegerAdder;
 import org.societies.personalisation.socialprofiler.datamodel.utils.IntegerDivider;
@@ -45,7 +46,7 @@ import org.societies.personalisation.socialprofiler.exception.NeoException;
 public class GraphManager implements Variables{
 
 	
-	private static final Logger logger = Logger.getLogger(GraphManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(GraphManager.class);
 	private GraphDatabaseService neoService;
 	private LuceneIndexService luceneIndexService;
 	private static final String NAME_INDEX = "name";
@@ -511,7 +512,7 @@ public class GraphManager implements Variables{
 					logger.debug("creating new fanPage before linking");
 					fanPage=createPageOfInterest(PageOfInterestId);
 					if (fanPage==null){
-						logger.fatal("ERROR - fanPage seemed not to exist - was created - but is null");
+						logger.error("ERROR - fanPage seemed not to exist - was created - but is null");
 					}
 				}else{
 					logger.debug("fanPage solved => linking");
@@ -625,14 +626,14 @@ public class GraphManager implements Variables{
 		Transaction tx = getNeoService().beginTx();
 		try{
 			if (fanPage==null){
-				logger.fatal("ERROR- fanpage was created just before , normally should exist");
+				logger.error("ERROR- fanpage was created just before , normally should exist");
 			}else{
 				fanPageCategory=getPageOfInterestCategory(type);
 				if (fanPageCategory==null){
 					logger.debug("creating new fanPageCateogry before linking");
 					fanPageCategory=createPageOfInterestCategory(type);
 					if (fanPageCategory==null){
-						logger.fatal("ERROR - fanPageCategory seemed not to exist - was created - but is null");
+						logger.error("ERROR - fanPageCategory seemed not to exist - was created - but is null");
 					}
 				}else{
 //					logger.debug("fanPageCategory solved =>now linking....");
@@ -1479,7 +1480,7 @@ public class GraphManager implements Variables{
 					logger.debug("creating the maniac and then linking it");
 					p=createManiac(maniacId, type);
 					if (p==null){
-						logger.fatal("ERROR - Maniac seemed not to exist - " +
+						logger.error("ERROR - Maniac seemed not to exist - " +
 								"was created - but is null");
 					}
 				}else{
@@ -1754,7 +1755,7 @@ public class GraphManager implements Variables{
 					logger.debug("creating the Interests and then linking it");
 					interests=createInterests(interestsId);
 					if (interests==null){
-						logger.fatal("ERROR - Interests seemed not to exist - " +
+						logger.error("ERROR - Interests seemed not to exist - " +
 								"was created - but is null");
 					}
 				}else{
@@ -1906,7 +1907,7 @@ public class GraphManager implements Variables{
 					logger.debug("creating the GeneralInfo and then linking it");
 					generalInfo=createGeneralInfo(generalInfoId);
 					if (generalInfo==null){
-						logger.fatal("ERROR - GeneralInfo seemed not to exist - " +
+						logger.error("ERROR - GeneralInfo seemed not to exist - " +
 								"was created - but is null");
 					}
 				}else{

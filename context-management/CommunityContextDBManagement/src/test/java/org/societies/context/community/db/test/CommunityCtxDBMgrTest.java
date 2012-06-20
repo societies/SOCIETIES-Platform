@@ -24,6 +24,158 @@
  */
 package org.societies.context.community.db.test;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CommunityMemberCtxEntity;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.context.community.db.impl.CommunityCtxDBMgr;
+
+/**
+ * 
+ * 
+ * @author
+ * 
+ */
 public class CommunityCtxDBMgrTest {
+
+	private static final String CIS_IIDENTITY_STRING = "myCIS.societies.local";
+
+	private CommunityCtxDBMgr communityDB;
+	
+	CommunityCtxEntity entity;
+	CtxAttribute attribute;
+	CtxModelObject modObj;	
+	CommunityMemberCtxEntity member;
+
+	private static IIdentity mockCisIdentity = mock(IIdentity.class);
+	
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+
+		when(mockCisIdentity.toString()).thenReturn(CIS_IIDENTITY_STRING);
+
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+		communityDB = new CommunityCtxDBMgr();
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
+		communityDB = null;
+	}
+
+	@Test
+ 	public void testCreateCommunityCtxEntity() throws CtxException{
+		System.out.println("---- testCreateCommunityCtxEntity");
+
+		entity = communityDB.createCommunityEntity(mockCisIdentity);
+
+		assertNotNull(entity);
+		assertEquals(mockCisIdentity.toString(), entity.getOwnerId());
+	}
+	
+	@Test
+ 	public void testCreateCommunityCtxAttribute() throws CtxException{
+		System.out.println("---- testCreateCommunityCtxAttribute");
+
+		entity = communityDB.createCommunityEntity(mockCisIdentity);
+		attribute = communityDB.createCommunityAttribute(entity.getId(), "name");
+		
+		assertNotNull(attribute);
+		assertEquals("name", attribute.getType());
+	}
+	
+   @Test
+   public void testUpdateEntity() throws CtxException{
+	   System.out.println("---- testUpdateAttribute");
+
+	   entity = communityDB.createCommunityEntity(mockCisIdentity);
+	   System.out.println("entities attributes " + entity.getAttributes());
+	   System.out.println("entities members " + entity.getMembers());
+
+	   // Add CommunityMemberCtxEntity
+	   member = communityDB.createCommunityEntity(mockCisIdentity);
+	   entity.addMember(member);
+	   
+	   communityDB.updateCommunityEntity(entity);
+	   System.out.println("updated entities members " + entity.getMembers());
+	   
+	   // Add Attribute
+	   attribute = communityDB.createCommunityAttribute(entity.getId(), "name");
+	   entity.addAttribute(attribute);
+	   communityDB.updateCommunityEntity(entity);
+	   System.out.println("updated entities attributes " + entity.getAttributes());
+
+	   // Retrieve CommunityCtxEntity
+	   modObj = communityDB.retrieve(entity.getId());
+	   CommunityCtxEntity retrEntity = (CommunityCtxEntity) modObj;
+	   System.out.println("retrieved entity - " + retrEntity);
+	   System.out.println("retrieved attributes - " + retrEntity.getAttributes());
+	   System.out.println("retrieves members - " + retrEntity.getMembers());
+	   System.out.println("retrieve entity another way - " + communityDB.retrieveCommunityEntity(mockCisIdentity));
+	   
+	   assertNotNull(entity);
+	   assertNotNull(retrEntity);
+	   assertEquals(entity.getAttributes(), retrEntity.getAttributes());
+	   assertEquals(entity.getMembers(), retrEntity.getMembers());
+	}
+
+   @Test
+   public void testRetrieveCommunityEntity() throws CtxException {
+
+	   entity = communityDB.createCommunityEntity(mockCisIdentity);
+
+	   CommunityCtxEntity retrEntity;
+	   retrEntity = communityDB.retrieveCommunityEntity(mockCisIdentity);
+	   assertNotNull(retrEntity);
+	   assertEquals(entity, retrEntity);
+   }
+   
+   @Test
+   public void testRetrieve() throws CtxException {
+
+	   entity = communityDB.createCommunityEntity(mockCisIdentity);
+	   attribute = communityDB.createCommunityAttribute(entity.getId(), CtxAttributeTypes.NAME);
+
+	   CommunityCtxEntity retrEntity;
+	   retrEntity = (CommunityCtxEntity) communityDB.retrieve(entity.getId());
+	   assertNotNull(retrEntity);
+	   assertEquals(entity, retrEntity);
+	   
+	   CtxAttribute retrAttribute;
+	   retrAttribute = (CtxAttribute) communityDB.retrieve(attribute.getId());
+	   assertNotNull(retrAttribute);
+	   assertEquals(attribute, retrAttribute);
+	}
 
 }

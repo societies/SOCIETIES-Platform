@@ -85,7 +85,8 @@ public class ExternalCtxBrokerTest {
 
 	private static final String OWNER_IDENTITY_STRING = "myFooIIdentity@societies.local";
 	private static final String NETWORK_NODE_STRING = "myFooIIdentity@societies.local/node";
-
+	private static final String CIS_IDENTITY_STRING = "FooCISIIdentity@societies.local";
+	
 	private CtxBroker ctxBroker;
 
 	private static IIdentityManager mockIdentityMgr = mock(IIdentityManager.class);
@@ -93,8 +94,10 @@ public class ExternalCtxBrokerTest {
 	private static Requestor mockRequestor = mock(Requestor.class);
 	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);
 
-	//private static IIdentity mockIdentity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
-	//private static Requestor requestor = new Requestor(mockIdentity);
+	
+	
+	private static IIdentity cisMockIdentity = mock(IIdentity.class);
+
 
 	/**
 	 * @throws java.lang.Exception
@@ -113,6 +116,9 @@ public class ExternalCtxBrokerTest {
 		when(mockRequestor.toString()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockNetworkNode.toString()).thenReturn(NETWORK_NODE_STRING);
 
+		
+		when(mockIdentityLocal.toString()).thenReturn(OWNER_IDENTITY_STRING);
+		when(mockIdentityLocal.getType()).thenReturn(IdentityType.CSS);
 	}
 
 	/**

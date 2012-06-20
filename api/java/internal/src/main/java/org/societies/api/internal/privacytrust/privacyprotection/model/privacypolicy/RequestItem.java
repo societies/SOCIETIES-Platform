@@ -30,6 +30,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 /**
  * The RequestItem class is used to represent a request to access a specific piece of personal data. 
  * It is embedded inside a RequestPolicy which is the privacy policy of a service provider. 
@@ -116,5 +118,27 @@ public class RequestItem implements Serializable{
 	}
 	public String toString(){
 		return this.toXMLString();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		RequestItem rhs = (RequestItem) obj;
+		return new EqualsBuilder()
+			.append(this.getActions(), rhs.getActions())
+			.append(this.getConditions(), rhs.getConditions())
+			.append(this.getResource(), rhs.getResource())
+			.append(this.isOptional(), rhs.isOptional())
+			.isEquals();
 	}
 }

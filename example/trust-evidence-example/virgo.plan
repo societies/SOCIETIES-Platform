@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.plan" version="3.0.0" scoped="false" atomic="true"
+        xmlns="http://www.eclipse.org/virgo/schema/plan"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="
+                        http://www.eclipse.org/virgo/schema/plan 
+                        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+        <!-- Comms Framework -->
+        <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
+        <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
+        <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
+        <artifact type="bundle" name="org.societies.comm.event.mgmt"/>
+
+        <!-- Common Modules -->
+        <artifact type="bundle" name="org.societies.data-source"/>
+
+        <!-- Privacy Protection -->
+<!--    <artifact type="bundle" name="org.societies.privacytrust.privacyprotection"/>    -->
+        <artifact type="bundle" name="org.societies.privacytrust.trust"/>
+        <artifact type="bundle" name="org.societies.privacytrust.privacytrustcommmanagement"/>
+        <artifact type="bundle" name="org.societies.privacytrust.trust-evidence-example"/>
+</plan>

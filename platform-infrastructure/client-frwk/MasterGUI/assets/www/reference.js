@@ -410,6 +410,23 @@ var Societies = {
 				'disconnectService',          //Telling the plugin, which action we want to perform
 				[]);        //Passing a list of arguments to the plugin
 			},
+			/**
+			 * @methodOf Societies.LocalCSSManagerService#
+			 * @description Retrieve the current locally cached CSSRecord
+			 * @param {Object} successCallback The callback which will be called when result is successful
+			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+			 * @returns AndroidCSSRecord
+			 */
+
+			readProfile: function(successCallback, failureCallback) {
+				console.log("Call LocalCSSManagerService - readProfile");
+
+				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+				'readCSSRecord',          //Telling the plugin, which action we want to perform
+				[]);        //Passing a list of arguments to the plugin
+			},
 			
 			/**
 			 * @methodOf Societies.LocalCSSManagerService#
@@ -745,32 +762,8 @@ var SocietiesGUI = {
 
 			function success(data) {
 				
-				var status = ["Available for Use", "Unavailable", "Not active but on alert"];
-				var type = ["Android based client", "Cloud Node", "JVM based client"];
+				SocietiesGUI.populateCSSRecordpage(data);
 				
-				jQuery("#cssrecordforename").val(data.foreName);
-				jQuery("#cssrecordname").val(data.name);
-				jQuery("#cssrecordemaildetails").val(data.emailID);
-				jQuery("#cssrecordimdetails").val(data.imID);
-				jQuery("#cssrecorduserlocation").val(data.homeLocation);
-				jQuery("#cssrecordsnsdetails").val(data.socialURI);
-				jQuery("#cssrecordidentity").val(data.cssIdentity);
-				jQuery("#cssrecordorgtype").val(data.entity);
-				jQuery("#cssrecordsextype").val(data.sex);
-				
-				//empty table
-				jQuery('#cssNodesTable tbody').remove();
-				
-				for (i  = 0; i < data.cssNodes.length; i++) {
-					var tableEntry = "<tr>" + 
-					"<td>" + data.cssNodes[i].identity + "</td>" + 
-					"<td>" + status[data.cssNodes[i].status] + "</td>" + 
-					"<td>" + type[data.cssNodes[i].type] + "</td>" + 
-						+ "</tr>"
-
-					jQuery('#cssNodesTable').append(tableEntry);
-				}
-
 				console.log("Current page: " + $.mobile.activePage[0].id);
 
 				
@@ -816,6 +809,28 @@ var SocietiesGUI = {
 			}
 		    window.plugins.CoreServiceMonitorService.connectService(success, failure);
 		},
+		
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Refresh the CSS Profile page with the current locally cached version
+		 * @returns null
+		 */
+
+		refreshCssProfile: function() {
+			console.log("Refresh CSS Profile");
+
+			function success(data) {
+				SocietiesGUI.populateCSSRecordpage(data);
+			}
+			
+			function failure(data) {
+				alert("refreshCssProfile - failure: " + data);
+			}
+			
+			window.plugins.LocalCSSManagerService.readProfile(success, failure);
+			
+		},
+
 		/**
 		 * @methodOf SocietiesGUI#
 		 * @description Refresh the Active Service page with currently active services
@@ -985,6 +1000,40 @@ var SocietiesGUI = {
 			}
 
 		},
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Populate the CSS Record page
+		 * @returns null
+		 */
+		populateCSSRecordpage: function(data) {
+			var status = ["Available for Use", "Unavailable", "Not active but on alert"];
+			var type = ["Android based client", "Cloud Node", "JVM based client"];
+			
+			jQuery("#cssrecordforename").val(data.foreName);
+			jQuery("#cssrecordname").val(data.name);
+			jQuery("#cssrecordemaildetails").val(data.emailID);
+			jQuery("#cssrecordimdetails").val(data.imID);
+			jQuery("#cssrecorduserlocation").val(data.homeLocation);
+			jQuery("#cssrecordsnsdetails").val(data.socialURI);
+			jQuery("#cssrecordidentity").val(data.cssIdentity);
+			jQuery("#cssrecordorgtype").val(data.entity);
+			jQuery("#cssrecordsextype").val(data.sex);
+			
+			//empty table
+			jQuery('#cssNodesTable tbody').remove();
+			
+			for (i  = 0; i < data.cssNodes.length; i++) {
+				var tableEntry = "<tr>" + 
+				"<td>" + data.cssNodes[i].identity + "</td>" + 
+				"<td>" + status[data.cssNodes[i].status] + "</td>" + 
+				"<td>" + type[data.cssNodes[i].type] + "</td>" + 
+					+ "</tr>"
+
+				jQuery('#cssNodesTable').append(tableEntry);
+			}
+
+		}
+
 };
 
 
@@ -1010,6 +1059,10 @@ jQuery(function() {
 		if (SocietiesGUI.validateCredentials(jQuery("#username").val(), jQuery("#userpass").val())) {
 			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.successfulLogin);
 		}
+	});
+	
+	$('#refreshCssRecord').click(function() {
+		SocietiesGUI.refreshCssProfile();
 	});
 	
 	$('#resetDeviceManager').click(function() {

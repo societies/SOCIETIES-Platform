@@ -22,12 +22,13 @@
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cisdirectory.html">CIS Directory</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	  
-	   <tr><td><p><b>Social Network Data</b></p></td></tr>
+	   <tr><td><b>Social Network Data</b></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/socialdata.html">SocialData</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 
 	  <tr><td><b>Privacy and Trust</b></td></tr>
-	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacyassessment.html">Privacy Assessment</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacy-assessment.html">Privacy Assessment</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacy-policies.html">Privacy Policy</a></td></tr>
 	  <tr><td><p><b>&nbsp;</b></p></td></tr>
 
 	  <!-- SPACERS -->	  

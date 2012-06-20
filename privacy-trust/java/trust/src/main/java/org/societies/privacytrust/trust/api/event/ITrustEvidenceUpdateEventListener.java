@@ -36,11 +36,13 @@ import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
 public interface ITrustEvidenceUpdateEventListener extends ITrustEventListener {
 	
 	/**
-	 * Notifies registered listeners that the trust evidence is updated.
+	 * Notifies registered listeners that a new piece of trust evidence is
+	 * available.
 	 * 
 	 * @param evt
 	 *            the <code>TrustEvidenceUpdateEvent</code> object describing
 	 *            the event source.
+	 * @since 0.3
 	 */
-	public void onUpdate(TrustEvidenceUpdateEvent evt);
+	public void onNew(TrustEvidenceUpdateEvent evt);
 }

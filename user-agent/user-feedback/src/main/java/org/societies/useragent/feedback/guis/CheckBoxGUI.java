@@ -44,38 +44,41 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 
 public class CheckBoxGUI{
 
-	private static final long serialVersionUID = 1L;
-	String proposalText;
-	String[] options;
-	IUserFeedbackCallback callback;
 	List<String> feedback;
-
 	JFrame frame;
 	JPanel jContentPane;
 	JPanel proposalPane;
 	JPanel optionsPane;
 	JPanel submitPane;
 	JButton submit;
+	boolean submitted;
 
-	public CheckBoxGUI(String proposalText, String[] options, IUserFeedbackCallback callback){
-		this.proposalText = proposalText;
-		this.options = options;
-		this.callback = callback;
+	public CheckBoxGUI(){
 		feedback = new ArrayList<String>();
+		submitted = false;
+	}
 
+	public List<String> displayGUI(String proposalText, String[] options){
 		frame = new JFrame();
 		frame.setTitle("TEST - Checkbox Feedback GUI");
 		frame.setSize(300, 300);
 		frame.setLocation(getXCoord(frame.getWidth()), getYCoord(frame.getHeight()));
-		frame.setContentPane(getJContentPane());
+		frame.setContentPane(getJContentPane(proposalText, options));
 		frame.setVisible(true);
+		while(!submitted){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return feedback;
 	}
 
-	private JPanel getJContentPane(){
+	private JPanel getJContentPane(String proposalText, String[] options){
 		if(jContentPane == null){
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new GridBagLayout());
@@ -87,13 +90,13 @@ public class CheckBoxGUI{
 			c.gridy = 0;
 			c.weightx = 1;
 			c.insets = new Insets(10,10,5,10);
-			jContentPane.add(getProposalPane(), c);
+			jContentPane.add(getProposalPane(proposalText), c);
 
 			//add options pane
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridy = 1;
 			c.weighty = 1;
-			jContentPane.add(getOptionsPane(), c);
+			jContentPane.add(getOptionsPane(options), c);
 
 			//add submit pane
 			c.gridy = 2;
@@ -105,7 +108,7 @@ public class CheckBoxGUI{
 		return jContentPane;
 	}
 
-	private JPanel getProposalPane(){
+	private JPanel getProposalPane(String proposalText){
 		if(proposalPane == null){
 			proposalPane = new JPanel();
 			proposalPane.setLayout(new GridBagLayout());
@@ -117,7 +120,7 @@ public class CheckBoxGUI{
 		return proposalPane;
 	}
 
-	private JPanel getOptionsPane(){
+	private JPanel getOptionsPane(String[] options){
 		if(optionsPane == null){
 			optionsPane = new JPanel();
 			optionsPane.setLayout(new GridBagLayout());
@@ -171,7 +174,7 @@ public class CheckBoxGUI{
 		yCoord = tmp.intValue();
 		return yCoord;
 	}
-	
+
 	public class CheckboxListener implements ItemListener{
 		@Override
 		public void itemStateChanged(ItemEvent e) {
@@ -188,17 +191,20 @@ public class CheckBoxGUI{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource().equals(submit)){
-				/*for(String output: feedback){
-					System.out.println("Feedback = "+output);
-				}*/
 				frame.setVisible(false);
-				callback.handleExpFeedback(feedback);
+				submitted = true;
 			}
 		}
 	}
 
-	/*public static void main(String[] args){
+	public static void main(String[] args){
 		String[] options = {"yes", "no", "maybe", "ask again later"};
-		new CheckBoxGUI("Are you OK??", options, null);
-	}*/
+		CheckBoxGUI gui = new CheckBoxGUI();
+
+		List<String> results = gui.displayGUI("Are you OK??", options);
+		System.out.println("Selected feedback: ");
+		for(String nextResult : results){
+			System.out.println(nextResult);
+		}
+	}
 }

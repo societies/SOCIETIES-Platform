@@ -180,8 +180,14 @@ public class CisRecord {
 
 
 	
-	public String getCisJid() {
+	public String getCisJID() {
 		return this.cisJID;
+	}
+
+
+
+	public void setCisJID(String cisJID) {
+		this.cisJID = cisJID;
 	}
 
 

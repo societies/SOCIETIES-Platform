@@ -33,13 +33,12 @@ import org.apache.cordova.api.PluginResult.Status;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.societies.android.api.external.utilities.ServiceMethodTranslator;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.devicemonitor.BatteryStatus;
 import org.societies.android.api.internal.devicemonitor.IDeviceStatus;
 import org.societies.android.api.internal.devicemonitor.ProviderStatus;
 import org.societies.android.platform.devicestatus.LocalDeviceStatusService;
 
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;

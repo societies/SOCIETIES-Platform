@@ -27,10 +27,14 @@ package org.societies.personalisation.dianne;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.dianne.model.ContextNode;
 import org.societies.personalisation.dianne.model.DIANNEOutcome;
+import org.societies.personalisation.dianne.model.IOutcomeListener;
 import org.societies.personalisation.dianne.model.Network;
 import org.societies.personalisation.dianne.model.ContextGroup;
 import org.societies.personalisation.dianne.model.Node;
@@ -45,22 +49,28 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 public class NetworkRunner implements Runnable{
 
 	public Network network;
+	private Logger LOG = LoggerFactory.getLogger(NetworkRunner.class);
+	private IOutcomeListener callback;
 	private NetworkBuffer buffer;
 	private int nur = 1000;  //network update rate
 	private int contextNodeCount;
 	private int outcomeNodeCount;
+	private int cycleNum;
 
 	//for threads
 	private Thread myThread;
 	private Object pauseMonitor = new Object();
 	private boolean paused = false;
+	private boolean getOutcomes = false;
 
-	public NetworkRunner(IIdentity identity, Network network){
+	public NetworkRunner(IIdentity identity, Network network, IOutcomeListener callback){
 		this.network = network;
+		this.callback = callback;
 		
 		buffer = new NetworkBuffer();
 		contextNodeCount = 0;
 		outcomeNodeCount = 0;
+		cycleNum = 1;
 
 		//start thread
 		myThread = new Thread(this);
@@ -70,6 +80,7 @@ public class NetworkRunner implements Runnable{
 	
 	public void contextUpdate(CtxAttribute attribute){
 		buffer.addContextUpdate(attribute);
+		getOutcomes = true;
 	}
 	
 	public void actionUpdate(IAction action){
@@ -77,13 +88,16 @@ public class NetworkRunner implements Runnable{
 	}
 	
 	public IDIANNEOutcome getPrefOutcome(ServiceResourceIdentifier serviceId, String preferenceName){
+		IDIANNEOutcome outcome = null;
 		OutcomeGroup outcomeGroup = network.getOutcomeGroup(serviceId, preferenceName);
-		OutcomeNode activeNode = (OutcomeNode)outcomeGroup.getActiveNode();
-		IDIANNEOutcome outcome = new DIANNEOutcome(
-				serviceId, 
-				outcomeGroup.getServiceType(), 
-				outcomeGroup.getGroupName(), 
-				activeNode.getNodeName());
+		if(outcomeGroup != null){
+			OutcomeNode activeNode = (OutcomeNode)outcomeGroup.getActiveNode();
+			outcome = new DIANNEOutcome(
+					serviceId, 
+					outcomeGroup.getServiceType(), 
+					outcomeGroup.getGroupName(), 
+					activeNode.getNodeName());
+		}
 		return outcome;
 	}
 
@@ -118,16 +132,30 @@ public class NetworkRunner implements Runnable{
 	}
 
 	private void updateNetwork(){
+		LOG.debug("Running next cycle "+cycleNum);
+		LOG.debug(cycleNum+": getting buffers");
 		ArrayList[] snapshot = buffer.getSnapshot();
-		updateContextLayer(snapshot[0]);  //set network to reflect context updates
+		LOG.debug(cycleNum+": updating context layer");
+		updateContextLayer(snapshot[0]);  //set network to reflect context updates, feed forward new context updates
+		LOG.debug(cycleNum+": updating outcome layer");
 		updateOutcomeLayer(snapshot[1]);  //set network to reflect outcome updates
+		LOG.debug(cycleNum+": updating network output");
 		updateNetworkOutput();  //update synapses and outcomes
+		LOG.debug(cycleNum+": checking for new outputs");
+		if(getOutcomes){
+			LOG.debug(cycleNum+": returning new outputs");
+			callback.handleOutcomes(retrieveNewOutcomes()); //get new outcomes - if any
+			getOutcomes = false;
+		}
+		LOG.debug(cycleNum+": COMPLETE");
+		//network.printNetwork();
+		
 		try {
 			Thread.sleep(nur);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		cycleNum++;
 	}
 	
 	/***********************************************************************************
@@ -238,26 +266,26 @@ public class NetworkRunner implements Runnable{
 			OutcomeGroup outcomeGroup = network.getOutcomeGroup(serviceId, groupName);
 			if(outcomeGroup != null) //group exists
 			{
-				//file.println("Group "+groupName+" already exists");
+				LOG.debug("Group "+groupName+" already exists");
 
 				//search for node
 				OutcomeNode outcomeNode = (OutcomeNode)outcomeGroup.getNode(nodeName);
 				if(outcomeNode != null)  //node exists in group
 				{
-					//file.println("Node "+nodeName+" already exists");
+					LOG.debug("Node "+nodeName+" already exists");
 					//activate node in group (deactivates all others)
 					activateOutcomeUpdate(outcomeGroup, outcomeNode);
 
 				}else{  //no such node exists in group
 
-					//file.println("Node "+nodeName+" doesn't exist, creating new");
+					LOG.debug("Node "+nodeName+" doesn't exist, creating new");
 					//create node, add it to group and activate
 					createNewOutcomeNode(outcomeGroup, nodeName);
 				}
 
 			}else{ //no such group exists
 
-				//file.println("Group "+groupName+" under serviceId "+serviceId+" doesn't exist, creating new with node "+nodeName);
+				LOG.debug("Group "+groupName+" under serviceId "+serviceId.getServiceInstanceIdentifier()+" doesn't exist, creating new with node "+nodeName);
 				//create group including new node and activate
 				createNewOutcomeGroup(serviceId, serviceType, groupName, nodeName);
 			}
@@ -290,6 +318,7 @@ public class NetworkRunner implements Runnable{
 		createNewOutcomeNode(newOutcomeGroup, nodeName);
 		//add new group to list
 		network.addOutcomeGroup(newOutcomeGroup);
+		LOG.debug("Number of outcome groups after adding new = "+network.getOutcomeGroups().size());
 	}
 
 	private void connectOutcomes(ContextNode node){
@@ -359,9 +388,11 @@ public class NetworkRunner implements Runnable{
 		updateSynapses();
 		//calculate new winners and communicate
 		Iterator<OutcomeGroup> outcomeGroups_it = network.getOutcomeGroups().iterator();
+		LOG.debug("Updating "+network.getOutcomeGroups().size()+" outcome groups");
 		while(outcomeGroups_it.hasNext())
 		{
 			OutcomeGroup nextGroup = (OutcomeGroup)outcomeGroups_it.next();
+			LOG.debug("Updating: "+nextGroup.getServiceId().getServiceInstanceIdentifier()+nextGroup.getGroupName());
 			nextGroup.updateGroupOutput();
 		}
 	}
@@ -374,5 +405,28 @@ public class NetworkRunner implements Runnable{
 			Synapse nextSynapse = (Synapse)synapses_it.next();
 			nextSynapse.updateWeight();
 		}
+	}
+	
+	/*
+	 * Network output capture methods
+	 */
+	public List<IDIANNEOutcome> retrieveNewOutcomes(){
+		List<IDIANNEOutcome> results = new ArrayList<IDIANNEOutcome>();
+		Iterator<OutcomeGroup> outcomeGroups_it = network.getOutcomeGroups().iterator();
+		LOG.info("Retrieving new outputs from "+network.getOutcomeGroups().size()+" outcome groups");
+		while(outcomeGroups_it.hasNext()){
+			OutcomeGroup nextGroup = (OutcomeGroup)outcomeGroups_it.next();
+			if(nextGroup.newOutput){
+				LOG.info(nextGroup.getServiceId().getServiceInstanceIdentifier()+"->"+nextGroup.getGroupName()+" has new output");
+				OutcomeNode activeNode = (OutcomeNode)nextGroup.getNewOutput();
+				IDIANNEOutcome newOutcome = new DIANNEOutcome(
+						nextGroup.getServiceId(), 
+						nextGroup.getServiceType(), 
+						nextGroup.getGroupName(), 
+						activeNode.getNodeName());
+				results.add(newOutcome);
+			}
+		}
+		return results;
 	}
 }

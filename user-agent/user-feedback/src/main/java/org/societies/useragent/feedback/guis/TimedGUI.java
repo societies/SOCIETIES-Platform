@@ -39,42 +39,50 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
-
 public class TimedGUI extends JFrame implements ActionListener{
-	
+
 	private static final long serialVersionUID = 1L;
-	String proposalText;
-	IUserFeedbackCallback callback;
-	Timer timer;
-	
+
 	JPanel jContentPane;
 	JPanel proposalPane;
 	JPanel abortPane;
 	JButton abort;
+	boolean feedback;
+	boolean submitted;
 
-	public TimedGUI(String proposalText, int timeout, IUserFeedbackCallback callback){
-		this.proposalText = proposalText;
-		this.callback = callback;
-		
+	public TimedGUI(){
+		feedback = false;		
+		submitted = false;
+	}
+
+	public boolean displayGUI(String proposalText, int timeout){
 		this.setTitle("TEST - Timed Abort Feedback GUI");
 		this.setSize(300, 150);
 		this.setLocation(getXCoord(this.getWidth()), getYCoord(this.getHeight()));
-		this.setContentPane(getJContentPane());
+		this.setContentPane(getJContentPane(proposalText));
 		this.setAlwaysOnTop(true);
-		
-		timer = new Timer(timeout, this);
+
+		Timer timer = new Timer(timeout, this);
 		this.setVisible(true);
 		timer.start();
+		
+		while(!submitted){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return feedback;
 	}
-	
-	private JPanel getJContentPane(){
+
+	private JPanel getJContentPane(String proposalText){
 		if(jContentPane == null){
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new GridBagLayout());
-			
+
 			GridBagConstraints c = new GridBagConstraints();
-			
+
 			//add proposal pane
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.gridx = 0;
@@ -82,7 +90,7 @@ public class TimedGUI extends JFrame implements ActionListener{
 			c.weightx = 1;
 			c.weighty = 1;
 			c.insets = new Insets(10,10,5,10);
-			jContentPane.add(getProposalPane(), c);
+			jContentPane.add(getProposalPane(proposalText), c);
 
 			//add submit pane
 			c.gridy = 1;
@@ -93,12 +101,12 @@ public class TimedGUI extends JFrame implements ActionListener{
 		}
 		return jContentPane;
 	}
-	
-	private JPanel getProposalPane(){
+
+	private JPanel getProposalPane(String proposalText){
 		if(proposalPane == null){
 			proposalPane = new JPanel();
 			proposalPane.setLayout(new GridBagLayout());
-			
+
 			GridBagConstraints c = new GridBagConstraints();
 			c.fill = GridBagConstraints.BOTH;
 			JLabel text = new JLabel(proposalText);
@@ -106,12 +114,12 @@ public class TimedGUI extends JFrame implements ActionListener{
 		}
 		return proposalPane;
 	}
-	
+
 	private JPanel getAbortPane(){
 		if(abortPane == null){
 			abortPane = new JPanel();
 			abortPane.setLayout(new GridBagLayout());
-			
+
 			GridBagConstraints c = new GridBagConstraints();
 			c.fill = GridBagConstraints.BOTH;
 			abort = new JButton("Abort");
@@ -120,39 +128,43 @@ public class TimedGUI extends JFrame implements ActionListener{
 		}
 		return abortPane;
 	}
-	
-	 /*
-     * Coordinate methods to position JDialog in bottom right of screen
-     */
-    private int getXCoord(int width) {
-	int xCoord = 0;
-	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	double screenWidth = screenSize.getWidth();
-	Double tmp = (Double) screenWidth - width;
-	xCoord = tmp.intValue();
-	return xCoord;
-    }
 
-    private int getYCoord(int height) {
-	int yCoord = 0;
-	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	double screenHeight = screenSize.getHeight();
-	Double tmp = (Double) screenHeight - height;
-	yCoord = tmp.intValue();
-	return yCoord;
-    }
+	/*
+	 * Coordinate methods to position JDialog in bottom right of screen
+	 */
+	private int getXCoord(int width) {
+		int xCoord = 0;
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		double screenWidth = screenSize.getWidth();
+		Double tmp = (Double) screenWidth - width;
+		xCoord = tmp.intValue();
+		return xCoord;
+	}
+
+	private int getYCoord(int height) {
+		int yCoord = 0;
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		double screenHeight = screenSize.getHeight();
+		Double tmp = (Double) screenHeight - height;
+		yCoord = tmp.intValue();
+		return yCoord;
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		this.setVisible(false);
 		if(e.getSource() == abort){
-			callback.handleImpFeedback(false);
+			feedback = false;
 		}else{
-			callback.handleImpFeedback(true);
+			feedback = true;
 		}
+		submitted = true;
 	}
-	
+
 	public static void main(String[] args){
-		new TimedGUI("Starting service A", 5000, null);
+		TimedGUI gui = new TimedGUI();
+		
+		boolean result = gui.displayGUI("Starting service A", 5000);
+		System.out.println("Returned feedback: "+result);
 	}
 }
