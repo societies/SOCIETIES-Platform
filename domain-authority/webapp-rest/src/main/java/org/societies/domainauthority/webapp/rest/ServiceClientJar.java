@@ -9,7 +9,8 @@ import javax.ws.rs.QueryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Example resource class hosted at the URI path "/myresource"
+/**
+ * Class for hosting jar files for clients of 3rd party services.
  */
 @Path("/serviceclient")
 public class ServiceClientJar {
@@ -24,7 +25,7 @@ public class ServiceClientJar {
 	/**
      * Method processing HTTP GET requests, producing "application/java-archive" MIME media type.
      * 
-     * @return String that will be send back as a response of type "text/plain".
+     * @return Service client in form of jar file
      */
 	@Path("{name}.jar")
     @GET 
