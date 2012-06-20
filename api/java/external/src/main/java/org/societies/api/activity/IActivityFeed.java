@@ -98,4 +98,10 @@ public interface IActivityFeed {
 	 * @return {@link boolean} true if the the activity was found and deleted, false if not.
 	 */
 	public boolean deleteActivity(IActivity activity);
+	/**
+	 * 
+	 * @param List of ActivityEntry as used by the social data connector, and implemented by shindig.
+	 * @return long number of entries successfully imported
+	 */
+	public long importActivtyEntries(List<?> activityEntries);
 }
