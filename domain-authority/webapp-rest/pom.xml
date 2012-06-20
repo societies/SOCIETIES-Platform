@@ -88,11 +88,11 @@
 		
 		
 		
-		<!--dependency>
+		<dependency>
 			<groupId>org.objectweb.asm</groupId>
 			<artifactId>com.springsource.org.objectweb.asm</artifactId>
 			<version>3.2.0</version>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
@@ -239,6 +239,7 @@
 						<Import-Package>
 							com.sun.jersey.spi.container.servlet,
 							javax.ws.rs,
+							org.objectweb.asm,
 							*;resolution:=optional
 						</Import-Package>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
@@ -330,12 +331,12 @@
 									<version>${jersey-version}</version>
 									<type>jar</type>
 								</artifactItem>
-								<!--artifactItem>
+								<artifactItem>
 									<groupId>org.objectweb.asm</groupId>
 									<artifactId>com.springsource.org.objectweb.asm</artifactId>
 									<version>3.2.0</version>
 									<type>jar</type>
-								</artifactItem-->
+								</artifactItem>
 								<artifactItem>
 									<groupId>javax.ws.rs</groupId>
 									<artifactId>jsr311-api</artifactId>

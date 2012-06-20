@@ -31,6 +31,7 @@ public class ServiceClientJar {
 	
 	public ServiceClientJar() {
 		LOG.info("Constructor");
+		new ServiceClientJarAccess();  // TODO: remove
 	}
 	
 	/**
