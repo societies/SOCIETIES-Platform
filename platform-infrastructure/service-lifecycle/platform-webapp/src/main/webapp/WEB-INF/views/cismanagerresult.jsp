@@ -25,19 +25,36 @@ String[] methodCalledArr = (String[]) model.get("method");
 String methodCalled = methodCalledArr[0];
 %>
 
+<script language="javascript">
+function updateForm(cisId, toDo, where) {    
+	document.all.cisJid.value = cisId;
+	document.forms["cmForm"]["method"].value = toDo;
+	document.forms["cmForm"].action = where;
+	document.forms["cmForm"].submit();
+} 
+</script>
+
 <h4>${res}</h4>
 <br/>
 <br/>
    <p><b>CIS's I own or am a member of </b></p>
+
+<form id="cmForm" name="cmForm" id="cmForm" method="post" action="cismanager.html">
+<input type="hidden" name="cisJid" id="cisJid">
+<input type="hidden" name="method" id="method">
+
 	<table>
 		<tr><td><B>Name</B></td><td><B>ID</B></td></tr>
 		<xc:forEach var="record" items="${cisrecords}">
 	        <tr>
 	        	<td>${record.getName()}&nbsp;</td>
 	        	<td>${record.getCisId()}&nbsp;</td>
+	        	<td><input type="button" value="Members" onclick="updateForm('${record.getCisId()}', 'GetMemberList', 'cismanager.html')" ></td>
+	        	<td><input type="button" value="Services" onclick="updateForm('${record.getCisId()}', 'GetServices', 'servicediscovery.html')" ></td>
 	        </tr>
 	    </xc:forEach>
 	</table>	
+</form>
 
 <%
 if (methodCalled.equals("GetMemberList")) {
@@ -59,10 +76,10 @@ if (methodCalled.equals("GetMemberListRemote")) {
 	%>
 	<p>Checking with hosting CIS...</p>
 	<form id="myform" name="myform" action="cismanager.html" method="post">
-	<input type="hidden" name="method" value="RefreshRemoteMembers">
+	<input type="hidden" name="method" id="method" value="RefreshRemoteMembers">
 	</form>
 	<script language="javascript">
-	setTimeout(continueExecution, 15000) 
+	setTimeout(continueExecution, 10000); 
 	//wait ten seconds before continuing  
 	
 	function continueExecution() {    
@@ -77,10 +94,10 @@ if (methodCalled.equals("RefreshRemoteMembers")) {
     <p><b>Membership List from remote CIS:</b></p>
 	<table>
 		<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
-		<xc:forEach var="record" items="${remoteCommunity.getWho().getParticipant()}">
+		<xc:forEach var="record" items="${memberRecords}">
 	        <tr>
-	        	<td>${record.getMembersJid()}&nbsp;</td>
-	        	<td>${record.getMembershipType()}&nbsp;</td>
+	        	<td>${record.getJid()}&nbsp;</td>
+	        	<td>${record.getRole().toString()}&nbsp;</td>
 	        </tr>
 	    </xc:forEach>
 	</table>

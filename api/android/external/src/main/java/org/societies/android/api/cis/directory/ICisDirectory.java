@@ -28,6 +28,7 @@ package org.societies.android.api.cis.directory;
  * @author Babak.Farshchian@sintef.no
  *
  */
+@Deprecated
 public interface ICisDirectory {
 	/*
 	 * Various search methods that return an array of CISAdvertisementRecords.

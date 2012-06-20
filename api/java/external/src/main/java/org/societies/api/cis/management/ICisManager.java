@@ -121,6 +121,13 @@ public interface ICisManager {
 	public List<ICisOwned> getListOfOwnedCis();
 
 	
+	/**
+	 * retrieves the list of CISs in which I joined 
+	 * 
+	 * @return list of {@link ICis}
+	 */
+	public List<ICis> getRemoteCis();
+
 	
 	
 	/**

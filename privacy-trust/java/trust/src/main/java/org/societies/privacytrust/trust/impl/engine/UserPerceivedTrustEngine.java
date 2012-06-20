@@ -38,7 +38,6 @@ import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
-import org.societies.privacytrust.trust.api.model.ITrust;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
@@ -74,30 +73,27 @@ public class UserPerceivedTrustEngine extends TrustEngine {
 	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCss, java.util.Set)
 	 */
 	@Override
-	public ITrust evaluate(ITrustedCss css, Set<ITrustEvidence> evidenceSet)
+	public void evaluate(ITrustedCss css, Set<ITrustEvidence> evidenceSet)
 			throws TrustEngineException {
 		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/*
 	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCis, java.util.Set)
 	 */
 	@Override
-	public ITrust evaluate(ITrustedCis cis, Set<ITrustEvidence> evidenceSet)
+	public void evaluate(ITrustedCis cis, Set<ITrustEvidence> evidenceSet)
 			throws TrustEngineException {
 		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/*
 	 * @see org.societies.privacytrust.trust.api.engine.ITrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedService, java.util.Set)
 	 */
 	@Override
-	public ITrust evaluate(ITrustedService service,
+	public void evaluate(ITrustedService service,
 			Set<ITrustEvidence> evidenceSet) throws TrustEngineException {
 		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	private class CssUserPerceivedTrustEngine implements Runnable {

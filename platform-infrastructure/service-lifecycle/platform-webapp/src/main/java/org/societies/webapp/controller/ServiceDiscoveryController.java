@@ -114,7 +114,7 @@ public class ServiceDiscoveryController {
 				services = asynchResult.get();
 				model.put("services", services);
 				
-			}else if (method.equalsIgnoreCase("GetServices")) {
+			} else if (method.equalsIgnoreCase("GetServices")) {
 				
 				asynchResult=this.getSDService().getServices(node);
 				res="ServiceDiscovery Result for Node : [" + node + "]";
@@ -122,7 +122,15 @@ public class ServiceDiscoveryController {
 				services = asynchResult.get();
 				model.put("services", services);
 					
-			}else{
+			} else if (method.equalsIgnoreCase("GetServicesCis")) {
+				
+				asynchResult=this.getSDService().getServices(node);
+				res="ServiceDiscovery Result for Node : [" + node + "]";
+					
+				services = asynchResult.get();
+				model.put("services", services);
+					
+			} else{
 				res="error unknown metod";
 			}
 		
