@@ -89,8 +89,14 @@ public class DirectTrustEngine extends TrustEngine {
 			if (TrustEvidenceType.RATED.equals(evidence.getType())) {
 				newValue = (Double) evidence.getInfo();
 			}
+			else {
+				LOG.warn("Ignoring evidence " + evidence);
+			}
 		}
 		css.getDirectTrust().setValue(newValue);
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluated direct trust for entity '" + css.getTeid()
+					+ "':" + css.getDirectTrust());
 	}
 
 	/*
