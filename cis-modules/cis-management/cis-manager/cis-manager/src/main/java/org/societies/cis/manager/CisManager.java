@@ -127,9 +127,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		Session session = sessionFactory.openSession();
 		try{
 			this.ownedCISs = session.createCriteria(Cis.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
-			Criteria crit = session.createCriteria(CisSubscribedImp.class);
-			crit.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-			this.subscribedCISs = crit.list();
+			this.subscribedCISs = session.createCriteria(CisSubscribedImp.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+
 			LOG.info("Nb of subscri CIS is " + this.subscribedCISs.size());
 		}catch(Exception e){
 			LOG.error("CISManager startup queries failed..");
@@ -352,7 +351,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public boolean subscribeToCis(CisRecord i) {
 
 		if(! this.subscribedCISs.contains(new Cis(i))){
-			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisJID()));
+			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getMembershipCriteria(),i.getCisName(), i.getCisJID()));			
 			this.subscribedCISs.add(csi);
 			this.persist(csi);
 			return true;
@@ -557,7 +556,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating getSubscribedTo notifications
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()));
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCisMembershipMode(), c.getNotification().getSubscribedTo().getCisName(), c.getNotification().getSubscribedTo().getCisJid()));
+				
+				
 				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){
 						LOG.info("CIS is already part of the list of subscribed CISs");
 					}

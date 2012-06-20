@@ -704,6 +704,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 				j.setResult(addresult);
 				p.setJid(jid);
 				result.setCommunityJid(this.getCisId()); 
+				result.setCommunityName(this.getName());
+				result.setCommunityType(this.cisType);
+				result.setMembershipMode(this.getMembershipCriteria());
 								
 				if(addresult == true){
 					// information sent on the xmpp just in the case of success
