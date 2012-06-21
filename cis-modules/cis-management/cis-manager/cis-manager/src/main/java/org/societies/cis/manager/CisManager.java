@@ -68,9 +68,11 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
@@ -112,15 +114,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
 	ICisDirectoryRemote iCisDirRemote;
-	
+
 	IServiceDiscoveryRemote iServDiscRemote;
 	IServiceControlRemote iServCtrlRemote;
-	
-	
-//	IPrivacyPolicyManager polManager;
-	
+//	private IPrivacyPolicyManager privacyPolicyManager;
 
 
+	
 	public void startup(){
 		//ActivityFeed ret = null;
 	
@@ -277,6 +277,47 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			return new AsyncResult<ICisOwned>(i);
 		
 	}
+	
+//	@Override
+//	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy) {
+//		ICisOwned cisOwned = null;
+//		try {
+//			// -- Retrieve the CSS owner identity
+//			IIdentity cssOwnerId = iCommMgr.getIdManager().fromJid(cssId);
+//			
+//			// -- Create the CIS	
+//			cisOwned = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode);
+//			if (null == cisOwned) {
+//				LOG.info("This CIS has not been created, neither its privacy policy");
+//				return new AsyncResult<ICisOwned>(null);
+//			}
+//			
+//			// -- Store this CIS Privacy Policy
+//			// Retrieve the CSS and CIS identities
+//			IIdentity cisId = iCommMgr.getIdManager().fromJid(cisOwned.getCisId());
+//			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisId);
+//			
+//			// Store this CIS Privacy Policy
+//			privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);
+//		} catch (PrivacyException e) {
+//			LOG.info("The privacy policy can't be stored.", e);
+//			if (null != cisOwned) {
+//				deleteCis(cssId, cssPassword, cisOwned.getCisId());
+//			}
+//			LOG.info("CIS deleted.");
+//			return new AsyncResult<ICisOwned>(null);
+//		} catch (InvalidFormatException e) {
+//			LOG.info("The CSS or CIS identities can't be retrieved.", e);
+//			if (null != cisOwned) {
+//				deleteCis(cssId, cssPassword, cisOwned.getCisId());
+//			}
+//			LOG.info("CIS deleted.");
+//			return new AsyncResult<ICisOwned>(null);
+//		}
+//		
+//		// -- Return the CIS
+//		return new AsyncResult<ICisOwned>(cisOwned);
+//	}
 	
 	
 	
@@ -937,5 +978,36 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//this.ccmFactory.
 	}
 
-
+	
+//	/* ***********************************
+//	 *         Dependency Injection      *
+//	 *************************************/
+//	
+//	/**
+//	 * @param privacyPolicyManager the privacyPolicyManager to set
+//	 */
+//	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+//		this.privacyPolicyManager = privacyPolicyManager;
+//		LOG.info("[Dependency Injection] IPrivacyPolicyManager injected");
+//	}
+//	
+//	
+//	private boolean isDepencyInjectionDone() {
+//		return isDepencyInjectionDone(0);
+//	}
+//	private boolean isDepencyInjectionDone(int level) {
+//		if (null == privacyPolicyManager) {
+//			LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
+//			return false;
+//		}
+//		if (null == iCommMgr) {
+//			LOG.info("[Dependency Injection] Missing ICommManager");
+//			return false;
+//		}
+//		if (null == iCommMgr.getIdManager()) {
+//			LOG.info("[Dependency Injection] Missing IIdentityManager");
+//			return false;
+//		}
+//		return true;
+//	}
 }
