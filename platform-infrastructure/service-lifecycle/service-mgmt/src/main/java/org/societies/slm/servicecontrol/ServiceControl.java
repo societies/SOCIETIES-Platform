@@ -1070,6 +1070,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						
 						if(result.getMessage() == ResultMessage.SUCCESS){
 
+							// Don't think this makes sense or is needed... should you be able to remove a service that isn't your from a remote CIS?!
 							if(!ServiceModelUtils.isServiceOurs(ourService, getCommMngr())){
 								if(logger.isDebugEnabled())
 									logger.debug("Service isn't ours, removing it from the service repository!");

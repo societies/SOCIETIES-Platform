@@ -270,6 +270,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
+						
+						if(log.isDebugEnabled()) log.debug("location: " +serBndl.getLocation());
 						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
 						
 						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
