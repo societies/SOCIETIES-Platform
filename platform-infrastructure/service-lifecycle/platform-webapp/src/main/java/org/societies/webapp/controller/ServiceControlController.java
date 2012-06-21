@@ -312,6 +312,24 @@ public class ServiceControlController {
 				res = scresult.getMessage().toString();
 				returnPage = "servicediscoveryresult";
 	
+			} else if (method.equalsIgnoreCase("Install3PService")){
+				
+				if(logger.isDebugEnabled()) logger.debug("Install3PService:" + serviceId);
+
+				//GENERATE SERVICE OBJECT
+				Future<Service> asyncService = this.getSDService().getService(serviceId);
+				Service serviceToInstall = asyncService.get();
+				//SHARE SERVICE
+				asynchResult = this.getSCService().installService(serviceToInstall);
+				scresult = asynchResult.get();
+				//GET REMOTE SERVICES
+				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
+				List<Service> cisServices = asynchServices.get();
+				model.put("cisservices", cisServices);
+
+				res = scresult.getMessage().toString();
+				returnPage = "servicediscoveryresult";
+	
 			} else {
 				res="error unknown metod";
 			}
