@@ -33,6 +33,13 @@ package org.societies.api.css.devicemgmt.model;
 public class DeviceMgmtConstants {
 	
 	
+	
+	/**
+	 * Unique Identifier of a css node to which a device is connected. Visible globally in the Societies Platform
+	 * this constant is to be used to get or set device service node id property
+	 * @value "deviceId"
+	 */
+	public static final String DEVICE_NODE_ID = "deviceNodeId";
 
 	/**
 	 * Unique Identifier of a device. Visible globally in the Societies Platform

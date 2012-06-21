@@ -22,65 +22,44 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.societies.api.css.devicemgmt;
-
-import java.util.Dictionary;
-import java.util.List;
-
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+package org.societies.api.internal.css.devicemgmt;
 
 /**
- * Interface used to invoke action in a device 
- * @author Rafik (Trialog)
+ * Internal interface used to let a user to control access to a its devices. enable/disable, share/unshare
+ *
+ * @author Rafik
  *
  */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface IAction {
+public interface IDeviceControl {
+	
+
+	/**
+	 * Method used to enable a device.This will give a full access to the device
+	 * @param nodeId
+	 * @param deviceId
+	 */
+	void enable(String nodeId, String deviceId);
+	
+
+	/**
+	 * Method used to disable a device.This will forbid the access to the device.
+	 * @param nodeId
+	 * @param deviceId
+	 */
+	public void disable(String nodeId, String deviceId);
 	
 	/**
 	 * 
-	 * @return a list of action input arguments
+	 * @param nodeId
+	 * @param deviceId
 	 */
-	public List<String> getInputArgumentNames();
+	public void share(String nodeId, String deviceId);
 	
 	/**
 	 * 
-	 * @return A string that will be used to get and/or invoke the action.
+	 * @param nodeId
+	 * @param deviceId
 	 */
-	public String getName();
-	
-	/**
-	 * 
-	 * @return a list of action output arguments
-	 */
-	public List <String> getOutputArgumentNames();
-	
-	/**
-	 * 
-	 * @param argumentName: the name of the state variable
-	 * @return a device state variable
-	 */
-	public IDeviceStateVariable getStateVariable (String argumentName);
-	
-	/**
-	 * 
-	 * @param arguments
-	 * @return 
-	 */
-	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments);
-	
-	/**
-	 * 
-	 * @return Humane readable action description
-	 */
-	public String getActionDescription();
-	
-	/**
-	 * 
-	 * @return Humane readable action name
-	 */
-	public String getActionName();
+	public void unshare(String nodeId, String deviceId);
 
 }

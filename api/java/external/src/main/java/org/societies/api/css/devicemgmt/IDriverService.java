@@ -67,6 +67,20 @@ public interface IDriverService {
      * 
      * @return driver device service id
      */
-    public String getId ();
+    public String getDriverServiceName ();
+    
+    /**
+     * 
+     * @return Humane readable service description
+     */
+    public String getServiceDescription();
+    
+    /**
+     * 
+     * @return Humane readable name of the service
+     */
+    public String getName();
+    
+    
     
 }

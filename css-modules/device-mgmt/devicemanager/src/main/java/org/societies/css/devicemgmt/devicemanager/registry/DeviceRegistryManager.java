@@ -22,65 +22,37 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.css.devicemgmt.devicemanager.registry;
 
-package org.societies.api.css.devicemgmt;
-
-import java.util.Dictionary;
-import java.util.List;
-
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.societies.api.internal.css.devicemgmt.IDeviceManagerRegistry;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 /**
- * Interface used to invoke action in a device 
- * @author Rafik (Trialog)
+ * Describe your class here...
+ *
+ * @author Rafik
  *
  */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface IAction {
+public class DeviceRegistryManager /*implements IDeviceManagerRegistry*/ {
+	
+	
 	
 	/**
-	 * 
-	 * @return a list of action input arguments
+	 * This method is used to register a new device to the registry or to update an existing device information
 	 */
-	public List<String> getInputArgumentNames();
-	
-	/**
-	 * 
-	 * @return A string that will be used to get and/or invoke the action.
-	 */
-	public String getName();
-	
-	/**
-	 * 
-	 * @return a list of action output arguments
-	 */
-	public List <String> getOutputArgumentNames();
-	
-	/**
-	 * 
-	 * @param argumentName: the name of the state variable
-	 * @return a device state variable
-	 */
-	public IDeviceStateVariable getStateVariable (String argumentName);
-	
-	/**
-	 * 
-	 * @param arguments
-	 * @return 
-	 */
-	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments);
-	
-	/**
-	 * 
-	 * @return Humane readable action description
-	 */
-	public String getActionDescription();
-	
-	/**
-	 * 
-	 * @return Humane readable action name
-	 */
-	public String getActionName();
+	public void registerDevice(String nodeId, DeviceCommonInfo deviceCommonInfo) {
+			
 
+	}
+	
+	
+	/**
+	 * This method is used to unregister a device from the registry
+	 */
+	public void unregisterDevice(String nodeId, String deviceId) {
+
+	}
+	
+
+	
 }
