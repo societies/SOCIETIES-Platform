@@ -50,14 +50,14 @@ import org.springframework.stereotype.Controller;
  * @author Mitja Vardjan
  *
  */
-@Controller
+//@Controller
 public class ServiceClientJarAccess implements IClinetJarServer {
 
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJarAccess.class);
 
 	private static HashMap<String, List<String>> keys = new HashMap<String, List<String>>();
 
-	@Autowired
+//	@Autowired
 	private ICommManager commMgr;
 
 	public ServiceClientJarAccess() {

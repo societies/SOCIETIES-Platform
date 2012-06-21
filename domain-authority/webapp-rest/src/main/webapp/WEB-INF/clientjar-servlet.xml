@@ -27,6 +27,7 @@
 	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:ctx="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
@@ -38,15 +39,29 @@
            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
            http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
            http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
-           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+            "
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+            >
 
 	<!-- Configures the annotation-driven Spring MVC Controller programming model -->
-	<mvc:annotation-driven />	
+	<!--mvc:annotation-driven /-->	
+
+	<context:annotation-config />
+	<context:component-scan base-package="org.societies.domainauthority.rest.control" />
+	
+	<!-- Required for Async processing -->
+	<tx:annotation-driven />
 
 	<!-- Scans the classpath for annotated components that will be auto-registered as Spring beans. -->
-	<ctx:component-scan base-package="org.societies.domainauthority.rest.control" />
+	<!--ctx:component-scan base-package="org.societies.domainauthority.rest.control" /-->
 	
-	<bean id="ServiceClientJarAccess"
+	<bean id="clientJar"
 		class="org.societies.domainauthority.rest.control.ServiceClientJarAccess"
 		depends-on="CommManagerBundle"
   		init-method="init"
