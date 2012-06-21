@@ -312,9 +312,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		try {
 			CISendpoint.register(this);
-			//iServCtrlRemote.registerCISEndpoint(CISendpoint);
-//			CISendpoint.register((IFeatureServer) iServCtrlRemote);
-//			CISendpoint.register((IFeatureServer) iServDiscRemote);
+			iServCtrlRemote.registerCISEndpoint(CISendpoint);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 			LOG.info("could not start comm manager!");
