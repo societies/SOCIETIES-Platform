@@ -14,6 +14,8 @@ import org.societies.api.identity.InvalidFormatException;
 
 public class IdentityManagerImpl implements IIdentityManager {
 	
+	public static final String CIS_PREFIX = "cis-";
+
 	private static Logger LOG = LoggerFactory
 			.getLogger(IdentityManagerImpl.class);
 	
@@ -57,8 +59,13 @@ public class IdentityManagerImpl implements IIdentityManager {
 //				LOG.info("JID="+jid+";richParts.length="+richParts.length);
 				int firstDotIndex = jid.indexOf(".");
 				String domain = jid.substring(firstDotIndex+1);
-				if (checkDomainNameFormat(domain))
-					return new NetworkNodeImpl(IdentityType.CSS_RICH, jid.substring(0,firstDotIndex), domain,"rich");
+				if (checkDomainNameFormat(domain)) {
+					String identifier = jid.substring(0,firstDotIndex);
+					if (identifier.startsWith(CIS_PREFIX))
+						return new IdentityImpl(IdentityType.CIS, identifier, domain);
+					else
+						return new NetworkNodeImpl(IdentityType.CSS_RICH, identifier, domain,"rich");
+				}
 				break;
 			case 2:
 				return new IdentityImpl(IdentityType.CSS, parts[0], parts[1]);
