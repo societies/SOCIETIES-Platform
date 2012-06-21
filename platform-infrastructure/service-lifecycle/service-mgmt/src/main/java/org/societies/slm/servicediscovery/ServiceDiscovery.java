@@ -34,6 +34,8 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
@@ -63,7 +65,15 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
 	private IServiceDiscoveryRemote serviceDiscoveryRemote;
-
+	private ICisManager cisManager;
+	
+	public ICisManager getCisManager(){
+		return cisManager;
+	}
+	
+	public void setCisManager(ICisManager cisManager){
+		this.cisManager = cisManager;
+	}
 	
 	/**
 	 * @return the commMngr
@@ -185,9 +195,29 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		if(logger.isDebugEnabled())
 			logger.debug("getServices(Identity node) for node: " + node.getJid());
 		
+		boolean myNode;
+		INetworkNode currentNode = commMngr.getIdManager().getThisNetworkNode();
+		if (!currentNode.getJid().contentEquals(node.getJid()))
+			myNode = false;
+		else
+			myNode = true;
+		
 		try
 		{
-			
+			// Is it our node? If so, local search
+			if(myNode){
+				if(logger.isDebugEnabled())
+					logger.debug("We're dealing with our own node!");
+				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
+			} else{
+				//Is it one of my CIS? If so, local search
+				ICisOwned myCis = getCisManager().getOwnedCis(node.getJid());
+				if(myCis != null){
+					if(logger.isDebugEnabled()) logger.debug("We're dealing with our CIS! Local search!");
+					serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());			
+				} 
+			}
+			/*
 			switch (node.getType())
 			{
 			case CSS:
@@ -197,12 +227,17 @@ public class ServiceDiscovery implements IServiceDiscovery {
 				break;
 			case CIS:
 				if(logger.isDebugEnabled()) logger.debug("Retrieving services of a CIS");
-				serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());			
+				ICisOwned myCis = getCisManager().getOwnedCis(node.getJid());
+				if(myCis != null){
+					if(logger.isDebugEnabled()) logger.debug("We're dealing with our CIS! Local search!");
+					serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());			
+				}
 				break;
 			default: 
 				logger.warn("Unknown node!");
 				break;
-			} 
+			}
+			*/
 		}catch (ServiceRetrieveException e)	{
 
 			//TODO Auto-generated catch block
@@ -219,9 +254,9 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			if(logger.isDebugEnabled())
 				logger.debug("No services retrieved from local node...");
 			
-			IIdentity currentNode = commMngr.getIdManager().getThisNetworkNode();
+			//IIdentity currentNode = commMngr.getIdManager().getThisNetworkNode();
 			
-			if (!currentNode.getJid().contentEquals(node.getJid()))
+			if (!myNode)
 			{
 				
 				if(logger.isDebugEnabled())

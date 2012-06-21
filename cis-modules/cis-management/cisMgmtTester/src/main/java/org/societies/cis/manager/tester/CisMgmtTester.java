@@ -105,14 +105,6 @@ public class CisMgmtTester {
 		public JoinCallBack(ICisManager cisClient){
 			this.cisClient = cisClient;
 		}
-		
-		public void receiveResult(boolean result){
-			LOG.info("boolean return on CIS Mgmgt tester");
-		}; 
-
-		public void receiveResult(int result) {;};
-		
-		public void receiveResult(String result){;}
 
 		public void receiveResult(Community communityResultObject) {
 			 
@@ -167,14 +159,7 @@ public class CisMgmtTester {
 	
 	public class GetInfoCallBack implements ICisManagerCallback{
 		
-		
-		public void receiveResult(boolean result){
-			LOG.info("boolean return on CIS Mgmgt tester");
-		}; 
 
-		public void receiveResult(int result) {;};
-		
-		public void receiveResult(String result){;}
 
 		public void receiveResult(Community communityResultObject) {
 			if(communityResultObject == null){
@@ -195,13 +180,7 @@ public class CisMgmtTester {
 	public class GetListMembersCallBack implements ICisManagerCallback{
 		
 		
-		public void receiveResult(boolean result){
-			LOG.info("boolean return on GetListMembersCallBack");
-		}; 
-
-		public void receiveResult(int result) {;};
-		
-		public void receiveResult(String result){;}
+	
 
 		public void receiveResult(Community communityResultObject) {
 			if(communityResultObject == null){

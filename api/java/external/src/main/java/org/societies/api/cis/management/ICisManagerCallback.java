@@ -36,13 +36,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICisManagerCallback {
 
-	
-	void receiveResult(boolean result); 
 
-	void receiveResult(int result); 
-	
-	void receiveResult(String result);
-	
 	void receiveResult(Community communityResultObject );
 
 	

@@ -45,7 +45,28 @@ public final class SocialContract {
     	
     }
     /**
-     * Class that defines constants related to CISs.
+     * Class that defines a pointer (record) to a CIS that I own or am member of.
+     * The CIS itself can be retrieved from Community using GLOBAL_ID that
+     * you get here. MyCommunity gives you a list of CIS records that you
+     * are a member of. You can use this list to look up the actual CIS in 
+     * Community. 
+     * 
+     * @author Babak.Farshchian@sintef.no
+     *
+     */
+    public static final class MyCommunity {
+        public static final Uri CONTENT_URI = 
+                    Uri.parse("content://org.societies.android.platform.cis/me/communities");
+        public static final String _ID = "_id"; //Key local ID
+        public static final String GLOBAL_ID = "global_id"; //Global ID for the community, e.g. JID
+        public static final String OWNER_ID = "owner"; //Person who owns the community
+        public static final String DISPLAY_NAME = "display_name"; //Name of the community to be shown to the user
+    }
+    /**
+     * Class that stores metadata about CISs, both those I am
+     * a member of and those I am not a member of. Use MyCommunity
+     * to find out which CISs you are a member of, then look the CIS
+     * up in this table.
      * 
      * @author Babak.Farshchian@sintef.no
      *
