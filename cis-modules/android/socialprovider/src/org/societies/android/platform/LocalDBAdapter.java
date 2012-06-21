@@ -232,19 +232,21 @@ public class LocalDBAdapter implements ISocialAdapter {
 	protected int updateMe(ContentValues values) {
 		//Always update first row.
 		//TODO: Fix this.
-		String[] args = {"1"};
-		return db.update(ME_TABLE_NAME, values, SocialContract.Me._ID + " LIKE ?", args);
+		db = dbHelper.getWritableDatabase();
+		return db.update(ME_TABLE_NAME, values, SocialContract.Me._ID + "=1", null);
 	}
 
 	protected int updateMyCommunities(ContentValues values, String selection,
 			String[] selectionArgs) {
 		// TODO Auto-generated method stub
+		db = dbHelper.getWritableDatabase();
 		return db.update(MY_COMMUNITIES_TABLE_NAME, values, selection, selectionArgs);
 	}
 
 	protected int updateCommunities(ContentValues values, String selection,
 			String[] selectionArgs) {
 		// TODO Auto-generated method stub
+		db = dbHelper.getWritableDatabase();
 		return db.update(COMMUNITIES_TABLE_NAME, values, selection, selectionArgs);
 	}
 
@@ -286,12 +288,14 @@ public class LocalDBAdapter implements ISocialAdapter {
 		return false;
 	}
 	
-	public int connect(){
+	public int connect() throws SQLiteException{
+		//TODO: try not to keep the DB open. just test getWritable here. then let methods open and close.
 		try{
 			db = dbHelper.getWritableDatabase();
 			return 1;
 		} catch (SQLiteException ex){
-			return android.util.Log.e("XXXXXXXXXXXXXXX", ex.getMessage());
+			throw ex;
+			//return android.util.Log.e("XXXXXXXXXXXXXXX", ex.getMessage());
 		}
 
 	}
