@@ -21,5 +21,9 @@
 		<osgi:reference id="CisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote"/>
 		<osgi:reference id="dataSource" interface="javax.sql.DataSource"/>
 	 <!--<osgi:reference id="PrivacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"/>-->	
+	
+	
+	<osgi:reference id="servDiscRemote" interface="org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote"/>
+	<osgi:reference id="servCtrlRemote" interface="org.societies.api.internal.servicelifecycle.IServiceControlRemote"/>
 		
 </beans>

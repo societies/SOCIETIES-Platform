@@ -48,6 +48,7 @@ public class ServiceImplementationDAO {
 	private String serviceNameSpace;
 	private String serviceProvider;
 	private String serviceVersion;
+	private String serviceClient;
 	
 	/**
 	 
@@ -56,12 +57,13 @@ public class ServiceImplementationDAO {
 	 * @param serviceVersion
 	 */
 	public ServiceImplementationDAO( String serviceNameSpace,
-			String serviceProvider, String serviceVersion) {
+			String serviceProvider, String serviceVersion, String serviceClient) {
 		super();
 		
 		this.serviceNameSpace = serviceNameSpace;
 		this.serviceProvider = serviceProvider;
 		this.serviceVersion = serviceVersion;
+		this.serviceClient = serviceClient;
 	}
 	/**
 	 * 
@@ -90,6 +92,13 @@ public class ServiceImplementationDAO {
 	}
 	public void setServiceVersion(String serviceVersion) {
 		this.serviceVersion = serviceVersion;
+	}
+	@Column(name = "ServiceClient")
+	public String getServiceClient() {
+		return serviceClient;
+	}
+	public void setServiceClient(String serviceClient) {
+		this.serviceClient = serviceClient;
 	}
 	@Id
 	@GeneratedValue

@@ -34,6 +34,8 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
@@ -42,9 +44,11 @@ import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -61,7 +65,16 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
 	private IServiceDiscoveryRemote serviceDiscoveryRemote;
-
+	private ICisManager cisManager;
+	
+	public ICisManager getCisManager(){
+		return cisManager;
+	}
+	
+	public void setCisManager(ICisManager cisManager){
+		this.cisManager = cisManager;
+	}
+	
 	/**
 	 * @return the commMngr
 	 */
@@ -182,11 +195,31 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		if(logger.isDebugEnabled())
 			logger.debug("getServices(Identity node) for node: " + node.getJid());
 		
+		boolean myNode;
+		boolean myCIS = false;
+		INetworkNode currentNode = commMngr.getIdManager().getThisNetworkNode();
+		if (!currentNode.getJid().contentEquals(node.getJid()))
+			myNode = false;
+		else
+			myNode = true;
+		
 		try
 		{
-			//Object filter = "*.*"; //placeholder for a filter to all
-			Service filter=new Service();
-			
+			// Is it our node? If so, local search
+			if(myNode){
+				if(logger.isDebugEnabled())
+					logger.debug("We're dealing with our own node!");
+				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
+			} else{
+				//Is it one of my CIS? If so, local search
+				ICisOwned localCis = getCisManager().getOwnedCis(node.getJid());
+				if(localCis != null){
+					if(logger.isDebugEnabled()) logger.debug("We're dealing with our CIS! Local search!");
+					serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
+					myCIS = true;
+				}
+			}
+			/*
 			switch (node.getType())
 			{
 			case CSS:
@@ -194,10 +227,19 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			case CSS_LIGHT:
 				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
 				break;
-			default: 
-				serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
+			case CIS:
+				if(logger.isDebugEnabled()) logger.debug("Retrieving services of a CIS");
+				ICisOwned myCis = getCisManager().getOwnedCis(node.getJid());
+				if(myCis != null){
+					if(logger.isDebugEnabled()) logger.debug("We're dealing with our CIS! Local search!");
+					serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());			
+				}
 				break;
-			} 
+			default: 
+				logger.warn("Unknown node!");
+				break;
+			}
+			*/
 		}catch (ServiceRetrieveException e)	{
 
 			//TODO Auto-generated catch block
@@ -214,9 +256,9 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			if(logger.isDebugEnabled())
 				logger.debug("No services retrieved from local node...");
 			
-			IIdentity currentNode = commMngr.getIdManager().getThisNetworkNode();
+			//IIdentity currentNode = commMngr.getIdManager().getThisNetworkNode();
 			
-			if (!currentNode.getJid().contentEquals(node.getJid()))
+			if (!myNode && !myCIS)
 			{
 				
 				if(logger.isDebugEnabled())
@@ -248,6 +290,136 @@ public class ServiceDiscovery implements IServiceDiscovery {
 				
 		return new AsyncResult<List<Service>>(serviceList);
 
+	}
+
+	@Override
+	public Future<Service> getService(ServiceResourceIdentifier serviceId)
+			throws ServiceDiscoveryException {
+
+		if(logger.isDebugEnabled())
+			logger.debug("Service Discovery::getService()");
+			
+		Service result = null;
+		try{
+			// First we check the local repository
+			result = getServiceReg().retrieveService(serviceId);
+
+			// Did we find it there?
+			if(result == null){
+				if(logger.isDebugEnabled()) 
+					logger.debug("Didn't find service on local repository, now checking if it's a remote service!");
+				
+				String myLocalJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+				String serviceJid = ServiceModelUtils.getJidFromServiceIdentifier(serviceId);
+				
+				// Is it supposed to be local?
+				if(!myLocalJid.equals(serviceJid)){
+					
+					if(logger.isDebugEnabled())
+						logger.debug("It's a remote service from node: " + serviceJid);
+					
+					INetworkNode node = getCommMngr().getIdManager().fromFullJid(serviceJid);
+
+					// We call the other network node to get the information on the service
+					ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
+					getServiceDiscoveryRemote().getService(serviceId, node, callback);
+					List<Service> resultList = callback.getResultList();
+					
+					// Only one service should be returned. If not, we're dealing with some sort of problem
+					if(resultList.size() == 1){
+						result = resultList.get(0);
+						if(logger.isDebugEnabled()) logger.debug("Found service remotely!");
+					}
+					
+				}
+				
+			}
+			
+		} catch(Exception ex){
+			ex.printStackTrace();
+			logger.error("getService():: Exception getting Service: " + ex);
+			throw new ServiceDiscoveryException("getService():: Exception getting Service",ex);
+		}
+			
+		if(result == null)
+			return null;
+		else
+			return new AsyncResult<Service>(result);
+
+	}
+
+	@Override
+	public Future<List<Service>> searchServices(Service filter)
+			throws ServiceDiscoveryException {
+		
+		if(logger.isDebugEnabled()) logger.debug("Searching local repository for a given service");
+		
+		List<Service> result;
+		
+		try{
+		
+			result = getServiceReg().findServices(filter);
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Found "+ result.size() + " services that fulfill the criteria"); 
+			
+		} catch(Exception ex){
+			ex.printStackTrace();
+			logger.error("Searching for services: Exception! : " + ex);
+			throw new ServiceDiscoveryException("Exception while searching for services",ex);
+		}
+		
+		return new AsyncResult<List<Service>>(result);
+	}
+
+	@Override
+	public Future<List<Service>> searchServices(Service filter, IIdentity node)
+			throws ServiceDiscoveryException {
+
+		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + node.getJid());
+		List<Service> result = new ArrayList<Service>();
+		
+		try{
+				
+			String myLocalJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+			
+			if(myLocalJid.equals(node.getJid())){
+				if(logger.isDebugEnabled()) logger.debug("It's the local node, so we do a local call");
+				return searchServices(filter);
+			}
+			
+			if(logger.isDebugEnabled()) logger.debug("Trying to query the remote node...");
+			
+			ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
+			getServiceDiscoveryRemote().searchService(filter, node, callback);
+			result = callback.getResultList();
+		
+		} catch(Exception ex){
+			ex.printStackTrace();
+			logger.error("Exception while searching for services!");
+			throw new ServiceDiscoveryException("Exception while searching for services!",ex);
+		}
+		
+		return new AsyncResult<List<Service>>(result);
+	}
+
+	@Override
+	public Future<List<Service>> searchServices(Service filter, String jid)
+			throws ServiceDiscoveryException {
+		
+		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + jid);
+
+		try {
+			
+			INetworkNode node = getCommMngr().getIdManager().fromFullJid(jid);
+			return searchServices(filter,node);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error("Searching for services: Exception! : " + ex);
+			throw new ServiceDiscoveryException("Exception while searching for services!",ex);
+		}
+			
 	}
 
 

@@ -27,6 +27,7 @@ package org.societies.android.api.cis.management;
  * @author Babak.Farshchian@sintef.no
  *
  */
+@Deprecated
 public interface ICisManager {
 	/**
 	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the

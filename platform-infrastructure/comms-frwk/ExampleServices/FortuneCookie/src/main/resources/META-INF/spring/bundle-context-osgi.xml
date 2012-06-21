@@ -16,6 +16,7 @@
 			<entry key="TargetPlatform" value="SOCIETIES" />
 			<entry key="ServiceProvider" value="ICT-SOCIETIES" />			
 			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
+			<entry key="ServiceClient" value="http://societies.local/client.jar" />
 		</osgi:service-properties>
 	</osgi:service>
 
@@ -24,5 +25,7 @@
 		<property name="authorSignature" value="aleckey" />
 		<property name="serviceDescription" value="Fortune Cookie service offering your fortune" />
 		<property name="serviceName" value="FortuneCookie Service" />
+		<property name="serviceType" value="THIRD_PARTY_SERVER" />
+		<property name="privacyPolicy" value="http://societies.local/local_file" />
 	</bean>
 </beans>

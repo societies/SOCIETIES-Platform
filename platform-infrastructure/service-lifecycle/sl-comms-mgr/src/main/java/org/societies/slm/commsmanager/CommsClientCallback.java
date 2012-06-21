@@ -122,6 +122,7 @@ public class CommsClientCallback implements ICommCallback {
 			ServiceDiscoveryResultBean serviceDiscoveryResult = (ServiceDiscoveryResultBean) msgBean;
 			
 			IServiceDiscoveryCallback serviceDiscoveryClient = getRequestingClient(returnStanza.getId());
+				
 			serviceDiscoveryClient.getResult(serviceDiscoveryResult.getServices());	
 		} 
 		

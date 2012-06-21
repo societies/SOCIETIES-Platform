@@ -13,9 +13,11 @@
        testing of the bundle outside of an OSGi container -->
        
        
-       <osgi:service ref="DeviceManager" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager" />
+		<osgi:service ref="DeviceManager" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager" />
 
 		<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+		
+		<osgi:reference id="DeviceCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager"/>
        
        
        <!-- <osgi:service ref="DeviceManager">	

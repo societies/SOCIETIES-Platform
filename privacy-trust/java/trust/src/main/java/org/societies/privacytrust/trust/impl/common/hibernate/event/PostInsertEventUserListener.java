@@ -28,7 +28,6 @@ import org.hibernate.event.PostInsertEvent;
 import org.hibernate.event.PostInsertEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
@@ -71,14 +70,13 @@ public class PostInsertEventUserListener implements PostInsertEventListener {
 		
 		if (event.getEntity() instanceof TrustEvidence) {
 			
-			final TrustedEntityId teid = ((TrustEvidence) event.getEntity()).getTeid();
 			final String topic;
 			if (event.getEntity() instanceof DirectTrustEvidence)
 				topic = TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED;
 			else // if (event.getEntity() instanceof IndirectTrustEvidence)
 				topic = TrustEventTopic.INDIRECT_TRUST_EVIDENCE_UPDATED;
 			final TrustEvidenceUpdateEvent trustEvidenceUpdateEvent = 
-					new TrustEvidenceUpdateEvent(teid);
+					new TrustEvidenceUpdateEvent((TrustEvidence) event.getEntity());
 			if (LOG.isDebugEnabled())
         		LOG.debug("Posting TrustEvidenceUpdateEvent " + trustEvidenceUpdateEvent
         				+ " to topic '" + topic + "'");

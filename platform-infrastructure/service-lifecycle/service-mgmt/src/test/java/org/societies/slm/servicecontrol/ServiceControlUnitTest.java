@@ -105,7 +105,7 @@ public class ServiceControlUnitTest {
 		testService.setServiceDescription("Description");
 		testService.setServiceLocation(ServiceLocation.LOCAL);
 		testService.setServiceName("ServiceName");
-		testService.setServiceType(ServiceType.THIRD_PARTY_SERVICE);
+		testService.setServiceType(ServiceType.THIRD_PARTY_SERVER);
 		hostJid = new String("testnode.societies.local");
 		remoteJid = new String("remotenode.societies.local");
 		testService.setServiceEndpoint(hostJid+"/"+testService.getServiceName().replaceAll(" ", ""));
@@ -166,10 +166,38 @@ public class ServiceControlUnitTest {
 
 	}
 
+/*
+	@Test
+	public void testServiceStuff(){
+		
+		try{
+			
+			ServiceResourceIdentifier testSRI= new ServiceResourceIdentifier();
+			ServiceResourceIdentifier othertestSRI= new ServiceResourceIdentifier();
+			testSRI.setServiceInstanceIdentifier("212");
+			othertestSRI.setServiceInstanceIdentifier("211");
+			testSRI.setIdentifier(new URI("http://manager.local.societies/laptop/CalculatorService"));
+			othertestSRI.setIdentifier(new URI("http://manager.local.societies/laptop/CalculatorService"));
+			
+			if(testSRI.equals(othertestSRI)){
+				System.out.println("true!");
+			} else
+				System.out.println("false!");
+			
+			System.out.println("getHost()" +testSRI.getIdentifier().getHost());
+			System.out.println("getPath()" +testSRI.getIdentifier().getPath());
+			System.out.println("getFragment()" +testSRI.getIdentifier().getFragment());
+			System.out.println("getScheme()" +testSRI.getIdentifier().getScheme());
+			
+			assertTrue(testSRI.equals(othertestSRI));
+			
+		} catch(Exception ex){
+			ex.printStackTrace();
+			fail();
+		}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+	}
+
 	@Test
 	public void testStartServiceSuccess() {
 		
@@ -198,9 +226,7 @@ public class ServiceControlUnitTest {
 
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStartServiceRemote() {
 		
@@ -226,9 +252,7 @@ public class ServiceControlUnitTest {
 
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStartServiceOsgiProblem() {
 		
@@ -257,9 +281,7 @@ public class ServiceControlUnitTest {
 
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStartServiceWrongService() {
 		
@@ -288,9 +310,7 @@ public class ServiceControlUnitTest {
 
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStartServiceWrongBundle() {
 		
@@ -319,9 +339,7 @@ public class ServiceControlUnitTest {
 
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#stopService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStopServiceSuccess() {
 		
@@ -349,9 +367,7 @@ public class ServiceControlUnitTest {
 		}
 	}	
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStopServiceRemote() {
 		
@@ -377,9 +393,7 @@ public class ServiceControlUnitTest {
 
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#stopService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testStopServiceOsgiProblem() {
 		
@@ -407,9 +421,6 @@ public class ServiceControlUnitTest {
 		}
 	}	
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#stopService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
 	@Test
 	public void testStopServiceWrongService() {
 		
@@ -437,9 +448,6 @@ public class ServiceControlUnitTest {
 		}
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#stopService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
 	@Test
 	public void testStopServiceWrongBundle() {
 		
@@ -467,10 +475,7 @@ public class ServiceControlUnitTest {
 		}
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.
-	 */
-	
+
 	/*
 	@Test
 	public void testInstallServiceURLSuccess() {
@@ -504,9 +509,7 @@ public class ServiceControlUnitTest {
 	}
 	*/
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.
-	 */
+/*
 	@Test
 	public void testInstallServiceURLProblem() {
 		
@@ -530,9 +533,7 @@ public class ServiceControlUnitTest {
 		
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL, org.societies.api.identity.IIdentity)}.
-	 */
+
 	@Test
 	public void testInstallServiceURLIIdentity() {
 
@@ -559,9 +560,7 @@ public class ServiceControlUnitTest {
 		}
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL, java.lang.String)}.
-	 */
+
 	@Test
 	public void testInstallServiceURLString() {
 		
@@ -591,9 +590,6 @@ public class ServiceControlUnitTest {
 		}
 	}
 
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#uninstallService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
 	@Test
 	public void testUninstallServiceSuccess() {
 		
@@ -621,9 +617,7 @@ public class ServiceControlUnitTest {
 		}
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#startService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testUninstallServiceRemote() {
 		
@@ -649,9 +643,7 @@ public class ServiceControlUnitTest {
 
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#uninstallService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testUninstallServiceOsgiProblem() {
 		
@@ -678,10 +670,7 @@ public class ServiceControlUnitTest {
 			fail("Exception occured");
 		}
 	}	
-	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#uninstallService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testUninstallServiceWrongService() {
 		
@@ -709,9 +698,7 @@ public class ServiceControlUnitTest {
 		}
 	}
 	
-	/**
-	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#uninstallService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)}.
-	 */
+
 	@Test
 	public void testUninstallServiceWrongBundle() {
 		
@@ -738,7 +725,7 @@ public class ServiceControlUnitTest {
 			fail("Exception occured");
 		}
 	}
-	
+	*/
 	private class FakeServiceRemote implements IServiceControlRemote{
 
 		@Override
@@ -781,6 +768,33 @@ public class ServiceControlUnitTest {
 			result.setServiceId(serviceId);
 			result.setMessage(ResultMessage.SUCCESS);
 			callback.setResult(result);
+			
+		}
+
+		@Override
+		public void installService(Service service, IIdentity node,
+				IServiceControlCallback callback) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void shareService(Service service, IIdentity node,
+				IServiceControlCallback callback) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void unshareService(Service service, IIdentity node,
+				IServiceControlCallback callback) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void registerCISEndpoint(ICommManager endpoint) {
+			// TODO Auto-generated method stub
 			
 		}
 		

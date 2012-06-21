@@ -25,16 +25,15 @@
 package org.societies.privacytrust.trust.api.event;
 
 import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
 /**
- * This event is fired whenever the trust evidence is updated. A 
+ * This event is fired whenever a new piece of trust evidence is available. A 
  * <code>TrustEvidenceUpdateEvent</code> object is sent as an argument to the
  * {@link ITrustEvidenceUpdateEventListener} methods.
  * <p>
  * TrustEvidenceUpdateEvents are accompanied by the source, i.e. the 
- * {@link TrustedEntityId identifier} of the entity whose trust evidence was
- * updated. 
+ * {@link ITrustEvidence} object that was added to the trust evidence set. 
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
@@ -48,36 +47,34 @@ public class TrustEvidenceUpdateEvent extends TrustEvent {
 	 * specified source.
 	 *  
 	 * @param source
-	 *            the identifier of the entity whose trust evidence was updated
+	 *            the {@link ITrustEvidence} object that was added to the trust
+	 *            evidence set
 	 */
-	public TrustEvidenceUpdateEvent(TrustedEntityId source) {
+	public TrustEvidenceUpdateEvent(final ITrustEvidence source) {
 		
 		super(source);
 	}
 	
 	/**
-	 * Returns the identifier of the entity whose trust evidence was updated.
+	 * Returns the {@link ITrustEvidence} object that was added to the trust
+	 * evidence set.
 	 * 
-	 * @return the identifier of the entity whose trust evidence was updated.
-	 * @since 0.0.7
+	 * @return the {@link ITrustEvidence} object that was added to the trust
+	 *         evidence set
+	 * @since 0.3
 	 */
-	public TrustedEntityId getId() {
+	@Override
+	public ITrustEvidence getSource() {
 		
-		return (TrustedEntityId) super.getSource();
+		return (ITrustEvidence) super.getSource();
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see java.util.EventObject#toString()
 	 */
 	@Override
 	public String toString() {
-		
-		final StringBuilder sb = new StringBuilder();
-		sb.append("{");
-		sb.append("id=" + this.getId());
-		sb.append("}");
-		
-		return sb.toString();
+				
+		return this.getSource().toString();
 	}
 }

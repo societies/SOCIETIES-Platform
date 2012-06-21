@@ -17,7 +17,6 @@
     boolean save = request.getParameter("save") != null;
     boolean success = request.getParameter("success") != null;
     String secret = ParamUtils.getParameter(request, "secret");
-    String allowedIPs = ParamUtils.getParameter(request, "allowedIPs");
     String cloudProviderUrls = ParamUtils.getParameter(request, "cloudProviderUrls");
 
     SocietiesPlugin plugin = (SocietiesPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("societies");
@@ -27,7 +26,6 @@
     if (save) {
         if (errors.size() == 0) {
         	plugin.setSecret(secret);
-            plugin.setAllowedIPs(StringUtils.stringToCollection(allowedIPs));
             plugin.setCloudProviderUrls(StringUtils.stringToCollection(cloudProviderUrls));
             response.sendRedirect("societies.jsp?success=true");
             return;
@@ -35,7 +33,6 @@
     }
 
     secret = plugin.getSecret();
-    allowedIPs = StringUtils.collectionToString(plugin.getAllowedIPs());
     cloudProviderUrls = StringUtils.collectionToString(plugin.getCloudProviderUrls());
 %>
 
@@ -48,7 +45,10 @@
 
 
 <p>
-Use the form below to configure the secret key.
+Use the form below to configure the secret key and the URLs for the Cloud Node Providers recommended by this Domain Authority.
+</p>
+<p>
+<strong>For the URLs use commas to separate between entries.</strong>
 </p>
 
 <%  if (success) { %>
@@ -70,22 +70,12 @@ Use the form below to configure the secret key.
 <fieldset>
     <legend>SOCIETIES</legend>
     <div>
-    <p>
-    Blabla
-    </p>
-    <ul>
-        <label for="text_secret">Secret key:</label>
-        <input type="text" name="secret" value="<%= secret %>" id="text_secret">
-        <br><br>
-
-        <label for="text_secret">Allowed IP Addresses:</label>
-        <textarea name="allowedIPs" cols="40" rows="3" wrap="virtual"><%= ((allowedIPs != null) ? allowedIPs : "") %></textarea>
-        
+        Secret key:
+        <input type="text" name="secret" value="<%= secret %>" id="text_secret" contenteditable="false">
         <br><br>
         
-        <label for="text_secret">SOCIETIES Cloud Node Provider URLs:</label>
-        <textarea name="cloudProviderUrls" cols="40" rows="3" wrap="virtual"><%= ((cloudProviderUrls != null) ? cloudProviderUrls : "") %></textarea>
-    </ul>
+        SOCIETIES Cloud Node Provider URLs:
+        <input type="text" name="cloudProviderUrls" value="<%= ((cloudProviderUrls != null) ? cloudProviderUrls : "") %>" size="100">
     </div>
 </fieldset>
 

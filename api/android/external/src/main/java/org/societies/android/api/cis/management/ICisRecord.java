@@ -28,6 +28,8 @@ package org.societies.android.api.cis.management;
  * @author Babak.Farshchian@sintef.no
  *
  */
+@Deprecated
+
 public interface ICisRecord {
 
     public String getCisId();

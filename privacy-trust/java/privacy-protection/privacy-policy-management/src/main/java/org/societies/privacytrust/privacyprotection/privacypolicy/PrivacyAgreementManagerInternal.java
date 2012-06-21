@@ -198,7 +198,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 				hasPrivacyPolicyAgreements.setParentEntity(css.getId());
 			}
 			else {
-				hasPrivacyPolicyAgreements = (CtxAssociation) ctxBroker.retrieve(hasPrivacyPolicyAgreementsList.iterator().next());
+				hasPrivacyPolicyAgreements = (CtxAssociation) ctxBroker.retrieve(hasPrivacyPolicyAgreementsList.iterator().next()).get();
 			}
 			// Add the agreement entity to this association
 			hasPrivacyPolicyAgreements.addChildEntity(agreementEntity.getId());
