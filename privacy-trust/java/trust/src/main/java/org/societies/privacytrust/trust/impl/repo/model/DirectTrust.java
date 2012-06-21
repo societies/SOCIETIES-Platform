@@ -44,7 +44,7 @@ public class DirectTrust extends Trust implements IDirectTrust {
 	private Double rating;
 	
 	@Column(name = "directScore")
-	private Double score;
+	private Double score = 0.0d;
 
 	/*
 	 * @see org.societies.privacytrust.trust.api.model.IDirectTrust#getRating()
