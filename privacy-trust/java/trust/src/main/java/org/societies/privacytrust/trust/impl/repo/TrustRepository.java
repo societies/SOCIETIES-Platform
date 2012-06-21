@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -195,5 +198,31 @@ public class TrustRepository implements ITrustRepository {
 			if (session != null)
 				session.close();
 		}
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntities(java.lang.String, java.lang.Class)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends ITrustedEntity> List<T> retrieveEntities(final String trustorId,
+			final Class<T> entityClass) throws TrustRepositoryException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (entityClass == null)
+			throw new NullPointerException("entityClass can't be null");
+		
+		final List<T> result = new ArrayList<T>();
+		final Session session = sessionFactory.openSession();
+		final Criteria criteria = session.createCriteria(entityClass)
+				.add(Restrictions.eq("teid.trustor_id", trustorId));
+		
+		result.addAll(criteria.list());
+		
+		if (session != null)
+			session.close();
+		
+		return result;
 	}
 }
