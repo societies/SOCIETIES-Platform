@@ -34,8 +34,8 @@ if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")
 <h4>${result}</h4>
 <script language="javascript">
 function updateForm(serviceID, toDo) {
-	document.all.service.value = serviceID;
-	document.all.method.value = toDo;
+	document.forms["scForm"]["service"].value = serviceID;
+	document.forms["scForm"]["method"].value = toDo;
 	document.forms["scForm"].submit();
 } 
 </script>
