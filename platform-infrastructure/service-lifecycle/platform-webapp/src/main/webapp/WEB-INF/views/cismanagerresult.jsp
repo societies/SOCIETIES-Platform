@@ -27,7 +27,8 @@ String methodCalled = methodCalledArr[0];
 
 <script language="javascript">
 function updateForm(cisId, toDo, where) {    
-	document.all.cisJid.value = cisId;
+	document.forms["cmForm"]["cisJid"].value = cisId;
+	document.forms["cmForm"]["node"].value = cisId;
 	document.forms["cmForm"]["method"].value = toDo;
 	document.forms["cmForm"].action = where;
 	document.forms["cmForm"].submit();
@@ -35,13 +36,12 @@ function updateForm(cisId, toDo, where) {
 </script>
 
 <h4>${res}</h4>
-<br/>
-<br/>
-   <p><b>CIS's I own or am a member of </b></p>
+<p><b>CIS's I own or am a member of </b></p>
 
 <form id="cmForm" name="cmForm" id="cmForm" method="post" action="cismanager.html">
 <input type="hidden" name="cisJid" id="cisJid">
 <input type="hidden" name="method" id="method">
+<input type="hidden" name="node" id="node">
 
 	<table>
 		<tr><td><B>Name</B></td><td><B>ID</B></td></tr>
@@ -50,16 +50,16 @@ function updateForm(cisId, toDo, where) {
 	        	<td>${record.getName()}&nbsp;</td>
 	        	<td>${record.getCisId()}&nbsp;</td>
 	        	<td><input type="button" value="Members" onclick="updateForm('${record.getCisId()}', 'GetMemberList', 'cismanager.html')" ></td>
-	        	<td><input type="button" value="Services" onclick="updateForm('${record.getCisId()}', 'GetServices', 'servicediscovery.html')" ></td>
+	        	<td><input type="button" value="Services" onclick="updateForm('${record.getCisId()}', 'GetServicesCis', 'servicediscovery.html')" ></td>
 	        </tr>
 	    </xc:forEach>
 	</table>	
 </form>
-
+<p>&nbsp;</p>
 <%
 if (methodCalled.equals("GetMemberList")) {
 %>
-    <p><b>Member list:</b></p>
+    <p><b>Member list:</b> ${cisid}</p>
 	<table>
 		<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
 		<xc:forEach var="record" items="${memberRecords}">
@@ -74,13 +74,13 @@ if (methodCalled.equals("GetMemberList")) {
 
 if (methodCalled.equals("GetMemberListRemote")) {
 	%>
-	<p>Checking with hosting CIS...</p>
+	<p>Checking with hosting CIS: ${cisid} ...</p>
 	<form id="myform" name="myform" action="cismanager.html" method="post">
-	<input type="hidden" name="method" value="RefreshRemoteMembers">
+	<input type="hidden" name="method" id="method" value="RefreshRemoteMembers">
 	</form>
 	<script language="javascript">
-	setTimeout(continueExecution, 10000); 
-	//wait ten seconds before continuing  
+	setTimeout(continueExecution, 5 * 1000); 
+	//wait n seconds before continuing  
 	
 	function continueExecution() {    
 		document.forms["myform"].submit(); 
@@ -91,7 +91,7 @@ if (methodCalled.equals("GetMemberListRemote")) {
 //remoteCommunity.getOwnerJid()
 if (methodCalled.equals("RefreshRemoteMembers")) {
 %>
-    <p><b>Membership List from remote CIS:</b></p>
+    <p><b>Membership List from remote CIS:</b> ${cisid}</p>
 	<table>
 		<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
 		<xc:forEach var="record" items="${memberRecords}">

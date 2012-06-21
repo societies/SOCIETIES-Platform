@@ -19,6 +19,7 @@
   <bean name="DeviceManager" class="org.societies.css.devicemgmt.devicemanager.impl.DeviceManager">
   		
   		<property name="commManager" ref="CommManager"/>
+  		<property name="deviceCommManager" ref="DeviceCommManager"/>
   </bean>
 
 </beans>

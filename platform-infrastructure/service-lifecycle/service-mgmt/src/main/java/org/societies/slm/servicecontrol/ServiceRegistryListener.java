@@ -219,6 +219,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			log.debug("Service type: "+service.getServiceType().toString());
 			log.debug("Service Location: "+service.getServiceLocation().toString());
 			log.debug("Service Endpoint: "+service.getServiceEndpoint());
+			log.debug("Service PrivacyPolicy: "+service.getPrivacyPolicy());
 			log.debug("Service Provider: "+service.getServiceInstance().getServiceImpl().getServiceProvider());
 			log.debug("Service Namespace: "+service.getServiceInstance().getServiceImpl().getServiceNameSpace());
 			log.debug("Service ServiceClient: "+service.getServiceInstance().getServiceImpl().getServiceClient());
@@ -235,7 +236,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 		case ServiceEvent.MODIFIED:
 			if(log.isDebugEnabled()) log.debug("Service Modification");
-			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
+			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
 			
 			try {
 				serviceList.add(service);
@@ -250,7 +251,10 @@ public class ServiceRegistryListener implements BundleContextAware,
 		case ServiceEvent.REGISTERED:
 			
 			if(log.isDebugEnabled()) log.debug("Service Registered");			
-			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
+			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
+			if(log.isDebugEnabled())
+				log.debug("Service Identifier generated: " + service.getServiceIdentifier().getIdentifier().toString()+"_"+service.getServiceIdentifier().getServiceInstanceIdentifier());
+			
 			serviceList.add(service);
 			
 			try {
@@ -266,7 +270,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
-						URI clientJar = null;
+						
+						if(log.isDebugEnabled()) log.debug("location: " +serBndl.getLocation());
+						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
 						
 						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
 					}
@@ -291,7 +297,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			
 		case ServiceEvent.UNREGISTERING:
 			if(log.isDebugEnabled()) log.debug("Service Unregistered, so we set it to stopped but do not remove from registry");			
-			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
+			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
 			
 			try {
 				this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STOPPED);
@@ -341,6 +347,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 						log.error("Couldn't unshare from that CIS!");
 					}
 				}
+			} else{
+				if(log.isDebugEnabled()) log.debug("Service not shared with any CIS!");
 			}
 			
 			if(log.isDebugEnabled())
@@ -405,7 +413,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		}
 		
 		 if(log.isDebugEnabled() && result != null) 
-			 log.debug("The service corresponding to bundle " + bundle.getSymbolicName() + "is "+ result.getServiceName() );
+			 log.debug("The service corresponding to bundle " + bundle.getSymbolicName() + " is "+ result.getServiceName() );
 			
 		// Finally, we return
 		 return result;

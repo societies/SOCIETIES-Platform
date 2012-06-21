@@ -33,6 +33,7 @@
   		depends-on="CommManagerBundle" 
   		init-method="InitService" >
   		<property name="commManager" ref="CommManagerBundle"/>
+  		<property name="slmCommManager" ref="SLMCommsManager"/>
   </bean>
 
 

@@ -281,7 +281,7 @@ public class CisSubscribedImp implements ICis {
 		a.setActor(activity.getActor());
 		a.setObject(activity.getObject());
 		a.setTarget(activity.getTarget());
-		a.setTime(activity.getTime());
+		a.setPublished(activity.getPublished());
 		a.setVerb(activity.getVerb());
 		g.setActivity(a);
 		c.setAddActivity(g);

@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
@@ -45,10 +44,10 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
+import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.springframework.osgi.context.BundleContextAware;
 
@@ -62,11 +61,13 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	
 	private final Map<String, Map<String, DeviceImpl>> deviceFamilyContainer; 
 	
+	private final Map<String, ServiceRegistration> serviceRegistrationConatainer; 
+	
 	private DeviceImpl deviceImpl;
 	
 	private Map<String, String []> deviceServiceNamesContainer;
 	
-	private BundleContext bundleContext;
+	public static BundleContext bundleContext;
 	
 	private BidiMap deviceIdBindingTable;
 	
@@ -79,11 +80,9 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	private Dictionary<String, String> properties;
 	
 	private ServiceRegistration registration;
-
 	
-
-	//TODO just for test
-	private Random rdmNumber;
+	private DmCommManager deviceCommManager;
+	
 	
 	public DeviceManager() {
 
@@ -92,11 +91,20 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 		//TODO Fill this table
 		deviceIdBindingTable = new DualHashBidiMap();
 		
-		rdmNumber = new Random();
-		//LOG.info("DeviceMgmt: " + "=========++++++++++------ DeviceManager constructor");
+		serviceRegistrationConatainer = new HashMap<String, ServiceRegistration>();
 	}
 	
 	
+	public DmCommManager getDeviceCommManager() {
+		return deviceCommManager;
+	}
+
+
+	public void setDeviceCommManager(DmCommManager deviceCommManager) {
+		this.deviceCommManager = deviceCommManager;
+	}
+
+
 	
 	public ICommManager getCommManager() 
 	{
@@ -121,9 +129,26 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	{
 		if (deviceFamilyContainer.get(deviceFamily).get(deviceId) != null)
 		{
+			DeviceImpl deviceImpl = deviceFamilyContainer.get(deviceFamily).get(deviceId);
+			
+			DeviceCommonInfo deviceCommon = new DeviceCommonInfo(
+					deviceFamily, deviceImpl.getDeviceName(), deviceImpl.getDeviceType(), deviceImpl.getDeviceDescription(), 
+					deviceImpl.getDeviceConnectionType(), deviceImpl.getDeviceLocation(), deviceImpl.getDeviceProvider(), 
+					deviceImpl.getDeviceId(), deviceImpl.isContextSource());
+			
+			deviceCommManager.fireDeviceDisconnected(deviceId, deviceCommon);
+			
 			deviceFamilyContainer.get(deviceFamily).remove(deviceId);
 			deviceServiceNamesContainer.remove(deviceId);
 			deviceIdBindingTable.inverseBidiMap().removeValue(deviceId);
+			
+			if (serviceRegistrationConatainer.get(deviceId) != null) 
+			{
+				serviceRegistrationConatainer.get(deviceId).unregister();
+			}
+			
+			deviceImpl = null;
+			deviceCommon = null;
 		}
 	}
 	
@@ -197,9 +222,10 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			
 			properties = new Hashtable<String, String>();
 			
+			properties.put(DeviceMgmtConstants.DEVICE_NODE_ID, nodeId.getJid());
+			properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
 			properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
 			properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
-			properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
 			properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
 			properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
 			properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
@@ -214,23 +240,37 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			}
 			
 			
-			Object lock = new Object();
+			//Object lock = new Object();
 
 			//create a new IDevice implementation
-			deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
+			deviceImpl = new DeviceImpl(this, nodeId.getJid(),deviceId, deviceCommonInfo);
 			
 			deviceInstanceContainer.put(deviceId, deviceImpl);
 			deviceServiceNamesContainer.put(deviceId, serviceNames);
 			LOG.info(" %%%%%%%%%%%%%%%%======================%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceNamesContainer.toString());
 			deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
 			
-			synchronized(lock)
+			synchronized(this)
 			{
 				registration = bundleContext.registerService(IDevice.class.getName(), deviceImpl, properties);
 				
-				LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred"); 
+				LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred");
+				
+				//Add the service registration to the map for future use (to unregister a service, to change his property...etc)
+				serviceRegistrationConatainer.put(deviceId, registration);
+				
+				//Adding generated deviceId to deviceCommonInfo object
+				deviceCommonInfo.setDeviceID(deviceId);
+				
+				LOG.info("-- Device Manager before Broadcast"); 
+				//Broadcast the the device connected event to the other nodes
+				deviceCommManager.fireNewDeviceConnected(deviceId, deviceCommonInfo);
+				
+				LOG.info("-- Device Manager after Broadcast");
+				
+				return deviceId;
 			}
-			return deviceId;
+			
 		}
 		else
 		{
@@ -239,17 +279,17 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			
 			if (!deviceIdBindingTable.containsValue(physicalDeviceId))
 			{
-				//TODO here generate the deviceId from  the CssId and CssNodeId
-				//int deviceId = rdmNumber.nextInt();
+
 				String deviceId =  nodeId.getJid() + "/" + deviceCommonInfo.getDeviceFamilyIdentity()+ "/" + deviceCommonInfo.getDeviceType() + "/" + physicalDeviceId;
 
 				deviceIdBindingTable.put(deviceId, physicalDeviceId);
 
 				properties = new Hashtable<String, String>();
 				
+				properties.put(DeviceMgmtConstants.DEVICE_NODE_ID, nodeId.getJid());
+				properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
 				properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
 				properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
-				properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
 				properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
 				properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
 				properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
@@ -264,10 +304,10 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 					properties.put(DeviceMgmtConstants.DEVICE_CONTEXT_SOURCE, "isNotContextSource");
 				}
 				
-				Object lock = new Object();
+				//Object lock = new Object();
 
 				//create a new IDevice implementation
-				deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
+				deviceImpl = new DeviceImpl(this, nodeId.getJid(), deviceId, deviceCommonInfo);
 				
 				deviceInstanceContainer.put(deviceId, deviceImpl);
 				deviceServiceNamesContainer.put(deviceId, serviceNames);
@@ -275,21 +315,35 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 					
 				deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
 				
-				synchronized(lock)
+				synchronized(this)
 				{
 					registration = bundleContext.registerService(IDevice.class.getName(), deviceImpl, properties);
 					
-					LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred"); 
-				}	
-				return deviceId;
+					LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred");
+					
+					//Add the service registration to the map for future use (to unregister a service, to change his property...etc)
+					serviceRegistrationConatainer.put(deviceId, registration);
+					
+					//Adding generated deviceId to deviceCommonInfo object
+					deviceCommonInfo.setDeviceID(deviceId);
+					
+					
+					LOG.info("-- Device Manager before Broadcast"); 
+
+					//Broadcast the the device connected event to the other nodes
+					deviceCommManager.fireNewDeviceConnected(deviceId, deviceCommonInfo);
+					
+					LOG.info("-- Device Manager after Broadcast");
+					
+					return deviceId;
+				}
+
 			}
 			return null;
 		}
 	}
 
-	/**
-	 *
-	 */
+
 	@Override
 	public String fireDeviceDisconnected(String deviceFamily, String physicalDeviceId)
 	{
@@ -314,7 +368,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	}
 
 	/**
-	 *
+	 * Not implemented yet
 	 */
 	@Override
 	public String fireNewDataReceived(String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data) {

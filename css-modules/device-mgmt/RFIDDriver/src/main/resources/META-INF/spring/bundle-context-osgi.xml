@@ -13,13 +13,13 @@
        
        	<osgi:service ref="RFIDDriver">
         <osgi:interfaces>
-        <value>org.societies.css.devicemgmt.rfid.server.api.IRfidServer</value>
+        <value>org.societies.api.css.devicemgmt.rfid.IRfidDriver</value>
         </osgi:interfaces>
         </osgi:service>
-        <osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr">
-        </osgi:reference>
-
+        
+        <osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr"></osgi:reference>
 		<osgi:reference id="deviceMgr" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager"></osgi:reference>
+		
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
 		
 </beans>
