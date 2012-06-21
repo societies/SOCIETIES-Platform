@@ -34,11 +34,15 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.domainauthority.IClinetJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 import org.societies.domainauthority.rest.server.Path;
 import org.societies.domainauthority.rest.server.ServiceClientJar;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 /**
  * 
@@ -46,11 +50,15 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author Mitja Vardjan
  *
  */
+@Controller
 public class ServiceClientJarAccess implements IClinetJarServer {
 
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJarAccess.class);
 
 	private static HashMap<String, List<String>> keys = new HashMap<String, List<String>>();
+
+	@Autowired
+	private ICommManager commMgr;
 
 	public ServiceClientJarAccess() {
 		
@@ -60,6 +68,20 @@ public class ServiceClientJarAccess implements IClinetJarServer {
 		addKey("http://localhost:8080", "Calculator.jar");
 	}
 
+	public void init() {
+
+		LOG.debug("init()");
+	}
+
+	// Getters and setters for beans
+	public ICommManager getCommMgr() {
+		return commMgr;
+	}
+	public void setCommMgr(ICommManager commMgr) {
+		LOG.info("setCommMgr()");
+		this.commMgr = commMgr;
+	}
+	
 	@Override
 	public Future<UrlBean> addKey(String hostname, String filePath) {
 		

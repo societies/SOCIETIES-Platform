@@ -2,8 +2,19 @@
 <!-- This web.xml file is not required when using Servlet 3.0 container, 
      see implementation details http://jersey.java.net/nonav/documentation/latest/jax-rs.html#d4e194 -->
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-    <servlet>
-        <servlet-name>JerseyWebApplication</servlet-name>
+
+	<!-- OSGI aware web application context declaration -->
+	<context-param>
+		<param-name>contextClass</param-name>
+		<param-value>org.eclipse.virgo.web.dm.ServerOsgiBundleXmlWebApplicationContext</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<servlet>
+        <servlet-name>clientjar</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 
 		<!--init-param>
@@ -28,7 +39,7 @@
         <load-on-startup>1</load-on-startup-->
     </servlet>
     <servlet-mapping>
-        <servlet-name>JerseyWebApplication</servlet-name>
+        <servlet-name>clientjar</servlet-name>
         <url-pattern>/webresources/*</url-pattern>
     </servlet-mapping>
 </web-app>

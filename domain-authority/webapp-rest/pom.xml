@@ -51,6 +51,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 
@@ -98,6 +99,23 @@
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>org.springframework.osgi.web</artifactId>
+			<version>1.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
@@ -241,16 +259,68 @@
 					</supportedProjectTypes>
 					<instructions>
 						<Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-						<Export-Package>!*</Export-Package>
+						<Export-Package>org.societies.domainauthority.rest.*</Export-Package>
 						<Import-Package>
+							javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
+							javax.servlet;version="[3.0.0, 4.0.0)",
+							javax.servlet.resources;
+							version="[2.4.0, 4.0.0)",
+							<!-- spring DM -->
+							org.springframework.beans.factory.config,
+							org.springframework.osgi.web.context.support,
+							org.springframework.web.context.request,
+							org.springframework.web.context.support,
+							org.springframework.web.context,
+							org.springframework.stereotype,
+							org.springframework.web.bind.annotation,
+							org.springframework.web.servlet,
+							org.eclipse.virgo.web.dm;version="[3.0.0, 4.0.0)",
+							org.springframework.beans.factory.annotation,
+							org.springframework.context.config,
+							org.springframework.web.util,
+							<!-- servlet -->
+							org.springframework.web.servlet.config;version="[3.0.0, 4.0.0)",
+							org.springframework.web.servlet.view;version="[3.0.0, 4.0.0)",
+							org.springframework.web.servlet.handler;version="[3.0.0, 4.0.0)",
+							org.springframework.web.servlet.mvc;version="[3.0.0, 4.0.0)",
+							org.springframework.web.servlet.resource;version="[3.0.0,4.0.0)",
+							org.springframework.web.servlet.support;version="[3.0.0,4.0.0)",
+							org.springframework.web.servlet.tags;version="[3.0.0,4.0.0)",
+							org.springframework.web.servlet.tags.form;version="[3.0.0,4.0.0)",
+							org.springframework.web.servlet.theme;version="[3.0.0,4.0.0)",
+							<!-- JSTL lib -->
+							org.apache.taglibs.standard; version="[1.2.0,2)",
+							org.apache.taglibs.standard.extra.spath; version="[1.2.0,2)",
+							org.apache.taglibs.standard.functions; version="[1.2.0,2)",
+							org.apache.taglibs.standard.lang.jstl; version="[1.2.0,2)",
+							org.apache.taglibs.standard.lang.jstl.parser;version="[1.2.0,2)",
+							org.apache.taglibs.standard.lang.jstl.test; version="[1.2.0,2)",
+							org.apache.taglibs.standard.lang.jstl.test.beans;version="[1.2.0,2)",
+							org.apache.taglibs.standard.lang.support; version="[1.2.0,2)",
+							org.apache.taglibs.standard.resources; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.common.core; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.common.fmt; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.common.sql; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.common.xml; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.el.core; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.el.fmt; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.el.sql; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.el.xml; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.rt.core; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.rt.fmt; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.rt.sql; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tag.rt.xml; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tei; version="[1.2.0,2)",
+							org.apache.taglibs.standard.tlv; version="[1.2.0,2)",
+							org.osgi.framework,
+
 							com.sun.jersey.spi.container.servlet,
 							javax.ws.rs,
 							org.objectweb.asm,
-							org.springframework.beans.factory.annotation*;version="0",
-							org.springframework.stereotype*;version="0",
 							javax.annotation;version="0",
 							*;resolution:=optional
 						</Import-Package>
+						<_nouses>true</_nouses>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
 						<Webapp-Context>rest</Webapp-Context>
 						<Web-ContextPath>rest</Web-ContextPath>
