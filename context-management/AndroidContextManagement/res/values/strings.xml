@@ -11,5 +11,6 @@
     <string name="userctx_name">User Context</string>
     <string name="communityctx_name">Community Context</string>
     <string name="createctx_entity">Create Entity</string>
+    <string name="createctx_attribute">Create Attribute</string>
     
 </resources>

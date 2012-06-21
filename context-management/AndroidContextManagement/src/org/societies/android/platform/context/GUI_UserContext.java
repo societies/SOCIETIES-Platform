@@ -27,6 +27,7 @@ package org.societies.android.platform.context;
 
 //import org.societies.android.api.context.CtxException;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.android.platform.context.ContextManagement.LocalBinder;
 
 import android.app.Activity;
@@ -46,6 +47,7 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 	private static final String LOG_TAG = GUI_UserContext.class.getName();
 	ContextManagement cmService = null;
 	boolean connectedToService = false;
+	CtxEntity entity;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -56,8 +58,11 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 
 		setContentView(R.layout.user_context);
 		
-		Button sayHello = (Button)findViewById(R.id.button3);
-		sayHello.setOnClickListener(this);
+		Button createEntity = (Button)findViewById(R.id.button3);
+		createEntity.setOnClickListener(this);
+
+		Button createAttribute = (Button)findViewById(R.id.button4);
+		createAttribute.setOnClickListener(this);
 
 //		setContentView(R.layout.create_entity);
 		
@@ -73,6 +78,16 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 				if(connectedToService){
 					cmService.createEntity("person");
 					Log.d(LOG_TAG, "Successfully Created Entity.");
+				}
+				else {
+					Log.d(LOG_TAG, "Not Connected!!!");
+				}
+			} else if(v.getId() == R.id.button4){
+				Log.d(LOG_TAG, "Running Create Attribute method.");
+				if(connectedToService){
+					entity = cmService.createEntity("house");
+					cmService.createAttribute(entity.getId(), "flat");
+					Log.d(LOG_TAG, "Successfully Created Attribute.");
 				}
 				else {
 					Log.d(LOG_TAG, "Not Connected!!!");

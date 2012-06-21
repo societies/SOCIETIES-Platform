@@ -34,6 +34,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
+//import springframework.cache.concurrent.ConcurrentMapCache;
+
 import org.jivesoftware.smack.packet.IQ;
 //import org.societies.android.api.useragent.IAndroidUserAgent;
 import org.societies.android.api.context.broker.ICtxClientBroker;
@@ -69,6 +71,8 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+//LruCache support from api 12
+//import android.util.LruCache;
 
 public class ContextManagement extends Service implements ICtxClientBroker{
 
@@ -81,6 +85,7 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 
 	private final ConcurrentHashMap<CtxIdentifier, CtxModelObject> modelObjects = null;
 	private static Map<CtxIdentifier, CtxModelObject> contextCache = new ConcurrentHashMap<CtxIdentifier, CtxModelObject>();
+//	private static LruCache<CtxIdentifier, CtxModelObject> cache = new LruCache<CtxIdentifier, CtxModelObject> (50);
 	
 	// TODO Remove and instantiate privateId properly so that privateId.toString() can be used instead
 	private final String privateIdtoString = "myFooIIdentity@societies.local";
@@ -127,44 +132,6 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 	public IBinder onBind(Intent arg0) {
 		return this.binder;
 	}
-/*
-	@Override
-	public void monitor(IIdentity identity, IAction action){
-		Log.d(LOG_TAG, "Context Management received monitored user action from identity " +identity.getJid()+ 
-				": "+action.getparameterName()+" = "+action.getvalue());
-		
-		//CREATE MESSAGE BEAN
-		UserActionMonitorBean uamBean = new UserActionMonitorBean();
-		Log.d(LOG_TAG, "Creating message to send to virgo user agent");
-		uamBean.setIdentity(identity.getJid());
-		uamBean.setServiceResourceIdentifier(action.getServiceID());
-		uamBean.setServiceType(action.getServiceType());
-		uamBean.setParameterName(action.getparameterName());
-		uamBean.setValue(action.getvalue());
-		uamBean.setMethod(MethodType.MONITOR);
-		
-		Stanza stanza = new Stanza(toXCManager);
-		
-		ICommCallback callback = new UserAgentCallback();
-				
-		try {
-			Log.d(LOG_TAG, "registering info with comms FW:");
-			List<String> nameSpaces = callback.getXMLNamespaces();
-			List<String> jPackages = callback.getJavaPackages();
-			for(String nextNameSpace: nameSpaces){
-				Log.d(LOG_TAG, nextNameSpace);
-			}
-			for(String nextPackage: jPackages){
-				Log.d(LOG_TAG, nextPackage);
-			}
-    		ccm.register(ELEMENT_NAMES, callback);
-			ccm.sendIQ(stanza, IQ.Type.SET, uamBean, callback);
-			Log.d(LOG_TAG, "Stanza sent!");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, Log.getStackTraceString(e));
-        } 
-	}
-*/
 
 	public Future<CtxAssociation> createAssociation(String arg0)
 			throws CtxException {
@@ -172,7 +139,7 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		return null;
 	}
 
-	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
+	public CtxAttribute createAttribute(CtxEntityIdentifier scope,
 			String type) throws CtxException {
 
 		if (scope == null)
@@ -180,7 +147,8 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
-		final CtxEntity entity = (CtxEntity) modelObjects.get(scope);
+//		final CtxEntity entity = (CtxEntity) modelObjects.get(scope);
+		final CtxEntity entity = (CtxEntity) contextCache.get(scope);
 		
 		if (entity == null)	
 			throw new NullPointerException("Scope not found: " + scope);
@@ -188,10 +156,11 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		CtxAttributeIdentifier attrIdentifier = new CtxAttributeIdentifier(scope, type, CtxModelObjectNumberGenerator.getNextValue());
 		final CtxAttribute attribute = new CtxAttribute(attrIdentifier);
 
-		this.modelObjects.put(attribute.getId(), attribute);
+//		this.modelObjects.put(attribute.getId(), attribute);
+		contextCache.put(attribute.getId(), attribute);
 		entity.addAttribute(attribute);
 		
-		return (Future<CtxAttribute>) attribute;
+		return attribute;
 		// on internalctxbroker
 		//		return new AsyncResult<CtxAttribute>(attribute);
 	}
@@ -210,6 +179,7 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 			Log.d(LOG_TAG, "Problem with maps key!!");
 	//	modelObjects.put(entity.getId(), entity);
 		contextCache.put(entity.getId(), entity);
+//		cache.put(entity.getId(), entity);
 		
 		return entity;
 	}

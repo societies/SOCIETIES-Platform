@@ -79,7 +79,7 @@ public interface ICtxClientBroker {
 	 *            the type of the context attribute to create
 	 * @throws CtxException 
 	 */
-	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope, String type) throws CtxException;
+	public CtxAttribute createAttribute(CtxEntityIdentifier scope, String type) throws CtxException;
 	
 	/**
 	 * Creates a {@link CtxEntity} with the specified type on the identified CSS.
