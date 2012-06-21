@@ -413,21 +413,21 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 		CtxModelObject modelObj = this.userCtxDBMgr.retrieve(identifier);
 		
-		LOG.info("obj to be inferred "+ modelObj.getId());
+		LOG.debug("obj to be inferred "+ modelObj.getId());
 		
 		// inference code
 		if (modelObj instanceof CtxAttribute){
 			CtxAttribute ctxAttr = (CtxAttribute) modelObj;
-			LOG.info("obj casted - to be inferred "+ ctxAttr.getId());
+			LOG.debug("obj casted - to be inferred "+ ctxAttr.getId());
 			
 			Boolean isInferable = false;
-			LOG.info("inference manager instance : "+this.userCtxInferenceMgr );
-			LOG.info("inference manager types : "+this.userCtxInferenceMgr.getInferrableTypes());
+			LOG.debug("inference manager instance : "+this.userCtxInferenceMgr );
+			LOG.debug("inference manager types : "+this.userCtxInferenceMgr.getInferrableTypes());
 
 			if(this.userCtxInferenceMgr.getInferrableTypes().contains(ctxAttr.getType()))  isInferable = true;
 
 			if( !CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-				LOG.info("has value "+ CtxBrokerUtils.hasValue(ctxAttr));
+				LOG.debug("has value "+ CtxBrokerUtils.hasValue(ctxAttr));
 				inferValue = true;
 			}
 /*
@@ -435,8 +435,11 @@ public class InternalCtxBroker implements ICtxBroker {
 				if(CtxBrokerUtils.isPoorQuality(ctxAttr.getQuality())) inferValue = true;
 			}
 */
-			LOG.info("inferValue: "+ inferValue);
-
+			LOG.debug("inferValue: "+ inferValue);
+			
+			//TO DO remove following line when integration is completed
+			inferValue = false;
+			
 			if(inferValue){
 				LOG.info("before inference infered CtxAttr: "+ ctxAttr.getStringValue());
 				CtxAttribute inferedCtxAttr = userCtxInferenceMgr.predictContext(ctxAttr.getId(), new Date());	
@@ -485,12 +488,12 @@ public class InternalCtxBroker implements ICtxBroker {
 				if(CtxBrokerUtils.isPoorQuality(ctxAttr.getQuality())) inferValue = true;
 			}
 
-			LOG.info("inferValue: "+ inferValue);
+			LOG.debug("inferValue: "+ inferValue);
 
 			if(inferValue){
 
 				CtxAttribute inferedCtxAttr = userCtxInferenceMgr.predictContext(ctxAttr.getId(), new Date());	
-				LOG.info("inferedCtxAttr: "+ inferedCtxAttr.getId());
+				LOG.debug("inferedCtxAttr: "+ inferedCtxAttr.getId());
 			}		
 
 		}

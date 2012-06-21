@@ -93,27 +93,27 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		LOG.info ("getInferrableTypes " + this.getInferrableTypes());
 		try {
 			this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
-			LOG.info("*** cssNodeId = " + this.cssNodeId);
+			LOG.debug("*** cssNodeId = " + this.cssNodeId);
 
 			final String cssOwnerStr = this.cssNodeId.getBareJid();
 			this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
-			LOG.info("*** cssOwnerId = " + this.cssOwnerId);
+			LOG.debug("*** cssOwnerId = " + this.cssOwnerId);
 
 			this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
-			LOG.info("*** cssOwnerId = " + this.cssOwnerId);
+			LOG.debug("*** cssOwnerId = " + this.cssOwnerId);
 
 			this.ownerEntity = this.internalCtxBroker.retrieveIndividualEntity(cssOwnerId).get();
 			List<String> infTypesList = this.getInferrableTypes();
 			
 			for(String inferableType: infTypesList){
 				
-				LOG.info("now checking inf type 1 "+inferableType+" size: " +this.ownerEntity.getAttributes(inferableType).size());
-				LOG.info("get attributes2  : "+this.ownerEntity.getAttributes());
-				LOG.info("get attributes3 : "+this.ownerEntity.getAttributes(inferableType));
+				LOG.debug("now checking inf type 1 "+inferableType+" size: " +this.ownerEntity.getAttributes(inferableType).size());
+				LOG.debug("get attributes2  : "+this.ownerEntity.getAttributes());
+				LOG.debug("get attributes3 : "+this.ownerEntity.getAttributes(inferableType));
 				
 				if (this.ownerEntity.getAttributes(inferableType).size() == 0) {
 					CtxAttribute ctxAttr = this.internalCtxBroker.createAttribute(this.ownerEntity.getId(), inferableType).get();
-					LOG.info("inf Attr created "+ ctxAttr.getId());
+					LOG.debug("inf Attr created "+ ctxAttr.getId());
 				}
 			}
 		} catch (InterruptedException e) {
@@ -161,8 +161,8 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	@Override
 	public CtxAttribute predictContext(CtxAttributeIdentifier attrID, Date date) {
 		CtxAttribute ctxAttribute = null;
-		LOG.info("predict context " +date);
-		LOG.info("no value predict context " +ctxAttribute);
+		LOG.debug("predict context " +date);
+		LOG.debug("no value predict context " +ctxAttribute);
 		try {
 			ctxAttribute = this.internalCtxBroker.retrieveAttribute(attrID, false).get();
 			ctxAttribute.setStringValue("HOME");
@@ -177,7 +177,7 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		LOG.info("with value predict context return " +ctxAttribute);
+		LOG.debug("with value predict context return " +ctxAttribute);
 		return ctxAttribute;
 	}
 
@@ -198,14 +198,14 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	@Override
 	public void setInferrableTypes(List<String> inferableTypes){
 
-		LOG.info("setInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
+		LOG.debug("setInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
 		this.inferableTypesList = inferableTypes;
 	}
 
 	@Override
 	public List<String> getInferrableTypes(){
 
-		LOG.info("getInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
+		LOG.debug("getInferrableTypes this.internalCtxBroker "+ this.internalCtxBroker);
 		return this.inferableTypesList;
 	}
 }
