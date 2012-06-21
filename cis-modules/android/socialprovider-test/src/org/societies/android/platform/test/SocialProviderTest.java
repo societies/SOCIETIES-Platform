@@ -24,7 +24,7 @@
  */
 package org.societies.android.platform.test;
 
-import org.societies.android.api.cis.SocialContract;
+import org.societies.android.platform.SocialContract;
 import org.societies.android.platform.SocialProvider;
 
 import android.content.ContentValues;

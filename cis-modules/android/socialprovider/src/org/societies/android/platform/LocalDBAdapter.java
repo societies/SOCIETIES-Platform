@@ -25,8 +25,6 @@
 package org.societies.android.platform;
 
 
-import org.societies.android.api.cis.SocialContract;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -290,12 +288,14 @@ public class LocalDBAdapter implements ISocialAdapter {
 		return false;
 	}
 	
-	public int connect(){
+	public int connect() throws SQLiteException{
+		//TODO: try not to keep the DB open. just test getWritable here. then let methods open and close.
 		try{
 			db = dbHelper.getWritableDatabase();
 			return 1;
 		} catch (SQLiteException ex){
-			return android.util.Log.e("XXXXXXXXXXXXXXX", ex.getMessage());
+			throw ex;
+			//return android.util.Log.e("XXXXXXXXXXXXXXX", ex.getMessage());
 		}
 
 	}

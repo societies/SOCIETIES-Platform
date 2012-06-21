@@ -24,13 +24,12 @@
  */
 package org.societies.android.platform;
 
-import org.societies.android.api.cis.SocialContract;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 
 /**
@@ -81,7 +80,11 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 	//Used for local testing that ContentProvider works:
 	//TODO: to be used in later versions with local caching.
 	dbAdapter = new LocalDBAdapter(context);
-	dbAdapter.connect();
+	try	{
+		dbAdapter.connect();
+	} catch (SQLiteException ex){
+		android.util.Log.e(TAG, ex.getMessage());
+	}
 	//flush old IDs
 	
 	populateMe();
