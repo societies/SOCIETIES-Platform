@@ -33,7 +33,7 @@ import android.net.Uri;
 /**
  * All adapters have to implement this interface. It follows a logic very
  * similar to Android content provider. The authorities and URLs are documented
- * in {@link SocialContract}. Currently it supports CRUD on people, groups and 
+ * in {@link SocialContract2}. Currently it supports CRUD on people, groups and 
  * apps.
  * 
  * for the first four methods below see Content Provider interfaces in Android.

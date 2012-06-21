@@ -25,6 +25,8 @@
 package org.societies.android.platform;
 
 
+import org.societies.android.api.cis.SocialContract;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -232,19 +234,21 @@ public class LocalDBAdapter implements ISocialAdapter {
 	protected int updateMe(ContentValues values) {
 		//Always update first row.
 		//TODO: Fix this.
-		String[] args = {"1"};
-		return db.update(ME_TABLE_NAME, values, SocialContract.Me._ID + " LIKE ?", args);
+		db = dbHelper.getWritableDatabase();
+		return db.update(ME_TABLE_NAME, values, SocialContract.Me._ID + "=1", null);
 	}
 
 	protected int updateMyCommunities(ContentValues values, String selection,
 			String[] selectionArgs) {
 		// TODO Auto-generated method stub
+		db = dbHelper.getWritableDatabase();
 		return db.update(MY_COMMUNITIES_TABLE_NAME, values, selection, selectionArgs);
 	}
 
 	protected int updateCommunities(ContentValues values, String selection,
 			String[] selectionArgs) {
 		// TODO Auto-generated method stub
+		db = dbHelper.getWritableDatabase();
 		return db.update(COMMUNITIES_TABLE_NAME, values, selection, selectionArgs);
 	}
 

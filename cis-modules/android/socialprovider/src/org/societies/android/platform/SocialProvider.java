@@ -24,7 +24,7 @@
  */
 package org.societies.android.platform;
 
-import org.societies.android.platform.SocialContract;
+import org.societies.android.api.cis.SocialContract;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -55,7 +55,18 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 
     private boolean online = false; // True when we are online.
     private LocalDBAdapter dbAdapter = null;
-    /* 
+    static{
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me", 0);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", 1);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", 2);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities", 3);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities/#", 4);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services", 5);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services/#", 6);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities", 7);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities/#", 8);
+    	}
+    	/* 
      * Here I should do the following:
      * - Create a {@link CommunicationAdapter} and try to get connection with cloud CisManager (currently not here 
      *   due to problems with communication manager.
@@ -72,6 +83,7 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 	dbAdapter = new LocalDBAdapter(context);
 	dbAdapter.connect();
 	//flush old IDs
+	
 	populateMe();
 	populateMyCommunities();
 	populateCommunities();
@@ -82,16 +94,6 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 	
 	//Construct all the legal query URIs:
 	//TODO replace with constants or move to SocialContract.
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me", 0);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", 1);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", 2);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities", 3);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities/#", 4);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services", 5);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services/#", 6);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities", 7);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities/#", 8);
-
 	return dbAdapter.isConnected();
     }
 
@@ -233,8 +235,8 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     	case 7: //Me/Communities
     		return dbAdapter.deleteMyCommunities(_selection, _selectionArgs);
     	default:
-    		return 0;
-    	}
+            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
+            }
    }
 
     /* (non-Javadoc)
@@ -255,17 +257,21 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     public Uri insert(Uri _uri, ContentValues _values) {
 
     	//Switch on the name of the path used in the query:
+    	Uri returnUri = null;
     	switch (sUriMatcher.match(_uri)){
     	case 0: //Me
-    		return Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMe(_values)));
+    		returnUri = Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMe(_values)));
+    		break;
     	case 3:
-    		return Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertCommunities(_values)));
+    		returnUri = Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertCommunities(_values)));
+    		break;
     	case 7: //Me/Communities
-    		return Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMyCommunity(_values)));
+    		returnUri = Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMyCommunity(_values)));
+    		break;
     	default:
-    		return _uri;
+            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
     	}
-    	//return dbAdapter.insert(_uri, _values);
+    	return returnUri;
     }
 
     /* 
@@ -284,10 +290,10 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     	case 3:
     		return dbAdapter.queryCommunities(_projection, _selection, _selectionArgs, _sortOrder);
     	case 7:
-    		return dbAdapter.queryMyCommunities(_projection, _selection, _selectionArgs, _sortOrder);
-    			
+    		return dbAdapter.queryMyCommunities(_projection, _selection, _selectionArgs, _sortOrder);		
+    	default:
+            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
     	}
-    	return dbAdapter.query(_uri, _projection, _selection, _selectionArgs, _sortOrder);
     }
 
     /* (non-Javadoc)
@@ -296,16 +302,24 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     @Override
     public int update(Uri _uri, ContentValues _values, String _selection,
 	    String[] _selectionArgs) {
-    	switch (sUriMatcher.match(_uri)){
+    	int returnValue;
+    	int caseValue = sUriMatcher.match(_uri); 
+    	switch (caseValue){
     	case 0: //Me
-    		return dbAdapter.updateMe(_values);
+    		returnValue= dbAdapter.updateMe(_values);
+    		break;
     	case 3:
-    		return dbAdapter.updateCommunities(_values, _selection, _selectionArgs);
+    		returnValue= dbAdapter.updateCommunities(_values, _selection, _selectionArgs);
+    		break;
     	case 7:
-    		return dbAdapter.updateMyCommunities(_values, _selection, _selectionArgs);
+    		returnValue= dbAdapter.updateMyCommunities(_values, _selection, _selectionArgs);
+    		break;
+    	default:
+            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
     	}
-    	return dbAdapter.update(_uri, _values, _selection, _selectionArgs);
+    	return returnValue;
     }
+    
     /**
      * 
      * 
