@@ -51,15 +51,15 @@ public class ServiceClientJarAccess implements IClinetJarServer {
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJarAccess.class);
 
 	private static HashMap<String, List<String>> keys = new HashMap<String, List<String>>();
-	
+
 	public ServiceClientJarAccess() {
 		
 		LOG.info("Constructor");
 		
 		// TODO: remove when other components do this
-		addKey("Calculator.jar", "abcd");
+		addKey("http://localhost:8080", "Calculator.jar");
 	}
-	
+
 	@Override
 	public Future<UrlBean> addKey(String hostname, String filePath) {
 		
@@ -121,11 +121,11 @@ public class ServiceClientJarAccess implements IClinetJarServer {
 		List<String> fileKeys = keys.get(filePath);
 		
 		if (fileKeys == null) {
-			LOG.debug("File {} not found", filePath);
+			LOG.debug("Resource {} not found", filePath);
 			return false;
 		}
 		else {
-			LOG.debug("File {} found", filePath);
+			LOG.debug("Resource {} found", filePath);
 			return fileKeys.contains(key);
 		}
 	}
