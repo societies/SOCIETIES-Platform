@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.societies.integration.test.bit.createcis;
 
 import static org.junit.Assert.*;
@@ -23,125 +47,152 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 
 
-
 /**
- * @author Rafik
- *
+ * @author Rafik, Olivier
  */
 public class NominalTestCase {
+	private static Logger LOG = LoggerFactory.getLogger(NominalTestCase.class.getSimpleName());
+	public static Integer testCaseNumber;
 
-	private static Logger LOG = LoggerFactory.getLogger(NominalTestCase.class);
-	
-	
-	public NominalTestCase() {
-	}
+	private String privacyPolicyWithoutRequestor;
+	private String cssId;
+	private String cssPassword;
+	private String cisName;
+	private String cisType;
+
 
 	@Before
 	public void setUp() {
-		LOG.info("###958... setUp");
+		LOG.info("[#"+testCaseNumber+"] setUp");
 
-		
+		cssId = TestCase958.commManager.getIdManager().getThisNetworkNode().getJid();
+		cssPassword = "admin";
+		cisName = "CisTest";
+		cisType = "trialog";
+		privacyPolicyWithoutRequestor = "<RequestPolicy>" +
+				"<Target>" +
+				"<Resource>" +
+				"<Attribute AttributeId=\"contextType\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+				"<AttributeValue>fdsfsf</AttributeValue>" +
+				"</Attribute>" +
+				"</Resource>" +
+				"<Action>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
+				"<AttributeValue>WRITE</AttributeValue>" +
+				"</Attribute>" +
+				"<optional>false</optional>" +
+				"</Action>" +
+				"<Condition>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<AttributeValue DataType=\"SHARE_WITH_3RD_PARTIES\">dfsdf</AttributeValue>" +
+				"</Attribute>" +
+				"<optional>true</optional>" +
+				"</Condition>" +
+				"<Condition>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<AttributeValue DataType=\"DATA_RETENTION_IN_MINUTES\">412</AttributeValue>" +
+				"</Attribute>" +
+				"<optional>true</optional>" +
+				"</Condition>" +
+				"<optional>false</optional>" +
+				"</Target>" +
+				"</RequestPolicy>";
 	}
-
-	@Test
-	public void body1() {
-		LOG.info("###958... body1");
-		
-		String cssId = TestCase958.node.getBareJid();
-		
-		LOG.info("0. before createCis cssNodeId = " + cssId);
-		
-		Future<ICisOwned> futureCis = TestCase958.cisManager.createCis(cssId, "admin", "CisTest","trialog" , 2);
-		
-		LOG.info("1. after createCis");
-		
-		assertNotNull("futureCis is null", futureCis);
-		
-		ICisOwned cis = null;
-		
-
-		try 
-		{
-			LOG.info("2. before futureCis.get(10, TimeUnit.SECONDS)");
-			cis = futureCis.get(10, TimeUnit.SECONDS);
-			LOG.info("3. after futureCis.get(10, TimeUnit.SECONDS)");
-		} 
-			catch (InterruptedException e) 
-			{
-				LOG.info("4. InterruptedException "+ e.getMessage());
-				e.printStackTrace();
-			} 
-			catch (ExecutionException e)
-			{
-				LOG.info("5. ExecutionException "+ e.getMessage());
-				e.printStackTrace();
-			}
-			catch (TimeoutException e) 
-			{	
-				LOG.info("6. TimeoutException "+ e.getMessage());
-				e.printStackTrace();
-			}
-		
-
-		assertNotNull("cis is null", cis);
-		
-		LOG.info("7. before cis.getCisId()");
-		String cisId =  cis.getCisId();
-		LOG.info("8. after cis.getCisId()");
-		
-		
-		
-		assertNotNull("cisId is null", cisId);
-		
-		LOG.info("9. before cisManager.getCis");
-		
-		ICis cis2 =  TestCase958.cisManager.getCis(TestCase958.node.getJid(), cisId);
-		
-		LOG.info("10. afeter cisManager.getCis");
-		
-		assertNotNull("cis is not stored", cis2);
-		
-		LOG.info("10. CIS name:" + cis2.getName() + " CIS ID: " + cis2.getCisId());
-		
-		IIdentity cisJidIdentity = null;
-		try {
-			LOG.info("11. before idMgr.fromJid(cisId)");
-			cisJidIdentity = TestCase958.idMgr.fromJid(cisId);
-			LOG.info("12. after idMgr.fromJid(cisId)");
-		} catch (InvalidFormatException e) {
-			
-			LOG.info("13. InvalidFormatException "+ e.getMessage());
-			e.printStackTrace();
-		}
-		
-		assertNotNull("cisJidIdentity = TestCase958.idMgr.fromJid(cisId) is null", cisJidIdentity);
-		
-		RequestorCis requestorCis = null;
-
-		
-		requestorCis = new RequestorCis(TestCase958.node, cisJidIdentity);
-
-		
-		RequestPolicy requestPolicy = null;
-		
-		try {
-			
-			LOG.info("14. before privacyPolicyManager.getPrivacyPolicy(requestorCis)");
-			requestPolicy =  TestCase958.privacyPolicyManager.getPrivacyPolicy(requestorCis);
-			LOG.info("15. after privacyPolicyManager.getPrivacyPolicy(requestorCis)");
-		} catch (PrivacyException e) {
-			
-			LOG.info("16. PrivacyException "+ e.getMessage());
-			e.printStackTrace();
-		}
-		
-		assertNotNull("requestPolicy is null, privacy policy not created when ", requestPolicy);
-	}
-	
 
 	@After
 	public void tearDown() {
-		LOG.info("###958... tearDown");
+		LOG.info("[#"+testCaseNumber+"] tearDown");
 	}
 
+
+	@Test
+	public void testCreateCisWithoutPrivacyPolicyCreation() {
+		String testTitle = "testCreateCisWithoutPrivacyPolicyCreation: create a CIS without create of its privacy policy";
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		// Create CIS
+		Future<ICisOwned> futureCis = TestCase958.cisManager.createCis(cssId, cssPassword, cisName, cisType, 1);
+		ICisOwned newCis = null;
+		assertNotNull("Future new CIS is null", futureCis);
+		
+		// Retrieve future CIS
+		try {
+			newCis = futureCis.get(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e)  {
+			LOG.error("[Error "+e.getLocalizedMessage()+"] "+testTitle, e);
+			fail("[Error InterruptedException] "+testTitle);
+		} catch (ExecutionException e) {
+			LOG.error("[Error "+e.getLocalizedMessage()+"] "+testTitle, e);
+			fail("[Error ExecutionException] "+testTitle);
+		} catch (TimeoutException e) {	
+			LOG.error("[Error "+e.getLocalizedMessage()+"] "+testTitle, e);
+			fail("[Error TimeoutException] "+testTitle);
+		}
+		assertNotNull("New CIS is null", newCis);
+
+		// Retrieve CIS id
+		String cisId =  newCis.getCisId();
+		assertNotNull("New CIS id is null", cisId);
+
+		// Check if the CIS is on the CIS Management registry
+		ICis cisRetrieved =  TestCase958.cisManager.getCis(TestCase958.commManager.getIdManager().getThisNetworkNode().getJid(), cisId);
+		assertNotNull("New CIS is not stored", cisRetrieved);
+		assertEquals("New CIS and retrived CIS should be the same but are not", newCis, cisRetrieved);
+	}
+	
+	@Test
+	public void testCreateCis() {
+		String testTitle = "testCreateCis: create a CIS";
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		// Create CIS
+		Future<ICisOwned> futureCis = TestCase958.cisManager.createCis(cssId, cssPassword, cisName, cisType, 1, privacyPolicyWithoutRequestor);
+		ICisOwned newCis = null;
+		assertNotNull("Future new CIS is null", futureCis);
+		
+		// Retrieve future CIS
+		try {
+			newCis = futureCis.get(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e)  {
+			LOG.error("[Error "+e.getLocalizedMessage()+"] "+testTitle, e);
+			fail("[Error InterruptedException] "+testTitle);
+		} catch (ExecutionException e) {
+			LOG.error("[Error "+e.getLocalizedMessage()+"] "+testTitle, e);
+			fail("[Error ExecutionException] "+testTitle);
+		} catch (TimeoutException e) {	
+			LOG.error("[Error "+e.getLocalizedMessage()+"] "+testTitle, e);
+			fail("[Error TimeoutException] "+testTitle);
+		}
+		assertNotNull("New CIS is null", newCis);
+
+		// Retrieve CIS id
+		String cisId =  newCis.getCisId();
+		assertNotNull("New CIS id is null", cisId);
+
+		// Check if the CIS is on the CIS Management registry
+		ICis cisRetrieved =  TestCase958.cisManager.getCis(TestCase958.commManager.getIdManager().getThisNetworkNode().getJid(), cisId);
+		assertNotNull("New CIS is not stored", cisRetrieved);
+		assertTrue("New CIS and retrived CIS should be the same but are not", newCis.equals(cisRetrieved));
+
+		RequestPolicy expectedPrivacyPolicy = null;
+		RequestPolicy retrievedPrivacyPolicy = null;
+		try {
+			// Retrieve privacy policy owner id
+			IIdentity cisIdentity = TestCase958.commManager.getIdManager().fromJid(cisId);
+			RequestorCis requestorCis = new RequestorCis(TestCase958.commManager.getIdManager().getThisNetworkNode(), cisIdentity);
+			expectedPrivacyPolicy = TestCase958.privacyPolicyManager.fromXMLString(privacyPolicyWithoutRequestor);
+			expectedPrivacyPolicy.setRequestor(requestorCis);
+			// Retrieve privacy policy
+			retrievedPrivacyPolicy =  TestCase958.privacyPolicyManager.getPrivacyPolicy(requestorCis);
+		} catch (PrivacyException e) {
+			LOG.error("[Error "+e.getLocalizedMessage()+"] "+testTitle, e);
+			fail("[Error PrivacyException] "+testTitle);
+		} catch (InvalidFormatException e) {
+			LOG.error("[Error "+e.getLocalizedMessage()+"] "+testTitle, e);
+			fail("[Error InvalidFormatException] "+testTitle);
+		}
+
+		assertNotNull("CIS Privacy policy is null but it should not", retrievedPrivacyPolicy);
+		assertEquals("CIS privacy policy retrieved is not the one that has been sent", expectedPrivacyPolicy, retrievedPrivacyPolicy);
+	}
 }
