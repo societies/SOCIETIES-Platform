@@ -66,7 +66,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.schema.cis.community.Community;
@@ -103,6 +105,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private ICommManager mockCISendpoint1;
 	private ICommManager mockCISendpoint2;
 	private ICommManager mockCISendpoint3;
+	private IPrivacyPolicyManager mockPrivacyPolicyManager;
 	
 	private IServiceDiscoveryRemote mockIServDiscRemote;
 	private IServiceControlRemote mockIServCtrlRemote;
@@ -310,6 +313,75 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		Future<ICisOwned> testCIS = cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE);
+		try {
+			assertNotNull(testCIS.get());
+			assertNotNull(testCIS.get().getCisId());
+			assertEquals(testCIS.get().getName(), TEST_CIS_NAME_1);
+			assertEquals(testCIS.get().getCisType(), TEST_CIS_TYPW);
+			assertEquals(testCIS.get().getMembershipCriteria(), TEST_CIS_MODE);
+
+			// CLEANING UP
+			cisManagerUnderTest.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, testCIS.get().getCisId());
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	// TODO: double check that the owner has been added as participant
+		
+		//this.deleteFromTables(new String[] { "org_societies_cis_manager_Cis"});		
+	}
+	
+	
+	@Ignore
+	@Test
+	public void testCreateCisIncludingPrivacyPolicy() {
+		// -- Prepare privacyPolicyManager mock
+//		String privacyPolicy = "<RequestPolicy>" +
+//				"<Target>" +
+//				"<Resource>" +
+//				"<Attribute AttributeId=\"contextType\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+//				"<AttributeValue>fdsfsf</AttributeValue>" +
+//				"</Attribute>" +
+//				"</Resource>" +
+//				"<Action>" +
+//				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
+//				"<AttributeValue>WRITE</AttributeValue>" +
+//				"</Attribute>" +
+//				"<optional>false</optional>" +
+//				"</Action>" +
+//				"<Condition>" +
+//				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+//				"<AttributeValue DataType=\"SHARE_WITH_3RD_PARTIES\">dfsdf</AttributeValue>" +
+//				"</Attribute>" +
+//				"<optional>true</optional>" +
+//				"</Condition>" +
+//				"<Condition>" +
+//				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+//				"<AttributeValue DataType=\"DATA_RETENTION_IN_MINUTES\">412</AttributeValue>" +
+//				"</Attribute>" +
+//				"<optional>true</optional>" +
+//				"</Condition>" +
+//				"<optional>false</optional>" +
+//				"</Target>" +
+//				"</RequestPolicy>";
+//		mockPrivacyPolicyManager = Mockito.mock(IPrivacyPolicyManager.class);
+//		RequestorCis requestor;
+//		Mockito.when(mockPrivacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestor), null);
+		
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.init();
+		
+		cisManagerUnderTestInterface = cisManagerUnderTest;
+		
+		Future<ICisOwned> testCIS = cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE);//, privacyPolicy);
 		try {
 			assertNotNull(testCIS.get());
 			assertNotNull(testCIS.get().getCisId());
