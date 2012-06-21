@@ -86,11 +86,16 @@ public class DirectTrustEngine extends TrustEngine {
 		
 		Double newValue = null;
 		for (final ITrustEvidence evidence : sortedEvidenceSet) {
-			if (TrustEvidenceType.RATED.equals(evidence.getType())) {
-				newValue = (Double) evidence.getInfo();
-			}
-			else {
-				LOG.warn("Ignoring evidence " + evidence);
+			if (evidence.getTeid().equals(css.getTeid())) {
+				if (TrustEvidenceType.RATED.equals(evidence.getType())) {
+					newValue = (Double) evidence.getInfo();
+				}
+				else {
+					LOG.warn("Ignoring evidence " + evidence);
+				}
+			} else {
+				LOG.warn("Ignoring evidence not associated with entity '"
+						+ css.getTeid() + "': " + evidence);
 			}
 		}
 		css.getDirectTrust().setValue(newValue);
@@ -105,7 +110,27 @@ public class DirectTrustEngine extends TrustEngine {
 	@Override
 	public void evaluate(ITrustedCis cis, Set<ITrustEvidence> evidenceSet)
 			throws TrustEngineException {
-		// TODO Auto-generated method stub
+		
+		final TreeSet<ITrustEvidence> sortedEvidenceSet = new TreeSet<ITrustEvidence>(evidenceSet);
+		
+		Double newValue = null;
+		for (final ITrustEvidence evidence : sortedEvidenceSet) {
+			if (evidence.getTeid().equals(cis.getTeid())) {
+				if (TrustEvidenceType.RATED.equals(evidence.getType())) {
+					newValue = (Double) evidence.getInfo();
+				}
+				else {
+					LOG.warn("Ignoring evidence of unsupported type: " + evidence);
+				}
+			} else {
+				LOG.warn("Ignoring evidence not associated with entity '"
+						+ cis.getTeid() + "': " + evidence);
+			}
+		}
+		cis.getDirectTrust().setValue(newValue);
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluated direct trust for entity '" + cis.getTeid()
+					+ "':" + cis.getDirectTrust());
 	}
 
 	/*

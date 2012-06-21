@@ -82,7 +82,6 @@ private static final String BASE_ID = "dtet";
 	@SuppressWarnings("unused")
 	private static ITrustedCss trustedCss2;
 	
-	@SuppressWarnings("unused")
 	private static ITrustedCis trustedCis;
 	@SuppressWarnings("unused")
 	private static ITrustedCis trustedCis2;
@@ -209,9 +208,57 @@ private static final String BASE_ID = "dtet";
 	 * Test method for {@link org.societies.privacytrust.trust.impl.engine.DirectTrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCis, java.util.Set)}.
 	 */
 	@Test
-	@Ignore
-	public void testEvaluateITrustedCisSetOfITrustEvidence() {
-		fail("Not yet implemented");
+	public void testEvaluateCisBasedOnOneTrustRating() throws TrustEngineException {
+		
+		final Set<ITrustEvidence> evidenceSet = new HashSet<ITrustEvidence>();
+		// trust rating
+		final Double rating = new Double(0.5d);
+		final Date timestamp = new Date();
+		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(trustedCis.getTeid(),
+				TrustEvidenceType.RATED, timestamp, rating);
+		evidenceSet.add(evidence1);
+		
+		this.engine.evaluate(trustedCis, evidenceSet);
+		assertNotNull(trustedCis.getDirectTrust().getLastModified());
+		assertNotNull(trustedCis.getDirectTrust().getLastUpdated());
+		assertEquals(trustedCis.getDirectTrust().getLastModified(), trustedCis.getDirectTrust().getLastUpdated());
+		assertNotNull(trustedCis.getDirectTrust().getValue());
+		assertEquals(rating, trustedCis.getDirectTrust().getValue());
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.impl.engine.DirectTrustEngine#evaluate(org.societies.privacytrust.trust.api.model.ITrustedCis, java.util.Set)}.
+	 */
+	public void testEvaluateCisBasedOnMultipleTrustRatings() throws TrustEngineException {
+		
+		final Set<ITrustEvidence> evidenceSet = new HashSet<ITrustEvidence>();
+		// trust rating
+		final Double rating = new Double(0.4d);
+		final Date timestamp = new Date();
+		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(trustedCis.getTeid(),
+				TrustEvidenceType.RATED, timestamp, rating);
+		evidenceSet.add(evidence1);
+		
+		// trust rating2
+		final Double rating2 = new Double(0.5d);
+		final Date timestamp2 = new Date(timestamp.getTime()+1000);
+		final IDirectTrustEvidence evidence2 = new DirectTrustEvidence(trustedCis.getTeid(),
+				TrustEvidenceType.RATED, timestamp2, rating2);
+		evidenceSet.add(evidence2);
+		
+		// trust rating3
+		final Double rating3 = new Double(0.6d);
+		final Date timestamp3 = new Date(timestamp.getTime()-1000);
+		final IDirectTrustEvidence evidence3 = new DirectTrustEvidence(trustedCis.getTeid(),
+				TrustEvidenceType.RATED, timestamp3, rating3);
+		evidenceSet.add(evidence3);
+		
+		this.engine.evaluate(trustedCis, evidenceSet);
+		assertNotNull(trustedCis.getDirectTrust().getLastModified());
+		assertNotNull(trustedCis.getDirectTrust().getLastUpdated());
+		assertEquals(trustedCis.getDirectTrust().getLastModified(), trustedCis.getDirectTrust().getLastUpdated());
+		assertNotNull(trustedCis.getDirectTrust().getValue());
+		assertEquals(rating2, trustedCis.getDirectTrust().getValue());
 	}
 
 	/**
