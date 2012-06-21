@@ -135,12 +135,6 @@ public class Screen implements IDriverService{
 		
 		return (IDeviceStateVariable[])(stateVariables.values()).toArray(new IDeviceStateVariable[]{}); 
 	}
-
-
-	@Override
-	public String getId() {
-		return serviceId;
-	}
 	
 	
 	public  void sendMessageToScreen (String message)
@@ -161,6 +155,24 @@ public class Screen implements IDriverService{
 			LOG.error("Error when publishing new screen", e);
 		}
 		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by eventAdmin");
+	}
+
+
+	@Override
+	public String getDriverServiceName() {
+		
+		return serviceId;
+	}
+
+	@Override
+	public String getServiceDescription() {
+		
+		return "This service is used to contol a TV Screen";
+	}
+
+	@Override
+	public String getName() {
+		return "TV Screen Control";
 	}
 
 }

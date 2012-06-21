@@ -113,36 +113,50 @@ public class LightSensor implements IDriverService{
 		}		
 	}
 
-
+	@Override
 	public IAction getAction(String actionName) {
 		
 		return (IAction)actions.get(actionName);
 	}
 
-	
+	@Override
 	public IAction[] getActions() {
 		
 		return (IAction[])(actions.values()).toArray(new IAction[]{});
 	}
 
-	
+	@Override
 	public IDeviceStateVariable getStateVariable(String stateVariableName) {
 		
 		return (IDeviceStateVariable)stateVariables.get(stateVariableName);
 	}
 
-	
+	@Override
 	public IDeviceStateVariable[] getStateVariables() {
 		
 		return (IDeviceStateVariable[])(stateVariables.values()).toArray(new IDeviceStateVariable[]{}); 
 	}
-
 	
-	public String getId() {
+	
+	@Override
+	public String getDriverServiceName() {
 		
 		return serviceId;
 	}
+
 	
+	@Override
+	public String getServiceDescription() {
+		
+		return "This service is used to make some control on the Light Sensor, for instance getting the last value of the light level";
+	}
+
+	
+	@Override
+	public String getName() {
+		
+		return "Light Sensor Control Service";
+	}
 	
 	
 	public double getLightValue() {

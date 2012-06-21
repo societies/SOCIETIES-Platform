@@ -68,4 +68,16 @@ public class GetLightLevelAction implements IAction {
 		return result;
 	}
 
+	@Override
+	public String getActionDescription() {
+		
+		return "Used to get the last value of light level";
+	}
+
+	@Override
+	public String getActionName() {
+		
+		return "Light Level Value";
+	}
+
 }
