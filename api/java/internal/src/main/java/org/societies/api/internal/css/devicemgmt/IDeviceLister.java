@@ -29,12 +29,12 @@ import java.util.List;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 /**
- * This interface is used to browse devices information in the device persistent storage
+ * This interface is used to browse devices information from the device persistent storage
  *
  * @author Rafik
  *
  */
-public interface IDeviceManagerRegistry {
+public interface IDeviceLister {
 	
 	/**
 	 * 

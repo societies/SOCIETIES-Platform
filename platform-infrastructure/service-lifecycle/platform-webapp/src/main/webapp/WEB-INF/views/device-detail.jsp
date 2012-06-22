@@ -37,13 +37,29 @@
 	<br />
 
 	<xc:forEach var="driverService" items="${driverServices}" varStatus="status1">
-		<h2>Service ${status1.index + 1} </h2>
+		<%-- <h2>Service ${status1.index + 1} </h2> --%>
+		
+		<h2>${driverService.name}</h2>
 		
 		<xc:forEach var="action" items="${iActions}" varStatus="status2">
 		
-			<h3> ${action.name} </h3>
-			
+			<h3> ${action.actionName}: </h3>
 		</xc:forEach>
+<%-- 		<form method="post" action="devicemgmt.html">
+						<input type="hidden" name="deviceId" value="${device.deviceId}" />
+						<input type="hidden" name="deviceNodeId" value="${device.deviceNodeId}" />
+						<xc:choose>
+							<xc:when test="${device.status == false }">
+								<input type="submit" name="enable" id="enable" value="Enable" />
+							</xc:when>
+							<xc:when test="${device.status == true }">
+								<input type="submit" name="enable" id="enable" value="Disable" />
+							</xc:when>
+    						<xc:otherwise>    						
+    						</xc:otherwise>
+						</xc:choose>
+					</form> --%>
+		
 		
 		<br />
 		<br />
