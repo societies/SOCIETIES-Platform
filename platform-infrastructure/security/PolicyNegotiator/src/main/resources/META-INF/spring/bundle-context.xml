@@ -41,6 +41,7 @@
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
         <property name="providerServiceMgr" ref="ProviderServiceMgr"/>
+        <property name="clientJarServer" ref="ClientJarServerRemote"/>
 	</bean>
 
 	<bean id="NegotiationRequester"

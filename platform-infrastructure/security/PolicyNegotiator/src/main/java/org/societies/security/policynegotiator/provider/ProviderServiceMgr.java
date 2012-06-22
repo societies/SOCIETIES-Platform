@@ -25,6 +25,7 @@
 package org.societies.security.policynegotiator.provider;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
@@ -94,15 +95,25 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	 * @throws NegotiationException When service is not found
 	 */
 	protected URI getClientJarUri(String id) throws NegotiationException {
-		
-		Service s = getService(id);
-		
-		if (s != null) {
-			return s.getClientJarUri();
+
+		// FIXME
+		String uriStr = "http://localhost:8080";
+		URI uri;
+		try {
+			uri = new URI(uriStr);
+			return uri;
+		} catch (URISyntaxException e) {
+			throw new NegotiationException(e);
 		}
-		else {
-			throw new NegotiationException("Service " + id + " not found");
-		}
+		
+//		Service s = getService(id);
+//		
+//		if (s != null) {
+//			return s.getClientJarUri();
+//		}
+//		else {
+//			throw new NegotiationException("Service " + id + " not found");
+//		}
 	}
 
 	/**
