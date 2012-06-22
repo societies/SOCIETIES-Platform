@@ -1,10 +1,17 @@
 package org.societies.orchestration.cpa.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
-public class SocialGraph {
+import edu.uci.ics.jung.graph.Graph;
+public class SocialGraph implements Collection<SocialGraphVertex> {
 	private ArrayList<SocialGraphEdge> edges;
 	private ArrayList<SocialGraphVertex> vertices;
+	public SocialGraph(){
+		edges = new ArrayList<SocialGraphEdge>();
+		vertices = new ArrayList<SocialGraphVertex>();
+	}
 	public ArrayList<SocialGraphEdge> getEdges() {
 		return edges;
 	}
@@ -28,5 +35,58 @@ public class SocialGraph {
 			if(edge.equals(iedge))
 				return edge;
 		return null;
+	}
+	@Override
+	public int size(){
+		return vertices.size();
+	}
+	@Override
+	public boolean add(SocialGraphVertex e) {
+		return vertices.add(e);
+	}
+	@Override
+	public boolean addAll(Collection<? extends SocialGraphVertex> c) {
+		return vertices.addAll(c);
+	}
+	@Override
+	public void clear() {
+		vertices.clear();
+	}
+	@Override
+	public boolean contains(Object o) {
+	
+		return vertices.contains(o);
+	}
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		return vertices.containsAll(c);
+	}
+	@Override
+	public boolean isEmpty() {
+		return vertices.isEmpty();
+	}
+	@Override
+	public Iterator<SocialGraphVertex> iterator() {
+		return vertices.iterator();
+	}
+	@Override
+	public boolean remove(Object o) {
+		return vertices.remove(o);
+	}
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		return vertices.removeAll(c);
+	}
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		return vertices.retainAll(c);
+	}
+	@Override
+	public Object[] toArray() {
+		return vertices.toArray();
+	}
+	@Override
+	public <T> T[] toArray(T[] a) {
+		return vertices.toArray(a);
 	}
 }

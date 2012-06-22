@@ -23,5 +23,7 @@ public class SocialGraphVertex {
 	public void setEdges(ArrayList<SocialGraphEdge> edges) {
 		this.edges = edges;
 	}
-
+	public String toString(){
+		return name;
+	}
 }
