@@ -11,5 +11,6 @@ public interface ICISCommunicationMgrFactory {
 	// same as above but with a pre-defined JID instead of a randomly generated one
 	public ICommManager getNewCommManager(String jid) throws CommunicationException;
 	public ICommManager getNewCommManager(IIdentity cisIdentity, String credentials) throws CommunicationException;
-	public Map<IIdentity, ICommManager> getAllCISCommMgrs() ;
+	public Map<IIdentity, ICommManager> getAllCISCommMgrs();
+	public void destroyAllConnections();
 }

@@ -145,13 +145,14 @@ public class CisManagerController {
 			model.put("errormsg", "CIS Manager Service reference not avaiable");
 			return new ModelAndView("error", model);
 		}
-
+		String res = "Starting...";
 		String method = cisForm.getMethod();
-		String res = "";
+		res = "Method: " + method;
 
 		try {
 			if (method.equalsIgnoreCase("CreateCis")) {
 				model.put("methodcalled", "CreateCis");
+				res = "Creating CIS...";
 
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
 						cisForm.getCssId(), 
@@ -161,7 +162,6 @@ public class CisManagerController {
 						cisForm.getCisMode());
 
 				res = "Successfully created CIS: " + cisResult.get().getCisId();
-				model.put("res", res);
 				localCISs.add(cisResult.get());
 
 			} else if (method.equalsIgnoreCase("GetCisList")) {

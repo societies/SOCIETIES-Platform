@@ -62,9 +62,9 @@ public class IdentityManagerImpl implements IIdentityManager {
 				if (checkDomainNameFormat(domain)) {
 					String identifier = jid.substring(0,firstDotIndex);
 					if (identifier.startsWith(CIS_PREFIX))
-						return new IdentityImpl(IdentityType.CIS, identifier, domain);
+						return new NetworkNodeImpl(IdentityType.CIS, identifier, domain, "cis");
 					else
-						return new NetworkNodeImpl(IdentityType.CSS_RICH, identifier, domain,"rich");
+						return new NetworkNodeImpl(IdentityType.CSS_RICH, identifier, domain, "rich");
 				}
 				break;
 			case 2:

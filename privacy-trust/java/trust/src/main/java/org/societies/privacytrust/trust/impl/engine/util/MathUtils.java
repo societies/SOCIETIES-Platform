@@ -22,64 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.impl.engine.util;
 
-import java.util.List;
+import org.apache.commons.math.stat.StatUtils;
 
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+/**
+ * Describe your class here...
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.3
+ */
+public class MathUtils {
 
-public interface ITrustRepository {
-
-	/**
-	 * Adds the specified {@link ITrustedEntity} to the repository if it is not
-	 * already present. If the repository already contains the entity, the call
-	 * leaves the repository unchanged and returns <code>false</code>. This
-	 * prevents duplicate entities in the repository.
-	 * 
-	 * @param entity
-	 *            the entity to be added to the repository
-	 * @return <code>true</code> if the repository did not already contain the
-	 *         specified entity; <code>false</code> otherwise
-	 * @throws NullPointerException
-	 *             if the specified entity is <code>null</code>
-	 * @throws TrustRepositoryException
-	 *             if the specified entity is not already present but cannot be
-	 *             added to the repository
-	 */
-	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
-
-	/**
-	 * 
-	 * @param teid
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
+	public static double[] normalise(double[] input) {
 	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
+		return StatUtils.normalize(input);
+	}
 	
-	/**
-	 * 
-	 * @param teid
-	 * @throws TrustRepositoryException
-	 */
-	public void removeEntity(TrustedEntityId teid) throws TrustRepositoryException;
-	
-	/**
-	 * 
-	 * @param trustorId
-	 * @param type
-	 * @return
-	 * @throws TrustRepositoryException
-	 * @since 0.3
-	 */
-	public <T extends ITrustedEntity> List<T> retrieveEntities(final String trustorId,
-			final Class<T> entityClass) throws TrustRepositoryException;
+	public static double[] stanine(double[] input) {
+		
+		double[] zscores = normalise(input);
+		
+		double[] stanines = new double[zscores.length];
+		for (int i = 0; i < zscores.length; ++i) {
+			if (zscores[i] < -1.75d)
+				stanines[i] = 1;
+			else if (zscores[i] >= -1.75d && zscores[i] < -1.25d)
+				stanines[i] = 2;
+			else if (zscores[i] >= -1.25d && zscores[i] < -0.75d)
+				stanines[i] = 3;
+			else if (zscores[i] >= -0.75d && zscores[i] < -0.25d)
+				stanines[i] = 4;
+			else if (zscores[i] >= -0.25d && zscores[i] < +0.25d)
+				stanines[i] = 5;
+			else if (zscores[i] >= +0.25d && zscores[i] < +0.75d)
+				stanines[i] = 6;
+			else if (zscores[i] >= +0.75d && zscores[i] < +1.25d)
+				stanines[i] = 7;
+			else if (zscores[i] >= +1.25d && zscores[i] < +1.75d)
+				stanines[i] = 8;
+			else // if (zscores[i] >= +1.75d)
+				stanines[i] = 9;
+		}
+		
+		return stanines;
+	}
 }
