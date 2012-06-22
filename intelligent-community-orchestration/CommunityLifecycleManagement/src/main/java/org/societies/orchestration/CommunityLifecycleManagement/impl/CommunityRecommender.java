@@ -27,7 +27,7 @@ package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
 import static org.mockito.Mockito.*;
 
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.css.directory.ICssDirectory;
 
 //import org.societies.api.css.discovery.ICssDiscovery;
@@ -141,7 +141,7 @@ public class CommunityRecommender //implements ICommCallback
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
-	private IDeviceManager deviceManager;
+//	private IDeviceManager deviceManager;
 	
 	private IIdentityManager identityManager;
 	
@@ -903,13 +903,13 @@ public class CommunityRecommender //implements ICommCallback
     	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
     }
     
-    public IDeviceManager getDeviceManager() {
-    	return deviceManager;
-    }
-    
-    public void setDeviceManager(IDeviceManager deviceManager) {
-    	this.deviceManager = deviceManager;
-    }
+//    public IDeviceManager getDeviceManager() {
+//    	return deviceManager;
+//    }
+//    
+//    public void setDeviceManager(IDeviceManager deviceManager) {
+//    	this.deviceManager = deviceManager;
+//    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

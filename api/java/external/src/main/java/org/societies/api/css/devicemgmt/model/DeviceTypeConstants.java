@@ -25,7 +25,7 @@
 package org.societies.api.css.devicemgmt.model;
 
 /**
- * Describe your class here...
+ * This class defines static string identifying type of devices that should be integrated in the User Trials.
  *
  * @author Rafik
  *

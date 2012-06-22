@@ -47,7 +47,7 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 
 //import org.societies.api.internal.cis.management.ICisActivityFeed;
 //import org.societies.api.internal.cis.management.ServiceSharingRecord;
@@ -177,7 +177,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
-	private IDeviceManager deviceManager;
+//	private IDeviceManager deviceManager;
 	
 	private ArrayList<String> returnMetadata;
 	
@@ -1709,13 +1709,13 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
     }
     
-    public IDeviceManager getDeviceManager() {
-    	return deviceManager;
-    }
-    
-    public void setDeviceManager(IDeviceManager deviceManager) {
-    	this.deviceManager = deviceManager;
-    }
+//    public IDeviceManager getDeviceManager() {
+//    	return deviceManager;
+//    }
+//    
+//    public void setDeviceManager(IDeviceManager deviceManager) {
+//    	this.deviceManager = deviceManager;
+//    }
     
     public IIdentityManager getLinkedCssManager() {
     	return linkedCssManager;

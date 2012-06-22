@@ -28,7 +28,9 @@ import java.net.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +48,7 @@ public class SocketClient extends Thread{
 	PrintWriter out = null;
 	BufferedReader in = null;
 	private IEventMgr eventMgr;
-
-	public void initialiseRFIDDriver(){
-		this.start();
-	}
+	
 	
 	private Pattern pattern;
 	private Matcher matcher;
@@ -100,14 +99,13 @@ public class SocketClient extends Thread{
 			out = new PrintWriter(echoSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
 		} catch (UnknownHostException e) {
-			System.err.println("Don't know about host: "+rfidAddress);
-			JOptionPane.showMessageDialog(null, "Don't know about host: "+rfidAddress);
+			this.logging.debug("Don't know about host: "+rfidAddress);
 			return;
 			//System.exit(1);
 		} catch (IOException e) {
 			System.err.println("Couldn't get I/O for "
 					+ "the connection to: "+rfidAddress);
-			JOptionPane.showMessageDialog(null, "Couldn't get I/O for "
+			this.logging.debug("Couldn't get I/O for "
 					+ "the connection to: "+rfidAddress);
 			//return;
 			
@@ -118,7 +116,7 @@ public class SocketClient extends Thread{
 				in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));			
 			} catch (UnknownHostException e1) {
 				// TODO Auto-generated catch block
-				JOptionPane.showMessageDialog(null, "Don't know about host: localhost");
+				this.logging.debug("Don't know about host: localhost");
 				e1.printStackTrace();
 				return;
 			}
@@ -126,12 +124,12 @@ public class SocketClient extends Thread{
 			catch (IOException ioe) {
 				// TODO Auto-generated catch block
 				ioe.printStackTrace();
-				JOptionPane.showMessageDialog(null, "Couldn't get I/O for the connection to localhost");
+				this.logging.debug("Couldn't get I/O for the connection to localhost");
 				return;
 			}
 		}
 
-		JOptionPane.showMessageDialog(null, "Ready to receive data from RFID Reader");
+		this.logging.debug("Ready to receive data from RFID Reader");
 		//BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 		String userInput = "GI";
 
@@ -159,9 +157,10 @@ public class SocketClient extends Thread{
 					//send an event to notify new data arrived
 					RFIDUpdateEvent rfidEvent = new RFIDUpdateEvent(wakeUpUnit, tag);
 					
-					InternalEvent event = new InternalEvent(EventTypes.RFID_UPDATE_EVENT, "RFIDUpdate", this.getName(), (Serializable) rfidEvent);
+					InternalEvent event = new InternalEvent(EventTypes.RFID_UPDATE_EVENT, "RFIDUpdate", "RFIDDriver", (Serializable) rfidEvent);
 					try {
 						this.eventMgr.publishInternalEvent(event);
+						this.logging.debug("Published internal event: "+wakeUpUnit+"-"+tag);
 					} catch (EMSException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
