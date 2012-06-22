@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 import org.societies.privacytrust.trust.api.model.IDirectTrust;
@@ -38,5 +39,68 @@ import org.societies.privacytrust.trust.api.model.IDirectTrust;
 public class DirectTrust extends Trust implements IDirectTrust {
 
 	private static final long serialVersionUID = 2604976855460869815L;
+	
+	@Column(name = "directRating")
+	private Double rating;
+	
+	@Column(name = "directScore")
+	private Double score = 0.0d;
 
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.IDirectTrust#getRating()
+	 */
+	@Override
+	public Double getRating() {
+		
+		return this.rating;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.IDirectTrust#setRating(java.lang.Double)
+	 */
+	@Override
+	public void setRating(Double rating) {
+		
+		this.rating = rating;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.IDirectTrust#getScore()
+	 */
+	@Override
+	public Double getScore() {
+		
+		return this.score;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.IDirectTrust#setScore(java.lang.Double)
+	 */
+	@Override
+	public void setScore(Double score) {
+		
+		this.score = score;
+	}
+	
+	/*
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		sb.append("value=" + super.getValue());
+		sb.append(",");
+		sb.append("lastModified=" + super.getLastModified());
+		sb.append(",");
+		sb.append("lastUpdated=" + super.getLastUpdated());
+		sb.append(",");
+		sb.append("rating=" + this.rating);
+		sb.append(",");
+		sb.append("score=" + this.score);
+		sb.append("]");
+		
+		return sb.toString();
+	}
 }

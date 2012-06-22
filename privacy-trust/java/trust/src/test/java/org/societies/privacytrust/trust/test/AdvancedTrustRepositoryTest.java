@@ -26,6 +26,8 @@ package org.societies.privacytrust.trust.test;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -268,6 +270,11 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		trustedCis2FromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCis2.getTeid());
 		assertNotNull(trustedCis2FromDb.getMembers());
 		assertTrue(trustedCis2FromDb.getMembers().isEmpty());
+		
+		// remove CIS from DB
+		this.trustRepo.removeEntity(trustedCis.getTeid());
+		// remove CIS2 from DB
+		this.trustRepo.removeEntity(trustedCis2.getTeid());
 	}
 	
 	/**
@@ -367,5 +374,57 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		this.trustRepo.removeEntity(trustedServiceFromDb.getTeid());
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceFromDb.getTeid());
 		assertNull(trustedServiceFromDb);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#retrieveEntities(String, Class))}.
+	 * @throws TrustRepositoryException 
+	 */
+	@Test
+	public void testRetrieveTrustedCsss() throws TrustRepositoryException {
+	
+		List<ITrustedCss> entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCss.class);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// add CSS to DB
+		this.trustRepo.addEntity(trustedCss);
+		entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCss.class);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(1, entities.size());
+		
+		// add CSS2 to DB
+		this.trustRepo.addEntity(trustedCss2);
+		entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCss.class);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(2, entities.size());
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#retrieveEntities(String, Class))}.
+	 * @throws TrustRepositoryException 
+	 */
+	@Test
+	public void testRetrieveTrustedCiss() throws TrustRepositoryException {
+	
+		List<ITrustedCis> entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCis.class);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// add CIS to DB
+		this.trustRepo.addEntity(trustedCis);
+		entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCis.class);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(1, entities.size());
+		
+		// add CIS2 to DB
+		this.trustRepo.addEntity(trustedCis2);
+		entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCis.class);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(2, entities.size());
 	}
 }

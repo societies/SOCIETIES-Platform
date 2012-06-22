@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.trust.api.engine;
 
-import java.util.Set;
+import java.util.List;
 
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
@@ -38,56 +38,56 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.3
  */
-public interface ITrustEngine {
+public interface IDirectTrustEngine {
 
 	/**
-	 * Evaluates the trustworthiness of the specified {@link ITrustedCss} based
-	 * on the supplied set of {@link ITrustEvidence}.
+	 * Evaluates the trustworthiness of the specified list of 
+	 * {@link ITrustedCss} based on the supplied list of {@link ITrustEvidence}.
 	 *  
-	 * @param css
-	 *            the {@link ITrustedCss} whose trust value to evaluate
-	 * @param evidenceSet
-	 *            the set of {@link ITrustEvidence} based on which to evaluate
-	 *            the trust value 
+	 * @param cssList
+	 *            the list of {@link ITrustedCss} whose trust values to evaluate
+	 * @param evidenceList
+	 *            the list of {@link ITrustEvidence} based on which to evaluate
+	 *            the trust values
 	 * @throws TrustEngineException
 	 *            if there is an error during trust evaluation
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public void evaluate(final ITrustedCss css, 
-			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException;
+	public void evaluateCssTrustValues(final List<ITrustedCss> cssList, 
+			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
 	
 	/**
-	 * Evaluates the trustworthiness of the specified {@link ITrustedCis} based
-	 * on the supplied set of {@link ITrustEvidence}.
+	 * Evaluates the trustworthiness of the specified list of {@link ITrustedCis} based
+	 * on the supplied list of {@link ITrustEvidence}.
 	 *  
-	 * @param cis
-	 *            the {@link ITrustedCis} whose trust value to evaluate
-	 * @param evidenceSet
-	 *            the set of {@link ITrustEvidence} based on which to evaluate
-	 *            the trust value 
+	 * @param cisList
+	 *            the list of {@link ITrustedCis} whose trust values to evaluate
+	 * @param evidenceList
+	 *            the list of {@link ITrustEvidence} based on which to evaluate
+	 *            the trust values 
 	 * @throws TrustEngineException
 	 *            if there is an error during trust evaluation
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public void evaluate(final ITrustedCis cis, 
-			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException;
+	public void evaluateCisTrustValues(final List<ITrustedCis> cisList, 
+			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
 	
 	/**
-	 * Evaluates the trustworthiness of the specified {@link ITrustedService}
-	 * based on the supplied set of {@link ITrustEvidence}.
+	 * Evaluates the trustworthiness of the specified list of {@link ITrustedService}
+	 * based on the supplied list of {@link ITrustEvidence}.
 	 *  
-	 * @param service
-	 *            the {@link ITrustedService} whose trust value to evaluate
-	 * @param evidenceSet
-	 *            the set of {@link ITrustEvidence} based on which to evaluate
-	 *            the trust value 
+	 * @param serviceList
+	 *            the list of {@link ITrustedService} whose trust values to evaluate
+	 * @param evidenceList
+	 *            the list of {@link ITrustEvidence} based on which to evaluate
+	 *            the trust values
 	 * @throws TrustEngineException
 	 *            if there is an error during trust evaluation
 	 * @throw NullPointerException
 	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public void evaluate(final ITrustedService service, 
-			final Set<ITrustEvidence> evidenceSet) throws TrustEngineException;
+	public void evaluateServiceTrustValues(final List<ITrustedService> serviceList, 
+			final List<ITrustEvidence> evidenceList) throws TrustEngineException;
 }

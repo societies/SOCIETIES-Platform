@@ -22,42 +22,37 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.api.internal.domainauthority;
 
-package org.societies.api.security.digsig;
+import java.util.concurrent.Future;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 
 /**
- * Methods to digitally sign given data and methods to verify given signatures.
  * 
+ *
  * @author Mitja Vardjan
  *
  */
-@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface ISignatureMgr {
+public interface IClinetJarServer {
 
 	/**
-	 * Digitally sign given XML data and embed the signature in the given XML.
+	 * Add a key for given file.
+	 * Any jar file can have multiple keys associated and this method may be
+	 * called multiple times to add more keys for same jar file.
 	 * 
-	 * @param xml The XML String to be signed.
-	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
-	 * @param identity The identity to be used for signature.
-	 * 
-	 * @return XML with embedded signature.
+	 * @param path Local path to the jar file to be served
+	 * @param key The key to authenticate jar file downloads in future
 	 */
-	public String signXml(String xml, String xmlNodeId, IIdentity identity);
+	//public void addKey(String path, String key);
 	
 	/**
-	 * Verify all digital signatures embedded in given XML. Verify also if the
-	 * identities used are valid.
+	 * Generate and add a new key for given file.
+	 * Any jar file can have multiple keys associated and this method may be
+	 * called multiple times to add more keys for same jar file.
 	 * 
-	 * @param xml The XML containing embedded digital signatures to be verified.
-	 * 
-	 * @return True if all digital signatures and identities are valid.
-	 * False otherwise or if no signatures found.
+	 * @param path Local path to the jar file to be served
+	 * @return Full URL with path and authentication key to directly download the jar file.
 	 */
-	public boolean verify(String xml);
-
+	public Future<UrlBean> addKey(String hostname, String filePath);
 }

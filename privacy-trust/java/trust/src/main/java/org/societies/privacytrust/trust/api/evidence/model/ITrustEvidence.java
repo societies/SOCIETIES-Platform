@@ -36,7 +36,7 @@ import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public interface ITrustEvidence extends Serializable {
+public interface ITrustEvidence extends Serializable, Comparable<ITrustEvidence> {
 
 	/**
 	 * 

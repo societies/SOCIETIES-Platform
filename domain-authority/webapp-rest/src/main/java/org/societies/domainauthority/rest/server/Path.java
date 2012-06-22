@@ -22,42 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.societies.api.security.digsig;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+package org.societies.domainauthority.rest.server;
 
 /**
- * Methods to digitally sign given data and methods to verify given signatures.
  * 
+ *
  * @author Mitja Vardjan
  *
  */
-@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface ISignatureMgr {
+public class Path {
 
-	/**
-	 * Digitally sign given XML data and embed the signature in the given XML.
-	 * 
-	 * @param xml The XML String to be signed.
-	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
-	 * @param identity The identity to be used for signature.
-	 * 
-	 * @return XML with embedded signature.
-	 */
-	public String signXml(String xml, String xmlNodeId, IIdentity identity);
-	
-	/**
-	 * Verify all digital signatures embedded in given XML. Verify also if the
-	 * identities used are valid.
-	 * 
-	 * @param xml The XML containing embedded digital signatures to be verified.
-	 * 
-	 * @return True if all digital signatures and identities are valid.
-	 * False otherwise or if no signatures found.
-	 */
-	public boolean verify(String xml);
-
+	public static final String BASE = "/rest/webresources";
 }
