@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plan
-	name="org.societies.integration.test.bit.privacypolicymanagement.policy-management-1244.plan"
-	version="3.0.0" scoped="false" atomic="false"
+	name="org.societies.integration.test.bit.privacydatamanagement.data-management-1266.plan"
+	version="1.0.0" scoped="false" atomic="false"
 	xmlns="http://www.eclipse.org/virgo/schema/plan" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.eclipse.org/virgo/schema/plan 
+	xsi:schemaLocation=" http://www.eclipse.org/virgo/schema/plan 
 						http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
 	<!-- Common -->
@@ -38,5 +38,5 @@
 		name="org.societies.context-management.community-context-db-mgmt" />
 	<artifact type="bundle"
 		name="org.societies.context-management.context-source-mgmt" />
-
+	
 </plan>

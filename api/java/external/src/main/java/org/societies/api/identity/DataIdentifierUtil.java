@@ -22,35 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.css.devicemgmt.devicemanager.registry;
+package org.societies.api.identity;
 
-import org.societies.api.internal.css.devicemgmt.IDeviceLister;
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+import org.societies.api.schema.identity.DataIdentifier;
 
 /**
- * @author Rafik
+ * Util method that helps manipulating DataIdentifier objects
+ *
+ * @author Olivier Maridat (Trialog)
  *
  */
-public class DeviceRegistryManager /*implements IDeviceManagerRegistry*/ {
-	
-	
-	
-	/**
-	 * This method is used to register a new device to the registry or to update an existing device information
-	 */
-	public void registerDevice(String nodeId, DeviceCommonInfo deviceCommonInfo) {
-			
-
+public class DataIdentifierUtil {
+	public static String generateUri(DataIdentifier dataId)
+	{
+		StringBuilder str = new StringBuilder("");
+		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
+		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
+		dataId.setUri(str.toString());
+		return str.toString();
 	}
-	
-	
-	/**
-	 * This method is used to unregister a device from the registry
-	 */
-	public void unregisterDevice(String nodeId, String deviceId) {
-
-	}
-	
-
-	
 }

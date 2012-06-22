@@ -22,35 +22,63 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.css.devicemgmt.devicemanager.registry;
-
-import org.societies.api.internal.css.devicemgmt.IDeviceLister;
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+package org.societies.integration.test.bit.privacydatamanagement;
 
 /**
- * @author Rafik
+ * The test case 1266 aims to test the privacy data management
+ * real usage, using the privacy preference manager.
+ * 
+ * @author Olivier Maridat (Trialog)
  *
  */
-public class DeviceRegistryManager /*implements IDeviceManagerRegistry*/ {
-	
-	
-	
-	/**
-	 * This method is used to register a new device to the registry or to update an existing device information
-	 */
-	public void registerDevice(String nodeId, DeviceCommonInfo deviceCommonInfo) {
-			
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.integration.test.IntegrationTestCase;
 
+public class TestCase1266 extends IntegrationTestCase {
+	private static Logger LOG = LoggerFactory.getLogger(TestCase1266.class.getSimpleName());
+
+	public static IPrivacyDataManager privacyDataManager;
+	public static ICommManager commManager;
+	
+	
+	public TestCase1266() {
+		// Call the super constructor
+		// with test case number
+		// and test case classes to run
+		super(1266, new Class[]{PrivacyDataManagerTest.class});
+		PrivacyDataManagerTest.testCaseNumber = this.testCaseNumber;
 	}
 	
 	
-	/**
-	 * This method is used to unregister a device from the registry
-	 */
-	public void unregisterDevice(String nodeId, String deviceId) {
-
+	/* -- Dependency injection --- */
+	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] IPrivacyDataManager injected");
 	}
-	
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICommManager injected");
+	}
 
-	
+	public static boolean isDepencyInjectionDone() {
+		return isDepencyInjectionDone(0);
+	}
+	public static boolean isDepencyInjectionDone(int level) {
+		if (null == commManager) {
+			LOG.info("[Dependency Injection] Missing ICommManager");
+			return false;
+		}
+		if (null == commManager.getIdManager()) {
+			LOG.info("[Dependency Injection] Missing IIdentityManager");
+			return false;
+		}
+		if (null == privacyDataManager) {
+			LOG.info("[Dependency Injection] Missing IPrivacyDataManager");
+			return false;
+		}
+		return true;
+	}
 }

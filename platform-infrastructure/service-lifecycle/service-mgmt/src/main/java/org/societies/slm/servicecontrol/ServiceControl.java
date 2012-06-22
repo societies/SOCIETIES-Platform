@@ -381,8 +381,11 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			ServiceNegotiationCallback negotiationCallback = new ServiceNegotiationCallback();
 			getPolicyNegotiation().startNegotiation(provider, includePrivacyPolicyNegotiation, negotiationCallback);
-			ServiceNegotiationResult negotiationResult = negotiationCallback.getResult();
 			
+			//TODO: TEMPORARY TESTING. HANDLE THIS ASYNC STUFF BETTER!
+			Thread.currentThread().sleep(10 * 1000);
+			
+			ServiceNegotiationResult negotiationResult = negotiationCallback.getResult();
 			if(negotiationResult == null){
 				if(logger.isDebugEnabled()) logger.debug("Problem doing negotiation!");
 				returnResult.setMessage(ResultMessage.NEGOTIATION_ERROR);

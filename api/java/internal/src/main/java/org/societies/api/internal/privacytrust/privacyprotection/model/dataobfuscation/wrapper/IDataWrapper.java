@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
+import org.societies.api.schema.identity.DataIdentifier;
+
 /**
  * This data wrapper is an abstraction between obfuscation manager
  * and data models. This is the way for wrapping data to obfuscate them,

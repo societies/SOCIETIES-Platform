@@ -309,7 +309,7 @@ public class ServiceControlController {
 				List<Service> cisServices = asynchServices.get();
 				model.put("cisservices", cisServices);
 
-				res = scresult.getMessage().toString();
+				res = "Success";//scresult.getMessage().toString();
 				returnPage = "servicediscoveryresult";
 	
 			} else if (method.equalsIgnoreCase("Install3PService")){

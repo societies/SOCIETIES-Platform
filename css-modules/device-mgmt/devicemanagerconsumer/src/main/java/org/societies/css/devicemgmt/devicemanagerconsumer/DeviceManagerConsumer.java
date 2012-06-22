@@ -30,6 +30,9 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
@@ -39,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.IDriverService;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
 import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
@@ -80,7 +84,18 @@ public class DeviceManagerConsumer extends EventListener implements ServiceTrack
 	
 	public void initConsumer()
 	{	
+
+//		String stringFilter = "(&("+ Constants.OBJECTCLASS +"="+ IDevice.class.getName()+")("+DeviceMgmtConstants.DEVICE_TYPE+"="+DeviceTypeConstants.SCREEN+"))";
+//		
+//		Filter filter = null;
+//		try {
+//			filter = bundleContext.createFilter(stringFilter);
+//		} catch (InvalidSyntaxException e) {
+//			e.printStackTrace();
+//		}
+		
 		this.serviceTracker = new ServiceTracker(bundleContext, IDevice.class.getName(), this);
+		//this.serviceTracker = new ServiceTracker(bundleContext, filter, this);
 		this.serviceTracker.open();
 
 		// -- Subscribe to LightSensorEvent
