@@ -22,17 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.commsmgr;
+package org.societies.security.comms.rest;
+
+import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
-import org.societies.api.internal.schema.security.policynegotiator.MethodType;
-import org.societies.api.internal.schema.security.policynegotiator.ProviderBean;
+import org.societies.api.internal.domainauthority.IClientJarServerCallback;
+import org.societies.api.internal.domainauthority.IClinetJarServerRemote;
+import org.societies.api.internal.schema.domainauthority.rest.ClientJarBean;
+import org.societies.api.internal.schema.domainauthority.rest.MethodType;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -45,7 +46,7 @@ import org.springframework.scheduling.annotation.Async;
  * 
  */
 //@Component
-public class CommsClient implements INegotiationProviderRemote {
+public class CommsClient implements IClinetJarServerRemote {
 	
 	private ICommManager commMgr;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
@@ -95,87 +96,37 @@ public class CommsClient implements INegotiationProviderRemote {
 		this.commMgr = commMgr;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.api.internal.security.policynegotiator.
-	 * INegotiationProviderRemote# acceptPolicyAndGetSla(int, java.lang.String,
-	 * boolean, org.societies.api.internal.security.policynegotiator.
-	 * INegotiationProviderCallback)
-	 */
 	@Override
 	@Async
-	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
-			boolean modified, IIdentity toIdentity, INegotiationProviderCallback callback) {
+	public void addKey(IIdentity toIdentity, URI hostname, String filePath, IClientJarServerCallback callback) {
 		
-		LOG.debug("acceptPolicyAndGetSla({}, ...)", sessionId);
+		LOG.debug("addKey(..., {}, {}, ...)", hostname, filePath);
 		
-		sendIQ(toIdentity, MethodType.ACCEPT_POLICY_AND_GET_SLA, null,
-				sessionId, signedPolicyOption, modified, callback);
+		sendIQ(toIdentity, MethodType.ADD_KEY, hostname, filePath, callback);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.api.internal.security.policynegotiator.
-	 * INegotiationProviderRemote#
-	 * getPolicyOptions(org.societies.api.internal.security
-	 * .policynegotiator.INegotiationProviderCallback)
-	 */
-	@Override
-	@Async
-	public void getPolicyOptions(String serviceId, Requestor provider, INegotiationProviderCallback callback) {
-		
-		LOG.debug("getPolicyOptions({})", provider.getRequestorId());
-		
-		sendIQ(provider.getRequestorId(), MethodType.GET_POLICY_OPTIONS, serviceId, -1, null, false, callback);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.api.internal.security.policynegotiator.
-	 * INegotiationProviderRemote#reject(int)
-	 */
-	@Override
-	@Async
-	public void reject(int sessionId, IIdentity toIdentity, INegotiationProviderCallback callback) {
-
-		LOG.debug("reject({})", sessionId);
-
-		sendIQ(toIdentity, MethodType.REJECT, null, sessionId, null, false, callback);
-	}
-	
 	/**
 	 * Send information query (IQ) using the comms framework.
 	 * IQ is a message where an async result is expected.
 	 * 
-	 * @param toIdentity
-	 * @param method
-	 * @param serviceId
-	 * @param sessionId
-	 * @param sla
-	 * @param modified
 	 * @return Stanza ID for success, null for error
 	 */
 	private String sendIQ(IIdentity toIdentity, MethodType method,
-			String serviceId, int sessionId, String sla, boolean modified,
-			INegotiationProviderCallback callback) {
+			URI hostname, String filePath, IClientJarServerCallback callback) {
 		
-		LOG.debug("send(" + toIdentity + ", " + method + ", " + serviceId +
-				", " + sessionId + ", ..., " + modified + ")");
+		LOG.debug("send(" + toIdentity + ", " + method + ", " + hostname +
+				", " + filePath + ", ...)");
 		
 		// Create stanza
 		Stanza stanza = new Stanza(toIdentity);
 		stanza.setId(StanzaIdGenerator.next());
-		
+		stanza.setFrom(idMgr.getThisNetworkNode());
+
 		// Create message bean
-		ProviderBean provider = new ProviderBean();
+		ClientJarBean provider = new ClientJarBean();
 		provider.setMethod(method);
-		provider.setServiceId(serviceId);
-		provider.setSessionId(sessionId);
-		provider.setSignedPolicyOption(sla);
-		provider.setModified(modified);
+		provider.setUrl(hostname);
+		provider.setFilePath(filePath);
 		
 		// Just to avoid theoretical race condition, add callback BEFORE sending IQ
 		clientCallback.addCallback(stanza.getId(), callback);
@@ -183,20 +134,17 @@ public class CommsClient implements INegotiationProviderRemote {
 		// Send information query
 		try {
 			commMgr.sendIQGet(stanza, provider, clientCallback);
-			LOG.debug("send({}): IQ sent to {}", sessionId, toIdentity.getJid());
+			LOG.debug("sendIQ({}): IQ sent to {}", hostname, toIdentity.getJid());
 			return stanza.getId();
 		} catch (CommunicationException e) {
-			LOG.warn("send({}): could not send IQ to " + toIdentity.getJid(), sessionId, e);
+			LOG.warn("sendIQ({}): could not send IQ to " + toIdentity.getJid(), hostname, e);
 			clientCallback.removeCallback(stanza.getId());
 			return null;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote#getIdMgr()
-	 */
-	@Override
-	public IIdentityManager getIdMgr() {
-		return idMgr;
-	}
+//	@Override
+//	public IIdentityManager getIdMgr() {
+//		return idMgr;
+//	}
 }

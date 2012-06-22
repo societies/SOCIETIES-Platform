@@ -31,6 +31,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.security.comms.policynegotiator.CommsClientCallback;
 
 /**
  * 
@@ -60,7 +61,7 @@ public class CommsClientCallbackUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#getJavaPackages()}.
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#getJavaPackages()}.
 	 */
 	@Test
 	public void testGetJavaPackages() {
@@ -75,7 +76,7 @@ public class CommsClientCallbackUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#getXMLNamespaces()}.
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#getXMLNamespaces()}.
 	 */
 	@Test
 	public void testGetXMLNamespaces() {
@@ -90,7 +91,7 @@ public class CommsClientCallbackUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#
 	 * receiveError(org.societies.api.comm.xmpp.datatypes.Stanza, org.societies.api.comm.xmpp.exceptions.XMPPError)}.
 	 */
 	@Test
@@ -99,7 +100,7 @@ public class CommsClientCallbackUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#
 	 * receiveInfo(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, org.societies.api.comm.xmpp.datatypes.XMPPInfo)}.
 	 */
 	@Test
@@ -108,7 +109,7 @@ public class CommsClientCallbackUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#
 	 * receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
 	 */
 	@Test
@@ -117,7 +118,7 @@ public class CommsClientCallbackUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#
 	 * receiveResult(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
 	 */
 	@Test
@@ -126,7 +127,7 @@ public class CommsClientCallbackUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#
 	 * receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)}.
 	 */
 	@Test

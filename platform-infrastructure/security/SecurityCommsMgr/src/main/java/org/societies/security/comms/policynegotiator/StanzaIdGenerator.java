@@ -22,12 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.domainauthority;
-
-import java.net.URI;
-import java.util.concurrent.Future;
-
-import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
+package org.societies.security.comms.policynegotiator;
 
 /**
  * 
@@ -35,29 +30,20 @@ import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
  * @author Mitja Vardjan
  *
  */
-public interface IClinetJarServer {
+public class StanzaIdGenerator {
+
+	private static int counter = 0;
+	
+	private static int nextInt() {
+		return counter++;
+	}
 
 	/**
-	 * Add a key for given file.
-	 * Any jar file can have multiple keys associated and this method may be
-	 * called multiple times to add more keys for same jar file.
+	 * Generates a number that is increased by one with each call. Starting with zero.
 	 * 
-	 * @param path Local path to the jar file to be served
-	 * @param key The key to authenticate jar file downloads in future
+	 * @return String representation of next number
 	 */
-	//public void addKey(String path, String key);
-	
-	/**
-	 * Generate and add a new key for given file.
-	 * Any jar file can have multiple keys associated and this method may be
-	 * called multiple times to add more keys for same jar file.
-	 * 
-	 * @param hostname the main part of the URL where the JAR is supposed to be,
-	 * including protocol and port if applicable, e.g., http://example.com:8080
-	 * 
-	 * @param filePath Local path to the jar file to be served
-	 * 
-	 * @return Full URL with path and authentication key to directly download the jar file.
-	 */
-	public Future<UrlBean> addKey(URI hostname, String filePath);
+	public static String next() {
+		return String.valueOf(nextInt());
+	}
 }

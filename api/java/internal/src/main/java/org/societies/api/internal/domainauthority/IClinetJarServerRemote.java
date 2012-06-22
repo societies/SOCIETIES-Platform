@@ -25,9 +25,8 @@
 package org.societies.api.internal.domainauthority;
 
 import java.net.URI;
-import java.util.concurrent.Future;
 
-import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
+import org.societies.api.identity.IIdentity;
 
 /**
  * 
@@ -35,7 +34,7 @@ import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
  * @author Mitja Vardjan
  *
  */
-public interface IClinetJarServer {
+public interface IClinetJarServerRemote {
 
 	/**
 	 * Add a key for given file.
@@ -52,12 +51,14 @@ public interface IClinetJarServer {
 	 * Any jar file can have multiple keys associated and this method may be
 	 * called multiple times to add more keys for same jar file.
 	 * 
+	 * @param toIdentity the identity of the server
+	 * 
 	 * @param hostname the main part of the URL where the JAR is supposed to be,
 	 * including protocol and port if applicable, e.g., http://example.com:8080
 	 * 
 	 * @param filePath Local path to the jar file to be served
 	 * 
-	 * @return Full URL with path and authentication key to directly download the jar file.
+	 * @param callback the callback to receive the result of this asynchronous method
 	 */
-	public Future<UrlBean> addKey(URI hostname, String filePath);
+	public void addKey(IIdentity toIdentity, URI hostname, String filePath, IClientJarServerCallback callback);
 }

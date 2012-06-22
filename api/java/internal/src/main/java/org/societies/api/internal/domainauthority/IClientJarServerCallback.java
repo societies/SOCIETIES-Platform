@@ -22,28 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.commsmgr;
+package org.societies.api.internal.domainauthority;
+
+import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 
 /**
+ * Interface for invoking the requester side (either the policy negotiator or
+ * some other component).
+ * To be used by policy negotiator from the provider side (from some other node).
  * 
- *
  * @author Mitja Vardjan
  *
  */
-public class StanzaIdGenerator {
-
-	private static int counter = 0;
-	
-	private static int nextInt() {
-		return counter++;
-	}
+public interface IClientJarServerCallback {
 
 	/**
-	 * Generates a number that is increased by one with each call. Starting with zero.
+	 * Receive result of asynchronous method that has been invoked on {@link IClinetJarServer}
 	 * 
-	 * @return String representation of next number
+	 * @param result Asynchronous return value
 	 */
-	public static String next() {
-		return String.valueOf(nextInt());
-	}
+	public void receiveResult(UrlBean result);
 }

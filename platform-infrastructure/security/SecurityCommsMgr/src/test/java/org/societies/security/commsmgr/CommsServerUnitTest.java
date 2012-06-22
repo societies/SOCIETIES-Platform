@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
+import org.societies.security.comms.policynegotiator.CommsServer;
 
 /**
  * 
@@ -71,7 +72,7 @@ public class CommsServerUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsServer#getJavaPackages()}.
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsServer#getJavaPackages()}.
 	 */
 	@Test
 	public void testGetJavaPackages() {
@@ -86,7 +87,7 @@ public class CommsServerUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsServer#getQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsServer#getQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
 	 */
 	@Test
 	public void testGetQuery() {
@@ -94,7 +95,7 @@ public class CommsServerUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsServer#getXMLNamespaces()}.
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsServer#getXMLNamespaces()}.
 	 */
 	@Test
 	public void testGetXMLNamespaces() {
@@ -109,7 +110,7 @@ public class CommsServerUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsServer#receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsServer#receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
 	 */
 	@Test
 	public void testReceiveMessage() {
@@ -117,7 +118,7 @@ public class CommsServerUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsServer#setQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsServer#setQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
 	 */
 	@Test
 	public void testSetQuery() {
