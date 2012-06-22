@@ -22,21 +22,37 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.css.devicemgmt.devicemanager.registry;
 
-package org.societies.api.internal.css.devicemgmt.device.sensor.extended;
-
-import org.societies.api.internal.css.devicemgmt.device.sensor.Sensor;
-
+import org.societies.api.internal.css.devicemgmt.IDeviceManagerRegistry;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 /**
- * <font color="#3f5fbf">Interface <b>proposal</b> for a RFID sensor.</font>
- * @author rafik
- * @version 1.0
- * @created 06-d�c.-2011 15:18:21
+ * Describe your class here...
+ *
+ * @author Rafik
+ *
  */
-@Deprecated
-public interface RFiDSensor extends Sensor {
+public class DeviceRegistryManager /*implements IDeviceManagerRegistry*/ {
+	
+	
+	
+	/**
+	 * This method is used to register a new device to the registry or to update an existing device information
+	 */
+	public void registerDevice(String nodeId, DeviceCommonInfo deviceCommonInfo) {
+			
 
-	public String getTagId();
+	}
+	
+	
+	/**
+	 * This method is used to unregister a device from the registry
+	 */
+	public void unregisterDevice(String nodeId, String deviceId) {
 
+	}
+	
+
+	
 }

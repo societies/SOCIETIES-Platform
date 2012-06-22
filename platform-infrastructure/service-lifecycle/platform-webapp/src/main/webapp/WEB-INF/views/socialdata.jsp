@@ -50,9 +50,9 @@
 	      <p> All your social data are stored in a common language and used by the platform to perform social operations</p>  
 	      <div class="connectors" style="width: 50%; ">
 	     	
-	      <input onclick="window.open('http://dev.lucasimone.eu/fb.php', 'FacebookConnector', 'height=100, width=800');" type="image" src="images/facebook.png">
-		  <input onclick="alert('Not implemented yet')" type="image" src="images/Twitter.jpg">
-		  <input onclick="alert('Not implemented yet')" type="image" src="images/Foursquare.png">
+	      <input onclick="window.open('http://dev.lucasimone.eu/fb.php', 'FacebookConnector');" type="image" src="images/facebook.png">
+		  <input onclick="window.open('http://157.159.160.188:8080/examples/servlets/servlet/TwitterLoginServlet','TwitterConnector');" type="image" src="images/Twitter.jpg">
+		  <input onclick="window.open('http://157.159.160.188:8080/examples/servlets/servlet/FoursquareLoginServlet', 'FoursquareConnector');" type="image" src="images/Foursquare.png">
 		  <input onclick="alert('Not implemented yet')" type="image" src="images/Linkedin.png">
 		
 		  </div>

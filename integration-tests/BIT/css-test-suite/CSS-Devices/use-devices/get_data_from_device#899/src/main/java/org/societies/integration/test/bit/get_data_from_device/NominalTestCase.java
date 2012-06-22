@@ -68,7 +68,7 @@ public class NominalTestCase {
 		assertEquals("The lisgt sensor's device type is not correct", DeviceTypeConstants.LIGHT_SENSOR, UpperTester.ls1.getDeviceType());
 		assertEquals("The lisgt sensor's device description is not correct", deviceId, UpperTester.ls1.getDeviceId());
 		assertEquals("The lisgt sensor's device description is not correct", "Light Sensor 1 test", UpperTester.ls1.getDeviceDescription());
-		assertEquals("The lisgt sensor's device connection type is not correct", "Zigbee", UpperTester.ls1.getDeviceConnetionType());
+		assertEquals("The lisgt sensor's device connection type is not correct", "Zigbee", UpperTester.ls1.getDeviceConnectionType());
 		assertEquals("The lisgt sensor's device location is not correct", "Room1", UpperTester.ls1.getDeviceLocation());
 		assertEquals("The lisgt sensor's device location is not correct", "Trialog", UpperTester.ls1.getDeviceProvider());
 		
@@ -101,7 +101,7 @@ public class NominalTestCase {
 		assertEquals("The lisgt sensor's device type is not correct", DeviceTypeConstants.LIGHT_SENSOR, UpperTester.ls2.getDeviceType());
 		assertEquals("The lisgt sensor's device description is not correct", deviceId, UpperTester.ls2.getDeviceId());
 		assertEquals("The lisgt sensor's device description is not correct", "Light Sensor 2 test", UpperTester.ls2.getDeviceDescription());
-		assertEquals("The lisgt sensor's device connection type is not correct", "Zigbee", UpperTester.ls2.getDeviceConnetionType());
+		assertEquals("The lisgt sensor's device connection type is not correct", "Zigbee", UpperTester.ls2.getDeviceConnectionType());
 		assertEquals("The lisgt sensor's device location is not correct", "Room2", UpperTester.ls2.getDeviceLocation());
 		assertEquals("The lisgt sensor's device location is not correct", "Trialog", UpperTester.ls2.getDeviceProvider());
 		
@@ -134,7 +134,7 @@ public class NominalTestCase {
 		assertEquals("The lisgt sensor's device type is not correct", DeviceTypeConstants.LIGHT_SENSOR, UpperTester.ls3.getDeviceType());
 		assertEquals("The lisgt sensor's device description is not correct", deviceId, UpperTester.ls3.getDeviceId());
 		assertEquals("The lisgt sensor's device description is not correct", "Light Sensor 3 test", UpperTester.ls3.getDeviceDescription());
-		assertEquals("The lisgt sensor's device connection type is not correct", "Zigbee", UpperTester.ls3.getDeviceConnetionType());
+		assertEquals("The lisgt sensor's device connection type is not correct", "Zigbee", UpperTester.ls3.getDeviceConnectionType());
 		assertEquals("The lisgt sensor's device location is not correct", "Room3", UpperTester.ls3.getDeviceLocation());
 		assertEquals("The lisgt sensor's device location is not correct", "Trialog", UpperTester.ls3.getDeviceProvider());
 		
@@ -167,7 +167,7 @@ public class NominalTestCase {
 		assertEquals("The screen's device type is not correct", DeviceTypeConstants.SCREEN, UpperTester.screen.getDeviceType());
 		assertEquals("The screen's device description is not correct", deviceId, UpperTester.screen.getDeviceId());
 		assertEquals("The screen's device description is not correct", "Screen display test", UpperTester.screen.getDeviceDescription());
-		assertEquals("The screen's device connection type is not correct", "HDMI", UpperTester.screen.getDeviceConnetionType());
+		assertEquals("The screen's device connection type is not correct", "HDMI", UpperTester.screen.getDeviceConnectionType());
 		assertEquals("The screen's device location is not correct", "Corridor1", UpperTester.screen.getDeviceLocation());
 		assertEquals("The screen's device location is not correct", "Trialog", UpperTester.screen.getDeviceProvider());
 		

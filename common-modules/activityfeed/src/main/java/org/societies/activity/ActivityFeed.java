@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 
 import org.apache.shindig.social.core.model.ActivityEntryImpl;
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -270,5 +271,42 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	public boolean deleteActivity(IActivity activity) {
 		// x
 		return false;
+	}
+	@Override
+	public long importActivtyEntries(List<?> activityEntries) {
+		long ret = 0;
+		if(activityEntries.size() == 0){
+			return ret;
+		}
+		if(!ActivityEntry.class.isInstance(activityEntries.get(0))) //just checking the first entry.
+			return ret;
+		List<ActivityEntry> castedList = (List<ActivityEntry>) activityEntries;
+		Activity newAct = null;
+		Session session = sessionFactory.openSession();//getSessionFactory().openSession();
+		Transaction t = session.beginTransaction();
+		try{
+			for(ActivityEntry act : castedList){
+				newAct = new Activity();
+				newAct.setActor(act.getActor().getContent());
+				newAct.setFeed(this);
+				newAct.setObject(act.getObject().getContent());
+				newAct.setPublished(act.getPublished());
+				newAct.setTarget(act.getTarget().getContent());
+				newAct.setVerb(act.getVerb());
+				ret++;
+				this.list.add(newAct);
+				session.save(newAct);
+			}
+			t.commit();
+		}catch(Exception e){
+			t.rollback();
+			LOG.warn("Query for actitvies failed..");
+
+		}finally{
+			if(session!=null)
+				session.close();
+		}
+
+		return ret;
 	}
 }

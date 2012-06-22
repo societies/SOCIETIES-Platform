@@ -47,7 +47,7 @@ public interface IAction {
 	
 	/**
 	 * 
-	 * @return the action name
+	 * @return A string that will be used to get and/or invoke the action.
 	 */
 	public String getName();
 	
@@ -70,5 +70,17 @@ public interface IAction {
 	 * @return 
 	 */
 	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments);
+	
+	/**
+	 * 
+	 * @return Humane readable action description
+	 */
+	public String getActionDescription();
+	
+	/**
+	 * 
+	 * @return Humane readable action name
+	 */
+	public String getActionName();
 
 }

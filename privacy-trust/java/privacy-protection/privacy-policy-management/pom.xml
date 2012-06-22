@@ -72,6 +72,12 @@
 			<artifactId>api</artifactId>
 			<version>${version.pt}</version>
 		</dependency>
+		<!-- Tools -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+		</dependency>
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>

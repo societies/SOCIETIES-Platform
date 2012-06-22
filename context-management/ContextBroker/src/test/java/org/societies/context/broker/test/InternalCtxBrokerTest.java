@@ -69,6 +69,7 @@ import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.broker.test.util.MockBlobClass;
 import org.societies.context.community.db.impl.CommunityCtxDBMgr;
@@ -87,6 +88,9 @@ public class InternalCtxBrokerTest {
 	private static final String NETWORK_NODE_STRING = "myFooIIdentity@societies.local/node";
 	private static final String CIS_IDENTITY_STRING = "FooCISIIdentity@societies.local";
 
+	private static final List<String> INF_TYPES_LIST = new ArrayList<String>(); 
+	
+	
 	private InternalCtxBroker internalCtxBroker;
 
 	private static IIdentityManager mockIdentityMgr = mock(IIdentityManager.class);
@@ -94,12 +98,16 @@ public class InternalCtxBrokerTest {
 	private static IIdentity cisMockIdentity = mock(IIdentity.class);
 	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);
 
+	private static IUserCtxInferenceMgr mockUserCtxInferenceMgr = mock(IUserCtxInferenceMgr.class);
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
+		INF_TYPES_LIST.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		INF_TYPES_LIST.add(CtxAttributeTypes.LOCATION_COORDINATES);
+		
 		when(mockIdentityMgr.getThisNetworkNode()).thenReturn(mockNetworkNode);
 		when(mockNetworkNode.getBareJid()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockIdentityMgr.fromJid(OWNER_IDENTITY_STRING)).thenReturn(cssMockIdentity);
@@ -113,6 +121,9 @@ public class InternalCtxBrokerTest {
 
 		//IIdentity scopeID = this.idMgr.fromJid(communityCtxEnt.getOwnerId());
 		when(mockIdentityMgr.fromJid(CIS_IDENTITY_STRING)).thenReturn(cisMockIdentity);
+	
+
+	//	when(mockUserCtxInferenceMgr.getInferrableTypes()).thenReturn(INF_TYPES_LIST);
 	}
 
 	/**
@@ -132,9 +143,14 @@ public class InternalCtxBrokerTest {
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 		internalCtxBroker.setCommunityCtxDBMgr(new CommunityCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
+		//internalCtxBroker.setUserCtxInferenceMgr(new UserCtxInferenceMgr());
 		internalCtxBroker.setIdentityMgr(mockIdentityMgr);
 		internalCtxBroker.createIndividualEntity(cssMockIdentity, CtxEntityTypes.PERSON); // TODO remove?
 		internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
+	
+		
+		//internalCtxBroker.setUserCtxInferenceMgr(mockUserCtxInferenceMgr);
+		
 	}
 
 	/**
@@ -394,8 +410,8 @@ public class InternalCtxBrokerTest {
 
 			// retrieve service attribute
 			List<CtxIdentifier> listAttrs = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "service").get();
-			CtxIdentifier serviceAttrID = listAttrs.get(0);
-			CtxAttribute ctxAttrRetrieved = (CtxAttribute) this.internalCtxBroker.retrieve(serviceAttrID).get();
+			CtxAttributeIdentifier serviceAttrID = (CtxAttributeIdentifier) listAttrs.get(0);
+			CtxAttribute ctxAttrRetrieved = (CtxAttribute) this.internalCtxBroker.retrieveAttribute(serviceAttrID, false).get();
 
 			ServiceResourceIdentifier ctxAttrRetrievedValue = (ServiceResourceIdentifier) SerialisationHelper.deserialise(ctxAttrRetrieved.getBinaryValue(), this.getClass().getClassLoader());
 
@@ -1471,6 +1487,8 @@ public class InternalCtxBrokerTest {
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
 
+		System.out.println("**** " +tupleResults);
+		
 		assertEquals(4,tupleResults.size());
 
 		printHocTuplesDB(tupleResults);
@@ -1567,8 +1585,8 @@ public class InternalCtxBrokerTest {
 		CtxAttribute ctxAttr = null;
 		try {
 			List<CtxIdentifier> tupleAttrList = internalCtxBroker.lookup(CtxModelType.ATTRIBUTE,type).get();
-			CtxIdentifier ctxId = tupleAttrList.get(0);
-			ctxAttr =  (CtxAttribute) this.internalCtxBroker.retrieve(ctxId).get();
+			CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) tupleAttrList.get(0);
+			ctxAttr =  (CtxAttribute) this.internalCtxBroker.retrieveAttribute(ctxId,false).get();
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

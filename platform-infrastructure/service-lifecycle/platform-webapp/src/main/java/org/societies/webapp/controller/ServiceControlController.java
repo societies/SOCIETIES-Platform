@@ -220,7 +220,7 @@ public class ServiceControlController {
 		Future<ServiceControlResult> asynchResult = null;
 		ServiceControlResult scresult;
 		
-		String res;
+		String res = "";
 		
 		try {
 	
@@ -293,6 +293,43 @@ public class ServiceControlController {
 				res="Uninstall service: " + serviceId;
 				returnPage = "servicediscoveryresult";
 	
+			//>>>>>>>>>>>> SHARE SERVICE <<<<<<<<<<<<<<<
+			} else if (method.equalsIgnoreCase("ShareService")){
+				
+				if(logger.isDebugEnabled()) logger.debug("ShareService:" + serviceId);
+
+				//GENERATE SERVICE OBJECT
+				Future<Service> asyncService = this.getSDService().getService(serviceId);
+				Service serviceToShare = asyncService.get();
+				//SHARE SERVICE
+				asynchResult = this.getSCService().shareService(serviceToShare, node);
+				scresult = asynchResult.get();
+				//GET REMOTE SERVICES
+				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
+				List<Service> cisServices = asynchServices.get();
+				model.put("cisservices", cisServices);
+
+				res = scresult.getMessage().toString();
+				returnPage = "servicediscoveryresult";
+	
+			} else if (method.equalsIgnoreCase("Install3PService")){
+				
+				if(logger.isDebugEnabled()) logger.debug("Install3PService:" + serviceId);
+
+				//GENERATE SERVICE OBJECT
+				Future<Service> asyncService = this.getSDService().getService(serviceId);
+				Service serviceToInstall = asyncService.get();
+				//SHARE SERVICE
+				asynchResult = this.getSCService().installService(serviceToInstall);
+				scresult = asynchResult.get();
+				//GET REMOTE SERVICES
+				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
+				List<Service> cisServices = asynchServices.get();
+				model.put("cisservices", cisServices);
+
+				res = scresult.getMessage().toString();
+				returnPage = "servicediscoveryresult";
+	
 			} else {
 				res="error unknown metod";
 			}
@@ -303,19 +340,13 @@ public class ServiceControlController {
 				model.put("services", services);	
 			}
 			
-		}
-		catch (ServiceControlException e)
-		{
-			res = "Oops!!!! Service Control Exception <br/>";
-		}
-		catch (Exception ex)
-		{
+		} catch (ServiceControlException e) {
+			res = "Oops!!!! Service Control Exception <br/>" + e.getMessage();
+		} catch (Exception ex) {
 			res = "Oops!!!! " +ex.getMessage() +" <br/>";
 		};
 		
-		
-		model.put("result", res);
-		
+		model.put("result", res);		
 		return new ModelAndView(returnPage, model);
 		
 

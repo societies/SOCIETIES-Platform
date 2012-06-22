@@ -26,7 +26,11 @@ package org.societies.privacytrust.privacyprotection.privacypolicy;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -35,6 +39,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -88,6 +93,57 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return privacyPolicy;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFrom3PServiceJar(java.lang.String)
+	 */
+	@Override
+	public String getPrivacyPolicyFrom3PServiceJar(String jarLocation)
+			throws PrivacyException {
+		return getPrivacyPolicyFrom3PServiceJar(jarLocation, null);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFrom3PServiceJar(java.lang.String, java.util.Map)
+	 */
+	@Override
+	public String getPrivacyPolicyFrom3PServiceJar(String jarLocation, Map<String, String> options) throws PrivacyException {
+		// -- Read options (and create default options)
+		String jarTypeField = "jarType";
+		String privacyPolicyFileLocationField = "ppfLocation";
+		String privacyPolicyFileNameField = "ppfName";
+		String privacyPolicyFileEncodingField = "ppfEncoding";
+		if (null == options) {
+			options = new HashMap<String, String>();
+		}
+		if (!options.containsKey(jarTypeField)) {
+			options.put(jarTypeField, "osgi");
+		}
+		if (!options.containsKey(privacyPolicyFileLocationField)) {
+			options.put(privacyPolicyFileLocationField, "/");
+		}
+		if (!options.containsKey(privacyPolicyFileNameField)) {
+			options.put(privacyPolicyFileNameField, "privacy-policy.xml");
+		}
+		if (!options.containsKey(privacyPolicyFileEncodingField)) {
+			options.put(privacyPolicyFileEncodingField, "UTF-8");
+		}
+
+		// -- Retrieve the privacy policy file
+		URL url;
+		String privacyPolicy = null;
+		try {
+			url = new URL("jar:file:"+jarLocation+"!"+options.get(privacyPolicyFileLocationField)+options.get(privacyPolicyFileNameField));
+			InputStream privacyPolicyStream = url.openStream();
+			privacyPolicy = IOUtils.toString(privacyPolicyStream, options.get(privacyPolicyFileEncodingField));
+		} catch (MalformedURLException e) {
+			throw new PrivacyException("Can't find the privacy policy file: \"jar:file:"+jarLocation+"!"+options.get(privacyPolicyFileLocationField)+options.get(privacyPolicyFileNameField)+"\"", e);
+		} catch (IOException e) {
+			throw new PrivacyException("Can't read the privacy policy file: \"jar:file:"+jarLocation+"!"+options.get(privacyPolicyFileLocationField)+options.get(privacyPolicyFileNameField)+"\"", e);
+		}
+		return privacyPolicy;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
@@ -113,6 +169,22 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		// -- Add
 		policyRegistryManager.addPolicy(privacyPolicy.getRequestor(), privacyPolicy);
 		return privacyPolicy;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#updatePrivacyPolicy(java.lang.String, org.societies.api.identity.Requestor)
+	 */
+	@Override
+	public RequestPolicy updatePrivacyPolicy(String privacyPolicyXml, Requestor requestor) throws PrivacyException {
+		// Retrieve the privacy policy
+		RequestPolicy privacyPolicy = fromXMLString(privacyPolicyXml);
+		if (null == privacyPolicy) {
+			throw new PrivacyException("Ths XML formatted string of the privacy policy can not be parsed as a privacy policy.");
+		}
+		// Fill the requestor id
+		privacyPolicy.setRequestor(requestor);
+		// Create / Store it
+		return updatePrivacyPolicy(privacyPolicy);
 	}
 
 	/*
@@ -164,10 +236,16 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	 */
 	@Override
 	public String toXMLString(RequestPolicy privacyPolicy) {
+		String encoding = "UTF-8";
 		if (null == privacyPolicy) {
-			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+			return "<?xml version=\"1.0\" encoding=\""+encoding+"\"?><RequestPolicy></RequestPolicy>";
 		}
-		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+privacyPolicy.toXMLString();
+		String privacyPolicyXml = privacyPolicy.toXMLString();
+		// Fill XML header if necessary
+		if (!privacyPolicyXml.startsWith("<?xml")) {
+			privacyPolicyXml = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicyXml;
+		}
+		return privacyPolicyXml;
 	}
 
 	/* (non-Javadoc)
@@ -189,10 +267,15 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		// -- Convert Xml to Java
 		RequestPolicy result = null;
 		XMLPolicyReader xmlPolicyReader = new XMLPolicyReader(ctxBroker, commManager.getIdManager());
+		// Fill XML header if necessary
+		String encoding = "UTF-8";
+		if (!privacyPolicy.startsWith("<?xml")) {
+			privacyPolicy = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicy;
+		}
 		try {
 			// -- Create XMLDocument version of the privacy policy
 			DocumentBuilder xmlDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document privacyPolicyDocument = xmlDocumentBuilder.parse(new ByteArrayInputStream(privacyPolicy.getBytes("UTF-8")));
+			Document privacyPolicyDocument = xmlDocumentBuilder.parse(new ByteArrayInputStream(privacyPolicy.getBytes(encoding)));
 			// -- Transform XML Privacy Policy to Java Privacy Policy
 			result = xmlPolicyReader.readPolicyFromFile(privacyPolicyDocument);
 		} catch (ParserConfigurationException e) {
