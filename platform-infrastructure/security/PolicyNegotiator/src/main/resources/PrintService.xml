@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?><societies>
 	<serviceOperationPolicy Id="Container">
-		<sop Id="Premium Printing for businesses. Costs 0.02€ per A4, but requires more that 2000 sheets to be printed per month">
+		<sop Id="Premium Printing for businesses. Costs 0.02$ per A4, but requires more that 2000 sheets to be printed per month">
 			<SLA xmlns="http://www.ibm.com/wsla" name="StockquoteServiceAgreement12345" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ibm.com/wsla c:\Projects\WSLA\wsla.xsd">
 				
 				<Parties>
@@ -186,7 +186,7 @@
 				
 			</SLA>
 		</sop>
-		<sop Id="Standard Printing. Costs 0.1€ per A4">
+		<sop Id="Standard Printing. Costs 0.1$ per A4">
 			<SLA xmlns="http://www.ibm.com/wsla" name="StockquoteServiceAgreement12345" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ibm.com/wsla c:\Projects\WSLA\wsla.xsd">
 				
 				<Parties>
