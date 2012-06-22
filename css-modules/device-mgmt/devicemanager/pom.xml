@@ -111,7 +111,7 @@
 							commons-collections;scope=compile|runtime,
 						</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<Import-Package>
+						<!-- <Import-Package>
 							org.osgi.framework,
 							org.springframework.osgi.context,
 							org.slf4j.*,
@@ -120,7 +120,7 @@
 							org.societies.api.comm.xmpp.interfaces, 
 							org.societies.api.identity,
 							org.societies.api.internal.css.devicemgmt.model
-						</Import-Package>
+						</Import-Package> -->
 
 					</instructions>
 				</configuration>

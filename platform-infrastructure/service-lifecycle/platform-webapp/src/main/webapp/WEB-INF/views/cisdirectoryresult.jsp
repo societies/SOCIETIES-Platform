@@ -23,7 +23,7 @@
 <br/>
 <script language="javascript">
 	function updateForm(cisId) {    
-		document.all.cisJid.value = cisId;
+		document.forms["cisDirectory"]["cisJid"].value = cisId;
 		document.forms["cisDirectory"].submit();
 	} 
 </script>

@@ -145,13 +145,14 @@ public class CisManagerController {
 			model.put("errormsg", "CIS Manager Service reference not avaiable");
 			return new ModelAndView("error", model);
 		}
-
+		String res = "Starting...";
 		String method = cisForm.getMethod();
-		String res = "";
+		res = "Method: " + method;
 
 		try {
 			if (method.equalsIgnoreCase("CreateCis")) {
 				model.put("methodcalled", "CreateCis");
+				res = "Creating CIS...";
 
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
 						cisForm.getCssId(), 
@@ -161,7 +162,6 @@ public class CisManagerController {
 						cisForm.getCisMode());
 
 				res = "Successfully created CIS: " + cisResult.get().getCisId();
-				model.put("res", res);
 				localCISs.add(cisResult.get());
 
 			} else if (method.equalsIgnoreCase("GetCisList")) {
@@ -186,53 +186,64 @@ public class CisManagerController {
 
 				this.getCisManager().leaveRemoteCIS(cisForm.getCisJid(), icall);
 				res = "left CIS: ";
-				model.put("res", res);
-
 
 			} else if (method.equalsIgnoreCase("GetMemberList")) {
 				model.put("methodcalled", "GetMemberList");
-				//model.put("res", cisForm.getCisJid());
-				
-				localCISs.addAll(this.getCisManager().getListOfOwnedCis());
-				Iterator<ICisOwned> it = localCISs.iterator();
+				model.put("cisid", cisForm.getCisJid());
+
 				ICisOwned thisCis = null;
-				while(it.hasNext() && thisCis == null){
-					ICisOwned element = it.next();
-					 if (element.getCisId().equalsIgnoreCase(cisForm.getCisJid())) {
-						 thisCis = element;
-						 //break;
-					 }
-			    }
+				List<ICisOwned> ownedCISs = this.getCisManager().getListOfOwnedCis();
+				if (ownedCISs.size() > 0) {
+					res = "before add";
+					localCISs.addAll(ownedCISs);
+					res = "Afteradd";
+					Iterator<ICisOwned> it = localCISs.iterator();
+					
+					res = "Beforewhile";
+					while(it.hasNext() && thisCis == null){
+						ICisOwned element = it.next();
+						res = "BeforeIf";
+						if (element.getCisId().equalsIgnoreCase(cisForm.getCisJid())) {
+							thisCis = element;
+							//break;
+						}
+				    }
+				}
 				if(thisCis == null){
+					res = "thisCIS is null";
 					//NOT LOCAL CIS, SO CALL REMOTE
-					ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid());
-					remoteCIS.getListOfMembers(icall);
+					ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid().trim());
+					if (remoteCIS != null) {
+						res = cisForm.getCisJid().trim();
+						remoteCIS.getListOfMembers(icall);
+						res = "After getList";
+					}
 					cisForm.setMethod("GetMemberListRemote");
 					model.put("methodcalled", "GetMemberListRemote");
-					model.put("res", "CIS==null: " + cisForm.getMethod());
+					res = "CIS==null: " + cisForm.getMethod();
 				} else {
 					Set<ICisParticipant> records = thisCis.getMemberList().get();
 					model.put("memberRecords", records);
-					model.put("res", "CIS is not null");
+					res = "CIS is not null";
 				}
 				
 			} else if (method.equalsIgnoreCase("GetMemberListRemote")) {
 				model.put("methodcalled", "GetMemberListRemote");
-				
+				model.put("cisid", cisForm.getCisJid());
 				//CALL REMOTE
+				res = "Before Remote";
 				ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid().trim());
 				remoteCIS.getListOfMembers(icall);
-				
-				model.put("res", res);
+				res = "After Remote";
 				
 			} else if (method.equalsIgnoreCase("RefreshRemoteMembers")) {
 				model.put("methodcalled", "RefreshRemoteMembers");
+				model.put("cisid", cisForm.getCisJid());
 				
 				Community remoteCommunity = (Community)m_session.getAttribute("community");
 				List<Participant> membersRemote = (List<Participant>) m_session.getAttribute("memberRecords");					
 				model.put("memberRecords", membersRemote);				
-				model.put("community", remoteCommunity);				
-				model.put("res", res);
+				model.put("community", remoteCommunity);
 				
 			} else if (method.equalsIgnoreCase("AddMember")) {
 				model.put("methodcalled", "AddMember");
@@ -254,7 +265,6 @@ public class CisManagerController {
 					else
 						res = "error when adding member";					
 				}
-				model.put("res", res);
 
 			} else if (method.equalsIgnoreCase("RemoveMemberFromCIS")) {
 				model.put("methodcalled", "RemoveMemberFromCIS");
@@ -271,9 +281,10 @@ public class CisManagerController {
 			model.put("cisrecords", records);
 			
 		} catch (Exception ex) {
-			res = "Oops!!!! <br/>" + ex.getMessage();
+			res += "Oops!!!! <br/>" + ex.getLocalizedMessage();//.getMessage();
 		}
 
+		model.put("res", res);
 		model.put("cmForm", cisForm);
 		return new ModelAndView("cismanagerresult", model);
 	}
@@ -281,11 +292,6 @@ public class CisManagerController {
 	// callback
 	ICisManagerCallback icall = new ICisManagerCallback(){
 
-		public void receiveResult(boolean result) {} 
-
-		public void receiveResult(int result) {};
-		
-		public void receiveResult(String result){}
 
 		public void receiveResult(Community communityResultObject) {
 			if(communityResultObject == null){

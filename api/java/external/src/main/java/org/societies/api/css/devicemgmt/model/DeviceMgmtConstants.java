@@ -25,7 +25,10 @@
 package org.societies.api.css.devicemgmt.model;
 
 /**
- * Describe your class here...
+ * This class contains property key constants used when registering IDevice services
+ * All these properties are provided by the DeviceManager when it registers a new IDevice service
+ * These property keys can be used by the consumer of the service as an LADP filter when tracking a given service
+ * in order to track only device services which is interested in.
  *
  * @author rafik
  *
@@ -33,6 +36,13 @@ package org.societies.api.css.devicemgmt.model;
 public class DeviceMgmtConstants {
 	
 	
+	
+	/**
+	 * Unique Identifier of a css node to which a device is connected. Visible globally in the Societies Platform
+	 * this constant is to be used to get or set device service node id property
+	 * @value "deviceId"
+	 */
+	public static final String DEVICE_NODE_ID = "deviceNodeId";
 
 	/**
 	 * Unique Identifier of a device. Visible globally in the Societies Platform

@@ -27,7 +27,6 @@ package org.societies.privacytrust.trust.impl.engine;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.societies.privacytrust.trust.api.engine.ITrustEngine;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public abstract class TrustEngine implements ITrustEngine {
+public abstract class TrustEngine {
 	
 	/** The Trust Repository service reference. */
 	@Autowired

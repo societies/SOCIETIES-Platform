@@ -196,6 +196,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			logger.debug("getServices(Identity node) for node: " + node.getJid());
 		
 		boolean myNode;
+		boolean myCIS = false;
 		INetworkNode currentNode = commMngr.getIdManager().getThisNetworkNode();
 		if (!currentNode.getJid().contentEquals(node.getJid()))
 			myNode = false;
@@ -211,11 +212,12 @@ public class ServiceDiscovery implements IServiceDiscovery {
 				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
 			} else{
 				//Is it one of my CIS? If so, local search
-				ICisOwned myCis = getCisManager().getOwnedCis(node.getJid());
-				if(myCis != null){
+				ICisOwned localCis = getCisManager().getOwnedCis(node.getJid());
+				if(localCis != null){
 					if(logger.isDebugEnabled()) logger.debug("We're dealing with our CIS! Local search!");
-					serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());			
-				} 
+					serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
+					myCIS = true;
+				}
 			}
 			/*
 			switch (node.getType())
@@ -256,7 +258,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			
 			//IIdentity currentNode = commMngr.getIdManager().getThisNetworkNode();
 			
-			if (!myNode)
+			if (!myNode && !myCIS)
 			{
 				
 				if(logger.isDebugEnabled())

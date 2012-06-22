@@ -27,7 +27,7 @@ String methodCalled = methodCalledArr[0];
 
 <script language="javascript">
 function updateForm(cisId, toDo, where) {    
-	document.all.cisJid.value = cisId;
+	document.forms["cmForm"]["cisJid"].value = cisId;
 	document.forms["cmForm"]["node"].value = cisId;
 	document.forms["cmForm"]["method"].value = toDo;
 	document.forms["cmForm"].action = where;
@@ -36,9 +36,7 @@ function updateForm(cisId, toDo, where) {
 </script>
 
 <h4>${res}</h4>
-<br/>
-<br/>
-   <p><b>CIS's I own or am a member of </b></p>
+<p><b>CIS's I own or am a member of </b></p>
 
 <form id="cmForm" name="cmForm" id="cmForm" method="post" action="cismanager.html">
 <input type="hidden" name="cisJid" id="cisJid">
@@ -57,11 +55,11 @@ function updateForm(cisId, toDo, where) {
 	    </xc:forEach>
 	</table>	
 </form>
-
+<p>&nbsp;</p>
 <%
 if (methodCalled.equals("GetMemberList")) {
 %>
-    <p><b>Member list:</b></p>
+    <p><b>Member list:</b> ${cisid}</p>
 	<table>
 		<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
 		<xc:forEach var="record" items="${memberRecords}">
@@ -76,13 +74,13 @@ if (methodCalled.equals("GetMemberList")) {
 
 if (methodCalled.equals("GetMemberListRemote")) {
 	%>
-	<p>Checking with hosting CIS...</p>
+	<p>Checking with hosting CIS: ${cisid} ...</p>
 	<form id="myform" name="myform" action="cismanager.html" method="post">
 	<input type="hidden" name="method" id="method" value="RefreshRemoteMembers">
 	</form>
 	<script language="javascript">
-	setTimeout(continueExecution, 10000); 
-	//wait ten seconds before continuing  
+	setTimeout(continueExecution, 5 * 1000); 
+	//wait n seconds before continuing  
 	
 	function continueExecution() {    
 		document.forms["myform"].submit(); 
@@ -93,7 +91,7 @@ if (methodCalled.equals("GetMemberListRemote")) {
 //remoteCommunity.getOwnerJid()
 if (methodCalled.equals("RefreshRemoteMembers")) {
 %>
-    <p><b>Membership List from remote CIS:</b></p>
+    <p><b>Membership List from remote CIS:</b> ${cisid}</p>
 	<table>
 		<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
 		<xc:forEach var="record" items="${memberRecords}">

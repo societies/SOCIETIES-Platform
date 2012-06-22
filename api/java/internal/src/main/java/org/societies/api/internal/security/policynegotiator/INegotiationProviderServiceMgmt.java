@@ -26,6 +26,7 @@ package org.societies.api.internal.security.policynegotiator;
 
 import java.net.URI;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -45,9 +46,21 @@ public interface INegotiationProviderServiceMgmt {
 	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
 	 * 
 	 * @param clientJar Location of the JAR file for service client, if the service provides a client.
-	 * If the service does not provide a client, this parameter should be null
+	 * If the service does not provide a client, this parameter should be null (TBD)
 	 */
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar);
+
+	/**
+	 * Tells Policy Negotiator that a new service is available for sharing to others.
+	 * 
+	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
+	 * 
+	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
+	 * 
+	 * @param clientJarServer Location of the JAR file for service client, if the service provides a client.
+	 * If the service does not provide a client, this parameter should be null (TBD)
+	 */
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, IIdentity clientJarServer);
 	
 	/**
 	 * Tells Policy Negotiator that a service is not available for sharing to others anymore.
