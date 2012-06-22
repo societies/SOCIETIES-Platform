@@ -124,7 +124,7 @@ public class ServiceDiscoveryController {
 					
 			} else if (method.equalsIgnoreCase("GetServicesCis")) {
 				//LOCAL
-				res="Local Services: ";
+				res="My Services: ";
 				asynchResult=this.getSDService().getLocalServices();
 				services = asynchResult.get();
 				model.put("services", services);

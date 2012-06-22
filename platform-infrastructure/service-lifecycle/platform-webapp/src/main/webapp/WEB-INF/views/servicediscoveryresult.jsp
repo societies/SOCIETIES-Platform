@@ -47,7 +47,7 @@ function updateForm(serviceID, toDo) {
 <input type="hidden" name="url" id="url" />
 <input type="hidden" name="node" id="node" value="<%= node %>" />
 
-<table>
+<table border="1">
 <tr><td><B>Name</B></td><td><B>Description</B></td>
 	<td><B>Author</B></td>
 	<td><B>Status</B></td>
@@ -84,8 +84,8 @@ function updateForm(serviceID, toDo) {
 if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")) {
 %>
 	<p>&nbsp;</p>
-    <p><b>Services available in: <%= node %></b></p>	
-	<table>
+    <p><b>Community Services: <%= node %></b></p>	
+	<table border="1">
 		<tr><td><B>Name</B></td><td><B>Description</B></td>
 			<td><B>Author</B></td>
 			<td><B>Status</B></td>
