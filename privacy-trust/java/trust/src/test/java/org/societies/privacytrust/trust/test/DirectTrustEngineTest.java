@@ -63,6 +63,10 @@ import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 public class DirectTrustEngineTest {
 	
 private static final String BASE_ID = "dtet";
+
+	private static final Double JOINED_COMMUNITY_SCORE = 5.0d;
+
+	private static final Double LEFT_COMMUNITY_SCORE = -10.0d;
 	
 	private static final String TRUSTOR_ID = BASE_ID + "TrustorIIdentity";
 	
@@ -293,6 +297,57 @@ private static final String BASE_ID = "dtet";
 		//assertEquals(???, evaluatedCis.getDirectTrust().getValue()); // TODO
 	}
 
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.impl.engine.DirectTrustEngine#evaluateCisTrustValues(List, List)}.
+	 */
+	@Test
+	public void testEvaluateCisBasedOnCisLifecycleEvidence() throws TrustEngineException {
+		
+		final List<ITrustedCis> cssList = new ArrayList<ITrustedCis>();
+		cssList.add(trustedCis);
+		
+		final List<ITrustEvidence> evidenceList = new ArrayList<ITrustEvidence>();
+		// Joined Community evidence
+		final Date timestamp = new Date();
+		final IDirectTrustEvidence evidence1 = new DirectTrustEvidence(trustedCis.getTeid(),
+				TrustEvidenceType.JOINED_COMMUNITY, timestamp, null);
+		evidenceList.add(evidence1);
+		
+		this.engine.evaluateCisTrustValues(cssList, evidenceList);
+		ITrustedCis evaluatedCis = cssList.get(0);
+		assertNotNull(evaluatedCis.getDirectTrust().getLastModified());
+		assertNotNull(evaluatedCis.getDirectTrust().getLastUpdated());
+		assertEquals(evaluatedCis.getDirectTrust().getLastModified(), evaluatedCis.getDirectTrust().getLastUpdated());
+		assertNull(evaluatedCis.getDirectTrust().getRating());
+		assertNotNull(evaluatedCis.getDirectTrust().getScore());
+		assertEquals(JOINED_COMMUNITY_SCORE, evaluatedCis.getDirectTrust().getScore());
+		assertNotNull(evaluatedCis.getDirectTrust().getValue());
+		//assertEquals(???, evaluatedCis.getDirectTrust().getValue()); // TODO
+		Double trustValueAfterEvidence1 = new Double(evaluatedCis.getDirectTrust().getValue());
+		
+		evidenceList.clear();
+		
+		final Date timestamp2 = new Date();
+		final IDirectTrustEvidence evidence2 = new DirectTrustEvidence(trustedCis.getTeid(),
+				TrustEvidenceType.LEFT_COMMUNITY, timestamp2, null);
+		evidenceList.add(evidence2);
+		
+		this.engine.evaluateCisTrustValues(cssList, evidenceList);
+		evaluatedCis = cssList.get(0);
+		assertNotNull(evaluatedCis.getDirectTrust().getLastModified());
+		assertNotNull(evaluatedCis.getDirectTrust().getLastUpdated());
+		assertEquals(evaluatedCis.getDirectTrust().getLastModified(), evaluatedCis.getDirectTrust().getLastUpdated());
+		assertNull(evaluatedCis.getDirectTrust().getRating());
+		assertNotNull(evaluatedCis.getDirectTrust().getScore());
+		assertEquals(new Double(JOINED_COMMUNITY_SCORE+LEFT_COMMUNITY_SCORE),
+				evaluatedCis.getDirectTrust().getScore());
+		assertNotNull(evaluatedCis.getDirectTrust().getValue());
+		//assertEquals(???, evaluatedCis.getDirectTrust().getValue()); // TODO
+		Double trustValueAfterEvidence2 = new Double(evaluatedCis.getDirectTrust().getValue());
+		
+		assertTrue(trustValueAfterEvidence1 >= trustValueAfterEvidence2);
+	}
+	
 	/**
 	 * Test method for {@link org.societies.privacytrust.trust.impl.engine.DirectTrustEngine#evaluateServiceTrustValues(List, List)}.
 	 */
