@@ -137,7 +137,7 @@ public class CommsServer implements IFeatureServer {
 				switch (method) {
 				case ADD_KEY:
 					LOG.debug("getQuery(): ClientJarBean.addKey({})", filePath);
-					resultFuture = clientJarServer.addKey(url.toASCIIString(), filePath);
+					resultFuture = clientJarServer.addKey(url, filePath);
 					break;
 				default:
 					LOG.warn("getQuery(): unrecognized method: {}", method);

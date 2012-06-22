@@ -26,6 +26,8 @@ package org.societies.domainauthority.rest.control;
 
 import static org.junit.Assert.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
@@ -62,11 +64,12 @@ public class ServiceClientJarAccessTest {
 	 * Test method for {@link ServiceClientJarAccess#addKey(String, String)}.
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
+	 * @throws URISyntaxException 
 	 */
 	@Test
-	public void testValidKey() throws InterruptedException, ExecutionException {
+	public void testValidKey() throws InterruptedException, ExecutionException, URISyntaxException {
 		
-		String hostname = "http://www.example.com:8080";
+		URI hostname = new URI("http://www.example.com:8080");
 		String filePath = "foo.jar";
 		UrlBean result;
 		String key;

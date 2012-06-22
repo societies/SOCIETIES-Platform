@@ -65,7 +65,13 @@ public class ServiceClientJarAccess implements IClinetJarServer {
 		LOG.info("Constructor");
 		
 		// TODO: remove when other components do this
-		addKey("http://localhost:8080", "Calculator.jar");
+		URI url;
+		try {
+			url = new URI("http://localhost:8080");
+			addKey(url, "Calculator.jar");
+		} catch (URISyntaxException e) {
+			LOG.error("Could not add key.", e);
+		}
 	}
 
 	public void init() {
@@ -83,7 +89,7 @@ public class ServiceClientJarAccess implements IClinetJarServer {
 	}
 	
 	@Override
-	public Future<UrlBean> addKey(String hostname, String filePath) {
+	public Future<UrlBean> addKey(URI hostname, String filePath) {
 		
 		String key = generateKey();
 		UrlBean result = new UrlBean();
