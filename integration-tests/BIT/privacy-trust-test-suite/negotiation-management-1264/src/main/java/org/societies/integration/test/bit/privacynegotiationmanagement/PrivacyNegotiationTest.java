@@ -24,8 +24,7 @@
  */
 package org.societies.integration.test.bit.privacynegotiationmanagement;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
@@ -39,7 +38,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
@@ -71,29 +74,22 @@ public class PrivacyNegotiationTest {
 	private RequestorCis requestorCis;
 	private RequestPolicy servicePrivacyPolicy;
 	private RequestPolicy cisPrivacyPolicy;
-
-	//	private MyIdentity userId;
-	//	private IndividualCtxEntity userCtxEntity;
-	//	private CtxAttributeIdentifier ctxLocationAttributeId;
-	//	private CtxAttribute locationAttribute;
-	//	private CtxAttributeIdentifier ctxStatusAttributeId;
-	//	private CtxAttribute statusAttribute;
-	//	private IAgreement agreement;
-	//	private PPNPOutcome locationOutcomeForService;
-	//	private PPNPOutcome statusOutcomeForService;
-	//	private PPNPOutcome locationOutcomeForCis;
-	//	private PPNPOutcome statusOutcomeForCis;
-	//	private PPNegotiationEvent successfulEvent;
-	//	private FailedNegotiationEvent failedEvent;
-
 	private ResponsePolicy serviceResponsePolicy;
 	private ResponsePolicy cisResponsePolicy;
-	private AgreementEnvelope negotiationAgreementEnvelope;
+
+	private IIdentity userId;
+	private IndividualCtxEntity userCtxEntity;
+	private CtxAttributeIdentifier ctxLocationAttributeId;
+	private CtxAttribute locationAttribute;
+	private CtxAttributeIdentifier ctxStatusAttributeId;
+	private CtxAttribute statusAttribute;
+
 
 
 	@Before
 	public void setUp() {
 		String testTitle = new String("setUp");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 
 		// -- Verify dependency injection
 		if (!TestCase1264.isDepencyInjectionDone()) {
@@ -122,34 +118,22 @@ public class PrivacyNegotiationTest {
 			fail("Error URISyntaxException  when generating the service id: "+e.getMessage()+" - "+testTitle);
 		}
 
-		// -- Generate ResponsePolicy
+		// -- Generate expected ResponsePolicy
 		this.serviceResponsePolicy = this.getServiceResponsePolicy();
 		this.cisResponsePolicy = this.getCisResponsePolicy();
-		//		setupContext();
-		//		this.createNegotiationAgreement();
-		//		this.setupPPNPOutcomes();
-		//		this.negotiationMgr = new PrivacyPolicyNegotiationManager();
-		//		this.negotiationMgr.setCtxBroker(ctxBroker);
-		//		this.negotiationMgr.setEventMgr(eventMgr);
-		//		this.negotiationMgr.setIdentitySelection(Mockito.mock(IIdentitySelection.class));
-		//		this.negotiationMgr.setIdm(Mockito.mock(IIdentityManager.class));
-		//		this.negotiationMgr.setPrefMgr(prefMgr);
-		//		this.negotiationMgr.setPrivacyDataManagerInternal(privacyDataManager);
-		//		this.negotiationMgr.setPrivacyAgreementManagerInternal(policyAgreementMgr );
-		//		this.negotiationMgr.setNegotiationAgent(negAgent);
-		//		this.negotiationMgr.setPrivacyPreferenceManager(privacyPreferenceManager);
-		//		
-		//		this.setupMockito();
-		//		
-		//		this.negotiationMgr.initialisePrivacyPolicyNegotiationManager();
+
+		// -- Add types to context
+		setupContext();
 	}
 
 	@After
 	public void tearDown() {
 		String testTitle = new String("tearDown");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 
 		// -- Delete privacy policies
 		try {
+			deleteContext();
 			TestCase1264.privacyPolicyManager.deletePrivacyPolicy(requestorService);
 			TestCase1264.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
 		} catch (PrivacyException e) {
@@ -159,12 +143,13 @@ public class PrivacyNegotiationTest {
 	}
 
 
+
 	@Test
 	public void testStartNegotiationCis() {
 		String testTitle = new String("testStartNegotiationCis");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		
-		AgreementEnvelope expectedPrivacyAgreement = null;
+
+		//		AgreementEnvelope expectedPrivacyAgreement = null;
 		AgreementEnvelope retrievedPrivacyAgreement = null;
 		try {
 			TestCase1264.privacyPolicyNegotiationManager.negotiateCISPolicy(requestorCis);
@@ -179,14 +164,14 @@ public class PrivacyNegotiationTest {
 		}
 		assertNotNull("Privacy agreement is null: the negotiation has failed", retrievedPrivacyAgreement);
 	}
-	
+
 	@Test
 	@Ignore
 	public void testStartNegotiationService() {
 		String testTitle = new String("testStartNegotiationService");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 
-		AgreementEnvelope expectedPrivacyAgreement = null;
+		//		AgreementEnvelope expectedPrivacyAgreement = null;
 		AgreementEnvelope retrievedPrivacyAgreement = null;
 		try {
 			TestCase1264.privacyPolicyNegotiationManager.negotiateServicePolicy(requestorService);
@@ -201,6 +186,7 @@ public class PrivacyNegotiationTest {
 		}
 		assertNotNull("Privacy agreement is null: the negotiation has failed", retrievedPrivacyAgreement);
 	}
+
 
 
 	/* **************
@@ -302,7 +288,6 @@ public class PrivacyNegotiationTest {
 		/*
 		 * status requestItem
 		 */
-
 		Resource rStatus = new Resource(CtxAttributeTypes.STATUS);
 		List<Action> actions1 = new ArrayList<Action>();
 		actions1.add(new Action(ActionConstants.READ));
@@ -313,93 +298,47 @@ public class PrivacyNegotiationTest {
 		conditions1.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
 		RequestItem itemStatus = new RequestItem(rStatus, actions1, conditions1);
 
-		/* ----------------------------------------------------*/
+		/*
+		 * birthday requestItem
+		 */
+		Resource rBirthday = new Resource(CtxAttributeTypes.BIRTHDAY);
+		List<Action> actions2 = new ArrayList<Action>();
+		actions2.add(new Action(ActionConstants.WRITE));
+		List<Condition> conditions2 = new ArrayList<Condition>();
+		conditions2.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
+		conditions2.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
+		conditions2.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "NO"));
+		conditions2.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
+		RequestItem itemBirthday = new RequestItem(rBirthday, actions2, conditions2, true);
 
+		/* ----------------------------------------------------*/
 
 		List<RequestItem> requests = new ArrayList<RequestItem>();
 		requests.add(itemLocation);
 		requests.add(itemStatus);
+		requests.add(itemBirthday);
 		RequestPolicy policy = new RequestPolicy(this.requestorCis, requests);
-
-
 		return policy;
 	}
-	//	
-	//	
-	//	private void setupContext(){
-	//		this.userId = new MyIdentity(IdentityType.CSS, "xcmanager","societies.local");
-	//		CtxEntityIdentifier ctxId = new CtxEntityIdentifier(userId.getJid(), "Person", new Long(1));
-	//		this.userCtxEntity = new IndividualCtxEntity(ctxId);
-	//		
-	//		
-	//		ctxLocationAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC, new Long(1));
-	//		locationAttribute = new CtxAttribute(ctxLocationAttributeId);
-	//		locationAttribute.setStringValue("home");
-	//		
-	//		
-	//		ctxStatusAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.STATUS, new Long(1));
-	//		statusAttribute = new CtxAttribute(ctxStatusAttributeId);
-	//		statusAttribute.setStringValue("busy");
-	//		
-	//		userCtxEntity.addAttribute(locationAttribute);
-	//		userCtxEntity.addAttribute(statusAttribute);
-	//		
-	//		
-	//	}
 
+	private void setupContext() {
+		userId = TestCase1264.commManager.getIdManager().getThisNetworkNode();
+		CtxEntityIdentifier ctxId = new CtxEntityIdentifier(userId.getJid(), "Person", new Long(1));
+		userCtxEntity = new IndividualCtxEntity(ctxId);
 
+		ctxLocationAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC, new Long(1));
+		locationAttribute = new CtxAttribute(ctxLocationAttributeId);
+		locationAttribute.setStringValue("home");
 
+		ctxStatusAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.STATUS, new Long(1));
+		statusAttribute = new CtxAttribute(ctxStatusAttributeId);
+		statusAttribute.setStringValue("busy");
 
+		userCtxEntity.addAttribute(locationAttribute);
+		userCtxEntity.addAttribute(statusAttribute);
+	}
 
-
-	//	private void setupPPNPOutcomes() {
-	//		List<Requestor> subjectsService = new ArrayList<Requestor>();
-	//		subjectsService.add(requestorService);		
-	//		List<Requestor> subjectsCis = new ArrayList<Requestor>();
-	//		subjectsCis.add(requestorCis);	
-	//		Resource rLocation = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
-	//		List<Action> actions = new ArrayList<Action>();
-	//		actions.add(new Action(ActionConstants.READ));
-	//		List<Condition> conditions = new ArrayList<Condition>();
-	//		conditions.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-	//		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-	//		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-	//		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
-	//		
-	//		RuleTarget targetLocationForService = new RuleTarget(subjectsService, rLocation, actions);
-	//		
-	//		
-	//		Resource rStatus = new Resource(CtxAttributeTypes.STATUS);
-	//		
-	//		RuleTarget targetStatusForService = new RuleTarget(subjectsService, rStatus, actions);
-	//		
-	//		RuleTarget targetLocationForCis = new RuleTarget(subjectsCis, rLocation, actions);
-	//		
-	//		RuleTarget targetStatusForCis = new RuleTarget(subjectsCis, rStatus, actions);
-	//		try {
-	//			locationOutcomeForService = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetLocationForService, conditions);
-	//			
-	//			locationOutcomeForCis = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetLocationForCis, conditions);
-	//			statusOutcomeForService = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetStatusForService, conditions);
-	//			statusOutcomeForCis = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetStatusForCis, conditions);
-	//		} catch (URISyntaxException e) {
-	//			// TODO Auto-generated catch block
-	//			e.printStackTrace();
-	//		}
-	//		
-	//	}
-	//
-	//
-	//	private void createNegotiationAgreement() {
-	//		AgreementFinaliser finaliser = new AgreementFinaliser();
-	//		agreement = new NegotiationAgreement(serviceResponsePolicy);
-	//		byte[] signature = finaliser.signAgreement(agreement);
-	//		Key publicKey = finaliser.getPublicKey();
-	//		try {
-	//			this.negotiationAgreementEnvelope = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
-	//		} catch (IOException e) {
-	//			// TODO Auto-generated catch block
-	//			e.printStackTrace();
-	//		}
-	//	}
+	private void deleteContext() {
+		// TODo
+	}
 }
