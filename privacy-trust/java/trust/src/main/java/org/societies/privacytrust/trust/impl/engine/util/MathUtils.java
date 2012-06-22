@@ -22,28 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.impl.engine;
+package org.societies.privacytrust.trust.impl.engine.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.apache.commons.math.stat.StatUtils;
 
 /**
+ * Describe your class here...
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.3
  */
-@Service
-public class IndirectTrustEngine extends TrustEngine {
+public class MathUtils {
 
-	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(IndirectTrustEngine.class);
+	public static double[] normalise(double[] input) {
 	
-	@Autowired
-	IndirectTrustEngine(ITrustEventMgr trustEventMgr) {
+		return StatUtils.normalize(input);
+	}
+	
+	public static double[] stanine(double[] input) {
 		
-		super(trustEventMgr);
-		LOG.info(this.getClass() + " instantiated");
+		double[] zscores = normalise(input);
+		
+		double[] stanines = new double[zscores.length];
+		for (int i = 0; i < zscores.length; ++i) {
+			if (zscores[i] < -1.75d)
+				stanines[i] = 1;
+			else if (zscores[i] >= -1.75d && zscores[i] < -1.25d)
+				stanines[i] = 2;
+			else if (zscores[i] >= -1.25d && zscores[i] < -0.75d)
+				stanines[i] = 3;
+			else if (zscores[i] >= -0.75d && zscores[i] < -0.25d)
+				stanines[i] = 4;
+			else if (zscores[i] >= -0.25d && zscores[i] < +0.25d)
+				stanines[i] = 5;
+			else if (zscores[i] >= +0.25d && zscores[i] < +0.75d)
+				stanines[i] = 6;
+			else if (zscores[i] >= +0.75d && zscores[i] < +1.25d)
+				stanines[i] = 7;
+			else if (zscores[i] >= +1.25d && zscores[i] < +1.75d)
+				stanines[i] = 8;
+			else // if (zscores[i] >= +1.75d)
+				stanines[i] = 9;
+		}
+		
+		return stanines;
 	}
 }

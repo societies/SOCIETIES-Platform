@@ -37,7 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.model.ITrustedCis;
+import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
@@ -213,9 +216,20 @@ public class TrustRepository implements ITrustRepository {
 		if (entityClass == null)
 			throw new NullPointerException("entityClass can't be null");
 		
+		final Class<? extends TrustedEntity> daClass;
+		if (ITrustedCss.class.equals(entityClass))
+			daClass = TrustedCss.class;
+		else if (ITrustedCis.class.equals(entityClass))
+			daClass = TrustedCis.class;
+		else if (ITrustedService.class.equals(entityClass))
+			daClass = TrustedService.class;
+		else
+			throw new TrustRepositoryException("Unsupported entityClass: "
+					+ entityClass);
+			
 		final List<T> result = new ArrayList<T>();
 		final Session session = sessionFactory.openSession();
-		final Criteria criteria = session.createCriteria(entityClass)
+		final Criteria criteria = session.createCriteria(daClass)
 				.add(Restrictions.eq("teid.trustor_id", trustorId));
 		
 		result.addAll(criteria.list());
