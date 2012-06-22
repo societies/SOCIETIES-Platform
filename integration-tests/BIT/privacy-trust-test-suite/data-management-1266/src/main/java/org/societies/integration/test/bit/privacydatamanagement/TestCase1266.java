@@ -22,58 +22,63 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
-
-import org.societies.api.schema.identity.DataIdentifier;
+package org.societies.integration.test.bit.privacydatamanagement;
 
 /**
- * This data wrapper is an abstraction between obfuscation manager
- * and data models. This is the way for wrapping data to obfuscate them,
- * and filling a type of data (needed to know how obfuscate them) 
- * This wrapper is linked to a specific data obfuscator
- * and know what kind of data is needed to launch the obfuscation. 
+ * The test case 1266 aims to test the privacy data management
+ * real usage, using the privacy preference manager.
+ * 
  * @author Olivier Maridat (Trialog)
- * @date 18 oct. 2011
+ *
  */
-public interface IDataWrapper<E> {
-	/**
-	 * @return Id of the data to be obfuscated
-	 */
-	public String getDataId();
-	/**
-	 * @param dataId Id of the data to be obfuscated
-	 */
-	public void setDataId(String dataId);
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.integration.test.IntegrationTestCase;
+
+public class TestCase1266 extends IntegrationTestCase {
+	private static Logger LOG = LoggerFactory.getLogger(TestCase1266.class.getSimpleName());
+
+	public static IPrivacyDataManager privacyDataManager;
+	public static ICommManager commManager;
 	
-	/**
-	 * Data
-	 * @return The data to be obfuscated
-	 */
-	public E getData();
-	/**
-	 * Set the data to be obfuscated
-	 * @param data The data to be obfuscated
-	 */
-	public void setData(E data);
 	
-	/**
-	 * To know if obfuscated data will be stored with this obfuscator
-	 * 
-	 * @return True if this obfuscator has enabled persistence
-	 * @return Otherwise false
-	 */
-	public boolean isPersistenceEnabled();
-	/**
-	 * To enable storage of obfuscated data
-	 * @param persist True to persist the data, false otherwise
-	 */
-	public void setPersistenceEnabled(boolean persist);
+	public TestCase1266() {
+		// Call the super constructor
+		// with test case number
+		// and test case classes to run
+		super(1266, new Class[]{PrivacyDataManagerTest.class});
+		PrivacyDataManagerTest.testCaseNumber = this.testCaseNumber;
+	}
 	
-	/**
-	 * To know if this wrapper is ready for obfuscation operation
-	 * 
-	 * @return True if this DataWrapper is ready for obfuscation
-	 * @return Otherwise false
-	 */
-	public boolean isReadyForObfuscation();
+	
+	/* -- Dependency injection --- */
+	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] IPrivacyDataManager injected");
+	}
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICommManager injected");
+	}
+
+	public static boolean isDepencyInjectionDone() {
+		return isDepencyInjectionDone(0);
+	}
+	public static boolean isDepencyInjectionDone(int level) {
+		if (null == commManager) {
+			LOG.info("[Dependency Injection] Missing ICommManager");
+			return false;
+		}
+		if (null == commManager.getIdManager()) {
+			LOG.info("[Dependency Injection] Missing IIdentityManager");
+			return false;
+		}
+		if (null == privacyDataManager) {
+			LOG.info("[Dependency Injection] Missing IPrivacyDataManager");
+			return false;
+		}
+		return true;
+	}
 }
