@@ -35,7 +35,7 @@ import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.css.directory.ICssDirectory;
 
 //import org.societies.api.internal.css.discovery.ICssDiscovery;
@@ -153,7 +153,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
-	private IDeviceManager deviceManager;
+//	private IDeviceManager deviceManager;
 	
 	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
 	private SuggestedCommunityAnalyserResultBean suggestedCommunityAnalyserResultBean;
@@ -1598,13 +1598,13 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
     }
     
-    public IDeviceManager getDeviceManager() {
-    	return deviceManager;
-    }
-    
-    public void setDeviceManager(IDeviceManager deviceManager) {
-    	this.deviceManager = deviceManager;
-    }
+//    public IDeviceManager getDeviceManager() {
+//    	return deviceManager;
+//    }
+//    
+//    public void setDeviceManager(IDeviceManager deviceManager) {
+//    	this.deviceManager = deviceManager;
+//    }
     
     public IPrivacyDataManager getPrivacyDataManager() {
     	return privacyDataManager;
