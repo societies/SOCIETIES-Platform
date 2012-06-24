@@ -34,24 +34,42 @@
 	  </xs:restriction>
 	</xs:simpleType>
 	
-	<xs:complexType name="cisRecord">
+	<xs:complexType name="cisProposal">
     <xs:sequence>
       <xs:element name="cisHostingLocation" type="xs:string" minOccurs="1"/>
       <xs:element name="cisIdentity" type="xs:string" minOccurs="0"/>
       <xs:element name="password" type="xs:string" minOccurs="0"/>
       <xs:element name="membershipCriteria" type="xs:string" minOccurs="0"/>
+      <xs:element name="memberList" type="tns:arrayList" minOccurs="0"/>
       <xs:element name="owner" type="xs:string" minOccurs="1"/>
-      <xs:element name="administrators" type="xs:string" minOccurs="0"/>
+      <xs:element name="administrators" type="tns:arrayList" minOccurs="0"/>
       <xs:element name="name" type="xs:string" minOccurs="1"/>
-      <xs:element name="subCiss" type="xs:string" minOccurs="0"/>
+      <xs:element name="subCiss" type="tns:arrayList" minOccurs="0"/>
+      <xs:element name="superCis" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="cis">
+    <xs:sequence>
+      <xs:element name="cisHostingLocation" type="xs:string" minOccurs="1"/>
+      <xs:element name="cisIdentity" type="xs:string" minOccurs="0"/>
+      <xs:element name="password" type="xs:string" minOccurs="0"/>
+      <xs:element name="membershipCriteria" type="xs:string" minOccurs="0"/>
+      <xs:element name="memberList" type="tns:arrayList" minOccurs="0"/>
+      <xs:element name="owner" type="xs:string" minOccurs="1"/>
+      <xs:element name="administrators" type="tns:arrayList" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="1"/>
+      <xs:element name="subCiss" type="tns:arrayList" minOccurs="0"/>
       <xs:element name="superCis" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   
   <xs:complexType name="arrayList">
     <xs:sequence>
-      <xs:element name="cisMetadata" type="xs:string" minOccurs="1"/>
-      <!-- <xs:element name="cisRecord" type="tns:cisRecord" minOccurs="1"/>-->
+      <xs:element name="cisMetadata" type="xs:string" minOccurs="0"/>
+       <xs:element name="cisProposal" type="tns:cisProposal" minOccurs="0"/>
+       <xs:element name="memberList" type="xs:string" minOccurs="0"/>
+       <xs:element name="cis" type="tns:arrayList" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 	
