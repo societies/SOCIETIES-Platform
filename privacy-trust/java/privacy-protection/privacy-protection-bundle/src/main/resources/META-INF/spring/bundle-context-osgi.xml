@@ -51,21 +51,26 @@
 	    </osgi:interfaces>
 	</osgi:service>
 
+
+
 	<!-- Needed references -->
+	
+	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
 
 	<osgi:reference id="commsMgr"
-		interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
+		interface="org.societies.api.comm.xmpp.interfaces.ICommManager"
+		cardinality="0..1">
 	</osgi:reference>
 
 	<osgi:reference id="ctxBroker"
-		interface="org.societies.api.internal.context.broker.ICtxBroker">
+		interface="org.societies.api.internal.context.broker.ICtxBroker"
+		cardinality="0..1">
 	</osgi:reference>
 
 	<osgi:reference id="trustBroker"
-		interface="org.societies.api.internal.privacytrust.trust.ITrustBroker">
+		interface="org.societies.api.internal.privacytrust.trust.ITrustBroker"
+		cardinality="0..1">
 	</osgi:reference>
-
-	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
 
 	<osgi:reference id="CommManagerBundle"
 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager"
@@ -74,13 +79,4 @@
 	<osgi:reference id="eventMgr"
 		interface="org.societies.api.osgi.event.IEventMgr">
 	</osgi:reference>
-
-
-<!-- 	<osgi:reference id="NegotiationAgentRemote">
-	    <osgi:interfaces>
-	        <value>
-	            
-	        </value>
-	    </osgi:interfaces>
-	</osgi:reference> -->
 </beans>

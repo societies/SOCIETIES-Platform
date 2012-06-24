@@ -156,8 +156,14 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		// Comm Manager
 		ICommManager commManager = Mockito.mock(ICommManager.class);
 		IIdentityManager idManager = Mockito.mock(IIdentityManager.class);
+		IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
+		IIdentity cisId = new MockIdentity(IdentityType.CIS, "onecis", "societies.local");
+		Mockito.when(idManager.fromJid(otherCssId.getJid())).thenReturn(otherCssId);
+		Mockito.when(idManager.fromJid(cisId.getJid())).thenReturn(cisId);
 		Mockito.when(idManager.fromJid("onecis.societies.local")).thenReturn(new MockIdentity("onecis.societies.local"));
+		Mockito.when(idManager.fromJid("onecis@societies.local")).thenReturn(new MockIdentity("onecis@societies.local"));
 		Mockito.when(idManager.fromJid("othercss@societies.local")).thenReturn(new MockIdentity("othercss@societies.local"));
+		Mockito.when(idManager.fromJid("red@societies.local")).thenReturn(new MockIdentity("red@societies.local"));
 		Mockito.when(idManager.fromJid("eliza@societies.local")).thenReturn(new MockIdentity("eliza@societies.local"));
 		Mockito.when(commManager.getIdManager()).thenReturn(idManager);
 
@@ -204,10 +210,13 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			LOG.info("[Test PrivacyException] testGetCisPrivacyPolicy: add and retrieve a privacy policy", e);
 			fail("[Error testGetCisPrivacyPolicy] Privacy error");
 		} catch (Exception e) {
+			LOG.error("[Test PrivacyException] testGetCisPrivacyPolicy: add and retrieve a privacy policy", e);
 			fail("[Error testDeletePrivacyPolicy] error");
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
+		LOG.info(privacyPolicy.toString());
+		LOG.info(addedPrivacyPolicy.toString());
 		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
@@ -404,16 +413,16 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testFromXmlNull() {
-		LOG.info("[Test] testFromXml");
+		LOG.info("[Test] testFromXmlNull");
 		RequestPolicy privacyPolicy = null;
 		try {
 			privacyPolicy = privacyPolicyManager.fromXMLString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		} catch (PrivacyException e) {
-			LOG.info("[Test PrivacyException] testFromXml", e);
-			fail("[Error testUpdatePrivacyPolicy] Privacy error");
+			LOG.info("[Test PrivacyException] testFromXmlNull", e);
+			fail("[Error testFromXmlNull] Privacy error");
 		} catch (Exception e) {
-			LOG.info("[Test Exception] testFromXml", e);
-			fail("[Error testFromXml] error");
+			LOG.info("[Test Exception] testFromXmlNull", e);
+			fail("[Error testFromXmlNull] error");
 		}
 		assertNull("Privacy policy not null, but it should", privacyPolicy);
 	}
@@ -427,10 +436,10 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		LOG.info("[Test] testFromXml");
 		RequestPolicy privacyPolicy = null;
 		try {
-			privacyPolicy = privacyPolicyManager.fromXMLString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+cisPolicy.toXMLString());
+			privacyPolicy = privacyPolicyManager.fromXMLString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString());
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] testFromXml", e);
-			fail("[Error testUpdatePrivacyPolicy] Privacy error");
+			fail("[Error testFromXml] Privacy error");
 		} catch (Exception e) {
 			LOG.info("[Test Exception] testFromXml", e);
 			fail("[Error testFromXml] error");
@@ -449,9 +458,9 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			privacyPolicy = privacyPolicyManager.toXMLString(null);
 		} catch (Exception e) {
 			LOG.info("[Test Exception] testToXmlNull", e);
-			fail("[Error testFromXml] error");
+			fail("[Error testToXmlNull] error");
 		}
-		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", privacyPolicy);
+		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RequestPolicy></RequestPolicy>", privacyPolicy);
 	}
 	
 	/**
@@ -467,7 +476,11 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			LOG.info("[Test Exception] testToXml", e);
 			fail("[Error testFromXml] error");
 		}
-		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+cisPolicy.toXMLString(), privacyPolicy);
+		LOG.info("***************************");
+		LOG.info("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString());
+		LOG.info(privacyPolicy);
+		LOG.info("***************************");
+		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString(), privacyPolicy);
 	}
 
 
@@ -476,7 +489,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testInferPrivacyPolicy() {
-		LOG.info("[Test] testRequestPolicyEquals");
+		LOG.info("[Test] testInferPrivacyPolicy");
 		RequestPolicy expected = new RequestPolicy(new ArrayList<RequestItem>());
 		RequestPolicy actual = null;
 		try {
@@ -512,6 +525,123 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 
 		assertEquals("Expected equals", expected.toXMLString(), actual.toXMLString());
 		assertEquals("Expected equals", expected, actual);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
+	 */
+	@Test
+	public void testUpdatePrivacyPolicyFromXml() {
+		String testTitle = "testUpdatePrivacyPolicyFromXml: add and retrieve a privacy policy created from a XML string";
+		LOG.info("[Test] "+testTitle);
+		String privacyPolicy = "<RequestPolicy>" +
+				"<Target>" +
+				"<Resource>" +
+				"<Attribute AttributeId=\"contextType\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+				"<AttributeValue>fdsfsf</AttributeValue>" +
+				"</Attribute>" +
+				"</Resource>" +
+				"<Action>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
+				"<AttributeValue>WRITE</AttributeValue>" +
+				"</Attribute>" +
+				"<optional>false</optional>" +
+				"</Action>" +
+				"<Condition>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<AttributeValue DataType=\"SHARE_WITH_3RD_PARTIES\">dfsdf</AttributeValue>" +
+				"</Attribute>" +
+				"<optional>true</optional>" +
+				"</Condition>" +
+				"<Condition>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<AttributeValue DataType=\"DATA_RETENTION_IN_MINUTES\">412</AttributeValue>" +
+				"</Attribute>" +
+				"<optional>true</optional>" +
+				"</Condition>" +
+				"<optional>false</optional>" +
+				"</Target>" +
+				"</RequestPolicy>";
+		RequestPolicy addedPrivacyPolicy = null;
+		RequestPolicy readPrivacyPolicy = null;
+		boolean deleteResult = false;
+		try {
+			addedPrivacyPolicy = privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);
+			readPrivacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
+			deleteResult = privacyPolicyManager.deletePrivacyPolicy(requestorCis);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("Privacy error "+e.getLocalizedMessage()+": "+testTitle);
+		} catch (Exception e) {
+			LOG.error("[Test Exception] "+testTitle, e);
+			fail("Error "+e.getLocalizedMessage()+": "+testTitle);
+		}
+		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
+		assertNotNull("Privacy policy retrieved is null, but it should not.", readPrivacyPolicy);
+		LOG.info(privacyPolicy);
+		LOG.info(addedPrivacyPolicy.toString());
+		LOG.info(readPrivacyPolicy.toString());
+		assertEquals("Expected a privacy policy, but it what not the good one.", readPrivacyPolicy, addedPrivacyPolicy);
+		assertTrue("Privacy policy not deleted.", deleteResult);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
+	 */
+	@Test
+	public void testGetPrivacyPolicyFromJar() {
+		String testTitle = "testGetPrivacyPolicyFromJar: retrieve a privacy policy contained in a JAR";
+		LOG.info("[Test] "+testTitle);
+		String expectedPrivacyPolicy = "<RequestPolicy>" +
+				"<Subject>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\" DataType=\""+IIdentity.class.getCanonicalName()+"\">" +
+				"<AttributeValue>othercss@societies.local</AttributeValue>" +
+				"</Attribute>" +
+				"<Attribute AttributeId=\"CisId\" DataType=\"org.societies.api.identity.IIdentity\">" +
+				"<AttributeValue>onecis.societies.local</AttributeValue>" +
+				"</Attribute>" +
+				"</Subject>"+
+				"<Target>" +
+				"<Resource>" +
+				"<Attribute AttributeId=\"contextType\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+				"<AttributeValue>fdsfsf</AttributeValue>" +
+				"</Attribute>" +
+				"</Resource>" +
+				"<Action>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
+				"<AttributeValue>WRITE</AttributeValue>" +
+				"</Attribute>" +
+				"<optional>false</optional>" +
+				"</Action>" +
+				"<Condition>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<AttributeValue DataType=\"SHARE_WITH_3RD_PARTIES\">dfsdf</AttributeValue>" +
+				"</Attribute>" +
+				"<optional>true</optional>" +
+				"</Condition>" +
+				"<Condition>" +
+				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+				"<AttributeValue DataType=\"DATA_RETENTION_IN_MINUTES\">412</AttributeValue>" +
+				"</Attribute>" +
+				"<optional>true</optional>" +
+				"</Condition>" +
+				"<optional>false</optional>" +
+				"</Target>" +
+				"</RequestPolicy>";
+		String retrievedPrivacyPolicy = null;
+		String jarLocation = "testjar-1.0.jar";
+		try {
+			retrievedPrivacyPolicy = privacyPolicyManager.getPrivacyPolicyFrom3PServiceJar(jarLocation);
+			assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyManager.fromXMLString(expectedPrivacyPolicy), privacyPolicyManager.fromXMLString(retrievedPrivacyPolicy));
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("Privacy error "+e.getLocalizedMessage()+": "+testTitle);
+		} catch (Exception e) {
+			LOG.error("[Test Exception] "+testTitle, e);
+			fail("Error "+e.getLocalizedMessage()+": "+testTitle);
+		}
+		LOG.info("*** Expected privacy policy:"+expectedPrivacyPolicy);
+		LOG.info("*** Retrieved privacy policy:"+retrievedPrivacyPolicy);
 	}
 
 

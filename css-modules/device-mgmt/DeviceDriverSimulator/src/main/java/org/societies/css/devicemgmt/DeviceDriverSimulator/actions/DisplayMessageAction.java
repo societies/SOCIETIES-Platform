@@ -107,4 +107,17 @@ public class DisplayMessageAction implements IAction{
 		return null;
 	}
 
+
+
+	@Override
+	public String getActionDescription() {
+		
+		return "Used to display somthing to the TV screen";
+	}
+
+	@Override
+	public String getActionName() {
+		return "Display Message";
+	}
+
 }

@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CSSNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
@@ -114,11 +115,11 @@ public class ServiceRegistryTest extends
 		assertTrue(retrievedService.getServiceName().equals(
 				servicesList.get(0).getServiceName()));
 	}
-	
+	/*
 	@Test
 	@Rollback(false)
 	public void retrieveServiceUsingTemplate() throws ServiceRetrieveException{
-		Service tmpServiceFilter=new Service();
+		Service tmpServiceFilter= ServiceModelUtils.generateEmptyFilter();
 	    tmpServiceFilter.setServiceName("%");
 		List<Service> returnedList=serReg.findServices(tmpServiceFilter);
 		assertTrue(returnedList.size()==_numberOfServiceCreated);
@@ -126,7 +127,7 @@ public class ServiceRegistryTest extends
 		returnedList=serReg.findServices(tmpServiceFilter);
 		assertTrue(returnedList.get(0).getServiceName().equals(tmpServiceFilter.getServiceName()));
 	}
-	
+	*/
 	@Test
 	@Rollback(false)
 	public void testForBug1004() throws ServiceRetrieveException{
@@ -280,16 +281,19 @@ public class ServiceRegistryTest extends
 				result.setServiceDescription("serviceDescription" + i);
 				result.setServiceEndpoint("serviceEndPoint");
 				result.setServiceName("serviceName" + i);
-				result.setServiceType(ServiceType.CORE_SERVICE);
+				result.setPrivacyPolicy("pathtoprivacypolicy");
+				result.setServiceType(ServiceType.THIRD_PARTY_SERVER);
 				result.setServiceLocation(ServiceLocation.LOCAL);
 				result.setServiceStatus(ServiceStatus.STARTED);
 				si = new ServiceInstance();
 				si.setFullJid("fullJid"+i);
+				si.setCssJid("cssJid"+i);
 				si.setXMPPNode("XMPPNode"+i);
 				servImpl = new ServiceImplementation();
 				servImpl.setServiceNameSpace("net.calendar");
 				servImpl.setServiceProvider("net.soluta");
 				servImpl.setServiceVersion("1.0");
+				servImpl.setServiceClient(new URI("societies","the/path/of/the/service/client"+1,null));
 				si.setServiceImpl(servImpl);
 				result.setServiceInstance(si);
 				returnedServiceList.add(result);

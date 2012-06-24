@@ -58,7 +58,7 @@ public class DecisionUtils {
 		if (null == decision) {
 			return null;
 		}
-		return org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision.valueOf(decision.name());
+		return org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision.fromValue(decision.name());
 	}
 	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision> toDecisionBeans(List<Decision> decisions)
 	{

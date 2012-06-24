@@ -50,5 +50,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>UserContextHistoryManagement</module>
 		<module>ContextBroker</module>
 		<module>ContextSourceManagement</module>
+		<module>UserContextInferenceManagement</module>
 	</modules>
 </project>

@@ -142,7 +142,7 @@ public class XMLPolicyReader {
 	
 	public RequestPolicy readPolicyFromFile(Document doc){
 		try {
-			Requestor subject;
+			Requestor subject = null;
 			ArrayList<RequestItem> targets;
 
 			
@@ -157,11 +157,11 @@ public class XMLPolicyReader {
 			
 			if (subjectXML.getLength()>0){
 				subject = this.readSubject(subjectXML);
-			}else{
-				this.log("No Subject in XML file");
-				return null;
-			
 			}
+//			else{
+//				this.log("No Subject in XML file");
+//				return null;
+//			}
 			if (targetXML.getLength()>0){
 				targets = this.readTargets(targetXML);
 			}else{
@@ -169,9 +169,9 @@ public class XMLPolicyReader {
 				return null;
 			}
 			
-			if (subject == null){
-				return null;
-			}
+//			if (subject == null){
+//				return null;
+//			}
 			if (targets == null){
 				return null;
 			}

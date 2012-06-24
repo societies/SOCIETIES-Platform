@@ -18,18 +18,23 @@
 	<bean id="serListener" class="org.societies.slm.servicecontrol.ServiceRegistryListener"
 		init-method="registerListener" destroy-method="unRegisterListener">	
 		<property name="serviceReg" ref="serviceRegRef" />
-		<property name="commMngr" ref="commMngrRef" />				
+		<property name="commMngr" ref="commMngrRef" />
+		<property name="serviceControl" ref ="serviceControl"/>
+		<property name="negotiationProvider" ref="negotiationProviderRef" />				
 	</bean>
 	
 	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
+		<property name="cisManager" ref="cisManagerRef" />
 		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />					
 	</bean>
 
 	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl" >
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
+		<property name="policyNegotiation" ref="policyNegotiationRef" />
+		<property name="cisManager" ref="cisManagerRef" />
 		<property name="serviceControlRemote" ref="serviceControlRemoteRef" />				
 	</bean>
 	

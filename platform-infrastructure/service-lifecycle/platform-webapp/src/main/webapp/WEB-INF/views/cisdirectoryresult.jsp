@@ -21,22 +21,37 @@
 <h4>${result}</h4>
 <br/>
 <br/>
-<Table>
-<tr><td><B>CIS Name</B></td><td><B>Uri</B></td><td><B>Type</B></td><td><B>ID</B></td><td><B>Password</B></td><td><B>Mode</B></td></tr> 
+<script language="javascript">
+	function updateForm(cisId) {    
+		document.forms["cisDirectory"]["cisJid"].value = cisId;
+		document.forms["cisDirectory"].submit();
+	} 
+</script>
+
+<form id="cisDirectory" name="cisDirectory" method="post" action="cismanager.html">
+<input type="hidden" name="cisJid" id="cisJid">
+<input type="hidden" name="method" id="method" value="JoinRemoteCIS">
+
+<Table border="1">
+<tr><td><B>CIS Name</B></td><td><B>Uri</B></td><td><B>Action</B></td><!-- <td><B>ID</B></td><td><B>Password</B></td><td><B>Mode</B></td> -->
+</tr> 
 
 	<xc:forEach var="advert" items="${adverts}">
         <tr>
         	<td>${advert.name}</td>
          	<td>${advert.uri}</td>
+         	<td><input type="button" value="join" onclick="updateForm('${advert.uri}')" ></td>
+         	<!-- 
             <td>${advert.type}</td>
             <td>${advert.id}</td> 
             <td>${advert.password}</td>
-            <td>${advert.mode}</td>           
+            <td>${advert.mode}</td>
+             -->           
         </tr>
     </xc:forEach>
     	
 	</table>
-	
+</form>	
 <!-- .................END PLACE YOUR CONTENT ................ -->
 	<!-- FOOTER -->
 	<jsp:include page="footer.jsp" />

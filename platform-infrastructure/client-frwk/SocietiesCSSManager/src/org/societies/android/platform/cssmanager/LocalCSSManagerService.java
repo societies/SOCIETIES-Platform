@@ -124,11 +124,12 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	private CssRecordDAO cssRecordDAO;
 	
 	
-
+	//Service API overrides
+	
 	@Override
 	public void onCreate () {
-
-		Debug.startMethodTracing(ANDROID_PROFILING_NAME);
+//		Traceview 
+//		Debug.startMethodTracing(ANDROID_PROFILING_NAME);
 		
 		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
 		this.registerForPubsub();
@@ -157,7 +158,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "CSSManager service terminating");
-		Debug.stopMethodTracing();
+//		Traceview 
+//		Debug.stopMethodTracing();
 	}
 
 	/**
@@ -174,7 +176,31 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //		return inMessenger.getBinder();
 		return this.binder;
 	}
+	
+	//Client Persistence methods
+	
+	/**
+	 * Insert or update the database with the new version of the CSS Record
+	 * 
+	 * @param aRecord
+	 */
+	private void updateLocalCSSrecord(AndroidCSSRecord aRecord) {
+		if (cssRecordDAO.cssRecordExists()) {
+			this.cssRecordDAO.updateCSSRecord(aRecord);			
+		} else {
+			this.cssRecordDAO.insertCSSRecord(aRecord);			
+		}
+	}
 
+	/**
+	 * Get the current CSSRecord stored locally
+	 *  
+	 * @return {@link AndroidCSSRecord} null if no local CSSRecord found
+	 */
+	private AndroidCSSRecord readLocalCSSRecord() {
+		AndroidCSSRecord record = this.cssRecordDAO.readCSSrecord();
+		return record;
+	}
 	//Service API that service offers
 
 	@Override
@@ -185,15 +211,39 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
+	/**
+	 * This method call either results in a local persistence access or a remote
+	 * action to update the local persistence cache of the CSSRecord
+	 */
 	public AndroidCSSRecord getAndroidCSSRecord(String client) {
 		Log.d(LOG_TAG, "getAndroidCSSRecord called with client: " + client);
-		return cssRecord;
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
+		
+		AndroidCSSRecord record = null;
+		
+		if (null == this.cssRecordDAO.readCSSrecord()) {
+			record = this.synchProfile(client, record);
+		} else {
+			if (client != null) {
+				Intent intent = new Intent(GET_ANDROID_CSS_RECORD);
+				
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
+
+				intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) record);
+				intent.setPackage(client);
+
+				LocalCSSManagerService.this.sendBroadcast(intent);
+			}
+
+		}
+		return null;
 	}
 
 	@Override
 	public AndroidCSSRecord loginCSS(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "loginCSS called with client: " + client);
 		
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
@@ -203,8 +253,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Stanza stanza = new Stanza(toXCManager);
 		
 		ICommCallback callback = new CSSManagerCallback(client, LOGIN_CSS);
-		
-        try {
+
+		try {
     		ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
@@ -219,6 +269,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	public boolean loginXMPPServer(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "loginXMPPServer called with client: " + client);
 
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		boolean retValue = true;
 		
@@ -247,6 +298,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	@Override
 	public AndroidCSSRecord logoutCSS(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "logoutCSS called with client: " + client);
+
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 
 		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGOUT_CSS));
@@ -272,6 +325,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	public boolean logoutXMPPServer(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "logoutXMPPServer called with client: " + client);
 
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
 		boolean retValue = true;
@@ -329,7 +383,27 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	@Override
 	public AndroidCSSRecord synchProfile(String client, AndroidCSSRecord record) {
-		Log.d(LOG_TAG, "??? called with client: " + client);
+		Log.d(LOG_TAG, "synchProfile called with client: " + client);
+		
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
+		Dbc.require("CSS record cannot be null", record != null);
+		
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean.setProfile(record);
+		messageBean.setMethod(MethodType.SYNCH_PROFILE);
+
+		Stanza stanza = new Stanza(toXCManager);
+		
+		ICommCallback callback = new CSSManagerCallback(client, SYNCH_PROFILE);
+		
+        try {
+    		ccm.register(ELEMENT_NAMES, callback);
+			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(LOG_TAG, "Send stanza");
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        } 
+
 		return null;
 	}
 
@@ -418,21 +492,23 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				
 				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
 		        
-				if (this.returnIntent.equals(LOGIN_CSS)) {
-					LocalCSSManagerService.this.updateDatabase(aRecord);
-				}
+				this.updateLocalPersistence(aRecord);
 			}
+		}
+		
+		/**
+		 * Decide which actions requires a database interaction
+		 * @param record
+		 */
+		private void updateLocalPersistence(AndroidCSSRecord record) {
+			if (this.returnIntent.equals(LOGIN_CSS) || this.returnIntent.equals(SYNCH_PROFILE)) {
+				LocalCSSManagerService.this.updateLocalCSSrecord(record);
+			}
+			
 		}
 	}
 	
-	/**
-	 * Insert or update the database with the new version of the CSS Record
-	 * 
-	 * @param aRecord
-	 */
-	private void updateDatabase(AndroidCSSRecord aRecord) {
-		this.cssRecordDAO.insertCSSRecord(aRecord);
-	}
+	
 	/**
 	 * Register for Pubsub events
 	 */

@@ -20,6 +20,8 @@
   <xs:complexType>
     <xs:sequence>
       <xs:element name="method" type="tns:methodName" minOccurs="0"/>
+	  <xs:element name="serviceId" type="ns1:serviceResourceIdentifier" minOccurs="0" />
+      <xs:element name="service" type="ns1:service" minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
 </xs:element>
@@ -28,6 +30,8 @@
   <xs:simpleType name="methodName">
     <xs:restriction base="xs:string">
       <xs:enumeration value="getLocalServices"/>
+      <xs:enumeration value="getService"/>
+      <xs:enumeration value="searchService"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

@@ -56,11 +56,14 @@ public interface IDeviceManager {
 	
 	/**
 	 * 
-	 * 
+	 * Method used to inform the Device Manager about new data received for a given device
 	 * @param deviceFamily
-	 * @param deviceMacAddress
-	 * @param data TODO to define
+	 * @param physicalDeviceId
+	 * @param data is a dictionary that can contains information about battery level change, device location change, value change and so on
 	 */
 	public String fireNewDataReceived (String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data);
+	
+	
+	
 
 }

@@ -134,6 +134,7 @@ public class ServiceControlController {
 	public ModelAndView serviceControlPost(@Valid ServiceControlForm scForm,
 			BindingResult result, Map model) {
 
+		String returnPage = "servicecontrolresult";
 		if (result.hasErrors()) {
 			model.put("result", "service control form error");
 			return new ModelAndView("servicecontrol", model);
@@ -219,7 +220,7 @@ public class ServiceControlController {
 		Future<ServiceControlResult> asynchResult = null;
 		ServiceControlResult scresult;
 		
-		String res;
+		String res = "";
 		
 		try {
 	
@@ -245,6 +246,9 @@ public class ServiceControlController {
 					res="ServiceControl Result Installing in Local Node: ";
 					
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 				
 			}else if (method.equalsIgnoreCase("InstallServiceRemote")) {
@@ -257,6 +261,9 @@ public class ServiceControlController {
 				res="ServiceControl Result for Node : [" + node + "]";
 				
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 					
 			}else if (method.equalsIgnoreCase("StartService")){
@@ -265,10 +272,13 @@ public class ServiceControlController {
 				
 				asynchResult=this.getSCService().startService(serviceId);
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 				
 				res="Started service: " + serviceId;
-
+				returnPage = "servicediscoveryresult";
 				
 			} else if (method.equalsIgnoreCase("StopService")){
 				
@@ -276,9 +286,13 @@ public class ServiceControlController {
 
 				asynchResult=this.getSCService().stopService(serviceId);
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 				
 				res="Stopped service: " + serviceId;
+				returnPage = "servicediscoveryresult";
 	
 			} else if (method.equalsIgnoreCase("UninstallService")){
 				
@@ -286,30 +300,75 @@ public class ServiceControlController {
 
 				asynchResult=this.getSCService().uninstallService(serviceId);
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 				
 				res="Uninstall service: " + serviceId;
+				returnPage = "servicediscoveryresult";
+	
+			//>>>>>>>>>>>> SHARE SERVICE <<<<<<<<<<<<<<<
+			} else if (method.equalsIgnoreCase("ShareService")){
+				
+				if(logger.isDebugEnabled()) logger.debug("ShareService:" + serviceId);
+
+				//GENERATE SERVICE OBJECT
+				Future<Service> asyncService = this.getSDService().getService(serviceId);
+				Service serviceToShare = asyncService.get();
+				//SHARE SERVICE
+				asynchResult = this.getSCService().shareService(serviceToShare, node);
+				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
+				//GET REMOTE SERVICES
+				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
+				List<Service> cisServices = asynchServices.get();
+				model.put("cisservices", cisServices);
+
+				res = "Success";//scresult.getMessage().toString();
+				returnPage = "servicediscoveryresult";
+	
+			} else if (method.equalsIgnoreCase("Install3PService")){
+				
+				if(logger.isDebugEnabled()) logger.debug("Install3PService:" + serviceId);
+
+				//GENERATE SERVICE OBJECT
+				Future<Service> asyncService = this.getSDService().getService(serviceId);
+				Service serviceToInstall = asyncService.get();
+				//SHARE SERVICE
+				asynchResult = this.getSCService().installService(serviceToInstall);
+				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
+				//GET REMOTE SERVICES
+				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
+				List<Service> cisServices = asynchServices.get();
+				model.put("cisservices", cisServices);
+
+				res = scresult.getMessage().toString();
+				returnPage = "servicediscoveryresult";
 	
 			} else {
 				res="error unknown metod";
 			}
 		
-			//model.put("result", res);
+			if (returnPage.equals("servicediscoveryresult")) {
+				Future<List<Service>> asynchServices = this.getSDService().getLocalServices();
+				List<Service> services = asynchServices.get();
+				model.put("services", services);	
+			}
 			
-		}
-		catch (ServiceControlException e)
-		{
-			res = "Oops!!!! Service Control Exception <br/>";
-		}
-		catch (Exception ex)
-		{
+		} catch (ServiceControlException e) {
+			res = "Oops!!!! Service Control Exception <br/>" + e.getMessage();
+		} catch (Exception ex) {
 			res = "Oops!!!! " +ex.getMessage() +" <br/>";
 		};
 		
-		
-		model.put("result", res);
-		
-		return new ModelAndView("servicecontrolresult", model);
+		model.put("result", res);		
+		return new ModelAndView(returnPage, model);
 		
 
 	}

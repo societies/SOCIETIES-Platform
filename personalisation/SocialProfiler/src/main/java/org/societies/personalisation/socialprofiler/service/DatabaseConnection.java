@@ -16,14 +16,15 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
 import org.jfree.data.xy.XYSeries;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.personalisation.socialprofiler.Variables;
 
 
 
 public class DatabaseConnection implements Variables {
-	private static final Logger logger = Logger.getLogger(DatabaseConnection.class);
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
 	private Connection connection;
 	private Properties 	props; 			
 	
@@ -62,7 +63,7 @@ public class DatabaseConnection implements Variables {
 			  connection = DriverManager.getConnection(url+dbName,userName,password);
 		}
 		catch (SQLException e) {
-			logger.fatal("Connection to Mysql database was unsuccesful.");
+			logger.error("Connection to Mysql database was unsuccesful.");
 			e.printStackTrace();
 			return false;
 		}
@@ -437,7 +438,7 @@ public class DatabaseConnection implements Variables {
 		int result=-1;
 		result=getNumberOfActionInPast(week, profile, userId)-getNumberOfActionInPast(week-1, profile, userId);
 		if (result<0){
-			logger.fatal("somehting is wrong : info from past superior than info from present");
+			logger.error("somehting is wrong : info from past superior than info from present");
 		}
 		return result;
 	}

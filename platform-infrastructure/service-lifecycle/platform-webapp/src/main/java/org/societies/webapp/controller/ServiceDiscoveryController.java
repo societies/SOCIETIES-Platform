@@ -103,7 +103,7 @@ public class ServiceDiscoveryController {
 		Future<List<Service>> asynchResult = null;
 		List<Service> services =  new ArrayList<Service>();
 		
-		String res;
+		String res = "";
 		
 		try {
 		
@@ -114,7 +114,7 @@ public class ServiceDiscoveryController {
 				services = asynchResult.get();
 				model.put("services", services);
 				
-			}else if (method.equalsIgnoreCase("GetServices")) {
+			} else if (method.equalsIgnoreCase("GetServices")) {
 				
 				asynchResult=this.getSDService().getServices(node);
 				res="ServiceDiscovery Result for Node : [" + node + "]";
@@ -122,7 +122,18 @@ public class ServiceDiscoveryController {
 				services = asynchResult.get();
 				model.put("services", services);
 					
-			}else{
+			} else if (method.equalsIgnoreCase("GetServicesCis")) {
+				//LOCAL
+				res="My Services: ";
+				asynchResult=this.getSDService().getLocalServices();
+				services = asynchResult.get();
+				model.put("services", services);
+				//REMOTE
+				asynchResult=this.getSDService().getServices(node);
+				services = asynchResult.get();
+				model.put("cisservices", services);
+					
+			} else{
 				res="error unknown metod";
 			}
 		

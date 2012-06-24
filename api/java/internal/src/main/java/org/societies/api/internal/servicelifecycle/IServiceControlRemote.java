@@ -26,7 +26,9 @@ package org.societies.api.internal.servicelifecycle;
 
 import java.net.URL;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -61,11 +63,21 @@ public interface IServiceControlRemote {
 	/**
 	 * This method install a new service into the container
 	 * 
-	 * @param serviceLocation the URL of the bundle to install
-	 * @param node The node where the service is located
+	 * @param bundleLocation the URL of the bundle to install
+	 * @param node The node where the service should be installed
 	 * @param callback The callback object
 	 */
 	public void installService(URL bundleLocation, IIdentity node, IServiceControlCallback callback);
+
+	
+	/**
+	 * This method installs a shared service into the container
+	 * 
+	 * @param service the Service to install
+	 * @param node The node where the service should be installed.
+	 * @param callback The callback object
+	 */
+	public void installService(Service service, IIdentity node, IServiceControlCallback callback);
 
 	/**
 	 * This method removes a service from the container.
@@ -76,6 +88,31 @@ public interface IServiceControlRemote {
 	 */
 	public void uninstallService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
 
+
+	/**
+	 * This method shares a service with a given CSS or CIS
+	 * 
+	 * @param service the Service to share
+	 * @param node The node we are sharing with
+	 * @param callback The callback object
+	 */
+	public void shareService(Service service, IIdentity node, IServiceControlCallback callback);
+
+	/**
+	 * This method removes the sharing of a service with a given CSS or CIS
+	 * 
+	 * @param service the Service to share
+	 * @param node The node we are sharing with
+	 * @param callback The callback object
+	 */
+	public void unshareService(Service service, IIdentity node, IServiceControlCallback callback);
 	
+	/**
+	 * This method is used to register a new CIS Endpoint with Service Control. It will allow service control to receive
+	 * meant for a particular CIS
+	 * 
+	 * @param endpoint
+	 */
+	public void registerCISEndpoint(ICommManager endpoint);
 	
 }

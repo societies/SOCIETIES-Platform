@@ -24,6 +24,8 @@
  */
 package org.societies.privacytrust.trust.api.repo;
 
+import java.util.List;
+
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
@@ -69,4 +71,15 @@ public interface ITrustRepository {
 	 * @throws TrustRepositoryException
 	 */
 	public void removeEntity(TrustedEntityId teid) throws TrustRepositoryException;
+	
+	/**
+	 * 
+	 * @param trustorId
+	 * @param type
+	 * @return
+	 * @throws TrustRepositoryException
+	 * @since 0.3
+	 */
+	public <T extends ITrustedEntity> List<T> retrieveEntities(final String trustorId,
+			final Class<T> entityClass) throws TrustRepositoryException;
 }

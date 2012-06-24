@@ -109,6 +109,9 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<L
 		Integer obfuscationOperation = -1;
 		Double middleObfuscationLevel = (double) -1;
 		Double theta = (double) -1;
+		if (obfuscationLevel <= 0) {
+			obfuscationLevel = 0.001;
+		}
 		LocationCoordinates obfuscatedLocationCoordinates = obfuscateLocation(geolocation, obfuscationLevel, obfuscationOperation, middleObfuscationLevel, theta);
 
 		// -- Return

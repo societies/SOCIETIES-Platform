@@ -34,4 +34,31 @@ package org.societies.privacytrust.trust.api.model;
  */
 public interface IDirectTrust extends ITrust {
 
+	/**
+	 * 
+	 * @return
+	 * @since 0.3
+	 */
+	public Double getRating();
+	
+	/**
+	 * 
+	 * @param rating
+	 * @since 0.3
+	 */
+	public void setRating(Double rating);
+	
+	/**
+	 *
+	 * @return
+	 * @since 0.3
+	 */
+	public Double getScore();
+	
+	/**
+	 * 
+	 * @param score
+	 * @since 0.3
+	 */
+	public void setScore(Double score);
 }

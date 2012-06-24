@@ -163,6 +163,8 @@
 	        <xs:extension base='empty'>
 	          <xs:attribute name='cis-jid' type='xs:string' use='required'/> 
 	          <xs:attribute name='role' type='xs:string' use='required'/> 
+	          <xs:attribute name='cis-membership-mode' type='xs:int'/> 
+	          <xs:attribute name='cis-name' type='xs:string'/>
 	        </xs:extension>
 	      </xs:simpleContent>
 	    </xs:complexType>
