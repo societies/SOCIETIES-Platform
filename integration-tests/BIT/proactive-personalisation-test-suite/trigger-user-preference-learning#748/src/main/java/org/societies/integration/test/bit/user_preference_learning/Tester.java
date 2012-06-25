@@ -7,6 +7,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
@@ -15,6 +16,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.IPersonalisationManager;
@@ -36,6 +38,7 @@ public class Tester {
 	// private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IAction action$1;
 	private IAction action$2;
+	private IIdentityManager idm;
 	// private IAction action$3;
 	private ServiceResourceIdentifier id;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
@@ -48,10 +51,10 @@ public class Tester {
 	public void setUp() {
 		try {
 			this.uam = Test748.getUam();
+			this.idm = Test748.getCommManager().getIdManager();
 			logging.debug("initializing UAM");
 			this.ctxBroker = Test748.getCtxBroker();
-			this.userId = new MockIdentity(IdentityType.CSS, "user",
-					"societies.org");
+			this.userId = idm.getThisNetworkNode();
 			id = new ServiceResourceIdentifier();
 			id.setIdentifier(new URI("http://ss.ss"));
 			id.setServiceInstanceIdentifier("http://ss.ss");
