@@ -10,6 +10,11 @@ public class Test748 extends IntegrationTestCase{
 	private static ICtxBroker ctxBroker;
 	private static IUserActionMonitor uam;
 	private static IPersonalisationManager personMan;
+	
+	public Test748(){
+		super(748, Test748.class);
+	}
+	
 	public static IPersonalisationManager getPersonMan() {
 		return personMan;
 	}

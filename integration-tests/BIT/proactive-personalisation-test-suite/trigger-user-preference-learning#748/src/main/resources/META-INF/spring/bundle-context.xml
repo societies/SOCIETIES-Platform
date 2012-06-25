@@ -28,7 +28,7 @@
 
 <!-- >context:component-scan base-package="org.societies.integration.test.bit.user_intent_learning"></context:component-scan-->
 	
-	<bean id="TestCase748" class="org.societies.integration.test.bit.user_preference_learning.TestCase748" init-method="run">
+	<bean id="TestCase748" class="org.societies.integration.test.bit.user_preference_learning.Test748" init-method="run">
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="uam" ref="uam" />
 		<property name="personMan" ref="persoMgr" />
