@@ -20,8 +20,6 @@ public class Test748 extends IntegrationTestCase{
 	public Test748(){
 		super(748, Test748.class);
 		Tester.instance=this;
-		JUnitCore jUnitCore = new JUnitCore();
-		jUnitCore.run(Tester.class);
 	}
 	
 	public IPersonalisationManager getPersonMan() {
