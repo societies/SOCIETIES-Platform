@@ -711,13 +711,13 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 
 	private String getCtxType(Requestor requestor){
 		if (requestor instanceof RequestorService){
-			return ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString();
+			return ""+((RequestorService) requestor).hashCode();
 		}
 		else if (requestor instanceof RequestorCis){
-			return ((RequestorCis) requestor).getCisRequestorId().getJid();
+			return ""+((RequestorCis) requestor).hashCode();
 		}
 		else {
-			return requestor.getRequestorId().getJid();
+			return ""+requestor.hashCode();
 		}
 	}
 

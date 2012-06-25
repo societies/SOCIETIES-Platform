@@ -282,7 +282,7 @@ public class PrivacyNegotiationTest {
 		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
 		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
 		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
-		RequestItem itemLocation = new RequestItem(rLocation, actions, conditions);
+		RequestItem itemLocation = new RequestItem(rLocation, actions, conditions, true);
 
 
 		/*
@@ -296,7 +296,7 @@ public class PrivacyNegotiationTest {
 		conditions1.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
 		conditions1.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
 		conditions1.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
-		RequestItem itemStatus = new RequestItem(rStatus, actions1, conditions1);
+		RequestItem itemStatus = new RequestItem(rStatus, actions1, conditions1, true);
 
 		/*
 		 * birthday requestItem
