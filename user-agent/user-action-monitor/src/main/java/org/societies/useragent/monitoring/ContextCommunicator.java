@@ -42,6 +42,8 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
@@ -85,7 +87,7 @@ public class ContextCommunicator {
 			//check context second for ctx attribute to update
 			try {
 				//get cssOperator (Person)
-				IndividualCtxEntity cssOperator = ctxBroker.retrieveCssOperator().get();
+				IndividualCtxEntity cssOperator = ctxBroker.retrieveIndividualEntity(owner).get();
 				LOG.info("Retrieved PERSON entity with ID: "+cssOperator.getId());
 
 				//get USES_SERVICE associations for this person entity
@@ -307,7 +309,24 @@ public class ContextCommunicator {
 		}
 	}
 
-	public void updateUID(IIdentity owner){
-
+	public void updateUID(IIdentity owner, String myDeviceID){
+		try {
+			List<CtxIdentifier> attrIds = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID).get();
+			if(attrIds.size() > 0){ //found existing UID - update
+				CtxAttributeIdentifier uidAttrID = (CtxAttributeIdentifier)attrIds.get(0);
+				ctxBroker.updateAttribute(uidAttrID, myDeviceID);
+			}else{  //no existing UID - create and populate
+				CtxEntity personEntity = ctxBroker.retrieveIndividualEntity(owner).get();
+				ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.UID);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
