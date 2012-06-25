@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.commsmgr;
+package org.societies.security.comms.policynegotiator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,6 +168,7 @@ public class CommsClient implements INegotiationProviderRemote {
 		// Create stanza
 		Stanza stanza = new Stanza(toIdentity);
 		stanza.setId(StanzaIdGenerator.next());
+		stanza.setFrom(idMgr.getThisNetworkNode());
 		
 		// Create message bean
 		ProviderBean provider = new ProviderBean();
@@ -183,10 +184,10 @@ public class CommsClient implements INegotiationProviderRemote {
 		// Send information query
 		try {
 			commMgr.sendIQGet(stanza, provider, clientCallback);
-			LOG.debug("send({}): IQ sent to {}", sessionId, toIdentity.getJid());
+			LOG.debug("sendIQ({}): IQ sent to {}", sessionId, toIdentity.getJid());
 			return stanza.getId();
 		} catch (CommunicationException e) {
-			LOG.warn("send({}): could not send IQ to " + toIdentity.getJid(), sessionId, e);
+			LOG.warn("sendIQ({}): could not send IQ to " + toIdentity.getJid(), sessionId, e);
 			clientCallback.removeCallback(stanza.getId());
 			return null;
 		}

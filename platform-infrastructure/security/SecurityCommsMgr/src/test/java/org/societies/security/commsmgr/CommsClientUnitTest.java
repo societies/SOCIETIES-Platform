@@ -33,6 +33,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.security.comms.policynegotiator.CommsClient;
 
 /**
  * 
@@ -67,7 +68,7 @@ public class CommsClientUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#
 	 * acceptPolicyAndGetSla(int, java.lang.String, boolean, org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback)}.
 	 */
 	@Test
@@ -76,7 +77,7 @@ public class CommsClientUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#
 	 * getPolicyOptions(org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback)}.
 	 */
 	@Test
@@ -85,7 +86,7 @@ public class CommsClientUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#reject(int)}.
+	 * Test method for {@link org.societies.security.comms.policynegotiator.CommsClient#reject(int)}.
 	 */
 	@Test
 	public void testReject() {
