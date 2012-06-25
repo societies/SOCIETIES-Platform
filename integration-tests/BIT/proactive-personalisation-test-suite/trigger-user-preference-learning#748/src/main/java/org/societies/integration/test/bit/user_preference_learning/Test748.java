@@ -13,9 +13,6 @@ public class Test748 extends IntegrationTestCase{
 	
 	public Test748(){
 		super(748, Test748.class);
-		Tester tester=new Tester();
-		tester.setUp();
-		tester.Test();
 	}
 	
 	public IPersonalisationManager getPersonMan() {
