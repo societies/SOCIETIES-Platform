@@ -47,6 +47,7 @@ public class UserActionMonitor implements IUserActionMonitor{
 	private IEventMgr eventMgr;
 	private ICommManager commsMgr;
 	private ContextCommunicator ctxComm;
+	String myDeviceID;
 
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
@@ -61,8 +62,8 @@ public class UserActionMonitor implements IUserActionMonitor{
 		ctxComm.updateHistory(owner, action);
 
 		//update interactionDevice if NOT on cloud node
-		if(!cloud){
-			ctxComm.updateUID(owner);
+		if(!cloud){  //CHANGE
+			ctxComm.updateUID(owner, myDeviceID);
 		}
 
 		//send local event
@@ -79,9 +80,11 @@ public class UserActionMonitor implements IUserActionMonitor{
 		System.out.println("Initialising user action monitor!");
 		ctxComm = new ContextCommunicator(ctxBroker);
 
-		//Set cloud flag - get device type from Identity Manager
+		//get device type from CSS Manager
 		IdentityType nodeType = commsMgr.getIdManager().getThisNetworkNode().getType();
-		//if()
+		
+		//get myDeviceID from comms Mgr
+		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
 	}
 
 	public void setCtxBroker(ICtxBroker broker){
