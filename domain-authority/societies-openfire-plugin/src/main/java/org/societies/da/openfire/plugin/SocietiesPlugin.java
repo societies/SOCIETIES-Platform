@@ -1,6 +1,10 @@
 package org.societies.da.openfire.plugin;
 
 import org.jivesoftware.openfire.XMPPServer;
+import org.jivesoftware.openfire.auth.AuthFactory;
+import org.jivesoftware.openfire.auth.ConnectionException;
+import org.jivesoftware.openfire.auth.InternalUnauthenticatedException;
+import org.jivesoftware.openfire.auth.UnauthorizedException;
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.group.Group;
@@ -215,4 +219,9 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
     public void xmlPropertyDeleted(String property, Map<String, Object> params) {
         // Do nothing
     }
+
+	public boolean loginUser(String username, String password) throws UnauthorizedException, ConnectionException, InternalUnauthenticatedException {
+		AuthFactory.getAuthProvider().authenticate(username, password);
+		return true;
+	}
 }

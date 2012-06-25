@@ -167,6 +167,9 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	private ArrayList<Integer> proposedActionsWithMetadata;
 	
 	private ArrayList<ProximityRecord> proximityHistory;	
+	
+	private boolean proceedForUser;
+	
 	/*
      * Constructor for SuggestedCommunityAnalyser
      * 
@@ -182,6 +185,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			this.linkedCss = linkedEntity;
 		//else
 		//	this.linkedDomain = linkedEntity;
+		
+		proceedForUser = true;
 		
 		proximityHistory = new ArrayList<ProximityRecord>();
 		recordedMetadata = new HashMap<String, String>();
@@ -1715,6 +1720,10 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	}
     	
     	return null;
+    }
+    
+    public void unblockCurrentProcess() {
+    	proceedForUser = true;
     }
 
 	

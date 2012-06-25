@@ -38,7 +38,6 @@ public class Tester {
 	// private IAction action$3;
 	private ServiceResourceIdentifier id;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-
 	
 	public Tester() {
 
@@ -134,8 +133,11 @@ public class Tester {
 	 */
 
 	private void setupContext() {
+		logging.debug("get person entity");
 		this.getPersonEntity();
+		logging.debug("get sym loc");
 		this.getSymLocAttribute();
+		logging.debug("get stat attr");
 		this.getStatusAttribute();
 	}
 
