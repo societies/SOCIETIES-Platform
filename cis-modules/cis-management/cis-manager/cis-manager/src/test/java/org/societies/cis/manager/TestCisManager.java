@@ -734,7 +734,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void addActivity() throws InterruptedException, ExecutionException {
 

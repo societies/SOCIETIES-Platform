@@ -25,14 +25,15 @@
 package org.societies.privacytrust.trust.impl.engine;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.engine.IDirectTrustEngine;
@@ -63,9 +64,16 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(DirectTrustEngine.class);
 	
-	private static final Double JOINED_COMMUNITY_SCORE = 5.0d;
-	
-	private static final Double LEFT_COMMUNITY_SCORE = -10.0d;
+	private static final Map<TrustEvidenceType, Double> EVIDENCE_SCORE_MAP;
+    
+	static {
+		
+        final Map<TrustEvidenceType, Double> aMap = new HashMap<TrustEvidenceType, Double>();
+        aMap.put(TrustEvidenceType.JOINED_COMMUNITY, +5.0d);
+        aMap.put(TrustEvidenceType.LEFT_COMMUNITY, -10.0d);
+        aMap.put(TrustEvidenceType.USED_SERVICE, +1.0d);
+        EVIDENCE_SCORE_MAP = Collections.unmodifiableMap(aMap);
+    }
 	
 	/** The Trust Evidence Repository service reference. */
 	@SuppressWarnings("unused")
@@ -97,12 +105,12 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		for (final ITrustedCss css : cssList)
 			cssMap.put(css.getTeid(), css);
 		
-		// create sorted evidence set based on the evidence timestamps
-		final TreeSet<ITrustEvidence> sortedEvidenceSet = 
-				new TreeSet<ITrustEvidence>(evidenceList);
+		// create sorted evidence list based on the evidence timestamps
+		final List<ITrustEvidence> sortedEvidenceList = new ArrayList<ITrustEvidence>(evidenceList);
+		Collections.sort(sortedEvidenceList);
 		
 		// re-evaluate trust ratings/scores
-		for (final ITrustEvidence evidence : sortedEvidenceSet) {
+		for (final ITrustEvidence evidence : sortedEvidenceList) {
 			final ITrustedCss css = cssMap.get(evidence.getTeid());
 			if (css != null) {
 				switch (evidence.getType()) {
@@ -124,16 +132,16 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		// re-evaluate trust values
 		double[] rawTrustScores = new double[cssList.size()];
 		for (int i = 0; i < cssList.size(); ++i)
-			rawTrustScores[i] = cssList.get(0).getDirectTrust().getScore();
+			rawTrustScores[i] = cssList.get(i).getDirectTrust().getScore();
 		
 		double[] normTrustScores = MathUtils.stanine(rawTrustScores);
 		for (int i = 0; i < cssList.size(); ++i) {
-			final Double rating = cssList.get(0).getDirectTrust().getRating();
+			final Double rating = cssList.get(i).getDirectTrust().getRating();
 			final Double score = 0.1d * normTrustScores[i]; 
-			cssList.get(0).getDirectTrust().setValue(
+			cssList.get(i).getDirectTrust().setValue(
 					(rating != null) 
 						? (0.5d * score + 0.5d * rating)
-								: 0.1d * score);
+								: score);
 		}
 		
 		if (LOG.isDebugEnabled())
@@ -153,12 +161,12 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		for (final ITrustedCis cis : cisList)
 			cisMap.put(cis.getTeid(), cis);
 
-		// create sorted evidence set based on the evidence timestamps
-		final TreeSet<ITrustEvidence> sortedEvidenceSet = 
-				new TreeSet<ITrustEvidence>(evidenceList);
+		// create sorted evidence list based on the evidence timestamps
+		final List<ITrustEvidence> sortedEvidenceList = new ArrayList<ITrustEvidence>(evidenceList);
+		Collections.sort(sortedEvidenceList);
 
 		// re-evaluate trust ratings/scores
-		for (final ITrustEvidence evidence : sortedEvidenceSet) {
+		for (final ITrustEvidence evidence : sortedEvidenceList) {
 			final ITrustedCis cis = cisMap.get(evidence.getTeid());
 			if (cis != null) {
 				switch (evidence.getType()) {
@@ -167,14 +175,16 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 					cis.getDirectTrust().setRating((Double) evidence.getInfo());
 					break;
 				case JOINED_COMMUNITY:
-					// add JOINED_COMMUNITY_SCORE to previous score
+					// add JOINED_COMMUNITY score  to previous score
 					cis.getDirectTrust().setScore(new Double(
-							cis.getDirectTrust().getScore() + JOINED_COMMUNITY_SCORE));
+							cis.getDirectTrust().getScore() 
+							+ EVIDENCE_SCORE_MAP.get(evidence.getType())));
 					break;
 				case LEFT_COMMUNITY:
-					// add LEFT_COMMUNITY_SCORE to previous score
+					// add LEFT_COMMUNITY score to previous score
 					cis.getDirectTrust().setScore(new Double(
-							cis.getDirectTrust().getScore() + LEFT_COMMUNITY_SCORE));
+							cis.getDirectTrust().getScore() 
+							+ EVIDENCE_SCORE_MAP.get(evidence.getType())));
 					break;
 				default:
 					LOG.warn("Ignoring evidence '" + evidence 
@@ -190,16 +200,16 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		// re-evaluate trust values
 		double[] rawTrustScores = new double[cisList.size()];
 		for (int i = 0; i < cisList.size(); ++i)
-			rawTrustScores[i] = cisList.get(0).getDirectTrust().getScore();
+			rawTrustScores[i] = cisList.get(i).getDirectTrust().getScore();
 
 		double[] normTrustScores = MathUtils.stanine(rawTrustScores);
 		for (int i = 0; i < cisList.size(); ++i) {
-			final Double rating = cisList.get(0).getDirectTrust().getRating();
+			final Double rating = cisList.get(i).getDirectTrust().getRating();
 			final Double score = 0.1d * normTrustScores[i]; 
-			cisList.get(0).getDirectTrust().setValue(
+			cisList.get(i).getDirectTrust().setValue(
 					(rating != null) 
 					? (0.5d * score + 0.5d * rating)
-							: 0.1d * score);
+							: score);
 		}
 
 		if (LOG.isDebugEnabled())
@@ -212,7 +222,60 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	@Override
 	public void evaluateServiceTrustValues(List<ITrustedService> serviceList,
 			final List<ITrustEvidence> evidenceList) throws TrustEngineException {
-		// TODO Auto-generated method stub
+		
+		// create <TEID,Service> map
+		final Map<TrustedEntityId, ITrustedService> serviceMap = 
+				new HashMap<TrustedEntityId, ITrustedService>(serviceList.size());
+		for (final ITrustedService service : serviceList)
+			serviceMap.put(service.getTeid(), service);
+
+		// create sorted evidence list based on the evidence timestamps
+		final List<ITrustEvidence> sortedEvidenceList = new ArrayList<ITrustEvidence>(evidenceList);
+		Collections.sort(sortedEvidenceList);
+
+		// re-evaluate trust ratings/scores
+		for (final ITrustEvidence evidence : sortedEvidenceList) {
+			final ITrustedService service = serviceMap.get(evidence.getTeid());
+			if (service != null) {
+				switch (evidence.getType()) {
+				case RATED:
+					// replace previous rating with new one
+					service.getDirectTrust().setRating((Double) evidence.getInfo());
+					break;
+				case USED_SERVICE:
+					// add USED_SERVICE score  to previous score
+					service.getDirectTrust().setScore(new Double(
+							service.getDirectTrust().getScore() 
+							+ EVIDENCE_SCORE_MAP.get(evidence.getType())));
+					break;
+				default:
+					LOG.warn("Ignoring evidence '" + evidence 
+							+ "': Unsupported type: " + evidence.getType());
+					break;
+				}
+			} else {
+				LOG.warn("Ignoring evidence '" + evidence
+						+ "': Unrelated TEID: " + evidence.getTeid());
+			}
+		}
+
+		// re-evaluate trust values
+		double[] rawTrustScores = new double[serviceList.size()];
+		for (int i = 0; i < serviceList.size(); ++i)
+			rawTrustScores[i] = serviceList.get(i).getDirectTrust().getScore();
+
+		double[] normTrustScores = MathUtils.stanine(rawTrustScores);
+		for (int i = 0; i < serviceList.size(); ++i) {
+			final Double rating = serviceList.get(i).getDirectTrust().getRating();
+			final Double score = 0.1d * normTrustScores[i]; 
+			serviceList.get(i).getDirectTrust().setValue(
+					(rating != null) 
+					? (0.5d * score + 0.5d * rating)
+							: score);
+		}
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluated direct trust for entities: " + serviceList);
 	}
 	
 	private class CssDirectTrustEngine implements Runnable {

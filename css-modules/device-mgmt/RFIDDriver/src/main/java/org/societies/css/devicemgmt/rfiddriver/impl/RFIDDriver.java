@@ -24,7 +24,6 @@
  */
 package org.societies.css.devicemgmt.rfiddriver.impl;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.slf4j.Logger;
@@ -54,6 +53,8 @@ public class RFIDDriver implements IRfidDriver {
 	public void initialiseRFIDDriver() {
 		
 		sockets = new Hashtable<String, SocketClient>();
+		
+		
 	}
 	
 	private IEventMgr eventMgr;

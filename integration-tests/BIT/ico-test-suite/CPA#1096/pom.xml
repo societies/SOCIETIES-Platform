@@ -1,12 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.orchestration</groupId>
-	<artifactId>cpa</artifactId>
+	<groupId>org.societies.integration.test.bit</groupId>
+	<artifactId>bit-1096-cpa</artifactId>
+	<name>#1055 Collaboration Pattern Analyzer</name>
 	<packaging>bundle</packaging>
-	<version>${version.ico}</version>
-	<description>Collaboration Pattern Analyzer (CPA)</description>
+	<version>0.0.1-SNAPSHOT</version>
+
 	<developers>
 		<developer>
 			<id>bjornmm</id>
@@ -19,20 +20,21 @@
 			</roles>
 		</developer>
 	</developers>
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<relativePath>../../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
-	<properties>
-  	  <powermock.version>1.4.12</powermock.version>
-	</properties>
+
 	<dependencies>
-
-
-		<!-- spring -->
+	    <dependency>
+			<groupId>org.societies.integration.test.util</groupId>
+			<artifactId>integrationtestutil</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -40,16 +42,11 @@
 			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- databases -->
-
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>com.springsource.org.apache.derby</artifactId>
 			<version>10.5.1000001.764942</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.hsqldb</groupId> <artifactId>com.springsource.org.hsqldb</artifactId> 
-			<version>1.8.0.10</version> </dependency> <dependency> <groupId>mysql</groupId> 
-			<artifactId>mysql-connector-java</artifactId> <version>5.1.9</version> </dependency> -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -92,38 +89,25 @@
 			<version>3.3.0.ga</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<!-- apache commons -->
 
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
-			<version>1.2.2.osgi</version>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>com.springsource.org.apache.commons.pool</artifactId>
-			<version>1.5.3</version>
+			<groupId>org.societies</groupId>
+			<artifactId>common-data-source</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>com.springsource.org.apache.commons.collections</artifactId>
-			<version>3.2.1</version>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
@@ -131,56 +115,15 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-
+			<groupId>org.societies.comm.xmpp.pubsub</groupId>
+			<artifactId>PubsubClientBundle</artifactId>
+			<version>${version.comm}</version>
+			<scope>provided</scope>
 		</dependency>
 
-	<dependency>
-	<groupId>org.societies.orchestration.api</groupId>
-	<artifactId>intelligent-community-orchestration-api</artifactId>
-	<version>${version.ico}</version>
-	<scope>provided</scope>
-	</dependency>
-	
-
-	<dependency>
-    	<groupId>org.societies.orchestration.api</groupId>
-		<artifactId>intelligent-community-orchestration-api</artifactId>
-		<version>${version.ico}</version>
-    </dependency>
-<!--  graph stuff -->
-<dependency>
-	<groupId>net.sf.jung</groupId>
-	<artifactId>jung-graph-impl</artifactId>
-	<version>2.0.1</version>
-</dependency>
-	<dependency>
-		<groupId>net.sf.jung</groupId>
-		<artifactId>jung-algorithms</artifactId>
-		<version>2.0.1</version>
-		<scope>compile</scope>
-	</dependency>
-	
-<!-- 	<dependency> -->
-<!-- 		<groupId>net.sf.jung</groupId> -->
-<!-- 		<artifactId>jung-io</artifactId> -->
-<!-- 		<version>${project.version}</version> -->
-<!-- 		<scope>compile</scope> -->
-<!-- 	</dependency> -->
-	
-	  	<dependency>
-		<groupId>net.sf.jung</groupId>
-		<artifactId>jung-visualization</artifactId>
-		<version>2.0.1</version>
-		<scope>compile</scope>
-	</dependency>
-	
 	</dependencies>
-
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -189,10 +132,57 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-Activator></Bundle-Activator>
-						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.artifactId}</Bundle-Name>
+						<Bundle-Version>${project.version}</Bundle-Version>
+						<Embed-Dependency>
+							junit;scope=compile|runtime, 
+							integrationtestutil;scope=compile|runtime, 
+						</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>
+							org.slf4j.*,
+							org.junit.*,
+							org.springframework.beans.factory.annotation;version="0",
+							org.springframework.stereotype;version="0",
+							javax.annotation;version="0",**;resolution:=optional
+						</Import-Package>
+
 					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset> 
+							<!-- created after mvn test using the Derby DBMS -->
+							<directory>cismanagertestdb</directory>
+						</fileset>
+						<fileset>
+							<directory>.</directory>
+							<includes> 
+								<!-- created after mvn test using the Derby DBMS -->
+								<include>derby.log</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor></descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.11</version>
+				<configuration>
+					<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -207,7 +197,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${version.ico}</version>
+							<version>${project.version}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
@@ -217,4 +207,5 @@
 			</plugin>
 		</plugins>
 	</build>
+
 </project>

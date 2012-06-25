@@ -1,21 +1,33 @@
 package org.societies.integration.test.bit.user_preference_learning;
 
+
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.integration.test.IntegrationTestCase;
 import org.societies.api.internal.personalisation.*;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 
 
 public class Test748 extends IntegrationTestCase{
-	private static ICtxBroker ctxBroker;
-	private static IUserActionMonitor uam;
-	private static IPersonalisationManager personMan;
-	public static IPersonalisationManager getPersonMan() {
+	private ICtxBroker ctxBroker;
+	private IUserActionMonitor uam;
+	private IPersonalisationManager personMan;
+	
+	public Test748(){
+		super(748, Test748.class);
+		Tester.instance=this;
+	}
+	
+	public IPersonalisationManager getPersonMan() {
 		return personMan;
 	}
 
-	public static void setPersonMan(IPersonalisationManager personMan) {
-		Test748.personMan = personMan;
+	public void setPersonMan(IPersonalisationManager personMan) {
+		this.personMan = personMan;
 	}
 
 	public Test748(int testCaseNumber, Class[] testCaseClasses) {
@@ -23,20 +35,20 @@ public class Test748 extends IntegrationTestCase{
 		// TODO Auto-generated constructor stub
 	}
 
-	public static ICtxBroker getCtxBroker() {
+	public ICtxBroker getCtxBroker() {
 		return ctxBroker;
 	}
 
-	public static void setCtxBroker(ICtxBroker ctxBroker) {
-		Test748.ctxBroker = ctxBroker;
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
 	}
 
-	public static IUserActionMonitor getUam() {
+	public IUserActionMonitor getUam() {
 		return uam;
 	}
 
-	public static void setUam(IUserActionMonitor uam) {
-		Test748.uam = uam;
+	public void setUam(IUserActionMonitor uam) {
+		this.uam = uam;
 	}
 
 }

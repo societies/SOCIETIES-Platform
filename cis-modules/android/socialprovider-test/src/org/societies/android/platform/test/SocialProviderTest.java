@@ -191,7 +191,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 				SocialContract.Me.DISPLAY_NAME
 			};
 		//I should always be the row 0 in Me:
-		String selection = SocialContract.Me._ID + " = 1";
+		String selection = SocialContract.Me._ID + " = 0";
 		Cursor cursor = resolver.query(SocialContract.Me.CONTENT_URI,
 				projection, selection, null, null);
 		
@@ -199,6 +199,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		assertFalse(cursor == null);
 		if (cursor == null)	return;
 		if (!cursor.moveToFirst()) return;
+		cursor.moveToNext();
 		//5- Fail if the CIS data are not correct:
 		//Create new ContentValues object based on returned CIS:
 		ContentValues returnedValues = new ContentValues();

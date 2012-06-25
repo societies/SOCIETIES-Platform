@@ -171,7 +171,7 @@ public class ServiceModelUtils {
 		// First we get the calling Bundle
 		Bundle serviceBundle = FrameworkUtil.getBundle(callingClass);
 
-		/*
+		
 		// Then we get the serviceReference
 		ServiceReference<?>[] serviceReferenceList = serviceBundle.getRegisteredServices();
 		ServiceReference ourService = null;
@@ -182,7 +182,10 @@ public class ServiceModelUtils {
 				break;
 			}
 		}
-		*/
+		
+		if(ourService == null)
+			return null;
+		
 		// We now have the right ServiceReference, the Bundle and the local IIdentity. Time to generate the ServiceResourceIdentifier
 		
 		
@@ -197,7 +200,7 @@ public class ServiceModelUtils {
 		result.setServiceInstanceIdentifier(String.valueOf(serviceBundle.getBundleId()));
 		//result.setServiceInstanceIdentifier(value);
 		
-		return null;
+		return result;
 	}
 	
 	/**

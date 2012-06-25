@@ -47,9 +47,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
@@ -186,7 +184,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					return new AsyncResult<ServiceControlResult>(returnResult);
 				} else{
 					if(logger.isDebugEnabled())
-						logger.debug("Result of operation was: " + result);
+						logger.debug("Result of operation was: " + result.getMessage());
 					
 					return new AsyncResult<ServiceControlResult>(result);
 				}
@@ -291,7 +289,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 				} else{
 					if(logger.isDebugEnabled())
-						logger.debug("Result of operation was: " + result);
+						logger.debug("Result of operation was: " + result.getMessage());
 					
 					return new AsyncResult<ServiceControlResult>(result);
 				}
@@ -371,7 +369,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 			if(logger.isDebugEnabled())
 				logger.debug("Got the provider IIdentity, now creating the Requestor");
-			
+		
 			RequestorService provider = new RequestorService(providerNode, serviceToInstall.getServiceIdentifier());
 		
 			boolean includePrivacyPolicyNegotiation = false;
@@ -381,11 +379,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			ServiceNegotiationCallback negotiationCallback = new ServiceNegotiationCallback();
 			getPolicyNegotiation().startNegotiation(provider, includePrivacyPolicyNegotiation, negotiationCallback);
-			
-			//TODO: TEMPORARY TESTING. HANDLE THIS ASYNC STUFF BETTER!
-			Thread.currentThread().sleep(10 * 1000);
-			
 			ServiceNegotiationResult negotiationResult = negotiationCallback.getResult();
+		
 			if(negotiationResult == null){
 				if(logger.isDebugEnabled()) logger.debug("Problem doing negotiation!");
 				returnResult.setMessage(ResultMessage.NEGOTIATION_ERROR);
@@ -421,7 +416,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				
 				Future<ServiceControlResult> asyncResult = null;
 				URL bundleLocation = negotiationResult.getServiceUri().toURL();
-					
+				//URL bundleLocation = serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient().toURL();
+
 				asyncResult = installService(bundleLocation);
 				ServiceControlResult result = asyncResult.get();
 
@@ -627,7 +623,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					
 				} else{
 					if(logger.isDebugEnabled())
-						logger.debug("Result of operation was: " + result);
+						logger.debug("Result of operation was: " + result.getMessage());
 					
 					return new AsyncResult<ServiceControlResult>(result);
 				}
@@ -724,7 +720,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					return new AsyncResult<ServiceControlResult>(returnResult);
 				} else{
 					if(logger.isDebugEnabled())
-						logger.debug("Result of operation was: " + result);
+						logger.debug("Result of operation was: " + result.getMessage());
 					
 					return new AsyncResult<ServiceControlResult>(result);
 				}
@@ -960,7 +956,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
 					} else{
 						if(logger.isDebugEnabled())
-							logger.debug("Result of operation was: " + result);
+							logger.debug("Result of operation was: " + result.getMessage());
+						
+						returnResult.setMessage(result.getMessage());
+						returnResult.setServiceId(result.getServiceId());
 						
 						if(result.getMessage() == ResultMessage.SUCCESS && ServiceModelUtils.isServiceOurs(service,getCommMngr())){
 								
@@ -1077,7 +1076,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("We need to send the message to the remote CIS!");
 					
 					ServiceControlRemoteClient callback = new ServiceControlRemoteClient();
-					getServiceControlRemote().shareService(service, node, callback);
+					getServiceControlRemote().unshareService(service, node, callback);
 					
 					if(logger.isDebugEnabled())
 						logger.debug("Remote call complete, now we need to wait for the result...");
@@ -1091,7 +1090,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
 					} else{
 						if(logger.isDebugEnabled())
-							logger.debug("Result of operation was: " + result);
+							logger.debug("Result of operation was: " + result.getMessage());
+						
+						returnResult.setMessage(result.getMessage());
 						
 						if(result.getMessage() == ResultMessage.SUCCESS){
 
