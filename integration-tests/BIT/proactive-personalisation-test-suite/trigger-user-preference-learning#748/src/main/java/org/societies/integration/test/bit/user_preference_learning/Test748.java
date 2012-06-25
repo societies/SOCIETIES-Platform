@@ -1,9 +1,15 @@
 package org.societies.integration.test.bit.user_preference_learning;
 
+
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.integration.test.IntegrationTestCase;
 import org.societies.api.internal.personalisation.*;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 
 
 public class Test748 extends IntegrationTestCase{
@@ -13,6 +19,9 @@ public class Test748 extends IntegrationTestCase{
 	
 	public Test748(){
 		super(748, Test748.class);
+		Tester.instance=this;
+		JUnitCore jUnitCore = new JUnitCore();
+		jUnitCore.run(Tester.class);
 	}
 	
 	public IPersonalisationManager getPersonMan() {
