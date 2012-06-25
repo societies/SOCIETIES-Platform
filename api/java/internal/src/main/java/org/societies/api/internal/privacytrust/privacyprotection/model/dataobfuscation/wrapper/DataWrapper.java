@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.schema.identity.DataIdentifier;
 
 
 
@@ -153,5 +154,16 @@ public class DataWrapper<E> implements IDataWrapper<E> {
 			.isEquals();
 		}
 		return false;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "DataWrapper ["
+				+ (dataId != null ? "dataId=" + dataId + ", " : "")
+				+ (data != null ? "data=" + data + ", " : "") + "persistence="
+				+ persistence + "]";
 	}
 }

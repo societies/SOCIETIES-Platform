@@ -15,6 +15,6 @@
        <osgi:service ref="RegSynchroniser" interface="org.societies.api.internal.css.devicemgmt.ILocalDevice" />
        <osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
        <osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1"/> 
-       <osgi:reference id="DMCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager" />
+       <!-- <osgi:reference id="DMCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager" /> -->
 		
 </beans>

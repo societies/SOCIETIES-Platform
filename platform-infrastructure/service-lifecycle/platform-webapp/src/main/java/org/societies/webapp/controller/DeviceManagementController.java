@@ -144,7 +144,6 @@ public class DeviceManagementController implements ServiceTrackerCustomizer, Bun
 			}
 		}
 		
-		
 		return new ModelAndView("device-detail");
 	}
 	

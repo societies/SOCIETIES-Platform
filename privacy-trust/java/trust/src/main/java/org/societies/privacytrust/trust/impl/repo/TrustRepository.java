@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,7 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.model.ITrustedCis;
+import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
@@ -195,5 +201,42 @@ public class TrustRepository implements ITrustRepository {
 			if (session != null)
 				session.close();
 		}
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntities(java.lang.String, java.lang.Class)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends ITrustedEntity> List<T> retrieveEntities(final String trustorId,
+			final Class<T> entityClass) throws TrustRepositoryException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (entityClass == null)
+			throw new NullPointerException("entityClass can't be null");
+		
+		final Class<? extends TrustedEntity> daClass;
+		if (ITrustedCss.class.equals(entityClass))
+			daClass = TrustedCss.class;
+		else if (ITrustedCis.class.equals(entityClass))
+			daClass = TrustedCis.class;
+		else if (ITrustedService.class.equals(entityClass))
+			daClass = TrustedService.class;
+		else
+			throw new TrustRepositoryException("Unsupported entityClass: "
+					+ entityClass);
+			
+		final List<T> result = new ArrayList<T>();
+		final Session session = sessionFactory.openSession();
+		final Criteria criteria = session.createCriteria(daClass)
+				.add(Restrictions.eq("teid.trustor_id", trustorId));
+		
+		result.addAll(criteria.list());
+		
+		if (session != null)
+			session.close();
+		
+		return result;
 	}
 }
