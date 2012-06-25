@@ -41,7 +41,7 @@ public class TestCase958 extends IntegrationTestCase {
 	public static ICisManager cisManager;
 	public static IPrivacyPolicyManager privacyPolicyManager;
 
-
+	
 	public TestCase958() {
 		// Call the super constructor
 		// with test case number
@@ -49,8 +49,8 @@ public class TestCase958 extends IntegrationTestCase {
 		super(958, NominalTestCase.class);	
 		NominalTestCase.testCaseNumber = testCaseNumber;
 	}
-
-
+	
+	
 	/* ***********************************
 	 *         Dependency Injection      *
 	 *************************************/
