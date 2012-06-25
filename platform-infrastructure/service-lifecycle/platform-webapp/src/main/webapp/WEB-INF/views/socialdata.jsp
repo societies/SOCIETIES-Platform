@@ -8,13 +8,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Societies services - Social Data</title>
-
-
+<script type="text/javascript" src="js/socialdata.js"></script>
 <style>
 
+input.icon{
+	width:45px;
+}
 
-#legend{
-	border: dotted  2px;
+div.legend{
+	border: solid 2px;
+	background-color: grey;
+	color:white;
+	width:20%;
 	
 }
 
@@ -25,6 +30,7 @@
  .connectors{
  	border: solid black;
 	text-align: center;
+	
  }
 .errorblock {
 	color: #000;
@@ -33,10 +39,46 @@
 	padding: 8px;
 	margin: 16px;
 }
+
+div#container {
+	width: 90%;
+	border: 1px solid #000;
+	text-align: center;
+}
+div.split2 div {
+	float: left;
+	width: 50%;
+}
+
+div.split2 ul { list-style-type: none; }
+
+div.wide {
+	clear: left;
+}
+
+div#connectors ul { list-style-type: none; text-align:left; margin-left: 20%; }
+div#connectors img{width:20px;}
+
+div#addConnector{
+	visibility: hidden;
+}
+
+
+
+
 </style>
+
+
 </head>
 
+
+
+
 <body>
+
+
+
+
 	<!-- HEADER -->
 	<jsp:include page="header.jsp" />
 	<!-- END HEADER -->
@@ -44,84 +86,85 @@
 	<!-- LEFTBAR -->
 	<jsp:include page="leftbar.jsp" />
 	<!-- END LEFTBAR -->
-<!-- .................PLACE YOUR CONTENT HERE ................ -->
+    <!-- .................PLACE YOUR CONTENT HERE ................ -->
 
-	<h3>Social Network Data</h3>
-	      <p> All your social data are stored in a common language and used by the platform to perform social operations</p>  
-	      <div class="connectors" style="width: 50%; ">
-	     	
-	      <input onclick="window.open('http://dev.lucasimone.eu/fb.php', 'FacebookConnector');" type="image" src="images/facebook.png">
-		  <input onclick="window.open('http://157.159.160.188:8080/examples/servlets/servlet/TwitterLoginServlet','TwitterConnector');" type="image" src="images/Twitter.jpg">
-		  <input onclick="window.open('http://157.159.160.188:8080/examples/servlets/servlet/FoursquareLoginServlet', 'FoursquareConnector');" type="image" src="images/Foursquare.png">
-		  <input onclick="alert('Not implemented yet')" type="image" src="images/Linkedin.png">
-		
-		  </div>
-		
-<form:form method="POST" action="socialdata.html" commandName="sdForm">
-		<form:errors path="*" cssClass="errorblock" element="div" />
-		<table>
-			<tr>
-				<td align="middle">Please</td>
-					<td><form:select path="method" >
-					   <form:option value="NONE" label="--- Select ---" />
-					   <form:options items="${methods}" />
-					</form:select></td>
-				<td><form:errors path="method" cssClass="error" />
-				</td>
-			
-				<td align="middle"> Connector </td>
-					<td><form:select path="snName" >
-					   <form:option value="NONE" label="--- Select ---" />
-					   <form:options items="${snName}" />
-					</form:select></td>
-				<td><form:errors path="snName" cssClass="error" />
-				</td>
-			</tr>
-			<tr>
-		 	<td colspan="6" id="legend">
-		 	     <p>How to work with SocialData Bundle </p>
-		 	     <ul>
-		 	     	<li>To <strong>ADD</strong>    a new Connnector please use one of the ICON above to get the token</li>
-		 	     	<li>To <strong>REMOVE</strong> a new Connnector please set the ID in the field below</li>
-		 	     	<li>To <strong>LIST</strong>   all Connnectors  available. Do not require any parameter</li>
-		 	     	<li>To get <strong>FRIENDs</strong> you Do not require any parameter</li>
-		 	     	<li>To get <strong>PROFILEs</strong> you Do not require any parameter</li>
-		 	     	<li>To get <strong>GROUPs</strong> you Do not require any parameter</li>
-		 	     	<li>To get <strong>ACTIVITIEs</strong> you Do not require any parameter</li>
-		 	     </ul> 
-		 	     
-		 	     
-		 	</td>
-		 	</tr>
-		 	<tr></tr>
-			<tr><td align="middle" color="green" >Parameter</td><td colspan="5" align="middle"> Parameter Value</td></tr>
-			<tr>
-				<td>Access Token:</td>
-				   <td colspan=4><form:input path="token"  value="${token}"/>
-				</td>
-				<td><form:errors path="token" cssClass="error" /></td>
-			</tr>
-			<tr>	
-				<td>Connector ID</td>
-				<td colspan="4"><form:input path="id" value="${id}"/>
-				</td>
-				<td><form:errors path="id" cssClass="error" />
-				</td>
-			</tr>
-			<tr>	
-				<td>Setting Options</td>
-				<td colspan="4"><form:input path="params" value="${params}"/>
-				</td>
-				<td><form:errors path="params" cssClass="error" />
-				</td>
-			</tr>	
-			<tr></tr>
-			<tr>
-				<td colspan="6"><input type="submit" value="Exectutes NOW! " style="width: 713px; "/></td>
-			</tr>
-		</table>	
-</form:form>
+     
 	
+	
+     <div id="container">
+     <h1>Social Network Data</h1>
+    <p> 
+         <strong>Socialdata</strong> is a bundle that manages your social data. Connecting your Social Network <br>
+         by on of the Societies Social Connector, you can use your social activity, friends, profiles and groups to  <br>
+         enrich services and context. This bundle doesn't store anything internally, it just provides <br>
+         a proxy to social data, using OpenSocial (Shindig) data model. Enjoy!
+    
+    </p>  
+	      
+<div class="split2">
+   <div id="connectors">
+      <h2>Your connectors</h2>
+      <p>Connector list of your social network. </p>
+       <ul id="listConn">
+		     ${connectors}
+		</ul>
+   </div>
+   <div>
+      <h2>Get Social data</h2>
+      <p>With those commands it is possible to fetch<br>social data from all the connectors</p>
+      <ul>
+         <li><a href="#" onclick="exe('friends');">Get your social network's <strong>Friends </strong></a></li>
+         <li><a href="#" onclick="exe('profiles');">Get your Social <Strong>Profiles</Strong></a></li>
+         <li><a href="#" onclick="exe('activities');">Read the <Strong>Activities</strong> feed</a></li>
+         <li><a href="#" onclick="exe('groups');">Get a list of subscribed <strong>Groups</a></strong></li>
+      </ul>
+   </div>
+</div>
+<div class="wide">
+
+ 
+
+   <div id="popup" style="visibility:hidden" ><img src="images/loading.gif"> Loading connector data. Please wait... </div><br>
+   <p> Connect your social network with Societies <br/>
+     <input class="icon" onclick="getToken('http://dev.lucasimone.eu/fb.php', 'facebook');" type="image" src="images/facebook.png">
+     <input class="icon" onclick="getToken('http://157.159.160.188:8080/examples/servlets/servlet/TwitterLoginServlet','twitter');" type="image" src="images/Twitter.jpg">
+	 <input class="icon" onclick="getToken('http://157.159.160.188:8080/examples/servlets/servlet/FoursquareLoginServlet', 'foursquare');" type="image" src="images/Foursquare.png">
+	 <input class="icon" onclick="alert('Not implemented yet')" type="image" src="images/Linkedin.png">
+   </p>
+   <div id="addConnector">
+   
+  <form:form method="POST" action="socialdata.html" commandName="sdForm" name="sd">
+		     
+	        <p> 
+	             When the popup has generated a json that contains access_token param,<br>
+		         please copy it to the Token field and click on add Connector
+		     </p> 
+   	     
+		     Method: <form:input id="method"  path="method" value="" />
+			 SN:     <form:input id="snName"     path="snName" value="" />
+			 Parameters<form:input id="params"  path="params" value=""/><br>
+			 Token:<form:input id="token"   path="token"   size="100" value=""/><br>
+			 <form:input id="id"  style="visibility:hidden" path="id" value=""/>
+		     <a href="javascript: submitform()">Add connector</a>  --- 
+		     <a href="javascript: removeform()">Cancel </a>
+    </form:form>
+    </div>
+  
+</div>
+
+</div>
+     
+     
+	
+	     
+		
+		
+		 	
+		 	
+		 	
+
+	
+
 <!-- .................END PLACE YOUR CONTENT HERE ................ -->
 	<!-- FOOTER -->
 	<jsp:include page="footer.jsp" />
