@@ -1,5 +1,6 @@
 package org.societies.integration.test.bit.user_preference_learning;
 
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -52,6 +53,8 @@ public class Tester {
 			this.userId = new MockIdentity(IdentityType.CSS, "user",
 					"societies.org");
 			id = new ServiceResourceIdentifier();
+			id.setIdentifier(new URI("http://ss.ss"));
+			id.setServiceInstanceIdentifier("http://ss.ss");
 			this.action$1 = new Action(id, "serviceintest", "volume", "0");
 			this.action$2 = new Action(id, "serviceintest", "volume", "10");
 			logging.debug("initializing actions");
