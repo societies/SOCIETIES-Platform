@@ -21,7 +21,7 @@ public class Test748 extends IntegrationTestCase{
 	}
 
 	public void setPersonMan(IPersonalisationManager personMan) {
-		personMan = personMan;
+		Test748.personMan = personMan;
 	}
 	
 	public static ICtxBroker getCtxBroker() {
@@ -29,7 +29,7 @@ public class Test748 extends IntegrationTestCase{
 	}
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		ctxBroker = ctxBroker;
+		Test748.ctxBroker = ctxBroker;
 	}
 
 	public static IUserActionMonitor getUam() {
@@ -37,7 +37,7 @@ public class Test748 extends IntegrationTestCase{
 	}
 
 	public void setUam(IUserActionMonitor uam) {
-		uam = uam;
+		Test748.uam = uam;
 	}
 
 }
