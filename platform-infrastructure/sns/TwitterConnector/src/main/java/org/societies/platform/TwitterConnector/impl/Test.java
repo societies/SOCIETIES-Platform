@@ -88,7 +88,7 @@ class Test {
 		
 		JSONObject tweet = new JSONObject();
 		try {
-			tweet.put("status", "Hi, I am a tester");
+			tweet.put("status", "Hi, I am a tester!");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
