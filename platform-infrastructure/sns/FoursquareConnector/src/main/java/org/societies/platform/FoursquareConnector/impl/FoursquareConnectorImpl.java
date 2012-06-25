@@ -216,8 +216,57 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 	 * @see org.societies.api.internal.sns.ISocialConnector#post(java.lang.String)
 	 */
 	@Override
-	public void post(String arg0) {
-		// TODO Auto-generated method stub
+	public void post(String activity) {
+		JSONObject checkin = null;
+		String res = null;
+		try {
+			checkin = new JSONObject(activity);
+			OAuthRequest request = new OAuthRequest(Verb.POST, POST_CHECKINS+ accessToken.getToken());
+			if (checkin.has("venueId"))
+				request.addBodyParameter("venueId", checkin.getString("venueId"));
+			if (checkin.has("eventId"))
+				request.addBodyParameter("eventId", checkin.getString("eventId"));
+			if (checkin.has("shout"))
+				request.addBodyParameter("shout", checkin.getString("shout"));
+			if (checkin.has("broadcast"))
+				request.addBodyParameter("broadcast", checkin.getString("broadcast"));
+			if (checkin.has("ll"))
+				request.addBodyParameter("ll", checkin.getString("ll"));
+			if (checkin.has("llAcc"))
+				request.addBodyParameter("llAcc", checkin.getString("llAcc"));
+			if (checkin.has("alt"))
+				request.addBodyParameter("alt", checkin.getString("alt"));
+			if (checkin.has("altAcc"))
+				request.addBodyParameter("altAcc", checkin.getString("altAcc"));
+			
+			this.service.signRequest(accessToken, request);
+			Response response = request.send();
+
+			res = response.getBody();
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(res);
+		if(res == null)
+			System.out.println("failure");
+		JSONObject resjson=null;
+		try {
+			resjson = new JSONObject(res);
+			if(resjson.has("meta")){
+				JSONObject m = resjson.getJSONObject(("meta"));
+				String code = m.getString("code");
+				if(code.equalsIgnoreCase("200"))
+					System.out.println("success");
+				else if(code.startsWith("4")) 
+					System.out.println(m.toString());
+			}
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
