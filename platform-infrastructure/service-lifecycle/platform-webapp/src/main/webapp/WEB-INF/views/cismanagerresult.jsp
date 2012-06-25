@@ -94,7 +94,7 @@ if (methodCalled.equals("RefreshRemoteMembers")) {
     <p><b>Membership List from remote CIS:</b> ${cisid}</p>
 	<table>
 		<tr><td><B>Participant</B></td><td><B>Role</B></td></tr>
-		<xc:forEach var="record" items="${memberRecords}">
+		<xc:forEach var="record" items="${remoteMemberRecords}">
 	        <tr>
 	        	<td>${record.getJid()}&nbsp;</td>
 	        	<td>${record.getRole().toString()}&nbsp;</td>
