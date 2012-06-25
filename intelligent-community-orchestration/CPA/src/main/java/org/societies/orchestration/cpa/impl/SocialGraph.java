@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 public class SocialGraph implements Collection<SocialGraphVertex> {
 	private ArrayList<SocialGraphEdge> edges;
 	private ArrayList<SocialGraphVertex> vertices;
@@ -88,5 +89,15 @@ public class SocialGraph implements Collection<SocialGraphVertex> {
 	@Override
 	public <T> T[] toArray(T[] a) {
 		return vertices.toArray(a);
+	}
+	public UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> toJung(){
+		UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> ret = new UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge>();
+		for(SocialGraphVertex vertex : this.vertices){
+			ret.addVertex(vertex);
+		}
+		for(SocialGraphEdge edge : this.edges){
+			ret.addEdge(edge, edge.getFrom(), edge.getTo());
+		}
+		return ret;
 	}
 }
