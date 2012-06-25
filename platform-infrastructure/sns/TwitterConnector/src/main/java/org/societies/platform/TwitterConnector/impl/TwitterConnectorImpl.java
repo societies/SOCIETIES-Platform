@@ -340,6 +340,21 @@ public class TwitterConnectorImpl implements TwitterConnector {
 			OAuthRequest request = new OAuthRequest(Verb.POST, POST_TWEET_URL);
 			if (tweet.has("status"))
 				request.addBodyParameter("status", tweet.getString("status"));
+			if (tweet.has("in_reply_to_status_id"))
+				request.addBodyParameter("in_reply_to_status_id", tweet.getString("in_reply_to_status_id"));
+			if (tweet.has("lat"))
+				request.addBodyParameter("lat", tweet.getString("lat"));
+			if (tweet.has("long"))
+				request.addBodyParameter("long", tweet.getString("long"));
+			if (tweet.has("place_id"))
+				request.addBodyParameter("place_id", tweet.getString("place_id"));
+			if (tweet.has("display_coordinates"))
+				request.addBodyParameter("display_coordinates", tweet.getString("display_coordinates"));
+			if (tweet.has("trim_user"))
+				request.addBodyParameter("trim_user", tweet.getString("trim_user"));
+			if (tweet.has("include_entities"))
+				request.addBodyParameter("include_entities", tweet.getString("include_entities"));
+			
 			this.service.signRequest(twToken.getAccessToken(), request);
 			Response response = request.send();
 
