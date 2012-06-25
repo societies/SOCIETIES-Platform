@@ -56,6 +56,7 @@ public class NominalTestCase {
 
 	private String privacyPolicyWithoutRequestor;
 	private String cssId;
+	private String cisId;
 	private String cssPassword;
 	private String cisName;
 	private String cisType;
@@ -102,6 +103,9 @@ public class NominalTestCase {
 	@After
 	public void tearDown() {
 		LOG.info("[#"+testCaseNumber+"] tearDown");
+		if (null != cisId && !"".equals(cisId)) {
+			TestCase958.cisManager.deleteCis(cssId, cssPassword, cisId);
+		}
 	}
 
 
@@ -132,7 +136,7 @@ public class NominalTestCase {
 		assertNotNull("New CIS is null", newCis);
 
 		// Retrieve CIS id
-		String cisId =  newCis.getCisId();
+		cisId =  newCis.getCisId();
 		assertNotNull("New CIS id is null", cisId);
 
 		// Check if the CIS is on the CIS Management registry
@@ -167,7 +171,7 @@ public class NominalTestCase {
 		assertNotNull("New CIS is null", newCis);
 
 		// Retrieve CIS id
-		String cisId =  newCis.getCisId();
+		cisId =  newCis.getCisId();
 		assertNotNull("New CIS id is null", cisId);
 
 		// Check if the CIS is on the CIS Management registry
@@ -193,6 +197,7 @@ public class NominalTestCase {
 			fail("[Error InvalidFormatException] "+testTitle);
 		}
 
+		LOG.info(retrievedPrivacyPolicy.toXMLString());
 		assertNotNull("CIS Privacy policy is null but it should not", retrievedPrivacyPolicy);
 		assertEquals("CIS privacy policy retrieved is not the one that has been sent", expectedPrivacyPolicy, retrievedPrivacyPolicy);
 	}
