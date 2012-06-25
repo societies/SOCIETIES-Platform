@@ -25,6 +25,7 @@
 
 package org.societies.api.security.digsig;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -46,7 +47,7 @@ public interface ISignatureMgr {
 	 * 
 	 * @return XML with embedded signature.
 	 */
-	public String signXml(String xml, String xmlNodeId, String identity);
+	public String signXml(String xml, String xmlNodeId, IIdentity identity);
 	
 	/**
 	 * Verify all digital signatures embedded in given XML. Verify also if the

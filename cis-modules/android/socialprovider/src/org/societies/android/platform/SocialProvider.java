@@ -24,13 +24,12 @@
  */
 package org.societies.android.platform;
 
-import org.societies.android.platform.SocialContract;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 
 /**
@@ -55,7 +54,20 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 
     private boolean online = false; // True when we are online.
     private LocalDBAdapter dbAdapter = null;
-    /* 
+	//Construct all the legal query URIs:
+	//TODO replace with constants or move to SocialContract.
+    static{
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me", 0);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", 1);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", 2);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities", 3);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities/#", 4);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services", 5);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services/#", 6);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities", 7);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities/#", 8);
+    	}
+    	/* 
      * Here I should do the following:
      * - Create a {@link CommunicationAdapter} and try to get connection with cloud CisManager (currently not here 
      *   due to problems with communication manager.
@@ -66,37 +78,32 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
      */
     @Override
     public boolean onCreate() {
-	Context context = getContext();
-	//Used for local testing that ContentProvider works:
-	//TODO: to be used in later versions with local caching.
-	dbAdapter = new LocalDBAdapter(context);
-	dbAdapter.connect();
-	//flush old IDs
-	populateMe();
-	populateMyCommunities();
-	populateCommunities();
-	//populateMyServices();
-	//populateMyPeople();
+    	Context context = getContext();
+    	dbAdapter = new LocalDBAdapter(context);
+    	
+    	//TODO: This code will be removed. Only for filling in test data:
+    	if (dbAdapter.firstRun()){
+    		initializeMe();
+    		populateMyCommunities();
+    		populateCommunities();
+    		//populateMyServices();
+    		//populateMyPeople();
+    	}
+    	
+    	return true;
 	
 	//TODO: Add Edgar's CommunicationAdapter initialization here.
 	
-	//Construct all the legal query URIs:
-	//TODO replace with constants or move to SocialContract.
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me", 0);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", 1);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", 2);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities", 3);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities/#", 4);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services", 5);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services/#", 6);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities", 7);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities/#", 8);
-
-	return dbAdapter.isConnected();
+    }
+    
+    public void shutdown(){
+    	if (dbAdapter.isConnected()){
+    	dbAdapter.disconnect();
+    	}
     }
 
-    private void populateMe(){
-    	//TODO: needs to be done more elegantly!
+    private void initializeMe(){
+    	//TODO: needs to be done more elegantly! now just add 
     	//Delete everything so there is only one CSS with _id = 1.
     	//dbAdapter.deleteMe();
 		ContentValues initialValues = new ContentValues();
@@ -105,28 +112,36 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 		initialValues.put(SocialContract.Me.DISPLAY_NAME , "Your Name");
 
 		//2- Call insert in SocialProvider to initiate insertion
-		update(SocialContract.Me.CONTENT_URI, initialValues, null, null);
+		dbAdapter.updateMe(initialValues, SocialContract.Me._ID+"=0", null);
+		//update(SocialContract.Me.CONTENT_URI, initialValues, null, null);
 		//android.util.Log.e(TAG + ": number deleted", u.getLastPathSegment());
     	
     }
+
     
     private void populateMyCommunities(){
     	ContentValues initialValues = new ContentValues();
 		initialValues.put(SocialContract.MyCommunity.GLOBAL_ID , "community1.societies.org");
 		initialValues.put(SocialContract.MyCommunity.OWNER_ID, "babak@societies.org");
 		initialValues.put(SocialContract.MyCommunity.DISPLAY_NAME , "Football");
+		dbAdapter.connect();
 		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
+		dbAdapter.disconnect();
 		initialValues.clear();
 		initialValues.put(SocialContract.MyCommunity.GLOBAL_ID , "community3.societies.org");
 		initialValues.put(SocialContract.MyCommunity.OWNER_ID, "babak@societies.org");
 		initialValues.put(SocialContract.MyCommunity.DISPLAY_NAME , "Basketball");
 		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
-		initialValues.clear();
+		dbAdapter.connect();
+		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
+		dbAdapter.disconnect();
 		initialValues.put(SocialContract.MyCommunity.GLOBAL_ID , "community4.societies.org");
 		initialValues.put(SocialContract.MyCommunity.OWNER_ID, "thomas@societies.org");
 		initialValues.put(SocialContract.MyCommunity.DISPLAY_NAME , "Handball");
 		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
-		initialValues.clear();
+		dbAdapter.connect();
+		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
+		dbAdapter.disconnect();
 
     }
     private void populateCommunities(){
@@ -140,7 +155,9 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 		initialValues.put(SocialContract.Community.CREATION_DATE , "Today");
 		initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
 		initialValues.put(SocialContract.Community.DIRTY , "yes");
+		dbAdapter.connect();
 		insert(SocialContract.Community.CONTENT_URI, initialValues);
+		dbAdapter.disconnect();
 		initialValues.clear();
 
 		initialValues.put(SocialContract.Community.GLOBAL_ID , "community2.societies.org");
@@ -151,7 +168,9 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 		initialValues.put(SocialContract.Community.CREATION_DATE , "Today");
 		initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
 		initialValues.put(SocialContract.Community.DIRTY , "yes");
+		dbAdapter.connect();
 		insert(SocialContract.Community.CONTENT_URI, initialValues);
+		dbAdapter.disconnect();
 		initialValues.clear();
 
 		initialValues.put(SocialContract.Community.GLOBAL_ID , "community3.societies.org");
@@ -162,7 +181,9 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 		initialValues.put(SocialContract.Community.CREATION_DATE , "Today");
 		initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
 		initialValues.put(SocialContract.Community.DIRTY , "yes");
+		dbAdapter.connect();
 		insert(SocialContract.Community.CONTENT_URI, initialValues);
+		dbAdapter.disconnect();
 		initialValues.clear();
 
 		initialValues.put(SocialContract.Community.GLOBAL_ID , "community4.societies.org");
@@ -173,7 +194,9 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 		initialValues.put(SocialContract.Community.CREATION_DATE , "Today");
 		initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Closed");
 		initialValues.put(SocialContract.Community.DIRTY , "yes");
+		dbAdapter.connect();
 		insert(SocialContract.Community.CONTENT_URI, initialValues);
+		dbAdapter.disconnect();
     	
     }
     private void populateMyServices(){
@@ -216,7 +239,7 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
 
 
 		//2- Call insert in SocialProvider to initiate insertion
-		dbAdapter.insertMe(initialValues);
+//		dbAdapter.insertMe(initialValues);
     	
     }
 
@@ -233,8 +256,8 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     	case 7: //Me/Communities
     		return dbAdapter.deleteMyCommunities(_selection, _selectionArgs);
     	default:
-    		return 0;
-    	}
+            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
+            }
    }
 
     /* (non-Javadoc)
@@ -255,17 +278,21 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     public Uri insert(Uri _uri, ContentValues _values) {
 
     	//Switch on the name of the path used in the query:
+    	Uri returnUri = null;
     	switch (sUriMatcher.match(_uri)){
-    	case 0: //Me
-    		return Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMe(_values)));
+//    	case 0: //Me
+//    		returnUri = Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMe(_values)));
+//    		break;
     	case 3:
-    		return Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertCommunities(_values)));
+    		returnUri = Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertCommunities(_values)));
+    		break;
     	case 7: //Me/Communities
-    		return Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMyCommunity(_values)));
+    		returnUri = Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMyCommunity(_values)));
+    		break;
     	default:
-    		return _uri;
+            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
     	}
-    	//return dbAdapter.insert(_uri, _values);
+    	return returnUri;
     }
 
     /* 
@@ -284,10 +311,10 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     	case 3:
     		return dbAdapter.queryCommunities(_projection, _selection, _selectionArgs, _sortOrder);
     	case 7:
-    		return dbAdapter.queryMyCommunities(_projection, _selection, _selectionArgs, _sortOrder);
-    			
+    		return dbAdapter.queryMyCommunities(_projection, _selection, _selectionArgs, _sortOrder);		
+    	default:
+            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
     	}
-    	return dbAdapter.query(_uri, _projection, _selection, _selectionArgs, _sortOrder);
     }
 
     /* (non-Javadoc)
@@ -296,16 +323,24 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     @Override
     public int update(Uri _uri, ContentValues _values, String _selection,
 	    String[] _selectionArgs) {
-    	switch (sUriMatcher.match(_uri)){
+    	int returnValue;
+    	int caseValue = sUriMatcher.match(_uri); 
+    	switch (caseValue){
     	case 0: //Me
-    		return dbAdapter.updateMe(_values);
+    		returnValue= dbAdapter.updateMe(_values, _selection, _selectionArgs);
+    		break;
     	case 3:
-    		return dbAdapter.updateCommunities(_values, _selection, _selectionArgs);
+    		returnValue= dbAdapter.updateCommunity(_values, _selection, _selectionArgs);
+    		break;
     	case 7:
-    		return dbAdapter.updateMyCommunities(_values, _selection, _selectionArgs);
+    		returnValue= dbAdapter.updateMyCommunity(_values, _selection, _selectionArgs);
+    		break;
+    	default:
+            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
     	}
-    	return dbAdapter.update(_uri, _values, _selection, _selectionArgs);
+    	return returnValue;
     }
+    
     /**
      * 
      * 
@@ -319,3 +354,5 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     };
 
 }
+
+

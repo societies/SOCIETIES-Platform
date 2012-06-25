@@ -230,7 +230,7 @@ public class CommsServer implements IFeatureServer {
 						controlResult = getServiceControl().startService(serviceMessage.getServiceId());
 						ServiceControlResult result = controlResult.get();
 						
-						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result.getMessage());
 						
 						serviceResult.setControlResult(result);
 						break;
@@ -243,7 +243,7 @@ public class CommsServer implements IFeatureServer {
 						controlResult = getServiceControl().stopService(serviceMessage.getServiceId());
 						ServiceControlResult result = controlResult.get();
 						
-						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result.getMessage());
 						
 						serviceResult.setControlResult(result);
 						break;
@@ -255,7 +255,7 @@ public class CommsServer implements IFeatureServer {
 						controlResult = getServiceControl().installService(serviceMessage.getURL().toURL());
 						ServiceControlResult result = controlResult.get();
 						
-						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result.getMessage());
 						
 						serviceResult.setControlResult(result);
 						break;
@@ -267,7 +267,7 @@ public class CommsServer implements IFeatureServer {
 						controlResult = getServiceControl().uninstallService(serviceMessage.getServiceId());
 						ServiceControlResult result = controlResult.get();
 						
-						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result.getMessage());
 						
 						serviceResult.setControlResult(result);
 						break;
@@ -279,7 +279,7 @@ public class CommsServer implements IFeatureServer {
 						controlResult = getServiceControl().shareService(serviceMessage.getService(), serviceMessage.getShareJid());
 						ServiceControlResult result = controlResult.get();
 						
-						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result.getMessage());
 						
 						serviceResult.setControlResult(result);
 						break;
@@ -291,7 +291,7 @@ public class CommsServer implements IFeatureServer {
 						controlResult = getServiceControl().unshareService(serviceMessage.getService(), serviceMessage.getShareJid());
 						ServiceControlResult result = controlResult.get();
 						
-						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result.getMessage());
 						
 						serviceResult.setControlResult(result);
 						break;

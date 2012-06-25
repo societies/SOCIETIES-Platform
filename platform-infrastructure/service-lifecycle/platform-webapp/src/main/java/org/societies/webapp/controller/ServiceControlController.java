@@ -246,6 +246,9 @@ public class ServiceControlController {
 					res="ServiceControl Result Installing in Local Node: ";
 					
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 				
 			}else if (method.equalsIgnoreCase("InstallServiceRemote")) {
@@ -258,6 +261,9 @@ public class ServiceControlController {
 				res="ServiceControl Result for Node : [" + node + "]";
 				
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 					
 			}else if (method.equalsIgnoreCase("StartService")){
@@ -266,6 +272,9 @@ public class ServiceControlController {
 				
 				asynchResult=this.getSCService().startService(serviceId);
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 				
 				res="Started service: " + serviceId;
@@ -277,6 +286,9 @@ public class ServiceControlController {
 
 				asynchResult=this.getSCService().stopService(serviceId);
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 				
 				res="Stopped service: " + serviceId;
@@ -288,6 +300,9 @@ public class ServiceControlController {
 
 				asynchResult=this.getSCService().uninstallService(serviceId);
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				model.put("serviceResult", scresult.getMessage());
 				
 				res="Uninstall service: " + serviceId;
@@ -304,6 +319,30 @@ public class ServiceControlController {
 				//SHARE SERVICE
 				asynchResult = this.getSCService().shareService(serviceToShare, node);
 				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
+				//GET REMOTE SERVICES
+				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
+				List<Service> cisServices = asynchServices.get();
+				model.put("cisservices", cisServices);
+
+				res = "Success";//scresult.getMessage().toString();
+				returnPage = "servicediscoveryresult";
+	
+			} else if (method.equalsIgnoreCase("Install3PService")){
+				
+				if(logger.isDebugEnabled()) logger.debug("Install3PService:" + serviceId);
+
+				//GENERATE SERVICE OBJECT
+				Future<Service> asyncService = this.getSDService().getService(serviceId);
+				Service serviceToInstall = asyncService.get();
+				//SHARE SERVICE
+				asynchResult = this.getSCService().installService(serviceToInstall);
+				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
 				//GET REMOTE SERVICES
 				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
 				List<Service> cisServices = asynchServices.get();

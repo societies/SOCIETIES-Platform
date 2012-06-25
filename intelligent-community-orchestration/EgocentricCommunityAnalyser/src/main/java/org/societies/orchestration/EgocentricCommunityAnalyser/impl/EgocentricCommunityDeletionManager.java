@@ -32,7 +32,7 @@ import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
 
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
@@ -174,7 +174,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
-	private IDeviceManager deviceManager;
+//	private IDeviceManager deviceManager;
 	
 	/*
      * Constructor for EgocentricCommunityDeletionManager
@@ -478,13 +478,13 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
     	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
     }
     
-    public IDeviceManager getDeviceManager() {
-    	return deviceManager;
-    }
-    
-    public void setDeviceManager(IDeviceManager deviceManager) {
-    	this.deviceManager = deviceManager;
-    }
+//    public IDeviceManager getDeviceManager() {
+//    	return deviceManager;
+//    }
+//    
+//    public void setDeviceManager(IDeviceManager deviceManager) {
+//    	this.deviceManager = deviceManager;
+//    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

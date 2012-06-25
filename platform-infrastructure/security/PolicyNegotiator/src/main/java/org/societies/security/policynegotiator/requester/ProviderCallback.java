@@ -95,7 +95,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				try {
 					String selectedSop = selectSopOption(sop);
 					// TODO: use real identity when it can be gathered from other components
-					sop = requester.getSignatureMgr().signXml(sop, selectedSop, "identity");
+					sop = requester.getSignatureMgr().signXml(sop, selectedSop, null);
 					ProviderCallback callback = new ProviderCallback(requester, provider,
 							MethodType.ACCEPT_POLICY_AND_GET_SLA, includePrivacyPolicyNegotiation,
 							finalCallback); 

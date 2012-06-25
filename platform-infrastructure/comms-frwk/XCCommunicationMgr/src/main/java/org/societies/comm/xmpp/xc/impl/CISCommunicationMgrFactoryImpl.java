@@ -10,9 +10,11 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.comm.ICommManagerController;
+import org.societies.identity.IdentityManagerImpl;
 
 public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFactory {
 
@@ -44,6 +46,8 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	
 	@Override
 	public ICommManager getNewCommManager(IIdentity cisIdentity, String credentials) throws CommunicationException {
+		if (!cisIdentity.getType().equals(IdentityType.CIS))
+			throw new CommunicationException("Provided identity does not belong to a CIS");
 		
 		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials, this.idm.getDomainAuthorityNode().getJid());
 		commMgr.loginFromConfig();
@@ -65,7 +69,7 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 				if (initCISCommunicationMgrFactoryImpl())
 					throw new CommunicationException("Not connected to domain!");
 				
-			String randomCisIdentifier = UUID.randomUUID().toString()+"."+domainName;
+			String randomCisIdentifier = IdentityManagerImpl.CIS_PREFIX+UUID.randomUUID().toString()+"."+domainName;
 			// TODO verify if exists
 			IIdentity cisIdentity = idm.fromJid(randomCisIdentifier);
 			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword, this.idm.getDomainAuthorityNode().getJid());
@@ -81,6 +85,9 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	}
 	
 	public ICommManager getNewCommManager(String jid) throws CommunicationException {
+		if (!jid.startsWith(IdentityManagerImpl.CIS_PREFIX))
+			throw new CommunicationException("The provided JID is not a valid CIS JID");
+		
 		try {
 			// TODO verify if exists one with same JID logged int
 			IIdentity cisIdentity = idm.fromJid(jid);

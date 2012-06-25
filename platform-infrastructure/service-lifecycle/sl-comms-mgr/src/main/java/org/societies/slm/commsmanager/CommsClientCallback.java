@@ -134,7 +134,7 @@ public class CommsClientCallback implements ICommCallback {
 			
 			IServiceControlCallback serviceControlClient = getRequestingControlClient(returnStanza.getId());
 			
-			if(logger.isDebugEnabled()) logger.debug("ServiceControlBeanResult: " + serviceControlResult.getControlResult());
+			if(logger.isDebugEnabled()) logger.debug("ServiceControlBeanResult: " + serviceControlResult.getControlResult().getMessage());
 			
 			serviceControlClient.setResult(serviceControlResult.getControlResult());
 			
@@ -170,7 +170,7 @@ public class CommsClientCallback implements ICommCallback {
 	 */
 	@Override
 	public void receiveInfo(Stanza returnStanza, String node, XMPPInfo info) {
-		System.out.println(info.getIdentityName());
+		//System.out.println(info.getIdentityName());
 		
 	}
 
@@ -179,7 +179,7 @@ public class CommsClientCallback implements ICommCallback {
 	 */
 	@Override
 	public void receiveMessage(Stanza returnStanza, Object messageBean) {
-		System.out.println(messageBean.getClass().toString());		
+		//System.out.println(messageBean.getClass().toString());		
 	}
 
 	/* (non-Javadoc)

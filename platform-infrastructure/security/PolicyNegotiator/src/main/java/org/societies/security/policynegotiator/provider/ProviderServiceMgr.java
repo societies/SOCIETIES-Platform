@@ -29,6 +29,7 @@ import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.security.policynegotiator.exception.NegotiationException;
@@ -49,7 +50,16 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar) {
 		
 		String idStr = serviceId.getIdentifier().toString();
-		Service s = new Service(idStr, slaXml, clientJar);
+		Service s = new Service(idStr, slaXml, clientJar, null);
+		
+		services.put(idStr, s);
+	}
+	
+	@Override
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, IIdentity clientJarServer) {
+		
+		String idStr = serviceId.getIdentifier().toString();
+		Service s = new Service(idStr, slaXml, null, clientJarServer);
 		
 		services.put(idStr, s);
 	}
