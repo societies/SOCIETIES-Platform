@@ -38,7 +38,6 @@ public class Tester {
 	// private IAction action$3;
 	private ServiceResourceIdentifier id;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	public static Test748 instance=null;
 	
 	public Tester() {
 
@@ -47,9 +46,9 @@ public class Tester {
 	@Before
 	public void setUp() {
 		try {
-			this.uam = instance.getUam();
+			this.uam = Test748.getUam();
 			logging.debug("initializing UAM");
-			this.ctxBroker = instance.getCtxBroker();
+			this.ctxBroker = Test748.getCtxBroker();
 			this.userId = new MockIdentity(IdentityType.CSS, "user",
 					"societies.org");
 			id = new ServiceResourceIdentifier();
@@ -57,7 +56,7 @@ public class Tester {
 			this.action$2 = new Action(id, "serviceintest", "volume", "10");
 			logging.debug("initializing actions");
 			// this.action$3=new Action(id,"serviceintest","volume","90");
-			this.personMan = instance.getPersonMan();
+			this.personMan = Test748.getPersonMan();
 			setupContext();
 			logging.debug("initializing first contexts");
 			changeContext("home", "free", "sleep");

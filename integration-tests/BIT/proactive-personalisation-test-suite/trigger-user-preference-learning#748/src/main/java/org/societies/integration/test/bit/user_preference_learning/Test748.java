@@ -8,37 +8,36 @@ import org.societies.api.internal.personalisation.*;
 
 
 public class Test748 extends IntegrationTestCase{
-	private ICtxBroker ctxBroker;
-	private IUserActionMonitor uam;
-	private IPersonalisationManager personMan;
+	private static ICtxBroker ctxBroker;
+	private static IUserActionMonitor uam;
+	private static IPersonalisationManager personMan;
 	
 	public Test748(){
 		super(748, new Class[]{Tester.class});
-		Tester.instance=this;
 	}
 	
-	public IPersonalisationManager getPersonMan() {
+	public static IPersonalisationManager getPersonMan() {
 		return personMan;
 	}
 
 	public void setPersonMan(IPersonalisationManager personMan) {
-		this.personMan = personMan;
+		personMan = personMan;
 	}
 	
-	public ICtxBroker getCtxBroker() {
+	public static ICtxBroker getCtxBroker() {
 		return ctxBroker;
 	}
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
+		ctxBroker = ctxBroker;
 	}
 
-	public IUserActionMonitor getUam() {
+	public static IUserActionMonitor getUam() {
 		return uam;
 	}
 
 	public void setUam(IUserActionMonitor uam) {
-		this.uam = uam;
+		uam = uam;
 	}
 
 }
