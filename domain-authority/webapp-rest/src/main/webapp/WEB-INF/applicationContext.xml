@@ -58,6 +58,6 @@
   		<property name="commMgr" ref="CommManagerBundle"/>
 	</bean>
 
-	<osgi:service ref="clientJar" interface="org.societies.api.internal.domainauthority.IClinetJarServer" />
+	<osgi:service ref="clientJar" interface="org.societies.api.internal.domainauthority.IClientJarServer" />
 	
 </beans>

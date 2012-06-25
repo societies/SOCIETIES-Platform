@@ -24,13 +24,13 @@
 
 	<context:annotation-config />
 	
-	<context:component-scan base-package="org.societies.security.commsmgr" />
+	<context:component-scan base-package="org.societies.security.comms" />
 
 	<!-- Required for Async processing -->
 	<tx:annotation-driven />
 	
 	<bean id="SecurityCommsServer"
-		class="org.societies.security.commsmgr.CommsServer"
+		class="org.societies.security.comms.policynegotiator.CommsServer"
 		depends-on="CommManagerBundle,NegotiationProvider"
 		init-method="init"
   		>
@@ -39,7 +39,15 @@
 	</bean>
 	
 	<bean id="NegotiationProviderRemote"
-		class="org.societies.security.commsmgr.CommsClient"
+		class="org.societies.security.comms.policynegotiator.CommsClient"
+		depends-on="CommManagerBundle"
+  		init-method="init"
+  		>
+  		<property name="commMgr" ref="CommManagerBundle"/>
+	</bean>
+	
+	<bean id="ClientJarServerRemote"
+		class="org.societies.security.comms.rest.CommsClient"
 		depends-on="CommManagerBundle"
   		init-method="init"
   		>

@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.commsmgr;
+package org.societies.security.comms.policynegotiator;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -132,7 +132,7 @@ public class CommsClientCallback implements ICommCallback {
 			String sla = result.getSla();
 			boolean success = result.isSuccess();
 			
-			LOG.debug("receiveMessage(): success = {}, sessionId = {}, sla = " + sla,
+			LOG.debug("receiveMessage(): sessionId = {}, success = {}, sla = " + sla,
 					sessionId, success);
 		}
 		else {
@@ -159,8 +159,8 @@ public class CommsClientCallback implements ICommCallback {
 			String sla = result.getSla();
 			boolean success = result.isSuccess();
 
-			LOG.debug("receiveResult(): success = {}, sessionId = {}, sla size = " +
-					(sla == null ? null : sla.length()), success, sessionId);
+			LOG.debug("receiveResult(): sessionId = {}, success = {}, sla size = " +
+					(sla == null ? null : sla.length()), sessionId, success);
 			
 			INegotiationProviderCallback cb = callbacks.get(stanzaId);
 			if (cb != null) {

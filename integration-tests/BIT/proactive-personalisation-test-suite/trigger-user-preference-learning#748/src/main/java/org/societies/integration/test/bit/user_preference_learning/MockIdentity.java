@@ -18,12 +18,12 @@ public class MockIdentity implements IIdentity{
 
 	@Override
 	public String getJid() {
-		return null;
+		return this.identifier+"@"+this.domainIdentifier;
 	}
 
 	@Override
 	public String getBareJid() {
-		return null;
+		return this.identifier+"@"+this.domainIdentifier;
 	}
 
 	@Override
