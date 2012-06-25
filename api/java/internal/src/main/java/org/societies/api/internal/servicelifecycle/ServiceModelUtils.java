@@ -19,7 +19,9 @@ import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
+
 public class ServiceModelUtils {
+
 
 	private ServiceModelUtils() {
 		
@@ -170,25 +172,6 @@ public class ServiceModelUtils {
 		
 		// First we get the calling Bundle
 		Bundle serviceBundle = FrameworkUtil.getBundle(callingClass);
-
-		
-		// Then we get the serviceReference
-		ServiceReference<?>[] serviceReferenceList = serviceBundle.getRegisteredServices();
-		ServiceReference ourService = null;
-		for(ServiceReference<?>  serviceReference : serviceReferenceList){
-			String targetPlatform = (String) serviceReference.getProperty("TargetPlatform");
-			if(targetPlatform != null && targetPlatform.equals("SOCIETIES")){
-				ourService = serviceReference;
-				break;
-			}
-		}
-		
-		if(ourService == null)
-			return null;
-		
-		// We now have the right ServiceReference, the Bundle and the local IIdentity. Time to generate the ServiceResourceIdentifier
-		
-		
 		
 		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
 		try {
