@@ -1,15 +1,10 @@
 package org.societies.integration.test.bit.user_preference_learning;
 
 
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.integration.test.IntegrationTestCase;
 import org.societies.api.internal.personalisation.*;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
-import org.junit.runner.notification.Failure;
 
 
 public class Test748 extends IntegrationTestCase{
@@ -18,7 +13,7 @@ public class Test748 extends IntegrationTestCase{
 	private IPersonalisationManager personMan;
 	
 	public Test748(){
-		super(748, Test748.class);
+		super(748, new Class[]{Tester.class});
 		Tester.instance=this;
 	}
 	
@@ -29,12 +24,7 @@ public class Test748 extends IntegrationTestCase{
 	public void setPersonMan(IPersonalisationManager personMan) {
 		this.personMan = personMan;
 	}
-
-	public Test748(int testCaseNumber, Class[] testCaseClasses) {
-		super(testCaseNumber, testCaseClasses);
-		// TODO Auto-generated constructor stub
-	}
-
+	
 	public ICtxBroker getCtxBroker() {
 		return ctxBroker;
 	}
