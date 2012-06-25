@@ -38,7 +38,7 @@ public class Tester {
 	// private IAction action$3;
 	private ServiceResourceIdentifier id;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	public Test748 instance=null;
+	public static Test748 instance=null;
 	
 	public Tester() {
 
