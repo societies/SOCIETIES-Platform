@@ -81,11 +81,13 @@ public class Tester {
 					// }else if(i%3==2){
 					// uam.monitor(userId, action$3);
 				}
+				Thread.sleep(500);
 				if (i % 2 == 0) {
 					this.changeContext("home", "busy", "working");
 				} else if (i % 2 == 1) {
 					this.changeContext("office", "free", "cafe");
 				}
+				Thread.sleep(500);
 			}
 			logging.debug("iterating context changes");
 			this.changeContext("office", "free", "cafe");
