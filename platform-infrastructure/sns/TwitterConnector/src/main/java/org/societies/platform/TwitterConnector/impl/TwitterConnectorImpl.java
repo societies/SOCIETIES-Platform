@@ -24,9 +24,17 @@
  */
 package org.societies.platform.TwitterConnector.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.shindig.social.core.model.ActivityEntryImpl;
+import org.apache.shindig.social.core.model.ActivityObjectImpl;
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +67,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 
 	public TwitterConnectorImpl() {
 	}
-	
+
 	public TwitterConnectorImpl(String access_token, String identity) {
 		this.twToken = new TwitterToken(access_token);
 		this.service = twToken.getAuthService();
@@ -84,7 +92,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		else
 			return null;
 	}
-	
+
 	public String getUserFriends() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
@@ -102,46 +110,46 @@ public class TwitterConnectorImpl implements TwitterConnector {
 			return null;
 	}
 
-//	public String getUserFriends() {
-//		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
-//		this.service.signRequest(twToken.getAccessToken(), request);
-//		Response response = request.send();
-//		JSONObject res = null;
-//		try {
-//			res = new JSONObject(response.getBody());
-//		} catch (JSONException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		JSONObject friends = new JSONObject();
-//		JSONArray friendsList = new JSONArray();
-//		// System.out.println(res.toString());
-//		try {
-//			JSONArray friendsIDList = res.getJSONArray("ids");
-//
-//			JSONObject other = null;
-//
-//			for (int i = 0; i < friendsIDList.length(); i++) {
-//				// System.out.println(friendsIDList.get(i).toString());
-//
-//				other = getOtherProfileJson(friendsIDList.get(i).toString());
-//
-//				// System.out.println(other);
-//				if (!other.toString().contains(
-//						"No user matches for specified terms"))
-//					friendsList.put(other);
-//				friends.put("friends", friendsList);
-//			}
-//		} catch (JSONException e) {
-//			return response.getBody();
-//		}
-//
-//		if (res != null)
-//			// return res.toJSONString();
-//			return friends.toString();
-//		else
-//			return null;
-//	}
+	//	public String getUserFriends() {
+	//		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
+	//		this.service.signRequest(twToken.getAccessToken(), request);
+	//		Response response = request.send();
+	//		JSONObject res = null;
+	//		try {
+	//			res = new JSONObject(response.getBody());
+	//		} catch (JSONException e1) {
+	//			// TODO Auto-generated catch block
+	//			e1.printStackTrace();
+	//		}
+	//		JSONObject friends = new JSONObject();
+	//		JSONArray friendsList = new JSONArray();
+	//		// System.out.println(res.toString());
+	//		try {
+	//			JSONArray friendsIDList = res.getJSONArray("ids");
+	//
+	//			JSONObject other = null;
+	//
+	//			for (int i = 0; i < friendsIDList.length(); i++) {
+	//				// System.out.println(friendsIDList.get(i).toString());
+	//
+	//				other = getOtherProfileJson(friendsIDList.get(i).toString());
+	//
+	//				// System.out.println(other);
+	//				if (!other.toString().contains(
+	//						"No user matches for specified terms"))
+	//					friendsList.put(other);
+	//				friends.put("friends", friendsList);
+	//			}
+	//		} catch (JSONException e) {
+	//			return response.getBody();
+	//		}
+	//
+	//		if (res != null)
+	//			// return res.toJSONString();
+	//			return friends.toString();
+	//		else
+	//			return null;
+	//	}
 
 	public String getUserFollowers() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FOLLOWERS_URL);
@@ -323,9 +331,42 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	 * @see org.societies.api.internal.sns.ISocialConnector#post(java.lang.String)
 	 */
 	@Override
-	public void post(String arg0) {
-		// TODO Auto-generated method stub
+	public void post(String activity) {
+
+		JSONObject tweet = null;
+		String res = null;
+		try {
+			tweet = new JSONObject(activity);
+			OAuthRequest request = new OAuthRequest(Verb.POST, POST_TWEET_URL);
+			if (tweet.has("status"))
+				request.addBodyParameter("status", tweet.getString("status"));
+			this.service.signRequest(twToken.getAccessToken(), request);
+			Response response = request.send();
+
+			res = response.getBody();
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if(res == null)
+			System.out.println("failure");
+		JSONObject resjson=null;
+		try {
+			resjson = new JSONObject(res);
+			if(resjson.has("error")){
+				System.out.println(resjson.get("error"));
+			}
+			if(resjson.has("text")){
+				String resStatus = resjson.getString("text");
+				if(resStatus.equalsIgnoreCase(tweet.getString("status")))
+					System.out.println("success");
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
-
 }
