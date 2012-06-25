@@ -139,6 +139,9 @@ public class Tester {
 		this.getSymLocAttribute();
 		logging.debug("get stat attr");
 		this.getStatusAttribute();
+		logging.debug("get activities");
+		this.getActivitiesAttribute();
+
 	}
 
 	//
