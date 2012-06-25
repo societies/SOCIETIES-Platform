@@ -34,7 +34,6 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.societies.api.internal.domainauthority.IClinetJarServerRemote;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
@@ -53,7 +52,6 @@ public class NegotiationProvider implements INegotiationProvider {
 	
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;
-	private IClinetJarServerRemote clientJarServer;
 	private ProviderServiceMgr providerServiceMgr;
 	
 	/**
@@ -89,13 +87,6 @@ public class NegotiationProvider implements INegotiationProvider {
 	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
 		LOG.debug("setGroupMgr()");
 		this.groupMgr = groupMgr;
-	}
-	public IClinetJarServerRemote getClientJarServer() {
-		return clientJarServer;
-	}
-	public void setClientJarServer(IClinetJarServerRemote clientJarServer) {
-		LOG.debug("setClientJarServer()");
-		this.clientJarServer = clientJarServer;
 	}
 	public ISignatureMgr getSignatureMgr() {
 		return signatureMgr;

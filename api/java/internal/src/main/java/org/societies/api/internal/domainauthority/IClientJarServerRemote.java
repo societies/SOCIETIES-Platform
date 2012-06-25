@@ -34,7 +34,7 @@ import org.societies.api.identity.IIdentity;
  * @author Mitja Vardjan
  *
  */
-public interface IClinetJarServerRemote {
+public interface IClientJarServerRemote {
 
 	/**
 	 * Add a key for given file.

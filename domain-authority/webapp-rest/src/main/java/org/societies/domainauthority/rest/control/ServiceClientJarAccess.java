@@ -35,7 +35,7 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.domainauthority.IClinetJarServer;
+import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 import org.societies.domainauthority.rest.server.Path;
 import org.societies.domainauthority.rest.server.ServiceClientJar;
@@ -51,7 +51,7 @@ import org.springframework.stereotype.Controller;
  *
  */
 //@Controller
-public class ServiceClientJarAccess implements IClinetJarServer {
+public class ServiceClientJarAccess implements IClientJarServer {
 
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJarAccess.class);
 

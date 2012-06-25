@@ -35,7 +35,7 @@ import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
  * @author Mitja Vardjan
  *
  */
-public interface IClinetJarServer {
+public interface IClientJarServer {
 
 	/**
 	 * Add a key for given file.

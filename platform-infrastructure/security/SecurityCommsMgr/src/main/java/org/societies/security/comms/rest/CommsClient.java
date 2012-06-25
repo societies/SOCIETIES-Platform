@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.domainauthority.IClientJarServerCallback;
-import org.societies.api.internal.domainauthority.IClinetJarServerRemote;
+import org.societies.api.internal.domainauthority.IClientJarServerRemote;
 import org.societies.api.internal.schema.domainauthority.rest.ClientJarBean;
 import org.societies.api.internal.schema.domainauthority.rest.MethodType;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -46,7 +46,7 @@ import org.springframework.scheduling.annotation.Async;
  * 
  */
 //@Component
-public class CommsClient implements IClinetJarServerRemote {
+public class CommsClient implements IClientJarServerRemote {
 	
 	private ICommManager commMgr;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);

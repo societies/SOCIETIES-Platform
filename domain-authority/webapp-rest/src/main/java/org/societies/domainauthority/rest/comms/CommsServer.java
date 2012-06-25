@@ -39,7 +39,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.internal.domainauthority.IClinetJarServer;
+import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.ClientJarBean;
 import org.societies.api.internal.schema.domainauthority.rest.ClientJarBeanResult;
 import org.societies.api.internal.schema.domainauthority.rest.MethodType;
@@ -57,7 +57,7 @@ public class CommsServer implements IFeatureServer {
 					  ));
 	
 	private ICommManager commMgr;
-	private IClinetJarServer clientJarServer;
+	private IClientJarServer clientJarServer;
 	
 	public CommsServer() {
 		LOG.info("CommsServer()");
@@ -76,10 +76,10 @@ public class CommsServer implements IFeatureServer {
 	}
 
 	// Getters and setters for beans
-	public IClinetJarServer getNegotiationProvider() {
+	public IClientJarServer getNegotiationProvider() {
 		return clientJarServer;
 	}
-	public void setNegotiationProvider(IClinetJarServer negotiationProvider) {
+	public void setNegotiationProvider(IClientJarServer negotiationProvider) {
 		this.clientJarServer = negotiationProvider;
 		//LOG.debug("setNegotiationProvider()");
 		//LOG.debug("setNegotiationProvider({})", negotiationProvider);

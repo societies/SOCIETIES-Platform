@@ -14,7 +14,7 @@
 		interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote" />
 
 	<osgi:service ref="ClientJarServerRemote"
-		interface="org.societies.api.internal.domainauthority.IClinetJarServerRemote" />
+		interface="org.societies.api.internal.domainauthority.IClientJarServerRemote" />
 
 	<!-- Get a reference to the Platform Comms Gateway service -->
  	<osgi:reference id="CommManagerBundle"
