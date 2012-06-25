@@ -2,6 +2,8 @@ package org.societies.activity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +18,7 @@ import javax.persistence.Table;
 
 import org.apache.shindig.social.core.model.ActivityEntryImpl;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -77,7 +80,8 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			LOG.error("timeperiod string was malformed, could not parse long");
 			return ret;
 		}
-
+		LOG.info("timeperiod: "+fromTime+" - " + toTime);
+		LOG.info("this: "+this.hashCode()+" list size: "+list.size());
 		if(list != null){
 			for(Activity act : list){
 				if(Long.parseLong(act.getPublished())>=fromTime && Long.parseLong(act.getPublished())<=toTime){
@@ -276,31 +280,46 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	public long importActivtyEntries(List<?> activityEntries) {
 		long ret = 0;
 		if(activityEntries.size() == 0){
+			LOG.error("list is empty, exiting");
 			return ret;
 		}
-		if(!ActivityEntry.class.isInstance(activityEntries.get(0))) //just checking the first entry.
+		if(!ActivityEntry.class.isInstance(activityEntries.get(0))){ //just checking the first entry.
+			LOG.error("first instance in the given list is not of type ActivityEntry, exiting");
 			return ret;
+		}
+		LOG.info("starting importing of "+activityEntries.size()+ " activityentries");
 		List<ActivityEntry> castedList = (List<ActivityEntry>) activityEntries;
 		Activity newAct = null;
 		Session session = sessionFactory.openSession();//getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		ParsePosition pp = new ParsePosition(0);
 		try{
 			for(ActivityEntry act : castedList){
+				pp.setIndex(0);
+				LOG.info("actor: "+getContentIfNotNull(act.getActor()) + " raw: "+act.getActor());
+				LOG.info("object: "+getContentIfNotNull(act.getObject())+" raw: "+act.getObject());
+				LOG.info("published: "+act.getPublished());
+				LOG.info("target: "+getContentIfNotNull(act.getTarget())+" raw: "+act.getTarget());
+				LOG.info("verb: "+act.getVerb());
 				newAct = new Activity();
-				newAct.setActor(act.getActor().getContent());
+				newAct.setActor(getContentIfNotNull(act.getActor()));
 				newAct.setFeed(this);
-				newAct.setObject(act.getObject().getContent());
-				newAct.setPublished(act.getPublished());
-				newAct.setTarget(act.getTarget().getContent());
+				newAct.setObject(getContentIfNotNull(act.getObject()));
+				newAct.setPublished(Long.toString(df.parse(act.getPublished(),pp).getTime()));
+				LOG.info("published after parsing:" + newAct.getPublished());
+				newAct.setTarget(getContentIfNotNull(act.getTarget()));
 				newAct.setVerb(act.getVerb());
 				ret++;
 				this.list.add(newAct);
 				session.save(newAct);
 			}
+			session.save(this);
 			t.commit();
 		}catch(Exception e){
 			t.rollback();
-			LOG.warn("Query for actitvies failed..");
+			LOG.warn("Importing of activities from social data failed..");
+			e.printStackTrace();
 
 		}finally{
 			if(session!=null)
@@ -308,5 +327,15 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		}
 
 		return ret;
+	}
+	public String getContentIfNotNull(ActivityObject a){
+		if(a == null) return null;
+		if(a.getObjectType().contains("person"))
+			return a.getDisplayName();
+		if(a.getObjectType().contains("note"))
+			return "note";
+		if(a.getObjectType().contains("bookmark"))
+			return a.getUrl();
+		return a.getContent();
 	}
 }

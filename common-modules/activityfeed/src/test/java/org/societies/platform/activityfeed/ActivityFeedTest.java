@@ -25,6 +25,12 @@
 package org.societies.platform.activityfeed;
 
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -39,6 +45,9 @@ import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
+import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
+import org.societies.platform.socialdata.SocialData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -116,7 +125,7 @@ public class ActivityFeedTest extends
 		}
 		
 	}
-	@Ignore // this test runs when running on junit in eclipse but fails when testing with maven
+	//@Ignore // this test runs when running on junit in eclipse but fails when testing with maven
 	@Test
 	@Rollback(false)
 	public void testFilter(){
@@ -135,7 +144,7 @@ public class ActivityFeedTest extends
 		LOG.info("sending timeSeries: "+timeSeries+ " act published: "+act1.getPublished());
 		List<IActivity> results = actfeed.getActivities(searchQuery.toString(), timeSeries);
 		LOG.info("testing filtering filter result: "+results.size());
-		assert(results.size() > 1);
+		assert(results.size() > 0);
 	}
 	
 	@Test
@@ -154,5 +163,50 @@ public class ActivityFeedTest extends
 		ActivityFeed queryFeed = ActivityFeed.startUp("0");
 		assert(queryFeed != null);
 	}
+	@Test
+	@Rollback(true)
+	public void testSNImporter(){
+		ISocialConnector mockedSocialConnector; 
+		mockedSocialConnector = mock(ISocialConnector.class);
+		stub(mockedSocialConnector.getConnectorName()).toReturn("facebook");
+		stub(mockedSocialConnector.getID()).toReturn("facebook_0001");
+		try {
+			stub(mockedSocialConnector.getUserFriends()).toReturn(readFileAsString("mocks/friends.txt"));
+			stub(mockedSocialConnector.getUserActivities()).toReturn(readFileAsString("mocks/activities.txt"));
+			stub(mockedSocialConnector.getUserGroups()).toReturn(readFileAsString("mocks/groups.txt"));
+			stub(mockedSocialConnector.getUserProfile()).toReturn(readFileAsString("mocks/profile.txt"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
+		SocialData data = new SocialData();
+		try {
+			data.addSocialConnector(mockedSocialConnector);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		data.updateSocialData();
+		ActivityFeed feed = new ActivityFeed("sntestid");
+		feed.importActivtyEntries(data.getSocialActivity());
+		LOG.info("testing importing from facebook, raw activities: " + mockedSocialConnector.getUserActivities());
+		LOG.info("testing importing from facebook, activities: " + data.getSocialActivity().size() );
+		LOG.info("feed-hash: "+feed.hashCode()+"  feed.getActivities(\"0 \" + Long.toString(System.currentTimeMillis())).size(): " +  feed.getActivities("0 " + Long.toString(System.currentTimeMillis())).size());
+		assert(data.getSocialActivity().size() == feed.getActivities("0 " + Long.toString(System.currentTimeMillis())).size());
+	}
+	private static String readFileAsString(String filePath)
+		    throws java.io.IOException{
+		        StringBuffer fileData = new StringBuffer(1000);
+		        BufferedReader reader = new BufferedReader(
+		                new FileReader(filePath));
+		        char[] buf = new char[1024];
+		        int numRead=0;
+		        while((numRead=reader.read(buf)) != -1){
+		            String readData = String.valueOf(buf, 0, numRead);
+		            fileData.append(readData);
+		            buf = new char[1024];
+		        }
+		        reader.close();
+		        return fileData.toString();
+		    }
 }
