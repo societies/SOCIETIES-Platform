@@ -45,7 +45,6 @@
 			<groupId>weka</groupId>
 			<artifactId>weka</artifactId>
 			<version>3.6.0</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 		    <groupId>junit</groupId>
@@ -85,7 +84,7 @@
 			<groupId>org.codehaus.mojo</groupId>
 			<artifactId>cobertura-maven-plugin</artifactId>
 		</plugin> -->
-		<!-- <plugin>
+		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-shade-plugin</artifactId>
 			<executions>
@@ -96,7 +95,7 @@
 					</goals>
 				</execution>
 			</executions>
-		</plugin> -->
+		</plugin>
 		<!-- <plugin>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-surefire-plugin</artifactId>
