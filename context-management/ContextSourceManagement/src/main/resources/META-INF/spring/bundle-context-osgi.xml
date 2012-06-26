@@ -2,10 +2,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:osgi="http://www.springframework.org/schema/osgi"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans 
-  	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-	http://www.springframework.org/schema/osgi 
-	http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+	xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-2.5.xsd
+						http://www.springframework.org/schema/osgi-compendium 
+						http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+                      	http://www.springframework.org/schema/osgi 
+                      	http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
   <!-- definitions using elements of the osgi namespace can be included
        in this file. There is no requirement to keep these definitions
@@ -17,4 +23,5 @@
 	
 	<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" cardinality="1..1" />
 	<osgi:reference id="deviceManager" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager" cardinality="1..1" />
+	<osgi:reference id="EventManager" interface="org.societies.api.osgi.event.IEventMgr"/>
 </beans>

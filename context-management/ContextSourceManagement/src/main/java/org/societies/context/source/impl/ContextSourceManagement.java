@@ -47,6 +47,7 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.context.source.ICtxSourceMgr;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
+import org.societies.api.osgi.event.IEventMgr;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +104,16 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	public void setDeviceManager(IDeviceManager deviceManager) {
 		this.deviceManager = deviceManager;
 	}
+	
+	@Autowired(required = true)
+	private IEventMgr eventManager;
+	public IEventMgr getEventManager() { return eventManager; }
+	public void setEventManager(IEventMgr eventManager) { 
+		if (null == eventManager) {
+			LOG.error("[COMM02] EventManager not available");
+		}
+		this.eventManager = eventManager;
+	}
 
 	private NewDeviceListener newDeviceListener;
 	private final String sensor = "CONTEXT_SOURCE";
@@ -123,7 +134,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	}
 		
 	public void initialise(){
-		this.newDeviceListener = new NewDeviceListener (deviceManager);
+		this.newDeviceListener = new NewDeviceListener (deviceManager,eventManager,this);
 		newDeviceListener.run();
 		LOG.info("{}", "CSM started");
 	}
