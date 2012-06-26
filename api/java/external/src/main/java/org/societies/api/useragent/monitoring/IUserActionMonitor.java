@@ -11,13 +11,18 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * @author S.Gallacher@hw.ac.uk
  *
  */
-/**
- * MISSING_JAVADOCS
- */
+
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IUserActionMonitor
 {
 	
+	/**
+	 * This method should be called by a service when a personalisable parameter is changed manually by the user
+	 * 
+	 * @param owner		this is the identity of the consumer CSS i.e. the user who is currently using this service
+	 * @param action	this datatype contains details of the action that the user has performed i.e. what
+	 * 					personalisable parameter has been changed in the service and how is has been changed
+	 */
 	public void monitor(IIdentity owner, IAction action);
 	
 	//Deprecated
