@@ -155,6 +155,7 @@ public class DecisionMaker extends AbstractDecisionMaker  implements BundleConte
 		logging.debug("implementing IAction DM");
 		boolean found=false;
 		for (IActionConsumer consumer : this.temporal) {
+			this.logging.debug("comparing: "+consumer.getServiceIdentifier().getServiceInstanceIdentifier()+" with: "+action.getServiceID().getServiceInstanceIdentifier());
 			if (consumer.getServiceIdentifier().equals(action.getServiceID())) {
 				consumer.setIAction(this.entityID, action);
 				logging.debug("Service has been matched. IAction has been sent to the service");
