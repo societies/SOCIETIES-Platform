@@ -39,7 +39,16 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IResourceSharing
 {
+	/**
+	 * This method should be called by a resource (service) to add itself to the list of resources that are sharable.  By calling this
+	 * method the resource makes itself known to the resource sharing components.
+	 * 
+	 * @param sharableResource		the resource that is sharable (ISharable should be implemented by the sharable resource
+	 */
 	public void addSharableResource(ISharable sharableResource);
 	
+	/**
+	 * This method may be removed
+	 */
 	public void newSharingRequest();
 }
