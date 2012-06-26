@@ -106,7 +106,7 @@ public class SocketServer extends JFrame implements ActionListener
 	 */
 	public SocketServer() 
 	{
-		super( "TITLE" );
+		super( "Mock RFID Reader" );
 
 		pnPanel0 = new JPanel();
 		GridBagLayout gbPanel0 = new GridBagLayout();
