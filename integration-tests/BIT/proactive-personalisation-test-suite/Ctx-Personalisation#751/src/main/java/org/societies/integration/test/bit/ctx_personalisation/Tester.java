@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.swing.JOptionPane;
+
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -90,38 +92,43 @@ public class Tester {
 	
 	@org.junit.Test
 	public void Test(){
-	
-		changeContext("home", "free");
+	try{
+		//changeContext("home", "free");
 		
 		for (int i=0; i<10; i++){
 			log("Step: "+i);
-			
+			changeContext("home", "free");
+			Thread.sleep(1000);
 			this.helloWorldService.setBackgroundColour(userId, "red");
 			changeContext("home", "busy");
+			Thread.sleep(1000);
 			this.helloWorldService.setVolume(userId, "10");
 			changeContext("work", "busy");
+			Thread.sleep(1000);
 			this.helloWorldService.setBackgroundColour(userId, "black");
 			changeContext("work", "free");
+			Thread.sleep(1000);
 			this.helloWorldService.setVolume(userId, "50");
-			changeContext("home", "free");	
 			
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
 		}
-					
-			Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
+		
+		Thread.sleep(5000);
 			
-			changeContext("work", "busy");
-			
-			Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
+		Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
 		
+		changeContext("work", "busy");
 		
-			this.helloWorldService.setBackgroundColour(userId, "red");
-		
+		Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
+	
+	
+		this.helloWorldService.setBackgroundColour(userId, "red");
+	}
+	catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
 	}
 	
 	
