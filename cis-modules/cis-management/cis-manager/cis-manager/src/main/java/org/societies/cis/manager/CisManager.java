@@ -573,7 +573,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating delete CIS notifications
 			if (c.getNotification().getDeleteNotification() != null) {
 				LOG.info("delete notification received");
-				this.unsubscribeToCis(c.getNotification().getSubscribedTo().getCisJid());
+				this.unsubscribeToCis(c.getNotification().getDeleteNotification().getCommunityJid());
 /*				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
 				if(!this.subscribedCISs.contains(new CisRecord(d.getCommunityJid()))){
 					LOG.info("CIS is not part of the list of subscribed CISs");
