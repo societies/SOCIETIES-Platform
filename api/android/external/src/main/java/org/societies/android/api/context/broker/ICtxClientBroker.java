@@ -27,7 +27,6 @@ package org.societies.android.api.context.broker;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 //import org.societies.android.api.context.CtxException;
 import org.societies.api.context.CtxException;
@@ -66,7 +65,7 @@ public interface ICtxClientBroker {
 	 *            the type of the context association to create
 	 * @throws CtxException 
 	 */
-	public Future<CtxAssociation> createAssociation(String type) throws CtxException;
+	public CtxAssociation createAssociation(String type) throws CtxException;
 	
 	/**
 	 * Creates a {@link CtxAttribute} with the specified type which is associated to
@@ -119,7 +118,7 @@ public interface ICtxClientBroker {
 	 * @param maxAttribValue
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxEntityIdentifier>> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
+	public List<CtxEntityIdentifier> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
 
 	/**
 	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
@@ -129,7 +128,7 @@ public interface ICtxClientBroker {
 	 * @param type
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxIdentifier>> lookup(CtxModelType modelType, String type) throws CtxException;
+	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
@@ -207,7 +206,7 @@ public interface ICtxClientBroker {
 	 * @param identifier
 	 * @throws CtxException 
 	 */
-	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException;
+	public CtxModelObject remove(CtxIdentifier identifier) throws CtxException;
 	
 	/**
 	 * Retrieves the specified context model object.
@@ -215,7 +214,7 @@ public interface ICtxClientBroker {
 	 * @param identifier
 	 * @throws CtxException 
 	 */
-	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException;
+	public CtxModelObject retrieve(CtxIdentifier identifier) throws CtxException;
 	
 	/**
 	 * Updates a single context model object.
@@ -223,7 +222,7 @@ public interface ICtxClientBroker {
 	 * @param identifier
 	 * @throws CtxException 
 	 */
-	public Future<CtxModelObject> update(CtxModelObject identifier) throws CtxException;
+	public CtxModelObject update(CtxModelObject identifier) throws CtxException;
 	
 	/**
 	 * Updates the specified attribute.
@@ -232,7 +231,7 @@ public interface ICtxClientBroker {
 	 * @param value
 	 * @throws CtxException 
 	 */
-	public Future<CtxAttribute> updateAttribute(CtxAttributeIdentifier attributeId, Serializable value) throws CtxException;
+	public CtxAttribute updateAttribute(CtxAttributeIdentifier attributeId, Serializable value) throws CtxException;
 	
 	/**
 	 * Updates the specified attribute.
@@ -242,7 +241,7 @@ public interface ICtxClientBroker {
 	 * @param valueMetric
 	 * @throws CtxException 
 	 */
-	public Future<CtxAttribute> updateAttribute(CtxAttributeIdentifier attributeId, Serializable value,
+	public CtxAttribute updateAttribute(CtxAttributeIdentifier attributeId, Serializable value,
   String valueMetric) throws CtxException;
 
 	//community
@@ -252,7 +251,7 @@ public interface ICtxClientBroker {
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<IndividualCtxEntity> retrieveAdministratingCSS(CtxEntityIdentifier community) throws CtxException;
+	public IndividualCtxEntity retrieveAdministratingCSS(CtxEntityIdentifier community) throws CtxException;
   
 	/**
 	 * Retrieves the context attribute(s) that acts as a bond of the community of
@@ -261,7 +260,7 @@ public interface ICtxClientBroker {
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<Set<CtxBond>> retrieveBonds(CtxEntityIdentifier community) throws CtxException;
+	public Set<CtxBond> retrieveBonds(CtxEntityIdentifier community) throws CtxException;
   
 	/**
 	 * Retrieves the sub-communities of the specified community Entity.
@@ -269,7 +268,7 @@ public interface ICtxClientBroker {
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(CtxEntityIdentifier community) throws CtxException;
+	public List<CtxEntityIdentifier> retrieveSubCommunities(CtxEntityIdentifier community) throws CtxException;
   
 	/**
      * Retrieves a list of Individual Context Entities that are members of the specified community Entity 
@@ -278,7 +277,7 @@ public interface ICtxClientBroker {
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(CtxEntityIdentifier community) throws CtxException;
+	public List<CtxEntityIdentifier> retrieveCommunityMembers(CtxEntityIdentifier community) throws CtxException;
 
   //history
 	/**
@@ -287,7 +286,7 @@ public interface ICtxClientBroker {
 	 * @param listOfEscortingAttributeIds
 	 * @throws CtxException
 	 */
-	public Future<Boolean> setHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	public Boolean setHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
      List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
  
 	/**
@@ -296,7 +295,7 @@ public interface ICtxClientBroker {
 	 * @param listOfEscortingAttributeIds
 	 * @throws CtxException
 	 */
-	public Future<List<CtxAttributeIdentifier>> getHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	public List<CtxAttributeIdentifier> getHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
      List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
   
 	/**
@@ -305,7 +304,7 @@ public interface ICtxClientBroker {
 	 * @param listOfEscortingAttributeIds
 	 * @throws CtxException
 	 */
-	public Future<List<CtxAttributeIdentifier>> updateHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	public List<CtxAttributeIdentifier> updateHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
      List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
 
 	/**
@@ -314,7 +313,7 @@ public interface ICtxClientBroker {
 	 * @param listOfEscortingAttributeIds
 	 * @throws CtxException
 	 */
-	public Future<Boolean> removeHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	public Boolean removeHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
      List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
   
 	/**

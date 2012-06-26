@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 //import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 
 //import springframework.cache.concurrent.ConcurrentMapCache;
 
@@ -83,9 +82,11 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 	private static final List<String> PACKAGES = Arrays.asList(
 			"org.societies.api.schema.useragent.monitoring");
 
-	private final ConcurrentHashMap<CtxIdentifier, CtxModelObject> modelObjects = null;
-	private static Map<CtxIdentifier, CtxModelObject> contextCache = new ConcurrentHashMap<CtxIdentifier, CtxModelObject>();
+//	private final ConcurrentHashMap<CtxIdentifier, CtxModelObject> modelObjects = null;
+//	private static Map<CtxIdentifier, CtxModelObject> contextCache = new ConcurrentHashMap<CtxIdentifier, CtxModelObject>();
 //	private static LruCache<CtxIdentifier, CtxModelObject> cache = new LruCache<CtxIdentifier, CtxModelObject> (50);
+	private static ExpiringCache<CtxIdentifier, CtxModelObject> cache = new ExpiringCache();
+
 	
 	// TODO Remove and instantiate privateId properly so that privateId.toString() can be used instead
 	private final String privateIdtoString = "myFooIIdentity@societies.local";
@@ -133,7 +134,7 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		return this.binder;
 	}
 
-	public Future<CtxAssociation> createAssociation(String arg0)
+	public CtxAssociation createAssociation(String arg0)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -148,7 +149,7 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 			throw new NullPointerException("type can't be null");
 
 //		final CtxEntity entity = (CtxEntity) modelObjects.get(scope);
-		final CtxEntity entity = (CtxEntity) contextCache.get(scope);
+		final CtxEntity entity = (CtxEntity) cache.get(scope);
 		
 		if (entity == null)	
 			throw new NullPointerException("Scope not found: " + scope);
@@ -157,7 +158,7 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		final CtxAttribute attribute = new CtxAttribute(attrIdentifier);
 
 //		this.modelObjects.put(attribute.getId(), attribute);
-		contextCache.put(attribute.getId(), attribute);
+		cache.put(attribute.getId(), attribute);
 		entity.addAttribute(attribute);
 		
 		return attribute;
@@ -178,8 +179,7 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		else
 			Log.d(LOG_TAG, "Problem with maps key!!");
 	//	modelObjects.put(entity.getId(), entity);
-		contextCache.put(entity.getId(), entity);
-//		cache.put(entity.getId(), entity);
+		cache.put(entity.getId(), entity);
 		
 		return entity;
 	}
@@ -206,20 +206,20 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		
 	}
 
-	public Future<List<CtxAttributeIdentifier>> getHistoryTuples(
+	public List<CtxAttributeIdentifier> getHistoryTuples(
 			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<List<CtxIdentifier>> lookup(CtxModelType arg0, String arg1)
+	public List<CtxIdentifier> lookup(CtxModelType arg0, String arg1)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<List<CtxEntityIdentifier>> lookupEntities(String arg0,
+	public List<CtxEntityIdentifier> lookupEntities(String arg0,
 			String arg1, Serializable arg2, Serializable arg3)
 			throws CtxException {
 		// TODO Auto-generated method stub
@@ -238,49 +238,49 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		
 	}
 
-	public Future<CtxModelObject> remove(CtxIdentifier arg0)
+	public CtxModelObject remove(CtxIdentifier arg0)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<Boolean> removeHistoryTuples(CtxAttributeIdentifier arg0,
+	public Boolean removeHistoryTuples(CtxAttributeIdentifier arg0,
 			List<CtxAttributeIdentifier> arg1) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<CtxModelObject> retrieve(CtxIdentifier arg0)
+	public CtxModelObject retrieve(CtxIdentifier arg0)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<IndividualCtxEntity> retrieveAdministratingCSS(
+	public IndividualCtxEntity retrieveAdministratingCSS(
 			CtxEntityIdentifier arg0) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<Set<CtxBond>> retrieveBonds(CtxEntityIdentifier arg0)
+	public Set<CtxBond> retrieveBonds(CtxEntityIdentifier arg0)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
+	public List<CtxEntityIdentifier> retrieveCommunityMembers(
 			CtxEntityIdentifier arg0) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(
+	public List<CtxEntityIdentifier> retrieveSubCommunities(
 			CtxEntityIdentifier arg0) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<Boolean> setHistoryTuples(CtxAttributeIdentifier arg0,
+	public Boolean setHistoryTuples(CtxAttributeIdentifier arg0,
 			List<CtxAttributeIdentifier> arg1) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -298,25 +298,25 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		
 	}
 
-	public Future<CtxModelObject> update(CtxModelObject arg0)
+	public CtxModelObject update(CtxModelObject arg0)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<CtxAttribute> updateAttribute(CtxAttributeIdentifier arg0,
+	public CtxAttribute updateAttribute(CtxAttributeIdentifier arg0,
 			Serializable arg1) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<CtxAttribute> updateAttribute(CtxAttributeIdentifier arg0,
+	public CtxAttribute updateAttribute(CtxAttributeIdentifier arg0,
 			Serializable arg1, String arg2) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Future<List<CtxAttributeIdentifier>> updateHistoryTuples(
+	public List<CtxAttributeIdentifier> updateHistoryTuples(
 			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
 			throws CtxException {
 		// TODO Auto-generated method stub
