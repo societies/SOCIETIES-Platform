@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.integration.test.bit.ctx_identity;
+package org.societies.integration.test.bit.ctx_src_registration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
