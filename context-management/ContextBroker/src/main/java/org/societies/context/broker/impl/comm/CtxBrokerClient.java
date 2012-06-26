@@ -41,6 +41,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -55,6 +56,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -79,6 +81,7 @@ import org.societies.api.schema.context.model.CtxModelTypeBean;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.context.broker.api.CtxBrokerException;
 import org.societies.context.broker.impl.comm.ICtxCallback;
 
 
@@ -87,29 +90,33 @@ public class CtxBrokerClient implements ICommCallback {
 
 	private static Logger LOG = LoggerFactory.getLogger(CtxBrokerClient.class);
 
-	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://jabber.org/protocol/pubsub");
-	private static final List<String> PACKAGES = Collections
-			.unmodifiableList(Arrays.asList("jabber.x.data",
-					"org.jabber.protocol.pubsub",
-					"org.jabber.protocol.pubsub.errors",
-					"org.jabber.protocol.pubsub.owner",
-					"org.jabber.protocol.pubsub.event"));
+	private final static List<String> NAMESPACES = Arrays.asList(
+			"http://societies.org/api/schema/identity",
+			"http://societies.org/api/schema/context/model",
+			"http://societies.org/api/schema/context/contextmanagement");
+	private static final List<String> PACKAGES = Arrays.asList(
+			"org.societies.api.schema.identity",
+			"org.societies.api.schema.context.model",
+			"org.societies.api.schema.context.contextmanagement");
 
 	private ICommManager commManager;
 
 	private IIdentityManager idMgr;
+	
+	private CtxBrokerCommCallback ctxBrokerCommCallback = new CtxBrokerCommCallback();
 
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+	}
 
 	public CtxBrokerClient(){
 		LOG.info(this.getClass() + " inside ctxBrokerClient class");
 	}
 
-	public void InitService() {
-		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
-
-	}
-	
 	/**
 	 * The Ctx Broker Client service reference.
 	 *
@@ -120,47 +127,53 @@ public class CtxBrokerClient implements ICommCallback {
 		this.commManager = commManager;
 		this.commManager.register(this);
 		idMgr = this.commManager.getIdManager();
-
+		
 	}
-	
+
 	//createEntity(final Requestor requestor,final IIdentity targetCss, final String type)
-	public void createRemoteEntity(Requestor requestor,IIdentity targetCss, String type, ICtxCallback callback){
+	public void createRemoteEntity(Requestor requestor,IIdentity targetCss, String type, ICtxCallback callback) throws CtxException{
 
-		final CtxEntity entity = null;
 		// creating the identity of the CtxBroker that will be contacted
-		IIdentity toIdentity = targetCss;
-		/*
-		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
-		 */
-		//create the message to be sent
-		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerBean cbPacket = new CtxBrokerBean();
-		// use the create entity method : createCtxEntity(String type)
-		//CtxBrokerBeanCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerBeanCreateEntityBean();
-		CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerCreateEntityBean();
-		// add the signatures of the method
-		ctxBrokerCreateEntityBean.setType(type);
-		RequestorBean requestorBean = createRequestorBean(requestor);
-		ctxBrokerCreateEntityBean.setRequestor(requestorBean);
 
-		cbPacket.setCreate(ctxBrokerCreateEntityBean);
+		// add local identity for testing (instead of targetCSS)
+		//IIdentity toIdentity = targetCss;
 
-		CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
-		//send the message
+		INetworkNode cssNodeId = this.commManager.getIdManager().getThisNetworkNode();
+		final String cssOwnerStr = cssNodeId.getBareJid();
+
+		IIdentity toIdentity;
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerCreateEntityBean, this);
+			toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
+			//create the message to be sent
+			Stanza stanza = new Stanza(toIdentity);
+			LOG.error("SKATA stanza " + stanza.getTo());
+			CtxBrokerBean cbPacket = new CtxBrokerBean();
+			// use the create entity method : createCtxEntity(String type)
+			//CtxBrokerBeanCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerBeanCreateEntityBean();
+			CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerCreateEntityBean();
+			// add the signatures of the method
+			// TODO ctxBrokerCreateEntityBean.setTargetCss(targetCss.toString());
+			ctxBrokerCreateEntityBean.setTargetCss(cssOwnerStr);
+			ctxBrokerCreateEntityBean.setType(type);
+			RequestorBean requestorBean = createRequestorBean(requestor);
+			// TODO ctxBrokerCreateEntityBean.setRequestor(requestorBean);
+
+			cbPacket.setCreate(ctxBrokerCreateEntityBean);
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+	
+			LOG.info("SKATA 3 before sendIQGet");
+			//send the message
+			if (cbPacket.getCreate() == null) // TODO remove
+				LOG.error("SKATA cbPacket.getCreate() == nulls");
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+			
 			//this.commManager.sendMessage(stanza, ctxBrokerCreateEntityBean);
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		} catch (Exception e) {
+			
+			throw new CtxBrokerException("Could not create remote entity: "
+					+ e.getLocalizedMessage(), e);
+		} 
 	}
-
 
 	public void /*Future<CtxAttribute>*/ createRemoteAttribute(Requestor requestor, CtxEntityIdentifier scope, String type, ICtxCallback callback){
 
@@ -192,7 +205,8 @@ public class CtxBrokerClient implements ICommCallback {
 		ctxBrokerCreateAttributeBean.setType(type);
 		cbPacket.setCreateAttr(ctxBrokerCreateAttributeBean);
 
-		CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 		//send the message
 		try {
 			this.commManager.sendIQGet(stanza, ctxBrokerCreateAttributeBean, this);
@@ -230,7 +244,8 @@ public class CtxBrokerClient implements ICommCallback {
 		ctxBrokerCreateAssociationBean.setType(type);
 		cbPacket.setCreateAssoc(ctxBrokerCreateAssociationBean);
 
-		CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 		//send the message
 		try {
 			this.commManager.sendIQGet(stanza, ctxBrokerCreateAssociationBean, this);
@@ -273,7 +288,8 @@ public class CtxBrokerClient implements ICommCallback {
 		ctxBrokerRemoveBean.setId(ctxIdBean);
 		cbPacket.setRemove(ctxBrokerRemoveBean);
 
-		CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 		//send the message
 		try {
 			this.commManager.sendIQGet(stanza, ctxBrokerRemoveBean, this);
@@ -330,7 +346,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		cbPacket.setUpdate(ctxBrokerUpdateBean);
 
-		CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 		//send the message
 		try {
 			this.commManager.sendIQGet(stanza, ctxBrokerUpdateBean, this);
@@ -373,8 +390,8 @@ public class CtxBrokerClient implements ICommCallback {
 		ctxBrokerUpdateAttributeBean.setValue((byte[]) value);
 		cbPacket.setUpdateAttr(ctxBrokerUpdateAttributeBean);
 
-		CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
-
+		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 		//send the message
 		try {
 			this.commManager.sendIQGet(stanza, ctxBrokerUpdateAttributeBean, this);
@@ -417,8 +434,8 @@ public class CtxBrokerClient implements ICommCallback {
 		ctxBrokerRetrieveBean.setRequestor(requestorBean);
 
 		cbPacket.setRetrieve(ctxBrokerRetrieveBean);
-
-		CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+		//this. commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
 
 		//send the message
 		try {
@@ -460,8 +477,8 @@ public class CtxBrokerClient implements ICommCallback {
 		//	ctxBrokerLookupBean.setRequester("FOO");
 		cbPacket.setLookup(ctxBrokerLookupBean);
 
-		CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
-
+		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
+		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 		//send the message
 		try {
 			this.commManager.sendIQGet(stanza, ctxBrokerLookupBean, this);
