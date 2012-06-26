@@ -118,7 +118,7 @@ public class Tester {
 		Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
 		
 		changeContext("work", "busy");
-		Thread.sleep(1000);
+		Thread.sleep(5000);
 		
 		Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
 	
