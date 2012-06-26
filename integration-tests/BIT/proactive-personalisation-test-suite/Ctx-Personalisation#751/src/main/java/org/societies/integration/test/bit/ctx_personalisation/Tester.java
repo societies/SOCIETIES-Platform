@@ -112,12 +112,13 @@ public class Tester {
 			
 			
 		}
-		
+		changeContext("home", "free");
 		Thread.sleep(5000);
 			
 		Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
 		
 		changeContext("work", "busy");
+		Thread.sleep(1000);
 		
 		Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
 	
@@ -169,9 +170,10 @@ public class Tester {
 
 	private void getPersonEntity(){
 		try {
-			Future<IndividualCtxEntity> futurePerson = this.ctxBroker.retrieveCssOperator();
+			this.userId = idm.getThisNetworkNode();
+			Future<IndividualCtxEntity> futurePerson = this.ctxBroker.retrieveIndividualEntity(userId);
 			person = futurePerson.get();
-			this.userId = idm.fromJid(person.getId().getOwnerId());
+			
 			
 			/*Future<List<CtxIdentifier>> futurePersons = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
 			List<CtxIdentifier> persons = futurePersons.get();
@@ -196,10 +198,7 @@ public class Tester {
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 	}
 	
 	private void getSymLocAttribute(){

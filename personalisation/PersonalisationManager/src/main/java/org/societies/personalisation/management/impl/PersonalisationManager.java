@@ -953,6 +953,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 
 				if (intentNonOverlapping.size() ==0 & prefNonOverlapping.size() ==0){
 					this.logging.debug("Action Event-> Nothing to send to decisionMaker");
+					return;
 				}else{
 					for (int i=0; i<prefNonOverlapping.size(); i++){
 						this.logging.debug("Preference Outcome "+i+" :"+prefNonOverlapping.get(i));
