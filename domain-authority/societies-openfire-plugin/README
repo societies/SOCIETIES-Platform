@@ -1,0 +1,5 @@
+SOCIETIES Openfire Plugin provides the functions of SOCIETIES that have to interact with Openfire XMPP server.
+It provides a public user interface for signing up to the system and an HTTP-based API for identity and user account management related functions.
+The plugin is built using Maven and then needs to be loaded in Openfire via the admin web interface. After that:
+1) the public user interface will be available @ http://DOMAIN:9090/plugins/societies/public/signup.html
+2) the HTTP-based API endpoint is http://DOMAIN:9090/plugins/societies/societies
