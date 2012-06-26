@@ -24,6 +24,7 @@
  */
 package org.societies.api.cis.management;
 
+import org.societies.api.activity.IActivity;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
@@ -106,6 +107,11 @@ public interface ICis {
 	 * @param callback callback function
 	 */
     public void setInfo(Community c, ICisManagerCallback callback);
+    
+    
+	public void addCisActivity(IActivity activity,ICisManagerCallback callback);
+	
+	public void getActivities(String timePeriod,ICisManagerCallback callback);
     
     
 }
