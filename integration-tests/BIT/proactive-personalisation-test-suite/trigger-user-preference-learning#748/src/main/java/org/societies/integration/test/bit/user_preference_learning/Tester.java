@@ -1,11 +1,13 @@
 package org.societies.integration.test.bit.user_preference_learning;
 
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
@@ -14,6 +16,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.IPersonalisationManager;
@@ -35,10 +38,10 @@ public class Tester {
 	// private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IAction action$1;
 	private IAction action$2;
+	private IIdentityManager idm;
 	// private IAction action$3;
 	private ServiceResourceIdentifier id;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	public static Test748 instance=null;
 	
 	public Tester() {
 
@@ -47,17 +50,19 @@ public class Tester {
 	@Before
 	public void setUp() {
 		try {
-			this.uam = instance.getUam();
+			this.uam = Test748.getUam();
+			this.idm = Test748.getCommManager().getIdManager();
 			logging.debug("initializing UAM");
-			this.ctxBroker = instance.getCtxBroker();
-			this.userId = new MockIdentity(IdentityType.CSS, "user",
-					"societies.org");
+			this.ctxBroker = Test748.getCtxBroker();
+			this.userId = idm.getThisNetworkNode();
 			id = new ServiceResourceIdentifier();
+			id.setIdentifier(new URI("http://ss.ss"));
+			id.setServiceInstanceIdentifier("http://ss.ss");
 			this.action$1 = new Action(id, "serviceintest", "volume", "0");
 			this.action$2 = new Action(id, "serviceintest", "volume", "10");
 			logging.debug("initializing actions");
 			// this.action$3=new Action(id,"serviceintest","volume","90");
-			this.personMan = instance.getPersonMan();
+			this.personMan = Test748.getPersonMan();
 			setupContext();
 			logging.debug("initializing first contexts");
 			changeContext("home", "free", "sleep");
@@ -79,11 +84,13 @@ public class Tester {
 					// }else if(i%3==2){
 					// uam.monitor(userId, action$3);
 				}
+				Thread.sleep(500);
 				if (i % 2 == 0) {
 					this.changeContext("home", "busy", "working");
 				} else if (i % 2 == 1) {
 					this.changeContext("office", "free", "cafe");
 				}
+				Thread.sleep(500);
 			}
 			logging.debug("iterating context changes");
 			this.changeContext("office", "free", "cafe");
@@ -134,9 +141,15 @@ public class Tester {
 	 */
 
 	private void setupContext() {
+		logging.debug("get person entity");
 		this.getPersonEntity();
+		logging.debug("get sym loc");
 		this.getSymLocAttribute();
+		logging.debug("get stat attr");
 		this.getStatusAttribute();
+		logging.debug("get activities");
+		this.getActivitiesAttribute();
+
 	}
 
 	//

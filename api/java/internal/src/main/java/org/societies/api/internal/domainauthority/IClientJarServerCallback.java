@@ -24,35 +24,22 @@
  */
 package org.societies.api.internal.domainauthority;
 
-import java.util.concurrent.Future;
-
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 
 /**
+ * Interface for invoking the requester side (either the policy negotiator or
+ * some other component).
+ * To be used by policy negotiator from the provider side (from some other node).
  * 
- *
  * @author Mitja Vardjan
  *
  */
-public interface IClinetJarServer {
+public interface IClientJarServerCallback {
 
 	/**
-	 * Add a key for given file.
-	 * Any jar file can have multiple keys associated and this method may be
-	 * called multiple times to add more keys for same jar file.
+	 * Receive result of asynchronous method that has been invoked on {@link IClinetJarServer}
 	 * 
-	 * @param path Local path to the jar file to be served
-	 * @param key The key to authenticate jar file downloads in future
+	 * @param result Asynchronous return value
 	 */
-	//public void addKey(String path, String key);
-	
-	/**
-	 * Generate and add a new key for given file.
-	 * Any jar file can have multiple keys associated and this method may be
-	 * called multiple times to add more keys for same jar file.
-	 * 
-	 * @param path Local path to the jar file to be served
-	 * @return Full URL with path and authentication key to directly download the jar file.
-	 */
-	public Future<UrlBean> addKey(String hostname, String filePath);
+	public void receiveResult(UrlBean result);
 }

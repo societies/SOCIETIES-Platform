@@ -1,6 +1,7 @@
 package org.societies.integration.test.bit.user_preference_learning;
 
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.integration.test.IntegrationTestCase;
@@ -8,37 +9,45 @@ import org.societies.api.internal.personalisation.*;
 
 
 public class Test748 extends IntegrationTestCase{
-	private ICtxBroker ctxBroker;
-	private IUserActionMonitor uam;
-	private IPersonalisationManager personMan;
+	private static ICtxBroker ctxBroker;
+	private static IUserActionMonitor uam;
+	private static IPersonalisationManager personMan;
+	private static ICommManager commManager;
 	
 	public Test748(){
 		super(748, new Class[]{Tester.class});
-		Tester.instance=this;
 	}
 	
-	public IPersonalisationManager getPersonMan() {
+	public static IPersonalisationManager getPersonMan() {
 		return personMan;
 	}
 
 	public void setPersonMan(IPersonalisationManager personMan) {
-		this.personMan = personMan;
+		Test748.personMan = personMan;
 	}
 	
-	public ICtxBroker getCtxBroker() {
+	public static ICtxBroker getCtxBroker() {
 		return ctxBroker;
 	}
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
+		Test748.ctxBroker = ctxBroker;
 	}
 
-	public IUserActionMonitor getUam() {
+	public static IUserActionMonitor getUam() {
 		return uam;
 	}
 
 	public void setUam(IUserActionMonitor uam) {
-		this.uam = uam;
+		Test748.uam = uam;
+	}
+
+	public static ICommManager getCommManager() {
+		return commManager;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		Test748.commManager = commManager;
 	}
 
 }

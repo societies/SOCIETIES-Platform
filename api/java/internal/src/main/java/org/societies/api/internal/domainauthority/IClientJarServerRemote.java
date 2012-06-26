@@ -22,18 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.rest.control;
-
-import static org.junit.Assert.*;
+package org.societies.api.internal.domainauthority;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
+import org.societies.api.identity.IIdentity;
 
 /**
  * 
@@ -41,63 +34,31 @@ import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
  * @author Mitja Vardjan
  *
  */
-public class ServiceClientJarAccessTest {
+public interface IClientJarServerRemote {
 
-	ServiceClientJarAccess classUnderTest;
+	/**
+	 * Add a key for given file.
+	 * Any jar file can have multiple keys associated and this method may be
+	 * called multiple times to add more keys for same jar file.
+	 * 
+	 * @param path Local path to the jar file to be served
+	 * @param key The key to authenticate jar file downloads in future
+	 */
+	//public void addKey(String path, String key);
 	
 	/**
-	 * @throws java.lang.Exception
+	 * Generate and add a new key for given file.
+	 * Any jar file can have multiple keys associated and this method may be
+	 * called multiple times to add more keys for same jar file.
+	 * 
+	 * @param toIdentity the identity of the server
+	 * 
+	 * @param hostname the main part of the URL where the JAR is supposed to be,
+	 * including protocol and port if applicable, e.g., http://example.com:8080
+	 * 
+	 * @param filePath Local path to the jar file to be served
+	 * 
+	 * @param callback the callback to receive the result of this asynchronous method
 	 */
-	@Before
-	public void setUp() throws Exception {
-		classUnderTest = new ServiceClientJarAccess();
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-	}
-
-	/**
-	 * Test method for {@link ServiceClientJarAccess#addKey(String, String)}.
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 * @throws URISyntaxException 
-	 */
-	@Test
-	public void testValidKey() throws InterruptedException, ExecutionException, URISyntaxException {
-		
-		URI hostname = new URI("http://www.example.com:8080");
-		String filePath = "foo.jar";
-		UrlBean result;
-		String key;
-		String url;
-		
-		result = classUnderTest.addKey(hostname, filePath).get();
-		assertTrue(result.isSuccess());
-		assertEquals("www.example.com", result.getUrl().getHost());
-		assertEquals(8080, result.getUrl().getPort(), 0.0);
-		
-		String start = hostname + "/rest/webresources/serviceclient/" + filePath + "?key=";
-		url = result.getUrl().toString();
-		assertTrue(url.contains("?key="));
-		assertTrue(url.startsWith(start));
-		assertTrue(url.length() > start.length());
-		
-		key = url.replace(start, "");
-		assertTrue(ServiceClientJarAccess.isKeyValid(filePath, key));
-	}
-
-	/**
-	 * Test method for {@link ServiceClientJarAccess#isKeyValid(String, String)}.
-	 */
-	@Test
-	public void testInvalidKey() {
-		
-		String filePath = "foo.jar";
-		String key = "d2nuvo";
-		assertTrue(!ServiceClientJarAccess.isKeyValid(filePath, key));
-	}
+	public void addKey(IIdentity toIdentity, URI hostname, String filePath, IClientJarServerCallback callback);
 }
