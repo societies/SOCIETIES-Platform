@@ -192,16 +192,19 @@ public class CisSubscribedImp implements ICis {
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
 		
-		LOG.debug("client call to get list of members from a RemoteCIS");
+		LOG.info("client call to get list of members from a RemoteCIS");
 
 
 		IIdentity toIdentity;
 		try {
 			toIdentity = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());
+			LOG.info("identity ok");
 			Stanza stanza = new Stanza(toIdentity);
+			LOG.info("stanza done");
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
 
+			LOG.info("callback");
 			Community c = new Community();
 			Who w = new Who();
 			c.setWho(w);

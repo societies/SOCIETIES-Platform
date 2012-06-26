@@ -231,19 +231,23 @@ public class CisManagerController {
 				model.put("methodcalled", "GetMemberListRemote");
 				model.put("cisid", cisForm.getCisJid());
 				//CALL REMOTE
-				res = "Before Remote";
-				ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid().trim());
+				res += cisForm.getCisJid();
+				res += "Before Remote";
+				ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid());
 				remoteCIS.getListOfMembers(icall);
-				res = "After Remote";
+				res += "After Remote";
 				
 			} else if (method.equalsIgnoreCase("RefreshRemoteMembers")) {
 				model.put("methodcalled", "RefreshRemoteMembers");
 				model.put("cisid", cisForm.getCisJid());
 				
 				Community remoteCommunity = (Community)m_session.getAttribute("community");
-				List<Participant> membersRemote = (List<Participant>) m_session.getAttribute("memberRecords");					
-				model.put("memberRecords", membersRemote);				
+				List<Participant> membersRemote = (List<Participant>) m_session.getAttribute("remoteMemberRecords");					
+				model.put("remoteMemberRecords", membersRemote);				
 				model.put("community", remoteCommunity);
+				Set<ICisParticipant> records = null;
+				model.put("memberRecords", records);
+
 				
 			} else if (method.equalsIgnoreCase("AddMember")) {
 				model.put("methodcalled", "AddMember");
@@ -307,8 +311,9 @@ public class CisManagerController {
 				if(communityResultObject.getWho() != null){
 					LOG.debug("### " + communityResultObject.getWho().getParticipant().size());
 
+					m_session.setAttribute("community", remoteCommunity);
 					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWho().getParticipant();					
-					m_session.setAttribute("memberRecords", l);
+					m_session.setAttribute("remoteMemberRecords", l);
 				}
 
 			}
