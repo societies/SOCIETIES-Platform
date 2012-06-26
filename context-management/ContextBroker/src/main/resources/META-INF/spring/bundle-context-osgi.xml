@@ -16,6 +16,7 @@
 	<osgi:service ref="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />
 	<osgi:service ref="ctxBroker" interface="org.societies.api.context.broker.ICtxBroker" />
 	<osgi:service ref="ctxBrokerClient" interface="org.societies.context.broker.impl.comm.CtxBrokerClient" />
+	<osgi:service ref="ctxBrokerServer" interface="org.societies.context.broker.impl.comm.CtxBrokerServer" />
 	
 	<osgi:reference id="ctxEventMgr" interface="org.societies.context.api.event.ICtxEventMgr" cardinality="1..1" />
 	<osgi:reference id="userCtxDBMgr" interface="org.societies.context.api.user.db.IUserCtxDBMgr" cardinality="1..1" />

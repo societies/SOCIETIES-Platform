@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -53,6 +55,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.societies.context.broker.impl.comm.CtxBrokerClient;
+import org.societies.context.broker.impl.comm.ICtxCallback;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +120,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	 * Used for JUnit testing only.
 	 */
 	public CtxBroker() {
-		//LOG.info(this.getClass() + " instantiated");
+		LOG.info(this.getClass() + " instantiated");
 	}
 
 	/*
@@ -133,17 +136,37 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	public Future<CtxEntity> createEntity(final Requestor requestor, 
 			final IIdentity targetCss, final String type) throws CtxException {
 
-		Future<CtxEntity> entity = null;
+		CtxEntity entity = null;
 		// ctxBrokerClient service retrieved
 		LOG.info(this.getClass() + " createEntity CtxBroker client service: "+ctxBrokerClient);
+		
 		if (idMgr.isMine(targetCss)) {
-			entity = internalCtxBroker.createEntity(type);
+			return internalCtxBroker.createEntity(type);
 		} else {
-			LOG.info("remote call");
+			
+			final CreateEntityCallback callback = new CreateEntityCallback();
+			LOG.debug("create remote 1");
+			ctxBrokerClient.createRemoteEntity(requestor, targetCss, type, callback);
+			LOG.debug("Sent remote entity create request");
+			synchronized (callback) {
+				
+				try {
+					LOG.debug("Callback wait");
+					callback.wait();
+					entity = callback.getResult();
+					
+				} catch (InterruptedException e) {
+					
+					throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
+				}
+			}
+			//end of remote testing
+		
 		}
-
-		return entity;
+		
+		return new AsyncResult<CtxEntity>(entity);
 	}
+
 
 	@Override
 	@Async
@@ -176,6 +199,9 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			ctxAssoc = internalCtxBroker.createAssociation(type);
 		} else {
 			LOG.info("remote call");
+		
+		
+		
 		}
 
 		return ctxAssoc;
@@ -669,5 +695,32 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		LOG.info("Unbinding service reference " + privacyLogAppender);
 		this.hasPrivacyLogAppender = false;
+	}
+	
+	private class CreateEntityCallback implements ICtxCallback {
+		
+		private CtxEntity result;
+		
+		@Override
+		public void receiveCtxResult(Object retObject, String type) {
+			
+			LOG.error("SKATA should not happen");
+			
+		}
+		
+		@Override
+		public void onCreatedEntity(CtxEntity retObject) {
+			
+			LOG.info("onCreatedEntity retObject " +retObject);
+			this.result = retObject;
+			synchronized (this) {	            
+				notifyAll();	        
+			}
+			LOG.info("notify all done");
+		}
+		
+		private CtxEntity getResult() {
+			return this.result;
+		}
 	}
 }
