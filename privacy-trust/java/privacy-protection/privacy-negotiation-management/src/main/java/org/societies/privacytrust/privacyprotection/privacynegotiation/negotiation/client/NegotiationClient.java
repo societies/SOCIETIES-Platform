@@ -142,6 +142,7 @@ public class NegotiationClient implements INegotiationClient {
 			str = str.concat(s+"\n");
 		}
 		if (notFoundTypes.size()>0){
+			log("Service requires these contextTypes\n"+str+"which don't exist");
 			JOptionPane.showMessageDialog(null, "Service requires these contextTypes\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
 			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
 			try {

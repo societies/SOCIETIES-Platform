@@ -30,8 +30,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.societies.android.platform.devicestatus.DeviceStatus;
-import org.societies.api.android.internal.model.BatteryStatus;
-import org.societies.api.android.internal.model.ProviderStatus;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.api.internal.devicemonitor.IDeviceStatus;
+import org.societies.android.api.internal.devicemonitor.BatteryStatus;
+import org.societies.android.api.internal.devicemonitor.ProviderStatus;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

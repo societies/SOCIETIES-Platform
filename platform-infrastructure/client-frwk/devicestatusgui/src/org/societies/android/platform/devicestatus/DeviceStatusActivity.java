@@ -30,10 +30,10 @@ import java.util.Set;
 
 import org.societies.android.platform.R;
 import org.societies.android.platform.devicestatus.DeviceStatusServiceSameProcess.LocalBinder;
-import org.societies.android.platform.utilities.ServiceMethodTranslator;
-import org.societies.api.android.internal.IDeviceStatus;
-import org.societies.api.android.internal.model.BatteryStatus;
-import org.societies.api.android.internal.model.ProviderStatus;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.api.internal.devicemonitor.IDeviceStatus;
+import org.societies.android.api.internal.devicemonitor.BatteryStatus;
+import org.societies.android.api.internal.devicemonitor.ProviderStatus;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;

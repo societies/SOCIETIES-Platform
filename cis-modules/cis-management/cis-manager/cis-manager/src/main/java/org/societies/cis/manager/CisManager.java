@@ -272,7 +272,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	@Override
 	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
-		String pPolicy = "<RequestPolicy><Target></RequestPolicy></Target>";	
+		String pPolicy = "<RequestPolicy></RequestPolicy>";	
 		ICisOwned i = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode,pPolicy);
 			return new AsyncResult<ICisOwned>(i);
 		
@@ -496,7 +496,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 				if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
 					int cisMode = create.getMembershipMode().intValue();
-					String pPolicy = "<RequestPolicy><Target></RequestPolicy></Target>";	
+					String pPolicy = "<RequestPolicy></RequestPolicy>";	
 					ICisOwned icis = localCreateCis(ownerJid, ownerPassword, cisName, cisType, cisMode,pPolicy);
 
 					
