@@ -8,4 +8,5 @@
 
 	<artifact type="bundle"
 		name="org.societies.integration.test.bit.privacynegotiationmanagement" />
+		
 </plan>
