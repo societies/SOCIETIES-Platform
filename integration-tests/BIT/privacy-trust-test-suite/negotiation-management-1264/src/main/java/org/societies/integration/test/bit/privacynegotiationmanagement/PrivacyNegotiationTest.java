@@ -304,6 +304,7 @@ public class PrivacyNegotiationTest {
 		Resource rBirthday = new Resource(CtxAttributeTypes.BIRTHDAY);
 		List<Action> actions2 = new ArrayList<Action>();
 		actions2.add(new Action(ActionConstants.WRITE));
+		actions2.add(new Action(ActionConstants.CREATE));
 		List<Condition> conditions2 = new ArrayList<Condition>();
 		conditions2.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
 		conditions2.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
@@ -339,6 +340,6 @@ public class PrivacyNegotiationTest {
 	}
 
 	private void deleteContext() {
-		// TODo
+		// TODO
 	}
 }

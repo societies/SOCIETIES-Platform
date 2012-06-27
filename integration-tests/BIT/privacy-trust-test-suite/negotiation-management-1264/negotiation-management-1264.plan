@@ -21,6 +21,7 @@
 	<!-- Privacy -->
 	<artifact type="bundle" name="org.societies.privacytrust.trust" />
 	<artifact type="bundle" name="org.societies.privacytrust.privacyprotection" />
+	<artifact type="bundle" name="org.societies.privacytrust.privacytrustcommmanagement" />
 
 	<!-- Device Management (needed by Context) -->
 	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager" />
@@ -32,6 +33,8 @@
 		name="org.societies.context-management.user-context-db-mgmt" />
 	<artifact type="bundle"
 		name="org.societies.context-management.user-context-history-mgmt" />
+	<artifact type="bundle"
+		name="org.societies.context-management.user-context-inference-mgmt" />
 	<artifact type="bundle"
 		name="org.societies.context-management.context-broker" />
 	<artifact type="bundle"
