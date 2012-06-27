@@ -25,10 +25,17 @@
 package org.societies.security.policynegotiator.provider;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.domainauthority.IClientJarServer;
+import org.societies.api.internal.domainauthority.IClientJarServerRemote;
+import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.security.policynegotiator.exception.NegotiationException;
@@ -43,13 +50,35 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	private static Logger LOG = LoggerFactory.getLogger(INegotiationProviderServiceMgmt.class);
 
+//	private IClientJarServerRemote clientJarServer;
+	private IClientJarServer clientJarServer;
+
 	private HashMap<String, Service> services = new HashMap<String, Service>();
-	
+
+//	public IClientJarServerRemote getClientJarServer() {
+	public IClientJarServer getClientJarServer() {
+		return clientJarServer;
+	}
+//	public void setClientJarServer(IClientJarServerRemote clientJarServer) {
+	public void setClientJarServer(IClientJarServer clientJarServer) {
+		LOG.debug("setClientJarServer()");
+		this.clientJarServer = clientJarServer;
+	}
+
 	@Override
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar) {
 		
 		String idStr = serviceId.getIdentifier().toString();
-		Service s = new Service(idStr, slaXml, clientJar);
+		Service s = new Service(idStr, slaXml, clientJar, null);
+		
+		services.put(idStr, s);
+	}
+	
+	@Override
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, IIdentity clientJarServer) {
+		
+		String idStr = serviceId.getIdentifier().toString();
+		Service s = new Service(idStr, slaXml, null, clientJarServer);
 		
 		services.put(idStr, s);
 	}
@@ -84,15 +113,33 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	 * @throws NegotiationException When service is not found
 	 */
 	protected URI getClientJarUri(String id) throws NegotiationException {
-		
-		Service s = getService(id);
-		
-		if (s != null) {
-			return s.getClientJarUri();
+
+		// FIXME
+		String uriStr = "http://localhost:8080";
+		String filePath = "Calculator.jar";
+		URI uri;
+		try {
+			uri = new URI(uriStr);
+			Future<UrlBean> urlBeanFuture = clientJarServer.addKey(uri, filePath);
+			UrlBean urlBean = urlBeanFuture.get();
+			uri = urlBean.getUrl();
+			return uri;
+		} catch (URISyntaxException e) {
+			throw new NegotiationException(e);
+		} catch (InterruptedException e) {
+			throw new NegotiationException(e);
+		} catch (ExecutionException e) {
+			throw new NegotiationException(e);
 		}
-		else {
-			throw new NegotiationException("Service " + id + " not found");
-		}
+		
+//		Service s = getService(id);
+//		
+//		if (s != null) {
+//			return s.getClientJarUri();
+//		}
+//		else {
+//			throw new NegotiationException("Service " + id + " not found");
+//		}
 	}
 
 	/**

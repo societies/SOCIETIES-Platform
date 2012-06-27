@@ -45,7 +45,7 @@ for that reason, Im defining a simpler version here initially.
         <xs:sequence>
         	<xs:element name='actor' type='xs:string' />
             <!--<xs:element ref='ActivityContext' />-->
-            <xs:element  name="time" type="xs:long" />
+            <xs:element  name="published" type="xs:string" />
             <!--<xs:element name="source" type="xs:string" />-->
             <xs:element name="verb" type="xs:string" />
             <xs:element name="object" type="xs:string" />

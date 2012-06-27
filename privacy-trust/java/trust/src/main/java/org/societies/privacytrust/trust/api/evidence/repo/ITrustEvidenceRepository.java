@@ -27,11 +27,18 @@ package org.societies.privacytrust.trust.api.evidence.repo;
 import java.util.Date;
 import java.util.Set;
 
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
+/**
+ * Describe your class here...
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.8
+ */
 public interface ITrustEvidenceRepository {
 
 	/**
@@ -48,78 +55,168 @@ public interface ITrustEvidenceRepository {
 	public void addEvidence(final ITrustEvidence evidence) throws TrustEvidenceRepositoryException;
 	
 	/**
+	 * Retrieves all the direct trust evidence associated with the specified 
+	 * {@link TrustedEntityId}.
 	 * 
 	 * @param teid
-	 * @return
+	 *            the {@link TrustedEntityId} whose direct trust evidence to
+	 *            retrieve 
+	 * @return a set containing the direct trust evidence associated with the
+	 *         specified trusted entity
 	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence Repository
+	 * @throws NullPointerException
+	 *             if the specified teid is <code>null</code>
 	 */
-	public Set<IDirectTrustEvidence> retrieveAllDirectEvidence(final TrustedEntityId teid)
-			throws TrustEvidenceRepositoryException;
+	public Set<IDirectTrustEvidence> retrieveAllDirectEvidence(
+			final TrustedEntityId teid) throws TrustEvidenceRepositoryException;
 	
 	/**
+	 * Retrieves the direct trust evidence associated with the specified 
+	 * {@link TrustedEntityId}. The method allows specifying optional search 
+	 * criteria, such as, the {@link TrustEvidenceType trust evidence type}, as
+	 * well as, the time range in which the evidence was collected.
 	 * 
 	 * @param teid
+	 *            the {@link TrustedEntityId} whose direct trust evidence to
+	 *            retrieve 
+	 * @param type
+	 *            the type of the direct trust evidence to retrieve (optional) 
 	 * @param startDate
+	 *            the start time (optional) 
 	 * @param endDate
-	 * @return
+	 *            the end time (optional)
+	 * @return the direct trust evidence matching the specified search criteria
 	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence Repository
+	 * @throws NullPointerException
+	 *             if the specified teid is <code>null</code>
+	 * @since 0.3
 	 */
-	public Set<IDirectTrustEvidence> retrieveDirectEvidence(final TrustedEntityId teid,
+	public Set<IDirectTrustEvidence> retrieveDirectEvidence(
+			final TrustedEntityId teid, final TrustEvidenceType type,			
 			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
 	
 	/**
+	 * Retrieves all the indirect trust evidence associated with the specified 
+	 * {@link TrustedEntityId}.
 	 * 
 	 * @param teid
-	 * @return
+	 *            the {@link TrustedEntityId} whose indirect trust evidence to
+	 *            retrieve 
+	 * @return a set containing the indirect trust evidence associated with the
+	 *         specified trusted entity
 	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence Repository
+	 * @throws NullPointerException
+	 *             if the specified teid is <code>null</code>
 	 */
-	public Set<IIndirectTrustEvidence> retrieveAllIndirectEvidence(final TrustedEntityId teid)
-			throws TrustEvidenceRepositoryException;
+	public Set<IIndirectTrustEvidence> retrieveAllIndirectEvidence(
+			final TrustedEntityId teid)	throws TrustEvidenceRepositoryException;
 	
 	/**
+	 * Retrieves the indirect trust evidence associated with the specified 
+	 * {@link TrustedEntityId}. The method allows specifying optional search 
+	 * criteria, such as, the {@link TrustEvidenceType trust evidence type}, as
+	 * well as, the time range in which the evidence was collected.
 	 * 
 	 * @param teid
+	 *            the {@link TrustedEntityId} whose indirect trust evidence to
+	 *            retrieve 
+	 * @param type
+	 *            the type of the indirect trust evidence to retrieve (optional) 
 	 * @param startDate
+	 *            the start time (optional) 
 	 * @param endDate
-	 * @return
+	 *            the end time (optional)
+	 * @return the indirect trust evidence matching the specified search criteria
 	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence Repository
+	 * @throws NullPointerException
+	 *             if the specified teid is <code>null</code>
+	 * @since 0.3
 	 */
-	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(final TrustedEntityId teid,
+	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(
+			final TrustedEntityId teid, final TrustEvidenceType type,
 			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
 	
 	/**
+	 * Removes all the direct trust evidence associated with the specified 
+	 * {@link TrustedEntityId}.
 	 * 
 	 * @param teid
+	 *            the {@link TrustedEntityId} whose direct trust evidence to
+	 *            remove
 	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence Repository
+	 * @throws NullPointerException
+	 *             if the specified teid is <code>null</code>
 	 */
 	public void removeAllDirectEvidence(final TrustedEntityId teid)
 			throws TrustEvidenceRepositoryException;
 	
 	/**
+	 * Removes the direct trust evidence associated with the specified 
+	 * {@link TrustedEntityId}. The method allows specifying optional search 
+	 * criteria, such as, the {@link TrustEvidenceType trust evidence type}, as
+	 * well as, the time range in which the evidence was collected.
 	 * 
 	 * @param teid
+	 *            the {@link TrustedEntityId} whose direct trust evidence to
+	 *            remove
+	 * @param type
+	 *            the type of the direct trust evidence to remove (optional) 
 	 * @param startDate
+	 *            the start time (optional) 
 	 * @param endDate
+	 *            the end time (optional)
 	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence Repository
+	 * @throws NullPointerException
+	 *             if the specified teid is <code>null</code>
+	 * @since 0.3
 	 */
-	public void removeDirectEvidence(final TrustedEntityId teid,
-			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
+	public void removeDirectEvidence(final TrustedEntityId teid, 
+			final TrustEvidenceType type, final Date startDate,
+			final Date endDate) throws TrustEvidenceRepositoryException;
 	
 	/**
+	 * Removes all the indirect trust evidence associated with the specified 
+	 * {@link TrustedEntityId}.
 	 * 
 	 * @param teid
+	 *            the {@link TrustedEntityId} whose indirect trust evidence to
+	 *            remove
 	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence Repository
+	 * @throws NullPointerException
+	 *             if the specified teid is <code>null</code>
 	 */
 	public void removeAllIndirectEvidence(final TrustedEntityId teid)
 			throws TrustEvidenceRepositoryException;
 	
 	/**
+	 * Removes the indirect trust evidence associated with the specified 
+	 * {@link TrustedEntityId}. The method allows specifying optional search 
+	 * criteria, such as, the {@link TrustEvidenceType trust evidence type}, as
+	 * well as, the time range in which the evidence was collected.
 	 * 
 	 * @param teid
+	 *            the {@link TrustedEntityId} whose indirect trust evidence to
+	 *            remove
+	 * @param type
+	 *            the type of the indirect trust evidence to remove (optional) 
 	 * @param startDate
+	 *            the start time (optional) 
 	 * @param endDate
+	 *            the end time (optional)
 	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence Repository
+	 * @throws NullPointerException
+	 *             if the specified teid is <code>null</code>
+	 * @since 0.3
 	 */
 	public void removeIndirectEvidence(final TrustedEntityId teid,
-			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
+			final TrustEvidenceType type, final Date startDate, 
+			final Date endDate) throws TrustEvidenceRepositoryException;
 }

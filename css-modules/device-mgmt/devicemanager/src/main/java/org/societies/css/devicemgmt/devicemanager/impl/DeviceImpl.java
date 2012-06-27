@@ -37,28 +37,201 @@ import org.slf4j.LoggerFactory;
 
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.IDriverService;
+import org.societies.api.internal.css.devicemgmt.IDeviceControl;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.internal.css.devicemgmt.model.DeviceMgmtDriverServiceConstants;
 
 
 
 
-public class DeviceImpl implements IDevice{
+public class DeviceImpl implements IDevice, IDeviceControl{
 	
 	private static Logger LOG = LoggerFactory.getLogger(DeviceImpl.class);
 	private DeviceManager deviceManager;
-	private BundleContext bundleContext;
 	private DeviceCommonInfo deviceCommonInfo;
 	private String deviceId;
-	private boolean status;
+	private boolean status = true;
+	private String deviceNodeId;
 
 
-	public DeviceImpl(BundleContext bc, DeviceManager deviceMgr, String deviceId, DeviceCommonInfo deviceCommonInfo) {
+	public DeviceImpl(DeviceManager deviceMgr, String deviceNodeId, String deviceId, DeviceCommonInfo deviceCommonInfo) {
 		
-		this.bundleContext = bc;
 		this.deviceManager = deviceMgr;
 		this.deviceCommonInfo = deviceCommonInfo;
 		this.deviceId = deviceId;
+		this.deviceNodeId = deviceNodeId;
+	}
+
+	@Override
+	public String getDeviceName() {
+		
+		return deviceCommonInfo.getDeviceName();
+	}
+
+	@Override
+	public String getDeviceId() {
+		
+		return this.deviceId;
+	}
+
+	@Override
+	public String getDeviceType() {
+		
+		return deviceCommonInfo.getDeviceType();
+	}
+
+	@Override
+	public String getDeviceDescription() {
+
+		return deviceCommonInfo.getDeviceDescription();
+	}
+
+	@Override
+	public String getDeviceConnectionType() {
+		return deviceCommonInfo.getDeviceConnectionType();
+	}
+
+
+//	public void enable() {
+//		
+//		this.status = true;
+//	}
+//
+//
+//	public void disable() {
+//		
+//		this.status = false;
+//	}
+
+	@Override
+	public boolean isEnable() {
+		
+		return this.status;
+	}
+
+	@Override
+	public String getDeviceLocation() {
+		
+		return deviceCommonInfo.getDeviceLocation();
+	}
+
+	@Override
+	public String getDeviceProvider() {
+		
+		return deviceCommonInfo.getDeviceProvider();
+	}
+
+	@Override
+	public boolean isContextSource() {
+		
+		return deviceCommonInfo.getContextSource();
+	}
+	
+	@Override
+	public List<String> getEventNameList(){
+		return null;
+	}
+
+	
+	@Override
+	public String getDeviceNodeId() {
+		return this.deviceNodeId;
+	}
+
+	@Override
+	public IDriverService getService(String serviceName) {
+		
+		if (status) 
+		{
+			LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 1 " + serviceName); 
+			
+			String physicalDeviceId = deviceManager.getPhysicalDeviceId(deviceId);
+			
+			LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 2 physicalDeviceId: " + physicalDeviceId);
+			
+			List <String> serviceList = deviceManager.getDeviceServiceNames(deviceId);
+			
+			LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 3"); 
+			
+			if (serviceList != null && physicalDeviceId != null) 
+			{
+				LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ serviceList non null"); 
+				if (serviceList.contains(serviceName))
+				{
+					LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ serviceList.contains(serviceId) get service by: service id = " + serviceName +" and device Id = " + deviceId); 
+					ServiceReference[] sr = null;
+					try 
+					{
+						sr = DeviceManager.bundleContext.getServiceReferences(IDriverService.class.getName(),  "(&("+DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME+"="+serviceName+")("+
+								DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID+"="+physicalDeviceId+"))");
+					} 
+					catch (InvalidSyntaxException e) 
+					{
+						e.printStackTrace();
+					}
+					if (sr != null)
+					{
+						LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ sr"); 
+						
+						IDriverService iDeviceService = (IDriverService)DeviceManager.bundleContext.getService(sr[0]);
+
+						return iDeviceService;
+					}
+					LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ sr null"); 
+					return null;
+				}
+				return null;
+			}
+			return null;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	@Override
+	public IDriverService [] getServices() 
+	{
+		
+		if (status) 
+		{
+			String physicalDeviceId = deviceManager.getPhysicalDeviceId(this.deviceId);
+			List <String> serviceNameList = deviceManager.getDeviceServiceNames(this.deviceId);
+			
+			List<IDriverService> deviceServiceList = new ArrayList<IDriverService>();
+			
+			if (serviceNameList != null && physicalDeviceId != null) 
+			{
+				ServiceReference[] sr = null;
+				for(String serviceName : serviceNameList)
+				{
+					try 
+					{
+						sr = DeviceManager.bundleContext.getServiceReferences(IDriverService.class.getName(), "(&("+DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME+"="+serviceName+")("+
+								DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID+"="+physicalDeviceId+"))");
+					
+					} catch (InvalidSyntaxException e) {
+						e.printStackTrace();
+					}
+					if (sr != null)
+					{
+						IDriverService iDeviceService = (IDriverService)DeviceManager.bundleContext.getService(sr[0]);
+
+						deviceServiceList.add(iDeviceService);
+					}
+				}
+				return (IDriverService [])deviceServiceList.toArray(new IDriverService []{});
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	public void removeDevice()
@@ -68,141 +241,33 @@ public class DeviceImpl implements IDevice{
 			LOG.info("-- The device " + deviceId + " has been removed");
 	}
 
-	public String getDeviceName() {
-		
-		return deviceCommonInfo.getDeviceName();
-	}
+	@Override
+	public void enable(String nodeId, String deviceId) {
 
-	public String getDeviceId() {
-		
-		return this.deviceId;
-	}
-
-	public String getDeviceType() {
-		
-		return deviceCommonInfo.getDeviceType();
-	}
-
-	public String getDeviceDescription() {
-
-		return deviceCommonInfo.getDeviceDescription();
-	}
-
-	public String getDeviceConnetionType() {
-		return deviceCommonInfo.getDeviceConnectionType();
-	}
-
-	public void enable() {
-		
 		this.status = true;
+		
+		LOG.info("-- IDevice: a device with Id: " + deviceId + " is enabled");
 	}
 
-	public void disable() {
-		
+	@Override
+	public void disable(String nodeId, String deviceId) {
+	
 		this.status = false;
+		
+		LOG.info("-- IDevice: a device with Id: " + deviceId + " is disable");
+		
 	}
 
-	public boolean isEnable() {
-		
-		return this.status;
-	}
 
-	public String getDeviceLocation() {
+	@Override
+	public void share(String nodeId, String deviceId) {
 		
-		return deviceCommonInfo.getDeviceLocation();
-	}
-
-	public String getDeviceProvider() {
 		
-		return deviceCommonInfo.getDeviceProvider();
-	}
-
-	public boolean isContextSource() {
-		
-		return deviceCommonInfo.getContextSource();
 	}
 
 	@Override
-	public IDriverService getService(String serviceName) {
-	
-		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 1 " + serviceName); 
+	public void unshare(String nodeId, String deviceId) {
 		
-		String physicalDeviceId = deviceManager.getPhysicalDeviceId(deviceId);
 		
-		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 2 physicalDeviceId: " + physicalDeviceId);
-		
-		List <String> serviceList = deviceManager.getDeviceServiceNames(deviceId);
-		
-		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 3"); 
-		
-		if (serviceList != null && physicalDeviceId != null) 
-		{
-			LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ serviceList non null"); 
-			if (serviceList.contains(serviceName))
-			{
-				LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ serviceList.contains(serviceId) get service by: service id = " + serviceName +" and device Id = " + deviceId); 
-				ServiceReference[] sr = null;
-				try 
-				{
-					sr = bundleContext.getServiceReferences(IDriverService.class.getName(),  "(&("+DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME+"="+serviceName+")("+
-							DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID+"="+physicalDeviceId+"))");
-				} 
-				catch (InvalidSyntaxException e) 
-				{
-					e.printStackTrace();
-				}
-				if (sr != null)
-				{
-					LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ sr"); 
-					
-					IDriverService iDeviceService = (IDriverService)bundleContext.getService(sr[0]);
-
-					return iDeviceService;
-				}
-				LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ sr null"); 
-				return null;
-			}
-			return null;
-		}
-		return null;
 	}
-
-	@Override
-	public IDriverService [] getServices() {
-
-		String physicalDeviceId = deviceManager.getPhysicalDeviceId(this.deviceId);
-		List <String> serviceNameList = deviceManager.getDeviceServiceNames(this.deviceId);
-		
-		List<IDriverService> deviceServiceList = new ArrayList<IDriverService>();
-		
-		if (serviceNameList != null && physicalDeviceId != null) 
-		{
-			ServiceReference[] sr = null;
-			for(String serviceName : serviceNameList)
-			{
-				try 
-				{
-					sr = bundleContext.getServiceReferences(IDriverService.class.getName(), "(&("+DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME+"="+serviceName+")("+
-							DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID+"="+physicalDeviceId+"))");
-				
-				} catch (InvalidSyntaxException e) {
-					e.printStackTrace();
-				}
-				if (sr != null)
-				{
-					IDriverService iDeviceService = (IDriverService)bundleContext.getService(sr[0]);
-
-					deviceServiceList.add(iDeviceService);
-				}
-			}
-			return (IDriverService [])deviceServiceList.toArray(new IDriverService []{});
-		}
-		return null;
-	}
-	
-	@Override
-	public List<String> getEventNameList(){
-		return null;
-	}
-
 }

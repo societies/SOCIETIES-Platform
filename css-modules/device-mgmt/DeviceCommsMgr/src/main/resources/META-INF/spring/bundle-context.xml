@@ -19,7 +19,7 @@
   
    <bean id="DmCommManager" 
        		 class="org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterImpl" 
-       		 depends-on="CommManager,PubsubClient" init-method="init">
+       		 depends-on="CommManager,PubsubClient">
        		<property name="pubSubManager" ref="PubsubClient"/>
 			<property name="commManager" ref="CommManager" />
    </bean>

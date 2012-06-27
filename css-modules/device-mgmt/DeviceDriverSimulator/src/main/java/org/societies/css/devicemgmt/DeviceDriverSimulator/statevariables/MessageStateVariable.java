@@ -66,7 +66,7 @@ public class MessageStateVariable implements IDeviceStateVariable{
 		return null;
 	}
 
-
+	
 	@Override
 	public String getName() {
 		return NAME;
@@ -84,9 +84,16 @@ public class MessageStateVariable implements IDeviceStateVariable{
 		return null;
 	}
 
+	
 	@Override
 	public boolean isEnventable() {
 		return false;
+	}
+
+
+	@Override
+	public String getDescription() {
+		return "Represent the message variable";
 	}
 
 }

@@ -44,4 +44,8 @@ public class NegotiationException extends Exception {
 	public NegotiationException(String msg) {
 		super(msg);
 	}
+
+	public NegotiationException(Throwable e) {
+		super(e);
+	}
 }

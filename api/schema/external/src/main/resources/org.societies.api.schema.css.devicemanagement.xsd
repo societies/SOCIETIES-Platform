@@ -1,0 +1,64 @@
+<xs:schema	elementFormDefault="qualified" version="1.0" 
+			targetNamespace="http://societies.org/api/schema/css/devicemanagement" 
+			xmlns:tns="http://societies.org/api/schema/css/devicemanagement" 
+			xmlns:xs="http://www.w3.org/2001/XMLSchema">
+								
+
+<!-- 
+<xs:element name="dmEvent">
+ 	<xs:complexType>
+	    <xs:sequence>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
+			<xs:element name="deviceId" type="xs:string" minOccurs="0"/>
+			<xs:element name="key" type="xs:string" minOccurs="0"/>
+			<xs:element name="value" type="xs:string" minOccurs="0"/>
+			<xs:element name="type" type="xs:string" minOccurs="0"/>
+	    </xs:sequence>
+  	</xs:complexType>
+</xs:element>
+</xs:schema>
+
+-->
+
+
+
+	<xs:element name="dmEvent">
+	<xs:complexType>
+	    <xs:sequence>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
+			<xs:element name="deviceId" type="xs:string" minOccurs="0"/>
+			<xs:element name="key" type="xs:string" minOccurs="0"/>
+			<xs:element name="value" type="xs:string" minOccurs="0"/>
+			<xs:element name="type" type="xs:string" minOccurs="0"/>
+			<xs:element name="name" type="xs:string" minOccurs="0"/>
+			<xs:element name="connectionType" type="xs:string" minOccurs="0"/>
+			<xs:element name="location" type="xs:string" minOccurs="0"/>
+			<xs:element name="provider" type="xs:string" minOccurs="0"/>
+			<xs:element name="contextSource" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="senderNetworkNode" type="xs:string" minOccurs="0"/>
+	    </xs:sequence>
+  	</xs:complexType>
+  	</xs:element>
+
+<!--  Original
+ 	<xs:complexType name="dmEvent">
+	    <xs:sequence>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
+			<xs:element name="deviceId" type="xs:string" minOccurs="0"/>
+			<xs:element name="key" type="xs:string" minOccurs="0"/>
+			<xs:element name="value" type="xs:string" minOccurs="0"/>
+			<xs:element name="type" type="xs:string" minOccurs="0"/>
+			<xs:element name="name" type="xs:string" minOccurs="0"/>
+			<xs:element name="connectionType" type="xs:string" minOccurs="0"/>
+			<xs:element name="location" type="xs:string" minOccurs="0"/>
+			<xs:element name="provider" type="xs:string" minOccurs="0"/>
+			<xs:element name="contextSource" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="senderNetworkNode" type="xs:string" minOccurs="0"/>
+	    </xs:sequence>
+  	</xs:complexType>
+-->
+
+</xs:schema>
+
+
+ 

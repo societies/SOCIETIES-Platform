@@ -45,4 +45,7 @@ public class SocialGraphEdge {
 	public void addToWeight(double dw){
 		weight += dw;
 	}
+	public String toString(){
+		return "E:"+weight;
+	}
 }

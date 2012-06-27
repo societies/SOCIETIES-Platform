@@ -4,6 +4,8 @@ import gnu.inet.encoding.Stringprep;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -13,6 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jivesoftware.admin.AuthCheckFilter;
 import org.jivesoftware.openfire.XMPPServer;
+import org.jivesoftware.openfire.auth.ConnectionException;
+import org.jivesoftware.openfire.auth.InternalUnauthenticatedException;
+import org.jivesoftware.openfire.auth.UnauthorizedException;
 import org.jivesoftware.openfire.user.UserAlreadyExistsException;
 import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.Log;
@@ -40,25 +45,6 @@ public class SocietiesServlet extends HttpServlet {
         // Printwriter for writing out responses to browser
         PrintWriter out = response.getWriter();
 
-        if (!plugin.getAllowedIPs().isEmpty()) {
-            // Get client's IP address
-            String ipAddress = request.getHeader("x-forwarded-for");
-            if (ipAddress == null) {
-                ipAddress = request.getHeader("X_FORWARDED_FOR");
-                if (ipAddress == null) {
-                    ipAddress = request.getHeader("X-Forward-For");
-                    if (ipAddress == null) {
-                        ipAddress = request.getRemoteAddr();
-                    }
-                }
-            }
-            if (!plugin.getAllowedIPs().contains(ipAddress)) {
-                Log.warn("User service rejected service to IP address: " + ipAddress);
-                replyError("RequestNotAuthorised",response, out);
-                return;
-            }
-        }
-
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String name = request.getParameter("name");
@@ -70,15 +56,15 @@ public class SocietiesServlet extends HttpServlet {
         //type = type == null ? "image" : type;
        
         // Check this request is authorized
-        if (secret == null || !secret.equals(plugin.getSecret())){
+        if ((plugin.getSecret() != null || !plugin.getSecret().equals("")) && (secret == null || !secret.equals(plugin.getSecret()))) {
             Log.warn("An unauthorised user service request was received: " + request.getQueryString());
-            replyError("RequestNotAuthorised",response, out);
+            replyError("RequestNotAuthorised: Provided secret '"+secret+"' did not match", request, response, out);
             return;
          }
 
         // Some checking is required on the username
         if (username == null){
-            replyError("IllegalArgumentException",response, out);
+            replyError("IllegalArgumentException", request, response, out);
             return;
         }
 
@@ -90,26 +76,30 @@ public class SocietiesServlet extends HttpServlet {
             username = Stringprep.nodeprep(username);
             if ("add".equals(type)) {
                 plugin.createUser(username, password, name, email, groupNames);
-                replyMessage("ok",response, out);
+                replyMessage("User account created successfully", request, response, out);
                 //imageProvider.sendInfo(request, response, presence);
             }
             else if ("delete".equals(type)) {
                 plugin.deleteUser(username);
-                replyMessage("ok",response,out);
+                replyMessage("ok", request, response,out);
                 //xmlProvider.sendInfo(request, response, presence);
             }
             else if ("enable".equals(type)) {
                 plugin.enableUser(username);
-                replyMessage("ok",response,out);
+                replyMessage("ok", request, response,out);
             }
             else if ("disable".equals(type)) {
                 plugin.disableUser(username);
-                replyMessage("ok",response,out);
+                replyMessage("ok", request, response,out);
             }
             else if ("update".equals(type)) {
                 plugin.updateUser(username, password,name,email, groupNames);
-                replyMessage("ok",response,out);
+                replyMessage("ok", request, response,out);
                 //xmlProvider.sendInfo(request, response, presence);
+            }
+            else if ("login".equals(type)) {
+            	if (plugin.loginUser(username,password))
+            		replyMessage("ok", request, response,out);
             }
             else {
                 Log.warn("The societies servlet received an invalid request of type: " + type);
@@ -117,26 +107,50 @@ public class SocietiesServlet extends HttpServlet {
             }
         }
         catch (UserAlreadyExistsException e) {
-            replyError("UserAlreadyExistsException",response, out);
+            replyError("UserAlreadyExistsException: "+e.getMessage(), request, response, out);
         }
         catch (UserNotFoundException e) {
-            replyError("UserNotFoundException",response, out);
+            replyError("UserNotFoundException: "+e.getMessage(), request, response, out);
         }
         catch (IllegalArgumentException e) {
-            
-            replyError("IllegalArgumentException",response, out);
+            replyError("IllegalArgumentException: "+e.getMessage(), request, response, out);
+        }
+        catch (UnauthorizedException e) {
+            replyError("UnauthorizedException: "+e.getMessage(), request, response, out);
+        }
+        catch (ConnectionException e) {
+            replyError("ConnectionException: "+e.getMessage(), request, response, out);
+        }
+        catch (InternalUnauthenticatedException e) {
+            replyError("InternalUnauthenticatedException: "+e.getMessage(), request, response, out);
         }
         catch (Exception e) {
-            replyError(e.toString(),response, out);
+            replyError("Exception: "+e.toString(), request, response, out);
         }
     }
 
-    private void replyMessage(String message,HttpServletResponse response, PrintWriter out) throws IOException{
-        response.sendRedirect("public/signup-result.jsp?success=true");
+    private void replyMessage(String message, HttpServletRequest request, HttpServletResponse response, PrintWriter out) throws IOException{
+    	String referer = request.getHeader("Referer");
+    	if (referer!=null && referer.endsWith("public/signup.html"))
+    		response.sendRedirect("public/signup-result.jsp?success="+message);
+    	else {
+    		response.setContentType("text/xml");
+    		response.setStatus(200);
+    		out.println("<result>"+message+"</result>");
+    		out.flush();
+    	}
     }
 
-    private void replyError(String error,HttpServletResponse response, PrintWriter out) throws IOException{
-    	response.sendRedirect("public/signup-result.jsp?error="+error);
+    private void replyError(String error, HttpServletRequest request, HttpServletResponse response, PrintWriter out) throws IOException{
+    	String referer = request.getHeader("Referer");
+    	if (referer!=null && referer.endsWith("public/signup.html"))
+    		response.sendRedirect("public/signup-result.jsp?error="+error);
+    	else {
+    		response.setContentType("text/xml");
+    		response.setStatus(200);
+    		out.println("<error>"+error+"</error>");
+    		out.flush();
+    	}
     }
     
     @Override

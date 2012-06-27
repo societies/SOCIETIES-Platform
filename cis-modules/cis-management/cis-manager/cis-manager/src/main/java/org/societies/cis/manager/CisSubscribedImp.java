@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -81,7 +82,7 @@ public class CisSubscribedImp implements ICis {
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisManagerClient.class);
 	
-	@OneToOne
+	@OneToOne(cascade=CascadeType.ALL)
 	private CisRecord cisRecord;
 	@Transient
 	private CisManager cisManag = null;
@@ -94,6 +95,9 @@ public class CisSubscribedImp implements ICis {
 		this.cisRecord = cisRecord;
 	}
 
+	public CisSubscribedImp() {
+	}
+	
 	public CisSubscribedImp(CisRecord cisRecord, CisManager cisManag) {
 		super();
 		this.cisRecord = cisRecord;
@@ -188,16 +192,19 @@ public class CisSubscribedImp implements ICis {
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
 		
-		LOG.debug("client call to get list of members from a RemoteCIS");
+		LOG.info("client call to get list of members from a RemoteCIS");
 
 
 		IIdentity toIdentity;
 		try {
 			toIdentity = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());
+			LOG.info("identity ok");
 			Stanza stanza = new Stanza(toIdentity);
+			LOG.info("stanza done");
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
 
+			LOG.info("callback");
 			Community c = new Community();
 			Who w = new Who();
 			c.setWho(w);
@@ -277,7 +284,7 @@ public class CisSubscribedImp implements ICis {
 		a.setActor(activity.getActor());
 		a.setObject(activity.getObject());
 		a.setTarget(activity.getTarget());
-		a.setTime(activity.getTime());
+		a.setPublished(activity.getPublished());
 		a.setVerb(activity.getVerb());
 		g.setActivity(a);
 		c.setAddActivity(g);

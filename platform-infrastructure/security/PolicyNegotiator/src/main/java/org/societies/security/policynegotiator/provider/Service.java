@@ -26,6 +26,8 @@ package org.societies.security.policynegotiator.provider;
 
 import java.net.URI;
 
+import org.societies.api.identity.IIdentity;
+
 /**
  * 
  *
@@ -37,11 +39,13 @@ public class Service {
 	private String id;
 	private String slaXmlOptions;
 	private URI clientJarUri;
+	private IIdentity clientJarServer;
 
-	public Service(String id, String slaXmlOptions, URI clientJarUri) {
+	public Service(String id, String slaXmlOptions, URI clientJarUri, IIdentity clientJarServer) {
 		this.id = id;
 		this.slaXmlOptions = slaXmlOptions;
 		this.clientJarUri = clientJarUri;
+		this.clientJarServer = clientJarServer;
 	}
 	
 	/**
@@ -63,5 +67,12 @@ public class Service {
 	 */
 	public URI getClientJarUri() {
 		return clientJarUri;
+	}
+
+	/**
+	 * @return the clientJarServer
+	 */
+	public IIdentity getClientJarServer() {
+		return clientJarServer;
 	}
 }

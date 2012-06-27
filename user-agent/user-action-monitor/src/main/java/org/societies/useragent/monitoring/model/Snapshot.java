@@ -27,7 +27,7 @@ package org.societies.useragent.monitoring.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -35,10 +35,10 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 public class Snapshot implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
-	Hashtable<String, CtxAttributeIdentifier> typeIDs; 
+	HashMap<String, CtxAttributeIdentifier> typeIDs; 
 	
 	public Snapshot(){
-		typeIDs = new Hashtable<String, CtxAttributeIdentifier>();
+		typeIDs = new HashMap<String, CtxAttributeIdentifier>();
 	}
 	
 	public void addType(String type){

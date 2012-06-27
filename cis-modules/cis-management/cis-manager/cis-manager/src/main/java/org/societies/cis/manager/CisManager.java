@@ -42,6 +42,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -71,6 +72,8 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.Cis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -109,6 +112,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
 	ICisDirectoryRemote iCisDirRemote;
+	
+	IServiceDiscoveryRemote iServDiscRemote;
+	IServiceControlRemote iServCtrlRemote;
+	
+	
 //	IPrivacyPolicyManager polManager;
 	
 
@@ -120,6 +128,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		try{
 			this.ownedCISs = session.createCriteria(Cis.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
 			this.subscribedCISs = session.createCriteria(CisSubscribedImp.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+
+			LOG.info("Nb of subscri CIS is " + this.subscribedCISs.size());
 		}catch(Exception e){
 			LOG.error("CISManager startup queries failed..");
 			e.printStackTrace();
@@ -133,15 +143,20 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		while(it.hasNext()){
 			 Cis element = it.next();
 			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory());
+			 element.setiServCtrlRemote(this.iServCtrlRemote);
+			 element.setiServDiscRemote(this.iServDiscRemote);
 	     }
 		
 	//	for(Cis cis : ownedCISs){
 	//		cis.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory());
 	//	}
-		for(CisSubscribedImp cisSub : subscribedCISs){
-			cisSub.startAfterDBretrieval(this);
-		}
-		
+		Iterator<CisSubscribedImp> i = this.subscribedCISs.iterator();
+		 
+		while(i.hasNext()){
+			CisSubscribedImp element = i.next();
+			 element.startAfterDBretrieval(this);
+	     }
+				
 	}
 
 	private final static List<String> NAMESPACES = Collections
@@ -186,6 +201,18 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
+	public IServiceDiscoveryRemote getiServDiscRemote() {
+		return iServDiscRemote;
+	}
+	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
+		this.iServDiscRemote = iServDiscRemote;
+	}
+	public IServiceControlRemote getiServCtrlRemote() {
+		return iServCtrlRemote;
+	}
+	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
+		this.iServCtrlRemote = iServCtrlRemote;
+	}
 
 
 
@@ -292,7 +319,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//}
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		
-		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory);
+		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote);
 		
 		if(cis == null)
 			return cis;
@@ -324,8 +351,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public boolean subscribeToCis(CisRecord i) {
 
 		if(! this.subscribedCISs.contains(new Cis(i))){
-			this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJID()),this));
-			this.updatePersisted(subscribedCISs);
+			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getMembershipCriteria(),i.getCisName(), i.getCisJID()), this);			
+			this.subscribedCISs.add(csi);
+			this.persist(csi);
 			return true;
 		}
 		return false;
@@ -528,16 +556,25 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating getSubscribedTo notifications
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				SubscribedTo s = (SubscribedTo) c.getNotification().getSubscribedTo();
-				CisRecord r = new CisRecord(s.getCisJid());
-				this.subscribeToCis(r);
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCisMembershipMode(), c.getNotification().getSubscribedTo().getCisName(), c.getNotification().getSubscribedTo().getCisJid()));
+				
+				
+				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){
+						LOG.info("CIS is already part of the list of subscribed CISs");
+					}
+					else{
+						SubscribedTo s = (SubscribedTo) c.getNotification().getSubscribedTo();
+						CisRecord r = new CisRecord(s.getCisJid());
+						this.subscribeToCis(r);
+					}*/
 				return;
 			}
 			
 			// treating delete CIS notifications
 			if (c.getNotification().getDeleteNotification() != null) {
 				LOG.info("delete notification received");
-				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
+				this.unsubscribeToCis(c.getNotification().getSubscribedTo().getCisJid());
+/*				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
 				if(!this.subscribedCISs.contains(new CisRecord(d.getCommunityJid()))){
 					LOG.info("CIS is not part of the list of subscribed CISs");
 				}
@@ -549,7 +586,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					this.subscribedCISs.remove(temp);// removing it from the list
 					this.deletePersisted(temp); // removing it from the database
 				}
-				return;
+				return;*/
 			}
 			
 			// treating deleteMember notifications
@@ -664,7 +701,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		return l;
 	}
 
-
+	@Override
+	public List<ICis> getRemoteCis(){
+			List<ICis> l = new ArrayList<ICis>();
+			l.addAll(subscribedCISs);
+			
+			return l;
+	}
 
 	@Override
 	public ICis[] getCisList(ICis arg0) {

@@ -80,11 +80,12 @@ public class ExternalCtxBrokerExample 	{
 	private static IndividualCtxEntity owner = null;
 	private static CtxEntity deviceCtxEntity;
 	private static CtxAssociation usesServiceAssoc;
-	
+
 	private static CtxAttributeIdentifier weightAttrIdentifier = null;
 	private static CtxAttributeIdentifier ctxAttributeDeviceIDIdentifier = null;
-	
+
 	private Requestor requestor = null;
+	private IIdentity remoteTargetCss;
 
 
 	@Autowired(required=true)
@@ -99,12 +100,17 @@ public class ExternalCtxBrokerExample 	{
 		final String cssOwnerStr = this.cssNodeId.getBareJid();
 		this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
 		LOG.info("*** cssOwnerId = " + this.cssOwnerId);
-				
-		IIdentity reqIdentity = commMgr.getIdManager().fromJid("foo@societies.local");
-		this.requestor = new Requestor(reqIdentity);
-		LOG.info("*** requestor = " + this.requestor);  
-		
+
+		//IIdentity reqIdentity = commMgr.getIdManager().fromJid("foo@societies.local");
+		this.requestor = new Requestor(this.cssOwnerId);
+		LOG.info("*** requestor = " + this.requestor);
+
+		this.remoteTargetCss = commMgr.getIdManager().fromJid("BOOO@societies.local");
+
 		LOG.info("*** Starting examples...");
+
+		createRemoteEntity();
+
 		retrieveCssOperator();
 		createDeviceEntity();
 		createCtxAssociation();
@@ -113,6 +119,29 @@ public class ExternalCtxBrokerExample 	{
 		retrieveContext();
 		simpleCtxHistoryTest();
 	}
+
+
+
+	private void createRemoteEntity() {
+		LOG.info("*** createRemoteEntity");
+
+		try {
+			LOG.info("remote id :"+ this.remoteTargetCss);
+			CtxEntity remoteEntity = this.externalCtxBroker.createEntity(requestor, this.remoteTargetCss, "remoteType").get();
+
+			LOG.info("remote Entity created : "+remoteEntity );
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 
 	private void retrieveCssOperator() {
 
@@ -135,10 +164,10 @@ public class ExternalCtxBrokerExample 	{
 			deviceCtxEntity = this.externalCtxBroker.createEntity(requestor, cssOwnerId, CtxEntityTypes.DEVICE).get();
 			//get the context identifier of the created entity (to be used at the next step)
 			CtxEntityIdentifier deviceCtxEntityIdentifier = deviceCtxEntity.getId();
-			
+
 			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity
 			CtxAttribute ctxAttributeDeviceID = this.externalCtxBroker.createAttribute(requestor, deviceCtxEntityIdentifier, CtxAttributeTypes.ID).get();
-			
+
 			// by setting this flag to true the CtxAttribute values will be stored to Context History Database upon update
 			ctxAttributeDeviceID.setHistoryRecorded(true);
 
@@ -149,10 +178,10 @@ public class ExternalCtxBrokerExample 	{
 			ctxAttributeDeviceID = (CtxAttribute) this.externalCtxBroker.update(requestor, ctxAttributeDeviceID).get();
 
 			// get the updated CtxAttribute object and identifier (to be used later for retrieval purposes)
-		
+
 			ctxAttributeDeviceIDIdentifier = ctxAttributeDeviceID.getId();
 			LOG.info("*** Device attribute identifier "+ctxAttributeDeviceIDIdentifier.toString());
-			
+
 			//create a ctxAttribute with a Binary value that is assigned to the deviceCtxEntity
 			CtxAttribute ctxAttrWeight = this.externalCtxBroker.createAttribute(requestor, deviceCtxEntity.getId(),CtxAttributeTypes.WEIGHT).get();
 
@@ -170,7 +199,7 @@ public class ExternalCtxBrokerExample 	{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			// create an attribute to model the temperature of the device
 			CtxAttribute deviceTempAttr = this.externalCtxBroker.createAttribute(requestor, deviceCtxEntity.getId(), CtxAttributeTypes.TEMPERATURE).get();
 
@@ -181,7 +210,7 @@ public class ExternalCtxBrokerExample 	{
 
 			// update the attribute in the Context DB
 			deviceTempAttr = (CtxAttribute) this.externalCtxBroker.update(requestor, deviceTempAttr).get();
-					
+
 			// at this point the ctxEntity of type CtxEntityTypes.DEVICE is assigned with CtxAttributes of type : ID, WEIGHT, TEMPERATURE
 			LOG.info("*** created attribute toString "+deviceTempAttr.toString());
 		} catch (Exception e) {
@@ -189,7 +218,7 @@ public class ExternalCtxBrokerExample 	{
 		}
 	}
 
-	
+
 	/**
 	 * This method demonstrates how to create an association among context entities
 	 */
@@ -200,15 +229,15 @@ public class ExternalCtxBrokerExample 	{
 			System.out.println("usesServiceAssoc 2 "+usesServiceAssoc);
 			System.out.println("usesServiceAssoc 3 "+owner);
 			System.out.println("usesServiceAssoc 4 "+deviceCtxEntity);
-			
+
 			usesServiceAssoc.addChildEntity(owner.getId());
 			usesServiceAssoc.addChildEntity(deviceCtxEntity.getId());
-		
+
 			System.out.println("usesServiceAssoc 3 "+usesServiceAssoc);
-			
+
 			this.externalCtxBroker.update(requestor, usesServiceAssoc);
 			System.out.println("usesServiceAssoc 4 "+usesServiceAssoc);
-			
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -219,7 +248,7 @@ public class ExternalCtxBrokerExample 	{
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		} 
 	}	
-	
+
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
 	 */
@@ -253,12 +282,12 @@ public class ExternalCtxBrokerExample 	{
 			}
 			// the retrieved identifier is used in order to retrieve the context model object (CtxEntity)
 			CtxEntity retrievedCtxEntity = (CtxEntity) this.externalCtxBroker.retrieve(requestor, deviceCtxEntIdentifier).get();
-			
+
 			LOG.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
-			
+
 			// Retrieve CtxAttributes assigned to retrievedCtxEntity 
 			Set<CtxAttribute> ctxAttrSet = retrievedCtxEntity.getAttributes(CtxAttributeTypes.ID);
-			
+
 			if( ctxAttrSet.size()>0 ){
 				List<CtxAttribute> 	ctxAttrList = new ArrayList(ctxAttrSet);
 				CtxAttribute ctxAttr = ctxAttrList.get(0);
@@ -266,7 +295,7 @@ public class ExternalCtxBrokerExample 	{
 			}
 			// retrieve ctxAttribute with the binary value based on a known identifier
 			CtxAttribute ctxAttributeWeight = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, weightAttrIdentifier).get();
-			
+
 			//deserialise object
 			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeWeight.getBinaryValue(), this.getClass().getClassLoader());
 			LOG.info("Retrieved ctxAttribute id " +ctxAttributeWeight.getId()+ "and value: "+ retrievedBlob.getSeed()+" initial value was 999 ");

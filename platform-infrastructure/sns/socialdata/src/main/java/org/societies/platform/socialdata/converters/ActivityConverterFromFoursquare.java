@@ -26,7 +26,6 @@ public class ActivityConverterFromFoursquare implements ActivityConverter {
 	final String LOCATION = "location";
 	final String POSITION = "position";
 	
-	
 	@Override
 	public List<ActivityEntry> load(String data) {
 		ArrayList<ActivityEntry> activities = new ArrayList<ActivityEntry>();

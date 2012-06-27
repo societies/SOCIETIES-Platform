@@ -29,6 +29,7 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.ISignatureMgr;
 
 public class SignatureMgrUnitTest {
@@ -59,7 +60,7 @@ public class SignatureMgrUnitTest {
 		
 		String xml = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
 		String xmlNodeId = "nodeA";
-		String identity = "";
+		IIdentity identity = null;  // FIXME
 		String result;
 		
 		result = classUnderTest.signXml(xml, xmlNodeId, identity);

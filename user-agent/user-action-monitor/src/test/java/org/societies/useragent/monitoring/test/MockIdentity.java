@@ -43,12 +43,12 @@ public class MockIdentity implements IIdentity{
 
 	@Override
 	public String getJid() {
-		return null;
+		return identifier+"."+domainIdentifier;
 	}
 
 	@Override
 	public String getBareJid() {
-		return null;
+		return identifier+"."+domainIdentifier;
 	}
 
 	@Override

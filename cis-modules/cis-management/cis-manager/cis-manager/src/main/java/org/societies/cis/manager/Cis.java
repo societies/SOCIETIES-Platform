@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
-import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -73,6 +72,8 @@ import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
@@ -152,9 +153,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public ActivityFeed activityFeed;
 	//TODO: should this be persisted?
 	@Transient
-	public Set<IServiceSharingRecord> sharedServices; 
-	@Transient
 	private ICommManager CISendpoint;
+	@Transient
+	IServiceDiscoveryRemote iServDiscRemote;
+	@Transient
+	IServiceControlRemote iServCtrlRemote;
+	
 	@Transient
 	private IIdentity cisIdentity;
 	@Transient
@@ -204,16 +208,23 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.activityFeed = activityFeed;
 	}
 
-
-	public Set<IServiceSharingRecord> getSharedServices() {
-		return sharedServices;
+	public IServiceDiscoveryRemote getiServDiscRemote() {
+		return iServDiscRemote;
 	}
 
-
-	public void setSharedServices(Set<IServiceSharingRecord> sharedServices) {
-		this.sharedServices = sharedServices;
+	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
+		this.iServDiscRemote = iServDiscRemote;
 	}
 
+	public IServiceControlRemote getiServCtrlRemote() {
+		return iServCtrlRemote;
+	}
+
+	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
+		this.iServCtrlRemote = iServCtrlRemote;
+	}
+
+	
 
 
 	private static Logger LOG = LoggerFactory
@@ -240,23 +251,27 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	// maximum constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
-	,String permaLink,String password,String host, String description) {
-		this(cssOwner, cisName, cisType, mode,ccmFactory);
+	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote) {
+		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote);
 		this.password = password;
 		this.permaLink = permaLink;
 		this.host = host;
 		this.description = description;
+
 	}
 
 	
 
 	// minimum constructor of a CIS without a pre-determined ID or host
-	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
+	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
+			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote) {
 		
 		this.owner = cssOwner;
 		this.cisType = cisType;
 		
-		sharedServices = new HashSet<IServiceSharingRecord>();
+		this.iServCtrlRemote = iServCtrlRemote;
+		this.iServDiscRemote = iServDiscRemote;
+		
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
 
@@ -283,6 +298,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		try {
 			CISendpoint.register(this);
+			iServCtrlRemote.registerCISEndpoint(CISendpoint);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 			LOG.info("could not start comm manager!");
@@ -313,7 +329,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory){
 		
-		sharedServices = new HashSet<IServiceSharingRecord>();
 		// first Ill try without members
 
 		try {
@@ -334,6 +349,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 		try {
 			CISendpoint.register(this);
+			//iServCtrlRemote.registerCISEndpoint(CISendpoint);
+//			CISendpoint.register((IFeatureServer) iServCtrlRemote);
+//			CISendpoint.register((IFeatureServer) iServDiscRemote);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 			LOG.info("could not start comm manager!");
@@ -373,10 +391,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		ret = this.insertMember(jid, typedRole);
 
 		
-		
-		// should we send a XMPP notification to all the users to say that the new member has been added to the group
-		// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
-		// and the GUI can be updated with that new member
 		Stanza sta;
 		LOG.info("new member added, going to notify the user");
 		IIdentity targetCssIdentity = null;
@@ -409,7 +423,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 			e.printStackTrace();
 		}
 				
-		LOG.info("notification sent to the new user");
+		LOG.info("notification sent to the new user");		
+
 		
 		return new AsyncResult<Boolean>(new Boolean(ret));
 	}
@@ -429,7 +444,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			//persist in database
 			this.updatePersisted(this);
 			
-	
+			// should we send a XMPP notification to all the users to say that the new member has been added to the group
+			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
+			// and the GUI can be updated with that new member
+
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a pubsub notification
 			
@@ -671,6 +689,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 				j.setResult(addresult);
 				p.setJid(jid);
 				result.setCommunityJid(this.getCisId()); 
+				result.setCommunityName(this.getName());
+				result.setCommunityType(this.cisType);
+				result.setMembershipMode(this.getMembershipCriteria());
 								
 				if(addresult == true){
 					// information sent on the xmpp just in the case of success
@@ -875,10 +896,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 				while(it.hasNext()){
 					IActivity element = it.next();
-					Activity a = new org.societies.api.schema.activity.Activity();
+					org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
 					a.setActor(element.getActor());
 					a.setObject(a.getObject());
-					a.setTime(a.getTime());
+					a.setPublished(a.getPublished());
 					a.setVerb(a.getVerb());
 					marshalledActivList.add(a);
 			     }
@@ -904,7 +925,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				iActivity.setActor(c.getAddActivity().getActivity().getActor());
 				iActivity.setObject(c.getAddActivity().getActivity().getObject());
 				iActivity.setTarget(c.getAddActivity().getActivity().getTarget());
-				iActivity.setTime(c.getAddActivity().getActivity().getTime());
+				iActivity.setPublished(c.getAddActivity().getActivity().getPublished());
 				iActivity.setVerb(c.getAddActivity().getActivity().getVerb());
 
 				activityFeed.addCisActivity(iActivity);
@@ -933,7 +954,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
 				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
 				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
-				iActivity.setTime(c.getDeleteActivity().getActivity().getTime());
+				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
 				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
 
 				r.setResult(activityFeed.deleteActivity(iActivity));
@@ -971,6 +992,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	@Override 
 	public Future<Set<ICisParticipant>> getMemberList(){
+		LOG.debug("local get member list WITH CALLBACK called");
 		Set<ICisParticipant> s = new  HashSet<ICisParticipant>();
 		s.addAll(this.getMembersCss());
 		return new AsyncResult<Set<ICisParticipant>>(s);
@@ -978,7 +1000,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
-		LOG.debug("local client call to get list of members");
+		LOG.debug("local get member list WITHOUT CALLBACK called");
 
 		
 		Community c = new Community();
@@ -1092,7 +1114,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
-		sharedServices = null; 
 		activityFeed = null; // TODO: replace with proper way of destroying it
 		
 		
@@ -1296,6 +1317,52 @@ public class Cis implements IFeatureServer, ICisOwned {
 		}
 	}
 	
+	
+	// TODO
+	@Override
+	public void addCisActivity(IActivity activity,ICisManagerCallback callback){
+		
+			Community result = new Community();
+			AddActivityResponse r = new AddActivityResponse();
+
+			activityFeed.addCisActivity(activity);
+			
+			r.setResult(true); //TODO. add a return on the activity feed method
+			
+			
+			result.setAddActivityResponse(r);		
+			callback.receiveResult(result);
+		
+	}
+	
+	@Override
+	public void getActivities(String timePeriod,ICisManagerCallback callback){
+		Community result = new Community();
+		GetActivitiesResponse r = new GetActivitiesResponse();
+		List<IActivity> iActivityList;
+		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+		
+		iActivityList = activityFeed.getActivities(timePeriod);
+		
+
+		Iterator<IActivity> it = iActivityList.iterator();
+		
+		while(it.hasNext()){
+			IActivity element = it.next();
+			org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
+			a.setActor(element.getActor());
+			a.setObject(a.getObject());
+			a.setPublished(a.getPublished());
+			a.setVerb(a.getVerb());
+			marshalledActivList.add(a);
+	     }
+		
+		r.setActivity(marshalledActivList);
+		result.setGetActivitiesResponse(r);		
+		
+		callback.receiveResult(result);
+				
+	}
 	
 	
 }
