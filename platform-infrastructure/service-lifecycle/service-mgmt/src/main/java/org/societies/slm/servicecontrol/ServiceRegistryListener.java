@@ -24,8 +24,10 @@
  */
 package org.societies.slm.servicecontrol;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +44,8 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
@@ -80,7 +84,16 @@ public class ServiceRegistryListener implements BundleContextAware,
 	private ICommManager commMngr;
 	private INegotiationProviderServiceMgmt negotiationProvider;
 	private IServiceControl serviceControl;
+	private IPrivacyPolicyManager privacyManager;
 
+	public IPrivacyPolicyManager getPrivacyManager(){
+		return privacyManager;
+	}
+	
+	public void setPrivacyManager(IPrivacyPolicyManager privacyManager){
+		this.privacyManager = privacyManager;
+	}
+	
 	public IServiceControl getServiceControl(){
 		return serviceControl;
 	}
@@ -271,11 +284,18 @@ public class ServiceRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
-						
-						if(log.isDebugEnabled()) log.debug("location: " +serBndl.getLocation());
 						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
-						
 						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
+						
+						if(log.isDebugEnabled())
+							log.debug("Adding privacy policy to the Policy Manager!");
+						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
+						
+						//getPrivacyManager().get
+						String privacyPolicy = "oops, bad privacy policy!";
+						RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
+						getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
+						
 					}
 					
 					//The service is now registered, so we update the hashmap
