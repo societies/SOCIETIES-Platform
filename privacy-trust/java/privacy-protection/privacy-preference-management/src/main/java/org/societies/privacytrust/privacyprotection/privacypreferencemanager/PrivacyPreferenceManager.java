@@ -895,9 +895,12 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			IDSPreferenceDetails details = new IDSPreferenceDetails(identities.get(i));
 			details.setRequestor(agreement.getRequestor());
 			IPrivacyPreferenceTreeModel model = prefCache.getIDSPreference(details);
-			IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-			if (null!=outcome){
-				outcomes.add(outcome);
+			if (model!=null){
+				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
+				if (null!=outcome){
+					outcomes.add(outcome);
+				}
+
 			}
 		}	
 
@@ -924,9 +927,12 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		for (int i=0; i<dpis.size(); i++){
 			IDSPreferenceDetails details = new IDSPreferenceDetails(dpis.get(i));
 			IPrivacyPreferenceTreeModel model = prefCache.getIDSPreference(details);
-			IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-			if (null!=outcome){
-				outcomes.add(outcome);
+
+			if (model!=null){
+				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
+				if (null!=outcome){
+					outcomes.add(outcome);
+				}
 			}
 		}	
 
