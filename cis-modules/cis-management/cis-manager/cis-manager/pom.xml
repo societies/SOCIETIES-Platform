@@ -181,13 +181,6 @@
 			<version>${release.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>		
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>privacydatamanagement</artifactId>
-			<version>0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-				
 	</dependencies>
 
 	<build>
@@ -198,6 +191,14 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
+						<!-- <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.name}</Bundle-Name>
+						<Bundle-Version>${project.version}</Bundle-Version>
+						<Embed-Dependency>
+							activityfeed;scope=compile|runtime,
+						</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Export-Package></Export-Package> -->
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
