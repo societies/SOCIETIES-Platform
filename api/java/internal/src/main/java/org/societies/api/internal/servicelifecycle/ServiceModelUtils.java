@@ -97,7 +97,7 @@ public class ServiceModelUtils {
 	 */
 	public static Bundle getBundleFromService(Service service, BundleContext bundleContext) {
 		
-		Long bundleId =Long.parseLong(service.getServiceIdentifier().getServiceInstanceIdentifier());
+		Long bundleId = getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
 		return bundleContext.getBundle(bundleId);
 		
 	}
@@ -142,9 +142,25 @@ public class ServiceModelUtils {
 		return result;
 	}
 	
+	/**
+	 * This method returns the Jid of the node where the service exists
+	 * 
+	 * @param serviceId
+	 * @return the requested Jid
+	 */
 	public static String getJidFromServiceIdentifier(ServiceResourceIdentifier serviceId){
 		
 		return serviceId.getIdentifier().toString();
+	}
+	
+	/**
+	 * This method takes a Service Resource Identifier and returns the id of the bundle
+	 * 
+	 * @param serviceId
+	 * @return the bundle Id
+	 */
+	public static Long getBundleIdFromServiceIdentifier(ServiceResourceIdentifier serviceId){
+		return Long.parseLong(serviceId.getServiceInstanceIdentifier());
 	}
 	
 	/**
@@ -167,7 +183,14 @@ public class ServiceModelUtils {
 		}
 	}
 	
-	
+	/**
+	 * This method generates a Service Resource Identifier; it is meant to be used by third-party services
+	 * in order to determine their own SRI.
+	 * 
+	 * @param identity The IIdentity of the node where this service is running
+	 * @param callingClass The service class
+	 * @return The SRI of the associated service
+	 */
 	public static ServiceResourceIdentifier generateServiceResourceIdentifier(IIdentity identity, java.lang.Class<?> callingClass){
 		
 		// First we get the calling Bundle
@@ -187,7 +210,8 @@ public class ServiceModelUtils {
 	}
 	
 	/**
-	 *  This method generates a ServiceResourceIdentifier given the ServiceBundle
+	 * This method generates a ServiceResourceIdentifier given the ServiceBundle and the Service Model object
+	 *
 	 * @param service
 	 * @param serBndl
 	 * @return the ServiceResourceIdentifier
@@ -210,6 +234,14 @@ public class ServiceModelUtils {
 		
 	}
 	
+	/**
+	 * This method determines if a service belongs to the current node
+	 * 
+	 * @param service
+	 * @param commManager
+	 * @return true or false
+	 * @throws InvalidFormatException
+	 */
 	public static boolean isServiceOurs(Service service, ICommManager commManager) throws InvalidFormatException{
 		
 		IIdentity ourNode = commManager.getIdManager().getThisNetworkNode();
@@ -218,4 +250,5 @@ public class ServiceModelUtils {
 		return ourNode.equals(serviceNode);
 
 	}
+
 }
