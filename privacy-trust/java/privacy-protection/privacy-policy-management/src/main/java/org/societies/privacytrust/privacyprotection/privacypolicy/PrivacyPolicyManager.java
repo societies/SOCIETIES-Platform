@@ -92,6 +92,45 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		RequestPolicy privacyPolicy = policyRegistryManager.getPolicy(requestor);
 		return privacyPolicy;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFromLocation(java.lang.String)
+	 */
+	@Override
+	public String getPrivacyPolicyFromLocation(String location) throws PrivacyException {
+		return getPrivacyPolicyFromLocation(location, null);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFromLocation(java.lang.String, java.util.Map)
+	 */
+	@Override
+	public String getPrivacyPolicyFromLocation(String location, Map<String, String> options) throws PrivacyException {
+		// -- Read options (and create default options)
+		String encodingField = "encoding";
+		if (null == options) {
+			options = new HashMap<String, String>();
+		}
+		if (!options.containsKey(encodingField)) {
+			options.put(encodingField, "UTF-8");
+		}
+
+		// -- Retrieve the privacy policy file
+		URL url;
+		String privacyPolicy = null;
+		try {
+			url = new URL(location);
+			InputStream privacyPolicyStream = url.openStream();
+			privacyPolicy = IOUtils.toString(privacyPolicyStream, options.get(encodingField));
+		} catch (MalformedURLException e) {
+			throw new PrivacyException("Can't find the privacy policy file: \""+location+"", e);
+		} catch (IOException e) {
+			throw new PrivacyException("Can't read the privacy policy file: \""+location+"", e);
+		}
+		return privacyPolicy;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFrom3PServiceJar(java.lang.String)
@@ -101,7 +140,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			throws PrivacyException {
 		return getPrivacyPolicyFrom3PServiceJar(jarLocation, null);
 	}
-
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFrom3PServiceJar(java.lang.String, java.util.Map)

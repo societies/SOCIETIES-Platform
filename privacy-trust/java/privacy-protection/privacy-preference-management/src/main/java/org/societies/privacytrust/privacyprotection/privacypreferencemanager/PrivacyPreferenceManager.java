@@ -857,10 +857,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			/*			if (model == null){
 				JOptionPane.showMessageDialog(null, "prefCache returned null model for details:"+details.toString());
 			}*/
-			IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-			if (null!=outcome){
-				//JOptionPane.showMessageDialog(null, "Evaluation returned non-null outcome");
-				outcomes.add(outcome);
+			if (model!=null){
+				
+			
+				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
+				if (null!=outcome){
+					//JOptionPane.showMessageDialog(null, "Evaluation returned non-null outcome");
+					outcomes.add(outcome);
+				}
 			}
 		}	
 
