@@ -424,7 +424,7 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
-		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", privacyPolicy);
+		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RequestPolicy></RequestPolicy>", privacyPolicy);
 	}
 
 	/**
@@ -441,7 +441,7 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
-		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+cisPolicy.toXMLString(), privacyPolicy);
+		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString(), privacyPolicy);
 	}
 
 
