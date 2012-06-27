@@ -589,6 +589,37 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
 	 */
 	@Test
+	public void testUpdatePrivacyPolicyFromEmptyXml() {
+		String testTitle = "testUpdatePrivacyPolicyFromEmptyXml: add and retrieve a privacy policy created from a XML string representing an empty privacy policy";
+		LOG.info("[Test] "+testTitle);
+		String privacyPolicy = "<RequestPolicy></RequestPolicy>";
+		RequestPolicy addedPrivacyPolicy = null;
+		RequestPolicy readPrivacyPolicy = null;
+		boolean deleteResult = false;
+		try {
+			addedPrivacyPolicy = privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);
+			readPrivacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
+			deleteResult = privacyPolicyManager.deletePrivacyPolicy(requestorCis);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("Privacy error "+e.getLocalizedMessage()+": "+testTitle);
+		} catch (Exception e) {
+			LOG.error("[Test Exception] "+testTitle, e);
+			fail("Error "+e.getLocalizedMessage()+": "+testTitle);
+		}
+		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
+		assertNotNull("Privacy policy retrieved is null, but it should not.", readPrivacyPolicy);
+		LOG.info(privacyPolicy);
+		LOG.info(addedPrivacyPolicy.toString());
+		LOG.info(readPrivacyPolicy.toString());
+		assertEquals("Expected a privacy policy, but it what not the good one.", readPrivacyPolicy, addedPrivacyPolicy);
+		assertTrue("Privacy policy not deleted.", deleteResult);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
+	 */
+	@Test
 	public void testGetPrivacyPolicyFromJar() {
 		String testTitle = "testGetPrivacyPolicyFromJar: retrieve a privacy policy contained in a JAR";
 		LOG.info("[Test] "+testTitle);
