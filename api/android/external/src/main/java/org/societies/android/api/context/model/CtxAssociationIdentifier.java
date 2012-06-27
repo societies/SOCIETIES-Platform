@@ -22,64 +22,64 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.model;
+package org.societies.android.api.context.model;
 
 /**
- * This class is used to identify context entities. It provides methods that
- * return information about the identified entity including:
+ * This class is used to identify context associations. It provides methods that
+ * return information about the identified association including:
  * <ul>
- * <li><tt>OwnerId</tt>: A unique identifier of the CSS or CIS where the 
- * identified context entity is stored.</li>
+ * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
+ * identified context association is stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
- * object, i.e. {@link CtxModelType#ENTITY ENTITY}.</li>
+ * object, i.e. {@link CtxModelType#ASSOCIATION ASSOCIATION}.</li>
  * <li><tt>Type</tt>: A semantic tag that characterises the identified context
- * entity. e.g. "person".</li>
+ * association, e.g. "isFriendWith".</li>
  * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
  * respective context information was initially sensed/collected and stored.</li>
  * </ul>
  * <p>
- * A context entity identifier can be represented as a URI formatted String as
- * follows:
+ * A context association identifier can be represented as a URI formatted
+ * String as follows:
  * <pre>
- * &lt;OwnerId&gt;/ENTITY/&lt;Type&gt;/&lt;ObjectNumber&gt;
+ * &lt;OperatorId&gt;/ASSOCIATION/&lt;Type&gt;/&lt;ObjectNumber&gt;
  * </pre>
  * 
  * @see CtxIdentifier
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class CtxEntityIdentifier extends CtxIdentifier {
+public class CtxAssociationIdentifier extends CtxIdentifier {
 
-	private static final long serialVersionUID = 1550923933016203797L;
+	private static final long serialVersionUID = -7991875953413583564L;
 	
 	/**
-	 * Creates a context entity identifier by specifying the CSS/CIS ID
+	 * Creates a context association identifier by specifying the CSS/CIS ID
 	 * where the identified context model object is stored, as well as,
-	 * the entity type and the unique numeric model object identifier.
+	 * the association type and the unique numeric model object identifier.
 	 * 
-	 * @param ownerId
+	 * @param operatorId
 	 *            the identifier of the CSS/CIS where the identified context
 	 *            model object is stored
 	 * @param type
-	 *            the entity type, e.g. "device"
+	 *            the association type, e.g. "device"
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	public CtxEntityIdentifier(String ownerId, String type, 
+	public CtxAssociationIdentifier(String operatorId, String type,
 			Long objectNumber) {
 		
-		super(ownerId, CtxModelType.ENTITY, type, objectNumber);
+		super(operatorId, CtxModelType.ASSOCIATION, type, objectNumber);
 	}
 	
-	public CtxEntityIdentifier(String str) throws MalformedCtxIdentifierException {
+	CtxAssociationIdentifier(String str) throws MalformedCtxIdentifierException {
 		
 		super(str);
 	}
 
-	/** 
-	 * Formats the string representation of a context entity identifier as follows:
+	/**
+	 * Formats the string representation of a context association identifier as follows:
 	 * <pre> 
-	 * ownerId/ENTITY/type/objectNumber
+	 * operatorId/ASSOCIATION/type/objectNumber
 	 * </pre>
 	 * 
 	 * @see CtxIdentifier#defineString()
@@ -92,9 +92,9 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append(super.ownerId);
+		sb.append(super.operatorId);
 		sb.append("/");
-		sb.append(CtxModelType.ENTITY);
+		sb.append(CtxModelType.ASSOCIATION);
 		sb.append("/");
 		sb.append(super.type);
 		sb.append("/");
@@ -104,9 +104,9 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 	}
 
 	/**
-	 * Parses the string form of a context entity identifier as follows:
+	 * Parses the string form of a context association identifier as follows:
 	 * <pre> 
-	 * ownerId/ENTITY/type/objectNumber
+	 * operatorId/ASSOCIATION/type/objectNumber
 	 * </pre>
 	 * 
 	 * @see CtxIdentifier#parseString(java.lang.String)
@@ -114,7 +114,7 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 	@Override
 	protected void parseString(String input)
 			throws MalformedCtxIdentifierException {
-	
+		
 		super.string = input;
 
 		final int length = input.length();
@@ -127,16 +127,14 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 			super.objectNumber = new Long(objectNumberStr);
 		} catch (NumberFormatException nfe) {
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Invalid context entity object number", nfe);
+					+ "': Invalid context association object number", nfe);
 		}
 
 		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
 		super.type = input.substring(typeDelim+1, objectNumberDelim);
-// not working for android api 8
-//		if (super.type.isEmpty())
-		if (super.type.length()==0)
+		if (super.type.isEmpty())
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Context entity type cannot be empty");
+					+ "': Context association type cannot be empty");
 
 		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
 		if (modelTypeDelim == -1)
@@ -148,16 +146,14 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Malformed context model type", iae);
 		}
-		if (!CtxModelType.ENTITY.equals(super.modelType))
+		if (!CtxModelType.ASSOCIATION.equals(super.modelType))
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Expected 'ENTITY' but found '"
+					+ "': Expected 'ASSOCIATION' but found '"
 					+ super.modelType + "'");
 
-		super.ownerId = input.substring(0, modelTypeDelim);
-		// not working for android api 8
-//		if (super.ownerId.isEmpty())
-		if (super.ownerId.length()==0)
+		operatorId = input.substring(0, modelTypeDelim);
+		if (operatorId.isEmpty())
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Owner ID cannot be empty");
+					+ "': Operator ID cannot be empty");
 	}
 }

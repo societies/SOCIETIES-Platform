@@ -22,64 +22,123 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.model;
+package org.societies.android.api.context.model;
 
 /**
- * This class is used to identify context entities. It provides methods that
- * return information about the identified entity including:
+ * This class is used to identify context attributes. It provides methods
+ * that return information about the identified attribute including:
  * <ul>
- * <li><tt>OwnerId</tt>: A unique identifier of the CSS or CIS where the 
- * identified context entity is stored.</li>
+ * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
+ * entity containing the identified context attribute was first stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
- * object, i.e. {@link CtxModelType#ENTITY ENTITY}.</li>
+ * object, i.e. {@link CtxModelType#ATTRIBUTE ATTRIBUTE}.</li>
  * <li><tt>Type</tt>: A semantic tag that characterises the identified context
- * entity. e.g. "person".</li>
+ * attribute. e.g. "name".</li>
  * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
  * respective context information was initially sensed/collected and stored.</li>
  * </ul>
  * <p>
- * A context entity identifier can be represented as a URI formatted String as
- * follows:
+ * Compared to context entity or association identifiers, attribute identifiers
+ * additionally contain their <tt>Scope</tt>, i.e. the Entity identifier they
+ * are associated with. The format of the resulting identifier is as follows:
  * <pre>
- * &lt;OwnerId&gt;/ENTITY/&lt;Type&gt;/&lt;ObjectNumber&gt;
+ * &lt;Scope&gt;/ATTRIBUTE/&lt;Type&gt;/&lt;ObjectNumber&gt;
  * </pre>
+ * <p>
+ * Use the {@link #getScope()} method to retrieve the {@link CtxEntityIdentifier}
+ * representing the attribute's <tt>Scope</tt>
+ * as a <code>CtxEntityIdentifier</code> object.
  * 
+ * @see CtxEntityIdentifier
  * @see CtxIdentifier
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class CtxEntityIdentifier extends CtxIdentifier {
-
-	private static final long serialVersionUID = 1550923933016203797L;
+public class CtxAttributeIdentifier extends CtxIdentifier {
+	
+	private static final long serialVersionUID = -282171829285239788L;
+	
+	/** The scope of this context attribute identifier. */
+	private transient CtxEntityIdentifier scope;
 	
 	/**
-	 * Creates a context entity identifier by specifying the CSS/CIS ID
-	 * where the identified context model object is stored, as well as,
-	 * the entity type and the unique numeric model object identifier.
+	 * Creates a context attribute identifier by specifying the containing
+	 * entity, the attribute type and the unique numeric model object identifier
 	 * 
-	 * @param ownerId
-	 *            the identifier of the CSS/CIS where the identified context
-	 *            model object is stored
+	 * @param scope
+	 *            the {@link CtxEntityIdentifier} of the context entity containing
+	 *            the identified attribute
 	 * @param type
-	 *            the entity type, e.g. "device"
+	 *            the attribute type, e.g. "name"
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	public CtxEntityIdentifier(String ownerId, String type, 
-			Long objectNumber) {
+	public CtxAttributeIdentifier(CtxEntityIdentifier scope, String type, Long objectNumber) {
 		
-		super(ownerId, CtxModelType.ENTITY, type, objectNumber);
+		super(scope.getOperatorId(), CtxModelType.ATTRIBUTE, type, objectNumber);
+		this.scope = scope;
 	}
 	
-	public CtxEntityIdentifier(String str) throws MalformedCtxIdentifierException {
+	CtxAttributeIdentifier(String str) throws MalformedCtxIdentifierException {
 		
 		super(str);
 	}
+	
+	/**
+	 * Returns the {@link CtxEntityIdentifier} of the context entity containing
+	 * the identified attribute.
+	 * 
+	 * @return the {@link CtxEntityIdentifier} of the context entity containing
+	 *         the identified attribute.
+	 */
+	public CtxEntityIdentifier getScope() {
+		
+		return this.scope;
+	}
+	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * @since 0.0.2
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = super.hashCode();
+		
+		result = prime * result + ((this.scope == null) ? 0 : this.scope.hashCode());
+		
+		return result;
+	}
 
-	/** 
-	 * Formats the string representation of a context entity identifier as follows:
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @since 0.0.2
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (!super.equals(that))
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		CtxAttributeIdentifier other = (CtxAttributeIdentifier) that;
+		if (this.scope == null) {
+			if (other.scope != null)
+				return false;
+		} else if (!this.scope.equals(other.scope))
+			return false;
+		
+		return true;
+	}
+
+	/**
+	 * Formats the string representation of a context attribute identifier as follows:
 	 * <pre> 
-	 * ownerId/ENTITY/type/objectNumber
+	 * scope/ATTRIBUTE/type/objectNumber
 	 * </pre>
 	 * 
 	 * @see CtxIdentifier#defineString()
@@ -92,9 +151,9 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append(super.ownerId);
+		sb.append(this.scope);
 		sb.append("/");
-		sb.append(CtxModelType.ENTITY);
+		sb.append(CtxModelType.ATTRIBUTE);
 		sb.append("/");
 		sb.append(super.type);
 		sb.append("/");
@@ -104,9 +163,9 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 	}
 
 	/**
-	 * Parses the string form of a context entity identifier as follows:
+	 * Parses the string form of a context attribute identifier as follows:
 	 * <pre> 
-	 * ownerId/ENTITY/type/objectNumber
+	 * scope/ATTRIBUTE/type/objectNumber
 	 * </pre>
 	 * 
 	 * @see CtxIdentifier#parseString(java.lang.String)
@@ -127,16 +186,14 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 			super.objectNumber = new Long(objectNumberStr);
 		} catch (NumberFormatException nfe) {
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Invalid context entity object number", nfe);
+					+ "': Invalid context attribute object number", nfe);
 		}
 
 		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
 		super.type = input.substring(typeDelim+1, objectNumberDelim);
-// not working for android api 8
-//		if (super.type.isEmpty())
-		if (super.type.length()==0)
+		if (super.type.isEmpty())
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Context entity type cannot be empty");
+					+ "': Context attribute type cannot be empty");
 
 		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
 		if (modelTypeDelim == -1)
@@ -148,16 +205,21 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Malformed context model type", iae);
 		}
-		if (!CtxModelType.ENTITY.equals(super.modelType))
+		if (!CtxModelType.ATTRIBUTE.equals(super.modelType))
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Expected 'ENTITY' but found '"
+					+ "': Expected 'ATTRIBUTE' but found '"
 					+ super.modelType + "'");
 
-		super.ownerId = input.substring(0, modelTypeDelim);
-		// not working for android api 8
-//		if (super.ownerId.isEmpty())
-		if (super.ownerId.length()==0)
+		final String scopeStr = input.substring(0, modelTypeDelim);
+		if (scopeStr.isEmpty())
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Owner ID cannot be empty");
+					+ "': Context attribute scope cannot be empty");
+		try { 
+			this.scope = new CtxEntityIdentifier(scopeStr);
+		} catch (MalformedCtxIdentifierException mcie) {
+			throw new MalformedCtxIdentifierException("'" + input
+					+ "': Malformed context attribute scope", mcie);
+		}
+		super.operatorId = this.scope.getOperatorId();
 	}
 }
