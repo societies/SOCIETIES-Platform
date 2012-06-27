@@ -126,7 +126,7 @@ public class RegistryEntry implements Serializable {
 		this.serviceLocation = location.toString();
 		this.serviceStatus = serviceStatus.toString();
 		this.serviceInstance = new ServiceInstanceDAO(
-				serviceInstance.getFullJid(), serviceInstance.getCssJid(), serviceInstance.getXMPPNode(),
+				serviceInstance.getFullJid(), serviceInstance.getCssJid(), serviceInstance.getParentJid(),serviceInstance.getXMPPNode(),
 				new ServiceImplementationDAO(serviceInstance.getServiceImpl()
 						.getServiceNameSpace(), serviceInstance
 						.getServiceImpl().getServiceProvider(), serviceInstance
@@ -239,6 +239,7 @@ public class RegistryEntry implements Serializable {
 			ServiceInstance si = new ServiceInstance();
 			si.setFullJid(this.serviceInstance.getFullJid());
 			si.setCssJid(this.serviceInstance.getCssJid());
+			si.setParentJid(this.serviceInstance.getParentJid());
 			si.setXMPPNode(this.serviceInstance.getXMPPNode());
 			ServiceImplementation servImpl = new ServiceImplementation();
 			servImpl.setServiceNameSpace(this.serviceInstance.getServiceImpl()
@@ -323,10 +324,18 @@ public class RegistryEntry implements Serializable {
 		if (service.getServiceEndpoint() != null) {
 			this.setServiceEndPoint(service.getServiceEndpoint());
 		}
-		/*if (service.getServiceInstance() != null) {
+		if (service.getServiceInstance() != null) {
 			if (service.getServiceInstance().getFullJid() != null) {
 				this.getServiceInstance().setFullJid(
 						service.getServiceInstance().getFullJid());
+			}
+			if (service.getServiceInstance().getCssJid() != null) {
+				this.getServiceInstance().setCssJid(
+						service.getServiceInstance().getCssJid());
+			}
+			if (service.getServiceInstance().getParentJid() != null) {
+				this.getServiceInstance().setParentJid(
+						service.getServiceInstance().getParentJid());
 			}
 			if (service.getServiceInstance().getXMPPNode() != null) {
 				this.getServiceInstance().setXMPPNode(
@@ -364,10 +373,20 @@ public class RegistryEntry implements Serializable {
 											.getServiceImpl()
 											.getServiceVersion());
 				}
+				if (service.getServiceInstance().getServiceImpl()
+						.getServiceClient() != null) {
+					this
+							.getServiceInstance()
+							.getServiceImpl()
+							.setServiceClient(
+									service.getServiceInstance()
+											.getServiceImpl()
+											.getServiceClient().toString());
+				}
 
 			}
 
-		}*/
+		}
 		if (service.getServiceLocation()!=null){
 			this.setServiceLocation(service.getServiceLocation().toString());
 		}
@@ -380,6 +399,9 @@ public class RegistryEntry implements Serializable {
 		}
 		if (service.getServiceType()!=null){
 			this.setServiceType(service.getServiceType().toString());
+		}
+		if (service.getPrivacyPolicy() != null) {
+			this.setServiceEndPoint(service.getPrivacyPolicy());
 		}
 	}
 }
