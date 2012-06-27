@@ -67,11 +67,14 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.CisParticipant.MembershipType;
@@ -158,6 +161,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 	IServiceDiscoveryRemote iServDiscRemote;
 	@Transient
 	IServiceControlRemote iServCtrlRemote;
+	@Transient
+	IPrivacyPolicyManager privacyPolicyManager;
 	
 	@Transient
 	private IIdentity cisIdentity;
@@ -251,8 +256,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	// maximum constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
-	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote) {
-		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote);
+	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
+		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote,privacyPolicyManager);
 		this.password = password;
 		this.permaLink = permaLink;
 		this.host = host;
@@ -264,7 +269,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	// minimum constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
-			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote) {
+			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
+		
+		this.privacyPolicyManager = privacyPolicyManager;
 		
 		this.owner = cssOwner;
 		this.cisType = cisType;
@@ -327,8 +334,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	}
 	
-	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory){
+	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager){
 		
+		
+		this.privacyPolicyManager = privacyPolicyManager;
 		// first Ill try without members
 
 		try {
@@ -1083,6 +1092,22 @@ public class Cis implements IFeatureServer, ICisOwned {
 		// deleting from DB
 		this.deletePersisted(this);
 		
+		// unregistering policy
+		IIdentity cssOwnerId;
+		try {
+			cssOwnerId = this.CISendpoint.getIdManager().fromJid(this.getOwnerId());
+			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisIdentity);	
+			this.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			LOG.info("bad format in cis owner jid at delete method");
+			e1.printStackTrace();
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			LOG.info("problem deleting policy");
+			e.printStackTrace();
+		}		
+		
 		while(it.hasNext()){
 			CisParticipant element = it.next();
 			
@@ -1133,6 +1158,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 	}
 
+	public boolean unregisterCIS(){
+		boolean ret = CISendpoint.UnRegisterCommManager();
+		return ret;
+		
+	}
+	
 	// getters and setters
 	
 	public Long getId() {
@@ -1231,15 +1262,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		callback.receiveResult(resp);	
 	}
 
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-	
-	
 	
 	
 	// session related methods
