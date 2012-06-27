@@ -402,7 +402,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		Service result = null;
 
 		for(Service service: listServices){
-			Long serBundleId = Long.parseLong(service.getServiceIdentifier().getServiceInstanceIdentifier());
+			Long serBundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
 			
 			if(log.isDebugEnabled())
 				log.debug("Checking service " + service.getServiceName() + " with bundleId " + service.getServiceIdentifier().getServiceInstanceIdentifier());

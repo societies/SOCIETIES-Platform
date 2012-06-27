@@ -131,7 +131,7 @@ public class ServiceModelUtils {
 		Service result = null;
 
 		for(Service service: listServices){
-			Long serBundleId = Long.parseLong(service.getServiceIdentifier().getServiceInstanceIdentifier());
+			Long serBundleId = getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
 			
 			if(serBundleId == bundle.getBundleId()){
 				result = service;
