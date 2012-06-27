@@ -22,19 +22,27 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.collaboration;
-
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+package org.societies.api.css.devicemgmt.model;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * This class is used to provide the list of actions name constants implemented by a devices.
+ * These constants will be used to get action from the device driver services.
+ * 
+ * @author Rafik
  *
  */
-/**
- * MISSING_JAVADOCS
- */
-@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface IServiceSharingRecord {
+public class DeviceActionsConstants {
+	
+	/**
+	 * Represents the name of an action provided by the screen device simulator
+	 * This constants can be used by the 3P service to get the displayMessage action object from driver service
+	 */
+	public static final String SCREEN_DISPLAY_MESSAGE_ACTION = "displayMessage";
+	
+	/**
+	 * Represents the name of an action provided by the light sensor device simulator
+	 * This constants can be used by the 3P service to get the getLightLevel action object from driver service
+	 */
+	public static final String LIGHT_SENSOR_GET_LIGHT_LEVEL_ACTION = "getLightLevel";
 
 }

@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
-import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -154,8 +153,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public ActivityFeed activityFeed;
 	//TODO: should this be persisted?
 	@Transient
-	public Set<IServiceSharingRecord> sharedServices; 
-	@Transient
 	private ICommManager CISendpoint;
 	@Transient
 	IServiceDiscoveryRemote iServDiscRemote;
@@ -209,16 +206,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	private void setActivityFeed(ActivityFeed activityFeed) {
 		this.activityFeed = activityFeed;
-	}
-
-
-	public Set<IServiceSharingRecord> getSharedServices() {
-		return sharedServices;
-	}
-
-
-	public void setSharedServices(Set<IServiceSharingRecord> sharedServices) {
-		this.sharedServices = sharedServices;
 	}
 
 	public IServiceDiscoveryRemote getiServDiscRemote() {
@@ -285,7 +272,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.iServCtrlRemote = iServCtrlRemote;
 		this.iServDiscRemote = iServDiscRemote;
 		
-		sharedServices = new HashSet<IServiceSharingRecord>();
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
 
@@ -343,7 +329,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory){
 		
-		sharedServices = new HashSet<IServiceSharingRecord>();
 		// first Ill try without members
 
 		try {
@@ -1129,7 +1114,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
-		sharedServices = null; 
 		activityFeed = null; // TODO: replace with proper way of destroying it
 		
 		
@@ -1333,6 +1317,52 @@ public class Cis implements IFeatureServer, ICisOwned {
 		}
 	}
 	
+	
+	// TODO
+	@Override
+	public void addCisActivity(IActivity activity,ICisManagerCallback callback){
+		
+			Community result = new Community();
+			AddActivityResponse r = new AddActivityResponse();
+
+			activityFeed.addCisActivity(activity);
+			
+			r.setResult(true); //TODO. add a return on the activity feed method
+			
+			
+			result.setAddActivityResponse(r);		
+			callback.receiveResult(result);
+		
+	}
+	
+	@Override
+	public void getActivities(String timePeriod,ICisManagerCallback callback){
+		Community result = new Community();
+		GetActivitiesResponse r = new GetActivitiesResponse();
+		List<IActivity> iActivityList;
+		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+		
+		iActivityList = activityFeed.getActivities(timePeriod);
+		
+
+		Iterator<IActivity> it = iActivityList.iterator();
+		
+		while(it.hasNext()){
+			IActivity element = it.next();
+			org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
+			a.setActor(element.getActor());
+			a.setObject(a.getObject());
+			a.setPublished(a.getPublished());
+			a.setVerb(a.getVerb());
+			marshalledActivList.add(a);
+	     }
+		
+		r.setActivity(marshalledActivList);
+		result.setGetActivitiesResponse(r);		
+		
+		callback.receiveResult(result);
+				
+	}
 	
 	
 }

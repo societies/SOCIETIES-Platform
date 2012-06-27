@@ -8,8 +8,8 @@
 
     
 	<artifact type="bundle" name="org.societies.cis.manager"/>
+
 	
-    <!--<artifact type="bundle" name="org.societies.integration.test.bit.create_cis_958"/>-->
     
     
 </plan>

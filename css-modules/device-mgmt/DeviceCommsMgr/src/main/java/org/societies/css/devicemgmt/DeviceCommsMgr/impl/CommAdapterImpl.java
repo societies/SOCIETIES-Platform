@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.xml.bind.JAXBException;
 
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -39,8 +40,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
 import org.societies.api.internal.css.devicemgmt.comm.EventsType;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-import org.societies.api.schema.css.devicemanagment.DmEvent;
-
+import org.societies.api.schema.css.devicemanagement.DmEvent;
+	   
 /**
  * 
  * Describe your class here...
@@ -49,7 +50,7 @@ import org.societies.api.schema.css.devicemanagment.DmEvent;
  *
  */
 public class CommAdapterImpl implements DmCommManager{
-
+										
 	public static final String SCHEMA = "org.societies.api.schema.css.devicemanagement";
 
 	private IIdentityManager idManager;
@@ -90,18 +91,26 @@ public class CommAdapterImpl implements DmCommManager{
 		return dmEvent;
 	}
 	
-	@SuppressWarnings("unused")
-	@PostConstruct
+	//@SuppressWarnings("unused")
+	//@PostConstruct
 	private void init(){
 		idManager = commManager.getIdManager();
 		try {
+			List<String> packageList = new ArrayList<String>();
+			packageList.add(SCHEMA);
+			pubSubManager.addJaxbPackages(packageList);
+			
 			IIdentity pubsubID = idManager.getThisNetworkNode();
 			pubSubManager.ownerCreate(pubsubID, EventsType.DEVICE_CONNECTED);
 			pubSubManager.ownerCreate(pubsubID, EventsType.DEVICE_DISCONNECTED);
+			
 		} catch (XMPPError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -111,10 +120,6 @@ public class CommAdapterImpl implements DmCommManager{
 		try{
 			idManager = commManager.getIdManager();
 			IIdentity pubsubID = idManager.getThisNetworkNode();
-			
-			List<String> packageList = new ArrayList<String>();
-			packageList.add(SCHEMA);
-			pubSubManager.addJaxbPackages(packageList);
 			String published = pubSubManager.publisherPublish(pubsubID, type,dmEvent.getDeviceId(), dmEvent);
 			
 		}catch (Exception e){
@@ -128,6 +133,9 @@ public class CommAdapterImpl implements DmCommManager{
 
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
+		if (this.commManager != null && this.pubSubManager != null){
+			init();
+		}
 	}
 	
 	public PubsubClient getPubSubManager() {
@@ -136,6 +144,9 @@ public class CommAdapterImpl implements DmCommManager{
 
 	public void setPubSubManager(PubsubClient pubSubManager) {
 		this.pubSubManager = pubSubManager;
+		if (this.commManager != null && this.pubSubManager != null){
+			init();
+		}
 	}
 
 }

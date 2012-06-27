@@ -70,7 +70,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		
         final Map<TrustEvidenceType, Double> aMap = new HashMap<TrustEvidenceType, Double>();
         aMap.put(TrustEvidenceType.JOINED_COMMUNITY, +5.0d);
-        aMap.put(TrustEvidenceType.LEFT_COMMUNITY, -10.0d);
+        aMap.put(TrustEvidenceType.LEFT_COMMUNITY, -50.0d);
         aMap.put(TrustEvidenceType.USED_SERVICE, +1.0d);
         EVIDENCE_SCORE_MAP = Collections.unmodifiableMap(aMap);
     }

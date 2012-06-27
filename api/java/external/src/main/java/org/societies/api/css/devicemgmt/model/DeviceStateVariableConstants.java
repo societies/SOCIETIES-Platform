@@ -22,22 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.collaboration;
+package org.societies.api.css.devicemgmt.model;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * This class is used to provide the list of state variable name constants used by a device actions.
+ * These constants will be used to get state variables from the device driver services.
+ * 
+ * @author Rafik
  *
  */
-/**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
- */
-
-public interface ICisSubscriptionManager {
-	Boolean addSubscriptionRecord(ICisSubscriptionRecord record);
-	Boolean updateSubscriptionRecord(ICisSubscriptionRecord record);
-	Boolean deleteSubscriptionRecord(ICisSubscriptionRecord record);
-	ICisSubscriptionRecord getSubscriptionRecord(String cssId, String cisId);
-	ICisSubscriptionRecord[] getSubscriptionRecords(String cssId);
+public class DeviceStateVariableConstants {
+	
+	/**
+	 * Represents the name of a sate variable provided by the light sensor device simulator
+	 * This constants can be used by the 3P service to get the lightLevel state variable object from driver service
+	 */
+	public static final String LIGHT_LEVEL_STATE_VARIABLE = "lightLevel";
 
 }

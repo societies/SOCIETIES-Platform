@@ -49,13 +49,13 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 
 	private ServiceResourceIdentifier myServiceID;
 	private IUserActionMonitor uam; 
-	Hashtable<IIdentity, String> colours;
-	Hashtable<IIdentity, String> volumes;
+	String bgColour;
+	String volume;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
 	public HelloWorld(){
-		colours = new Hashtable<IIdentity, String>();
-		volumes = new Hashtable<IIdentity, String>();
+		bgColour = "";
+		volume = "";
 		myServiceID = new ServiceResourceIdentifier();
 		myServiceID.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
 		try {
@@ -84,9 +84,9 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	public boolean setIAction(IIdentity userId, IAction action) {
 		log("Received action: "+action.toString());
 		if (action.getparameterName().equalsIgnoreCase("bgColour")){
-			this.colours.put(userId, action.getvalue());
+			this.bgColour = action.getvalue();
 		}else if (action.getparameterName().equalsIgnoreCase("volume")){
-			this.volumes.put(userId, action.getvalue());
+			this.volume = action.getvalue();
 		}
 		return true;
 	}
@@ -117,19 +117,12 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	}
 	@Override
 	public String getBackgroundColour(IIdentity userId) {
-		if (this.colours.containsKey(userId)){
-			return this.colours.get(userId);
-		}
-		
-		return "";
+		return this.bgColour;
 	}
+	
 	@Override
 	public String getVolume(IIdentity userId) {
-		if (this.volumes.containsKey(userId)){
-			return this.volumes.get(userId);
-		}
-		
-		return "";
+		return this.volume;
 		
 	}
 	private void log(String msg){
