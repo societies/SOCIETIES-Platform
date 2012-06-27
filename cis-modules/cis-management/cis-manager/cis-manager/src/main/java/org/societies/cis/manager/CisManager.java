@@ -142,7 +142,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		 
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory());
+			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager);
 			 element.setiServCtrlRemote(this.iServCtrlRemote);
 			 element.setiServDiscRemote(this.iServDiscRemote);
 	     }
@@ -272,64 +272,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	@Override
 	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
-			ICisOwned i = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode);
+		String pPolicy = "<RequestPolicy><Target></RequestPolicy></Target>";	
+		ICisOwned i = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode,pPolicy);
 			return new AsyncResult<ICisOwned>(i);
 		
 	}
 	
 	@Override
 	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy) {
-		// -- Verification
-		// Dependency injection
-		if (!isDepencyInjectionDone(1)) {
-			LOG.error("[Dependency Injection] CisManager::createCis not ready");
-			return new AsyncResult<ICisOwned>(null);
-		}
-		// Parameters
-		if ((null == cssId || "".equals(cssId))
-				|| (null == privacyPolicy || "".equals(privacyPolicy))) {
-			LOG.error("CisManager::createCis is missing data");
-			return new AsyncResult<ICisOwned>(null);
-		}
-		
-		// -- Create the new CIS
-		ICisOwned cisOwned = null;
-		try {
-			// -- Retrieve the CSS owner identity
-			IIdentity cssOwnerId = iCommMgr.getIdManager().fromJid(cssId);
-			
-			// -- Create the CIS	
-			cisOwned = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode);
-			if (null == cisOwned) {
-				LOG.error("This CIS has not been created, neither its privacy policy");
-				return new AsyncResult<ICisOwned>(null);
-			}
-			
-			// -- Store this CIS Privacy Policy
-			// Retrieve the CSS and CIS identities
-			IIdentity cisId = iCommMgr.getIdManager().fromJid(cisOwned.getCisId());
-			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisId);
-			
-			// Store this CIS Privacy Policy
-			privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);
-		} catch (PrivacyException e) {
-			LOG.error("The privacy policy can't be stored.", e);
-			if (null != cisOwned) {
-				deleteCis(cssId, cssPassword, cisOwned.getCisId());
-			}
-			LOG.error("CIS deleted.");
-			return new AsyncResult<ICisOwned>(null);
-		} catch (InvalidFormatException e) {
-			LOG.error("The CSS or CIS identities can't be retrieved.", e);
-			if (null != cisOwned) {
-				deleteCis(cssId, cssPassword, cisOwned.getCisId());
-			}
-			LOG.error("CIS deleted.");
-			return new AsyncResult<ICisOwned>(null);
-		}
-		
-		// -- Return the CIS
-		return new AsyncResult<ICisOwned>(cisOwned);
+		ICisOwned i = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode, privacyPolicy);
+		return new AsyncResult<ICisOwned>(i);
 	}
 	
 	
@@ -366,19 +318,63 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	
 	// local version of the createCis
-	private ICisOwned localCreateCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
+	private ICisOwned localCreateCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy) {
 		// TODO: how do we check fo the cssID/pwd?
 		//if(cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid()) == false){ // if the cssID does not match with the host owner
 		//	LOG.info("cssID does not match with the host owner");
 		//	return null;
 		//}
+		
+		// -- Verification
+		// Dependency injection
+		if (!isDepencyInjectionDone(1)) {
+			LOG.error("[Dependency Injection] CisManager::createCis not ready");
+			return null;
+		}
+		// Parameters
+		if ((null == cssId || "".equals(cssId))
+				|| (null == privacyPolicy || "".equals(privacyPolicy))) {
+			return null;
+		}
+				
 		// TODO: review this logic as maybe I should probably check if it exists before creating
-		
-		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote);
-		
+
+		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager);
 		if(cis == null)
 			return cis;
+
+		// PRIVACY POLICY CODE
+
+		try {
+			IIdentity cssOwnerId = this.iCommMgr.getIdManager().fromJid(cssId);
+			IIdentity cisId = iCommMgr.getIdManager().fromJid(cis.getCisId());
+			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisId);
+			privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
+		} catch (InvalidFormatException e) {
+			LOG.error("CIS or CSS jid came in bad format");
+			e.printStackTrace();
+			return null;
+		} catch (PrivacyException e) {
+			LOG.error("The privacy policy can't be stored.", e);
+			if (null != cis) {
+				cis.unregisterCIS();
+			}
+			LOG.error("CIS deleted.");
+			e.printStackTrace();
+			return null;
+		}
+
 		
+		
+		//
+		
+		
+		// persisting
+		LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
+		this.persist(cis);
+		cis.setSessionFactory(sessionFactory);
+
+
 		// advertising the CIS to global CIS directory
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
 		cisAd.setMode(cis.getMembershipCriteria());
@@ -387,10 +383,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		cisAd.setType(cis.getCisType());
 		cisAd.setId(cis.getCisId());
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
+
 		
-		LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
-		this.persist(cis);
-		cis.setSessionFactory(sessionFactory);
+		
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
 			return i;
@@ -501,8 +496,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 				if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
 					int cisMode = create.getMembershipMode().intValue();
-
-					ICisOwned icis = localCreateCis(ownerJid, ownerPassword, cisName, cisType, cisMode);
+					String pPolicy = "<RequestPolicy><Target></RequestPolicy></Target>";	
+					ICisOwned icis = localCreateCis(ownerJid, ownerPassword, cisName, cisType, cisMode,pPolicy);
 
 					
 					create.setCommunityJid(icis.getCisId());
