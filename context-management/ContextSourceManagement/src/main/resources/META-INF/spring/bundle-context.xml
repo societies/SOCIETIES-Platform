@@ -25,7 +25,7 @@
 
 
    <bean id="ContextSourceManagement" class="org.societies.context.source.impl.ContextSourceManagement" 
-   depends-on="ctxBroker,deviceManager" name="ContextSourceManagement" init-method="initialise">
+   depends-on="ctxBroker,deviceManager,eventManager" name="ContextSourceManagement" init-method="activate" destroy-method="deactivate">
 		  <property name="ctxBroker" ref="ctxBroker"></property>
 		  <property name="deviceManager" ref="deviceManager"></property>
 		<property name="eventManager" ref ="EventManager" />

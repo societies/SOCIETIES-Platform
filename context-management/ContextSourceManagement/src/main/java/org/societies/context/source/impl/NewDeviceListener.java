@@ -27,7 +27,7 @@ import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.springframework.osgi.context.BundleContextAware;
 
-public class NewDeviceListener extends EventListener implements ServiceTrackerCustomizer, BundleContextAware, Runnable{
+public class NewDeviceListener extends EventListener implements ServiceTrackerCustomizer, BundleContextAware{
 	private static Logger LOG = LoggerFactory.getLogger(ContextSourceManagement.class);
 	private BundleContext bundleContext;
 	private ServiceTracker serviceTracker;
@@ -37,6 +37,7 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 	
 	private ArrayList<IDevice> newDevices = new ArrayList<IDevice>();
 	private ContextSourceManagement csm;
+	private boolean RUNNING_MODE = true;
 	
 	/* --- Injections --- */
 	/**
@@ -78,11 +79,18 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 
 	
 
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
 	public void run() {
+		while(RUNNING_MODE){
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if (LOG.isDebugEnabled())
+				LOG.debug("NewDeviceListener: keeps looking");
+		}
+
+		//TODO
 		// -- Subscribe to LightSensorEvent
 		// Set filter
 		String lightEventFilter = "(&" + 
@@ -102,8 +110,7 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 				")";
 		// Subscribe
 		eventManager.subscribeInternalEvent(this, new String[] {EventTypes.DEVICE_MANAGEMENT_EVENT}, screenEventFilter);
-		LOG.info("Subscribe to internal event: org/societies/css/device -> sensor/lightSensorEvent");	
-
+		LOG.info("Subscribe to internal event: org/societies/css/device -> sensor/lightSensorEvent");
 		
 		// TODO Auto-generated method stub
 		
@@ -292,6 +299,16 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 	@Override
 	public void handleExternalEvent(CSSEvent event) {
 		if (LOG.isDebugEnabled()) LOG.debug("NewDeviceListener has received external Event: "+event.geteventType());
+	}
+
+	/**
+	 * 
+	 */
+	public void stop() {
+		RUNNING_MODE = false;
+		
+		//TODO unregister all
+		eventManager.unSubscribeInternalEvent(this, new String[]{EventTypes.DEVICE_MANAGEMENT_EVENT}, filterOption)
 	}
 
 }
