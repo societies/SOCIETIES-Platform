@@ -37,15 +37,15 @@ import org.societies.api.identity.Requestor;
  *
  */
 public class PrivacyPolicyRegistry implements Serializable{
+	private static final long serialVersionUID = -7184601590881429985L;
+	private Hashtable<Integer, CtxIdentifier> policies;
 
 
-	private Hashtable<Requestor,CtxIdentifier> policies;
-
-	
 	public PrivacyPolicyRegistry(){
-		this.policies = new Hashtable<Requestor, CtxIdentifier>();		
+		this.policies = new Hashtable<Integer, CtxIdentifier>();		
 	}
 	
+
 	/**
 	 * method to retrieve a policy document from the registry
 	 * @param requestor		the serviceID of the service or Identity of CIS for which the policy is for
@@ -55,12 +55,12 @@ public class PrivacyPolicyRegistry implements Serializable{
 		if (requestor==null){
 			return null;
 		}
-		if (this.policies.containsKey(requestor)){
-			return this.policies.get(requestor);
+		if (this.policies.containsKey(requestor.hashCode())){
+			return this.policies.get(requestor.hashCode());
 		}
 		return null;
 	}
-	
+
 	/**
 	 * method to add a service policy document to the registry object
 	 * @param requestor	the serviceID of the service or the IIdentity of the CIS for which this policy is for
@@ -68,11 +68,11 @@ public class PrivacyPolicyRegistry implements Serializable{
 	 */
 	public void addPolicy (Requestor requestor, CtxIdentifier ctxID){
 		if (this.policies == null){
-			this.policies = new Hashtable<Requestor, CtxIdentifier>();	
+			this.policies = new Hashtable<Integer, CtxIdentifier>();	
 		}
-		this.policies.put(requestor, ctxID);
+		this.policies.put(requestor.hashCode(), ctxID);
 	}
-	
+
 	/**
 	 * method to check if any policies exist in the registry
 	 * @return
@@ -86,7 +86,7 @@ public class PrivacyPolicyRegistry implements Serializable{
 	 * 
 	 * @param newPublicDPI the new public DPI 
 	 */
-/*	public void setPublicDPIinServiceID(IDigitalPersonalIdentifier newPublicDPI){
+	/*	public void setPublicDPIinServiceID(IDigitalPersonalIdentifier newPublicDPI){
 		Enumeration<IServiceIdentifier> serviceIDs = this.policies.keys();
 		while (serviceIDs.hasMoreElements()){
 			IServiceIdentifier oldserviceID = serviceIDs.nextElement();
@@ -97,7 +97,7 @@ public class PrivacyPolicyRegistry implements Serializable{
 			this.policies.remove(oldserviceID);
 			this.policies.put(pssID, policy);
 		}
- 
+
 	}*/
 
 	public void replaceServiceIdentifier(Requestor oldRequestor, Requestor newRequestor){
@@ -106,31 +106,27 @@ public class PrivacyPolicyRegistry implements Serializable{
 			return;
 		}
 		this.policies.remove(oldRequestor);
-		this.policies.put(newRequestor, ctxID);
+		this.policies.put(newRequestor.hashCode(), ctxID);
 	}
-	
-public void removePolicy(Requestor requestor){
-		
-		if (this.policies.containsKey(requestor)){
-			this.policies.remove(requestor);
+
+	public void removePolicy(Requestor requestor){
+
+		if (this.policies.containsKey(requestor.hashCode())){
+			this.policies.remove(requestor.hashCode());
 		}
 	}
 
-/**
- * @return the policies
- */
-public Hashtable<Requestor, CtxIdentifier> getPolicies() {
-	return policies;
-}
+	/**
+	 * @return the policies
+	 */
+	public Hashtable<Integer, CtxIdentifier> getPolicies() {
+		return policies;
+	}
 
-/**
- * @param policies the policies to set
- */
-public void setPolicies(Hashtable<Requestor, CtxIdentifier> policies) {
-	this.policies = policies;
-}
-
-
-
-	
+	/**
+	 * @param policies the policies to set
+	 */
+	public void setPolicies(Hashtable<Integer, CtxIdentifier> policies) {
+		this.policies = policies;
+	}
 }

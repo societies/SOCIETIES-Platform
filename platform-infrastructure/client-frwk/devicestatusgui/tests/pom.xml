@@ -23,10 +23,6 @@
 			<artifactId>android-test</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>android</groupId>
-			<artifactId>android</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.societies.android.platform</groupId>
 			<artifactId>devicestatus</artifactId>
 			<version>${release.version}</version>

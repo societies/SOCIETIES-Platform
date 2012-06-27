@@ -191,7 +191,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 
 		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
 		super.type = input.substring(typeDelim+1, objectNumberDelim);
-		if (super.type.isEmpty())
+		if (super.type.length()==0)
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Context attribute type cannot be empty");
 
@@ -211,7 +211,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 					+ super.modelType + "'");
 
 		final String scopeStr = input.substring(0, modelTypeDelim);
-		if (scopeStr.isEmpty())
+		if (scopeStr.length()==0)
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Context attribute scope cannot be empty");
 		try { 

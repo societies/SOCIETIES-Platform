@@ -166,15 +166,15 @@ public class XMLPolicyReader {
 				targets = this.readTargets(targetXML);
 			}else{
 				this.log("No requested Targets in XML file");
-				return null;
+				targets = new ArrayList<RequestItem>();
 			}
 			
 //			if (subject == null){
 //				return null;
 //			}
-			if (targets == null){
-				return null;
-			}
+//			if (targets == null){
+//				return null;
+//			}
 			
 			return new RequestPolicy(subject,targets);
 			
