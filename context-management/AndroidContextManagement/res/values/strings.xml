@@ -12,5 +12,9 @@
     <string name="communityctx_name">Community Context</string>
     <string name="createctx_entity">Create Entity</string>
     <string name="createctx_attribute">Create Attribute</string>
-    
+    <string name="createctx_association">Create Association</string>
+    <string name="lookup">Lookup</string>
+    <string name="lookup_entities">Lookup Entities</string>
+    <string name="update">Update</string>
+        
 </resources>

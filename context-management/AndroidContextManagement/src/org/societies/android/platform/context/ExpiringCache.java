@@ -101,4 +101,8 @@ class ExpiringCache<K, V> {
         }
         queryCount = 0;
     }
+    
+    synchronized Set<K> keySet() {
+    	return map.keySet();
+    }
 }

@@ -25,7 +25,9 @@
 
 package org.societies.android.platform.context;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +43,10 @@ import org.societies.android.api.context.broker.ICtxClientBroker;
 
 /// allaksa se kanoniko api
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -53,6 +57,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -134,10 +139,21 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		return this.binder;
 	}
 
-	public CtxAssociation createAssociation(String arg0)
+	public CtxAssociation createAssociation(String type)
 			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+
+		final CtxAssociationIdentifier identifier;
+		
+		identifier = new CtxAssociationIdentifier(this.privateIdtoString, 
+				type, CtxModelObjectNumberGenerator.getNextValue());
+
+		final CtxAssociation association = new  CtxAssociation(identifier);
+		cache.put(association.getId(), association);		
+
+		return association;
 	}
 
 	public CtxAttribute createAttribute(CtxEntityIdentifier scope,
@@ -160,6 +176,7 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 //		this.modelObjects.put(attribute.getId(), attribute);
 		cache.put(attribute.getId(), attribute);
 		entity.addAttribute(attribute);
+		Log.d(LOG_TAG, "Attribute cached - " + attribute);
 		
 		return attribute;
 		// on internalctxbroker
@@ -180,6 +197,7 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 			Log.d(LOG_TAG, "Problem with maps key!!");
 	//	modelObjects.put(entity.getId(), entity);
 		cache.put(entity.getId(), entity);
+		Log.d(LOG_TAG, "Entity cached - " + entity);
 		
 		return entity;
 	}
@@ -213,17 +231,70 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		return null;
 	}
 
-	public List<CtxIdentifier> lookup(CtxModelType arg0, String arg1)
+	public List<CtxIdentifier> lookup(CtxModelType modelType, String type)
 			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		final List<CtxIdentifier> foundList = new ArrayList<CtxIdentifier>();
+	
+		for (CtxIdentifier identifier : cache.keySet()) {
+			if (identifier.getModelType().equals(modelType) && identifier.getType().equals(type)) {
+				foundList.add(identifier);
+			}		
+		}
+		return foundList;
 	}
 
-	public List<CtxEntityIdentifier> lookupEntities(String arg0,
-			String arg1, Serializable arg2, Serializable arg3)
+	public List<CtxEntityIdentifier> lookupEntities(String entityType,
+			String attribType, Serializable minAttribValue,
+			Serializable maxAttribValue)
 			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+        final List<CtxEntityIdentifier> foundList = new ArrayList<CtxEntityIdentifier>();
+        for (CtxIdentifier identifier : cache.keySet()) {
+            if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)
+                    && identifier.getType().equals(attribType)) {
+                final CtxAttribute attribute = (CtxAttribute) cache.get(identifier);
+//                if (attribute.getScope().getType().equals(entityType) && attribute.getValue().equals(minAttribValue)) {
+                if (attribute.getScope().getType().equals(entityType)) {
+                	if (minAttribValue instanceof String && maxAttribValue instanceof String) {
+                		if (attribute.getStringValue()!=null) {
+		                	String valueStr = attribute.getStringValue();
+		                		if(valueStr.compareTo(minAttribValue.toString()) >=0 && valueStr.compareTo(maxAttribValue.toString()) <=0)
+		               				foundList.add(attribute.getScope());                			
+        				}
+                	} else if (minAttribValue instanceof Integer && maxAttribValue instanceof Integer) {
+                		if(attribute.getIntegerValue()!=null) {
+		               		Integer valueInt = attribute.getIntegerValue();
+		          			if(valueInt.compareTo((Integer) minAttribValue) >=0 && valueInt.compareTo((Integer) maxAttribValue) <=0)
+		               			foundList.add(attribute.getScope());
+                		}
+                	} else if (minAttribValue instanceof Double && maxAttribValue instanceof Double) {
+                		if(attribute.getDoubleValue()!=null) {
+		               		Double valueDouble = attribute.getDoubleValue();
+		           			if(valueDouble.compareTo((Double) minAttribValue) >= 0 && valueDouble.compareTo((Double) maxAttribValue) <= 0)
+		               			foundList.add(attribute.getScope());                			
+                		}
+                	} else {
+                		byte[] valueBytes;
+                		byte[] minValueBytes;
+                		byte[] maxValueBytes;
+						try {
+							minValueBytes = SerialisationHelper.serialise(minAttribValue);
+							maxValueBytes = SerialisationHelper.serialise(maxAttribValue);
+							valueBytes = SerialisationHelper.serialise(attribute.getBinaryValue());
+							if (Arrays.equals(minValueBytes, maxValueBytes))
+								if (Arrays.equals(valueBytes, minValueBytes))
+									foundList.add(attribute.getScope());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}                		
+                	}
+                	
+                }
+            }
+        }
+        return foundList;
 	}
 
 	public void registerForChanges(CtxChangeEventListener arg0,
@@ -250,10 +321,10 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		return null;
 	}
 
-	public CtxModelObject retrieve(CtxIdentifier arg0)
+	public CtxModelObject retrieve(CtxIdentifier id)
 			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		return this.cache.get(id);
 	}
 
 	public IndividualCtxEntity retrieveAdministratingCSS(
@@ -298,10 +369,36 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		
 	}
 
-	public CtxModelObject update(CtxModelObject arg0)
+	public CtxModelObject update(CtxModelObject modelObject)
 			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (cache.keySet().contains(modelObject.getId())) {
+			cache.put(modelObject.getId(), modelObject);
+		}
+		
+		 if (modelObject instanceof CtxAssociation) {
+
+			   CtxEntity ent = null;
+			   CtxEntityIdentifier entId;
+
+			   // Add association to parent entity
+			   entId = ((CtxAssociation) modelObject).getParentEntity();
+			   if (entId != null)
+			     ent = (CtxEntity) this.retrieve(entId);
+			     if (ent != null)
+			       ent.addAssociation(((CtxAssociation) modelObject).getId());
+
+			    // Add association to child entities
+			    Set<CtxEntityIdentifier> entIds = ((CtxAssociation) modelObject).getChildEntities();
+			    for (CtxEntityIdentifier entIdent : entIds) {
+			    	//entIdent = ((CtxAssociation) modelObject).getParentEntity();
+			    	ent = (CtxEntity) this.retrieve(entIdent);
+			    	if (ent != null)
+			    		ent.addAssociation(((CtxAssociation) modelObject).getId());
+			    }
+		}
+			      
+		return modelObject;
 	}
 
 	public CtxAttribute updateAttribute(CtxAttributeIdentifier arg0,
@@ -322,45 +419,5 @@ public class ContextManagement extends Service implements ICtxClientBroker{
 		// TODO Auto-generated method stub
 		return null;
 	}	
-	
-	
-	/*
-	 * Callback - not needed
-	 */
-/*	private class UserAgentCallback implements ICommCallback{
 
-		public List<String> getJavaPackages() {
-			return PACKAGES;
-		}
-
-		public List<String> getXMLNamespaces() {
-			return NAME_SPACES;
-		}
-
-		public void receiveError(Stanza arg0, XMPPError arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		public void receiveMessage(Stanza arg0, Object arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		public void receiveResult(Stanza arg0, Object arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	} */
 }
