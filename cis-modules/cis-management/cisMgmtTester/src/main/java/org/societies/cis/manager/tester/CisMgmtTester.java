@@ -87,12 +87,29 @@ public class CisMgmtTester {
 		this.cisClient = cisClient;
 		LOG.info("got autowired reference, target cisId is " + targetCisId);
 
+		ICis icis = cisClient.getCis("xcmanager1.thomas.local", targetCisId);
+
+		if(icis == null){
+			LOG.info("could not retrieve CIS");
+		}
+		
+		IActivity iActivity = new org.societies.activity.model.Activity();
+		iActivity.setActor("act");
+		iActivity.setObject("obj");
+		iActivity.setTarget("tgt");
+		iActivity.setPublished((System.currentTimeMillis() -55) + "");
+		iActivity.setVerb("verb");
+
+		LOG.info("calling add activity remote");				
+		AddActivityCallBack h = new AddActivityCallBack();
+		icis.addCisActivity(iActivity, h);
+		LOG.info("add activity remote done");
 
 	
-		LOG.info("join a remote CIS");
+/*		LOG.info("join a remote CIS");
 		this.cisClient.joinRemoteCIS(targetCisId, icall);
 		LOG.info("join sent");
-
+*/
 		
 
 		
@@ -132,7 +149,7 @@ public class CisMgmtTester {
 				icis.addCisActivity(iActivity, h);
 				LOG.info("add activity remote done");
 				
-				iActivity.setTarget("New tgt");
+/*				iActivity.setTarget("New tgt");
 				iActivity.setPublished((System.currentTimeMillis()) + "");
 
 				LOG.info("calling 2nds add activity remote");				
@@ -152,7 +169,7 @@ public class CisMgmtTester {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+*/				
 			
 				
 			}
