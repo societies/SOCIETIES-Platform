@@ -226,7 +226,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			serviceBundle.start();
 			
 			if(logger.isDebugEnabled())
-				logger.debug("Bundle " + serviceBundle.getSymbolicName() + " is now in state " + getStateName(serviceBundle.getState()));
+				logger.debug("Bundle " + serviceBundle.getSymbolicName() + " is now in state " + ServiceModelUtils.getBundleStateName(serviceBundle.getState()));
 			
 			if(serviceBundle.getState() == Bundle.ACTIVE ){
 				logger.info("Service " + service.getServiceName() + " has been started.");
@@ -329,7 +329,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			serviceBundle.stop();
 			
 			if(logger.isDebugEnabled())
-				logger.debug("Bundle " + serviceBundle.getSymbolicName() + " is now in state " + getStateName(serviceBundle.getState()));
+				logger.debug("Bundle " + serviceBundle.getSymbolicName() + " is now in state " + ServiceModelUtils.getBundleStateName(serviceBundle.getState()));
 			
 			if(serviceBundle.getState() == Bundle.RESOLVED ){
 				logger.info("Service " + service.getServiceName() + " has been stopped.");
@@ -434,6 +434,11 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					// We get the service from the registry
 					Service newService = getServiceReg().retrieveService(result.getServiceId());
 					
+					ServiceInstance newServiceInstance = newService.getServiceInstance();
+					newServiceInstance.setParentJid(serviceToInstall.getServiceInstance().getFullJid());
+					newService.setServiceInstance(newServiceInstance);
+					getServiceReg().updateRegisteredService(newService);
+					
 					//
 					logger.info("Installed shared third-party service client!");
 					returnResult.setServiceId(result.getServiceId());
@@ -520,7 +525,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			if(logger.isDebugEnabled()){
 				logger.debug("Service bundle "+newBundle.getSymbolicName() +" has been installed with id: " + newBundle.getBundleId());
-				logger.debug("Service bundle "+newBundle.getSymbolicName() +" is in state: " + getStateName(newBundle.getState()));
+				logger.debug("Service bundle "+newBundle.getSymbolicName() +" is in state: " + ServiceModelUtils.getBundleStateName(newBundle.getState()));
 			}
 			
 			//Before we start the bundle we prepare the entry on the hashmap
@@ -788,26 +793,6 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 	}
 	
-	/**
-	 * This method returns the textual description of a Bundle state
-	 * 
-	 * @param the state of the service
-	 * @return The textual description of the bundle's state
-	 */
-	private String getStateName(int state){
-		
-		switch(state){
-		
-			case Bundle.ACTIVE: return "ACTIVE";
-			case Bundle.INSTALLED: return "INSTALLED";
-			case Bundle.RESOLVED: return "RESOLVED";
-			case Bundle.STARTING: return "STARTING";
-			case Bundle.STOPPING: return "STOPPING";
-			case Bundle.UNINSTALLED: return "UNINSTALLED";
-			default: return null;
-		}
-	}
-
 	
 	/**
 	 * This method is used to obtain the Bundle that corresponds to a given a Service
@@ -820,8 +805,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		if(logger.isDebugEnabled()) logger.debug("Obtaining Bundle that corresponds to a service...");
 		
 		// First we get the bundleId
-		 long bundleId = Long.parseLong(service.getServiceIdentifier().getServiceInstanceIdentifier());
-		
+		 long bundleId = ServiceModelUtils.getBundleIdFromServiceIdentifier(service.getServiceIdentifier());
+				 
 		 if(logger.isDebugEnabled())
 			 logger.debug("The bundle Id is " + bundleId);
 		 
@@ -829,7 +814,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		 Bundle result = bundleContext.getBundle(bundleId);
 
 		 if(logger.isDebugEnabled()) 
-				logger.debug("Bundle is " + result.getSymbolicName() + " with id: " + result.getBundleId() + " and state: " + getStateName(result.getState()));
+				logger.debug("Bundle is " + result.getSymbolicName() + " with id: " + result.getBundleId() + " and state: " + ServiceModelUtils.getBundleStateName(result.getState()));
 			
 		// Finally, we return
 		 return result;
@@ -919,7 +904,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			case CSS_RICH:
 			case CSS_LIGHT:
 				if(logger.isDebugEnabled()) logger.debug("For now, sharing to specific CSS is not supported");
-				//break;
+				break;
 			case CIS:
 				if(logger.isDebugEnabled()) logger.debug("Sharing with a CIS: " + node.getJid());
 				
@@ -1043,7 +1028,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			case CSS_RICH:
 			case CSS_LIGHT:
 				if(logger.isDebugEnabled()) logger.debug("For now, sharing to specific CSS is not supported");
-				//break;
+				break;
 			case CIS:
 				if(logger.isDebugEnabled()) logger.debug("Removing sharing with a CIS: " + node.getJid());
 				
