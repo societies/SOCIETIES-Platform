@@ -15,7 +15,7 @@
 	<name>Device Status GUI</name>
 	<version>${release.version}</version>
 	<packaging>apk</packaging>
-	
+
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>
@@ -31,15 +31,22 @@
 
 
 	<dependencies>
+		<!-- Societies -->
 		<dependency>
-		        <groupId>com.google.android</groupId>
-            		<artifactId>android</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.android.platform</groupId>
-			<artifactId>CoreInterfaces</artifactId>
+			<groupId>org.societies.android.api.external</groupId>
+			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.phonegap</groupId>
