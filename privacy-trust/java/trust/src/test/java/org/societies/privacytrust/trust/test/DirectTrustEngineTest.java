@@ -151,8 +151,7 @@ public class DirectTrustEngineTest {
 		for (int i = 0; i < TRUSTED_SERVICE_LIST_SIZE; ++i) {
 			final TrustedEntityId serviceTeid = 
 					new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID_BASE+i);
-			trustedServiceList.add(new TrustedService(serviceTeid,
-					trustedServiceTypeList.get(i%TRUSTED_SERVICE_TYPE_LIST_SIZE)));
+			trustedServiceList.add(new TrustedService(serviceTeid));
 		}
 		
 		this.engine = new DirectTrustEngine(mockTrustEventMgr);
