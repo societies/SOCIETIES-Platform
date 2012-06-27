@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +109,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private MessageBox myMessageBox;
 	
 	public PrivacyPreferenceManager(){
+		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
 		}
