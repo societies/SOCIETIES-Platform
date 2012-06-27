@@ -434,6 +434,11 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					// We get the service from the registry
 					Service newService = getServiceReg().retrieveService(result.getServiceId());
 					
+					ServiceInstance newServiceInstance = newService.getServiceInstance();
+					newServiceInstance.setParentJid(serviceToInstall.getServiceInstance().getFullJid());
+					newService.setServiceInstance(newServiceInstance);
+					getServiceReg().updateRegisteredService(newService);
+					
 					//
 					logger.info("Installed shared third-party service client!");
 					returnResult.setServiceId(result.getServiceId());
@@ -919,7 +924,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			case CSS_RICH:
 			case CSS_LIGHT:
 				if(logger.isDebugEnabled()) logger.debug("For now, sharing to specific CSS is not supported");
-				//break;
+				break;
 			case CIS:
 				if(logger.isDebugEnabled()) logger.debug("Sharing with a CIS: " + node.getJid());
 				
@@ -1043,7 +1048,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			case CSS_RICH:
 			case CSS_LIGHT:
 				if(logger.isDebugEnabled()) logger.debug("For now, sharing to specific CSS is not supported");
-				//break;
+				break;
 			case CIS:
 				if(logger.isDebugEnabled()) logger.debug("Removing sharing with a CIS: " + node.getJid());
 				

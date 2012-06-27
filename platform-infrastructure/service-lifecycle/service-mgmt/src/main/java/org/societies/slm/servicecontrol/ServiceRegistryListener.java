@@ -165,7 +165,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 				// serviceMeteData.put(key, value);
 			}
 		
-		log.debug("Bundle Id: " + serBndl.getBundleId() + " Bundle State: "
+			log.debug("Bundle Id: " + serBndl.getBundleId() + " Bundle State: "
 				+ serBndl.getState() + "  Bundle Symbolic Name: "
 				+ serBndl.getSymbolicName());
 		}
@@ -189,6 +189,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		INetworkNode myNode = commMngr.getIdManager().getThisNetworkNode();
 		si.setFullJid(myNode.getJid());
 		si.setCssJid(myNode.getBareJid());
+		si.setParentJid(myNode.getBareJid()); //This is later changed!
 		si.setXMPPNode(myNode.getNodeIdentifier());
 		
 		ServiceImplementation servImpl = new ServiceImplementation();
@@ -266,7 +267,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
 					this.getServiceReg().registerServiceList(serviceList);
 					
-					if(ServiceModelUtils.isServiceOurs(service, getCommMngr())){
+					if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && service.getServiceType() != ServiceType.THIRD_PARTY_CLIENT){
 						if(log.isDebugEnabled())
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
