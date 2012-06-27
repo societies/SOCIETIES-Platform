@@ -25,5 +25,6 @@
 	
 	<osgi:reference id="servDiscRemote" interface="org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote"/>
 	<osgi:reference id="servCtrlRemote" interface="org.societies.api.internal.servicelifecycle.IServiceControlRemote"/>
+	<osgi:reference id="PrivacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" cardinality="0..1" />
 		
 </beans>

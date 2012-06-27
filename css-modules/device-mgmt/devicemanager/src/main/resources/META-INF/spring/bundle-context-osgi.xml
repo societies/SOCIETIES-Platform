@@ -17,7 +17,7 @@
 
 		<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 		
-		<osgi:reference id="DeviceCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager"/>
+		<osgi:reference id="DeviceCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager" cardinality="0..1" />
        
        
        <!-- <osgi:service ref="DeviceManager">	
