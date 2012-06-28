@@ -256,6 +256,9 @@ public class NegotiationClient implements INegotiationClient {
 		}
 		return selectedIdentity;
 		**/
+		if (idOptions.size()==0){
+			return this.idm.getThisNetworkNode();
+		}
 		
 		//replace this line with above code when we enable multiple identities
 		return idOptions.get(0).getReferenceIdentity();
