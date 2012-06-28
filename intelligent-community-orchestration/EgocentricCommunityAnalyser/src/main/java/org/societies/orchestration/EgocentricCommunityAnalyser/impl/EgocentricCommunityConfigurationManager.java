@@ -27,7 +27,7 @@ package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 //import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 
 
