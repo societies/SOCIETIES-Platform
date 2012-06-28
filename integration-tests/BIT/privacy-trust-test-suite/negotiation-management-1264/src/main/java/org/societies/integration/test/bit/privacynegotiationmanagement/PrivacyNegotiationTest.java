@@ -340,6 +340,5 @@ public class PrivacyNegotiationTest {
 	}
 
 	private void deleteContext() {
-		// TODO
 	}
 }

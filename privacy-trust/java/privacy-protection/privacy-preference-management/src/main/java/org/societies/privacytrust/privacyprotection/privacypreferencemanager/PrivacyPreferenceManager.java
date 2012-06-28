@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +109,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private MessageBox myMessageBox;
 	
 	public PrivacyPreferenceManager(){
+		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
 		}
@@ -855,10 +857,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			/*			if (model == null){
 				JOptionPane.showMessageDialog(null, "prefCache returned null model for details:"+details.toString());
 			}*/
-			IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-			if (null!=outcome){
-				//JOptionPane.showMessageDialog(null, "Evaluation returned non-null outcome");
-				outcomes.add(outcome);
+			if (model!=null){
+				
+			
+				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
+				if (null!=outcome){
+					//JOptionPane.showMessageDialog(null, "Evaluation returned non-null outcome");
+					outcomes.add(outcome);
+				}
 			}
 		}	
 
@@ -889,9 +895,12 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			IDSPreferenceDetails details = new IDSPreferenceDetails(identities.get(i));
 			details.setRequestor(agreement.getRequestor());
 			IPrivacyPreferenceTreeModel model = prefCache.getIDSPreference(details);
-			IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-			if (null!=outcome){
-				outcomes.add(outcome);
+			if (model!=null){
+				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
+				if (null!=outcome){
+					outcomes.add(outcome);
+				}
+
 			}
 		}	
 
@@ -918,9 +927,12 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		for (int i=0; i<dpis.size(); i++){
 			IDSPreferenceDetails details = new IDSPreferenceDetails(dpis.get(i));
 			IPrivacyPreferenceTreeModel model = prefCache.getIDSPreference(details);
-			IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-			if (null!=outcome){
-				outcomes.add(outcome);
+
+			if (model!=null){
+				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
+				if (null!=outcome){
+					outcomes.add(outcome);
+				}
 			}
 		}	
 

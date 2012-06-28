@@ -22,25 +22,25 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.context.model;
 
-/**
- * This class is used to represent a single participant (CSS) of a
- * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
- * zero or more CISs, simultaneously. The individual members of a pervasive community do
- * not need to be human beings. They can also be organisations, smart space
- * infrastructures, autonomous or semi-autonomous agents, etc.
- * 
- * @see CtxEntityIdentifier
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
- */
-public class IndividualCtxEntity extends CommunityMemberCtxEntity {
+package org.societies.api.internal.qosmonitor;
 
-	private static final long serialVersionUID = -1841816618272931692L;
-	
-	public IndividualCtxEntity(CtxEntityIdentifier id) {
-		
-		super(id);
-	}
+import java.io.Serializable;
+
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
+public interface IQoSReporterCallback {
+
+	/**
+	 * Async return for
+	 * {@link IQoSReporter#getCommunityData(String, IQoSReporterCallback)}
+	 * 
+	 * @param dataId Data ID
+	 * 
+	 * @param data The returned data. The data are anonymized.
+	 */
+	public void onGetCommunityData(String dataId, Serializable data);
+
 }

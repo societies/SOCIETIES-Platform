@@ -22,51 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.context.event;
+
+package org.societies.api.internal.qosmonitor;
+
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
- * A listener for receiving {@link CtxChangeEvent CtxChangeEvents}. More
- * specifically, it defines methods for reacting to the addition, update,
- * modification or removal of context model objects.
+ * Interface for invoking the Quality of Service (QoS) Reporter.
+ * To be used by 3rd party QoS Monitor.
+ * 
+ * @author Mitja Vardjan
  *
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.3
  */
-public interface CtxChangeEventListener extends CtxEventListener {
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
+public interface IQoSReporter {
 	
 	/**
-	 * This method is called when a context model object is created.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was created.
-	 */
-	public void onCreation(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is updated.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was updated.
-	 */
-	public void onUpdate(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is modified.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was modified.
-	 */
-	public void onModification(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is removed.
+	 * Get additional community data required by 3rd party monitor in order to
+	 * use the service properly and evaluate QoS. This method has to be invoked
+	 * only when the data sent with original evaluation request are insufficient.
+	 * The data are anonymized before returning.
 	 * 
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was removed.
+	 * @param dataId Data ID. TODO: How will data be retrieved?
+	 * 
+	 * @param callback The callback for async return
 	 */
-	public void onRemoval(CtxChangeEvent event);
+	public void getCommunityData(String dataId, IQoSReporterCallback callback);
+	
+	/**
+	 * Notify about completed evaluation of QoS.
+	 * 
+	 * @param report Evaluation report digitally signed by the 3rd party QoS
+	 * monitor.
+	 */
+	public void notifyEvaluationResult(String report);
 }

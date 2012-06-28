@@ -263,6 +263,9 @@ public class ServiceRegistry implements IServiceRegistry {
 			if (servInst.getCssJid() != null) {
 				c.add(Restrictions.like("servInst.cssJid", servInst.getXMPPNode()));
 			}
+			if (servInst.getParentJid() != null) {
+				c.add(Restrictions.like("servInst.parentJid", servInst.getXMPPNode()));
+			}
 			if (servInst.getXMPPNode() != null) {
 				c.add(Restrictions.like("servInst.XMPPNode", servInst.getXMPPNode()));
 			}
