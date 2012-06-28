@@ -117,6 +117,14 @@ public interface ICommunityCtxDBMgr {
 	public CommunityCtxEntity updateCommunityEntity(CommunityCtxEntity entity) throws CtxException;
 	
 	/**
+	  * Updates a community Context Entity. 
+	  * @param entity
+	  * @throws CtxException 
+	  * @since 0.2
+	  */
+	public CtxAttribute updateCommunityAttribute(CtxAttribute attribute) throws CtxException;
+
+	/**
 	  * Removes the specidied community Context Entity. 
 	  * @param ctxId
 	  * @throws CtxException 
