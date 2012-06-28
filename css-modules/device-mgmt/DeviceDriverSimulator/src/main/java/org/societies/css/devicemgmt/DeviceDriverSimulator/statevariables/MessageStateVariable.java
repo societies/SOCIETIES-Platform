@@ -25,6 +25,7 @@
 package org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables;
 
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
 
 /**
  * Describe your class here...
@@ -34,7 +35,7 @@ import org.societies.api.css.devicemgmt.IDeviceStateVariable;
  */
 public class MessageStateVariable implements IDeviceStateVariable{
 
-	final private String NAME = "message";
+	final private String NAME = DeviceStateVariableConstants.MESSAGE_STATE_VARIABLE;
 
 	@Override
 	public String[] getAllowedValues() {

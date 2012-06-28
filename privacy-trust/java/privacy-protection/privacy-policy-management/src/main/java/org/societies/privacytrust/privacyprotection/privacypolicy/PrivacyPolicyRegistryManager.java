@@ -175,12 +175,12 @@ public class PrivacyPolicyRegistryManager {
 		try {
 			String name = "";
 			if (requestor instanceof RequestorService){
-				name = ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString();
+				name = "policyOf"+((RequestorService) requestor).hashCode();
 			}else if (requestor instanceof RequestorCis){
-				name = ((RequestorCis) requestor).getCisRequestorId().getJid();
+				name = "policyOf"+((RequestorCis) requestor).hashCode();
 			}
 			//TODO: The name might cause an error. We might need to provide different names for storing the policies as attributes in DB
-			List<CtxIdentifier> ctxIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+name).get();
+			List<CtxIdentifier> ctxIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, name).get();
 			if (ctxIDs.size()==0){
 				List<CtxIdentifier> entityIDs = ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PRIVACY_POLICY).get();
 				if (entityIDs.size()==0){
@@ -203,7 +203,7 @@ public class PrivacyPolicyRegistryManager {
 					entityIDs.add(policyEntity.getId());
 
 				}
-				CtxAttribute ctxAttr = ctxBroker.createAttribute((CtxEntityIdentifier) entityIDs.get(0), "policyOf"+name).get();
+				CtxAttribute ctxAttr = ctxBroker.createAttribute((CtxEntityIdentifier) entityIDs.get(0), name).get();
 				ctxAttr.setBinaryValue(SerialisationHelper.serialise(RequestPolicyUtils.toRequestPolicyBean(policy)));
 				ctxBroker.update(ctxAttr);
 				this.log("Created attribute: "+ctxAttr.getType());

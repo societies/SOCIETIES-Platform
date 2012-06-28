@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.model.DeviceActionsConstants;
+import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.Screen;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables.MessageStateVariable;
 
@@ -43,11 +45,11 @@ import org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables.Message
  */
 public class DisplayMessageAction implements IAction{
 
-	final private String NAME = "displayMessage";
+	final private String NAME = DeviceActionsConstants.SCREEN_DISPLAY_MESSAGE_ACTION;
 	
 	final private String OUTPUT = null;
 	
-	final private String INPUT = "message";
+	final private String INPUT = DeviceStateVariableConstants.MESSAGE_STATE_VARIABLE;
 
 	private static Logger LOG = LoggerFactory.getLogger(DisplayMessageAction.class);
 	

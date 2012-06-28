@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
-import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -68,11 +67,14 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.CisParticipant.MembershipType;
@@ -154,13 +156,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public ActivityFeed activityFeed;
 	//TODO: should this be persisted?
 	@Transient
-	public Set<IServiceSharingRecord> sharedServices; 
-	@Transient
 	private ICommManager CISendpoint;
 	@Transient
 	IServiceDiscoveryRemote iServDiscRemote;
 	@Transient
 	IServiceControlRemote iServCtrlRemote;
+	@Transient
+	IPrivacyPolicyManager privacyPolicyManager;
 	
 	@Transient
 	private IIdentity cisIdentity;
@@ -211,16 +213,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.activityFeed = activityFeed;
 	}
 
-
-	public Set<IServiceSharingRecord> getSharedServices() {
-		return sharedServices;
-	}
-
-
-	public void setSharedServices(Set<IServiceSharingRecord> sharedServices) {
-		this.sharedServices = sharedServices;
-	}
-
 	public IServiceDiscoveryRemote getiServDiscRemote() {
 		return iServDiscRemote;
 	}
@@ -264,8 +256,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	// maximum constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
-	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote) {
-		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote);
+	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
+		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote,privacyPolicyManager);
 		this.password = password;
 		this.permaLink = permaLink;
 		this.host = host;
@@ -277,7 +269,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	// minimum constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
-			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote) {
+			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
+		
+		this.privacyPolicyManager = privacyPolicyManager;
 		
 		this.owner = cssOwner;
 		this.cisType = cisType;
@@ -285,7 +279,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.iServCtrlRemote = iServCtrlRemote;
 		this.iServDiscRemote = iServDiscRemote;
 		
-		sharedServices = new HashSet<IServiceSharingRecord>();
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
 
@@ -341,9 +334,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	}
 	
-	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory){
+	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager){
 		
-		sharedServices = new HashSet<IServiceSharingRecord>();
+		
+		this.privacyPolicyManager = privacyPolicyManager;
 		// first Ill try without members
 
 		try {
@@ -1098,6 +1092,22 @@ public class Cis implements IFeatureServer, ICisOwned {
 		// deleting from DB
 		this.deletePersisted(this);
 		
+		// unregistering policy
+		IIdentity cssOwnerId;
+		try {
+			cssOwnerId = this.CISendpoint.getIdManager().fromJid(this.getOwnerId());
+			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisIdentity);	
+			this.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			LOG.info("bad format in cis owner jid at delete method");
+			e1.printStackTrace();
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			LOG.info("problem deleting policy");
+			e.printStackTrace();
+		}		
+		
 		while(it.hasNext()){
 			CisParticipant element = it.next();
 			
@@ -1129,7 +1139,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
-		sharedServices = null; 
 		activityFeed = null; // TODO: replace with proper way of destroying it
 		
 		
@@ -1149,6 +1158,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 	}
 
+	public boolean unregisterCIS(){
+		boolean ret = CISendpoint.UnRegisterCommManager();
+		return ret;
+		
+	}
+	
 	// getters and setters
 	
 	public Long getId() {
@@ -1247,15 +1262,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 		callback.receiveResult(resp);	
 	}
 
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-	
-	
 	
 	
 	// session related methods
@@ -1333,6 +1339,52 @@ public class Cis implements IFeatureServer, ICisOwned {
 		}
 	}
 	
+	
+	// TODO
+	@Override
+	public void addCisActivity(IActivity activity,ICisManagerCallback callback){
+		
+			Community result = new Community();
+			AddActivityResponse r = new AddActivityResponse();
+
+			activityFeed.addCisActivity(activity);
+			
+			r.setResult(true); //TODO. add a return on the activity feed method
+			
+			
+			result.setAddActivityResponse(r);		
+			callback.receiveResult(result);
+		
+	}
+	
+	@Override
+	public void getActivities(String timePeriod,ICisManagerCallback callback){
+		Community result = new Community();
+		GetActivitiesResponse r = new GetActivitiesResponse();
+		List<IActivity> iActivityList;
+		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+		
+		iActivityList = activityFeed.getActivities(timePeriod);
+		
+
+		Iterator<IActivity> it = iActivityList.iterator();
+		
+		while(it.hasNext()){
+			IActivity element = it.next();
+			org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
+			a.setActor(element.getActor());
+			a.setObject(a.getObject());
+			a.setPublished(a.getPublished());
+			a.setVerb(a.getVerb());
+			marshalledActivList.add(a);
+	     }
+		
+		r.setActivity(marshalledActivList);
+		result.setGetActivitiesResponse(r);		
+		
+		callback.receiveResult(result);
+				
+	}
 	
 	
 }

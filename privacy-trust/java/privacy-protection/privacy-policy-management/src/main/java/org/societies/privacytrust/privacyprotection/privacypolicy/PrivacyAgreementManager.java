@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -70,13 +69,13 @@ public class PrivacyAgreementManager implements IPrivacyAgreementManager {
 		}
 
 		try {
-			List<CtxIdentifier> agreementIdList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestor)).get();
+			List<CtxIdentifier> agreementIdList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, PrivacyAgreementManagerInternal.getRequestorId(requestor)).get();
 			if (null == agreementIdList || agreementIdList.size() <= 0) {
 				return null;
 			}
 			CtxIdentifier agreementId = agreementIdList.get(0);
 			CtxAttribute agreementData = (CtxAttribute) ctxBroker.retrieve(agreementId).get();
-			AgreementEnvelope agreement = (AgreementEnvelope) SerialisationHelper.deserialise(agreementData.getBinaryValue(), this.getClass().getClassLoader());
+			AgreementEnvelope agreement = (AgreementEnvelope) SerialisationHelper.deserialise(agreementData.getBinaryValue(), ClassLoader.getSystemClassLoader());
 			return agreement;
 		} catch (CtxException e) {
 			LOG.error("[Error getAgreement] Can't find the agreement. Context error.", e);

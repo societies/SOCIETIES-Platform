@@ -90,6 +90,13 @@
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>activityfeed</artifactId>
+			<version>${version.cis}</version>
+
+		</dependency>
+
 	</dependencies>
 
  	<build>
@@ -100,8 +107,10 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
+												<Import-Package>
+							*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

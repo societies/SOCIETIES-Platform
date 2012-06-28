@@ -145,6 +145,15 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
 		return this.toString();
 	}
 	
+	/*
+	 * @see org.societies.api.schema.identity.DataIdentifier#getUri()
+	 */
+	@Override
+	public String getUri() {
+		
+		return this.toUriString();
+	}
+	
 	/**
 	 * Returns a String representation of this context model object identifier
 	 * 

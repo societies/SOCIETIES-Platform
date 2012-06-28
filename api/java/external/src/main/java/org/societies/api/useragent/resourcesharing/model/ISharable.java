@@ -26,10 +26,13 @@
 package org.societies.api.useragent.resourcesharing.model;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-/**
- * MISSING_JAVADOCS
- */
+
 @SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface ISharable {
+	
+	/**
+	 * To be completed - this interface will be completed when the details of service/device sharing
+	 * are more concrete
+	 */
 
 }

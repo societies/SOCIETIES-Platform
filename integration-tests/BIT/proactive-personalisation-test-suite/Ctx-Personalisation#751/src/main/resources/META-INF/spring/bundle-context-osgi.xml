@@ -30,7 +30,11 @@
 	</osgi:reference>
 	
 	
-	<osgi:service ref="HelloWorld" interface="org.societies.integration.test.bit.ctx_personalisation.IHelloWorld">
+	<osgi:service ref="HelloWorld" >
+	    <osgi:interfaces>
+	        <value>org.societies.integration.test.bit.ctx_personalisation.IHelloWorld</value>
+	        <value>org.societies.api.personalisation.model.IActionConsumer</value>
+	    </osgi:interfaces>
 		<osgi:service-properties>
 			<entry key="TargetPlatform" value="SOCIETIES" />
 			<entry key="ServiceProvider" value="ICT-SOCIETIES" />

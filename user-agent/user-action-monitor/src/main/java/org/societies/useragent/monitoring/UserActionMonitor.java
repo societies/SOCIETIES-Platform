@@ -47,22 +47,24 @@ public class UserActionMonitor implements IUserActionMonitor{
 	private IEventMgr eventMgr;
 	private ICommManager commsMgr;
 	private ContextCommunicator ctxComm;
+	String myDeviceID;
+	IIdentity myCssID;
 
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
-		LOG.info("UAM - Received user action!");
-		LOG.info("action ServiceId: "+action.getServiceID().toString());
-		LOG.info("action serviceType: "+action.getServiceType());
-		LOG.info("action parameterName: "+action.getparameterName());
-		LOG.info("action value: "+action.getvalue());
+		LOG.debug("UAM - Received user action!");
+		LOG.debug("action ServiceId: "+action.getServiceID().toString());
+		LOG.debug("action serviceType: "+action.getServiceType());
+		LOG.debug("action parameterName: "+action.getparameterName());
+		LOG.debug("action value: "+action.getvalue());
 
 		//save action in context - IIdentity (Person) > ServiceId > paramName
 		//create new entities and attributes if necessary
 		ctxComm.updateHistory(owner, action);
 
 		//update interactionDevice if NOT on cloud node
-		if(!cloud){
-			ctxComm.updateUID(owner);
+		if(!cloud){  //CHANGE
+			ctxComm.updateUID(owner, myDeviceID);
 		}
 
 		//send local event
@@ -77,11 +79,17 @@ public class UserActionMonitor implements IUserActionMonitor{
 
 	public void initialiseUserActionMonitor(){
 		System.out.println("Initialising user action monitor!");
-		ctxComm = new ContextCommunicator(ctxBroker);
+		
+		//get myDeviceID from comms Mgr
+		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
+		myCssID = commsMgr.getIdManager().getThisNetworkNode();
 
-		//Set cloud flag - get device type from Identity Manager
+		ctxComm = new ContextCommunicator(ctxBroker, myCssID);
+
+		//get device type from CSS Manager
 		IdentityType nodeType = commsMgr.getIdManager().getThisNetworkNode().getType();
-		//if()
+
+
 	}
 
 	public void setCtxBroker(ICtxBroker broker){
@@ -91,9 +99,9 @@ public class UserActionMonitor implements IUserActionMonitor{
 	public void setEventMgr(IEventMgr eventMgr){
 		this.eventMgr = eventMgr;
 	}
-	
+
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
 	}
-	
+
 }

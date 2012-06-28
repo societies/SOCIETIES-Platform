@@ -26,11 +26,12 @@ package org.societies.context.broker.impl.comm;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.societies.api.context.model.CtxEntity;
+
 
 public interface ICtxCallback {
 
-	public void receiveCtxResult(Object retObject) throws DatatypeConfigurationException;
+	public void onCreatedEntity(CtxEntity retObject);
 
-	public void receiveCtxResult(Object retObject, String type)
-			throws DatatypeConfigurationException;
+	public void receiveCtxResult(Object retObject, String type);
 }

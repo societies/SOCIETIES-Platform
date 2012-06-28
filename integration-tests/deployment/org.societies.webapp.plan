@@ -5,9 +5,8 @@
         xsi:schemaLocation=" 
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
-
-	<!-- Note :CommFramework.plan , exampleServices.plan and servicelifecycleplan hould be deployed also -->
 	
 	<artifact type="bundle" name="societies-webapp"/>
+	
 </plan>
 

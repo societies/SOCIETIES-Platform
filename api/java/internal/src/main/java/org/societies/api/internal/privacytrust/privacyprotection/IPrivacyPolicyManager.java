@@ -53,6 +53,25 @@ public interface IPrivacyPolicyManager {
 	public RequestPolicy getPrivacyPolicy(Requestor requestor) throws PrivacyException;
 	
 	/**
+	 * Retrieve a privacy policy file from a JAR
+	 * 
+	 * @param location Location where to find the privay policy
+	 * @return the content of the privacy policy file
+	 * @throws PrivacyException
+	 */
+	public String getPrivacyPolicyFromLocation(String location) throws PrivacyException;
+	
+	/**
+	 * Retrieve a privacy policy file from a JAR
+	 * 
+	 * @param location Location where to find the privay policy
+	 * @param options Options giving more information about the location
+	 * @return the content of the privacy policy file
+	 * @throws PrivacyException
+	 */
+	public String getPrivacyPolicyFromLocation(String location, Map<String, String> options) throws PrivacyException;
+	
+	/**
 	 * Retrieve the "privacy-policy.xml" file in the JAR file.
 	 * This file need to be in the root folder of the OSGi bundle JAR file.
 	 * 

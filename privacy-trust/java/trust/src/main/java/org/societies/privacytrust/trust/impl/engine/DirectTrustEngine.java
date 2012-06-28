@@ -50,7 +50,6 @@ import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.impl.engine.util.MathUtils;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +69,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		
         final Map<TrustEvidenceType, Double> aMap = new HashMap<TrustEvidenceType, Double>();
         aMap.put(TrustEvidenceType.JOINED_COMMUNITY, +5.0d);
-        aMap.put(TrustEvidenceType.LEFT_COMMUNITY, -10.0d);
+        aMap.put(TrustEvidenceType.LEFT_COMMUNITY, -50.0d);
         aMap.put(TrustEvidenceType.USED_SERVICE, +1.0d);
         EVIDENCE_SCORE_MAP = Collections.unmodifiableMap(aMap);
     }
@@ -298,25 +297,30 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 						+ this.evidence);
 			
 			try {
+				// if there is no TrustedEntity associated with the specified
+				// TrustEvidence, then create it
+				if (trustRepo.retrieveEntity(this.evidence.getTeid()) == null)
+					trustRepo.createEntity(this.evidence.getTeid());
+				
+				// retrieve all TrustedEntities trusted by the trustor
+				// referenced in the specified TrustEvidence
 				final List<ITrustedCss> cssList = trustRepo.retrieveEntities(
 						this.evidence.getTeid().getTrustorId(), ITrustedCss.class);
-				
-				// if there is no entity associated with the evidence create it
-				if (trustRepo.retrieveEntity(this.evidence.getTeid()) == null)
-					cssList.add(new TrustedCss(this.evidence.getTeid()));
 					
 				// prepare list of TrustEvidence
 				final List<ITrustEvidence> evidenceList = new ArrayList<ITrustEvidence>();
 				evidenceList.add(this.evidence);
 				
+				// evaluate TrustedEntities based on the TrustEvidence list
 				evaluateCssTrustValues(cssList, evidenceList);
 				
+				// persist updated TrustValues in the Trust Repository
 				for (final ITrustedCss css : cssList)
 					trustRepo.updateEntity(css);
 			} catch (TrustException te) {
 				
-				LOG.error("Could not (re)evaluate direct trust for entity "
-						+ evidence.getTeid() + ": " + te.getLocalizedMessage(), te);
+				LOG.error("Could not (re)evaluate direct trust values using evidence "
+						+ evidence + ": " + te.getLocalizedMessage(), te);
 			}
 		} 
 	}
@@ -335,10 +339,37 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		 */
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
+			
 			if (LOG.isDebugEnabled())
 				LOG.debug("Running CisDirectTrustEngine with evidence " 
 						+ this.evidence);
+			
+			try {
+				// if there is no TrustedEntity associated with the specified
+				// TrustEvidence, then create it
+				if (trustRepo.retrieveEntity(this.evidence.getTeid()) == null)
+					trustRepo.createEntity(this.evidence.getTeid());
+				
+				// retrieve all TrustedEntities trusted by the trustor
+				// referenced in the specified TrustEvidence
+				final List<ITrustedCis> cisList = trustRepo.retrieveEntities(
+						this.evidence.getTeid().getTrustorId(), ITrustedCis.class);
+					
+				// prepare list of TrustEvidence
+				final List<ITrustEvidence> evidenceList = new ArrayList<ITrustEvidence>();
+				evidenceList.add(this.evidence);
+				
+				// evaluate TrustedEntities based on the TrustEvidence list
+				evaluateCisTrustValues(cisList, evidenceList);
+				
+				// persist updated TrustValues in the Trust Repository
+				for (final ITrustedCis cis : cisList)
+					trustRepo.updateEntity(cis);
+			} catch (TrustException te) {
+				
+				LOG.error("Could not (re)evaluate direct trust values using evidence "
+						+ evidence + ": " + te.getLocalizedMessage(), te);
+			}
 		} 
 	}
 	
@@ -356,10 +387,37 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		 */
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
+			
 			if (LOG.isDebugEnabled())
 				LOG.debug("Running ServiceDirectTrustEngine with evidence "	
 						+ this.evidence);
+			
+			try {
+				// if there is no TrustedEntity associated with the specified
+				// TrustEvidence, then create it
+				if (trustRepo.retrieveEntity(this.evidence.getTeid()) == null)
+					trustRepo.createEntity(this.evidence.getTeid());
+				
+				// retrieve all TrustedEntities trusted by the trustor
+				// referenced in the specified TrustEvidence
+				final List<ITrustedService> serviceList = trustRepo.retrieveEntities(
+						this.evidence.getTeid().getTrustorId(), ITrustedService.class);
+					
+				// prepare list of TrustEvidence
+				final List<ITrustEvidence> evidenceList = new ArrayList<ITrustEvidence>();
+				evidenceList.add(this.evidence);
+				
+				// evaluate TrustedEntities based on the TrustEvidence list
+				evaluateServiceTrustValues(serviceList, evidenceList);
+				
+				// persist updated TrustValues in the Trust Repository
+				for (final ITrustedService service : serviceList)
+					trustRepo.updateEntity(service);
+			} catch (TrustException te) {
+				
+				LOG.error("Could not (re)evaluate direct trust values using evidence "
+						+ evidence + ": " + te.getLocalizedMessage(), te);
+			}
 		} 
 	}
 	

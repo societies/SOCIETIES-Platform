@@ -34,12 +34,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.model.DeviceActionsConstants;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.LightSensor;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables.LightLevelStateVariable;
 
 public class GetLightLevelAction implements IAction {
 
-	final private String NAME = "getLightLevel";
+	final private String NAME = DeviceActionsConstants.LIGHT_SENSOR_GET_LIGHT_LEVEL_ACTION;
 	final private String OUTPUT_LIGHT_LEVEL = "outputLightLevel";
 	final private String INPUT_LIGHT_LEVEL = null;
 

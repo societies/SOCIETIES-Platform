@@ -87,60 +87,76 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName) {
+		LOG.debug("Request - getOutcome with values: "+ownerId.getBareJid()+", "+serviceId.getServiceInstanceIdentifier()+", "+preferenceName);
 		//no updates received - just return current outcome
 		List<IDIANNEOutcome> results = new ArrayList<IDIANNEOutcome>();
 		if(runnerMappings.containsKey(ownerId.getBareJid())){
-			LOG.info("Network Runner already exists for this ownerId: "+ownerId.getBareJid());
+			LOG.info("DIANNE already exists for this ownerId: "+ownerId.getBareJid());
 			NetworkRunner runner = runnerMappings.get(ownerId.getBareJid());
 			IDIANNEOutcome outcome = runner.getPrefOutcome(serviceId, preferenceName);
 			if(outcome!=null){
 				results.add(outcome);
 			}
 		}else{
-			LOG.info("No DIANNE exists for this identity: "+ownerId.getBareJid());
+			LOG.info("No DIANNE exists for this ownerId: "+ownerId.getBareJid()+"...cannot return result");
 		}
 		return new AsyncResult<List<IDIANNEOutcome>>(results);
 	}
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute) {
-		LOG.info("Received request for outcome with new context update");		
+		LOG.info("Context update - getOutcome with values: "+ownerId.getBareJid()+", "+attribute.getType()+"="+attribute.getStringValue());	
 		List<IDIANNEOutcome> results = new ArrayList<IDIANNEOutcome>();
-		// Context update received!!!
-		if(runnerMappings.containsKey(ownerId.getBareJid())){
-			LOG.info("Network runner already exists for this ownerId: "+ownerId.getBareJid());
-			runnerMappings.get(ownerId.getBareJid()).contextUpdate(attribute);
-		}else{
-			LOG.info("Network runner does not exist for this ownerId: "+ownerId.getBareJid());
-			Network newD_net = new Network();
-			NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net, this);
-			d_nets.put(ownerId, newD_net);
-			runnerMappings.put(ownerId.getBareJid(), newRunner);
-			newRunner.contextUpdate(attribute);
-		}
 		
-		//wait for new outcomes
-		while(outcomes == null){
-			try {
-				LOG.info("waiting for output response...");
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		//process if context update is not null
+		if(attribute.getType() != null && attribute.getStringValue()!=null){
+			// Context update received!!!
+			if(runnerMappings.containsKey(ownerId.getBareJid())){
+				LOG.info("DIANNE already exists for this ownerId: "+ownerId.getBareJid());
+				runnerMappings.get(ownerId.getBareJid()).contextUpdate(attribute);
+			}else{
+				LOG.info("DIANNE does not exist for this ownerId: "+ownerId.getBareJid()+"...creating");
+				Network newD_net = new Network();
+				NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net, this);
+				d_nets.put(ownerId, newD_net);
+				runnerMappings.put(ownerId.getBareJid(), newRunner);
+				newRunner.contextUpdate(attribute);
 			}
+			
+			//wait for new outcomes
+			int loopCount = 0;
+			while(outcomes == null && loopCount < 10){
+				try {
+					LOG.info("waiting for output response..."+loopCount);
+					Thread.sleep(500);
+					loopCount++;
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			if(outcomes != null){
+				results = outcomes;
+				outcomes = null;
+			}else{
+				LOG.debug("Wait cycle exited - DIANNE did not return any new outcomes for this context update");
+			}
+			
+		}else{
+			LOG.debug("Not performing context update - context update contained null element: "+attribute.getType()+"="+attribute.getStringValue());
 		}
-		results = outcomes;
-		outcomes = null;
 		
 		return new AsyncResult<List<IDIANNEOutcome>>(results);
 	}
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, IAction action){
-		LOG.info("Received request for outcome with new action update");		
+		LOG.info("Action update with value: "+ownerId.getBareJid()+", "+action.getparameterName()+"="+action.getvalue());		
 		// Action update received!!!
 		if(runnerMappings.containsKey(ownerId.getBareJid())){
+			LOG.info("DIANNE already exists for this ownerId: "+ownerId.getBareJid());
 			runnerMappings.get(ownerId.getBareJid()).actionUpdate(action);
 		}else{
+			LOG.info("DIANNE does not exist for this ownerId: "+ownerId.getBareJid()+"...creating");
 			Network newD_net = new Network();
 			NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net, this);
 			d_nets.put(ownerId, newD_net);
@@ -181,12 +197,16 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 	 * @see org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE#registerContext()
 	 */
 	public void registerContext(){
+		LOG.debug("DIANNE is registering for default context updates: symLoc, status and temperature");
 		for(int i=0; i<defaultContext.length; i++){
 			try {
 				String nextType = defaultContext[i];
 				List<CtxIdentifier> attrIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, nextType).get();
 				if(attrIDs.size() > 0){
+					LOG.debug("Registering for context update: "+defaultContext[i]);
 					persoMgr.registerForContextUpdate(cssID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attrIDs.get(0));
+				}else{
+					LOG.debug("Ctx Attribute: "+defaultContext[i]+" does not yet exist - could not register for context updates");
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
