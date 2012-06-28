@@ -35,6 +35,10 @@ import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+
 //import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.css.directory.ICssDirectory;
 
@@ -124,6 +128,8 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 {
+
+	private static Logger LOG = LoggerFactory.getLogger(SuggestedCommunityAnalyser.class);
 	
 	private IIdentity linkedCss;
 	
@@ -203,14 +209,19 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		} catch (InterruptedException e) {
 			
 			e.printStackTrace();
+			LOG.error("Failed to lookup and record stored CLM metadata: InterruptedException");
+
 		} catch (ExecutionException e) {
 			
 			e.printStackTrace();
+			LOG.error("Failed to lookup and record stored CLM metadata: ExecutionException");
 		} catch (CtxException e) {
 			
 			e.printStackTrace();
+			LOG.error("Failed to lookup and record stored CLM metadata: CtxException");
 		} catch (NullPointerException e) {
 			e.printStackTrace();
+			LOG.error("Failed to lookup and record stored CLM metadata: NullPointerException");
 		}
 			
 		//new ProximityRecordingThread().start();
@@ -411,6 +422,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 										} catch (InvalidFormatException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
+											LOG.error("Failed to add a member to the proposed CIS: InvalidFormatException");
 										}
 	        						}
 	    						}
@@ -424,6 +436,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 							} catch (CommunicationException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
+								LOG.error("Failed to remove a member from the proposed CIS: CommunicationFormatException");
 							}
 	    					creations.set(i, updatedCreation);
 	    				}
@@ -472,6 +485,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 										} catch (InvalidFormatException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
+											LOG.error("Failed to add a member to the proposed CIS: InvalidFormatException");
 										}
 	        						}
 	    						}
@@ -504,6 +518,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						LOG.error("Failed to retrieve members list from an existing CIS, due to Future get error: InterruptedException");
 					} catch (ExecutionException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -700,6 +715,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				LOG.error("Failed to add a member to the proposed CIS: CommunicationException");
 			}
     	}
     	
@@ -831,6 +847,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 									} catch (InvalidFormatException e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
+										LOG.error("Failed to add a member to the proposed CIS member list: InvalidFormatException");
 									}
 	       						}
 	    					}
@@ -844,6 +861,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 						} catch (CommunicationException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
+							LOG.error("Failed to remove a member from the proposed CIS: CommunicationException");
 						}
 	    				creations.set(i, updatedCreation);
 	    			}
@@ -897,9 +915,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						LOG.error("Failed to get the members list of an existing CIS, due to Future get error: InterruptedException");
 					} catch (ExecutionException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						LOG.error("Failed to get the members list of an existing CIS, due to Future get error: ExecutionException");
 					}
 					if ((members.size() == cisProposal.getMemberList().size()) &&
 						(members.contains(cisProposal.getMemberList())) &&
@@ -1037,12 +1057,18 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			LOG.error("Failed user context lookup: InterruptedException");
+			
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			LOG.error("Failed user context lookup: ExecutionException");
+			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			LOG.error("Failed user context lookup: CtxException");
+			
 		}
 	    try {
 			userContextBroker.updateAttribute(x, recordedMetadata.toString());
@@ -1075,6 +1101,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 								} catch (InvalidFormatException e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
+									LOG.error("Failed lookup of member in privacy checking: InvalidFormatException");
+									
 								}
     		    			    Requestor thisRequestor = new Requestor(thisMember);
     		    		        Future<List<CtxIdentifier>> id = null;
@@ -1083,6 +1111,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     							} catch (CtxException e) {
     								// TODO Auto-generated catch block
     								e.printStackTrace();
+    								LOG.error("Failed membership criteria context lookup: CtxException");
+									
     							}
     		    		        List<CtxIdentifier> id2 = null;
     							try {
@@ -1090,12 +1120,18 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     							} catch (InterruptedException e) {
     								// TODO Auto-generated catch block
     								e.printStackTrace();
+    								LOG.error("Failed membership criteria context lookup: InterruptedException");
+									
     							} catch (ExecutionException e) {
     								// TODO Auto-generated catch block
     								e.printStackTrace();
+    								LOG.error("Failed membership criteria context lookup: ExecutionException");
+									
     							} catch (RuntimeException e) {
     								// TODO Auto-generated catch block
     								e.printStackTrace();
+    								LOG.error("Failed membership criteria context lookup: RuntimeException");
+									
     							}
     							
     		    		        
@@ -1123,9 +1159,13 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     							} catch (PrivacyException e) {
     								// TODO Auto-generated catch block
     								e.printStackTrace();
+    								LOG.error("Failed in privacy permission checking: PrivacyException");
+									
     							} catch (RuntimeException e) {
     								// TODO Auto-generated catch block
     								e.printStackTrace();
+    								LOG.error("Failed in privacy permission checking: RuntimeException");
+									
     							}
     							if (response != null) {
     		    			        Decision decision = response.getDecision();
@@ -1145,7 +1185,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     									conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
     							} catch (NullPointerException e) {
     								e.printStackTrace();
-    								
+    								LOG.error("Failed in privacy policy checking: NullPointerException");
+									
     							} catch (CtxException e) {
 									conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
 
@@ -1154,9 +1195,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
+									LOG.error("Failed in privacy policy checking: InterruptedException");
 								} catch (ExecutionException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
+									LOG.error("Failed in privacy policy checking: ExecutionException");
+									
 								}
     						}
     		    		}
@@ -1241,31 +1285,40 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: InterruptedException");
 				} catch (ExecutionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: ExecutionException");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
+					LOG.error("Failed to retrieve user context matching membership criteria: CtxException");
 					e.printStackTrace();
 				} catch (RuntimeException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: RuntimeException");
 				}
+				
     		    CtxModelObject theCriteriaObject = null;
 				try {
 					theCriteriaObject = userContextBroker.retrieve(theCriteriaId).get();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: InterruptedException");
 				} catch (ExecutionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: ExecutionException");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
+					LOG.error("Failed to retrieve user context matching membership criteria: CtxException");
 					e.printStackTrace();
 				} catch (RuntimeException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: RuntimeException");
 				}
 				
     		    if (theCriteriaObject instanceof CtxAssociation)
@@ -1316,15 +1369,19 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: InterruptedException");
 				} catch (ExecutionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: ExecutionException");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
+					LOG.error("Failed to retrieve user context matching membership criteria: CtxException");
 					e.printStackTrace();
 				} catch (RuntimeException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: RuntimeException");
 				}
     		    CtxModelObject theCriteriaObject = null;
 				try {
@@ -1332,15 +1389,19 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: InterruptedException");
 				} catch (ExecutionException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: ExecutionException");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
+					LOG.error("Failed to retrieve user context matching membership criteria: CtxException");
 					e.printStackTrace();
 				} catch (RuntimeException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					LOG.error("Failed to retrieve user context matching membership criteria: RuntimeException");
 				}
     			if (theCriteriaObject instanceof CtxAssociation) {
     		        CtxAssociation theCriteria = (CtxAssociation)theCriteriaObject;
@@ -1403,6 +1464,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 											} catch (CommunicationException e) {
 												// TODO Auto-generated catch block
 												e.printStackTrace();
+												LOG.error("Failed to remove CIS member from CIS proposal: CommunicationException");
 											}
         	    		            	}
     	    		            	}
@@ -1467,6 +1529,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 											} catch (CommunicationException e) {
 												// TODO Auto-generated catch block
 												e.printStackTrace();
+												LOG.error("Failed to remove CIS member from CIS proposal: CommunicationException");
 											}
         	    		            	}
     	    		            	}
@@ -1529,12 +1592,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     }
     */
     public void setUserContextBroker(ICtxBroker userContextBroker) {
-    	System.out.println("GOT user context broker" + userContextBroker);
+    	LOG.info("Got user context broker" + userContextBroker);
     	this.userContextBroker = userContextBroker;
     }
     
     public void setExternalContextBroker(org.societies.api.context.broker.ICtxBroker externalContextBroker) {
-    	System.out.println("GOT user context broker" + userContextBroker);
+    	LOG.info("Got external context broker" + externalContextBroker);
     	this.externalContextBroker = externalContextBroker;
     }
     
@@ -1671,6 +1734,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				break;
 			} catch (RuntimeException e) {
 				e.printStackTrace();
+				LOG.error("Failed to remotely invoke processEgocentricRecommendations method: RunTime exception");
+		    	
 			}
 		case processEgocentricConfigurationRecommendations:
 			try {
@@ -1680,6 +1745,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				break;
 			} catch (RuntimeException e) {
 				e.printStackTrace();
+				LOG.error("Failed to remotely invoke processEgocentricConfigurationsRecommendations method: RunTime exception");
+
 			}
         case processCSMRecommendations:
 		try {
@@ -1689,6 +1756,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			break;
 		} catch (RuntimeException e) {
 			e.printStackTrace();
+			LOG.error("Failed to remotely invoke processCSMRecommendations method: RunTime exception");
+
 		}
         /**case processCSMConfigurationRecommendations:
     		try {
@@ -1707,6 +1776,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     			break;
     		} catch (RuntimeException e) {
     			e.printStackTrace();
+    			LOG.error("Failed to remotely invoke processCSCWRecommendations method: RunTime exception");
+
     		}
         case processCSCWConfigurationRecommendations:
     		try {
@@ -1716,6 +1787,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     			break;
     		} catch (RuntimeException e) {
     			e.printStackTrace();
+    			LOG.error("Failed to remotely invoke processCSCWConfigurationRecommendations method: RunTime exception");
+
     		}
     	}
     	
