@@ -75,7 +75,7 @@ public class PrivacyAgreementManager implements IPrivacyAgreementManager {
 			}
 			CtxIdentifier agreementId = agreementIdList.get(0);
 			CtxAttribute agreementData = (CtxAttribute) ctxBroker.retrieve(agreementId).get();
-			AgreementEnvelope agreement = (AgreementEnvelope) SerialisationHelper.deserialise(agreementData.getBinaryValue(), this.getClass().getClassLoader());
+			AgreementEnvelope agreement = (AgreementEnvelope) SerialisationHelper.deserialise(agreementData.getBinaryValue(), ClassLoader.getSystemClassLoader());
 			return agreement;
 		} catch (CtxException e) {
 			LOG.error("[Error getAgreement] Can't find the agreement. Context error.", e);
