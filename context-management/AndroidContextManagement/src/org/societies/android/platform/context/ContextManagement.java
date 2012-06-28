@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.jivesoftware.smack.packet.IQ;
 //import org.societies.android.api.useragent.IAndroidUserAgent;
 import org.societies.android.api.context.broker.ICtxClientBroker;
+import org.societies.android.api.context.broker.ICtxLocalBinder;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -107,7 +108,7 @@ public class ContextManagement extends Service /* implements ICtxClientBroker */
 	/**
 	 * Create Binder object for local service invocation
 	 */
-	public class CtxLocalBinder/*CtxLocaBinder*/ extends Binder {
+	public class CtxLocalBinder/*CtxLocaBinder*/ extends Binder implements ICtxLocalBinder {
 		public ICtxClientBroker/*ICtxClientManager*/ getService() {
 			return acm; //return ccm ??????????????????
 		}
