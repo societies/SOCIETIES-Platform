@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 import org.societies.privacytrust.trust.api.model.IIndirectTrust;
@@ -38,5 +39,25 @@ import org.societies.privacytrust.trust.api.model.IIndirectTrust;
 public class IndirectTrust extends Trust implements IIndirectTrust {
 
 	private static final long serialVersionUID = -5920971093636087917L;
+	
+	@Column(name = "indirect_confidence")
+	private Double confidence = 0.0d;
 
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.IIndirectTrust#getConfidence()
+	 */
+	@Override
+	public Double getConfidence() {
+	
+		return this.confidence;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.IIndirectTrust#setConfidence(java.lang.Double)
+	 */
+	@Override
+	public void setConfidence(Double confidence) {
+	
+		this.confidence = confidence;
+	}
 }

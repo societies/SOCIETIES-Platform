@@ -34,4 +34,17 @@ package org.societies.privacytrust.trust.api.model;
  */
 public interface IIndirectTrust extends ITrust {
 
+	/**
+	 * 
+	 * @return
+	 * @since 0.3
+	 */
+	public Double getConfidence();
+	
+	/**
+	 * 
+	 * @param confidence
+	 * @since 0.3
+	 */
+	public void setConfidence(final Double confidence);
 }
