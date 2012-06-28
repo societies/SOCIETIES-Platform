@@ -36,6 +36,8 @@ import static org.mockito.Mockito.*;
 //import org.societies.api.internal.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICis;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 //import org.societies.api.internal.cis.management.ICis;
@@ -85,6 +87,8 @@ import org.societies.api.identity.IIdentityManager;
 
 public class EgocentricCommunityAnalyser //implements ICommCallback
 {
+	
+	//private static Logger LOG = LoggerFactory.getLogger(EgocentricCommunityAnalyser.class);
 	
 	private EgocentricCommunityCreationManager egocentricCreationManager;
 	private EgocentricCommunityConfigurationManager egocentricConfigurationManager;
