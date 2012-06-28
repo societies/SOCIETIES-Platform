@@ -48,6 +48,9 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
  * @since 0.0.1
  */
 @Entity
+@org.hibernate.annotations.Entity(
+		dynamicUpdate=true
+)
 @Table(
 		name = TableName.TRUSTED_SERVICE, 
 		uniqueConstraints = { @UniqueConstraint(columnNames = { "trustor_id", "trustee_id" }) }
