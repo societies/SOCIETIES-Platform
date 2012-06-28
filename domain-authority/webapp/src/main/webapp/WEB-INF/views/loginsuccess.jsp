@@ -43,7 +43,7 @@ iframe {
 			<td class="content"><iframe
 				  src="${webappurl}" frameborder="0"  
 			 
-					scrolling="no"></iframe></td>
+					scrolling="auto"></iframe></td>
 		</tr>
 	</table>
 </body>

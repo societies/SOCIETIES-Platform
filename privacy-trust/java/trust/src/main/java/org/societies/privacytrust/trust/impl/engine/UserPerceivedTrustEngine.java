@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.trust.impl.engine;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.TrustException;
@@ -31,6 +34,8 @@ import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventList
 import org.societies.api.internal.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.engine.IUserPerceivedTrustEngine;
+import org.societies.privacytrust.trust.api.engine.TrustEngineException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
@@ -45,15 +50,13 @@ import org.springframework.stereotype.Service;
  * @since 0.0.8
  */
 @Service
-public class UserPerceivedTrustEngine extends TrustEngine {
+public class UserPerceivedTrustEngine extends TrustEngine implements IUserPerceivedTrustEngine {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(UserPerceivedTrustEngine.class);
 	
-	private static final double a = 0.5d;
-	
 	@Autowired
-	UserPerceivedTrustEngine(ITrustEventMgr trustEventMgr) throws TrustEventMgrException {
+	public UserPerceivedTrustEngine(ITrustEventMgr trustEventMgr) throws TrustEventMgrException {
 		
 		super(trustEventMgr);
 		LOG.info(this.getClass() + " instantiated");
@@ -63,6 +66,75 @@ public class UserPerceivedTrustEngine extends TrustEngine {
 				new TrustUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
 					TrustEventTopic.INDIRECT_TRUST_UPDATED }, null);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.engine.IUserPerceivedTrustEngine#evaluateCssTrustValues(java.util.List)
+	 */
+	@Override
+	public void evaluateCssTrustValues(final List<ITrustedCss> cssList)
+			throws TrustEngineException {
+		
+		for (final ITrustedCss css : cssList) {
+			final double directTrustValue = (css.getDirectTrust().getValue() != null) 
+					? css.getDirectTrust().getValue() : 0.0d;
+			final double indirectTrustValue = (css.getIndirectTrust().getValue() != null)
+					? css.getIndirectTrust().getValue() : 0.0d;
+			final double bias = (css.getIndirectTrust().getValue() != null 
+					&& css.getIndirectTrust().getConfidence() != null)
+					? css.getIndirectTrust().getConfidence() : 0.0d;
+			final double userPerceivedTrustValue = (1-bias) * directTrustValue + bias * indirectTrustValue;
+			css.getUserPerceivedTrust().setValue(userPerceivedTrustValue);
+		}
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluated user-perceived trust for entities: " + cssList);
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.engine.IUserPerceivedTrustEngine#evaluateCisTrustValues(java.util.List)
+	 */
+	@Override
+	public void evaluateCisTrustValues(final List<ITrustedCis> cisList)
+			throws TrustEngineException {
+		
+		for (final ITrustedCis cis : cisList) {
+			final double directTrustValue = (cis.getDirectTrust().getValue() != null)
+					? cis.getDirectTrust().getValue() : 0.0d;
+			final double indirectTrustValue = (cis.getIndirectTrust().getValue() != null)
+					? cis.getIndirectTrust().getValue() : 0.0d;
+			final double bias = (cis.getIndirectTrust().getValue() != null
+					&& cis.getIndirectTrust().getConfidence() != null)
+					? cis.getIndirectTrust().getConfidence() : 0.0d;
+			final double userPerceivedTrustValue = (1-bias) * directTrustValue + bias * indirectTrustValue;
+			cis.getUserPerceivedTrust().setValue(userPerceivedTrustValue);
+		}
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluated user-perceived trust for entities: " + cisList);
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.engine.IUserPerceivedTrustEngine#evaluateServiceTrustValues(java.util.List)
+	 */
+	@Override
+	public void evaluateServiceTrustValues(final List<ITrustedService> serviceList)
+			throws TrustEngineException {
+		
+		for (final ITrustedService service : serviceList) {
+			final double directTrustValue = (service.getDirectTrust().getValue() != null)
+					? service.getDirectTrust().getValue() : 0.0d;
+			final double indirectTrustValue = (service.getIndirectTrust().getValue() != null)
+					? service.getIndirectTrust().getValue() : 0.0d;
+			final double bias = (service.getIndirectTrust().getValue() != null
+					&& service.getIndirectTrust().getConfidence() != null)
+					? service.getIndirectTrust().getConfidence() : 0.0d;
+			final double userPerceivedTrustValue = (1-bias) * directTrustValue + bias * indirectTrustValue;
+			service.getUserPerceivedTrust().setValue(userPerceivedTrustValue);
+		}
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluated user-perceived trust for entities: " + serviceList);
 	}
 	
 	private class CssUserPerceivedTrustEngine implements Runnable {
@@ -84,19 +156,19 @@ public class UserPerceivedTrustEngine extends TrustEngine {
 				LOG.debug("Running CssUserPerceivedTrustEngine for entity " + teid);
 			
 			try {
-				ITrustedCss css = (ITrustedCss) trustRepo.retrieveEntity(teid);
+				final ITrustedCss css = (ITrustedCss) trustRepo.retrieveEntity(teid);
 				if (css == null) {
 					LOG.error("Could not (re)evaluate user-perceived trust for entity "
 						+ teid + ": Entity not found in the trust repository");
 					return;
 				}
-				final double directTrustValue = (css.getDirectTrust().getValue() != null)
-						? css.getDirectTrust().getValue() : 0.0d;
-				final double indirectTrustValue = (css.getIndirectTrust().getValue() != null)
-						? css.getIndirectTrust().getValue() : 0.0d;
-				final double userPerceivedTrustValue = a * directTrustValue + (1-a) * indirectTrustValue;
-				css.getUserPerceivedTrust().setValue(userPerceivedTrustValue);
-				trustRepo.updateEntity(css);
+				
+				final List<ITrustedCss> cssList = new ArrayList<ITrustedCss>(1);
+				cssList.add(css);
+				evaluateCssTrustValues(cssList);
+				
+				for (final ITrustedCss evaluatedCss : cssList)
+					trustRepo.updateEntity(evaluatedCss);
 			} catch (TrustException te) {
 				
 				LOG.error("Could not (re)evaluate user-perceived trust for entity "
@@ -124,19 +196,19 @@ public class UserPerceivedTrustEngine extends TrustEngine {
 				LOG.debug("Running CisDirectTrustEngine for entity " + teid);
 			
 			try {
-				ITrustedCis cis = (ITrustedCis) trustRepo.retrieveEntity(teid);
+				final ITrustedCis cis = (ITrustedCis) trustRepo.retrieveEntity(teid);
 				if (cis == null) {
 					LOG.error("Could not (re)evaluate user-perceived trust for entity "
 						+ teid + ": Entity not found in the trust repository");
 					return;
 				}
-				final double directTrustValue = (cis.getDirectTrust().getValue() != null)
-						? cis.getDirectTrust().getValue() : 0.0d;
-				final double indirectTrustValue = (cis.getIndirectTrust().getValue() != null)
-						? cis.getIndirectTrust().getValue() : 0.0d;
-				final double userPerceivedTrustValue = a * directTrustValue + (1-a) * indirectTrustValue;
-				cis.getUserPerceivedTrust().setValue(userPerceivedTrustValue);
-				trustRepo.updateEntity(cis);
+				
+				final List<ITrustedCis> cisList = new ArrayList<ITrustedCis>(1);
+				cisList.add(cis);
+				evaluateCisTrustValues(cisList);
+				
+				for (final ITrustedCis evaluatedCis : cisList)
+					trustRepo.updateEntity(evaluatedCis);
 			} catch (TrustException te) {
 				
 				LOG.error("Could not (re)evaluate user-perceived trust for entity "
@@ -164,19 +236,19 @@ public class UserPerceivedTrustEngine extends TrustEngine {
 				LOG.debug("Running ServiceDirectTrustEngine for entity " + teid);
 			
 			try {
-				ITrustedService service = (ITrustedService) trustRepo.retrieveEntity(teid);
+				final ITrustedService service = (ITrustedService) trustRepo.retrieveEntity(teid);
 				if (service == null) {
 					LOG.error("Could not (re)evaluate user-perceived trust for entity "
 						+ teid + ": Entity not found in the trust repository");
 					return;
 				}
-				final double directTrustValue = (service.getDirectTrust().getValue() != null)
-						? service.getDirectTrust().getValue() : 0.0d;
-				final double indirectTrustValue = (service.getIndirectTrust().getValue() != null)
-						? service.getIndirectTrust().getValue() : 0.0d;
-				final double userPerceivedTrustValue = a * directTrustValue + (1-a) * indirectTrustValue;
-				service.getUserPerceivedTrust().setValue(userPerceivedTrustValue);
-				trustRepo.updateEntity(service);
+				
+				final List<ITrustedService> serviceList = new ArrayList<ITrustedService>(1);
+				serviceList.add(service);
+				evaluateServiceTrustValues(serviceList);
+				
+				for (final ITrustedService evaluatedService : serviceList)
+					trustRepo.updateEntity(evaluatedService);
 			} catch (TrustException te) {
 				
 				LOG.error("Could not (re)evaluate user-perceived trust for entity "
