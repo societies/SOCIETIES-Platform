@@ -70,6 +70,24 @@
 		</exclusions>
 	</dependency>
 
+    <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+	</dependency>
+
+	<dependency>
+		<groupId>org.societies.comm.xmpp</groupId>
+		<artifactId>XCCommunicationMgr</artifactId>
+		<version>0.1-SNAPSHOT</version>
+		<scope>provided</scope>
+	</dependency>
+
 	</dependencies>
 
 	<build>
