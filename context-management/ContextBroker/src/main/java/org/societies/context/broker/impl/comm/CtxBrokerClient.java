@@ -61,12 +61,14 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.schema.context.contextmanagement.CtxBrokerBean;
+import org.societies.api.schema.context.contextmanagement.BrokerMethodBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateAssociationBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateEntityBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerLookupBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRemoveBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRetrieveBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerUpdateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerUpdateBean;
@@ -147,7 +149,8 @@ public class CtxBrokerClient implements ICommCallback {
 			//create the message to be sent
 			Stanza stanza = new Stanza(toIdentity);
 			LOG.error("SKATA stanza " + stanza.getTo());
-			CtxBrokerBean cbPacket = new CtxBrokerBean();
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+			cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
 			// use the create entity method : createCtxEntity(String type)
 			//CtxBrokerBeanCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerBeanCreateEntityBean();
 			CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerCreateEntityBean();
@@ -158,12 +161,12 @@ public class CtxBrokerClient implements ICommCallback {
 			RequestorBean requestorBean = createRequestorBean(requestor);
 			// TODO ctxBrokerCreateEntityBean.setRequestor(requestorBean);
 
-			cbPacket.setCreate(ctxBrokerCreateEntityBean);
+			cbPacket.setCreateEntity(ctxBrokerCreateEntityBean);
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 	
 			LOG.info("SKATA 3 before sendIQGet");
 			//send the message
-			if (cbPacket.getCreate() == null) // TODO remove
+			if (cbPacket.getCreateEntity() == null) // TODO remove
 				LOG.error("SKATA cbPacket.getCreate() == nulls");
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
 			
@@ -188,7 +191,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerBean cbPacket = new CtxBrokerBean();
+		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 		// use the method : createAttribute(CtxEntityIdentifier scope, String type)
 		CtxBrokerCreateAttributeBean ctxBrokerCreateAttributeBean = new CtxBrokerCreateAttributeBean();
 		// add the signatures of the method
@@ -203,7 +206,7 @@ public class CtxBrokerClient implements ICommCallback {
 		ctxBrokerCreateAttributeBean.setScope(ctxEntIdBean);
 
 		ctxBrokerCreateAttributeBean.setType(type);
-		cbPacket.setCreateAttr(ctxBrokerCreateAttributeBean);
+		cbPacket.setCreateAttribute(ctxBrokerCreateAttributeBean);
 
 		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
 		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
@@ -232,7 +235,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerBean cbPacket = new CtxBrokerBean();
+		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 		// use the method : createAssociation(String type)
 		CtxBrokerCreateAssociationBean ctxBrokerCreateAssociationBean = new CtxBrokerCreateAssociationBean();
 		// add the signatures of the method
@@ -242,7 +245,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 
 		ctxBrokerCreateAssociationBean.setType(type);
-		cbPacket.setCreateAssoc(ctxBrokerCreateAssociationBean);
+		cbPacket.setCreateAssociation(ctxBrokerCreateAssociationBean);
 
 		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
 		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
@@ -271,7 +274,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerBean cbPacket = new CtxBrokerBean();
+		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 		// use the method : remove(CtxIdentifier identifier)
 		CtxBrokerRemoveBean ctxBrokerRemoveBean = new CtxBrokerRemoveBean();
 		// add the signatures of the method
@@ -316,7 +319,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerBean cbPacket = new CtxBrokerBean();
+		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 		// use the method : update
 		CtxBrokerUpdateBean ctxBrokerUpdateBean = new CtxBrokerUpdateBean();
 		// add the signatures of the method
@@ -374,7 +377,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerBean cbPacket = new CtxBrokerBean();
+		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 		// use the method : remove(CtxIdentifier identifier)
 		CtxBrokerUpdateAttributeBean ctxBrokerUpdateAttributeBean = new CtxBrokerUpdateAttributeBean();
 		// add the signatures of the method
@@ -388,7 +391,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 
 		ctxBrokerUpdateAttributeBean.setValue((byte[]) value);
-		cbPacket.setUpdateAttr(ctxBrokerUpdateAttributeBean);
+		cbPacket.setUpdateAttribute(ctxBrokerUpdateAttributeBean);
 
 		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
 		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
@@ -420,7 +423,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerBean cbPacket = new CtxBrokerBean();
+		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 		// use the method : retrieve
 		CtxBrokerRetrieveBean ctxBrokerRetrieveBean = new CtxBrokerRetrieveBean();
 		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
@@ -463,7 +466,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
-		CtxBrokerBean cbPacket = new CtxBrokerBean();
+		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 		// use the method : lookup
 		CtxBrokerLookupBean ctxBrokerLookupBean = new CtxBrokerLookupBean();
 		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();

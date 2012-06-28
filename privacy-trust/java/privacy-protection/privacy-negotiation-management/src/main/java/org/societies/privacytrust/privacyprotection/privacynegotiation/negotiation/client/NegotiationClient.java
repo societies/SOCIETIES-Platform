@@ -229,6 +229,7 @@ public class NegotiationClient implements INegotiationClient {
 		
 	}
 	private IIdentity selectIdentity(List<IIdentityOption> idOptions, IAgreement agreement) {
+		/**
 		List<IIdentity> identities = new ArrayList<IIdentity>();
 		List<String> strIds = new ArrayList<String>();
 		for (IIdentityOption idOption : idOptions){
@@ -254,6 +255,13 @@ public class NegotiationClient implements INegotiationClient {
 			}
 		}
 		return selectedIdentity;
+		**/
+		if (idOptions.size()==0){
+			return this.idm.getThisNetworkNode();
+		}
+		
+		//replace this line with above code when we enable multiple identities
+		return idOptions.get(0).getReferenceIdentity();
 			
 	}
 
