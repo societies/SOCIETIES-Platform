@@ -27,6 +27,7 @@ package org.societies.privacytrust.privacyprotection.privacynegotiation;
 import java.util.Hashtable;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +82,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	private IIdentitySelection identitySelection;
 	
 	private ICommManager commsMgr;
+	
 	
 	
 	/**
@@ -196,7 +198,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		this.identitySelection = identitySelection;
 	}
 	public PrivacyPolicyNegotiationManager(){	
-		
+		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
 	}
 
     public void initialisePrivacyPolicyNegotiationManager(){

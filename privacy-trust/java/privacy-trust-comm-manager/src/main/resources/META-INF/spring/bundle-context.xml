@@ -33,7 +33,8 @@
 	<bean name="PrivacyTrustCommServer"
 		class="org.societies.privacytrust.remote.PrivacyTrustCommServer"
 		depends-on="commManager"
-		init-method="initBean">
+		init-method="initBean"
+		destroy-method="destroyBean">
 		<property name="commManager" ref="commManager" />
 		<property name="privacyDataManagerCommServer" ref="PrivacyDataManagerCommServer" />
 		<property name="privacyPolicyManagerCommServer" ref="PrivacyPolicyManagerCommServer" />

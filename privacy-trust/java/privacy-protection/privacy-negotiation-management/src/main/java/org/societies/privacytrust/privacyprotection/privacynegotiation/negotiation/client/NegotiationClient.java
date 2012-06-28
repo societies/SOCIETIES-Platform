@@ -109,6 +109,7 @@ public class NegotiationClient implements INegotiationClient {
 	private IIdentitySelection idS;
 	private IPrivacyPreferenceManager privPrefMgr;
 	private IIdentityManager idm;
+	private IIdentity userIdentity;
 
 	public NegotiationClient(INegotiationAgent negotiationAgent, PrivacyPolicyNegotiationManager policyMgr){
 		this.negotiationAgent = negotiationAgent;
@@ -122,6 +123,7 @@ public class NegotiationClient implements INegotiationClient {
 		this.idm = policyMgr.getIdm();
 		this.myPolicies = new Hashtable<Requestor, ResponsePolicy>();
 		this.agreements = new Hashtable<Requestor, IAgreement>();
+		this.userIdentity = idm.getThisNetworkNode();
 		
 		
 	}
@@ -142,6 +144,7 @@ public class NegotiationClient implements INegotiationClient {
 			str = str.concat(s+"\n");
 		}
 		if (notFoundTypes.size()>0){
+			log("Service requires these contextTypes\n"+str+"which don't exist");
 			JOptionPane.showMessageDialog(null, "Service requires these contextTypes\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
 			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
 			try {
@@ -197,6 +200,10 @@ public class NegotiationClient implements INegotiationClient {
 			ClientResponseChecker checker = new ClientResponseChecker();
 			if (checker.checkResponse(myResponsePolicy, policy)){
 				IAgreement agreement = new NegotiationAgreement(policy);
+				agreement.setUserPublicIdentity(this.userIdentity);
+				
+				
+				
 				
 				this.agreements.put(policy.getRequestor(), agreement);
 				//TODO: select an identity and call setFinalIdentity(..);

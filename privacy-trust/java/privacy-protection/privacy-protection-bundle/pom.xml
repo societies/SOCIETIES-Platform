@@ -55,16 +55,15 @@
 			<timezone>+0</timezone>
 		</developer>
 	</developers>
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 
 	<dependencies>
-		<!-- add your dependencies here -->
+		<!-- Societies -->
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -77,11 +76,7 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.1</version>
-		</dependency>
+		<!-- Societies Privacy -->
 		<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>api</artifactId>
@@ -111,27 +106,27 @@
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>assessment</artifactId>
 			<version>${version.pt}</version>
-			<!--scope>compile</scope-->
 		</dependency>
 		<dependency>
-		    <groupId>org.societies.privacytrust.privacyprotection</groupId>
-		    <artifactId>privacynegotiationmanagement</artifactId>
-		    <version>${version.pt}</version>
-		    </dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>privacynegotiationmanagement</artifactId>
+			<version>${version.pt}</version>
+		</dependency>
+		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.0</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- logging -->
+		<!-- Log -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- spring -->
+		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -148,13 +143,9 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<!--Import-Package>
-							org.slf4j.*,
-							org.junit.*,
-							org.springframework.beans.factory.annotation;version="0",
-							org.springframework.stereotype;version="0",
-							javax.annotation;version="0",**;resolution:=optional
-						</Import-Package-->
+						<!--Import-Package> org.slf4j.*, org.junit.*, org.springframework.beans.factory.annotation;version="0", 
+							org.springframework.stereotype;version="0", javax.annotation;version="0",**;resolution:=optional 
+							</Import-Package -->
 
 						<!-- <Bundle-Activator></Bundle-Activator> <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency> 
 							<Embed-Transitive>true</Embed-Transitive> <Import-Package>!javax.swing.*</Import-Package> 
@@ -163,7 +154,6 @@
 						<Bundle-Name>${project.name}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Embed-Dependency>
-							commons-lang3;scope=compile|runtime,
 							gson;scope=compile|runtime,
 							api;scope=compile|runtime,
 							identityselection;scope=compile|runtime,
@@ -172,9 +162,8 @@
 							privacypreferencemanagement;scope=compile|runtime,
 							assessment;scope=compile|runtime,
 							privacynegotiationmanagement;scope=compile|runtime
-							</Embed-Dependency>
+						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-
 						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
@@ -193,7 +182,6 @@
 							<artifactId>${project.artifactId}</artifactId>
 							<version>${project.version}</version>
 							<type>jar</type>
-							<!--type>bundle</type-->
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>

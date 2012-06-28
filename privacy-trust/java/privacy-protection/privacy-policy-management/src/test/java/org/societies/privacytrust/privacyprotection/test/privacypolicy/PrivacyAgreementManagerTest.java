@@ -133,15 +133,15 @@ public class PrivacyAgreementManagerTest extends AbstractJUnit4SpringContextTest
 		cisAgreementIdList.add(cisAgreementAttribute.getId());
 		List<CtxIdentifier> serviceAgreementIdList = new ArrayList<CtxIdentifier>();
 		serviceAgreementIdList.add(serviceAgreementAttribute.getId());
-		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorCis))).thenReturn(new AsyncResult<List<CtxIdentifier>>(cisAgreementIdList));
-		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorService))).thenReturn(new AsyncResult<List<CtxIdentifier>>(serviceAgreementIdList));
+		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, PrivacyAgreementManagerInternal.getRequestorId(requestorCis))).thenReturn(new AsyncResult<List<CtxIdentifier>>(cisAgreementIdList));
+		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, PrivacyAgreementManagerInternal.getRequestorId(requestorService))).thenReturn(new AsyncResult<List<CtxIdentifier>>(serviceAgreementIdList));
 		Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PRIVACY_POLICY_AGREEMENT)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 		IndividualCtxEntity weirdPerson = new IndividualCtxEntity(personEntity.getId());
 		Mockito.when(ctxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
 		Mockito.when(ctxBroker.createAssociation(CtxAssociationTypes.HAS_PRIVACY_POLICY_AGREEMENTS)).thenReturn(new AsyncResult<CtxAssociation>(hasPrivacyAgreements));
 		Mockito.when(ctxBroker.createEntity(CtxEntityTypes.PRIVACY_POLICY_AGREEMENT)).thenReturn(new AsyncResult<CtxEntity>(agreementEntity));
-		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) agreementEntity.getId(), CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorCis))).thenReturn(new AsyncResult<CtxAttribute>(cisAgreementAttribute));
-		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) agreementEntity.getId(), CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorService))).thenReturn(new AsyncResult<CtxAttribute>(serviceAgreementAttribute));
+		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) agreementEntity.getId(), PrivacyAgreementManagerInternal.getRequestorId(requestorCis))).thenReturn(new AsyncResult<CtxAttribute>(cisAgreementAttribute));
+		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) agreementEntity.getId(), PrivacyAgreementManagerInternal.getRequestorId(requestorService))).thenReturn(new AsyncResult<CtxAttribute>(serviceAgreementAttribute));
 //		Mockito.when(ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT)).thenReturn(new AsyncResult<CtxAttribute>(registryAttribute));
 		Mockito.when(ctxBroker.retrieve(cisAgreementAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(cisAgreementAttribute));
 		Mockito.when(ctxBroker.retrieve(serviceAgreementAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(serviceAgreementAttribute));
@@ -175,15 +175,15 @@ public class PrivacyAgreementManagerTest extends AbstractJUnit4SpringContextTest
 
 		// CtxBorker
 		ICtxBroker ctxBroker = Mockito.mock(ICtxBroker.class);
-		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorCis))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
-		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorService))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
+		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, PrivacyAgreementManagerInternal.getRequestorId(requestorCis))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
+		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, PrivacyAgreementManagerInternal.getRequestorId(requestorService))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 		Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PRIVACY_POLICY_AGREEMENT)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 		IndividualCtxEntity weirdPerson = new IndividualCtxEntity(personEntity.getId());
 		Mockito.when(ctxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
 		Mockito.when(ctxBroker.createAssociation(CtxAssociationTypes.HAS_PRIVACY_POLICY_AGREEMENTS)).thenReturn(new AsyncResult<CtxAssociation>(hasPrivacyAgreements));
 		Mockito.when(ctxBroker.createEntity(CtxEntityTypes.PRIVACY_POLICY_AGREEMENT)).thenReturn(new AsyncResult<CtxEntity>(agreementEntity));
-		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) agreementEntity.getId(), CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorCis))).thenReturn(new AsyncResult<CtxAttribute>(cisAgreementAttribute));
-		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) agreementEntity.getId(), CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorService))).thenReturn(new AsyncResult<CtxAttribute>(serviceAgreementAttribute));
+		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) agreementEntity.getId(), PrivacyAgreementManagerInternal.getRequestorId(requestorCis))).thenReturn(new AsyncResult<CtxAttribute>(cisAgreementAttribute));
+		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) agreementEntity.getId(), PrivacyAgreementManagerInternal.getRequestorId(requestorService))).thenReturn(new AsyncResult<CtxAttribute>(serviceAgreementAttribute));
 //		Mockito.when(ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT)).thenReturn(new AsyncResult<CtxAttribute>(registryAttribute));
 		Mockito.when(ctxBroker.retrieve(cisAgreementAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(cisAgreementAttribute));
 		Mockito.when(ctxBroker.retrieve(serviceAgreementAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(serviceAgreementAttribute));
@@ -258,10 +258,10 @@ public class PrivacyAgreementManagerTest extends AbstractJUnit4SpringContextTest
 		hasPrivacyAgreements = new CtxAssociation(new CtxAssociationIdentifier(mockId.getJid(), CtxAssociationTypes.HAS_PRIVACY_POLICY_AGREEMENTS, new Long(3)));
 		CtxEntityIdentifier policyEntityId = new CtxEntityIdentifier(mockId.getJid(), CtxEntityTypes.PRIVACY_POLICY_AGREEMENT, new Long(1));
 		agreementEntity = new CtxEntity(policyEntityId);
-		CtxAttributeIdentifier cisAgreementAttributeId = new CtxAttributeIdentifier(policyEntityId, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorCis), new Long(2));
+		CtxAttributeIdentifier cisAgreementAttributeId = new CtxAttributeIdentifier(policyEntityId, PrivacyAgreementManagerInternal.getRequestorId(requestorCis), new Long(2));
 		cisAgreementAttribute = new CtxAttribute(cisAgreementAttributeId);
 		cisAgreementAttribute.setBinaryValue(SerialisationHelper.serialise(agreementCis));
-		CtxAttributeIdentifier serviceAgreementAttributeId = new CtxAttributeIdentifier(policyEntityId, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+PrivacyAgreementManagerInternal.getRequestorId(requestorService), new Long(2));
+		CtxAttributeIdentifier serviceAgreementAttributeId = new CtxAttributeIdentifier(policyEntityId, PrivacyAgreementManagerInternal.getRequestorId(requestorService), new Long(2));
 		serviceAgreementAttribute = new CtxAttribute(serviceAgreementAttributeId);
 		serviceAgreementAttribute.setBinaryValue(SerialisationHelper.serialise(agreementService));
 //		CtxAttributeIdentifier registryAttrId = new CtxAttributeIdentifier(ctxPersonId, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT, new Long(2));

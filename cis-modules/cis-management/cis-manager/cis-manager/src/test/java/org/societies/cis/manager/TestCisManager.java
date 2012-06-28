@@ -70,7 +70,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.schema.cis.community.Community;
@@ -107,6 +109,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private ICommManager mockCISendpoint1;
 	private ICommManager mockCISendpoint2;
 	private ICommManager mockCISendpoint3;
+	private IPrivacyPolicyManager mockPrivacyPolicyManager;
 	
 	private IServiceDiscoveryRemote mockIServDiscRemote;
 	private IServiceControlRemote mockIServCtrlRemote;
@@ -186,6 +189,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	
 	void mockingDB(){
+
 		mockedSessionFactory = mock(org.hibernate.SessionFactory.class);
 		mockedSession = mock(org.hibernate.classic.Session.class);
 		mockedTransaction = mock(org.hibernate.Transaction.class);
@@ -317,7 +321,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockCcmFactory = mock(ICISCommunicationMgrFactory.class);
 		mockIServDiscRemote = mock(IServiceDiscoveryRemote.class);
 		mockIServCtrlRemote = mock(IServiceControlRemote.class);
-		
+		mockPrivacyPolicyManager = mock(IPrivacyPolicyManager.class);		
 		
 		
 		// mocking the IcomManagers
@@ -334,6 +338,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockICisDirRemote1 = mock (ICisDirectoryRemote.class);
 		//mockICisDirRemote2 = mock (ICisDirectoryRemote.class);
 		//mockICisDirRemote3 = mock (ICisDirectoryRemote.class);
+		
+		when(mockPrivacyPolicyManager.deletePrivacyPolicy(any(org.societies.api.identity.RequestorCis.class))).thenReturn(true);
+		when(mockPrivacyPolicyManager.updatePrivacyPolicy(anyString(),any(org.societies.api.identity.RequestorCis.class))).thenReturn(null);
+		
 		
 		doNothing().when(mockICisDirRemote1).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
 		doNothing().when(mockIServCtrlRemote).registerCISEndpoint(any(org.societies.api.comm.xmpp.interfaces.ICommManager.class));
@@ -435,7 +443,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote); cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		assertEquals(CIS_MANAGER_CSS_ID, cisManagerUnderTest.cisManagerId.getJid());
@@ -455,7 +463,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -485,7 +493,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		//this.deleteFromTables(new String[] { "org_societies_cis_manager_Cis"});		
 	}
 	
-	
 	//@Ignore
 	//@Rollback(true)
 	@Test
@@ -493,7 +500,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory);cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1); 
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote); 
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager); 
 		
 		cisManagerUnderTest.init();
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -547,7 +554,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest = new CisManager();
 		//LOG.info("testdeleteCIS, sessionFactory: "+sessionFactory.hashCode());
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -609,7 +616,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -641,7 +648,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -690,7 +697,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		
@@ -740,7 +747,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 	
@@ -803,7 +810,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -869,7 +876,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -944,7 +951,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
@@ -1001,7 +1008,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
