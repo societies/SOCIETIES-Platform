@@ -32,6 +32,7 @@ import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
@@ -78,7 +79,9 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
+import org.societies.privacytrust.privacyprotection.api.identity.IIdentityOption;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
+import org.societies.privacytrust.privacyprotection.api.identity.ILinkabilityDetail;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
@@ -103,6 +106,8 @@ public class PrivacyNegotiationTest {
 	private IPrivacyDataManagerInternal privacyDataManager = Mockito.mock(IPrivacyDataManagerInternal.class);
 	private IPrivacyAgreementManagerInternal policyAgreementMgr = Mockito.mock(IPrivacyAgreementManagerInternal.class);
 	private INegotiationAgent negAgent = Mockito.mock(INegotiationAgent.class);
+	private IIdentitySelection ids = Mockito.mock(IIdentitySelection.class);
+
 	private RequestorService requestorService;
 	private RequestorCis requestorCis;
 	private RequestPolicy servicePolicy;
@@ -245,6 +250,7 @@ public class PrivacyNegotiationTest {
 			Mockito.when(negAgent.negotiate(Mockito.eq(requestorService), (ResponsePolicy) Mockito.anyObject())).thenReturn(new AsyncResult<ResponsePolicy>(serviceResponsePolicy));
 			Mockito.when(negAgent.negotiate(Mockito.eq(requestorCis), (ResponsePolicy) Mockito.anyObject())).thenReturn(new AsyncResult<ResponsePolicy>(cisResponsePolicy));
 			Mockito.when(negAgent.acknowledgeAgreement((IAgreementEnvelope) Mockito.anyObject())).thenReturn(new AsyncResult<Boolean>(true));
+			Mockito.when(ids.processIdentityContext((IAgreement) Mockito.anyObject())).thenReturn(this.getIdOptions());
 			
 			
 		} catch (CtxException e) {
@@ -254,6 +260,39 @@ public class PrivacyNegotiationTest {
 		
 	}
 	
+	public List<IIdentityOption> getIdOptions(){
+		ArrayList<IIdentityOption> idOptions = new ArrayList<IIdentityOption>();
+		
+		IIdentityOption option = new IIdentityOption() {
+			
+			@Override
+			public IIdentity getReferenceIdentity() {
+				// TODO Auto-generated method stub
+				return userId;
+			}
+			
+			@Override
+			public List<ILinkabilityDetail> getOrderedLinkabilityDetailList() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public Map<IIdentity, ILinkabilityDetail> getLinkabilityDetailMap() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public int getIdentityContextMatch() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+		};
+		
+		idOptions.add(option);
+		return idOptions;
+	}
 	@Test
 	public void TestStartNegotiation(){
 
