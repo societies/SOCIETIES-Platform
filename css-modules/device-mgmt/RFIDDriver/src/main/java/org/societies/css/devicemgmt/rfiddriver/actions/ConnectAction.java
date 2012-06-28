@@ -22,79 +22,101 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables;
+package org.societies.css.devicemgmt.rfiddriver.actions;
 
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.List;
+
+import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.model.DeviceActionsConstants;
 import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
+import org.societies.css.devicemgmt.rfiddriver.impl.RFIDDriver;
+import org.societies.css.devicemgmt.rfiddriver.readers.RfidReader;
+import org.societies.css.devicemgmt.rfiddriver.statesvariables.IpAddressStatesVariable;
 
 /**
- * Describe your class here...
+ * This class represents the connect action implementation
+ * The connect action permits to the RFID 3P Server to connect the driver to a specific RFID Reader through a Sockets
  *
- * @author rafik
+ * @author Rafik
  *
  */
-public class MessageStateVariable implements IDeviceStateVariable{
-
-	final private String NAME = DeviceStateVariableConstants.MESSAGE_STATE_VARIABLE;
-
-	@Override
-	public String[] getAllowedValues() {
-		return null;
-	}
-
-
-	@Override
-	public Object getDefaultValue() {
-		
-		return "Display messages";
-	}
-
-
-	@Override
-	public Class<?> getDataJavaType() {
-		return String.class;
-	}
-
-
-	@Override
-	public Number getMaximumValue() {
-		return null;
-	}
-
-
-	@Override
-	public Number getMinimumValue() {
-		return null;
-	}
+public class ConnectAction implements IAction{
 
 	
+	final private String NAME = DeviceActionsConstants.RFID_CONNECT_ACTION;
+	
+	final private String OUTPUT = null;
+	
+	final private String INPUT = DeviceStateVariableConstants.IP_ADDRESS_STATE_VARIABLE;
+	
+	private List<String> outputArguments;
+	private List<String> inputArguments;
+	
+	private RfidReader rfidReader;
+	private IpAddressStatesVariable ipAddressStatesVariable;
+
+	public ConnectAction(RfidReader rfidReader, IpAddressStatesVariable ipAddressStatesVariable) {
+		this.rfidReader = rfidReader;
+		this.ipAddressStatesVariable = ipAddressStatesVariable;
+		
+		inputArguments = new ArrayList<String>();
+		this.inputArguments.add(INPUT);
+		
+	}
+	
+	
+	@Override
+	public List<String> getInputArgumentNames() {
+		return inputArguments;
+	}
+
+
 	@Override
 	public String getName() {
+		
 		return NAME;
 	}
 
 
 	@Override
-	public Number getStep() {
-		return null;
-	}
-
-
-	@Override
-	public String getDeviceMgmtDataType() {
+	public List<String> getOutputArgumentNames() {
 		return null;
 	}
 
 	
 	@Override
-	public boolean isEnventable() {
-		return false;
+	public IDeviceStateVariable getStateVariable(String argumentName) {
+		return ipAddressStatesVariable;
 	}
 
-
+	
 	@Override
-	public String getDescription() {
-		return "Represent the message variable";
+	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments) {
+		
+		String ipAddress = (String)arguments.get(INPUT);
+		
+		if (null != ipAddress) {
+			
+			rfidReader.connect(ipAddress);
+			
+		}
+		return null;
+	}
+
+	
+	@Override
+	public String getActionDescription() {
+		return "Used to connect the the driver to a given RFID reader";
+	}
+
+	
+	@Override
+	public String getActionName() {
+
+		return "Connect to an RFID Reader";
 	}
 
 }

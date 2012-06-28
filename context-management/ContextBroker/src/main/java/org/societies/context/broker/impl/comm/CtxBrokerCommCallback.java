@@ -38,7 +38,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxModelBeanTranslator;
-import org.societies.api.schema.context.contextmanagement.CtxBrokerBeanResult;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
@@ -80,9 +80,9 @@ public class CtxBrokerCommCallback implements ICommCallback {
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
 		LOG.info("inside receiveResult 1");
-		if (msgBean.getClass().equals(CtxBrokerBeanResult.class)) {
+		if (msgBean.getClass().equals(CtxBrokerResponseBean.class)) {
 			
-			CtxBrokerBeanResult payload = (CtxBrokerBeanResult) msgBean;
+			CtxBrokerResponseBean payload = (CtxBrokerResponseBean) msgBean;
 			try {
 			
 				LOG.info("inside receiveResult 2");
