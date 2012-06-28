@@ -187,7 +187,7 @@ public class PrivacyDataManagerTest
 		String testTitle = new String("testHasObfuscatedVersion");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 		
-		IDataWrapper<Name> wrapper = new DataWrapper<Name>(DataIdentifierUtil.generateUri(dataId), null);
+		IDataWrapper<Name> wrapper = new DataWrapper<Name>(dataId.getUri(), null);
 		LOG.info("[#"+testCaseNumber+"] "+wrapper);
 		String actual = "";
 		try {
