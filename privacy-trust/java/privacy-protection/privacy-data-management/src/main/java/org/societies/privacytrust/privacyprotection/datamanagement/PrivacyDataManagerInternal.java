@@ -72,14 +72,14 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// -- Retrieve the privacy permission
 			Criteria criteria = session
 					.createCriteria(PrivacyPermission.class)
-					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getJid()))
-					.add(Restrictions.eq("ownerId", ownerId.getJid()))
-					.add(Restrictions.eq("dataId", dataId.toUriString()));
+					.add(Restrictions.like("requestorId", requestor.getRequestorId().getJid()))
+					.add(Restrictions.like("ownerId", ownerId.getJid()))
+					.add(Restrictions.like("dataId", dataId.toUriString()));
 			if (requestor instanceof RequestorCis) {
-				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
+				criteria.add(Restrictions.like("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
 			}
 			else if (requestor instanceof RequestorService) {
-				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
+				criteria.add(Restrictions.like("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
 			}
 			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
 

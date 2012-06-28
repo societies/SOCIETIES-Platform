@@ -107,7 +107,6 @@ public class PrivacyDataManagerTest
 			Action action = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(action);
-			Decision decision = Decision.PERMIT;
 			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, ownerId, dataId, action);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
