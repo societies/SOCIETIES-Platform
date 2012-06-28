@@ -38,5 +38,19 @@ public class DeviceStateVariableConstants {
 	 * This constants can be used by the 3P service to get the lightLevel state variable object from driver service
 	 */
 	public static final String LIGHT_LEVEL_STATE_VARIABLE = "lightLevel";
+	
+	
+	/**
+	 * Represents the name of a sate variable provided by the screen device simulator
+	 * This constants can be used by the 3P service to get the message state variable object from driver service
+	 */
+	public static final String MESSAGE_STATE_VARIABLE = "message";
+	
+	
+	/**
+	 * Represents the name of a sate variable provided by the HWU RFID Driver
+	 * This constants can be used by the 3P service to get the ipAddress state variable object from driver service
+	 */
+	public static final String IP_ADDRESS_STATE_VARIABLE = "ipAddress";
 
 }

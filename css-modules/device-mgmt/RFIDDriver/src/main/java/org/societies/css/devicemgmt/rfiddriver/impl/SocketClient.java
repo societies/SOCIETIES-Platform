@@ -25,16 +25,13 @@
 package  org.societies.css.devicemgmt.rfiddriver.impl;
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.css.devicemgmt.rfid.RFIDUpdateEvent;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
@@ -59,6 +56,8 @@ public class SocketClient extends Thread{
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	private final String rfidAddress;
+
+	private String deviceId;
 
 	public SocketClient(String rfidAddress){
 		this.rfidAddress = rfidAddress;
@@ -155,14 +154,18 @@ public class SocketClient extends Thread{
 					
 					//this.rfidServer.sendUpdate(wakeUpUnit, tag);
 					//send an event to notify new data arrived
-					RFIDUpdateEvent rfidEvent = new RFIDUpdateEvent(wakeUpUnit, tag);
+					//RFIDUpdateEvent rfidEvent = new RFIDUpdateEvent(wakeUpUnit, tag);
 					
-					InternalEvent event = new InternalEvent(EventTypes.RFID_UPDATE_EVENT, "RFIDUpdate", "RFIDDriver", (Serializable) rfidEvent);
+					HashMap<String, Object> payload = new HashMap<String, Object>();
+					payload.put("wakeupUnit", wakeUpUnit);
+					payload.put("tagNumber", tag);
+					
+					
+					InternalEvent event = new InternalEvent(EventTypes.RFID_UPDATE_EVENT, DeviceMgmtEventConstants.RFID_READER_EVENT, deviceId, payload);
 					try {
 						this.eventMgr.publishInternalEvent(event);
 						this.logging.debug("Published internal event: "+wakeUpUnit+"-"+tag);
 					} catch (EMSException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -193,6 +196,22 @@ public class SocketClient extends Thread{
 	 */
 	public void setEventMgr(IEventMgr eventMgr) {
 		this.eventMgr = eventMgr;
+	}
+	
+	
+	/**
+	 * 
+	 * @param deviceId
+	 */
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+	
+	/**
+	 * @return the deviceId
+	 */
+	public String getDeviceId() {
+		return deviceId;
 	}
 
 

@@ -44,5 +44,12 @@ public class DeviceActionsConstants {
 	 * This constants can be used by the 3P service to get the getLightLevel action object from driver service
 	 */
 	public static final String LIGHT_SENSOR_GET_LIGHT_LEVEL_ACTION = "getLightLevel";
+	
+	
+	/**
+	 * Represents the name of an action provided by the HWU RFID Driver
+	 * This constants can be used by the 3P service to get the connect action object from driver service
+	 */
+	public static final String RFID_CONNECT_ACTION = "connect";
 
 }
