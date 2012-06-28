@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables;
+package org.societies.css.devicemgmt.rfiddriver.statesvariables;
 
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
@@ -30,12 +30,12 @@ import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
 /**
  * Describe your class here...
  *
- * @author rafik
+ * @author Rafik
  *
  */
-public class MessageStateVariable implements IDeviceStateVariable{
+public class IpAddressStatesVariable implements IDeviceStateVariable{
 
-	final private String NAME = DeviceStateVariableConstants.MESSAGE_STATE_VARIABLE;
+	final private String NAME = DeviceStateVariableConstants.IP_ADDRESS_STATE_VARIABLE;
 
 	@Override
 	public String[] getAllowedValues() {
@@ -45,8 +45,7 @@ public class MessageStateVariable implements IDeviceStateVariable{
 
 	@Override
 	public Object getDefaultValue() {
-		
-		return "Display messages";
+		return "localhost";
 	}
 
 
@@ -55,7 +54,7 @@ public class MessageStateVariable implements IDeviceStateVariable{
 		return String.class;
 	}
 
-
+	
 	@Override
 	public Number getMaximumValue() {
 		return null;
@@ -85,7 +84,7 @@ public class MessageStateVariable implements IDeviceStateVariable{
 		return null;
 	}
 
-	
+
 	@Override
 	public boolean isEnventable() {
 		return false;
@@ -94,7 +93,8 @@ public class MessageStateVariable implements IDeviceStateVariable{
 
 	@Override
 	public String getDescription() {
-		return "Represent the message variable";
+
+		return "Represents the IP Address of the wakeup unit";
 	}
 
 }

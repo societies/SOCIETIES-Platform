@@ -103,8 +103,8 @@
               				org.springframework.context,
               				org.societies.api.osgi.event
               			</Import-Package> 
-          </instructions>
-      </configuration>
+          			</instructions>
+     			 </configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>

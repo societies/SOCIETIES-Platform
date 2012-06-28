@@ -114,6 +114,16 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (!isDepencyInjectionDone()) {
 			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
 		}
+		// Verifications
+		if (null == ownerId) {
+			throw new PrivacyException("[Parameters] OwnerId is missing");
+		}
+		if (null == requestor) {
+			throw new PrivacyException("[Parameters] RequestorId is missing");
+		}
+		if (null == dataId) {
+			throw new PrivacyException("[Parameters] DataId is missing");
+		}
 
 		Session session = sessionFactory.openSession();
 		boolean result = false;
