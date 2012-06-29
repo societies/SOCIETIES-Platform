@@ -40,10 +40,10 @@ public class DirectTrust extends Trust implements IDirectTrust {
 
 	private static final long serialVersionUID = 2604976855460869815L;
 	
-	@Column(name = "directRating")
+	@Column(name = "direct_rating")
 	private Double rating;
 	
-	@Column(name = "directScore")
+	@Column(name = "direct_score")
 	private Double score = 0.0d;
 
 	/*

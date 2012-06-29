@@ -24,34 +24,50 @@
  */
 package org.societies.api.identity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.schema.identity.DataIdentifier;
 
 /**
- * Util method that helps manipulating DataIdentifier objects
+ * Simple data identifier implementations that helps managing data identifiers
  *
  * @author Olivier Maridat (Trialog)
  *
  */
-public class DataIdentifierUtil {
-	/**
-	 * Generate a URI: type/ownerId/
-	 * @param dataId
-	 * @return
-	 */
-	public static String toUriString(DataIdentifier dataId)
-	{
-		StringBuilder str = new StringBuilder("");
-		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
-		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
-		return str.toString();
+public class SimpleDataIdentifier extends DataIdentifier {
+	@Override
+	public String getUri() {
+		uri = DataIdentifierUtil.toUriString(this);
+		return uri;
 	}
 	
-	public static DataIdentifier fromUri(String dataIdUri)
-	{
-		String[] infos = dataIdUri.split("/");
-		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setType(infos[0]);
-		dataId.setOwnerId(infos[1]);
-		return dataId;
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "SimpleDataIdentifier ["
+				+ (ownerId != null ? "ownerId=" + ownerId + ", " : "")
+				+ (type != null ? "type=" + type + ", " : "")
+				+ (uri != null ? "uri=" + uri : "") + "]";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		SimpleDataIdentifier rhs = (SimpleDataIdentifier) obj;
+		return new EqualsBuilder()
+			.append(this.getOwnerId(), rhs.getOwnerId())
+			.append(this.getType(), rhs.getType())
+			.isEquals();
 	}
 }

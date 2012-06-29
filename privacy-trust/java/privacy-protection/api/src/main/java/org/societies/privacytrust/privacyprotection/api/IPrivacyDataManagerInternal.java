@@ -33,6 +33,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.identity.DataIdentifier;
 
 /**
  * Interface internal to privacy components to manage data access control and data access conditions.
@@ -61,7 +62,7 @@ public interface IPrivacyDataManagerInternal {
 	 * @return Success of the operation
 	 * @throws PrivacyException
 	 */
-	public boolean updatePermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
+	public boolean updatePermission(Requestor requestor, IIdentity ownerId, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
 	
 	/**
 	 * Update access control permissions over a data
