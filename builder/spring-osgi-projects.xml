@@ -101,7 +101,7 @@
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
 		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
-		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
+		<!--<module>../css-modules/device-mgmt/RegSynchroniser/</module>-->
 		<module>../css-modules/device-mgmt/DeviceCommsMgr/</module>
 		<module>../css-modules/device-mgmt/DeviceDriverSimulator/</module>
 		<module>../css-modules/device-mgmt/devicemanagerconsumer/</module>
