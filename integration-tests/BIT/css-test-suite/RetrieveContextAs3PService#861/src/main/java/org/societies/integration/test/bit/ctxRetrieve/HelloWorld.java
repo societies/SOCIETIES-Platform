@@ -116,9 +116,7 @@ public class HelloWorld implements IHelloWorld{
 
 	@Override
 	public CtxAttribute retrieveCtxAttribute(String ctxType){
-		
-		
-		
+	
 		try {
 			Future<List<CtxIdentifier>> flookupResults = this.ctxBroker.lookup(me, userIdentity, CtxModelType.ATTRIBUTE, ctxType);
 			List<CtxIdentifier> lookupResults = flookupResults.get();
