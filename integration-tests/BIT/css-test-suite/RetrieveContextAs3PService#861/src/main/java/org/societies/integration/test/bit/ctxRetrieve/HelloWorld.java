@@ -61,7 +61,7 @@ public class HelloWorld implements IHelloWorld{
 	private IIdentity userIdentity;
 	private IIdentity serviceIdentity;
 	
-	private ICommManager commManager;
+	private ICommManager commsMgr;
 	private IIdentityManager idMgr;
 	
 	private RequestorService me;
@@ -95,15 +95,15 @@ public class HelloWorld implements IHelloWorld{
 	/**
 	 * @return the commManager
 	 */
-	public ICommManager getCommManager() {
-		return commManager;
+	public ICommManager getCommsMgr() {
+		return commsMgr;
 	}
 
 	/**
 	 * @param commManager the commManager to set
 	 */
-	public void setCommManager(ICommManager commManager) {
-		this.commManager = commManager;
+	public void setCommsMgr(ICommManager commManager) {
+		this.commsMgr = commManager;
 		this.idMgr = commManager.getIdManager();
 		this.userIdentity = this.idMgr.getThisNetworkNode();
 		try {
@@ -115,11 +115,12 @@ public class HelloWorld implements IHelloWorld{
 	}
 
 	@Override
-	public CtxAttribute retrieveCtxAttribute(String ctxType) throws CtxException{
+	public CtxAttribute retrieveCtxAttribute(String ctxType){
 		
-		Future<List<CtxIdentifier>> flookupResults = this.ctxBroker.lookup(me, userIdentity, CtxModelType.ATTRIBUTE, ctxType);
+		
 		
 		try {
+			Future<List<CtxIdentifier>> flookupResults = this.ctxBroker.lookup(me, userIdentity, CtxModelType.ATTRIBUTE, ctxType);
 			List<CtxIdentifier> lookupResults = flookupResults.get();
 			if (lookupResults.size()==0){
 				return null;
@@ -132,6 +133,10 @@ public class HelloWorld implements IHelloWorld{
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Retrieve not allowed on this resource!");
 		}
 		
 		return null;

@@ -113,13 +113,9 @@ public class Tester {
 	
 	@Test
 	public void testRetrieve(){
-		try {
 			this.helloWorld.retrieveCtxAttribute(CtxAttributeTypes.NAME);
 			this.helloWorld.displayUserLocation();
-		} catch (CtxException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Retrieve not allowed on this resource!");
-		}
+	
 		
 	}
 	
