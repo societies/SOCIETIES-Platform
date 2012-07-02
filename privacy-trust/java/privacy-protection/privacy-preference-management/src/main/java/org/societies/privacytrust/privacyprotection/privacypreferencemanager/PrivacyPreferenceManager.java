@@ -168,11 +168,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	 */
 	@Override
 	public ResponseItem checkPermission(Requestor requestor, CtxAttributeIdentifier ctxId, List<Action> actions) throws PrivacyException{
+		
 		if (null==ctxId){
 			this.logging.debug("requested permission for null CtxIdentifier. returning : null");
 			return null;
 			
 		}
+		this.logging.debug("checkPermission: \nRequestor: "+requestor.toString()+"\nctxId: "+ctxId.toUriString()+"\n and actions...");
+		
 		String actionList = "";
 		for (Action a : actions){
 			actionList = actionList.concat(a.toString());
@@ -183,9 +186,11 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel model = prefCache.getPPNPreference(details);
 		if (model!=null){
+			this.logging.debug("Preference for specific request found");
 			return this.checkPreferenceForAccessControl(model, requestor, ctxId, conditions, actions);
 		}
 
+		this.logging.debug("Preference for specific request NOT found");
 		details = new PPNPreferenceDetails(ctxId.getType());
 		details.setRequestor(requestor);
 		model = this.prefCache.getPPNPreference(details);
@@ -226,15 +231,16 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	 */
 	@Override
 	public ResponseItem checkPermission(Requestor requestor, String ctxType, List<Action> actions) throws PrivacyException{
-
+		this.logging.debug("checkPermission: \nRequestor: "+requestor.toString()+"\nctxType : "+ctxType+"\n and actions...");
 		PPNPreferenceDetails details = new PPNPreferenceDetails(ctxType);
 		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel model = prefCache.getPPNPreference(details);
 		List<Condition> conditions = new ArrayList<Condition>();
 		if (model!=null){
+			this.logging.debug("Preference for specific request found");
 			return this.checkPreferenceForAccessControl(model, requestor, ctxType, conditions, actions);
 		}
-		
+		this.logging.debug("Preference for specific request NOT found");
 		details = new PPNPreferenceDetails(ctxType);
 		model = prefCache.getPPNPreference(details);
 		if (model!=null){
