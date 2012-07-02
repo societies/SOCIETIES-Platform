@@ -57,6 +57,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.context.broker.api.CtxBrokerException;
@@ -284,26 +285,44 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	}
 
 	/*
-	 * @see org.societies.api.context.broker.ICtxBroker#retrieveIndividualEntity(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieveIndividualEntityId(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
 	 */
 	@Override
 	@Async
-	public Future<IndividualCtxEntity> retrieveIndividualEntity(
+	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
 			final Requestor requestor, final IIdentity cssId) throws CtxException {
 
 		if (requestor == null)
 			throw new NullPointerException("requestor can't be null");
 		if (cssId == null)
 			throw new NullPointerException("cssId can't be null");
+		if (!IdentityType.CSS.equals(cssId.getType()) && 
+				!IdentityType.CSS_RICH.equals(cssId.getType()) &&
+				!IdentityType.CSS_LIGHT.equals(cssId.getType()))
+			throw new IllegalArgumentException("cssId IdentityType is not CSS");
 
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving the CtxEntityIdentifier for CSS " + cssId);
+		
+		CtxEntityIdentifier individualEntityId = null;
+		
 		if (this.idMgr.isMine(cssId)) {
 			// TODO access control
-			return this.internalCtxBroker.retrieveIndividualEntity(cssId);
+			IndividualCtxEntity individualEntity;
+			try {
+				individualEntity = this.internalCtxBroker.retrieveIndividualEntity(cssId).get();
+				if (individualEntity != null)
+					individualEntityId = individualEntity.getId();
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+			}
 		} else {
 
 			LOG.warn("remote call");
-			return new AsyncResult<IndividualCtxEntity>(null);
 		}
+		
+		return new AsyncResult<CtxEntityIdentifier>(individualEntityId);
 	}
 
 	@Override

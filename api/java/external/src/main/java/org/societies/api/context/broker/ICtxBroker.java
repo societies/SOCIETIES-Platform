@@ -274,8 +274,9 @@ public interface ICtxBroker {
 			final CtxIdentifier identifier) throws CtxException;
 	
 	/**
-	 * Retrieves the {@link IndividualCtxEntity} which represents the owner
-	 * of the specified CSS. IndividualCtxEntities are most commonly of type
+	 * Retrieves the {@link CtxEntityEntityIdentifier} of the 
+	 * {@link IndividualCtxEntity} which represents the owner of the identified
+	 * CSS. IndividualCtxEntities are most commonly of type
 	 * CtxEntityTypes.PERSON; however they can also be organisations, smart
 	 * space infrastructures, autonomous or semi-autonomous agents, etc. The
 	 * method returns <code>null</code> if there is no IndividualCtxEntity
@@ -283,20 +284,19 @@ public interface ICtxBroker {
 	 * 
 	 * @param requestor
 	 *            the entity requesting to retrieve the CSS owner context 
-	 *            entity
+	 *            entity identifier
 	 * @param cssId
 	 *            the {@link IIdentity} identifying the CSS whose 
-	 *            IndividualCtxEntity to retrieve
-	 * @return the {@link IndividualCtxEntity} which represents the owner of
-	 *         the specified CSS
+	 *            IndividualCtxEntity CtxEntityIdentifier to retrieve
+	 * @return the CtxEntityEntityIdentifier of the IndividualCtxEntity which
+	 *         represents the owner of the identified CSS
 	 * @throws CtxException 
-	 *             if the IndividualCtxEntity representing the owner of the 
-	 *             specified CSS exists but cannot be retrieved
+	 *             if there is a problem retrieving the CtxEntityIdentifier
 	 * @throws NullPointerException
 	 *             if any of the specified parameters is <code>null</code>
 	 * @since 0.3
 	 */
-	public Future<IndividualCtxEntity> retrieveIndividualEntity(
+	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
 			final Requestor requestor, final IIdentity cssId) throws CtxException;
 
 	/**
