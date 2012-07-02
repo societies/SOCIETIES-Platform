@@ -437,6 +437,11 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException {
 
+		
+		if (identifier == null)
+			throw new NullPointerException("identifier can't be null");
+		
+		
 		final CtxModelObject modelObjReturn;
 		//CtxAttribute inferenceOutcome;
 		final IIdentity targetCss;
@@ -483,8 +488,16 @@ public class InternalCtxBroker implements ICtxBroker {
 			CtxAttributeIdentifier identifier, boolean enableInference)
 					throws CtxException {
 
+		if (identifier == null)
+			throw new NullPointerException("identifier can't be null");
+		
+		
 		final CtxAttribute ctxAttrReturn;
-
+		//final CtxAttribute inferedAttrReturn;
+		
+		LOG.info("identifier " + identifier);
+		LOG.info("identifier.getOwnerId() " + identifier.getOwnerId());
+		
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
@@ -511,14 +524,16 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		// inference code
 		// TO DO following lines initiate inference, uncomment when inference code is ready
-		/*
+		
 		if(enableInference == true){
 
-			if ( modelObjReturn != null && modelObjReturn instanceof CtxAttribute){
-				inferenceOutcome = this.initiateInference((CtxAttribute) modelObjReturn);
+			if ( ctxAttrReturn != null && ctxAttrReturn instanceof CtxAttribute){
+				
+				LOG.info("initiate inference for "+ ctxAttrReturn.getId());
+				//inferedAttrReturn = this.initiateInference((CtxAttribute) ctxAttrReturn);
 			} // TO DO integrate inference outcome with returned value
 	}
-		 */
+		
 		return new AsyncResult<CtxAttribute>(ctxAttrReturn);
 	}
 

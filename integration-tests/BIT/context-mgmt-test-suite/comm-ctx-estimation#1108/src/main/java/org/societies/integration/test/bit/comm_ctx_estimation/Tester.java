@@ -42,8 +42,7 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.context.community.estimation.impl.CommunityContextEstimation;
-import org.societies.context.community.estimation.impl.ConvexHull;
+
 
 /**
  * Utility class that creates mock actions
@@ -70,6 +69,8 @@ public class Tester {
 	bro = Test1108.getCtxBroker();
 	
 	}
+	
+	/*
 	@org.junit.Test	
 	public void testConvexHull(){
 		
@@ -260,5 +261,5 @@ public class Tester {
 		expectedHashMapTable.put("Chef", 2);
 		assertEquals(expectedHashMapTable, res);
 	}
-
+*/
 }
