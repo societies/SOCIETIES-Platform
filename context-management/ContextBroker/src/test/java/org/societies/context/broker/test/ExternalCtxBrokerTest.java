@@ -37,7 +37,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -59,6 +58,10 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.context.broker.impl.CtxBroker;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.broker.test.util.MockBlobClass;
@@ -212,7 +215,6 @@ public class ExternalCtxBrokerTest {
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAssociation(java.lang.String)}.
 	 */
 	@Test
-	@Ignore
 	public void testCreateAssociationByString() throws Exception {
 
 		Requestor requestor = new Requestor(mockIdentityLocal);
@@ -224,11 +226,15 @@ public class ExternalCtxBrokerTest {
 		assertEquals(mockIdentityLocal.toString(), ctxAssocHasParam.getOwnerId());
 		assertEquals(CtxAssociationTypes.HAS_PARAMETERS, ctxAssocHasParam.getType());
 
-		List<CtxIdentifier> assocIdentifierList = 
+		// mock checkPermission
+		ResponseItem mockPermitResponse = mock(ResponseItem.class);
+		when(mockPermitResponse.getDecision()).thenReturn(Decision.PERMIT);
+		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, ctxAssocHasParam.getId(), new Action(ActionConstants.READ))).thenReturn(mockPermitResponse);
+		final List<CtxIdentifier> assocIdentifierList = 
 				this.ctxBroker.lookup(requestor, mockIdentityLocal, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_PARAMETERS).get();
-		assertEquals(assocIdentifierList.size(),1);
+		assertEquals(1, assocIdentifierList.size());
 		CtxIdentifier retrievedCtxAssocHasParamID = assocIdentifierList.get(0);
-		assertEquals(retrievedCtxAssocHasParamID.toString(),ctxAssocHasParam.getId().toString());
+		assertEquals(ctxAssocHasParam.getId().toString(), retrievedCtxAssocHasParamID.toString());
 	}
 
 
