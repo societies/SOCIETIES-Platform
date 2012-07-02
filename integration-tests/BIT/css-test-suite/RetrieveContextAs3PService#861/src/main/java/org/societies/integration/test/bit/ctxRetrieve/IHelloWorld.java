@@ -25,6 +25,8 @@
 
 package org.societies.integration.test.bit.ctxRetrieve;
 
+import java.util.List;
+
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 
@@ -38,5 +40,5 @@ public interface IHelloWorld {
 
 	public void displayUserLocation();
 
-	CtxAttribute retrieveCtxAttribute(String ctxType);
+	List<CtxAttribute> retrieveCtxAttribute(String ctxType);
 }
