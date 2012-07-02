@@ -121,18 +121,35 @@ public interface ICtxBroker {
 	public Future<List<Object>> evaluateSimilarity(final Serializable objectUnderComparison, final List<Serializable> referenceObjects) throws CtxException;
 
 	/**
-	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
-	 * CtxAttribute, CtxAssociation) of  the specified type.
+	 * Looks up context model objects of the specified type associated with the
+	 * identified target CSS or CIS. The requestor on whose behalf the look-up
+	 * will be performed must also be specified. The method returns a list of
+	 * {@link CtxIdentifier CtxIdentifiers} referencing the context model
+	 * objects that match the supplied criteria.
 	 * 
 	 * @param requestor
-	 * @param targetCss
-	 *            the {@link IIdentity} of the CSS where to perform the look-up 
+	 *            the requestor on whose behalf to lookup the context model 
+	 *            objects
+	 * @param target
+	 *            the {@link IIdentity} of the CSS or CIS where to perform the
+	 *            look-up 
 	 * @param modelType
+	 *            the {@link CtxModelType} of the context model objects to
+	 *            lookup
 	 * @param type
-	 * @throws CtxException 
+	 *            the type of the context model objects to lookup
+	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
+	 *         context model objects that match the supplied criteria.
+	 * @throws CtxAccessControlException
+	 *             if the specified requestor is not allowed to perform the
+	 *             look-up
+	 * @throws CtxException
+	 *             if there is a problem performing the look-up operation 
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
 	 */
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
-			final IIdentity targetCss, final CtxModelType modelType,
+			final IIdentity target, final CtxModelType modelType,
 			final String type) throws CtxException;
 
 	/**
