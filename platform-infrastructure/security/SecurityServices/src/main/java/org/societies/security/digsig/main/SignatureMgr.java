@@ -1,4 +1,4 @@
-package org.societies.security.digsig;
+package org.societies.security.digsig.main;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.ISignatureMgr;
@@ -18,28 +18,6 @@ public class SignatureMgr implements ISignatureMgr {
 		
 		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
 
-		/*
-		SecurityManager sm = new SecurityManager();
-		sm.
-		*/
-		
-		/*
-		try {
-			throw new Exception();
-		} catch (Exception e) {
-			StackTraceElement[] stackTrace = e.getStackTrace();
-			LOG.debug("stackTrace length = {}", stackTrace.length);
-			if (stackTrace != null) {
-				for (StackTraceElement st : stackTrace) {
-					LOG.debug(" ");
-					LOG.debug("  ClassName : {}", st.getClassName());
-					//LOG.debug("  FileName  : {}", st.getFileName());
-					//LOG.debug("  MethodName: {}", st.getMethodName());
-				}
-			}
-		}
-		*/
-		
 		return xml;  // FIXME
 	}
 

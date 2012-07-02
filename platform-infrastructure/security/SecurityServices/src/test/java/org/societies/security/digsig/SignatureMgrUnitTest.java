@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.digsig.main.SignatureMgr;
 
 public class SignatureMgrUnitTest {
 
