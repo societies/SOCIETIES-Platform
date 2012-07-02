@@ -125,7 +125,7 @@ public class CommunityCtxDBMgrTest {
 
 	   // Add CommunityMemberCtxEntity
 	   member = communityDB.createCommunityEntity(mockCisIdentity);
-	   entity.addMember(member);
+	   entity.addMember(member.getId());
 	   
 	   communityDB.updateCommunityEntity(entity);
 	   System.out.println("updated entities members " + entity.getMembers());
@@ -160,7 +160,7 @@ public class CommunityCtxDBMgrTest {
 
 	   // Add CommunityMemberCtxEntity
 	   member = communityDB.createCommunityEntity(mockCisIdentity);
-	   entity.addMember(member);
+	   entity.addMember(member.getId());
 	   
 	   communityDB.updateCommunityEntity(entity);
 	   System.out.println("updated entities members " + entity.getMembers());
