@@ -22,49 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.api.identity;
 
-package org.societies.css.devicemgmt.devicemgmtold.device.api;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.schema.identity.DataIdentifier;
 
 /**
- * 
- * Interface for a GPS device.
+ * Simple data identifier implementations that helps managing data identifiers
+ *
+ * @author Olivier Maridat (Trialog)
  *
  */
-public interface GpsLocation {
+public class SimpleDataIdentifier extends DataIdentifier {
+	@Override
+	public String getUri() {
+		uri = DataIdentifierUtil.toUriString(this);
+		return uri;
+	}
 	
-	/*
-	 * 
-	 * @Return
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
 	 */
-	double getLatitude();
-	
+	@Override
+	public String toString() {
+		return "SimpleDataIdentifier ["
+				+ (ownerId != null ? "ownerId=" + ownerId + ", " : "")
+				+ (type != null ? "type=" + type + ", " : "")
+				+ (uri != null ? "uri=" + uri : "") + "]";
+	}
+
 	/*
-	 * 
-	 * @Return
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	double getLongtitude();
-	
-	/*
-	 * 
-	 * @Return
-	 */
-	float getAccuracy();
-	
-	/*
-	 * 
-	 * @return
-	 */
-	double getBearing();
-	
-	/*
-	 * 
-	 * @return
-	 */
-	String getProvider();
-	
-	/*
-	 * 
-	 * @return
-	 */
-	float getSpeed();
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		SimpleDataIdentifier rhs = (SimpleDataIdentifier) obj;
+		return new EqualsBuilder()
+			.append(this.getOwnerId(), rhs.getOwnerId())
+			.append(this.getType(), rhs.getType())
+			.isEquals();
+	}
 }

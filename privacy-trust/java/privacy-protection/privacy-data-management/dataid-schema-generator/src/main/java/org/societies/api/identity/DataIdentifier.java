@@ -42,7 +42,6 @@ public abstract class DataIdentifier {
 	/**
 	 * Id of the data owner
 	*/
-	@XmlElement(required = true)
 	private String ownerId;
 	
 	/**
@@ -52,7 +51,6 @@ public abstract class DataIdentifier {
 	 * 
 	 * E.g.: activity, context, deviceData, deviceMetaData, preference
 	*/
-	@XmlElement(required = true)
 	private String type;
 	
 	/**
@@ -99,11 +97,5 @@ public abstract class DataIdentifier {
 	 */
 	public String getUri() {
 		return uri;
-	}
-	/**
-	 * @param uri the uri to set
-	 */
-	public void setUri(String uri) {
-		this.uri= uri;
 	}
 }

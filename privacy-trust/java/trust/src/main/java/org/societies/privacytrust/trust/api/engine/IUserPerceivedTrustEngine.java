@@ -22,29 +22,62 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.api.engine;
+
+import java.util.List;
+
+import org.societies.privacytrust.trust.api.model.ITrustedCis;
+import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.ITrustedService;
 
 /**
- * This interface is used to represent the indirect trust in a {@link ITrustedEntity}.
- * The IIndirectTrust value is evaluated based on the recommendations of another
- * TrustedEntity or a chain of TrustedEntities (trust path).
+ * This interface provides methods to evaluate the user-perceived
+ * trustworthiness of {@link ITrustedEntity} objects.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 0.3
  */
-public interface IIndirectTrust extends ITrust {
+public interface IUserPerceivedTrustEngine {
 
 	/**
-	 * 
-	 * @return
-	 * @since 0.3
+	 * Evaluates the user-perceived trustworthiness of the specified list of 
+	 * {@link ITrustedCss}.
+	 *  
+	 * @param cssList
+	 *            the list of {@link ITrustedCss} whose trust values to evaluate
+	 * @throws TrustEngineException
+	 *            if there is an error during trust evaluation
+	 * @throw NullPointerException
+	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public Double getConfidence();
+	public void evaluateCssTrustValues(final List<ITrustedCss> cssList)
+			throws TrustEngineException;
 	
 	/**
-	 * 
-	 * @param confidence
-	 * @since 0.3
+	 * Evaluates the user-perceived trustworthiness of the specified list of
+	 * {@link ITrustedCis}.
+	 *  
+	 * @param cisList
+	 *            the list of {@link ITrustedCis} whose trust values to evaluate 
+	 * @throws TrustEngineException
+	 *            if there is an error during trust evaluation
+	 * @throw NullPointerException
+	 *            if any of the specified parameters is <code>null</code>
 	 */
-	public void setConfidence(final Double confidence);
+	public void evaluateCisTrustValues(final List<ITrustedCis> cisList)
+			throws TrustEngineException;
+	
+	/**
+	 * Evaluates the user-perceived trustworthiness of the specified list of
+	 * {@link ITrustedService}.
+	 *  
+	 * @param serviceList
+	 *            the list of {@link ITrustedService} whose trust values to evaluate
+	 * @throws TrustEngineException
+	 *            if there is an error during trust evaluation
+	 * @throw NullPointerException
+	 *            if any of the specified parameters is <code>null</code>
+	 */
+	public void evaluateServiceTrustValues(final List<ITrustedService> serviceList)
+			throws TrustEngineException;
 }

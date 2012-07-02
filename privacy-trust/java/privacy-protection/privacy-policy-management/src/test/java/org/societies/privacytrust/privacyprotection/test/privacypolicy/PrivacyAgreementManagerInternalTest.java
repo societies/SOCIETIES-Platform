@@ -24,7 +24,11 @@
  */
 package org.societies.privacytrust.privacyprotection.test.privacypolicy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URI;
@@ -33,9 +37,8 @@ import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -58,6 +61,7 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
@@ -71,17 +75,16 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementEnvelopeUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.AgreementFinaliser;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManager;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManagerInternal;
-import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager;
 import org.societies.util.commonmock.MockIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -121,7 +124,15 @@ public class PrivacyAgreementManagerInternalTest extends AbstractJUnit4SpringCon
 	private CtxAttribute cisAgreementAttribute;
 	private CtxAttribute serviceAgreementAttribute;
 	private CtxAttribute registryAttribute;
+	private static IIdentityManager idManager;
 
+	@BeforeClass
+	public static void setUpClass() throws InvalidFormatException {
+		idManager = Mockito.mock(IIdentityManager.class);
+		Mockito.when(idManager.fromJid("onecis.societies.local")).thenReturn(new MockIdentity("onecis.societies.local"));
+		Mockito.when(idManager.fromJid("othercss@societies.local")).thenReturn(new MockIdentity("othercss@societies.local"));
+		Mockito.when(idManager.fromJid("eliza@societies.local")).thenReturn(new MockIdentity("eliza@societies.local"));
+	}
 	@Before
 	public void setUp() throws IOException, PrivacyException {
 		// Data
@@ -159,10 +170,6 @@ public class PrivacyAgreementManagerInternalTest extends AbstractJUnit4SpringCon
 
 		// Comm Manager
 		ICommManager commManager = Mockito.mock(ICommManager.class);
-		IIdentityManager idManager = Mockito.mock(IIdentityManager.class);
-		Mockito.when(idManager.fromJid("onecis.societies.local")).thenReturn(new MockIdentity("onecis.societies.local"));
-		Mockito.when(idManager.fromJid("othercss@societies.local")).thenReturn(new MockIdentity("othercss@societies.local"));
-		Mockito.when(idManager.fromJid("eliza@societies.local")).thenReturn(new MockIdentity("eliza@societies.local"));
 		Mockito.when(commManager.getIdManager()).thenReturn(idManager);
 
 		// Privacy Policy Manager
@@ -274,12 +281,34 @@ public class PrivacyAgreementManagerInternalTest extends AbstractJUnit4SpringCon
 	public void testCompareRequestorsHashCode() {
 		String testTitle = new String("testUpdateCisPrivacyAgreement: update a privacy agreement");
 		LOG.info("[Test] "+testTitle);
-		assertEquals("RequestorCis Hashcode != RequestorCis Hashcode", requestorCis.hashCode(), requestorCis.hashCode());
-		assertEquals("requestorService Hashcode != requestorService Hashcode", requestorService.hashCode(), requestorService.hashCode());
-		assertEquals("requestor Hashcode != requestor Hashcode", requestor.hashCode(), requestor.hashCode());
-		assertTrue("RequestorCis Hashcode == RequestorService Hashcode", requestorCis.hashCode() != requestorService.hashCode());
-		assertTrue("RequestorCis Hashcode == Requestor Hashcode", requestorCis.hashCode() != requestor.hashCode());
-		assertTrue("RequestorService Hashcode == Requestor Hashcode", requestorService.hashCode() != requestor.hashCode());
+		try {
+			assertEquals("RequestorCis Hashcode != RequestorCis Hashcode", requestorCis.hashCode(), requestorCis.hashCode());
+			assertEquals("requestorService Hashcode != requestorService Hashcode", requestorService.hashCode(), requestorService.hashCode());
+			assertEquals("requestor Hashcode != requestor Hashcode", requestor.hashCode(), requestor.hashCode());
+			assertTrue("RequestorCis Hashcode == RequestorService Hashcode", requestorCis.hashCode() != requestorService.hashCode());
+			assertTrue("RequestorCis Hashcode == Requestor Hashcode", requestorCis.hashCode() != requestor.hashCode());
+			assertTrue("RequestorService Hashcode == Requestor Hashcode", requestorService.hashCode() != requestor.hashCode());
+		} catch (Exception e) {
+			LOG.info("[Test Exception] testDeleteServicePrivacyAgreementNotExisting: delete a non-existing privacy agreement", e);
+			fail("[Error testDeleteServicePrivacyAgreementNotExisting] error");
+		}
+	}
+
+	@Test
+	public void testEqualsAgreement() {
+		String testTitle = new String("testEqualsAgreement");
+		LOG.info("[Test] "+testTitle);
+		try {
+			assertEquals("AgreementEnveloppe not equals to him", agreementCis, agreementCis);
+			assertEquals("Agreement not equals to him", agreementCis.getAgreement(), agreementCis.getAgreement());
+			assertEquals("Agreement publickey not equals to him after bean transformations", agreementCis.getPublicKey(), AgreementEnvelopeUtils.toAgreementEnvelope(AgreementEnvelopeUtils.toAgreementEnvelopeBean(agreementCis), idManager).getPublicKey());
+			assertEquals("Agreement signature not equals to him after bean transformations", agreementCis.getSignature(), AgreementEnvelopeUtils.toAgreementEnvelope(AgreementEnvelopeUtils.toAgreementEnvelopeBean(agreementCis), idManager).getSignature());
+			assertEquals("Agreement not equals to him after bean transformations", agreementCis.getAgreement(), AgreementEnvelopeUtils.toAgreementEnvelope(AgreementEnvelopeUtils.toAgreementEnvelopeBean(agreementCis), idManager).getAgreement());
+			assertEquals("AgreementEnveloppe not equals to him after bean transformations", agreementCis, AgreementEnvelopeUtils.toAgreementEnvelope(AgreementEnvelopeUtils.toAgreementEnvelopeBean(agreementCis), idManager));
+		} catch (Exception e) {
+			LOG.info("[Test Exception] "+testTitle, e);
+			fail("[Error "+testTitle+"] error");
+		}
 	}
 
 
