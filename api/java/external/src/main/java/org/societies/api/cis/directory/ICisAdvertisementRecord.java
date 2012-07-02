@@ -28,24 +28,98 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
+ * This interface allows access to the CISAdvertisement record
+ * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-/**
- * 
- * MISSING_JAVADOCS
- */
+
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICisAdvertisementRecord {
+	
+	/**
+     * Description: Gets the name of the CIS from the advertisement record
+     *
+     * @return String Name
+     */
 	public String getName();
+	
+	/**
+     * Description: Sets the name of the CIS in the advertisement record
+     *
+     * @param String Name
+     */
 	public void setName(String name);
+	
+	/**
+     * Description: Gets the Identity of the CIS from the advertisement record
+     *
+     *  
+     * @return String Id
+     */
 	public String getId();
+	
+	/**
+     * Description: Gets the Uri of the CIS from the advertisement record
+     *
+     * 
+     * @return String Uri
+     */
 	public String getUri();
+	
+	
+	/**
+     * Description: Sets the Uri of the CIS from the advertisement record
+     *
+     * @param String Uri
+     */
 	public void setUri(String uri);
+	
+	/**
+     * Description: Gets the password of the CIS from the advertisement record
+     *
+     * 
+     * @return String password
+     */
 	public String getPassword();
+	
+	
+	/**
+     * Description: Sets the password of the CIS in the advertisement record
+     *
+     * @param String password
+     * 
+     * @return:
+     */
 	public String setPassword(String password);
+	
+	/**
+     * Description: Gets the type of the CIS from the advertisement record
+     *
+     * @return String type
+     */
 	public String getType();
+	
+	/**
+     * Description: Sets the type of the CIS in the advertisement record
+     *
+     * @param String type
+     * 
+     */
 	public String setType(String type);
+	
+	/**
+     * Description: Gets the mode of the CIS from the advertisement record
+     *
+     * 
+     * @return String mode
+     */
 	public String getMode();
+	
+	/**
+     *Description: Sets the mode of the CIS in the advertisement record
+     *
+     * @param int mode
+     */
 	public String setMode(int mode);
 }
