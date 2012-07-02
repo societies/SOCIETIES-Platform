@@ -264,11 +264,27 @@ public interface ICtxBroker {
 			final CtxIdentifier identifier) throws CtxException;
 
 	/**
-	 * Retrieves the specified context model object.
+	 * Retrieves the {@link CtxModelObject} identified by the specified 
+	 * {@link CtxIdentifier}. The requestor on whose behalf to retrieve the
+	 * context model object must also be specified. The method returns
+	 * <code>null</code> if the requested context model object does not exist
+	 * in the Context DB. If the specified requestor is not allowed to retrieve
+	 * the identified context model object, a {@link CtxAccessControlException}
+	 * is thrown.
 	 * 
 	 * @param requestor
+	 *            the requestor on whose behalf to retrieve the identified
+	 *            context model object
 	 * @param identifier
-	 * @throws CtxException 
+	 *            the {@link CtxIdentifier} of the {@link CtxModelObject} to
+	 *            retrieve 
+	 * @throws CtxAccessControlException
+	 *             if the specified requestor is not allowed to retrieve the
+	 *             identified context model object
+	 * @throws CtxException
+	 *             if there is a problem performing the retrieve operation
+	 * @throws NullPointerException
+	 *             if the specified identifier is <code>null</code> 
 	 */
 	public Future<CtxModelObject> retrieve(final Requestor requestor, 
 			final CtxIdentifier identifier) throws CtxException;
