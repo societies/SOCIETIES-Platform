@@ -355,6 +355,31 @@ public class InternalCtxBroker implements ICtxBroker {
 
 
 
+	@Override
+	public Future<List<CtxIdentifier>> lookup(IIdentity target,
+			CtxModelType modelType, String type) throws CtxException {
+
+		final List<CtxIdentifier> modObjListReturn;
+
+		if (IdentityType.CSS.equals(target.getType()) 
+				|| IdentityType.CSS_RICH.equals(target.getType())
+				|| IdentityType.CSS_LIGHT.equals(target.getType())){
+
+			LOG.info("retrieving css " + target.getType());
+			modObjListReturn = this.userCtxDBMgr.lookup(modelType, type);	
+
+		}else if (IdentityType.CIS.equals(target.getType())){
+
+			LOG.info("retrieving cis " + target.getType());
+			//TODO uncomment following line when communityCtxDBMgr method implemented
+			//modObjListReturn = this.communityCtxDBMgr.lookup();
+			modObjListReturn = null;
+
+		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
+
+		return new AsyncResult<List<CtxIdentifier>>(modObjListReturn);
+	}
+
 	/*
 	 * returns a list of entities with a specified value for a specified attribute type
 	 */
@@ -739,7 +764,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		final CtxAttribute attributeReturn ;
 		final CtxAttribute currentAttribute ;
-		
+
 		try {
 			currentAttribute = this.retrieveAttribute(attributeId, false).get();
 			//CtxAttribute attribute = (CtxAttribute) this.userCtxDBMgr.retrieve(attributeId);
@@ -768,7 +793,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		} catch (ExecutionException e) {
 			throw new CtxBrokerException("updateAttribute including value failed " + e.getLocalizedMessage());
 		}
-		
+
 		return new AsyncResult<CtxAttribute>(attributeReturn);
 	}
 
@@ -776,10 +801,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public Future<List<CtxIdentifier>> lookup(CtxModelType modelType,
 			String type) throws CtxException {
-		
+
 		final List<CtxIdentifier> userResults = this.userCtxDBMgr.lookup(modelType, type);
 		//final List<CtxIdentifier> communityResults = this.communityCtxDBMgr.lookup(modelType, type);
-		
+
 		return new AsyncResult<List<CtxIdentifier>>(userResults) ;
 
 	}
@@ -1606,4 +1631,6 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ ": " + e.getLocalizedMessage(), e);
 		}
 	}
+
+
 }
