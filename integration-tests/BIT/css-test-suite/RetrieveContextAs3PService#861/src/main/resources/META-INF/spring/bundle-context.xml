@@ -35,7 +35,7 @@
 		<property name="privPrefMgr" ref="privPrefMgr"></property>
   	</bean>
   	
-  	<bean id="HelloWorld" class="org.societies.integration.test.bit.ctxRetrieve.HelloWorld">
+  	<bean id="HelloWorld" class="org.societies.integration.test.bit.ctxRetrieve.HelloWorld" init-method="initialiseHelloWorld">
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="commsMgr" ref="commsMgr"/>		
   	</bean>

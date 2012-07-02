@@ -71,6 +71,11 @@ public class HelloWorld implements IHelloWorld{
 	private CtxAttribute nameCtxAttribute;
 	
 	public HelloWorld(){
+
+	}
+
+	
+	public void initialiseHelloWorld(){
 		myServiceID = new ServiceResourceIdentifier();
 		myServiceID.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
 		try {
@@ -82,7 +87,6 @@ public class HelloWorld implements IHelloWorld{
 		
 		me = new RequestorService(serviceIdentity, myServiceID);
 	}
-
 	@Override
 	public void displayUserLocation() {
 		if (this.nameCtxAttribute==null){
