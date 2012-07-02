@@ -33,7 +33,7 @@ package org.societies.orchestration.GroupIdentfier;
 public class GroupIdentifier {
 	
 	public GroupIdentifier(){
-	
+	//
 		
 				
 	}
