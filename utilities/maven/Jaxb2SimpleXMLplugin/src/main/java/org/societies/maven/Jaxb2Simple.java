@@ -215,10 +215,16 @@ public class Jaxb2Simple extends AbstractMojo
 		textToReplace = "$1required = false)\n    @Namespace(reference$2)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
+		//@XmlElement(name = "Activity", namespace = "http://societies.org/api/schema/activity", required = true)
+		textToFind = "(@XmlElement\\(.*)namespace( = \".*\"),(.*)\\)";
+		textToReplace = "$1$3)\n    @Namespace(reference$2)";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+				
 		// @XmlElement with List -> @XmlElementList     @XmlElement(nillable = true) -> @ElementList(inline=true, entry="Service")
 		// @XmlElement(name[      ]*=\(.*\)).*\(\n.*List\<.*\>.*;\)/@ElementList(inline=true, entry=\1)\2/
 		textToFind   = "@XmlElement\\(.*?\\)(\n.*?List\\<(.*?)\\>.*?;)";
-		textToReplace = "@ElementList(inline=true, entry=\"$2\")$1";
+		//textToReplace = "@ElementList(inline=true, entry=\"$2\")$1";
+		textToReplace = "$1";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace, Pattern.DOTALL|Pattern.CASE_INSENSITIVE);
 		
 		//@XmlElement -> @Element
@@ -275,7 +281,7 @@ public class Jaxb2Simple extends AbstractMojo
 		
 		// @XmlAccessorType([ ]*XmlAccessType\.\(.*\))\n@XmlType(\(.*\)[ ]*,[ ]*propOrder[ ]*\(=.*\)/@Default(DefaultType.\1)\n@Order(elements\3/
 		textToFind = "@XmlAccessorType\\(XmlAccessType.FIELD\\)";
-		textToReplace = "@org.simpleframework.xml.Default";
+		textToReplace = "@org.simpleframework.xml.Default(value=DefaultType.FIELD, required=false)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		// @XmlAccessorType([ ]*XmlAccessType\.\(.*\))\n@XmlType(\(.*\))/@Default(DefaultType.\1)\n@Root(\2, strict=false
