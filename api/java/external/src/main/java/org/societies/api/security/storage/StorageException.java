@@ -22,34 +22,34 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.digsig.exception;
+package org.societies.api.security.storage;
 
 /**
- * Exception that may get thrown from methods that use digital signatures.
+ * Exception that may get thrown from methods that use secure storage.
  *
  * @author Mitja Vardjan
  *
  */
-public class DigsigException extends Exception {
+public class StorageException extends Exception {
 
 	/**
 	 *  The Constant serialVersionUID
 	 */
-	private static final long serialVersionUID = -2334307465917723771L;
+	private static final long serialVersionUID = -2495640674929124304L;
 
 	/**
 	 * Instantiates a new exception.
 	 */
-	public DigsigException() {
+	public StorageException() {
 		super();
 	}
-
+	
 	/**
 	 * Instantiates a new exception.
 	 * 
 	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
 	 */
-	public DigsigException(String msg) {
+	public StorageException(String msg) {
 		super(msg);
 	}
 	
@@ -58,7 +58,7 @@ public class DigsigException extends Exception {
 	 * 
 	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-	public DigsigException(Throwable e) {
+	public StorageException(Throwable e) {
 		super(e);
 	}
 	
@@ -68,7 +68,7 @@ public class DigsigException extends Exception {
 	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
 	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-	public DigsigException(String msg, Throwable e) {
+	public StorageException(String msg, Throwable e) {
 		super(msg, e);
 	}
 	
@@ -78,7 +78,7 @@ public class DigsigException extends Exception {
 	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
 	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-	public DigsigException(Throwable e, String msg) {
+	public StorageException(Throwable e, String msg) {
 		super(msg, e);
 	}
 }

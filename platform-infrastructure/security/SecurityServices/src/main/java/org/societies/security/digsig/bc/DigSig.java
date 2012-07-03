@@ -34,7 +34,7 @@ import java.security.SignatureException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.security.digsig.exception.DigsigException;
+import org.societies.api.security.digsig.DigsigException;
 import org.societies.security.digsig.util.StringUtil;
 
 /**

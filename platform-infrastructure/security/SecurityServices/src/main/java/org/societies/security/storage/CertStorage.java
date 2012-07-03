@@ -33,6 +33,7 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.societies.api.security.storage.StorageException;
 import org.societies.security.digsig.util.StreamUtil;
 
 

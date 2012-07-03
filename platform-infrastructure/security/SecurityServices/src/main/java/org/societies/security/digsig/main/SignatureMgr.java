@@ -31,8 +31,8 @@ import java.security.cert.X509Certificate;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.api.security.storage.StorageException;
 import org.societies.security.storage.CertStorage;
-import org.societies.security.storage.StorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
