@@ -22,59 +22,35 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.digsig.main;
-
-import java.security.Key;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.security.storage.CertStorage;
-import org.societies.security.storage.StorageException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.societies.security.storage;
 
 /**
+ * 
+ *
  * @author Mitja Vardjan
+ *
  */
-public class SignatureMgr implements ISignatureMgr {
+public class StorageException extends Exception {
 
-	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
+	private static final long serialVersionUID = -2495640674929124304L;
 
-	public SignatureMgr() {
-		
-		LOG.info("SignatureMgr()");
-		
-		CertStorage certs;
-		try {
-			certs = CertStorage.getInstance();
-		} catch (StorageException e) {
-			LOG.error("Could not initialize storage", e);
-			return;
-		}
-		X509Certificate cert = certs.getOurCert();
-		Key key = certs.getOurKey();
-		PrivateKey privateKey = (PrivateKey) key;
-		PublicKey publicKey = cert.getPublicKey();
-		
-		LOG.debug("Certificate: {}", cert);
-		LOG.debug("Public key: {}", publicKey);
-		LOG.debug("Private key: {}", privateKey);
+	public StorageException() {
+		super();
 	}
 	
-	@Override
-	public String signXml(String xml, String xmlNodeId, IIdentity identity) {
-		
-		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
-
-		return xml;  // FIXME
+	public StorageException(String msg) {
+		super(msg);
 	}
-
-	@Override
-	public boolean verify(String xml) {
-		LOG.debug("verify()");
-		return true;  // FIXME
+	
+	public StorageException(Throwable e) {
+		super(e);
+	}
+	
+	public StorageException(String msg, Throwable e) {
+		super(msg, e);
+	}
+	
+	public StorageException(Throwable e, String msg) {
+		super(msg, e);
 	}
 }

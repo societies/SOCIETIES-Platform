@@ -46,11 +46,11 @@ public class CertStorage {
 	private X509Certificate ourCert;
 	private Key ourKey;
 
-	private CertStorage() {
+	private CertStorage() throws StorageException {
 		initOurIdentity();
 	}
 
-	private void initOurIdentity() {
+	private void initOurIdentity() throws StorageException {
 		
 		InputStream ksStream = null;
 		
@@ -79,8 +79,7 @@ public class CertStorage {
 			if (ourCert == null || ourKey == null)
 				throw new NullPointerException();
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Failed to initialize identity information", e);
+			throw new StorageException("Failed to initialize identity information", e);
 		} finally {
 			StreamUtil.closeStream(ksStream);
 		}
@@ -100,7 +99,7 @@ public class CertStorage {
 		return ourKey;
 	}
 
-	public static synchronized CertStorage getInstance() {
+	public static synchronized CertStorage getInstance() throws StorageException {
 		if (instance == null)
 			instance = new CertStorage();
 		return instance;
