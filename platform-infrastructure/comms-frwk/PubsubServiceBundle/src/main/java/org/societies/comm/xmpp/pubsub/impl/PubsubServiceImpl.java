@@ -63,12 +63,13 @@ public class PubsubServiceImpl implements PubsubService {
 			.getLogger(PubsubServiceImpl.class);
 	
 	// PubSub Errors
-	private static final Object ERROR_SUBID_REQUIRED;
-	private static final Object ERROR_NOT_SUBSCRIBED;
-	private static final Object ERROR_INVALID_SUBID;
-	private static final Object ERROR_NODEID_REQUIRED;
-	private static final Object ERROR_ITEM_REQUIRED;
-	private static final Object ERROR_INVALID_JID;
+	private static final Object ERROR_SUBID_REQUIRED = null;
+	private static final Object ERROR_NOT_SUBSCRIBED = null;
+	private static final Object ERROR_INVALID_SUBID = null;
+	private static final Object ERROR_NODEID_REQUIRED = null;
+	private static final Object ERROR_ITEM_REQUIRED = null;
+	private static final Object ERROR_INVALID_JID = null;
+	/*
 	static {
 		org.jabber.protocol.pubsub.errors.ObjectFactory errorFactory = new org.jabber.protocol.pubsub.errors.ObjectFactory();
 		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired("");
@@ -78,7 +79,7 @@ public class PubsubServiceImpl implements PubsubService {
 		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired("");
 		ERROR_INVALID_JID = errorFactory.createInvalidJid("");
 	}
-	
+	*/
 	// PubSub Constants
 	private static final String SUBSCRIPTION_SUBSCRIBED = "subscribed";
 	private static final String SUBSCRIPTION_UNCONFIGURED = "unconfigured"; // TODO

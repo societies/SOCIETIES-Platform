@@ -2,7 +2,7 @@
 	import="java.util.*" %>
 <%@ taglib prefix="c" uri="http://www.springframework.org/tags/form"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc" %> 
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -22,14 +22,13 @@
 
 <%
 //GET THE METHOD CALLED FROM THE FORM
-//Map model = request.getParameterMap();
-//String[] methodCalledArr = (String[]) model.get("method");
-//String methodCalled = methodCalledArr[0];
+Map model = request.getParameterMap();
+String[] methodCalledArr = (String[]) model.get("method");
+String methodCalled = methodCalledArr[0];
 
 //Map model = (Map)request.getAttribute("data");
 //String methodCalled = (String) model.get("method");
 
-String methodCalled = ${method};
 %>
 
 <script language="javascript">
