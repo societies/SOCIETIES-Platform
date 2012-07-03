@@ -169,25 +169,20 @@ public class CreateCommunityCtx {
 			CtxAttribute communityAttr1 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, false).get();
 
 			LOG.info(" communityAttr  "+communityAttr1.getId()); 
-			LOG.info(" communityAttr  value "+ communityAttr1.getStringValue());
-
-			LOG.info(" trigger inference ");
-
-			
+			LOG.info(" communityAttr  value "+ communityAttr1.getStringValue()+ " should be null");
+	
 			estimatedCommunityAttribute = Test1108.getCtxBroker().estimateCommunityContext(this.communityCtxEntityID, this.communityAttrInterestsId);
-			LOG.info(" estimatedCommunityAttribute getString value:  "+estimatedCommunityAttribute.getStringValue());
-			
+			LOG.info(" estimatedCommunityAttribute getString value:  "+estimatedCommunityAttribute.getStringValue() +" should not be null ");
+		
+			// TODO second version of the test
 			//retrieving attribute with flag true should initiate the inference process.
 			//inference process will assign a community context value to community attribute
-			
-			CtxAttribute communityAttr2 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, true).get();
-			LOG.info(" communityAttr  "+communityAttr2.getId()); 
-			LOG.info(" communityAttr  value "+ communityAttr2.getStringValue());
-
-			
-			
-			
-			
+					
+			//CtxAttribute communityAttr2 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, true).get();
+			//LOG.info(" trigger inference ");
+			//LOG.info(" communityAttr  "+communityAttr2.getId()); 
+			//LOG.info(" communityAttr  value "+ communityAttr2.getStringValue());
+		
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

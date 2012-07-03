@@ -67,8 +67,10 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
+
 import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
+
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
@@ -76,6 +78,7 @@ import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -1660,7 +1663,8 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public CtxAttribute estimateCommunityContext(CtxEntityIdentifier communityCtxEntityID,	CtxAttributeIdentifier ctxAttrId) {
 
-		CtxAttribute returnCtxAttr = communityCtxInferenceMgr.estimateCommunityContext(communityCtxEntityID, ctxAttrId);
+		LOG.info("communityCtxInferenceMgr service: "+ this.communityCtxInferenceMgr);
+		CtxAttribute returnCtxAttr = this.communityCtxInferenceMgr.estimateCommunityContext(communityCtxEntityID, ctxAttrId);
 		
 		// TODO at this point check if inference (estimation) outcome is acceptable and if yes persist ctxAttribute 
 		

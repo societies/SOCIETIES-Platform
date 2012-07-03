@@ -41,7 +41,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 
 
