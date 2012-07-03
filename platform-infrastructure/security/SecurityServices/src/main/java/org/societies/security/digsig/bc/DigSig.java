@@ -35,6 +35,7 @@ import java.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.security.digsig.exception.DigsigException;
+import org.societies.security.digsig.util.StringUtil;
 
 /**
  * Signing and verifying digital signatures.
@@ -45,66 +46,56 @@ import org.societies.security.digsig.exception.DigsigException;
 public class DigSig {
 
 	private static Logger LOG = LoggerFactory.getLogger(DigSig.class);
-	
+
 	public static final String ALGORITHM = "MD5WithRSA";
 	public static final String ENCODING = "UTF8";
 
 	public String sign(String textToSign, PrivateKey privateKey) throws DigsigException {
 
-        byte[] dataToSign;
-        
-		try {
-			dataToSign = textToSign.getBytes(ENCODING);
-		} catch (UnsupportedEncodingException e) {
-        	LOG.warn("Signing failed", e);
-        	throw new DigsigException(e);
-		}
+		byte[] dataToSign = str2bytes(textToSign);
 
-        return sign(dataToSign, privateKey);
-    }
+		return sign(dataToSign, privateKey);
+	}
 
 	public String sign(byte[] dataToSign, PrivateKey privateKey) throws DigsigException {
 
 		LOG.debug("Signing {} with {}", dataToSign, privateKey);
-		
-        Signature sig;
-        byte[] signature;
-        String signatureStr;
-        
-        try {
-	        sig = Signature.getInstance(ALGORITHM);
-	        sig.initSign(privateKey);
-	        sig.update(dataToSign);
-	        signature = sig.sign();
-	        signatureStr = new String(signature, ENCODING);
-        } catch (SignatureException e) {
-        	LOG.warn("Signing failed", e);
-        	throw new DigsigException(e);
-        } catch (NoSuchAlgorithmException e) {
-        	LOG.warn("Signing failed", e);
-        	throw new DigsigException(e);
-		} catch (InvalidKeyException e) {
-        	LOG.warn("Signing failed", e);
-        	throw new DigsigException(e);
-		} catch (UnsupportedEncodingException e) {
-        	LOG.warn("Signing failed", e);
-        	throw new DigsigException(e);
-		}
-        
-        LOG.debug(sig.getProvider().getInfo());
-        LOG.debug("Signature: {}", signatureStr);
 
-        return signatureStr;
-    }
-    
-    /** 
-     * Verify the signature with the public key
-     * 
-     * @param data
-     * @param signature
-     * @param publicKey
-     * @return True if signature verification succeeded and signature is valid. False if signature invalid or on error.
-     */
+		Signature sig;
+		byte[] signature;
+		String signatureStr;
+
+		try {
+			sig = Signature.getInstance(ALGORITHM);
+			sig.initSign(privateKey);
+			sig.update(dataToSign);
+			signature = sig.sign();
+			signatureStr = bytes2str(signature);
+		} catch (SignatureException e) {
+			LOG.warn("Signing failed", e);
+			throw new DigsigException(e);
+		} catch (NoSuchAlgorithmException e) {
+			LOG.warn("Signing failed", e);
+			throw new DigsigException(e);
+		} catch (InvalidKeyException e) {
+			LOG.warn("Signing failed", e);
+			throw new DigsigException(e);
+		}
+
+		LOG.debug(sig.getProvider().getInfo());
+		LOG.debug("Signature: {}", signatureStr);
+
+		return signatureStr;
+	}
+
+	/** 
+	 * Verify the signature with the public key
+	 * 
+	 * @param data
+	 * @param signature
+	 * @param publicKey
+	 * @return True if signature verification succeeded and signature is valid. False if signature invalid or on error.
+	 */
 	private boolean verify(byte[] data, byte[] signature, PublicKey publicKey) {
 
 		LOG.debug("Verifying signature {} with {}", signature, publicKey);
@@ -113,50 +104,78 @@ public class DigSig {
 		boolean valid;
 
 		try {
-		sig = Signature.getInstance(ALGORITHM);
-		sig.initVerify(publicKey);
-        sig.update(data);
-            valid = sig.verify(signature);
-        } catch (SignatureException e) {
-        	LOG.warn("Signature verification failed", e);
-        	return false;
-        } catch (InvalidKeyException e) {
-        	LOG.warn("Signature verification failed", e);
-        	return false;
+			sig = Signature.getInstance(ALGORITHM);
+			sig.initVerify(publicKey);
+			sig.update(data);
+			valid = sig.verify(signature);
+		} catch (SignatureException e) {
+			LOG.warn("Signature verification failed", e);
+			return false;
+		} catch (InvalidKeyException e) {
+			LOG.warn("Signature verification failed", e);
+			return false;
 		} catch (NoSuchAlgorithmException e) {
-        	LOG.warn("Signature verification failed", e);
-        	return false;
-		}
-        LOG.debug("Signature validity: ", valid);
-        return valid;
-    }
-    
-	public boolean verify(byte[] data, String signature, PublicKey publicKey) {
-		
-		byte[] signatureBA;
-		
-		try {
-			signatureBA = signature.getBytes(ENCODING);
-		} catch (UnsupportedEncodingException e) {
-        	LOG.warn("Verification error", e);
-        	return false;
-		}
-		
-		return verify(data, signatureBA, publicKey);
-    }
-    
-	public boolean verify(String data, String signature, PublicKey publicKey) {
-		
-		byte[] signatureBA;
-		byte[] dataBA;
-		
-		try {
-			signatureBA = signature.getBytes(ENCODING);
-			dataBA = data.getBytes(ENCODING);
-			return verify(dataBA, signatureBA, publicKey);
-		} catch (UnsupportedEncodingException e) {
-			LOG.warn("Verification error", e);
+			LOG.warn("Signature verification failed", e);
 			return false;
 		}
-    }
+		LOG.debug("Signature validity: ", valid);
+		return valid;
+	}
+
+	public boolean verify(byte[] data, String signature, PublicKey publicKey) {
+
+		LOG.info("Verifying signature {}", signature);
+
+		byte[] signatureBytes;
+
+		signatureBytes = hexstr2bytes(signature);
+
+		return verify(data, signatureBytes, publicKey);
+	}
+
+	public boolean verify(String data, String signature, PublicKey publicKey) {
+
+		LOG.info("Verifying signature {}", signature);
+
+		byte[] dataBytes;
+
+		dataBytes = str2bytes(data);
+		
+		return verify(dataBytes, signature, publicKey);
+	}
+
+	private byte[] str2bytes(String str) {
+
+		byte[] bytes;
+		
+		try {
+			bytes = str.getBytes(ENCODING);
+		} catch (UnsupportedEncodingException e) {
+        	LOG.warn("str2bytes({}), str", e);
+        	return null;
+		}
+
+		return bytes;
+	}
+
+	private byte[] hexstr2bytes(String str) {
+
+		byte[] bytes;
+
+		bytes = new StringUtil().hexStringToByteArray(str);
+		
+		return bytes;
+	}
+
+	private String bytes2str(byte[] bytes) {
+		
+		String str;
+		
+//		str = new String(bytes, ENCODING);
+//		str = String.format("%02X", bytes);
+//		str = StringUtil.bytesToHexString(bytes);
+		str = new StringUtil().bytesToHexString(bytes);
+		
+		return str;
+	}
 }
