@@ -32,10 +32,7 @@ import org.junit.Test;
 import org.societies.security.digsig.util.StringUtil;
 
 /**
- * 
- *
  * @author Mitja Vardjan
- *
  */
 public class StringUtilTest {
 

@@ -33,6 +33,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.digsig.main.SignatureMgr;
 
+/**
+ * @author Mitja Vardjan
+ */
 public class SignatureMgrUnitTest {
 
 	private SignatureMgr classUnderTest;

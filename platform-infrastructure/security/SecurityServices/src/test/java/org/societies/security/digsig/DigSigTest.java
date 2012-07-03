@@ -40,10 +40,7 @@ import org.societies.security.digsig.bc.DigSig;
 import org.societies.security.digsig.exception.DigsigException;
 
 /**
- * 
- *
  * @author Mitja Vardjan
- *
  */
 public class DigSigTest {
 
