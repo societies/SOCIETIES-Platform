@@ -25,7 +25,7 @@
 package org.societies.privacytrust.trust.impl.repo.model;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
+//import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -48,6 +48,9 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
  * @since 0.0.1
  */
 @Entity
+@org.hibernate.annotations.Entity(
+		dynamicUpdate=true
+)
 @Table(
 		name = TableName.TRUSTED_SERVICE, 
 		uniqueConstraints = { @UniqueConstraint(columnNames = { "trustor_id", "trustee_id" }) }
@@ -57,8 +60,8 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	private static final long serialVersionUID = 8253551733059925542L;
 	
 	/** The type of this service. */
-	@Column(name = "type", nullable = false, updatable = false, length = 256)
-	private final String type;
+	//@Column(name = "type", nullable = false, updatable = false, length = 256)
+	//private final String type;
 	
 	/** The CSS providing this service. */
 	@ManyToOne(
@@ -84,23 +87,22 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	private TrustedService() {
 		
 		super(null);
-		this.type = null;
+		//this.type = null;
 	}
 	
-	public TrustedService(final TrustedEntityId teid, final String type) {
+	public TrustedService(final TrustedEntityId teid) {
 		
 		super(teid);
-		this.type = type;
 	}
 
 	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getType()
-	 */
+	 *
 	@Override
 	public String getType() {
 		
 		return this.type;
-	}
+	}*/
 	
 	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getProvider()

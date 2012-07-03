@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +109,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private MessageBox myMessageBox;
 	
 	public PrivacyPreferenceManager(){
+		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
 		}
@@ -166,11 +168,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	 */
 	@Override
 	public ResponseItem checkPermission(Requestor requestor, CtxAttributeIdentifier ctxId, List<Action> actions) throws PrivacyException{
+		
 		if (null==ctxId){
 			this.logging.debug("requested permission for null CtxIdentifier. returning : null");
 			return null;
 			
 		}
+		this.logging.debug("checkPermission: \nRequestor: "+requestor.toString()+"\nctxId: "+ctxId.toUriString()+"\n and actions...");
+		
 		String actionList = "";
 		for (Action a : actions){
 			actionList = actionList.concat(a.toString());
@@ -181,9 +186,11 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel model = prefCache.getPPNPreference(details);
 		if (model!=null){
+			this.logging.debug("Preference for specific request found");
 			return this.checkPreferenceForAccessControl(model, requestor, ctxId, conditions, actions);
 		}
 
+		this.logging.debug("Preference for specific request NOT found");
 		details = new PPNPreferenceDetails(ctxId.getType());
 		details.setRequestor(requestor);
 		model = this.prefCache.getPPNPreference(details);
@@ -224,15 +231,16 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	 */
 	@Override
 	public ResponseItem checkPermission(Requestor requestor, String ctxType, List<Action> actions) throws PrivacyException{
-
+		this.logging.debug("checkPermission: \nRequestor: "+requestor.toString()+"\nctxType : "+ctxType+"\n and actions...");
 		PPNPreferenceDetails details = new PPNPreferenceDetails(ctxType);
 		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel model = prefCache.getPPNPreference(details);
 		List<Condition> conditions = new ArrayList<Condition>();
 		if (model!=null){
+			this.logging.debug("Preference for specific request found");
 			return this.checkPreferenceForAccessControl(model, requestor, ctxType, conditions, actions);
 		}
-		
+		this.logging.debug("Preference for specific request NOT found");
 		details = new PPNPreferenceDetails(ctxType);
 		model = prefCache.getPPNPreference(details);
 		if (model!=null){
@@ -855,10 +863,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			/*			if (model == null){
 				JOptionPane.showMessageDialog(null, "prefCache returned null model for details:"+details.toString());
 			}*/
-			IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-			if (null!=outcome){
-				//JOptionPane.showMessageDialog(null, "Evaluation returned non-null outcome");
-				outcomes.add(outcome);
+			if (model!=null){
+				
+			
+				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
+				if (null!=outcome){
+					//JOptionPane.showMessageDialog(null, "Evaluation returned non-null outcome");
+					outcomes.add(outcome);
+				}
 			}
 		}	
 
@@ -889,9 +901,12 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			IDSPreferenceDetails details = new IDSPreferenceDetails(identities.get(i));
 			details.setRequestor(agreement.getRequestor());
 			IPrivacyPreferenceTreeModel model = prefCache.getIDSPreference(details);
-			IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-			if (null!=outcome){
-				outcomes.add(outcome);
+			if (model!=null){
+				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
+				if (null!=outcome){
+					outcomes.add(outcome);
+				}
+
 			}
 		}	
 
@@ -918,9 +933,12 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		for (int i=0; i<dpis.size(); i++){
 			IDSPreferenceDetails details = new IDSPreferenceDetails(dpis.get(i));
 			IPrivacyPreferenceTreeModel model = prefCache.getIDSPreference(details);
-			IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-			if (null!=outcome){
-				outcomes.add(outcome);
+
+			if (model!=null){
+				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
+				if (null!=outcome){
+					outcomes.add(outcome);
+				}
 			}
 		}	
 

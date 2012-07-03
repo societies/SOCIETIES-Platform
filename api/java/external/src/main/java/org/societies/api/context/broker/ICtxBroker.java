@@ -121,18 +121,35 @@ public interface ICtxBroker {
 	public Future<List<Object>> evaluateSimilarity(final Serializable objectUnderComparison, final List<Serializable> referenceObjects) throws CtxException;
 
 	/**
-	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
-	 * CtxAttribute, CtxAssociation) of  the specified type.
+	 * Looks up context model objects of the specified type associated with the
+	 * identified target CSS or CIS. The requestor on whose behalf the look-up
+	 * will be performed must also be specified. The method returns a list of
+	 * {@link CtxIdentifier CtxIdentifiers} referencing the context model
+	 * objects that match the supplied criteria.
 	 * 
 	 * @param requestor
-	 * @param targetCss
-	 *            the {@link IIdentity} of the CSS where to perform the look-up 
+	 *            the requestor on whose behalf to lookup the context model 
+	 *            objects
+	 * @param target
+	 *            the {@link IIdentity} of the CSS or CIS where to perform the
+	 *            look-up 
 	 * @param modelType
+	 *            the {@link CtxModelType} of the context model objects to
+	 *            lookup
 	 * @param type
-	 * @throws CtxException 
+	 *            the type of the context model objects to lookup
+	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
+	 *         context model objects that match the supplied criteria.
+	 * @throws CtxAccessControlException
+	 *             if the specified requestor is not allowed to perform the
+	 *             look-up
+	 * @throws CtxException
+	 *             if there is a problem performing the look-up operation 
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
 	 */
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
-			final IIdentity targetCss, final CtxModelType modelType,
+			final IIdentity target, final CtxModelType modelType,
 			final String type) throws CtxException;
 
 	/**
@@ -247,18 +264,35 @@ public interface ICtxBroker {
 			final CtxIdentifier identifier) throws CtxException;
 
 	/**
-	 * Retrieves the specified context model object.
+	 * Retrieves the {@link CtxModelObject} identified by the specified 
+	 * {@link CtxIdentifier}. The requestor on whose behalf to retrieve the
+	 * context model object must also be specified. The method returns
+	 * <code>null</code> if the requested context model object does not exist
+	 * in the Context DB. If the specified requestor is not allowed to retrieve
+	 * the identified context model object, a {@link CtxAccessControlException}
+	 * is thrown.
 	 * 
 	 * @param requestor
+	 *            the requestor on whose behalf to retrieve the identified
+	 *            context model object
 	 * @param identifier
-	 * @throws CtxException 
+	 *            the {@link CtxIdentifier} of the {@link CtxModelObject} to
+	 *            retrieve 
+	 * @throws CtxAccessControlException
+	 *             if the specified requestor is not allowed to retrieve the
+	 *             identified context model object
+	 * @throws CtxException
+	 *             if there is a problem performing the retrieve operation
+	 * @throws NullPointerException
+	 *             if the specified identifier is <code>null</code> 
 	 */
 	public Future<CtxModelObject> retrieve(final Requestor requestor, 
 			final CtxIdentifier identifier) throws CtxException;
 	
 	/**
-	 * Retrieves the {@link IndividualCtxEntity} which represents the owner
-	 * of the specified CSS. IndividualCtxEntities are most commonly of type
+	 * Retrieves the {@link CtxEntityEntityIdentifier} of the 
+	 * {@link IndividualCtxEntity} which represents the owner of the identified
+	 * CSS. IndividualCtxEntities are most commonly of type
 	 * CtxEntityTypes.PERSON; however they can also be organisations, smart
 	 * space infrastructures, autonomous or semi-autonomous agents, etc. The
 	 * method returns <code>null</code> if there is no IndividualCtxEntity
@@ -266,20 +300,19 @@ public interface ICtxBroker {
 	 * 
 	 * @param requestor
 	 *            the entity requesting to retrieve the CSS owner context 
-	 *            entity
+	 *            entity identifier
 	 * @param cssId
 	 *            the {@link IIdentity} identifying the CSS whose 
-	 *            IndividualCtxEntity to retrieve
-	 * @return the {@link IndividualCtxEntity} which represents the owner of
-	 *         the specified CSS
+	 *            IndividualCtxEntity CtxEntityIdentifier to retrieve
+	 * @return the CtxEntityEntityIdentifier of the IndividualCtxEntity which
+	 *         represents the owner of the identified CSS
 	 * @throws CtxException 
-	 *             if the IndividualCtxEntity representing the owner of the 
-	 *             specified CSS exists but cannot be retrieved
+	 *             if there is a problem retrieving the CtxEntityIdentifier
 	 * @throws NullPointerException
 	 *             if any of the specified parameters is <code>null</code>
 	 * @since 0.3
 	 */
-	public Future<IndividualCtxEntity> retrieveIndividualEntity(
+	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
 			final Requestor requestor, final IIdentity cssId) throws CtxException;
 
 	/**

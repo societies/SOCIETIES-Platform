@@ -109,6 +109,7 @@ public class NegotiationClient implements INegotiationClient {
 	private IIdentitySelection idS;
 	private IPrivacyPreferenceManager privPrefMgr;
 	private IIdentityManager idm;
+	private IIdentity userIdentity;
 
 	public NegotiationClient(INegotiationAgent negotiationAgent, PrivacyPolicyNegotiationManager policyMgr){
 		this.negotiationAgent = negotiationAgent;
@@ -122,6 +123,7 @@ public class NegotiationClient implements INegotiationClient {
 		this.idm = policyMgr.getIdm();
 		this.myPolicies = new Hashtable<Requestor, ResponsePolicy>();
 		this.agreements = new Hashtable<Requestor, IAgreement>();
+		this.userIdentity = idm.getThisNetworkNode();
 		
 		
 	}
@@ -198,6 +200,10 @@ public class NegotiationClient implements INegotiationClient {
 			ClientResponseChecker checker = new ClientResponseChecker();
 			if (checker.checkResponse(myResponsePolicy, policy)){
 				IAgreement agreement = new NegotiationAgreement(policy);
+				agreement.setUserPublicIdentity(this.userIdentity);
+				
+				
+				
 				
 				this.agreements.put(policy.getRequestor(), agreement);
 				//TODO: select an identity and call setFinalIdentity(..);
@@ -223,6 +229,7 @@ public class NegotiationClient implements INegotiationClient {
 		
 	}
 	private IIdentity selectIdentity(List<IIdentityOption> idOptions, IAgreement agreement) {
+		/**
 		List<IIdentity> identities = new ArrayList<IIdentity>();
 		List<String> strIds = new ArrayList<String>();
 		for (IIdentityOption idOption : idOptions){
@@ -248,6 +255,13 @@ public class NegotiationClient implements INegotiationClient {
 			}
 		}
 		return selectedIdentity;
+		**/
+		if (idOptions.size()==0){
+			return this.idm.getThisNetworkNode();
+		}
+		
+		//replace this line with above code when we enable multiple identities
+		return idOptions.get(0).getReferenceIdentity();
 			
 	}
 

@@ -40,8 +40,8 @@ public interface ITrustedService extends ITrustedEntity {
 	 * Returns the type of this service.
 	 * 
 	 * @return the type of this service.
-	 */
-	public String getType();
+	 *
+	public String getType();/
 
 	/**
 	 * Returns the CSS providing this service.

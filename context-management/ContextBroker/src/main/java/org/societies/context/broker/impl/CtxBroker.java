@@ -25,16 +25,16 @@
 package org.societies.context.broker.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -48,9 +48,16 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.context.broker.api.CtxBrokerException;
@@ -61,6 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -74,6 +82,9 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
 
+	/** The Privacy Data Mgr service reference. */
+	private IPrivacyDataManager privacyDataMgr;
+	
 	/** The privacy logging facility. */
 	@Autowired(required=false)
 	private IPrivacyLogAppender privacyLogAppender;
@@ -173,19 +184,32 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	public Future<CtxAttribute> createAttribute(final Requestor requestor,
 			final CtxEntityIdentifier scope, final String type) throws CtxException {
 
-		Future<CtxAttribute> ctxAttribute = null;
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		
+		CtxAttribute ctxAttribute = null;
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(scope.getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (idMgr.isMine(targetCss)) {
-			ctxAttribute = internalCtxBroker.createAttribute(scope, type);
+		if (this.idMgr.isMine(targetCss)) {
+			try {
+				ctxAttribute = internalCtxBroker.createAttribute(scope, type).get();
+			} catch (Exception e) {
+				
+				throw new CtxBrokerException("Could not create context attribute with scope"
+						+ scope + " and type " + type + ": " + e.getLocalizedMessage(), e);
+			}
 		} else{
 			LOG.info("remote call");
 		}
-		return ctxAttribute;
+		return new AsyncResult<CtxAttribute>(ctxAttribute);
 	}
 
 	@Override
@@ -237,50 +261,102 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return obj;
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieve(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxIdentifier)
+	 */
 	@Override
 	@Async
 	public Future<CtxModelObject> retrieve(final Requestor requestor,
-			CtxIdentifier identifier) throws CtxException {
+			final CtxIdentifier identifier) throws CtxException {
 
-		Future<CtxModelObject> obj = null;
-		IIdentity targetCss;
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (identifier == null)
+			throw new NullPointerException("identifier can't be null");
+		
+		CtxModelObject obj = null;
+		
+		IIdentity target;
 		try {
-			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
+			target = this.idMgr.fromJid(identifier.getOwnerId());
 			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(requestor, targetCss);
+				this.privacyLogAppender.logContext(requestor, target);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "':" + ife.getLocalizedMessage(), ife);
 		}
-		if (idMgr.isMine(targetCss)) {
-			obj = internalCtxBroker.retrieve(identifier);
+		if (this.idMgr.isMine(target)) {
+			try {
+				if (LOG.isDebugEnabled())
+					LOG.debug("Checking permission: requestor="
+							+ requestor + ",target=" + target 
+							+ ",ctxId="	+ identifier + ",action=READ");
+				final ResponseItem response = this.privacyDataMgr.checkPermission(
+						requestor, target, identifier, new Action(ActionConstants.READ));
+				if (Decision.PERMIT.equals(response.getDecision()))
+					obj = internalCtxBroker.retrieve(identifier).get();
+				else
+					throw new CtxAccessControlException("Could not retrieve context model object with id "
+							+  identifier + ": Access denied"); 
+			} catch (PrivacyException pe) {
+				throw new CtxBrokerException("Could not retrieve context model object with id " 
+						+ identifier + ": Failed to perform access control: "
+						+ ": PrivacyDataManager checkPermission failed: "
+						+ pe.getLocalizedMessage(), pe);
+			} catch (ServiceUnavailableException sue) {
+				throw new CtxBrokerException("Could not retrieve context model object with id " 
+						+ identifier + ": Failed to perform access control: "
+						+ " PrivacyDataManager service is not available");
+			} catch (Exception e) {
+				throw new CtxBrokerException("Could not retrieve context model object with id " 
+						+ identifier + ": " +  e.getLocalizedMessage(), e);
+			} 
 		} else {
 			LOG.info("remote call");
 		}
-		return obj;
+		
+		return new AsyncResult<CtxModelObject>(obj);
 	}
 
 	/*
-	 * @see org.societies.api.context.broker.ICtxBroker#retrieveIndividualEntity(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieveIndividualEntityId(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
 	 */
 	@Override
 	@Async
-	public Future<IndividualCtxEntity> retrieveIndividualEntity(
+	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
 			final Requestor requestor, final IIdentity cssId) throws CtxException {
 
 		if (requestor == null)
 			throw new NullPointerException("requestor can't be null");
 		if (cssId == null)
 			throw new NullPointerException("cssId can't be null");
+		if (!IdentityType.CSS.equals(cssId.getType()) && 
+				!IdentityType.CSS_RICH.equals(cssId.getType()) &&
+				!IdentityType.CSS_LIGHT.equals(cssId.getType()))
+			throw new IllegalArgumentException("cssId IdentityType is not CSS");
 
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving the CtxEntityIdentifier for CSS " + cssId);
+		
+		CtxEntityIdentifier individualEntityId = null;
+		
 		if (this.idMgr.isMine(cssId)) {
 			// TODO access control
-			return this.internalCtxBroker.retrieveIndividualEntity(cssId);
+			IndividualCtxEntity individualEntity;
+			try {
+				individualEntity = this.internalCtxBroker.retrieveIndividualEntity(cssId).get();
+				if (individualEntity != null)
+					individualEntityId = individualEntity.getId();
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+			}
 		} else {
 
 			LOG.warn("remote call");
-			return new AsyncResult<IndividualCtxEntity>(null);
 		}
+		
+		return new AsyncResult<CtxEntityIdentifier>(individualEntityId);
 	}
 
 	@Override
@@ -455,20 +531,64 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return entityList;
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#lookup(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxModelType, java.lang.String)
+	 */
 	@Override
 	@Async
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
-			final IIdentity targetCss, final CtxModelType modelType,
+			final IIdentity target, final CtxModelType modelType,
 			final String type) throws CtxException {
 
-		Future<List<CtxIdentifier>> ctxIdList = null;
-		if (idMgr.isMine(targetCss)) {
-			ctxIdList = internalCtxBroker.lookup(modelType, type);
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (target == null)
+			throw new NullPointerException("target can't be null");
+		if (modelType == null)
+			throw new NullPointerException("modelType can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		
+		final List<CtxIdentifier> ctxIdList = new ArrayList<CtxIdentifier>();
+		if (this.idMgr.isMine(target)) {
+			List<CtxIdentifier> ctxIdListFromDb;
+			try {
+				ctxIdListFromDb = internalCtxBroker.lookup(modelType, type).get();
+				if (!ctxIdListFromDb.isEmpty()) {
+
+					for (final CtxIdentifier ctxId : ctxIdListFromDb) {
+						if (LOG.isDebugEnabled())
+							LOG.debug("Checking permission: requestor="
+									+ requestor + ",target=" + target 
+									+ ",ctxId="	+ ctxId + ",action=READ");
+						final ResponseItem response = this.privacyDataMgr.checkPermission(
+								requestor, target, ctxId, new Action(ActionConstants.READ));
+						if (LOG.isDebugEnabled())
+							LOG.debug("ResponseItem is " + response);
+						if (response != null && Decision.PERMIT.equals(response.getDecision()))
+							ctxIdList.add(ctxId);
+					}
+					if (ctxIdList.isEmpty())
+						throw new CtxAccessControlException("Access denied");
+				}
+			} catch (PrivacyException pe) {
+				throw new CtxBrokerException("Could not lookup " + modelType 
+						+ "	objects of type " + type + ": Failed to perform access control: "
+						+ ": PrivacyDataManager checkPermission failed: "
+						+ pe.getLocalizedMessage(), pe);
+			} catch (ServiceUnavailableException sue) {
+				throw new CtxBrokerException("Could not lookup " + modelType 
+						+ "	objects of type " + type + ": Failed to perform access control: "
+						+ " PrivacyDataManager service is not available");
+			} catch (Exception e) {
+				throw new CtxBrokerException("Could not lookup " + modelType 
+						+ " objects of type " + type + ": " +  e.getLocalizedMessage(), e);
+			} 
 		} else {
 			LOG.info("remote call");
 		}
 
-		return ctxIdList;
+		return new AsyncResult<List<CtxIdentifier>>(ctxIdList);
 	}
 
 	@Override
@@ -665,6 +785,16 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	public void setIdentityMgr(IIdentityManager idMgr) {
 
 		this.idMgr = idMgr;
+	}
+	
+	/**
+	 * 
+	 * @param privacyDataMgr
+	 */
+	@Autowired(required=false)
+	public void setPrivacyDataMgr(IPrivacyDataManager privacyDataMgr) {
+		
+		this.privacyDataMgr = privacyDataMgr;
 	}
 
 	/**

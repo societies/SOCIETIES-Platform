@@ -27,6 +27,8 @@ package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
 import static org.mockito.Mockito.*;
 
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
@@ -137,6 +139,8 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 public class EgocentricCommunityDeletionManager //implements ICommCallback
 {
 
+	//private static Logger LOG = LoggerFactory.getLogger(EgocentricCommunityDeletionManager.class);
+	
 	private IIdentity linkedCss;
 	
     private ICis linkedCis;

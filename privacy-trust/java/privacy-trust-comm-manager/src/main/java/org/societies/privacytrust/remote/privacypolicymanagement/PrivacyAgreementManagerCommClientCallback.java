@@ -44,6 +44,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.privacyp
 public class PrivacyAgreementManagerCommClientCallback {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyAgreementManagerCommClientCallback.class);
 
+	private ICommManager commManager;
 	// -- Listeners list
 	public Map<String, IPrivacyAgreementManagerListener> privacyAgreementManagerlisteners;
 
@@ -60,7 +61,11 @@ public class PrivacyAgreementManagerCommClientCallback {
 			IPrivacyAgreementManagerListener listener = privacyAgreementManagerlisteners.get(stanza.getId());
 			privacyAgreementManagerlisteners.remove(stanza.getId());
 			if (bean.isAck()) {
-				listener.onPrivacyAgreementRetrieved(AgreementEnvelopeUtils.toAgreementEnvelope(bean.getPrivacyAgreement()));
+				try {
+					listener.onPrivacyAgreementRetrieved(AgreementEnvelopeUtils.toAgreementEnvelope(bean.getPrivacyAgreement(), commManager.getIdManager()));
+				} catch (InvalidFormatException e) {
+					listener.onOperationAborted(e.getMessage(), e);
+				}
 			}
 			else {
 				listener.onOperationCancelled(bean.getAckMessage());
@@ -71,4 +76,9 @@ public class PrivacyAgreementManagerCommClientCallback {
 
 
 	// -- Dependency Injection
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+		LOG.info("[DependencyInjection] CommManager injected");
+	}
 }

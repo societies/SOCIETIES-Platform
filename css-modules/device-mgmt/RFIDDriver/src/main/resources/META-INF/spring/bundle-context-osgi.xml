@@ -11,11 +11,11 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
        
-       	<osgi:service ref="RFIDDriver">
+       	<!-- <osgi:service ref="RFIDDriver">
         <osgi:interfaces>
         <value>org.societies.api.css.devicemgmt.rfid.IRfidDriver</value>
         </osgi:interfaces>
-        </osgi:service>
+        </osgi:service> -->
         
         <osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr"></osgi:reference>
 		<osgi:reference id="deviceMgr" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager"></osgi:reference>

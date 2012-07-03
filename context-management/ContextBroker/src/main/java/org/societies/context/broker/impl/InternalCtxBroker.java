@@ -132,6 +132,13 @@ public class InternalCtxBroker implements ICtxBroker {
 	private ICommunityCtxDBMgr communityCtxDBMgr;
 
 	/**
+	 * The ICommManager service reference.
+	 * 
+	 * @see {@link #setCommMgr(ICommManager)}
+	 */
+	private ICommManager commMgr;
+
+	/**
 	 * The User Inference Mgmt service reference.
 	 * 
 	 * @see {@link #setUserCtxInferenceMgr(IUserCtxInferenceMgr)}
@@ -153,7 +160,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		LOG.info(this.getClass() + " instantiated");
 		this.userCtxDBMgr = userCtxDBMgr;
 		this.communityCtxDBMgr = communityCtxDBMgr;
-		LOG.info("Found ICommunityCtxDBMgr " + communityCtxDBMgr);
+		//LOG.info("Found ICommunityCtxDBMgr " + communityCtxDBMgr);
+		//this.commMgr = commMgr;
 
 		this.idMgr = commMgr.getIdManager();
 		final INetworkNode localCssNodeId = this.idMgr.getThisNetworkNode();
@@ -200,13 +208,12 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		CtxAttribute attribute = null;
 
-		attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
-		//TODO uncomment following lines when id manager is complete
-		/*
 		try {
 			IIdentity scopeID = this.idMgr.fromJid(scope.getOwnerId());
 
-			if (IdentityType.CSS.equals(scopeID.getType())){
+			if (IdentityType.CSS.equals(scopeID.getType()) 
+					|| IdentityType.CSS_RICH.equals(scopeID.getType())
+					|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
 
 				attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
 
@@ -221,7 +228,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ ": Invalid owner IIdentity String: " 
 					+ ife.getLocalizedMessage(), ife);
 		}
-		 */
+
 		return new AsyncResult<CtxAttribute>(attribute);
 	}
 
@@ -294,6 +301,11 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CommunityCtxEntity> createCommunityEntity(IIdentity cisId)
 			throws CtxException {
 
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		if (!IdentityType.CIS.equals(cisId.getType()))
+			throw new IllegalArgumentException("Inserted id is not of type CIS");
+
 		CommunityCtxEntity communityCtxEnt = communityCtxDBMgr.createCommunityEntity(cisId);
 
 		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
@@ -342,6 +354,31 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 
+
+	@Override
+	public Future<List<CtxIdentifier>> lookup(IIdentity target,
+			CtxModelType modelType, String type) throws CtxException {
+
+		final List<CtxIdentifier> modObjListReturn;
+
+		if (IdentityType.CSS.equals(target.getType()) 
+				|| IdentityType.CSS_RICH.equals(target.getType())
+				|| IdentityType.CSS_LIGHT.equals(target.getType())){
+
+			LOG.info("retrieving css " + target.getType());
+			modObjListReturn = this.userCtxDBMgr.lookup(modelType, type);	
+
+		}else if (IdentityType.CIS.equals(target.getType())){
+
+			LOG.info("retrieving cis " + target.getType());
+			//TODO uncomment following line when communityCtxDBMgr method implemented
+			//modObjListReturn = this.communityCtxDBMgr.lookup();
+			modObjListReturn = null;
+
+		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
+
+		return new AsyncResult<List<CtxIdentifier>>(modObjListReturn);
+	}
 
 	/*
 	 * returns a list of entities with a specified value for a specified attribute type
@@ -400,9 +437,15 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException {
 
-		Boolean inferValue = false;
+		
+		if (identifier == null)
+			throw new NullPointerException("identifier can't be null");
+		
+		
+		final CtxModelObject modelObjReturn;
+		//CtxAttribute inferenceOutcome;
+		final IIdentity targetCss;
 
-		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
 			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
@@ -411,53 +454,50 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
-		CtxModelObject modelObj = this.userCtxDBMgr.retrieve(identifier);
-		
-		LOG.debug("obj to be inferred "+ modelObj.getId());
-		
-		// inference code
-		if (modelObj instanceof CtxAttribute){
-			CtxAttribute ctxAttr = (CtxAttribute) modelObj;
-			LOG.debug("obj casted - to be inferred "+ ctxAttr.getId());
-			
-			Boolean isInferable = false;
-			LOG.debug("inference manager instance : "+this.userCtxInferenceMgr );
-			LOG.debug("inference manager types : "+this.userCtxInferenceMgr.getInferrableTypes());
 
-			if(this.userCtxInferenceMgr.getInferrableTypes().contains(ctxAttr.getType()))  isInferable = true;
+		if (IdentityType.CSS.equals(targetCss.getType()) 
+				|| IdentityType.CSS_RICH.equals(targetCss.getType())
+				|| IdentityType.CSS_LIGHT.equals(targetCss.getType())){
 
-			if( !CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-				LOG.debug("has value "+ CtxBrokerUtils.hasValue(ctxAttr));
-				inferValue = true;
-			}
-/*
-			if (CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-				if(CtxBrokerUtils.isPoorQuality(ctxAttr.getQuality())) inferValue = true;
-			}
-*/
-			LOG.debug("inferValue: "+ inferValue);
-			
-			//TO DO remove following line when integration is completed
-			inferValue = false;
-			
-			if(inferValue){
-				LOG.info("before inference infered CtxAttr: "+ ctxAttr.getStringValue());
-				CtxAttribute inferedCtxAttr = userCtxInferenceMgr.predictContext(ctxAttr.getId(), new Date());	
-				LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getId());
-				LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getStringValue());
-				modelObj = (CtxModelObject) inferedCtxAttr;
-				LOG.info("return modelObj: "+ modelObj.getId()) ;
-			}
-		}
+			LOG.info("retrieving css " + targetCss.getType());
+			modelObjReturn = this.userCtxDBMgr.retrieve(identifier);	
 
-		return new AsyncResult<CtxModelObject>(modelObj);
+		}else if (IdentityType.CIS.equals(targetCss.getType())){
+
+			LOG.info("retrieving cis " + targetCss.getType());
+			modelObjReturn = this.communityCtxDBMgr.retrieve(identifier);
+
+		} else throw new CtxBrokerException("objects identifier does not correspond to a css or a cis");
+
+		// TO DO following lines initiate inference, uncomment when inference code is ready
+		/*
+		if ( modelObjReturn != null && modelObjReturn instanceof CtxAttribute){
+			inferenceOutcome = this.initiateInference((CtxAttribute) modelObjReturn);
+		} // TO DO integrate inference outcome with returned value
+		 */
+		LOG.info("retrieved  " + modelObjReturn.getId());
+
+		return new AsyncResult<CtxModelObject>(modelObjReturn);
 	}	
+
+
+
 
 	@Override
 	public Future<CtxAttribute> retrieveAttribute(
 			CtxAttributeIdentifier identifier, boolean enableInference)
 					throws CtxException {
 
+		if (identifier == null)
+			throw new NullPointerException("identifier can't be null");
+		
+		
+		final CtxAttribute ctxAttrReturn;
+		//final CtxAttribute inferedAttrReturn;
+		
+		LOG.info("identifier " + identifier);
+		LOG.info("identifier.getOwnerId() " + identifier.getOwnerId());
+		
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
@@ -468,40 +508,34 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ identifier.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
 
-		CtxModelObject modelObj = this.userCtxDBMgr.retrieve(identifier);
-		CtxAttribute ctxAttr = (CtxAttribute) modelObj;
+		if (IdentityType.CSS.equals(targetCss.getType()) 
+				|| IdentityType.CSS_RICH.equals(targetCss.getType())
+				|| IdentityType.CSS_LIGHT.equals(targetCss.getType())){
+
+			LOG.info("retrieving css " + targetCss.getType());
+			ctxAttrReturn = (CtxAttribute) this.userCtxDBMgr.retrieve(identifier);	
+
+		}else if (IdentityType.CIS.equals(targetCss.getType())){
+
+			LOG.info("retrieving cis " + targetCss.getType());
+			ctxAttrReturn = (CtxAttribute) this.communityCtxDBMgr.retrieve(identifier);
+
+		} else throw new CtxBrokerException("object's identifier does not correspond to a CSS or a CIS");
 
 		// inference code
+		// TO DO following lines initiate inference, uncomment when inference code is ready
+		
 		if(enableInference == true){
 
-
-			Boolean inferValue = false;
-			Boolean isInferable = false;
-
-			if(userCtxInferenceMgr.getInferrableTypes().contains(ctxAttr.getType()))  isInferable = true;
-
-			if( !CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-				inferValue = true;
-			}
-
-			if (CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-				if(CtxBrokerUtils.isPoorQuality(ctxAttr.getQuality())) inferValue = true;
-			}
-
-			LOG.debug("inferValue: "+ inferValue);
-
-			if(inferValue){
-
-				CtxAttribute inferedCtxAttr = userCtxInferenceMgr.predictContext(ctxAttr.getId(), new Date());	
-				LOG.debug("inferedCtxAttr: "+ inferedCtxAttr.getId());
-			}		
-
-		}
-
-		return new AsyncResult<CtxAttribute>(ctxAttr);
+			if ( ctxAttrReturn != null && ctxAttrReturn instanceof CtxAttribute){
+				
+				LOG.info("initiate inference for "+ ctxAttrReturn.getId());
+				//inferedAttrReturn = this.initiateInference((CtxAttribute) ctxAttrReturn);
+			} // TO DO integrate inference outcome with returned value
 	}
-
-
+		
+		return new AsyncResult<CtxAttribute>(ctxAttrReturn);
+	}
 
 	/*
 	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieveIndividualEntity(org.societies.api.identity.IIdentity)
@@ -587,33 +621,132 @@ public class InternalCtxBroker implements ICtxBroker {
 	 */
 	@Override
 	@Async
-	public Future<CtxModelObject> update(CtxModelObject identifier) throws CtxException {
+	public Future<CtxModelObject> update(CtxModelObject ctxModelObj) throws CtxException {
 
-		final CtxModelObject modelObject = this.userCtxDBMgr.update(identifier);
+		final CtxModelObject returnModelObject ;
+		IIdentity modelObjIdentity = null;
 
-		// this part allows the storage of attribute updates to context history
-		if (CtxModelType.ATTRIBUTE.equals(modelObject.getModelType())) {
-			final CtxAttribute ctxAttr = (CtxAttribute) modelObject;
-			if (ctxAttr.isHistoryRecorded() && this.userCtxHistoryMgr != null)
-				this.userCtxHistoryMgr.storeHoCAttribute(ctxAttr);
+		if(ctxModelObj == null) throw new NullPointerException("ctxModelObj can't be null");
 
-			// check if ctxAttr is also registered to be stored in tuples			
-			try {
-				// the list of escorting atts is empty
-				List<CtxAttributeIdentifier> escList = new ArrayList<CtxAttributeIdentifier>();
-				List<CtxAttributeIdentifier> hocTuplesList = this.getHistoryTuples(ctxAttr.getId(),escList).get();
-				if( hocTuplesList.size()>0 ) this.storeHoCAttributeTuples(ctxAttr);
+		try {
+			modelObjIdentity = this.idMgr.fromJid(ctxModelObj.getOwnerId());
 
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		return new AsyncResult<CtxModelObject>(modelObject);
+
+		if (IdentityType.CSS.equals(modelObjIdentity.getType()) 
+				|| IdentityType.CSS_RICH.equals(modelObjIdentity.getType())
+				|| IdentityType.CSS_LIGHT.equals(modelObjIdentity.getType())) {
+
+			if (ctxModelObj instanceof CtxEntity 
+					|| ctxModelObj instanceof IndividualCtxEntity 
+					|| ctxModelObj instanceof CtxAttribute 
+					||ctxModelObj instanceof CtxAssociation){
+
+				returnModelObject = this.userCtxDBMgr.update(ctxModelObj);
+
+				storeHoc(ctxModelObj);
+
+			}  else throw new CtxBrokerException("CSS model object not regognized as valid");
+
+		} else if (IdentityType.CIS.equals(modelObjIdentity.getType())){
+
+			if (ctxModelObj instanceof CommunityCtxEntity) {
+
+				CommunityCtxEntity commEntity = (CommunityCtxEntity) ctxModelObj;
+				returnModelObject = this.communityCtxDBMgr.updateCommunityEntity(commEntity);	
+
+			} else if(ctxModelObj instanceof CtxAttribute){
+
+				CtxAttribute ctxCommAttribute = (CtxAttribute) ctxModelObj;
+				returnModelObject = this.communityCtxDBMgr.updateCommunityAttribute(ctxCommAttribute);
+
+			} else throw new CtxBrokerException("CIS ctx model object is not a communityEntity or communityAttribute");
+
+		} else throw new CtxBrokerException("ctx model object has not a cis or css id");
+
+		return new AsyncResult<CtxModelObject>(returnModelObject);
 	}
+
+
+	private void storeHoc(CtxModelObject ctxModelObj){
+
+		// ********************** HISTORY CODE ******************************* 
+		// TODO move to HoC
+		// this part allows the storage of attribute updates to context history
+		if (CtxModelType.ATTRIBUTE.equals(ctxModelObj.getModelType())) {
+			final CtxAttribute ctxAttr = (CtxAttribute) ctxModelObj;
+			if (ctxAttr.isHistoryRecorded() && this.userCtxHistoryMgr != null){
+
+				// check if ctxAttr is also registered to be stored in tuples			
+				try {
+					this.userCtxHistoryMgr.storeHoCAttribute(ctxAttr);
+					// the list of escorting atts is empty
+					List<CtxAttributeIdentifier> escList = new ArrayList<CtxAttributeIdentifier>();
+					List<CtxAttributeIdentifier> hocTuplesList = this.getHistoryTuples(ctxAttr.getId(),escList).get();
+					if( hocTuplesList.size()>0 ) this.storeHoCAttributeTuples(ctxAttr);
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}			
+			}
+		}
+	}
+
+	// ********************** HISTORY CODE *******************************end of hoc code	
+
+
+
+	/*
+	 * Inference of a ctxAttribute will be triggered in case:
+	 * a) retrieved value is null
+	 * b) qoc of the retrieved value is not acceptable
+	 */	
+	protected CtxAttribute initiateInference(CtxAttribute ctxAttr){
+
+		CtxAttribute inferedCtxAttr  = null;
+
+		Boolean inferValue = false;
+		Boolean isInferable = false;
+
+		//CtxAttribute ctxAttr = (CtxAttribute) modelObjReturn;
+
+		if(this.userCtxInferenceMgr.getInferrableTypes().contains(ctxAttr.getType()))  isInferable = true;
+
+		if( !CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
+			LOG.info("has value "+ CtxBrokerUtils.hasValue(ctxAttr));
+			inferValue = true;
+		}
+
+		if (CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
+			if(CtxBrokerUtils.isPoorQuality(ctxAttr.getQuality())) inferValue = true;
+		}
+		LOG.info("inferValue: "+ inferValue);
+
+		//TO DO remove following line when integration is completed
+		inferValue = false;
+		if(inferValue){
+			LOG.info("before inference infered CtxAttr: "+ ctxAttr.getStringValue());	
+			// TO DO multiple inference methods will be added
+			inferedCtxAttr = userCtxInferenceMgr.predictContext(ctxAttr.getId(), new Date());	
+			LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getId());
+			LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getStringValue());
+			//modelObjReturn = (CtxModelObject) inferedCtxAttr;
+		}
+
+		return inferedCtxAttr;
+	}
+
+
 
 	/*
 	 * (non-Javadoc)
@@ -640,53 +773,54 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		if (attributeId == null)
 			throw new NullPointerException("attributeId can't be null");
+
 		// Will throw IllegalArgumentException if value type is not supported
 		final CtxAttributeValueType valueType = CtxBrokerUtils.findAttributeValueType(value);
 
+		final CtxAttribute attributeReturn ;
+		final CtxAttribute currentAttribute ;
 
-		CtxAttribute attribute = (CtxAttribute) this.userCtxDBMgr.retrieve(attributeId);
+		try {
+			currentAttribute = this.retrieveAttribute(attributeId, false).get();
+			//CtxAttribute attribute = (CtxAttribute) this.userCtxDBMgr.retrieve(attributeId);
 
-		if (attribute == null) {
-			// Requested attribute not found
-			return new AsyncResult<CtxAttribute>(null);
-		} else {
-			if (CtxAttributeValueType.EMPTY.equals(valueType))
-				attribute.setStringValue(null);
-			else if (CtxAttributeValueType.STRING.equals(valueType))
-				attribute.setStringValue((String) value);
-			else if (CtxAttributeValueType.INTEGER.equals(valueType))
-				attribute.setIntegerValue((Integer) value);
-			else if (CtxAttributeValueType.DOUBLE.equals(valueType))
-				attribute.setDoubleValue((Double) value);
-			else if (CtxAttributeValueType.BINARY.equals(valueType))
-				attribute.setBinaryValue((byte[]) value);
-
-
-			attribute.setValueType(valueType);
-			try {
-				attribute = (CtxAttribute) this.update(attribute).get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (currentAttribute == null) {
+				// Requested attribute not found
+				return new AsyncResult<CtxAttribute>(null);
+			} else {
+				if (CtxAttributeValueType.EMPTY.equals(valueType))
+					currentAttribute.setStringValue(null);
+				else if (CtxAttributeValueType.STRING.equals(valueType))
+					currentAttribute.setStringValue((String) value);
+				else if (CtxAttributeValueType.INTEGER.equals(valueType))
+					currentAttribute.setIntegerValue((Integer) value);
+				else if (CtxAttributeValueType.DOUBLE.equals(valueType))
+					currentAttribute.setDoubleValue((Double) value);
+				else if (CtxAttributeValueType.BINARY.equals(valueType)){
+					currentAttribute.setBinaryValue((byte[]) value);
+					currentAttribute.setValueType(valueType);
+				} else throw new CtxBrokerException("unkown type of attribute value");
 			}
+			attributeReturn = (CtxAttribute) this.update(currentAttribute).get();
 
-			return new AsyncResult<CtxAttribute>(attribute);
+		} catch (InterruptedException e) {
+			throw new CtxBrokerException("updateAttribute including value failed " + e.getLocalizedMessage());
+		} catch (ExecutionException e) {
+			throw new CtxBrokerException("updateAttribute including value failed " + e.getLocalizedMessage());
 		}
 
+		return new AsyncResult<CtxAttribute>(attributeReturn);
 	}
-
 
 
 	@Override
 	public Future<List<CtxIdentifier>> lookup(CtxModelType modelType,
 			String type) throws CtxException {
 
-		final List<CtxIdentifier> results = this.userCtxDBMgr.lookup(modelType, type);
+		final List<CtxIdentifier> userResults = this.userCtxDBMgr.lookup(modelType, type);
+		//final List<CtxIdentifier> communityResults = this.communityCtxDBMgr.lookup(modelType, type);
 
-		return new AsyncResult<List<CtxIdentifier>>(results) ;
+		return new AsyncResult<List<CtxIdentifier>>(userResults) ;
 
 	}
 
@@ -1512,8 +1646,6 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ ": " + e.getLocalizedMessage(), e);
 		}
 	}
-
-
 
 
 }

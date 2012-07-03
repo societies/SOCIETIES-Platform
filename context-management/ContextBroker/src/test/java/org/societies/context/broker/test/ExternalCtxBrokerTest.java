@@ -28,13 +28,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -43,24 +37,19 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -68,7 +57,11 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.context.broker.impl.CtxBroker;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.broker.test.util.MockBlobClass;
@@ -85,6 +78,7 @@ public class ExternalCtxBrokerTest {
 
 	private static final String OWNER_IDENTITY_STRING = "myFooIIdentity@societies.local";
 	private static final String NETWORK_NODE_STRING = "myFooIIdentity@societies.local/node";
+	@SuppressWarnings("unused")
 	private static final String CIS_IDENTITY_STRING = "FooCISIIdentity@societies.local";
 	
 	private CtxBroker ctxBroker;
@@ -94,10 +88,10 @@ public class ExternalCtxBrokerTest {
 	private static Requestor mockRequestor = mock(Requestor.class);
 	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);
 
-	
-	
+	@SuppressWarnings("unused")
 	private static IIdentity cisMockIdentity = mock(IIdentity.class);
-
+	
+	private static IPrivacyDataManager mockPrivacyDataMgr = mock(IPrivacyDataManager.class);
 
 	/**
 	 * @throws java.lang.Exception
@@ -108,7 +102,6 @@ public class ExternalCtxBrokerTest {
 		when(mockIdentityMgr.getThisNetworkNode()).thenReturn(mockNetworkNode);
 		when(mockIdentityMgr.isMine(mockIdentityLocal)).thenReturn(true);
 
-
 		when(mockNetworkNode.getBareJid()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockIdentityMgr.fromJid(OWNER_IDENTITY_STRING)).thenReturn(mockIdentityLocal);
 		when(mockIdentityLocal.toString()).thenReturn(OWNER_IDENTITY_STRING);
@@ -116,7 +109,6 @@ public class ExternalCtxBrokerTest {
 		when(mockRequestor.toString()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockNetworkNode.toString()).thenReturn(NETWORK_NODE_STRING);
 
-		
 		when(mockIdentityLocal.toString()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockIdentityLocal.getType()).thenReturn(IdentityType.CSS);
 	}
@@ -144,7 +136,7 @@ public class ExternalCtxBrokerTest {
 
 		ctxBroker = new CtxBroker(internalCtxBroker);
 		ctxBroker.setIdentityMgr(mockIdentityMgr);
-
+		ctxBroker.setPrivacyDataMgr(mockPrivacyDataMgr);
 	}
 
 	/**
@@ -155,8 +147,6 @@ public class ExternalCtxBrokerTest {
 
 		ctxBroker = null;
 	}
-
-
 
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createEntity(java.lang.String)}.
@@ -169,9 +159,12 @@ public class ExternalCtxBrokerTest {
 	public void testCreateEntityByString() throws CtxException, InterruptedException, ExecutionException {
 
 		Requestor requestor = new Requestor(mockIdentityLocal);
-		final CtxEntity ctxEntity = ctxBroker.createEntity(requestor, mockIdentityLocal ,CtxEntityTypes.DEVICE).get();
+		final CtxEntity ctxEntity = ctxBroker.createEntity(
+				requestor, mockIdentityLocal, CtxEntityTypes.DEVICE).get();
 		assertNotNull(ctxEntity);
-		assertTrue(ctxEntity.getType().equalsIgnoreCase(CtxEntityTypes.DEVICE));
+		assertNotNull(ctxEntity.getId());
+		assertEquals(mockIdentityLocal.toString(), ctxEntity.getOwnerId());
+		assertEquals(CtxEntityTypes.DEVICE, ctxEntity.getType());
 	}
 
 	/**
@@ -181,8 +174,6 @@ public class ExternalCtxBrokerTest {
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
-
-
 	@Test
 	public void testCreateAttributeByCtxEntityIdentifierString() throws CtxException, InterruptedException, ExecutionException {
 
@@ -195,61 +186,55 @@ public class ExternalCtxBrokerTest {
 
 		// Create the attribute to be tested
 		ctxAttribute = ctxBroker.createAttribute(requestor, ctxEntity.getId(), CtxAttributeTypes.ID).get();
-
-
 		assertNotNull(ctxAttribute.getId());
-		assertEquals(ctxAttribute.getId().getScope(), ctxEntity.getId());
-		assertTrue(ctxAttribute.getType().equalsIgnoreCase(CtxAttributeTypes.ID));
+		assertEquals(ctxEntity.getId(), ctxAttribute.getId().getScope());
+		assertEquals(CtxAttributeTypes.ID, ctxAttribute.getType());
 	}
 
-
-
 	/**
-	 * Test method for {@link org.societies.context.broker.impl.CtxBroker#retrieveOwnerCss()}.
+	 * Test method for {@link org.societies.context.broker.impl.CtxBroker#retrieveIndividualEntityId()}.
 	 * 
 	 * @throws CtxException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 * @throws InvalidFormatException 
 	 */
-
 	@Test
-	public void testRetrieveOwnerCss() throws Exception {
+	public void testRetrieveCssOwnerEntityId() throws Exception {
 
 		Requestor requestor = new Requestor(mockIdentityLocal);
 
-		CtxEntity ownerEntity = ctxBroker.retrieveIndividualEntity(requestor, mockIdentityLocal).get();
-		assertNotNull(ownerEntity);
-		assertEquals(ownerEntity.getType(), CtxEntityTypes.PERSON);
+		final CtxEntityIdentifier ownerEntityId = 
+				ctxBroker.retrieveIndividualEntityId(requestor, mockIdentityLocal).get();
+		assertNotNull(ownerEntityId);
+		assertEquals(mockIdentityLocal.toString(), ownerEntityId.getOwnerId());
+		assertEquals(CtxEntityTypes.PERSON, ownerEntityId.getType());
 	}
-
 
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAssociation(java.lang.String)}.
 	 */
 	@Test
-	public void testCreateAssociationString() {
+	public void testCreateAssociationByString() throws Exception {
 
 		Requestor requestor = new Requestor(mockIdentityLocal);
 
-		try {
-			CtxAssociation ctxAssocHasParam = ctxBroker.createAssociation(requestor, mockIdentityLocal ,CtxAssociationTypes.HAS_PARAMETERS).get();
+		CtxAssociation ctxAssocHasParam = 
+				this.ctxBroker.createAssociation(requestor, mockIdentityLocal, CtxAssociationTypes.HAS_PARAMETERS).get();
+		assertNotNull(ctxAssocHasParam);
+		assertNotNull(ctxAssocHasParam.getId());
+		assertEquals(mockIdentityLocal.toString(), ctxAssocHasParam.getOwnerId());
+		assertEquals(CtxAssociationTypes.HAS_PARAMETERS, ctxAssocHasParam.getType());
 
-			List<CtxIdentifier> assocIdentifierList = ctxBroker.lookup(requestor, mockIdentityLocal,CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_PARAMETERS).get();
-			assertEquals(assocIdentifierList.size(),1);
-			CtxIdentifier retrievedCtxAssocHasParamID = assocIdentifierList.get(0);
-			assertEquals(retrievedCtxAssocHasParamID.toString(),ctxAssocHasParam.getId().toString());
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// mock checkPermission
+		ResponseItem mockPermitResponse = mock(ResponseItem.class);
+		when(mockPermitResponse.getDecision()).thenReturn(Decision.PERMIT);
+		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, ctxAssocHasParam.getId(), new Action(ActionConstants.READ))).thenReturn(mockPermitResponse);
+		final List<CtxIdentifier> assocIdentifierList = 
+				this.ctxBroker.lookup(requestor, mockIdentityLocal, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_PARAMETERS).get();
+		assertEquals(1, assocIdentifierList.size());
+		CtxIdentifier retrievedCtxAssocHasParamID = assocIdentifierList.get(0);
+		assertEquals(ctxAssocHasParam.getId().toString(), retrievedCtxAssocHasParamID.toString());
 	}
 
 
@@ -263,8 +248,8 @@ public class ExternalCtxBrokerTest {
 		try {
 			System.out.println("testRetrieveEntitiesAssociationString");
 
-			CtxEntity person = this.ctxBroker.retrieveIndividualEntity(requestor, mockIdentityLocal).get();
-
+			CtxEntityIdentifier personId = 
+					this.ctxBroker.retrieveIndividualEntityId(requestor, mockIdentityLocal).get();
 
 			CtxEntity serviceEnt = this.ctxBroker.createEntity(requestor,mockIdentityLocal,CtxEntityTypes.SERVICE).get();
 			CtxAttribute serviceAttr = this.ctxBroker.createAttribute(requestor, serviceEnt.getId(), "parameterName1").get();
@@ -272,14 +257,14 @@ public class ExternalCtxBrokerTest {
 
 			CtxAssociation hasServiceAssoc = this.ctxBroker.createAssociation(requestor,mockIdentityLocal,CtxAssociationTypes.HAS_PARAMETERS).get();
 			hasServiceAssoc.addChildEntity(serviceEnt.getId());
-			hasServiceAssoc.addChildEntity(person.getId());
-			hasServiceAssoc.setParentEntity(person.getId());
+			hasServiceAssoc.addChildEntity(personId);
+			hasServiceAssoc.setParentEntity(personId);
 
 			hasServiceAssoc = (CtxAssociation) this.ctxBroker.update(requestor,hasServiceAssoc).get();
 			//System.out.println("hasServiceAssoc "+hasServiceAssoc);
 
 			serviceEnt = (CtxEntity) this.ctxBroker.update(requestor, serviceEnt).get();
-			person = (CtxEntity) this.ctxBroker.update(requestor,person).get();
+			CtxEntity person = (CtxEntity) this.ctxBroker.retrieve(requestor,personId).get();
 
 			//retrieve assoc data
 			CtxAssociationIdentifier retrievedAssocID = null;
@@ -409,8 +394,6 @@ public class ExternalCtxBrokerTest {
 		final CtxEntity scope;
 		System.out.println("testRetrieveHistoryCtxAttributeIdentifierDateDate");
 
-		// Create the attribute's scope
-		Future<CtxEntity> futureEntity;
 		try {
 			scope = this.ctxBroker.createEntity(requestor,mockIdentityLocal,"entType").get();
 

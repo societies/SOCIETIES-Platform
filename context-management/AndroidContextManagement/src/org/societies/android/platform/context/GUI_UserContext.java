@@ -39,7 +39,8 @@ import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.android.platform.context.ContextManagement.LocalBinder;
+import org.societies.android.api.context.broker.ICtxClientBroker;
+import org.societies.android.platform.context.ContextManagement.CtxLocalBinder;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -56,7 +57,7 @@ import android.widget.Button;
 public class GUI_UserContext extends Activity implements OnClickListener{
 
 	private static final String LOG_TAG = GUI_UserContext.class.getName();
-	ContextManagement cmService = null;
+	ICtxClientBroker cmService = null;
 	boolean connectedToService = false;
 	CtxEntity entity;
 	CtxAttribute attribute;
@@ -276,7 +277,7 @@ public class GUI_UserContext extends Activity implements OnClickListener{
 	
 	private ServiceConnection cmConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
-			cmService = ((LocalBinder) service).getService();
+			cmService = ((CtxLocalBinder) service).getService();
 			connectedToService = true;
 			Log.d(LOG_TAG, "UserContext GUI connected to ContextManagement service");
 		}
