@@ -78,4 +78,15 @@ public class StringUtilTest {
 		assertEquals(initialStr, str);
 	}
 
+	@Test
+	public void testHexStringToByteArrayInvalidParam() {
+
+		byte[] bytes;
+		
+		bytes = stringUtil.hexStringToByteArray(initialStr + "G5");
+		assertNull(bytes);
+
+		bytes = stringUtil.hexStringToByteArray(initialStr + "C");
+		assertNull(bytes);
+	}
 }

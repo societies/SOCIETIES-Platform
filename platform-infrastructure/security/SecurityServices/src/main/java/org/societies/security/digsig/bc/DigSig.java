@@ -124,8 +124,6 @@ public class DigSig {
 
 	public boolean verify(byte[] data, String signature, PublicKey publicKey) {
 
-		LOG.info("Verifying signature {}", signature);
-
 		byte[] signatureBytes;
 
 		signatureBytes = hexstr2bytes(signature);
@@ -134,8 +132,6 @@ public class DigSig {
 	}
 
 	public boolean verify(String data, String signature, PublicKey publicKey) {
-
-		LOG.info("Verifying signature {}", signature);
 
 		byte[] dataBytes;
 
@@ -173,7 +169,6 @@ public class DigSig {
 		
 //		str = new String(bytes, ENCODING);
 //		str = String.format("%02X", bytes);
-//		str = StringUtil.bytesToHexString(bytes);
 		str = new StringUtil().bytesToHexString(bytes);
 		
 		return str;
