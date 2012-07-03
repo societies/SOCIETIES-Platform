@@ -29,8 +29,10 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.societies.security.digsig.util.StreamUtil;
 
 
@@ -51,6 +53,8 @@ public class CertStorage {
 	private void initOurIdentity() {
 		
 		InputStream ksStream = null;
+		
+		Security.addProvider(new BouncyCastleProvider());
 		
 		try {
 
@@ -86,6 +90,12 @@ public class CertStorage {
 		return ourCert;
 	}
 
+	/**
+	 * Get the private key. For the public key use {@link #getOurCert()} and invoke
+	 * {@link X509Certificate#getPublicKey()} on that.
+	 * 
+	 * @return The private key
+	 */
 	public Key getOurKey() {
 		return ourKey;
 	}
