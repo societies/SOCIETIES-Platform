@@ -349,19 +349,20 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			IIdentity cssOwnerId = this.iCommMgr.getIdManager().fromJid(cssId);
 			IIdentity cisId = iCommMgr.getIdManager().fromJid(cis.getCisId());
 			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisId);
-			privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
+			//PRIVACY BUNDLE NOT STARTING SO THIS LINE HANGS WAITING FOR RESPONSE!!!
+			//privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
 		} catch (InvalidFormatException e) {
 			LOG.error("CIS or CSS jid came in bad format");
 			e.printStackTrace();
 			return null;
-		} catch (PrivacyException e) {
-			LOG.error("The privacy policy can't be stored.", e);
-			if (null != cis) {
-				cis.unregisterCIS();
-			}
-			LOG.error("CIS deleted.");
-			e.printStackTrace();
-			return null;
+		//} catch (PrivacyException e) {
+		//	LOG.error("The privacy policy can't be stored.", e);
+		//	if (null != cis) {
+		//		cis.unregisterCIS();
+		//	}
+		//	LOG.error("CIS deleted.");
+		//	e.printStackTrace();
+		//	return null;
 		}
 
 		
