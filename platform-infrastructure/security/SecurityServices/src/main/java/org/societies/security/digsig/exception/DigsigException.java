@@ -25,7 +25,7 @@
 package org.societies.security.digsig.exception;
 
 /**
- * 
+ * Exception that may get thrown from methods that use digital signatures.
  *
  * @author Mitja Vardjan
  *
@@ -33,29 +33,51 @@ package org.societies.security.digsig.exception;
 public class DigsigException extends Exception {
 
 	/**
-	 * 
+	 *  The Constant serialVersionUID
 	 */
 	private static final long serialVersionUID = -2334307465917723771L;
 
 	/**
-	 * 
+	 * Instantiates a new exception.
 	 */
 	public DigsigException() {
 		super();
 	}
-	
+
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 */
 	public DigsigException(String msg) {
 		super(msg);
 	}
 	
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 */
 	public DigsigException(Throwable e) {
 		super(e);
 	}
 	
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 */
 	public DigsigException(String msg, Throwable e) {
 		super(msg, e);
 	}
 	
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 */
 	public DigsigException(Throwable e, String msg) {
 		super(msg, e);
 	}

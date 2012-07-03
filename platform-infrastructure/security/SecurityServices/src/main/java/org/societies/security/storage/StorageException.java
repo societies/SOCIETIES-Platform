@@ -25,31 +25,59 @@
 package org.societies.security.storage;
 
 /**
- * 
+ * Exception that may get thrown from methods that use secure storage.
  *
  * @author Mitja Vardjan
  *
  */
 public class StorageException extends Exception {
 
+	/**
+	 *  The Constant serialVersionUID
+	 */
 	private static final long serialVersionUID = -2495640674929124304L;
 
+	/**
+	 * Instantiates a new exception.
+	 */
 	public StorageException() {
 		super();
 	}
 	
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 */
 	public StorageException(String msg) {
 		super(msg);
 	}
 	
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 */
 	public StorageException(Throwable e) {
 		super(e);
 	}
 	
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 */
 	public StorageException(String msg, Throwable e) {
 		super(msg, e);
 	}
 	
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 */
 	public StorageException(Throwable e, String msg) {
 		super(msg, e);
 	}
