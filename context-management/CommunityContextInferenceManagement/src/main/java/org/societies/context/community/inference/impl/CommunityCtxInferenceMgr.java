@@ -22,19 +22,74 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityInference.inference;
+package org.societies.context.community.inference.impl;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
+
+
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(CommunityCtxInferenceMgr.class);
+
+	private ICtxBroker internalCtxBroker;
+	ICommManager commMgr;
+
+	@Autowired(required=true)
+	CommunityCtxInferenceMgr(ICtxBroker internalCtxBroker, ICommManager commMgr){
+
+		this.internalCtxBroker = internalCtxBroker;
+		LOG.info(this.getClass() + "internalCtxBroker instantiated "+ this.internalCtxBroker);
+
+		this.commMgr = commMgr;
+		LOG.info(this.getClass() + "commMgr instantiated " +this.commMgr);
+	}
+
+	@Override
+	public CtxAttribute estimateCommunityContext(CtxEntityIdentifier communityEntIdentifier,
+			CtxAttributeIdentifier communityAttrId) {
+
+		CtxAttribute ctxAttrReturn = null; 
+
+		try {
+			ctxAttrReturn = this.internalCtxBroker.retrieveAttribute(communityAttrId, false).get();
+			LOG.info("communityEntIdentifier "+communityEntIdentifier.toString());
+			LOG.info("communityAttrId "+communityAttrId.toString());
+
+			// at this point call community context estimation component and retrieve the community value
+			ctxAttrReturn.setStringValue("communityEstimatedValue");
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ctxAttrReturn;
+	}
+
 
 	@Override
 	public Double evaluateSimilarity(CtxAttributeIdentifier arg0,
@@ -48,13 +103,6 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 			List<CtxAttributeIdentifier> arg0, List<CtxAttributeIdentifier> arg1) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void inheritContext(CtxAttributeIdentifier arg0,
-			CtxAttributeValueType arg1, EntityIdentifier arg2) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -72,7 +120,14 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 	@Override
 	public void refineContext(CtxAttributeIdentifier arg0) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	public void inheritContext(CtxAttributeIdentifier arg0,
+			CtxAttributeValueType arg1, IIdentity arg2) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

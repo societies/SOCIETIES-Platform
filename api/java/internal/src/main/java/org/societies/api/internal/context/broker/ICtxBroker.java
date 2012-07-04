@@ -501,6 +501,17 @@ public interface ICtxBroker {
 	//     Context Inference Methods  
 	//***********************************************	
 	
+	
+	/**
+	 * This method initiates the estimation of a community context attribute value. The method returns the ctxAttribute with 
+	 * the estimated value that is assigned to a Community Context Entity. 
+	 * 
+	 * @param communityCtxEntityID the community Entity identifier
+	 * @param ctxAttrId the context attribute id 
+	 * @return ctxAttribute object 
+	 */
+	public CtxAttribute estimateCommunityContext(CtxEntityIdentifier communityCtxEntityID, CtxAttributeIdentifier ctxAttrId);
+	
 	/**
 	 * Predicts a future context attribute for the specified time.
 	 * 
