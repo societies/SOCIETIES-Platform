@@ -1,5 +1,7 @@
 package org.societies.comm.xmpp.pubsub.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -8,11 +10,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+//import javax.xml.bind.JAXBContext;
+//import javax.xml.bind.JAXBException;
+//import javax.xml.bind.Marshaller;
+//import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,6 +30,10 @@ import org.jabber.protocol.pubsub.owner.Affiliations;
 import org.jabber.protocol.pubsub.owner.Delete;
 import org.jabber.protocol.pubsub.owner.Purge;
 import org.jabber.protocol.pubsub.owner.Subscriptions;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -47,8 +52,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.dom4j.io.SAXReader;
 
 @Component
 public class PubsubClientImpl implements PubsubClient, ICommCallback {
@@ -71,8 +76,10 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	private Map<String,Object> responses;
 	private Map<Subscription,List<Subscriber>> subscribers;
 	private IIdentityManager idm;
-	private Marshaller contentMarshaller;
-	private Unmarshaller contentUnmarshaller;
+	//private Marshaller contentMarshaller;
+	//private Unmarshaller contentUnmarshaller;
+	
+	private final Map<String, String> nsToPackage = new HashMap<String, String>();
 	private String packagesContextPath;
 	private IIdentity localIdentity;
 	
@@ -88,14 +95,14 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			else
 				throw new CommunicationException("Injected endpoint is not connected!");
 			packagesContextPath = "";
-			JAXBContext jc = JAXBContext.newInstance();
-			contentUnmarshaller = jc.createUnmarshaller();
-			contentMarshaller = jc.createMarshaller();
+			//JAXBContext jc = JAXBContext.newInstance();
+			//contentUnmarshaller = jc.createUnmarshaller();
+			//contentMarshaller = jc.createMarshaller();
 			endpoint.register(this);
 		} catch (CommunicationException e) {
 			LOG.error(e.getMessage());
-		} catch (JAXBException e) {
-			LOG.error(e.getMessage());
+		//} catch (JAXBException e) {
+		//	LOG.error(e.getMessage());
 		}
 	}
 	
@@ -117,6 +124,15 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		return PACKAGES;
 	}
 
+	/** Retrieves a package from a namespace mapping
+	 * @param namespace
+	 * @return
+	 * @throws UnavailableException
+	 */
+	private String getPackage(String namespace) {
+		return nsToPackage.get(namespace);
+	}
+	
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		if (payload instanceof org.jabber.protocol.pubsub.event.Event) {
@@ -125,15 +141,28 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
 			org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
 			try {
-				Object bean = null;
-				synchronized (contentUnmarshaller) {
-					bean = contentUnmarshaller.unmarshal((Element)i.getAny());
-				}
+				//synchronized (contentUnmarshaller) {
+				//	bean = contentUnmarshaller.unmarshal((Element)i.getAny());
+				//}
+				
+				//GET CLASS FIRST
+				org.dom4j.Element element = (org.dom4j.Element)i.getAny();
+				String namespace = element.getNamespace().getURI();
+				String packageStr = getPackage(namespace);  
+				String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+				Class<?> c = Class.forName(packageStr + "." + beanName);
+				//GET SIMPLE SERIALISER 
+				Strategy strategy = new AnnotationStrategy();
+				Serializer s = new Persister(strategy);
+				Object bean = s.read(c, element.asXML());
+				
 				List<Subscriber> subscriberList = subscribers.get(sub);
 				for (Subscriber subscriber : subscriberList)
 					subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
-			} catch (JAXBException e) {
-				LOG.warn("JAXBException while unmarshalling pubsub payload",e);
+			} catch (ClassNotFoundException e) {
+				LOG.error("Exception finding match class for serialisation", e);
+			} catch (Exception e) {
+				LOG.error("Exception while unmarshalling pubsub payload", e);
 			}
 		}
 	}
@@ -331,8 +360,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
 	@Override
 	public String publisherPublish(IIdentity pubsubService, String node,
-			String itemId, Object item) throws XMPPError,
-			CommunicationException {
+			String itemId, Object item) throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
 		Publish p = new Publish();
@@ -343,13 +371,24 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.newDocument();
-			synchronized (contentMarshaller) {
-				contentMarshaller.marshal(item, doc);
-			}
-			i.setAny(doc.getDocumentElement());
+			//DocumentBuilder db = dbf.newDocumentBuilder();
+			//Document doc = db.newDocument();
+			//synchronized (contentMarshaller) {
+			//	contentMarshaller.marshal(item, doc);
+			//}
 			
+			//GET SIMPLE SERIALISER 
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			Strategy strategy = new AnnotationStrategy();
+			Serializer s = new Persister(strategy);
+			s.write(payload, os);
+			
+			//CONVERT TO XML
+			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+			SAXReader reader = new SAXReader();
+			org.dom4j.Document document = reader.read(is);
+			
+			i.setAny(document.getRootElement());
 			p.setItem(i);
 			payload.setPublish(p);
 			
@@ -358,8 +397,11 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			return ((Pubsub)response).getPublish().getItem().getId();
 		} catch (ParserConfigurationException e) {
 			throw new CommunicationException("ParserConfigurationException while marshalling item to publish", e);
-		} catch (JAXBException e) {
-			throw new CommunicationException("JAXBException while marshalling item to publish", e);
+		}// catch (JAXBException e) {
+		//	throw new CommunicationException("JAXBException while marshalling item to publish", e);
+		//}
+		catch (Exception e) {
+			throw new CommunicationException("Exception while serialising item to publish", e);
 		}
 	}
 
@@ -509,7 +551,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public synchronized void addJaxbPackages(List<String> packageList) throws JAXBException {
+	public synchronized void addJaxbPackages(List<String> packageList) { //throws JAXBException {
 		if (packagesContextPath.length()==0) {
 			// TODO first run!
 		}
@@ -518,12 +560,36 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		for (String pack : packageList)
 			contextPath.append(":" + pack);
 
+		/*
 		JAXBContext jc = JAXBContext.newInstance(contextPath.toString(),
 				this.getClass().getClassLoader());
 		contentUnmarshaller = jc.createUnmarshaller();
 		contentMarshaller = jc.createMarshaller();
-		
+		*/
+		//TODO: SIMPLE
+		try {
+			for (int i=0; i<packageList.size(); i++) {
+				String packageStr = packageList.get(i);
+				String nsStr = getNSfromPackage(packageStr);
+				nsToPackage.put(nsStr, packageStr);
+			}	
+		}
+		catch (Exception ex) {
+			LOG.error("Error in JAXBMapping adding: " + ex.getMessage());
+		}
 		packagesContextPath = contextPath.toString();
 	}
-	
+
+	/** Returns the Namespace for a Package string
+	 * @param packageString
+	 * @return
+	 */
+	private String getNSfromPackage(String packageString) {
+		String ns = "";
+		String[] packArr = packageString.split("\\.");
+		ns = "http://" + packArr[1] + "." + packArr[0];
+		for(int i=2; i<packArr.length; i++)
+			ns+="/" + packArr[i]; 
+		return ns;
+	}
 }
