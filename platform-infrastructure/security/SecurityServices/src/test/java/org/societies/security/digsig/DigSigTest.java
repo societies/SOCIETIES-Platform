@@ -36,7 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.security.digsig.bc.DigSig;
+import org.societies.security.digsig.main.DigSig;
 import org.societies.api.security.digsig.DigsigException;
 
 /**

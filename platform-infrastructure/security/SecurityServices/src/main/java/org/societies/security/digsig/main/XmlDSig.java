@@ -24,11 +24,29 @@
  */
 package org.societies.security.digsig.main;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+
 /**
  * 
  *
  * @author Mitja Vardjan
  *
  */
-public class Bouncy {
+public class XmlDSig {
+
+	private static Logger LOG = LoggerFactory.getLogger(XmlDSig.class);
+
+	public String signXml(String xml, String xmlNodeId, IIdentity identity) {
+		
+		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
+
+		return xml;  // FIXME
+	}
+
+	public boolean verifyXml(String xml) {
+		LOG.debug("verifyXml()");
+		return true;  // FIXME
+	}
 }

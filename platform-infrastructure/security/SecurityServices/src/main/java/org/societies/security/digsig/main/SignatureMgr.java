@@ -33,7 +33,6 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.api.security.storage.StorageException;
-import org.societies.security.digsig.bc.DigSig;
 import org.societies.security.storage.CertStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,40 +45,37 @@ public class SignatureMgr implements ISignatureMgr {
 	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
 
 	private DigSig digSig = new DigSig();
+	private XmlDSig xmlDSig = new XmlDSig();
 	
 	public SignatureMgr() {
 		
 		LOG.info("SignatureMgr()");
 		
-		CertStorage certs;
-		try {
-			certs = CertStorage.getInstance();
-		} catch (StorageException e) {
-			LOG.error("Could not initialize storage", e);
-			return;
-		}
-		X509Certificate cert = certs.getOurCert();
-		Key key = certs.getOurKey();
-		PrivateKey privateKey = (PrivateKey) key;
-		PublicKey publicKey = cert.getPublicKey();
-		
-		LOG.debug("Certificate: {}", cert);
-		LOG.debug("Public key: {}", publicKey);
-		LOG.debug("Private key: {}", privateKey);
+//		CertStorage certs;
+//		try {
+//			certs = CertStorage.getInstance();
+//		} catch (StorageException e) {
+//			LOG.error("Could not initialize storage", e);
+//			return;
+//		}
+//		X509Certificate cert = certs.getOurCert();
+//		Key key = certs.getOurKey();
+//		PrivateKey privateKey = (PrivateKey) key;
+//		PublicKey publicKey = cert.getPublicKey();
+//		
+//		LOG.debug("Certificate: {}", cert);
+//		LOG.debug("Public key: {}", publicKey);
+//		LOG.debug("Private key: {}", privateKey);
 	}
 	
 	@Override
 	public String signXml(String xml, String xmlNodeId, IIdentity identity) {
-		
-		LOG.debug("signXml(..., {}, {})", xmlNodeId, identity);
-
-		return xml;  // FIXME
+		return xmlDSig.signXml(xml, xmlNodeId, identity);
 	}
 
 	@Override
 	public boolean verifyXml(String xml) {
-		LOG.debug("verify()");
-		return true;  // FIXME
+		return xmlDSig.verifyXml(xml);
 	}
 	
 	@Override
