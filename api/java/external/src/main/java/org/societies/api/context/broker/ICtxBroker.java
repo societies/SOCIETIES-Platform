@@ -366,11 +366,23 @@ public interface ICtxBroker {
 			final Date endDate) throws CtxException;
 		
 	/**
-	 * Updates a single context model object.
+	 * Updates the specified {@link CtxModelObject}. The requestor on whose
+	 * behalf to update the context model object must also be specified. The
+	 * method returns the updated context model object.
 	 * 
 	 * @param requestor
+	 *            the requestor on whose behalf to update the specified
+	 *            context model object
 	 * @param object
+	 *             the {@link CtxModelObject} to update
+	 * @return the updated {@link CtxModelObject}
+	 * @throws CtxAccessControlException
+	 *             if the specified requestor is not allowed to update the
+	 *             specified context model object
 	 * @throws CtxException 
+	 *             if there is a problem performing the update operation
+	 * @throws NullPointerException
+	 *             if the specified context model object is <code>null</code>
 	 */
 	public Future<CtxModelObject> update(final Requestor requestor,
 			final CtxModelObject object) throws CtxException;
