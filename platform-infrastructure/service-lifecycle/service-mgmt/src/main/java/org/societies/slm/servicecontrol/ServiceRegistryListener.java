@@ -292,9 +292,15 @@ public class ServiceRegistryListener implements BundleContextAware,
 						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
 						
 						//getPrivacyManager().get
-						String privacyPolicy = "oops, bad privacy policy!";
-						RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
-						getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
+						//String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyLocation);
+						
+						if(log.isDebugEnabled()){
+							log.debug("Tried to get privacy policy from: " + privacyLocation);
+							//log.debug("The result is: " + privacyPolicy);
+						}
+						
+						//RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
+						//getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
 						
 					}
 					

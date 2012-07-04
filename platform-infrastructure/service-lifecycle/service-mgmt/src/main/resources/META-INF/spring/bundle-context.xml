@@ -21,7 +21,7 @@
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="serviceControl" ref ="serviceControl"/>
 		<property name="negotiationProvider" ref="negotiationProviderRef" />
-		<property name="privacyManager" ref="privacyManagerProviderRef" />				
+		<!--  <property name="privacyManager" ref="privacyManagerProviderRef" />	-->			
 	</bean>
 	
 	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
