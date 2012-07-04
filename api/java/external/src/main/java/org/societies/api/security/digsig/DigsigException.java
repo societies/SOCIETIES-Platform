@@ -22,66 +22,63 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.api.security.digsig;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-
 /**
- * Methods to digitally sign given data and methods to verify given signatures.
- * 
+ * Exception that may get thrown from methods that use digital signatures.
+ *
  * @author Mitja Vardjan
  *
  */
-@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface ISignatureMgr {
+public class DigsigException extends Exception {
 
 	/**
-	 * Digitally sign given XML data and embed the signature in the given XML.
-	 * 
-	 * @param xml The XML String to be signed.
-	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
-	 * @param identity The identity to be used for signature.
-	 * 
-	 * @return XML with embedded signature.
+	 *  The Constant serialVersionUID
 	 */
-	public String signXml(String xml, String xmlNodeId, IIdentity identity);
-	
-	/**
-	 * Verify all digital signatures embedded in given XML. Verify also if the
-	 * identities used are valid.
-	 * 
-	 * @param xml The XML containing embedded digital signatures to be verified.
-	 * 
-	 * @return True if all digital signatures and identities are valid.
-	 * False otherwise or if no signatures found.
-	 */
-	public boolean verifyXml(String xml);
+	private static final long serialVersionUID = -2334307465917723771L;
 
 	/**
-	 * Digitally sign given data.
-	 * 
-	 * @param dataToSign The data to sign
-	 * @param privateKey The private key to use for signing the data
-	 * @return Hex encoded digital signature  
-	 * @throws DigsigException If something is wrong with the given key, or
-	 * (unlikely) the algorithm cannot process the given data
+	 * Instantiates a new exception.
 	 */
-	public String sign(byte[] dataToSign, PrivateKey privateKey) throws DigsigException;
+	public DigsigException() {
+		super();
+	}
+
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 */
+	public DigsigException(String msg) {
+		super(msg);
+	}
 	
 	/**
-	 * Verify given digital signature against given data.
+	 * Instantiates a new exception.
 	 * 
-	 * @param data The data that given signature is supposed to correspond to.
-	 * @param signature The digital signature to verify
-	 * @param publicKey The public key to use for verification
-	 * @return True if signature is valid. False if signature or public key is invalid, or
-	 * (unlikely) other error occurred.
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-	public boolean verify(byte[] data, String signature, PublicKey publicKey);
+	public DigsigException(Throwable e) {
+		super(e);
+	}
+	
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 */
+	public DigsigException(String msg, Throwable e) {
+		super(msg, e);
+	}
+	
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 */
+	public DigsigException(Throwable e, String msg) {
+		super(msg, e);
+	}
 }

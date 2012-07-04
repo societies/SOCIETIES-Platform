@@ -168,7 +168,7 @@ public class NegotiationProvider implements INegotiationProvider {
 		sla.setSessionId(sessionId);
 		finalSla = signedPolicyOption;  //TODO: add provider's signature
 		
-		if (session != null && signatureMgr.verify(signedPolicyOption)) {
+		if (session != null && signatureMgr.verifyXml(signedPolicyOption)) {
 			
 			sla.setSla(finalSla);
 			serviceId = session.getServiceId();
