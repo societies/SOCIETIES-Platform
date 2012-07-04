@@ -7,9 +7,7 @@
 		        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
 	<artifact type="bundle" name="org.societies.privacytrust.trust" />
-	
 	<artifact type="bundle" name="org.societies.privacytrust.privacyprotection"/>
+	<artifact type="bundle" name="org.societies.privacytrust.privacytrustcommmanagement"/>
 	
-
-
 </plan>

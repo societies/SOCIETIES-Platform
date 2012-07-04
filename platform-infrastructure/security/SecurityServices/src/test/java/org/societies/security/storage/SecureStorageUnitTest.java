@@ -40,6 +40,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.security.storage.ISecureStorage;
 
+/**
+ * @author Mitja Vardjan
+ */
 public class SecureStorageUnitTest {
 
 	private SecureStorage classUnderTest;

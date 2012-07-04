@@ -456,25 +456,59 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return hocObj;
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#update(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxModelObject)
+	 */
 	@Override
 	@Async
 	public Future<CtxModelObject> update(final Requestor requestor,
-			CtxModelObject object) throws CtxException {
+			final CtxModelObject object) throws CtxException {
 
-		Future<CtxModelObject> obj = null;
-		IIdentity targetCss;
+		if (object == null)
+			throw new NullPointerException("object can't be null");
+		
+		CtxModelObject updatedObject = null;
+		IIdentity target;
 		try {
-			targetCss = this.idMgr.fromJid(object.getId().getOwnerId());
+			target = this.idMgr.fromJid(object.getId().getOwnerId());
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
-		if (idMgr.isMine(targetCss)) {
-			obj = internalCtxBroker.update(object);
+		if (idMgr.isMine(target)) {
+			try {
+				if (LOG.isDebugEnabled())
+					LOG.debug("Checking permission: requestor="
+							+ requestor + ",target=" + target 
+							+ ",ctxId="	+ object.getId() + ",action=WRITE");
+				final ResponseItem response = this.privacyDataMgr.checkPermission(
+						requestor, target, object.getId(), new Action(ActionConstants.WRITE));
+				if (LOG.isDebugEnabled())
+					LOG.debug("ResponseItem is " + response);
+				if (response != null && Decision.PERMIT.equals(response.getDecision()))
+					updatedObject = internalCtxBroker.update(object).get();
+				else
+					throw new CtxAccessControlException("Could not update context model object with id " 
+							+ object.getId() + ": Access denied"); 
+			} catch (PrivacyException pe) {
+				throw new CtxBrokerException("Could not update context model object with id " 
+						+ object.getId() + ": Failed to perform access control: "
+						+ ": PrivacyDataManager checkPermission failed: "
+						+ pe.getLocalizedMessage(), pe);
+			} catch (ServiceUnavailableException sue) {
+				throw new CtxBrokerException("Could not update context model object with id " 
+						+ object.getId() + ": Failed to perform access control: "
+						+ " PrivacyDataManager service is not available");
+			} catch (CtxAccessControlException cace) {
+				throw cace;
+			} catch (Exception e) {
+				throw new CtxBrokerException("Could not update context model object with id " 
+						+ object.getId() + ": " +  e.getLocalizedMessage(), e);
+			} 
 		} else {
 			LOG.info("remote call");
 		}
 
-		return obj;
+		return new AsyncResult<CtxModelObject>(updatedObject);
 	}
 
 	@Override
@@ -609,7 +643,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return entIdList;
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
@@ -639,7 +673,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
@@ -669,7 +703,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
@@ -684,8 +718,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			throw new NullPointerException("listener can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 
 		IIdentity targetCss;
 		try {
@@ -700,7 +732,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.datatypes.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
@@ -715,8 +747,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			throw new NullPointerException("listener can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 
 		IIdentity targetCss;
 		try {

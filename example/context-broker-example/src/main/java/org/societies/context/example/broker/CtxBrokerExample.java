@@ -75,7 +75,6 @@ public class CtxBrokerExample 	{
 
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
-	//private ICommManager commMgr;
 
 	private IIdentity cisID;
 	private IIdentity cssOwnerId;
@@ -91,7 +90,7 @@ public class CtxBrokerExample 	{
 	private ICisOwned cisOwned  = null;
 
 	private INetworkNode cssNodeId;
-	private ICisManager cisManager;
+	
 	private String privacyPolicyWithoutRequestor  = "<RequestPolicy>" +
 			"<Target>" +
 			"<Resource>" +
@@ -156,7 +155,6 @@ public class CtxBrokerExample 	{
 		LOG.info( "this.cssID3 "+ this.cssID3);
 		LOG.info( "this.cssID3.getType() "+ this.cssID3.getType());
 
-
 		try {
 			cisOwned = cisManager.createCis(this.cssOwnerId.toString(), cssPassword, "cisName", "contextTestingCIS", 1, this.privacyPolicyWithoutRequestor).get();
 			LOG.info("*** cisOwned " +cisOwned);
@@ -179,11 +177,7 @@ public class CtxBrokerExample 	{
 		LOG.info("*** cisManager this.cisID type " +this.cisID.getType());
 
 		LOG.info("*** Starting examples...");
-
-		
 		this.retrieveIndividualEntity();
-		
-		
 		this.retrieveCssNode();
 		this.createContext();
 		this.registerForContextChanges();
@@ -328,29 +322,6 @@ public class CtxBrokerExample 	{
 		}
 	}
 
-	private void createIndividualCtxEntity1() {
-
-		LOG.info("*** createIndividualCtxEntity1");
-
-		try {
-			//IIdentity cssID1 = 
-			final IndividualCtxEntity operator = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
-			LOG.info("*** CSS owner context entity id: " + operator.getId());
-
-			Set<CtxAttribute> attributes = operator.getAttributes();
-			if(attributes.size()>0){
-				for(CtxAttribute ctxAttr : attributes){
-					LOG.info("CtxAttribute "+ctxAttr.getId());
-				}	
-			}
-
-		} catch (Exception e) {
-
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
-		}
-	}
-
-
 	private void retrieveCssNode() {
 
 		LOG.info("*** retrieveCssNode");
@@ -449,8 +420,6 @@ public class CtxBrokerExample 	{
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
-
-
 
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
@@ -656,7 +625,7 @@ public class CtxBrokerExample 	{
 		}
 	}	
 
-
+	@SuppressWarnings("unused")
 	private void triggerInferenceTest() {
 		LOG.info("*** triggerInferenceTest");
 		try {
@@ -700,6 +669,9 @@ public class CtxBrokerExample 	{
 
 			// 1b. Register listener by specifying the context attribute scope and type
 			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, CtxAttributeTypes.ID);
+			
+			// 1c. Register listener by specifying the context attribute scope
+			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, null);
 
 			// 2. Update attribute to see some event action
 			this.internalCtxBroker.updateAttribute((CtxAttributeIdentifier) this.ctxAttributeStringIdentifier, "newDeviceIdValue");

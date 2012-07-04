@@ -7,6 +7,7 @@
 	<artifactId>community-context-inference-mgmt</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
@@ -15,9 +16,30 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-mgmt-api</artifactId>
 			<version>${version.cm}</version>
+			<scope>provided</scope>
+			<type>bundle</type>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.beans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -27,6 +49,7 @@
         </dependency>
 	
 	</dependencies>
+	
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>

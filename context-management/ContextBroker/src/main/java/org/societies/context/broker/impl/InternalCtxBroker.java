@@ -67,7 +67,10 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
+
 import org.societies.context.api.community.db.ICommunityCtxDBMgr;
+import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
+
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
@@ -75,6 +78,7 @@ import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -146,6 +150,14 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Autowired(required=true)
 	private IUserCtxInferenceMgr userCtxInferenceMgr;
 
+	/**
+	 * The Community Inference Mgmt service reference.
+	 * 
+	 * @see {@link #setCommunityCtxInferenceMgr(ICommunityCtxInferenceMgr)}
+	 */
+	@Autowired(required=true)
+	private ICommunityCtxInferenceMgr communityCtxInferenceMgr;
+	
 	/**
 	 * Instantiates the platform Context Broker in Spring.
 	 * 
@@ -527,6 +539,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		
 		if(enableInference == true){
 
+			// check if value is null and if yes estimate community context 
 			if ( ctxAttrReturn != null && ctxAttrReturn instanceof CtxAttribute){
 				
 				LOG.info("initiate inference for "+ ctxAttrReturn.getId());
@@ -834,7 +847,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
@@ -863,7 +876,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
@@ -878,19 +891,18 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
 	public void registerForChanges(final CtxChangeEventListener listener,
-			final CtxEntityIdentifier scope, final String attrType) throws CtxException {
+			final CtxEntityIdentifier scope, final String attrType)
+					throws CtxException {
 
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 
 		final String[] topics = new String[] {
 				CtxChangeEventTopic.UPDATED,
@@ -921,8 +933,6 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new NullPointerException("listener can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 
 		// TODO Auto-generated method stub
 	}
@@ -1647,5 +1657,31 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
+	@Override
+	public CtxAttribute estimateCommunityContext(CtxEntityIdentifier communityCtxEntityID,	CtxAttributeIdentifier ctxAttrId) {
+
+		LOG.info("communityCtxInferenceMgr service: "+ this.communityCtxInferenceMgr);
+		CtxAttribute returnCtxAttr = this.communityCtxInferenceMgr.estimateCommunityContext(communityCtxEntityID, ctxAttrId);
+		
+		// TODO at this point check if inference (estimation) outcome is acceptable and if yes persist ctxAttribute 
+		
+		if(returnCtxAttr != null)
+			try {
+			
+				returnCtxAttr = (CtxAttribute) this.update(returnCtxAttr).get();
+		
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		return returnCtxAttr;
+	}
 
 }
