@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.directory;
+package org.societies.api.cis.attributes;
 
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
@@ -32,7 +32,6 @@ import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.context.model.CtxAttribute;
 
 /**
- * @author Babak.Farshchian@sintef.no
  *
  */
 /**
@@ -40,20 +39,29 @@ import org.societies.api.context.model.CtxAttribute;
  * MISSING_JAVADOCS
  */
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface ICisAdvertisementRecord {
-	public String getName();
-	public void setName(String name);
-	public String getId(); //Can be used to query CIS owner for an ICis to get member list, if CIS is set to public
-	public String getUri();
-	public void setUri(String uri);
-	public String getPassword();
-	public String setPassword(String password);
-	public String getType();
-	public String setType(String type);
-	public String getMode();
-	public String setMode(int mode);
-	public String getDescription();
-    public boolean setDescription(String description);
-    public HashMap<CtxAttribute, MembershipCriteria> getMembershipCriteria();
-    public boolean setMembershipCriteria(HashMap<CtxAttribute, MembershipCriteria> membershipCriteria);
+public class MembershipCriteria {
+	private Rule theRule;
+    private int rank; //Placeholder that may be used by 5.1 at some point
+
+    //Non-4.5 components need to be able to create new Membership Criteria
+    public MembershipCriteria() {
+        rank = 1;
+    }
+
+
+    public Rule getRule() {
+    	return theRule;
+    }
+    public boolean setRule(Rule theRule) {
+    	this.theRule = theRule;
+    	return true;
+    }
+    public int getRank() {
+    	return rank;
+    }
+    public boolean setRank(int rank) {
+    	this.rank = rank;
+    	return true;
+    }
+
 }
