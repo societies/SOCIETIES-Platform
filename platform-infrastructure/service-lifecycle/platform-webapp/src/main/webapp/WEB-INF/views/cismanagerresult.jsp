@@ -29,7 +29,11 @@
 //Map model = (Map)request.getAttribute("data");
 //String methodCalled = (String) model.get("method");
 
-String methodCalled = ${method};
+Map model = request.getParameterMap();
+String[] methodCalledArr = (String[]) model.get("method");
+String methodCalled = methodCalledArr[0];
+
+//String methodCalled = ${method};
 %>
 
 <script language="javascript">
