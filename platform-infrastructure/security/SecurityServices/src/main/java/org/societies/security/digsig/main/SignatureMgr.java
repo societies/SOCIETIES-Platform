@@ -30,8 +30,10 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.api.security.storage.StorageException;
+import org.societies.security.digsig.bc.DigSig;
 import org.societies.security.storage.CertStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,8 @@ public class SignatureMgr implements ISignatureMgr {
 
 	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
 
+	private DigSig digSig = new DigSig();
+	
 	public SignatureMgr() {
 		
 		LOG.info("SignatureMgr()");
@@ -73,8 +77,18 @@ public class SignatureMgr implements ISignatureMgr {
 	}
 
 	@Override
-	public boolean verify(String xml) {
+	public boolean verifyXml(String xml) {
 		LOG.debug("verify()");
 		return true;  // FIXME
+	}
+	
+	@Override
+	public String sign(byte[] dataToSign, PrivateKey privateKey) throws DigsigException {
+		return digSig.sign(dataToSign, privateKey);
+	}
+	
+	@Override
+	public boolean verify(byte[] data, String signature, PublicKey publicKey) {
+		return digSig.verify(data, signature, publicKey);
 	}
 }

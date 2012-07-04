@@ -73,7 +73,7 @@ public class SignatureMgrUnitTest {
 
 
 	/**
-	 * Test method for {@link ISignatureMgr#verify(String)}.
+	 * Test method for {@link ISignatureMgr#verifyXml(String)}.
 	 */
 	@Test
 	public void testVerify() {
@@ -83,7 +83,7 @@ public class SignatureMgrUnitTest {
 //		String xmlWithInvalidSig = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
 		boolean result;
 		
-		result = classUnderTest.verify(xmlWithValidSig);
+		result = classUnderTest.verifyXml(xmlWithValidSig);
 		assertTrue(result);
 		
 //		result = classUnderTest.verify(xmlWithInvalidSig);
