@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -80,16 +81,16 @@ public class ServiceClientJar {
 		
 		if (!ServiceClientJarAccess.isKeyValid(path, key)) {
 			LOG.warn("Invalid filename or key");
-			// Return HTTP code 401 - Unauthorized
-			throw new WebApplicationException(401);
+			// Return HTTP status code 401 - Unauthorized
+			throw new WebApplicationException(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 		
 		try {
 			file = getBytesFromFile(path);
 		} catch (IOException e) {
 			LOG.warn("Could not open file {}", path, e);
-			// Return HTTP code 500 - Internal Server Error
-			throw new WebApplicationException(500);
+			// Return HTTP status code 500 - Internal Server Error
+			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		
 		LOG.info("Serving {}", path);

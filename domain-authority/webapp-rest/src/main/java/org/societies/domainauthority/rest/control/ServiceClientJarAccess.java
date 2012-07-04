@@ -39,10 +39,7 @@ import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 import org.societies.domainauthority.rest.server.Path;
 import org.societies.domainauthority.rest.server.ServiceClientJar;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
 /**
  * 
@@ -50,14 +47,12 @@ import org.springframework.stereotype.Controller;
  * @author Mitja Vardjan
  *
  */
-//@Controller
 public class ServiceClientJarAccess implements IClientJarServer {
 
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJarAccess.class);
 
 	private static HashMap<String, List<String>> keys = new HashMap<String, List<String>>();
 
-//	@Autowired
 	private ICommManager commMgr;
 
 	public ServiceClientJarAccess() {
