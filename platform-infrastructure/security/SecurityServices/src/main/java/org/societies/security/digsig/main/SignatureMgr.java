@@ -22,66 +22,69 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.security.digsig.main;
 
-package org.societies.api.security.digsig;
-
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.societies.api.security.digsig.DigsigException;
+import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.api.security.storage.StorageException;
+import org.societies.security.storage.CertStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Methods to digitally sign given data and methods to verify given signatures.
- * 
  * @author Mitja Vardjan
- *
  */
-@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface ISignatureMgr {
+public class SignatureMgr implements ISignatureMgr {
 
-	/**
-	 * Digitally sign given XML data and embed the signature in the given XML.
-	 * 
-	 * @param xml The XML String to be signed.
-	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
-	 * @param identity The identity to be used for signature.
-	 * 
-	 * @return XML with embedded signature.
-	 */
-	public String signXml(String xml, String xmlNodeId, IIdentity identity);
-	
-	/**
-	 * Verify all digital signatures embedded in given XML. Verify also if the
-	 * identities used are valid.
-	 * 
-	 * @param xml The XML containing embedded digital signatures to be verified.
-	 * 
-	 * @return True if all digital signatures and identities are valid.
-	 * False otherwise or if no signatures found.
-	 */
-	public boolean verifyXml(String xml);
+	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
 
-	/**
-	 * Digitally sign given data.
-	 * 
-	 * @param dataToSign The data to sign
-	 * @param privateKey The private key to use for signing the data
-	 * @return Hex encoded digital signature  
-	 * @throws DigsigException If something is wrong with the given key, or
-	 * (unlikely) the algorithm cannot process the given data
-	 */
-	public String sign(byte[] dataToSign, PrivateKey privateKey) throws DigsigException;
+	private DigSig digSig = new DigSig();
+	private XmlDSig xmlDSig = new XmlDSig();
 	
-	/**
-	 * Verify given digital signature against given data.
-	 * 
-	 * @param data The data that given signature is supposed to correspond to.
-	 * @param signature The digital signature to verify
-	 * @param publicKey The public key to use for verification
-	 * @return True if signature is valid. False if signature or public key is invalid, or
-	 * (unlikely) other error occurred.
-	 */
-	public boolean verify(byte[] data, String signature, PublicKey publicKey);
+	public SignatureMgr() {
+		
+		LOG.info("SignatureMgr()");
+		
+//		CertStorage certs;
+//		try {
+//			certs = CertStorage.getInstance();
+//		} catch (StorageException e) {
+//			LOG.error("Could not initialize storage", e);
+//			return;
+//		}
+//		X509Certificate cert = certs.getOurCert();
+//		Key key = certs.getOurKey();
+//		PrivateKey privateKey = (PrivateKey) key;
+//		PublicKey publicKey = cert.getPublicKey();
+//		
+//		LOG.debug("Certificate: {}", cert);
+//		LOG.debug("Public key: {}", publicKey);
+//		LOG.debug("Private key: {}", privateKey);
+	}
+	
+	@Override
+	public String signXml(String xml, String xmlNodeId, IIdentity identity) {
+		return xmlDSig.signXml(xml, xmlNodeId, identity);
+	}
+
+	@Override
+	public boolean verifyXml(String xml) {
+		return xmlDSig.verifyXml(xml);
+	}
+	
+	@Override
+	public String sign(byte[] dataToSign, PrivateKey privateKey) throws DigsigException {
+		return digSig.sign(dataToSign, privateKey);
+	}
+	
+	@Override
+	public boolean verify(byte[] data, String signature, PublicKey publicKey) {
+		return digSig.verify(data, signature, publicKey);
+	}
 }

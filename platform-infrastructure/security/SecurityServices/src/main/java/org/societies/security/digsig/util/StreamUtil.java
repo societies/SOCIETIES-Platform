@@ -22,71 +22,46 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.digsig;
+package org.societies.security.digsig.util;
 
-import static org.junit.Assert.*;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.security.digsig.main.SignatureMgr;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
- * @author Mitja Vardjan
+ * @author Miroslav Pavleski, Mitja Vardjan
  */
-public class SignatureMgrUnitTest {
+public class StreamUtil {
+	public static void copyStream(InputStream is, OutputStream os) {
+		try {
+			byte buf[] = new byte[8192];
+			int rd = -1;
 
-	private SignatureMgr classUnderTest;
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		classUnderTest = new SignatureMgr();
+			while ((rd = is.read(buf)) != -1)
+				os.write(buf, 0, rd);
+		} catch (Exception e) {
+			throw new RuntimeException("Stream copy failed", e);
+		} finally {
+			closeStream(os);
+			closeStream(is);
+		}
 	}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-		classUnderTest = null;
+	public static void closeStream(InputStream is) {
+		if (is == null)
+			return;
+		try {
+			is.close();
+		} catch (IOException e) {
+		}
 	}
 
-	/**
-	 * Test method for {@link ISignatureMgr#signXml(String, String)}.
-	 */
-	@Test
-	public void testSignXml() {
-		
-		String xml = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
-		String xmlNodeId = "nodeA";
-		IIdentity identity = null;  // FIXME
-		String result;
-		
-		result = classUnderTest.signXml(xml, xmlNodeId, identity);
-		assertEquals(xml, result);  // TODO
-	}
-
-
-	/**
-	 * Test method for {@link ISignatureMgr#verifyXml(String)}.
-	 */
-	@Test
-	public void testVerify() {
-		
-		// TODO: use real signatures. Now the test only shows the SignatureMgr is initialized and doesn't crash
-		String xmlWithValidSig = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
-//		String xmlWithInvalidSig = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
-		boolean result;
-		
-		result = classUnderTest.verifyXml(xmlWithValidSig);
-		assertTrue(result);
-		
-//		result = classUnderTest.verify(xmlWithInvalidSig);
-//		assertFalse(result);
+	public static void closeStream(OutputStream os) {
+		if (os == null)
+			return;
+		try {
+			os.close();
+		} catch (IOException e) {
+		}
 	}
 }
