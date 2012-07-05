@@ -32,8 +32,7 @@ import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 import org.societies.api.css.devicemgmt.model.DeviceActionsConstants;
 import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
-import org.societies.css.devicemgmt.rfiddriver.impl.RFIDDriver;
-import org.societies.css.devicemgmt.rfiddriver.readers.RfidReader;
+import org.societies.css.devicemgmt.rfiddriver.readers.RfidSystem;
 import org.societies.css.devicemgmt.rfiddriver.statesvariables.IpAddressStatesVariable;
 
 /**
@@ -55,11 +54,11 @@ public class ConnectAction implements IAction{
 	private List<String> outputArguments;
 	private List<String> inputArguments;
 	
-	private RfidReader rfidReader;
+	private RfidSystem rfidSystem;
 	private IpAddressStatesVariable ipAddressStatesVariable;
 
-	public ConnectAction(RfidReader rfidReader, IpAddressStatesVariable ipAddressStatesVariable) {
-		this.rfidReader = rfidReader;
+	public ConnectAction(RfidSystem rfidSystem, IpAddressStatesVariable ipAddressStatesVariable) {
+		this.rfidSystem = rfidSystem;
 		this.ipAddressStatesVariable = ipAddressStatesVariable;
 		
 		inputArguments = new ArrayList<String>();
@@ -100,7 +99,7 @@ public class ConnectAction implements IAction{
 		
 		if (null != ipAddress) {
 			
-			rfidReader.connect(ipAddress);
+			rfidSystem.connect(ipAddress);
 			
 		}
 		return null;
@@ -109,7 +108,7 @@ public class ConnectAction implements IAction{
 	
 	@Override
 	public String getActionDescription() {
-		return "Used to connect the the driver to a given RFID reader";
+		return "Used to connect the driver to a given RFID reader using its IP address";
 	}
 
 	

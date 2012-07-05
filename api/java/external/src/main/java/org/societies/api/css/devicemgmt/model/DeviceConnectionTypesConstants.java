@@ -22,78 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.css.devicemgmt.rfiddriver.statesvariables;
-
-import org.societies.api.css.devicemgmt.IDeviceStateVariable;
-import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
+package org.societies.api.css.devicemgmt.model;
 
 /**
+ *
+ *This class contains constants related to device connection types
  *
  * @author Rafik
  *
  */
-public class IpAddressStatesVariable implements IDeviceStateVariable{
-
-	final private String NAME = DeviceStateVariableConstants.IP_ADDRESS_STATE_VARIABLE;
-
-	@Override
-	public String[] getAllowedValues() {
-		return null;
-	}
-
-
-	@Override
-	public Object getDefaultValue() {
-		return "localhost";
-	}
-
-
-	@Override
-	public Class<?> getDataJavaType() {
-		return String.class;
-	}
-
+public class DeviceConnectionTypesConstants {
 	
-	@Override
-	public Number getMaximumValue() {
-		return null;
-	}
-
-
-	@Override
-	public Number getMinimumValue() {
-		return null;
-	}
-
+	/**
+	 * Represents the zigbee connection name
+	 * A Driver that uses zigbee to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String ZIGBEE_CONNECTION = "zigbee";
 	
-	@Override
-	public String getName() {
-		return NAME;
-	}
-
-
-	@Override
-	public Number getStep() {
-		return null;
-	}
-
-
-	@Override
-	public String getDeviceMgmtDataType() {
-		return null;
-	}
-
-
-	@Override
-	public boolean isEnventable() {
-		return false;
-	}
-
-
-	@Override
-	public String getDescription() {
-
-		return "Represents the IP Address of the RFiD reader";
-	}
+	/**
+	 * Represents the ethernet connection name
+	 * A Driver that uses ethernet to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String ETHERNET_CONNECTION = "ethernet";
+	
+	
+	/**
+	 * Represents the WIFI connection name
+	 * A Driver that uses WIFI to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String WIFI_CONNECTION = "wifi";
+	
+	
+	/**
+	 * Represents the bluetooth connection name
+	 * A Driver that uses bluetooth to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String BLUETOOTH_CONNECTION = "bluetooth";
+	
+	
+	/**
+	 * Represents the HDMI connection name
+	 * A Driver that uses HDMI to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String HDMI_CONNECTION = "hdmi";
+	
 
 }
