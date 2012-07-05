@@ -27,7 +27,6 @@ package org.societies.context.broker.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -64,6 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -84,8 +84,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	/** The privacy logging facility. */
 	@Autowired(required=false)
 	private IPrivacyLogAppender privacyLogAppender;
-
-	private boolean hasPrivacyLogAppender = false;
 
 	/**
 	 * The IIdentity Mgmt service reference.
@@ -275,12 +273,13 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		IIdentity target;
 		try {
 			target = this.idMgr.fromJid(identifier.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(requestor, target);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "':" + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(requestor, target);
+		
 		if (this.idMgr.isMine(target)) {
 			
 			this.ctxAccessController.checkPermission(requestor, target,
@@ -322,7 +321,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		CtxEntityIdentifier individualEntityId = null;
 		
 		if (this.idMgr.isMine(cssId)) {
-			// TODO access control
+			
 			IndividualCtxEntity individualEntity;
 			try {
 				individualEntity = this.internalCtxBroker.retrieveIndividualEntity(cssId).get();
@@ -346,18 +345,22 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			final Requestor requestor, CtxAttributeIdentifier attrId, Date date) throws CtxException {
 
 		Future<List<CtxAttribute>> futureObj = null;
+		
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(requestor, targetCss);
+		
 		if (idMgr.isMine(targetCss)) {
+			
 			futureObj = internalCtxBroker.retrieveFuture(attrId, date);
 		} else {
+			
 			LOG.info("remote call");
 		}
 		return futureObj;
@@ -370,18 +373,22 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			int modificationIndex) throws CtxException {
 
 		Future<List<CtxAttribute>> futureObj = null;
+		
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(requestor, targetCss);
+		
 		if (idMgr.isMine(targetCss)) {
+			
 			futureObj = internalCtxBroker.retrieveFuture(attrId, modificationIndex);
 		} else {
+			
 			LOG.info("remote call");
 		}
 		return futureObj;
@@ -394,18 +401,22 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			int modificationIndex) throws CtxException {
 
 		Future<List<CtxHistoryAttribute>> hocObj = null;
+		
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(requestor, targetCss);
+		
 		if (idMgr.isMine(targetCss)) {
+			
 			hocObj = internalCtxBroker.retrieveHistory(attrId, modificationIndex);
 		} else {
+			
 			LOG.info("remote call");
 		}
 
@@ -422,15 +433,18 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(requestor, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(requestor, targetCss);
+		
 		if (idMgr.isMine(targetCss)) {
+			
 			hocObj = internalCtxBroker.retrieveHistory(attrId, startDate, endDate);
 		} else {
+			
 			LOG.info("remote call");
 		}
 
@@ -784,33 +798,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	}
 
 	/**
-	 * This method is called when the {@link IPrivacyLogAppender} service is
-	 * bound.
+	 * Sets the {@link IPrivacyLogAppender} service reference.
 	 * 
 	 * @param privacyLogAppender
-	 *            the service that was bound
-	 * @param props
-	 *            the set of properties that the service was registered with
+	 *            the {@link IPrivacyLogAppender} service reference to set
 	 */
-	public void bindPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender, Dictionary<Object,Object> props) {
+	public void setPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender) {
 
-		LOG.info("Binding service reference " + privacyLogAppender);
-		this.hasPrivacyLogAppender = true;
-	}
-
-	/**
-	 * This method is called when the {@link IPrivacyLogAppender} service is
-	 * unbound.
-	 * 
-	 * @param privacyLogAppender
-	 *            the service that was unbound
-	 * @param props
-	 *            the set of properties that the service was registered with
-	 */
-	public void unbindPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender, Dictionary<Object,Object> props) {
-
-		LOG.info("Unbinding service reference " + privacyLogAppender);
-		this.hasPrivacyLogAppender = false;
+		this.privacyLogAppender = privacyLogAppender;
 	}
 	
 	private class CreateEntityCallback implements ICtxCallback {
@@ -837,6 +832,16 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		
 		private CtxEntity getResult() {
 			return this.result;
+		}
+	}
+	
+	private void logRequest(final Requestor requestor, final IIdentity target) {
+		
+		try {
+			if (this.privacyLogAppender != null)
+				this.privacyLogAppender.logContext(requestor, target);
+		} catch (ServiceUnavailableException sue) {
+			// do nothing
 		}
 	}
 }
