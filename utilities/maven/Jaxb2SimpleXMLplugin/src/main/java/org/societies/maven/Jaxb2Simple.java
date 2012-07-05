@@ -139,7 +139,9 @@ public class Jaxb2Simple extends AbstractMojo
 		String pkgName = m.group(1);
 		Map<String,String> fieldClasses = detectFields(newSchemaContent, newClassesOnPackage.get(pkgName));
 		for (String fieldName : fieldClasses.keySet()) {
-			newSchemaContent = replaceFieldAndAccessors(newSchemaContent, fieldName, fieldClasses.get(fieldName));
+			String className = fieldClasses.get(fieldName);
+			getLog().debug("Changing class of field '"+fieldName+"' to class '"+className+"'");
+			newSchemaContent = replaceFieldAndAccessors(newSchemaContent, fieldName, className);
 		}
 
 		//ENUM NEEDS TO BE SERIALIZED WITH "VALUE", NOT "NAME"
@@ -160,8 +162,6 @@ public class Jaxb2Simple extends AbstractMojo
 	}
 
 	private static String replaceFieldAndAccessors(String newSchemaContent, String fieldName, String className) {
-		System.out.println("Changing class of field '"+fieldName+"' to class '"+className+"'");
-		
 		String textToFind = "protected String "+fieldName+";\n";
 		String textToReplace = "protected "+className+" "+fieldName+";\n";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
@@ -341,8 +341,13 @@ public class Jaxb2Simple extends AbstractMojo
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//@XmlType(.*propOrder[    ]*\(=.*\)/@Order(elements\1/  
-		textToFind = "@XmlType\\(.*propOrder";
-		textToReplace = "@Order(elements";
+//		textToFind = "@XmlType\\(.*propOrder";
+//		textToReplace = "@Order(elements";
+//		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		// TODO discarding element order information instead of placing @Order annotations
+		textToFind = "@XmlType\\([^\\)]*\\)";
+		textToReplace = "";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		// @XmlAccessorType([ ]*XmlAccessType\.\(.*\))\n@XmlType(\(.*\)[ ]*,[ ]*propOrder[ ]*\(=.*\)/@Default(DefaultType.\1)\n@Order(elements\3/
