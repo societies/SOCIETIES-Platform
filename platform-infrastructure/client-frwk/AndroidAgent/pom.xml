@@ -16,69 +16,69 @@
 
     <dependencies>
     	<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.utilities</groupId>
-		    <artifactId>DBC</artifactId>
-		    <version>${release.version}</version>
-		</dependency>
-	    <dependency>
+		<groupId>org.societies.api.external</groupId>
+		<artifactId>societies-api</artifactId>
+		<version>${release.version}</version>
+	</dependency>
+	<dependency>
+		 <groupId>org.societies.comm.xmpp</groupId>
+		 <artifactId>CommunicationFrameworkCommons</artifactId>
+		 <version>${version.comm}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.societies.utilities</groupId>
+		<artifactId>DBC</artifactId>
+		<version>${release.version}</version>
+	</dependency>
+	<dependency>
 	    	<groupId>com.google.android</groupId>
            	<artifactId>android</artifactId> 
            	<exclusions>
-			    <!-- Provided by Android -->
-			    <exclusion>
-			        <artifactId>xpp3</artifactId>
-			        <groupId>xpp3</groupId>
-			    </exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.asmack</groupId>
+			<!-- Provided by Android -->
+			<exclusion>
+				<artifactId>xpp3</artifactId>
+				<groupId>xpp3</groupId>
+			</exclusion>
+		</exclusions>
+	</dependency>
+	<dependency>
+		<groupId>org.societies</groupId>
+		<artifactId>AndroidAgentApi</artifactId>
+		<version>${version.comm}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.asmack</groupId>
 	        <artifactId>asmack</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.simpleframework</groupId>
-			<artifactId>simple-xml</artifactId>
-			<version>2.6.2</version>
-			<exclusions>
-			    <!-- StAX is not available on Android -->
-			    <exclusion>
-			        <artifactId>stax</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.simpleframework</groupId>
+		<artifactId>simple-xml</artifactId>
+		<version>2.6.2</version>
+		<exclusions>
+			<!-- StAX is not available on Android -->
+			<exclusion>
+				<artifactId>stax</artifactId>
 			        <groupId>stax</groupId>
-			    </exclusion>
-			    <exclusion>
+			</exclusion>
+			<exclusion>
 			        <artifactId>stax-api</artifactId>
 			        <groupId>stax</groupId>
-			    </exclusion>
+			 </exclusion>
 			    <!-- Provided by Android -->
-			    <exclusion>
+			 <exclusion>
 			        <artifactId>xpp3</artifactId>
 			        <groupId>xpp3</groupId>
-			    </exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-android</artifactId>
-			<version>1.6.1-RC1</version>
-		</dependency>
+			 </exclusion>
+		</exclusions>
+	</dependency>
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-android</artifactId>
+		<version>1.6.1-RC1</version>
+	</dependency>
     </dependencies>
 	
-	<build>
+    <build>
         <finalName>${project.artifactId}</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
