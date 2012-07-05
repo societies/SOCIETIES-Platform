@@ -44,7 +44,7 @@ import org.societies.css.devicemgmt.rfiddriver.statesvariables.IpAddressStatesVa
  * @author Rafik
  *
  */
-public class RfidReader implements IDriverService{
+public class RfidSystem implements IDriverService{
 	
 	private IEventMgr eventMgr;
 	
@@ -58,7 +58,7 @@ public class RfidReader implements IDriverService{
 	private String deviceId;
 
 
-	public RfidReader(IEventMgr eventMgr) {
+	public RfidSystem (IEventMgr eventMgr) {
 		
 		this.eventMgr = eventMgr;
 		
@@ -113,14 +113,14 @@ public class RfidReader implements IDriverService{
 	@Override
 	public String getServiceDescription() {
 
-		return "This service is used to control the RFiD Reader";
+		return "This service is used to control the RFiD System";
 	}
 
 
 	@Override
 	public String getName() {
 
-		return "RFID Reader Control";
+		return "RFID System Control";
 	}
 
 	/**
