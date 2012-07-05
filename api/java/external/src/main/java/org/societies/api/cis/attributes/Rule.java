@@ -22,38 +22,46 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.directory;
+package org.societies.api.cis.attributes;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import java.util.ArrayList;
 
-import java.util.HashMap;
-import org.societies.api.cis.attributes.MembershipCriteria;
-import org.societies.api.context.model.CtxAttribute;
+public class Rule {
+        
+    //could be an enumeration with its own API.
+    private ArrayList<String> operations;
 
-/**
- * @author Babak.Farshchian@sintef.no
- *
- */
-/**
- * 
- * MISSING_JAVADOCS
- */
-@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface ICisAdvertisementRecord {
-	public String getName();
-	public void setName(String name);
-	public String getId(); //Can be used to query CIS owner for an ICis to get member list, if CIS is set to public
-	public String getUri();
-	public void setUri(String uri);
-	public String getPassword();
-	public String setPassword(String password);
-	public String getType();
-	public String setType(String type);
-	public String getMode();
-	public String setMode(int mode);
-	public String getDescription();
-    public boolean setDescription(String description);
-    public HashMap<CtxAttribute, MembershipCriteria> getMembershipCriteria();
-    public boolean setMembershipCriteria(HashMap<CtxAttribute, MembershipCriteria> membershipCriteria);
+    private String operation;
+
+    private ArrayList<Object> values;
+
+    //Non-T4.5 components need to be able to create a rule
+    public Rule() {
+        operations.add("equals");
+        operations.add("greater than");
+        operations.add("less than");
+        operations.add("range");
+    }
+
+	public String getOperation() {
+        return operation;
+    }
+	public boolean setOperation(String operation) {
+        if (operations.contains(operation)) {
+            this.operation = operation;
+            return true;
+        }
+        else return false;
+    }
+
+    public ArrayList<Object> getValues() {
+        return values;
+    }
+
+    public boolean setValues(ArrayList<Object> values) {
+        if ((!operation.equals("range")) && (values.size() == 1)) this.values = values;
+        else if ((operations.equals("range")) && (values.size() == 2)) this.values = values;
+        else return false;
+        return true;
+    }
 }

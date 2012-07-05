@@ -11,9 +11,8 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.schema.cis.community.Community;
-import org.springframework.beans.factory.annotation.Autowired;
+
 
 
 public class CisManagerClientCallback implements ICommCallback {

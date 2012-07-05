@@ -22,38 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.directory;
-
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-
-import java.util.HashMap;
-import org.societies.api.cis.attributes.MembershipCriteria;
-import org.societies.api.context.model.CtxAttribute;
+package org.societies.api.css.devicemgmt.model;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ *
+ *This class contains constants related to device connection types
+ *
+ * @author Rafik
  *
  */
-/**
- * 
- * MISSING_JAVADOCS
- */
-@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface ICisAdvertisementRecord {
-	public String getName();
-	public void setName(String name);
-	public String getId(); //Can be used to query CIS owner for an ICis to get member list, if CIS is set to public
-	public String getUri();
-	public void setUri(String uri);
-	public String getPassword();
-	public String setPassword(String password);
-	public String getType();
-	public String setType(String type);
-	public String getMode();
-	public String setMode(int mode);
-	public String getDescription();
-    public boolean setDescription(String description);
-    public HashMap<CtxAttribute, MembershipCriteria> getMembershipCriteria();
-    public boolean setMembershipCriteria(HashMap<CtxAttribute, MembershipCriteria> membershipCriteria);
+public class DeviceConnectionTypesConstants {
+	
+	/**
+	 * Represents the zigbee connection name
+	 * A Driver that uses zigbee to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String ZIGBEE_CONNECTION = "zigbee";
+	
+	/**
+	 * Represents the ethernet connection name
+	 * A Driver that uses ethernet to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String ETHERNET_CONNECTION = "ethernet";
+	
+	
+	/**
+	 * Represents the WIFI connection name
+	 * A Driver that uses WIFI to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String WIFI_CONNECTION = "wifi";
+	
+	
+	/**
+	 * Represents the bluetooth connection name
+	 * A Driver that uses bluetooth to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String BLUETOOTH_CONNECTION = "bluetooth";
+	
+	
+	/**
+	 * Represents the HDMI connection name
+	 * A Driver that uses HDMI to communicate with a device must use this constants when declaring this device to the platform Device Manager
+	 */
+	public static final String HDMI_CONNECTION = "hdmi";
+	
+
 }

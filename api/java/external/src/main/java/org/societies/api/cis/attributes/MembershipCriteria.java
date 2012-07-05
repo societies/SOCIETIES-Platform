@@ -22,80 +22,46 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package org.societies.api.cis.attributes;
 
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Future;
-
-import org.societies.api.activity.IActivityFeed;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
+import java.util.HashMap;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.context.model.CtxAttribute;
+
 /**
- * This interface represents the CISs that are owned by this CSS.
- * 
- * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * 
+ * MISSING_JAVADOCS
+ */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
+public class MembershipCriteria {
+	private Rule theRule;
+    private int rank; //Placeholder that may be used by 5.1 at some point
+
+    //Non-4.5 components need to be able to create new Membership Criteria
+    public MembershipCriteria() {
+        rank = 1;
+    }
 
 
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICisOwned extends ICis {
-	
-	
-	/**
-	 * Gets the interface for working with the ActivityFeed of the CIS
-	 * 
-	 * 
-	 * @param 
-	 * @return {@link IActivityFeed} of that CIS
-	 */
-	//public Future<IActivityFeed> getCisActivityFeed();
-	
-	/**
-	 * get list of members
-	 * 
-	 * @return list of participants of the CIS as {@link ICisParticipant} 
-	 * @throws CommunicationException 
-	 * @throws InvalidFormatException 
-	 */
-	public Future<Set<ICisParticipant>> getMemberList();
-	
-	
-	/**
-	 * add a member to the CIS 
-	 * 
-	 * @param jid is the full jid of the user to be added
-	 * @param role of the user. At the moment it can be "participant" or "owner"
-	 * @return true if it worked and false if the jid was already there
-	 * @throws CommunicationException 
-	 * @throws InvalidFormatException 
-	 */
-	public Future<Boolean> addMember(String jid, String role) throws  CommunicationException;
-
-	/**
-	 * remove a member from the CIS 
-	 * 
-	 * @param jid is the full jid of the user to be removed
-	 * @return true if it worked and false if the user was not part of the group
-	 * @throws CommunicationException 
-	 * @throws InvalidFormatException 
-	 */
-	public Future<Boolean> removeMemberFromCIS(String jid) throws  CommunicationException;
-	
-	
-	// some getters and setters. TODO: change them to return Future so they can work for both remote and local CISs
-	// as soon as this is done, we will add the javadoc as well
-	public String getOwnerId();
-	public String getCisType();
-	public String setCisType(String type);
-	public int getMembershipCriteria();	
-	public String getDescription();
-	public void setDescription(String description); 
-	public IActivityFeed getActivityFeed();
-
+    public Rule getRule() {
+    	return theRule;
+    }
+    public boolean setRule(Rule theRule) {
+    	this.theRule = theRule;
+    	return true;
+    }
+    public int getRank() {
+    	return rank;
+    }
+    public boolean setRank(int rank) {
+    	this.rank = rank;
+    	return true;
+    }
 
 }
