@@ -2,7 +2,7 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
   
-   <PreferenceCategory android:title="First Category">
+   <PreferenceCategory android:title="Example Category">
         <CheckBoxPreference
                 android:key="DeadorAlive"
                 android:title="Alive"
@@ -33,4 +33,27 @@
    		    	android:summary="A String value"/>
         
     </PreferenceCategory>
+   	<PreferenceCategory android:title="Domain Authority Information">
+    		<EditTextPreference 
+   		    	android:title="Domain Authority URI" 
+   		    	android:key="daURI" 
+   		    	android:defaultValue="URI" 
+   		    	android:summary="URI of Domain Authority"/>
+           	<EditTextPreference 
+   		    	android:title="CSS Identity" 
+   		    	android:key="cssIdentity" 
+   		    	android:defaultValue="value" 
+   		    	android:summary="CSS XMPP identity"/>
+           	<EditTextPreference 
+   		    	android:title="Identity Password" 
+   		    	android:key="cssPassword" 
+   		    	android:defaultValue="value" 
+   		    	android:summary="CSS XMPP password"/>
+            <EditTextPreference 
+   		    	android:title="Domain Authority Port" 
+   		    	android:numeric="integer"
+   		    	android:key="daPort" 
+   		    	android:defaultValue="5222" 
+   		    	android:summary="Domain Authority Port"/>
+   	</PreferenceCategory>
 </PreferenceScreen>

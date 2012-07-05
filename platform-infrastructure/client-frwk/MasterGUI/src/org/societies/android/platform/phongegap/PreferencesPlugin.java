@@ -61,6 +61,7 @@ public class PreferencesPlugin extends Plugin {
 	 */
 	private static final String GET_ALL_PREFS = "getAllPrefs";
 	private static final String GET_STRING_PREF_VALUE = "getStringPrefValue";
+	private static final String PUT_STRING_PREF_VALUE = "putStringPrefValue";
 	private static final String GET_BOOLEAN_PREF_VALUE = "getBooleanPrefValue";
 	private static final String GET_INTEGER_PREF_VALUE = "getIntegerPrefValue";
 	private static final String GET_LONG_PREF_VALUE = "getLongPrefValue";
@@ -137,6 +138,15 @@ public class PreferencesPlugin extends Plugin {
 				e1.printStackTrace();
 			}
 			
+		} else if (action.equals(PUT_STRING_PREF_VALUE)) {
+			try {
+				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, putStringPrefValue(parameters.getString(0), parameters.getString(1))));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
 		} else	{
 			Log.d(LOG_TAG, "Undefined action: " + action);
 		}
@@ -182,6 +192,31 @@ public class PreferencesPlugin extends Plugin {
 			Log.d(LOG_TAG, "getStringPrefValue value: " + retValue);
 		}
 		return retValue;
+	}
+	/**
+	 * Update a string preference for a given preference name
+	 * @param prefName
+	 * @param editValue
+	 * @return String preference value
+	 */
+	private String putStringPrefValue(String prefName, String editValue) {
+		Dbc.require("Preference name must be supplied", prefName != null && prefName.length() > 0);
+		Dbc.require("Preference value must be supplied", editValue != null && editValue.length() > 0);
+		Log.d(LOG_TAG, "putStringPrefValue for: " + prefName + " value: " + editValue);
+		
+		String retValue = null;
+
+		if (this.sharedPrefs.contains(prefName)) {
+			SharedPreferences.Editor editor = this.sharedPrefs.edit();
+			
+			editor.putString(prefName, editValue);
+			editor.commit();
+			retValue = this.sharedPrefs.getString(prefName, UNDEFINED_PREF_STRING_VALUE);
+			Log.d(LOG_TAG, "putStringPrefValue updated value: " + retValue);
+			
+		}
+		return retValue;
+		
 	}
 	/**
 	 * Get an Integer preference value for a given preference name
