@@ -25,6 +25,8 @@
 package org.societies.context.broker.api.security;
 
 import org.societies.api.context.broker.CtxAccessControlException;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 
 /**
  * This interface is used for access control operations and decisions regarding
@@ -42,10 +44,16 @@ public interface ICtxAccessController {
 
 	/**
 	 * Determines whether the access request indicated by the specified
-	 * {@link CtxPermission} should be allowed or denied, based on the privacy
-	 * policy currently in effect. This method quietly returns if the access
-	 * request is permitted, or throws a CtxAccessControlException otherwise.
+	 * {@link CtxPermission} should be allowed or denied to the supplied 
+	 * requestor, based on the privacy policy currently in effect on the given
+	 * target CSS or CIS. This method quietly returns if the access request is
+	 * permitted, or throws a CtxAccessControlException otherwise.
 	 * 
+	 * @param requestor
+	 *            the entity requesting the specified permission
+	 * @param target
+	 *            the target CSS or CIS whose privacy policy to check for the
+	 *            requested permission
 	 * @param perm
 	 *            the requested permission
 	 * @throws CtxAccessControlException
@@ -53,10 +61,11 @@ public interface ICtxAccessController {
 	 *             current privacy policy
 	 * @throws CtxAccessControllerException
 	 *             if the specified permission cannot be checked against the
-	 *             current the privacy policy 
+	 *             current privacy policy 
 	 * @throws NullPointerException
-	 *             if the specified permission is <code>null</code>
+	 *             if any of the specified parameters is <code>null</code>
 	 */
-	public void checkPermission(final CtxPermission perm)
+	public void checkPermission(final Requestor requestor, 
+			final IIdentity target, final CtxPermission perm)
 			throws CtxAccessControlException, CtxAccessControllerException;
 }

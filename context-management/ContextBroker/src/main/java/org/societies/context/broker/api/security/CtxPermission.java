@@ -37,21 +37,21 @@ import org.societies.api.context.model.CtxIdentifier;
  * <p>
  * The actions to be granted are passed to the constructor in a String
  * containing a list of one or more comma-separated keywords. The possible
- * keywords are "read", "write", "create", and "delete". Their meaning is
- * defined as follows:
+ * keywords are {@link #READ}, {@link #WRITE}, {@link #CREATE}, and 
+ * {@link #DELETE}. Their meaning is defined as follows:
  * <dl>
- *   <dt>read
+ *   <dt>{@link #READ}
  *   <dd>Read access to the identified context model object. Allows
  *       {@link ICtxBroker#retrieve} to be called.
- *   <dt>write
+ *   <dt>{@link #WRITE}
  *   <dd>Write access to the identified context model object. Allows
  *       {@link ICtxBroker#update} to be called.
- *   <dt>create
+ *   <dt>{@link #CREATE}
  *   <dd>Ability to create entities, associations or add attributes to an
  *       existing context entity (scope). Allows
  *       {@link ICtxBroker#createEntity}, {@link ICtxBroker#createAttribute},
  *       or {@link ICtxBroker#createAssociation} to be called.
- *   <dt>delete
+ *   <dt>{@link #DELETE}
  *   <dd>Ability to delete the identified context model object. Allows
  *       {@link ICtxBroker#remove} to be called.
  * </dl>
@@ -73,16 +73,20 @@ public final class CtxPermission extends Permission {
 	private static final long serialVersionUID = -1210133900549828490L;
 	
 	/** READ action. */
-    private static final short READ = 0x04;
+	public static final String READ = "read"; 
+    private static final short READ_CODE = 0x04;
     
     /** WRITE action. */
-    private static final short WRITE = 0x02;
+    public static final String WRITE = "write";
+    private static final short WRITE_CODE = 0x02;
     
     /** CREATE action. */
-    private static final short CREATE = 0x01;
+    public static final String CREATE = "create";
+    private static final short CREATE_CODE = 0x01;
     
     /** DELETE action. */
-    private static final short DELETE = 0x08;
+    public static final String DELETE = "delete";
+    private static final short DELETE_CODE = 0x08;
     
     private volatile CtxIdentifier resource;
 
@@ -187,33 +191,33 @@ public final class CtxPermission extends Permission {
 		StringBuilder sb = new StringBuilder();
         boolean comma = false;
 
-        if ((this.mask & READ) == READ) {
+        if ((this.mask & READ_CODE) == READ_CODE) {
             comma = true;
-            sb.append("read");
+            sb.append(READ);
         }
 
-        if ((this.mask & WRITE) == WRITE) {
+        if ((this.mask & WRITE_CODE) == WRITE_CODE) {
             if (comma)
                 sb.append(',');
             else
                 comma = true;
-            sb.append("write");
+            sb.append(WRITE);
         }
 
-        if ((this.mask & CREATE) == CREATE) {
+        if ((this.mask & CREATE_CODE) == CREATE_CODE) {
             if (comma)
                 sb.append(',');
             else
                 comma = true;
-            sb.append("create");
+            sb.append(CREATE);
         }
 
-        if ((this.mask & DELETE) == DELETE) {
+        if ((this.mask & DELETE_CODE) == DELETE_CODE) {
             if (comma)
                 sb.append(',');
             else
                 comma = true;
-            sb.append("delete");
+            sb.append(DELETE);
         }
 
         return sb.toString();
@@ -300,7 +304,7 @@ public final class CtxPermission extends Permission {
                     && (a[i - 1] == 'a' || a[i - 1] == 'A')
                     && (a[i] == 'd' || a[i] == 'D')) {
                 matchlen = 4;
-                mask |= READ;
+                mask |= READ_CODE;
 
             } else if (i >= 4 && (a[i - 4] == 'w' || a[i - 4] == 'W')
                     && (a[i - 3] == 'r' || a[i - 3] == 'R')
@@ -308,7 +312,7 @@ public final class CtxPermission extends Permission {
                     && (a[i - 1] == 't' || a[i - 1] == 'T')
                     && (a[i] == 'e' || a[i] == 'E')) {
                 matchlen = 5;
-                mask |= WRITE;
+                mask |= WRITE_CODE;
 
             } else if (i >= 5 && (a[i - 5] == 'c' || a[i - 5] == 'C')
                     && (a[i - 4] == 'r' || a[i - 4] == 'R')
@@ -317,7 +321,7 @@ public final class CtxPermission extends Permission {
                     && (a[i - 1] == 't' || a[i - 1] == 'T')
                     && (a[i] == 'e' || a[i] == 'E')) {
                 matchlen = 6;
-                mask |= CREATE;
+                mask |= CREATE_CODE;
 
             } else if (i >= 5 && (a[i - 5] == 'd' || a[i - 5] == 'D')
                     && (a[i - 4] == 'e' || a[i - 4] == 'E')
@@ -326,7 +330,7 @@ public final class CtxPermission extends Permission {
                     && (a[i - 1] == 't' || a[i - 1] == 'T')
                     && (a[i] == 'e' || a[i] == 'E')) {
                 matchlen = 6;
-                mask |= DELETE;
+                mask |= DELETE_CODE;
 
             } else {
                 // parse error
