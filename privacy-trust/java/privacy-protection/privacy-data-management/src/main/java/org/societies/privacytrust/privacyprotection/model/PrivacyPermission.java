@@ -50,7 +50,9 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.schema.identity.DataIdentifier;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -120,7 +122,7 @@ public class PrivacyPermission implements Serializable {
 		this.actions = actions;
 		this.permission = permission;
 	}
-	
+
 	/**
 	 * @param requestor
 	 * @param ownerId
@@ -128,7 +130,7 @@ public class PrivacyPermission implements Serializable {
 	 * @param actions
 	 * @param permission
 	 */
-	public PrivacyPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, Decision permission) {
+	public PrivacyPermission(Requestor requestor, IIdentity ownerId, DataIdentifier dataId, List<Action> actions, Decision permission) {
 		super();
 		setRequestor(requestor);
 		setOwnerId(ownerId);
@@ -136,7 +138,7 @@ public class PrivacyPermission implements Serializable {
 		setActions(actions);
 		setPermission(permission);
 	}
-	
+
 	/**
 	 * @param requestor
 	 * @param permission
@@ -146,9 +148,9 @@ public class PrivacyPermission implements Serializable {
 	}
 
 
-	
+
 	/* --- Intelegint Setters --- */
-	
+
 	/**
 	 * Retrieve the access control permission as a ResponseItem
 	 * @return Permission wrapped as a ResponseItem
@@ -160,12 +162,7 @@ public class PrivacyPermission implements Serializable {
 		Resource resource = new Resource(dataId);
 
 		// - Create the list of actions from JSON
-		Gson jsonManager = new Gson();
-		List<Action> actions = new ArrayList<Action>();
-		if (null != this.actions && !"".equals(this.actions)) {
-			Type actionsType = new TypeToken<List<Action>>(){}.getType();
-			actions = jsonManager.fromJson(this.actions, actionsType);
-		}
+		List<Action> actions = getActionsFromString();
 
 		// - Create the ResponseItem
 		RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
@@ -173,7 +170,7 @@ public class PrivacyPermission implements Serializable {
 
 		return reponseItem;
 	}
-	
+
 	public void setRequestor(Requestor requestor) {
 		if (requestor != null) {
 			this.requestorId = requestor.getRequestorId().getJid();
@@ -197,26 +194,43 @@ public class PrivacyPermission implements Serializable {
 
 	}
 
-	public void setDataId(CtxIdentifier dataId) {
+	public void setDataId(DataIdentifier dataId) {
 		if (dataId != null) {
-			this.dataId = dataId.toUriString();
+			this.dataId = dataId.getUri();
 		}
 	}
 
+	/**
+	 * @return
+	 */
+	public List<Action> getActionsFromString() {
+		List<Action> actions = new ArrayList<Action>();
+		if (null != this.actions && !"".equals(this.actions)) {
+			int pos = 0, end;
+			// Loop over actions
+			while ((end = this.actions.indexOf('/', pos)) >= 0) {
+				String action = this.actions.substring(pos, end);
+				int positionOptional = action.indexOf(':');
+				ActionConstants actionType = ActionConstants.valueOf(action.substring(0, positionOptional));
+				boolean optional = "false".equals(action.substring(positionOptional+1, action.length())) ? false : true;
+				actions.add(new Action(actionType, optional));
+				pos = end + 1;
+			}
+		}
+		return actions;
+	}
+	
 	/*
 	 * Set a list of actions as a JSOn formatted string
 	 */
 	public void setActions(List<Action> actions) {
-		this.actions = "[";
+		StringBuilder sb = new StringBuilder();
 		if (null != actions) {
 			for(int i=0; i<actions.size(); i++) {
-				this.actions += "{\"action\": "+actions.get(i).getActionType().toString()+", \"optional\": "+actions.get(i).isOptional()+"}";
-				if (i != (actions.size()-1)) {
-					this.actions += ", ";
-				}
+				sb.append(actions.get(i).getActionType().name()+":"+actions.get(i).isOptional()+"/");
 			}
 		}
-		this.actions += "]";
+		this.actions = sb.toString();
 	}
 
 	/**
@@ -227,11 +241,11 @@ public class PrivacyPermission implements Serializable {
 		setActions(permission.getRequestItem().getActions());
 		setPermission(permission.getDecision());
 	}
-	
-	
-	
+
+
+
 	/* --- Normal Setters ---*/
-	
+
 	/**
 	 * @return the id
 	 */
@@ -360,7 +374,7 @@ public class PrivacyPermission implements Serializable {
 		this.actions = actions;
 	}
 
-	
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()

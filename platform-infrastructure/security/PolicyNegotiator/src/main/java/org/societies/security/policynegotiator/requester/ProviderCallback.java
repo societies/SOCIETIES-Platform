@@ -114,7 +114,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 			if (result.isSuccess()) {
 				String sla;
 				sla = result.getSla();
-				if (requester.getSignatureMgr().verify(sla)) {
+				if (requester.getSignatureMgr().verifyXml(sla)) {
 					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
 					LOG.debug("receiveResult(): final SLA size: {}", sessionId, sla == null ? null : sla.length());
 					

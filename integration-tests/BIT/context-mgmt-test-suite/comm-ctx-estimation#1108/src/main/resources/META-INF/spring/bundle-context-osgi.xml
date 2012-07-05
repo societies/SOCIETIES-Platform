@@ -21,4 +21,12 @@
 		interface="org.societies.api.internal.context.broker.ICtxBroker">
 	</osgi:reference>
 
+	<osgi:reference id="commManager"
+		interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
+	</osgi:reference>
+
+	<osgi:reference id="cisManager" 
+		interface="org.societies.api.cis.management.ICisManager">
+	</osgi:reference>
+	
 </beans>

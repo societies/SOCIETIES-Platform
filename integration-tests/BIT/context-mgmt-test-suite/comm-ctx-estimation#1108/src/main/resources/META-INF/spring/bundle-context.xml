@@ -30,7 +30,9 @@
 	
 	<bean id="TestCase1108" class="org.societies.integration.test.bit.comm_ctx_estimation.Test1108" init-method="run">
 		<property name="ctxBroker" ref ="ctxBroker" />
-		
+		<property name="commManager" ref="commManager" />
+		<property name="cisManager" ref="cisManager" />
+ 
   	</bean>
   	
   	

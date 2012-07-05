@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindingResult;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -121,7 +123,7 @@ public class LoginController {
 	 * @return login jsp page and model object
 	 */
 	@RequestMapping(value="/{cssId}/loginviada.html",method = RequestMethod.GET)
-	public ModelAndView loginviada(@PathVariable(value="cssId") String cssId) {
+	public ModelAndView loginviada(@PathVariable(value="cssId") String cssId, HttpSession session) {
 		//model is nothing but a standard Map object
 		Map<String, Object> model = new HashMap<String, Object>();
 		
@@ -132,6 +134,7 @@ public class LoginController {
 			//all okay, we're in the correct container
 			model.put("message", "Welcome to your Societies account");
 			model.put("paraCssid", cssId);
+			session.setAttribute("User", cssId);
 			return new ModelAndView("loginviada", model) ;
 		}
 		/*return modelandview object and passing login (jsp page name) and model object as

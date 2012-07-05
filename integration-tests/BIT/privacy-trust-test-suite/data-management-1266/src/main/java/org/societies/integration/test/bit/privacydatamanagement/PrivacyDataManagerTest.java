@@ -107,7 +107,6 @@ public class PrivacyDataManagerTest
 			Action action = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(action);
-			Decision decision = Decision.PERMIT;
 			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, ownerId, dataId, action);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
@@ -188,7 +187,7 @@ public class PrivacyDataManagerTest
 		String testTitle = new String("testHasObfuscatedVersion");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 		
-		IDataWrapper<Name> wrapper = new DataWrapper<Name>(DataIdentifierUtil.generateUri(dataId), null);
+		IDataWrapper<Name> wrapper = new DataWrapper<Name>(dataId.getUri(), null);
 		LOG.info("[#"+testCaseNumber+"] "+wrapper);
 		String actual = "";
 		try {

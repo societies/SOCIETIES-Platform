@@ -25,6 +25,8 @@
 package org.societies.integration.test.bit.comm_ctx_estimation;
 
 
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.integration.test.IntegrationTestCase;
 
@@ -38,9 +40,12 @@ public class Test1108 extends IntegrationTestCase{
 
 	
 	public static ICtxBroker ctxBroker;
+	public static ICommManager commManager;
+	public static ICisManager cisManager;
+	
 	
 	public Test1108(){
-		super(1108, new Class[]{Tester.class});
+		super(1108, new Class[]{CreateCommunityCtx.class});
 	}
 
 	/**
@@ -54,12 +59,31 @@ public class Test1108 extends IntegrationTestCase{
 	 * @param ctxBroker the ctxBroker to set
 	 */
 	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
+		Test1108.ctxBroker = ctxBroker;
 
 	}
+	
+	/**
+	 * @return the commMgr
+	 */
+	public static ICommManager  getCommManager() {
+		return commManager ;
+	}
 
-	
-	
-	
-	
+	/**
+	 * @param commMgr the commMgr to set
+	 */
+	public  void setCommManager(ICommManager commMgr) {
+		Test1108.commManager = commMgr;
+	}	
+
+
+	public static ICisManager getCisManager() {
+		return cisManager;
+	}
+
+	public void setCisManager(ICisManager cisManager) {
+		Test1108.cisManager = cisManager;
+	}
+
 }

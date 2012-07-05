@@ -64,33 +64,29 @@ public interface IAndroidCSSManager {
 	 * 
 	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSRecord
 	 */
-	AndroidCSSRecord registerXMPPServer(String client, AndroidCSSRecord profile);
+	void registerXMPPServer(String client, AndroidCSSRecord profile);
 	/**
 	 * Unregister with chosen Domain Server
 	 * 
 	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSRecord
 	 */
-	AndroidCSSRecord unregisterXMPPServer(String client, AndroidCSSRecord profile);
+	void unregisterXMPPServer(String client, AndroidCSSRecord profile);
 	/**
 	 * Login with chosen Domain server
 	 * 
 	 * @param client component package calling method
 	 * @param profile
-	 * @return boolean
 	 */
-	boolean loginXMPPServer(String client, AndroidCSSRecord profile);
+	void loginXMPPServer(String client, AndroidCSSRecord profile);
 	/**
 	 * Logout from chosen Domain server
 	 * 
 	 * @param client component package calling method
 	 * @param profile
-	 * @return boolean
 	 */
-	boolean logoutXMPPServer(String client, AndroidCSSRecord profile);
+	void logoutXMPPServer(String client, AndroidCSSRecord profile);
 
 	
 	/**
