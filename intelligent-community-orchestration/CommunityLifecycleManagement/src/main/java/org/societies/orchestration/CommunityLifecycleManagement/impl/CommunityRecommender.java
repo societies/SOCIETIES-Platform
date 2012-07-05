@@ -106,6 +106,9 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This is the class for the Community Recommender component
  * 
@@ -117,6 +120,9 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 public class CommunityRecommender //implements ICommCallback
 {
 
+	private static Logger LOG = LoggerFactory.getLogger(CommunityRecommender.class);
+
+	
 	private IIdentity linkedCss;
 		
 	private int longestTimeWithoutActivity;
@@ -841,7 +847,7 @@ public class CommunityRecommender //implements ICommCallback
     }
     
     public void setUserContextBroker(ICtxBroker userContextBroker) {
-    	System.out.println("GOT user context broker" + userContextBroker);
+    	LOG.info("Got user context broker" + userContextBroker);
     	this.userContextBroker = userContextBroker;
     }
     

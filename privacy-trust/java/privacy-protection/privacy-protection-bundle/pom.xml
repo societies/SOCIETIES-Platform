@@ -164,7 +164,7 @@
 							privacynegotiationmanagement;scope=compile|runtime
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Export-Package></Export-Package>
+						<Export-Package>org.societies.privacytrust.privacyprotection.**</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

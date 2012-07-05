@@ -25,7 +25,12 @@
 
 package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 //import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+
+
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import static org.mockito.Mockito.*;
@@ -133,6 +138,8 @@ import java.util.List;
 
 public class EgocentricCommunityConfigurationManager //implements ICommCallback
 {
+	
+	//private static Logger LOG = LoggerFactory.getLogger(EgocentricCommunityConfigurationManager.class);
 	
 	private IIdentity linkedCss;
     

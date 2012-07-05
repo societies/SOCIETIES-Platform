@@ -49,6 +49,32 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>com.springsource.org.bouncycastle.jce</artifactId>
+			<version>1.39.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.xml</groupId>
+			<artifactId>com.springsource.org.apache.xml.security</artifactId>
+			<version>1.4.2</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -83,7 +109,12 @@
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>
+						<Import-Package>
+							org.springframework.beans.factory.annotation;version="0",
+							org.springframework.stereotype;version="0",
+							javax.annotation;version="0",
+							**;resolution:=optional
+						</Import-Package>
 						<Export-Package>org.societies.api.security.digsig.*,org.societies.api.internal.security.storage.*</Export-Package>
 
 						<!-- Private-Package> org.societies.security.digsig.*, org.societies.security.something.* 

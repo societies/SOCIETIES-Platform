@@ -29,6 +29,7 @@ package org.societies.android.platform.cssmanager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
@@ -40,9 +41,11 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.schema.cssmanagement.CssEvent;
+import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.MethodType;
@@ -266,7 +269,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
-	public boolean loginXMPPServer(String client, AndroidCSSRecord record) {
+	public void loginXMPPServer(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "loginXMPPServer called with client: " + client);
 
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
@@ -292,7 +295,6 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //		 * Return value returned to client binding using a local bind
 //		 */
 //		Log.d(LOG_TAG, "loginXMPPServer return value: " + retValue);
-		return retValue;
 	}
 
 	@Override
@@ -322,7 +324,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
-	public boolean logoutXMPPServer(String client, AndroidCSSRecord record) {
+	public void logoutXMPPServer(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "logoutXMPPServer called with client: " + client);
 
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
@@ -348,7 +350,6 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //		 */
 //		Log.d(LOG_TAG, "logoutXMPPServer return value: " + retValue);
 
-		return retValue;
 	}
 
 	@Override
@@ -370,9 +371,17 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
-	public AndroidCSSRecord registerXMPPServer(String client, AndroidCSSRecord record) {
+	public void registerXMPPServer(String client, AndroidCSSRecord record) {
+		AndroidCSSRecord retValue = null;
 		Log.d(LOG_TAG, "registerXMPPServer called with client: " + client);
-		return null;
+		Log.d(LOG_TAG, "registering user: " + record.getCssIdentity() + " at domain: " + record.getDomainServer());
+		
+		AndroidCSSRecord params [] = {record};
+
+		DomainRegistration domainRegister = new DomainRegistration();
+		
+		domainRegister.execute(params);
+		
 	}
 
 	@Override
@@ -420,9 +429,78 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
-	public AndroidCSSRecord unregisterXMPPServer(String client,	AndroidCSSRecord record) {
+	public void unregisterXMPPServer(String client,	AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "unregisterXMPPServer called with client: " + client);
-		return null;
+	}
+	
+	
+	/**
+	 * AsyncTask classes required to carry out threaded tasks. These classes should be used where it is estimated that 
+	 * the task length is unknown or potentially long. While direct usage of the Communications components for remote 
+	 * method invocation is an explicitly asynchronous operation, other usage is not and the use of these types of classes
+	 * is encouraged. Remember, Android Not Responding (ANR) exceptions will be invoked if the main app thread is abused
+	 * and the app will be closed down by Android very soon after.
+	 * 
+	 * Although the result of an AsyncTask can be obtained by using <AsyncTask Object>.get() it's not a good idea as 
+	 * it will effectively block the parent method until the result is delivered back and so render the use if the AsyncTask
+	 * class ineffective. Use Intents as an asynchronous callback mechanism.
+	 */
+	
+	private class DomainRegistration extends AsyncTask<AndroidCSSRecord, Void, AndroidCSSRecord> {
+
+		@Override
+		/**
+		 * Carry out compute task 
+		 */
+		protected AndroidCSSRecord doInBackground(AndroidCSSRecord... params) {
+			Dbc.require("AndroidCssRecord must be supplied", params.length > 0);
+			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
+			AndroidCSSRecord retValue = null;
+
+			try {
+				INetworkNode networkNode = LocalCSSManagerService.this.ccm.newMainIdentity(params[0].getCssIdentity(), params[0].getDomainServer(), params[0].getPassword());
+				
+				if (null != networkNode && null != networkNode.getDomain() && null != networkNode.getIdentifier() ) {
+					Log.d(LOG_TAG, "registration successful");
+					retValue = new AndroidCSSRecord();
+					
+					retValue.setCssIdentity(networkNode.getIdentifier());
+					retValue.setDomainServer(networkNode.getDomain());
+					retValue.setPassword(params[0].getPassword());
+				}
+			} catch (XMPPError e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return retValue;
+		}
+		
+		@Override
+		/**
+		 * Handle the communication of the result
+		 */
+		protected void onPostExecute(AndroidCSSRecord result) {
+			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
+			
+			Intent intent = new Intent(LocalCSSManagerService.REGISTER_XMPP_SERVER);
+			
+			if (null != result) {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
+			} else {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, false);
+			}
+
+			AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(result);
+			
+			intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
+			intent.setPackage("");
+
+			Log.d(LOG_TAG, "DomainRegistration result sent");
+
+			LocalCSSManagerService.this.sendBroadcast(intent);
+
+	    }
+		
 	}
 	/**
 	 * Callback used with Android Comms

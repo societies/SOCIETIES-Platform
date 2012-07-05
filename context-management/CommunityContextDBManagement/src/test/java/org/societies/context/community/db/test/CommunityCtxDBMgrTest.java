@@ -117,7 +117,7 @@ public class CommunityCtxDBMgrTest {
 	
    @Test
    public void testUpdateEntity() throws CtxException{
-	   System.out.println("---- testUpdateAttribute");
+	   System.out.println("---- testUpdateEntity");
 
 	   entity = communityDB.createCommunityEntity(mockCisIdentity);
 	   System.out.println("entities attributes " + entity.getAttributes());
@@ -125,7 +125,7 @@ public class CommunityCtxDBMgrTest {
 
 	   // Add CommunityMemberCtxEntity
 	   member = communityDB.createCommunityEntity(mockCisIdentity);
-	   entity.addMember(member);
+	   entity.addMember(member.getId());
 	   
 	   communityDB.updateCommunityEntity(entity);
 	   System.out.println("updated entities members " + entity.getMembers());
@@ -143,6 +143,53 @@ public class CommunityCtxDBMgrTest {
 	   System.out.println("retrieved attributes - " + retrEntity.getAttributes());
 	   System.out.println("retrieves members - " + retrEntity.getMembers());
 	   System.out.println("retrieve entity another way - " + communityDB.retrieveCommunityEntity(mockCisIdentity));
+	   
+	   assertNotNull(entity);
+	   assertNotNull(retrEntity);
+	   assertEquals(entity.getAttributes(), retrEntity.getAttributes());
+	   assertEquals(entity.getMembers(), retrEntity.getMembers());
+	}
+   
+   @Test
+   public void testUpdateAttribute() throws CtxException{
+	   System.out.println("---- testUpdateAttribute");
+
+	   entity = communityDB.createCommunityEntity(mockCisIdentity);
+	   System.out.println("entities attributes " + entity.getAttributes());
+	   System.out.println("entities members " + entity.getMembers());
+
+	   // Add CommunityMemberCtxEntity
+	   member = communityDB.createCommunityEntity(mockCisIdentity);
+	   entity.addMember(member.getId());
+	   
+	   communityDB.updateCommunityEntity(entity);
+	   System.out.println("updated entities members " + entity.getMembers());
+	   
+	   // Add Attribute
+	   attribute = communityDB.createCommunityAttribute(entity.getId(), "name");
+	   entity.addAttribute(attribute);
+	   communityDB.updateCommunityEntity(entity);
+	   System.out.println("updated entities attributes " + entity.getAttributes());
+	   
+	   // Retrieve CommunityCtxEntity
+	   modObj = communityDB.retrieve(entity.getId());
+	   CommunityCtxEntity retrEntity = (CommunityCtxEntity) modObj;
+	   System.out.println("retrieved entity - " + retrEntity);
+	   System.out.println("retrieved attributes - " + retrEntity.getAttributes());
+	   System.out.println("retrieves members - " + retrEntity.getMembers());
+	   System.out.println("retrieve entity another way - " + communityDB.retrieveCommunityEntity(mockCisIdentity));
+	   
+	   // Update attribute
+	   attribute.setIntegerValue(5);
+	   communityDB.updateCommunityAttribute(attribute);
+	   System.out.println("updated attribute");
+	   
+	   modObj = communityDB.retrieve(attribute.getId());
+	   attribute = (CtxAttribute) modObj;
+
+	   System.out.println("attribute value should be 5 and it is:"+attribute.getIntegerValue());
+
+	   assertNotNull(attribute);
 	   
 	   assertNotNull(entity);
 	   assertNotNull(retrEntity);

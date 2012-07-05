@@ -129,22 +129,6 @@ public class DeviceManagerConsumer extends EventListener implements ServiceTrack
 		}
 		this.eventManager = eventManager;
 	}
-
-
-//	public void handleEvent(Event event) {
-//		
-//		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent ");
-//		if (event.getProperty("event_name").equals(DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT)) 
-//		{
-//			ll = (Double)event.getProperty("lightLevel");
-//			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent lightLevel: " + ll);
-//		}
-//		else if (event.getProperty("event_name").equals(DeviceMgmtEventConstants.SCREEN_EVENT))
-//		{
-//			screenMessage = (String)event.getProperty("screenEvent");
-//			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent screenMessage: " + screenMessage);
-//		}
-//	}
 	
 	
 	@Override

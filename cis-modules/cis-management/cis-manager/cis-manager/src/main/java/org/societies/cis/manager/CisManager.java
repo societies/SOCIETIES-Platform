@@ -161,11 +161,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
-						  		"http://societies.org/api/schema/cis/community"));
+//					"http://societies.org/api/schema/activity",	  		
+					"http://societies.org/api/schema/cis/community"));
 			//.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
 		//	.singletonList("org.societies.api.schema.cis.manager");
 			.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+//					"org.societies.api.schema.activity",
 					"org.societies.api.schema.cis.community"));
 
 	private static Logger LOG = LoggerFactory
@@ -623,7 +625,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating delete CIS notifications
 			if (c.getNotification().getDeleteNotification() != null) {
 				LOG.info("delete notification received");
-				this.unsubscribeToCis(c.getNotification().getSubscribedTo().getCisJid());
+				this.unsubscribeToCis(c.getNotification().getDeleteNotification().getCommunityJid());
 /*				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
 				if(!this.subscribedCISs.contains(new CisRecord(d.getCommunityJid()))){
 					LOG.info("CIS is not part of the list of subscribed CISs");

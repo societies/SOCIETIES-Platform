@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -121,18 +122,35 @@ public interface ICtxBroker {
 	public Future<List<Object>> evaluateSimilarity(final Serializable objectUnderComparison, final List<Serializable> referenceObjects) throws CtxException;
 
 	/**
-	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
-	 * CtxAttribute, CtxAssociation) of  the specified type.
+	 * Looks up context model objects of the specified type associated with the
+	 * identified target CSS or CIS. The requestor on whose behalf the look-up
+	 * will be performed must also be specified. The method returns a list of
+	 * {@link CtxIdentifier CtxIdentifiers} referencing the context model
+	 * objects that match the supplied criteria.
 	 * 
 	 * @param requestor
-	 * @param targetCss
-	 *            the {@link IIdentity} of the CSS where to perform the look-up 
+	 *            the requestor on whose behalf to lookup the context model 
+	 *            objects
+	 * @param target
+	 *            the {@link IIdentity} of the CSS or CIS where to perform the
+	 *            look-up 
 	 * @param modelType
+	 *            the {@link CtxModelType} of the context model objects to
+	 *            lookup
 	 * @param type
-	 * @throws CtxException 
+	 *            the type of the context model objects to lookup
+	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
+	 *         context model objects that match the supplied criteria.
+	 * @throws CtxAccessControlException
+	 *             if the specified requestor is not allowed to perform the
+	 *             look-up
+	 * @throws CtxException
+	 *             if there is a problem performing the look-up operation 
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
 	 */
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
-			final IIdentity targetCss, final CtxModelType modelType,
+			final IIdentity target, final CtxModelType modelType,
 			final String type) throws CtxException;
 
 	/**
@@ -156,7 +174,14 @@ public interface ICtxBroker {
 	
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
-	 * related to the context model object referenced by the specified identifier.
+	 * related to the context model object referenced by the specified
+	 * {@link CtxIdentifier}. Once registered, the CtxChangeEventListener
+     * will receive {@link CtxChangeEvent CtxChangeEvents} associated with the
+     * identified context model object.
+     * <p>
+     * To unregister the specified CtxChangeEventListener, use the
+     * {@link #unregisterFromChanges(CtxChangeEventListener, CtxIdentifier)}
+     * method.
 	 * 
 	 * @param requestor
 	 *            the entity requesting to register for context changes
@@ -165,8 +190,10 @@ public interface ICtxBroker {
 	 * @param ctxId
 	 *            the identifier of the context model object whose change
 	 *            events to register for
-	 * @throws CtxException if the registration process fails
-	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @throws CtxException 
+	 *             if the registration process fails
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
 	public void registerForChanges(final Requestor requestor, 
@@ -184,8 +211,10 @@ public interface ICtxBroker {
 	 * @param ctxId
 	 *            the identifier of the context model object whose change
 	 *            events to unregister from
-	 * @throws CtxException if the unregistration process fails
-	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @throws CtxException 
+	 *             if the unregistration process fails
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
 	public void unregisterFromChanges(final Requestor requestor,
@@ -195,6 +224,16 @@ public interface ICtxBroker {
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
 	 * related to the context attribute(s) with the supplied scope and type.
+	 * Once registered, the CtxChangeEventListener will receive 
+	 * {@link CtxChangeEvent CtxChangeEvents} associated with the context
+	 * attribute(s) of the specified scope and type. Note that if a
+	 * <code>null</code> type is specified then the supplied listener will
+     * receive events associated with any CtxAttribute under the given scope
+     * regardless of their type.
+     * <p>
+     * To unregister the specified CtxChangeEventListener, use the
+     * {@link #unregisterFromChanges(CtxChangeEventListener, CtxEntityIdentifier, String)}
+     * method.
 	 * 
 	 * @param requestor
 	 *            the entity requesting to register for context changes
@@ -205,14 +244,18 @@ public interface ICtxBroker {
 	 *            register for 
 	 * @param attrType
 	 *            the type of the context attribute(s) whose change events to
-	 *            register for
-	 * @throws CtxException if the registration process fails
-	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 *            register for, or <code>null</code> to indicate all attributes
+	 * @throws CtxException 
+	 *             if the registration process fails
+	 * @throws NullPointerException 
+	 *             if any of the listener, topics or scope parameter is
+     *             <code>null</code>
 	 * @since 0.0.3
 	 */
 	public void registerForChanges(final Requestor requestor, 
-			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
-			final String attrType) throws CtxException;
+			final CtxChangeEventListener listener, 
+			final CtxEntityIdentifier scope, final String attrType)
+					throws CtxException;
 	
 	/**
 	 * Unregisters the specified {@link CtxChangeEventListener} from changes
@@ -228,13 +271,16 @@ public interface ICtxBroker {
 	 * @param attrType
 	 *            the type of the context attribute(s) whose change events to
 	 *            unregister from
-	 * @throws CtxException if the unregistration process fails
-	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @throws CtxException 
+	 *             if the unregistration process fails
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
 	public void unregisterFromChanges(final Requestor requestor, 
-			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
-			final String attrType) throws CtxException;
+			final CtxChangeEventListener listener, 
+			final CtxEntityIdentifier scope, final String attrType)
+					throws CtxException;
 
 	/**
 	 * Removes the specified context model object.
@@ -247,18 +293,35 @@ public interface ICtxBroker {
 			final CtxIdentifier identifier) throws CtxException;
 
 	/**
-	 * Retrieves the specified context model object.
+	 * Retrieves the {@link CtxModelObject} identified by the specified 
+	 * {@link CtxIdentifier}. The requestor on whose behalf to retrieve the
+	 * context model object must also be specified. The method returns
+	 * <code>null</code> if the requested context model object does not exist
+	 * in the Context DB. If the specified requestor is not allowed to retrieve
+	 * the identified context model object, a {@link CtxAccessControlException}
+	 * is thrown.
 	 * 
 	 * @param requestor
+	 *            the requestor on whose behalf to retrieve the identified
+	 *            context model object
 	 * @param identifier
-	 * @throws CtxException 
+	 *            the {@link CtxIdentifier} of the {@link CtxModelObject} to
+	 *            retrieve 
+	 * @throws CtxAccessControlException
+	 *             if the specified requestor is not allowed to retrieve the
+	 *             identified context model object
+	 * @throws CtxException
+	 *             if there is a problem performing the retrieve operation
+	 * @throws NullPointerException
+	 *             if the specified identifier is <code>null</code> 
 	 */
 	public Future<CtxModelObject> retrieve(final Requestor requestor, 
 			final CtxIdentifier identifier) throws CtxException;
 	
 	/**
-	 * Retrieves the {@link IndividualCtxEntity} which represents the owner
-	 * of the specified CSS. IndividualCtxEntities are most commonly of type
+	 * Retrieves the {@link CtxEntityEntityIdentifier} of the 
+	 * {@link IndividualCtxEntity} which represents the owner of the identified
+	 * CSS. IndividualCtxEntities are most commonly of type
 	 * CtxEntityTypes.PERSON; however they can also be organisations, smart
 	 * space infrastructures, autonomous or semi-autonomous agents, etc. The
 	 * method returns <code>null</code> if there is no IndividualCtxEntity
@@ -266,20 +329,19 @@ public interface ICtxBroker {
 	 * 
 	 * @param requestor
 	 *            the entity requesting to retrieve the CSS owner context 
-	 *            entity
+	 *            entity identifier
 	 * @param cssId
 	 *            the {@link IIdentity} identifying the CSS whose 
-	 *            IndividualCtxEntity to retrieve
-	 * @return the {@link IndividualCtxEntity} which represents the owner of
-	 *         the specified CSS
+	 *            IndividualCtxEntity CtxEntityIdentifier to retrieve
+	 * @return the CtxEntityEntityIdentifier of the IndividualCtxEntity which
+	 *         represents the owner of the identified CSS
 	 * @throws CtxException 
-	 *             if the IndividualCtxEntity representing the owner of the 
-	 *             specified CSS exists but cannot be retrieved
+	 *             if there is a problem retrieving the CtxEntityIdentifier
 	 * @throws NullPointerException
 	 *             if any of the specified parameters is <code>null</code>
 	 * @since 0.3
 	 */
-	public Future<IndividualCtxEntity> retrieveIndividualEntity(
+	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
 			final Requestor requestor, final IIdentity cssId) throws CtxException;
 
 	/**
@@ -333,11 +395,23 @@ public interface ICtxBroker {
 			final Date endDate) throws CtxException;
 		
 	/**
-	 * Updates a single context model object.
+	 * Updates the specified {@link CtxModelObject}. The requestor on whose
+	 * behalf to update the context model object must also be specified. The
+	 * method returns the updated context model object.
 	 * 
 	 * @param requestor
+	 *            the requestor on whose behalf to update the specified
+	 *            context model object
 	 * @param object
+	 *             the {@link CtxModelObject} to update
+	 * @return the updated {@link CtxModelObject}
+	 * @throws CtxAccessControlException
+	 *             if the specified requestor is not allowed to update the
+	 *             specified context model object
 	 * @throws CtxException 
+	 *             if there is a problem performing the update operation
+	 * @throws NullPointerException
+	 *             if the specified context model object is <code>null</code>
 	 */
 	public Future<CtxModelObject> update(final Requestor requestor,
 			final CtxModelObject object) throws CtxException;

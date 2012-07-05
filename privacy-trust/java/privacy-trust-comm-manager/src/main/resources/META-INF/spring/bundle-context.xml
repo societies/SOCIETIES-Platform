@@ -103,7 +103,9 @@
 	</bean>
 	
 	<bean name="PrivacyAgreementManagerCommClientCallback"
-		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClientCallback">
+		class="org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommClientCallback"
+		depends-on="commManager">
+		<property name="commManager" ref="commManager" />
 	</bean>
 
 	<bean name="PrivacyAgreementManagerCommServer"

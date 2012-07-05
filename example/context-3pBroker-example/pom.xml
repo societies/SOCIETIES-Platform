@@ -44,13 +44,6 @@
 
 	<!-- List dependencies here -->
 	<dependencies>
-		<!--dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency-->
-
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -107,6 +100,6 @@
 
 		</plugins>
 	</build>
-	<description>This bundle provides examples for using the Internal Context Broker in an OSGi environment.</description>
-	<name>External Context Broker Example</name>
+	<description>This bundle provides examples for using the 3P Context Broker in an OSGi environment.</description>
+	<name>3P Context Broker Example</name>
 </project>

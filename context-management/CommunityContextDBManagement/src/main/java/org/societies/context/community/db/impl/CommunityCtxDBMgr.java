@@ -230,6 +230,28 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 		return entity;
 	}
 
+	@Override
+	public CtxAttribute updateCommunityAttribute(CtxAttribute attribute)
+			throws CtxException {
+
+		if (this.modelObjects.keySet().contains(attribute.getId())) {
+			this.modelObjects.put(attribute.getId(), attribute);
+		
+			final String[] topics = new String[] { CtxChangeEventTopic.UPDATED, CtxChangeEventTopic.MODIFIED };
+			if (this.ctxEventMgr != null) {
+				this.ctxEventMgr.post(new CtxChangeEvent(attribute.getId()), 
+						topics, CtxEventScope.LOCAL);
+			} else {
+				LOG.warn("Could not send context change event to topics '" 
+						+ Arrays.toString(topics) 
+						+ "' with scope '" + CtxEventScope.LOCAL 
+						+ "': ICtxEventMgr service is not available");
+			}
+		}
+					      
+		return attribute;
+	}
+
 	/*
 	 * @see org.societies.context.api.community.db.ICommunityCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier)
 	 */

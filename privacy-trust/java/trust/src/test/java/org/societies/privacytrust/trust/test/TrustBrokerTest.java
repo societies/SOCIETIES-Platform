@@ -43,9 +43,6 @@ import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -71,13 +68,13 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	
 	private static final String TRUSTED_SERVICE_ID = BASE_ID + "ServiceResourceIdentifier";
 	
-	private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
+	//private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
 	
-	private static ITrustedCss trustedCss;
+	private static TrustedEntityId cssTeid;
 	
-	private static ITrustedCis trustedCis;
+	private static TrustedEntityId cisTeid;
 	
-	private static ITrustedService trustedService;
+	private static TrustedEntityId serviceTeid;
 	
 	@Autowired
 	private ITrustBroker trustBroker;
@@ -91,14 +88,11 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
-		final TrustedEntityId cssTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID);
-		trustedCss = new TrustedCss(cssTeid);
+		cssTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID);
 		
-		final TrustedEntityId cisTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID);
-		trustedCis = new TrustedCis(cisTeid);
+		cisTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID);
 		
-		final TrustedEntityId serviceTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
-		trustedService = new TrustedService(serviceTeid, TRUSTED_SERVICE_TYPE);
+		serviceTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
 	}
 
 	/**
@@ -107,9 +101,9 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		
-		trustedCss = null;
-		trustedCis = null;
-		trustedService = null;
+		cssTeid = null;
+		cisTeid = null;
+		serviceTeid = null;
 	}
 
 	/**
@@ -141,12 +135,14 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		
 		Double retrievedTrustValue;
 		
-		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedCss.getTeid()).get(); 
+		retrievedTrustValue = this.trustBroker.retrieveTrust(cssTeid).get(); 
 		assertNull(retrievedTrustValue);
 		
-		// add trusted CSS with user perceived value set to trustValue1 
+		// add trusted CSS with user perceived value set to trustValue1
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(cssTeid);
 		trustedCss.getUserPerceivedTrust().setValue(trustValue1);
-		this.trustRepo.addEntity(trustedCss);
+		this.trustRepo.updateEntity(trustedCss);
+		
 		// verify
 		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedCss.getTeid()).get();
 		assertNotNull(retrievedTrustValue);
@@ -177,12 +173,14 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		
 		Double retrievedTrustValue;
 		
-		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedCis.getTeid()).get(); 
+		retrievedTrustValue = this.trustBroker.retrieveTrust(cisTeid).get(); 
 		assertNull(retrievedTrustValue);
 		
-		// add trusted CIS with user perceived value set to trustValue1 
+		// add trusted CIS with user perceived value set to trustValue1
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(cisTeid);  
 		trustedCis.getUserPerceivedTrust().setValue(trustValue1);
-		this.trustRepo.addEntity(trustedCis);
+		this.trustRepo.updateEntity(trustedCis);
+		
 		// verify
 		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedCis.getTeid()).get();
 		assertNotNull(retrievedTrustValue);
@@ -213,12 +211,14 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		
 		Double retrievedTrustValue;
 		
-		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedService.getTeid()).get(); 
+		retrievedTrustValue = this.trustBroker.retrieveTrust(serviceTeid).get(); 
 		assertNull(retrievedTrustValue);
 		
 		// add trusted service with user perceived value set to trustValue1 
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(serviceTeid); 
 		trustedService.getUserPerceivedTrust().setValue(trustValue1);
-		this.trustRepo.addEntity(trustedService);
+		this.trustRepo.updateEntity(trustedService);
+		
 		// verify
 		retrievedTrustValue = this.trustBroker.retrieveTrust(trustedService.getTeid()).get();
 		assertNotNull(retrievedTrustValue);

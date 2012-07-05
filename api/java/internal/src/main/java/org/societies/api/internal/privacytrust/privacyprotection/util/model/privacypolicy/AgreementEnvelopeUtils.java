@@ -27,6 +27,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.util.model.pri
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 
 
@@ -35,21 +37,21 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
  * @author Olivier Maridat (Trialog)
  */
 public class AgreementEnvelopeUtils {
-	public static AgreementEnvelope toAgreementEnvelope(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreementEnvelopeBean)
+	public static AgreementEnvelope toAgreementEnvelope(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreementEnvelopeBean, IIdentityManager identityManager) throws InvalidFormatException
 	{
 		if (null == agreementEnvelopeBean) {
 			return null;
 		}
-		return new AgreementEnvelope(AgreementUtils.toAgreement(agreementEnvelopeBean.getAgreement()), agreementEnvelopeBean.getPublicKey(), agreementEnvelopeBean.getSignature());
+		return new AgreementEnvelope(AgreementUtils.toAgreement(agreementEnvelopeBean.getAgreement(), identityManager), agreementEnvelopeBean.getPublicKey(), agreementEnvelopeBean.getSignature());
 	}
-	public static List<AgreementEnvelope> toAgreementEnvelopes(List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope> agreementEnvelopeBeans)
+	public static List<AgreementEnvelope> toAgreementEnvelopes(List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope> agreementEnvelopeBeans, IIdentityManager identityManager) throws InvalidFormatException
 	{
 		if (null == agreementEnvelopeBeans) {
 			return null;
 		}
 		List<AgreementEnvelope> agreementEnvelopes = new ArrayList<AgreementEnvelope>();
 		for(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreementEnvelopeBean : agreementEnvelopeBeans) {
-			agreementEnvelopes.add(AgreementEnvelopeUtils.toAgreementEnvelope(agreementEnvelopeBean));
+			agreementEnvelopes.add(AgreementEnvelopeUtils.toAgreementEnvelope(agreementEnvelopeBean, identityManager));
 		}
 		return agreementEnvelopes;
 	}
@@ -61,9 +63,9 @@ public class AgreementEnvelopeUtils {
 		}
 		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreementEnvelopeBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope();
 		agreementEnvelopeBean.setAgreement(AgreementUtils.toAgreementBean(agreementEnvelope.getAgreement()));
-		if (null != agreementEnvelope.getChecksum()) {
-			agreementEnvelopeBean.setAgreementCheckSum(agreementEnvelope.getChecksum().getValue());
-		}
+//		if (null != agreementEnvelope.getChecksum()) {
+//			agreementEnvelopeBean.setAgreementCheckSum(agreementEnvelope.getChecksum().getValue());
+//		}
 		agreementEnvelopeBean.setPublicKey(agreementEnvelope.getPublicKeyInBytes());
 		agreementEnvelopeBean.setSignature(agreementEnvelope.getSignature());
 		return agreementEnvelopeBean;

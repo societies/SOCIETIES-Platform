@@ -33,12 +33,25 @@ import org.societies.api.schema.identity.DataIdentifier;
  *
  */
 public class DataIdentifierUtil {
-	public static String generateUri(DataIdentifier dataId)
+	/**
+	 * Generate a URI: type/ownerId/
+	 * @param dataId
+	 * @return
+	 */
+	public static String toUriString(DataIdentifier dataId)
 	{
 		StringBuilder str = new StringBuilder("");
 		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
 		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
-		dataId.setUri(str.toString());
 		return str.toString();
+	}
+	
+	public static DataIdentifier fromUri(String dataIdUri)
+	{
+		String[] infos = dataIdUri.split("/");
+		DataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setType(infos[0]);
+		dataId.setOwnerId(infos[1]);
+		return dataId;
 	}
 }

@@ -24,71 +24,69 @@
  */
 package org.societies.css.devicemgmt.rfiddriver.impl;
 
+
+import java.util.Dictionary;
 import java.util.Hashtable;
 
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.css.devicemgmt.IDriverService;
+import org.societies.api.css.devicemgmt.model.DeviceConnectionTypesConstants;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
 import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
-import org.societies.api.css.devicemgmt.rfid.IRfidDriver;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+import org.societies.api.internal.css.devicemgmt.model.DeviceMgmtDriverServiceConstants;
 import org.societies.api.osgi.event.IEventMgr;
+import org.societies.css.devicemgmt.rfiddriver.readers.RfidSystem;
+import org.springframework.osgi.context.BundleContextAware;
+
 
 /**
- * Describe your class here...
  *
  * @author Eliza
  *
  */
-public class RFIDDriver implements IRfidDriver {
+public class RFIDDriver implements /*IRfidDriver,*/ BundleContextAware{
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	Hashtable<String, SocketClient> sockets;
 	private final String DEVICE_FAMILY_IDENTITY = "org.societies.css.devicemgmt.RFIDDriver";
-	private final String DEVICE_NAME = "RFID_READER";
+	private final String DEVICE_NAME = "RFiD System";
 	private final String DEVICE_DESCR = "RFID Location Management System";
 	private final String DEVICE_PROVIDER = "HWU";
+	private final String DEVICE_LOCATION = "HWU-Campus";
+	private BundleContext bc;
 	
-	public void initialiseRFIDDriver() {
-		
-		sockets = new Hashtable<String, SocketClient>();
-		
-		
-	}
+
+	private DeviceCommonInfo rfidSystemCommonInfo;
+	
+	private Dictionary<String, String> properties;
+	
+	private ServiceRegistration rfidSystemReg;
 	
 	private IEventMgr eventMgr;
+	
 	private IDeviceManager deviceMgr;
-	/* (non-Javadoc)
-	 * @see org.societies.api.css.devicemgmt.rfid.IRfidDriver#connect(java.lang.String)
-	 */
-	@Override
-	public void connect(String ipAddress) {
-		if (sockets.containsKey(ipAddress)){
-			this.logging.debug("Already connected to: "+ipAddress);
-			return;
-		}
-
-		SocketClient socketClient = new SocketClient(ipAddress);
-		if (socketClient.checkIp(ipAddress)){
-			socketClient.setEventMgr(eventMgr);
-			socketClient.start();
-			DeviceCommonInfo deviceCommonInfo = new DeviceCommonInfo(DEVICE_FAMILY_IDENTITY, 
-					DEVICE_NAME,
-					DeviceTypeConstants.RFID_READER,
-					DEVICE_DESCR, 
-					"ETHERNET", 
-					"LearningZone", 
-					DEVICE_PROVIDER, 
-					null, 
-					false);
-			this.deviceMgr.fireNewDeviceConnected(ipAddress, deviceCommonInfo, new String[]{DeviceMgmtDriverServiceNames.RFID_READER_DRIVER_SERVICE});
-			this.sockets.put(ipAddress, socketClient);
-		}else{
-			this.logging.error(ipAddress+" not valid. ignoring request");
-		}
+	
+	private RfidSystem rfidSystem;
+	
+	
+	private String physicalDeviceId = "00.00.00.00.11.11.11.11";
+	
+	
+	
+	private String [] rfidReaderServiceNamesList = {DeviceMgmtDriverServiceNames.RFID_READER_DRIVER_SERVICE};
+	
+	//BundleContext injection
+	public void setBundleContext(BundleContext bc) {
+		this.bc =  bc;
 		
 	}
+	
 	/**
 	 * @return the eventMgr
 	 */
@@ -113,5 +111,96 @@ public class RFIDDriver implements IRfidDriver {
 	public void setDeviceMgr(IDeviceManager deviceMgr) {
 		this.deviceMgr = deviceMgr;
 	}
+	
+	
+	
+	public void initialiseRFIDDriver() {
+		
+		//sockets = new Hashtable<String, SocketClient>();
+		
+		rfidSystemCommonInfo = new DeviceCommonInfo(DEVICE_FAMILY_IDENTITY, DEVICE_NAME, 
+				DeviceTypeConstants.RFID_READER, DEVICE_DESCR, DeviceConnectionTypesConstants.ETHERNET_CONNECTION,
+				DEVICE_LOCATION, 
+				DEVICE_PROVIDER, null, false);
+		
+		rfidSystem = new RfidSystem(eventMgr);
+		
+		synchronized(this) 
+		{
+			
+			properties = new Hashtable<String, String>();
+			
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME, 
+					DeviceMgmtDriverServiceNames.RFID_READER_DRIVER_SERVICE);
+			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID, 
+					physicalDeviceId);
+			
+			rfidSystemReg = bc.registerService(IDriverService.class.getName(), rfidSystem, properties);
+		}
+		
 
+		String rfidSystemDeviceId = deviceMgr.fireNewDeviceConnected(physicalDeviceId, rfidSystemCommonInfo, rfidReaderServiceNamesList);
+		
+		
+		rfidSystem.setDeviceId(rfidSystemDeviceId);
+		
+		
+	}
+	
+	
+	public void stop(BundleContext context) throws Exception {
+		
+		stopappli();
+			
+		if(rfidSystemReg != null){
+			rfidSystemReg.unregister();
+		}
+		
+	}
+	
+	
+	public void stopappli(){
+
+		if (rfidSystem!=null){
+			deviceMgr.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", physicalDeviceId);
+			rfidSystem = null;
+		}
+		else {
+			System.out.println("no reader 2");
+		}
+	}
+
+	/*
+	@Override
+	public void connect(String ipAddress) {
+		if (sockets.containsKey(ipAddress)){
+			this.logging.debug("Already connected to: "+ipAddress);
+			return;
+		}
+
+		SocketClient socketClient = new SocketClient(ipAddress);
+		if (socketClient.checkIp(ipAddress)){
+			socketClient.setEventMgr(eventMgr);
+			socketClient.start();
+			
+			
+			DeviceCommonInfo deviceCommonInfo = new DeviceCommonInfo(DEVICE_FAMILY_IDENTITY, 
+					DEVICE_NAME,
+					DeviceTypeConstants.RFID_READER,
+					DEVICE_DESCR, 
+					"ETHERNET", 
+					"LearningZone", 
+					DEVICE_PROVIDER, 
+					null, 
+					false);
+			this.deviceMgr.fireNewDeviceConnected(ipAddress, deviceCommonInfo, new String[]{DeviceMgmtDriverServiceNames.RFID_READER_DRIVER_SERVICE});
+			
+			
+			this.sockets.put(ipAddress, socketClient);
+		}else{
+			this.logging.error(ipAddress+" not valid. ignoring request");
+		}
+		
+	}
+	//*/
 }

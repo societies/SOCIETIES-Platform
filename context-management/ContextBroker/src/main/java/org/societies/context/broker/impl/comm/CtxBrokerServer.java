@@ -42,8 +42,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.schema.context.contextmanagement.CtxBrokerBean;
-import org.societies.api.schema.context.contextmanagement.CtxBrokerBeanResult;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
@@ -116,20 +116,25 @@ public class CtxBrokerServer implements IFeatureServer{
 
 		LOG.error("SKATA 0 brokerserver "+ stanza );
 		LOG.error("SKATA 1 brokerserver "+payload.getClass() );
-		CtxBrokerBeanResult beanResponse = new CtxBrokerBeanResult();
+		CtxBrokerResponseBean beanResponse = new CtxBrokerResponseBean();
 
-		if (!(payload instanceof CtxBrokerBean))
+		if (!(payload instanceof CtxBrokerRequestBean))
 			throw new XMPPError(StanzaError.bad_request, "Unknown request bean class: " + payload.getClass());
 
-		CtxBrokerBean cbPayload = (CtxBrokerBean) payload;
-
-		//checks if the payload contains the createEntity method
-		if (cbPayload.getCreate()!=null) {
+		CtxBrokerRequestBean cbPayload = (CtxBrokerRequestBean) payload;
+		if (cbPayload.getMethod() == null) {
+			LOG.error("CtxBrokerRequestBean.getMethod() can't be null");
+			throw new XMPPError(StanzaError.bad_request, "CtxBrokerRequestBean.getMethod() can't be null");
+		}
+		
+		switch (cbPayload.getMethod()) {
+		
+		case CREATE_ENTITY:
 
 			// get the identity based on Jid and the identity manager
 			//String xmppIdentityJid = cbPayload.getCreate().getRequester();
 			LOG.error("SKATA 2 brokerserver");
-			String targetIdentityString = cbPayload.getCreate().getTargetCss();
+			String targetIdentityString = cbPayload.getCreateEntity().getTargetCss();
 			// TODO RequestorBean reqBean = cbPayload.getCreate().getRequestor();
 			// TODo Requestor requestor = getRequestorFromBean( reqBean);
 
@@ -138,8 +143,9 @@ public class CtxBrokerServer implements IFeatureServer{
 				targetIdentity = this.identMgr.fromJid(targetIdentityString);
 
 				// TODO Future<CtxEntity> newEntityFuture = ctxbroker.createEntity(requestor,targetIdentity,cbPayload.getCreate().getType());
-				Future<CtxEntity> newEntityFuture = ctxbroker.createEntity(null, targetIdentity, cbPayload.getCreate().getType());
+				Future<CtxEntity> newEntityFuture = ctxbroker.createEntity(null, targetIdentity, cbPayload.getCreateEntity().getType());
 				CtxEntity newCtxEntity = newEntityFuture.get();
+				
 				// the entity is created
 				//create the response based on the created CtxEntity - the response should be a result bean
 				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
@@ -163,10 +169,8 @@ public class CtxBrokerServer implements IFeatureServer{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-		}		
-
-		//checks if the payload contains the createAssociation method
+			break;
+		/*
 		else if (cbPayload.getCreateAssoc()!=null) {
 
 
@@ -391,13 +395,13 @@ public class CtxBrokerServer implements IFeatureServer{
 
 		//checks if the payload contains the updateAttr method
 		else if (cbPayload.getUpdateAttr()!=null) {
-			/*
+			/
 			 * add the code for update attribute method here.
 			 * the problem is that the external broker does not allow the update of an attribute, whereas the internal does allow that action.
 			 * therefore no update attribute server side call can be implemented.
-			 */
-
-		} else {
+			 *
+*/
+		default: 
 			throw new XMPPError(StanzaError.bad_request, "Nothing to do");
 		}
 
