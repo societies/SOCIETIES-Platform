@@ -34,14 +34,14 @@ import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IDriverService;
+import org.societies.api.css.devicemgmt.model.DeviceConnectionTypesConstants;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
 import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
-import org.societies.api.css.devicemgmt.rfid.IRfidDriver;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.internal.css.devicemgmt.model.DeviceMgmtDriverServiceConstants;
 import org.societies.api.osgi.event.IEventMgr;
-import org.societies.css.devicemgmt.rfiddriver.readers.RfidReader;
+import org.societies.css.devicemgmt.rfiddriver.readers.RfidSystem;
 import org.springframework.osgi.context.BundleContextAware;
 
 
@@ -55,33 +55,27 @@ public class RFIDDriver implements /*IRfidDriver,*/ BundleContextAware{
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	Hashtable<String, SocketClient> sockets;
 	private final String DEVICE_FAMILY_IDENTITY = "org.societies.css.devicemgmt.RFIDDriver";
-	private final String DEVICE_NAME = "RFID_READER";
+	private final String DEVICE_NAME = "RFiD System";
 	private final String DEVICE_DESCR = "RFID Location Management System";
 	private final String DEVICE_PROVIDER = "HWU";
+	private final String DEVICE_LOCATION = "HWU-Campus";
 	private BundleContext bc;
 	
-	private DeviceCommonInfo testRfidReaderCommonInfo;
-	
-	private DeviceCommonInfo rfidReaderCommonInfo1;
-	private DeviceCommonInfo rfidReaderCommonInfo2;
+
+	private DeviceCommonInfo rfidSystemCommonInfo;
 	
 	private Dictionary<String, String> properties;
 	
-	private ServiceRegistration testRfidReaderReg;
-	private ServiceRegistration rfidReaderReg1;
-	private ServiceRegistration rfidReaderReg2;
+	private ServiceRegistration rfidSystemReg;
 	
 	private IEventMgr eventMgr;
 	
 	private IDeviceManager deviceMgr;
 	
-	private RfidReader testRfidReader;
-	private RfidReader rfidReader1;
-	private RfidReader rfidReader2;
+	private RfidSystem rfidSystem;
 	
-	private String testPhysicalDeviceId = "127.0.0.1";
-	private String physicalDeviceId1 = "137.195.27.197";
-	private String physicalDeviceId2 = "137.195.27.198";
+	
+	private String physicalDeviceId = "00.00.00.00.11.11.11.11";
 	
 	
 	
@@ -124,66 +118,31 @@ public class RFIDDriver implements /*IRfidDriver,*/ BundleContextAware{
 		
 		//sockets = new Hashtable<String, SocketClient>();
 		
-		testRfidReaderCommonInfo = new DeviceCommonInfo(DEVICE_FAMILY_IDENTITY, DEVICE_NAME, 
-				DeviceTypeConstants.RFID_READER, DEVICE_DESCR, "ETHERNET", "LearningZone_0", 
+		rfidSystemCommonInfo = new DeviceCommonInfo(DEVICE_FAMILY_IDENTITY, DEVICE_NAME, 
+				DeviceTypeConstants.RFID_READER, DEVICE_DESCR, DeviceConnectionTypesConstants.ETHERNET_CONNECTION,
+				DEVICE_LOCATION, 
 				DEVICE_PROVIDER, null, false);
 		
-		rfidReaderCommonInfo1 = new DeviceCommonInfo(DEVICE_FAMILY_IDENTITY, DEVICE_NAME, 
-				DeviceTypeConstants.RFID_READER, DEVICE_DESCR, "ETHERNET", "LearningZone_1", 
-				DEVICE_PROVIDER, null, false);
-		
-		rfidReaderCommonInfo2 = new DeviceCommonInfo(DEVICE_FAMILY_IDENTITY, DEVICE_NAME, 
-				DeviceTypeConstants.RFID_READER, DEVICE_DESCR, "ETHERNET", "LearningZone_2", 
-				DEVICE_PROVIDER, null, false);
-		
-		
-		testRfidReader = new RfidReader(eventMgr);
-		
-		rfidReader1 = new RfidReader(eventMgr);
-		
-		rfidReader2 = new RfidReader(eventMgr);
+		rfidSystem = new RfidSystem(eventMgr);
 		
 		synchronized(this) 
 		{
-			properties = new Hashtable<String, String>();
-			
-			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME, 
-					DeviceMgmtDriverServiceNames.RFID_READER_DRIVER_SERVICE);
-			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID, 
-					testPhysicalDeviceId);
-			
-			testRfidReaderReg = bc.registerService(IDriverService.class.getName(), testRfidReader, properties);
-			
 			
 			properties = new Hashtable<String, String>();
 			
 			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME, 
 					DeviceMgmtDriverServiceNames.RFID_READER_DRIVER_SERVICE);
 			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID, 
-					physicalDeviceId1);
+					physicalDeviceId);
 			
-			rfidReaderReg1 = bc.registerService(IDriverService.class.getName(), rfidReader1, properties);
-			
-			
-			
-			properties = new Hashtable<String, String>();
-			
-			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_SERVICE_NAME, 
-					DeviceMgmtDriverServiceNames.RFID_READER_DRIVER_SERVICE);
-			properties.put(DeviceMgmtDriverServiceConstants.DEVICE_DRIVER_PHYSICAL_DEVICE_ID, 
-					physicalDeviceId2);
-			
-			rfidReaderReg2 = bc.registerService(IDriverService.class.getName(), rfidReader2, properties);
+			rfidSystemReg = bc.registerService(IDriverService.class.getName(), rfidSystem, properties);
 		}
 		
-		String testRfidReaderDeviceId = deviceMgr.fireNewDeviceConnected(testPhysicalDeviceId, testRfidReaderCommonInfo, rfidReaderServiceNamesList);
-		String rfidReaderDeviceId1 = deviceMgr.fireNewDeviceConnected(physicalDeviceId1, rfidReaderCommonInfo1, rfidReaderServiceNamesList);
-		String rfidReaderDeviceId2 = deviceMgr.fireNewDeviceConnected(physicalDeviceId2, rfidReaderCommonInfo2, rfidReaderServiceNamesList);
+
+		String rfidSystemDeviceId = deviceMgr.fireNewDeviceConnected(physicalDeviceId, rfidSystemCommonInfo, rfidReaderServiceNamesList);
 		
 		
-		testRfidReader.setDeviceId(testRfidReaderDeviceId);
-		rfidReader1.setDeviceId(rfidReaderDeviceId1);
-		rfidReader2.setDeviceId(rfidReaderDeviceId2);
+		rfidSystem.setDeviceId(rfidSystemDeviceId);
 		
 		
 	}
@@ -192,15 +151,9 @@ public class RFIDDriver implements /*IRfidDriver,*/ BundleContextAware{
 	public void stop(BundleContext context) throws Exception {
 		
 		stopappli();
-		
-		if(rfidReaderReg1 != null){
-			rfidReaderReg1.unregister();
-		}	
-		if(rfidReaderReg2 != null){
-			rfidReaderReg2.unregister();
-		}
-		if(testRfidReaderReg != null){
-			testRfidReaderReg.unregister();
+			
+		if(rfidSystemReg != null){
+			rfidSystemReg.unregister();
 		}
 		
 	}
@@ -208,26 +161,12 @@ public class RFIDDriver implements /*IRfidDriver,*/ BundleContextAware{
 	
 	public void stopappli(){
 
-		if (rfidReader1!=null){
-			deviceMgr.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", physicalDeviceId1);
-			rfidReader1 = null;
-		}
-		else {
-			System.out.println("no reader 1");
-		}
-		if (rfidReader2!=null){
-			deviceMgr.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", physicalDeviceId2);
-			rfidReader2 = null;
+		if (rfidSystem!=null){
+			deviceMgr.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", physicalDeviceId);
+			rfidSystem = null;
 		}
 		else {
 			System.out.println("no reader 2");
-		}
-		if (testRfidReader!=null){
-			deviceMgr.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", testPhysicalDeviceId);
-			testRfidReader = null;
-		}
-		else {
-			System.out.println("no reader test");
 		}
 	}
 
