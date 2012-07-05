@@ -120,7 +120,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		URI uri;
 		try {
 			uri = new URI(uriStr);
-			Future<UrlBean> urlBeanFuture = clientJarServer.addKey(uri, filePath);
+			Future<UrlBean> urlBeanFuture = clientJarServer.shareFiles();
 			UrlBean urlBean = urlBeanFuture.get();
 			uri = urlBean.getUrl();
 			return uri;

@@ -48,14 +48,16 @@
      <mvc:annotation-driven />  
 	
 	
-	<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1"/>
+	<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1"/>
+	<osgi:reference id="SignatureManager" interface="org.societies.api.security.digsig.ISignatureMgr"/>
 	
 	<bean id="clientJar"
 		class="org.societies.domainauthority.rest.control.ServiceClientJarAccess"
-		depends-on="CommManagerBundle"
+		depends-on="CommManager"
   		init-method="init"
   		>
-  		<property name="commMgr" ref="CommManagerBundle"/>
+  		<property name="commMgr" ref="CommManager"/>
+  		<property name="sigMgr" ref="SignatureManager"/>
 	</bean>
 
 	<osgi:service ref="clientJar" interface="org.societies.api.internal.domainauthority.IClientJarServer" />

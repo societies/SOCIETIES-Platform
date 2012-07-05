@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 
@@ -45,7 +46,7 @@ public class CertStorage {
 
 	// private XmlManipulator xml = Config.getInstance().getXml();
 	private X509Certificate ourCert;
-	private Key ourKey;
+	private PrivateKey ourKey;
 
 	private CertStorage() throws StorageException {
 		initOurIdentity();
@@ -75,7 +76,7 @@ public class CertStorage {
 
 			String alias = ks.aliases().nextElement();
 			ourCert = (X509Certificate) ks.getCertificate(alias);
-			ourKey = ks.getKey(alias, pass.toCharArray());
+			ourKey = (PrivateKey) ks.getKey(alias, pass.toCharArray());
 
 			if (ourCert == null || ourKey == null)
 				throw new NullPointerException();
@@ -96,7 +97,7 @@ public class CertStorage {
 	 * 
 	 * @return The private key
 	 */
-	public Key getOurKey() {
+	public PrivateKey getOurKey() {
 		return ourKey;
 	}
 
