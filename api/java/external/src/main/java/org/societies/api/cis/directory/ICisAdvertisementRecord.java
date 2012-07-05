@@ -27,6 +27,10 @@ package org.societies.api.cis.directory;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
+import java.util.HashMap;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.context.model.CtxAttribute;
+
 /**
  * @author Babak.Farshchian@sintef.no
  *
@@ -39,7 +43,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 public interface ICisAdvertisementRecord {
 	public String getName();
 	public void setName(String name);
-	public String getId();
+	public String getId(); //Can be used to query CIS owner for an ICis to get member list, if CIS is set to public
 	public String getUri();
 	public void setUri(String uri);
 	public String getPassword();
@@ -48,4 +52,8 @@ public interface ICisAdvertisementRecord {
 	public String setType(String type);
 	public String getMode();
 	public String setMode(int mode);
+	public String getDescription();
+    public boolean setDescription(String description);
+    public HashMap<CtxAttribute, MembershipCriteria> getMembershipCriteria();
+    public boolean setMembershipCriteria(HashMap<CtxAttribute, MembershipCriteria> membershipCriteria);
 }

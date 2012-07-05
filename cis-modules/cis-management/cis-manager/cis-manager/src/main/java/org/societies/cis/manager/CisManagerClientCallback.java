@@ -21,11 +21,13 @@ public class CisManagerClientCallback implements ICommCallback {
 
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+//								"http://societies.org/api/schema/activity",
 						  		"http://societies.org/api/schema/cis/community"));
 			//.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
 			//.singletonList("org.societies.api.schema.cis.manager");
 			.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+//					"org.societies.api.schema.activity",
 					"org.societies.api.schema.cis.community"));
 	
 	private static Logger LOG = LoggerFactory.getLogger(CisManagerClientCallback.class);

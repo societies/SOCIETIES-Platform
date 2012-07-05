@@ -45,6 +45,12 @@ import org.societies.api.internal.schema.domainauthority.rest.ClientJarBeanResul
 import org.societies.api.internal.schema.domainauthority.rest.MethodType;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 
+/**
+ * 
+ *
+ * @author Mitja Vardjan
+ *
+ */
 public class CommsServer implements IFeatureServer {
 
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);

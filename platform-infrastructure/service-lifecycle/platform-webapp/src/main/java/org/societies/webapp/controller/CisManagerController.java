@@ -194,9 +194,9 @@ public class CisManagerController {
 				ICisOwned thisCis = null;
 				List<ICisOwned> ownedCISs = this.getCisManager().getListOfOwnedCis();
 				if (ownedCISs.size() > 0) {
-					res = "before add";
+					res = "before addall";
 					localCISs.addAll(ownedCISs);
-					res = "Afteradd";
+					res = "AfteraddAll";
 					Iterator<ICisOwned> it = localCISs.iterator();
 					
 					res = "Beforewhile";
@@ -252,23 +252,32 @@ public class CisManagerController {
 			} else if (method.equalsIgnoreCase("AddMember")) {
 				model.put("methodcalled", "AddMember");
 				// TODO
-				Iterator<ICisOwned> it = localCISs.iterator();
+				res = "";
+				List<ICisOwned> listOwned = this.cisManager.getListOfOwnedCis();
+				Iterator<ICisOwned> it = listOwned.iterator();
 				ICisOwned thisCis = null;
-				while(it.hasNext() && thisCis != null){
+				res +=" owned size " + listOwned.size();
+				while(it.hasNext() ){//&& (thisCis != null)){
+					res +="got in the loop";
 					ICisOwned element = it.next();
-					 if (element.getCisId().equalsIgnoreCase(cisForm.getCssId()))
+					 if (element.getCisId().equalsIgnoreCase(cisForm.getCisJid())){
+						 res +="found a match";
 						 thisCis = element;
-					 else
-						  res.concat("CIS being compared = " + element.getCisId() + "and form = " + cisForm.getCssId());
+					 }
+					 else{
+						  res +="CIS being compared = " + element.getCisId() + "and form = " + cisForm.getCssId();
+					 }
 			     }
+				res += " interactor done ";
 				if(thisCis == null){
-					res.concat("CIS not found: " + cisForm.getCssId());
+					res +="CIS not found: " + cisForm.getCssId();
 				}else{
 					if (thisCis.addMember(cisForm.getCssId(), cisForm.getRole()).get())
-						res = "member added ";
+						res += "member added ";
 					else
-						res = "error when adding member";					
+						res += "error when adding member";					
 				}
+				model.put("res", res);
 
 			} else if (method.equalsIgnoreCase("RemoveMemberFromCIS")) {
 				model.put("methodcalled", "RemoveMemberFromCIS");

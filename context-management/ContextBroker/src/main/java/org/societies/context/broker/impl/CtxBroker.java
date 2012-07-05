@@ -643,7 +643,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return entIdList;
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
@@ -673,7 +673,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
@@ -703,7 +703,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
@@ -718,8 +718,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			throw new NullPointerException("listener can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 
 		IIdentity targetCss;
 		try {
@@ -734,7 +732,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.datatypes.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
@@ -749,8 +747,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			throw new NullPointerException("listener can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 
 		IIdentity targetCss;
 		try {

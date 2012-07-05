@@ -108,7 +108,8 @@ public class Tester {
 		
 		this.setupRequestor();
 		this.createNonInferrableAttribute();
-		this.createPPNPreference();
+		this.createPPNPreference1();
+		this.createPPNPreference2();
 	}
 	
 	@Test
@@ -161,9 +162,9 @@ public class Tester {
 	}
 	
 	
-	private void createPPNPreference(){
+	private void createPPNPreference1(){
 		
-		Resource resource = new Resource(CtxAttributeTypes.NAME);
+		Resource resource = new Resource(nameAttribute.getId());
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.CREATE));
 		actions.add(new Action(ActionConstants.DELETE));
@@ -178,7 +179,7 @@ public class Tester {
 			IPrivacyPreference privacyPreference = new PrivacyPreference(outcome);
 			PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(CtxAttributeTypes.NAME, privacyPreference);
 			model.setRequestor(requestor);
-			
+			model.setAffectedCtxId(nameAttribute.getId());
 			PPNPreferenceDetails details = new PPNPreferenceDetails(CtxAttributeTypes.NAME);
 			details.setRequestor(requestor);
 			this.privPrefMgr.storePPNPreference(details, privacyPreference);
@@ -187,5 +188,35 @@ public class Tester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+
+		
+	}
+	
+	private void createPPNPreference2(){
+		Resource resource2 = new Resource(nameAttribute2.getId());
+		List<Action> actions2 = new ArrayList<Action>();
+		actions2.add(new Action(ActionConstants.CREATE));
+		actions2.add(new Action(ActionConstants.DELETE));
+		actions2.add(new Action(ActionConstants.READ));
+		actions2.add(new Action(ActionConstants.WRITE));
+		List<Requestor> requestors2 = new ArrayList<Requestor>();
+		requestors2.add(requestor);
+		RuleTarget target2 = new RuleTarget(requestors2, resource2, actions2);
+		List<Condition> conditions2 = new ArrayList<Condition>();
+		try {
+			PPNPOutcome outcome2 = new PPNPOutcome(PrivacyOutcomeConstants.BLOCK, target2 , conditions2);
+			IPrivacyPreference privacyPreference2 = new PrivacyPreference(outcome2);
+			PPNPrivacyPreferenceTreeModel model2 = new PPNPrivacyPreferenceTreeModel(CtxAttributeTypes.NAME, privacyPreference2);
+			model2.setRequestor(requestor);
+			model2.setAffectedCtxId(nameAttribute2.getId());
+			PPNPreferenceDetails details2 = new PPNPreferenceDetails(CtxAttributeTypes.NAME);
+			details2.setRequestor(requestor);
+			this.privPrefMgr.storePPNPreference(details2, privacyPreference2);
+			
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 	}
 }

@@ -847,7 +847,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
@@ -876,7 +876,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
@@ -891,19 +891,18 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
 	public void registerForChanges(final CtxChangeEventListener listener,
-			final CtxEntityIdentifier scope, final String attrType) throws CtxException {
+			final CtxEntityIdentifier scope, final String attrType)
+					throws CtxException {
 
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 
 		final String[] topics = new String[] {
 				CtxChangeEventTopic.UPDATED,
@@ -934,8 +933,6 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new NullPointerException("listener can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 
 		// TODO Auto-generated method stub
 	}
