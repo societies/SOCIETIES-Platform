@@ -120,8 +120,10 @@ public class CtxAccessController implements ICtxAccessController {
 	}
 	
 	/**
+	 * Sets the {@link IPrivacyDataManager} service reference.
 	 * 
 	 * @param privacyDataMgr
+	 *            the {@link IPrivacyDataManager} service reference to set
 	 */
 	@Autowired(required=false)
 	public void setPrivacyDataMgr(IPrivacyDataManager privacyDataMgr) {
