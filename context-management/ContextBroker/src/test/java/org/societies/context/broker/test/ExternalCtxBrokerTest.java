@@ -58,11 +58,8 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.context.broker.api.security.CtxPermission;
+import org.societies.context.broker.api.security.ICtxAccessController;
 import org.societies.context.broker.impl.CtxBroker;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.broker.test.util.MockBlobClass;
@@ -92,7 +89,7 @@ public class ExternalCtxBrokerTest {
 	@SuppressWarnings("unused")
 	private static IIdentity cisMockIdentity = mock(IIdentity.class);
 	
-	private static IPrivacyDataManager mockPrivacyDataMgr = mock(IPrivacyDataManager.class);
+	private static ICtxAccessController mockCtxAccessController = mock(ICtxAccessController.class);
 
 	/**
 	 * @throws java.lang.Exception
@@ -137,7 +134,7 @@ public class ExternalCtxBrokerTest {
 
 		ctxBroker = new CtxBroker(internalCtxBroker);
 		ctxBroker.setIdentityMgr(mockIdentityMgr);
-		ctxBroker.setPrivacyDataMgr(mockPrivacyDataMgr);
+		ctxBroker.setCtxAccessController(mockCtxAccessController);
 	}
 
 	/**
@@ -228,11 +225,10 @@ public class ExternalCtxBrokerTest {
 		assertEquals(CtxAssociationTypes.HAS_PARAMETERS, ctxAssocHasParam.getType());
 
 		// mock checkPermission
-		ResponseItem mockPermitResponse = mock(ResponseItem.class);
-		when(mockPermitResponse.getDecision()).thenReturn(Decision.PERMIT);
-		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, ctxAssocHasParam.getId(), new Action(ActionConstants.READ))).thenReturn(mockPermitResponse);
-		final List<CtxIdentifier> assocIdentifierList = 
-				this.ctxBroker.lookup(requestor, mockIdentityLocal, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_PARAMETERS).get();
+		doNothing().when(mockCtxAccessController).checkPermission(requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAssocHasParam.getId(), CtxPermission.READ));
+		final List<CtxIdentifier> assocIdentifierList =	this.ctxBroker.lookup(
+				requestor, mockIdentityLocal, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_PARAMETERS).get();
 		assertEquals(1, assocIdentifierList.size());
 		CtxIdentifier retrievedCtxAssocHasParamID = assocIdentifierList.get(0);
 		assertEquals(ctxAssocHasParam.getId().toString(), retrievedCtxAssocHasParamID.toString());
@@ -484,9 +480,8 @@ public class ExternalCtxBrokerTest {
 		emptyAttribute = this.ctxBroker.createAttribute(requestor, deviceEntity.getId(), "attrType").get();
 
 		// mock checkPermission
-		final ResponseItem mockPermitResponse = mock(ResponseItem.class);
-		when(mockPermitResponse.getDecision()).thenReturn(Decision.PERMIT);
-		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, emptyAttribute.getId(), new Action(ActionConstants.WRITE))).thenReturn(mockPermitResponse);
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, new CtxPermission(emptyAttribute.getId(), CtxPermission.WRITE));
 		
 		// Set the attribute's initial value
 		emptyAttribute.setIntegerValue(100);
@@ -539,6 +534,10 @@ public class ExternalCtxBrokerTest {
 		// Create the attribute to be tested
 		emptyAttribute = this.ctxBroker.createAttribute(requestor, deviceEntity.getId(), "attrType").get();
 
+		doThrow(new CtxAccessControlException()).when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(emptyAttribute.getId(), CtxPermission.WRITE));
+		
 		// Set the attribute's initial value
 		emptyAttribute.setIntegerValue(100);
 		this.ctxBroker.update(requestor, emptyAttribute).get();
@@ -548,9 +547,6 @@ public class ExternalCtxBrokerTest {
 	public void testLookupAttributeValues() throws Exception {
 
 		final Requestor requestor = new Requestor(mockIdentityLocal);
-		// mock Permit Response
-		final ResponseItem mockPermitResponse = mock(ResponseItem.class);
-		when(mockPermitResponse.getDecision()).thenReturn(Decision.PERMIT);
 		
 		// create entity1
 		CtxEntity entity1 = this.ctxBroker.createEntity(requestor, mockIdentityLocal, CtxEntityTypes.SERVICE).get();
@@ -559,7 +555,9 @@ public class ExternalCtxBrokerTest {
 		CtxAttribute ctxAttributeLocationCoords1 = this.ctxBroker.createAttribute(requestor, entity1.getId(), CtxAttributeTypes.LOCATION_COORDINATES).get();
 
 		// mock checkPermission
-		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, ctxAttributeLocationCoords1.getId(), new Action(ActionConstants.WRITE))).thenReturn(mockPermitResponse);
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAttributeLocationCoords1.getId(), CtxPermission.WRITE));
 		
 		MockBlobClass coordinatesValue = new MockBlobClass(125125);
 		ctxAttributeLocationCoords1.setBinaryValue(SerialisationHelper.serialise(coordinatesValue));
@@ -569,7 +567,9 @@ public class ExternalCtxBrokerTest {
 		CtxAttribute ctxAttributeLocationSymb = this.ctxBroker.createAttribute(requestor, entity1.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
 		
 		// mock checkPermission
-		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, ctxAttributeLocationSymb.getId(), new Action(ActionConstants.WRITE))).thenReturn(mockPermitResponse);
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAttributeLocationSymb.getId(), CtxPermission.WRITE));
 		
 		ctxAttributeLocationSymb.setStringValue("Athens");
 		this.ctxBroker.update(requestor,ctxAttributeLocationSymb);
@@ -581,7 +581,9 @@ public class ExternalCtxBrokerTest {
 		CtxAttribute ctxAttributeLocationCoords2 = this.ctxBroker.createAttribute(requestor, entity2.getId(), CtxAttributeTypes.LOCATION_COORDINATES).get();
 
 		// mock checkPermission
-		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, ctxAttributeLocationCoords2.getId(), new Action(ActionConstants.WRITE))).thenReturn(mockPermitResponse);
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAttributeLocationCoords2.getId(), CtxPermission.WRITE));
 		
 		MockBlobClass coordinatesValue2 = new MockBlobClass(135135);
 		ctxAttributeLocationCoords2.setBinaryValue(SerialisationHelper.serialise(coordinatesValue2));
@@ -591,7 +593,9 @@ public class ExternalCtxBrokerTest {
 		CtxAttribute ctxAttributeLocationSymb2 = this.ctxBroker.createAttribute(requestor, entity2.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
 		
 		// mock checkPermission
-		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, ctxAttributeLocationSymb2.getId(), new Action(ActionConstants.WRITE))).thenReturn(mockPermitResponse);
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAttributeLocationSymb2.getId(), CtxPermission.WRITE));
 		
 		ctxAttributeLocationSymb2.setStringValue("Caracas");
 		this.ctxBroker.update(requestor,ctxAttributeLocationSymb2);
@@ -610,7 +614,9 @@ public class ExternalCtxBrokerTest {
 		CtxEntityIdentifier entId = serviceEntStringValues.get(0);
 
 		// mock checkPermission
-		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, entId, new Action(ActionConstants.READ))).thenReturn(mockPermitResponse);
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(entId, CtxPermission.READ));
 		
 		CtxEntity ent1 = (CtxEntity) this.ctxBroker.retrieve(requestor, entId).get();
 		Set<CtxAttribute> atrrSet1 = ent1.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
