@@ -24,7 +24,10 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.concurrent.Future;
+
 import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
@@ -113,5 +116,13 @@ public interface ICis {
 	
 	public void getActivities(String timePeriod,ICisManagerCallback callback);
     
+	/**
+	 * Gets the interface for working with the ActivityFeed of the CIS
+	 * 
+	 * 
+	 * @param 
+	 * @return {@link IActivityFeed} of that CIS
+	 */
+	public Future<IActivityFeed> getCisActivityFeed();
     
 }
