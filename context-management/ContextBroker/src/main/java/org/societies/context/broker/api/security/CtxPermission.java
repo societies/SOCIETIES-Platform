@@ -111,6 +111,9 @@ public final class CtxPermission extends Permission {
      *            the permitted actions on the identified context model object.
      * @throws NullPointerException
      *             if the specified resource is <code>null</code>.
+     * @throws IllegalArgumentException
+     *             if the specified actions String contains an action other than
+     *             the specified possible actions.
      */
 	public CtxPermission(final CtxIdentifier resource, final String actions) {
 		
