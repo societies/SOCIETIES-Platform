@@ -242,7 +242,7 @@ public class Jaxb2Simple extends AbstractMojo
 		
 		//import javax\.xml\.bind\.annotation\.XmlValue/import org.simpleframework.xml.Text
 		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlValue;";
-		textToReplace = "import org.simpleframework.xml.Text(required=false);";
+		textToReplace = "import org.simpleframework.xml.Text;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//import javax\.xml\.bind\.annotation\.XmlElements/import org.simpleframework.xml.ElementList 
@@ -383,7 +383,7 @@ public class Jaxb2Simple extends AbstractMojo
 		
 		//@XmlValue -> @Text
 		textToFind = "@XmlValue";
-		textToReplace = "@Text";
+		textToReplace = "@Text(required=false)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//REMOVE @XmlSchemaType(name = "anyURI")
