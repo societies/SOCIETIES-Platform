@@ -19,7 +19,12 @@ import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
-
+/**
+ * Collection of utility methods.
+ *
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
+ *
+ */
 public class ServiceModelUtils {
 
 

@@ -81,10 +81,11 @@ import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
 import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.DeleteActivityResponse;
 import org.societies.api.schema.cis.community.AddActivityResponse;
 import org.societies.api.schema.cis.community.AddMemberResponse;
 import org.societies.api.schema.cis.community.CleanUpActivityFeedResponse;
-import org.societies.api.schema.cis.community.DeleteActivityResponse;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
 import org.societies.api.schema.cis.community.GetActivitiesResponse;
 import org.societies.api.schema.cis.community.GetInfoResponse;
@@ -120,12 +121,14 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+							"http://societies.org/api/schema/activityfeed",
 					  		"http://societies.org/api/schema/cis/community"));
 	//		.singletonList("http://societies.org/api/schema/cis/community");
 	@Transient
 	private final static List<String> PACKAGES = Collections
 			//.singletonList("org.societies.api.schema.cis.community");
 	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+			"org.societies.api.schema.activityfeed",
 		"org.societies.api.schema.cis.community"));
 	@Transient
 	private SessionFactory sessionFactory;
@@ -371,7 +374,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 		
 		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
-		//activityFeed.getActivities("0 1339689547000");
+		activityFeed.getActivities("0 1339689547000");
 	}
 	
 
@@ -947,32 +950,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 			}				// END OF add Activity
 			
-			
-			// delete Activity
-
-			if (c.getDeleteActivity() != null) {
-				Community result = new Community();
-				DeleteActivityResponse r = new DeleteActivityResponse();
-				String senderJid = stanza.getFrom().getBareJid();
-				
-				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
-				//	r.setResult(false);
-				//}else{
-					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-				IActivity iActivity = new org.societies.activity.model.Activity();
-				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
-				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
-				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
-				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
-				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
-
-				r.setResult(activityFeed.deleteActivity(iActivity));
-
-				result.setDeleteActivityResponse(r);		
-				return result;
-
-			}				// END OF delete Activity
-			
+						
 			
 			// cleanup activities
 			if (c.getCleanUpActivityFeed() != null) {
@@ -995,6 +973,38 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}				// END OF cleanup activities
 			
 		}
+		if (payload.getClass().equals(Activityfeed.class)) {
+			LOG.info("activity feed type received");
+			Activityfeed c = (Activityfeed) payload;
+			
+			// delete Activity
+
+			if (c.getDeleteActivity() != null) {
+				Activityfeed result = new Activityfeed();
+				DeleteActivityResponse r = new DeleteActivityResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+				IActivity iActivity = new org.societies.activity.model.Activity();
+				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
+				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
+				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
+				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
+				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
+
+				r.setResult(activityFeed.deleteActivity(iActivity));
+
+				result.setDeleteActivityResponse(r);		
+				return result;
+
+			}				// END OF delete Activity
+			
+		}
+		
+		
 		return null;
 	}
 

@@ -29,6 +29,7 @@ import java.util.List;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxBond;
@@ -73,6 +74,15 @@ public interface ICommunityCtxDBMgr {
 	public CommunityCtxEntity createCommunityEntity(IIdentity cisId) throws CtxException;
 
 	/**
+	 * Looks up CtxModelObjects, i.e. CtxEntities, CtxAttributes, or
+	 * CtxAssociations, of the specified type.
+	 * 
+	 * @param modelType
+	 * @param type
+	 */
+	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
+	
+	/**
 	 * Retrieves the context model object identified by the specified
 	 * {@link CtxIdentifier}. The method returns <code>null</code> if the
 	 * identified CtxModelObject is not present in the Community Context DB.
@@ -116,6 +126,14 @@ public interface ICommunityCtxDBMgr {
 	  */
 	public CommunityCtxEntity updateCommunityEntity(CommunityCtxEntity entity) throws CtxException;
 	
+	/**
+	  * Updates a community Context Entity. 
+	  * @param entity
+	  * @throws CtxException 
+	  * @since 0.2
+	  */
+	public CtxAttribute updateCommunityAttribute(CtxAttribute attribute) throws CtxException;
+
 	/**
 	  * Removes the specidied community Context Entity. 
 	  * @param ctxId

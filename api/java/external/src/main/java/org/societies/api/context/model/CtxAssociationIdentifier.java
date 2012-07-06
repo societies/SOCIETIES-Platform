@@ -71,7 +71,7 @@ public class CtxAssociationIdentifier extends CtxIdentifier {
 		super(ownerId, CtxModelType.ASSOCIATION, type, objectNumber);
 	}
 	
-	CtxAssociationIdentifier(String str) throws MalformedCtxIdentifierException {
+	public CtxAssociationIdentifier(String str) throws MalformedCtxIdentifierException {
 		
 		super(str);
 	}

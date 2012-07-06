@@ -11,21 +11,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.IndividualCtxEntity;
 
 public class RetrieveLearnedModelTest {
 
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1109.class);
-
+	
+	private INetworkNode cssNodeId;
+	
 	public void setUp(){
 	}
 
 	@Test
 	public void TestRetrieveModel() {
+				
 		try {
-			IndividualCtxEntity operator = TestCase1109.getCtxBroker().retrieveCssOperator().get();
-			Set<CtxAttribute> setAttr = operator.getAttributes(CtxAttributeTypes.CAUI_MODEL);
+					
+			final String cssOwnerStr = this.cssNodeId.getBareJid();
+			IIdentity cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
+						
+			// add code for cssNodeID
+			IndividualCtxEntity operator =  TestCase1109.getCtxBroker().retrieveIndividualEntity(cssOwnerId).get();
+			
+					Set<CtxAttribute> setAttr = operator.getAttributes(CtxAttributeTypes.CAUI_MODEL);
 			
 			Assert.assertNotNull(setAttr);
 			Assert.assertEquals(1, setAttr.size());

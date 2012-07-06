@@ -53,7 +53,7 @@ public interface ICisOwned extends ICis {
 	 * @param 
 	 * @return {@link IActivityFeed} of that CIS
 	 */
-	public Future<IActivityFeed> getCisActivityFeed();
+	//public Future<IActivityFeed> getCisActivityFeed();
 	
 	/**
 	 * get list of members

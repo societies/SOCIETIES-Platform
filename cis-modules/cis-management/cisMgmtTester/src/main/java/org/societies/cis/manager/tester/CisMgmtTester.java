@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -87,12 +88,43 @@ public class CisMgmtTester {
 		this.cisClient = cisClient;
 		LOG.info("got autowired reference, target cisId is " + targetCisId);
 
+		ICis icis = cisClient.getCis("xcmanager1.thomas.local", targetCisId);
 
+		if(icis == null){
+			LOG.info("could not retrieve CIS");
+		}
+		
+		IActivity iActivity = new org.societies.activity.model.Activity();
+		iActivity.setActor("act");
+		iActivity.setObject("obj");
+		iActivity.setTarget("tgt");
+		iActivity.setPublished((System.currentTimeMillis() -55) + "");
+		iActivity.setVerb("verb");
+
+		/*LOG.info("calling add activity remote");				
+		AddActivityCallBack h = new AddActivityCallBack();
+		icis.addCisActivity(iActivity, h);
+		LOG.info("add activity remote done");*/
+
+		
+		LOG.info("del activity remote");
+		try {
+			IActivityFeed iac =  icis.getCisActivityFeed().get();
+			iac.deleteActivity(iActivity);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
-		LOG.info("join a remote CIS");
+				
+		LOG.info("del activity remote done");
+/*		LOG.info("join a remote CIS");
 		this.cisClient.joinRemoteCIS(targetCisId, icall);
 		LOG.info("join sent");
-
+*/
 		
 
 		
@@ -132,7 +164,27 @@ public class CisMgmtTester {
 				icis.addCisActivity(iActivity, h);
 				LOG.info("add activity remote done");
 				
-				iActivity.setTarget("New tgt");
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				try {
+					IActivityFeed iac = icis.getCisActivityFeed().get();
+					iac.deleteActivity(iActivity);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+				
+/*				iActivity.setTarget("New tgt");
 				iActivity.setPublished((System.currentTimeMillis()) + "");
 
 				LOG.info("calling 2nds add activity remote");				
@@ -152,7 +204,7 @@ public class CisMgmtTester {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+*/				
 			
 				
 			}

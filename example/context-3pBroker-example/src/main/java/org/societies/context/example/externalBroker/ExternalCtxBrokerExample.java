@@ -25,17 +25,14 @@
 package org.societies.context.example.externalBroker;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.context.broker.ICtxBroker;
@@ -55,7 +52,6 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -71,7 +67,7 @@ public class ExternalCtxBrokerExample 	{
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(ExternalCtxBrokerExample.class);
 
-	/** The Internal Context Broker service reference. */
+	/** The 3P Context Broker service reference. */
 	private ICtxBroker externalCtxBroker;
 
 	private IIdentity cssOwnerId;
@@ -87,12 +83,12 @@ public class ExternalCtxBrokerExample 	{
 	private Requestor requestor = null;
 	private IIdentity remoteTargetCss;
 
-
 	@Autowired(required=true)
 	public ExternalCtxBrokerExample(ICtxBroker externalCtxBroker, ICommManager commMgr) throws InvalidFormatException {
 
+		LOG.info("*** " + this.getClass() + " instantiated");
+		
 		this.externalCtxBroker = externalCtxBroker;
-		LOG.info("*** CtxBrokerExample instantiated "+ this.externalCtxBroker);
 
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
@@ -105,19 +101,17 @@ public class ExternalCtxBrokerExample 	{
 		this.requestor = new Requestor(this.cssOwnerId);
 		LOG.info("*** requestor = " + this.requestor);
 
-		this.remoteTargetCss = commMgr.getIdManager().fromJid("BOOO@societies.local");
-
+		// TODO this.remoteTargetCss = commMgr.getIdManager().fromJid("BOOO@societies.local");
+		
 		LOG.info("*** Starting examples...");
-
-		createRemoteEntity();
-
-		retrieveCssOperator();
-		createDeviceEntity();
-		createCtxAssociation();
-		registerForContextChanges();
-		lookupContextEntities();
-		retrieveContext();
-		simpleCtxHistoryTest();
+		// TODO createRemoteEntity();
+		this.retrieveIndividualEntityId();
+		this.createDeviceEntity();
+		//createCtxAssociation();
+		//registerForContextChanges();
+		this.lookupContextEntities();
+		this.retrieveContext();
+		//simpleCtxHistoryTest();
 	}
 
 
@@ -142,18 +136,19 @@ public class ExternalCtxBrokerExample 	{
 		}
 	}
 
-
-	private void retrieveCssOperator() {
-
-		LOG.info("*** retrieveCssOperator");
+	private void retrieveIndividualEntityId() {
+		
+		LOG.info("*** retrieveIndividualEntityId");
 		try {
-			owner = this.externalCtxBroker.retrieveIndividualEntity(requestor, cssOwnerId).get();
-			LOG.info("*** CSS owner context entity id: " + owner.getId());
+			CtxEntityIdentifier cssOwnerEntityId = 
+					this.externalCtxBroker.retrieveIndividualEntityId(this.requestor, this.cssOwnerId).get();
+			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
 		} catch (Exception e) {
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+			
+			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
-
+	
 	/**
 	 */
 	private void createDeviceEntity(){
@@ -214,7 +209,7 @@ public class ExternalCtxBrokerExample 	{
 			// at this point the ctxEntity of type CtxEntityTypes.DEVICE is assigned with CtxAttributes of type : ID, WEIGHT, TEMPERATURE
 			LOG.info("*** created attribute toString "+deviceTempAttr.toString());
 		} catch (Exception e) {
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -223,20 +218,21 @@ public class ExternalCtxBrokerExample 	{
 	 * This method demonstrates how to create an association among context entities
 	 */
 	private void createCtxAssociation(){
-		System.out.println("usesServiceAssoc 1 "+usesServiceAssoc);
+
+		LOG.info("usesServiceAssoc 1 "+usesServiceAssoc);
 		try {
 			usesServiceAssoc = this.externalCtxBroker.createAssociation(requestor, cssOwnerId, CtxAssociationTypes.USES_SERVICES).get();
-			System.out.println("usesServiceAssoc 2 "+usesServiceAssoc);
-			System.out.println("usesServiceAssoc 3 "+owner);
-			System.out.println("usesServiceAssoc 4 "+deviceCtxEntity);
+			LOG.info("usesServiceAssoc 2 "+usesServiceAssoc);
+			LOG.info("usesServiceAssoc 3 "+owner);
+			LOG.info("usesServiceAssoc 4 "+deviceCtxEntity);
 
 			usesServiceAssoc.addChildEntity(owner.getId());
 			usesServiceAssoc.addChildEntity(deviceCtxEntity.getId());
 
-			System.out.println("usesServiceAssoc 3 "+usesServiceAssoc);
+			LOG.info("usesServiceAssoc 3 "+usesServiceAssoc);
 
 			this.externalCtxBroker.update(requestor, usesServiceAssoc);
-			System.out.println("usesServiceAssoc 4 "+usesServiceAssoc);
+			LOG.info("usesServiceAssoc 4 "+usesServiceAssoc);
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -262,7 +258,7 @@ public class ExternalCtxBrokerExample 	{
 			List<CtxIdentifier> idsAttribute =this.externalCtxBroker.lookup(requestor, cssOwnerId,CtxModelType.ATTRIBUTE, CtxAttributeTypes.ID).get();
 			LOG.info("*** lookup results for Attribute type: '" + CtxAttributeTypes.ID + "' " +idsAttribute);
 		} catch (Exception e) {
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -288,11 +284,11 @@ public class ExternalCtxBrokerExample 	{
 			// Retrieve CtxAttributes assigned to retrievedCtxEntity 
 			Set<CtxAttribute> ctxAttrSet = retrievedCtxEntity.getAttributes(CtxAttributeTypes.ID);
 
-			if( ctxAttrSet.size()>0 ){
-				List<CtxAttribute> 	ctxAttrList = new ArrayList(ctxAttrSet);
-				CtxAttribute ctxAttr = ctxAttrList.get(0);
-				LOG.info("Resoleved ctxAttribute id " +ctxAttr.getId()+ " and value: "+ctxAttr.getStringValue()+" initial value was device1234");
-			}
+			for (final CtxAttribute ctxAttr : ctxAttrSet)
+				LOG.info("Resoleved ctxAttribute id " + ctxAttr.getId() 
+						+ " and value: " + ctxAttr.getStringValue() 
+						+ " initial value was device1234");
+			
 			// retrieve ctxAttribute with the binary value based on a known identifier
 			CtxAttribute ctxAttributeWeight = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, weightAttrIdentifier).get();
 
@@ -300,7 +296,7 @@ public class ExternalCtxBrokerExample 	{
 			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeWeight.getBinaryValue(), this.getClass().getClassLoader());
 			LOG.info("Retrieved ctxAttribute id " +ctxAttributeWeight.getId()+ "and value: "+ retrievedBlob.getSeed()+" initial value was 999 ");
 		} catch (Exception e) {
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -335,7 +331,6 @@ public class ExternalCtxBrokerExample 	{
 			}
 			//test createHistory methods
 			CtxAttribute fakeAttribute = this.externalCtxBroker.createAttribute(requestor, ctxDevEntity.getId(), "historyAttribute").get();
-			List<CtxHistoryAttribute> historyList = new ArrayList<CtxHistoryAttribute>();
 
 			List<CtxHistoryAttribute> historyListRetrieved = this.externalCtxBroker.retrieveHistory(requestor, fakeAttribute.getId(), null, null).get();
 			if(historyListRetrieved.equals(historyListRetrieved)) System.out.println("Succesfull Retrieval of created hoc Attributes");

@@ -71,7 +71,8 @@
       <xs:element name="cisMetadata" type="xs:string" minOccurs="0"/>
        <xs:element name="cisProposal" type="tns:cisProposal" minOccurs="0"/>
        <xs:element name="memberList" type="xs:string" minOccurs="0"/>
-       <xs:element name="cis" type="tns:arrayList" minOccurs="0"/>
+       <xs:element name="ciss" type="tns:cis" minOccurs="0"/>
+       <xs:element name="cisID" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 	

@@ -48,6 +48,7 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementEnvelopeUtils;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 
 /**
@@ -112,7 +113,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 			}
 
 			// - Save the agreement
-			agreementData.setBinaryValue(SerialisationHelper.serialise(agreement));
+			agreementData.setBinaryValue(SerialisationHelper.serialise(AgreementEnvelopeUtils.toAgreementEnvelopeBean(agreement)));
 			ctxBroker.update(agreementData);
 		} catch (CtxException e) {
 			LOG.error("[Error updateAgreement] Can't find the agreement. Context error.", e);

@@ -27,6 +27,8 @@ package org.societies.context.community.db.test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -36,8 +38,13 @@ import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CommunityMemberCtxEntity;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.context.community.db.impl.CommunityCtxDBMgr;
@@ -51,6 +58,7 @@ import org.societies.context.community.db.impl.CommunityCtxDBMgr;
 public class CommunityCtxDBMgrTest {
 
 	private static final String CIS_IIDENTITY_STRING = "myCIS.societies.local";
+	private static final String CIS_IIDENTITY_STRING2 = "myCIS2.societies.local";
 
 	private CommunityCtxDBMgr communityDB;
 	
@@ -60,6 +68,7 @@ public class CommunityCtxDBMgrTest {
 	CommunityMemberCtxEntity member;
 
 	private static IIdentity mockCisIdentity = mock(IIdentity.class);
+	private static IIdentity mockCisIdentity2 = mock(IIdentity.class);
 	
 	/**
 	 * @throws java.lang.Exception
@@ -68,6 +77,7 @@ public class CommunityCtxDBMgrTest {
 	public static void setUpBeforeClass() throws Exception {
 
 		when(mockCisIdentity.toString()).thenReturn(CIS_IIDENTITY_STRING);
+		when(mockCisIdentity2.toString()).thenReturn(CIS_IIDENTITY_STRING2);
 
 	}
 
@@ -117,7 +127,7 @@ public class CommunityCtxDBMgrTest {
 	
    @Test
    public void testUpdateEntity() throws CtxException{
-	   System.out.println("---- testUpdateAttribute");
+	   System.out.println("---- testUpdateEntity");
 
 	   entity = communityDB.createCommunityEntity(mockCisIdentity);
 	   System.out.println("entities attributes " + entity.getAttributes());
@@ -125,7 +135,7 @@ public class CommunityCtxDBMgrTest {
 
 	   // Add CommunityMemberCtxEntity
 	   member = communityDB.createCommunityEntity(mockCisIdentity);
-	   entity.addMember(member);
+	   entity.addMember(member.getId());
 	   
 	   communityDB.updateCommunityEntity(entity);
 	   System.out.println("updated entities members " + entity.getMembers());
@@ -143,6 +153,53 @@ public class CommunityCtxDBMgrTest {
 	   System.out.println("retrieved attributes - " + retrEntity.getAttributes());
 	   System.out.println("retrieves members - " + retrEntity.getMembers());
 	   System.out.println("retrieve entity another way - " + communityDB.retrieveCommunityEntity(mockCisIdentity));
+	   
+	   assertNotNull(entity);
+	   assertNotNull(retrEntity);
+	   assertEquals(entity.getAttributes(), retrEntity.getAttributes());
+	   assertEquals(entity.getMembers(), retrEntity.getMembers());
+	}
+   
+   @Test
+   public void testUpdateAttribute() throws CtxException{
+	   System.out.println("---- testUpdateAttribute");
+
+	   entity = communityDB.createCommunityEntity(mockCisIdentity);
+	   System.out.println("entities attributes " + entity.getAttributes());
+	   System.out.println("entities members " + entity.getMembers());
+
+	   // Add CommunityMemberCtxEntity
+	   member = communityDB.createCommunityEntity(mockCisIdentity);
+	   entity.addMember(member.getId());
+	   
+	   communityDB.updateCommunityEntity(entity);
+	   System.out.println("updated entities members " + entity.getMembers());
+	   
+	   // Add Attribute
+	   attribute = communityDB.createCommunityAttribute(entity.getId(), "name");
+	   entity.addAttribute(attribute);
+	   communityDB.updateCommunityEntity(entity);
+	   System.out.println("updated entities attributes " + entity.getAttributes());
+	   
+	   // Retrieve CommunityCtxEntity
+	   modObj = communityDB.retrieve(entity.getId());
+	   CommunityCtxEntity retrEntity = (CommunityCtxEntity) modObj;
+	   System.out.println("retrieved entity - " + retrEntity);
+	   System.out.println("retrieved attributes - " + retrEntity.getAttributes());
+	   System.out.println("retrieves members - " + retrEntity.getMembers());
+	   System.out.println("retrieve entity another way - " + communityDB.retrieveCommunityEntity(mockCisIdentity));
+	   
+	   // Update attribute
+	   attribute.setIntegerValue(5);
+	   communityDB.updateCommunityAttribute(attribute);
+	   System.out.println("updated attribute");
+	   
+	   modObj = communityDB.retrieve(attribute.getId());
+	   attribute = (CtxAttribute) modObj;
+
+	   System.out.println("attribute value should be 5 and it is:"+attribute.getIntegerValue());
+
+	   assertNotNull(attribute);
 	   
 	   assertNotNull(entity);
 	   assertNotNull(retrEntity);
@@ -178,4 +235,46 @@ public class CommunityCtxDBMgrTest {
 	   assertEquals(attribute, retrAttribute);
 	}
 
+   @Test
+   public void testLookup() throws CtxException{
+	   System.out.println("---- testLookup");
+	   
+       List<CtxIdentifier> ids;
+       
+       // Create test entity.
+       final CtxEntityIdentifier entId = communityDB.createCommunityEntity(mockCisIdentity).getId();
+       final CtxEntityIdentifier entId2 = communityDB.createCommunityEntity(mockCisIdentity2).getId();
+       
+       // Create test attribute.
+       final CtxAttributeIdentifier attrId = communityDB.createCommunityAttribute(entId, CtxAttributeTypes.NAME).getId();
+       final CtxAttributeIdentifier attrId2 = communityDB.createCommunityAttribute(entId2, CtxAttributeTypes.NAME_LAST).getId();
+       
+
+       //
+       // Lookup entities
+       //
+       ids = communityDB.lookup(CtxModelType.ENTITY, entId.getType());
+       assertTrue(ids.contains(entId));
+       assertEquals(entId.getOwnerId(),CIS_IIDENTITY_STRING);
+       assertEquals(2, ids.size());
+              
+       ids = communityDB.lookup(CtxModelType.ENTITY, entId2.getType());
+       assertTrue(ids.contains(entId2));
+       assertEquals(entId2.getOwnerId(),CIS_IIDENTITY_STRING2);
+       assertEquals(2, ids.size());
+
+       //
+       // Lookup attributes
+       //
+       
+       ids = communityDB.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME);
+       assertTrue(ids.contains(attrId));
+       assertEquals(1, ids.size());
+       
+       ids = communityDB.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME_LAST);
+       assertTrue(ids.contains(attrId2));
+       assertEquals(1, ids.size());
+
+              
+	}
 }

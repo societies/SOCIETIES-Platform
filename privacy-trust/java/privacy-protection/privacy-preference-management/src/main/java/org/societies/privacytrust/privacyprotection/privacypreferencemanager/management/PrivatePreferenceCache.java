@@ -67,7 +67,7 @@ public class PrivatePreferenceCache {
 	
 	
 	public void addPPNPreference(PPNPreferenceDetails details, IPrivacyPreferenceTreeModel model){
-		printCacheContentsOnScreen();
+		printCacheContentsOnScreen("Before update");
 		this.logging.debug("REquest to add preference :\n"+details.toString());
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getPPNPreference(details);
 		if (preferenceCtxID==null){
@@ -86,13 +86,13 @@ public class PrivatePreferenceCache {
 			this.logging.debug("Preference existed and updated.");
 
 		}
-		printCacheContentsOnScreen();
+		printCacheContentsOnScreen("After update");
 		
 	}
 	
 
 	public void addIDSPreference(IDSPreferenceDetails details, IPrivacyPreferenceTreeModel model){
-		printCacheContentsOnScreen();
+		printCacheContentsOnScreen("Before Update");
 		this.logging.debug("REquest to add preference :\n"+details.toString());
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getIDSPreference(details);
 		if (preferenceCtxID==null){
@@ -115,12 +115,12 @@ public class PrivatePreferenceCache {
 			this.logging.debug("Preference existed and updated.");
 
 		}
-		printCacheContentsOnScreen();	
+		printCacheContentsOnScreen("After Update");	
 	}
 	public IPrivacyPreferenceTreeModel getPPNPreference(PPNPreferenceDetails details){
 		
 		this.logging.debug("Request for preference: \n"+details.toString());
-		printCacheContentsOnScreen();
+		printCacheContentsOnScreen("No update");
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getPPNPreference(details);
 		if (preferenceCtxID!=null){
 			if (this.ppnCtxIDtoModel.containsKey(preferenceCtxID)){
@@ -140,7 +140,7 @@ public class PrivatePreferenceCache {
 	public IPrivacyPreferenceTreeModel getIDSPreference(IDSPreferenceDetails details){
 		
 		this.logging.debug("Request for preference: \n"+details.toString());
-		printCacheContentsOnScreen();
+		printCacheContentsOnScreen("No update");
 		
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getIDSPreference(details);
 		if (preferenceCtxID!=null){
@@ -359,11 +359,11 @@ public class PrivatePreferenceCache {
 		}
 	}
 	
-	private void printCacheContentsOnScreen(){
+	private void printCacheContentsOnScreen(String string){
 	
-		this.logging.debug("*********CACHE CONTENTS START **************");
+		this.logging.debug("*********CACHE CONTENTS START "+string+"**************");
 		this.logging.debug(this.registry.toString());
-		this.logging.debug("*********CACHE CONTENTS END **************");
+		this.logging.debug("*********CACHE CONTENTS END "+string+"**************");
 	}
 
 	

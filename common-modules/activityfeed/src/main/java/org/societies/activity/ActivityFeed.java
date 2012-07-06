@@ -81,8 +81,8 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			return ret;
 		}
 		LOG.info("timeperiod: "+fromTime+" - " + toTime);
-		LOG.info("this: "+this.hashCode()+" list size: "+list.size());
 		if(list != null){
+			LOG.info(" list size: "+list.size());
 			for(Activity act : list){
 				if(Long.parseLong(act.getPublished())>=fromTime && Long.parseLong(act.getPublished())<=toTime){
 					ret.add(act);
