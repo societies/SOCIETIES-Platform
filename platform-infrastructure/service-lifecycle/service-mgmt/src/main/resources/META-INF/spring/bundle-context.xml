@@ -20,7 +20,8 @@
 		<property name="serviceReg" ref="serviceRegRef" />
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="serviceControl" ref ="serviceControl"/>
-		<property name="negotiationProvider" ref="negotiationProviderRef" />				
+		<property name="negotiationProvider" ref="negotiationProviderRef" />
+		<!--  <property name="privacyManager" ref="privacyManagerProviderRef" />	-->			
 	</bean>
 	
 	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
@@ -36,6 +37,11 @@
 		<property name="policyNegotiation" ref="policyNegotiationRef" />
 		<property name="cisManager" ref="cisManagerRef" />
 		<property name="serviceControlRemote" ref="serviceControlRemoteRef" />				
+	</bean>
+	
+	<bean id="serviceManagement" class="org.societies.slm.servicecontrol.ServiceMgmt" >
+		<property name="serviceDiscovery" ref="serviceDiscovery" /> 	
+		<property name="commMngr" ref="commMngrRef" />				
 	</bean>
 	
 </beans>

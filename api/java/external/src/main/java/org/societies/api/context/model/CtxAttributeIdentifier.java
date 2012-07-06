@@ -79,7 +79,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 		this.scope = scope;
 	}
 	
-	CtxAttributeIdentifier(String str) throws MalformedCtxIdentifierException {
+	public CtxAttributeIdentifier(String str) throws MalformedCtxIdentifierException {
 		
 		super(str);
 	}
