@@ -29,8 +29,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import java.util.Set;
@@ -64,10 +67,14 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
@@ -178,15 +185,32 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	public String owner;
 	
-// extra attributes	
 	
-	//@Transient
-	//public String permaLink; // all those have been moved to the Editor
+	Hashtable<CtxAttribute, MembershipCriteria> cisCriteria = null;
 	
-	//@Transient
-	//private String password = "none";
-	//@Transient
-	//private String host = "none";
+	
+	private boolean checkQualification(HashMap<CtxAttribute,Object> qualification){
+		
+		for (CtxAttribute cisContext : cisCriteria.keySet()) { // loop through all my criterias
+		    if(qualification.containsKey(cisContext)){
+		    	MembershipCriteria m = cisCriteria.get(cisContext); // retrieves the context for that criteria
+		    	if(m != null){ // if there is a rule we check it
+		    		Object valueToBeCompared = qualification.get(cisContext);
+		    		if (m.getRule().checkRule(cisContext.getValueType(), valueToBeCompared))
+		    			return false;
+		    	}
+
+		    }
+		    else{// did not have a needed context attribute in its qualification
+		    	return false;
+		    }
+			
+		}
+				
+		return true;
+		
+	}
+
 	
 
 	String description = "";

@@ -63,5 +63,5 @@ public class MembershipCriteria {
     	this.rank = rank;
     	return true;
     }
-
+    
 }

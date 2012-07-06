@@ -26,29 +26,40 @@ package org.societies.api.cis.attributes;
 
 import java.util.ArrayList;
 
+import org.societies.api.context.model.CtxAttributeValueType;
+
 public class Rule {
         
     //could be an enumeration with its own API.
-    private ArrayList<String> operations;
+    //private ArrayList<String> operations;
 
-    private String operation;
+    private OperationType operation;
 
+	public enum OperationType {
+		   equals, greaterThan, lessThan, range, differentFrom;		
+		   
+		   static public boolean isValid(String aName) {
+			   OperationType[] oTypes = OperationType.values();
+		       for (OperationType oType : oTypes)
+		           if (oType.name().equals(aName))
+		               return true;
+		       return false;
+		   }
+	}
+    
     private ArrayList<Object> values;
 
     //Non-T4.5 components need to be able to create a rule
     public Rule() {
-        operations.add("equals");
-        operations.add("greater than");
-        operations.add("less than");
-        operations.add("range");
+
     }
 
 	public String getOperation() {
-        return operation;
+        return operation.name();
     }
 	public boolean setOperation(String operation) {
-        if (operations.contains(operation)) {
-            this.operation = operation;
+        if (OperationType.isValid(operation)) {
+            this.operation = OperationType.valueOf(operation);
             return true;
         }
         else return false;
@@ -59,9 +70,58 @@ public class Rule {
     }
 
     public boolean setValues(ArrayList<Object> values) {
-        if ((!operation.equals("range")) && (values.size() == 1)) this.values = values;
-        else if ((operations.equals("range")) && (values.size() == 2)) this.values = values;
+        if ((!operation.equals(OperationType.range)) && (values.size() == 1)) this.values = values;
+        else if ((operation.equals(OperationType.range)) && (values.size() == 2)) this.values = values;
         else return false;
         return true;
     }
+    
+    public boolean checkRule(CtxAttributeValueType t, Object value){
+		switch (t){
+		case STRING:
+			String v = (String) value;
+			switch (this.operation){
+			case equals:
+				if(v.equals((String) this.values.get(0))) return true;
+				else return false;
+			case differentFrom:
+				if(!v.equals((String) this.values.get(0))) return true;
+				else return false;
+			case lessThan:
+			case greaterThan:
+			case range:
+				return false; // invalid rule TODO: print a warning
+			}
+				
+			break;			//end of String check
+
+		case INTEGER:
+			int i = ((Integer) value).intValue();
+			switch (this.operation){
+			case equals:
+				if(i == ((Integer)this.values.get(0)).intValue()   ) return true;
+				else return false;
+			case differentFrom:
+				if(i != ((Integer)this.values.get(0)).intValue()  ) return true;
+				else return false;
+			case lessThan:
+				if(i < ((Integer)this.values.get(0)).intValue()  ) return true;
+				else return false;
+			case greaterThan:
+				if(i > ((Integer)this.values.get(0)).intValue()  ) return true;
+				else return false;
+			case range:
+				if((i > ((Integer)this.values.get(0)).intValue()  ) && (i < ((Integer)this.values.get(1)).intValue()  ))  return true;
+				else return false;
+			}
+			
+			break;			//end of Integer check
+		case DOUBLE:
+		case BINARY:
+		case EMPTY:
+		default:
+		}
+    	return false;
+    }
+    
 }
