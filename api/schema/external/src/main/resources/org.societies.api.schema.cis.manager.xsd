@@ -83,13 +83,12 @@
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base='empty'>
-          <xs:attribute name='owner-jid' type='xs:string' use='required'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='owner-jid' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
           <xs:attribute name='community-jid' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='community-password' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='owner-password' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
           <xs:attribute name='community-type' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
           <xs:attribute name='community-name' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
           <xs:attribute name='membership-mode' type='xs:int'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='description' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>

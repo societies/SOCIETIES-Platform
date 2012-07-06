@@ -91,10 +91,7 @@
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
 
 		<!-- CIS Mgmt -->
-		<module>../cis-modules/cis-persistance/</module>
 		<module>../cis-modules/cis-management/cis-manager/cis-manager</module>
-		<module>../cis-modules/cis-discovery/</module>
-		<module>../cis-modules/cis-collaboration/</module>
 		<module>../cis-modules/cis-directory/</module>
 		<module>../cis-modules/cis-directory-client/</module>
 

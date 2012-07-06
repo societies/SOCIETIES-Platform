@@ -488,13 +488,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				
 				String ownerJid = create.getOwnerJid();
 				String cisJid = create.getCommunityJid();
-				String cisPassword = create.getCommunityPassword();
-				String ownerPassword = create.getOwnerPassword();
 				String cisType = create.getCommunityType();
 				String cisName = create.getCommunityName();
 				//int cisMode = create.getMembershipMode().intValue();
 
-				if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
+				if(ownerJid != null  && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
 					int cisMode = create.getMembershipMode().intValue();
 					String pPolicy = "<RequestPolicy></RequestPolicy>";	
 					ICisOwned icis = localCreateCis( cisName, cisType, cisMode,pPolicy);
