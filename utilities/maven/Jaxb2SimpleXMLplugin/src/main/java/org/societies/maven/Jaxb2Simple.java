@@ -242,7 +242,7 @@ public class Jaxb2Simple extends AbstractMojo
 		
 		//import javax\.xml\.bind\.annotation\.XmlValue/import org.simpleframework.xml.Text
 		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlValue;";
-		textToReplace = "import org.simpleframework.xml.Text;";
+		textToReplace = "import org.simpleframework.xml.Text(required=false);";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//import javax\.xml\.bind\.annotation\.XmlElements/import org.simpleframework.xml.ElementList 
