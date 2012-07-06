@@ -44,33 +44,42 @@ public interface ICisManager {
 	
 	// API implementing server functionality
 	
+	// this methods have been deprecated so we remove the css password and also the cssid (which will come through the Xcommanger)
+	@Deprecated
+	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
+	
+	@Deprecated
+	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy);
+	
 	
 	/**
-	 * Create a new CIS for the CSS whose JID is the one in cssId. Password is needed and is the
-	 * same as the CSS password (at the moment this is not checked).
+	 * Create a new CIS for the CSS whose JID is the one in cssId.
 	 * 
 	 * 
-	 * The CSS who creates the CIS will be added as a meber to the CIS and with the owner role.
+	 * The CSS who creates the CIS will be added as a member to the CIS and with the owner role.
 	 *  Ownership should be possible to be changed later, but it is not right now. 
 	 * 
 	 * At the moment, the creation of the CIS triggers and advertisement record of it to be sent to
 	 * the global cis directory 
 	 * 
-	 * TODO: define what values mode can have and what each means.
-	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
 	 *  
-	 * @param cssId and cssPassword are to recognise the user
 	 * @param cisName is user given name for the CIS, e.g. "Footbal".
 	 * @param cisType E.g. "disaster"
 	 * @param mode membership type, e.g 1= read-only (will be defined in the future).
+	 * @param privacyPolicy (for the second method) should follow the privacy policy schema.
 	 * @return a Future link to the {@link ICisOwned} representing the new CIS, or 
 	 * null if the CIS was not created.
 	 */
+	
+
+	Future<ICisOwned> createCis(String cisName, String cisType, int mode);
+	
+
+	Future<ICisOwned> createCis(String cisName, String cisType, int mode, String privacyPolicy);
+	
+	// removed the need to add the cssID
 	@Deprecated
-	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
-	
-	
-	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy);
+	boolean deleteCis(String cssId, String cssPassword, String cisId);
 	
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
@@ -80,23 +89,25 @@ public interface ICisManager {
 	 * But it will trigger a delete notification to be sent to all the members of the CIS
 	 * 
 	 * 
-	 * @param cssId and cssPassword of the owner of the CIS.
 	 * @param cisId The ID of the CIS to be deleted.
 	 * @return true if deleted, false otherwise.
 	 */
-	boolean deleteCis(String cssId, String cssPassword, String cisId);
+	boolean deleteCis(String cisId);
+	
+	
+	@Deprecated
+	ICis getCis(String cssId, String cisId);
 	
 	/**
 	 * Get a CIS Record with the ID cisId.
 	 * The one calling the api must be aware that he will get a {@link ICis} which
 	 * will not implement all the methods for the case of CIS that the user owns
 	 * 
-	 * @param cssId The ID (jabber ID) of the CSS triggering the command (TODO: do we really need it?).
 	 * @param cisId The ID (jabber ID) of the CIS to get.
 	 * @return the {@link ICis} matching the input cisID, or null if no such CIS is owned or subscribed by the user.
 	 * 
 	 */
-	ICis getCis(String cssId, String cisId);
+	ICis getCis(String cisId);
 	
 	/**
 	 * Get a CIS Owned Interface with the ID cisId.

@@ -155,8 +155,6 @@ public class CisManagerController {
 				res = "Creating CIS...";
 
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
-						cisForm.getCssId(), 
-						cisForm.getCisPassword(), 
 						cisForm.getCisName(),
 						cisForm.getCisType(),
 						cisForm.getCisMode());
@@ -178,7 +176,7 @@ public class CisManagerController {
 				this.getCisManager().joinRemoteCIS(cisForm.getCisJid(), icall);
 				Thread.sleep(5 * 1000);
 				model.put("joinStatus", resultCallback);
-				ICis i = getCisManager().getCis(cisForm.getCssId(), cisForm.getCisJid());
+				ICis i = getCisManager().getCis(cisForm.getCisJid());
 				model.put("cis", i);
 
 			} else if (method.equalsIgnoreCase("LeaveRemoteCIS")) {
@@ -212,7 +210,7 @@ public class CisManagerController {
 				if(thisCis == null){
 					res = "thisCIS is null";
 					//NOT LOCAL CIS, SO CALL REMOTE
-					ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid().trim());
+					ICis remoteCIS = this.getCisManager().getCis(cisForm.getCisJid().trim());
 					if (remoteCIS != null) {
 						res = cisForm.getCisJid().trim();
 						remoteCIS.getListOfMembers(icall);
@@ -233,7 +231,7 @@ public class CisManagerController {
 				//CALL REMOTE
 				res += cisForm.getCisJid();
 				res += "Before Remote";
-				ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid());
+				ICis remoteCIS = this.getCisManager().getCis(cisForm.getCisJid());
 				remoteCIS.getListOfMembers(icall);
 				res += "After Remote";
 				

@@ -180,13 +180,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 // extra attributes	
 	
-	@Transient
-	public String permaLink; // all those have been moved to the Editor
+	//@Transient
+	//public String permaLink; // all those have been moved to the Editor
 	
-	@Transient
-	private String password = "none";
-	@Transient
-	private String host = "none";
+	//@Transient
+	//private String password = "none";
+	//@Transient
+	//private String host = "none";
 	
 
 	String description = "";
@@ -257,13 +257,22 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 
 
-	// maximum constructor of a CIS without a pre-determined ID or host
+	// deprecated, use the version below without password, permalink and host
+	@Deprecated
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
 	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
 		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote,privacyPolicyManager);
-		this.password = password;
-		this.permaLink = permaLink;
-		this.host = host;
+		//this.password = password;
+		//this.permaLink = permaLink;
+		//this.host = host;
+		this.description = description;
+
+	}
+
+	// maximum constructor of a CIS without a pre-determined ID or host
+	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
+	,String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
+		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote,privacyPolicyManager);
 		this.description = description;
 
 	}
@@ -374,7 +383,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 		
 		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
-		activityFeed.getActivities("0 1339689547000");
+		//activityFeed.getActivities("0 1339689547000");
 	}
 	
 

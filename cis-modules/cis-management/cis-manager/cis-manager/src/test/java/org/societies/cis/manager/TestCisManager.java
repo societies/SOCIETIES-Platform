@@ -468,7 +468,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
-		Future<ICisOwned> testCIS = cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		Future<ICisOwned> testCIS = cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE);
 		try {
 			assertNotNull(testCIS.get());
@@ -478,7 +478,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			assertEquals(testCIS.get().getMembershipCriteria(), TEST_CIS_MODE);
 
 			// CLEANING UP
-			cisManagerUnderTest.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, testCIS.get().getCisId());
+			cisManagerUnderTest.deleteCis(testCIS.get().getCisId());
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -508,11 +508,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ICisOwned[] ciss = new ICisOwned [3]; 
 		int[] cissCheck = {0,0,0};
 		
-		ciss[0] =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ciss[0] =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1+"aa", TEST_CIS_TYPW , TEST_CIS_MODE)).get();
-		ciss[1] = (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ciss[1] = (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
-		ciss[2] = (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ciss[2] = (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_3, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 
 		List<ICisOwned> l = cisManagerUnderTestInterface.getListOfOwnedCis();
@@ -542,7 +542,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		// CLEANING UP
 
 		 for(int i=0;i<ciss.length;i++){
-			 cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, ciss[i].getCisId());
+			 cisManagerUnderTestInterface.deleteCis(ciss[i].getCisId());
 		 }
 
 	}
@@ -563,9 +563,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ICisOwned[] ciss = new ICisOwned [2]; 
 		String jidTobeDeleted = "";
 		
-		ciss[0] =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ciss[0] =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
-		ciss[1] = (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ciss[1] = (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
 		LOG.info("cis 1 sessionfactory:"+((Cis)ciss[0]).getSessionFactory().hashCode());
@@ -577,7 +577,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		boolean presence = false;
 		
-		presence = cisManagerUnderTestInterface.deleteCis("", "", jidTobeDeleted);
+		presence = cisManagerUnderTestInterface.deleteCis(jidTobeDeleted);
 		assertEquals(true,presence);
 		
 		presence = false;
@@ -603,7 +603,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		while(it.hasNext()){
 			element = it.next();
-			cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, element.getCisId());
+			cisManagerUnderTestInterface.deleteCis( element.getCisId());
 	     }
 
 	
@@ -621,7 +621,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
-		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 
 		try {
@@ -636,7 +636,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 		
 		// CLEANING UP
-		cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
+		cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
 
 		
 	}
@@ -653,7 +653,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
-		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
 
@@ -685,7 +685,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 		
 		// CLEANING UP
-		cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
+		cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
 
 		
 	}
@@ -702,7 +702,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
-		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 				
 		try {
@@ -738,7 +738,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	 
 		// CLEANING UP
-		 cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
+		 cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
 	}
 	
 	//@Ignore
@@ -752,7 +752,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 	
 		cisManagerUnderTestInterface = cisManagerUnderTest;
-		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
 		
@@ -797,7 +797,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 }
 
 		// CLEANING UP
-		 cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
+		 cisManagerUnderTestInterface.deleteCis( Iciss.getCisId());
 	}
 	
 	///////////////////////////////////////////////////
@@ -815,12 +815,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
-		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
 		setUpRemoteNode();
 
-		ICisOwned localInstOfRemoteCIS =  (remoteCisManagerUnderTest.createCis(REMOTE_CIS_MANAGER_ID, TEST_CSS_PWD,
+		ICisOwned localInstOfRemoteCIS =  (remoteCisManagerUnderTest.createCis(
 				"name", TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
 
@@ -832,7 +832,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		
 		// CLEANING UP
-		cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, Iciss.getCisId());
+		cisManagerUnderTestInterface.deleteCis( Iciss.getCisId());
 
 		
 	}	
@@ -880,7 +880,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
-		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 				
 		try {
@@ -929,7 +929,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				
 				
 				// CLEANING UP
-				cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, communityResultObject.getCommunityJid());
+				cisManagerUnderTestInterface.deleteCis(communityResultObject.getCommunityJid());
 				
 			}
 
@@ -955,7 +955,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
-		ICisOwned IcissOwned =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ICisOwned IcissOwned =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		ICis icssRemote = IcissOwned;
 				
@@ -993,7 +993,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				
 				
 				// CLEANING UP
-				cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, communityResultObject.getCommunityJid());
+				cisManagerUnderTestInterface.deleteCis(communityResultObject.getCommunityJid());
 				
 			}
 		}		
@@ -1012,7 +1012,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest.init();
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
-		ICisOwned IcissOwned =  (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
+		ICisOwned IcissOwned =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		ICis icssRemote = IcissOwned;
 				
@@ -1053,7 +1053,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				
 				
 				// CLEANING UP
-				cisManagerUnderTestInterface.deleteCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD, communityResultObject.getCommunityJid());
+				cisManagerUnderTestInterface.deleteCis(communityResultObject.getCommunityJid());
 				
 			}
 		}		

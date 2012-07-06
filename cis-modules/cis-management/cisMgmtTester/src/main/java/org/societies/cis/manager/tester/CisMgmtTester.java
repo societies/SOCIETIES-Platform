@@ -88,7 +88,7 @@ public class CisMgmtTester {
 		this.cisClient = cisClient;
 		LOG.info("got autowired reference, target cisId is " + targetCisId);
 
-		ICis icis = cisClient.getCis("xcmanager1.thomas.local", targetCisId);
+		ICis icis = cisClient.getCis(targetCisId);
 
 		if(icis == null){
 			LOG.info("could not retrieve CIS");
@@ -149,7 +149,7 @@ public class CisMgmtTester {
 				LOG.info("good return on JoinCallBack");
 				LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
 				join = 1;
-				ICis icis = cisClient.getCis("xcmanager1.thomas.local", communityResultObject.getCommunityJid());
+				ICis icis = cisClient.getCis(communityResultObject.getCommunityJid());
 				
 				
 				IActivity iActivity = new org.societies.activity.model.Activity();

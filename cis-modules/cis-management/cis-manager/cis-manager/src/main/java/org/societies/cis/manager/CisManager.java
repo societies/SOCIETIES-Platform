@@ -240,6 +240,15 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
+	@Deprecated
+	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode){
+		return null;
+	}
+	
+	@Deprecated
+	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy) {
+		return null;
+	}
 
 	/**
 	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
@@ -263,16 +272,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	
 	@Override
-	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
+	public Future<ICisOwned> createCis(String cisName, String cisType, int mode) {
 		String pPolicy = "<RequestPolicy></RequestPolicy>";	
-		ICisOwned i = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode,pPolicy);
+		ICisOwned i = this.localCreateCis(cisName, cisType, mode,pPolicy);
 			return new AsyncResult<ICisOwned>(i);
 		
 	}
 	
 	@Override
-	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy) {
-		ICisOwned i = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode, privacyPolicy);
+	public Future<ICisOwned> createCis(String cisName, String cisType, int mode, String privacyPolicy) {
+		ICisOwned i = this.localCreateCis(cisName, cisType, mode, privacyPolicy);
 		return new AsyncResult<ICisOwned>(i);
 	}
 	
@@ -292,8 +301,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	
 	// local version of the deleteCIS
-	private boolean deleteOwnedCis(String cssId, String cssPassword, String cisJid){
-		// TODO: how do we check fo the cssID/pwd?
+	private boolean deleteOwnedCis(String cisJid){
+
 		
 		boolean ret = false;
 		if(getOwnedCISs().contains(new Cis(new CisRecord(cisJid)))){
@@ -310,7 +319,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	
 	// local version of the createCis
-	private ICisOwned localCreateCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy) {
+	private ICisOwned localCreateCis(String cisName, String cisType, int mode, String privacyPolicy) {
 		// TODO: how do we check fo the cssID/pwd?
 		//if(cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid()) == false){ // if the cssID does not match with the host owner
 		//	LOG.info("cssID does not match with the host owner");
@@ -324,21 +333,20 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			return null;
 		}
 		// Parameters
-		if ((null == cssId || "".equals(cssId))
-				|| (null == privacyPolicy || "".equals(privacyPolicy))) {
+		if ((null == privacyPolicy || "".equals(privacyPolicy))) {
 			return null;
 		}
 				
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 
-		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager);
+		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager);
 		if(cis == null)
 			return cis;
 
 		// PRIVACY POLICY CODE
 
 		try {
-			IIdentity cssOwnerId = this.iCommMgr.getIdManager().fromJid(cssId);
+			IIdentity cssOwnerId = this.cisManagerId;
 			IIdentity cisId = iCommMgr.getIdManager().fromJid(cis.getCisId());
 			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisId);
 			privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
@@ -489,7 +497,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
 					int cisMode = create.getMembershipMode().intValue();
 					String pPolicy = "<RequestPolicy></RequestPolicy>";	
-					ICisOwned icis = localCreateCis(ownerJid, ownerPassword, cisName, cisType, cisMode,pPolicy);
+					ICisOwned icis = localCreateCis( cisName, cisType, cisMode,pPolicy);
 
 					
 					create.setCommunityJid(icis.getCisId());
@@ -559,7 +567,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				Delete delete = c.getDelete();
 				Delete d2 = new Delete();
 				
-				if(!this.deleteOwnedCis(senderjid, "", delete.getCommunityJid()))
+				if(!this.deleteOwnedCis(delete.getCommunityJid()))
 					d2.setValue("error"); // TODO: replace for a proper XMPP error message
 
 				c.setDelete(d2);
@@ -677,12 +685,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		return null;
 	}
 
+	
+	@Deprecated
+	public boolean deleteCis(String cssId, String cssPassword, String cisId){
+		return false;
+	}
 
 
 	@Override
-	public boolean deleteCis(String cssId, String cssPassword, String cisId) {
+	public boolean deleteCis(String cisId) {
 		// TODO Auto-generated method stub
-		return 	this.deleteOwnedCis(cssId, cssPassword, cisId);
+		return 	this.deleteOwnedCis(cisId);
 	}
 
 	@Override
@@ -769,6 +782,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 
 	
+	@Deprecated
+	public ICis getCis(String cssId, String cisId){
+		return null;
+	} 
+	
 	/**
 	 * Get a CIS Record with the ID cisId.
 	 * 
@@ -778,7 +796,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
 	 */
 	@Override
-	public ICis getCis(String cssId, String cisId) {
+	public ICis getCis(String cisId) {
 		
 		// first we check it on the owned CISs		
 		Iterator<Cis> it = getOwnedCISs().iterator();
