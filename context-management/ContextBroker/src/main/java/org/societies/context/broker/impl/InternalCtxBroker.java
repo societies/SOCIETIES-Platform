@@ -112,7 +112,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Autowired(required=true)
 	private ICtxEventMgr ctxEventMgr;
 
-
 	/**
 	 * The User Context History Mgmt service reference. 
 	 * 
@@ -133,14 +132,8 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @see {@link #setCommunityCtxDBMgr(ICommunityCtxDBMgr)}
 	 */
+	@Autowired(required=true)
 	private ICommunityCtxDBMgr communityCtxDBMgr;
-
-	/**
-	 * The ICommManager service reference.
-	 * 
-	 * @see {@link #setCommMgr(ICommManager)}
-	 */
-	private ICommManager commMgr;
 
 	/**
 	 * The User Inference Mgmt service reference.
@@ -167,15 +160,12 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * @throws CtxException 
 	 */
 	@Autowired(required=true)
-	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr,ICommunityCtxDBMgr communityCtxDBMgr) throws Exception {
+	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr) throws Exception {
 
 		LOG.info(this.getClass() + " instantiated");
 		this.userCtxDBMgr = userCtxDBMgr;
-		this.communityCtxDBMgr = communityCtxDBMgr;
-		//LOG.info("Found ICommunityCtxDBMgr " + communityCtxDBMgr);
-		//this.commMgr = commMgr;
-
 		this.idMgr = commMgr.getIdManager();
+		
 		final INetworkNode localCssNodeId = this.idMgr.getThisNetworkNode();
 		LOG.info("Found local CSS node ID " + localCssNodeId);
 		final IIdentity localCssId = this.idMgr.fromJid(localCssNodeId.getBareJid());
