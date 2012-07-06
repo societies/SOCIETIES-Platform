@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -100,12 +101,26 @@ public class CisMgmtTester {
 		iActivity.setPublished((System.currentTimeMillis() -55) + "");
 		iActivity.setVerb("verb");
 
-		LOG.info("calling add activity remote");				
+		/*LOG.info("calling add activity remote");				
 		AddActivityCallBack h = new AddActivityCallBack();
 		icis.addCisActivity(iActivity, h);
-		LOG.info("add activity remote done");
+		LOG.info("add activity remote done");*/
 
+		
+		LOG.info("del activity remote");
+		try {
+			IActivityFeed iac =  icis.getCisActivityFeed().get();
+			iac.deleteActivity(iActivity);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
+				
+		LOG.info("del activity remote done");
 /*		LOG.info("join a remote CIS");
 		this.cisClient.joinRemoteCIS(targetCisId, icall);
 		LOG.info("join sent");
@@ -148,6 +163,26 @@ public class CisMgmtTester {
 				AddActivityCallBack h = new AddActivityCallBack();
 				icis.addCisActivity(iActivity, h);
 				LOG.info("add activity remote done");
+				
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				try {
+					IActivityFeed iac = icis.getCisActivityFeed().get();
+					iac.deleteActivity(iActivity);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
 				
 /*				iActivity.setTarget("New tgt");
 				iActivity.setPublished((System.currentTimeMillis()) + "");

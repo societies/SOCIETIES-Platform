@@ -130,6 +130,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public void initialisePrivacyPreferenceManager(){
 		prefCache = new PrivatePreferenceCache(ctxBroker);
 		contextCache = new PrivateContextCache(ctxBroker);
+		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, getprivacyDataManagerInternal(), idm);
+		contextCache = new PrivateContextCache(ctxBroker);
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
 		}
