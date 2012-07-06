@@ -154,6 +154,7 @@ public class CisManagerController {
 				model.put("methodcalled", "CreateCis");
 				res = "Creating CIS...";
 
+				@SuppressWarnings("deprecation")
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
 						cisForm.getCssId(), 
 						cisForm.getCisPassword(), 
