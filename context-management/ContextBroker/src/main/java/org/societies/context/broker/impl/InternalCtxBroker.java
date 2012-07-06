@@ -287,16 +287,9 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
-	@Override
-	@Async
-	@Deprecated
-	public Future<IndividualCtxEntity> createIndividualEntity(String type)
-			throws CtxException {
-
-		IndividualCtxEntity individualCtxEnt = this.userCtxDBMgr.createIndividualCtxEntity(type);
-		return new AsyncResult<IndividualCtxEntity>(individualCtxEnt);
-	}
-
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createCommunityEntity(org.societies.api.identity.IIdentity)
+	 */
 	@Override
 	@Async
 	public Future<CommunityCtxEntity> createCommunityEntity(IIdentity cisId)
@@ -353,8 +346,6 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		return new AsyncResult<List<CtxEntityIdentifier>>(results);
 	}
-
-
 
 	@Override
 	public Future<List<CtxIdentifier>> lookup(IIdentity target,
