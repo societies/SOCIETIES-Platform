@@ -83,12 +83,12 @@ public class ExternalCtxBrokerExample 	{
 	private Requestor requestor = null;
 	private IIdentity remoteTargetCss;
 
-
 	@Autowired(required=true)
 	public ExternalCtxBrokerExample(ICtxBroker externalCtxBroker, ICommManager commMgr) throws InvalidFormatException {
 
+		LOG.info("*** " + this.getClass() + " instantiated");
+		
 		this.externalCtxBroker = externalCtxBroker;
-		LOG.info("*** CtxBrokerExample instantiated "+ this.externalCtxBroker);
 
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
@@ -209,7 +209,7 @@ public class ExternalCtxBrokerExample 	{
 			// at this point the ctxEntity of type CtxEntityTypes.DEVICE is assigned with CtxAttributes of type : ID, WEIGHT, TEMPERATURE
 			LOG.info("*** created attribute toString "+deviceTempAttr.toString());
 		} catch (Exception e) {
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -258,7 +258,7 @@ public class ExternalCtxBrokerExample 	{
 			List<CtxIdentifier> idsAttribute =this.externalCtxBroker.lookup(requestor, cssOwnerId,CtxModelType.ATTRIBUTE, CtxAttributeTypes.ID).get();
 			LOG.info("*** lookup results for Attribute type: '" + CtxAttributeTypes.ID + "' " +idsAttribute);
 		} catch (Exception e) {
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -296,7 +296,7 @@ public class ExternalCtxBrokerExample 	{
 			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeWeight.getBinaryValue(), this.getClass().getClassLoader());
 			LOG.info("Retrieved ctxAttribute id " +ctxAttributeWeight.getId()+ "and value: "+ retrievedBlob.getSeed()+" initial value was 999 ");
 		} catch (Exception e) {
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
 

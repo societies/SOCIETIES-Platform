@@ -24,6 +24,7 @@
  */
 package org.societies.context.community.db.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,6 +39,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -260,5 +262,18 @@ public class CommunityCtxDBMgr implements ICommunityCtxDBMgr {
 			throws CtxException {
 
 		return this.modelObjects.get(ctxId);
+	}
+
+	@Override
+	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException {
+		
+		final List<CtxIdentifier> foundList = new ArrayList<CtxIdentifier>();
+		
+		for (CtxIdentifier identifier : modelObjects.keySet()) {
+			if (identifier.getModelType().equals(modelType) && identifier.getType().equals(type)) {
+				foundList.add(identifier);
+			}		
+		}
+		return foundList;
 	}
 }
