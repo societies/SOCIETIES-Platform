@@ -316,7 +316,7 @@ public class Jaxb2Simple extends AbstractMojo
 		
 		//@XmlElement(\(.*\))/@Element(required=false,\1)/ 
 		textToFind = "@XmlElement\\((.*?)\\)";
-		textToReplace = "@Element($1)";
+		textToReplace = "@Element($1, required=false)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//NAMESPACE
