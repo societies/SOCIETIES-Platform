@@ -376,7 +376,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Log.d(LOG_TAG, "registerXMPPServer called with client: " + client);
 		Log.d(LOG_TAG, "registering user: " + record.getCssIdentity() + " at domain: " + record.getDomainServer());
 		
-		AndroidCSSRecord params [] = {record};
+		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword()};
 
 		DomainRegistration domainRegister = new DomainRegistration();
 		
@@ -446,54 +446,63 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	 * class ineffective. Use Intents as an asynchronous callback mechanism.
 	 */
 	
-	private class DomainRegistration extends AsyncTask<AndroidCSSRecord, Void, AndroidCSSRecord> {
-
+	private class DomainRegistration extends AsyncTask<String, Void, String[]> {
+		
 		@Override
 		/**
 		 * Carry out compute task 
 		 */
-		protected AndroidCSSRecord doInBackground(AndroidCSSRecord... params) {
-			Dbc.require("AndroidCssRecord must be supplied", params.length > 0);
+		protected String[] doInBackground(String... params) {
+			Dbc.require("AndroidCssRecord must be supplied", params.length >= 4);
 			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
-			AndroidCSSRecord retValue = null;
+			Log.d(LOG_TAG, "DomainRegistration param username: " + params[0]);
+			Log.d(LOG_TAG, "DomainRegistration param domain server: " + params[1]);
+			Log.d(LOG_TAG, "DomainRegistration param password: " + params[2]);
+			Log.d(LOG_TAG, "DomainRegistration param client: " + params[3]);
+			
+			String results [] = new String[4];
 
 			try {
-				INetworkNode networkNode = LocalCSSManagerService.this.ccm.newMainIdentity(params[0].getCssIdentity(), params[0].getDomainServer(), params[0].getPassword());
+				INetworkNode networkNode = LocalCSSManagerService.this.ccm.newMainIdentity(params[0], params[1], params[2]);
 				
-				if (null != networkNode && null != networkNode.getDomain() && null != networkNode.getIdentifier() ) {
+				if (null != networkNode && null != networkNode.getDomain() && null != networkNode.getIdentifier()) {
 					Log.d(LOG_TAG, "registration successful");
-					retValue = new AndroidCSSRecord();
 					
-					retValue.setCssIdentity(networkNode.getIdentifier());
-					retValue.setDomainServer(networkNode.getDomain());
-					retValue.setPassword(params[0].getPassword());
+					results[0]  = networkNode.getIdentifier();
+					results[1] = networkNode.getDomain();
+					results[2] = params[2];
+					results[3] = params[3];
 				}
 			} catch (XMPPError e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return retValue;
+			return results;
 		}
 		
 		@Override
 		/**
 		 * Handle the communication of the result
 		 */
-		protected void onPostExecute(AndroidCSSRecord result) {
+		protected void onPostExecute(String results []) {
 			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
 			
 			Intent intent = new Intent(LocalCSSManagerService.REGISTER_XMPP_SERVER);
 			
-			if (null != result) {
+			if (null != results[0]) {
 				intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
 			} else {
 				intent.putExtra(INTENT_RETURN_STATUS_KEY, false);
 			}
 
-			AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(result);
+			AndroidCSSRecord aRecord = new AndroidCSSRecord();
+			aRecord.setCssIdentity(results[0]);
+			aRecord.setDomainServer(results[1]);
+			aRecord.setPassword(results[2]);
 			
 			intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
-			intent.setPackage("");
+			
+			intent.setPackage(results[3]);
 
 			Log.d(LOG_TAG, "DomainRegistration result sent");
 

@@ -55,5 +55,6 @@
    		    	android:key="daPort" 
    		    	android:defaultValue="5222" 
    		    	android:summary="Domain Authority Port"/>
+            <EditTextPreference android:key="nodeType" android:title="Node Type" android:selectable="false" android:summary="CSS Node Type - Android" android:defaultValue="0" android:enabled="true"/>
    	</PreferenceCategory>
 </PreferenceScreen>

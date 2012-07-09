@@ -600,7 +600,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		this.privacyPCM.updatePreferences(details, preference);
 	}
 	
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deleteIDSPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails)
+	 */
+	@Override
+	public void deleteIDSPreference(IDSPreferenceDetails details){
+		this.prefCache.removeIDSPreference(details);
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deleteIDSPreference(org.societies.api.identity.IIdentity)

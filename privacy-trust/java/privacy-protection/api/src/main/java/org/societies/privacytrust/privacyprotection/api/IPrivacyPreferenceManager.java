@@ -247,6 +247,13 @@ public interface IPrivacyPreferenceManager {
 	 */
 	public void storePPNPreference(PPNPreferenceDetails details, IPrivacyPreference preference);
 	
+
+	/**
+	 * Method to delete the IDS preference referring to this details object.
+	 * @param details		the details to which the preference to be deleted refers to
+	 */
+	public void deleteIDSPreference(IDSPreferenceDetails details);
+	
 	/**
 	 * Method to delete the IDS preference referring to this identity (only deletes the
 	 * generic IDS preference)

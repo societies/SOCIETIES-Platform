@@ -8,6 +8,7 @@
 * http://jung.sourceforge.net/license.txt for a description.
 * This file is based on the JUNG project's example
 */
+
 package org.societies.orchestration.cpa.impl;
 
 import java.awt.BasicStroke;
