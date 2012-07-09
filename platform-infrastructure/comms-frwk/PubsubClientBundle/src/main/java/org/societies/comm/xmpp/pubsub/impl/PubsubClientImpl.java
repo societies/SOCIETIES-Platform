@@ -145,30 +145,11 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			String node = items.getNode();
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
 			org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
-			try {
-				//synchronized (contentUnmarshaller) {
-				//	bean = contentUnmarshaller.unmarshal((Element)i.getAny());
-				//}
-				
-				//GET CLASS FIRST
-				org.dom4j.Element element = (org.dom4j.Element)i.getAny();
-				String namespace = element.getNamespace().getURI();
-				String packageStr = getPackage(namespace);  
-				String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-				Class<?> c = Class.forName(packageStr + "." + beanName);
-				//GET SIMPLE SERIALISER 
-				Strategy strategy = new AnnotationStrategy();
-				Serializer s = new Persister(strategy);
-				Object bean = s.read(c, element.asXML());
-				
-				List<Subscriber> subscriberList = subscribers.get(sub);
-				for (Subscriber subscriber : subscriberList)
-					subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
-			} catch (ClassNotFoundException e) {
-				LOG.error("Exception finding match class for serialisation", e);
-			} catch (Exception e) {
-				LOG.error("Exception while unmarshalling pubsub payload", e);
-			}
+			
+			List<Subscriber> subscriberList = subscribers.get(sub);
+			for (Subscriber subscriber : subscriberList)
+				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), i.getAny());
+		
 		}
 	}
 	// TODO subId
