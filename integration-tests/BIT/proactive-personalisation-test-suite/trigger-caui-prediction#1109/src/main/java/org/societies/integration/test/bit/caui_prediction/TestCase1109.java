@@ -15,6 +15,7 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
@@ -31,12 +32,15 @@ public class TestCase1109 extends IntegrationTestCase{
 	public static ICtxBroker ctxBroker;
 	public static IUserActionMonitor uam;
 	public static ICAUIPrediction cauiPrediction;
+	public static ICommManager commMgr;
 	
 	public TestCase1109() {
 		super(1109, new Class[]{ContextStorageTest.class, RetrieveLearnedModelTest.class, PerformPredictionTest.class});
 		System.out.println("Test 1109 started : TestCase1109() ");
 		//startTest(); 
 	}
+	
+	//setters
 	public void setCauiPrediction(ICAUIPrediction cauiPrediction){
 		TestCase1109.cauiPrediction = cauiPrediction;
 	}
@@ -48,20 +52,32 @@ public class TestCase1109 extends IntegrationTestCase{
 	public void setUam(IUserActionMonitor uam){
 		TestCase1109.uam = uam;
 	}
-
-	protected static ICAUIPrediction getCauiPrediction(){
+	
+	public void setCommMgr (ICommManager commMgr){
+		TestCase1109.commMgr = commMgr;
+	}
+		
+	
+	//getters
+	
+	public static ICAUIPrediction getCauiPrediction(){
 		return TestCase1109.cauiPrediction;
 	}
 	
-	protected static ICtxBroker getCtxBroker(){
+	public static ICtxBroker getCtxBroker(){
 		return TestCase1109.ctxBroker;
 	}
 
-	protected static IUserActionMonitor getUam(){
+	public static IUserActionMonitor getUam(){
 		return TestCase1109.uam;
 	}
 
-/*	
+	public static ICommManager  getCommMgr(){
+		return TestCase1109.commMgr;
+	}
+	
+	
+	/*	
 	private void startTest() {
 		LOG.info("###1109... startTest");
 		jUnitCore = new JUnitCore();

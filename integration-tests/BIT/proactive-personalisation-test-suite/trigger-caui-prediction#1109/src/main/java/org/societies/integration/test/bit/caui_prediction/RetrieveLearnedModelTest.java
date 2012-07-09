@@ -13,6 +13,7 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.IndividualCtxEntity;
 
@@ -31,7 +32,7 @@ public class RetrieveLearnedModelTest {
 		try {
 					
 			final String cssOwnerStr = this.cssNodeId.getBareJid();
-			IIdentity cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
+			IIdentity cssOwnerId = TestCase1109.getCommMgr().getIdManager().fromJid(cssOwnerStr);
 						
 			// add code for cssNodeID
 			IndividualCtxEntity operator =  TestCase1109.getCtxBroker().retrieveIndividualEntity(cssOwnerId).get();
@@ -54,6 +55,9 @@ public class RetrieveLearnedModelTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

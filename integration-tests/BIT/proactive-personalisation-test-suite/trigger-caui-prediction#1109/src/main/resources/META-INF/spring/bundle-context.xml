@@ -33,6 +33,7 @@
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="uam" ref="uam" />
 		<property name="cauiPrediction" ref="cauiPrediction" />
+ 		<property name="commMgr" ref="commMgr" />
   	</bean>
 	
 </beans>
