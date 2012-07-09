@@ -57,12 +57,12 @@ public class Activity implements IActivity {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	private Long ownerId;
+	private String ownerId;
 	
-	public Long getOwnerId() {
+	public String getOwnerId() {
 		return ownerId;
 	}
-	public void setOwnerId(Long ownerId) {
+	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
 	}
 	public Activity()

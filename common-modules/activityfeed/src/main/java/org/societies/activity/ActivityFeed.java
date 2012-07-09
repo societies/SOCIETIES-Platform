@@ -71,7 +71,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	 */
 	
 //	@Id
-	private Long id = 0L;
+	private String id;
 //	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	private
 	Set<Activity> list;
@@ -79,7 +79,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	{
 		list = new HashSet<Activity>();
 	}
-	public ActivityFeed(Long id){
+	public ActivityFeed(String id){
 		this.id = id;
 		list = new HashSet<Activity>();// from Thomas
 	}
@@ -266,11 +266,11 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		}
 	}
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -305,8 +305,12 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	}
 	@Override
 	public boolean deleteActivity(IActivity activity) {
-		// x
-		return false;
+		if(!list.contains(activity))
+			return false;
+		boolean ret = list.remove(activity);
+		Transaction t = session.beginTransaction();
+		session.delete(activity);
+		return ret;
 	}
 	@Override
 	synchronized public long importActivtyEntries(List<?> activityEntries) {
