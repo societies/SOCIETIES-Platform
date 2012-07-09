@@ -331,7 +331,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 
-		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager);
+		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory);
 		if(cis == null)
 			return cis;
 
@@ -896,7 +896,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 		LOG.info("in setsessionfactory!! sessionFactory is: "+sessionFactory);
-		ActivityFeed.setStaticSessionFactory(sessionFactory);
+		//ActivityFeed.setStaticSessionFactory(sessionFactory);
 		for(Cis cis : ownedCISs)
 			cis.setSessionFactory(sessionFactory);
 	}

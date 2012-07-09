@@ -28,11 +28,15 @@ package org.societies.orchestration.cpa.impl;
 import org.societies.api.activity.IActivity;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisProposal;
 
+import edu.uci.ics.jung.algorithms.cluster.EdgeBetweennessClusterer;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This
@@ -47,6 +51,18 @@ public class CPACreationPatterns
 {
 	private long lastTime = 0L;
 	private SocialGraph graph = new SocialGraph();
+	private int numEdgesToRemove = 4;
+	private GraphAnalyser analyser;
+	private static final String JUNGBETWEENNESS = "jungbetweenness";
+
+	public CPACreationPatterns(){}
+	public void init(){
+		//TODO: read config
+		String analyserprop = JUNGBETWEENNESS;
+		if(analyserprop.contains(JUNGBETWEENNESS)){
+			analyser = new JungBetweennessAnalyser(5);
+		}
+	}
 	public List<ICisProposal> analyze(List<ICisOwned> cises){
 		ArrayList<ICisProposal> ret = new ArrayList<ICisProposal>();
 		ArrayList<IActivity> actDiff = new ArrayList<IActivity>();
@@ -82,8 +98,19 @@ public class CPACreationPatterns
 			}
 		}
 		//TADA, the social graph should be created, phew
-		//Now for the NP-complete analysis..
-		
+		//Now for the analysis..
+		Set<Set<SocialGraphVertex>> clusterSet = analyser.cluster(graph);
+		try{
+		for(Set<SocialGraphVertex> set : clusterSet){
+			ICisProposal prop = new ICisProposal();
+			for(SocialGraphVertex member : set){
+				prop.addMember(member.getName(), "role");//TODO: role?
+			}
+			ret.add(prop);
+		}
+		}catch(CommunicationException ce){
+			
+		}
 		return ret;
 		
 	}
@@ -109,6 +136,4 @@ public class CPACreationPatterns
 			return true;
 		return false;
 	}
-	public void init(){}
-	public CPACreationPatterns(){}
 }

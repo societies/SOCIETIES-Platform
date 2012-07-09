@@ -49,17 +49,17 @@
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses" >
             <list>
-                <value>org.societies.activity.ActivityFeed</value>
+<!--                 <value>org.societies.activity.ActivityFeed</value> -->
                 <value>org.societies.activity.model.Activity</value>
             </list>
         </property>
 
-        <property name="annotatedPackages" >
+<!--         <property name="annotatedPackages" > -->
 
-            <list>
-                <value>org.societies.activity.model</value>
-            </list>
-        </property>
+<!--             <list> -->
+<!--                 <value>org.societies.activity.model</value> -->
+<!--             </list> -->
+<!--         </property> -->
 
         <property name="hibernateProperties" >
             <props>

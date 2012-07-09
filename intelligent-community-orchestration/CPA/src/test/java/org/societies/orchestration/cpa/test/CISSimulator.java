@@ -22,54 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.cpa.impl;
+package org.societies.orchestration.cpa.test;
 
-public class SocialGraphEdge {
-	private double weight;
-	private SocialGraphVertex from;
-	private SocialGraphVertex to;
-	public SocialGraphEdge(){
-		weight = 0;
-		from = null; to = null;
+import java.util.HashMap;
+import java.util.Set;
+
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.schema.activity.Activity;
+import org.societies.cis.manager.Cis;
+
+public class CISSimulator {
+	private HashMap<String,HashMap<String,Double>> userToUserMap;
+	private int messagesperuserperday;
+	public CISSimulator(int initUsers, int messagesperuserperday)
+	{
+		this.messagesperuserperday = messagesperuserperday;
+		userToUserMap = new HashMap<String,HashMap<String,Double>>();
+		init(initUsers);
 	}
-	public SocialGraphEdge(SocialGraphVertex from, SocialGraphVertex to){
-		this.from = from; this.to = to;
+	
+	public void init(int initUsers){
+		String base = "user";
+		for(int i = 0;i<initUsers;i++){
+			addUser(base+Integer.toString(i+1));
+		}
+		Set<String> keySet = userToUserMap.keySet();
+		Object[] keyArr = keySet.toArray();
+		int arrsize = keyArr.length;
+		for(int i=0;i<arrsize;i++){
+			for(int i2=0;i2<arrsize/2;i2++){
+				if(i!=i2)
+					setUserToUserRate((String)keyArr[i],(String)keyArr[i2],Math.random());
+			}
+		}
 	}
-	public SocialGraphEdge(SocialGraphVertex from, SocialGraphVertex to, double weight){
-		this.weight = weight;
-		this.from = from; this.to = to;
+	/*
+	 * 
+	 * @param double rate
+	 */
+	public void setUserToUserRate(String user1, String user2, double rate){
+		userToUserMap.get(user1).put(user2, new Double(rate));
+		userToUserMap.get(user2).put(user1, new Double(rate));
 	}
-	public double getWeight() {
-		return weight;
+	public void addUser(String user){
+		userToUserMap.put(user, new HashMap<String,Double>());
 	}
-	public void setWeight(double weight) {
-		this.weight = weight;
+	public ICisOwned simulate(long days){
+		ICisOwned ret = new Cis();
+		for(String user : userToUserMap.keySet()){
+//			try {
+//				ret.addMember(user,"member");
+//			} catch (CommunicationException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+		}
+		return ret;
 	}
-	public SocialGraphVertex getFrom() {
-		return from;
+	public Activity makeMessage(String user1, String user2, String message, String published){
+		Activity ret = new Activity();
+		ret.setActor(user1);
+		ret.setObject(message);
+		ret.setTarget(user2);
+		ret.setPublished(published);
+		return ret;
 	}
-	public void setFrom(SocialGraphVertex from) {
-		this.from = from;
-	}
-	public SocialGraphVertex getTo() {
-		return to;
-	}
-	public void setTo(SocialGraphVertex to) {
-		this.to = to;
-	}
-	@Override
-	public boolean equals(Object o){
-		if(!o.getClass().equals(SocialGraphEdge.class))
-			return false;
-		SocialGraphEdge e = (SocialGraphEdge)o;
-		long l = e.getFrom().hashCode()+e.getTo().hashCode();
-		long l2 = this.getFrom().hashCode()+this.getTo().hashCode();
-		return l==l2;
-	}
-	public void addToWeight(double dw){
-		weight += dw;
-	}
-	public String toString(){
-		return "E:"+weight;
-	}
+	
 }

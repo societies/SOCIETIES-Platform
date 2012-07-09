@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.societies.activity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -11,6 +35,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -38,30 +63,36 @@ import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Entity
-@Table(name = "org_societies_activity_ActivityFeed")
+//@Entity
+//@Table(name = "org_societies_activity_ActivityFeed")
 public class ActivityFeed implements IActivityFeed, Subscriber {
 	/**
 	 * 
 	 */
 	
-	@Id
-	private String id;
-	@OneToMany(cascade=CascadeType.ALL)
+//	@Id
+	private Long id = 0L;
+//	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
 	private
 	Set<Activity> list;
 	public ActivityFeed()
 	{
 		list = new HashSet<Activity>();
 	}
-	public ActivityFeed(String id){
+	public ActivityFeed(Long id){
 		this.id = id;
 		list = new HashSet<Activity>();// from Thomas
 	}
 	@Autowired 
-	private static SessionFactory sessionFactory;
+	private SessionFactory sessionFactory;
 	private static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
-	
+	private Session session;
+	public Session getSession() {
+		return session;
+	}
+	public void setSession(Session session) {
+		this.session = session;
+	}
 	//timeperiod: "millisecondssinceepoch millisecondssinceepoch+n" 
 	//where n has to be equal to or greater than 0
 	@Override
@@ -141,6 +172,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		try {
 			for(IActivity act : tmp){
 				if((Boolean)method.invoke(((Activity)act).getValue(filterBy),filterValue) ){
+
 					ret.add(act);
 				}
 			}
@@ -161,11 +193,14 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	public void addCisActivity(IActivity activity) {
 
 		//persist.
-		Session session = sessionFactory.openSession();//getSessionFactory().openSession();
+		//Session session = sessionFactory.openSession();//getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		Activity newact = new Activity(activity);
+		newact.setOwnerId(this.id);
 		try{
-			session.save(newact);
+			list.add(newact);
+			//session.save(newact);
+			//session.save(this);
 			t.commit();
 		}catch(Exception e){
 			e.printStackTrace();
@@ -173,14 +208,14 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			LOG.warn("Saving activity failed, rolling back");
 			e.printStackTrace();
 		}finally{
-			list.add(newact);
-			if(session!=null)
-				session.close();
+			
+//			if(session!=null)
+//				session.close();
 		}		
 	}
 
 	@Override
-	public int cleanupFeed(String criteria) {
+	synchronized public int cleanupFeed(String criteria) {
 		int ret = 0;
 		String forever = "0 "+Long.toString(System.currentTimeMillis());
 		List<IActivity> toBeDeleted = getActivities(criteria,forever);
@@ -201,44 +236,41 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
-	public static SessionFactory getStaticSessionFactory() {
-		return sessionFactory;
-	}
-	public static void setStaticSessionFactory(SessionFactory isessionFactory) {
-		sessionFactory = isessionFactory;
-	}
 	
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 	
-	public static ActivityFeed startUp(String id){
-		ActivityFeed ret = null;
-		Session session = sessionFactory.openSession();
+	synchronized public void startUp(Session session, String id){
+		LOG.info("starting loading activities from db with ownerId: "+ id );
+		//Session session = sessionFactory.openSession();
 		try{
-			List l = session.createCriteria(ActivityFeed.class).add(Property.forName("id").eq(id)).list();
-			if(l.size() == 0)
-				return new ActivityFeed(id);
-			if(l.size() > 1){
-				LOG.error("activityfeed startup with id: "+id+" gave more than one activityfeed!! ");
-				return null;
+			list.addAll(session.createCriteria(Activity.class).add(Property.forName("ownerId").eq(id)).list());
+			if(list.size() == 0){
+				LOG.error("did not find actitivties with ownerId: "+ id ) ;
+			}else if(list.size() > 1){
+				LOG.error("activityfeed startup with ownerId: "+id+" gave more than one activityfeed!! ");
 			}
-			ret = (ActivityFeed) l.get(0);
 		}catch(Exception e){
 			LOG.warn("Query for actitvies failed..");
 
 		}finally{
-			if(session!=null)
-				session.close();
+//			if(session!=null)
+//				session.close();
 		}
-		return ret;
+		LOG.info("loaded activityfeed with ownerId: " + id + " with "+list.size()+" activities.");
+		for(Activity act : list){
+			act.repopHash();
+			LOG.info("act actor: " + act.getActor());
+			LOG.info("act verb: " + act.getVerb());
+		}
 	}
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -259,7 +291,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		LOG.info("in activityfeed close");
 	}
 	@Override
-	public void pubsubEvent(IIdentity pubsubService, String node,
+	synchronized public void pubsubEvent(IIdentity pubsubService, String node,
 			String itemId, Object item) {
 		if(item.getClass().equals(Activity.class)){
 			Activity act = (Activity)item;
@@ -267,7 +299,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		}
 	}
 	@Override
-	public List<IActivity> getActivities(String CssId, String query,
+	synchronized public List<IActivity> getActivities(String CssId, String query,
 			String timePeriod) {
 		return this.getActivities(query,timePeriod);
 	}
@@ -277,7 +309,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		return false;
 	}
 	@Override
-	public long importActivtyEntries(List<?> activityEntries) {
+	synchronized public long importActivtyEntries(List<?> activityEntries) {
 		long ret = 0;
 		if(activityEntries.size() == 0){
 			LOG.error("list is empty, exiting");
@@ -287,34 +319,25 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			LOG.error("first instance in the given list is not of type ActivityEntry, exiting");
 			return ret;
 		}
-		LOG.info("starting importing of "+activityEntries.size()+ " activityentries");
 		List<ActivityEntry> castedList = (List<ActivityEntry>) activityEntries;
 		Activity newAct = null;
-		Session session = sessionFactory.openSession();//getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		ParsePosition pp = new ParsePosition(0);
 		try{
 			for(ActivityEntry act : castedList){
 				pp.setIndex(0);
-				LOG.info("actor: "+getContentIfNotNull(act.getActor()) + " raw: "+act.getActor());
-				LOG.info("object: "+getContentIfNotNull(act.getObject())+" raw: "+act.getObject());
-				LOG.info("published: "+act.getPublished());
-				LOG.info("target: "+getContentIfNotNull(act.getTarget())+" raw: "+act.getTarget());
-				LOG.info("verb: "+act.getVerb());
 				newAct = new Activity();
 				newAct.setActor(getContentIfNotNull(act.getActor()));
-				newAct.setFeed(this);
+				newAct.setOwnerId(this.id);
 				newAct.setObject(getContentIfNotNull(act.getObject()));
 				newAct.setPublished(Long.toString(df.parse(act.getPublished(),pp).getTime()));
-				LOG.info("published after parsing:" + newAct.getPublished());
 				newAct.setTarget(getContentIfNotNull(act.getTarget()));
 				newAct.setVerb(act.getVerb());
 				ret++;
 				this.list.add(newAct);
 				session.save(newAct);
 			}
-			session.save(this);
 			t.commit();
 		}catch(Exception e){
 			t.rollback();
@@ -322,8 +345,6 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			e.printStackTrace();
 
 		}finally{
-			if(session!=null)
-				session.close();
 		}
 
 		return ret;
@@ -337,5 +358,11 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		if(a.getObjectType().contains("bookmark"))
 			return a.getUrl();
 		return a.getContent();
+	}
+	public void clear(){
+		for(Activity act : list){
+			session.delete(act);
+		}
+		list.clear();
 	}
 }
