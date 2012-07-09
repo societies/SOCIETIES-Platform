@@ -109,6 +109,7 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(LocalCSSManagerService.LOGIN_CSS);
         intentFilter.addAction(LocalCSSManagerService.LOGOUT_CSS);
         intentFilter.addAction(LocalCSSManagerService.REGISTER_XMPP_SERVER);
+        
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     	
     }
