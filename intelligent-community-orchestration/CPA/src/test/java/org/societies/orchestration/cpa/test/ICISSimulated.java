@@ -1,7 +1,10 @@
 package org.societies.orchestration.cpa.test;
 
+import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
@@ -50,13 +53,13 @@ public class ICISSimulated implements ICisOwned {
 
 	@Override
 	public void addCisActivity(IActivity activity, ICisManagerCallback callback) {
-		// TODO Auto-generated method stub
+		this.activities.add(activity);
 
 	}
 
 	@Override
 	public void getActivities(String timePeriod, ICisManagerCallback callback) {
-		// TODO Auto-generated method stub
+		//nope
 
 	}
 
@@ -75,8 +78,13 @@ public class ICISSimulated implements ICisOwned {
 	@Override
 	public Future<Boolean> addMember(String jid, String role)
 			throws CommunicationException {
-		// TODO Auto-generated method stub
-		return null;
+		final boolean ret = this.members.add(jid);
+		return new FutureTask<Boolean>(new Callable<Boolean>() {
+		@Override
+		public Boolean call() throws Exception {
+			// TODO Auto-generated method stub
+			return ret;
+		}});
 	}
 
 	@Override
