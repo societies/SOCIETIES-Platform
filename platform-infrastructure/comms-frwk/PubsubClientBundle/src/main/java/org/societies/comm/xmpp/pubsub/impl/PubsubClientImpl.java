@@ -373,41 +373,14 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		Item i = new Item();
 		if (itemId!=null)
 			i.setId(itemId);
-
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try {
-			//DocumentBuilder db = dbf.newDocumentBuilder();
-			//Document doc = db.newDocument();
-			//synchronized (contentMarshaller) {
-			//	contentMarshaller.marshal(item, doc);
-			//}
-			
-			//GET SIMPLE SERIALISER 
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			Strategy strategy = new AnnotationStrategy();
-			Serializer s = new Persister(strategy);
-			s.write(payload, os);
-			
-			//CONVERT TO XML
-			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-			SAXReader reader = new SAXReader();
-			org.dom4j.Document document = reader.read(is);
-			
-			i.setAny(document.getRootElement());
-			p.setItem(i);
-			payload.setPublish(p);
-			
-			Object response = blockingIQ(stanza, payload);
-			
-			return ((Pubsub)response).getPublish().getItem().getId();
-		} catch (ParserConfigurationException e) {
-			throw new CommunicationException("ParserConfigurationException while marshalling item to publish", e);
-		}// catch (JAXBException e) {
-		//	throw new CommunicationException("JAXBException while marshalling item to publish", e);
-		//}
-		catch (Exception e) {
-			throw new CommunicationException("Exception while serialising item to publish", e);
-		}
+		
+		i.setAny(item);
+		p.setItem(i);
+		payload.setPublish(p);
+		
+		Object response = blockingIQ(stanza, payload);
+		
+		return ((Pubsub)response).getPublish().getItem().getId();
 	}
 
 	@Override
