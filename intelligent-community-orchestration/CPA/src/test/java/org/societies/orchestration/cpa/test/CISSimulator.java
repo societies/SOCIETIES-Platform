@@ -88,5 +88,11 @@ public class CISSimulator {
 		ret.setPublished(published);
 		return ret;
 	}
-	
+	//test of the test code..
+	public static void main(String[] args){
+		CISSimulator sim = new CISSimulator(10,10);
+		
+		
+		
+	}
 }
