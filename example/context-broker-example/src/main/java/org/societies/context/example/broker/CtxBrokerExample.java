@@ -46,9 +46,12 @@ import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeBond;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxBond;
+import org.societies.api.context.model.CtxBondOriginType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
@@ -190,7 +193,9 @@ public class CtxBrokerExample 	{
 		// community context tests
 		this.createCommunityEntity();
 		this.createIndividualEntities();
+		// includes context bond tests
 		this.populateCommunityEntity();
+		
 	}
 
 
@@ -198,6 +203,21 @@ public class CtxBrokerExample 	{
 		LOG.info("*** populateCommunityEntity");
 
 		try {
+		//	this.internalCtxBroker
+			CtxAttributeBond attributeLocationBond = new CtxAttributeBond(CtxAttributeTypes.LOCATION_SYMBOLIC, CtxBondOriginType.MANUALLY_SET);
+			attributeLocationBond.setMinValue("home");
+			attributeLocationBond.setMaxValue("home");
+			attributeLocationBond.setValueType(CtxAttributeValueType.STRING);
+			LOG.info("locationBond created : " + attributeLocationBond.toString());
+			CtxAttributeBond attributeAgeBond = new CtxAttributeBond(CtxAttributeTypes.WEIGHT, CtxBondOriginType.MANUALLY_SET);
+			
+			attributeLocationBond.setValueType(CtxAttributeValueType.INTEGER);
+			attributeAgeBond.setMinValue(new Integer(18));
+			attributeAgeBond.setMinValue(new Integer(20));
+			
+			this.communityEntity.addBond(attributeLocationBond);
+			this.communityEntity.addBond(attributeAgeBond);
+			
 			this.communityEntity.addMember(this.indiEnt1.getId());
 			this.communityEntity.addMember(this.indiEnt2.getId());
 			this.communityEntity.addMember(this.indiEnt3.getId());
@@ -210,6 +230,15 @@ public class CtxBrokerExample 	{
 			CommunityCtxEntity communityEnt = (CommunityCtxEntity) this.internalCtxBroker.retrieve(this.communityEntity.getId()).get();
 			LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt);
 			LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt.getMembers());
+			
+			
+			Set<CtxBond> retrievedBonds = communityEnt.getBonds();
+			LOG.info(" retrievedBonds " +retrievedBonds);
+			for(CtxBond bond : retrievedBonds){
+				LOG.info(" bond type : " +bond.getType());
+				LOG.info(" bond modelType : " +bond.getModelType());
+				LOG.info(" bond origin type : " +bond.getOriginType());
+			}
 			
 			
 		} catch (InterruptedException e) {
@@ -237,13 +266,13 @@ public class CtxBrokerExample 	{
 			LOG.info("individual entity 3 "+this.indiEnt3);
 
 			
-			CtxAttribute individualAttr1 = this.internalCtxBroker.createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.ACTION).get();
-			CtxAttribute individualAttr2 = this.internalCtxBroker.createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.ACTION).get();
-			CtxAttribute individualAttr3 = this.internalCtxBroker.createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.ACTION).get();
+			CtxAttribute individualAttr1 = this.internalCtxBroker.createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			CtxAttribute individualAttr2 = this.internalCtxBroker.createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			CtxAttribute individualAttr3 = this.internalCtxBroker.createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.LOCATION_SYMBOLIC).get();
 			
-			individualAttr1.setStringValue("buzzing");
-			individualAttr2.setStringValue("drinking");
-			individualAttr3.setStringValue("eating");
+			individualAttr1.setStringValue("Athens_Greece");
+			individualAttr2.setStringValue("Athens_Greece");
+			individualAttr3.setStringValue("Athens_Greece");
 
 			this.internalCtxBroker.update(individualAttr1);
 			this.internalCtxBroker.update(individualAttr2);
