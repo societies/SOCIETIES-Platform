@@ -312,7 +312,7 @@ public class PubsubServiceImpl implements PubsubService {
 			//TODO If the <item/> element contains more than one payload element or the namespace of the root payload element does not match the configured namespace for the node
 			
 			// Publish and Update Item ID for Response			
-			String itemId = node.publishItem(item.getId(),(org.w3c.dom.Element)item.getAny(),sender);
+			String itemId = node.publishItem(item.getId(),item.getAny(),sender);
 			item.setId(itemId);
 			
 			// Build Notifications
@@ -320,7 +320,7 @@ public class PubsubServiceImpl implements PubsubService {
 			org.jabber.protocol.pubsub.event.Items eventItems = new org.jabber.protocol.pubsub.event.Items();
 			org.jabber.protocol.pubsub.event.Item eventItem = new org.jabber.protocol.pubsub.event.Item();
 			eventItem.setId(itemId);
-			eventItem.setAny((org.w3c.dom.Element)item.getAny());
+			eventItem.setAny(item.getAny());
 			eventItems.setNode(nodeId);
 			eventItems.getItem().add(eventItem);
 			event.setItems(eventItems);
