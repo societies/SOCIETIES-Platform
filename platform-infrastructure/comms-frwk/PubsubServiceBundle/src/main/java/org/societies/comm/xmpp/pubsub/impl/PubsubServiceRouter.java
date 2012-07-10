@@ -63,13 +63,18 @@ public class PubsubServiceRouter implements IFeatureServer {
 			.getLogger(PubsubServiceRouter.class);
 
 	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://jabber.org/protocol/pubsub");
+			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
+   					"http://jabber.org/protocol/pubsub#errors",
+   					"http://jabber.org/protocol/pubsub#event",
+   					"http://jabber.org/protocol/pubsub#owner",
+   					"jabber:x:data"));
 	private static final List<String> PACKAGES = Collections
-			.unmodifiableList(Arrays.asList("jabber.x.data",
+			.unmodifiableList(Arrays.asList(
 					"org.jabber.protocol.pubsub",
 					"org.jabber.protocol.pubsub.errors",
 					"org.jabber.protocol.pubsub.owner",
-					"org.jabber.protocol.pubsub.event"));
+					"org.jabber.protocol.pubsub.event",
+					"jabber.x.data"));
 
 	private ICommManager endpoint;
 	private PubsubService impl;

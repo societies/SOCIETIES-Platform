@@ -61,13 +61,18 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	public static final int TIMEOUT = 10000;
 	
 	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://jabber.org/protocol/pubsub");
+			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
+   					"http://jabber.org/protocol/pubsub#errors",
+   					"http://jabber.org/protocol/pubsub#event",
+   					"http://jabber.org/protocol/pubsub#owner",
+   					"jabber:x:data"));
 	private static final List<String> PACKAGES = Collections
-			.unmodifiableList(Arrays.asList("jabber.x.data",
+			.unmodifiableList(Arrays.asList(
 					"org.jabber.protocol.pubsub",
 					"org.jabber.protocol.pubsub.errors",
 					"org.jabber.protocol.pubsub.owner",
-					"org.jabber.protocol.pubsub.event"));
+					"org.jabber.protocol.pubsub.event",
+					"jabber.x.data"));
 	
 	private static Logger LOG = LoggerFactory
 			.getLogger(PubsubClientImpl.class);
@@ -140,30 +145,11 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			String node = items.getNode();
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
 			org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
-			try {
-				//synchronized (contentUnmarshaller) {
-				//	bean = contentUnmarshaller.unmarshal((Element)i.getAny());
-				//}
-				
-				//GET CLASS FIRST
-				org.dom4j.Element element = (org.dom4j.Element)i.getAny();
-				String namespace = element.getNamespace().getURI();
-				String packageStr = getPackage(namespace);  
-				String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-				Class<?> c = Class.forName(packageStr + "." + beanName);
-				//GET SIMPLE SERIALISER 
-				Strategy strategy = new AnnotationStrategy();
-				Serializer s = new Persister(strategy);
-				Object bean = s.read(c, element.asXML());
-				
-				List<Subscriber> subscriberList = subscribers.get(sub);
-				for (Subscriber subscriber : subscriberList)
-					subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
-			} catch (ClassNotFoundException e) {
-				LOG.error("Exception finding match class for serialisation", e);
-			} catch (Exception e) {
-				LOG.error("Exception while unmarshalling pubsub payload", e);
-			}
+			
+			List<Subscriber> subscriberList = subscribers.get(sub);
+			for (Subscriber subscriber : subscriberList)
+				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), i.getAny());
+		
 		}
 	}
 	// TODO subId
@@ -368,41 +354,14 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		Item i = new Item();
 		if (itemId!=null)
 			i.setId(itemId);
-
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try {
-			//DocumentBuilder db = dbf.newDocumentBuilder();
-			//Document doc = db.newDocument();
-			//synchronized (contentMarshaller) {
-			//	contentMarshaller.marshal(item, doc);
-			//}
-			
-			//GET SIMPLE SERIALISER 
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			Strategy strategy = new AnnotationStrategy();
-			Serializer s = new Persister(strategy);
-			s.write(payload, os);
-			
-			//CONVERT TO XML
-			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-			SAXReader reader = new SAXReader();
-			org.dom4j.Document document = reader.read(is);
-			
-			i.setAny(document.getRootElement());
-			p.setItem(i);
-			payload.setPublish(p);
-			
-			Object response = blockingIQ(stanza, payload);
-			
-			return ((Pubsub)response).getPublish().getItem().getId();
-		} catch (ParserConfigurationException e) {
-			throw new CommunicationException("ParserConfigurationException while marshalling item to publish", e);
-		}// catch (JAXBException e) {
-		//	throw new CommunicationException("JAXBException while marshalling item to publish", e);
-		//}
-		catch (Exception e) {
-			throw new CommunicationException("Exception while serialising item to publish", e);
-		}
+		
+		i.setAny(item);
+		p.setItem(i);
+		payload.setPublish(p);
+		
+		Object response = blockingIQ(stanza, payload);
+		
+		return ((Pubsub)response).getPublish().getItem().getId();
 	}
 
 	@Override
