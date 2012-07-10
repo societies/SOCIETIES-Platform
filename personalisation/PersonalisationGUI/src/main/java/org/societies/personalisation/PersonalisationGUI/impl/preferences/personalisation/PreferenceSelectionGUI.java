@@ -49,7 +49,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.personalisation.PersonalisationGUI.impl.preferences.initiatePrefGUI;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.personalisation.PersonalisationGUI.impl.preferences.GUI;
+import org.societies.personalisation.preference.api.IUserPreferenceManagement;
+
 /**
  * @author  Administrator
  * @created July 1, 2010
@@ -69,9 +72,9 @@ public class PreferenceSelectionGUI extends JFrame implements ActionListener, Wi
 	JPanel pnPanel4;
 	JTable tbTable1;
 
-	private initiatePrefGUI masterGUI;
+	private GUI masterGUI;
 
-	private IIdentity dpi;
+	private IIdentity userIdentity;
 
 	
 	private PreferenceDetailsTableModel model = new PreferenceDetailsTableModel();
@@ -83,6 +86,10 @@ public class PreferenceSelectionGUI extends JFrame implements ActionListener, Wi
 	private JPanel pnPanel5;
 
 	private JButton btRefresh;
+
+	private IUserPreferenceManagement prefMgr;
+	
+	private IServiceDiscovery serviceDiscovery;
 	/**
 	 */
 	public static void main( String args[] ) 
@@ -115,12 +122,13 @@ public class PreferenceSelectionGUI extends JFrame implements ActionListener, Wi
 		this.showGUI();
 		
 	} 
-	public PreferenceSelectionGUI(initiatePrefGUI masterGUI, IIdentity dpi){
-		super( "Preferences for DPI: "+dpi.toString() );
+	public PreferenceSelectionGUI(GUI masterGUI, IIdentity identity){
+		super( "Preferences for DPI: "+identity.toString() );
 		this.setLocation();
 		this.addWindowListener(this);
 		this.masterGUI = masterGUI;
-		this.dpi = dpi;
+		this.userIdentity = identity;
+		this.serviceDiscovery = this.masterGUI.getServiceDiscovery();
 		this.retrievePreferenceDetails();
 		this.showGUI();
 		
@@ -306,7 +314,7 @@ public class PreferenceSelectionGUI extends JFrame implements ActionListener, Wi
 				return;
 			}
 			System.out.println("Going to create new preference for \n"+detail.toString());
-			UserPreferenceGUI gui = new UserPreferenceGUI(this.masterGUI, this.dpi, detail);
+			UserPreferenceGUI gui = new UserPreferenceGUI(this.masterGUI, this.userIdentity, detail);
 			
 			this.refreshTable();
 		}else if (e.getSource().equals(this.btEditPreference)){
@@ -315,7 +323,7 @@ public class PreferenceSelectionGUI extends JFrame implements ActionListener, Wi
 				int row  = this.tbTable1.getSelectedRow();
 				detail = ((PreferenceDetailsTableModel)this.tbTable1.getModel()).getRow(row);
 				System.out.println("Edit existing preference");
-				UserPreferenceGUI gui = new UserPreferenceGUI(this.masterGUI, this.dpi, detail);
+				UserPreferenceGUI gui = new UserPreferenceGUI(this.masterGUI, this.userIdentity, detail);
 			}else{
 				JOptionPane.showMessageDialog(this, "Please select a preference to edit", "Error", JOptionPane.ERROR_MESSAGE);
 			}
@@ -329,8 +337,8 @@ public class PreferenceSelectionGUI extends JFrame implements ActionListener, Wi
 				int row  = this.tbTable1.getSelectedRow();
 				detail = ((PreferenceDetailsTableModel)this.tbTable1.getModel()).getRow(row);
 				System.out.println("Edit existing preference");
-				IPreferenceHandler prefMgr = (IPreferenceHandler) this.masterGUI.getPrefMgr();
-				prefMgr.deletePreference(dpi, detail);
+				
+				prefMgr.deletePreference(userIdentity, detail);
 				this.refreshTable();
 			}else{
 				JOptionPane.showMessageDialog(this, "Please select a preference to delete", "Error", JOptionPane.ERROR_MESSAGE);
@@ -344,20 +352,9 @@ public class PreferenceSelectionGUI extends JFrame implements ActionListener, Wi
 	
 	
 	private void retrievePreferenceDetails(){
-		IPreferenceHandlerInternal prefMgr = this.masterGUI.getPrefMgr();
-		/*IdentitySelectionDialog dpiDialog = new IdentitySelectionDialog(this, masterGUI);
-		if (dpiDialog.isCancelled()){
-			System.out.println("dpiDialog cancelled");
-			this.dispose();
-			return;
-		}else{
-			System.out.println("dpiDialog not cancelled");
-			this.dpi = dpiDialog.getDPI();
-			List<PreferenceDetails> details = prefMgr.getPreferenceDetailsForAllPreferences(this.dpi);
-			this.model = new PreferenceDetailsTableModel(details);
-		}*/
+		prefMgr = this.masterGUI.getPrefMgr();
 		
-		List<PreferenceDetails> details = prefMgr.getPreferenceDetailsForAllPreferences(this.dpi);
+		List<PreferenceDetails> details = prefMgr.getPreferenceDetailsForAllPreferences();
 		this.model = new PreferenceDetailsTableModel(details);
 		
 	}
@@ -369,8 +366,8 @@ public class PreferenceSelectionGUI extends JFrame implements ActionListener, Wi
 		}else{
 			System.out.println("NOT in EventDispatchThread");
 		}
-		IPreferenceHandlerInternal prefMgr = this.masterGUI.getPrefMgr();
-		List<PreferenceDetails> details = prefMgr.getPreferenceDetailsForAllPreferences(this.dpi);
+		
+		List<PreferenceDetails> details = prefMgr.getPreferenceDetailsForAllPreferences();
 		if (details.isEmpty()){
 			System.out.println("Refreshed data empty");
 		}else{

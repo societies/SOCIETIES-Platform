@@ -24,20 +24,10 @@
  */
 package org.societies.personalisation.PersonalisationGUI.impl.preferences.common;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.JPanel;
-import javax.swing.BorderFactory;
-
-import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
@@ -47,22 +37,30 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import org.personalsmartspace.cm.api.pss3p.ContextException;
-import org.personalsmartspace.cm.broker.api.platform.ICtxBroker;
-import org.personalsmartspace.cm.model.api.pss3p.ICtxAttribute;
-import org.personalsmartspace.cm.model.api.pss3p.ICtxAttributeIdentifier;
-import org.personalsmartspace.cm.model.api.pss3p.ICtxEntity;
-import org.personalsmartspace.cm.model.api.pss3p.ICtxIdentifier;
-import org.personalsmartspace.pm.prefmodel.api.platform.ContextPreferenceCondition;
-import org.personalsmartspace.pm.prefmodel.api.platform.IPreferenceCondition;
-import org.personalsmartspace.pm.prefmodel.api.platform.OperatorConstants;
-import org.personalsmartspace.spm.preference.api.platform.IPrivacyPreferenceCondition;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
+import org.societies.personalisation.preference.api.model.IPreferenceCondition;
+import org.societies.personalisation.preference.api.model.OperatorConstants;
 /**
  * @author  Administrator
  * @created April 30, 2010
@@ -87,11 +85,13 @@ public class ConditionCreatorDialog extends JDialog implements ActionListener
 
 	private final ICtxBroker broker;
 	
-	private List<ICtxAttribute> ctxAttributes = new ArrayList<ICtxAttribute>();
+	private List<CtxAttribute> ctxAttributes = new ArrayList<CtxAttribute>();
 
 	private JLabel lbLabel2;
 
 	private JComboBox cmbOperators;
+
+	private IIdentity userIdentity;
 	/**
 	 */
 	public static void main( String args[] ) 
@@ -112,14 +112,15 @@ public class ConditionCreatorDialog extends JDialog implements ActionListener
 		catch ( UnsupportedLookAndFeelException e ) 
 		{
 		}
-		theConditionCreatorDialog = new ConditionCreatorDialog(null,  true, null);
+		theConditionCreatorDialog = new ConditionCreatorDialog(null,  true, null, null);
 	} 
 
 	/**
 	 */
-	public ConditionCreatorDialog(JFrame frame,  boolean isModal, ICtxBroker broker){
+	public ConditionCreatorDialog(JFrame frame,  boolean isModal, ICtxBroker broker, IIdentity userIdentity){
 		super(frame, "Create new Condition", isModal );
 		this.broker = broker;
+		this.userIdentity = userIdentity;
 		
 		this.showGUI();
 	}
@@ -291,19 +292,21 @@ public class ConditionCreatorDialog extends JDialog implements ActionListener
 		return this.ctxAttributes.get(index).getType();
 	}
 	
-	public ICtxIdentifier getContextID(){
-		ICtxAttribute attr = this.getCtxAttribute();
-		ICtxIdentifier id = attr.getCtxIdentifier();
+	public CtxIdentifier getContextID(){
+		
+		CtxAttribute attr = this.getCtxAttribute();
+		return attr.getId();
+/*		CtxIdentifier id = attr.getId();
 		try{
-			ICtxIdentifier parsed = this.broker.parseIdentifier(id.toUriString());
+			CtxIdentifier parsed = this.broker.parseIdentifier(id.toUriString());
 			return parsed;
-		}catch (ContextException ce){
-			System.out.println(this.getClass().getName()+"WARNING: Unable to parse ICtxIdentifier. Condition will possibly exceed 30KB and won't be stored in DB");
+		}catch (CtxException ce){
+			System.out.println(this.getClass().getName()+"WARNING: Unable to parse CtxIdentifier. Condition will possibly exceed 30KB and won't be stored in DB");
 		}
-		return id;
+		return id;*/
 	}
 	
-	public ICtxAttribute getCtxAttribute(){
+	public CtxAttribute getCtxAttribute(){
 		int index = this.cmbContextTypes.getSelectedIndex();
 		
 		return this.ctxAttributes.get(index);
@@ -327,30 +330,18 @@ public class ConditionCreatorDialog extends JDialog implements ActionListener
 	}
 	
 	public IPreferenceCondition getConditionObject(){
-		ICtxAttributeIdentifier id = (ICtxAttributeIdentifier) this.getContextID();
-		this.calculateSizeOfObject("ctxIdentifier size"+id.toUriString(), id);
+		CtxAttributeIdentifier id = (CtxAttributeIdentifier) this.getContextID();
+		//this.calculateSizeOfObject("ctxIdentifier size"+id.toUriString(), id);
 		OperatorConstants op = this.getOperator();
-		this.calculateSizeOfObject("Operator size"+op.toString(), op);
+		//this.calculateSizeOfObject("Operator size"+op.toString(), op);
 		String value = this.getContextValue();
-		this.calculateSizeOfObject("Value size"+value, value);
+		//this.calculateSizeOfObject("Value size"+value, value);
 		String type = this.getContextType();
-		this.calculateSizeOfObject("Type size"+type, type);
-		IPreferenceCondition con = new ContextPreferenceCondition((ICtxAttributeIdentifier) this.getContextID(), this.getOperator(), this.getContextValue(), this.getContextType());
+		//this.calculateSizeOfObject("Type size"+type, type);
+		ContextPreferenceCondition con = new ContextPreferenceCondition((CtxAttributeIdentifier) this.getContextID(), this.getOperator(), value, type);
 		return con;
 	}
 	
-	public IPrivacyPreferenceCondition getConditionForPrivacy(){
-		ICtxAttributeIdentifier id = (ICtxAttributeIdentifier) this.getContextID();
-		this.calculateSizeOfObject("ctxIdentifier size"+id.toUriString(), id);
-		OperatorConstants op = this.getOperator();
-		this.calculateSizeOfObject("Operator size"+op.toString(), op);
-		String value = this.getContextValue();
-		this.calculateSizeOfObject("Value size"+value, value);
-		String type = this.getContextType();
-		this.calculateSizeOfObject("Type size"+type, type);
-		IPrivacyPreferenceCondition con = new org.personalsmartspace.spm.preference.api.platform.ContextPreferenceCondition((ICtxAttributeIdentifier) this.getContextID(), this.getOperator(), this.getContextValue());
-		return con;
-	}
 	public OperatorConstants getOperator(){
 		return (OperatorConstants) this.cmbOperators.getSelectedItem();
 	}
@@ -388,16 +379,22 @@ public class ConditionCreatorDialog extends JDialog implements ActionListener
 	
 	private void loadContextTypes(){
 		try {
-			ICtxEntity entity = broker.retrieveOperator();
-			Set<ICtxAttribute> attributes = entity.getAttributes();
-			Iterator<ICtxAttribute> it = attributes.iterator();
+			CtxEntity entity = broker.retrieveIndividualEntity(this.userIdentity).get();
+			Set<CtxAttribute> attributes = entity.getAttributes();
+			Iterator<CtxAttribute> it = attributes.iterator();
 			while (it.hasNext()){
-				ICtxAttribute attr = it.next();
+				CtxAttribute attr = it.next();
 				this.ctxAttributes.add(attr);
-				cmbContextTypes.addItem(attr.getType()+" "+attr.getCtxIdentifier().toUriString());
+				cmbContextTypes.addItem(attr.getType()+" "+attr.getId().toUriString());
 			}
 			
-		} catch (ContextException e) {
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

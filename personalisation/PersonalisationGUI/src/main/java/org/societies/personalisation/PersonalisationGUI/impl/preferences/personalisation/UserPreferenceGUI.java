@@ -27,7 +27,6 @@ package org.societies.personalisation.PersonalisationGUI.impl.preferences.person
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -57,24 +56,20 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.personalsmartspace.onm.api.pss3p.XMLConverter;
-import org.personalsmartspace.pm.api.PreferenceChangedEvent;
-import org.personalsmartspace.pm.prefGUI.impl.initiatePrefGUI;
-import org.personalsmartspace.pm.prefGUI.impl.common.ConditionCreatorDialog;
-import org.personalsmartspace.pm.prefmgr.api.platform.IPreferenceHandler;
-import org.personalsmartspace.pm.prefmodel.api.platform.IOutcome;
-import org.personalsmartspace.pm.prefmodel.api.platform.IPreference;
-import org.personalsmartspace.pm.prefmodel.api.platform.IPreferenceCondition;
-import org.personalsmartspace.pm.prefmodel.api.platform.IPreferenceOutcome;
-import org.personalsmartspace.pm.prefmodel.api.platform.IPreferenceTreeModel;
-import org.personalsmartspace.pm.prefmodel.api.platform.PreferenceDetails;
-import org.personalsmartspace.pm.prefmodel.api.platform.PreferenceTreeModel;
-import org.personalsmartspace.pm.prefmodel.api.platform.PreferenceTreeNode;
-import org.personalsmartspace.sre.api.pss3p.IDigitalPersonalIdentifier;
-import org.personalsmartspace.sre.api.pss3p.IServiceIdentifier;
-import org.personalsmartspace.sre.ems.api.pss3p.EMSException;
-import org.personalsmartspace.sre.ems.api.pss3p.PSSEvent;
-import org.personalsmartspace.sre.ems.api.pss3p.PSSEventTypes;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.personalisation.PersonalisationGUI.impl.preferences.GUI;
+import org.societies.personalisation.PersonalisationGUI.impl.preferences.common.ConditionCreatorDialog;
+import org.societies.personalisation.preference.api.IUserPreferenceManagement;
+import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
+import org.societies.personalisation.preference.api.model.IPreference;
+import org.societies.personalisation.preference.api.model.IPreferenceCondition;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.PreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
 /**
  * @author  EPapadopoulou@users.sourceforge.net
  * @created April 27, 2010
@@ -105,9 +100,9 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 
 	JPanel pnPanel10;
 	JButton btSavePreference;
-	private final IDigitalPersonalIdentifier dpi;
+	private final IIdentity userIdentity;
 	
-	private final initiatePrefGUI masterGUI;
+	private final GUI masterGUI;
 	
 	private IPreference selectedNode;
 	/*JPopupMenu popupMenu;
@@ -125,6 +120,8 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 	private final PreferenceDetails details;
 
 	private IPreferenceTreeModel preferenceTreeModel;
+
+	private IUserPreferenceManagement prefMgr;
 	/**
 	 */
 	public static void main( String args[] ) 
@@ -155,16 +152,16 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 
 	/**
 	 */
-	public UserPreferenceGUI(initiatePrefGUI masterGUI, IDigitalPersonalIdentifier dpi, PreferenceDetails d) 
+	public UserPreferenceGUI(GUI masterGUI, IIdentity identity, PreferenceDetails d) 
 	{
 		super();
 		System.out.println("Creating user preferenceGUI for: \n"+d.toString());
 		this.details = d;
-		this.dpi = dpi;
+		this.userIdentity = identity;
 		this.addWindowListener(this);
 		this.masterGUI = masterGUI;
-		IPreferenceHandler handler = (IPreferenceHandler) this.masterGUI.getPrefMgr();
-		preferenceTreeModel = handler.getModel(dpi, d);
+		prefMgr = this.masterGUI.getPrefMgr();
+		preferenceTreeModel = prefMgr.getModel(identity, d);
 		if (this.preferenceTreeModel==null){
 			this.preferenceTreeModel = new PreferenceTreeModel(new PreferenceTreeNode());
 			this.preferenceTreeModel.setServiceType(d.getServiceType());
@@ -329,7 +326,7 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 
 		tfTxtServiceID = new JTextField( );
 		if (this.details.getServiceID()!=null){
-			tfTxtServiceID.setText(this.details.getServiceID().toUriString());
+			tfTxtServiceID.setText(this.details.getServiceID().getServiceInstanceIdentifier());
 		}else{
 			tfTxtServiceID.setText("Generic");
 		}
@@ -545,15 +542,19 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 	private void storePreference() {
 		this.calculateSizeOfObject("Retrieved model from JTree:",this.trDisplayTree.getModel());
 		
-		IPreferenceHandler prefMgr = (IPreferenceHandler) this.masterGUI.getPrefMgr();
+		
 		try{
 			IPreferenceTreeModel model = (IPreferenceTreeModel) this.trDisplayTree.getModel();
-			prefMgr.updatePreference(this.dpi, details, model.getRootPreference());
-			this.sendEvent();
+			boolean stored = prefMgr.storePreference(this.userIdentity, details, model.getRootPreference());
+			if (stored){
+				//need to inform pcm
 			JOptionPane.showMessageDialog(this, "Successfully stored preference", "Preference saved", JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
+			}else{
+				JOptionPane.showMessageDialog(this, "An error occurred while storing preference. Please report this to the SOCIETIES administrators if the problem persists.", "Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}catch(Exception e){
-			JOptionPane.showMessageDialog(this, "Unable to store preference",e.toString(),JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "An error occurred while storing preference. Please report this to the SOCIETIES administrators if the problem persists.", "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 		
@@ -571,14 +572,14 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 			if (p.isLeaf()){
 				Enumeration<IPreference> children = p.children();
 				if (children.hasMoreElements()){
-					JOptionPane.showMessageDialog(this, "An outcome cannot have conditions as subtrees", "Error in preference", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this, "An outcome cannot have conditions below it", "Error in preference", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 			}
 			if (p.isBranch()){
 				Enumeration<IPreference> children = p.children();
 				if (!children.hasMoreElements()){
-					JOptionPane.showMessageDialog(this, "All leaves of the tree must be Outcomes", "Error in preference", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this, "Preference is incomplete. A Preference has to have an outcome at the end. ", "Error in preference", JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 			}
@@ -589,7 +590,7 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 	}
 
 	private void addCondition(){
-		ConditionCreatorDialog dialog = new  ConditionCreatorDialog(this,true,this.masterGUI.getCtxBroker());
+		ConditionCreatorDialog dialog = new  ConditionCreatorDialog(this,true,this.masterGUI.getCtxBroker(), this.userIdentity);
 		if (dialog.getResult()){
 			IPreferenceCondition condition = dialog.getConditionObject();
 			this.calculateSizeOfObject("Condition object is of size: ", condition);
@@ -618,7 +619,7 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 		
 	}*/
 	private void addOutcome(){
-		OutcomeCreatorDialog dialog = new OutcomeCreatorDialog(this, details.getPreferenceName());
+		OutcomeCreatorDialog dialog = new OutcomeCreatorDialog(this, details);
 		if (dialog.getResponse()){
 			IPreferenceOutcome outcome = dialog.getOutcome();
 			IPreference node = new PreferenceTreeNode(outcome);
@@ -668,15 +669,15 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 
 
 	
-	private void sendEvent(){
-		PreferenceChangedEvent event = new PreferenceChangedEvent(dpi.toUriString(), details.getServiceID(), details.getServiceType(), details.getPreferenceName());
+/*	private void sendEvent(){
+		PreferenceChangedEvent event = new PreferenceChangedEvent(userIdentity.toUriString(), details.getServiceID(), details.getServiceType(), details.getPreferenceName());
 		PSSEvent pssEvent  = new PSSEvent(PSSEventTypes.PREFERENCES_CHANGED, "", this.getClass().getName(), XMLConverter.objectToXml(event));
 		try {
 			this.masterGUI.getEventMgr().postEventToPSS(pssEvent);
 		} catch (EMSException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	@Override
 	public void windowActivated(WindowEvent e) {}

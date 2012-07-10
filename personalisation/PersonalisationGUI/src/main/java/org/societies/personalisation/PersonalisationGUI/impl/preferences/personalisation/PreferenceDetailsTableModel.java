@@ -26,13 +26,10 @@ package org.societies.personalisation.PersonalisationGUI.impl.preferences.person
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.personalsmartspace.pm.prefmodel.api.platform.PreferenceDetails;
-import org.personalsmartspace.spm.preference.api.platform.constants.ConditionConstants;
-import org.personalsmartspace.sre.api.pss3p.IServiceIdentifier;
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
 
 
 public class PreferenceDetailsTableModel extends AbstractTableModel{

@@ -239,7 +239,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 		return data;
 	}
 	
-	public void storePreference(IIdentity ownerID, PreferenceDetails details, IPreference preference){
+	public boolean storePreference(IIdentity ownerID, PreferenceDetails details, IPreference preference){
 		
 		logging.debug("request to store preference: for "+details.toString()+"\nPreference:\n"+preference.toTreeString());
 
@@ -249,8 +249,8 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 			model.setServiceID(details.getServiceID());
 		}
 		model.setServiceType(details.getServiceType());
-		this.preferenceCache.storePreference(ownerID,details,model);
-		this.calculateSizeOfObject(preference);
+		return this.preferenceCache.storePreference(ownerID,details,model);
+		//this.calculateSizeOfObject(preference);
 		
 
 	}
@@ -357,8 +357,8 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 	
 	
 	@Override
-	public void deletePreference(IIdentity ownerID,	PreferenceDetails details){
-		this.preferenceCache.deletePreference(ownerID, details);
+	public boolean deletePreference(IIdentity ownerID,	PreferenceDetails details){
+		return this.preferenceCache.deletePreference(ownerID, details);
 	}
 	
 	/*

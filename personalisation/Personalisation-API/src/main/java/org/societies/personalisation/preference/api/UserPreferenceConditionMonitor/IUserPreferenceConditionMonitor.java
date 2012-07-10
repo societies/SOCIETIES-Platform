@@ -29,9 +29,10 @@ import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.preference.api.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
@@ -40,7 +41,7 @@ import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
  * @version 1.0
  * @created 11-Nov-2011 14:52:53
  */
-public interface IUserPreferenceConditionMonitor extends IUserPreferenceManagement{
+public interface IUserPreferenceConditionMonitor {
 
 	/**
 	 * 
@@ -60,5 +61,18 @@ public interface IUserPreferenceConditionMonitor extends IUserPreferenceManageme
 	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, IAction action);
 	
 	
-
+	/**
+	 * 
+	 * @param ownerId
+	 * @param serviceId
+	 * @param preferenceName
+	 * @return
+	 */
+	public Future<IOutcome> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName);
+	
+	/**
+	 * Returns the PreferenceManager service
+	 * @return PreferenceManager service
+	 */
+	public IUserPreferenceManagement getPreferenceManager();
 }

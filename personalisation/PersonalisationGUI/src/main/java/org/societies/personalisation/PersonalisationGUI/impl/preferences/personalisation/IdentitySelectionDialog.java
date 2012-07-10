@@ -34,6 +34,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -47,7 +48,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.personalisation.PersonalisationGUI.impl.preferences.initiatePrefGUI;
+import org.societies.personalisation.PersonalisationGUI.impl.preferences.GUI;
 /**
  * @author  Administrator
  * @created April 28, 2010
@@ -89,14 +90,14 @@ public class IdentitySelectionDialog extends JDialog implements ActionListener, 
 	} 
 	
 
-	public IdentitySelectionDialog(JFrame frame, initiatePrefGUI masterGUI){
+	public IdentitySelectionDialog(JFrame frame, GUI masterGUI){
 		super(frame, true);
 		this.addWindowListener(this);
 		this.dpis = new ArrayList<IIdentity>();
 		try{
-			IIdentity[] dpiArray = masterGUI.getIdMgr().getAllDigitalPersonalIdentifiers();
+			Set<IIdentity> identitySet = masterGUI.getIdMgr().getPublicIdentities();
 			
-			for (IIdentity dpi: dpiArray){
+			for (IIdentity dpi: identitySet){
 				this.dpis.add(dpi);
 			}
 		}

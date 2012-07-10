@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -48,10 +50,12 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
+import org.societies.personalisation.preference.api.IUserPreferenceManagement;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.personalisation.PersonalisationGUI.impl.preferences.initiatePrefGUI;
+import org.societies.personalisation.PersonalisationGUI.impl.preferences.GUI;
 /**
  * @author  Administrator
  * @created July 1, 2010
@@ -83,10 +87,16 @@ public class PreferenceSelectionDialog extends JDialog implements ActionListener
 	JComboBox serviceIDcombo;
 	private PreferenceDetails detail;
 
-	private  initiatePrefGUI masterGUI;
+	private  GUI masterGUI;
 
 	private IUserPreferenceManagement prefMgr;
+	
+	private IServiceDiscovery serviceDiscovery;
+	
 	private Hashtable<String,ServiceResourceIdentifier> serviceIDsForCombo = new Hashtable<String,ServiceResourceIdentifier>();
+
+
+	private List<Service> localServices;
 	/**
 	 */
 	public static void main( String args[] ) 
@@ -111,11 +121,14 @@ public class PreferenceSelectionDialog extends JDialog implements ActionListener
 	} 
 
 
-	public PreferenceSelectionDialog(initiatePrefGUI masterGUI){
+	public PreferenceSelectionDialog(GUI masterGUI){
 		super();
+		this.localServices = new ArrayList<Service>();
+		serviceIDsForCombo = new Hashtable<String, ServiceResourceIdentifier>();
 		this.setModal(true);
 		this.setTitle("Preference name input");
 		this.masterGUI = masterGUI;
+		this.serviceDiscovery = this.masterGUI.getServiceDiscovery();
 		this.prefMgr = masterGUI.getPrefMgr();
 		this.showGUI();
 	}
@@ -345,11 +358,33 @@ public class PreferenceSelectionDialog extends JDialog implements ActionListener
 
 	private void addAllServices(){
 		
-		
-		
-		
-		
 		try {
+			Future<List<Service>> flocalServices = this.serviceDiscovery.getLocalServices();
+			localServices = flocalServices.get();
+			
+			for (Service service : localServices){
+				this.serviceIDsForCombo.put(service.getServiceName(), service.getServiceIdentifier());
+				this.serviceIDcombo.addItem(service.getServiceName());
+			}
+			if (localServices.size()==0){
+				this.btSpecificContinue.setEnabled(false);
+				this.btGenericContinue.setEnabled(true);
+			}
+		} catch (ServiceDiscoveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+		
+		
+/*		try {
 			services = discovery.findAllServices();
 			if (services==null){
 				JOptionPane.showMessageDialog(this, "Service Discovery returned 0 services");
@@ -374,8 +409,19 @@ public class PreferenceSelectionDialog extends JDialog implements ActionListener
 		} catch (ServiceMgmtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}	*/
 	}
+
+	private String getServiceName(ServiceResourceIdentifier serviceID) {
+		for (Service service: localServices){
+			if (service.getServiceIdentifier().equals(serviceID)){
+				return service.getServiceName();
+			}
+		}
+		
+		return "Service has no name";
+	}
+
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -427,14 +473,14 @@ public class PreferenceSelectionDialog extends JDialog implements ActionListener
 				initialQ=false;
 			}
 			String decorativeName = this.serviceIDcombo.getSelectedItem().toString();
-			ServiceResourceIdentifier serviceID = this.serviceIDsForCombo.get(decorativeName);
-			String serviceType = "";
-			for (PssService service : this.discoveredServices){
-				if (service.getServiceId().toUriString().equalsIgnoreCase(serviceID.getServiceInstanceIdentifier())){
-					serviceType = service.getServiceType();
+			
+			for (Service service: localServices){
+				if (service.getServiceName().equalsIgnoreCase(decorativeName)){
+					this.detail = new PreferenceDetails(this.serviceTypeTextField.getText(), service.getServiceIdentifier(), s);
 				}
 			}
-			this.detail = new PreferenceDetails(serviceType, serviceID, s);
+			
+			
 			this.dispose();
 		}
 	}

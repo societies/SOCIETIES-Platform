@@ -117,7 +117,7 @@ public class PrivatePreferenceCache {
 	}
 
 	
-	public void storePreference(IIdentity userId, PreferenceDetails details, IPreferenceTreeModel model){
+	public boolean storePreference(IIdentity userId, PreferenceDetails details, IPreferenceTreeModel model){
 		this.logging.debug("Request to store preference for:"+details.toString());
 
 		
@@ -129,7 +129,7 @@ public class PrivatePreferenceCache {
 			CtxIdentifier newCtxIdentifier = storer.storeNewPreference(userId, model, this.registry.getNameForNewPreference());
 			if (newCtxIdentifier==null){
 				this.logging.debug("Could not store NEW preference in DB. aborting");
-				return;
+				return false;
 			}
 			this.logging.debug("Successfully stored NEW preference in DB. CtxID: "+newCtxIdentifier.toUriString());
 			this.registry.addPreference(details, newCtxIdentifier);
@@ -143,11 +143,14 @@ public class PrivatePreferenceCache {
 		}else{
 			this.logging.debug("Preference exists in DB. Attempt  to update existing preference");
 			PreferenceStorer storer = new PreferenceStorer(this.broker);
-			storer.storeExisting(userId, id, model);
+			if (!storer.storeExisting(userId, id, model)){
+				return false;
+			}
 			this.logging.debug("Successfully updated preference in DB. CtxID: "+id.toUriString());
 			this.idToIPreferenceTreeModel.put(id, model);
 			this.logging.debug("Successfully updated preference cache with new preference");
 		}
+		return true;
 	}
 
 	public void deletePreference(IIdentity dpi, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
@@ -164,17 +167,22 @@ public class PrivatePreferenceCache {
 		}
 	}
 	
-	public void deletePreference(IIdentity dpi, PreferenceDetails details){
+	public boolean deletePreference(IIdentity dpi, PreferenceDetails details){
 		CtxIdentifier id = this.registry.getCtxID(details);
 		if (id==null){
 			//preference doesn't exist. can't delete it
 			logging.debug("Preference :"+details.toString()+"\ndoesn't exist. Aborting deletion");
-		}else{
+			return false;
+		}
 			PreferenceStorer storer = new PreferenceStorer(this.broker);
-			storer.deletePreference(dpi, id);
-			this.registry.deletePreference(details);
-			storer.storeRegistry(dpi, registry);
-		}		
+			if (storer.deletePreference(dpi, id)){
+				this.registry.deletePreference(details);
+				storer.storeRegistry(dpi, registry);
+				return true;
+			}else{
+				return false;
+			}
+				
 	}
 	public List<String> getPreferenceNamesofService(String serviceType, ServiceResourceIdentifier serviceID){
 		return this.registry.getPreferenceNamesofService(serviceType, serviceID);

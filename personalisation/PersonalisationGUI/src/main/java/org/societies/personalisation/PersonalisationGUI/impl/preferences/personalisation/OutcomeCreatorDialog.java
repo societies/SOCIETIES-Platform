@@ -24,16 +24,7 @@
  */
 package org.societies.personalisation.PersonalisationGUI.impl.preferences.personalisation;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.JPanel;
-import javax.swing.BorderFactory;
-
 import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -41,14 +32,22 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JTextField;
-import javax.swing.JButton;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import org.personalsmartspace.pm.prefmodel.api.platform.IOutcome;
-import org.personalsmartspace.pm.prefmodel.api.platform.IPreferenceOutcome;
-import org.personalsmartspace.pm.prefmodel.api.platform.PreferenceOutcome;
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+import org.societies.personalisation.preference.api.model.PreferenceOutcome;
 /**
  * @author  Administrator
  * @created May 3, 2010
@@ -70,6 +69,7 @@ public class OutcomeCreatorDialog extends JDialog implements ActionListener
 	JTextField tfAction;
 
 	private boolean result = false;
+	private PreferenceDetails detail;
 	/**
 	 */
 	public static void main( String args[] ) 
@@ -90,11 +90,14 @@ public class OutcomeCreatorDialog extends JDialog implements ActionListener
 		catch ( UnsupportedLookAndFeelException e ) 
 		{
 		}
-		theOutcomeCreatorDialog = new OutcomeCreatorDialog(new JFrame(), "volume");
+		PreferenceDetails detail = new PreferenceDetails();
+		detail.setPreferenceName("volume");
+		theOutcomeCreatorDialog = new OutcomeCreatorDialog(new JFrame(), detail);
 	} 
-	public OutcomeCreatorDialog(JFrame parent, String preferenceName) {
+	public OutcomeCreatorDialog(JFrame parent, PreferenceDetails detail) {
 		super( parent, "Outcome Creator", true );
-		this.showGUI(preferenceName);
+		this.detail = detail;
+		this.showGUI();
 
 	}
 
@@ -110,7 +113,7 @@ public class OutcomeCreatorDialog extends JDialog implements ActionListener
 	
 	/**
 	 */
-	public void showGUI(String preferenceName)
+	public void showGUI()
 	{
 
 		
@@ -213,7 +216,7 @@ public class OutcomeCreatorDialog extends JDialog implements ActionListener
 		pnPanel1.add( lbLabel1 );
 
 		tfAction = new JTextField( );
-		tfAction.setText(preferenceName);
+		tfAction.setText(detail.getPreferenceName());
 		tfAction.setEditable(false);
 		gbcPanel1.gridx = 1;
 		gbcPanel1.gridy = 0;
@@ -277,7 +280,7 @@ public class OutcomeCreatorDialog extends JDialog implements ActionListener
 	}
 	
 	public IPreferenceOutcome getOutcome(){
-		IPreferenceOutcome outcome = new PreferenceOutcome(this.getAction(),this.getActionValue());
+		IPreferenceOutcome outcome = new PreferenceOutcome(this.detail.getServiceID(), this.detail.getServiceType(), this.getAction(),this.getActionValue());
 		return outcome;
 	}
 	public boolean getResponse(){
