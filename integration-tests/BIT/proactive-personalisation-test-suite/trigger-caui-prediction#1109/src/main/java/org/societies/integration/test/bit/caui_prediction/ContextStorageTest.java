@@ -51,7 +51,9 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -60,21 +62,37 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 public class ContextStorageTest {
 
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1109.class);
-	IIdentity identity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
+	
+	//IIdentity identity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
 
+	private IIdentity cssOwnerId;
+	
+	
 	public void setUp(){
 		System.out.println("Test 1109 started : ContextStorageTest");
 	}
 
 	@Test
 	public void TestMonitorActionsContext() {
-
+		System.out.println("Test 1109 started : ContextStorageTest");
 		//create actions
-
+		
+		
+		
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
 		ServiceResourceIdentifier serviceIdRandom = new ServiceResourceIdentifier();
 		try {
+		
+			final INetworkNode cssNodeId = TestCase1109.commMgr.getIdManager().getThisNetworkNode();
+			LOG.info("*** cssNodeId = " + cssNodeId);
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			this.cssOwnerId = TestCase1109.commMgr.getIdManager().fromJid(cssOwnerStr);
+			
+			
+			
+			
+			
 			serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
 			serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
 
@@ -86,6 +104,9 @@ public class ContextStorageTest {
 			serviceIdRandom.setServiceInstanceIdentifier("css://nikosk@societies.org/randomService");
 
 		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -183,7 +204,7 @@ public class ContextStorageTest {
     //           helper classes 
 	//******************************************** 
 	private void randomAction (IAction action){
-		TestCase1109.uam.monitor(identity, action);
+		TestCase1109.uam.monitor(this.cssOwnerId, action);
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
@@ -201,7 +222,7 @@ public class ContextStorageTest {
 		setContext(CtxAttributeTypes.TEMPERATURE, 30);
 		setContext(CtxAttributeTypes.STATUS, "driving");
 
-		TestCase1109.uam.monitor(identity, action1);
+		TestCase1109.uam.monitor(this.cssOwnerId, action1);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e1) {
@@ -211,7 +232,7 @@ public class ContextStorageTest {
 		setContext(CtxAttributeTypes.TEMPERATURE, 30);
 		setContext(CtxAttributeTypes.STATUS, "driving");
 
-		TestCase1109.uam.monitor(identity, action2);
+		TestCase1109.uam.monitor(this.cssOwnerId, action2);
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
@@ -222,7 +243,7 @@ public class ContextStorageTest {
 		setContext(CtxAttributeTypes.TEMPERATURE, 30);
 		setContext(CtxAttributeTypes.STATUS, "driving");
 
-		TestCase1109.uam.monitor(identity, action3);
+		TestCase1109.uam.monitor(this.cssOwnerId, action3);
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
@@ -241,7 +262,7 @@ public class ContextStorageTest {
 		setContext(CtxAttributeTypes.TEMPERATURE, 22);
 		setContext(CtxAttributeTypes.STATUS, "driving");
 
-		TestCase1109.uam.monitor(identity, action4);
+		TestCase1109.uam.monitor(this.cssOwnerId, action4);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e1) {
@@ -251,7 +272,7 @@ public class ContextStorageTest {
 		setContext(CtxAttributeTypes.TEMPERATURE, 28);
 		setContext(CtxAttributeTypes.STATUS, "stopped");
 
-		TestCase1109.uam.monitor(identity, action5);
+		TestCase1109.uam.monitor(this.cssOwnerId, action5);
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
@@ -262,7 +283,7 @@ public class ContextStorageTest {
 		setContext(CtxAttributeTypes.TEMPERATURE, 30);
 		setContext(CtxAttributeTypes.STATUS, "driving");
 
-		TestCase1109.uam.monitor(identity, action6);
+		TestCase1109.uam.monitor(this.cssOwnerId, action6);
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
@@ -277,13 +298,13 @@ public class ContextStorageTest {
 		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"office_parking");
 		setContext(CtxAttributeTypes.TEMPERATURE, 22);
 		setContext(CtxAttributeTypes.STATUS, "stopped");
-		TestCase1109.uam.monitor(identity, action7);
+		TestCase1109.uam.monitor(this.cssOwnerId, action7);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		TestCase1109.uam.monitor(identity, action8);
+		TestCase1109.uam.monitor(this.cssOwnerId, action8);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e1) {
@@ -296,7 +317,7 @@ public class ContextStorageTest {
 
 		CtxAttribute attr = null; 
 		try {
-			IndividualCtxEntity operator = TestCase1109.ctxBroker.retrieveCssOperator().get();
+			IndividualCtxEntity operator = TestCase1109.ctxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 			Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
 			if(ctxAttrSet.size()>0 ){
 				ArrayList<CtxAttribute> ctxAttrList = new ArrayList<CtxAttribute>(ctxAttrSet);	
