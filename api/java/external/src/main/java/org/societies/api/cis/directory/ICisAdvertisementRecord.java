@@ -56,20 +56,12 @@ public interface ICisAdvertisementRecord {
 	public void setName(String name);
 
 	/**
-     * Description: Get the name of the CIS in the advertisement record
+     * Description: Gets the Identity of the CIS from the advertisement record
      *
      * @return String ID 
      */
 	public String getId(); //Can be used to query CIS owner for an ICis to get member list, if CIS is set to public
 
-	
-	/**
-     * Description: Gets the Identity of the CIS from the advertisement record
-     *
-     *  
-     * @return String Id
-     */
-	public String getId();
 	
 	/**
      * Description: Gets the Uri of the CIS from the advertisement record
