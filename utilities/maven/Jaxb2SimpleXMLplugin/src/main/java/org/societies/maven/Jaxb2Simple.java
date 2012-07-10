@@ -523,6 +523,8 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 		
 		newClassesOnPackage.put(pkgName,newClasses);
+		
+		br.close();
 	}
 
 	private String buildEmptySimpleXmlBean(File directory, String pkgName,
