@@ -532,9 +532,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			this.asynchTask.execute(pubsubClient);
 
 
-		} catch (JAXBException e) {
-			Log.e(LOG_TAG, "Error while adding namespace package to Pubsub", e);
-		} catch (Exception e) {
+        } catch (Exception e) {
 			Log.e(LOG_TAG, "Error while adding namespace package to Pubsub", e);
 		}
 
