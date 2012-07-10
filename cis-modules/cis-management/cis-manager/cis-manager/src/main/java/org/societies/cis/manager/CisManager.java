@@ -362,9 +362,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		
 		// persisting
-		LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
-		this.persist(cis);
-		cis.setSessionFactory(sessionFactory);
+		//LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
+		//this.persist(cis);
+		//cis.setSessionFactory(sessionFactory);
 
 
 		// advertising the CIS to global CIS directory

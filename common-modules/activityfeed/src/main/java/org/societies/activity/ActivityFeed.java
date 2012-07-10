@@ -365,7 +365,9 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	}
 	public void clear(){
 		for(Activity act : list){
+			Transaction t = session.beginTransaction();
 			session.delete(act);
+			t.commit();
 		}
 		list.clear();
 	}

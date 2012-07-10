@@ -456,7 +456,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	// Local Interface Testing
 	//////////////////////////////////////////////////
 	
-	@Ignore
+	//@Ignore
 	//@Rollback(true)
 	@Test
 	public void testCreateCIS() {
@@ -493,7 +493,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		//this.deleteFromTables(new String[] { "org_societies_cis_manager_Cis"});		
 	}
 	
-	@Ignore
+	//@Ignore
 	//@Rollback(true)
 	@Test
 	public void testListCIS() throws InterruptedException, ExecutionException {
@@ -547,7 +547,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	}
 
 	//@Rollback(true)
-	@Ignore
+	//@Ignore
 	@Test
 	public void testdeleteCIS() throws InterruptedException, ExecutionException {
 
@@ -568,9 +568,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ciss[1] = (cisManagerUnderTestInterface.createCis(CIS_MANAGER_CSS_ID, TEST_CSS_PWD,
 				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
-		LOG.info("cis 1 sessionfactory:"+((Cis)ciss[0]).getSessionFactory().hashCode());
+//		LOG.info("cis 1 sessionfactory:"+((Cis)ciss[0]).getSessionFactory().hashCode());
 		List<ICis> l = cisManagerUnderTestInterface.getCisList();
-		LOG.info("cis 1 sessionfactory:"+((Cis)l.get(0)).getSessionFactory());
+//		LOG.info("cis 1 sessionfactory:"+((Cis)l.get(0)).getSessionFactory());
 		Iterator<ICis> it = l.iterator();
 		ICis element = it.next(); 
 		jidTobeDeleted = element.getCisId();
@@ -870,7 +870,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	///////////////////////////////////////////////////
 	// Local Interface with Callback Testing
 	//////////////////////////////////////////////////
-	@Ignore
+	//@Ignore
 	@Test
 	public void listdMembersOnOwnedCISwithCallback() throws InterruptedException, ExecutionException {
 
@@ -945,7 +945,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void getInfoWithCallback() throws InterruptedException, ExecutionException {
 
@@ -1002,7 +1002,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 icssRemote.getInfo(new GetInfoCallBack(IcissOwned));
 	
 	}
-	@Ignore
+	//@Ignore
 	@Test
 	public void setInfoWithCallback() throws InterruptedException, ExecutionException {
 
