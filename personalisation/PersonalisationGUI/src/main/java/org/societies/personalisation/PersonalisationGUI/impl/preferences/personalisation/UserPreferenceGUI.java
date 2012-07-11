@@ -679,30 +679,58 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 		}
 	}*/
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+	 */
 	@Override
 	public void windowActivated(WindowEvent e) {}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+	 */
 	@Override
 	public void windowClosed(WindowEvent e) {
 		this.isClosed=true;
 		System.out.println(this.getClass().getEnclosingMethod());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+	 */
 	@Override
 	public void windowClosing(WindowEvent e) {
 		this.isClosed = true;
 		System.out.println(this.getClass().getEnclosingMethod());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+	 */
 	@Override
 	public void windowDeactivated(WindowEvent e) {}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+	 */
 	@Override
 	public void windowDeiconified(WindowEvent e) {}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+	 */
 	@Override
 	public void windowIconified(WindowEvent e) {}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+	 */
 	@Override
 	public void windowOpened(WindowEvent e) {}
 
@@ -712,6 +740,10 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 		return this.isClosed;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
+	 */
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
 		this.selectedNode = (IPreference) this.trDisplayTree.getLastSelectedPathComponent();
@@ -740,7 +772,7 @@ public class UserPreferenceGUI extends JFrame implements ActionListener,  Window
 				this.btAddOutcome.setEnabled(true);
 			}
 		}
-		
+		this.trDisplayTree.requestFocusInWindow();
 	}
 	
 	/*

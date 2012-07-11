@@ -311,11 +311,12 @@ public class PreferenceSelectionGUI extends JFrame implements ActionListener, Wi
 			
 			detail = dialog.getPreferenceDetail();
 			if (detail==null){
+				JOptionPane.showMessageDialog(this, "detail is null");
 				return;
 			}
 			System.out.println("Going to create new preference for \n"+detail.toString());
 			UserPreferenceGUI gui = new UserPreferenceGUI(this.masterGUI, this.userIdentity, detail);
-			
+		
 			this.refreshTable();
 		}else if (e.getSource().equals(this.btEditPreference)){
 			if (this.tbTable1.getSelectedRow()!=-1)
