@@ -29,6 +29,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -42,6 +44,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
@@ -155,12 +158,9 @@ public class PPNMonitor implements CtxChangeEventListener {
 			}
 		
 		
-		}	
+		}
 		
 	}
-	
-	
-
 
 
 	@Override
@@ -177,6 +177,24 @@ public class PPNMonitor implements CtxChangeEventListener {
 	@Override
 	public void onUpdate(CtxChangeEvent arg0) {
 		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateDetails(PPNPreferenceDetails detail,
+			IPrivacyPreference preference) {
+		PreferenceConditionExtractor extractor = new PreferenceConditionExtractor();
+
+		List<CtxIdentifier> ctxIds = extractor.extractConditions(preference);
+		for (CtxIdentifier ctxId: ctxIds){
+			if (monitoring.containsKey(ctxId)){
+				monitoring.get(ctxId).add(detail);
+			}else{
+				ArrayList<PPNPreferenceDetails> list = new ArrayList<PPNPreferenceDetails>();
+				list.add(detail);
+				monitoring.put(ctxId, list);
+
+			}
+		}
 		
 	}
 
