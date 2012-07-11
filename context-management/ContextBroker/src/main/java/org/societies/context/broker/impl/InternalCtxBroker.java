@@ -551,8 +551,11 @@ public class InternalCtxBroker implements ICtxBroker {
 			final CtxAttribute cssIdAttr = (CtxAttribute) this.userCtxDBMgr.retrieve(attrId);
 			if (!CtxEntityTypes.CSS_NODE.equals(cssIdAttr.getScope().getType())
 					&& cssId.toString().equals(cssIdAttr.getStringValue())) {
-				cssOwner = (IndividualCtxEntity) this.userCtxDBMgr.retrieve(cssIdAttr.getScope());
-				break;
+				final CtxModelObject object = this.userCtxDBMgr.retrieve(cssIdAttr.getScope());
+				if (object instanceof IndividualCtxEntity) {
+					cssOwner = (IndividualCtxEntity) object; 
+					break;
+				}
 			}
 		}
 
