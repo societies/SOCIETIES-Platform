@@ -44,7 +44,7 @@ public class PerformPredictionTest {
 		try {
 			try {
 				LOG.info("TestPerformPrediction : waiting 10000 for model creation ");
-				Thread.sleep(90000);
+				Thread.sleep(9000);
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
