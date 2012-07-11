@@ -219,7 +219,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		int ret = 0;
 		String forever = "0 "+Long.toString(System.currentTimeMillis());
 		List<IActivity> toBeDeleted = getActivities(criteria,forever);
-		Session session = sessionFactory.openSession();
+		//Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			for(IActivity act : toBeDeleted){
@@ -242,6 +242,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	}
 	
 	synchronized public void startUp(Session session, String id){
+		this.session = session;
 		LOG.info("starting loading activities from db with ownerId: "+ id );
 		//Session session = sessionFactory.openSession();
 		try{
