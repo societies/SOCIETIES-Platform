@@ -42,9 +42,12 @@ public class PreferenceConditionExtractor {
 	public PreferenceConditionExtractor(){
 		
 	}
-	
 	public List<CtxIdentifier> extractConditions(IPrivacyPreferenceTreeModel pModel){
 		IPrivacyPreference p = pModel.getRootPreference();
+		return this.extractConditions(p);
+	}
+	public List<CtxIdentifier> extractConditions(IPrivacyPreference p){
+		
 		ArrayList<CtxIdentifier> list = new ArrayList<CtxIdentifier>();
 		
 		Enumeration<IPrivacyPreference> newNodeEnum = p.depthFirstEnumeration();
@@ -79,6 +82,7 @@ public class PreferenceConditionExtractor {
 		
 		return list;
 	}
+	
 	
 	private boolean hasCondition(ArrayList<CtxIdentifier> list, CtxIdentifier id){
 		Iterator<CtxIdentifier> tuplesIt = list.iterator();
