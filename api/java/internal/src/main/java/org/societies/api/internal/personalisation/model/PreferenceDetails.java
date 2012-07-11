@@ -195,8 +195,23 @@ public class PreferenceDetails implements Serializable {
 	}
 
 	public String toString(){
-		return "ServiceType: "+this.serviceType+"\n"
-				+ "ServiceID: "+this.serviceID.toString()+"\n"
+		String st;
+		if (this.serviceType==null){
+			st = "GenericType";
+		}else{
+			st = this.serviceType;
+		}
+		
+		String sID;
+		if (this.serviceID==null){
+			sID="GenericID";
+		}else{
+			sID = this.serviceID.getServiceInstanceIdentifier();
+		}
+		
+		
+		return "ServiceType: "+st+"\n"
+				+ "ServiceID: "+sID+"\n"
 				+ "PreferenceName: "+this.preferenceName+"\n";
 	}
 

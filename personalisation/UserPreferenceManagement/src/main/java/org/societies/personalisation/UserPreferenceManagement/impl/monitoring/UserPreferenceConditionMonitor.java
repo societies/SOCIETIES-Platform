@@ -288,10 +288,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.personalisation.preference.IUserPreferenceManagement#getOutcome(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
-	 */
+
 	@Override
 	public Future<IOutcome> getOutcome(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
@@ -302,7 +299,8 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	/**
 	 * @return the prefMgr
 	 */
-	public UserPreferenceManagement getPrefMgr() {
+	@Override
+	public UserPreferenceManagement getPreferenceManager() {
 		return prefMgr;
 	}
 
