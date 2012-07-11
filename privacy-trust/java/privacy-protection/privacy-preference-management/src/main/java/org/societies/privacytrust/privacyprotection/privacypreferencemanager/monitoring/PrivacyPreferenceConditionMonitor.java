@@ -78,8 +78,24 @@ public class PrivacyPreferenceConditionMonitor implements IPrivacyPreferenceCond
 
 	public void updatePreferences(PPNPreferenceDetails details,
 			IPrivacyPreference preference) {
-		// TODO Auto-generated method stub
+		this.ppnMonitor.updateDetails(details, preference);
 		
+	}
+
+
+	/**
+	 * @return the ppnMonitor
+	 */
+	public PPNMonitor getPpnMonitor() {
+		return ppnMonitor;
+	}
+
+
+	/**
+	 * @param ppnMonitor the ppnMonitor to set
+	 */
+	public void setPpnMonitor(PPNMonitor ppnMonitor) {
+		this.ppnMonitor = ppnMonitor;
 	}
 
 }
