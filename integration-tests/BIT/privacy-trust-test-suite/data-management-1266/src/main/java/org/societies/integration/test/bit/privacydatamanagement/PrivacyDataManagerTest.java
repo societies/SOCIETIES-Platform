@@ -112,7 +112,6 @@ public class PrivacyDataManagerTest
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
 		}
-		assertTrue("Data permission not updated", dataUpdated);
 		assertNotNull("No permission retrieved", permission);
 		assertNotNull("No (real) permission retrieved", permission.getDecision());
 		assertEquals("Bad permission retrieved", permission.getDecision().name(), Decision.PERMIT.name());
@@ -122,7 +121,6 @@ public class PrivacyDataManagerTest
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, IIdentity, IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)}.
 	 */
 	@Test
-	@Ignore
 	public void testCheckPermissionPreviouslyAdded()
 	{
 		String testTitle = new String("testCheckPermissionPreviouslyAdded: retrieve a privacy two times");
@@ -142,7 +140,6 @@ public class PrivacyDataManagerTest
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
 		}
-		assertTrue("Data permission not updated", dataUpdated);
 		assertNotNull("No permission retrieved", permission1);
 		assertNotNull("No (real) permission retrieved", permission1.getDecision());
 		assertEquals("Bad permission retrieved", permission1.getDecision().name(), Decision.PERMIT.name());
