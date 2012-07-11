@@ -70,6 +70,7 @@ public interface ICisManager {
 	 * @return a Future link to the {@link ICisOwned} representing the new CIS, or 
 	 * null if the CIS was not created.
 	 */
+
 	
 
 	Future<ICisOwned> createCis(String cisName, String cisType, int mode);
@@ -80,7 +81,7 @@ public interface ICisManager {
 	// removed the need to add the cssID
 	@Deprecated
 	boolean deleteCis(String cssId, String cssPassword, String cisId);
-	
+
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
 	 * method of {@link ICisOwned} representing the CIS to be deleted. This method

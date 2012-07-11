@@ -63,5 +63,6 @@
 		<module>assessment</module>
 		<module>privacy-protection-bundle</module>
 		<module>privacy-protection-bundle-test</module>
+		<module>privacy-preference-GUI</module>
 	</modules>
 </project>

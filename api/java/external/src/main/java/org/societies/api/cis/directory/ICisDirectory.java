@@ -33,26 +33,55 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
+ * Interface used to allow interaction with the CIS Directory
  * @author Babak.Farshchian@sintef.no
+ * @author Liam Marshall
  *
- */
-/**
- * 
- * MISSING_JAVADOCS
  */
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICisDirectory {
-	/*
-	 * Various search methods that return an array of CISAdvertisementRecords.
+	
+	/**
+	 * Description: Search method to search by name for CIS Advertisements that return an array of CISAdvertisementRecords.
+	 * 
+	 * @return Array ICisAdvertisementRecord[]
 	 */
 	ICisAdvertisementRecord[] searchByName(String cisName);
+	
+	/**
+	 * Description: Search method to search by Owner for CIS Advertisements that return an array of CISAdvertisementRecords.
+	 * 
+	 * @return Array ICisAdvertisementRecord[]
+	 */
 	ICisAdvertisementRecord[] searchByOwner(String ownerId);
+	
+	/**
+	 * Description: Search method to search by Uri for CIS Advertisements that return an array of CISAdvertisementRecords.
+	 * 
+	 * @return Array ICisAdvertisementRecord[]
+	 */
 	ICisAdvertisementRecord[] searchByUri(String uri);
 	
+	/**
+	 * Description: Register a CIS 
+	 * 
+	 * @param: CisAdevertisementRecord
+	 *  
+	 * @return Boolean
+	 */
 	Boolean RegisterCis (ICisAdvertisementRecord cis);
+	
+	/**
+	 * Description: UnRegister a CIS 
+	 * 
+	 * @param: CisAdevertisementRecord
+	 *  
+	 * @return Boolean
+	 */
 	Boolean UnregisterCis (ICisAdvertisementRecord cis);
-	/*
-	 * This method is used to add CIS Directories that reside on other nodes.
+	
+	/**
+	 * Description: This method is used to add CIS Directories that reside on other nodes.
 	 * 
 	 * @param directoryURI URI for the directory to be added.
 	 * @param cssId ID for the CSS where the new directory resides.
@@ -61,13 +90,16 @@ public interface ICisDirectory {
 	 */
 	Integer AddPeerDirectory(String directoryURI, String cssId, Integer synchMode);
 	
-	/*
-	 * Ping method for checking whether this Directory is alive.
+	/**
+	 * Description: Ping method for checking whether this Directory is alive.
 	 */
 	Boolean ping();
-	/*
-	 * A method that will return the current URI for this Directory. This URI might be fetched
+	
+	/**
+	 * Description: A method that will return the current URI for this Directory. This URI might be fetched
 	 * from XMPP name-space or be a web service.
+	 * 
+	 * @return String
 	 */
 	
 	public String getURI();

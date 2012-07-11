@@ -39,4 +39,9 @@
 		<property name="serviceControlRemote" ref="serviceControlRemoteRef" />				
 	</bean>
 	
+	<bean id="serviceManagement" class="org.societies.slm.servicecontrol.ServiceMgmt" >
+		<property name="serviceDiscovery" ref="serviceDiscovery" /> 	
+		<property name="commMngr" ref="commMngrRef" />				
+	</bean>
+	
 </beans>

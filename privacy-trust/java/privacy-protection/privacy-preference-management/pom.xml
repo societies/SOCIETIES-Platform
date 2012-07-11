@@ -35,9 +35,9 @@
 	<version>0.1-SNAPSHOT</version>
 	<developers>
 		<developer>
-			<name>Olivier Maridat</name>
-			<email>olivier.maridat@trialog.com</email>
-			<organization>Trialog</organization>
+			<name>Eliza Papadopoulou</name>
+			<email>E.Papadopoulou@hw.ac.uk</email>
+			<organization>HWU</organization>
 			<timezone>+1</timezone>
 			<roles>
 				<role>Owner</role>

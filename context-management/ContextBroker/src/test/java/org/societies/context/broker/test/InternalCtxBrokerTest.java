@@ -391,57 +391,28 @@ public class InternalCtxBrokerTest {
 	}
 
 	@Test
-	public void testStoreRetrieveServiceParameters2() {
+	public void testStoreRetrieveServiceParameters2() throws Exception {
 
+		final ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+		serviceId1.setIdentifier(new URI("http://testService1"));
+		
+		final IndividualCtxEntity operator = 
+				this.internalCtxBroker.retrieveIndividualEntity(cssMockIdentity).get();
 
-		//	ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
-		//		serviceId2.setIdentifier(new URI("http://testService2"));
+		// create service attribute
+		CtxAttribute service1Attr = this.internalCtxBroker.createAttribute(operator.getId(), "service").get();
+		final byte[] service1Blob = SerialisationHelper.serialise(serviceId1);
+		service1Attr = this.internalCtxBroker.updateAttribute(service1Attr.getId(), service1Blob).get();
 
-		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
-		try {
-			serviceId1.setIdentifier(new URI("http://testService1"));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		System.out.println("testStoreRetrieveServiceParameters service created :"+ serviceId1);
+		// retrieve service attribute
+		final List<CtxIdentifier> listAttrs = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "service").get();
+		assertEquals(1, listAttrs.size());
+		final CtxAttributeIdentifier serviceAttrID = (CtxAttributeIdentifier) listAttrs.get(0);
+		final CtxAttribute ctxAttrRetrieved = (CtxAttribute) this.internalCtxBroker.retrieveAttribute(serviceAttrID, false).get();
 
-		try {
-			IndividualCtxEntity operator = (IndividualCtxEntity) this.internalCtxBroker.createIndividualEntity("Person").get();
-			//IndividualCtxEntity operator = this.internalCtxBroker.retrieveCssOperator().get();
-			//System.out.println("operator "+operator);
-			// create service attribute
-			CtxAttribute service1Attr = this.internalCtxBroker.createAttribute(operator.getId(), "service").get();
-			final byte[] service1Blob = SerialisationHelper.serialise(serviceId1);
-			service1Attr = this.internalCtxBroker.updateAttribute(service1Attr.getId(), service1Blob).get();
-
-			// retrieve service attribute
-			List<CtxIdentifier> listAttrs = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "service").get();
-			CtxAttributeIdentifier serviceAttrID = (CtxAttributeIdentifier) listAttrs.get(0);
-			CtxAttribute ctxAttrRetrieved = (CtxAttribute) this.internalCtxBroker.retrieveAttribute(serviceAttrID, false).get();
-
-			ServiceResourceIdentifier ctxAttrRetrievedValue = (ServiceResourceIdentifier) SerialisationHelper.deserialise(ctxAttrRetrieved.getBinaryValue(), this.getClass().getClassLoader());
-
-			System.out.println("testStoreRetrieveServiceParameters service retrieved :"+ ctxAttrRetrievedValue);
-
-
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
+		final ServiceResourceIdentifier retrievedServiceId = (ServiceResourceIdentifier) 
+				SerialisationHelper.deserialise(ctxAttrRetrieved.getBinaryValue(), this.getClass().getClassLoader());
+		assertEquals(serviceId1.getIdentifier(), retrievedServiceId.getIdentifier());
 	}
 
 

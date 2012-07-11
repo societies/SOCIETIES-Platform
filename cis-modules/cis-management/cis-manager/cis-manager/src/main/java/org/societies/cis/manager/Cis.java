@@ -55,7 +55,7 @@ import javax.persistence.Transient;
 //import org.societies.cis.mgmt;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
@@ -139,7 +139,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		"org.societies.api.schema.cis.community"));
 	@Transient
 	private SessionFactory sessionFactory;
-	
+	@Transient
+	private Session session;
 	
 	
 	public SessionFactory getSessionFactory() {
@@ -162,8 +163,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@OneToOne(cascade=CascadeType.ALL)
 	public CisRecord cisRecord;
 	
-	@OneToOne(cascade=CascadeType.ALL)
-	public ActivityFeed activityFeed;
+	//@OneToOne(cascade=CascadeType.ALL)
+	@Transient
+	public ActivityFeed activityFeed = new ActivityFeed();
 	//TODO: should this be persisted?
 	@Transient
 	private ICommManager CISendpoint;
@@ -284,6 +286,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	// deprecated, use the version below without password, permalink and host
 	@Deprecated
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
+
 	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
 		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote,privacyPolicyManager);
 		//this.password = password;
@@ -305,7 +308,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	// minimum constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
-			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
+			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory) {
 		
 		this.privacyPolicyManager = privacyPolicyManager;
 		
@@ -364,8 +367,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 		
-
-		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
+		session = sessionFactory.openSession();
+		System.out.println("activityFeed: "+activityFeed);
+		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
+		
+		this.persist(this);
 		//activityFeed.getActivities("0 1339689547000");
 
 	}
@@ -405,9 +411,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		this.setSessionFactory(sessionFactory);
 
-		
-		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
-		//activityFeed.getActivities("0 1339689547000");
+		session = sessionFactory.openSession();
+		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
+		activityFeed.getActivities("0 1339689547000");
 	}
 	
 
@@ -1128,11 +1134,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		n.setDeleteNotification(d);
 		message.setNotification(n);
-		//Session session = sessionFactory.openSession();
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();
 
 		// deleting from DB
+		activityFeed.clear();
+		activityFeed = null;
 		this.deletePersisted(this);
 		
 		// unregistering policy
@@ -1177,12 +1184,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		
 
-		
-		//session.close();
+		if(session!=null)
+			session.close();
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
-		activityFeed = null; // TODO: replace with proper way of destroying it
+		//activityFeed = null; // TODO: replace with proper way of destroying it
 		
 		
 		ret = CISendpoint.UnRegisterCommManager();
@@ -1310,7 +1317,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	// session related methods
 
 	private void persist(Object o){
-		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.save(o);
@@ -1324,10 +1330,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.warn("Saving CIS object failed, rolling back");
 		}finally{
 			if(session!=null){
-				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
 			}
 			
 		}
@@ -1335,7 +1337,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	
 	private void deletePersisted(Object o){
-		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.delete(o);
@@ -1348,18 +1349,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			t.rollback();
 			LOG.warn("Deleting object in CisManager failed, rolling back");
 		}finally{
-			if(session!=null){
-				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
-			}
-			
 		}
 	}
 	
 	private void updatePersisted(Object o){
-		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.update(o);
@@ -1372,12 +1365,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			t.rollback();
 			LOG.warn("Updating CIS object failed, rolling back");
 		}finally{
-			if(session!=null){
-				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
-			}
 			
 		}
 	}

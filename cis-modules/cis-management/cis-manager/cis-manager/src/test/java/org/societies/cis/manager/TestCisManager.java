@@ -114,7 +114,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private IServiceDiscoveryRemote mockIServDiscRemote;
 	private IServiceControlRemote mockIServCtrlRemote;
 	
-	public static final String CIS_MANAGER_CSS_ID = "testXcmanager.societies.local";
+	public static String CIS_MANAGER_CSS_ID = "testXcmanager.societies.local";
 	
 	//public static final String TEST_CSSID = "juca@societies.local";
 	public static final String TEST_CSS_PWD = "password";
@@ -174,7 +174,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	IIdentityManager mockRemoteIICisManagerIdManager;
 	INetworkNode remoteCisManagerId;
-	public static final String REMOTE_CIS_MANAGER_ID = "testXcmanager1.societies.local";
+	public static String REMOTE_CIS_MANAGER_ID = "testXcmanager1.societies.local";
 	
 	public static final String REMOTER_CISID_1 = "gama.societies.local";
 	INetworkNode remoteCisId_1;
@@ -393,7 +393,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockCSSendpoint = mock (ICommManager.class);
 
 		mockIICisManagerId = mock (IIdentityManager.class);
-		
+		CIS_MANAGER_CSS_ID += "newtest";
 		testCisManagerId = new NetworkNodeImpl(CIS_MANAGER_CSS_ID);
 
 		
@@ -406,7 +406,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		//PowerMockito.mockStatic(ActivityFeed.class);
 		//this.session = sessionFactory.openSession();
 		System.out.println("in setup! cisManagerUnderTest.getSessionFactory(): "+sessionFactory);
-		ActivityFeed.setStaticSessionFactory(sessionFactory);
+		//ActivityFeed.setStaticSessionFactory(sessionFactory);
 		//cisManagerUnderTest.setSessionFactory(sessionFactory);
 		//cisManagerUnderTest.setSessionFactory(sessionFactory);
 		//Mockito.when(ActivityFeed.startUp(anyString())).thenReturn(new ActivityFeed());
@@ -501,7 +501,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest = new CisManager();
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory);cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1); 
 		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager); 
-		
 		cisManagerUnderTest.init();
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
@@ -548,6 +547,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	}
 
 	//@Rollback(true)
+	//@Ignore
 	@Test
 	public void testdeleteCIS() throws InterruptedException, ExecutionException {
 
@@ -568,9 +568,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ciss[1] = (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 		
-		LOG.info("cis 1 sessionfactory:"+((Cis)ciss[0]).getSessionFactory().hashCode());
+//		LOG.info("cis 1 sessionfactory:"+((Cis)ciss[0]).getSessionFactory().hashCode());
 		List<ICis> l = cisManagerUnderTestInterface.getCisList();
-		LOG.info("cis 1 sessionfactory:"+((Cis)l.get(0)).getSessionFactory());
+//		LOG.info("cis 1 sessionfactory:"+((Cis)l.get(0)).getSessionFactory());
 		Iterator<ICis> it = l.iterator();
 		ICis element = it.next(); 
 		jidTobeDeleted = element.getCisId();
@@ -870,7 +870,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	///////////////////////////////////////////////////
 	// Local Interface with Callback Testing
 	//////////////////////////////////////////////////
-	
+	//@Ignore
 	@Test
 	public void listdMembersOnOwnedCISwithCallback() throws InterruptedException, ExecutionException {
 
@@ -945,7 +945,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	
 	}
-	
+	//@Ignore
 	@Test
 	public void getInfoWithCallback() throws InterruptedException, ExecutionException {
 
@@ -1002,7 +1002,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 icssRemote.getInfo(new GetInfoCallBack(IcissOwned));
 	
 	}
-	
+	//@Ignore
 	@Test
 	public void setInfoWithCallback() throws InterruptedException, ExecutionException {
 

@@ -118,22 +118,7 @@ public interface ICtxBroker {
 	 */
 	public Future<IndividualCtxEntity> createIndividualEntity(
 			final IIdentity cssId, final String ownerType) throws CtxException;
-	
-	/**
-	 * Creates an individual Context Entity that is possible to join or to form a community. 
-	 * The  created <code>IndividualCtxEntity</code> is used to represent a single participant 
-	 * (CSS) of a {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may 
-	 * belong to zero or more CISs, simultaneously. The individual members of a pervasive 
-	 * community do not need to be human beings. They can also be organisations, smart space
-	 * infrastructures, autonomous or semi-autonomous agents, etc.
-	 *  
-	 * @param type
-	 * @deprecated As of 0.3, use {@link #createIndividualEntity(IIdentity, String)} 
-	 */
-	@Deprecated
-	public Future<IndividualCtxEntity> createIndividualEntity(String type) throws CtxException;
 		
-
 	/**
 	 * Creates a {@link CommunityCtxEntity} that represents the specified CIS.
 	 *  

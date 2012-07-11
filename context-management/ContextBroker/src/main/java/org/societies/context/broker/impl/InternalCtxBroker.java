@@ -29,7 +29,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,6 +62,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
@@ -80,6 +80,7 @@ import org.societies.context.broker.api.CtxBrokerException;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -99,8 +100,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Autowired(required=false)
 	private IPrivacyLogAppender privacyLogAppender;
 
-	private boolean hasPrivacyLogAppender = false;
-
 	/**
 	 * The IIdentity Mgmt service reference.
 	 *
@@ -111,7 +110,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	/** The Context Event Mgmt service reference. */
 	@Autowired(required=true)
 	private ICtxEventMgr ctxEventMgr;
-
 
 	/**
 	 * The User Context History Mgmt service reference. 
@@ -133,14 +131,8 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @see {@link #setCommunityCtxDBMgr(ICommunityCtxDBMgr)}
 	 */
+	@Autowired(required=true)
 	private ICommunityCtxDBMgr communityCtxDBMgr;
-
-	/**
-	 * The ICommManager service reference.
-	 * 
-	 * @see {@link #setCommMgr(ICommManager)}
-	 */
-	private ICommManager commMgr;
 
 	/**
 	 * The User Inference Mgmt service reference.
@@ -167,15 +159,12 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * @throws CtxException 
 	 */
 	@Autowired(required=true)
-	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr,ICommunityCtxDBMgr communityCtxDBMgr) throws Exception {
+	InternalCtxBroker(IUserCtxDBMgr userCtxDBMgr, ICommManager commMgr) throws Exception {
 
 		LOG.info(this.getClass() + " instantiated");
 		this.userCtxDBMgr = userCtxDBMgr;
-		this.communityCtxDBMgr = communityCtxDBMgr;
-		//LOG.info("Found ICommunityCtxDBMgr " + communityCtxDBMgr);
-		//this.commMgr = commMgr;
-
 		this.idMgr = commMgr.getIdManager();
+		
 		final INetworkNode localCssNodeId = this.idMgr.getThisNetworkNode();
 		LOG.info("Found local CSS node ID " + localCssNodeId);
 		final IIdentity localCssId = this.idMgr.fromJid(localCssNodeId.getBareJid());
@@ -298,16 +287,9 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
-	@Override
-	@Async
-	@Deprecated
-	public Future<IndividualCtxEntity> createIndividualEntity(String type)
-			throws CtxException {
-
-		IndividualCtxEntity individualCtxEnt = this.userCtxDBMgr.createIndividualCtxEntity(type);
-		return new AsyncResult<IndividualCtxEntity>(individualCtxEnt);
-	}
-
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createCommunityEntity(org.societies.api.identity.IIdentity)
+	 */
 	@Override
 	@Async
 	public Future<CommunityCtxEntity> createCommunityEntity(IIdentity cisId)
@@ -365,8 +347,6 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<List<CtxEntityIdentifier>>(results);
 	}
 
-
-
 	@Override
 	public Future<List<CtxIdentifier>> lookup(IIdentity target,
 			CtxModelType modelType, String type) throws CtxException {
@@ -377,12 +357,12 @@ public class InternalCtxBroker implements ICtxBroker {
 				|| IdentityType.CSS_RICH.equals(target.getType())
 				|| IdentityType.CSS_LIGHT.equals(target.getType())){
 
-			LOG.info("retrieving css " + target.getType());
+		//	LOG.info("retrieving css " + target.getType());
 			modObjListReturn = this.userCtxDBMgr.lookup(modelType, type);	
 
 		}else if (IdentityType.CIS.equals(target.getType())){
 
-			LOG.info("retrieving cis " + target.getType());
+		//	LOG.info("retrieving cis " + target.getType());
 			//TODO uncomment following line when communityCtxDBMgr method implemented
 			//modObjListReturn = this.communityCtxDBMgr.lookup();
 			modObjListReturn = null;
@@ -460,23 +440,23 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		try {
 			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(null, targetCss);
 
 		if (IdentityType.CSS.equals(targetCss.getType()) 
 				|| IdentityType.CSS_RICH.equals(targetCss.getType())
 				|| IdentityType.CSS_LIGHT.equals(targetCss.getType())){
 
-			LOG.info("retrieving css " + targetCss.getType());
+		//	LOG.info("retrieving css " + targetCss.getType());
 			modelObjReturn = this.userCtxDBMgr.retrieve(identifier);	
 
 		}else if (IdentityType.CIS.equals(targetCss.getType())){
 
-			LOG.info("retrieving cis " + targetCss.getType());
+	//		LOG.info("retrieving cis " + targetCss.getType());
 			modelObjReturn = this.communityCtxDBMgr.retrieve(identifier);
 
 		} else throw new CtxBrokerException("objects identifier does not correspond to a css or a cis");
@@ -487,7 +467,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			inferenceOutcome = this.initiateInference((CtxAttribute) modelObjReturn);
 		} // TO DO integrate inference outcome with returned value
 		 */
-		LOG.info("retrieved  " + modelObjReturn.getId());
+	//	LOG.info("retrieved  " + modelObjReturn.getId());
 
 		return new AsyncResult<CtxModelObject>(modelObjReturn);
 	}	
@@ -507,29 +487,29 @@ public class InternalCtxBroker implements ICtxBroker {
 		final CtxAttribute ctxAttrReturn;
 		//final CtxAttribute inferedAttrReturn;
 		
-		LOG.info("identifier " + identifier);
-		LOG.info("identifier.getOwnerId() " + identifier.getOwnerId());
+	//	LOG.info("identifier " + identifier);
+    //	LOG.info("identifier.getOwnerId() " + identifier.getOwnerId());
 		
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(identifier.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(null, targetCss);
 
 		if (IdentityType.CSS.equals(targetCss.getType()) 
 				|| IdentityType.CSS_RICH.equals(targetCss.getType())
 				|| IdentityType.CSS_LIGHT.equals(targetCss.getType())){
 
-			LOG.info("retrieving css " + targetCss.getType());
+		//	LOG.info("retrieving css " + targetCss.getType());
 			ctxAttrReturn = (CtxAttribute) this.userCtxDBMgr.retrieve(identifier);	
 
 		}else if (IdentityType.CIS.equals(targetCss.getType())){
 
-			LOG.info("retrieving cis " + targetCss.getType());
+		//	LOG.info("retrieving cis " + targetCss.getType());
 			ctxAttrReturn = (CtxAttribute) this.communityCtxDBMgr.retrieve(identifier);
 
 		} else throw new CtxBrokerException("object's identifier does not correspond to a CSS or a CIS");
@@ -542,7 +522,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			// check if value is null and if yes estimate community context 
 			if ( ctxAttrReturn != null && ctxAttrReturn instanceof CtxAttribute){
 				
-				LOG.info("initiate inference for "+ ctxAttrReturn.getId());
+	//			LOG.info("initiate inference for "+ ctxAttrReturn.getId());
 				//inferedAttrReturn = this.initiateInference((CtxAttribute) ctxAttrReturn);
 			} // TO DO integrate inference outcome with returned value
 	}
@@ -561,8 +541,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (cssId == null)
 			throw new NullPointerException("cssId can't be null");
 
-		if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-			this.privacyLogAppender.logContext(null, cssId);
+		this.logRequest(null, cssId);
 
 		IndividualCtxEntity cssOwner = null;
 		final List<CtxIdentifier> attrIds = this.userCtxDBMgr.lookup(
@@ -736,23 +715,23 @@ public class InternalCtxBroker implements ICtxBroker {
 		if(this.userCtxInferenceMgr.getInferrableTypes().contains(ctxAttr.getType()))  isInferable = true;
 
 		if( !CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-			LOG.info("has value "+ CtxBrokerUtils.hasValue(ctxAttr));
+			//LOG.info("has value "+ CtxBrokerUtils.hasValue(ctxAttr));
 			inferValue = true;
 		}
 
 		if (CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
 			if(CtxBrokerUtils.isPoorQuality(ctxAttr.getQuality())) inferValue = true;
 		}
-		LOG.info("inferValue: "+ inferValue);
+	//	LOG.info("inferValue: "+ inferValue);
 
 		//TO DO remove following line when integration is completed
 		inferValue = false;
 		if(inferValue){
-			LOG.info("before inference infered CtxAttr: "+ ctxAttr.getStringValue());	
+	//		LOG.info("before inference infered CtxAttr: "+ ctxAttr.getStringValue());	
 			// TO DO multiple inference methods will be added
 			inferedCtxAttr = userCtxInferenceMgr.predictContext(ctxAttr.getId(), new Date());	
-			LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getId());
-			LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getStringValue());
+	//		LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getId());
+	//		LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getStringValue());
 			//modelObjReturn = (CtxModelObject) inferedCtxAttr;
 		}
 
@@ -958,12 +937,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(null, targetCss);
+		
 		return null;
 	}
 
@@ -974,12 +954,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(null, targetCss);
+		
 		return null;
 	}
 
@@ -1035,12 +1016,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(null, targetCss);
+		
 		result.addAll(this.userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate));
 
 		return new AsyncResult<List<CtxHistoryAttribute>>(result);
@@ -1059,12 +1041,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
-			if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-				this.privacyLogAppender.logContext(null, targetCss);
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
 		}
+		
+		this.logRequest(null, targetCss);
+		
 		printHocDB(); // TODO remove
 		return null;
 	}
@@ -1125,7 +1108,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		boolean result = false;
 
-		LOG.info("setting history tuples primaryAttrIdentifier: "+primaryAttrIdentifier );
+	//	LOG.info("setting history tuples primaryAttrIdentifier: "+primaryAttrIdentifier );
 
 		try {
 			// set hoc recording flag for the attributes contained in tuple list
@@ -1156,7 +1139,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 			if(updatedAttr != null && updatedAttr.getType().contains("tupleIds_")) result = true;
 
-			LOG.info("tuple Attr ids "+allAttrIds);
+		//	LOG.info("tuple Attr ids "+allAttrIds);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -1241,11 +1224,11 @@ public class InternalCtxBroker implements ICtxBroker {
 				IIdentity targetCss;
 				try {
 					targetCss = this.idMgr.fromJid(primaryAttrId.getOwnerId());
-					if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-						this.privacyLogAppender.logContext(null, targetCss);
 				} catch (InvalidFormatException ife) {
 					throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 				}
+				
+				this.logRequest(null, targetCss);
 
 				List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
 				Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tempTupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>(); 
@@ -1315,11 +1298,11 @@ public class InternalCtxBroker implements ICtxBroker {
 			IIdentity targetCss;
 			try {
 				targetCss = this.idMgr.fromJid(primaryAttrId.getOwnerId());
-				if (this.hasPrivacyLogAppender && this.privacyLogAppender != null)
-					this.privacyLogAppender.logContext(null, targetCss);
 			} catch (InvalidFormatException ife) {
 				throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 			}
+			
+			this.logRequest(null, targetCss);
 
 			String tupleAttrType = "tuple_"+primaryAttrId.toString();
 			List<CtxIdentifier> listIds;
@@ -1589,7 +1572,6 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.idMgr = identityMgr;
 	}
 
-
 	/**
 	 * Sets the UserCtxInferenceMgr service reference.
 	 * 
@@ -1604,33 +1586,14 @@ public class InternalCtxBroker implements ICtxBroker {
 
 
 	/**
-	 * This method is called when the {@link IPrivacyLogAppender} service is
-	 * bound.
+	 * Sets the {@link IPrivacyLogAppender} service reference.
 	 * 
 	 * @param privacyLogAppender
-	 *            the service that was bound
-	 * @param props
-	 *            the set of properties that the service was registered with
+	 *            the {@link IPrivacyLogAppender} service reference to set
 	 */
-	public void bindPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender, Dictionary<Object,Object> props) {
+	public void setPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender) {
 
-		LOG.info("Binding service reference " + privacyLogAppender);
-		this.hasPrivacyLogAppender = true;
-	}
-
-	/**
-	 * This method is called when the {@link IPrivacyLogAppender} service is
-	 * unbound.
-	 * 
-	 * @param privacyLogAppender
-	 *            the service that was unbound
-	 * @param props
-	 *            the set of properties that the service was registered with
-	 */
-	public void unbindPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender, Dictionary<Object,Object> props) {
-
-		LOG.info("Unbinding service reference " + privacyLogAppender);
-		this.hasPrivacyLogAppender = false;
+		this.privacyLogAppender = privacyLogAppender;
 	}
 
 	// TODO remove
@@ -1660,7 +1623,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public CtxAttribute estimateCommunityContext(CtxEntityIdentifier communityCtxEntityID,	CtxAttributeIdentifier ctxAttrId) {
 
-		LOG.info("communityCtxInferenceMgr service: "+ this.communityCtxInferenceMgr);
+	
 		CtxAttribute returnCtxAttr = this.communityCtxInferenceMgr.estimateCommunityContext(communityCtxEntityID, ctxAttrId);
 		
 		// TODO at this point check if inference (estimation) outcome is acceptable and if yes persist ctxAttribute 
@@ -1684,4 +1647,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		return returnCtxAttr;
 	}
 
+	private void logRequest(final Requestor requestor, final IIdentity target) {
+		
+		try {
+			if (this.privacyLogAppender != null)
+				this.privacyLogAppender.logContext(requestor, target);
+		} catch (ServiceUnavailableException sue) {
+			// do nothing
+		}
+	}
 }

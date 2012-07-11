@@ -489,6 +489,47 @@ var Societies = {
 				'loginCSS',          //Telling the plugin, which action we want to perform
 				[client, cssRecord]);        //Passing a list of arguments to the plugin
 			},
+			/**
+			 * @methodOf Societies.LocalCSSManagerService#
+			 * @description Register a user's identity with a chosen Identity Domain 
+			 * @param {Object} successCallback The callback which will be called when result is successful
+			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+			 * @returns CSSrecord with registered values
+			 */
+			registerXMPPServer: function(successCallback, failureCallback) {
+				var client = "org.societies.android.platform.gui";
+				var cssRecord = {
+						  			"archiveCSSNodes": [],
+				                    "cssIdentity": jQuery("#regUsername").val(),
+				                    "cssInactivation": null,
+				                    "cssNodes": [],
+				                    "cssRegistration": null,
+				                    "cssHostingLocation" : null,
+				                    "domainServer" : jQuery("#domainServers").val(),
+				                    "cssUpTime": 0,
+				                    "emailID": null,
+				                    "entity": 0,
+				                    "foreName": null,
+				                    "homeLocation": null,
+				                    "identityName": null,
+				                    "imID": null,
+				                    "name": null,
+				                    "password": jQuery("#regUserpass").val(),
+				                    "presence": 0,
+				                    "sex": 0,
+				                    "socialURI": null,
+				                    "status": 0
+						                  }
+
+
+				console.log("Call LocalCSSManagerService - registerXMPPServer");
+
+				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+				'registerXMPPServer',          //Telling the plugin, which action we want to perform
+				[client, cssRecord]);        //Passing a list of arguments to the plugin
+			},
 
 			/**
 			 * @methodOf Societies.LocalCSSManagerService#
@@ -694,18 +735,6 @@ var SocietiesGUI = {
 		
 		/**
 		 * @methodOf SocietiesGUI#
-		 * @description Register an identity with a selected Identity Domain Server
-		 * @param {Object} username
-		 * @param {Object} password
-		 * @param {Object} domainServer
-		 * @returns null
-		 */
-
-		registerWithDomainServer: function(username, password, domainServer) {
-			
-		},
-		/**
-		 * @methodOf SocietiesGUI#
 		 * @description Android Backbutton handler
 		 * @param {Object} backbutton event
 		 * @returns null
@@ -844,9 +873,9 @@ var SocietiesGUI = {
 			function failure(data) {
 				alert("updateCredentialPreferences - failure: " + data);
 			}
-			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#regUsername").val(data.value));
-			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#regUserpass").val(data.value));
-			window.plugins.AppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#domainServers").val(data.value));
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#regUsername").val());
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#regUserpass").val());
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#domainServers").val());
 		},
 		
 		/**
@@ -894,6 +923,32 @@ var SocietiesGUI = {
 		    window.plugins.LocalCSSManagerService.loginCSS(success, failure);
 
 		},
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Actions carried in the event that a successful Identity Domain registration occurs
+		 * @returns null
+		 */
+
+		xmppRegistration: function() {
+			console.log("Regsister identity with chosen Identity domain");
+
+			function success(data) {
+				SocietiesGUI.updateCredentialPreferences();
+				
+				
+				console.log("Current page: " + $.mobile.activePage[0].id);
+
+				
+				$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
+			}
+			
+			function failure(data) {
+				alert("xmppRegistration - failure: " + data);
+			}
+		    window.plugins.LocalCSSManagerService.registerXMPPServer(success, failure);
+
+		},
+
 		/**
 		 * @methodOf SocietiesGUI#
 		 * @description Reset the Device Manager page HTML elements 
@@ -1203,14 +1258,14 @@ jQuery(function() {
 	});
 
 	$('#connectXMPP').click(function() {
-		if (SocietiesGUI.validateLoginCredentials(jQuery("#username").val(), jQuery("#userpass").val()), "") {
+		if (SocietiesGUI.validateLoginCredentials(jQuery("#username").val(), jQuery("#userpass").val())) {
 			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.successfulLogin);
 		}
 	});
 	
 	$('#registerXMPP').click(function() {
 		if (SocietiesGUI.validateRegistrationCredentials(jQuery("#regUsername").val(), jQuery("#regUserpass").val(), jQuery("#repeatRegUserpass").val(), jQuery("#regSocietiesTerms").val())) {
-		alert("XMPP registration successful");
+			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.xmppRegistration);
 	}
 	});
 	
