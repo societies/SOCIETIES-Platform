@@ -129,8 +129,17 @@ public class Condition implements Serializable{
 	public void setTheCondition(ConditionConstants theCondition) {
 		this.theCondition = theCondition;
 	}
-	
-	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (optional ? 1231 : 1237);
+		result = prime * result
+				+ ((theCondition == null) ? 0 : theCondition.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -150,5 +159,6 @@ public class Condition implements Serializable{
 			.append(this.isOptional(), rhs.isOptional())
 			.isEquals();
 	}
+
 
 }

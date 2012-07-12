@@ -92,7 +92,14 @@ public class Action implements Serializable{
 		Action action = new Action(ActionConstants.READ);
 		System.out.println(action.toXMLString());
 	}
-	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((action == null) ? 0 : action.hashCode());
+		result = prime * result + (optional ? 1231 : 1237);
+		return result;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -112,4 +119,5 @@ public class Action implements Serializable{
 			.append(this.isOptional(), rhs.isOptional())
 			.isEquals();
 	}
+
 }
