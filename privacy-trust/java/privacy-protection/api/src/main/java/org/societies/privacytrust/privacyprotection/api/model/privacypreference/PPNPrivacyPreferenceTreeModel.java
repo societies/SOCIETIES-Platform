@@ -98,4 +98,55 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 		this.requestor = requestor;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((affectedCtxId == null) ? 0 : affectedCtxId.hashCode());
+		result = prime * result
+				+ ((myContextType == null) ? 0 : myContextType.hashCode());
+		result = prime * result
+				+ ((myPrivacyType == null) ? 0 : myPrivacyType.hashCode());
+		result = prime * result + ((pref == null) ? 0 : pref.hashCode());
+		result = prime * result
+				+ ((requestor == null) ? 0 : requestor.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PPNPrivacyPreferenceTreeModel other = (PPNPrivacyPreferenceTreeModel) obj;
+		if (affectedCtxId == null) {
+			if (other.affectedCtxId != null)
+				return false;
+		} else if (!affectedCtxId.equals(other.affectedCtxId))
+			return false;
+		if (myContextType == null) {
+			if (other.myContextType != null)
+				return false;
+		} else if (!myContextType.equals(other.myContextType))
+			return false;
+		if (myPrivacyType != other.myPrivacyType)
+			return false;
+		if (pref == null) {
+			if (other.pref != null)
+				return false;
+		} else if (!pref.equals(other.pref))
+			return false;
+		if (requestor == null) {
+			if (other.requestor != null)
+				return false;
+		} else if (!requestor.equals(other.requestor))
+			return false;
+		return true;
+	}
+
+	
 }

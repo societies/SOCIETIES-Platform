@@ -1,52 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-   <parent>
-        <groupId>org.societies</groupId>
+	<parent>
+		<groupId>org.societies</groupId>
         <artifactId>android-parent</artifactId>
         <version>0.1</version>
-	<relativePath>../../../../parent/android.xml</relativePath>
-   </parent>
+		<relativePath>../../../../parent/android.xml</relativePath>
+	</parent>
 
-   <groupId>org.societies.android.platform</groupId>
-   <artifactId>trust-droid</artifactId>
-   <version>0.1</version> 
-   <name>Trust Management and Evaluation Client</name>
-   <packaging>apk</packaging>
-   <developers>
-     <developer>
-        <name>Nicolas Liampotis</name>
-	<email>nicolas.liampotis@cn.ntua.gr</email>
-	<organization>ICCS</organization>
-	<organizationUrl>http://www.iccs.gr/</organizationUrl>
-	<roles>
-	  <role>owner</role>
-	  <role>developer</role>
-	  <role>tester</role>
-	</roles>
-      </developer>
-    </developers>	
+	<groupId>org.societies.android.platform</groupId>
+	<artifactId>trust-droid</artifactId>
+	<name>Trust Management and Evaluation Client</name>
+	<packaging>apk</packaging>
+	<developers>
+		<developer>
+			<name>Nicolas Liampotis</name>
+			<email>nicolas.liampotis@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+				<role>tester</role>
+			</roles>
+		</developer>
+	</developers>	
 
-    <dependencies>
-        <dependency>
-            <groupId>android</groupId>
-            <artifactId>android</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.phonegap</groupId>
-            <artifactId>phonegap</artifactId>
-        </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.phonegap</groupId>
+			<artifactId>phonegap</artifactId>
+		</dependency>
+	</dependencies>
 
-    <build>
-        <finalName>${project.artifactId}</finalName>
-        <sourceDirectory>src</sourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>

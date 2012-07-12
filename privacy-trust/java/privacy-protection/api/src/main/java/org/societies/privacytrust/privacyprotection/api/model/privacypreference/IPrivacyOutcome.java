@@ -34,8 +34,44 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  * @author Elizabeth
  *
  */
-public interface IPrivacyOutcome {
+public abstract class IPrivacyOutcome {
 
-	public PrivacyPreferenceTypeConstants getOutcomeType();
-	public int getConfidenceLevel();
+	private int confidenceLevel = 50;
+	
+	private boolean askUser = true;
+	
+	public abstract PrivacyPreferenceTypeConstants getOutcomeType();
+	
+	public int getConfidenceLevel(){
+		return this.confidenceLevel;
+	}
+	
+	public boolean requiresUserConfirmation(){
+		return this.askUser;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (askUser ? 1231 : 1237);
+		result = prime * result + confidenceLevel;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IPrivacyOutcome other = (IPrivacyOutcome) obj;
+		if (askUser != other.askUser)
+			return false;
+		if (confidenceLevel != other.confidenceLevel)
+			return false;
+		return true;
+	}
 }

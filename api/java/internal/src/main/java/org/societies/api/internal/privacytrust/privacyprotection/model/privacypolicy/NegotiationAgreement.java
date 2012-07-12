@@ -115,7 +115,20 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 		// TODO Auto-generated method stub
 		return this.requestor;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((items == null) ? 0 : items.hashCode());
+		result = prime * result
+				+ ((requestor == null) ? 0 : requestor.hashCode());
+		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+		result = prime * result
+				+ ((userPublicId == null) ? 0 : userPublicId.hashCode());
+		return result;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -137,6 +150,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 			.append(this.getRequestedItems(), rhs.getRequestedItems())
 			.isEquals();
 	}
+
 
 }
 

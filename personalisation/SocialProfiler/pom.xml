@@ -56,10 +56,8 @@
 			<artifactId>jfreechart</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-		
-		
   
-            
+ 
  
 <!-- 
 
@@ -219,13 +217,11 @@
 					   				   !sun.misc.*,
 					   				   org.json.*,
 					   				   org.societies.platform.socialdata.*,
-					   				   *
+					   				   *;resolution:=optional
 					   	</Import-Package>
 	
-						<!-- 
-						<Import-Package>!com.sun.jdmk.comm,!jline,!org.neo4j.shell,!org.jboss.resource.adapter.jdbc.*,!com.mchange.v2.c3p0,!org.neo4j.kernel.impl.annotations,!sun.misc,*</Import-Package>
-						 -->
-						<Export-Package></Export-Package>
+						
+						<Export-Package>org.societies.personalisation.socialprofiler*</Export-Package>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
