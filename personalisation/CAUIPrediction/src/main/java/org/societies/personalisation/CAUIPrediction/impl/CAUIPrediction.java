@@ -267,13 +267,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
-	//den auksanoume counter
-	
+		
 	@Override
 	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String userActionType) {
-
-		LOG.debug("getCurrentIntentAction "+predictionRequestsCounter+" serviceID"+ serviceID+" identity requestor"+ownerID+" userActionType"+userActionType);
+		
+		//bgColour=red/10 
+		LOG.info("getCurrentIntentAction based on identity and serviceID"+ serviceID+" identity requestor"+ownerID+" userActionType"+userActionType);
 		//predictionRequestsCounter = predictionRequestsCounter +1;
 		IUserIntentAction action = null;
 
@@ -294,7 +294,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			}
 
 		}
-		LOG.info("getCurrentIntentAction(IIdentity ownerID,	ServiceResourceIdentifier serviceID, String userActionType)"+action );
+	//	LOG.info("getCurrentIntentAction(IIdentity ownerID,	ServiceResourceIdentifier serviceID, String userActionType)"+action );
 		return new AsyncResult<IUserIntentAction>(action);
 	}
 

@@ -69,7 +69,7 @@ public class ContextStorageTest {
 	//IIdentity identity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
 
 	private IIdentity cssOwnerId;
-	
+
 
 	public void setUp(){
 
@@ -216,9 +216,9 @@ public class ContextStorageTest {
 
 
 	@Test
-	public void TestPerformPrediction() {
+	public void TestPerformOnDemandPrediction() {
 
-		System.out.println("Test 1109 started : TestPerformPrediction");
+		System.out.println("Test 1109 started : TestPerformOnDemandPrediction");
 		//LOG.info("TestPerformPrediction : Initiate prediction test ");
 		try {
 			LOG.info("TestPerformPrediction : waiting 10000 for model creation ");
@@ -241,12 +241,9 @@ public class ContextStorageTest {
 
 			//LOG.info("CAUI PREDICTION SERVICE SET:"+ TestCase1109.cauiPrediction );
 
-			//IndividualCtxEntity operator = TestCase1109.getCtxBroker().retrieveIndividualEntity(this.cssOwnerId).get();
-			CtxAttribute locationAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.TEMPERATURE);
-			LOG.info("temperature value type "+ locationAttr.getValueType());
-			LOG.info("temperature integer value "+ locationAttr.getIntegerValue());
-
-
+			
+			printCurrentContext();
+			
 			LOG.info("A action performed :  "+  actionRadio1 );
 
 			List<IUserIntentAction> actionList = TestCase1109.cauiPrediction.getPrediction(this.cssOwnerId, actionRadio1).get();
@@ -262,10 +259,17 @@ public class ContextStorageTest {
 				Assert.assertEquals("medium", value);
 
 				HashMap<String, Serializable> context = predictedAction.getActionContext();
+				
+				if(context != null){
+					LOG.info("predicted action cotnext size :"+ context.size());	
+				} else {
+					LOG.info("predicted action cotnext is null");
+				}
+				//TODO fix broker set type method
 
 				for(String ctxType : context.keySet()){
 					Serializable ctxValue = context.get(ctxType);
-					//LOG.info("context value :"+ ctxValue);
+					LOG.info("context value :"+ ctxValue);
 					if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC)&& ctxValue instanceof String){
 						String location = (String) ctxValue;
 						LOG.info("String context location value :"+ location);
@@ -297,15 +301,75 @@ public class ContextStorageTest {
 		} 
 	}
 
+	
+	
+	void printCurrentContext(){
+		CtxAttribute locationAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		LOG.info("location value type "+ locationAttr.getValueType());
+		LOG.info("current location symbolic value "+ locationAttr.getStringValue());
+
+		
+		CtxAttribute temperatureAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.TEMPERATURE);
+		LOG.info("temperature value type "+ temperatureAttr.getValueType());
+		LOG.info("current temperature integer value "+ temperatureAttr.getIntegerValue());
+			
+		CtxAttribute statusAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.STATUS);
+		LOG.info(" status value type "+ statusAttr.getValueType());
+		LOG.info("current  status integer value "+ statusAttr.getStringValue());
+	}
+
+	
+	@Test
+	public void TestPerformContinuousPrediction(){
+
+		System.out.println("Test 1109 started : TestPerformContinuousPrediction");
+
+		try {
+			LOG.info("TestPerformPrediction : waiting 9000 for model creation ");
+			Thread.sleep(9000);
 
 
+			//IIdentity identity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
+			final INetworkNode cssNodeId = TestCase1109.commMgr.getIdManager().getThisNetworkNode();
 
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			this.cssOwnerId = TestCase1109.commMgr.getIdManager().fromJid(cssOwnerStr);
+
+			
+			ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
+			serviceId2.setIdentifier(new URI("css://nikosk@societies.org/navigatorService"));
+			serviceId2.setServiceInstanceIdentifier("css://nikosk@societies.org/navigatorService");
+			
+			// this action simulates an action performed by the user 
+			IAction action4 = new Action(serviceId2, "serviceType2", "setDestination", "gasStation");
+			
+			printCurrentContext();
+			
+			LOG.info("performing action: "+ action4);
+			
+			LOG.info("Stringperforming action type:setDestination and value:gasStation");
+			
+			TestCase1109.uam.monitor(this.cssOwnerId, action4);
+			
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+	}
 
 	//********************************************
 	//           helper classes 
 	//******************************************** 
 	private void randomAction (IAction action){
-		
+
 		TestCase1109.uam.monitor(this.cssOwnerId, action);
 		try {
 			Thread.sleep(5000);
@@ -313,7 +377,7 @@ public class ContextStorageTest {
 			e1.printStackTrace();
 		}
 		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "randomLocation");
-		setContext(CtxAttributeTypes.TEMPERATURE, 300);
+		setContext(CtxAttributeTypes.TEMPERATURE, new Integer(300));
 		setContext(CtxAttributeTypes.STATUS, "randomStatus");
 	}
 
@@ -323,30 +387,28 @@ public class ContextStorageTest {
 
 		try {
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
-			setContext(CtxAttributeTypes.TEMPERATURE, 30);
+			setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
 			setContext(CtxAttributeTypes.STATUS, "driving");
-			
-			
-		
+
 			Date date= new Date();
 			LOG.info("monitor action "+action1 + " time "+date.getTime());
-			
+
 			TestCase1109.uam.monitor(this.cssOwnerId, action1);
 			Thread.sleep(5000);
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
-			setContext(CtxAttributeTypes.TEMPERATURE, 30);
+			setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
 			setContext(CtxAttributeTypes.STATUS, "driving");
-			
+
 			date= new Date();
 			LOG.info("monitor action "+action2 + " time "+date.getTime());
 			TestCase1109.uam.monitor(this.cssOwnerId, action2);
 			Thread.sleep(5000);
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"Home-Parking");
-			setContext(CtxAttributeTypes.TEMPERATURE, 30);
+			setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(30));
 			setContext(CtxAttributeTypes.STATUS, "driving");
-			
+
 			date= new Date();
 			LOG.info("monitor action "+action3 + " time "+date.getTime());
 			TestCase1109.uam.monitor(this.cssOwnerId, action3);
@@ -365,9 +427,9 @@ public class ContextStorageTest {
 		//IAction action6 = new Action(serviceId2, "serviceType2", "getInfo", "traffic");
 		try {
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"High_way");
-			setContext(CtxAttributeTypes.TEMPERATURE, 22);
+			setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(22));
 			setContext(CtxAttributeTypes.STATUS, "driving");
-			
+
 			Date date= new Date();
 			LOG.info("monitor action "+action4 + " time "+date.getTime());
 			TestCase1109.uam.monitor(this.cssOwnerId, action4);
@@ -375,9 +437,9 @@ public class ContextStorageTest {
 			Thread.sleep(5000);
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Gas_station");
-			setContext(CtxAttributeTypes.TEMPERATURE, 28);
+			setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(28));
 			setContext(CtxAttributeTypes.STATUS, "stopped");
-			
+
 			date= new Date();
 			LOG.info("monitor action "+action5 + " time "+date.getTime());
 			TestCase1109.uam.monitor(this.cssOwnerId, action5);
@@ -386,15 +448,15 @@ public class ContextStorageTest {
 
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"high_way_junction");
-			setContext(CtxAttributeTypes.TEMPERATURE, 30);
+			setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(30));
 			setContext(CtxAttributeTypes.STATUS, "driving");
-			
+
 			date= new Date();
 			LOG.info("monitor action "+action6 + " time "+date.getTime());
 			TestCase1109.uam.monitor(this.cssOwnerId, action6);
 
 			Thread.sleep(5000);
-		
+
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
@@ -403,21 +465,21 @@ public class ContextStorageTest {
 
 
 	private void actionsTask3 (IAction action7, IAction action8){
-	
+
 		try {
-		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"office_parking");
-		setContext(CtxAttributeTypes.TEMPERATURE, 22);
-		setContext(CtxAttributeTypes.STATUS, "stopped");
-		
-		Date date= new Date();
-		LOG.info("monitor action "+action7 + " time "+date.getTime());
-		TestCase1109.uam.monitor(this.cssOwnerId, action7);
-		
-		date= new Date();
-		Thread.sleep(5000);
-		LOG.info("monitor action "+action8 + " time "+date.getTime());
-		TestCase1109.uam.monitor(this.cssOwnerId, action8);
-		
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"office_parking");
+			setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(22));
+			setContext(CtxAttributeTypes.STATUS, "stopped");
+
+			Date date= new Date();
+			LOG.info("monitor action "+action7 + " time "+date.getTime());
+			TestCase1109.uam.monitor(this.cssOwnerId, action7);
+
+			date= new Date();
+			Thread.sleep(5000);
+			LOG.info("monitor action "+action8 + " time "+date.getTime());
+			TestCase1109.uam.monitor(this.cssOwnerId, action8);
+
 			Thread.sleep(5000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
