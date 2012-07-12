@@ -30,6 +30,7 @@
       <xs:element name="serviceInstance" type="tns:serviceInstance" minOccurs="0"/>
       <xs:element name="serviceLocation" type="tns:serviceLocation" minOccurs="0"/>
       <xs:element name="serviceName" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceCategory" type="xs:string" minOccurs="0"/>
       <xs:element name="serviceStatus" type="tns:serviceStatus" minOccurs="0"/>
       <xs:element name="serviceType" type="tns:serviceType" minOccurs="0"/>
     </xs:sequence>
