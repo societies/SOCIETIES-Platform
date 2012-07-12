@@ -1,0 +1,25 @@
+<!-- Comms Framework -->
+<plan name="org.societies.plan" version="3.0.0" scoped="false" atomic="true" 
+        xmlns="http://www.eclipse.org/virgo/schema/plan" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation=" 
+                http://www.eclipse.org/virgo/schema/plan 
+                http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+                
+                
+<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
+
+<!-- 
+<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
+<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
+<artifact type="bundle" name="org.societies.comm.event.mgmt"/>
+ -->
+ 
+<artifact type="bundle" name="org.societies.context-management.context-broker"/>
+<artifact type="bundle" name="org.societies.context-management.context-source-mgmt"/>
+<artifact type="bundle" name="org.societies.context-management.user-context-inference-mgmt"/>
+
+<artifact type="bundle" name="org.societies.platform.socialdata"/>
+
+<artifact type="bundle" name="org.societies.personalisation.socialprofiler"/>
+</plan>
