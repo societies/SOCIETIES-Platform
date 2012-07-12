@@ -6,13 +6,29 @@
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-    <!-- CSS / CIS Directory -->
-    <artifact type="bundle" name="org.societies.css.CssDirectory"/>
-    <artifact type="bundle" name="org.societies.cis.CisDirectory"/>
 
-    <!-- Group Manager -->
-    <artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityGroupManager"/>
-    <!--Domain Authoity Registry -->
-    <artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityRegistry"/>
+    
+    	<!-- Communication framework -->
+    	<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
+    	
+    	<!-- Data source bundle -->
+		<artifact type="bundle" name="org.societies.data-source"/>
+		
+		<!-- CSS / CIS Directory -->
+		<artifact type="bundle" name="org.societies.css.CssDirectory"/>
+		<artifact type="bundle" name="org.societies.cis.CisDirectory"/>
+		
+		<!-- Group Manager -->
+		<artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityGroupManager"/>
+
+		<!--Domain Authoity Registry -->
+		<artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityRegistry"/>
+		
+		<!--Domain Authoity WebApps -->
+		<artifact type="bundle" name="DomainAuthorityRest"/>
+		<artifact type="bundle" name="DomainAuthorityWebApp"/>
+    
+    
+    
 	
 </plan>
