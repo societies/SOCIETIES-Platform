@@ -138,7 +138,9 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public IUserIntentAction retrieveAction(String actID) {
-
+		
+		if( actID == null ) throw new NullPointerException("actID can't be null");
+		
 		IUserIntentAction actionResult = null;
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
@@ -153,6 +155,9 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public List<IUserIntentAction> retrieveActionsByTypeValue(String actionType, String actionValue) {
 
+		if(actionType == null ||actionValue == null) throw new NullPointerException("actionType, actionValue can't be null");
+		
+		
 		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
@@ -163,10 +168,44 @@ public class CAUITaskManager implements ICAUITaskManager{
 		return actionResult;
 	}
 
+	@Override
+	public List<IUserIntentAction> retrieveActionsByServiceTypeValue(String serviceId,String actionType, String actionValue) {
 
+		if(serviceId ==  null || actionType == null ||actionValue == null) throw new NullPointerException("serviceId, actionType, actionValue can't be null");
+		
+		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
+		UserIntentModelData model = retrieveModel();
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
+		
+		for(IUserIntentAction action : actionsMap.keySet()){
+			if (action.getServiceID().getServiceInstanceIdentifier().equals(serviceId) && action.getparameterName().equals(actionType) && action.getvalue().equals(actionValue) ) actionResult.add(action);
+		}
+		return actionResult;
+	}
+	
+	@Override
+	public List<IUserIntentAction> retrieveActionsByServiceType (String serviceId,String actionType) {
+
+		if(serviceId ==  null || actionType == null) throw new NullPointerException("serviceId, actionType can't be null");
+		
+		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
+		UserIntentModelData model = retrieveModel();
+		
+		if(model == null || model.getActionModel().size() == 0 ) throw new NullPointerException("UserIntentModelData is null");
+		
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
+		
+		for(IUserIntentAction action : actionsMap.keySet()){
+			if (action.getServiceID().getServiceInstanceIdentifier().equals(serviceId) && action.getparameterName().equals(actionType)) actionResult.add(action);
+		}
+		return actionResult;
+	}
+	
 	@Override
 	public List<IUserIntentAction> retrieveActionsByType(String actionType) {
 
+		if( actionType == null) throw new NullPointerException("serviceId or actionType can't be null");
+		
 		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
 		UserIntentModelData model = retrieveModel();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();

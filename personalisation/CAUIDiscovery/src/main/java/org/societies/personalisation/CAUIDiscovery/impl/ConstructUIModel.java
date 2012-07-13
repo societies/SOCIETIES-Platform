@@ -57,18 +57,19 @@ public class ConstructUIModel {
 		for (String actionTemp : transDictionaryAll.keySet()){
 			String [] action = actionTemp.split("\\#");
 			// add here the serviceID /
-			//	LOG.info("1 paramName: "+action[0]+"paramValue: "+action[1]);
+			LOG.info("action details > serviceID: "+action[0]+" paramName: "+action[1]+" paramValue:"+action[2]);
 			String serviceId = action[0];
 			//System.out.println("serviceId="+serviceId);
 			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 			try {
 				serviceId1.setIdentifier(new URI(serviceId));
+				serviceId1.setServiceInstanceIdentifier(serviceId);				
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
 			
 			IUserIntentAction userAction = cauiTaskManager.createAction(serviceId1,"serviceType",action[1],action[2]);
-			//	LOG.info("2 userAction created "+userAction);
+			LOG.info("2 userAction created "+userAction);
 
 			if(ctxActionsMap.get(actionTemp)!=null){
 				List<String> contexValuesStringList = ctxActionsMap.get(actionTemp);
@@ -121,7 +122,7 @@ public class ConstructUIModel {
 		}		 
 		
 		modelData  = cauiTaskManager.retrieveModel();
-		//	LOG.info("10 modelData action model:"+ modelData.getActionModel());
+		LOG.info("10 modelData action model:"+ modelData.getActionModel());
 		return modelData;
 	}
 

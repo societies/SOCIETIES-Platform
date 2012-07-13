@@ -20,6 +20,8 @@
 package org.societies.personalisation.CAUITaskManager.test;
 
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import java.util.Map;
 
 
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
@@ -55,7 +58,7 @@ public class CAUITaskManagerTest {
 
 	private void  retrieveTests(){
 
-		IUserIntentAction retrievedAction = modelManager.retrieveAction("A-homePc=off/0");
+		IUserIntentAction retrievedAction = modelManager.retrieveAction("css://nikosk@societies.org/HelloEarth#A-homePc=off/0");
 		System.out.println("retrievedAction "+ retrievedAction.getparameterName()+" "+retrievedAction.getvalue());
 
 		List<IUserIntentAction> resultsType = modelManager.retrieveActionsByType("A-homePc");
@@ -82,8 +85,19 @@ public class CAUITaskManagerTest {
 
 	private void createModel(){
 
+		
+		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+		try {
+			serviceId.setIdentifier(new URI("css://nikosk@societies.org/HelloEarth"));
+			serviceId.setServiceInstanceIdentifier("css://nikosk@societies.org/HelloEarth");
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 		//create Task A
-		IUserIntentAction userActionA = modelManager.createAction(null,"ServiceType","A-homePc","off");
+		IUserIntentAction userActionA = modelManager.createAction(serviceId,"ServiceType","A-homePc","off");
 		
 		HashMap<String,Serializable> contextMap = new HashMap<String,Serializable>(); 
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"earth");
@@ -91,13 +105,13 @@ public class CAUITaskManagerTest {
 		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
 		userActionA.setActionContext(contextMap);
 		
-		IUserIntentAction userActionB = modelManager.createAction(null,"ServiceType","B-tv","on");
+		IUserIntentAction userActionB = modelManager.createAction(serviceId,"ServiceType","B-tv","on");
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"moon");
 		contextMap.put(CtxAttributeTypes.STATUS,"free");
 		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
 		userActionB.setActionContext(contextMap);
 		
-		IUserIntentAction userActionC = modelManager.createAction(null,"ServiceType","C-radio","mute");
+		IUserIntentAction userActionC = modelManager.createAction(serviceId,"ServiceType","C-radio","mute");
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"mars");
 		contextMap.put(CtxAttributeTypes.STATUS,"free");
 		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);

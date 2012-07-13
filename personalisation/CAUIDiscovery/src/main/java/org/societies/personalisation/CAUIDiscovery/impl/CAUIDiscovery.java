@@ -145,7 +145,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			//LOG.info("5a ctxActionsMap "+ ctxActionsMap);
 			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
 
-			LOG.debug("6. result "+modelData.getActionModel());
+			LOG.info("6. result "+modelData.getActionModel());
 
 			//LOG.info("7. Store UserIntentModelData to ctx DB");
 
