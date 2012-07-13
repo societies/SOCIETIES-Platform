@@ -376,7 +376,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Log.d(LOG_TAG, "registerXMPPServer called with client: " + client);
 		Log.d(LOG_TAG, "registering user: " + record.getCssIdentity() + " at domain: " + record.getDomainServer());
 		
-		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword()};
+		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 
 		DomainRegistration domainRegister = new DomainRegistration();
 		
@@ -453,7 +453,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		 * Carry out compute task 
 		 */
 		protected String[] doInBackground(String... params) {
-			Dbc.require("AndroidCssRecord must be supplied", params.length >= 4);
+			Dbc.require("Four parameters must be supplied", params.length >= 4);
 			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
 			Log.d(LOG_TAG, "DomainRegistration param username: " + params[0]);
 			Log.d(LOG_TAG, "DomainRegistration param domain server: " + params[1]);

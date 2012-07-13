@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
-import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CSSNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
@@ -282,6 +281,7 @@ public class ServiceRegistryTest extends
 				result.setServiceEndpoint("serviceEndPoint");
 				result.setServiceName("serviceName" + i);
 				result.setPrivacyPolicy("pathtoprivacypolicy");
+				result.setServiceCategory("testservice");
 				result.setServiceType(ServiceType.THIRD_PARTY_SERVER);
 				result.setServiceLocation(ServiceLocation.LOCAL);
 				result.setServiceStatus(ServiceStatus.STARTED);

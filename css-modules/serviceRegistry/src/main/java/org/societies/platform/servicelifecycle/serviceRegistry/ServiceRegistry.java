@@ -79,6 +79,7 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceDescription(),
 						service.getAuthorSignature(),
 						service.getPrivacyPolicy(),
+						service.getServiceCategory(),
 						service.getServiceType(),
 						service.getServiceLocation(),
 						service.getServiceInstance(),
@@ -117,6 +118,7 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceDescription(),
 						service.getAuthorSignature(), 
 						service.getPrivacyPolicy(),
+						service.getServiceCategory(),
 						service.getServiceType(),
 						service.getServiceLocation(),
 						service.getServiceInstance(),
@@ -231,8 +233,10 @@ public class ServiceRegistry implements IServiceRegistry {
 			c.add(Restrictions.like("serviceDescription", filter.getServiceDescription()));
 		if (filter.getAuthorSignature() != null)
 			c.add(Restrictions.like("authorSignature", filter.getAuthorSignature()));
-		if (filter.getAuthorSignature() != null)
+		if (filter.getPrivacyPolicy() != null)
 			c.add(Restrictions.like("privacyPolicy", filter.getPrivacyPolicy()));
+		if (filter.getServiceCategory() != null)
+			c.add(Restrictions.like("serviceCategory", filter.getPrivacyPolicy()));
 		if (filter.getServiceEndpoint() != null)
 			c.add(Restrictions.like("serviceEndPoint", filter.getServiceEndpoint()));
 		if (filter.getServiceLocation() != null)

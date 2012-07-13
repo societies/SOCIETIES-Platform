@@ -112,7 +112,6 @@ public class PrivacyPreferenceMerger {
 			mergedTree = temp; //in the MergingManager if this method returns null, it means we have to request a full learning cycle
 
 		}
-		//DisplayPreferenceTree dpt = new DisplayPreferenceTree(new PreferenceTreeModel(oldTree),"Merged Tree :"+title);
 
 		return mergedTree;
 	}
