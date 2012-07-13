@@ -9,10 +9,10 @@
 		<relativePath>../../../../parent/android.xml</relativePath>
 	</parent>
 
-	<groupId>org.societies.android.platform</groupId>
+	<groupId>org.societies.android.privacytrust.trust</groupId>
 	<artifactId>trust-droid</artifactId>
 	<name>Trust Management and Evaluation Client</name>
-	<packaging>apk</packaging>
+	<packaging>apklib</packaging>
 	<developers>
 		<developer>
 			<name>Nicolas Liampotis</name>
@@ -28,18 +28,14 @@
 	</developers>	
 
 	<dependencies>
-		<dependency>
-			<groupId>org.societies.android.api.internal</groupId>
-			<artifactId>societies-android-api-internal</artifactId>
-			<version>${release.version}</version>
-		</dependency>
-		<dependency>
+	    <dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.phonegap</groupId>
-			<artifactId>phonegap</artifactId>
+			<groupId>org.societies.android.api.internal</groupId>
+			<artifactId>societies-android-api-internal</artifactId>
+			<version>${release.version}</version>
 		</dependency>
 	</dependencies>
 
