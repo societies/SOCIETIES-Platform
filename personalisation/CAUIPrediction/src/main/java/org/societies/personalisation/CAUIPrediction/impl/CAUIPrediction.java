@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -45,7 +44,6 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -74,9 +72,8 @@ import java.util.concurrent.ExecutionException;
  */
 public class CAUIPrediction implements ICAUIPrediction{
 
-	//CAUIPrediction depends on CauiTaskManager,PersonalisationManager and CtxBroker
 	private static final Logger LOG = LoggerFactory.getLogger(CAUIPrediction.class);
-	boolean modelExist = false;
+
 
 	private ICtxBroker ctxBroker;
 	private IInternalPersonalisationManager persoMgr;
@@ -85,55 +82,18 @@ public class CAUIPrediction implements ICAUIPrediction{
 	private ICommManager commsMgr;
 
 	private Boolean enablePrediction = true;  
-	private String [] lastActions = null;
+
+	// maintains the last 100 actions
+	private List<IAction> lastMonitoredActions = new ArrayList<IAction>();
+	private List<IUserIntentAction> lastPredictedActions = new ArrayList<IUserIntentAction>();
 
 	int predictionRequestsCounter = 0;
 	int discoveryThreshold = 19;
+	boolean modelExist = false;
 
-	public IIdentity identity = null;
-	public CtxAttributeIdentifier locationAttrId;
-	public CtxAttributeIdentifier statusAttrId;
-	public CtxAttributeIdentifier activityAttrId;
 	private IIdentity cssOwnerId;
 
-
-	public CtxAttributeIdentifier getStatusAttrId() {
-		return statusAttrId;
-	}
-
-	public void setStatusAttrId(CtxAttributeIdentifier statusAttr) {
-		this.statusAttrId = statusAttr;
-	}
-
-	public CtxAttributeIdentifier getActivityAttrId() {
-		return activityAttrId;
-	}
-
-	public void setActivityAttrId(CtxAttributeIdentifier activityAttr) {
-		this.activityAttrId = activityAttr;
-	}
-
-	public CtxAttributeIdentifier getLocationAttrId() {
-		return locationAttrId;
-	}
-
-	public void setLocationAttrId(CtxAttributeIdentifier locationAttr) {
-		this.locationAttrId = locationAttr;
-	}
-
-
-	public IIdentity getIdentity() {
-		return identity;
-	}
-
-
-	public void setIdentity(IIdentity identity) {
-		this.identity = identity;
-	}
-
-
-	//Services
-
+	//Services registration
 	public ICAUIDiscovery getCauiDiscovery() {
 		LOG.info(this.getClass().getName()+": Return cauiDiscovery");
 		return cauiDiscovery;
@@ -221,7 +181,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		LOG.info("getPrediction based on action: "+ action+" identity requestor:"+requestor+" modelExist"+modelExist);
 		predictionRequestsCounter = predictionRequestsCounter +1;
-
+		this.recordMonitoredAction(action);
 
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 		if(cauiDiscovery != null){
@@ -245,12 +205,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 			LOG.info("2. action perf par:"+ par+" action val:"+val);
 			//add code here for retrieving current context;
 
-			HashMap<String,Serializable> currentContext = new HashMap<String,Serializable>();
-			//Map<IUserIntentAction, IUserIntentTask> currentActionTask = cauiTaskManager.identifyActionTaskInModel(par, val, currentContext, this.lastActions);
+
 			// identify performed action in model
 			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
 			LOG.info("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
+
 			if(actionsList.size()>0){
+				// improve this to also use context for action identification
 				IUserIntentAction currentAction = actionsList.get(0);
 				LOG.info("4. currentAction " +currentAction);
 				Map<IUserIntentAction,Double> nextActionsMap = cauiTaskManager.retrieveNextActions(currentAction);	
@@ -269,19 +230,69 @@ public class CAUIPrediction implements ICAUIPrediction{
 			LOG.info("no CAUI model exist yet ");
 		}
 		//LOG.info(" getPrediction(IIdentity requestor, IAction action) "+ results);
+
+		if(results.size()>0){
+			for(IUserIntentAction predAction : results){
+				this.recordPrediction(predAction);		
+			}
+		}
+
+
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
+	// kalite mono otan allazei to attribute,,, synypologizei to teleutaio predicted/performed action 
+
+	@Override
+	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
+			CtxAttribute contextAttribute) {
+
+		LOG.info("getPrediction based on attr update  contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
+		LOG.info("attr string value "+contextAttribute.getStringValue() );
+
+		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
+		IAction lastAction = null;
+		// TODO use last predicted or performed action?
+		// if performed actions also trigger prediction... so no use ?
+		IUserIntentAction lastPredictedAction = null;
+
+		if(lastMonitoredActions.size()>0){
+			lastAction = lastMonitoredActions.get(lastMonitoredActions.size()-1);	
+		}
+
+		if(lastAction != null && modelExist == true && enablePrediction == true){
+			String par = lastAction.getparameterName();
+			String val = lastAction.getvalue();
+			// identify performed action in model
+			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
+
+			if(actionsList.size()>0){
+				// improve this to also use context for action identification
+				IUserIntentAction currentAction = actionsList.get(0);
+				Map<IUserIntentAction,Double> nextActionsMap = cauiTaskManager.retrieveNextActions(currentAction);	
+
+				if(nextActionsMap.size()>0){
+					for(IUserIntentAction nextAction : nextActionsMap.keySet()){
+						Double doubleConf = nextActionsMap.get(nextAction);
+						nextAction.setConfidenceLevel(doubleConf.intValue());
+						results.add(nextAction);
+					}
+				}			
+			}
+		}
+		LOG.info("ctx update based action prediction:"+ results);		
+		return new AsyncResult<List<IUserIntentAction>>(results);
+	}
 
 	// based on the current identity, serviceid and actionType what is the predicted action value?
-	// concider also context data
+	// consider also context data
 	// i.e. userActionType:setDestination --> predict value:office
 
 	@Override
 	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String userActionType) {
 
-		LOG.info("getCurrentIntentAction based on identity and serviceID:"+ serviceID+" identity requestor:"+ownerID+" userActionType:"+userActionType);
+		LOG.info("getCurrentIntentAction based on identity and serviceID:"+ serviceID.getServiceInstanceIdentifier() +" identity requestor:"+ownerID+" userActionType:"+userActionType);
 
 		IUserIntentAction predictedAction = null;
 		if(modelExist == true && enablePrediction == true){
@@ -294,9 +305,32 @@ public class CAUIPrediction implements ICAUIPrediction{
 			LOG.info("no model exist - predictionRequestsCounter:" +predictionRequestsCounter);
 		}
 
+		if(predictedAction!= null)	this.recordPrediction(predictedAction);		
 		LOG.info("getCurrentIntentAction based on serviceID and actionType : "+predictedAction );
 		return new AsyncResult<IUserIntentAction>(predictedAction);
 	}
+
+
+	//the list should also consider the perso feedback  
+	private void recordPrediction(IUserIntentAction predAction){
+
+		if(this.lastPredictedActions.size()>100){
+			this.lastPredictedActions.remove(0);
+		}
+		this.lastPredictedActions.add(predAction);
+	}
+
+
+	//the list should also consider the perso feedback  
+	private void recordMonitoredAction(IAction action){
+
+		if(this.lastMonitoredActions.size()>100){
+			this.lastMonitoredActions.remove(0);
+		}
+		this.lastMonitoredActions.add(action);
+	}
+
+
 
 
 	/*
@@ -353,65 +387,6 @@ public class CAUIPrediction implements ICAUIPrediction{
 	}
 
 
-	//**********************************
-	//*** helper contex class 
-	//***********************************
-
-	private CtxAttribute retrieveOperatorsCtx(String type){
-		CtxAttribute ctxAttr = null;
-		try {
-			IndividualCtxEntity operator = this.ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
-			Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
-			if(ctxAttrSet.size()>0){
-				List<CtxAttribute>  ctxAttrList = new ArrayList<CtxAttribute> (ctxAttrSet);
-				ctxAttr = ctxAttrList.get(0);
-			}
-
-		} catch (InterruptedException e) {
-			// 
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// 
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// 
-			e.printStackTrace();
-		}
-
-		return ctxAttr;
-	}
-
-
-	// kalite mono otan allazei to attribute 
-	@Override
-	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
-			CtxAttribute contextAttribute) {
-
-		LOG.info("getPrediction based on attr update  contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
-		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
-
-		IUserIntentAction action = null;
-
-		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		try {
-			serviceId.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
-			serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-
-
-		if(modelExist == true && enablePrediction == true){
-			//fake prediction
-
-			action = cauiTaskManager.createAction(serviceId, serviceId.getServiceInstanceIdentifier(), "fakeType", "fakeAction");
-			results.add(action);		
-			LOG.info("modelExist getPrediction(IIdentity requestor,	CtxAttribute contextAttribute) create fake prediction "+ results);
-		}
-		LOG.info("getPrediction(IIdentity requestor,	CtxAttribute contextAttribute)"+ results);		
-		return new AsyncResult<List<IUserIntentAction>>(results);
-	}
-
 
 	@Override
 	public void receivePredictionFeedback(IAction action) {
@@ -444,7 +419,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				uiModelAttributeId = attr.getId();
 			}
 			if (uiModelAttributeId != null){
-				this.ctxBroker.registerForChanges(new MyCtxChangeEventListener(),uiModelAttributeId);	
+				this.ctxBroker.registerForChanges(new MyCtxUIModelChangeEventListener(),uiModelAttributeId);	
 			}		
 
 			LOG.info("registration for context attribute updates of type CAUI: "+uiModelAttributeId);
@@ -463,11 +438,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}			
 	}
 
-
 	public void setActiveModel(UserIntentModelData newUIModelData){
 
-		// retrieve model from Context DB
-		// set model as active in CauiTaskManager
 		if (newUIModelData != null){
 			cauiTaskManager.updateModel(newUIModelData);
 			modelExist = true;		 
@@ -476,12 +448,10 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 	}
 
+	private class MyCtxUIModelChangeEventListener implements CtxChangeEventListener {
 
 
-	private class MyCtxChangeEventListener implements CtxChangeEventListener {
-
-
-		MyCtxChangeEventListener(){
+		MyCtxUIModelChangeEventListener(){
 		}
 
 		@Override
@@ -491,7 +461,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
-			LOG.info(event.getId() + ": *** Update event ***");
+			LOG.info(event.getId() + ": *** Update event *** new User Intentn model stored in ctxDB");
 
 			CtxIdentifier uiModelAttrID = event.getId();
 
@@ -504,9 +474,24 @@ public class CAUIPrediction implements ICAUIPrediction{
 					setActiveModel(newUIModelData);
 
 					//TODO register with pers manager for location updates.
-					//LOG.info("register with pers manager for ctxAttr location update: "+getLocationAttrId());
-					//locationAttrId = initialiseAttrId(CtxAttributeTypes.LOCATION_SYMBOLIC);
-					//persoMgr.registerForContextUpdate(getIdentity(), PersonalisationTypes.CAUIIntent, locationAttrId);			
+					LOG.info("register with pers manager for ctxAttr  update");
+					if(retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
+						CtxAttribute ctxAttrLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
+						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrLocation.getId());	
+						LOG.info("register with pers manager for ctxAttr LOCATION_SYMBOLIC update");
+					}
+
+					if(retrieveOperatorsCtx(CtxAttributeTypes.STATUS) != null){
+						CtxAttribute ctxAttrStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
+						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrStatus.getId());	
+						LOG.info("register with pers manager for ctxAttr STATUS update");
+					}
+
+					if(retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE) != null){
+						CtxAttribute ctxAttrTemp = retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE);
+						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrTemp.getId());	
+						LOG.info("register with pers manager for ctxAttr TEMPERATURE update");
+					}
 
 				} catch (InterruptedException e) {
 
@@ -537,8 +522,53 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		}
 	}
+	// end of event listener implementation
 
 
+
+	//**********************************
+	//*** helper context class 
+	//***********************************
+
+	private CtxAttribute retrieveOperatorsCtx(String type){
+		CtxAttribute ctxAttr = null;
+		try {
+			IndividualCtxEntity operator = this.ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
+			Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
+			if(ctxAttrSet.size()>0){
+				List<CtxAttribute>  ctxAttrList = new ArrayList<CtxAttribute> (ctxAttrSet);
+				ctxAttr = ctxAttrList.get(0);
+			}
+
+		} catch (InterruptedException e) {
+			// 
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// 
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// 
+			e.printStackTrace();
+		}
+
+		return ctxAttr;
+	}
+
+	private IIdentity getOwnerId(){
+
+		IIdentity cssOwnerId = null;
+		try {
+			final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+			//LOG.info("*** cssNodeId = " + cssNodeId);
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			cssOwnerId =  this.commsMgr.getIdManager().fromJid(cssOwnerStr);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return cssOwnerId;
+	}
 
 	/*
 	private CtxAttributeIdentifier initialiseAttrId(String attrType){
@@ -578,5 +608,4 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return attrid;	
 	}
 	 */
-
 }

@@ -68,7 +68,7 @@ public class CAUITaskManagerTest {
 		System.out.println("getActionsByType(homePC,on) " + resultsTypeValue);
 
 		List<IUserIntentAction> resultsTypeValue2 = modelManager.retrieveActionsByTypeValue("A-homePc","off");
-		System.out.println("getActionsByType(homePC,ttt) " + resultsTypeValue2);
+		System.out.println("getActionsByType(homePC,off) " + resultsTypeValue2);
 
 		UserIntentModelData model = modelManager.retrieveModel();
 		System.out.println(model.getActionModel());

@@ -62,7 +62,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 
 
-public class ContextStorageTest {
+public class Tester {
 
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1109.class);
 
@@ -84,8 +84,8 @@ public class ContextStorageTest {
 		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
 		ServiceResourceIdentifier serviceIdRandom = new ServiceResourceIdentifier();
 		try {
-		//	IIdentity cssOwnerId = getOwnerId();
-		
+			//	IIdentity cssOwnerId = getOwnerId();
+
 			serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
 			serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
 
@@ -203,8 +203,6 @@ public class ContextStorageTest {
 		}
 	}
 
-
-
 	@Test
 	public void TestPerformOnDemandPrediction() {
 
@@ -220,7 +218,7 @@ public class ContextStorageTest {
 
 			// this action simulates an action performed by the user 
 			IAction actionRadio1 = new Action(serviceId, "serviceType1", "setRadio", "on");
-			printCurrentContext();
+			printOperatorAttr();
 			LOG.info("A action performed :  "+ actionRadio1 );
 
 			List<IUserIntentAction> actionList = TestCase1109.cauiPrediction.getPrediction(cssOwnerId, actionRadio1).get();
@@ -295,7 +293,7 @@ public class ContextStorageTest {
 
 			// this action simulates an action performed by the user 
 			IAction action4 = new Action(serviceId2, "serviceType2", "setDestination", "gasStation");
-			printCurrentContext();
+			printOperatorAttr();
 
 			LOG.info("performing action: "+ action4);
 			TestCase1109.uam.monitor(cssOwnerId, action4);
@@ -318,19 +316,19 @@ public class ContextStorageTest {
 		ServiceResourceIdentifier serviceId3 = new ServiceResourceIdentifier();
 		try {
 			IIdentity cssOwnerId = getOwnerId();
-			
+
 			LOG.info("TestGetCurrentIntentAction : waiting 9000 ");
 			Thread.sleep(9000);
 
 			serviceId3.setIdentifier(new URI("css://nikosk@societies.org/navigatorService"));
 			serviceId3.setServiceInstanceIdentifier("css://nikosk@societies.org/navigatorService");
 
-			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "High_way");
 			//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
 			setContext(CtxAttributeTypes.STATUS, "driving");
 
 			LOG.info("print current context");
-			printAttr();
+			printOperatorAttr();
 
 			IUserIntentAction predictedAction = TestCase1109.cauiPrediction.getCurrentIntentAction(cssOwnerId, serviceId3, "setDestination").get();
 
@@ -346,10 +344,7 @@ public class ContextStorageTest {
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 
 
 	}
@@ -359,17 +354,20 @@ public class ContextStorageTest {
 	//           helper classes 
 	//******************************************** 
 	private void randomAction (IAction action){
-		
+
 		IIdentity cssOwnerId = getOwnerId();
+		
+		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "randomLocation");
+		//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(300));
+		setContext(CtxAttributeTypes.STATUS, "randomStatus");
+		
 		TestCase1109.uam.monitor(cssOwnerId, action);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "randomLocation");
-		setContext(CtxAttributeTypes.TEMPERATURE, new Integer(300));
-		setContext(CtxAttributeTypes.STATUS, "randomStatus");
+		
 	}
 
 
@@ -412,7 +410,7 @@ public class ContextStorageTest {
 
 
 	private void actionsTask2 (IAction action4, IAction action5, IAction action6){
-	
+
 		IIdentity cssOwnerId = getOwnerId();
 		//IAction action4 = new Action(serviceId2, "serviceType2", "setDestination", "gasStation");
 		//IAction action5 = new Action(serviceId2, "serviceType2", "setDestination", "office");
@@ -455,7 +453,7 @@ public class ContextStorageTest {
 
 		try {
 			IIdentity cssOwnerId = getOwnerId();
-			
+
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"office_parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE,  new Integer(22));
 			setContext(CtxAttributeTypes.STATUS, "stopped");
@@ -476,8 +474,9 @@ public class ContextStorageTest {
 
 	}
 
+
 	private CtxAttribute setContext(String type, Serializable value){
-		
+
 		IIdentity cssOwnerId = getOwnerId();
 		CtxAttribute attr = null; 
 		try {
@@ -501,15 +500,19 @@ public class ContextStorageTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		LOG.info("ctxAttr of type: "+attr.getType()+" set to value: "+attr.getStringValue());
+		
 		return attr;
 	}
 
-	private void printAttr() throws InterruptedException, ExecutionException, CtxException{
-		
+
+
+	private void printOperatorAttr() {
+
 		IIdentity cssOwnerId = getOwnerId();
 		try {
 			final INetworkNode cssNodeId = TestCase1109.commMgr.getIdManager().getThisNetworkNode();
-			LOG.info("*** cssNodeId = " + cssNodeId);
+			//LOG.info("*** cssNodeId = " + cssNodeId);
 			final String cssOwnerStr = cssNodeId.getBareJid();
 
 			cssOwnerId = TestCase1109.commMgr.getIdManager().fromJid(cssOwnerStr);
@@ -517,7 +520,7 @@ public class ContextStorageTest {
 
 			System.out.println("operator: "+operator);
 			Set<CtxAttribute> attrSet = operator.getAttributes();
-			System.out.println("operator attrs : "+attrSet);
+			//System.out.println("operator attrs : "+attrSet);
 			for(CtxAttribute attrs: attrSet){
 				System.out.println("attr type: "+attrs.getType());
 				if(attrs.getStringValue() != null) System.out.println(" value "+attrs.getStringValue());
@@ -525,19 +528,6 @@ public class ContextStorageTest {
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
-
-
-	protected CtxAttribute lookupRetrieveAttrHelp(String type){
-		CtxAttribute ctxAttr = null;
-		try {
-			List<CtxIdentifier> tupleAttrList = TestCase1109.ctxBroker.lookup(CtxModelType.ATTRIBUTE,type).get();
-			if(tupleAttrList.size() >0 ){
-				CtxIdentifier ctxId = tupleAttrList.get(0);
-				ctxAttr =  (CtxAttribute) TestCase1109.ctxBroker.retrieve(ctxId).get();	
-				System.out.println("lookupRetrieveAttrHelp "+ ctxAttr.getId());
-			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -548,7 +538,6 @@ public class ContextStorageTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return ctxAttr;
 	}
 
 
@@ -575,20 +564,6 @@ public class ContextStorageTest {
 		}
 	}
 
-	void printCurrentContext(){
-		CtxAttribute locationAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.LOCATION_SYMBOLIC);
-		LOG.info("location value type "+ locationAttr.getValueType());
-		LOG.info("current location symbolic value "+ locationAttr.getStringValue());
-
-		CtxAttribute temperatureAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.TEMPERATURE);
-		LOG.info("temperature value type "+ temperatureAttr.getValueType());
-		LOG.info("current temperature integer value "+ temperatureAttr.getIntegerValue());
-
-		CtxAttribute statusAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.STATUS);
-		LOG.info(" status value type "+ statusAttr.getValueType());
-		LOG.info("current  status integer value "+ statusAttr.getStringValue());
-	}
-
 	protected String getValue(CtxHistoryAttribute attribute){
 
 		String result = "";
@@ -608,9 +583,9 @@ public class ContextStorageTest {
 		return result; 
 	}
 
-	
+
 	private IIdentity getOwnerId(){
-		
+
 		IIdentity cssOwnerId = null;
 		try {
 			final INetworkNode cssNodeId = TestCase1109.commMgr.getIdManager().getThisNetworkNode();
@@ -624,4 +599,97 @@ public class ContextStorageTest {
 
 		return cssOwnerId;
 	}
+
+	
+	/*
+	 * Actions create the following model
+	 * caui model created - actions map: 
+{
+.../navigatorService#setDestination=office/5={css://nikosk@societies.org/navigatorService#getInfo=traffic/6=1.0}, 
+.../radioService#setVolume=medium/1={css://nikosk@societies.org/radioService#setTuner=favoriteChannel1/2=1.0}, 
+.../navigatorService#getInfo=traffic/6={css://nikosk@societies.org/randomService#random=yyy/7=1.0}, 
+.../navigatorService#setDestination=gasStation/4={css://nikosk@societies.org/navigatorService#setDestination=office/5=1.0}, 
+.../radioService#setRadio=on/0={css://nikosk@societies.org/radioService#setVolume=medium/1=1.0}, 
+.../navigatorService#setDestinator=off/9={css://nikosk@societies.org/radioService#setRadio=on/0=1.0}, 
+.../radioService#setRadio=off/8={css://nikosk@societies.org/navigatorService#setDestinator=off/9=1.0}, 
+.../radioService#setTuner=favoriteChannel1/2={css://nikosk@societies.org/randomService#random=yyy/7=0.5, css://nikosk@societies.org/randomService#random=xxx/3=0.5}
+
+.../randomService#random=xxx/3={css://nikosk@societies.org/navigatorService#setDestination=gasStation/4=1.0}, 
+.../randomService#random=yyy/7={css://nikosk@societies.org/radioService#setRadio=off/8=0.5, css://nikosk@societies.org/randomService#random=xxx/3=0.5},
+} 
+	 */
+	
+	// ****************** Dead moon ***********************
+	
+	/*
+	private CtxAttribute retrieveOperatorsCtx(String type){
+		CtxAttribute ctxAttr = null;
+		try {
+			IndividualCtxEntity operator = this.ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
+			Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
+			if(ctxAttrSet.size()>0){
+				List<CtxAttribute>  ctxAttrList = new ArrayList<CtxAttribute> (ctxAttrSet);
+				ctxAttr = ctxAttrList.get(0);
+			}
+		} catch (InterruptedException e) {
+			// 
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// 
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// 
+			e.printStackTrace();
+		}
+		return ctxAttr;
+	}
+	 */
+	
+	/*
+	void printOperatorsCurrentContext(){
+
+		IndividualCtxEntity operator = TestCase1109.ctxBroker.retrieveIndividualEntity(getOwnerId()).get();
+		Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
+
+		//CtxAttribute locationAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.LOCATION_SYMBOLIC);
+
+		Set<CtxAttribute> ctxAttrLocSet = operator.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		List<CtxAttribute> ctxAttrLocList = new ArrayList<CtxAttribute>(ctxAttrLocSet);
+		if(ctxAttrLocList.size()>0){
+			//LOG.info("location value type "+ ctxAttrLocList.get(0).getValueType());
+			LOG.info("current location symbolic value "+ ctxAttrLocList.get(0).getStringValue());
+		}
+		CtxAttribute temperatureAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.TEMPERATURE);
+		LOG.info("temperature value type "+ temperatureAttr.getValueType());
+		LOG.info("current temperature integer value "+ temperatureAttr.getIntegerValue());
+		CtxAttribute statusAttr = lookupRetrieveAttrHelp(CtxAttributeTypes.STATUS);
+		LOG.info(" status value type "+ statusAttr.getValueType());
+		LOG.info("current  status  value "+ statusAttr.getStringValue());
+	}
+	 */
+
+	/*
+	protected CtxAttribute lookupRetrieveAttrHelp(String type){
+		CtxAttribute ctxAttr = null;
+		try {
+			List<CtxIdentifier> tupleAttrList = TestCase1109.ctxBroker.lookup(CtxModelType.ATTRIBUTE,type).get();
+			if(tupleAttrList.size() >0 ){
+				CtxIdentifier ctxId = tupleAttrList.get(0);
+				ctxAttr =  (CtxAttribute) TestCase1109.ctxBroker.retrieve(ctxId).get();	
+				System.out.println("lookupRetrieveAttrHelp "+ ctxAttr.getId());
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ctxAttr;
+	}
+
+	 */
 }

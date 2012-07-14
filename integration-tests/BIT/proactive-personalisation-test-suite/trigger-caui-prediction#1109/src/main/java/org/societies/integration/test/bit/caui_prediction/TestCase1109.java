@@ -7,12 +7,9 @@ package org.societies.integration.test.bit.caui_prediction;
  * @author nikosk
  *
  */
-import java.util.List;
 
 import org.societies.integration.test.IntegrationTestCase;
 import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
-import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -35,7 +32,7 @@ public class TestCase1109 extends IntegrationTestCase{
 	public static ICommManager commMgr;
 	
 	public TestCase1109() {
-		super(1109, new Class[]{ContextStorageTest.class});
+		super(1109, new Class[]{Tester.class});
 		System.out.println("Test 1109 started : TestCase1109() ");
 		//startTest(); 
 	}

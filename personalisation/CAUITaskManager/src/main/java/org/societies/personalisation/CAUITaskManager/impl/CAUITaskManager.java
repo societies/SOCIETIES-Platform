@@ -139,7 +139,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public IUserIntentAction retrieveAction(String actID) {
 		
-		if( actID == null ) throw new NullPointerException("actID can't be null");
+		if( actID == null ) throw new NullPointerException("actID can't be null" );
 		
 		IUserIntentAction actionResult = null;
 		UserIntentModelData model = retrieveModel();
@@ -155,7 +155,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public List<IUserIntentAction> retrieveActionsByTypeValue(String actionType, String actionValue) {
 
-		if(actionType == null ||actionValue == null) throw new NullPointerException("actionType, actionValue can't be null");
+		if( actionType == null ||actionValue == null) throw new NullPointerException("actionType:"+actionType+" actionValue:"+ actionValue+" can't be null");
 		
 		
 		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
@@ -171,7 +171,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public List<IUserIntentAction> retrieveActionsByServiceTypeValue(String serviceId,String actionType, String actionValue) {
 
-		if(serviceId ==  null || actionType == null ||actionValue == null) throw new NullPointerException("serviceId, actionType, actionValue can't be null");
+		if(serviceId ==  null || actionType == null ||actionValue == null) throw new NullPointerException("serviceId:"+serviceId + "actionType:"+actionType+" actionValue:"+ actionValue+" can't be null");
 		
 		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
 		UserIntentModelData model = retrieveModel();
@@ -186,8 +186,8 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public List<IUserIntentAction> retrieveActionsByServiceType (String serviceId,String actionType) {
 
-		if(serviceId ==  null || actionType == null) throw new NullPointerException("serviceId, actionType can't be null");
-		
+		//if(serviceId ==  null || actionType == null) throw new NullPointerException("serviceId, actionType can't be null");
+		if(serviceId ==  null || actionType == null ) throw new NullPointerException("serviceId:"+serviceId + "actionType:"+actionType+" can't be null");
 		List<IUserIntentAction> actionResult = new ArrayList<IUserIntentAction>();
 		UserIntentModelData model = retrieveModel();
 		
