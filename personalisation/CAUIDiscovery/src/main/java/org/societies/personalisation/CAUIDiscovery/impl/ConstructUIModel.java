@@ -37,7 +37,7 @@ public class ConstructUIModel {
 		LinkedHashMap<String,HashMap<String,Double>> filtered = new LinkedHashMap<String,HashMap<String,Double>>();
 		for(String actions : dictionary.keySet()){
 			HashMap<String,Double> transTargets = dictionary.get(actions);
-			System.out.println("Action:"+actions+ "| target: "+transTargets);
+			//System.out.println("Action:"+actions+ "| target: "+transTargets);
 			for(String targetAction : transTargets.keySet()){
 				if(transTargets.get(targetAction) >= limit){
 					filtered.put(actions, transTargets);
@@ -57,7 +57,7 @@ public class ConstructUIModel {
 		for (String actionTemp : transDictionaryAll.keySet()){
 			String [] action = actionTemp.split("\\#");
 			// add here the serviceID /
-			LOG.info("action details > serviceID: "+action[0]+" paramName: "+action[1]+" paramValue:"+action[2]);
+			//LOG.info("action details > serviceID: "+action[0]+" paramName: "+action[1]+" paramValue:"+action[2]);
 			String serviceId = action[0];
 			//System.out.println("serviceId="+serviceId);
 			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
@@ -69,7 +69,7 @@ public class ConstructUIModel {
 			}
 			
 			IUserIntentAction userAction = cauiTaskManager.createAction(serviceId1,"serviceType",action[1],action[2]);
-			LOG.info("2 userAction created "+userAction);
+			//LOG.info("2 userAction created "+userAction);
 
 			if(ctxActionsMap.get(actionTemp)!=null){
 				List<String> contexValuesStringList = ctxActionsMap.get(actionTemp);
@@ -122,7 +122,7 @@ public class ConstructUIModel {
 		}		 
 		
 		modelData  = cauiTaskManager.retrieveModel();
-		LOG.info("10 modelData action model:"+ modelData.getActionModel());
+		//LOG.info("10 modelData action model:"+ modelData.getActionModel());
 		return modelData;
 	}
 
@@ -131,7 +131,7 @@ public class ConstructUIModel {
 		//System.out.println ("** ConstructUIModel ** total number of entries: " + transProbDictionary.size());
 		for(String actions : transProbDictionary.keySet()){
 			HashMap<String,Double> transTargets = transProbDictionary.get(actions);
-			System.out.println("Action:"+actions+ "| target: "+transTargets);
+			//System.out.println("Action:"+actions+ "| target: "+transTargets);
 		}
 	}	
 

@@ -145,7 +145,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			//LOG.info("5a ctxActionsMap "+ ctxActionsMap);
 			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
 
-			LOG.info("6. result "+modelData.getActionModel());
+			//LOG.info("6. result "+modelData.getActionModel());
 
 			//LOG.info("7. Store UserIntentModelData to ctx DB");
 
@@ -566,9 +566,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			final String cssOwnerStr = cssNodeId.getBareJid();
 			IIdentity cssOwnerId = commsMgr.getIdManager().fromJid(cssOwnerStr);
 			
-			LOG.info("cssOwnerId "+cssOwnerId);
+			//LOG.info("cssOwnerId "+cssOwnerId);
 			IndividualCtxEntity operator = ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
-			LOG.info("discovery operator retrieved "+operator);
+			//LOG.info("discovery operator retrieved "+operator);
 			
 			ctxAttrCAUIModel = lookupAttrHelp(CtxAttributeTypes.CAUI_MODEL);
 			if(ctxAttrCAUIModel != null){
