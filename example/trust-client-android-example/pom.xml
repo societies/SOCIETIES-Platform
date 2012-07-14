@@ -6,13 +6,13 @@
 		<groupId>org.societies</groupId>
         <artifactId>android-parent</artifactId>
         <version>0.1</version>
-		<relativePath>../../../../parent/android.xml</relativePath>
+		<relativePath>../../parent/android.xml</relativePath>
 	</parent>
 
-	<groupId>org.societies.android.privacytrust.trust</groupId>
-	<artifactId>trust-droid</artifactId>
-	<name>Trust Management and Evaluation Client</name>
-	<packaging>apklib</packaging>
+	<groupId>org.societies.android.privacytrust.trust.example</groupId>
+	<artifactId>trust-client-android-example</artifactId>
+	<name>Trust Management and Evaluation Client Android App</name>
+	<packaging>apk</packaging>
 	<developers>
 		<developer>
 			<name>Nicolas Liampotis</name>
@@ -33,9 +33,19 @@
 			<artifactId>android</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.phonegap</groupId>
+			<artifactId>phonegap</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.privacytrust.trust</groupId>
+			<artifactId>trust-droid</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
 		</dependency>
 	</dependencies>
 

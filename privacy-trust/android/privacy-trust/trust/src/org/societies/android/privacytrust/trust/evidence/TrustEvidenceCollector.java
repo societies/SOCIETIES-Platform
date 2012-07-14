@@ -40,6 +40,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Describe your class here...
@@ -52,8 +53,17 @@ public class TrustEvidenceCollector extends Service
 	
 	private static final String TAG = TrustEvidenceCollector.class.getName();
 	
-	private IBinder binder;
+	private final IBinder binder = new LocalBinder();
 
+	/*
+	 * @see android.app.Service#onBind(android.content.Intent)
+	 */
+	@Override
+	public IBinder onBind(Intent intent) {
+	
+		return this.binder;
+	}
+	
 	/*
 	 * @see android.app.Service#onCreate()
 	 */
@@ -61,16 +71,6 @@ public class TrustEvidenceCollector extends Service
 	public void onCreate () {
 		
 		Log.i(TAG, "Starting");
-		this.binder = new LocalBinder();
-	}
-	
-	/*
-	 * @see android.app.Service#onBind(android.content.Intent)
-	 */
-	@Override
-	public IBinder onBind(Intent intent) {
-		
-		return this.binder;
 	}
 	
 	/*
@@ -96,19 +96,21 @@ public class TrustEvidenceCollector extends Service
 		if (timestamp == null)
 			throw new NullPointerException("timestamp can't be null");
 		
-		// TODO Auto-generated method stub
-		StringBuilder sb = new StringBuilder();
-		sb.append("Add direct evidence:");
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Adding direct trust evidence:");
 		sb.append("teid=");
 		sb.append(teid);
-		sb.append("type=");
+		sb.append(", type=");
 		sb.append(type);
-		sb.append("timestamp=");
+		sb.append(", timestamp=");
 		sb.append(timestamp);
-		sb.append("info=");
+		sb.append(", info=");
 		sb.append(info);
+		Log.d(TAG, sb.toString());
+		// TODO remove
+		Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
 		
-		Log.i(TAG, sb.toString());
+		// TODO Auto-generated method stub
 	}
 
 	/*
@@ -183,7 +185,8 @@ public class TrustEvidenceCollector extends Service
 	
 	public class LocalBinder extends Binder {
 		
-		TrustEvidenceCollector getService() {
+		public ITrustEvidenceCollector getService() {
+			
 			return TrustEvidenceCollector.this;
 		}
 	}
