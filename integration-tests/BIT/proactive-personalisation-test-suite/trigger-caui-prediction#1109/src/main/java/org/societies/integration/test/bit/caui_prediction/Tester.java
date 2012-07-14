@@ -190,7 +190,7 @@ public class Tester {
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults;
 		try {
 			tupleResults = TestCase1109.ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, ls, null, null).get();
-			//Assert.assertEquals(49,tupleResults.size());
+			Assert.assertEquals(20,tupleResults.size());
 			printHocTuplesDB(tupleResults);
 			LOG.info("number of actions in history "+ tupleResults.size());
 
@@ -230,37 +230,31 @@ public class Tester {
 				String value = predictedAction.getvalue();
 
 				LOG.info("C CAUI PREDICTION perform prediction :"+ predictedAction);
-				//Assert.assertEquals("setVolume", parName);
-				//	Assert.assertEquals("medium", value);
+				Assert.assertEquals("setVolume", parName);
+				Assert.assertEquals("medium", value);
 
 				HashMap<String, Serializable> context = predictedAction.getActionContext();
 
 				if(context != null){
 					LOG.info("predicted action cotnext :"+ context);	
-					LOG.info("predicted action cotnext size :"+ context.size());
+					//LOG.info("predicted action cotnext size :"+ context.size());
 				} else {
 					LOG.info("predicted action cotnext is null");
 				}
 				//TODO fix broker set type method
 
-				for(String ctxType : context.keySet()){
-					Serializable ctxValue = context.get(ctxType);
-					LOG.info("context value :"+ ctxValue);
-					if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC)&& ctxValue instanceof String){
-						String location = (String) ctxValue;
-						LOG.info("String context location value :"+ location);
-						///Assert.assertEquals("Home-Parking", location);
-					} else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Integer ){
-						Integer temperature= (Integer) ctxValue;
-						LOG.info("String context temperature value :"+ temperature);
-						//Assert.assertEquals(30, temperature);
-					} else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
-						String status = (String) ctxValue;
-						LOG.info("String context status value :"+ status);
-						//Assert.assertEquals("driving", status);
-					}
+				if(context.get(CtxAttributeTypes.LOCATION_SYMBOLIC)!= null){
+					String location = (String) context.get(CtxAttributeTypes.LOCATION_SYMBOLIC);
+					LOG.info("String context location value :"+ location);
+					Assert.assertEquals("Home-Parking", location);
 				}
-				LOG.info("CAUI PREDICTION perform prediction :"+ predictedAction);
+
+				if(context.get(CtxAttributeTypes.STATUS)!= null){
+					String status = (String) context.get(CtxAttributeTypes.STATUS);
+					LOG.info("String context status value :"+ status);
+					Assert.assertEquals("driving", status);
+				}
+
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -297,7 +291,7 @@ public class Tester {
 
 			LOG.info("performing action: "+ action4);
 			TestCase1109.uam.monitor(cssOwnerId, action4);
-
+			//LOG.info("");
 		}  catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -334,7 +328,10 @@ public class Tester {
 
 			LOG.info("predictedAction "+predictedAction.getActionID());
 			LOG.info("predictedAction context: "+predictedAction.getActionContext());
-
+			// predictedAction css://nikosk@societies.org/navigatorService#setDestination=gasStation/4 
+			// predictedAction context: {location=High_way, status=driving}
+			Assert.assertEquals("css://nikosk@societies.org/navigatorService#setDestination=gasStation/4",predictedAction.getActionID());
+			
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -356,18 +353,18 @@ public class Tester {
 	private void randomAction (IAction action){
 
 		IIdentity cssOwnerId = getOwnerId();
-		
+
 		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "randomLocation");
 		//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(300));
 		setContext(CtxAttributeTypes.STATUS, "randomStatus");
-		
+
 		TestCase1109.uam.monitor(cssOwnerId, action);
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		
+
 	}
 
 
@@ -501,7 +498,7 @@ public class Tester {
 			e.printStackTrace();
 		}
 		LOG.info("ctxAttr of type: "+attr.getType()+" set to value: "+attr.getStringValue());
-		
+
 		return attr;
 	}
 
@@ -600,7 +597,7 @@ public class Tester {
 		return cssOwnerId;
 	}
 
-	
+
 	/*
 	 * Actions create the following model
 	 * caui model created - actions map: 
@@ -618,9 +615,9 @@ public class Tester {
 .../randomService#random=yyy/7={css://nikosk@societies.org/radioService#setRadio=off/8=0.5, css://nikosk@societies.org/randomService#random=xxx/3=0.5},
 } 
 	 */
-	
+
 	// ****************** Dead moon ***********************
-	
+
 	/*
 	private CtxAttribute retrieveOperatorsCtx(String type){
 		CtxAttribute ctxAttr = null;
@@ -644,7 +641,7 @@ public class Tester {
 		return ctxAttr;
 	}
 	 */
-	
+
 	/*
 	void printOperatorsCurrentContext(){
 
