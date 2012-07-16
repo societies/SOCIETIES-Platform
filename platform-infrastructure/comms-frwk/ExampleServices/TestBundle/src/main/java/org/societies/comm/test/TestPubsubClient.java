@@ -56,7 +56,7 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 	@Override
 	public void run() {
 		try {
-			IIdentity psService = idm.fromJid("societiespubsub.red.local");
+			IIdentity psService = idm.getThisNetworkNode();
 			String node = "testNode";
 			List<String> packageList = new ArrayList<String>();
 			packageList.add("org.societies.test");
@@ -93,8 +93,6 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 		} catch (InterruptedException e) {
 			LOG.error(e.getMessage(), e);
 		} catch (JAXBException e) {
-			LOG.error(e.getMessage(), e);
-		} catch (InvalidFormatException e) {
 			LOG.error(e.getMessage(), e);
 		}
 	}
