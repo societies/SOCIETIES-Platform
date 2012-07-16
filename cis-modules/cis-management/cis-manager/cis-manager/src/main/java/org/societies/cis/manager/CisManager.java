@@ -29,21 +29,14 @@ package org.societies.cis.manager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+
 import java.util.concurrent.Future;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
-import org.hibernate.Criteria;
-import org.hibernate.Query;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -59,33 +52,31 @@ import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
+
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.Cis;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.stereotype.Component;
+
 
 
 import org.societies.api.schema.cis.community.Community;
-import org.societies.api.schema.cis.community.Join;
-import org.societies.api.schema.cis.community.Leave;
-import org.societies.api.schema.cis.community.Participant;
+
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.manager.Communities;
 import org.societies.api.schema.cis.manager.CommunityManager;
@@ -93,9 +84,6 @@ import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.CisCommunity;
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
-import org.societies.api.schema.cis.manager.DeleteNotification;
-import org.societies.api.schema.cis.manager.SubscribedTo;
-
 
 
 // this is the class which manages all the CIS from a CSS
@@ -163,11 +151,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
-						  		"http://societies.org/api/schema/cis/community"));
+					"http://societies.org/api/schema/activityfeed",	  		
+					"http://societies.org/api/schema/cis/community"));
 			//.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
 		//	.singletonList("org.societies.api.schema.cis.manager");
 			.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+					"org.societies.api.schema.activityfeed",
 					"org.societies.api.schema.cis.community"));
 
 	private static Logger LOG = LoggerFactory
@@ -341,7 +331,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 
-		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager);
+		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory);
 		if(cis == null)
 			return cis;
 
@@ -351,20 +341,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			IIdentity cssOwnerId = this.iCommMgr.getIdManager().fromJid(cssId);
 			IIdentity cisId = iCommMgr.getIdManager().fromJid(cis.getCisId());
 			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisId);
-			//PRIVACY BUNDLE NOT STARTING SO THIS LINE HANGS WAITING FOR RESPONSE!!!
-			//privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
+			privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
 		} catch (InvalidFormatException e) {
 			LOG.error("CIS or CSS jid came in bad format");
 			e.printStackTrace();
 			return null;
-		//} catch (PrivacyException e) {
-		//	LOG.error("The privacy policy can't be stored.", e);
-		//	if (null != cis) {
-		//		cis.unregisterCIS();
-		//	}
-		//	LOG.error("CIS deleted.");
-		//	e.printStackTrace();
-		//	return null;
+		} catch (PrivacyException e) {
+			LOG.error("The privacy policy can't be stored.", e);
+			if (null != cis) {
+				cis.unregisterCIS();
+			}
+			LOG.error("CIS deleted.");
+			e.printStackTrace();
+			return null;
 		}
 
 		
@@ -373,9 +362,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		
 		// persisting
-		LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
-		this.persist(cis);
-		cis.setSessionFactory(sessionFactory);
+		//LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
+		//this.persist(cis);
+		//cis.setSessionFactory(sessionFactory);
 
 
 		// advertising the CIS to global CIS directory
@@ -626,7 +615,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating delete CIS notifications
 			if (c.getNotification().getDeleteNotification() != null) {
 				LOG.info("delete notification received");
-				this.unsubscribeToCis(c.getNotification().getSubscribedTo().getCisJid());
+				this.unsubscribeToCis(c.getNotification().getDeleteNotification().getCommunityJid());
 /*				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
 				if(!this.subscribedCISs.contains(new CisRecord(d.getCommunityJid()))){
 					LOG.info("CIS is not part of the list of subscribed CISs");
@@ -907,7 +896,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 		LOG.info("in setsessionfactory!! sessionFactory is: "+sessionFactory);
-		ActivityFeed.setStaticSessionFactory(sessionFactory);
+		//ActivityFeed.setStaticSessionFactory(sessionFactory);
 		for(Cis cis : ownedCISs)
 			cis.setSessionFactory(sessionFactory);
 	}
@@ -943,7 +932,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			Community c = new Community();
 
-			c.setJoin(new Join());
+			c.setJoin("");
 			try {
 				LOG.info("Sending stanza with join");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
@@ -971,7 +960,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			Community c = new Community();
 
-			c.setLeave(new Leave());
+			c.setLeave("");
 			try {
 				LOG.info("Sending stanza with leave");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
