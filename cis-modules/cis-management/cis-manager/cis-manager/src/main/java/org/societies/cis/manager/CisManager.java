@@ -76,6 +76,9 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Join;
+import org.societies.api.schema.cis.community.Leave;
+import org.societies.api.schema.cis.community.Participant;
 
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.manager.Communities;
@@ -932,7 +935,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			Community c = new Community();
 
-			c.setJoin("");
+			c.setJoin(new Join());
 			try {
 				LOG.info("Sending stanza with join");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
@@ -960,7 +963,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			Community c = new Community();
 
-			c.setLeave("");
+			c.setLeave(new Leave());
 			try {
 				LOG.info("Sending stanza with leave");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
