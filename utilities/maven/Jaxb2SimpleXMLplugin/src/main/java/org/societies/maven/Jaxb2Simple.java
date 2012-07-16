@@ -71,7 +71,7 @@ public class Jaxb2Simple extends AbstractMojo
 	
 	
 	private Map<String, Set<String>> newClassesOnPackage = new HashMap<String, Set<String>>();
-	
+	private Map<String, String> namespaceForPackage = new HashMap<String, String>();
 
 	public void execute() throws MojoExecutionException
 	{
@@ -84,11 +84,15 @@ public class Jaxb2Simple extends AbstractMojo
 	    try {
 			files = FileListing.getFileListing(startingDirectory);
 
-			// First process ObjectFactories
+			// First process ObjectFactories and package-infos
 			for (File javaFile : files) {
 				if (javaFile.isFile() && javaFile.getName().equals("ObjectFactory.java")) {
 						getLog().debug("Processing: " + javaFile.getAbsolutePath());
 						processObjectFactory(javaFile);
+				}
+				if (javaFile.isFile() && javaFile.getName().equals("package-info.java")) {
+					getLog().debug("Processing: " + javaFile.getAbsolutePath());
+					processPackageInfo(javaFile);
 				}
 			}
 			
@@ -326,11 +330,12 @@ public class Jaxb2Simple extends AbstractMojo
 		if (matcherNS.find()) { 
 			String pkgTmp = matcherNS.group();
 			String pkgFinal = pkgTmp.substring(8, pkgTmp.indexOf(";"));
-			String[] nsArr = pkgFinal.split("\\.");
-			ns = "@Namespace(reference=\"http://" + nsArr[1] + "." + nsArr[0];
-			for(int i=2; i<nsArr.length; i++)
-				ns+="/" + nsArr[i];
-			ns += "\")\n"; 
+//			String[] nsArr = pkgFinal.split("\\.");
+//			ns = "@Namespace(reference=\"http://" + nsArr[1] + "." + nsArr[0];
+//			for(int i=2; i<nsArr.length; i++)
+//				ns+="/" + nsArr[i];
+//			ns += "\")\n";
+			ns = "@Namespace(reference=\""+namespaceForPackage.get(pkgFinal)+"\")\n"; // fix for non-default namespaces (eg pubsub#event) issue
 		}
 		
 		// @XmlRootElement -> @Root + @Namespace(reference="http://...)
@@ -561,5 +566,32 @@ public class Jaxb2Simple extends AbstractMojo
 			sb.append(parts[i].substring(1));
 		}
 		return sb.toString();
+	}
+	
+	private void processPackageInfo(File javaFile) throws IOException {
+		String pkgName = null;
+		String ns = null;
+		BufferedReader br = new BufferedReader(new FileReader(javaFile));
+		while (true) {
+			String line = br.readLine();
+			if (line==null)
+				break;
+			
+			if (pkgName==null && line.startsWith(pkgDecl)) {
+				pkgName = line.substring(pkgDecl.length(),line.length()-1);
+				getLog().debug("Got package: '"+pkgName+"'");
+			}
+			
+			if (ns==null) {
+				Matcher nm = namespacePattern.matcher(line);
+				if (nm.matches())
+					ns = nm.group(1);
+			}
+			
+			if (pkgName!=null && ns!=null) {
+				namespaceForPackage.put(pkgName, ns);
+				return;
+			}
+		}
 	}
 }

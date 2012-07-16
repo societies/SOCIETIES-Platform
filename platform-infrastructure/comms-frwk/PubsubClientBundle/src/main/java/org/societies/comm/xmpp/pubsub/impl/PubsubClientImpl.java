@@ -63,12 +63,11 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
    					"http://jabber.org/protocol/pubsub#errors",
-   					"http://jabber.org/protocol/pubsub#event",
    					"http://jabber.org/protocol/pubsub#owner",
+   					"http://jabber.org/protocol/pubsub#event",
    					"jabber:x:data"));
 	private static final List<String> PACKAGES = Collections
-			.unmodifiableList(Arrays.asList(
-					"org.jabber.protocol.pubsub",
+			.unmodifiableList(Arrays.asList("org.jabber.protocol.pubsub",
 					"org.jabber.protocol.pubsub.errors",
 					"org.jabber.protocol.pubsub.owner",
 					"org.jabber.protocol.pubsub.event",

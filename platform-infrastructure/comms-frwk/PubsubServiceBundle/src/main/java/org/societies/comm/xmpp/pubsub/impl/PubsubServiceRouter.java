@@ -65,8 +65,8 @@ public class PubsubServiceRouter implements IFeatureServer {
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
    					"http://jabber.org/protocol/pubsub#errors",
-   					"http://jabber.org/protocol/pubsub#event",
    					"http://jabber.org/protocol/pubsub#owner",
+   					"http://jabber.org/protocol/pubsub#event",
    					"jabber:x:data"));
 	private static final List<String> PACKAGES = Collections
 			.unmodifiableList(Arrays.asList(
