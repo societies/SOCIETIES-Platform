@@ -24,9 +24,11 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -67,16 +69,20 @@ public interface ICisManager {
 	 * @param cisType E.g. "disaster"
 	 * @param mode membership type, e.g 1= read-only (will be defined in the future).
 	 * @param privacyPolicy (for the second method) should follow the privacy policy schema.
+	 * @param cisCriteria specifies the criterias for one to be a member of the CIS, specified as a Hashtable
+	 *  of Context Attribute (String) and its criteria rule as a {@link MembershipCriteria} object
+	 * @param description is the description of the CIS 
 	 * @return a Future link to the {@link ICisOwned} representing the new CIS, or 
 	 * null if the CIS was not created.
 	 */
 
-	
 
-	Future<ICisOwned> createCis(String cisName, String cisType, int mode);
+	Future<ICisOwned> createCis(String cisName, String cisType, Hashtable<String, MembershipCriteria> cisCriteria, String description);
 	
+	Future<ICisOwned> createCis(String cisName, String cisType, Hashtable<String, MembershipCriteria> cisCriteria, String description
+			,String privacyPolicy);
 
-	Future<ICisOwned> createCis(String cisName, String cisType, int mode, String privacyPolicy);
+	
 	
 	// removed the need to add the cssID
 	@Deprecated

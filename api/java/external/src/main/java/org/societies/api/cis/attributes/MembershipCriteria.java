@@ -63,5 +63,36 @@ public class MembershipCriteria {
     	this.rank = rank;
     	return true;
     }
+
+
+    // equals based on rule only
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((theRule == null) ? 0 : theRule.hashCode());
+		return result;
+	}
+
+
+	// equals based on rule only
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MembershipCriteria other = (MembershipCriteria) obj;
+		if (theRule == null) {
+			if (other.theRule != null)
+				return false;
+		} else if (!theRule.equals(other.theRule))
+			return false;
+		return true;
+	}
+    
+    
     
 }

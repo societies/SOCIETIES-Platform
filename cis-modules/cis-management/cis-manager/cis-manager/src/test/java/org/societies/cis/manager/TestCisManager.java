@@ -28,6 +28,7 @@ package org.societies.cis.manager;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivity;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -120,7 +123,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	public static final String TEST_CSS_PWD = "password";
 	public static final String TEST_CIS_NAME_1 = "Flamengo Futebol Clube";
 	public static final String TEST_CIS_TYPW = "futebol";
-	public static final int TEST_CIS_MODE = 0;
 	
 	public static final String TEST_CISID_1 = "flamengo.societies.local";
 	public static final String TEST_CISID_2 = "santos.societies.local";
@@ -469,13 +471,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
 		Future<ICisOwned> testCIS = cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE);
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , null,""); //TODO: test criteria and description
 		try {
 			assertNotNull(testCIS.get());
 			assertNotNull(testCIS.get().getCisId());
 			assertEquals(testCIS.get().getName(), TEST_CIS_NAME_1);
 			assertEquals(testCIS.get().getCisType(), TEST_CIS_TYPW);
-			assertEquals(testCIS.get().getMembershipCriteria(), TEST_CIS_MODE);
 
 			// CLEANING UP
 			cisManagerUnderTest.deleteCis(testCIS.get().getCisId());
@@ -508,11 +509,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		int[] cissCheck = {0,0,0};
 		
 		ciss[0] =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1+"aa", TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1+"aa", TEST_CIS_TYPW ,null,"")).get();
 		ciss[1] = (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_2, TEST_CIS_TYPW ,null,"")).get();
 		ciss[2] = (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_3, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_3, TEST_CIS_TYPW ,null,"")).get();
 
 		List<ICisOwned> l = cisManagerUnderTestInterface.getListOfOwnedCis();
 		Iterator<ICisOwned> it = l.iterator();
@@ -564,9 +565,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		String jidTobeDeleted = "";
 		
 		ciss[0] =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 		ciss[1] = (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_2, TEST_CIS_TYPW ,null,"")).get();
 		
 //		LOG.info("cis 1 sessionfactory:"+((Cis)ciss[0]).getSessionFactory().hashCode());
 		List<ICis> l = cisManagerUnderTestInterface.getCisList();
@@ -622,7 +623,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
 		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 
 		try {
 			assertEquals(true,Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get());
@@ -654,7 +655,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
 		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 		
 
 		try {
@@ -703,7 +704,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 				
 		try {
 			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get();
@@ -753,7 +754,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 		
 		
 		
@@ -816,12 +817,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
 		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 		
 		setUpRemoteNode();
 
 		ICisOwned localInstOfRemoteCIS =  (remoteCisManagerUnderTest.createCis(
-				"name", TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				"name", TEST_CIS_TYPW ,null,"")).get();
 		
 
 		cisManagerUnderTest.joinRemoteCIS(REMOTER_CISID_1, new JoinCallBack());
@@ -881,7 +882,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 				
 		try {
 			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get();
@@ -956,7 +957,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		ICisOwned IcissOwned =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 		ICis icssRemote = IcissOwned;
 				
 		
@@ -985,7 +986,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 					// check vs input on create
 					assertEquals(communityResultObject.getCommunityName(), TEST_CIS_NAME_1);
 					assertEquals(communityResultObject.getCommunityType(), TEST_CIS_TYPW);
-					assertEquals(communityResultObject.getMembershipMode().intValue(), TEST_CIS_MODE);
+					// TODO: add criteria test
 					// check between non-callback interface
 					assertEquals(communityResultObject.getCommunityName(), IcissOwned.getName());
 					assertEquals(communityResultObject.getCommunityJid(), IcissOwned.getCisId());
@@ -1013,7 +1014,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		ICisOwned IcissOwned =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 		ICis icssRemote = IcissOwned;
 				
 		
@@ -1043,7 +1044,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 					// check vs input on create
 					assertEquals(communityResultObject.getCommunityName(), TEST_CIS_NAME_1);
 					assertEquals(communityResultObject.getCommunityType(), TEST_CIS_TYPE2);
-					assertEquals(communityResultObject.getMembershipMode().intValue(), TEST_CIS_MODE);
+					//assertEquals(communityResultObject.getMembershipMode().intValue(), TEST_CIS_MODE); TODO: add criteria test
 					assertEquals(communityResultObject.getDescription(), TEST_CIS_DESC);
 					// check between non-callback interface
 					assertEquals(communityResultObject.getCommunityName(), IcissOwned.getName());
@@ -1068,5 +1069,59 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 
+	/*
+	@Test
+	public void checkCriteria() throws InterruptedException, ExecutionException {
+
+		cisManagerUnderTest = new CisManager();
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
+		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
+		cisManagerUnderTest.init();
+		
+		cisManagerUnderTestInterface = cisManagerUnderTest;
+		ICisOwned IcissOwned =  (cisManagerUnderTestInterface.createCis(
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+		
+		MembershipCriteria m = new MembershipCriteria();
+		Rule r = new Rule();
+		r.setOperation("equals");
+		ArrayList<Object> a = new ArrayList<Object>();
+		a.add("Brazil");
+		r.setValues(a);
+		m.setRule(r);
+		
+		IcissOwned.addCriteria("location", m);		
+
+		
+		m = new MembershipCriteria();
+		r = new Rule();
+		r.setOperation("differentFrom");
+		a = new ArrayList<Object>();
+		a.add("married");
+		r.setValues(a);
+		m.setRule(r);
+		IcissOwned.addCriteria("status", m);		
+
+		
+		//setting the user qualification
+		HashMap<String,Object> q1 = new HashMap<String,Object>();
+		q1.put("status","divorced");
+		q1.put("music","rock");
+		q1.put("hair","blond");
+		q1.put("location","Brazil");
+		assertFalse(IcissOwned.checkQualification(q1));
+		
+
+		HashMap<String,Object> q2 = new HashMap<String,Object>();
+		q2.put("location","Brazil");
+		assertFalse(IcissOwned.checkQualification(q2));
+
+		HashMap<String,Object> q3 = new HashMap<String,Object>();
+		q3.put("status","married");
+		q3.put("music","rock");
+		q3.put("hair","blond");
+		q3.put("location","Brazil");		
+		assertTrue(IcissOwned.checkQualification(q3));
 	
+	}*/
 }

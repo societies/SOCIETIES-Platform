@@ -29,6 +29,7 @@ package org.societies.cis.manager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Hashtable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +46,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.activity.ActivityFeed;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -76,6 +79,8 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.MembershipCrit;
 
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.manager.Communities;
@@ -270,19 +275,23 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	 * null if the CIS was not created.
 	 */
 	
-	
 	@Override
-	public Future<ICisOwned> createCis(String cisName, String cisType, int mode) {
+	public Future<ICisOwned> createCis(String cisName, String cisType,
+			Hashtable<String, MembershipCriteria> cisCriteria,
+			String description) {
+
 		String pPolicy = "<RequestPolicy></RequestPolicy>";	
-		ICisOwned i = this.localCreateCis(cisName, cisType, mode,pPolicy);
+		ICisOwned i = this.localCreateCis(cisName, cisType, description,cisCriteria ,pPolicy);
 			return new AsyncResult<ICisOwned>(i);
-		
 	}
-	
 	@Override
-	public Future<ICisOwned> createCis(String cisName, String cisType, int mode, String privacyPolicy) {
-		ICisOwned i = this.localCreateCis(cisName, cisType, mode, privacyPolicy);
-		return new AsyncResult<ICisOwned>(i);
+	public Future<ICisOwned> createCis(String cisName, String cisType,
+			Hashtable<String, MembershipCriteria> cisCriteria,
+			String description, String privacyPolicy) {
+	
+
+		ICisOwned i = this.localCreateCis(cisName, cisType,  description,cisCriteria,privacyPolicy);
+			return new AsyncResult<ICisOwned>(i);
 	}
 	
 	
@@ -319,7 +328,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	
 	// local version of the createCis
-	private ICisOwned localCreateCis(String cisName, String cisType, int mode, String privacyPolicy) {
+	private ICisOwned localCreateCis(String cisName, String cisType, String description, Hashtable<String, MembershipCriteria> cisCriteria, String privacyPolicy) {
 		// TODO: how do we check fo the cssID/pwd?
 		//if(cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid()) == false){ // if the cssID does not match with the host owner
 		//	LOG.info("cssID does not match with the host owner");
@@ -340,7 +349,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 
 
-		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager);
+		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
+		this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
+		,description,cisCriteria);
 		if(cis == null)
 			return cis;
 
@@ -358,7 +369,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		} catch (PrivacyException e) {
 			LOG.error("The privacy policy can't be stored.", e);
 			if (null != cis) {
-				cis.unregisterCIS();
+				cis.deleteCIS();
+				//cis.unregisterCIS();
 			}
 			LOG.error("CIS deleted.");
 			e.printStackTrace();
@@ -378,7 +390,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		// advertising the CIS to global CIS directory
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
-		cisAd.setMode(cis.getMembershipCriteria());
+		cisAd.setMode(0);//TODO: update this
 		cisAd.setName(cis.getName());
 		cisAd.setUri(cis.getCisId());
 		cisAd.setType(cis.getCisType());
@@ -402,7 +414,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public boolean subscribeToCis(CisRecord i) {
 
 		if(! this.subscribedCISs.contains(new Cis(i))){
-			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getMembershipCriteria(),i.getCisName(), i.getCisJID()), this);			
+			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisName(), i.getCisJID()), this);			
 			this.subscribedCISs.add(csi);
 			this.persist(csi);
 			return true;
@@ -476,7 +488,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		if (payload.getClass().equals(org.societies.api.schema.cis.manager.CommunityManager.class)) {
 			CommunityManager c = (CommunityManager) payload;
 
-			if (c.getCreate() != null) {
+			if (c.getCreate() != null && c.getCreate().getCommunity() != null) {
 				
 				// CREATE CIS
 				LOG.info("create received");
@@ -485,28 +497,55 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				
 				//TODO: check if the sender is allowed to create a CIS
 				
-				Create create = c.getCreate();
+				Create create = c.getCreate(); 
 				
-				String ownerJid = create.getOwnerJid();
-				String cisJid = create.getCommunityJid();
-				String cisType = create.getCommunityType();
-				String cisName = create.getCommunityName();
+				//String ownerJid = create.getCommunity().getOwnerJid(); // TODO: owner must be retrieved other way
+				//String cisJid = create.getCommunityJid();
+				String cisType = create.getCommunity().getCommunityType();
+				String cisName = create.getCommunity().getCommunityName();
+				String cisDescription;
+				if(create.getCommunity().getDescription() != null)
+					cisDescription = create.getCommunity().getDescription();
+				else
+					cisDescription = "";
 				//int cisMode = create.getMembershipMode().intValue();
 
-				if(ownerJid != null  && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
-					int cisMode = create.getMembershipMode().intValue();
-					String pPolicy = "<RequestPolicy></RequestPolicy>";	
-					ICisOwned icis = localCreateCis( cisName, cisType, cisMode,pPolicy);
-
+				if(cisType != null && cisName != null){
+					String pPolicy = "<RequestPolicy></RequestPolicy>";						
+					Hashtable<String, MembershipCriteria> h = null;
 					
-					create.setCommunityJid(icis.getCisId());
+					MembershipCrit m = create.getCommunity().getMembershipCrit();
+					if (m!=null && m.getCriteria() != null && m.getCriteria().size()>0){
+						h =new Hashtable<String, MembershipCriteria>();
+						
+						// populate the hashtable
+						for (Criteria crit : m.getCriteria()) {
+							MembershipCriteria meb = new MembershipCriteria();
+							if(crit.getRank() != null)
+								meb.setRank(Integer.parseInt(crit.getRank()));
+							Rule r = new Rule();
+							if( r.setOperation(crit.getOperator()) == false) {create.setResult(false); return c;}
+							if( r.setValues(crit.getValue()) == false) {create.setResult(false); return c;}
+							meb.setRule(r);
+							h.put(crit.getAttr(), meb);
+							
+						}
+					}
+					
+					ICisOwned icis = localCreateCis( cisName, cisType, cisDescription,h,pPolicy);
+		
+						
+					create.getCommunity().setCommunityJid(icis.getCisId());
 					LOG.info("CIS with self assigned ID Created!!");
+
 					return c;  
-				}else{
-				
-				LOG.info("missing parameter on the create");
-				// if one of those parameters did not come, we should return an error
-				return new CommunityManager();
+				}
+				else{
+					create.setResult(false);
+					LOG.info("missing parameter on the create");
+					
+					// if one of those parameters did not come, we should return an error
+					return c;
 				}
 				// END OF CREATE CIS					
 
@@ -605,7 +644,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating getSubscribedTo notifications
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCisMembershipMode(), c.getNotification().getSubscribedTo().getCisName(), c.getNotification().getSubscribedTo().getCisJid()));
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunityName(), c.getNotification().getSubscribedTo().getCommunityJid()));
 				
 				
 				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){
@@ -1031,4 +1070,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}
 		return true;
 	}
+
+
 }

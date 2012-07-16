@@ -33,8 +33,13 @@
   -->
  
 <xs:schema targetNamespace='http://societies.org/api/schema/cis/manager'
-	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/api/schema/cis/manager">
-<!--	xmlns:ns1="http://societies.org/api/schema/cis/community">-->
+	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				xmlns:tns="http://societies.org/api/schema/cis/manager" 
+	xmlns="http://societies.org/api/schema/cis/manager"
+	xmlns:ins="http://societies.org/api/schema/cis/community">
+
+<xs:import namespace="http://societies.org/api/schema/cis/community" 
+           schemaLocation="org.societies.api.schema.cis.community.xsd"/>
 
 	<xs:annotation>
 		<xs:documentation>
@@ -80,18 +85,12 @@
 
 	
 	<xs:element name='create'>
-    <xs:complexType>
-      <xs:simpleContent>
-        <xs:extension base='empty'>
-          <xs:attribute name='owner-jid' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='community-jid' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='community-type' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='community-name' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='membership-mode' type='xs:int'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='description' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-        </xs:extension>
-      </xs:simpleContent>
-    </xs:complexType>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref='ins:community'/>
+		</xs:sequence>
+		<xs:attribute name='result' type='xs:boolean'/>
+	</xs:complexType>
   </xs:element>
     
     <xs:element name='configure' type='empty' /><!-- TODO-->
@@ -160,10 +159,10 @@
 	    <xs:complexType>
 	      <xs:simpleContent>
 	        <xs:extension base='empty'>
-	          <xs:attribute name='cis-jid' type='xs:string' use='required'/> 
+	          <xs:attribute name='community-jid' type='xs:string' use='required'/> 
 	          <xs:attribute name='role' type='xs:string' use='required'/> 
-	          <xs:attribute name='cis-membership-mode' type='xs:int'/> 
-	          <xs:attribute name='cis-name' type='xs:string'/>
+	          <xs:attribute name='community-membership-mode' type='xs:int'/> 
+	          <xs:attribute name='community-name' type='xs:string'/>
 	        </xs:extension>
 	      </xs:simpleContent>
 	    </xs:complexType>

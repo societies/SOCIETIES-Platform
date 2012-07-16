@@ -24,6 +24,8 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.activity.IActivity;
@@ -31,6 +33,7 @@ import org.societies.api.activity.IActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.societies.api.cis.attributes.MembershipCriteria;
 
 /**
  * @author Babak.Farshchian@sintef.no
@@ -63,13 +66,16 @@ public interface ICis {
     //public String getCisType();
     
 	/**
-	 * Returns the membership criteria (also known as mode) of the CIS
+	 * Returns the membership criteria of the CIS
 	 * 
 	 * @param 
 	 * @return name of the CIS as a string
 	 */ 
-    public int getMembershipCriteria();
+    public Hashtable<String,MembershipCriteria> getMembershipCriteria();
+	public boolean addCriteria(String contextAtribute, MembershipCriteria m);
+	public boolean removeCriteria(String contextAtribute, MembershipCriteria m);
 
+    
 	/**
 	 * Get info from a CIS.
 	 * The callback must be able to retrieve a community object

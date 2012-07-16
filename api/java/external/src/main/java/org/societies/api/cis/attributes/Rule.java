@@ -25,6 +25,7 @@
 package org.societies.api.cis.attributes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeValueType;
 
@@ -47,7 +48,7 @@ public class Rule {
 		   }
 	}
     
-    private ArrayList<Object> values;
+    private List<String> values;
 
     //Non-T4.5 components need to be able to create a rule
     public Rule() {
@@ -65,27 +66,27 @@ public class Rule {
         else return false;
     }
 
-    public ArrayList<Object> getValues() {
+    public List<String> getValues() {
         return values;
     }
 
-    public boolean setValues(ArrayList<Object> values) {
+    public boolean setValues(List<String> values) {
         if ((!operation.equals(OperationType.range)) && (values.size() == 1)) this.values = values;
         else if ((operation.equals(OperationType.range)) && (values.size() == 2)) this.values = values;
         else return false;
         return true;
     }
     
-    public boolean checkRule(CtxAttributeValueType t, Object value){
+    public boolean checkRule(CtxAttributeValueType t, String value){
 		switch (t){
 		case STRING:
-			String v = (String) value;
+			String v = value;
 			switch (this.operation){
 			case equals:
-				if(v.equals((String) this.values.get(0))) return true;
+				if(v.equals(this.values.get(0))) return true;
 				else return false;
 			case differentFrom:
-				if(!v.equals((String) this.values.get(0))) return true;
+				if(!v.equals(this.values.get(0))) return true;
 				else return false;
 			case lessThan:
 			case greaterThan:
@@ -96,22 +97,22 @@ public class Rule {
 			break;			//end of String check
 
 		case INTEGER:
-			int i = ((Integer) value).intValue();
+			int i = Integer.valueOf(value);
 			switch (this.operation){
 			case equals:
-				if(i == ((Integer)this.values.get(0)).intValue()   ) return true;
+				if(i == (Integer.valueOf(this.values.get(0))   )) return true;
 				else return false;
 			case differentFrom:
-				if(i != ((Integer)this.values.get(0)).intValue()  ) return true;
+				if(i != (Integer.valueOf(this.values.get(0))   ))  return true;
 				else return false;
 			case lessThan:
-				if(i < ((Integer)this.values.get(0)).intValue()  ) return true;
+				if(i < (Integer.valueOf(this.values.get(0))   ))  return true;
 				else return false;
 			case greaterThan:
-				if(i > ((Integer)this.values.get(0)).intValue()  ) return true;
+				if(i > (Integer.valueOf(this.values.get(0))   ))  return true;
 				else return false;
 			case range:
-				if((i > ((Integer)this.values.get(0)).intValue()  ) && (i < ((Integer)this.values.get(1)).intValue()  ))  return true;
+				if((i > (Integer.valueOf(this.values.get(0))   )) && (i < (Integer.valueOf(this.values.get(1))   )))  return true;
 				else return false;
 			}
 			
@@ -123,5 +124,36 @@ public class Rule {
 		}
     	return false;
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((operation == null) ? 0 : operation.hashCode());
+		result = prime * result + ((values == null) ? 0 : values.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Rule other = (Rule) obj;
+		if (operation != other.operation)
+			return false;
+		if (values == null) {
+			if (other.values != null)
+				return false;
+		} else if (!values.equals(other.values))
+			return false;
+		return true;
+	}
+    
+    
     
 }

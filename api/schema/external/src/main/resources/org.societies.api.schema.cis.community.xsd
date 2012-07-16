@@ -39,37 +39,49 @@
 <xs:import namespace="http://societies.org/api/schema/activity" 
            schemaLocation="org.societies.api.schema.activity.xsd"/>
            
-<!--  	<xs:element name='community' type='community-type'></xs:element>
-	
-	<xs:complexType name='community-type'>
+ 	<xs:element name='community'>
+ 	 <xs:complexType>
+	 	 <xs:sequence>
+	 	 
+	 	    <!-- methods -->
 			<xs:choice minOccurs='0' maxOccurs='1'>
 				<xs:element ref='join'/>
 				<xs:element ref='leave'/>
 				<xs:element ref='invite'/>
 				<xs:element ref='who'/>
-				<xs:element ref='add'/>
+				<xs:element ref='addMember'/>
 				<xs:element ref='subscription'/>
-				<xs:element ref='delete'/>
+				<xs:element ref='deleteMember'/>
 				<xs:element ref='getInfo'/>
 				<xs:element ref='setInfo'/>
 				<xs:element ref='joinResponse'/>
 				<xs:element ref='leaveResponse'/>
-				<xs:element ref='addResponse'/>
-				<xs:element ref='deleteResponse'/>
+				<xs:element ref='addMemberResponse'/>
+				<xs:element ref='deleteMemberResponse'/>
 				<xs:element ref='getInfoResponse'/>
 				<xs:element ref='setInfoResponse'/>
+				<xs:element ref='getActivities'/>
+				<xs:element ref='getActivitiesResponse'/>
+				<xs:element ref='addActivity'/>
+				<xs:element ref='addActivityResponse'/>
+				<xs:element ref='cleanUpActivityFeed'/>
+				<xs:element ref='cleanUpActivityFeedResponse'/>
+				<xs:element ref='insact:activityfeed'/>
+<!-- 				<xs:element ref='deleteActivity'/>
+				<xs:element ref='deleteActivityResponse'/>-->
 			</xs:choice>
+			<xs:element ref='membershipCrit'/>
+		</xs:sequence>
+	
 		  <xs:attribute name='owner-jid' type='xs:string'/> 
-          <xs:attribute name='community-jid' type='xs:string'/> 
-          <xs:attribute name='community-password' type='xs:string'/> 
-          <xs:attribute name='owner-password' type='xs:string'/> 
+          <xs:attribute name='community-jid' type='xs:string'/>  
           <xs:attribute name='community-type' type='xs:string'/>
           <xs:attribute name='community-name' type='xs:string'/> 
-          <xs:attribute name='membership-mode' type='xs:int'/> 
           <xs:attribute name='description' type='xs:string'/> 
-	</xs:complexType>
--->
+	 </xs:complexType>
+	</xs:element>
 
+<!-- 
 <xs:element name='community' >
 	
 	<xs:complexType>
@@ -96,8 +108,7 @@
 				<xs:element ref='cleanUpActivityFeed'/>
 				<xs:element ref='cleanUpActivityFeedResponse'/>
 				<xs:element ref='insact:activityfeed'/>
-<!-- 				<xs:element ref='deleteActivity'/>
-				<xs:element ref='deleteActivityResponse'/>-->
+
 			
 			</xs:choice>
 		  <xs:attribute name='owner-jid' type='xs:string'/> 
@@ -109,7 +120,7 @@
           <xs:attribute name='description' type='xs:string'/> 
 	</xs:complexType>
 </xs:element>
-
+-->
 
 	<xs:element name='getActivities'>
 		<xs:complexType>
@@ -157,6 +168,28 @@
 			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
 	</xs:element>-->
+
+	<xs:element name='membershipCrit'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element ref='criteria'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name='criteria'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="attr" type="xs:string" minOccurs='1' maxOccurs='1'/>
+				<xs:element name="operator" type="xs:string" minOccurs='1' maxOccurs='1'/>
+				<xs:element name="value" type="xs:string" minOccurs='1' maxOccurs='2'/>
+				<xs:element name="rank" type="xs:string"></xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
 
 	<xs:element name='cleanUpActivityFeed'>
 		<xs:complexType>

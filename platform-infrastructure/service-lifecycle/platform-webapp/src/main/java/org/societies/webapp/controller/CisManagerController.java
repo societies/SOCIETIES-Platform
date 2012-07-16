@@ -26,6 +26,7 @@ package org.societies.webapp.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
@@ -154,10 +156,11 @@ public class CisManagerController {
 				model.put("methodcalled", "CreateCis");
 				res = "Creating CIS...";
 
+				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
 						cisForm.getCisName(),
-						cisForm.getCisType(),
-						cisForm.getCisMode());
+						cisForm.getCisType(),cisCriteria,""
+						); // for some strange reason null instead of cisCriteria did not work
 
 				res = "Successfully created CIS: " + cisResult.get().getCisId();
 				localCISs.add(cisResult.get());

@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.activity.RemoteActivityFeed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -84,7 +86,7 @@ public class CisSubscribedImp implements ICis {
 	
 	@Transient
 	private static Logger LOG = LoggerFactory
-			.getLogger(CisManagerClient.class);
+			.getLogger(CisSubscribedImp.class);
 	
 	@OneToOne(cascade=CascadeType.ALL)
 	private CisRecord cisRecord;
@@ -121,12 +123,6 @@ public class CisSubscribedImp implements ICis {
 	@Override
 	public String getName() {
 		return this.cisRecord.getCisName();
-	}
-
-	@Override
-	public int getMembershipCriteria() {
-
-		return this.cisRecord.getMembershipCriteria();
 	}
 
 	
@@ -335,6 +331,24 @@ public class CisSubscribedImp implements ICis {
 		
 		
 		return new AsyncResult<IActivityFeed>(i);
+	}
+
+	@Override
+	public boolean addCriteria(String contextAtribute, MembershipCriteria m) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeCriteria(String contextAtribute, MembershipCriteria m) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Hashtable<String, MembershipCriteria> getMembershipCriteria() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
