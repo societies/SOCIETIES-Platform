@@ -51,5 +51,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>ContextBroker</module>
 		<module>ContextSourceManagement</module>
 		<module>UserContextInferenceManagement</module>
+		<module>CommunityContextInferenceManagement</module>
 	</modules>
 </project>

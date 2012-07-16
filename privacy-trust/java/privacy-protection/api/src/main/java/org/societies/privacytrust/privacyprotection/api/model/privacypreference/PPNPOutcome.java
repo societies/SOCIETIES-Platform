@@ -49,7 +49,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  * @author Elizabeth
  *
  */
-public class PPNPOutcome implements IPrivacyOutcome, Serializable {
+public class PPNPOutcome extends IPrivacyOutcome implements Serializable {
 
 
 	private CtxAttributeIdentifier ctxID;
@@ -145,6 +145,53 @@ public class PPNPOutcome implements IPrivacyOutcome, Serializable {
 			print = print.concat(c.toString());
 		}
 		return print;
+	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result
+				+ ((conditions == null) ? 0 : conditions.hashCode());
+		result = prime * result + ((ctxID == null) ? 0 : ctxID.hashCode());
+		result = prime * result + ((effect == null) ? 0 : effect.hashCode());
+		result = prime * result
+				+ ((myOutcomeType == null) ? 0 : myOutcomeType.hashCode());
+		result = prime * result + ((rule == null) ? 0 : rule.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PPNPOutcome other = (PPNPOutcome) obj;
+		if (conditions == null) {
+			if (other.conditions != null)
+				return false;
+		} else if (!conditions.equals(other.conditions))
+			return false;
+		if (ctxID == null) {
+			if (other.ctxID != null)
+				return false;
+		} else if (!ctxID.equals(other.ctxID))
+			return false;
+		if (effect != other.effect)
+			return false;
+		if (myOutcomeType != other.myOutcomeType)
+			return false;
+		if (rule == null) {
+			if (other.rule != null)
+				return false;
+		} else if (!rule.equals(other.rule))
+			return false;
+		return true;
 	}
 	
 	

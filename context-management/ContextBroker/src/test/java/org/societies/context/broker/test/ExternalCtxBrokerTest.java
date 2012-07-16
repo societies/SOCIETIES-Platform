@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAssociationTypes;
@@ -57,11 +58,8 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.context.broker.api.security.CtxPermission;
+import org.societies.context.broker.api.security.ICtxAccessController;
 import org.societies.context.broker.impl.CtxBroker;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.broker.test.util.MockBlobClass;
@@ -91,7 +89,7 @@ public class ExternalCtxBrokerTest {
 	@SuppressWarnings("unused")
 	private static IIdentity cisMockIdentity = mock(IIdentity.class);
 	
-	private static IPrivacyDataManager mockPrivacyDataMgr = mock(IPrivacyDataManager.class);
+	private static ICtxAccessController mockCtxAccessController = mock(ICtxAccessController.class);
 
 	/**
 	 * @throws java.lang.Exception
@@ -136,7 +134,7 @@ public class ExternalCtxBrokerTest {
 
 		ctxBroker = new CtxBroker(internalCtxBroker);
 		ctxBroker.setIdentityMgr(mockIdentityMgr);
-		ctxBroker.setPrivacyDataMgr(mockPrivacyDataMgr);
+		ctxBroker.setCtxAccessController(mockCtxAccessController);
 	}
 
 	/**
@@ -227,11 +225,10 @@ public class ExternalCtxBrokerTest {
 		assertEquals(CtxAssociationTypes.HAS_PARAMETERS, ctxAssocHasParam.getType());
 
 		// mock checkPermission
-		ResponseItem mockPermitResponse = mock(ResponseItem.class);
-		when(mockPermitResponse.getDecision()).thenReturn(Decision.PERMIT);
-		when(mockPrivacyDataMgr.checkPermission(requestor, mockIdentityLocal, ctxAssocHasParam.getId(), new Action(ActionConstants.READ))).thenReturn(mockPermitResponse);
-		final List<CtxIdentifier> assocIdentifierList = 
-				this.ctxBroker.lookup(requestor, mockIdentityLocal, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_PARAMETERS).get();
+		doNothing().when(mockCtxAccessController).checkPermission(requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAssocHasParam.getId(), CtxPermission.READ));
+		final List<CtxIdentifier> assocIdentifierList =	this.ctxBroker.lookup(
+				requestor, mockIdentityLocal, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_PARAMETERS).get();
 		assertEquals(1, assocIdentifierList.size());
 		CtxIdentifier retrievedCtxAssocHasParamID = assocIdentifierList.get(0);
 		assertEquals(ctxAssocHasParam.getId().toString(), retrievedCtxAssocHasParamID.toString());
@@ -468,24 +465,27 @@ public class ExternalCtxBrokerTest {
 	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testUpdateByCtxAttribute() throws IOException, ClassNotFoundException, CtxException, InterruptedException, ExecutionException {
+	public void testUpdateByCtxAttribute() throws Exception {
 
 		final CtxAttribute emptyAttribute;
 		final CtxAttribute initialisedAttribute;
 		final CtxAttribute updatedAttribute;
 		final CtxEntity deviceEntity;
 
-		Requestor requestor = new Requestor(mockIdentityLocal);
+		final Requestor requestor = new Requestor(mockIdentityLocal);
 		// Create the attribute's scope
 		deviceEntity = this.ctxBroker.createEntity(requestor,mockIdentityLocal, CtxEntityTypes.DEVICE).get();
 
 		// Create the attribute to be tested
 		emptyAttribute = this.ctxBroker.createAttribute(requestor, deviceEntity.getId(), "attrType").get();
 
+		// mock checkPermission
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, new CtxPermission(emptyAttribute.getId(), CtxPermission.WRITE));
+		
 		// Set the attribute's initial value
 		emptyAttribute.setIntegerValue(100);
 		initialisedAttribute = (CtxAttribute) this.ctxBroker.update(requestor, emptyAttribute).get();
-
 
 		// Verify the initial attribute value
 		assertEquals(new Integer(100), initialisedAttribute.getIntegerValue());
@@ -511,34 +511,96 @@ public class ExternalCtxBrokerTest {
 				deserialise(binaryAttribute.getBinaryValue(), this.getClass().getClassLoader());
 		assertEquals(blob, retrievedBlob);
 	}	
+	
+	/**
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#update(org.societies.api.context.model.CtxModelObject)}.
+	 * 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws CtxException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test(expected=CtxAccessControlException.class)
+	public void testUpdateByCtxAttributeAccessControlException() throws Exception {
+
+		final CtxAttribute emptyAttribute;
+		final CtxEntity deviceEntity;
+
+		final Requestor requestor = new Requestor(mockIdentityLocal);
+		// Create the attribute's scope
+		deviceEntity = this.ctxBroker.createEntity(requestor, mockIdentityLocal, CtxEntityTypes.DEVICE).get();
+
+		// Create the attribute to be tested
+		emptyAttribute = this.ctxBroker.createAttribute(requestor, deviceEntity.getId(), "attrType").get();
+
+		doThrow(new CtxAccessControlException()).when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(emptyAttribute.getId(), CtxPermission.WRITE));
+		
+		// Set the attribute's initial value
+		emptyAttribute.setIntegerValue(100);
+		this.ctxBroker.update(requestor, emptyAttribute).get();
+	}
 
 	@Test
-	public void testLookupAttributeValues(){
+	public void testLookupAttributeValues() throws Exception {
 
-		Requestor requestor = new Requestor(mockIdentityLocal);
-		try {
-			CtxEntity entity1 = this.ctxBroker.createEntity(requestor, mockIdentityLocal, CtxEntityTypes.SERVICE).get();
-			CtxAttribute ctxAttributeLocationCoords1 = this.ctxBroker.createAttribute(requestor, entity1.getId(), CtxAttributeTypes.LOCATION_COORDINATES).get();
+		final Requestor requestor = new Requestor(mockIdentityLocal);
+		
+		// create entity1
+		CtxEntity entity1 = this.ctxBroker.createEntity(requestor, mockIdentityLocal, CtxEntityTypes.SERVICE).get();
+		
+		// create ctxAttributeLocationCoords1
+		CtxAttribute ctxAttributeLocationCoords1 = this.ctxBroker.createAttribute(requestor, entity1.getId(), CtxAttributeTypes.LOCATION_COORDINATES).get();
 
-			MockBlobClass coordinatesValue = new MockBlobClass(125125);
-			ctxAttributeLocationCoords1.setBinaryValue(SerialisationHelper.serialise(coordinatesValue));
-			this.ctxBroker.update(requestor, ctxAttributeLocationCoords1);
+		// mock checkPermission
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAttributeLocationCoords1.getId(), CtxPermission.WRITE));
+		
+		MockBlobClass coordinatesValue = new MockBlobClass(125125);
+		ctxAttributeLocationCoords1.setBinaryValue(SerialisationHelper.serialise(coordinatesValue));
+		this.ctxBroker.update(requestor, ctxAttributeLocationCoords1);
 
-			CtxAttribute ctxAttributeLocationSymb = this.ctxBroker.createAttribute(requestor, entity1.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
-			ctxAttributeLocationSymb.setStringValue("Athens");
-			this.ctxBroker.update(requestor,ctxAttributeLocationSymb);
-			CtxEntity entity2 = this.ctxBroker.createEntity(requestor, mockIdentityLocal, CtxEntityTypes.SERVICE).get();
-			CtxAttribute ctxAttributeLocationCoords2 = this.ctxBroker.createAttribute(requestor, entity2.getId(), CtxAttributeTypes.LOCATION_COORDINATES).get();
+		// create ctxAttributeLocationSymb
+		CtxAttribute ctxAttributeLocationSymb = this.ctxBroker.createAttribute(requestor, entity1.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+		
+		// mock checkPermission
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAttributeLocationSymb.getId(), CtxPermission.WRITE));
+		
+		ctxAttributeLocationSymb.setStringValue("Athens");
+		this.ctxBroker.update(requestor,ctxAttributeLocationSymb);
+		
+		// create entity2
+		CtxEntity entity2 = this.ctxBroker.createEntity(requestor, mockIdentityLocal, CtxEntityTypes.SERVICE).get();
+		
+		// create ctxAttributeLocationCoords2
+		CtxAttribute ctxAttributeLocationCoords2 = this.ctxBroker.createAttribute(requestor, entity2.getId(), CtxAttributeTypes.LOCATION_COORDINATES).get();
 
-			MockBlobClass coordinatesValue2 = new MockBlobClass(135135);
-			ctxAttributeLocationCoords2.setBinaryValue(SerialisationHelper.serialise(coordinatesValue2));
-			this.ctxBroker.update(requestor, ctxAttributeLocationCoords2);
+		// mock checkPermission
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAttributeLocationCoords2.getId(), CtxPermission.WRITE));
+		
+		MockBlobClass coordinatesValue2 = new MockBlobClass(135135);
+		ctxAttributeLocationCoords2.setBinaryValue(SerialisationHelper.serialise(coordinatesValue2));
+		this.ctxBroker.update(requestor, ctxAttributeLocationCoords2);
 
-			CtxAttribute ctxAttributeLocationSymb2 = this.ctxBroker.createAttribute(requestor, entity2.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
-			ctxAttributeLocationSymb2.setStringValue("Caracas");
-			this.ctxBroker.update(requestor,ctxAttributeLocationSymb2);
-			//start lookups
-			/*
+		// create ctxAttributeLocationSymb
+		CtxAttribute ctxAttributeLocationSymb2 = this.ctxBroker.createAttribute(requestor, entity2.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+		
+		// mock checkPermission
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(ctxAttributeLocationSymb2.getId(), CtxPermission.WRITE));
+		
+		ctxAttributeLocationSymb2.setStringValue("Caracas");
+		this.ctxBroker.update(requestor,ctxAttributeLocationSymb2);
+		//start lookups
+		/*
 			List<CtxEntityIdentifier> allServiceEntIds = new ArrayList<CtxEntityIdentifier>();
 
 			List<CtxIdentifier> listServiceCtxIds = this.ctxBroker.lookup(requestor,mockIdentityLocal,CtxModelType.ENTITY,CtxEntityTypes.SERVICE).get();
@@ -546,22 +608,28 @@ public class ExternalCtxBrokerTest {
 				CtxEntityIdentifier cxtEnt = (CtxEntityIdentifier) ctxId;
 				allServiceEntIds.add(cxtEnt);
 			}
-			 */
-			List<CtxEntityIdentifier> serviceEntStringValues = this.ctxBroker.lookupEntities(requestor,mockIdentityLocal,CtxEntityTypes.SERVICE, CtxAttributeTypes.LOCATION_SYMBOLIC , "Caracas", "Caracas").get();
-			CtxEntityIdentifier entId = serviceEntStringValues.get(0);
+		 */
+		List<CtxEntityIdentifier> serviceEntStringValues = this.ctxBroker.lookupEntities(
+				requestor, mockIdentityLocal, CtxEntityTypes.SERVICE, CtxAttributeTypes.LOCATION_SYMBOLIC , "Caracas", "Caracas").get();
+		CtxEntityIdentifier entId = serviceEntStringValues.get(0);
 
-			CtxEntity ent1 = (CtxEntity) this.ctxBroker.retrieve(requestor, entId).get();
-			Set<CtxAttribute> atrrSet1 = ent1.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		// mock checkPermission
+		doNothing().when(mockCtxAccessController).checkPermission(
+				requestor, mockIdentityLocal, 
+				new CtxPermission(entId, CtxPermission.READ));
+		
+		CtxEntity ent1 = (CtxEntity) this.ctxBroker.retrieve(requestor, entId).get();
+		Set<CtxAttribute> atrrSet1 = ent1.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
 
-			for(CtxAttribute attr: atrrSet1){
-				//final MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
-				System.out.println("retrievedBlob.getSeed() "+attr.getStringValue());
-				assertEquals(attr.getStringValue(),"Caracas");
-				//assertEquals(retrievedBlob.getSeed(),125);
-			}			
-			//TODO
-			//verify that also works for blob values
-			/*
+		for(CtxAttribute attr: atrrSet1){
+			//final MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
+			System.out.println("retrievedBlob.getSeed() "+attr.getStringValue());
+			assertEquals(attr.getStringValue(),"Caracas");
+			//assertEquals(retrievedBlob.getSeed(),125);
+		}			
+		//TODO
+		//verify that also works for blob values
+		/*
 			MockBlobClass coordinatesValueX = new MockBlobClass(135135);
 			List<CtxEntityIdentifier> serviceEntBlobValues = this.ctxBroker.lookupEntities(requestor,mockIdentityLocal,CtxEntityTypes.SERVICE, CtxAttributeTypes.LOCATION_COORDINATES , coordinatesValueX, coordinatesValueX).get();
 			CtxEntityIdentifier entId2 = serviceEntBlobValues.get(0);
@@ -574,19 +642,6 @@ public class ExternalCtxBrokerTest {
 				System.out.println("retrievedBlob.getSeed() "+retrievedBlob.getSeed());
 				assertEquals(retrievedBlob.getSeed(),135135);
 			}		
-			 */
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();		
-		}
+		 */
 	}
 }

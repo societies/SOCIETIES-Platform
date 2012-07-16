@@ -80,6 +80,7 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.eva
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.PrivacyPreferenceConditionMonitor;
+import org.springframework.context.annotation.Scope;
 
 /**
  * @author Elizabeth
@@ -119,7 +120,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public void initialisePrivacyPreferenceManager(ICtxBroker ctxBroker, ITrustBroker trustBroker){
 		this.setCtxBroker(ctxBroker);
 		this.trustBroker = trustBroker;
-		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, getprivacyDataManagerInternal(), idm);
+		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, privacyDataManagerInternal, idm);
 		prefCache = new PrivatePreferenceCache(ctxBroker);
 		contextCache = new PrivateContextCache(ctxBroker);
 		if (this.myMessageBox==null){
@@ -129,6 +130,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	
 	public void initialisePrivacyPreferenceManager(){
 		prefCache = new PrivatePreferenceCache(ctxBroker);
+		contextCache = new PrivateContextCache(ctxBroker);
+		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, getprivacyDataManagerInternal(), idm);
 		contextCache = new PrivateContextCache(ctxBroker);
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
@@ -195,6 +198,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		details.setRequestor(requestor);
 		model = this.prefCache.getPPNPreference(details);
 		if (model!=null){
+			this.logging.debug("Preference found specific to type and requestor but not for ctxId");
 			return this.checkPreferenceForAccessControl(model, requestor, ctxId, conditions, actions);
 		}		
 
@@ -202,12 +206,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		details.setAffectedCtxID(ctxId);
 		model = this.prefCache.getPPNPreference(details);
 		if (model!=null){
+			this.logging.debug("Preference found specific to ctxId but not for requestor");
 			return this.checkPreferenceForAccessControl(model, requestor, ctxId, conditions, actions);
 		}
 
 		details = new PPNPreferenceDetails(ctxId.getType());
 		model = this.prefCache.getPPNPreference(details);
 		if (model!=null){
+			this.logging.debug("Preference found specific to type  but not for ctxId or requestor");
 			return this.checkPreferenceForAccessControl(model, requestor, ctxId, conditions, actions);
 		}
 		
@@ -364,7 +370,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public IPrivacyOutcome evaluatePPNPreference(PPNPreferenceDetails detail){
 		IPrivacyPreferenceTreeModel model = this.prefCache.getPPNPreference(detail);
 		if (model==null){
-			JOptionPane.showMessageDialog(null, "no stored ppnp preference with these details");
+			this.logging.debug("Requested evaluation of PPN preference with details: "+detail.toString()+" but preference with these details does not exist");
+			return null;
 		}
 		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
 		
@@ -592,8 +599,17 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 		this.logging.debug("REquest to add preference :\n"+details.toString());
 		this.prefCache.addPPNPreference(details, model);
+		this.privacyPCM.updatePreferences(details, preference);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deleteIDSPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails)
+	 */
+	@Override
+	public void deleteIDSPreference(IDSPreferenceDetails details){
+		this.prefCache.removeIDSPreference(details);
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deleteIDSPreference(org.societies.api.identity.IIdentity)
@@ -666,7 +682,9 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	
 	
 	private ResponseItem checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Requestor requestor, CtxAttributeIdentifier ctxId, List<Condition> conditions, List<Action> actions){
+		this.logging.debug("Evaluating preference");
 		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
+		
 		String actionList = "";
 		for (Action a : actions){
 			actionList = actionList.concat(a.toString());
@@ -684,8 +702,10 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			}
 		}else{
 			if (((PPNPOutcome) outcome).getEffect()==PrivacyOutcomeConstants.ALLOW){
+				this.logging.debug("Returning PERMIT decision for resource: "+ctxId.toUriString());
 				return this.createResponseItem(requestor, ctxId, actions, conditions, Decision.PERMIT);
 			}
+			this.logging.debug("Returning DENY decision for resource: "+ctxId.toUriString());
 			return this.createResponseItem(requestor, ctxId, actions, conditions, Decision.DENY);
 		}
 	}
@@ -701,6 +721,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		return respItem;
 	}
 	private ResponseItem checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Requestor requestor, String ctxType, List<Condition> conditions, List<Action> actions){
+		this.logging.debug("Evaluating preference");
 		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
 		if (null==outcome){
 			this.logging.debug("Evaluation did not return a result");
@@ -720,6 +741,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 					return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
 				}else if (ctxIds.size()==1){
 					ctxId = (CtxAttributeIdentifier) ctxIds.get(0);
+					this.logging.debug("Found 1 CtxType: "+ctxType+" in db. Asking permission from user");
 				}else{
 					this.logging.debug("Asking the user: "+ctxType);
 					ctxId = (CtxAttributeIdentifier) myMessageBox.showInputDialog(requestor.getRequestorId().toString()+" is requesting access to: \n"
@@ -1092,6 +1114,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 
 
+	
+	public PrivacyPreferenceConditionMonitor getPCM(){
+		return privacyPCM;
+	}
+	
+	public PrivateContextCache getContextCache(){
+		return this.contextCache;
+	}
 
 
 

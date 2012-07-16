@@ -53,7 +53,8 @@
         <artifact type="bundle" name="org.societies.context-management.user-context-history-mgmt"/>
         <artifact type="bundle" name="org.societies.context-management.context-broker"/>
         <artifact type="bundle" name="org.societies.context-management.context-source-mgmt"/>
- 				<artifact type="bundle" name="org.societies.context-management.user-context-inference-mgmt"/>
+		<artifact type="bundle" name="org.societies.context-management.user-context-inference-mgmt"/>
+		<artifact type="bundle" name="org.societies.context-management.community-context-inference-mgmt"/>
 
 <!-- Personalisation Management -->		
 	<artifact type="bundle" name="org.societies.personalisation.personalisationBundle"/>

@@ -46,9 +46,12 @@ import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeBond;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxBond;
+import org.societies.api.context.model.CtxBondOriginType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
@@ -75,7 +78,6 @@ public class CtxBrokerExample 	{
 
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
-	//private ICommManager commMgr;
 
 	private IIdentity cisID;
 	private IIdentity cssOwnerId;
@@ -91,7 +93,7 @@ public class CtxBrokerExample 	{
 	private ICisOwned cisOwned  = null;
 
 	private INetworkNode cssNodeId;
-	private ICisManager cisManager;
+	
 	private String privacyPolicyWithoutRequestor  = "<RequestPolicy>" +
 			"<Target>" +
 			"<Resource>" +
@@ -156,7 +158,6 @@ public class CtxBrokerExample 	{
 		LOG.info( "this.cssID3 "+ this.cssID3);
 		LOG.info( "this.cssID3.getType() "+ this.cssID3.getType());
 
-
 		try {
 			cisOwned = cisManager.createCis(this.cssOwnerId.toString(), cssPassword, "cisName", "contextTestingCIS", 1, this.privacyPolicyWithoutRequestor).get();
 			LOG.info("*** cisOwned " +cisOwned);
@@ -179,11 +180,7 @@ public class CtxBrokerExample 	{
 		LOG.info("*** cisManager this.cisID type " +this.cisID.getType());
 
 		LOG.info("*** Starting examples...");
-
-		
 		this.retrieveIndividualEntity();
-		
-		
 		this.retrieveCssNode();
 		this.createContext();
 		this.registerForContextChanges();
@@ -196,7 +193,9 @@ public class CtxBrokerExample 	{
 		// community context tests
 		this.createCommunityEntity();
 		this.createIndividualEntities();
+		// includes context bond tests
 		this.populateCommunityEntity();
+		
 	}
 
 
@@ -204,6 +203,21 @@ public class CtxBrokerExample 	{
 		LOG.info("*** populateCommunityEntity");
 
 		try {
+		//	this.internalCtxBroker
+			CtxAttributeBond attributeLocationBond = new CtxAttributeBond(CtxAttributeTypes.LOCATION_SYMBOLIC, CtxBondOriginType.MANUALLY_SET);
+			attributeLocationBond.setMinValue("home");
+			attributeLocationBond.setMaxValue("home");
+			attributeLocationBond.setValueType(CtxAttributeValueType.STRING);
+			LOG.info("locationBond created : " + attributeLocationBond.toString());
+			CtxAttributeBond attributeAgeBond = new CtxAttributeBond(CtxAttributeTypes.WEIGHT, CtxBondOriginType.MANUALLY_SET);
+			
+			attributeLocationBond.setValueType(CtxAttributeValueType.INTEGER);
+			attributeAgeBond.setMinValue(new Integer(18));
+			attributeAgeBond.setMinValue(new Integer(20));
+			
+			this.communityEntity.addBond(attributeLocationBond);
+			this.communityEntity.addBond(attributeAgeBond);
+			
 			this.communityEntity.addMember(this.indiEnt1.getId());
 			this.communityEntity.addMember(this.indiEnt2.getId());
 			this.communityEntity.addMember(this.indiEnt3.getId());
@@ -216,6 +230,15 @@ public class CtxBrokerExample 	{
 			CommunityCtxEntity communityEnt = (CommunityCtxEntity) this.internalCtxBroker.retrieve(this.communityEntity.getId()).get();
 			LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt);
 			LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt.getMembers());
+			
+			
+			Set<CtxBond> retrievedBonds = communityEnt.getBonds();
+			LOG.info(" retrievedBonds " +retrievedBonds);
+			for(CtxBond bond : retrievedBonds){
+				LOG.info(" bond type : " +bond.getType());
+				LOG.info(" bond modelType : " +bond.getModelType());
+				LOG.info(" bond origin type : " +bond.getOriginType());
+			}
 			
 			
 		} catch (InterruptedException e) {
@@ -243,13 +266,13 @@ public class CtxBrokerExample 	{
 			LOG.info("individual entity 3 "+this.indiEnt3);
 
 			
-			CtxAttribute individualAttr1 = this.internalCtxBroker.createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.ACTION).get();
-			CtxAttribute individualAttr2 = this.internalCtxBroker.createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.ACTION).get();
-			CtxAttribute individualAttr3 = this.internalCtxBroker.createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.ACTION).get();
+			CtxAttribute individualAttr1 = this.internalCtxBroker.createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			CtxAttribute individualAttr2 = this.internalCtxBroker.createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			CtxAttribute individualAttr3 = this.internalCtxBroker.createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.LOCATION_SYMBOLIC).get();
 			
-			individualAttr1.setStringValue("buzzing");
-			individualAttr2.setStringValue("drinking");
-			individualAttr3.setStringValue("eating");
+			individualAttr1.setStringValue("Athens_Greece");
+			individualAttr2.setStringValue("Athens_Greece");
+			individualAttr3.setStringValue("Athens_Greece");
 
 			this.internalCtxBroker.update(individualAttr1);
 			this.internalCtxBroker.update(individualAttr2);
@@ -327,29 +350,6 @@ public class CtxBrokerExample 	{
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
-
-	private void createIndividualCtxEntity1() {
-
-		LOG.info("*** createIndividualCtxEntity1");
-
-		try {
-			//IIdentity cssID1 = 
-			final IndividualCtxEntity operator = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
-			LOG.info("*** CSS owner context entity id: " + operator.getId());
-
-			Set<CtxAttribute> attributes = operator.getAttributes();
-			if(attributes.size()>0){
-				for(CtxAttribute ctxAttr : attributes){
-					LOG.info("CtxAttribute "+ctxAttr.getId());
-				}	
-			}
-
-		} catch (Exception e) {
-
-			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
-		}
-	}
-
 
 	private void retrieveCssNode() {
 
@@ -449,8 +449,6 @@ public class CtxBrokerExample 	{
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
-
-
 
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
@@ -656,7 +654,7 @@ public class CtxBrokerExample 	{
 		}
 	}	
 
-
+	@SuppressWarnings("unused")
 	private void triggerInferenceTest() {
 		LOG.info("*** triggerInferenceTest");
 		try {
@@ -700,6 +698,9 @@ public class CtxBrokerExample 	{
 
 			// 1b. Register listener by specifying the context attribute scope and type
 			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, CtxAttributeTypes.ID);
+			
+			// 1c. Register listener by specifying the context attribute scope
+			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, null);
 
 			// 2. Update attribute to see some event action
 			this.internalCtxBroker.updateAttribute((CtxAttributeIdentifier) this.ctxAttributeStringIdentifier, "newDeviceIdValue");

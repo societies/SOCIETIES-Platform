@@ -119,7 +119,19 @@ public class RequestItem implements Serializable{
 	public String toString(){
 		return this.toXMLString();
 	}
-	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((actions == null) ? 0 : actions.hashCode());
+		result = prime * result
+				+ ((conditions == null) ? 0 : conditions.hashCode());
+		result = prime * result + (optional ? 1231 : 1237);
+		result = prime * result
+				+ ((resource == null) ? 0 : resource.hashCode());
+		return result;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -141,4 +153,5 @@ public class RequestItem implements Serializable{
 			.append(this.isOptional(), rhs.isOptional())
 			.isEquals();
 	}
+
 }

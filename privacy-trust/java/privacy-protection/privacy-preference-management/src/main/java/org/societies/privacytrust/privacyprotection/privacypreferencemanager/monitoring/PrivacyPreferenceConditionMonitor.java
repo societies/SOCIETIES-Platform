@@ -32,6 +32,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceConditionMonitor;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.dobf.DObfMonitor;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.ids.IDSMonitor;
@@ -71,6 +73,29 @@ public class PrivacyPreferenceConditionMonitor implements IPrivacyPreferenceCond
 	public void contextEventReceived(CtxAttributeIdentifier arg0, IIdentity arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	public void updatePreferences(PPNPreferenceDetails details,
+			IPrivacyPreference preference) {
+		this.ppnMonitor.updateDetails(details, preference);
+		
+	}
+
+
+	/**
+	 * @return the ppnMonitor
+	 */
+	public PPNMonitor getPpnMonitor() {
+		return ppnMonitor;
+	}
+
+
+	/**
+	 * @param ppnMonitor the ppnMonitor to set
+	 */
+	public void setPpnMonitor(PPNMonitor ppnMonitor) {
+		this.ppnMonitor = ppnMonitor;
 	}
 
 }

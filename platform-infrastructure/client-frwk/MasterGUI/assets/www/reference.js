@@ -280,23 +280,40 @@ var Societies = {
 		 */
 
 		AppPreferences: {
-				/**
-				 * @methodOf Societies.AppPreferences#
-				 * @description Retrieve a String preference value for a given preference name
-				 * @param {Object} successCallback The callback which will be called when result is successful
-				 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-				 * @param {String} prefName The name of preference
-				 * @returns value of preference
-				 */
-				getStringPrefValue: function(successCallback, failureCallback, prefName) {
-					console.log("Call Preferences - getStringPrefValue");
-					
-					return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-					failureCallback,     //Callback which will be called when plugin action encounters an error
-					'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-					'getStringPrefValue',          //Telling the plugin, which action we want to perform
-					[prefName]);        //Passing a list of arguments to the plugin
-				},
+			/**
+			 * @methodOf Societies.AppPreferences#
+			 * @description Retrieve a String preference value for a given preference name
+			 * @param {Object} successCallback The callback which will be called when result is successful
+			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+			 * @param {String} prefName The name of preference
+			 * @returns value of preference
+			 */
+			getStringPrefValue: function(successCallback, failureCallback, prefName) {
+				console.log("Call Preferences - getStringPrefValue");
+				
+				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+				'getStringPrefValue',          //Telling the plugin, which action we want to perform
+				[prefName]);        //Passing a list of arguments to the plugin
+			},
+			/**
+			 * @methodOf Societies.AppPreferences#
+			 * @description Retrieve a String preference value for a given preference name
+			 * @param {Object} successCallback The callback which will be called when result is successful
+			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+			 * @param {String} prefName The name of preference
+			 * @returns value of preference
+			 */
+			putStringPrefValue: function(successCallback, failureCallback, prefName, value) {
+				console.log("Call Preferences - putStringPrefValue");
+				
+				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
+				'putStringPrefValue',          //Telling the plugin, which action we want to perform
+				[prefName, value]);        //Passing a list of arguments to the plugin
+			},
 
 				/**
 				 * @methodOf Societies.AppPreferences#
@@ -470,6 +487,47 @@ var Societies = {
 				failureCallback,     //Callback which will be called when plugin action encounters an error
 				'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
 				'loginCSS',          //Telling the plugin, which action we want to perform
+				[client, cssRecord]);        //Passing a list of arguments to the plugin
+			},
+			/**
+			 * @methodOf Societies.LocalCSSManagerService#
+			 * @description Register a user's identity with a chosen Identity Domain 
+			 * @param {Object} successCallback The callback which will be called when result is successful
+			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+			 * @returns CSSrecord with registered values
+			 */
+			registerXMPPServer: function(successCallback, failureCallback) {
+				var client = "org.societies.android.platform.gui";
+				var cssRecord = {
+						  			"archiveCSSNodes": [],
+				                    "cssIdentity": jQuery("#regUsername").val(),
+				                    "cssInactivation": null,
+				                    "cssNodes": [],
+				                    "cssRegistration": null,
+				                    "cssHostingLocation" : null,
+				                    "domainServer" : jQuery("#domainServers").val(),
+				                    "cssUpTime": 0,
+				                    "emailID": null,
+				                    "entity": 0,
+				                    "foreName": null,
+				                    "homeLocation": null,
+				                    "identityName": null,
+				                    "imID": null,
+				                    "name": null,
+				                    "password": jQuery("#regUserpass").val(),
+				                    "presence": 0,
+				                    "sex": 0,
+				                    "socialURI": null,
+				                    "status": 0
+						                  }
+
+
+				console.log("Call LocalCSSManagerService - registerXMPPServer");
+
+				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+				'registerXMPPServer',          //Telling the plugin, which action we want to perform
 				[client, cssRecord]);        //Passing a list of arguments to the plugin
 			},
 
@@ -693,7 +751,7 @@ var SocietiesGUI = {
 		    }
 		    else if ($.mobile.activePage[0].id === "menu"){
 		        e.preventDefault();
-		        connectToLocalCSSManager(successfulLogout);
+		        SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.successfulLogout);
 		    } else {
 		        navigator.app.backHistory();
 		    }
@@ -729,8 +787,97 @@ var SocietiesGUI = {
 			//PhoneGap/ HTML views break semantics of Back button unless
 			//app intercepts button and simulates back button behaviour
 			document.addEventListener("backbutton", SocietiesGUI.backButtonHandler, false);
+			
+			SocietiesGUI.displayConnectionInfo();
 
 		},
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Displays the CSS credentials
+		 * @returns null
+		 */
+
+		displayConnectionInfo: function() {
+
+			console.log("displayConnectionInfo");
+			
+			SocietiesGUI.getCSSIdentity();
+			SocietiesGUI.getCSSIdentityPassword();
+			SocietiesGUI.getCSSIdentityDomain();
+		},
+		
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Gets the CSS Identity app preference value
+		 * @returns null
+		 */
+		getCSSIdentity: function () {
+			function success(data) {
+				console.log("getCSSIdentity - successful: " + data.value);
+				jQuery("#username").val(data.value);
+			}
+			
+			function failure(data) {
+				alert("getCSSIdentity - failure: " + data);
+			}
+
+			window.plugins.AppPreferences.getStringPrefValue(success, failure, "cssIdentity");
+
+		},
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Gets the CSS Identity Password app preference value
+		 * @returns null
+		 */
+
+		getCSSIdentityPassword: function () {
+			function success(data) {
+				console.log("getCSSIdentityPassword - successful: " + data.value);
+				jQuery("#userpass").val(data.value);
+			}
+			
+			function failure(data) {
+				alert("getCSSIdentityPassword - failure: " + data);
+			}
+			window.plugins.AppPreferences.getStringPrefValue(success, failure, "cssPassword");
+		},
+		
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Gets the CSS Identity Password app preference value
+		 * @returns null
+		 */
+
+		getCSSIdentityDomain: function () {
+			function success(data) {
+				console.log("getCSSIdentityDomain - successful: " + data.value);
+				jQuery("#identityDomain").val(data.value);
+			}
+			
+			function failure(data) {
+				alert("getCSSIdentityDomain - failure: " + data);
+			}
+			window.plugins.AppPreferences.getStringPrefValue(success, failure, "daURI");
+		},
+		
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description updates the registered user credentials and domain server for future login purposes
+		 * @returns null
+		 */
+		updateCredentialPreferences: function () {
+			function success(data) {
+				console.log("updateCredentialPreferences - successful: " + data.value);
+			}
+			
+			function failure(data) {
+				alert("updateCredentialPreferences - failure: " + data);
+			}
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#regUsername").val());
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#regUserpass").val());
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#domainServers").val());
+		},
+		
 		/**
 		 * @methodOf SocietiesGUI#
 		 * @description Populate Device Info page HTML elements with device information
@@ -776,6 +923,32 @@ var SocietiesGUI = {
 		    window.plugins.LocalCSSManagerService.loginCSS(success, failure);
 
 		},
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Actions carried in the event that a successful Identity Domain registration occurs
+		 * @returns null
+		 */
+
+		xmppRegistration: function() {
+			console.log("Regsister identity with chosen Identity domain");
+
+			function success(data) {
+				SocietiesGUI.updateCredentialPreferences();
+				
+				
+				console.log("Current page: " + $.mobile.activePage[0].id);
+
+				
+				$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
+			}
+			
+			function failure(data) {
+				alert("xmppRegistration - failure: " + data);
+			}
+		    window.plugins.LocalCSSManagerService.registerXMPPServer(success, failure);
+
+		},
+
 		/**
 		 * @methodOf SocietiesGUI#
 		 * @description Reset the Device Manager page HTML elements 
@@ -917,12 +1090,41 @@ var SocietiesGUI = {
 		 * @returns boolean true if credentials viable
 		 */
 
-		validateCredentials: function(name, password) {
+		validateLoginCredentials: function(name, password) {
 			var retValue = true;
 
 			if (name.length === 0 || password.length === 0) {
 				retValue  = false;
-				alert("validateCredentials: " + "User credentials must be entered");
+				alert("validateLoginCredentials: " + "User credentials must be entered");
+			} 
+			return retValue;
+		},
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Validate that viable registration credentials have been entered
+		 * @param {Object} username
+		 * @param {Object} password
+		 * @param {Object} repeatPassword 
+		 * @returns boolean true if credentials viable
+		 */
+
+		validateRegistrationCredentials: function(name, password, repeatPassword, termsAck) {
+			var retValue = true;
+			alert ("checkbox value: " + termsAck);
+			if (SocietiesGUI.validateLoginCredentials(name, password)) {
+				if (repeatPassword.length === 0) {
+					retValue  = false;
+					alert("validateRegistrationCredentials: " + "repeat entry of password must be completed");
+					
+				} else if (password !== repeatPassword) {
+					retValue  = false;
+					alert("validateRegistrationCredentials: " + "passwords are not the same - re-enter");
+				} else if (!termsAck) {
+					retValue  = false;
+					alert("validateRegistrationCredentials: " + "Terms & Conditions must be acknowledged");
+				}
+			} else {
+				retValue  = false;
 			}
 			return retValue;
 		},
@@ -981,19 +1183,19 @@ var SocietiesGUI = {
 			switch(type)
 			{
 			case "string":
-				window.plugins.AppPreferences.getStringPrefValue(success, failure, prefName, type);
+				window.plugins.AppPreferences.getStringPrefValue(success, failure, prefName);
 				break;
 			case "integer":
-				window.plugins.AppPreferences.getIntegerPrefValue(success, failure, prefName, type);
+				window.plugins.AppPreferences.getIntegerPrefValue(success, failure, prefName);
 				break;
 			case "long":
-				window.plugins.AppPreferences.getLongPrefValue(success, failure, prefName, type);
+				window.plugins.AppPreferences.getLongPrefValue(success, failure, prefName);
 				break;
 			case "float":
-				window.plugins.AppPreferences.getFloatPrefValue(success, failure, prefName, type);
+				window.plugins.AppPreferences.getFloatPrefValue(success, failure, prefName);
 				break;
 			case "boolean":
-				window.plugins.AppPreferences.getBooleanPrefValue(success, failure, prefName, type);
+				window.plugins.AppPreferences.getBooleanPrefValue(success, failure, prefName);
 				break;
 			default:
 			  console.log("Error - Preference type is not defined");
@@ -1056,9 +1258,15 @@ jQuery(function() {
 	});
 
 	$('#connectXMPP').click(function() {
-		if (SocietiesGUI.validateCredentials(jQuery("#username").val(), jQuery("#userpass").val())) {
+		if (SocietiesGUI.validateLoginCredentials(jQuery("#username").val(), jQuery("#userpass").val())) {
 			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.successfulLogin);
 		}
+	});
+	
+	$('#registerXMPP').click(function() {
+		if (SocietiesGUI.validateRegistrationCredentials(jQuery("#regUsername").val(), jQuery("#regUserpass").val(), jQuery("#repeatRegUserpass").val(), jQuery("#regSocietiesTerms").val())) {
+			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.xmppRegistration);
+	}
 	});
 	
 	$('#refreshCssRecord').click(function() {
@@ -1100,630 +1308,3 @@ jQuery(function() {
 	});
 
 });
-
-//var Preferences = function() { 
-//};
-//
-///**
-//* Get a String Preference value
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//* @param prefName name of preference to be retrieved
-//*/
-//Preferences.prototype.getStringPrefValue = function(successCallback, failureCallback, prefName) {
-//	console.log("Call Preferences - getStringPrefValue");
-//	
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-//	'getStringPrefValue',          //Telling the plugin, which action we want to perform
-//	[prefName]);        //Passing a list of arguments to the plugin
-//};
-//
-///**
-//* Get a Integer Preference value
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//* @param prefName name of preference to be retrieved
-//*/
-//Preferences.prototype.getIntegerPrefValue = function(successCallback, failureCallback, prefName) {
-//	console.log("Call Preferences - getIntegerPrefValue");
-//	
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-//	'getIntegerPrefValue',          //Telling the plugin, which action we want to perform
-//	[prefName]);        //Passing a list of arguments to the plugin
-//};
-//
-///**
-//* Get a Long Preference value
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//* @param prefName name of preference to be retrieved
-//*/
-//Preferences.prototype.getLongPrefValue = function(successCallback, failureCallback, prefName) {
-//	console.log("Call Preferences - getLongPrefValue");
-//	
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-//	'getLongPrefValue',          //Telling the plugin, which action we want to perform
-//	[prefName]);        //Passing a list of arguments to the plugin
-//};
-//
-///**
-//* Get a Float Preference value
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//* @param prefName name of preference to be retrieved
-//*/
-//Preferences.prototype.getFloatPrefValue = function(successCallback, failureCallback, prefName) {
-//	console.log("Call Preferences - getFloatPrefValue");
-//	
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-//	'getFloatPrefValue',          //Telling the plugin, which action we want to perform
-//	[prefName]);        //Passing a list of arguments to the plugin
-//};
-//
-///**
-//* Get a Boolean Preference value
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//* @param prefName name of preference to be retrieved
-//*/
-//Preferences.prototype.getBooleanPrefValue = function(successCallback, failureCallback, prefName) {
-//	console.log("Call Preferences - getBooleanPrefValue");
-//	
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginPreferences',  //Telling PhoneGap that we want to run specified plugin
-//	'getBooleanPrefValue',          //Telling the plugin, which action we want to perform
-//	[prefName]);        //Passing a list of arguments to the plugin
-//};
-
-///**
-//* LocalCSSManagerService object
-//*/
-//var LocalCSSManagerService = function() { 
-//}
-//
-///**
-//* Connect to LocalCSSManager service
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//*/
-//LocalCSSManagerService.prototype.connectService = function(successCallback, failureCallback) {
-//	console.log("Call LocalCSSManagerService - connectService");
-//
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
-//	'connectService',          //Telling the plugin, which action we want to perform
-//	[]);        //Passing a list of arguments to the plugin
-//};
-//
-///**
-//* Disconnect from LocalCSSManager service
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//*/
-//LocalCSSManagerService.prototype.disconnectService = function(successCallback, failureCallback) {
-//	console.log("Call LocalCSSManagerService - disconnectService");
-//
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
-//	'disconnectService',          //Telling the plugin, which action we want to perform
-//	[]);        //Passing a list of arguments to the plugin
-//};
-//
-//
-///**
-//* Login to CSS on cloud/rich node
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//*/
-//LocalCSSManagerService.prototype.loginCSS = function(successCallback, failureCallback) {
-//	var client = "org.societies.android.platform.gui";
-//	var cssRecord = {
-//			  			"archiveCSSNodes": [],
-//	                    "cssIdentity": jQuery("#username").val(),
-//	                    "cssInactivation": null,
-//	                    "cssNodes": [{
-//	                        "identity": "android@societies.local/androidOne",
-//	                        "status": 0,
-//	                        "type": 0}],
-//	                    "cssRegistration": null,
-//	                    "cssHostingLocation" : null,
-//	                    "domainServer" : null,
-//	                    "cssUpTime": 0,
-//	                    "emailID": null,
-//	                    "entity": 0,
-//	                    "foreName": null,
-//	                    "homeLocation": null,
-//	                    "identityName": null,
-//	                    "imID": null,
-//	                    "name": null,
-//	                    "password": jQuery("#userpass").val(),
-//	                    "presence": 0,
-//	                    "sex": 0,
-//	                    "socialURI": null,
-//	                    "status": 0
-//			                  }
-//
-//
-//	console.log("Call LocalCSSManagerService - loginCSS");
-//
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
-//	'loginCSS',          //Telling the plugin, which action we want to perform
-//	[client, cssRecord]);        //Passing a list of arguments to the plugin
-//};
-//
-///**
-//* Login to CSS on cloud/rich node
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//*/
-//LocalCSSManagerService.prototype.logoutCSS = function(successCallback, failureCallback) {
-//	var client = "org.societies.android.platform.gui";
-//	var cssRecord = {
-//			  			"archiveCSSNodes": [],
-//	                    "cssIdentity": "android",
-//	                    "cssInactivation": null,
-//	                    "cssNodes": [{
-//	                        "identity": "android@societies.local/androidOne",
-//	                        "status": 0,
-//	                        "type": 0}],
-//	                    "cssRegistration": null,
-//	                    "cssHostingLocation" : null,
-//	                    "domainServer" : null,
-//	                    "cssUpTime": 0,
-//	                    "emailID": null,
-//	                    "entity": 0,
-//	                    "foreName": null,
-//	                    "homeLocation": null,
-//	                    "identityName": null,
-//	                    "imID": null,
-//	                    "name": null,
-//	                    "password": "androidpass",
-//	                    "presence": 0,
-//	                    "sex": 0,
-//	                    "socialURI": null,
-//	                    "status": 0
-//			                  }
-//
-//
-//	console.log("Call LocalCSSManagerService - logoutCSS");
-//
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
-//	'logoutCSS',          //Telling the plugin, which action we want to perform
-//	[client, cssRecord]);        //Passing a list of arguments to the plugin
-//};
-
-///**
-//* CoreServiceMonitorService object
-//*/
-//var CoreServiceMonitorService = function() { 
-//}
-//
-///**
-//* Connect to CoreServiceMonitorService service
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//*/
-//CoreServiceMonitorService.prototype.connectService = function(successCallback, failureCallback) {
-//
-//	console.log("Call CoreServiceMonitorService - connectService");
-//
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
-//	'connectService',              //Telling the plugin, which action we want to perform
-//	[]);        //Passing a list of arguments to the plugin
-//};
-//
-///**
-//* Disconnect from CoreServiceMonitorService service
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//*/
-//CoreServiceMonitorService.prototype.disconnectService = function(successCallback, failureCallback) {
-//
-//	console.log("Call CoreServiceMonitorService - disconnectService");
-//
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
-//	'disconnectService',              //Telling the plugin, which action we want to perform
-//	[]);        //Passing a list of arguments to the plugin
-//};
-//
-///**
-//* Get all active services
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//*/
-//CoreServiceMonitorService.prototype.activeServices = function(successCallback, failureCallback) {
-//
-//	console.log("Call CoreServiceMonitorService - activeServices");
-//
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
-//	'activeServices',              //Telling the plugin, which action we want to perform
-//	["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
-//};
-//
-///**
-//* Get all active tasks, i.e. apps
-//* 
-//* @param successCallback The callback which will be called when Java method is successful
-//* @param failureCallback The callback which will be called when Java method has an error
-//*/
-//CoreServiceMonitorService.prototype.activeTasks = function(successCallback, failureCallback) {
-//	var clientPackage = "org.societies.android.platform.gui";
-//
-//	console.log("Call CoreServiceMonitorService - activeTasks");
-//
-//	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-//	failureCallback,     //Callback which will be called when plugin action encounters an error
-//	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
-//	'activeTasks',              //Telling the plugin, which action we want to perform
-//	["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
-//};
-
-///**
-// * Connect to CSSManager 
-// * @param actionFunction function to be called if successful
-// */
-//var connectToLocalCSSManager = function(actionFunction) {
-//	console.log("Connect to LocalCSSManager");
-//		
-//	function success(data) {
-//		console.log(data);
-//		actionFunction();
-//	}
-//	
-//	function failure(data) {
-//		alert("connectToLocalCSSManager - failure: " + data);
-//	}
-//    window.plugins.LocalCSSManagerService.connectService(success, failure);
-//}
-//
-//
-//function backButtonHandler(e) {
-//	console.log("Back button handling");
-//	
-//	console.log("Back button handling on page: " + $.mobile.activePage[0].id );
-//	
-//    if ($.mobile.activePage[0].id === "main"){
-//        e.preventDefault();
-//        navigator.app.exitApp();
-//    }
-//    else if ($.mobile.activePage[0].id === "menu"){
-//        e.preventDefault();
-//        connectToLocalCSSManager(successfulLogout);
-//    } else {
-//        navigator.app.backHistory();
-//    }
-//}
-///**
-// * Called when HTML page has been loaded
-// * Add custom PhoneGap plugins
-// * All PhoneGap supported event registrations should be occur here
-// * 
-// * N.B. Ensure that res/xml/plugins.xml file is updated
-// */
-//function onDeviceReady() {
-//	console.log("PhoneGap Loaded, Device Ready");
-//	
-//	//Register any PhoneGap plugins here. Example shown for illustration
-//	 
-//	cordova.addConstructor(function() {
-//		//Register the javascript plugin with PhoneGap
-//		console.log("Register CoreServiceMonitorService plugin ");
-//		cordova.addPlugin('CoreServiceMonitorService', Societies.CoreServiceMonitorService);
-//		
-//		console.log("Register LocalCSSManagerService plugin ");
-//		cordova.addPlugin('LocalCSSManagerService', Societies.LocalCSSManagerService);
-//		
-//		console.log("Register DeviceStatus Service plugin ");
-//		cordova.addPlugin("DeviceStatus", Societies.DeviceStatus);
-//
-//		console.log("Register Preferences plugin ");
-//		cordova.addPlugin("AppPreferences", Societies.AppPreferences);
-//
-//	});
-//	
-//	//handle the Android Back button 
-//	//PhoneGap/ HTML views break semantics of Back button unless
-//	//app intercepts button and simulates back button behaviour
-//	document.addEventListener("backbutton", backButtonHandler, false);
-//
-//}
-//
-//
-//
-//
-///**
-// * Populate HTML elements with device information
-// */
-//var deviceInfo = function() {
-//	console.log("Get device information");
-//	
-//	jQuery("#phoneGapVer").text(device.cordova);
-//	jQuery("#platform").text(device.platform);
-//	jQuery("#version").text(device.version);
-//	jQuery("#uuid").text(device.uuid);
-//	jQuery("#name").text(device.name);
-//	jQuery("#width").text(screen.width);
-//	jQuery("#height").text(screen.height);
-//	jQuery("#colorDepth").text(screen.colorDepth);
-//	jQuery("#pixelDepth").text(screen.pixelDepth);
-//	jQuery("#browserAgent").text(navigator.userAgent);
-//
-//};
-///**
-// * Actions carried in the event that a successful CSS login occurs
-// */
-//var successfulLogin = function() {
-//	console.log("Login to CSS");
-//
-//	function success(data) {
-//		
-//		var status = ["Available for Use", "Unavailable", "Not active but on alert"];
-//		var type = ["Android based client", "Cloud Node", "JVM based client"];
-//		
-//		jQuery("#cssrecordforename").val(data.foreName);
-//		jQuery("#cssrecordname").val(data.name);
-//		jQuery("#cssrecordemaildetails").val(data.emailID);
-//		jQuery("#cssrecordimdetails").val(data.imID);
-//		jQuery("#cssrecorduserlocation").val(data.homeLocation);
-//		jQuery("#cssrecordsnsdetails").val(data.socialURI);
-//		jQuery("#cssrecordidentity").val(data.cssIdentity);
-//		jQuery("#cssrecordorgtype").val(data.entity);
-//		jQuery("#cssrecordsextype").val(data.sex);
-//		
-//		//empty table
-//		jQuery('#cssNodesTable tbody').remove();
-//		
-//		for (i  = 0; i < data.cssNodes.length; i++) {
-//			var tableEntry = "<tr>" + 
-//			"<td>" + data.cssNodes[i].identity + "</td>" + 
-//			"<td>" + status[data.cssNodes[i].status] + "</td>" + 
-//			"<td>" + type[data.cssNodes[i].type] + "</td>" + 
-//				+ "</tr>"
-//
-//			jQuery('#cssNodesTable').append(tableEntry);
-//		}
-//
-//		console.log("Current page: " + $.mobile.activePage[0].id);
-//
-//		
-//		$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
-//	}
-//	
-//	function failure(data) {
-//		alert("successfulLogin - failure: " + data);
-//	}
-//    window.plugins.LocalCSSManagerService.loginCSS(success, failure);
-//
-//};
-//
-//
-//var resetDeviceMgr = function(){
-//    jQuery("#connStatuslist").text("");
-//    jQuery("#battStatuslist").text("");
-//    jQuery("#locStatuslist").text("");
-//    
-//    
-//    
-//}
-///**
-// * Bind to the CoreServiceMonitor service
-// * @param actionFunction function to be invoked if action successful
-// */
-//var connectToCoreServiceMonitor = function(actionFunction) {
-//	console.log("Connect to CoreServiceMonitor");
-//		
-//	function success(data) {
-//		actionFunction();
-//	}
-//	
-//	function failure(data) {
-//		alert("connectToCoreServiceMonitor - failure: " + data);
-//	}
-//    window.plugins.CoreServiceMonitorService.connectService(success, failure);
-//}
-///**
-// * List active services
-// */
-//var refreshActiveServices = function() {
-//	console.log("Refresh Active Service");
-//
-//	function success(data) {
-//		//empty table
-//		jQuery('#activeServicesTable tbody').remove();
-//		
-//		for (i  = 0; i < data.length; i++) {
-//			var tableEntry = "<tr>" + 
-//			"<td>" + data[i].className + "</td>" + 
-//			"<td>" + convertMilliseconds(data[i].activeSince) + "</td>" + 
-//				+ "</tr>"
-//
-//			jQuery('#activeServicesTable').append(tableEntry);
-//		}
-//	}
-//	
-//	function failure(data) {
-//		alert("refreshActiveServices - failure: " + data);
-//	}
-//	
-//	window.plugins.CoreServiceMonitorService.activeServices(success, failure);
-//	
-//};
-///**
-// * List active tasks, i.e. apps
-// */
-//var refreshActiveTasks = function() {
-//	console.log("Refresh Active Tasks");
-//
-//	function success(data) {
-//		//empty table
-//		jQuery('#activeTasksTable tbody').remove();
-//
-//		//add rows
-//		for (i  = 0; i < data.length; i++) {
-//			var tableEntry = "<tr>" + 
-//			"<td>" + data[i].className + "</td>" + 
-//			"<td>" + data[i].numRunningActivities + "</td>" + 
-//				+ "</tr>"
-//
-//			jQuery('#activeTasksTable').append(tableEntry);
-//		}
-//	}
-//	
-//	function failure(data) {
-//		alert("refreshActiveTasks - failure: " + data);
-//	}
-//	
-//	window.plugins.CoreServiceMonitorService.activeTasks(success, failure);
-//};
-//
-///**
-// * Convert an elapsed time in milliseconds
-// * @param milliseconds time elapsed
-// */
-//var convertMilliseconds = function(milliseconds) {
-//	value = milliseconds / 1000
-//	seconds = value % 60
-//	value /= 60
-//	minutes = value % 60
-//	value /= 60
-//	hours = value % 24
-//	value /= 24
-//	days = value	
-//	return "d: " + days + " h: " + hours + " m:" + minutes;
-//}
-///**
-// * Validate user login credentials
-// * @param name username
-// * @param password 
-// */
-//var validateCredentials = function(name, password) {
-//	var retValue = true;
-//
-//	if (name.length === 0 || password.length === 0) {
-//		retValue  = false;
-//		alert("validateCredentials: " + "User credentials must be entered");
-//	}
-//	return retValue;
-//}
-//
-//function onSuccess(data) {
-//	console.log("JS Success");
-//	console.log(JSON.stringify(data));
-//	$('.result').remove();
-//	$('.error').remove();
-//	$('<span>').addClass('result').html("Result: "+JSON.stringify(data)).appendTo('#main article[data-role=content]');
-//}
-//function onFailure(e) {
-//	console.log("JS Error");
-//	console.log(e);
-//	$('.result').remove();
-//	$('.error').remove();
-//	$('<span>').addClass('error').html(e).appendTo('#main article[data-role=content]');
-//}
-//
-//var getAppPref = function() {
-//	console.log("Get app preference");
-//	
-//	jQuery("#prefValue").val("");
-//	prefName = jQuery("#prefName").val();
-//	type = jQuery("#prefType").val();
-//
-//	function success(data) {
-//		console.log("getAppPref - successful: " + data.value);
-//		jQuery("#prefValue").val(data.value);
-//		
-//	};
-//	
-//	function failure(data) {
-//		console.log("getAppPref - failure: " + data.value);
-//	};
-//
-//	console.log("Preference type: " + type);
-//	
-//	switch(type)
-//	{
-//	case "string":
-//		window.plugins.AppPreferences.getStringPrefValue(success, failure, prefName, type);
-//		break;
-//	case "integer":
-//		window.plugins.AppPreferences.getIntegerPrefValue(success, failure, prefName, type);
-//		break;
-//	case "long":
-//		window.plugins.AppPreferences.getLongPrefValue(success, failure, prefName, type);
-//		break;
-//	case "float":
-//		window.plugins.AppPreferences.getFloatPrefValue(success, failure, prefName, type);
-//		break;
-//	case "boolean":
-//		window.plugins.AppPreferences.getBooleanPrefValue(success, failure, prefName, type);
-//		break;
-//	default:
-//	  console.log("Error - Preference type is not defined");
-//	}
-//
-//};
-//
-//var disconnectFromLocalCSSManager = function() {
-//	console.log("Disconnect from LocalCSSManager");
-//		
-//	function success(data) {
-//		console.log(data);
-//	}
-//	
-//	function failure(data) {
-//		alert("disconnectFromLocalCSSManager - failure: " + data);
-//	}
-//    window.plugins.LocalCSSManagerService.disconnectService(success, failure);
-//}
-//
-//var successfulLogout = function() {
-//	console.log("Logout from CSS");
-//
-//	function success(data) {
-//		jQuery("#username").val("");
-//		jQuery("#userpass").val("");
-//		disconnectFromLocalCSSManager();
-//
-//	}
-//
-//	function failure(data) {
-//		alert("successfulLogout : " + "failure: " + data);
-//	}
-//	
-//    window.plugins.LocalCSSManagerService.logoutCSS(success, failure);
-//
-//};
-

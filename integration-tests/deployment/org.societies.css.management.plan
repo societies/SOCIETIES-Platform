@@ -7,7 +7,7 @@
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
 
-	<artifact type="bundle" name="org.societies.css.CssDirectory"/>
+	<artifact type="bundle" name="org.societies.css.CssDirectoryClient"/>
     <artifact type="bundle" name="org.societies.css.CssRegistry"/>
     <artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
     <artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>

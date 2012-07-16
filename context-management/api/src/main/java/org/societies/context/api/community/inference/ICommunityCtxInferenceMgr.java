@@ -28,11 +28,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-//import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntityIdentifier;
 
 
 /**
@@ -41,51 +41,76 @@ import org.societies.api.context.model.CtxAttributeValueType;
  */
 public interface ICommunityCtxInferenceMgr {
 
+
+
 	/**
+	 * This method initiates the estimation of a community context attribute value. The method returns the ctxAttribute with 
+	 * the estimated value that is assigned to a Community Context Entity. 
 	 * 
-	 * @param ctxID
+	 * @param communityCtxEntityID the community Entity identifier
+	 * @param ctxAttrId the context attribute id 
+	 * @return ctxAttribute object 
+	 */
+	public CtxAttribute estimateCommunityContext(CtxEntityIdentifier communityCtxEntityID, CtxAttributeIdentifier ctxAttrId);
+
+	/**
+	 * Evaluates the similatiry of two indicated Community Context Attributes.
+	 * 
+	 * @param ctxID1
 	 * @param ctxID2
+	 * @return a number indicating the objects similarity
+	 * @since 0.0.1
 	 */
-	public Double evaluateSimilarity(CtxAttributeIdentifier ctxID, CtxAttributeIdentifier ctxID2);
+	public Double evaluateSimilarity(CtxAttributeIdentifier ctxID1, CtxAttributeIdentifier ctxID2);
 
 	/**
+	 * This method returns a linked map with key the recorded
+	 * CtxAttributeIdentifier and value the result of the 
+	 * similarity evaluation. 
 	 * 
-	 * @param listCtxID
+	 * @param listCtxID1
 	 * @param listCtxID2
+	 * @since 0.0.1
 	 */
-	public Map<CtxAttributeIdentifier,Double> evaluateSimilarity(List<CtxAttributeIdentifier> listCtxID, List<CtxAttributeIdentifier> listCtxID2);
-
+	public Map<CtxAttributeIdentifier,Double> evaluateSimilarity(List<CtxAttributeIdentifier> listCtxID1, List<CtxAttributeIdentifier> listCtxID2);
 
 	/**
+	 * Inherits the Community Context Attribute belonging to a CIS.
 	 * 
 	 * @param ctxAttrId
 	 * @param type
 	 * @param cisid
+	 * @since 0.0.1
 	 */
 	public void inheritContext(CtxAttributeIdentifier ctxAttrId, CtxAttributeValueType type, IIdentity cisid);
 
 	/**
+	 * Predicts context using indicated date. 
 	 * 
 	 * @param ctxAttrID
-	 * @param predictionMethod
 	 * @param date
+	 * @returns context attribute with predicted context
+	 * @since 0.0.1
 	 */
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
 
 	/**
+	 * Predicts context using indicated index.
 	 * 
 	 * @param ctxAttrID
-	 * @param predictionMethodl
-	 * @param int
+	 * @param index
+	 * @returns context attribute with predicted context
+	 * @since 0.0.1
 	 */
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index );
 
 
 	/**
+	 * Refines context for an indicate Context Attribute. 
 	 * 
 	 * @param ctxAttrId
+	 * @since 0.0.1
 	 */
 	public void refineContext(CtxAttributeIdentifier ctxAttrId);
-
 
 }

@@ -67,7 +67,7 @@ public abstract class CtxBond implements Serializable {
 	 * @throws IllegalArgumentException if the specified modelType is not one of
 	 *         {@link CtxModelType#ATTRIBUTE} or {@link CtxModelType#ASSOCIATION}
 	 */
-	public CtxBond(CtxModelType modelType, String type, CtxBondOriginType originType) {
+	CtxBond(CtxModelType modelType, String type, CtxBondOriginType originType) {
 		
 		if (modelType == null)
 			throw new NullPointerException("modelType can't be null");

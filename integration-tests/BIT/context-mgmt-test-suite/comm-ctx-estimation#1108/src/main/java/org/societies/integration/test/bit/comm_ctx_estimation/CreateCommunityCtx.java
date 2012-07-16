@@ -13,6 +13,7 @@ import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
@@ -35,13 +36,14 @@ public class CreateCommunityCtx {
 	private IIdentity cssID3;
 
 
-	private CommunityCtxEntity communityEntity;
+	//private CommunityCtxEntity communityEntity;
+	
 	private IndividualCtxEntity indiEnt1;
 	private IndividualCtxEntity indiEnt2;
 	private IndividualCtxEntity indiEnt3;
 
-	CtxAttributeIdentifier communityAttrInterestsId = null;
-
+	private CtxAttributeIdentifier communityAttrInterestsId = null;
+	private CtxEntityIdentifier communityCtxEntityID = null;
 
 
 	private INetworkNode cssNodeId;
@@ -98,12 +100,13 @@ public class CreateCommunityCtx {
 		LOG.info("comm manager service"+ Test1108.getCommManager());
 		LOG.info("cisManager service"+ Test1108.getCisManager());
 		
+		CommunityCtxEntity communityEntity = null;
 		
 		try {
 			IIdentity cisID = createCISid();
 			LOG.info("Cis id "+cisID);
 
-			this.communityEntity = Test1108.getCtxBroker().createCommunityEntity(cisID).get();
+			communityEntity = Test1108.getCtxBroker().createCommunityEntity(cisID).get();
 
 			this.cssID1 =  Test1108.getCommManager().getIdManager().fromJid("boo@societies.local ");
 			this.indiEnt1 = Test1108.getCtxBroker().createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
@@ -121,15 +124,17 @@ public class CreateCommunityCtx {
 			CtxAttribute individualAttr3 = Test1108.getCtxBroker().createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.INTERESTS).get();
 			individualAttr3.setStringValue("cooking,horseRiding,socialnetworking,restaurants,cinema");
 
-			this.communityEntity.addMember(this.indiEnt1.getId());
-			this.communityEntity.addMember(this.indiEnt2.getId());
-			this.communityEntity.addMember(this.indiEnt3.getId());
+			communityEntity.addMember(this.indiEnt1.getId());
+			communityEntity.addMember(this.indiEnt2.getId());
+			communityEntity.addMember(this.indiEnt3.getId());
 
-			Test1108.getCtxBroker().update(this.communityEntity);
+			Test1108.getCtxBroker().update(communityEntity);
 
-			 CtxAttribute ctxAttr = Test1108.getCtxBroker().createAttribute(this.communityEntity.getId(),CtxAttributeTypes.INTERESTS).get();
+			 CtxAttribute ctxAttr = Test1108.getCtxBroker().createAttribute(communityEntity.getId(),CtxAttributeTypes.INTERESTS).get();
+		
 			 this.communityAttrInterestsId = ctxAttr.getId();
-			
+			 this.communityCtxEntityID = communityEntity.getId();
+			 
 			 LOG.info("TestRetrieveCommunityEntities "+ctxAttr.getId() );
 			 LOG.info("TestRetrieveCommunityEntities   this.communityAttrInterestsId "+ this.communityAttrInterestsId );
 			 
@@ -155,7 +160,8 @@ public class CreateCommunityCtx {
 	public void retrieveCommunityEntities() {
 
 		LOG.info("TestRetrieveCommunityEntities");
-
+		CtxAttribute estimatedCommunityAttribute;
+		
 		try {
 			// at this point communityAttrInterests is created and assignet to communityEntity but has a null value 
 			LOG.info("communityAttrInterestsId " + this.communityAttrInterestsId);
@@ -163,17 +169,20 @@ public class CreateCommunityCtx {
 			CtxAttribute communityAttr1 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, false).get();
 
 			LOG.info(" communityAttr  "+communityAttr1.getId()); 
-			LOG.info(" communityAttr  value "+ communityAttr1.getStringValue());
-
-			LOG.info(" trigger inference ");
-
+			LOG.info(" communityAttr  value "+ communityAttr1.getStringValue()+ " should be null");
+	
+			estimatedCommunityAttribute = Test1108.getCtxBroker().estimateCommunityContext(this.communityCtxEntityID, this.communityAttrInterestsId);
+			LOG.info(" estimatedCommunityAttribute getString value:  "+estimatedCommunityAttribute.getStringValue() +" should not be null ");
+		
+			// TODO second version of the test
 			//retrieving attribute with flag true should initiate the inference process.
 			//inference process will assign a community context value to community attribute
-			
-			CtxAttribute communityAttr2 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, true).get();
-			LOG.info(" communityAttr  "+communityAttr2.getId()); 
-			LOG.info(" communityAttr  value "+ communityAttr2.getStringValue());
-
+					
+			//CtxAttribute communityAttr2 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, true).get();
+			//LOG.info(" trigger inference ");
+			//LOG.info(" communityAttr  "+communityAttr2.getId()); 
+			//LOG.info(" communityAttr  value "+ communityAttr2.getStringValue());
+		
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

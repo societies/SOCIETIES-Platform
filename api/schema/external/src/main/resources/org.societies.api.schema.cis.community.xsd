@@ -29,13 +29,16 @@
 			xmlns:tns="http://societies.org/api/schema/cis/community" 
 	xmlns="http://societies.org/api/schema/cis/community"
 	
+	xmlns:insact="http://societies.org/api/schema/activityfeed"
 	xmlns:ins="http://societies.org/api/schema/activity"
 	>
 
+<xs:import namespace="http://societies.org/api/schema/activityfeed" 
+           schemaLocation="org.societies.api.schema.activityfeed.xsd"/>
+
 <xs:import namespace="http://societies.org/api/schema/activity" 
            schemaLocation="org.societies.api.schema.activity.xsd"/>
-
-
+           
 <!--  	<xs:element name='community' type='community-type'></xs:element>
 	
 	<xs:complexType name='community-type'>
@@ -92,8 +95,10 @@
 				<xs:element ref='addActivityResponse'/>
 				<xs:element ref='cleanUpActivityFeed'/>
 				<xs:element ref='cleanUpActivityFeedResponse'/>
-				<xs:element ref='deleteActivity'/>
-				<xs:element ref='deleteActivityResponse'/>
+				<xs:element ref='insact:activityfeed'/>
+<!-- 				<xs:element ref='deleteActivity'/>
+				<xs:element ref='deleteActivityResponse'/>-->
+			
 			</xs:choice>
 		  <xs:attribute name='owner-jid' type='xs:string'/> 
           <xs:attribute name='community-jid' type='xs:string'/> 
@@ -141,7 +146,7 @@
 	</xs:element>
 
 
-	<xs:element name='deleteActivity'>
+<!-- 	<xs:element name='deleteActivity'>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref='ins:Activity'/>
@@ -152,7 +157,7 @@
 		<xs:complexType>
 			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
-	</xs:element>
+	</xs:element>-->
 
 	<xs:element name='cleanUpActivityFeed'>
 		<xs:complexType>

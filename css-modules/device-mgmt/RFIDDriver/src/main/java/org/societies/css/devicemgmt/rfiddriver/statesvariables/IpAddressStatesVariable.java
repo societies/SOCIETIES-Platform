@@ -28,7 +28,6 @@ import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
 
 /**
- * Describe your class here...
  *
  * @author Rafik
  *
@@ -94,7 +93,7 @@ public class IpAddressStatesVariable implements IDeviceStateVariable{
 	@Override
 	public String getDescription() {
 
-		return "Represents the IP Address of the wakeup unit";
+		return "Represents the IP Address of the RFiD reader";
 	}
 
 }

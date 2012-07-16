@@ -148,7 +148,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		// TODO Auto-generated method stub
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.context.api.event.ICtxEventMgr#registerChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
@@ -162,14 +162,19 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 			throw new NullPointerException("topics can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 		
 		final Dictionary<String, Object> props = new Hashtable<String, Object>();
 		props.put(EventConstants.EVENT_TOPIC, topics);
 		// TODO Add ctx event constants
-		props.put(EventConstants.EVENT_FILTER, "(id=" + scope
-				+ "/ATTRIBUTE/" + attrType + "/*)");
+		final StringBuilder eventFilterSB = new StringBuilder();
+		eventFilterSB.append("(");
+		eventFilterSB.append("id=" + scope + "/ATTRIBUTE/");
+		if (attrType != null)
+			eventFilterSB.append(attrType + "/*");
+		else
+			eventFilterSB.append("*");
+		eventFilterSB.append(")");
+		props.put(EventConstants.EVENT_FILTER, eventFilterSB.toString());
 		if (LOG.isInfoEnabled()) 
 			LOG.info("Registering context event listener to topics "
 					+ Arrays.toString(topics)
@@ -178,7 +183,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 				new CtxChangeEventHandler(listener), props);
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.context.api.event.ICtxEventMgr#unregisterChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
@@ -192,8 +197,6 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 			throw new NullPointerException("topics can't be null");
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
-		if (attrType == null)
-			throw new NullPointerException("attrType can't be null");
 		
 		// TODO Auto-generated method stub
 	}
