@@ -56,6 +56,19 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.4</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.societies.maven.converters</groupId>
+		    <artifactId>SimpleXMLConverters</artifactId>
+		    <version>0.1</version>
+		    <scope>compile</scope>
 		</dependency>
 	</dependencies>
 
@@ -72,9 +85,14 @@
 							'internal' and 'impl' package names org.societies.api.** -->
 						<_exportcontents>
 							!org.societies.api.internal,
+							!org.osgi.*,
 							*
 						</_exportcontents>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Import-Package>
+    						!javax.microedition.io,*
+    					</Import-Package>
+						<Embed-Dependency>*</Embed-Dependency>
+						<!-- ;scope=compile|runtime -->
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>

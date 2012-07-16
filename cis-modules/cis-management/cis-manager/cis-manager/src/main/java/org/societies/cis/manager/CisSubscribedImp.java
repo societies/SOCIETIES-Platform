@@ -64,8 +64,10 @@ import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.cis.community.AddActivity;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.GetActivities;
+import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
+import org.societies.api.schema.cis.community.SetInfo;
 import org.societies.api.schema.cis.community.Who;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -150,7 +152,7 @@ public class CisSubscribedImp implements ICis {
 					stanza.getId(), callback, this.cisManag);
 
 			Community c = new Community();
-			c.setGetInfo("");
+			c.setGetInfo(new GetInfo());
 			try {
 				LOG.info("Sending stanza with get info");
 				this.cisManag.iCommMgr.sendIQGet(stanza, c, commsCallback);
@@ -177,7 +179,7 @@ public class CisSubscribedImp implements ICis {
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
 
-			c.setSetInfo("");
+			c.setSetInfo(new SetInfo());
 		
 			try {
 				LOG.info("Sending stanza with set info");

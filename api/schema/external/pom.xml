@@ -26,7 +26,35 @@
 			<version>2.1.8</version>
 			<scope>provided</scope>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.4</version>
+			<scope>compile</scope>
+			<exclusions>
+			    <!-- StAX is not available on Android -->
+			    <exclusion>
+			        <artifactId>stax</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <exclusion>
+			        <artifactId>stax-api</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <!-- Provided by Android -->
+			    <exclusion>
+			        <artifactId>xpp3</artifactId>
+			        <groupId>xpp3</groupId>
+			    </exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.societies.maven.converters</groupId>
+		    <artifactId>SimpleXMLConverters</artifactId>
+		    <version>0.1</version>
+		    <scope>compile</scope>
+		</dependency>
+	</dependencies>	
 	<build>
 		<sourceDirectory>src/main/resources</sourceDirectory>
 		<resources>
@@ -40,6 +68,10 @@
 			</resource>
 		</resources>
 		<plugins>
+		    <!-- 1) generate-sources jaxb2:generate
+			 	 2) process-sources  jaxb2simple:convert
+				 3) compile 		 maven-compiler-plugin 
+			-->
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
@@ -155,6 +187,22 @@
 				</dependencies>
 			</plugin>
 			<plugin>
+				<groupId>org.societies.maven</groupId>
+				<artifactId>jaxb2simple-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>convert</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+			 		<!-- <folderInputDirectory>${project.build.directory}/generated-sources/</folderInputDirectory> -->
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
@@ -194,5 +242,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

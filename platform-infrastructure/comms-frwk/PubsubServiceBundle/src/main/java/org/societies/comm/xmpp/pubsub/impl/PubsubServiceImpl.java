@@ -63,12 +63,13 @@ public class PubsubServiceImpl implements PubsubService {
 			.getLogger(PubsubServiceImpl.class);
 	
 	// PubSub Errors
-	private static final Object ERROR_SUBID_REQUIRED;
-	private static final Object ERROR_NOT_SUBSCRIBED;
-	private static final Object ERROR_INVALID_SUBID;
-	private static final Object ERROR_NODEID_REQUIRED;
-	private static final Object ERROR_ITEM_REQUIRED;
-	private static final Object ERROR_INVALID_JID;
+	private static final Object ERROR_SUBID_REQUIRED = null;
+	private static final Object ERROR_NOT_SUBSCRIBED = null;
+	private static final Object ERROR_INVALID_SUBID = null;
+	private static final Object ERROR_NODEID_REQUIRED = null;
+	private static final Object ERROR_ITEM_REQUIRED = null;
+	private static final Object ERROR_INVALID_JID = null;
+	/*
 	static {
 		org.jabber.protocol.pubsub.errors.ObjectFactory errorFactory = new org.jabber.protocol.pubsub.errors.ObjectFactory();
 		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired("");
@@ -78,7 +79,7 @@ public class PubsubServiceImpl implements PubsubService {
 		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired("");
 		ERROR_INVALID_JID = errorFactory.createInvalidJid("");
 	}
-	
+	*/
 	// PubSub Constants
 	private static final String SUBSCRIPTION_SUBSCRIBED = "subscribed";
 	private static final String SUBSCRIPTION_UNCONFIGURED = "unconfigured"; // TODO
@@ -311,7 +312,7 @@ public class PubsubServiceImpl implements PubsubService {
 			//TODO If the <item/> element contains more than one payload element or the namespace of the root payload element does not match the configured namespace for the node
 			
 			// Publish and Update Item ID for Response			
-			String itemId = node.publishItem(item.getId(),(org.w3c.dom.Element)item.getAny(),sender);
+			String itemId = node.publishItem(item.getId(),item.getAny(),sender);
 			item.setId(itemId);
 			
 			// Build Notifications
@@ -319,7 +320,7 @@ public class PubsubServiceImpl implements PubsubService {
 			org.jabber.protocol.pubsub.event.Items eventItems = new org.jabber.protocol.pubsub.event.Items();
 			org.jabber.protocol.pubsub.event.Item eventItem = new org.jabber.protocol.pubsub.event.Item();
 			eventItem.setId(itemId);
-			eventItem.setAny((org.w3c.dom.Element)item.getAny());
+			eventItem.setAny(item.getAny());
 			eventItems.setNode(nodeId);
 			eventItems.getItem().add(eventItem);
 			event.setItems(eventItems);

@@ -73,6 +73,18 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.societies.maven.converters</groupId>
+		    <artifactId>SimpleXMLConverters</artifactId>
+		    <version>0.1</version>
+		    <scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -94,23 +106,22 @@
 							!org.societies.api.internal.schema,
 							*
 						</_exportcontents>
-						<!-- 
 						<Import-Package>
-							!org.apache.shindig.auth,
-							!org.apache.shindig.common.*,
-							!org.apache.commons.*,
-							!org.apache.shindig.protocol.*,
-							!net.oauth.*,
-							!com.thoughtworks.*,
-							!com.google.*,
-							!org.apache.http.*,
-							!org.apache.shindig.config,
-							!org.json,
-							*
+    						!javax.microedition.io,
+    						!org.jruby.*,
+    						!org.apache.*,
+    						!org.hibernate.*,
+    						!com.sun.net.*,
+    						!org.springframework.*,
+    						!org.joda.*,
+    						!javax.inject,
+    						!bsh,
+    						!edu.emory.*,
+    						!groovy.lang,
+    						*
 						</Import-Package>
-						-->
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<!-- <Embed-Transitive>true</Embed-Transitive> -->
+						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
 			</plugin>

@@ -1,5 +1,7 @@
 package org.societies.comm.xmpp.pubsub.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -8,11 +10,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+//import javax.xml.bind.JAXBContext;
+//import javax.xml.bind.JAXBException;
+//import javax.xml.bind.Marshaller;
+//import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,6 +30,10 @@ import org.jabber.protocol.pubsub.owner.Affiliations;
 import org.jabber.protocol.pubsub.owner.Delete;
 import org.jabber.protocol.pubsub.owner.Purge;
 import org.jabber.protocol.pubsub.owner.Subscriptions;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -47,8 +52,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.dom4j.io.SAXReader;
 
 @Component
 public class PubsubClientImpl implements PubsubClient, ICommCallback {
@@ -56,13 +61,17 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	public static final int TIMEOUT = 10000;
 	
 	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://jabber.org/protocol/pubsub");
+			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
+   					"http://jabber.org/protocol/pubsub#errors",
+   					"http://jabber.org/protocol/pubsub#owner",
+   					"http://jabber.org/protocol/pubsub#event",
+   					"jabber:x:data"));
 	private static final List<String> PACKAGES = Collections
-			.unmodifiableList(Arrays.asList("jabber.x.data",
-					"org.jabber.protocol.pubsub",
+			.unmodifiableList(Arrays.asList("org.jabber.protocol.pubsub",
 					"org.jabber.protocol.pubsub.errors",
 					"org.jabber.protocol.pubsub.owner",
-					"org.jabber.protocol.pubsub.event"));
+					"org.jabber.protocol.pubsub.event",
+					"jabber.x.data"));
 	
 	private static Logger LOG = LoggerFactory
 			.getLogger(PubsubClientImpl.class);
@@ -71,8 +80,10 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	private Map<String,Object> responses;
 	private Map<Subscription,List<Subscriber>> subscribers;
 	private IIdentityManager idm;
-	private Marshaller contentMarshaller;
-	private Unmarshaller contentUnmarshaller;
+	//private Marshaller contentMarshaller;
+	//private Unmarshaller contentUnmarshaller;
+	
+	private final Map<String, String> nsToPackage = new HashMap<String, String>();
 	private String packagesContextPath;
 	private IIdentity localIdentity;
 	
@@ -88,14 +99,14 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			else
 				throw new CommunicationException("Injected endpoint is not connected!");
 			packagesContextPath = "";
-			JAXBContext jc = JAXBContext.newInstance();
-			contentUnmarshaller = jc.createUnmarshaller();
-			contentMarshaller = jc.createMarshaller();
+			//JAXBContext jc = JAXBContext.newInstance();
+			//contentUnmarshaller = jc.createUnmarshaller();
+			//contentMarshaller = jc.createMarshaller();
 			endpoint.register(this);
 		} catch (CommunicationException e) {
 			LOG.error(e.getMessage());
-		} catch (JAXBException e) {
-			LOG.error(e.getMessage());
+		//} catch (JAXBException e) {
+		//	LOG.error(e.getMessage());
 		}
 	}
 	
@@ -117,6 +128,15 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		return PACKAGES;
 	}
 
+	/** Retrieves a package from a namespace mapping
+	 * @param namespace
+	 * @return
+	 * @throws UnavailableException
+	 */
+	private String getPackage(String namespace) {
+		return nsToPackage.get(namespace);
+	}
+	
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		if (payload instanceof org.jabber.protocol.pubsub.event.Event) {
@@ -124,17 +144,11 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			String node = items.getNode();
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
 			org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
-			try {
-				Object bean = null;
-				synchronized (contentUnmarshaller) {
-					bean = contentUnmarshaller.unmarshal((Element)i.getAny());
-				}
-				List<Subscriber> subscriberList = subscribers.get(sub);
-				for (Subscriber subscriber : subscriberList)
-					subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
-			} catch (JAXBException e) {
-				LOG.warn("JAXBException while unmarshalling pubsub payload",e);
-			}
+			
+			List<Subscriber> subscriberList = subscribers.get(sub);
+			for (Subscriber subscriber : subscriberList)
+				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), i.getAny());
+		
 		}
 	}
 	// TODO subId
@@ -331,8 +345,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
 	@Override
 	public String publisherPublish(IIdentity pubsubService, String node,
-			String itemId, Object item) throws XMPPError,
-			CommunicationException {
+			String itemId, Object item) throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
 		Publish p = new Publish();
@@ -340,27 +353,14 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		Item i = new Item();
 		if (itemId!=null)
 			i.setId(itemId);
-
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try {
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.newDocument();
-			synchronized (contentMarshaller) {
-				contentMarshaller.marshal(item, doc);
-			}
-			i.setAny(doc.getDocumentElement());
-			
-			p.setItem(i);
-			payload.setPublish(p);
-			
-			Object response = blockingIQ(stanza, payload);
-			
-			return ((Pubsub)response).getPublish().getItem().getId();
-		} catch (ParserConfigurationException e) {
-			throw new CommunicationException("ParserConfigurationException while marshalling item to publish", e);
-		} catch (JAXBException e) {
-			throw new CommunicationException("JAXBException while marshalling item to publish", e);
-		}
+		
+		i.setAny(item);
+		p.setItem(i);
+		payload.setPublish(p);
+		
+		Object response = blockingIQ(stanza, payload);
+		
+		return ((Pubsub)response).getPublish().getItem().getId();
 	}
 
 	@Override
@@ -509,7 +509,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public synchronized void addJaxbPackages(List<String> packageList) throws JAXBException {
+	public synchronized void addJaxbPackages(List<String> packageList) { //throws JAXBException {
 		if (packagesContextPath.length()==0) {
 			// TODO first run!
 		}
@@ -518,12 +518,36 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		for (String pack : packageList)
 			contextPath.append(":" + pack);
 
+		/*
 		JAXBContext jc = JAXBContext.newInstance(contextPath.toString(),
 				this.getClass().getClassLoader());
 		contentUnmarshaller = jc.createUnmarshaller();
 		contentMarshaller = jc.createMarshaller();
-		
+		*/
+		//TODO: SIMPLE
+		try {
+			for (int i=0; i<packageList.size(); i++) {
+				String packageStr = packageList.get(i);
+				String nsStr = getNSfromPackage(packageStr);
+				nsToPackage.put(nsStr, packageStr);
+			}	
+		}
+		catch (Exception ex) {
+			LOG.error("Error in JAXBMapping adding: " + ex.getMessage());
+		}
 		packagesContextPath = contextPath.toString();
 	}
-	
+
+	/** Returns the Namespace for a Package string
+	 * @param packageString
+	 * @return
+	 */
+	private String getNSfromPackage(String packageString) {
+		String ns = "";
+		String[] packArr = packageString.split("\\.");
+		ns = "http://" + packArr[1] + "." + packArr[0];
+		for(int i=2; i<packArr.length; i++)
+			ns+="/" + packArr[i]; 
+		return ns;
+	}
 }

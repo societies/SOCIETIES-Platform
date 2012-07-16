@@ -25,42 +25,25 @@
 
 package org.societies.webapp.controller;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.societies.webapp.models.CISDirectoryForm;
+import javax.validation.Valid;
 
+import org.societies.api.cis.directory.ICisDirectoryRemote;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.cis.directory.client.CisDirectoryRemoteClient;
+import org.societies.webapp.models.CISDirectoryForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-
-
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.comm.ICommManagerController;
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-
-import javax.validation.Valid;
-
-import org.societies.api.cis.directory.ICisDirectoryRemote;
-import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
-import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.cis.directory.ICisAdvertisementRecord;
-import org.societies.api.cis.directory.ICisDirectory;
-import org.societies.cis.directory.client.CisDirectoryRemoteClient;
-
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 
 @Controller
 public class CisDirectoryController {
@@ -70,11 +53,7 @@ public class CisDirectoryController {
 	 */
 	@Autowired
 	private ICisDirectoryRemote cisDirectoryRemote;
-	@Autowired
-	private ICommManager commManager;
-	
-	@Autowired
-	private ICommManagerController commManagerControl;
+
 	
 	
 	public ICisDirectoryRemote getCisDirectoryRemote() {
