@@ -33,6 +33,7 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
@@ -52,7 +53,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 public class PPNPOutcome extends IPrivacyOutcome implements Serializable {
 
 
-	private CtxAttributeIdentifier ctxID;
+	private DataIdentifier dataId;
 	private PrivacyOutcomeConstants effect;
 	private RuleTarget rule;
 	private List<Condition> conditions;
@@ -61,7 +62,7 @@ public class PPNPOutcome extends IPrivacyOutcome implements Serializable {
 	public PPNPOutcome(PrivacyOutcomeConstants effect, RuleTarget target, List<Condition> conditions) throws URISyntaxException{
 		this.rule = target;
 		this.effect = effect;
-		this.ctxID = rule.getResource().getCtxIdentifier();
+		this.dataId = rule.getResource().getDataId();
 		this.conditions = conditions;
 		this.myOutcomeType = PrivacyPreferenceTypeConstants.PPNP;
 		
@@ -154,7 +155,7 @@ public class PPNPOutcome extends IPrivacyOutcome implements Serializable {
 		int result = super.hashCode();
 		result = prime * result
 				+ ((conditions == null) ? 0 : conditions.hashCode());
-		result = prime * result + ((ctxID == null) ? 0 : ctxID.hashCode());
+		result = prime * result + ((dataId == null) ? 0 : dataId.hashCode());
 		result = prime * result + ((effect == null) ? 0 : effect.hashCode());
 		result = prime * result
 				+ ((myOutcomeType == null) ? 0 : myOutcomeType.hashCode());
@@ -177,10 +178,10 @@ public class PPNPOutcome extends IPrivacyOutcome implements Serializable {
 				return false;
 		} else if (!conditions.equals(other.conditions))
 			return false;
-		if (ctxID == null) {
-			if (other.ctxID != null)
+		if (dataId == null) {
+			if (other.dataId != null)
 				return false;
-		} else if (!ctxID.equals(other.ctxID))
+		} else if (!dataId.equals(other.dataId))
 			return false;
 		if (effect != other.effect)
 			return false;

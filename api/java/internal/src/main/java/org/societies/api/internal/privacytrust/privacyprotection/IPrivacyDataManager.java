@@ -24,6 +24,7 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection;
 
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxIdentifier;
@@ -33,6 +34,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.identity.DataIdentifier;
 
 /**
  * Interface exposed to Societies components in order to manage access control over resources
@@ -40,6 +42,16 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
  * @created 09-nov.-2011 16:45:26
  */
 public interface IPrivacyDataManager {
+	/**
+	 * Check if a requestor has the permission to perform actions under a personal data
+	 * 
+	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service or a CIS.
+	 * @param dataId Id of the requested data
+	 * @param action Action requested over this data.
+	 * @return A ResponseItem containing permission information
+	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
+	 */
+	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
 	/**
 	 * Check permission to access/use/disclose a data
 	 * Example of use:
@@ -55,8 +67,21 @@ public interface IPrivacyDataManager {
 	 * @return A ResponseItem with permission information in it
 	 * @throws PrivacyException
 	 */
+	@Deprecated
 	public ResponseItem checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action) throws PrivacyException;
 
+	/**
+	 * Protect a data following the user preferences by obfuscating it to a correct
+	 * obfuscation level. The data information are wrapped into a relevant data
+	 * wrapper in order to execute the relevant obfuscation operation into relevant
+	 * information.
+	 *
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataWrapper Data wrapped in a relevant data wrapper. @see{org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory} to select the relevant DataWrapper.
+	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to launch the obfuscation)
+	 * @throws PrivacyException if parameters are not correct (especially the data wrapper), or if the privacy layer is not ready
+	 */
+	public Future<IDataWrapper> obfuscateData(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException;
 	/**
 	 * Protect a data following the user preferences by obfuscating it to a correct
 	 * obfuscation level. The data information are wrapped into a relevant data
@@ -70,12 +95,23 @@ public interface IPrivacyDataManager {
 	 * - Anyone who wants to obfuscate a data
 	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
 	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
-	 * @param dataWrapper Data wrapped in a relevant data wrapper. Use DataWrapperFactory to select the relevant DataWrapper
+	 * @param dataWrapper Data wrapped in a relevant data wrapper. @see{org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory} to select the relevant DataWrapper.
 	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to instantiate the obfuscator)
 	 * @throws PrivacyException
 	 */
+	@Deprecated
 	public Future<IDataWrapper> obfuscateData(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException;
 
+	/**
+	 * Check if there is an obfuscated version of the data and return its ID.
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataWrapper Data Id wrapped in the relevant DataWrapper. Only the is information is mandatory to retrieve an obfuscated version. @see{org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.DataWrapperFactory} to select the relevant DataWrapper.
+	 * @return Id of the obfuscated version of the data if the persistence is enabled and if the obfuscated data exists
+	 * @return otherwise id of the non-obfuscated data (the one that as been passed in the dataWrapper field)
+	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
+	 */
+	public IDataWrapper hasObfuscatedVersion(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException;
 	/**
 	 * Check if there is an obfuscated version of the data and return its ID.
 	 * Example of use:
@@ -92,5 +128,6 @@ public interface IPrivacyDataManager {
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws PrivacyException
 	 */
+	@Deprecated
 	public String hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException;
 }

@@ -107,8 +107,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			if (null == privacyDataManagerInternal) {
 				LOG.info("privacyDataManagerInternal null");
 			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
-			responseItem = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
+			responseItem = privacyDataManagerInternal.getPermission(requestor, dataId);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -142,7 +142,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			if (null == privacyDataManagerInternal) {
 				LOG.info("privacyDataManagerInternal null");
 			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -176,8 +176,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			if (null == privacyDataManagerInternal) {
 				LOG.info("privacyDataManagerInternal null");
 			}
-			dataUpdated1 = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
-			dataUpdated2 = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
+			dataUpdated1 = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
+			dataUpdated2 = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -215,7 +215,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			if (null == privacyDataManagerInternal) {
 				LOG.info("privacyDataManagerInternal null");
 			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, permission);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -252,7 +252,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			if (null == privacyDataManagerInternal) {
 				LOG.info("privacyDataManagerInternal null");
 			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, permission);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -287,9 +287,9 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			if (null == privacyDataManagerInternal) {
 				LOG.info("privacyDataManagerInternal null");
 			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
-			dataDeleted = privacyDataManagerInternal.deletePermission(requestor, ownerId, dataId);
-			responseItem = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
+			dataDeleted = privacyDataManagerInternal.deletePermission(requestor, dataId);
+			responseItem = privacyDataManagerInternal.getPermission(requestor, dataId);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());

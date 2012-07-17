@@ -37,6 +37,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
@@ -63,7 +64,7 @@ public interface IPrivacyPreferenceManager {
 	 * @param actions    the actions requested
 	 * @exception PrivacyPreferenceException PrivacyPreferenceException
 	 */
-	public ResponseItem checkPermission(Requestor requestor, CtxAttributeIdentifier ctxId, List<Action> actions)
+	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions)
 	  throws PrivacyException;
 
 	/**
@@ -137,7 +138,7 @@ public interface IPrivacyPreferenceManager {
 	 * @return				the evaluated outcome of the data obfuscation preferences for this specific request. Indicates the level
 	 * 						of obfuscation that must be applied
 	 */
-	public DObfOutcome evaluateDObfPreference(Requestor requestor, IIdentity owner, String contextType);
+	public DObfOutcome evaluateDObfPreference(Requestor requestor, String dataType);
 	
 	/**
 	 * Method to evaluate the data obfuscation preferences based on the context identifier. 

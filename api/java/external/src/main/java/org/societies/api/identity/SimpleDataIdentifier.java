@@ -46,6 +46,7 @@ public class SimpleDataIdentifier extends DataIdentifier {
 	@Override
 	public String toString() {
 		return "SimpleDataIdentifier ["
+				+ (scheme != null ? "scheme=" + scheme + ", " : "")
 				+ (ownerId != null ? "ownerId=" + ownerId + ", " : "")
 				+ (type != null ? "type=" + type + ", " : "")
 				+ (uri != null ? "uri=" + uri : "") + "]";
@@ -66,6 +67,7 @@ public class SimpleDataIdentifier extends DataIdentifier {
 		// -- Verify obj type
 		SimpleDataIdentifier rhs = (SimpleDataIdentifier) obj;
 		return new EqualsBuilder()
+			.append(this.getScheme(), rhs.getScheme())
 			.append(this.getOwnerId(), rhs.getOwnerId())
 			.append(this.getType(), rhs.getType())
 			.isEquals();

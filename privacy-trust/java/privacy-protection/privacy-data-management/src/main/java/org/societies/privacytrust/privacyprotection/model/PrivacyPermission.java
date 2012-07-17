@@ -40,6 +40,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -80,16 +81,11 @@ public class PrivacyPermission implements Serializable {
 	private String serviceId;
 	@Basic(optional=true)
 	private String cisId;
-
-	private String ownerId;
-
 	private String dataId;
-
 	/**
 	 * Formatted:  [{"action": READ, "optional": true}, ...]
 	 */
 	private String actions;
-
 	@Enumerated
 	private Decision permission;
 
@@ -110,14 +106,13 @@ public class PrivacyPermission implements Serializable {
 	 */
 	public PrivacyPermission(String requestorId,
 			PrivacyPolicyTypeConstants permissionType, String serviceId,
-			String cisId, String ownerId, String dataId, String actions,
+			String cisId, String dataId, String actions,
 			Decision permission) {
 		super();
 		this.requestorId = requestorId;
 		this.permissionType = permissionType;
 		this.serviceId = serviceId;
 		this.cisId = cisId;
-		this.ownerId = ownerId;
 		this.dataId = dataId;
 		this.actions = actions;
 		this.permission = permission;
@@ -130,10 +125,9 @@ public class PrivacyPermission implements Serializable {
 	 * @param actions
 	 * @param permission
 	 */
-	public PrivacyPermission(Requestor requestor, IIdentity ownerId, DataIdentifier dataId, List<Action> actions, Decision permission) {
+	public PrivacyPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, Decision permission) {
 		super();
 		setRequestor(requestor);
-		setOwnerId(ownerId);
 		setDataId(dataId);
 		setActions(actions);
 		setPermission(permission);
@@ -143,8 +137,8 @@ public class PrivacyPermission implements Serializable {
 	 * @param requestor
 	 * @param permission
 	 */
-	public PrivacyPermission(Requestor requestor, IIdentity ownerId, ResponseItem permission) {
-		this(requestor, ownerId, permission.getRequestItem().getResource().getCtxIdentifier(), permission.getRequestItem().getActions(), permission.getDecision());
+	public PrivacyPermission(Requestor requestor, ResponseItem permission) {
+		this(requestor, permission.getRequestItem().getResource().getCtxIdentifier(), permission.getRequestItem().getActions(), permission.getDecision());
 	}
 
 
@@ -158,7 +152,7 @@ public class PrivacyPermission implements Serializable {
 	 */
 	public ResponseItem createResponseItem() throws MalformedCtxIdentifierException {
 		// - Create the resource
-		CtxAttributeIdentifier dataId = (CtxAttributeIdentifier) CtxIdentifierFactory.getInstance().fromString(this.dataId);
+		DataIdentifier dataId = DataIdentifierFactory.fromUri(this.dataId);
 		Resource resource = new Resource(dataId);
 
 		// - Create the list of actions from JSON
@@ -185,13 +179,6 @@ public class PrivacyPermission implements Serializable {
 				this.cisId = null;
 			}
 		}
-	}
-
-	public void setOwnerId(IIdentity ownerId) {
-		if (ownerId != null) {
-			this.ownerId = ownerId.getJid();
-		}
-
 	}
 
 	public void setDataId(DataIdentifier dataId) {
@@ -275,27 +262,11 @@ public class PrivacyPermission implements Serializable {
 	}
 
 	/**
-	 * @return the ownerId
-	 */
-	public String getOwnerId() {
-		return ownerId;
-	}
-
-	/**
-	 * @param ownerId the ownerId to set
-	 */
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
-	}
-
-
-	/**
 	 * @return the dataId
 	 */
 	public String getDataId() {
 		return dataId;
 	}
-
 
 	/**
 	 * @param dataId the dataId to set
@@ -383,7 +354,7 @@ public class PrivacyPermission implements Serializable {
 	public String toString() {
 		return "PrivacyPermission [id=" + id + ", requestorId=" + requestorId
 				+ ", permissionType=" + permissionType + ", serviceId="
-				+ serviceId + ", cisId=" + cisId + ", ownerId=" + ownerId
+				+ serviceId + ", cisId=" + cisId + ", +"
 				+ ", dataId=" + dataId + ", actions=" + actions
 				+ ", permission=" + permission + "]";
 	}

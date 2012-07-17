@@ -63,21 +63,20 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
-	public ResponseItem getPermission(Requestor requestor, IIdentity ownerId,
-			CtxIdentifier dataId) throws PrivacyException {
+	public ResponseItem getPermission(Requestor requestor, DataIdentifier dataId) throws PrivacyException {
 		// Check Dependency injection
 		if (!isDepencyInjectionDone()) {
 			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
 		}
 		// Verifications
-		if (null == ownerId) {
-			throw new PrivacyException("[Parameters] OwnerId is missing");
-		}
 		if (null == requestor) {
 			throw new PrivacyException("[Parameters] RequestorId is missing");
 		}
 		if (null == dataId) {
 			throw new PrivacyException("[Parameters] DataId is missing");
+		}
+		if (null == dataId.getOwnerId()) {
+			throw new PrivacyException("[Parameters] OwnerId is missing");
 		}
 		LOG.info("############getPermission"+dataId.getUri());
 
@@ -89,7 +88,6 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			Criteria criteria = session
 					.createCriteria(PrivacyPermission.class)
 					.add(Restrictions.like("requestorId", requestor.getRequestorId().getJid()))
-					.add(Restrictions.like("ownerId", ownerId.getJid()))
 					.add(Restrictions.like("dataId", dataId.getUri()));
 			if (requestor instanceof RequestorCis) {
 				criteria.add(Restrictions.like("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
@@ -125,15 +123,12 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier, java.util.List, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants)
 	 */
 	@Override
-	public boolean updatePermission(Requestor requestor, IIdentity ownerId, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException {
+	public boolean updatePermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException {
 		// Check Dependency injection
 		if (!isDepencyInjectionDone()) {
 			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
 		}
 		// Verifications
-		if (null == ownerId) {
-			throw new PrivacyException("[Parameters] OwnerId is missing");
-		}
 		if (null == requestor) {
 			throw new PrivacyException("[Parameters] RequestorId is missing");
 		}
@@ -150,7 +145,6 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			Criteria criteria = session
 					.createCriteria(PrivacyPermission.class)
 					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getJid()))
-					.add(Restrictions.eq("ownerId", ownerId.getJid()))
 					.add(Restrictions.eq("dataId", dataId.getUri()));
 			if (requestor instanceof RequestorCis) {
 				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
@@ -165,12 +159,11 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// - Privacy Permission doesn't exist: create a new one
 			if (null == privacyPermission) {
 				LOG.info("PrivacyPermission not available: create it");
-				privacyPermission = new PrivacyPermission(requestor, ownerId, dataId, actions, permission);
+				privacyPermission = new PrivacyPermission(requestor, dataId, actions, permission);
 			}
 			// - Privacy permission already exists: update it
 			else {
 				privacyPermission.setRequestor(requestor);
-				privacyPermission.setOwnerId(ownerId);
 				privacyPermission.setDataId(dataId);
 				privacyPermission.setActions(actions);
 				privacyPermission.setPermission(permission);
@@ -195,35 +188,31 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
 	 */
 	@Override
-	public boolean updatePermission(Requestor requestor, IIdentity ownerId, ResponseItem permission) throws PrivacyException {
+	public boolean updatePermission(Requestor requestor, ResponseItem permission) throws PrivacyException {
 		DataIdentifier dataId;
-		if (null != permission.getRequestItem().getResource().getCtxIdentifier()) {
-			dataId = permission.getRequestItem().getResource().getCtxIdentifier();
+		if (null != permission.getRequestItem().getResource().getDataId()) {
+			dataId = permission.getRequestItem().getResource().getDataId();
 		}
-		else if (null != permission.getRequestItem().getResource().getContextType() && !"".equals(permission.getRequestItem().getResource().getContextType())) {
+		else if (null != permission.getRequestItem().getResource().getDataType() && !"".equals(permission.getRequestItem().getResource().getDataType())) {
 			dataId = new SimpleDataIdentifier();
-			dataId.setType(permission.getRequestItem().getResource().getContextType());
+			dataId.setType(permission.getRequestItem().getResource().getDataType());
 		}
 		else {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
-		return updatePermission(requestor, ownerId, dataId, permission.getRequestItem().getActions(), permission.getDecision());
+		return updatePermission(requestor, dataId, permission.getRequestItem().getActions(), permission.getDecision());
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
-	public boolean deletePermission(Requestor requestor, IIdentity ownerId,
-			CtxIdentifier dataId) throws PrivacyException {
+	public boolean deletePermission(Requestor requestor, DataIdentifier dataId) throws PrivacyException {
 		// Check Dependency injection
 		if (!isDepencyInjectionDone()) {
 			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
 		}
 		// Verifications
-		if (null == ownerId) {
-			throw new PrivacyException("[Parameters] OwnerId is missing");
-		}
 		if (null == requestor) {
 			throw new PrivacyException("[Parameters] RequestorId is missing");
 		}
@@ -240,7 +229,6 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			Criteria criteria = session
 					.createCriteria(PrivacyPermission.class)
 					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getJid()))
-					.add(Restrictions.eq("ownerId", ownerId.getJid()))
 					.add(Restrictions.eq("dataId", dataId.getUri()));
 			if (requestor instanceof RequestorCis) {
 				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));

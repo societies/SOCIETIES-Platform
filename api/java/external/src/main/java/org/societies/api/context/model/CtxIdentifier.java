@@ -31,6 +31,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
  * This abstract class is used to identify context model objects. It provides
@@ -80,7 +81,7 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
 	 *            the unique numeric model object identifier
 	 */
 	CtxIdentifier(String ownerId, CtxModelType modelType, String type, Long objectNumber) {
-		
+		super.scheme = DataIdentifierScheme.CONTEXT;
 		super.ownerId = ownerId;
 		this.modelType = modelType;
 		super.type = type;

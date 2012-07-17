@@ -72,26 +72,6 @@ public interface IPrivacyPolicyManager {
 	public String getPrivacyPolicyFromLocation(String location, Map<String, String> options) throws PrivacyException;
 	
 	/**
-	 * Retrieve the "privacy-policy.xml" file in the JAR file.
-	 * This file need to be in the root folder of the OSGi bundle JAR file.
-	 * 
-	 * @param jarLocation Location of the 3P service OSGi bundle JAR
-	 * @return the content of the "privacy-policy.xml" file
-	 * @throws PrivacyException
-	 */
-	public String getPrivacyPolicyFrom3PServiceJar(String jarLocation) throws PrivacyException;
-	
-	/**
-	 * Retrieve the "privacy-policy.xml" file in the JAR file.
-	 * 
-	 * @param jarLocation Location of the 3P service JAR
-	 * @param options Options giving more information about the JAR file. If null, the JAR has to be an OSGi bundle, and by default, the privacy policy file is on the root folder of the jar file.
-	 * @return the content of the "privacy-policy.xml" file
-	 * @throws PrivacyException
-	 */
-	public String getPrivacyPolicyFrom3PServiceJar(String jarLocation, Map<String, String> options) throws PrivacyException;
-	
-	/**
 	 * Store or update a (CIS or 3P Service) privacy policy
 	 * Example of use:
 	 * - CIS Management, to create a policy for a CIS.

@@ -49,7 +49,7 @@ public interface IPrivacyDataManagerInternal {
 	 * @return The ResponseItem of this permission
 	 * @throws PrivacyException
 	 */
-	public ResponseItem getPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId) throws PrivacyException;
+	public ResponseItem getPermission(Requestor requestor, DataIdentifier dataId) throws PrivacyException;
 	
 	/**
 	 * Update access control permissions over a data
@@ -62,7 +62,7 @@ public interface IPrivacyDataManagerInternal {
 	 * @return Success of the operation
 	 * @throws PrivacyException
 	 */
-	public boolean updatePermission(Requestor requestor, IIdentity ownerId, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
+	public boolean updatePermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
 	
 	/**
 	 * Update access control permissions over a data
@@ -72,7 +72,7 @@ public interface IPrivacyDataManagerInternal {
 	 * @return Success of the operation
 	 * @throws PrivacyException
 	 */
-	public boolean updatePermission(Requestor requestor, IIdentity ownerId, ResponseItem permission) throws PrivacyException;
+	public boolean updatePermission(Requestor requestor, ResponseItem permission) throws PrivacyException;
 	
 	/**
 	 * Delete the relevant permission
@@ -83,6 +83,6 @@ public interface IPrivacyDataManagerInternal {
 	 * @return Success of the operation
 	 * @throws PrivacyException
 	 */
-	public boolean deletePermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId) throws PrivacyException;
+	public boolean deletePermission(Requestor requestor, DataIdentifier dataId) throws PrivacyException;
 
 }

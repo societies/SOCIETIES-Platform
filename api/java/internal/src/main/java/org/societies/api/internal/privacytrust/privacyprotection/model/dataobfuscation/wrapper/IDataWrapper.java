@@ -39,11 +39,11 @@ public interface IDataWrapper<E> {
 	/**
 	 * @return Id of the data to be obfuscated
 	 */
-	public String getDataId();
+	public DataIdentifier getDataId();
 	/**
 	 * @param dataId Id of the data to be obfuscated
 	 */
-	public void setDataId(String dataId);
+	public void setDataId(DataIdentifier dataId);
 	
 	/**
 	 * Data

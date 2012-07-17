@@ -24,6 +24,8 @@
  */
 package org.societies.api.identity;
 
+import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
@@ -33,26 +35,38 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class DataIdentifierUtil {
+public class DataIdentifierFactory {
 	/**
-	 * Generate a URI: type/ownerId/
-	 * @param dataId
-	 * @return
+	 * Create the relevant DataIdentifier extension using a correct URI
+	 *
+	 * @param dataIdUri URI format sheme://ownerId/type
+	 * @return the relevant DataIdentifier instance
+	 * @throws MalformedCtxIdentifierException 
 	 */
-	public static String toUriString(DataIdentifier dataId)
-	{
-		StringBuilder str = new StringBuilder("");
-		str.append((dataId.getScheme() != null ? dataId.getScheme().name()+"://" : "/"));
-		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
-		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
-		return str.toString();
-	}
-	
-	public static DataIdentifier fromUri(String dataIdUri)
+	public static DataIdentifier fromUri(String dataIdUri) throws MalformedCtxIdentifierException
 	{
 		String[] uri = dataIdUri.split("://");
+		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
+
+		// Context
+		if (DataIdentifierScheme.CONTEXT.equals(scheme)) {
+			return CtxIdentifierFactory.getInstance().fromString(dataIdUri);
+		}
+		//		// CIS
+		//		if (DataIdentifierScheme.CIS.equals(scheme)) {
+		//			
+		//		}
+		//		// DEVICE
+		//		if (DataIdentifierScheme.DEVICE.equals(scheme)) {
+		//			
+		//		}
+		//		// ACTIVITY
+		//		if (DataIdentifierScheme.ACTIVITY.equals(scheme)) {
+		//			
+		//		}
+		// Default SimpleDataIdentifier
 		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setScheme(DataIdentifierScheme.fromValue(uri[0]));
+		dataId.setScheme(scheme);
 		String path = uri[1];
 		int pos = 0, end = 0;
 		if ((end = path.indexOf('/', pos)) >= 0) {
