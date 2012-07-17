@@ -1,9 +1,11 @@
 <xs:schema elementFormDefault="qualified" version="1.0"
 	xmlns="http://societies.org/api/schema/cis/directory" targetNamespace="http://societies.org/api/schema/cis/directory"
-	xmlns:tns="http://societies.org/api/schema/cis/directory" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	xmlns:tns="http://societies.org/api/schema/cis/directory" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ins="http://societies.org/api/schema/cis/community">
 
 
-
+<xs:import namespace="http://societies.org/api/schema/cis/community" 
+           schemaLocation="org.societies.api.schema.cis.community.xsd"/>
 
 	<xs:element name="cisDirectoryBean">
 		<xs:complexType>
@@ -25,7 +27,7 @@
 			<xs:element name="uri" type="xs:string" minOccurs="0" />
 			<xs:element name="password" type="xs:string" minOccurs="0" />
 			<xs:element name="type" type="xs:string" minOccurs="0" />
-			<xs:element name="mode" type="xs:int" minOccurs="0" />
+			<xs:element ref='ins:membershipCrit'/>
 		</xs:sequence>
 	</xs:complexType>
 

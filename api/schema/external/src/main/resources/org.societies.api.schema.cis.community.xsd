@@ -189,6 +189,16 @@
 		</xs:complexType>
 	</xs:element>
 
+	<xs:element name='qualifications'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element name="attr" type="xs:string" minOccurs='1' maxOccurs='1'/>
+				<xs:element name="value" type="xs:string" minOccurs='1' maxOccurs='1'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
 
 
 	<xs:element name='cleanUpActivityFeed'>
@@ -291,7 +301,15 @@
 			</xs:sequence> 
 		</xs:complexType>
 	</xs:element>-->
-	<xs:element name='join' type='empty' />
+	
+	<xs:element name='join'>		
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='1'>
+				<xs:element ref='qualifications'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
 	<xs:element name='leave' type='empty' />
 	<xs:element name='invite'>
 		<xs:complexType>

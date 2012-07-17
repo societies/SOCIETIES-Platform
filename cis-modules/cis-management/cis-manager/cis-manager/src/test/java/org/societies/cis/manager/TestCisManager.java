@@ -524,8 +524,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			 for(int i=0;i<ciss.length;i++){
 				 if(element.getName().equals(ciss[i].getName()) 
 				&& 	element.getCisId().equals(ciss[i].getCisId())
-				&& 	element.getCisType().equals(ciss[i].getCisType())
-				&& 	(element.getMembershipCriteria() == ciss[i].getMembershipCriteria())		 
+				&& 	element.getCisType().equals(ciss[i].getCisType())		 
 						 )
 					 cissCheck[i] = 1; // found a matching CIS
 					 

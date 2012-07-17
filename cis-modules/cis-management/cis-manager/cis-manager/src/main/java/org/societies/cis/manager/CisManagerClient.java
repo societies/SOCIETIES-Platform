@@ -101,7 +101,7 @@ public class CisManagerClient implements IcisManagerClient {
 			Participant p = new Participant();
 			p.setJid(this.cssManagerId.getBareJid());
 			j.setParticipant(p);*/
-			c.setJoin("");
+			//c.setJoin("");
 			try {
 				LOG.info("Sending stanza with join");
 				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);

@@ -24,12 +24,13 @@
  */
 package org.societies.api.cis.attributes;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeValueType;
 
-public class Rule {
+public class Rule{
         
     //could be an enumeration with its own API.
     //private ArrayList<String> operations;
@@ -52,6 +53,13 @@ public class Rule {
 
     //Non-T4.5 components need to be able to create a rule
     public Rule() {
+
+    }
+    
+    public Rule(String operation, List<String> values) throws InvalidParameterException {
+    	if(this.setOperation(operation) == false) throw new InvalidParameterException("Operation invalid");
+    	List<String> newStrs = new ArrayList<String>(values);
+    	if(this.setValues(newStrs) == false) throw new InvalidParameterException("Value list invalid");
 
     }
 

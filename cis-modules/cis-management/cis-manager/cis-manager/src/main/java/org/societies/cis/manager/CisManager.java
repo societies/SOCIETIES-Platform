@@ -80,6 +80,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.MembershipCrit;
 
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
@@ -390,7 +391,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		// advertising the CIS to global CIS directory
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
-		cisAd.setMode(0);//TODO: update this
+		//cisAd.setMode(0);//TODO: update this
+		MembershipCrit m = new MembershipCrit();
+		Hashtable<String, MembershipCriteria> h= cis.getMembershipCriteria();
+		// TODO: add membership criteria in CISAdv
+		
+		//cisAd.setMembershipCrit();
 		cisAd.setName(cis.getName());
 		cisAd.setUri(cis.getCisId());
 		cisAd.setType(cis.getCisType());
@@ -988,7 +994,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			Community c = new Community();
 
-			c.setJoin("");
+			Join j = new Join();
+			c.setJoin(j);
 			try {
 				LOG.info("Sending stanza with join");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);

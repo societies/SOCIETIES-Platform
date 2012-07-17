@@ -197,11 +197,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 	Hashtable<String, MembershipCriteria> cisCriteria = null;
 	
 	
-	public Set<String> getMembershipCritOnDb() {
+	private Set<String> getMembershipCritOnDb() {
 		return membershipCritOnDb;
 	}
 
-	public void setMembershipCritOnDb(Set<String> membershipCritOnDb) {
+	private void setMembershipCritOnDb(Set<String> membershipCritOnDb) {
 		this.membershipCritOnDb = membershipCritOnDb;
 	}
 
@@ -1500,7 +1500,21 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	@Override
 	public Hashtable<String, MembershipCriteria> getMembershipCriteria() {
-		return this.cisCriteria; // TODO: maybe we should return a copy instead
+		//return this.cisCriteria; // TODO: maybe we should return a copy instead
+		//returns a home-made clone
+		
+		Hashtable<String, MembershipCriteria> h = new Hashtable<String, MembershipCriteria> ();
+		
+		for(Map.Entry<String, MembershipCriteria> entry : this.cisCriteria.entrySet()){
+			MembershipCriteria orig =  entry.getValue();
+			MembershipCriteria clone = new MembershipCriteria();
+			clone.setRank(orig.getRank());
+			clone.setRule(new Rule(orig.getRule().getOperation(), orig.getRule().getValues()));
+			h.put(new String(entry.getKey()),clone );
+		}
+		
+		return h;
+		
 	}
 	
 	
