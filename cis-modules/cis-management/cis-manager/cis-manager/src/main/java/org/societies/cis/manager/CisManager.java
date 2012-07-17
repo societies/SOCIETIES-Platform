@@ -393,14 +393,14 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
 		//cisAd.setMode(0);//TODO: update this
 		MembershipCrit m = new MembershipCrit();
-		Hashtable<String, MembershipCriteria> h= cis.getMembershipCriteria();
+		Hashtable<String, MembershipCriteria> h= cis.cisCriteria;
 		// TODO: add membership criteria in CISAdv
 		
 		//cisAd.setMembershipCrit();
 		cisAd.setName(cis.getName());
 		cisAd.setUri(cis.getCisId());
 		cisAd.setType(cis.getCisType());
-		cisAd.setId(cis.getCisId());
+		cisAd.setId(cis.getCisId()); // TODO: check if the id or uri needs the jid
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
 
 		
@@ -527,8 +527,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 						// populate the hashtable
 						for (Criteria crit : m.getCriteria()) {
 							MembershipCriteria meb = new MembershipCriteria();
-							if(crit.getRank() != null)
-								meb.setRank(Integer.parseInt(crit.getRank()));
+							meb.setRank(crit.getRank());
 							Rule r = new Rule();
 							if( r.setOperation(crit.getOperator()) == false) {create.setResult(false); return c;}
 							if( r.setValues(crit.getValue()) == false) {create.setResult(false); return c;}
@@ -980,14 +979,18 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 // client methods
 	
 	@Override
-	public void joinRemoteCIS(String cisId, ICisManagerCallback callback) {
+	public void joinRemoteCIS(CisAdvertisementRecord adv, ICisManagerCallback callback) {
 		
 		LOG.debug("client call to join a RemoteCIS");
 
+		// TODO: check with privacy
+		
+		// TODO: get qualifications
+		
 
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.iCommMgr.getIdManager().fromJid(cisId);
+			toIdentity = this.iCommMgr.getIdManager().fromJid(adv.getId());
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this);

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -174,10 +175,10 @@ public interface ICisManager {
 	 * defined at org.societies.api.schema.cis.community 
 	 * it has the result of the join plus some complimentary info from the CIS
 	 *  
-	 * @param cisId JID of the CIS to be joined
+	 * @param adv advertisement Record of the cis (includes the membership criteria and jid)
 	 * @param callback callback function
 	 */
-	public void joinRemoteCIS(String cisId, ICisManagerCallback callback);
+	public void joinRemoteCIS(CisAdvertisementRecord adv, ICisManagerCallback callback);
 	
 	/**
 	 * Leave a CIS, most likely hosted remotely.

@@ -71,11 +71,24 @@ public interface ICis {
 	 * @param 
 	 * @return name of the CIS as a string
 	 */ 
-    public Hashtable<String,MembershipCriteria> getMembershipCriteria();
+ /*   public Hashtable<String,MembershipCriteria> getMembershipCriteria();
 	public boolean addCriteria(String contextAtribute, MembershipCriteria m);
-	public boolean removeCriteria(String contextAtribute, MembershipCriteria m);
+	public boolean removeCriteria(String contextAtribute, MembershipCriteria m);*/
 
-    
+	/**
+	 * Get membership criteria from a CIS.
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 * it has the  info from the CIS
+	 * 
+	 * Notice that the membership criteria will be formated as the marshable object
+	 * 
+	 * org.societies.api.schema.cis.community.MembershipCrit
+	 * @param callback callback function
+	 */
+	public void getMembershipCriteria(ICisManagerCallback callback);
+
+	
 	/**
 	 * Get info from a CIS.
 	 * The callback must be able to retrieve a community object

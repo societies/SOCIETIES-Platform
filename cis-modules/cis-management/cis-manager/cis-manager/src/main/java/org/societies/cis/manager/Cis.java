@@ -85,11 +85,13 @@ import org.societies.api.schema.cis.community.AddActivityResponse;
 import org.societies.api.schema.cis.community.AddMemberResponse;
 import org.societies.api.schema.cis.community.CleanUpActivityFeedResponse;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
 import org.societies.api.schema.cis.community.GetActivitiesResponse;
 import org.societies.api.schema.cis.community.GetInfoResponse;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
+import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.SetInfoResponse;
@@ -175,7 +177,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	@Column
 	public String cisType;
-	
+	@Column
 	public String owner;
 	
 	//@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER,orphanRemoval=true)
@@ -290,7 +292,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 
 	
-
+	@Column
 	String description = "";
 	
 	@Override
@@ -1498,11 +1500,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 	}
 
-	@Override
+	// local method
 	public Hashtable<String, MembershipCriteria> getMembershipCriteria() {
 		//return this.cisCriteria; // TODO: maybe we should return a copy instead
 		//returns a home-made clone
-		
 		Hashtable<String, MembershipCriteria> h = new Hashtable<String, MembershipCriteria> ();
 		
 		for(Map.Entry<String, MembershipCriteria> entry : this.cisCriteria.entrySet()){
@@ -1513,9 +1514,34 @@ public class Cis implements IFeatureServer, ICisOwned {
 			h.put(new String(entry.getKey()),clone );
 		}
 		
+	
+		
 		return h;
 		
 	}
-	
+
+	@Override
+	public void getMembershipCriteria(ICisManagerCallback callback) {
+		Community result = new Community();
+		
+		MembershipCrit m = new MembershipCrit();
+		List<Criteria> l = new ArrayList<Criteria>();
+		
+		
+		for(Map.Entry<String, MembershipCriteria> entry : this.cisCriteria.entrySet()){
+			MembershipCriteria orig =  entry.getValue();
+			Criteria c = new Criteria();
+			c.setAttr(entry.getKey());
+			c.setOperator(orig.getRule().getOperation());
+			c.setRank(orig.getRank());
+			c.setValue(orig.getRule().getValues());
+			l.add(c);
+		}
+		m.setCriteria(l);
+		result.setMembershipCrit(m);
+		callback.receiveResult(result);
+	}
+
+
 	
 }

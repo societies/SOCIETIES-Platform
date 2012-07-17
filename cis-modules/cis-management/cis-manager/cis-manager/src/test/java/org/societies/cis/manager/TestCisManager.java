@@ -80,6 +80,7 @@ import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -823,8 +824,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ICisOwned localInstOfRemoteCIS =  (remoteCisManagerUnderTest.createCis(
 				"name", TEST_CIS_TYPW ,null,"")).get();
 		
+		CisAdvertisementRecord ad = new CisAdvertisementRecord();
+		ad.setId(REMOTER_CISID_1);
 
-		cisManagerUnderTest.joinRemoteCIS(REMOTER_CISID_1, new JoinCallBack());
+		cisManagerUnderTest.joinRemoteCIS(ad, new JoinCallBack());
 
 
 		

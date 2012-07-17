@@ -101,5 +101,6 @@ public interface ICisOwned extends ICis {
 	// TODO: change the visitibility of those methods and add documentation
 	public boolean checkQualification(HashMap<String,String> qualification);
 	
-	
+	public boolean addCriteria(String contextAtribute, MembershipCriteria m);
+	public boolean removeCriteria(String contextAtribute, MembershipCriteria m);
 }

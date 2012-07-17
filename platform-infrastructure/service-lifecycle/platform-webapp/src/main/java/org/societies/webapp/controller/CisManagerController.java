@@ -55,6 +55,7 @@ import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 
 @Controller
@@ -176,7 +177,9 @@ public class CisManagerController {
 			} else if (method.equalsIgnoreCase("JoinRemoteCIS")) {
 				model.put("methodcalled", "JoinRemoteCIS");
 
-				this.getCisManager().joinRemoteCIS(cisForm.getCisJid(), icall);
+				CisAdvertisementRecord ad = new CisAdvertisementRecord();
+				ad.setId(cisForm.getCisJid());
+				this.getCisManager().joinRemoteCIS(ad, icall);
 				Thread.sleep(5 * 1000);
 				model.put("joinStatus", resultCallback);
 				ICis i = getCisManager().getCis(cisForm.getCisJid());

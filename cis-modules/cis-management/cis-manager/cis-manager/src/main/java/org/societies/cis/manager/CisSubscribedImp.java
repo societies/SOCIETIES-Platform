@@ -334,21 +334,9 @@ public class CisSubscribedImp implements ICis {
 	}
 
 	@Override
-	public boolean addCriteria(String contextAtribute, MembershipCriteria m) {
+	public void getMembershipCriteria(ICisManagerCallback callback) {
 		// TODO Auto-generated method stub
-		return false;
+		
 	}
 
-	@Override
-	public boolean removeCriteria(String contextAtribute, MembershipCriteria m) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Hashtable<String, MembershipCriteria> getMembershipCriteria() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 }

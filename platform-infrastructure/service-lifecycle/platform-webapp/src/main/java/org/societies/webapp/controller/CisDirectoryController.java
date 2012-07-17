@@ -153,7 +153,7 @@ public class CisDirectoryController {
 					record.setUri(cdForm.getUri());
 					record.setType(cdForm.getType());
 					record.setId(cdForm.getId());
-					record.setMode(cdForm.getMode());
+					//record.setMode(cdForm.getMode());
 					record.setPassword(cdForm.getPassword());
 					
 				getCisDirectoryRemote().addCisAdvertisementRecord(record);
