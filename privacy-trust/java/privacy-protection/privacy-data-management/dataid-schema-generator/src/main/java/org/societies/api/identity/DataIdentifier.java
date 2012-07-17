@@ -26,8 +26,6 @@ package org.societies.api.identity;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 
 
@@ -49,9 +47,16 @@ public abstract class DataIdentifier {
 	 * The format of this field is defined by 
 	 * the SOCIETIES data taxonomy
 	 * 
-	 * E.g.: activity, context, deviceData, deviceMetaData, preference
+	 * E.g.: location, member-list
 	*/
 	private String type;
+	
+	/**
+	 * Scheme of data, i.e. the provider name
+	 * @see{org.societies.api.identity.DataIdentifierScheme}
+	 * E.g.: CONTEXT, DEVICE, CIS
+	 */
+	private DataIdentifierScheme scheme;
 	
 	/**
 	 * The string URI form of this data identifier
@@ -59,9 +64,9 @@ public abstract class DataIdentifier {
 	 * so it is possible to regenerate a DataIdentifier
 	 * using this field
 	 * 
-	 * This is the only serialized element
+	 * Format: scheme://ownerId/type
 	*/
-	private volatile String uri;
+	private String uri;
 
 	
 	// -- GET / SET
@@ -91,7 +96,20 @@ public abstract class DataIdentifier {
 	public void setType(String type) {
 		this.type = type;
 	}
-
+	
+	/**
+	 * @return the scheme
+	 */
+	public DataIdentifierScheme getScheme() {
+		return scheme;
+	}
+	/**
+	 * @param scheme the scheme to set
+	 */
+	public void setScheme(DataIdentifierScheme scheme) {
+		this.scheme = scheme;
+	}
+	
 	/**
 	 * @return the uri
 	 */

@@ -81,7 +81,7 @@
 			<httpNamespace>http://societies.org/api/schema/identity</httpNamespace>
 			<!-- Output and input directories -->
 			<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
-			<file>schema2.xsd</file>
+			<file>schema1.xsd</file>
 			<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
 		</configuration>
 	</plugin>

@@ -2,16 +2,14 @@
 <xs:schema version="1.0" elementFormDefault="qualified"
 	targetNamespace="http://societies.org/api/schema/identity"
 	xmlns:tns="http://societies.org/api/schema/identity"
-	xmlns:ns1="http://societies.org/api/schema/servicelifecycle/model" 
+	
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
-
-  <xs:import namespace="http://societies.org/api/schema/servicelifecycle/model" schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd" />
 
   <xs:complexType name="requestorServiceBean">
     <xs:complexContent>
       <xs:extension base="tns:requestorBean">
         <xs:sequence>
-          <xs:element name="requestorServiceId" type="ns1:serviceResourceIdentifier"/>
+          <xs:element name="requestorServiceId" type="tns:serviceResourceIdentifier"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -23,10 +21,18 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="serviceResourceIdentifier">
+    <xs:sequence>
+      <xs:element name="identifier" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceInstanceIdentifier" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:complexType name="dataIdentifier" abstract="true">
     <xs:sequence>
       <xs:element name="ownerId" type="xs:string" minOccurs="0"/>
       <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="scheme" type="tns:dataIdentifierScheme" minOccurs="0"/>
       <xs:element name="uri" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
@@ -40,5 +46,14 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+
+  <xs:simpleType name="dataIdentifierScheme">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CONTEXT"/>
+      <xs:enumeration value="DEVICE"/>
+      <xs:enumeration value="CIS"/>
+      <xs:enumeration value="ACTIVITY"/>
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>
 
