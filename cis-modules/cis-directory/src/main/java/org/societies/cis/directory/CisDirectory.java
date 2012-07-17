@@ -93,7 +93,7 @@ public class CisDirectory implements ICisDirectory {
 		try {
 
 			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), cisAdRec.getMode());
+					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), 1);
 
 			session.save(tmpEntry);
 
@@ -127,7 +127,7 @@ public class CisDirectory implements ICisDirectory {
 		try {
 
 			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), cisAdRec.getMode());
+					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), 1);
 
 			session.delete(tmpEntry);
 
@@ -174,7 +174,7 @@ public class CisDirectory implements ICisDirectory {
 				record.setUri(entry.getUri());
 				record.setPassword(entry.getpassword());
 				record.setType(entry.gettype());
-				record.setMode(entry.getmode());
+				//record.setMode(entry.getmode()); TODO: replace with membership criteria
 
 				returnList.add(record);
 
@@ -222,7 +222,7 @@ public class CisDirectory implements ICisDirectory {
 					record.setUri(entry.getUri());
 					record.setPassword(entry.getpassword());
 					record.setType(entry.gettype());
-					record.setMode(entry.getmode());
+					//record.setMode(entry.getmode()); TODO: replace with membership criteria
 
 					returnList.add(record);
 				}
@@ -258,7 +258,7 @@ public class CisDirectory implements ICisDirectory {
 		try {
 
 			tmpEntry = new CisAdvertisementRecordEntry(oldCisValues.getName(),
-					oldCisValues.getId(), oldCisValues.getUri(), oldCisValues.getPassword(), oldCisValues.getType(), oldCisValues.getMode());
+					oldCisValues.getId(), oldCisValues.getUri(), oldCisValues.getPassword(), oldCisValues.getType(), 1);
 			session.delete(tmpEntry);
 
 			tmpEntry.setName(updatedCisValues.getName());
@@ -266,7 +266,7 @@ public class CisDirectory implements ICisDirectory {
 			tmpEntry.setUri(updatedCisValues.getUri());
 			tmpEntry.setPassword(updatedCisValues.getPassword());
 			tmpEntry.setType(updatedCisValues.getType());
-			tmpEntry.setMode(updatedCisValues.getMode());
+			tmpEntry.setMode(1);
 			session.save(tmpEntry);
 
 			t.commit();
