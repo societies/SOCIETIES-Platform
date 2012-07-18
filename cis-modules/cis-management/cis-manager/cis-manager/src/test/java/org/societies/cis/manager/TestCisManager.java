@@ -1071,7 +1071,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 
-	/*
+	
 	@Test
 	public void checkCriteria() throws InterruptedException, ExecutionException {
 
@@ -1082,12 +1082,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		ICisOwned IcissOwned =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , null,"")).get();
 		
 		MembershipCriteria m = new MembershipCriteria();
 		Rule r = new Rule();
 		r.setOperation("equals");
-		ArrayList<Object> a = new ArrayList<Object>();
+		ArrayList<String> a = new ArrayList<String>();
 		a.add("Brazil");
 		r.setValues(a);
 		m.setRule(r);
@@ -1098,7 +1098,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		m = new MembershipCriteria();
 		r = new Rule();
 		r.setOperation("differentFrom");
-		a = new ArrayList<Object>();
+		a = new ArrayList<String>();
 		a.add("married");
 		r.setValues(a);
 		m.setRule(r);
@@ -1106,7 +1106,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		
 		//setting the user qualification
-		HashMap<String,Object> q1 = new HashMap<String,Object>();
+		HashMap<String,String> q1 = new HashMap<String,String>();
 		q1.put("status","divorced");
 		q1.put("music","rock");
 		q1.put("hair","blond");
@@ -1114,16 +1114,16 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		assertFalse(IcissOwned.checkQualification(q1));
 		
 
-		HashMap<String,Object> q2 = new HashMap<String,Object>();
+		HashMap<String,String> q2 = new HashMap<String,String>();
 		q2.put("location","Brazil");
 		assertFalse(IcissOwned.checkQualification(q2));
 
-		HashMap<String,Object> q3 = new HashMap<String,Object>();
+		HashMap<String,String> q3 = new HashMap<String,String>();
 		q3.put("status","married");
 		q3.put("music","rock");
 		q3.put("hair","blond");
 		q3.put("location","Brazil");		
 		assertTrue(IcissOwned.checkQualification(q3));
 	
-	}*/
+	}
 }

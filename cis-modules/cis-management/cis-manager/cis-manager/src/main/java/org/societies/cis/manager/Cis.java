@@ -263,7 +263,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		}
 		
 		membershipCritOnDb.add(s);
-//TODO: remove comment when persistance is working		this.updatePersisted(this);		
+		this.updatePersisted(this);		
 		cisCriteria.put(contextAtribute, m);
 		return true;
 	}
@@ -280,7 +280,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				s+=  "," + m.getRule().getValues().get(i);
 			}
 			if( membershipCritOnDb.remove(s) != true) return false;
-//TODO: remove comment when persistance is working			this.updatePersisted(this);
+			this.updatePersisted(this);
 			cisCriteria.remove(contextAtribute); // TODO: maybe inver this from the remove
 			return true;
 			
