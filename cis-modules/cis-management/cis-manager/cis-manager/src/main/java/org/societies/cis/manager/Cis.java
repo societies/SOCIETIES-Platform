@@ -40,7 +40,6 @@ import java.util.concurrent.Future;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -50,10 +49,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.JoinColumn;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.annotations.CollectionOfElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
@@ -185,11 +186,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 	//Set<MembershipCriteriaImp> cisCriteria = null;
 	
 	
-	
-//	@ElementCollection
-//	@CollectionTable(name="org_societies_cis_manager_Cis_criteria",joinColumns = @javax.persistence.JoinColumn(name = "cis_id"))
-//	@Column(name="criteria", nullable=false,length=500)
-	@Transient
+	@CollectionOfElements(targetElement = java.lang.String.class)
+	@CollectionTable(name="org_societies_cis_manager_Cis_criteria",joinColumns = @JoinColumn(name = "cis_id"))
+	@Column(name="criteria", nullable=false,length=500)
 	public Set<String> membershipCritOnDb = new HashSet<String>();// we will store it in the db as "context,rank,operator,value1,value2"
 
 
