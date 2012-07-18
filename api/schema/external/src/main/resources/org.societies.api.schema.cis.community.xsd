@@ -189,12 +189,10 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name='qualifications'>
+	<xs:element name='qualification'>
 		<xs:complexType>
-			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
-				<xs:element name="attr" type="xs:string" minOccurs='1' maxOccurs='1'/>
-				<xs:element name="value" type="xs:string" minOccurs='1' maxOccurs='1'/>
-			</xs:sequence>
+			<xs:attribute name='attr' type='xs:string'/>
+			<xs:attribute name='value' type='xs:string'/>
 		</xs:complexType>
 	</xs:element>
 
@@ -304,8 +302,8 @@
 	
 	<xs:element name='join'>		
 		<xs:complexType>
-			<xs:sequence minOccurs='0' maxOccurs='1'>
-				<xs:element ref='qualifications'/>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element ref='qualification'/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

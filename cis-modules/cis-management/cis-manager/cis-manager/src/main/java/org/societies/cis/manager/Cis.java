@@ -89,6 +89,7 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
 import org.societies.api.schema.cis.community.GetActivitiesResponse;
+import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.GetInfoResponse;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
@@ -1154,7 +1155,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		c.setCommunityType(this.getCisType());
 		c.setOwnerJid(this.getOwnerId());
 		c.setDescription(this.getDescription());
-		c.setGetInfo("");
+		c.setGetInfo(new GetInfo());
 		
 		Who w = new Who();
 		c.setWho(w);
