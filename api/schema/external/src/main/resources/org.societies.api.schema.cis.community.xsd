@@ -70,7 +70,7 @@
 <!-- 				<xs:element ref='deleteActivity'/>
 				<xs:element ref='deleteActivityResponse'/>-->
 			</xs:choice>
-			<xs:element ref='membershipCrit'/>
+			<xs:element ref='membershipCrit' minOccurs='0' maxOccurs='1'/>
 		</xs:sequence>
 	
 		  <xs:attribute name='owner-jid' type='xs:string'/> 
