@@ -118,9 +118,10 @@ public class TrustEvidenceCollectorCommClient implements
 			// 2. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 3. timestamp
-			final GregorianCalendar gregCal = new GregorianCalendar();
-			gregCal.setTime(timestamp);
-			addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+			// TODO Uncomment once #1310 is resolved
+			//final GregorianCalendar gregCal = new GregorianCalendar();
+			//gregCal.setTime(timestamp);
+			//addEvidenceBean.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
 			// 4. info
 			if (TrustEvidenceType.RATED.equals(type))
 				addEvidenceBean.setInfo(serialise(info));
@@ -141,10 +142,13 @@ public class TrustEvidenceCollectorCommClient implements
 			throw new TrustEvidenceCollectorCommException("Could not add direct trust evidence for entity " + teid
 					+ ": " + ce.getLocalizedMessage(), ce);
 			
+		// TODO Uncomment once #1310 is resolved
+/*			
 		} catch (DatatypeConfigurationException dce) {
 			
 			throw new TrustEvidenceCollectorCommException("Could not add direct trust evidence for entity " + teid
 					+ ": " + dce.getLocalizedMessage(), dce);
+*/
 		} catch (IOException ioe) {
 		
 			throw new TrustEvidenceCollectorCommException("Could not add direct trust evidence for entity " + teid
