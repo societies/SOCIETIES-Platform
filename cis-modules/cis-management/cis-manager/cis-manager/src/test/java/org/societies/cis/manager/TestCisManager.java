@@ -1071,7 +1071,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 
-	
+	/*
 	@Test
 	public void checkCriteria() throws InterruptedException, ExecutionException {
 
@@ -1125,5 +1125,5 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		q3.put("location","Brazil");		
 		assertTrue(IcissOwned.checkQualification(q3));
 	
-	}
+	}*/
 }

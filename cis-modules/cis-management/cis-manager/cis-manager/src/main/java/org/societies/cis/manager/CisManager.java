@@ -1006,13 +1006,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			Community c = new Community();
 
-<<<<<<< HEAD
-			Join j = new Join();
-			c.setJoin(j);
-
-=======
 			c.setJoin(new Join());
->>>>>>> branch 'development' of local repository
+
 			try {
 				LOG.info("Sending stanza with join");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
