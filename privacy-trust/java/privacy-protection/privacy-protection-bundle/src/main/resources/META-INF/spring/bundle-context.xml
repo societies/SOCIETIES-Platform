@@ -107,6 +107,7 @@
 		<property name="negotiationAgent" ref="negotiationAgent" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 		<property name="identitySelection" ref="identitySelection" />
+		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
 	</bean>
 
 	<!-- this is the bean for the NegotiationAgent of the current CSS (not the 
