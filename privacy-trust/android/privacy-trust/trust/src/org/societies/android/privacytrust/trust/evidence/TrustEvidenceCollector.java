@@ -45,6 +45,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
@@ -342,7 +343,13 @@ public class TrustEvidenceCollector extends Service
 		if (timestamp == null)
 			timestamp = new Date();
 		
-		// TODO Auto-generated method stub
+		final TrustedEntityType entityType;
+		if (IdentityType.CSS.equals(trustee.getType()))
+			entityType = TrustedEntityType.CSS;
+		else // if (IdentityType.CIS.equals(trustee.getType()))
+			entityType = TrustedEntityType.CIS;
+		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
+		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
 	}
 
 	/*
@@ -366,7 +373,9 @@ public class TrustEvidenceCollector extends Service
 		if (timestamp == null)
 			timestamp = new Date();
 		
-		// TODO Auto-generated method stub		
+		final TrustedEntityType entityType = TrustedEntityType.SVC;
+		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
+		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
 	}
 	
 	public class LocalBinder extends Binder {
