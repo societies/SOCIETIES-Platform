@@ -30,7 +30,6 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-    	
     	<!-- Commons -->
     	<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
@@ -38,38 +37,47 @@
 			<version>${version.comm}</version>
 			<scope>compile</scope>
 		</dependency>
-    	<!-- SCHEMA'S REQUIRED FOR EXAMPLE SERVICES - TO BE REMOVED LATER -->
-    	<!-- 
-    	<dependency>
-			<groupId>org.societies.example</groupId>
-			<artifactId>internalAPI</artifactId>
-			<version>0.1</version>
-			<scope>provided</scope>
-		</dependency>
-    	 -->
 		<!-- XMPP -->
 		<dependency>
 			<groupId>org.igniterealtime</groupId>
 			<artifactId>whack</artifactId>
 			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack</artifactId>
+			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
-		
-		<!-- JAXB -->
 		<dependency>
-        	<groupId>javax.xml.bind</groupId>
-        	<artifactId>jaxb-api</artifactId>
-        	<version>2.2.5</version>
-        	<scope>compile</scope>
-        </dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smackx</artifactId>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
-	  		<groupId>com.sun.xml.bind</groupId>
-	  		<artifactId>jaxb-impl</artifactId>
-	  		<version>2.2.5-b01</version>
-	  		<type>jar</type>
-	  		<scope>compile</scope>
-	  	</dependency>
-		
+		    <groupId>org.simpleframework</groupId>
+		    <artifactId>simple-xml</artifactId>
+		    <version>2.6.4</version>
+		    <scope>provided</scope>
+		   <exclusions>
+			    <!-- StAX is not available on Android -->
+			    <exclusion>
+			        <artifactId>stax</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <exclusion>
+			        <artifactId>stax-api</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			    <!-- Provided by Android -->
+			    <exclusion>
+			        <artifactId>xpp3</artifactId>
+			        <groupId>xpp3</groupId>
+			    </exclusion>
+			</exclusions>
+		</dependency>
 		<!-- Virgo -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -90,7 +98,6 @@
 			<scope>provided</scope>
 		</dependency>
     </dependencies>
-
     
     <build>        
         <plugins>
@@ -113,7 +120,7 @@
 		           		</Export-Package>
 		           		<DynamicImport-Package>*</DynamicImport-Package>
 		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>false</Embed-Transitive>
+						<Embed-Transitive>true</Embed-Transitive>
 						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment> 
 		         	</instructions>
 	       		</configuration>

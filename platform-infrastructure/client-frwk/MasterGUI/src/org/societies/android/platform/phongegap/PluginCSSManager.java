@@ -187,9 +187,10 @@ public class PluginCSSManager extends Plugin {
 
 			try {
 				Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
-				Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getString("cssIdentity"));
-				Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getString("cssHostingLocation"));
-				Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
+				Log.d(LOG_TAG, "parameter 1 - identity: " + data.getJSONObject(1).getString("cssIdentity"));
+				Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
+				Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
+				Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -200,6 +201,14 @@ public class PluginCSSManager extends Plugin {
 			
 			//Call local service method
 			if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 4))) {
+				
+				try {
+					Log.d(LOG_TAG, "parameter 1 - nodes: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
 				try {
 					this.localCSSManager.loginCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
@@ -376,7 +385,6 @@ public class PluginCSSManager extends Plugin {
 		}
     	
     	Log.d(LOG_TAG, "Converted CSSRecord identity: " + aRecord.getCssIdentity());
-    	Log.d(LOG_TAG, "Converted CSSRecord node identity: " + aRecord.getCSSNodes()[0].getIdentity());
     	return aRecord;
     }
 

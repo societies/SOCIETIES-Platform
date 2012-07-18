@@ -108,8 +108,22 @@ public class Action implements IAction, Serializable{
 
 
 	public String toString(){
-		return "ServiceID: "+this.serviceID.getIdentifier()+
-				"\n "+"ServiceType: "+this.serviceType+
+		String sID;
+		
+		if (this.serviceID==null){
+			sID = "Generic";
+		}else{
+			sID = this.serviceID.getServiceInstanceIdentifier();
+		}
+		
+		String st;
+		if (this.serviceType==null){
+			st = "Generic";
+		}else{
+			st = this.serviceType;
+		}
+		return "ServiceID: "+sID+
+				"\n "+"ServiceType: "+st+
 				"\n "+this.parameterName+" = "+this.value;
 	}
 	

@@ -51,6 +51,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.Participant;
 
 @Deprecated
@@ -101,7 +102,8 @@ public class CisManagerClient implements IcisManagerClient {
 			Participant p = new Participant();
 			p.setJid(this.cssManagerId.getBareJid());
 			j.setParticipant(p);*/
-			//c.setJoin("");
+
+			c.setJoin(new Join());
 			try {
 				LOG.info("Sending stanza with join");
 				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);

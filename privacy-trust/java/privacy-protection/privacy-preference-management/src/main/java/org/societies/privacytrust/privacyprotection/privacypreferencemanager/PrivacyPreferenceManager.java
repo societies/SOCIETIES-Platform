@@ -80,6 +80,7 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.eva
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.PrivacyPreferenceConditionMonitor;
+import org.springframework.context.annotation.Scope;
 
 /**
  * @author Elizabeth
@@ -119,7 +120,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public void initialisePrivacyPreferenceManager(ICtxBroker ctxBroker, ITrustBroker trustBroker){
 		this.setCtxBroker(ctxBroker);
 		this.trustBroker = trustBroker;
-		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, getprivacyDataManagerInternal(), idm);
+		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, privacyDataManagerInternal, idm);
 		prefCache = new PrivatePreferenceCache(ctxBroker);
 		contextCache = new PrivateContextCache(ctxBroker);
 		if (this.myMessageBox==null){
@@ -369,7 +370,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public IPrivacyOutcome evaluatePPNPreference(PPNPreferenceDetails detail){
 		IPrivacyPreferenceTreeModel model = this.prefCache.getPPNPreference(detail);
 		if (model==null){
-			JOptionPane.showMessageDialog(null, "no stored ppnp preference with these details");
+			this.logging.debug("Requested evaluation of PPN preference with details: "+detail.toString()+" but preference with these details does not exist");
+			return null;
 		}
 		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
 		
@@ -1112,6 +1114,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 
 
+	
+	public PrivacyPreferenceConditionMonitor getPCM(){
+		return privacyPCM;
+	}
+	
+	public PrivateContextCache getContextCache(){
+		return this.contextCache;
+	}
 
 
 

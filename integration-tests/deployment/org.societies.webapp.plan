@@ -6,9 +6,8 @@
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 	
-	<artifact type="bundle" name="societies-webapp"/>
-    	<artifact type="bundle" name="DomainAuthorityWebApp"/>
-
+		<artifact type="bundle" name="societies-webapp"/>
+    	
 	
 </plan>
 

@@ -1,6 +1,10 @@
-<xs:schema elementFormDefault="qualified" version="1.0"
-	xmlns="http://societies.org/api/schema/cis/directory" targetNamespace="http://societies.org/api/schema/cis/directory"
-	xmlns:tns="http://societies.org/api/schema/cis/directory" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+<?xml version='1.0' encoding='UTF-8'?>
+
+<xs:schema targetNamespace="http://societies.org/api/schema/cis/directory"
+elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"  
+	xmlns:tns="http://societies.org/api/schema/cis/directory"
+	xmlns="http://societies.org/api/schema/cis/directory" 
+	
 	xmlns:ins="http://societies.org/api/schema/cis/community">
 
 

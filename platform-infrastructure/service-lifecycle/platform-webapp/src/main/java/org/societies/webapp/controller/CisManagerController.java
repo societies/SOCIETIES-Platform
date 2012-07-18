@@ -157,6 +157,7 @@ public class CisManagerController {
 				model.put("methodcalled", "CreateCis");
 				res = "Creating CIS...";
 
+
 				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
 						cisForm.getCisName(),

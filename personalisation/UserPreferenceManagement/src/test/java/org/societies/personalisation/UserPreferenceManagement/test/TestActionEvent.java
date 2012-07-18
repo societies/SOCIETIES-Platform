@@ -186,7 +186,7 @@ public class TestActionEvent {
 		pcm.setUserPrefLearning(Mockito.mock(IC45Learning.class));
 		pcm.initialisePreferenceManagement();
 		setupContext();
-		upm = pcm.getPrefMgr();
+		upm = pcm.getPreferenceManager();
 		details = new PreferenceDetails(Service_Type, serviceId, VOLUME);
 		upm.storePreference(mockId, details, preference);
 		pcm.processServiceStarted(mockId, Service_Type, serviceId);
@@ -347,8 +347,8 @@ public class TestActionEvent {
 	private void changeContext(String symloc, String status){
 		this.symLocAttribute.setStringValue(symloc);
 		this.statusAttribute.setStringValue(status);
-		this.pcm.getPrefMgr().getPrivateContextCache().updateCache(symLocAttribute);
-		this.pcm.getPrefMgr().getPrivateContextCache().updateCache(statusAttribute);
+		this.pcm.getPreferenceManager().getPrivateContextCache().updateCache(symLocAttribute);
+		this.pcm.getPreferenceManager().getPrivateContextCache().updateCache(statusAttribute);
 	
 	}
 	

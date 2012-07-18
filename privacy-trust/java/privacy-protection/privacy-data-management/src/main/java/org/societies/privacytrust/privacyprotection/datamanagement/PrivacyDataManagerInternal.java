@@ -176,7 +176,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 				privacyPermission.setPermission(permission);
 			}
 			// - Update
-			session.save(privacyPermission);
+			session.saveOrUpdate(privacyPermission);
 			t.commit();
 			LOG.info("PrivacyPermission saved.");
 			result = true;

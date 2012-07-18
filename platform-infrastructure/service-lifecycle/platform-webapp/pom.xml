@@ -134,14 +134,14 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.societies.platform</groupId>
-	        <artifactId>socialdata</artifactId>
-	         <version>${release.version}</version>
+			<artifactId>socialdata</artifactId>
+			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.shindig</groupId>
 			<artifactId>shindig-social-api</artifactId>
@@ -150,20 +150,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies.cis</groupId>
-	        <artifactId>CisDirectoryClient</artifactId>
-	         <version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		
-		<!-- 
-		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
+			<artifactId>CisDirectoryClient</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		 -->
+
+
+		<!-- <dependency> <groupId>org.societies.api.schema</groupId> <artifactId>societies-api-schema</artifactId> 
+			<version>${release.version}</version> <scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
@@ -179,7 +173,7 @@
 			<artifactId>org.jfree.chart-library</artifactId>
 			<type>libd</type>
 			<version>1.0.9</version>
-			<!--scope>provided</scope-->
+			<!--scope>provided</scope -->
 		</dependency>
 		<dependency>
 			<groupId>org.jfree.chart</groupId>
@@ -196,8 +190,29 @@
 			<artifactId>com.springsource.javax.servlet</artifactId>
 			<version>2.5.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.4</version>
+			<scope>provided</scope>
+			<exclusions>
+				<!-- StAX is not available on Android -->
+				<exclusion>
+					<artifactId>stax</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>stax-api</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
-
 	<build>
 		<finalName>societies-webapp</finalName>
 		<plugins>
@@ -224,6 +239,7 @@
 						<Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
 						<Export-Package>!*</Export-Package>
 						<Import-Package>
+							org.simpleframework.xml;resolution:=optional,
 							javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
 							javax.servlet;version="[3.0.0, 4.0.0)",
 							javax.servlet.resources;
@@ -286,7 +302,8 @@
 							org.jfree.data.category,
 							org.jfree.data.general,
 							<!-- Form validation -->
-							javax.validation,*;resolution:=optional
+							javax.validation,
+							*;resolution:=optional
 						</Import-Package>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
 						<Webapp-Context>societies</Webapp-Context>

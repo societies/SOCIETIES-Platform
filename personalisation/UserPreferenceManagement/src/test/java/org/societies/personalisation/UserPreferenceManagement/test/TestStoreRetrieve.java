@@ -54,7 +54,7 @@ public class TestStoreRetrieve {
 		pcm.setPersoMgr(Mockito.mock(IInternalPersonalisationManager.class));
 		pcm.setUserPrefLearning(Mockito.mock(IC45Learning.class));
 		pcm.initialisePreferenceManagement();	
-		this.prefMgr = pcm.getPrefMgr();
+		this.prefMgr = pcm.getPreferenceManager();
 	}
 	
 	@Test
