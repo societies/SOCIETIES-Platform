@@ -28,14 +28,36 @@
 	</developers>	
 
 	<dependencies>
-	    <dependency>
+
+
+		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.asmack</groupId>
+			<artifactId>asmack</artifactId>
+		</dependency>
+		<!-- Required by IdentityManagerImpl -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-android</artifactId>
+			<version>1.6.1-RC1</version>
+
 		</dependency>
 	</dependencies>
 

@@ -80,13 +80,15 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 import org.societies.api.schema.cis.community.Community;
 
+
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.Leave;
 import org.societies.api.schema.cis.community.MembershipCrit;
 
 
-
+import org.societies.api.schema.cis.community.Join;
+import org.societies.api.schema.cis.community.Leave;
 import org.societies.api.schema.cis.community.Participant;
 
 
@@ -1004,9 +1006,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			Community c = new Community();
 
+<<<<<<< HEAD
 			Join j = new Join();
 			c.setJoin(j);
 
+=======
+			c.setJoin(new Join());
+>>>>>>> branch 'development' of local repository
 			try {
 				LOG.info("Sending stanza with join");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
