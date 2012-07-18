@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlElement;
@@ -45,18 +47,13 @@ public class PrivacyDataManagerBean {
 	@XmlElement(required = true)
 	private RequestorBean requestor;
 	/**
-	 * JID of the owner of the requested data
-	 */
-	@XmlElement(required = true)
-	private String ownerId;
-	/**
 	 * String formatted ID of the requested Data
 	 */
 	@XmlElement(required = true)
-	private String dataId;
+	private String dataIdUri;
 	
 	@XmlElement(required = true)
-	private Action action;
+	private List<Action> actions;
 
 	
 	/**
@@ -72,40 +69,28 @@ public class PrivacyDataManagerBean {
 		this.requestor = requestor;
 	}
 	/**
-	 * @return the ownerId
-	 */
-	public String getOwnerId() {
-		return ownerId;
-	}
-	/**
-	 * @param ownerId the ownerId to set
-	 */
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
-	}
-	/**
 	 * @return the dataId
 	 */
-	public String getDataId() {
-		return dataId;
+	public String getDataIdUri() {
+		return dataIdUri;
 	}
 	/**
 	 * @param dataId the dataId to set
 	 */
-	public void setDataId(String dataId) {
-		this.dataId = dataId;
+	public void setDataIdUri(String dataIdUri) {
+		this.dataIdUri = dataIdUri;
 	}
 	/**
 	 * @return the action
 	 */
-	public Action getAction() {
-		return action;
+	public List<Action> getActions() {
+		return actions;
 	}
 	/**
 	 * @param action the action to set
 	 */
-	public void setAction(Action action) {
-		this.action = action;
+	public void setActions(List<Action> actions) {
+		this.actions = actions;
 	}
 	
 	

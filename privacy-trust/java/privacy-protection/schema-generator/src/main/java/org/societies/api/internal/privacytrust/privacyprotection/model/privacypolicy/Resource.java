@@ -31,32 +31,32 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
  *
  */
 public class Resource {
-	private String ctxUriIdentifier;
-	private String contextType;
+	private String dataIdUri;
+	private String dataType;
 	
 	/**
-	 * @return the contextType
+	 * @return the dataIdUri
 	 */
-	public String getContextType() {
-		return contextType;
+	public String getDataIdUri() {
+		return dataIdUri;
 	}
 	/**
-	 * @param contextType the contextType to set
+	 * @param dataIdUri the dataIdUri to set
 	 */
-	public void setContextType(String contextType) {
-		this.contextType = contextType;
+	public void setDataIdUri(String dataIdUri) {
+		this.dataIdUri = dataIdUri;
 	}
 	/**
-	 * @return the ctxUriIdentifier
+	 * @return the dataType
 	 */
-	public String getCtxUriIdentifier() {
-		return ctxUriIdentifier;
+	public String getDataType() {
+		return dataType;
 	}
 	/**
-	 * @param ctxUriIdentifier the ctxUriIdentifier to set
+	 * @param dataType the dataType to set
 	 */
-	public void setCtxUriIdentifier(String ctxUriIdentifier) {
-		this.ctxUriIdentifier = ctxUriIdentifier;
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
 	}
 }
 

@@ -31,6 +31,7 @@
  */
 package org.societies.privacytrust.remote.privacydatamanagement;
 
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
@@ -55,6 +57,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Uti
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
+import org.societies.api.schema.identity.DataIdentifier;
 
 
 public class PrivacyDataManagerCommServer {
@@ -99,10 +102,9 @@ public class PrivacyDataManagerCommServer {
 	private boolean checkPermission(PrivacyDataManagerBean bean, PrivacyDataManagerBeanResult beanResult) {
 		try {
 			Requestor requestor = Util.getRequestorFromBean(bean.getRequestor(), commManager);
-			IIdentity ownerId = commManager.getIdManager().fromJid(bean.getOwnerId());
-			Action action = ActionUtils.toAction(bean.getAction());
-			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString(bean.getDataId());
-			ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
+			List<Action> actions = ActionUtils.toActions(bean.getActions());
+			DataIdentifier dataId = DataIdentifierFactory.fromUri(bean.getDataIdUri());
+			ResponseItem permission = privacyDataManager.checkPermission(requestor, dataId, actions);
 			beanResult.setPermission(ResponseItemUtils.toResponseItemBean(permission));
 		} catch (MalformedCtxIdentifierException e) {
 			beanResult.setAckMessage("Error MalformedCtxIdentifierException: "+e.getMessage());
@@ -111,9 +113,6 @@ public class PrivacyDataManagerCommServer {
 		catch (PrivacyException e) {
 			beanResult.setAckMessage("Error PrivacyException: "+e.getMessage());
 			return false;
-		} catch (InvalidFormatException e) {
-			beanResult.setAckMessage("Error InvalidFormatException: "+e.getMessage());
-			return false;
 		}
 		return true;
 	}
@@ -121,22 +120,21 @@ public class PrivacyDataManagerCommServer {
 	private boolean obfuscateData(PrivacyDataManagerBean bean, PrivacyDataManagerBeanResult beanResult) {
 		try {
 			Requestor requestor = Util.getRequestorFromBean(bean.getRequestor(), commManager);
-			IIdentity ownerId = commManager.getIdManager().fromJid(bean.getOwnerId());
-			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString(bean.getDataId());
-			Future<IDataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, ownerId, DataWrapperFactory.selectDataWrapper(dataId));
-			beanResult.setAckMessage("Sorry, the obfuscation is available, but not emotely yet.");
+			DataIdentifier dataId = DataIdentifierFactory.fromUri(bean.getDataIdUri());
+//			Future<IDataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, DataWrapperFactory.selectDataWrapper(dataId));
+			beanResult.setAckMessage("Sorry, the obfuscation is available, but not remotely yet.");
 			return false;
 		} catch (MalformedCtxIdentifierException e) {
 			beanResult.setAckMessage("Error MalformedCtxIdentifierException: "+e.getMessage());
 			return false;
 		}
-		catch (PrivacyException e) {
-			beanResult.setAckMessage("Error PrivacyException: "+e.getMessage());
-			return false;
-		} catch (InvalidFormatException e) {
-			beanResult.setAckMessage("Error InvalidFormatException: "+e.getMessage());
-			return false;
-		}
+//		catch (PrivacyException e) {
+//			beanResult.setAckMessage("Error PrivacyException: "+e.getMessage());
+//			return false;
+//		} catch (InvalidFormatException e) {
+//			beanResult.setAckMessage("Error InvalidFormatException: "+e.getMessage());
+//			return false;
+//		}
 //		return true;
 	}
 	
