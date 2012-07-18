@@ -57,6 +57,7 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
@@ -107,7 +108,7 @@ public class PrivacyNegotiationTest {
 	private IPrivacyAgreementManagerInternal policyAgreementMgr = Mockito.mock(IPrivacyAgreementManagerInternal.class);
 	private INegotiationAgent negAgent = Mockito.mock(INegotiationAgent.class);
 	private IIdentitySelection ids = Mockito.mock(IIdentitySelection.class);
-
+	private IPrivacyPolicyManager privacyPolicyManager = Mockito.mock(IPrivacyPolicyManager.class);
 	private RequestorService requestorService;
 	private RequestorCis requestorCis;
 	private RequestPolicy servicePolicy;
@@ -150,7 +151,7 @@ public class PrivacyNegotiationTest {
 		this.negotiationMgr.setPrivacyAgreementManagerInternal(policyAgreementMgr );
 		this.negotiationMgr.setNegotiationAgent(negAgent);
 		this.negotiationMgr.setPrivacyPreferenceManager(privacyPreferenceManager);
-		
+		this.negotiationMgr.setPrivacyPolicyManager(privacyPolicyManager);
 		this.setupMockito();
 		
 		this.negotiationMgr.initialisePrivacyPolicyNegotiationManager();
