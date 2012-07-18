@@ -61,7 +61,7 @@ public interface IUserCtxRefiner {
 	 * @param updateFreq Frequency of re-evaluation of inference/refinement algorithms.
 	 * @since 0.3
 	 */
-	public void inferContextContinuously(CtxAttributeIdentifier id, double updateFreq)
+	public void inferContextContinuously(CtxAttributeIdentifier id, double updateFreq);
 
 
 }
