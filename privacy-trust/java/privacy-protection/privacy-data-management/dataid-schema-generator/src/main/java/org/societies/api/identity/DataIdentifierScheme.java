@@ -25,7 +25,7 @@
 package org.societies.api.identity;
 
 /**
- * Describe your class here...
+ * List all data providers
  *
  * @author Olivier Maridat (Trialog)
  *

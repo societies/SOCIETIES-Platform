@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>org.societies.privacytrust.privacyprotection.privacydatamanagement</groupId>
 	<artifactId>dataidschemagenerator</artifactId>
-	<version>0.1</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
 	<dependencies>
@@ -61,30 +61,30 @@
 				</configuration>
 			</plugin>
 			<plugin>
-		<groupId>org.societies.maven</groupId>
-		<artifactId>societies-xmpp-maven-plugin</artifactId>
-		<version>1.0-SNAPSHOT</version>
-		<executions>
-			<execution>
-				<phase>generate-sources</phase>
-				<goals>
-					<goal>xsd</goal>
-				</goals>
-			</execution>
-		</executions>
-		<configuration>
-			<!--  We only have complex type here, no bean element that can be called -->
-			<beans>
-			</beans>
-			<!-- Namespace define in the CommClient and CommServer of the beans -->
-			<packageName>org.societies.api.schema.identity</packageName>
-			<httpNamespace>http://societies.org/api/schema/identity</httpNamespace>
-			<!-- Output and input directories -->
-			<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
-			<file>schema1.xsd</file>
-			<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
-		</configuration>
-	</plugin>
+				<groupId>org.societies.maven</groupId>
+				<artifactId>societies-xmpp-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>xsd</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- We only have complex type here, no bean element that can be called -->
+					<beans>
+					</beans>
+					<!-- Namespace define in the CommClient and CommServer of the beans -->
+					<packageName>org.societies.api.schema.identity</packageName>
+					<httpNamespace>http://societies.org/api/schema/identity</httpNamespace>
+					<!-- Output and input directories -->
+					<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
+					<file>schema2.xsd</file>
+					<folderOutputDirectory>${project.build.directory}/generated-resources/schemagen</folderOutputDirectory>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

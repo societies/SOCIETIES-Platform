@@ -24,8 +24,6 @@
  */
 package org.societies.api.identity;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 
 
 
@@ -35,7 +33,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * 
  * @author Olivier Maridat (Trialog)
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class DataIdentifier {
 	/**
 	 * Id of the data owner
@@ -66,7 +63,7 @@ public abstract class DataIdentifier {
 	 * 
 	 * Format: scheme://ownerId/type
 	*/
-	private String uri;
+	private volatile String uri;
 
 	
 	// -- GET / SET
@@ -115,5 +112,11 @@ public abstract class DataIdentifier {
 	 */
 	public String getUri() {
 		return uri;
+	}
+	/**
+	 * @param uri the uri to set
+	 */
+	public void setUri(String uri) {
+		this.uri = uri;
 	}
 }
