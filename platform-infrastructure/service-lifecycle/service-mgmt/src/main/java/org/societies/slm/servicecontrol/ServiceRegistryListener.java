@@ -46,7 +46,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
+//import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
@@ -82,7 +82,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 	private static Logger log = LoggerFactory.getLogger(ServiceRegistryListener.class);
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
-	private INegotiationProviderServiceMgmt negotiationProvider;
+	//private INegotiationProviderServiceMgmt negotiationProvider;
 	private IServiceControl serviceControl;
 	private IPrivacyPolicyManager privacyManager;
 
@@ -102,14 +102,15 @@ public class ServiceRegistryListener implements BundleContextAware,
 		this.serviceControl = serviceControl;
 	}
 	
-	public INegotiationProviderServiceMgmt getNegotiationProvider(){
+	/*
+	  public INegotiationProviderServiceMgmt getNegotiationProvider(){
 		return negotiationProvider;
 	}
 	
 	public void setNegotiationProvider(INegotiationProviderServiceMgmt negotiationProvider){
 		this.negotiationProvider = negotiationProvider;
 	}
-	
+*/	
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
 	}
@@ -285,7 +286,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
 						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
-						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
+				//		getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
 						
 						if(log.isDebugEnabled())
 							log.debug("Adding privacy policy to the Policy Manager!");
@@ -380,7 +381,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			
 			if(log.isDebugEnabled())
 					log.debug("Removing the shared service from the policy provider!");
-			getNegotiationProvider().removeService(serviceToRemove.getServiceIdentifier());
+		//	getNegotiationProvider().removeService(serviceToRemove.getServiceIdentifier());
 			
 			if(log.isDebugEnabled()) log.debug("Removing service: " + serviceToRemove.getServiceName() + " from SOCIETIES Registry");
 

@@ -45,8 +45,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.security.policynegotiator.INegotiation;
-import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
+//import org.societies.api.internal.security.policynegotiator.INegotiation;
+//import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
@@ -60,7 +60,7 @@ import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
-import org.societies.slm.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
+//import org.societies.slm.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -79,7 +79,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
 	private IServiceControlRemote serviceControlRemote;
-	private INegotiation policyNegotiation;
+	//private INegotiation policyNegotiation;
 	private ICisManager cisManager;
 
 	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
@@ -111,6 +111,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		return commMngr;
 	}
 
+	/*
 	public void setPolicyNegotiation(INegotiation policyNegotiation){
 		this.policyNegotiation = policyNegotiation;
 	}
@@ -118,7 +119,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public INegotiation getPolicyNegotiation(){
 		return policyNegotiation;
 	}
-	
+	*/
 	public void setServiceControlRemote(IServiceControlRemote serviceControlRemote){
 		this.serviceControlRemote = serviceControlRemote;
 	}
@@ -355,6 +356,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		ServiceControlResult returnResult = new ServiceControlResult();
 		returnResult.setServiceId(serviceToInstall.getServiceIdentifier());
 		
+		
 		try{
 		
 			if(logger.isDebugEnabled()) 
@@ -377,6 +379,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(logger.isDebugEnabled())
 				logger.debug("For now, PrivacyPolicyNegotiation is: " + includePrivacyPolicyNegotiation);
 			
+			/*
 			ServiceNegotiationCallback negotiationCallback = new ServiceNegotiationCallback();
 			getPolicyNegotiation().startNegotiation(provider, includePrivacyPolicyNegotiation, negotiationCallback);
 			ServiceNegotiationResult negotiationResult = negotiationCallback.getResult();
@@ -397,12 +400,18 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			if(logger.isDebugEnabled())
 					logger.debug("Negotiation was successful! URI returned is: " + negotiationResult.getServiceUri());
-			
+			*/
 			// Now install the client!
 			if(serviceToInstall.getServiceType().equals(ServiceType.THIRD_PARTY_WEB)){
 				if(logger.isDebugEnabled()) logger.debug("This is a web-type service, no client to install!");
 				serviceToInstall.setServiceLocation(ServiceLocation.REMOTE);
-				serviceToInstall.setServiceEndpoint(negotiationResult.getServiceUri().toString());
+				//serviceToInstall.setServiceEndpoint(negotiationResult.getServiceUri().toString());
+				//mmannion: Note this is just temporary fix to get around bug#1314
+				// ServiceEndpoint might not be current for remote servers
+				// but since it's only temporary ......
+				serviceToInstall.setServiceEndpoint(getCommMngr().getIdManager().getThisNetworkNode().getJid()  + "/" +  serviceToInstall.getServiceName().replaceAll(" ", ""));
+				
+				
 				List<Service> addServices = new ArrayList<Service>();
 				addServices.add(serviceToInstall);
 				getServiceReg().registerServiceList(addServices);
@@ -415,8 +424,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("This is a client-based service, we need to install it");
 				
 				Future<ServiceControlResult> asyncResult = null;
-				URL bundleLocation = negotiationResult.getServiceUri().toURL();
-				//URL bundleLocation = serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient().toURL();
+				//URL bundleLocation = negotiationResult.getServiceUri().toURL();
+				URL bundleLocation = serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient().toURL();
 
 				asyncResult = installService(bundleLocation);
 				ServiceControlResult result = asyncResult.get();

@@ -30,13 +30,15 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import javax.xml.datatype.DatatypeFactory;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
@@ -45,8 +47,10 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
+import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
@@ -116,13 +120,28 @@ public class TrustEvidenceCollector extends Service
 		 */
 		public void receiveResult(Stanza stanza, Object payload) {
 			
-			Log.d(TrustEvidenceCollector.TAG, "receiveResult with stanza "
+			Log.d(TrustEvidenceCollector.TAG, "receiveResult:stanza="
 					+ this.stanzaToString(stanza)
-					+ " and payload of type " 
+					+ ",payload.getClass=" 
 					+ payload.getClass().getName());
 			if (payload instanceof TrustEvidenceCollectorResponseBean) {
 				
-				// TODO handle
+				TrustEvidenceCollectorResponseBean responseBean = 
+						(TrustEvidenceCollectorResponseBean) payload;
+				Log.d(TrustEvidenceCollector.TAG, 
+						"receiveResult:payload.methodName=" 
+								+ responseBean.getMethodName());
+				switch (responseBean.getMethodName()) {
+
+				case ADD_DIRECT_EVIDENCE:
+					// TODO handle
+					break;
+				case ADD_INDIRECT_EVIDENCE:
+					// TODO handle
+					break;
+				default:
+					break;
+				}
 			}				
 		}
 
@@ -267,7 +286,10 @@ public class TrustEvidenceCollector extends Service
 			// 2. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 3. timestamp
-			// TODO
+			final GregorianCalendar gregCal = new GregorianCalendar();
+			gregCal.setTime(timestamp);
+			addEvidenceBean.setTimestamp(
+					DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
 			// 4. info
 			if (TrustEvidenceType.RATED.equals(type))
 				addEvidenceBean.setInfo(serialise(info));
@@ -282,20 +304,20 @@ public class TrustEvidenceCollector extends Service
 			
 		} catch (IOException ioe) {
 
-			throw new TrustEvidenceCollectorCommException(
+			final String errorMessage = 
 					"Could not add direct trust evidence for entity " + teid
 					+ ": Could not serialise info object into byte[]: " 
-					+ ioe.getLocalizedMessage(), ioe);
-		} catch (CommunicationException ce) {
-
-			throw new TrustEvidenceCollectorCommException(
-					"Could not add direct trust evidence for entity " + teid
-					+ ": " + ce.getLocalizedMessage(), ce);
+					+ ioe.getLocalizedMessage();
+			Log.e(TAG, errorMessage);
+			throw new TrustEvidenceCollectorCommException(errorMessage, ioe);
+			
 		} catch (Exception e) {
 			
-			throw new TrustEvidenceCollectorCommException(
+			final String errorMessage =
 					"Could not add direct trust evidence for entity " + teid
-					+ ": " + e.getLocalizedMessage(), e);
+					+ ": " + e.getLocalizedMessage();
+			Log.e(TAG, errorMessage);
+			throw new TrustEvidenceCollectorCommException(errorMessage, e);
 		}
 	}
 
@@ -316,7 +338,62 @@ public class TrustEvidenceCollector extends Service
 		if (timestamp == null)
 			throw new NullPointerException("timestamp can't be null");
 		
-		// TODO Auto-generated method stub
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Adding indirect trust evidence:");
+		sb.append("source=");
+		sb.append(source);
+		sb.append(",teid=");
+		sb.append(teid);
+		sb.append(", type=");
+		sb.append(type);
+		sb.append(", timestamp=");
+		sb.append(timestamp);
+		sb.append(", info=");
+		sb.append(info);
+		Log.d(TAG, sb.toString());
+		// TODO remove
+		Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
+
+		try {
+			final AddIndirectEvidenceRequestBean addEvidenceBean = 
+					new AddIndirectEvidenceRequestBean();
+			// 1. source
+			addEvidenceBean.setSource(source);
+			// 2. teid
+			addEvidenceBean.setTeid(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(teid));
+			// 3. type
+			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
+			// 4. timestamp
+			final GregorianCalendar gregCal = new GregorianCalendar();
+			gregCal.setTime(timestamp);
+			addEvidenceBean.setTimestamp(
+					DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+			// 5. info
+			if (TrustEvidenceType.RATED.equals(type))
+				addEvidenceBean.setInfo(serialise(info));
+
+			final TrustEvidenceCollectorRequestBean requestBean = 
+					new TrustEvidenceCollectorRequestBean();
+			requestBean.setMethodName(MethodName.ADD_INDIRECT_EVIDENCE);
+			requestBean.setAddIndirectEvidence(addEvidenceBean);
+
+			final Stanza stanza = new Stanza(this.cloudNodeId);
+			this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, this.callback);
+			
+		} catch (IOException ioe) {
+
+			throw new TrustEvidenceCollectorCommException(
+					"Could not add indirect trust evidence for entity " + teid
+					+ ": Could not serialise info object into byte[]: " 
+					+ ioe.getLocalizedMessage(), ioe);
+
+		} catch (Exception e) {
+			
+			throw new TrustEvidenceCollectorCommException(
+					"Could not add indirect trust evidence for entity " + teid
+					+ ": " + e.getLocalizedMessage(), e);
+		}
 	}
 
 	/*
@@ -342,7 +419,13 @@ public class TrustEvidenceCollector extends Service
 		if (timestamp == null)
 			timestamp = new Date();
 		
-		// TODO Auto-generated method stub
+		final TrustedEntityType entityType;
+		if (IdentityType.CSS.equals(trustee.getType()))
+			entityType = TrustedEntityType.CSS;
+		else // if (IdentityType.CIS.equals(trustee.getType()))
+			entityType = TrustedEntityType.CIS;
+		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
+		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
 	}
 
 	/*
@@ -366,7 +449,9 @@ public class TrustEvidenceCollector extends Service
 		if (timestamp == null)
 			timestamp = new Date();
 		
-		// TODO Auto-generated method stub		
+		final TrustedEntityType entityType = TrustedEntityType.SVC;
+		final TrustedEntityId teid = new TrustedEntityId(trustor.toString(), entityType, trustee.toString());
+		this.addDirectEvidence(teid, TrustEvidenceType.RATED, timestamp, new Double(rating));
 	}
 	
 	public class LocalBinder extends Binder {
