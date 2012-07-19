@@ -58,8 +58,9 @@ public class IdentityManagerImpl implements IIdentityManager {
 //				String[] richParts = jid.split("\\."); // TODO regexp
 //				LOG.info("JID="+jid+";richParts.length="+richParts.length);
 				int firstDotIndex = jid.indexOf(".");
-				String domain = jid.substring(firstDotIndex+1);
-				if (checkDomainNameFormat(domain)) {
+				if (firstDotIndex>0) {
+					String domain = jid.substring(firstDotIndex+1);
+//				if (checkDomainNameFormat(domain)) {
 					String identifier = jid.substring(0,firstDotIndex);
 					if (identifier.startsWith(CIS_PREFIX))
 						return new NetworkNodeImpl(IdentityType.CIS, identifier, domain, "cis");

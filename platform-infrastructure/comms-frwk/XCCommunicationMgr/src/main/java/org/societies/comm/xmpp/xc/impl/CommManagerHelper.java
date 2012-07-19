@@ -62,13 +62,13 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.comm.simplexml.XMLGregorianCalendarConverter;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 import org.xmpp.packet.PacketError;
-
 
 /**
  * @author Joao M. Goncalves (PTIN), Miquel Martin (NEC), Alec Leckey (Intel)
@@ -109,6 +109,19 @@ public class CommManagerHelper {
 	private final Map<String, HostedNode> localToplevelNodes = new HashMap<String, HostedNode>();
 	private final List<XMPPNode> allToplevelNodes = new ArrayList<XMPPNode>();
 
+	private Serializer s;
+	
+	public CommManagerHelper () {
+		Registry registry = new Registry();
+		Strategy strategy = new RegistryStrategy(registry);
+		s = new Persister(strategy);
+		try {
+			registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(),e);
+		}
+	}
+	
 	public String[] getSupportedNamespaces() {
 		String[] returnArray = new String[featureServers.size()];
 		return featureServers.keySet().toArray(returnArray);
@@ -259,8 +272,7 @@ public class CommManagerHelper {
 			
 			//GET SIMPLE SERIALISER 
 			//TreeStrategy tree = new TreeStrategy();
-			Strategy strategy = new AnnotationStrategy();
-			Serializer s = new Persister(strategy);
+			
 			Object bean = s.read(c, element.asXML() );
 			
 			callback.receiveResult(TinderUtils.stanzaFromPacket(iq), bean);
@@ -306,10 +318,6 @@ public class CommManagerHelper {
 			String beanName = e.getName().substring(0,1).toUpperCase() + e.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
 			Class<?> c = Class.forName(packageStr + "." + beanName);
 			
-			//GET SIMPLE SERIALISER 
-			//TreeStrategy tree = new TreeStrategy();
-			Strategy strategy = new AnnotationStrategy();
-			Serializer s = new Persister(strategy);
 			Object appError;
 			try {
 				appError = s.read(c, e.asXML());
@@ -334,10 +342,6 @@ public class CommManagerHelper {
 			String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
 			Class<?> c = Class.forName(packageStr + "." + beanName);
 			
-			//GET SIMPLE SERIALISER 
-			//TreeStrategy tree = new TreeStrategy();
-			Strategy strategy = new AnnotationStrategy();
-			Serializer s = new Persister(strategy);
 			Object bean = s.read(c, element.asXML());
 			
 			IFeatureServer fs = getFeatureServer(namespace);
@@ -383,10 +387,6 @@ public class CommManagerHelper {
 			String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
 			Class<?> c = Class.forName(packageStr + "." + beanName);
 			
-			//GET SIMPLE SERIALISER 
-			//TreeStrategy tree = new TreeStrategy();
-			Strategy strategy = new AnnotationStrategy();
-			Serializer s = new Persister(strategy);
 			Object bean = s.read(c, element.asXML());
 			
 			IFeatureServer fs = getFeatureServer(namespace);
@@ -410,10 +410,6 @@ public class CommManagerHelper {
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			
-			//GET SIMPLE SERIALISER 
-			//TreeStrategy tree = new TreeStrategy();
-			Strategy strategy = new AnnotationStrategy();
-			Serializer s = new Persister(strategy);
 			s.write(payload, os);
 
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
@@ -435,10 +431,6 @@ public class CommManagerHelper {
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-			//GET SIMPLE SERIALISER
-			//TreeStrategy tree = new TreeStrategy();
-			Strategy strategy = new AnnotationStrategy();
-			Serializer s = new Persister(strategy);
 			s.write(payload, os);
 			
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
@@ -541,10 +533,6 @@ public class CommManagerHelper {
 				InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
 				inxsw.setXmlDeclaration(false);
 
-				//GET SIMPLE SERIALISER 
-				TreeStrategy tree = new TreeStrategy();
-				Strategy strategy = new AnnotationStrategy(tree);
-				Serializer s = new Persister(strategy);
 				s.write(error.getApplicationError(), os);
 			}
 			os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
@@ -583,9 +571,6 @@ public class CommManagerHelper {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
 		if (responseBean!=null) {
-			//GET SIMPLE SERIALISER 
-			Strategy strategy = new AnnotationStrategy();
-			Serializer s = new Persister(strategy);
 			try {
 				s.write(responseBean, os);
 			} catch (Exception e) {
