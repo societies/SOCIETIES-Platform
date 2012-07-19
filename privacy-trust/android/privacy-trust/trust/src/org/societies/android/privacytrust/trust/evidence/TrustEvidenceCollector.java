@@ -30,13 +30,15 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import javax.xml.datatype.DatatypeFactory;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
@@ -284,7 +286,10 @@ public class TrustEvidenceCollector extends Service
 			// 2. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 3. timestamp
-			// TODO
+			final GregorianCalendar gregCal = new GregorianCalendar();
+			gregCal.setTime(timestamp);
+			addEvidenceBean.setTimestamp(
+					DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
 			// 4. info
 			if (TrustEvidenceType.RATED.equals(type))
 				addEvidenceBean.setInfo(serialise(info));
@@ -299,20 +304,20 @@ public class TrustEvidenceCollector extends Service
 			
 		} catch (IOException ioe) {
 
-			throw new TrustEvidenceCollectorCommException(
+			final String errorMessage = 
 					"Could not add direct trust evidence for entity " + teid
 					+ ": Could not serialise info object into byte[]: " 
-					+ ioe.getLocalizedMessage(), ioe);
-		} catch (CommunicationException ce) {
-
-			throw new TrustEvidenceCollectorCommException(
-					"Could not add direct trust evidence for entity " + teid
-					+ ": " + ce.getLocalizedMessage(), ce);
+					+ ioe.getLocalizedMessage();
+			Log.e(TAG, errorMessage);
+			throw new TrustEvidenceCollectorCommException(errorMessage, ioe);
+			
 		} catch (Exception e) {
 			
-			throw new TrustEvidenceCollectorCommException(
+			final String errorMessage =
 					"Could not add direct trust evidence for entity " + teid
-					+ ": " + e.getLocalizedMessage(), e);
+					+ ": " + e.getLocalizedMessage();
+			Log.e(TAG, errorMessage);
+			throw new TrustEvidenceCollectorCommException(errorMessage, e);
 		}
 	}
 
@@ -360,7 +365,10 @@ public class TrustEvidenceCollector extends Service
 			// 3. type
 			addEvidenceBean.setType(TrustEvidenceTypeBean.valueOf(type.toString()));
 			// 4. timestamp
-			// TODO
+			final GregorianCalendar gregCal = new GregorianCalendar();
+			gregCal.setTime(timestamp);
+			addEvidenceBean.setTimestamp(
+					DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
 			// 5. info
 			if (TrustEvidenceType.RATED.equals(type))
 				addEvidenceBean.setInfo(serialise(info));
@@ -376,18 +384,14 @@ public class TrustEvidenceCollector extends Service
 		} catch (IOException ioe) {
 
 			throw new TrustEvidenceCollectorCommException(
-					"Could not add direct trust evidence for entity " + teid
+					"Could not add indirect trust evidence for entity " + teid
 					+ ": Could not serialise info object into byte[]: " 
 					+ ioe.getLocalizedMessage(), ioe);
-		} catch (CommunicationException ce) {
 
-			throw new TrustEvidenceCollectorCommException(
-					"Could not add direct trust evidence for entity " + teid
-					+ ": " + ce.getLocalizedMessage(), ce);
 		} catch (Exception e) {
 			
 			throw new TrustEvidenceCollectorCommException(
-					"Could not add direct trust evidence for entity " + teid
+					"Could not add indirect trust evidence for entity " + teid
 					+ ": " + e.getLocalizedMessage(), e);
 		}
 	}
