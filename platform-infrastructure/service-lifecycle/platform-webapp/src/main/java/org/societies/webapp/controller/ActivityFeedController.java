@@ -108,14 +108,14 @@ public class ActivityFeedController {
 		try {
 		
 			if (method.equalsIgnoreCase("addCisActivity")) {
-				IActivityFeed iact = cisManager.getOwnedCis(cisId).getActivityFeed();
+//				IActivityFeed iact = cisManager.getOwnedCis(cisId).getActivityFeed();
 //				IActivity activity = new org.societies.activity.model.Activity();
 //				activity.setActor(activityForm.getActor());
 //				activity.setObject(activityForm.getObject());
 //				activity.setPublished(activityForm.getTimePeriod());
 //				activity.setTarget(activityForm.getTarget());
 //				activity.setVerb(activityForm.getVerb());
-//				iact.addActivity(activity, new DummyActFeedCback()); // TODO: replace for the real thing
+//				iact.addActivity(activity, new DummyActFeedCback()); // TODO: replace 
 				res="Activty added for cssID: " + cisId;
 				
 			}else if (method.equalsIgnoreCase("getActivities")) {
