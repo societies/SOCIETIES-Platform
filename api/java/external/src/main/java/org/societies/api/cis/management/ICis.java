@@ -130,18 +130,6 @@ public interface ICis {
 	 */
     public void setInfo(Community c, ICisManagerCallback callback);
     
-    
-	public void addCisActivity(IActivity activity,ICisManagerCallback callback);
-	
-	public void getActivities(String timePeriod,ICisManagerCallback callback);
-    
-	/**
-	 * Gets the interface for working with the ActivityFeed of the CIS
-	 * 
-	 * 
-	 * @param 
-	 * @return {@link IActivityFeed} of that CIS
-	 */
-	public Future<IActivityFeed> getCisActivityFeed();
+    public IActivityFeed getActivityFeed();
     
 }

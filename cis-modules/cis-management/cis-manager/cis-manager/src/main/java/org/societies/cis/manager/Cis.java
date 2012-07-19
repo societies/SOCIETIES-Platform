@@ -81,14 +81,14 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.AddActivityResponse;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
 import org.societies.api.schema.activityfeed.DeleteActivityResponse;
-import org.societies.api.schema.cis.community.AddActivityResponse;
+import org.societies.api.schema.activityfeed.GetActivitiesResponse;
 import org.societies.api.schema.cis.community.AddMemberResponse;
-import org.societies.api.schema.cis.community.CleanUpActivityFeedResponse;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
-import org.societies.api.schema.cis.community.GetActivitiesResponse;
 import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.GetInfoResponse;
 import org.societies.api.schema.cis.community.JoinResponse;
@@ -303,11 +303,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Override
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	@Override
-	public Future<IActivityFeed> getCisActivityFeed(){
-		return  new AsyncResult<IActivityFeed>(activityFeed);
 	}
 	
 	@Override
@@ -1012,9 +1007,41 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}				// END OF GET INFO
 
 			
+		}
+		if (payload.getClass().equals(Activityfeed.class)) {
+			LOG.info("activity feed type received");
+			Activityfeed c = (Activityfeed) payload;
+			
+			// delete Activity
+
+			if (c.getDeleteActivity() != null) {
+				Activityfeed result = new Activityfeed();
+				DeleteActivityResponse r = new DeleteActivityResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+				IActivity iActivity = new org.societies.activity.model.Activity();
+				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
+				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
+				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
+				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
+				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
+
+				r.setResult(activityFeed.deleteActivity(iActivity));
+
+				result.setDeleteActivityResponse(r);		
+				return result;
+
+			}				// END OF delete Activity
+
+			
+			
 			// get Activities
 			if (c.getGetActivities() != null) {
-				Community result = new Community();
+				org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
 				GetActivitiesResponse r = new GetActivitiesResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				List<IActivity> iActivityList;
@@ -1052,7 +1079,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			// add Activity
 
 			if (c.getAddActivity() != null) {
-				Community result = new Community();
+				org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
 				AddActivityResponse r = new AddActivityResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				
@@ -1067,7 +1094,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				iActivity.setPublished(c.getAddActivity().getActivity().getPublished());
 				iActivity.setVerb(c.getAddActivity().getActivity().getVerb());
 
-				activityFeed.addCisActivity(iActivity);
+				activityFeed.addActivity(iActivity);
 				
 				r.setResult(true); //TODO. add a return on the activity feed method
 				
@@ -1081,7 +1108,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			// cleanup activities
 			if (c.getCleanUpActivityFeed() != null) {
-				Community result = new Community();
+				org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
 				CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				
@@ -1098,36 +1125,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 				return result;
 
 			}				// END OF cleanup activities
+
 			
-		}
-		if (payload.getClass().equals(Activityfeed.class)) {
-			LOG.info("activity feed type received");
-			Activityfeed c = (Activityfeed) payload;
 			
-			// delete Activity
-
-			if (c.getDeleteActivity() != null) {
-				Activityfeed result = new Activityfeed();
-				DeleteActivityResponse r = new DeleteActivityResponse();
-				String senderJid = stanza.getFrom().getBareJid();
-				
-				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
-				//	r.setResult(false);
-				//}else{
-					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-				IActivity iActivity = new org.societies.activity.model.Activity();
-				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
-				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
-				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
-				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
-				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
-
-				r.setResult(activityFeed.deleteActivity(iActivity));
-
-				result.setDeleteActivityResponse(r);		
-				return result;
-
-			}				// END OF delete Activity
 			
 		}
 		
@@ -1138,7 +1138,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	@Override 
 	public Future<Set<ICisParticipant>> getMemberList(){
-		LOG.debug("local get member list WITH CALLBACK called");
+		LOG.debug("local get member list WITHOUT CALLBACK called");
 		Set<ICisParticipant> s = new  HashSet<ICisParticipant>();
 		s.addAll(this.getMembersCss());
 		return new AsyncResult<Set<ICisParticipant>>(s);
@@ -1146,7 +1146,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
-		LOG.debug("local get member list WITHOUT CALLBACK called");
+		LOG.debug("local get member list WITH CALLBACK called");
 
 		
 		Community c = new Community();
@@ -1454,51 +1454,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 	
 	
-	// TODO
-	@Override
-	public void addCisActivity(IActivity activity,ICisManagerCallback callback){
-		
-			Community result = new Community();
-			AddActivityResponse r = new AddActivityResponse();
 
-			activityFeed.addCisActivity(activity);
-			
-			r.setResult(true); //TODO. add a return on the activity feed method
-			
-			
-			result.setAddActivityResponse(r);		
-			callback.receiveResult(result);
-		
-	}
-	
-	@Override
-	public void getActivities(String timePeriod,ICisManagerCallback callback){
-		Community result = new Community();
-		GetActivitiesResponse r = new GetActivitiesResponse();
-		List<IActivity> iActivityList;
-		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
-		
-		iActivityList = activityFeed.getActivities(timePeriod);
-		
-
-		Iterator<IActivity> it = iActivityList.iterator();
-		
-		while(it.hasNext()){
-			IActivity element = it.next();
-			org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
-			a.setActor(element.getActor());
-			a.setObject(a.getObject());
-			a.setPublished(a.getPublished());
-			a.setVerb(a.getVerb());
-			marshalledActivList.add(a);
-	     }
-		
-		r.setActivity(marshalledActivList);
-		result.setGetActivitiesResponse(r);		
-		
-		callback.receiveResult(result);
-				
-	}
 
 	// local method
 	public Hashtable<String, MembershipCriteria> getMembershipCriteria() {

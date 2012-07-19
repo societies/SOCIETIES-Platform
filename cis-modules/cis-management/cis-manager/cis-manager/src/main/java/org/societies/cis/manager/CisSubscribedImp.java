@@ -63,9 +63,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.cis.community.AddActivity;
 import org.societies.api.schema.cis.community.Community;
-import org.societies.api.schema.cis.community.GetActivities;
 import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
@@ -99,6 +97,9 @@ public class CisSubscribedImp implements ICis {
 		return cisRecord;
 	}
 
+	@Transient
+	private IActivityFeed iactivityFeed = null;
+	
 	public void setCisRecord(CisRecord cisRecord) {
 		this.cisRecord = cisRecord;
 	}
@@ -110,8 +111,15 @@ public class CisSubscribedImp implements ICis {
 		super();
 		this.cisRecord = cisRecord;
 		this.cisManag =cisManag;
+		try {
+			this.iactivityFeed = new RemoteActivityFeed(cisManag.iCommMgr, cisManag.iCommMgr.getIdManager().fromJid(cisRecord.cisJID));
+		} catch (InvalidFormatException e) {
+			LOG.debug("Wrong format of CIS jid in cisRecord");
+			e.printStackTrace();
+		}
 	}
 	
+	// constructor to be used just for "equals" check
 	public CisSubscribedImp(CisRecord cisRecord) {
 		super();
 		this.cisRecord = cisRecord;
@@ -130,6 +138,13 @@ public class CisSubscribedImp implements ICis {
 	
 	public void startAfterDBretrieval(CisManager cisManag){
 		this.cisManag = cisManag;
+		try {
+			this.iactivityFeed = new RemoteActivityFeed(cisManag.iCommMgr, cisManag.iCommMgr.getIdManager().fromJid(this.cisRecord.cisJID));
+		} catch (InvalidFormatException e) {
+			LOG.debug("Wrong format of CIS jid in cisRecord");
+			e.printStackTrace();
+		}
+
 	}
 	
 	
@@ -254,48 +269,6 @@ public class CisSubscribedImp implements ICis {
 	}
 	
 	
-
-	
-	
-	public void getActivities(String timePeriod,ICisManagerCallback callback){
-		LOG.debug("client call to get activities from a RemoteCIS");
-			Community c = new Community();
-			GetActivities g = new GetActivities();
-			g.setTimePeriod(timePeriod);
-			c.setGetActivities(g);
-			this.sendXmpp(c, callback);
-	}
-	
-	
-	public void getActivities(String query, String timePeriod,ICisManagerCallback callback){
-		LOG.debug("client call to get activities with query from a RemoteCIS");
-		Community c = new Community();
-		GetActivities g = new GetActivities();
-		g.setTimePeriod(timePeriod);
-		g.setQuery(query);
-		c.setGetActivities(g);
-		this.sendXmpp(c, callback);
-
-	}
-	
-	public void addCisActivity(IActivity activity,ICisManagerCallback callback){
-		LOG.debug("client call to add activity to a RemoteCIS");
-		Community c = new Community();
-		AddActivity g = new AddActivity();
-		Activity a = new Activity();
-		a.setActor(activity.getActor());
-		a.setObject(activity.getObject());
-		a.setTarget(activity.getTarget());
-		a.setPublished(activity.getPublished());
-		a.setVerb(activity.getVerb());
-		g.setActivity(a);
-		c.setAddActivity(g);
-		this.sendXmpp(c, callback);
-		
-	}
-	
-	public void cleanupFeed(String criteria,ICisManagerCallback callback){}
-	public void deleteActivity(IActivity activity,ICisManagerCallback callback){}
 	
 	
 	private void sendXmpp(Community c,ICisManagerCallback callback){
@@ -339,6 +312,11 @@ public class CisSubscribedImp implements ICis {
 	public void getMembershipCriteria(ICisManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public IActivityFeed getActivityFeed() {
+		return this.iactivityFeed;
 	}
 
 }

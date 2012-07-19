@@ -255,16 +255,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-	@Deprecated
-	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode){
-		return null;
-	}
-	
-	@Deprecated
-	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy) {
-		return null;
-	}
-
 	/**
 	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
 	 * same as the CSS password.
@@ -757,17 +747,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		List<ICis> l = new ArrayList<ICis>();
 		l.addAll(subscribedCISs);
 
-		
-		/*// add owned CIS to the list to be returned
-		List<ICis> l2 = new ArrayList<ICis>();
-
-		Iterator<Cis> it = getOwnedCISs().iterator();
-		 
-		while(it.hasNext()){
-			 Cis element = it.next();
-			 l2.add(element);
-			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
-	     }*/
+	
 		l.addAll(ownedCISs);
 		
 		return l;
@@ -834,10 +814,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 
 	
-	@Deprecated
-	public ICis getCis(String cssId, String cisId){
-		return null;
-	} 
 	
 	/**
 	 * Get a CIS Record with the ID cisId.
@@ -1050,10 +1026,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 	
-	public void UnRegisterCisManager(){
+	//public void UnRegisterCisManager(){
 		//TODO
 		//this.ccmFactory.
-	}
+	//}
 
 	
 	/* ***********************************

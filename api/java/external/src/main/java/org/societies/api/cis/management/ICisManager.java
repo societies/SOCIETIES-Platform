@@ -47,14 +47,6 @@ public interface ICisManager {
 	
 	// API implementing server functionality
 	
-	// this methods have been deprecated so we remove the css password and also the cssid (which will come through the Xcommanger)
-	@Deprecated
-	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
-	
-	@Deprecated
-	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy);
-	
-	
 	/**
 	 * Create a new CIS for the CSS whose JID is the one in cssId.
 	 * 
@@ -85,10 +77,6 @@ public interface ICisManager {
 
 	
 	
-	// removed the need to add the cssID
-	@Deprecated
-	boolean deleteCis(String cssId, String cssPassword, String cisId);
-
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
 	 * method of {@link ICisOwned} representing the CIS to be deleted. This method
@@ -102,9 +90,6 @@ public interface ICisManager {
 	 */
 	boolean deleteCis(String cisId);
 	
-	
-	@Deprecated
-	ICis getCis(String cssId, String cisId);
 	
 	/**
 	 * Get a CIS Record with the ID cisId.

@@ -96,7 +96,7 @@ public interface ICisOwned extends ICis {
 	public String setCisType(String type);
 	public String getDescription();
 	public void setDescription(String description); 
-	public IActivityFeed getActivityFeed();
+	
 
 	// TODO: change the visitibility of those methods and add documentation
 	public boolean checkQualification(HashMap<String,String> qualification);

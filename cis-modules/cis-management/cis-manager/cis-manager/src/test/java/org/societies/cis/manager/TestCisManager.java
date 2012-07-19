@@ -55,7 +55,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
+import org.societies.activity.ActivityFeedCallback;
 import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
@@ -78,6 +80,8 @@ import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
+import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
@@ -772,33 +776,62 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		iActivity2.setPublished((System.currentTimeMillis() -500) + "");
 		iActivity2.setVerb("verb2");
 
+		class DummyActFeedCback implements IActivityFeedCallback {
+
+			public void receiveResult(Activityfeed activityFeedObject){
+				
+			}
+		}
 		
-		Iciss.getActivityFeed().addCisActivity(iActivity);
-		Iciss.getActivityFeed().addCisActivity(iActivity2);
+		
+		Iciss.getActivityFeed().addActivity(iActivity, new DummyActFeedCback());
+		Iciss.getActivityFeed().addActivity(iActivity2,new DummyActFeedCback());
 		System.out.println((System.currentTimeMillis() -20000) + " " + System.currentTimeMillis());
-		List <IActivity> l = Iciss.getActivityFeed().getActivities((System.currentTimeMillis() -20000) + " " + System.currentTimeMillis());
 		
 		
-		int[] check = {0,0};
-		
-		Iterator<IActivity> it = l.iterator();
-		
-		while(it.hasNext()){
-			IActivity element = it.next();
-			if(element.getActor().equals("act") )
-				check[0] = 1;
-			if(element.getActor().equals("act2") )
-				check[1] = 1;
+		class getActivitiesCallback implements IActivityFeedCallback {
 
-	     }
-		
-		// check if it found all matching CISs
-		 for(int i=0;i<check.length;i++){
-			 assertEquals(check[i], 1);
-		 }
+			String parentJid = "";
+			
+			public getActivitiesCallback (String parentJid){
+				super();
+				this.parentJid = parentJid;
+			}
+			
+			public void receiveResult(Activityfeed activityFeedObject){
 
-		// CLEANING UP
-		 cisManagerUnderTestInterface.deleteCis( Iciss.getCisId());
+				int[] check = {0,0};
+				
+				List<Activity> l = activityFeedObject.getGetActivitiesResponse().getActivity();
+				
+				Iterator<Activity> it = l.iterator();
+				
+				while(it.hasNext()){
+					Activity element = it.next();
+					if(element.getActor().equals("act") )
+						check[0] = 1;
+					if(element.getActor().equals("act2") )
+						check[1] = 1;
+
+			     }
+				
+				// check if it found all matching CISs
+				 for(int i=0;i<check.length;i++){
+					 assertEquals(check[i], 1);
+				 }
+
+				// CLEANING UP
+				 cisManagerUnderTestInterface.deleteCis(this.parentJid);
+
+				
+			}
+		}
+		
+		
+		
+		Iciss.getActivityFeed().getActivities((System.currentTimeMillis() -20000) + " " + System.currentTimeMillis(), new getActivitiesCallback(Iciss.getCisId()));
+		
+		
 	}
 	
 	///////////////////////////////////////////////////
@@ -1071,7 +1104,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 
-	/*
+	@Ignore
 	@Test
 	public void checkCriteria() throws InterruptedException, ExecutionException {
 
@@ -1092,7 +1125,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		r.setValues(a);
 		m.setRule(r);
 		
-		IcissOwned.addCriteria("location", m);		
+		assertTrue(IcissOwned.addCriteria("location", m));		
 
 		
 		m = new MembershipCriteria();
@@ -1102,7 +1135,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		a.add("married");
 		r.setValues(a);
 		m.setRule(r);
-		IcissOwned.addCriteria("status", m);		
+		assertTrue(IcissOwned.addCriteria("status", m));		
 
 		
 		//setting the user qualification
@@ -1125,5 +1158,5 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		q3.put("location","Brazil");		
 		assertTrue(IcissOwned.checkQualification(q3));
 	
-	}*/
+	}
 }
