@@ -1104,7 +1104,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 
-	@Ignore
+
 	@Test
 	public void checkCriteria() throws InterruptedException, ExecutionException {
 
@@ -1140,7 +1140,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		//setting the user qualification
 		HashMap<String,String> q1 = new HashMap<String,String>();
-		q1.put("status","divorced");
+		q1.put("status","married");
 		q1.put("music","rock");
 		q1.put("hair","blond");
 		q1.put("location","Brazil");
@@ -1152,7 +1152,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		assertFalse(IcissOwned.checkQualification(q2));
 
 		HashMap<String,String> q3 = new HashMap<String,String>();
-		q3.put("status","married");
+		q3.put("status","divorced");
 		q3.put("music","rock");
 		q3.put("hair","blond");
 		q3.put("location","Brazil");		

@@ -91,11 +91,13 @@ import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
 import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.GetInfoResponse;
+import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
+import org.societies.api.schema.cis.community.Qualification;
 import org.societies.api.schema.cis.community.SetInfoResponse;
 import org.societies.api.schema.cis.community.Who;
 import org.societies.api.schema.cis.manager.CommunityManager;
@@ -214,7 +216,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		    	MembershipCriteria m = cisCriteria.get(cisContext); // retrieves the context for that criteria
 		    	if(m != null){ // if there is a rule we check it
 		    		String valueToBeCompared = qualification.get(cisContext);
-		    		if (m.getRule().checkRule(CtxAttributeValueType.STRING, valueToBeCompared)) //TODO: this CtxAttributeValueType.STRING should be changed!! 
+		    		if (! (m.getRule().checkRule(CtxAttributeValueType.STRING, valueToBeCompared))) //TODO: this CtxAttributeValueType.STRING should be changed!! 
 		    			return false;
 		    	}
 
@@ -356,16 +358,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 
 
-	// deprecated, use the version below without password, permalink and host
-	@Deprecated
-	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
-		this(cssOwner, cisName, cisType, ccmFactory,iServDiscRemote,iServCtrlRemote,privacyPolicyManager,null,null,null);
-		//this.password = password;
-		//this.permaLink = permaLink;
-		//this.host = host;
-		this.description = description;
 
-	}
 
 
 	//  constructor of a CIS without a pre-determined ID or host
@@ -810,21 +803,54 @@ public class Cis implements IFeatureServer, ICisOwned {
 				String jid = "";
 				LOG.info("join received");
 				String senderjid = stanza.getFrom().getBareJid();
-				boolean addresult = false; 
-				addresult = this.insertMember(senderjid, MembershipType.participant);
-				
-				
+
+				// information sent on the xmpp in case of failure or success
 				Community result = new Community();
-				
 				Participant p = new Participant();
 				JoinResponse j = new JoinResponse();
-				
-				// information sent on the xmpp in case of failure or success
-				j.setResult(addresult);
+				boolean addresult = false; 
 				p.setJid(jid);
 				result.setCommunityJid(this.getCisId()); 
 				result.setCommunityName(this.getName());
 				result.setCommunityType(this.cisType);
+				result.setJoinResponse(j);
+				
+				
+				// checking the criteria
+				if(this.cisCriteria.size()>0){
+					Join join = (Join) c.getJoin();
+					if(join.getQualification() != null && join.getQualification().size()>0 ){
+						
+						// retrieving from marshalled object the qualifications to be checked
+						HashMap<String,String> qualification = new HashMap<String,String>();
+						for (Qualification q : join.getQualification()) {
+							qualification.put(q.getAttr(), q.getValue());
+						}
+						
+						
+						
+						if (this.checkQualification(qualification) == false){
+							j.setResult(addresult);
+							return result;
+						}
+							
+					}
+					else{
+						j.setResult(addresult);
+						return result;
+					}
+				}
+				
+				
+				
+				
+				
+				addresult = this.insertMember(senderjid, MembershipType.participant);
+				j.setResult(addresult);
+				
+				
+				
+				
 				// TODO: add the criteria to the response
 								
 				if(addresult == true){
@@ -837,7 +863,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 				}
 					
 				j.setParticipant(p);
-				result.setJoinResponse(j);
 					
 				return result;
 
