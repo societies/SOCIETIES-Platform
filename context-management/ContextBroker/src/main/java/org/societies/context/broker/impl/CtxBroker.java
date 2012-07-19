@@ -146,13 +146,17 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		LOG.info(this.getClass() + " createEntity CtxBroker client service: "+ctxBrokerClient);
 		
 		if (idMgr.isMine(targetCss)) {
-			return internalCtxBroker.createEntity(type);
+			LOG.info(" targetCss is mine :"+targetCss);
+			
+			Future<CtxEntity> localEntity = internalCtxBroker.createEntity(type);
+		
+			return localEntity;
 		} else {
 			
 			final CreateEntityCallback callback = new CreateEntityCallback();
-			LOG.debug("create remote 1");
+			LOG.info("create remote 1");
 			ctxBrokerClient.createRemoteEntity(requestor, targetCss, type, callback);
-			LOG.debug("Sent remote entity create request");
+			LOG.info("Sent remote entity create request");
 			synchronized (callback) {
 				
 				try {

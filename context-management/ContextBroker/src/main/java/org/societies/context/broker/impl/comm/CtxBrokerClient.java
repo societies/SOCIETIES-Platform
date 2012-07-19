@@ -158,6 +158,7 @@ public class CtxBrokerClient implements ICommCallback {
 			// TODO ctxBrokerCreateEntityBean.setTargetCss(targetCss.toString());
 			ctxBrokerCreateEntityBean.setTargetCss(cssOwnerStr);
 			ctxBrokerCreateEntityBean.setType(type);
+	
 			RequestorBean requestorBean = createRequestorBean(requestor);
 			// TODO ctxBrokerCreateEntityBean.setRequestor(requestorBean);
 
