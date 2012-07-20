@@ -37,6 +37,7 @@ import javax.xml.datatype.DatatypeFactory;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.android.privacytrust.trust.org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -289,7 +290,7 @@ public class TrustEvidenceCollector extends Service
 			final GregorianCalendar gregCal = new GregorianCalendar();
 			gregCal.setTime(timestamp);
 			addEvidenceBean.setTimestamp(
-					DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+					new DatatypeFactoryImpl().newXMLGregorianCalendar(gregCal));
 			// 4. info
 			if (TrustEvidenceType.RATED.equals(type))
 				addEvidenceBean.setInfo(serialise(info));
