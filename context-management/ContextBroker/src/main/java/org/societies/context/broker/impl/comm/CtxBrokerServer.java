@@ -145,14 +145,16 @@ public class CtxBrokerServer implements IFeatureServer{
 				// TODO Future<CtxEntity> newEntityFuture = ctxbroker.createEntity(requestor,targetIdentity,cbPayload.getCreate().getType());
 				Future<CtxEntity> newEntityFuture = ctxbroker.createEntity(null, targetIdentity, cbPayload.getCreateEntity().getType());
 				CtxEntity newCtxEntity = newEntityFuture.get();
-				
+				LOG.error("SKATA 3 brokerserver:" +newCtxEntity.getId());
 				// the entity is created
 				//create the response based on the created CtxEntity - the response should be a result bean
 				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 				CtxEntityBean ctxBean = ctxBeanTranslator.fromCtxEntity(newCtxEntity);
+				LOG.error("SKATA 4 ctxBean:" +ctxBean.toString());
+				LOG.error("SKATA 5 ctxBean:" +ctxBean.getLastModified());
 				//setup the CtxEntityBean from CtxEntity				
 				beanResponse.setCtxBrokerCreateEntityBeanResult(ctxBean);
-
+				LOG.error("SKATA 6 beanResponse:" +beanResponse);
 			} catch (CtxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -404,7 +406,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		default: 
 			throw new XMPPError(StanzaError.bad_request, "Nothing to do");
 		}
-
+		LOG.error("SKATA 7 over beanResponse :" +beanResponse);
 		return beanResponse;
 	}
 
