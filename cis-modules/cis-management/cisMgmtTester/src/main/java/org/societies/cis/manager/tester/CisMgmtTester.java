@@ -27,6 +27,7 @@ package org.societies.cis.manager.tester;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -111,11 +112,13 @@ public class CisMgmtTester {
 			List<Criteria> l = new ArrayList<Criteria>();
 			m.setCriteria(l);
 			Criteria crit = new Criteria();
-			crit.setAttr("status");
+			crit.setAttrib("status");
 			crit.setOperator("equals");
-			crit.setRank(0);
-			crit.setValue(new ArrayList<String>(Arrays.asList("married")));
+			//crit.setRank(0);
+			crit.setValue1("married");
 			l.add(crit);
+			
+			com.setMembershipCrit(m);
 			
 			try {
 				LOG.info("Sending stanza");
@@ -248,22 +251,32 @@ public class CisMgmtTester {
 	
 	public class TestIcomCallBack implements ICommCallback{
 		
-
+		private final  List<String> NAMESPACES = Collections
+				.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+//									"http://societies.org/api/schema/activity",
+							  		"http://societies.org/api/schema/cis/community"));
+				//.singletonList("http://societies.org/api/schema/cis/manager");
+		private final  List<String> PACKAGES = Collections
+				//.singletonList("org.societies.api.schema.cis.manager");
+				.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+//						"org.societies.api.schema.activity",
+						"org.societies.api.schema.cis.community"));
+		
 		@Override
 		public List<String> getXMLNamespaces() {
-			// TODO Auto-generated method stub
-			return null;
+			
+			return this.NAMESPACES;
 		}
 
 		@Override
 		public List<String> getJavaPackages() {
 			// TODO Auto-generated method stub
-			return null;
+			return this.PACKAGES;
 		}
 
 		@Override
 		public void receiveResult(Stanza stanza, Object payload) {
-			// TODO Auto-generated method stub
+			LOG.info(payload.toString());
 			
 		}
 
@@ -287,7 +300,7 @@ public class CisMgmtTester {
 
 		@Override
 		public void receiveMessage(Stanza stanza, Object payload) {
-			// TODO Auto-generated method stub
+			LOG.info(payload.toString());
 			
 		}
 

@@ -530,7 +530,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 							meb.setRank(crit.getRank());
 							Rule r = new Rule();
 							if( r.setOperation(crit.getOperator()) == false) {create.setResult(false); return c;}
-							if( r.setValues(crit.getValue()) == false) {create.setResult(false); return c;}
+							ArrayList<String> a = new ArrayList<String>();
+							a.add(crit.getValue1());
+							if (crit.getValue2() != null && !crit.getValue2().isEmpty()) a.add(crit.getValue2()); 
+							if( r.setValues(a) == false) {create.setResult(false); return c;}
 							meb.setRule(r);
 							h.put(crit.getAttrib(), meb);
 							

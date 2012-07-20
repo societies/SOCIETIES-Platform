@@ -117,6 +117,20 @@
 -->
 
 
+	<xs:element name='criteria'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="attrib" type="xs:string" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="operator" type="xs:string" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="value1" type="xs:string" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="value2" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="rank" type="xs:int" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+
 	<xs:element name='membershipCrit'>
 		<xs:complexType>
 			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
@@ -126,16 +140,6 @@
 	</xs:element>
 
 
-	<xs:element name='criteria'>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="attrib" type="xs:string" minOccurs='1' maxOccurs='1'/>
-				<xs:element name="operator" type="xs:string" minOccurs='1' maxOccurs='1'/>
-				<xs:element name="value" type="xs:string" minOccurs='1' maxOccurs='2'/>
-				<xs:element name="rank" type="xs:int"></xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
 
 	<xs:element name='qualification'>
 		<xs:complexType>

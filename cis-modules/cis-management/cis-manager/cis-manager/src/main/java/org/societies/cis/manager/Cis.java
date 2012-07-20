@@ -1518,7 +1518,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 			c.setAttrib(entry.getKey());
 			c.setOperator(orig.getRule().getOperation());
 			c.setRank(orig.getRank());
-			c.setValue(orig.getRule().getValues());
+			c.setValue1(orig.getRule().getValues().get(0));
+			if(orig.getRule().getValues().size()==2)
+				c.setValue1(orig.getRule().getValues().get(1));
 			l.add(c);
 		}
 		m.setCriteria(l);
