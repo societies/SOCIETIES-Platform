@@ -52,8 +52,9 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Join;
-
 import org.societies.api.schema.cis.community.Leave;
+
+//import org.societies.api.schema.cis.community.Leave;
 
 import org.societies.api.schema.cis.community.Participant;
 

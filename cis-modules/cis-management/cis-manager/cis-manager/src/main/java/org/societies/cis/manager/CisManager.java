@@ -84,19 +84,20 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.Leave;
+//import org.societies.api.schema.cis.community.Leave;
 import org.societies.api.schema.cis.community.MembershipCrit;
 
 
 import org.societies.api.schema.cis.community.Join;
-import org.societies.api.schema.cis.community.Leave;
+//import org.societies.api.schema.cis.community.Leave;
 import org.societies.api.schema.cis.community.Participant;
 
 
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
-import org.societies.api.schema.cis.manager.Communities;
+
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
-import org.societies.api.schema.cis.manager.CisCommunity;
+
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
 
@@ -531,7 +532,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 							if( r.setOperation(crit.getOperator()) == false) {create.setResult(false); return c;}
 							if( r.setValues(crit.getValue()) == false) {create.setResult(false); return c;}
 							meb.setRule(r);
-							h.put(crit.getAttr(), meb);
+							h.put(crit.getAttrib(), meb);
 							
 						}
 					}
@@ -561,8 +562,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				if(c.getList().getListCriteria() !=null)
 					listingType = c.getList().getListCriteria();
 								
-				
-				Communities com = new Communities();
+				// TODO: redo the list
+/*				Communities com = new Communities();
 				
 				if(listingType.equals("owned") || listingType.equals("all")){
 				// GET LIST CODE of ownedCIS
@@ -590,9 +591,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 						com.getCisCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
-				}
+				}*/
 				
-				return com;
+				return c;
 
 			}
 				// END OF LIST
@@ -1026,10 +1027,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 	
-	//public void UnRegisterCisManager(){
-		//TODO
-		//this.ccmFactory.
-	//}
+	public void UnRegisterCisManager(){
+		// unregister all its CISs
+		for(Cis c : ownedCISs ){
+			c.unregisterCIS();
+		}
+		
+	}
 
 	
 	/* ***********************************

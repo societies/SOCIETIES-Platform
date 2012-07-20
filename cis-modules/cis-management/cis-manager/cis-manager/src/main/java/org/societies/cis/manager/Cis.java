@@ -89,6 +89,7 @@ import org.societies.api.schema.cis.community.AddMemberResponse;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
+//import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.GetInfoResponse;
 import org.societies.api.schema.cis.community.Join;
@@ -423,8 +424,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 			iServCtrlRemote.registerCISEndpoint(CISendpoint);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
+			this.unregisterCIS();
 			LOG.info("could not start comm manager!");
-		} // TODO unregister??
+		} 
 		LOG.info("CIS listener registered");
 		
 		
@@ -482,7 +484,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 			LOG.info("could not start comm manager!");
-		} // TODO unregister??
+			this.unregisterCIS();
+		} 
 		LOG.info("CIS listener registered");
 		
 		this.setSessionFactory(sessionFactory);
@@ -824,7 +827,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 						// retrieving from marshalled object the qualifications to be checked
 						HashMap<String,String> qualification = new HashMap<String,String>();
 						for (Qualification q : join.getQualification()) {
-							qualification.put(q.getAttr(), q.getValue());
+							qualification.put(q.getAttrib(), q.getValue());
 						}
 						
 						
@@ -1512,7 +1515,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		for(Map.Entry<String, MembershipCriteria> entry : this.cisCriteria.entrySet()){
 			MembershipCriteria orig =  entry.getValue();
 			Criteria c = new Criteria();
-			c.setAttr(entry.getKey());
+			c.setAttrib(entry.getKey());
 			c.setOperator(orig.getRule().getOperation());
 			c.setRank(orig.getRank());
 			c.setValue(orig.getRule().getValues());

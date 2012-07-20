@@ -64,10 +64,12 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.cis.community.Community;
+//import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.SetInfo;
+//import org.societies.api.schema.cis.community.SetInfo;
 import org.societies.api.schema.cis.community.Who;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -163,7 +165,7 @@ public class CisSubscribedImp implements ICis {
 					stanza.getId(), callback, this.cisManag);
 
 			Community c = new Community();
-			c.setGetInfo(new GetInfo());
+			c.setGetInfo( new GetInfo());
 			try {
 				LOG.info("Sending stanza with get info");
 				this.cisManag.iCommMgr.sendIQGet(stanza, c, commsCallback);

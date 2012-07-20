@@ -129,7 +129,7 @@
 	<xs:element name='criteria'>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="attr" type="xs:string" minOccurs='1' maxOccurs='1'/>
+				<xs:element name="attrib" type="xs:string" minOccurs='1' maxOccurs='1'/>
 				<xs:element name="operator" type="xs:string" minOccurs='1' maxOccurs='1'/>
 				<xs:element name="value" type="xs:string" minOccurs='1' maxOccurs='2'/>
 				<xs:element name="rank" type="xs:int"></xs:element>
@@ -139,7 +139,7 @@
 
 	<xs:element name='qualification'>
 		<xs:complexType>
-			<xs:attribute name='attr' type='xs:string'/>
+			<xs:attribute name='attrib' type='xs:string'/>
 			<xs:attribute name='value' type='xs:string'/>
 		</xs:complexType>
 	</xs:element>
