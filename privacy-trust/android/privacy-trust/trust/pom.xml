@@ -56,6 +56,15 @@
 			<artifactId>slf4j-android</artifactId>
 			<version>1.6.1-RC1</version>
 		</dependency>
+		<!-- Required for missing org.apache.xerces.jaxp.datatype.DatatypeFactoryImpl -->
+<!--		
+		<dependency>
+ 			<groupId>xerces</groupId>
+ 			<artifactId>xercesImpl</artifactId>
+ 			<version>2.10.0</version>
+ 			<scope>compile</scope>
+		</dependency>
+-->
 	</dependencies>
 
 	<build>

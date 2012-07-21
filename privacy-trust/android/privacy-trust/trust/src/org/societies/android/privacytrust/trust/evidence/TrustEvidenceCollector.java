@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import javax.xml.datatype.DatatypeFactory;
 
@@ -97,9 +98,15 @@ public class TrustEvidenceCollector extends Service
 	/** The Client Comm Mgr service reference. */
 	private ClientCommunicationMgr clientCommMgr;
 	
+	/** The exception from the Client Comm Mgr callback. */
+	private Exception callbackException;
+	
+	/** The latch for waiting the Client Comm Mgr callback. */
+	private CountDownLatch cdLatch;
+	
 	/** The Client Comm Mgr callback. */
 	private final ICommCallback callback = new ICommCallback() {
-
+		
 		/*
 		 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getXMLNamespaces()
 		 */
@@ -120,13 +127,14 @@ public class TrustEvidenceCollector extends Service
 		 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveResult(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 		 */
 		public void receiveResult(Stanza stanza, Object payload) {
-			
+
 			Log.d(TrustEvidenceCollector.TAG, "receiveResult:stanza="
 					+ this.stanzaToString(stanza)
 					+ ",payload.getClass=" 
 					+ payload.getClass().getName());
+
 			if (payload instanceof TrustEvidenceCollectorResponseBean) {
-				
+
 				TrustEvidenceCollectorResponseBean responseBean = 
 						(TrustEvidenceCollectorResponseBean) payload;
 				Log.d(TrustEvidenceCollector.TAG, 
@@ -135,15 +143,20 @@ public class TrustEvidenceCollector extends Service
 				switch (responseBean.getMethodName()) {
 
 				case ADD_DIRECT_EVIDENCE:
-					// TODO handle
-					break;
 				case ADD_INDIRECT_EVIDENCE:
-					// TODO handle
+					TrustEvidenceCollector.this.callbackException = null;
 					break;
 				default:
-					break;
+					TrustEvidenceCollector.this.callbackException = 
+						new TrustEvidenceCollectorCommException("Unsupported method in response bean: "
+							+ responseBean.getMethodName());
 				}
-			}				
+			} else {
+				TrustEvidenceCollector.this.callbackException = 
+						new TrustEvidenceCollectorCommException("Unsupported payload type: "
+								+ payload.getClass().getName());
+			}
+			TrustEvidenceCollector.this.cdLatch.countDown();
 		}
 
 		/*
@@ -151,8 +164,15 @@ public class TrustEvidenceCollector extends Service
 		 */
 		public void receiveError(Stanza stanza, XMPPError error) {
 			
-			Log.d(TrustEvidenceCollector.TAG, "receiveError with stanza "
-					+ this.stanzaToString(stanza));
+			Log.d(TrustEvidenceCollector.TAG, "receiveError:stanza="
+					+ this.stanzaToString(stanza) 
+					+ ",error=" + error);
+			if (error != null)
+				TrustEvidenceCollector.this.callbackException = error;
+			else
+				TrustEvidenceCollector.this.callbackException = 
+					new TrustEvidenceCollectorCommException("Unspecified XMPPError");
+			TrustEvidenceCollector.this.cdLatch.countDown();
 		}
 
 		/*
@@ -222,7 +242,7 @@ public class TrustEvidenceCollector extends Service
 		try {
 			if (this.cloudNodeId == null)
 				this.cloudNodeId = IdentityManagerImpl.staticfromJid(cloudNodeJid);
-			Log.d(TAG, "Cloud node IIdentity " + this.cloudNodeId);
+			Log.d(TAG, "Hardcoded cloud node IIdentity " + this.cloudNodeId);
 			if (this.clientCommMgr == null)
 				this.clientCommMgr = new ClientCommunicationMgr(this);
 			this.clientCommMgr.register(ELEMENT_NAMES, this.callback);
@@ -275,8 +295,6 @@ public class TrustEvidenceCollector extends Service
 		sb.append(", info=");
 		sb.append(info);
 		Log.d(TAG, sb.toString());
-		// TODO remove
-		Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
 
 		try {
 			final AddDirectEvidenceRequestBean addEvidenceBean = 
@@ -302,6 +320,10 @@ public class TrustEvidenceCollector extends Service
 
 			final Stanza stanza = new Stanza(this.cloudNodeId);
 			this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, this.callback);
+			this.cdLatch = new CountDownLatch(1);
+			this.cdLatch.await();
+			if (this.callbackException != null)
+				throw this.callbackException;
 			
 		} catch (IOException ioe) {
 
@@ -352,8 +374,6 @@ public class TrustEvidenceCollector extends Service
 		sb.append(", info=");
 		sb.append(info);
 		Log.d(TAG, sb.toString());
-		// TODO remove
-		Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
 
 		try {
 			final AddIndirectEvidenceRequestBean addEvidenceBean = 
@@ -381,6 +401,10 @@ public class TrustEvidenceCollector extends Service
 
 			final Stanza stanza = new Stanza(this.cloudNodeId);
 			this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, this.callback);
+			this.cdLatch = new CountDownLatch(1);
+			this.cdLatch.await();
+			if (this.callbackException != null)
+				throw this.callbackException;
 			
 		} catch (IOException ioe) {
 
