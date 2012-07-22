@@ -76,11 +76,27 @@ public class CssNodeController {
 		
 		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
 		Map<String, String> methods = new LinkedHashMap<String, String>();
+		Map<String, String> nodetypes = new LinkedHashMap<String, String>();
+		Map<String, String> nodestatus = new LinkedHashMap<String, String>();
+		
+		
+		
 		methods.put("addnode", "Add a Node");
 		methods.put("removenode", "Remove a Node");
 		methods.put("returnnodetype", "Find Node Type");
-		//methods.put("removenode", "Remove a Node");
+				
+		nodetypes.put("Android", "Android");
+		nodetypes.put("Rich", "Rich");
+		nodetypes.put("Cloud", "Cloud");
+		
+		nodestatus.put("Available", "Available");
+		nodestatus.put("Unavailable", "Unavailable");
+		nodestatus.put("Hibernating", "Hibernating");
+		
+		
 		model.put("methods", methods);
+		model.put("nodetypes", nodetypes);
+		model.put("nodestatus", nodestatus);
 		
 		model.put("cssnodemgmtResult", "CSS Node Mgmt Result :");
 		return new ModelAndView("cssnodemgmt", model);
@@ -100,13 +116,21 @@ public class CssNodeController {
 			model.put("errormsg", "CSS Manager reference not available");
 			return new ModelAndView("error", model);
 		}
-
+		int Android = 0;
+		int Cloud = 1;
+		int Rich = 2;
+		int nodeType = 0;
+		int nodestates = 0;
 		
+		String nodetypes = cnForm.getnodetypes();
 		String method = cnForm.getMethod();
+		String nodestatus = cnForm.getnodestatus();
 		CssRecord cssrecord = null;
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
 		List<Service> nodes =  new ArrayList<Service>();
 		Future<CssInterfaceResult> cssDetails = null; 
+		
+		//put getrecord back in here
 		cssDetails = getCssLocalManager().getCssRecord();
 		try {
 			cssrecord = cssDetails.get().getProfile();
@@ -117,28 +141,51 @@ public class CssNodeController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		String res = null;
 		
 		try {
 		
 			if (method.equalsIgnoreCase("addnode")) {
 				res="Node Added";
+				
+				
+				
+				
 				CssNode cssnode = new CssNode();
 				cssnode.setIdentity(cnForm.getCssNodeId());
-				cssnode.setStatus(cnForm.getcssNodeStatus());
-				cssnode.setType(cnForm.getcssNodeType());
+				//cssnode.setStatus(cnForm.getcssNodeStatus());
+				//cssnode.setType(cnForm.getcssNodeType());
+				if (nodetypes.equalsIgnoreCase("Android")) {
+					 nodeType = Android;
+				} 
 				
+				if (nodetypes.equalsIgnoreCase("Rich")) {
+					nodeType = Rich;
+				} 
+				
+				if (nodetypes.equalsIgnoreCase("Cloud")) {
+					nodeType = Cloud;
+				}
+				
+				if (nodestatus.equalsIgnoreCase("Available")) {
+					nodestates = 0;
+				} 
+				
+				if (nodestatus.equalsIgnoreCase("Unavailable")) {
+					nodestates = 1;
+				} 
+				
+				if (nodestatus.equalsIgnoreCase("Hibernating")) {
+					nodestates = 2;
+				}
 				cssNodes = cssrecord.getCssNodes();
-				//cssNodes.add(0, cssnode);
-				//cssrecord.setCssNodes(cssNodes);
-				//cssLocalManager.registerCSSNode(cssrecord);
+				
 
-
-				cssLocalManager.setNodeType(cssrecord, cnForm.getCssNodeId(), cnForm.getcssNodeStatus(), cnForm.getcssNodeType());
-				//asynchResult=this.cssLocalManager.registerCSSNode(cssrecord); 
+				cssLocalManager.setNodeType(cssrecord, cnForm.getCssNodeId(), nodestates, nodeType, cnForm.getcssNodeMAC(), cnForm.getInteractable());
+				
 				res="CSS Node Result ";
 				
-				//nodes = asynchResult.get();
 				model.put("cssNodes", cssNodes);
 				
 			}else if (method.equalsIgnoreCase("removenode")) {
@@ -152,9 +199,9 @@ public class CssNodeController {
 				
 				cssNodes = cssrecord.getCssNodes();
 				
-				//cssLocalManager.removeNode(cssrecord, cnForm.getCssNodeId());
+				cssLocalManager.removeNode(cssrecord, cnForm.getCssNodeId());
 				
-				res="CSS Node Result ";
+				res="CSS Node Removed ";
 				
 				//nodes = asynchResult.get();
 				model.put("cssNodes", cssNodes);
@@ -164,10 +211,10 @@ public class CssNodeController {
 			
 			}else if (method.equalsIgnoreCase("returnnodetype")) {
 				Future<String> Type;
-				Type = cssLocalManager.getthisNodeType();
-				res="CSS Node Type Result ";
-				
-				model.put("cssNodes", Type);
+				Type = cssLocalManager.getthisNodeType(cnForm.getCssNodeId());
+				//res="CSS Node Type Result ";
+				res = "CSS Node Type is: " +Type.get().toString();
+				//model.put("cssNodes", Type);
 					
 			}else{
 				res="error unknown metod";

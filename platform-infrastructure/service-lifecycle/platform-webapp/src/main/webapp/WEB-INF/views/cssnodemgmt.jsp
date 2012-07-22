@@ -57,13 +57,19 @@
 			</tr>
 			<tr>
 				<td>CSS Node Status:</td>
-				<td><form:input path="cssNodeStatus" /></td>
-				<td><form:errors path="cssNodeStatus" cssClass="error" /></td>
+				<td><form:select path="nodestatus" >
+					   <form:option value="NONE" label="--- Select ---" />
+					   <form:options items="${nodestatus}" />
+					</form:select></td>
+				<td><form:errors path="nodestatus" cssClass="error" />
 			</tr>
 			<tr>
 				<td>CSS Node Type</td>
-				<td><form:input path="cssNodeType" /></td>
-				<td><form:errors path="cssNodeType" cssClass="error" /></td>
+				<td><form:select path="nodetypes" >
+					   <form:option value="NONE" label="--- Select ---" />
+					   <form:options items="${nodetypes}" />
+					</form:select></td>
+				<td><form:errors path="nodetypes" cssClass="error" />
 			</tr>
 			<tr>
 				<td>CSS Node MAC Address</td>
@@ -72,8 +78,8 @@
 			</tr>
 			<tr>
 				<td>CSS Node Interactable</td>
-				<td><form:checkbox path="Interactable" /></td>
-				<td><form:errors path="Interactable" cssClass="error" /></td>
+				<td><form:checkbox path="interactable" /></td>
+				<td><form:errors path="interactable" cssClass="error" /></td>
 			</tr>
 		</table>
 			<tr>

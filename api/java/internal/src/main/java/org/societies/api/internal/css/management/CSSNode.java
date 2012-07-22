@@ -52,12 +52,12 @@ public class CSSNode {
 	/**
 	 * MAC address of the Node
 	 */
-	String cssNodeMAC = null;
+	String cssnodeMAC = null;
 	
 	/**
 	 * is the node interactable
 	 */
-	boolean Interactable = true;
+	boolean contactable = true;
 	
 	/**
 	 * Default Constructor
@@ -90,18 +90,18 @@ public class CSSNode {
 	}
 	
 	public String getcssNodeMAC() {
-		return cssNodeMAC;
+		return cssnodeMAC;
 	}
 
 	public void setcssNodeMAC(String cssnodeMAC) {
 		this.cssnodeMAC = cssnodeMAC;
 	}
 
-	public boolean isInteractable() {
-		return interactable;
+	public boolean getContactable() {
+		return contactable;
 	}
 
-	public void setInteractable(boolean interactable) {
-		this.interactable = interactable;
+	public void setContactable(boolean contactable) {
+		this.contactable = contactable;
 	}
 }

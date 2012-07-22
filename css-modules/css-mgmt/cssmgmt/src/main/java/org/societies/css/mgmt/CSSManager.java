@@ -213,14 +213,19 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public Future<CssInterfaceResult> getCssRecord() {
 		CssInterfaceResult result = new CssInterfaceResult();
+		
+		LOG.info("%%%%%%%%%%%%%% CSS Manager getCssRecord Called");
+		
 		try {
 			CssRecord currentCssRecord = cssRegistry.getCssRecord();
 			result.setProfile(currentCssRecord);
+			LOG.info(";;;;;;;;;;;;;;;;;;; CSS Manager getCssRecord Size is : " +currentCssRecord.getCssNodes().size());
 			result.setResultStatus(true);
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//LOG.info("%%%%%%%%%%%%%% CSS Manager getCssRecord Size is : " +result.getProfile().getCssNodes().size()); //getCssNodes().size());
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 //	@Override
@@ -430,6 +435,8 @@ public class CSSManager implements ICSSLocalManager {
 	public Future<CssInterfaceResult> modifyCssRecord(CssRecord profile) {
 		CssInterfaceResult result = new CssInterfaceResult();
 		LOG.info("%%%%%%%%%%%%%% CSS Manager modifyCSSrecord Called");
+		LOG.info("%%%%%%%%%%%%%% CSS Manager cssrecord Size is : " +profile.getCssNodes().size());
+		
 		try {
 			cssRegistry.unregisterCss(profile);
 			result = cssRegistry.registerCss(profile);
@@ -1028,7 +1035,8 @@ public class CSSManager implements ICSSLocalManager {
 		
 	}
 	
-	public Future<String> getthisNodeType() {
+	
+	public Future<String> getthisNodeType(String nodeId) {
 		String Type = null, nodeid = null;
 		LOG.info("[][][][][] getthisNodeType has been called   [][][][][]: ");
 		List<CSSNode> cssnodes = new ArrayList<CSSNode>();
@@ -1036,7 +1044,9 @@ public class CSSManager implements ICSSLocalManager {
 		List<CSSNode> incssnodes = null;
 		int android = 0;
 		
-		nodeid = idManager.getThisNetworkNode().toString();
+		//nodeid = idManager.getThisNetworkNode().toString();
+		nodeid = nodeId;
+		LOG.info("[][][][][] nodeid is now   [][][][][]: " +nodeid);
 	
 		CssRecord currentCssRecord = null;
 		try {
@@ -1052,7 +1062,7 @@ public class CSSManager implements ICSSLocalManager {
 				LOG.info("[][][][][] cssNode.getIdentity is returning   [][][][][]: " +cssNode.getIdentity());
 				LOG.info("[][][][][] nodeid is returning   [][][][][]: " +nodeid);
 				if (nodeid.equalsIgnoreCase(cssNode.getIdentity())){
-					LOG.info("[][][][][] nodeid is returning   [][][][][]: ");
+					LOG.info("[][][][][] cssNode.getType() is returning   [][][][][]: " +cssNode.getType());
 					if (CSSManagerEnums.nodeType.Android.ordinal() == (cssNode.getType())) {
 						Type = "Android";
 					} else if (CSSManagerEnums.nodeType.Rich.ordinal() == (cssNode.getType())) {
@@ -1068,24 +1078,51 @@ public class CSSManager implements ICSSLocalManager {
 	}
 
 //	@Override
-	public void setNodeType(CssRecord cssrecord, String nodeId, int nodestatus, int nodetype) {
+	public void setNodeType(CssRecord cssrecord, String nodeId, int nodestatus, int nodetype, String cssnodemac, boolean interactable) {
 		
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
 		CssNode cssnode = new CssNode();
 		CssNode tmpNode = new CssNode();
+		LOG.info("!!!!!!!!!!!!!!!!!!! From Webapp cssNodes SIZE is: " +cssrecord.getCssNodes().size());
+		/*
+		try {
+			cssrecord = cssRegistry.getCssRecord();
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
+		LOG.info("!!!!!!!!!!!!!!!!!!! from CSSRegistry cssNodes SIZE is: " +cssrecord.getCssNodes().size());
 		
+		
+		int index = 0;
 		cssnode.setIdentity(nodeId);
 		cssnode.setStatus(nodestatus);
 		cssnode.setType(nodetype);
+		//cssnode.setCssNodeMAC(cssnodemac);
+		//cssnode.setInteractable(interactable);
 		
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeId passed in is: " +nodeId );
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodestatus passed in is: " +nodestatus );
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodetype passed in is: " +nodetype);
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodetype passed in is: " +cssnodemac);
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodetype passed in is: " +interactable);
 		
 		cssNodes = cssrecord.getCssNodes();
+		
+		LOG.info("!!!!!!!!!!!!!!!!!!! cssNodes are BEFORE : " +cssNodes);
+		for (index = 0; index < cssrecord.getCssNodes().size(); index ++) {
+			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode BEFORE index: " +index + " identity is now : " +cssNodes.get(index).getIdentity());
+		}
+		
 		//cssNodes.add(tmpNode);
 		cssNodes.add(cssnode);
+		
+		LOG.info("!!!!!!!!!!!!!!!!!!! cssNodes are AFTER : " +cssNodes);
 				
 		cssrecord.setCssNodes(cssNodes);
-		LOG.info("!!!!!!!!!!!!!!!!!!! cssrecord cssNodes SIZE is: " +cssrecord.getCssNodes().size());
-		int index = 0;
+		LOG.info("!!!!!!!!!!!!!!!!!!! cssrecord cssNodes SIZE AFTER add node is: " +cssrecord.getCssNodes().size());
+		
 		
 		LOG.info("!!!!!!!!!!!!!!!!!!! cssrecord cssNodes SIZE is now : " +cssrecord.getCssNodes().size());
 		cssNodes = cssrecord.getCssNodes();
@@ -1093,10 +1130,60 @@ public class CSSManager implements ICSSLocalManager {
 			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index + " identity is now : " +cssNodes.get(index).getIdentity());
 			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index + " Status is now : " +cssNodes.get(index).getStatus());
 			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" type is now : " +cssNodes.get(index).getType());
+			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" MAC is now : " +cssNodes.get(index).getCssNodeMAC());
+			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" type is now : " +cssNodes.get(index).isInteractable());
 		}
 		
 		
 		this.modifyCssRecord(cssrecord); 
+	
+	}
+	
+public void removeNode(CssRecord cssrecord, String nodeId ) {
+		
+		List<CssNode> cssNodes = new ArrayList<CssNode>();
+		//List<CssNode> tmpNodes = new ArrayList<CssNode>(cssNodes.size());
+		CssNode cssnode = new CssNode();
+		CssNode tmpNode = new CssNode();
+		//CssRecord newrecord = cssrecord;
+		
+		try {
+			cssRegistry.unregisterCss(cssrecord);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		cssNodes = cssrecord.getCssNodes();
+		
+		
+		LOG.info("~~~~~~~~~~~~~~~~ removeNode cssNodes SIZE is: " +cssrecord.getCssNodes().size());
+		LOG.info("~~~~~~~~~~~~~~~~ removeNode nodeId to remove is : " +nodeId);
+		int index = 0;
+		
+		//LOG.info("~~~~~~~~~~~~~~~~ removeNode cssNodes SIZE is now : " +cssrecord.getCssNodes().size());
+		cssNodes = cssrecord.getCssNodes();
+		for (index = 0; index < cssrecord.getCssNodes().size(); index ++) {
+			if (cssNodes.get(index).getIdentity().equalsIgnoreCase(nodeId)) {
+				LOG.info("~~~~~~~~~~~~~~~~ removeNode loop identity : " +cssNodes.get(index).getIdentity());
+				cssNodes.remove(index); 
+				LOG.info("~~~~~~~~~~~~~~~ removeNode Node Removed : ");
+				//tmpNodes.add(cssnode);
+			}
+			//tmpNodes.add(cssnode);
+			LOG.info("~~~~~~~~~~~~~~~ removeNode cssNodes element is : " +cssNodes.get(index).getIdentity());
+		}
+		cssrecord.setCssNodes(cssNodes);
+		LOG.info("~~~~~~~~~~~~~~~ removeNode cssrecord SIZE final : " +cssrecord.getCssNodes().size());
+		//LOG.info("~~~~~~~~~~~~~~~ removeNode newrecord SIZE final : " +newrecord.getCssNodes().size());
+		
+		try {
+			cssRegistry.registerCss(cssrecord);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//this.modifyCssRecord(cssrecord); 
 	
 	}
 	

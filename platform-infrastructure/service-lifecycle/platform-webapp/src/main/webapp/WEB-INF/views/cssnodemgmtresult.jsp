@@ -30,7 +30,7 @@
          	<td>${cssnode.status}</td>
             <td>${cssnode.type}</td>
             <td>${cssnode.cssNodeMAC}</td>
-            <td>${cssnode.Interactable}</td>
+            <td>${cssnode.interactable}</td>
         </tr>
     </xc:forEach>
     	
