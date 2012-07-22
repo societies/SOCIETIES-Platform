@@ -1078,7 +1078,7 @@ public class CSSManager implements ICSSLocalManager {
 	}
 
 //	@Override
-	public void setNodeType(CssRecord cssrecord, String nodeId, int nodestatus, int nodetype, String cssnodemac, boolean interactable) {
+	public void setNodeType(CssRecord cssrecord, String nodeId, int nodestatus, int nodetype, String cssnodemac) {
 		
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
 		CssNode cssnode = new CssNode();
@@ -1099,14 +1099,17 @@ public class CSSManager implements ICSSLocalManager {
 		cssnode.setIdentity(nodeId);
 		cssnode.setStatus(nodestatus);
 		cssnode.setType(nodetype);
+		cssnode.setCssNodeMAC(cssnodemac);
+		//cssnode.setIdentity(interactable);
+		
 		//cssnode.setCssNodeMAC(cssnodemac);
 		//cssnode.setInteractable(interactable);
 		
 		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeId passed in is: " +nodeId );
 		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodestatus passed in is: " +nodestatus );
 		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodetype passed in is: " +nodetype);
-		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodetype passed in is: " +cssnodemac);
-		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodetype passed in is: " +interactable);
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeMAC passed in is: " +cssnodemac);
+		//LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeInteractable passed in is: " +interactable);
 		
 		cssNodes = cssrecord.getCssNodes();
 		
@@ -1131,7 +1134,7 @@ public class CSSManager implements ICSSLocalManager {
 			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index + " Status is now : " +cssNodes.get(index).getStatus());
 			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" type is now : " +cssNodes.get(index).getType());
 			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" MAC is now : " +cssNodes.get(index).getCssNodeMAC());
-			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" type is now : " +cssNodes.get(index).isInteractable());
+			//LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" type is now : " +cssNodes.get(index).isInteractable());
 		}
 		
 		

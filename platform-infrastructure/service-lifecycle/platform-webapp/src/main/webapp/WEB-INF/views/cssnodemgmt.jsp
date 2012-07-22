@@ -76,11 +76,6 @@
 				<td><form:input path="cssNodeMAC" /></td>
 				<td><form:errors path="cssNodeType" cssClass="error" /></td>
 			</tr>
-			<tr>
-				<td>CSS Node Interactable</td>
-				<td><form:checkbox path="interactable" /></td>
-				<td><form:errors path="interactable" cssClass="error" /></td>
-			</tr>
 		</table>
 			<tr>
 				<td colspan="3"><input type="submit" /></td>

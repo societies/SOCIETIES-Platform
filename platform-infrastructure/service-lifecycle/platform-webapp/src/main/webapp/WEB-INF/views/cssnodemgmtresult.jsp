@@ -22,7 +22,7 @@
 <br/>
 <br/>
 <Table border="1">
-<tr><td><B>CSS NodeID</B></td><td><B>CSS Node Status</B></td><td><B>CSS Node Type</B></td><td><B>CSS Node MAC</B></td><td><B>CSS Node Interactable</B></td></tr> 
+<tr><td><B>CSS NodeID</B></td><td><B>CSS Node Status</B></td><td><B>CSS Node Type</B></td><td><B>CSS Node MAC</B></td></tr> 
 
 	<xc:forEach var="cssnode" items="${cssNodes}">
         <tr>
@@ -30,7 +30,6 @@
          	<td>${cssnode.status}</td>
             <td>${cssnode.type}</td>
             <td>${cssnode.cssNodeMAC}</td>
-            <td>${cssnode.interactable}</td>
         </tr>
     </xc:forEach>
     	

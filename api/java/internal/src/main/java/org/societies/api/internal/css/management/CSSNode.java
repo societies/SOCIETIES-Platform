@@ -57,7 +57,7 @@ public class CSSNode {
 	/**
 	 * is the node interactable
 	 */
-	boolean contactable = true;
+	boolean interactable = true;
 	
 	/**
 	 * Default Constructor
@@ -97,11 +97,11 @@ public class CSSNode {
 		this.cssnodeMAC = cssnodeMAC;
 	}
 
-	public boolean getContactable() {
-		return contactable;
+	public boolean getInteractable() {
+		return interactable;
 	}
 
-	public void setContactable(boolean contactable) {
-		this.contactable = contactable;
+	public void setInteractable(boolean interactable) {
+		this.interactable = interactable;
 	}
 }

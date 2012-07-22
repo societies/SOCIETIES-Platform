@@ -182,7 +182,7 @@ public class CssNodeController {
 				cssNodes = cssrecord.getCssNodes();
 				
 
-				cssLocalManager.setNodeType(cssrecord, cnForm.getCssNodeId(), nodestates, nodeType, cnForm.getcssNodeMAC(), cnForm.getInteractable());
+				cssLocalManager.setNodeType(cssrecord, cnForm.getCssNodeId(), nodestates, nodeType, cnForm.getcssNodeMAC());
 				
 				res="CSS Node Result ";
 				
