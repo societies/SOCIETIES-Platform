@@ -100,7 +100,7 @@ public class CssRegistry implements ICssRegistry {
 				log.info("??????????????? CSSRegistry Node Size is : " +cssRecord.getCssNodes().size());
 				for (CssNode cssNode : cssRecord.getCssNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
-						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), false);
+						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), false);
 					log.info("??????????????? CSSRegistry nodeId is : " +cssNode.getIdentity());
 					log.info("??????????????? CSSRegistry status is : " +cssNode.getStatus());
 					log.info("??????????????? CSSRegistry type is : " +cssNode.getType());
@@ -112,7 +112,7 @@ public class CssRegistry implements ICssRegistry {
 			if (cssRecord.getArchiveCSSNodes() != null) {
 				for (CssNode cssNode : cssRecord.getArchiveCSSNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
-						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), true);
+						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), true);
 					session.save(tmpNodeEntry);
 				}
 			}
@@ -179,7 +179,7 @@ public class CssRegistry implements ICssRegistry {
 			if (cssRecord.getCssNodes() != null) {
 				for (CssNode cssNode : cssRecord.getCssNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
-						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), false);
+						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), false);
 					log.info("!!!!!!!!!!!!!!!!!!! cssNode identity: " +cssNode.getIdentity() + " cssNode Status : " +cssNode.getStatus() + " cssNode Type : " +cssNode.getType() + "cssNodeMAC : " +cssNode.getCssNodeMAC());
 					session.delete(tmpNodeEntry);
 				}
@@ -188,7 +188,7 @@ public class CssRegistry implements ICssRegistry {
 			if (cssRecord.getArchiveCSSNodes() != null) {
 				for (CssNode cssNode : cssRecord.getArchiveCSSNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
-						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), true);
+						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), true);
 					session.delete(tmpNodeEntry);
 				}
 			}
@@ -285,8 +285,9 @@ public class CssRegistry implements ICssRegistry {
 					cssNodeDetails.setType(savedNode.getType());
 					cssNodeDetails.setStatus(savedNode.getStatus());
 					cssNodeDetails.setCssNodeMAC(savedNode.getcssNodeMAC());
-					log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList MAC : " +savedNode.getcssNodeMAC()); 
-					//cssNodeDetails.setInteractable(true);
+					log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList MAC : " +savedNode.getcssNodeMAC());
+					log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList Interactable : " +savedNode.getInteractable());
+					cssNodeDetails.setInteractable(savedNode.getInteractable());
 
 					if (savedNode.getArchived() == true) 
 						cssDetails.getArchiveCSSNodes().add(cssNodeDetails);
@@ -336,7 +337,7 @@ public class CssRegistry implements ICssRegistry {
 			if (cssDetails.getCssNodes() != null) {
 				for (CssNode cssNode : cssDetails.getCssNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
-						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), false);
+						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), false);
 					session.save(tmpNodeEntry);
 				}
 			}
@@ -344,12 +345,12 @@ public class CssRegistry implements ICssRegistry {
 			if (cssDetails.getArchiveCSSNodes() != null) {
 				for (CssNode cssNode : cssDetails.getArchiveCSSNodes()) {
 					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
-						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), true);
+						cssNode.getStatus(), cssNode.getType(), cssNode.getCssNodeMAC(), cssNode.getInteractable(), true);
 					log.info("??????????????? CSSRegistry nodeId is : " +cssNode.getIdentity());
 					log.info("??????????????? CSSRegistry status is : " +cssNode.getStatus());
 					log.info("??????????????? CSSRegistry type is : " +cssNode.getType());
 					log.info("??????????????? CSSRegistry nodeMAC is : " +cssNode.getCssNodeMAC());
-					//log.info("??????????????? CSSRegistry interactable is : " +cssNode.isInteractable());
+					log.info("??????????????? CSSRegistry interactable is : " +cssNode.getInteractable());
 					session.save(tmpNodeEntry);
 				}
 			}
