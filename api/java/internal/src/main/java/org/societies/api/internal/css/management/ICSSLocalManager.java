@@ -215,7 +215,7 @@ public interface ICSSLocalManager {
 	 */
  Future<String> getthisNodeType(String nodeId);
  
- public void setNodeType(CssRecord cssrecord, String nodeId, int nodestatus, int nodetype, String cssNodeMAC);
+ public void setNodeType(CssRecord cssrecord, String nodeId, int nodestatus, int nodetype, String cssNodeMAC, String interactable);
  
  public void removeNode(CssRecord cssrecord, String nodeId);
 

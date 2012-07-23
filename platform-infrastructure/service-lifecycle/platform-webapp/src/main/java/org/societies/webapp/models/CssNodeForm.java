@@ -7,7 +7,7 @@ public class CssNodeForm {
 	private int cssNodeStatus;
 	private int cssNodeType;
 	private String cssNodeMAC;
-	private boolean interactable;
+	private String interactable;
 	private String nodetypes;
 	private String nodestatus;
 	
@@ -86,13 +86,13 @@ public class CssNodeForm {
 	/**
 	 * @return the contextSource
 	 */
-	public boolean getInteractable() {
+	public String getInteractable() {
 		return interactable;
 	}
 	/**
 	 * @param contextSource the contextSource to set
 	 */
-	public void setInteractable(boolean interactable) {
+	public void setInteractable(String interactable) {
 		this.interactable = interactable;
 	}
 
