@@ -90,67 +90,12 @@ public class CisManagerClient implements IcisManagerClient {
 	
 	@Override
 	public void joinRemoteCIS(String cisId, ICisManagerCallback callback) {
-		
-		LOG.debug("client call to join a RemoteCIS");
 
-
-		IIdentity toIdentity;
-		try {
-			toIdentity = this.CSSendpoint.getIdManager().fromJid(cisId);
-			Stanza stanza = new Stanza(toIdentity);
-			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
-					stanza.getId(), callback, this.cisManag);
-
-			Community c = new Community();
-/*			Join j = new Join();
-			Participant p = new Participant();
-			p.setJid(this.cssManagerId.getBareJid());
-			j.setParticipant(p);*/
-
-			c.setJoin(new Join());
-
-			try {
-				LOG.info("Sending stanza with join");
-				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);
-			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (InvalidFormatException e1) {
-			LOG.info("Problem with the input jid when trying to send the join");
-			e1.printStackTrace();
-		}
 	}
 
 	@Override
 	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback){
-		LOG.debug("client call to leave a RemoteCIS");
-
-
-		IIdentity toIdentity;
-		try {
-			toIdentity = this.CSSendpoint.getIdManager().fromJid(cisId);
-			Stanza stanza = new Stanza(toIdentity);
-			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
-					stanza.getId(), callback, this.cisManag);
-
-			Community c = new Community();
-/*			Join j = new Join();
-			Participant p = new Participant();
-			p.setJid(this.cssManagerId.getBareJid());
-			j.setParticipant(p);*/
-			c.setLeave(new Leave());
-			try {
-				LOG.info("Sending stanza with leave");
-				this.CSSendpoint.sendIQGet(stanza, c, commsCallback);
-			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (InvalidFormatException e1) {
-			LOG.info("Problem with the input jid when trying to send the join");
-			e1.printStackTrace();
-		}
+	
 	}
 
 

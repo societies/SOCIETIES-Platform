@@ -74,6 +74,7 @@
 	          <xs:element ref='create'/>
 	          <xs:element ref='delete'/>
 			  <xs:element ref='list'/>
+			  <xs:element ref='listResponse'/>
 			  <xs:element ref='searchCis'/>
 			  <xs:element ref='configure'/>
 			  <xs:element ref='notification'/>
@@ -107,6 +108,14 @@
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>
+  </xs:element>
+  
+      <xs:element name='listResponse'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element ref='ins:community'/>
+			</xs:sequence>
+		</xs:complexType>
   </xs:element>
   
     <xs:element name='delete'>
@@ -157,13 +166,10 @@
 
 	<xs:element name='subscribedTo'>
 	    <xs:complexType>
-	      <xs:simpleContent>
-	        <xs:extension base='empty'>
-	          <xs:attribute name='community-jid' type='xs:string' use='required'/> 
-	          <xs:attribute name='role' type='xs:string' use='required'/> 
-	          <xs:attribute name='community-name' type='xs:string'/>
-	        </xs:extension>
-	      </xs:simpleContent>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element ref='ins:community'/>
+			</xs:sequence>
+			 <xs:attribute name='role' type='xs:string'  use='required'/> 
 	    </xs:complexType>
 	</xs:element>
 

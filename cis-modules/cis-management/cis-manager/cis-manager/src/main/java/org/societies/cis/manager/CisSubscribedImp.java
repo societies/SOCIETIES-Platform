@@ -65,6 +65,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.cis.community.Community;
 //import org.societies.api.schema.cis.community.GetInfo;
+import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
@@ -164,7 +165,7 @@ public class CisSubscribedImp implements ICis {
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
 
-			Community c = new Community();
+			CommunityMethods c = new CommunityMethods();
 			c.setGetInfo( new GetInfo());
 			try {
 				LOG.info("Sending stanza with get info");
@@ -192,11 +193,14 @@ public class CisSubscribedImp implements ICis {
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
 
-			c.setSetInfo(new SetInfo());
+			CommunityMethods com = new CommunityMethods();
+			SetInfo s = new SetInfo();
+			s.setCommunity(c);
+			com.setSetInfo(s);
 		
 			try {
 				LOG.info("Sending stanza with set info");
-				this.cisManag.iCommMgr.sendIQGet(stanza, c, commsCallback);
+				this.cisManag.iCommMgr.sendIQGet(stanza, com, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -224,7 +228,7 @@ public class CisSubscribedImp implements ICis {
 					stanza.getId(), callback, this.cisManag);
 
 			LOG.info("callback");
-			Community c = new Community();
+			CommunityMethods c = new CommunityMethods();
 			Who w = new Who();
 			c.setWho(w);
 			try {

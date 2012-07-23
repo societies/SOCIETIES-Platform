@@ -25,6 +25,7 @@
 package org.societies.webapp.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -47,6 +48,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -54,8 +56,11 @@ import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+
+import java.security.InvalidParameterException;
 
 
 @Controller
@@ -125,6 +130,18 @@ public class CisManagerController {
 			log.concat(("CIS initially added with jid = " + element.getCisId()));
 	     }
 
+		// criteria
+		
+		String [] attributeList = {"location", "marital status","hobby","age"};
+		
+		String [] operatorList = {"equals", "differentFrom"};
+		
+		model.put("attributeList", attributeList);
+		model.put("operatorList", operatorList);
+		
+		// end of criteria
+		
+		
 		model.put("remoteCISsArray", remoteCISs);
 		model.put("localCISsArray", localCISs);
 		model.put("log", log);
@@ -156,9 +173,19 @@ public class CisManagerController {
 			if (method.equalsIgnoreCase("CreateCis")) {
 				model.put("methodcalled", "CreateCis");
 				res = "Creating CIS...";
-
+				
 				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
-
+				MembershipCriteria m = new MembershipCriteria();
+				try{
+					Rule r = new Rule(cisForm.getOperator(),new ArrayList(Arrays.asList(cisForm.getValue())));
+					m.setRule(r);
+					cisCriteria.put(cisForm.getAttribute(), m);
+				}
+				catch(InvalidParameterException e){
+					// TODO: treat expection
+					res += " excepation of invalid param " + cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue();
+				}
+				
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
 						cisForm.getCisName(),
 						cisForm.getCisType(),cisCriteria,""
@@ -311,15 +338,15 @@ public class CisManagerController {
 	ICisManagerCallback icall = new ICisManagerCallback(){
 
 
-		public void receiveResult(Community communityResultObject) {
+		public void receiveResult(CommunityMethods communityResultObject) {
 			if(communityResultObject == null){
 				resultCallback = "Failure getting result from remote node!";
 			}
 			else {
 				if(communityResultObject.getJoinResponse() != null){
-					resultCallback = "Joined CIS: " + communityResultObject.getCommunityJid();
+					resultCallback = "Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
 	
-					remoteCommunity = communityResultObject;
+					remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
 					m_session.setAttribute("community", remoteCommunity);
 				}
 				if(communityResultObject.getWho() != null){

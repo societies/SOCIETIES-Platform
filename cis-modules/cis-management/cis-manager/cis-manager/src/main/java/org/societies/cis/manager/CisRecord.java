@@ -139,7 +139,7 @@ public class CisRecord {
 		if (cisJID == null) {
 			if (other.cisJID != null)
 				return false;
-		} else if (!cisJID.equals(other.cisJID))
+		} else if (!cisJID.equalsIgnoreCase(other.cisJID))
 			return false;
 		return true;
 	}

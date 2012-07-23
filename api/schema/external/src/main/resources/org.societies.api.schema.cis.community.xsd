@@ -38,8 +38,8 @@
 
 <xs:import namespace="http://societies.org/api/schema/activity" 
            schemaLocation="org.societies.api.schema.activity.xsd"/>
-           
- 	<xs:element name='community'>
+     
+     <xs:element name='communityMethods'>
  	 <xs:complexType>
 	 	 <xs:sequence>
 	 	 
@@ -61,9 +61,23 @@
 				<xs:element ref='getInfoResponse'/>
 				<xs:element ref='setInfoResponse'/>
 				<xs:element ref='insact:activityfeed'/>
+				<xs:element ref='setMembershipCriteria'/>
+				<xs:element ref='setMembershipCriteriaResponse'/>
+				<xs:element ref='getMembershipCriteria'/>
+				<xs:element ref='getMembershipCriteriaResponse'/>
+				
+				
 <!-- 				<xs:element ref='deleteActivity'/>
 				<xs:element ref='deleteActivityResponse'/>-->
 			</xs:choice>
+		</xs:sequence>
+	 </xs:complexType>
+	</xs:element>
+     
+           
+ 	<xs:element name='community'>
+ 	 <xs:complexType>
+	 	 <xs:sequence>
 			<xs:element ref='membershipCrit' minOccurs='0' maxOccurs='1'/>
 		</xs:sequence>
 	
@@ -72,6 +86,31 @@
           <xs:attribute name='community-type' type='xs:string'/>
           <xs:attribute name='community-name' type='xs:string'/> 
           <xs:attribute name='description' type='xs:string'/> 
+	 </xs:complexType>
+	</xs:element>
+	
+	<xs:element name='setMembershipCriteria'>
+ 	 <xs:complexType>
+	 	 <xs:sequence>
+			<xs:element ref='membershipCrit' minOccurs='0' maxOccurs='1'/>
+		</xs:sequence>
+	 </xs:complexType>
+	</xs:element>
+	
+	<xs:element name='setMembershipCriteriaResponse'>
+ 	 <xs:complexType>
+	 	 <xs:sequence>
+			<xs:element ref='membershipCrit' minOccurs='0' maxOccurs='1'/>
+		</xs:sequence>
+	 </xs:complexType>
+	</xs:element>
+	
+	<xs:element name='getMembershipCriteria' type='empty' />	
+	<xs:element name='getMembershipCriteriaResponse'>
+ 	 <xs:complexType>
+	 	 <xs:sequence>
+			<xs:element ref='membershipCrit' minOccurs='0' maxOccurs='1'/>
+		</xs:sequence>
 	 </xs:complexType>
 	</xs:element>
 
@@ -161,8 +200,9 @@
 
 	<xs:element name='joinResponse'>
 		<xs:complexType>
-			<xs:sequence minOccurs='1' maxOccurs='1'>
-				<xs:element ref='participant'/>
+			<xs:sequence>
+				<xs:element ref='participant' minOccurs='1' maxOccurs='1'/>
+				<xs:element ref='community' minOccurs='1' maxOccurs='1'/>
 			</xs:sequence>
 			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
@@ -214,16 +254,29 @@
 	
 	
 	<xs:element name='getInfo' type='empty' />	
-	<xs:element name='setInfo' type='empty' />
+
+	<xs:element name='setInfo'>
+		<xs:complexType>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element ref='community'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	
 	<xs:element name='getInfoResponse'>
 		<xs:complexType>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element ref='community'/>
+			</xs:sequence>
 			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
 	</xs:element>
 	
 	<xs:element name='setInfoResponse'>
 		<xs:complexType>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element ref='community'/>
+			</xs:sequence>
 			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
 	</xs:element>

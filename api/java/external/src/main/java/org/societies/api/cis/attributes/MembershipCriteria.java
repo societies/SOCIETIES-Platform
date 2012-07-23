@@ -45,7 +45,7 @@ public class MembershipCriteria {
 
     //Non-4.5 components need to be able to create new Membership Criteria
     public MembershipCriteria() {
-        rank = 1;
+        this.rank = 1;
     }
 
 

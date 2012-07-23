@@ -27,9 +27,12 @@ package org.societies.cis.manager;
 
 import static org.junit.Assert.*;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -83,6 +86,7 @@ import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.identity.NetworkNodeImpl;
@@ -475,8 +479,22 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		
+		Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
+		MembershipCriteria m = new MembershipCriteria();
+		try{
+			Rule r = new Rule("equals",new ArrayList<String>(Arrays.asList("married")));
+			m.setRule(r);
+			cisCriteria.put("civil status", m);
+			r = new Rule("equals",new ArrayList<String>(Arrays.asList("Brazil")));
+			m.setRule(r);
+			cisCriteria.put("location", m);
+		}catch(InvalidParameterException e){
+			// TODO: treat expection
+			e.printStackTrace();
+		}
+		
 		Future<ICisOwned> testCIS = cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , null,""); //TODO: test criteria and description
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , cisCriteria,""); //TODO: test criteria and description
 		try {
 			assertNotNull(testCIS.get());
 			assertNotNull(testCIS.get().getCisId());
@@ -493,10 +511,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-	// TODO: double check that the owner has been added as participant
-		
-		//this.deleteFromTables(new String[] { "org_societies_cis_manager_Cis"});		
+	
 	}
 	
 	//@Ignore
@@ -882,7 +897,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			
 		}
 
-		public void receiveResult(Community communityResultObject) {
+		public void receiveResult(CommunityMethods communityResultObject) {
 			 
 			if(communityResultObject == null){
 				LOG.info("null return on JoinCallBack");
@@ -890,7 +905,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			}
 			else{
 				LOG.info("good return on JoinCallBack");
-				LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
+				LOG.info("Result Status: joined CIS " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());
 
 			}
 
@@ -918,6 +933,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTestInterface = cisManagerUnderTest;
 		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
+		String cisJid = Iciss.getCisId();
 				
 		try {
 			Iciss.addMember(MEMBER_JID_1, MEMBER_ROLE_1).get();
@@ -931,11 +947,19 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		// callback that will do the real test
 
 		 class GetListCallBack implements ICisManagerCallback{
+
+			public String cisJid = "";
+			
+			public GetListCallBack (String cisJid){
+				super();
+				this.cisJid = cisJid;
+			}
+			 
 			public void receiveResult(boolean result){fail("should have received a Communy obj");}
 			public void receiveResult(int result) {fail("should have received a Communy obj");}
 			public void receiveResult(String result){fail("should have received a Communy obj");}
 
-			public void receiveResult(Community communityResultObject) {
+			public void receiveResult(CommunityMethods communityResultObject) {
 				if(communityResultObject == null){
 					fail("Communy obj is null");
 					return;
@@ -965,7 +989,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				
 				
 				// CLEANING UP
-				cisManagerUnderTestInterface.deleteCis(communityResultObject.getCommunityJid());
+				cisManagerUnderTestInterface.deleteCis(this.cisJid);
 				
 			}
 
@@ -976,7 +1000,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 
 		// call and wait for callback
-		Iciss.getListOfMembers(new GetListCallBack());
+		Iciss.getListOfMembers(new GetListCallBack(cisJid));
 
 	
 	
@@ -1010,26 +1034,27 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			public void receiveResult(int result) {fail("should have received a Communy obj");}
 			public void receiveResult(String result){fail("should have received a Communy obj");}
 
-			public void receiveResult(Community communityResultObject) {
-				if(communityResultObject == null){
+			public void receiveResult(CommunityMethods communityResultObject) {
+				if(communityResultObject == null || communityResultObject.getGetInfoResponse() == null ||
+						communityResultObject.getGetInfoResponse().getCommunity() == null){
 					fail("Communy obj is null");
 					return;
 				}
 				else{
 
-				
+					Community c = communityResultObject.getGetInfoResponse().getCommunity();
 					// check vs input on create
-					assertEquals(communityResultObject.getCommunityName(), TEST_CIS_NAME_1);
-					assertEquals(communityResultObject.getCommunityType(), TEST_CIS_TYPW);
+					assertEquals(c.getCommunityName(), TEST_CIS_NAME_1);
+					assertEquals(c.getCommunityType(), TEST_CIS_TYPW);
 					// TODO: add criteria test
 					// check between non-callback interface
-					assertEquals(communityResultObject.getCommunityName(), IcissOwned.getName());
-					assertEquals(communityResultObject.getCommunityJid(), IcissOwned.getCisId());
+					assertEquals(c.getCommunityName(), IcissOwned.getName());
+					assertEquals(c.getCommunityJid(), IcissOwned.getCisId());
 				}
 				
 				
 				// CLEANING UP
-				cisManagerUnderTestInterface.deleteCis(communityResultObject.getCommunityJid());
+				cisManagerUnderTestInterface.deleteCis(this.IcissOwned.getCisId());
 				
 			}
 		}		
@@ -1067,14 +1092,16 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			public void receiveResult(int result) {fail("should have received a Communy obj");}
 			public void receiveResult(String result){fail("should have received a Communy obj");}
 
-			public void receiveResult(Community communityResultObject) {
-				if(communityResultObject == null){
+			public void receiveResult(CommunityMethods result) {
+				if(result == null || result.getSetInfoResponse() == null || result.getSetInfoResponse().getCommunity() == null){
 					fail("Communy obj is null");
 					return;
 				}
 				else{
+					
+					Community communityResultObject = result.getSetInfoResponse().getCommunity();
 
-					assertTrue(communityResultObject.getSetInfoResponse().isResult().booleanValue());
+					assertTrue(result.getSetInfoResponse().isResult().booleanValue());
 				
 					// check vs input on create
 					assertEquals(communityResultObject.getCommunityName(), TEST_CIS_NAME_1);
@@ -1089,7 +1116,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				
 				
 				// CLEANING UP
-				cisManagerUnderTestInterface.deleteCis(communityResultObject.getCommunityJid());
+				cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
 				
 			}
 		}		

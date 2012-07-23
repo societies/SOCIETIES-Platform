@@ -90,8 +90,11 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
 //import org.societies.api.schema.cis.community.GetInfo;
+import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.GetInfoResponse;
+import org.societies.api.schema.cis.community.GetMembershipCriteria;
+import org.societies.api.schema.cis.community.GetMembershipCriteriaResponse;
 import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
@@ -189,11 +192,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 	//@Transient
 	//Set<MembershipCriteriaImp> cisCriteria = null;
 	
-	
-	@CollectionOfElements(targetElement = java.lang.String.class)
+	@CollectionOfElements(targetElement = java.lang.String.class,fetch=FetchType.EAGER)
 	@CollectionTable(name="org_societies_cis_manager_Cis_criteria",joinColumns = @JoinColumn(name = "cis_id"))
-	@Column(name="criteria", nullable=false,length=500)
-	public Set<String> membershipCritOnDb = new HashSet<String>();// we will store it in the db as "context,rank,operator,value1,value2"
+	@Column(name="criteria",length=500)
+	public Set<String> membershipCritOnDb;// we will store it in the db as "context,rank,operator,value1,value2"
 
 
 	
@@ -234,6 +236,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	private void buildCriteriaFromDb(){
 		for (String s : membershipCritOnDb) { // loop through all my criterias
+			LOG.warn("on the loop to build criteria with crit = " + s);
 			String[] tokens = s.split(",");
 			if(tokens == null || tokens.length < 4){
 				LOG.warn("Badly coded criteria on db");
@@ -241,34 +244,68 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}else{
 				MembershipCriteria m = new MembershipCriteria();
 				m.setRank(Integer.parseInt(tokens[1]));
+				LOG.info("rank set");
 				Rule r = new Rule();
 				r.setOperation(tokens[2]);
+				LOG.info("op set");
 				List<String> o = new ArrayList<String>();
 				o.add(tokens[3]);
-				if(tokens.length>3)
+				LOG.info("token set");
+				if(tokens.length>4)
 					o.add(tokens[4]);
 				
 				if( (r.setValues(o) && m.setRule(r)) != true)
 					LOG.warn("Badly typed criteria on db");
+				LOG.info("adding on table");
 				cisCriteria.put(tokens[0], m);
+				LOG.info("added on table");
 			}
 			
 		}
 	}
 	
 	public boolean addCriteria(String contextAtribute, MembershipCriteria m){
+		LOG.warn("adding criteria on db");
+		
 		String s = contextAtribute;
 		if(m.getRule() == null || m.getRule().getOperation() == null || m.getRule().getValues() == null
 				|| m.getRule().getValues().isEmpty()) return false;
 		s +=  "," + m.getRank();
 		s +=  "," + m.getRule().getOperation();
+		LOG.warn("got operation");
 		for(int i=0; i<m.getRule().getValues().size() && i<2; i++){
 			s+=  "," + m.getRule().getValues().get(i);
 		}
-		
+		LOG.warn("calling the list add inside the add criteria and s = " + s);
 		membershipCritOnDb.add(s);
-		this.updatePersisted(this);		
+		LOG.warn("going to persist");
+		this.updatePersisted(this);
+		LOG.warn("before putting on the table");
 		cisCriteria.put(contextAtribute, m);
+		LOG.warn("criteria added on db");
+		return true;
+	}
+	
+	
+	//to be used only for the constructor
+	public boolean addCriteriaWithoutDBcall(String contextAtribute, MembershipCriteria m){
+		LOG.warn("adding criteria on db");
+		
+		String s = contextAtribute;
+		if(m.getRule() == null || m.getRule().getOperation() == null || m.getRule().getValues() == null
+				|| m.getRule().getValues().isEmpty()) return false;
+		s +=  "," + m.getRank();
+		s +=  "," + m.getRule().getOperation();
+		LOG.warn("got operation");
+		for(int i=0; i<m.getRule().getValues().size() && i<2; i++){
+			s+=  "," + m.getRule().getValues().get(i);
+		}
+		LOG.warn("calling the list add inside the add criteria and s = " + s);
+		membershipCritOnDb.add(s);
+		LOG.warn("going to persist");
+		LOG.warn("before putting on the table");
+		cisCriteria.put(contextAtribute, m);
+		LOG.warn("criteria added on db");
 		return true;
 	}
 
@@ -378,18 +415,24 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.iServCtrlRemote = iServCtrlRemote;
 		this.iServDiscRemote = iServDiscRemote;
 		
+		membershipCritOnDb= new HashSet<String>();
+		
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
 
 		cisCriteria = new Hashtable<String, MembershipCriteria> ();
+		
+		LOG.info("before adding membership criteria");
 		
 		// adding membership criteria
 		if(inputCisCriteria != null && inputCisCriteria.size() >0){
 			Iterator<Map.Entry<String, MembershipCriteria>> it = inputCisCriteria.entrySet().iterator();
 		    while (it.hasNext()) {
 		        Map.Entry<String, MembershipCriteria> pairs = (Map.Entry<String, MembershipCriteria>)it.next();
-		        this.addCriteria(pairs.getKey(), pairs.getValue());
-		        it.remove(); // avoids a ConcurrentModificationException
+		        LOG.info("going to add criteria of attribute" + pairs.getKey());
+		        if (this.addCriteriaWithoutDBcall(pairs.getKey(), pairs.getValue()) == false)
+		        	LOG.info("Got a false return when trying to add the criteria on the db");// TODO: add an exception here
+		        //it.remove(); // avoids a ConcurrentModificationException
 		    }
 		}
 
@@ -459,6 +502,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		this.privacyPolicyManager = privacyPolicyManager;
 		// first Ill try without members
+		
 
 		try {
 			CISendpoint = ccmFactory.getNewCommManager(this.getCisId());
@@ -491,6 +535,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.setSessionFactory(sessionFactory);
 
 		session = sessionFactory.openSession();
+		
+		LOG.info("building criteria from db");
+		cisCriteria = new Hashtable<String, MembershipCriteria> ();
+		this.buildCriteriaFromDb();
+		LOG.info("done building criteria from db");
+		
+		
 		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
 		activityFeed.getActivities("0 1339689547000");
 	}
@@ -536,7 +587,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		CommunityManager cMan = new CommunityManager();
 		Notification n = new Notification();
 		SubscribedTo s = new SubscribedTo();
-		s.setCommunityJid(this.getCisId());
+		Community com = new Community();
+		com.setCommunityJid(this.getCisId());
 		s.setRole(role.toString());
 		n.setSubscribedTo(s);
 		cMan.setNotification(n);
@@ -799,7 +851,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
 			LOG.info("community type received");
-			Community c = (Community) payload;
+			CommunityMethods c = (CommunityMethods) payload;
 
 			// JOIN
 			if (c.getJoin() != null) {
@@ -808,14 +860,19 @@ public class Cis implements IFeatureServer, ICisOwned {
 				String senderjid = stanza.getFrom().getBareJid();
 
 				// information sent on the xmpp in case of failure or success
-				Community result = new Community();
+				Community com = new Community();
+				CommunityMethods result = new CommunityMethods();
 				Participant p = new Participant();
 				JoinResponse j = new JoinResponse();
 				boolean addresult = false; 
 				p.setJid(jid);
-				result.setCommunityJid(this.getCisId()); 
-				result.setCommunityName(this.getName());
-				result.setCommunityType(this.cisType);
+				com.setCommunityJid(this.getCisId()); 
+				com.setCommunityName(this.getName());
+				com.setCommunityType(this.cisType);
+				com.setOwnerJid(this.owner);
+				// TODO: add the criteria to the response
+				
+				j.setCommunity(com);
 				result.setJoinResponse(j);
 				
 				
@@ -831,11 +888,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 						}
 						
 						
-						
-						if (this.checkQualification(qualification) == false){
-							j.setResult(addresult);
-							return result;
-						}
+						// TEMPORARELY DISABLING THE QUALIFICATION CHECKS
+						// TODO: uncomment this
+						//if (this.checkQualification(qualification) == false){
+						//	j.setResult(addresult);
+						//	return result;
+						//}
 							
 					}
 					else{
@@ -859,10 +917,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 				if(addresult == true){
 					// information sent on the xmpp just in the case of success
 					p.setRole( ParticipantRole.fromValue("participant")  );
-					result.setCommunityName(this.getName());
-					result.setCommunityType(this.cisType);
-					// TODO: add the criteria to the response
-					result.setOwnerJid(this.getOwnerId());
 				}
 					
 				j.setParticipant(p);
@@ -873,8 +927,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}
 			if (c.getLeave() != null) {
 				LOG.info("get leave received");
-				Community result = new Community();
-				result.setCommunityJid(this.getCisId());
+				CommunityMethods result = new CommunityMethods();
 				String jid = stanza.getFrom().getBareJid();
 				boolean b = false;
 				try{
@@ -892,7 +945,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			if (c.getWho() != null) {
 				// WHO
 				LOG.info("get who received");
-				Community result = new Community();
+				CommunityMethods result = new CommunityMethods();
 				Who who = new Who();
 				this.getMembersCss();
 		
@@ -914,9 +967,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}
 			if (c.getAddMember() != null) {
 				// ADD
-				Community result = new Community();
+				CommunityMethods result = new CommunityMethods();
 				AddMemberResponse ar = new AddMemberResponse();
-				result.setCommunityJid(this.getCisId());
 				String senderJid = stanza.getFrom().getBareJid();
 				Participant p = c.getAddMember().getParticipant();
 				ar.setParticipant(p);			
@@ -955,9 +1007,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 			if (c.getDeleteMember() != null) {
 				// DELETE MEMBER
-				Community result = new Community();
+				CommunityMethods result = new CommunityMethods();
 				DeleteMemberResponse dr = new DeleteMemberResponse();
-				result.setCommunityJid(this.getCisId());
 				String senderJid = stanza.getFrom().getBareJid();
 				Participant p = c.getDeleteMember().getParticipant();
 				dr.setParticipant(p);			
@@ -987,15 +1038,17 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			// get Info
 			if (c.getGetInfo()!= null) {
-				Community result = new Community();
+				CommunityMethods result = new CommunityMethods();
+				Community com = new Community();
 				GetInfoResponse r = new GetInfoResponse();
 				// TODO: add the criteria to the response
-				result.setOwnerJid(this.getOwnerId());
-				result.setCommunityJid(this.getCisId());
-				result.setCommunityName(this.getName());
-				result.setCommunityType(this.getCisType());
-				result.setDescription(this.getDescription());
+				com.setOwnerJid(this.getOwnerId());
+				com.setCommunityJid(this.getCisId());
+				com.setCommunityName(this.getName());
+				com.setCommunityType(this.getCisType());
+				com.setDescription(this.getDescription());
 				r.setResult(true);
+				r.setCommunity(com);
 				result.setGetInfoResponse(r);
 				return result;
 
@@ -1003,20 +1056,22 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 			// set Info
 			// at the moment we limit this to description and type
-			if (c.getSetInfo()!= null) {
-				Community result = new Community();
+			if (c.getSetInfo()!= null && c.getSetInfo().getCommunity() != null) {
+				CommunityMethods result = new CommunityMethods();
+				Community com = new Community();
 				SetInfoResponse r = new SetInfoResponse();
 				String senderJid = stanza.getFrom().getBareJid();
 				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-					if( (c.getCommunityType() != null) &&  (!c.getCommunityType().isEmpty()) && 
-							(!c.getCommunityType().equals(this.getCisType()))) // if is not empty and is different from current value
-						this.setCisType(c.getCommunityType());
-					if( (c.getDescription() != null) &&  (!c.getDescription().isEmpty()) && 
-							(!c.getDescription().equals(this.getDescription()))) // if is not empty and is different from current value
-						this.setDescription(c.getDescription());
+				Community inputCommunity = c.getSetInfo().getCommunity();
+					if( (inputCommunity.getCommunityType() != null) &&  (!inputCommunity.getCommunityType().isEmpty()) && 
+							(!inputCommunity.getCommunityType().equalsIgnoreCase(this.getCisType()))) // if is not empty and is different from current value
+						this.setCisType(inputCommunity.getCommunityType());
+					if( (inputCommunity.getDescription() != null) &&  (!inputCommunity.getDescription().isEmpty()) && 
+							(!inputCommunity.getDescription().equalsIgnoreCase(this.getDescription()))) // if is not empty and is different from current value
+						this.setDescription(inputCommunity.getDescription());
 					r.setResult(true);	
 					
 					// updating at DB
@@ -1025,11 +1080,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//}
 				
 				// TODO: add the criteria to the response
-				result.setOwnerJid(this.getOwnerId());
-				result.setCommunityJid(this.getCisId());
-				result.setCommunityName(this.getName());
-				result.setCommunityType(this.getCisType());				
-				result.setDescription(this.getDescription());
+					com.setOwnerJid(this.getOwnerId());
+					com.setCommunityJid(this.getCisId());
+					com.setCommunityName(this.getName());
+					com.setCommunityType(this.getCisType());				
+					com.setDescription(this.getDescription());
+					r.setCommunity(com);
+					result.setSetInfoResponse(r);
 				return result;
 
 			}				// END OF GET INFO
@@ -1177,13 +1234,13 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.debug("local get member list WITH CALLBACK called");
 
 		
-		Community c = new Community();
-		c.setCommunityJid(this.getCisId());
-		c.setCommunityName(this.getName());
-		c.setCommunityType(this.getCisType());
-		c.setOwnerJid(this.getOwnerId());
-		c.setDescription(this.getDescription());
-		c.setGetInfo(new GetInfo());
+		CommunityMethods c = new CommunityMethods();
+	//	c.setCommunityJid(this.getCisId());
+	//	c.setCommunityName(this.getName());
+	//	c.setCommunityType(this.getCisType());
+	//	c.setOwnerJid(this.getOwnerId());
+	//	c.setDescription(this.getDescription());
+	//	c.setGetInfo(new GetInfo());
 		
 		Who w = new Who();
 		c.setWho(w);
@@ -1367,7 +1424,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public void getInfo(ICisManagerCallback callback){
 		LOG.debug("local client call to get info from this CIS");
 
-		
+		CommunityMethods result = new CommunityMethods();
 		Community c = new Community();
 		GetInfoResponse r = new GetInfoResponse();
 		r.setResult(true);
@@ -1377,9 +1434,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 		c.setOwnerJid(this.getOwnerId());
 		// TODO: add the criteria to the response
 		c.setDescription(this.getDescription());
-		c.setGetInfoResponse(r);
+		result.setGetInfoResponse(r);
+		r.setCommunity(c);
 		
-		callback.receiveResult(c);	
+		callback.receiveResult(result);	
 	}
 
 	
@@ -1411,7 +1469,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			this.updatePersisted(this);
 			
 		}
-				
+		CommunityMethods result = new CommunityMethods();		
 		Community resp = new Community();
 		resp.setCommunityJid(this.getCisId());
 		resp.setCommunityName(this.getName());
@@ -1419,9 +1477,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 // TODO: add the criteria here		resp.setMembershipMode(this.getMembershipCriteria());
 		resp.setOwnerJid(this.getOwnerId());
 		resp.setDescription(this.getDescription());
-		resp.setSetInfoResponse(r);
+		result.setSetInfoResponse(r);
+		r.setCommunity(resp);
 		
-		callback.receiveResult(resp);	
+		callback.receiveResult(result);	
 	}
 
 	
@@ -1506,7 +1565,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	@Override
 	public void getMembershipCriteria(ICisManagerCallback callback) {
-		Community result = new Community();
+		CommunityMethods result = new CommunityMethods();
+		GetMembershipCriteriaResponse g = new GetMembershipCriteriaResponse();
 		
 		MembershipCrit m = new MembershipCrit();
 		List<Criteria> l = new ArrayList<Criteria>();
@@ -1524,7 +1584,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 			l.add(c);
 		}
 		m.setCriteria(l);
-		result.setMembershipCrit(m);
+		g.setMembershipCrit(m);
+		result.setGetMembershipCriteriaResponse(g);
 		callback.receiveResult(result);
 	}
 

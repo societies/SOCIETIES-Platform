@@ -43,7 +43,7 @@ public class Rule{
 		   static public boolean isValid(String aName) {
 			   OperationType[] oTypes = OperationType.values();
 		       for (OperationType oType : oTypes)
-		           if (oType.name().equals(aName))
+		           if (oType.name().equalsIgnoreCase(aName))
 		               return true;
 		       return false;
 		   }
@@ -91,10 +91,10 @@ public class Rule{
 			String v = value;
 			switch (this.operation){
 			case equals:
-				if(v.equals(this.values.get(0))) return true;
+				if(v.equalsIgnoreCase(this.values.get(0))) return true;
 				else return false;
 			case differentFrom:
-				if(!v.equals(this.values.get(0))) return true;
+				if(!v.equalsIgnoreCase(this.values.get(0))) return true;
 				else return false;
 			case lessThan:
 			case greaterThan:

@@ -81,6 +81,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.societies.api.schema.cis.community.Community;
 
 
+import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.Leave;
@@ -302,7 +303,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		 
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 if (element.getCisRecord().getCisJID().equals(jid))
+			 if (element.getCisRecord().getCisJID().equalsIgnoreCase(jid))
 				 return element;
 	     }
 		return null;
@@ -336,6 +337,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//	return null;
 		//}
 		
+		LOG.info("creating a CIS");
 		// -- Verification
 		// Dependency injection
 		if (!isDepencyInjectionDone(1)) {
@@ -652,7 +654,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating getSubscribedTo notifications
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunityName(), c.getNotification().getSubscribedTo().getCommunityJid()));
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), stanza.getFrom().getBareJid()));
 				
 				
 				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){
@@ -669,7 +671,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating delete CIS notifications
 			if (c.getNotification().getDeleteNotification() != null) {
 				LOG.info("delete notification received");
-				this.unsubscribeToCis(c.getNotification().getDeleteNotification().getCommunityJid());
+				this.unsubscribeToCis(stanza.getFrom().getBareJid());
 /*				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
 				if(!this.subscribedCISs.contains(new CisRecord(d.getCommunityJid()))){
 					LOG.info("CIS is not part of the list of subscribed CISs");
@@ -706,9 +708,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				return;
 			}
 		}
-		if (payload.getClass().equals(Community.class)) {
+		if (payload.getClass().equals(CommunityMethods.class)) {
 
-			Community c = (Community) payload;
+			CommunityMethods c = (CommunityMethods) payload;
 
 			// treating new member notifications
 			if (c.getWho() != null) {
@@ -834,7 +836,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		Iterator<Cis> it = getOwnedCISs().iterator();
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 if (element.getCisId().equals(cisId))
+			 if (element.getCisId().equalsIgnoreCase(cisId))
 				 return element;
 	     }
 		
@@ -842,7 +844,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		Iterator<CisSubscribedImp> iterator = this.subscribedCISs.iterator();
 		while(iterator.hasNext()){
 			CisSubscribedImp element = iterator.next();
-			 if (element.getCisId().equals(cisId))
+			 if (element.getCisId().equalsIgnoreCase(cisId))
 				 return element;
 	     }
 		
@@ -858,7 +860,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		Iterator<Cis> it = getOwnedCISs().iterator();
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 if (element.getCisId().equals(cisId))
+			 if (element.getCisId().equalsIgnoreCase(cisId))
 				 return element;
 	     }
 		
@@ -984,7 +986,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this);
 
-			Community c = new Community();
+			CommunityMethods c = new CommunityMethods();
 
 			c.setJoin(new Join());
 
@@ -1013,7 +1015,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this);
 
-			Community c = new Community();
+			CommunityMethods c = new CommunityMethods();
 
 			c.setLeave(new Leave());
 			try {

@@ -98,6 +98,16 @@
 				<td><form:errors path="role" cssClass="error" /></td>
 				<td>admin, owner or participant. Used Add member, Remove Member</td>
 			</tr>
+			<tr>
+				<td>Criteria:</td>
+				
+				<td><form:select path="attribute" cssClass="textArea"> <option value="Select" label=" - Select - " ></option>
+				<form:options items="${attributeList}"/></form:select></td>
+				<td><form:select path="operator" cssClass="textArea"> <option value="Select" label=" - Select - " ></option>
+				<form:options items="${operatorList}"/></form:select></td>
+				<td><form:input path="value" /></td><td><form:errors path="value" cssClass="error" /></td>
+				
+			</tr>
 		</table>
 
 <h4>${log}</h4>
