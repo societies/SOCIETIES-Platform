@@ -5,17 +5,34 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This data class maintains only the necessary information derived from a history attribute 
+ * 
+ * @author nikosk
+ *
+ */
+
 public class MockHistoryData {
 
 	
 	Date timestamp;
-	Map<String,String> contextMap = new HashMap<String,String>();
+	
 	String contextValue = "";
+	
+	
+	
+	// The Action parameter name
+	String parameterName;
+
+	// The Action value
+	String actionValue;
+	
+	// The service id that the action refers to 
 	String serviceId = "";
 	
-	String parameterName;
-	String actionValue;
-
+	// Context data that escort an action
+	Map<String,String> contextMap = new HashMap<String,String>();
+	
 	public MockHistoryData(String parameterName,String actionValue, Map<String,String> context, Date timestamp, String serviceId){
 		this.parameterName = parameterName;
 		this.actionValue = actionValue;
