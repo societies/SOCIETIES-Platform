@@ -307,8 +307,12 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 	public void stop() {
 		RUNNING_MODE = false;
 		
+		String filterOption = "(&" + 
+				//"(" + CSSEventConstants.EVENT_NAME + "="+DeviceMgmtEventConstants.SCREEN_EVENT+")" + 
+				//"(" + CSSEventConstants.EVENT_SOURCE + "=test_event_source)" + 
+				")";
 		//TODO unregister all
-		eventManager.unSubscribeInternalEvent(this, new String[]{EventTypes.DEVICE_MANAGEMENT_EVENT}, filterOption)
+		eventManager.unSubscribeInternalEvent(this, new String[]{EventTypes.DEVICE_MANAGEMENT_EVENT}, filterOption);
 	}
 
 }

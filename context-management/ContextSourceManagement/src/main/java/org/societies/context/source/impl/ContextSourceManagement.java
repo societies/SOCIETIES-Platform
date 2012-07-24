@@ -39,12 +39,15 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.context.source.ICtxSourceMgr;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.osgi.event.IEventMgr;
@@ -119,6 +122,10 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		this.eventManager = eventManager;
 	}
 
+
+	private IIdentityManager idManager = null;
+
+
 	private NewDeviceListener newDeviceListener;
 	private final String sensor = "CONTEXT_SOURCE";
 	private int counter;
@@ -140,6 +147,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	public void activate() {
 		this.newDeviceListener = new NewDeviceListener(deviceManager,
 				eventManager, this);
+		idManager = commMgr.getIdManager();
 		//newDeviceListener.run();
 		LOG.info("{}", "CSM started");
 	}
@@ -160,11 +168,10 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	 * 
 	 * @see
 	 * org.societies.api.context.source.ICtxSourceMgr#register(org.societies
-	 * .api.context.model.CtxEntity, java.lang.String, java.lang.String)
+	 * .api.context.model.INetworkNode, java.lang.String, java.lang.String)
 	 */
-	@Override
 	@Async
-	public Future<String> register(CtxEntity contextOwner, String name,
+	public Future<String> register(INetworkNode contextOwner, String name,
 			String contextType) {
 		if (ctxBroker == null) {
 			LOG.error("Could not register " + contextType
@@ -228,13 +235,19 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			CtxAttribute ctxTypeAttr = ctxTypeAttrFuture.get();
 			ctxBroker.updateAttribute(ctxTypeAttr.getId(), contextType);
 
+			CtxEntity ownerCtxEntity = null;
 			if (contextOwner != null) {
+
+				String cssOwnerStr = contextOwner.getBareJid();
+				IIdentity ownerCtxEntityID = idManager.fromJid(cssOwnerStr);
+				ownerCtxEntity = ctxBroker.retrieveIndividualEntity(ownerCtxEntityID).get();
+				
 				Future<CtxAssociation> futAssociationToContextOwnerEntity = ctxBroker
 						.createAssociation("providesUpdatesFor");
 				CtxAssociation associationToContextOwnerEntity = futAssociationToContextOwnerEntity
 						.get();
 				associationToContextOwnerEntity.setParentEntity(fooEnt.getId());
-				associationToContextOwnerEntity.addChildEntity(contextOwner
+				associationToContextOwnerEntity.addChildEntity(ownerCtxEntity
 						.getId());
 			}
 
@@ -244,6 +257,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		} catch (InterruptedException e) {
 			LOG.error(e.getMessage());
 		} catch (ExecutionException e) {
+			LOG.error(e.getMessage());
+		} catch (InvalidFormatException e) {
 			LOG.error(e.getMessage());
 		}
 
