@@ -122,9 +122,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		this.eventManager = eventManager;
 	}
 
-
 	private IIdentityManager idManager = null;
-
 
 	private NewDeviceListener newDeviceListener;
 	private final String sensor = "CONTEXT_SOURCE";
@@ -141,14 +139,14 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	}
 
 	public ContextSourceManagement() {
-		activate();
+//		activate();
 	}
 
 	public void activate() {
 		this.newDeviceListener = new NewDeviceListener(deviceManager,
 				eventManager, this);
 		idManager = commMgr.getIdManager();
-		//newDeviceListener.run();
+		// newDeviceListener.run();
 		LOG.info("{}", "CSM started");
 	}
 
@@ -160,7 +158,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	@Override
 	@Async
 	public Future<String> register(String name, String contextType) {
-		return register(null, name, contextType);
+		return registerFull(null, name, contextType, null);
 	}
 
 	/*
@@ -173,14 +171,24 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	@Async
 	public Future<String> register(INetworkNode contextOwner, String name,
 			String contextType) {
+		return registerFull(contextOwner, name, contextType, null);
+	}
+
+	/**
+	 * full internal register, used by external register methods and by DeviceManager connector
+	 */
+	@Async
+	Future<String> registerFull(INetworkNode contextOwner, String name,
+			String contextType, String id) {
 		if (ctxBroker == null) {
 			LOG.error("Could not register " + contextType
 					+ ": Context Broker cannot be found");
 			return null;
 		}
 
-		String id = name + counter++; // TODO interface with IDs provided by
-										// DeviceManager
+		if (id==null)
+			id = name + counter++; 
+		//TODO ID counter checking... number of sources registered...
 
 		try {
 			Future<List<CtxEntityIdentifier>> shadowEntitiesFuture = ctxBroker
@@ -240,8 +248,9 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 				String cssOwnerStr = contextOwner.getBareJid();
 				IIdentity ownerCtxEntityID = idManager.fromJid(cssOwnerStr);
-				ownerCtxEntity = ctxBroker.retrieveIndividualEntity(ownerCtxEntityID).get();
-				
+				ownerCtxEntity = ctxBroker.retrieveIndividualEntity(
+						ownerCtxEntityID).get();
+
 				Future<CtxAssociation> futAssociationToContextOwnerEntity = ctxBroker
 						.createAssociation("providesUpdatesFor");
 				CtxAssociation associationToContextOwnerEntity = futAssociationToContextOwnerEntity

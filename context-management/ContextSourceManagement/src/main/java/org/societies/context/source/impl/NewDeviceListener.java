@@ -1,31 +1,22 @@
 package org.societies.context.source.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import org.springframework.osgi.context.BundleContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.css.devicemgmt.IAction;
+
 import org.societies.api.css.devicemgmt.IDevice;
-import org.societies.api.css.devicemgmt.IDriverService;
-import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
-import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
-import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.osgi.event.CSSEvent;
-import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
-import org.springframework.osgi.context.BundleContextAware;
 
 public class NewDeviceListener extends EventListener implements ServiceTrackerCustomizer, BundleContextAware{
 	private static Logger LOG = LoggerFactory.getLogger(ContextSourceManagement.class);
@@ -35,9 +26,14 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 	private IDeviceManager deviceManager;
 	private IEventMgr eventManager;
 	
-	private ArrayList<IDevice> newDevices = new ArrayList<IDevice>();
 	private ContextSourceManagement csm;
 	private boolean RUNNING_MODE = true;
+
+	private String filterOption = "(&" + 
+				//"(" + CSSEventConstants.EVENT_NAME + "="+DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT+")" + //example 
+				// "(" + CSSEventConstants.EVENT_NAME + "="+DeviceMgmtEventConstants.SCREEN_EVENT+")" +  //example
+				//"(" + CSSEventConstants.EVENT_SOURCE + "=test_event_source)" +  //example
+				")";
 	
 	/* --- Injections --- */
 	/**
@@ -68,160 +64,67 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 		this.deviceManager = deviceManager;
 		this.eventManager = eventManager;
 		this.csm = contextSourceManagement;
-		
-		this.serviceTracker = new ServiceTracker(bundleContext, IDevice.class.getName(), this);
-		this.serviceTracker.open();
 
-		if (LOG.isDebugEnabled()) LOG.debug(this+" created");
 		LOG.info("NewDeviceListener: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device manager consumer constructor");
 		
+		registerDevicesAndUpdates();
+
+		if (LOG.isDebugEnabled()) LOG.debug(this+" created");
 	}
 
 	
 
-	public void run() {
-		while(RUNNING_MODE){
-			try {
-				Thread.sleep(10000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			if (LOG.isDebugEnabled())
-				LOG.debug("NewDeviceListener: keeps looking");
+	public void registerDevicesAndUpdates() {
+
+		if (bundleContext!=null){
+			// subscribe for all new devices
+			this.serviceTracker = new ServiceTracker(bundleContext, IDevice.class.getName(), this);
+			this.serviceTracker.open();
 		}
-
-		//TODO
-		// -- Subscribe to LightSensorEvent
-		// Set filter
-		String lightEventFilter = "(&" + 
-				"(" + CSSEventConstants.EVENT_NAME + "="+DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT+")" + 
-				//"(" + CSSEventConstants.EVENT_SOURCE + "=test_event_source)" + 
-				")";
-		// Subscribe
-		eventManager.subscribeInternalEvent(this, new String[] {EventTypes.DEVICE_MANAGEMENT_EVENT}, lightEventFilter);
-		LOG.info("Subscribe to internal event: org/societies/css/device -> sensor/lightSensorEvent");
-
-
-		// -- Subscribe to Screen event
-		// Set filter
-		String screenEventFilter = "(&" + 
-				"(" + CSSEventConstants.EVENT_NAME + "="+DeviceMgmtEventConstants.SCREEN_EVENT+")" + 
-				//"(" + CSSEventConstants.EVENT_SOURCE + "=test_event_source)" + 
-				")";
-		// Subscribe
-		eventManager.subscribeInternalEvent(this, new String[] {EventTypes.DEVICE_MANAGEMENT_EVENT}, screenEventFilter);
-		LOG.info("Subscribe to internal event: org/societies/css/device -> sensor/lightSensorEvent");
+		else
+			LOG.error("BundleContext="+bundleContext+"\n\tNo device services will be found!");
 		
-		// TODO Auto-generated method stub
+//		while(RUNNING_MODE){
+//			try {
+//				Thread.sleep(10000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			if (LOG.isDebugEnabled())
+//				LOG.debug("NewDeviceListener: keeps looking");
+//		}
+
+		// Subscribe to all device management events
+		// empty filter represented by "null"
+		LOG.info("eventManager="+eventManager);
+		eventManager.subscribeInternalEvent(this, new String[] {EventTypes.DEVICE_MANAGEMENT_EVENT}, null);
+		LOG.debug("Subscribe to all internal events of device management: org/societies/css/device");
 		
 	}
 
 	
 	
-	
+	/**
+	 * Called by OSGI via ServiceTracker for all registered services. the only registered Service is IDevice, 
+	 * 
+	 * @see #registerDevicesAndUpdates(org.osgi.framework.ServiceReference)
+	 */
 	@Override
 	public Object addingService(ServiceReference reference) 
 	{
 		Object obj = bundleContext.getService(reference);
 
 		IDevice iDevice = (IDevice)obj;
-		newDevices.add(iDevice);
-		//TODO
+		if (!iDevice.isContextSource())
+			return null;
 		
-		//TODO register with CSM
-		//TODO register for this device's events
-
-		if (iDevice != null) 
-		{ 		
-			if (iDevice.getDeviceType() == DeviceTypeConstants.LIGHT_SENSOR) 
-			{
-				if (iDevice.getDeviceLocation().equalsIgnoreCase("Room1")) 
-				{
-					
-					IDevice ls1 = iDevice;
-					IDriverService driverService = ls1.getService(DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE);
-					
-					IAction ia = driverService.getAction("getLightLevel");
-					
-					Dictionary dic = ia.invokeAction(null);
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ ls1.getDeviceName());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Type: "+ ls1.getDeviceType());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ ls1.getDeviceId());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ ls1.getDeviceDescription());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ ls1.getDeviceProvider());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Connection Type: "+ ls1.getDeviceConnectionType());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls1.getDeviceLocation());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% getLightLevel action Return: "+ dic.get("outputLightLevel"));
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-				}
-				else if (iDevice.getDeviceLocation().equalsIgnoreCase("Room2")) 
-				{
-					
-					IDevice ls2 = iDevice;
-					IDriverService driverService = ls2.getService(DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE);
-					
-					IAction ia = driverService.getAction("getLightLevel");
-
-					Dictionary dic = ia.invokeAction(null);
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ ls2.getDeviceName());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Type: "+ ls2.getDeviceType());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ ls2.getDeviceId());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ ls2.getDeviceDescription());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ ls2.getDeviceProvider());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Connection Type: "+ ls2.getDeviceConnectionType());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls2.getDeviceLocation());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% getLightLevel action Return: "+ dic.get("outputLightLevel"));
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-				}
-				else if (iDevice.getDeviceLocation().equalsIgnoreCase("Room3")) 
-				{
-					IDevice ls3 = iDevice;
-					IDriverService driverService = ls3.getService(DeviceMgmtDriverServiceNames.LIGHT_SENSOR_DRIVER_SERVICE);
-					
-					IAction ia = driverService.getAction("getLightLevel");
-
-					Dictionary dic = ia.invokeAction(null);
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ ls3.getDeviceName());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Type: "+ ls3.getDeviceType());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ ls3.getDeviceId());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ ls3.getDeviceDescription());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ ls3.getDeviceProvider());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Connection Type: "+ ls3.getDeviceConnectionType());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls3.getDeviceLocation());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% getLightLevel action Return: "+ dic.get("outputLightLevel"));
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-				}
-			}
-			else if (iDevice.getDeviceType() == DeviceTypeConstants.SCREEN)
-			{
-				if (iDevice.getDeviceLocation().equalsIgnoreCase("Corridor1")) 
-				{
-					IDevice screen1 = iDevice;
-					IDriverService driverService = screen1.getService(DeviceMgmtDriverServiceNames.SCREEN_DRIVER_SERVICE);
-					
-					IAction ia = driverService.getAction("displayMessage");
-
-					Dictionary<String, Object> dic = new Hashtable<String, Object>();
-					dic.put("message", "Display this message for me please ! ");
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ screen1.getDeviceName());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ screen1.getDeviceType());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ screen1.getDeviceId());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ screen1.getDeviceDescription());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ screen1.getDeviceProvider());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Connection Type: "+ screen1.getDeviceConnectionType());
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ screen1.getDeviceLocation());
-					ia.invokeAction(dic);
-					
-					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-				}
-				
-			}
+		String sourceName;
+		for (String eventName : iDevice.getEventNameList()){
+			sourceName = iDevice.getDeviceName() + "#" + eventName;
+			csm.registerFull(null, sourceName, eventName, iDevice.getDeviceId());
 		}
-		return null;
+
+		return iDevice;
 	}
 
 	
@@ -240,7 +143,14 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 	@Override
 	public void removedService(ServiceReference reference, Object service) {
 		if (LOG.isDebugEnabled()) LOG.debug("NewDeviceListener has received removedService event: "+reference.getBundle());
-		newDevices.remove((IDevice)bundleContext.getService(reference));
+		
+		IDevice toRemove = (IDevice)bundleContext.getService(reference);
+		String sourceName;
+		for (String eventName : toRemove.getEventNameList()){
+			sourceName = toRemove.getDeviceName() + "#" + eventName;
+			csm.unregister(sourceName);
+		}
+
 	}
 	
 
@@ -262,24 +172,27 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 //	}
 
 
-
+	/**
+	 * Is called when devices send updates.
+	 * 
+	 */
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
-		LOG.info("*** Internal event received *****");    
-		LOG.info("** event name : "+ event.geteventName());
-		LOG.info("** event source : "+ event.geteventSource());
-		LOG.info("** event type : "+event.geteventType());
+		LOG.debug("*** Internal event received *****");    
+		LOG.debug("** event name : "+ event.geteventName());
+		LOG.debug("** event source : "+ event.geteventSource());
+		LOG.debug("** event type : "+event.geteventType());
 		
 
 		@SuppressWarnings("unchecked")
 		HashMap<String, Object> payload = (HashMap<String, Object>)event.geteventInfo();
 		
-		String source = event.geteventSource();
-
-		String identifier = null;//TODO get event causing context source
+		//		sourceName = iDevice.getDeviceName() + "#" + eventName;
+		String sourceName = event.geteventSource() + "#" + event.geteventName();
 		
-		csm.sendUpdate(identifier, (Serializable)payload.get(event.geteventName()));
-		LOG.info("CSM-DM-Integration: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent "+event.geteventName() +" from " +event.geteventSource() + ":\t" + payload.get(event.geteventName()));
+		csm.sendUpdate(sourceName, payload);
+		LOG.debug("CSM-DM-Integration: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent "+event.geteventName() +" from " +event.geteventSource() + ":\t" + payload.get(event.geteventName()));
+		LOG.debug("CSM-DM-Integration: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Source "+sourceName+ " has sent update "+payload);
 		
 		/*
 		if (event.geteventName().equals(DeviceMgmtEventConstants.LIGHT_SENSOR_EVENT)) {
@@ -295,7 +208,9 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 		
 	}
 
-	
+	/**
+	 * should not be called - no registration for external events is necessary.
+	 */
 	@Override
 	public void handleExternalEvent(CSSEvent event) {
 		if (LOG.isDebugEnabled()) LOG.debug("NewDeviceListener has received external Event: "+event.geteventType());
@@ -307,12 +222,10 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 	public void stop() {
 		RUNNING_MODE = false;
 		
-		String filterOption = "(&" + 
-				//"(" + CSSEventConstants.EVENT_NAME + "="+DeviceMgmtEventConstants.SCREEN_EVENT+")" + 
-				//"(" + CSSEventConstants.EVENT_SOURCE + "=test_event_source)" + 
-				")";
-		//TODO unregister all
-		eventManager.unSubscribeInternalEvent(this, new String[]{EventTypes.DEVICE_MANAGEMENT_EVENT}, filterOption);
+		//unregister all events
+		//empty filter means null
+		eventManager.unSubscribeInternalEvent(this, new String[]{EventTypes.DEVICE_MANAGEMENT_EVENT}, null);
+		serviceTracker.close();
 	}
 
 }
