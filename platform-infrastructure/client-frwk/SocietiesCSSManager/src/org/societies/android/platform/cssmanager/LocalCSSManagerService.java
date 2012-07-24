@@ -29,8 +29,10 @@ package org.societies.android.platform.cssmanager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.android.platform.content.CssRecordDAO;
@@ -40,22 +42,26 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.schema.cssmanagement.CssEvent;
+import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
+import org.societies.api.schema.cssmanagement.CssNode;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
-import javax.xml.bind.JAXBException;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Debug;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
@@ -69,6 +75,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	//Logging tag
 	private static final String LOG_TAG = LocalCSSManagerService.class.getName();
+	
+	private static final String ANDROID_PROFILING_NAME = "SocietiesCSSManager";
 
 	//Pubsub packages
 	private static final String CSS_MGMT_PACKAGE = "org.societies.api.schema.cssmanagement";
@@ -121,12 +129,15 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	private CssRecordDAO cssRecordDAO;
 	
 	
-
+	//Service API overrides
+	
 	@Override
 	public void onCreate () {
-
-		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
-		this.registerForPubsub();
+//		Traceview 
+//		Debug.startMethodTracing(ANDROID_PROFILING_NAME);
+		//TODO - re-instate when Pubsub simple is working
+//		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
+//		this.registerForPubsub();
 		
 		Log.d(LOG_TAG, "CSSManager opening database");
 		this.cssRecordDAO = new CssRecordDAO(this);
@@ -152,6 +163,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "CSSManager service terminating");
+//		Traceview 
+//		Debug.stopMethodTracing();
 	}
 
 	/**
@@ -168,7 +181,31 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //		return inMessenger.getBinder();
 		return this.binder;
 	}
+	
+	//Client Persistence methods
+	
+	/**
+	 * Insert or update the database with the new version of the CSS Record
+	 * 
+	 * @param aRecord
+	 */
+	private void updateLocalCSSrecord(AndroidCSSRecord aRecord) {
+		if (cssRecordDAO.cssRecordExists()) {
+			this.cssRecordDAO.updateCSSRecord(aRecord);			
+		} else {
+			this.cssRecordDAO.insertCSSRecord(aRecord);			
+		}
+	}
 
+	/**
+	 * Get the current CSSRecord stored locally
+	 *  
+	 * @return {@link AndroidCSSRecord} null if no local CSSRecord found
+	 */
+	private AndroidCSSRecord readLocalCSSRecord() {
+		AndroidCSSRecord record = this.cssRecordDAO.readCSSrecord();
+		return record;
+	}
 	//Service API that service offers
 
 	@Override
@@ -179,26 +216,50 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
+	/**
+	 * This method call either results in a local persistence access or a remote
+	 * action to update the local persistence cache of the CSSRecord
+	 */
 	public AndroidCSSRecord getAndroidCSSRecord(String client) {
 		Log.d(LOG_TAG, "getAndroidCSSRecord called with client: " + client);
-		return cssRecord;
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
+		
+		AndroidCSSRecord record = null;
+		
+		if (null == this.cssRecordDAO.readCSSrecord()) {
+			record = this.synchProfile(client, record);
+		} else {
+			if (client != null) {
+				Intent intent = new Intent(GET_ANDROID_CSS_RECORD);
+				
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
+
+				intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) record);
+				intent.setPackage(client);
+
+				LocalCSSManagerService.this.sendBroadcast(intent);
+			}
+
+		}
+		return null;
 	}
 
 	@Override
 	public AndroidCSSRecord loginCSS(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "loginCSS called with client: " + client);
 		
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-		messageBean.setProfile(record);
+		messageBean.setProfile(convertAndroidCSSRecord(record));
 		messageBean.setMethod(MethodType.LOGIN_CSS);
 
 		Stanza stanza = new Stanza(toXCManager);
 		
 		ICommCallback callback = new CSSManagerCallback(client, LOGIN_CSS);
-		
-        try {
+
+		try {
     		ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Send stanza");
@@ -210,9 +271,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
-	public boolean loginXMPPServer(String client, AndroidCSSRecord record) {
+	public void loginXMPPServer(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "loginXMPPServer called with client: " + client);
 
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		boolean retValue = true;
 		
@@ -235,18 +297,19 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //		 * Return value returned to client binding using a local bind
 //		 */
 //		Log.d(LOG_TAG, "loginXMPPServer return value: " + retValue);
-		return retValue;
 	}
 
 	@Override
 	public AndroidCSSRecord logoutCSS(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "logoutCSS called with client: " + client);
+
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 
 		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGOUT_CSS));
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-		messageBean.setProfile(record);
+		messageBean.setProfile(convertAndroidCSSRecord(record));
 		messageBean.setMethod(MethodType.LOGOUT_CSS);
 
 		Stanza stanza = new Stanza(toXCManager);
@@ -263,9 +326,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
-	public boolean logoutXMPPServer(String client, AndroidCSSRecord record) {
+	public void logoutXMPPServer(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "logoutXMPPServer called with client: " + client);
 
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
 		boolean retValue = true;
@@ -288,7 +352,6 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //		 */
 //		Log.d(LOG_TAG, "logoutXMPPServer return value: " + retValue);
 
-		return retValue;
 	}
 
 	@Override
@@ -310,9 +373,17 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
-	public AndroidCSSRecord registerXMPPServer(String client, AndroidCSSRecord record) {
+	public void registerXMPPServer(String client, AndroidCSSRecord record) {
+		AndroidCSSRecord retValue = null;
 		Log.d(LOG_TAG, "registerXMPPServer called with client: " + client);
-		return null;
+		Log.d(LOG_TAG, "registering user: " + record.getCssIdentity() + " at domain: " + record.getDomainServer());
+		
+		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
+
+		DomainRegistration domainRegister = new DomainRegistration();
+		
+		domainRegister.execute(params);
+		
 	}
 
 	@Override
@@ -323,7 +394,27 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	@Override
 	public AndroidCSSRecord synchProfile(String client, AndroidCSSRecord record) {
-		Log.d(LOG_TAG, "??? called with client: " + client);
+		Log.d(LOG_TAG, "synchProfile called with client: " + client);
+		
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
+		Dbc.require("CSS record cannot be null", record != null);
+		
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean.setProfile(record);
+		messageBean.setMethod(MethodType.SYNCH_PROFILE);
+
+		Stanza stanza = new Stanza(toXCManager);
+		
+		ICommCallback callback = new CSSManagerCallback(client, SYNCH_PROFILE);
+		
+        try {
+    		ccm.register(ELEMENT_NAMES, callback);
+			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(LOG_TAG, "Send stanza");
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        } 
+
 		return null;
 	}
 
@@ -340,9 +431,87 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
-	public AndroidCSSRecord unregisterXMPPServer(String client,	AndroidCSSRecord record) {
+	public void unregisterXMPPServer(String client,	AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "unregisterXMPPServer called with client: " + client);
-		return null;
+	}
+	
+	
+	/**
+	 * AsyncTask classes required to carry out threaded tasks. These classes should be used where it is estimated that 
+	 * the task length is unknown or potentially long. While direct usage of the Communications components for remote 
+	 * method invocation is an explicitly asynchronous operation, other usage is not and the use of these types of classes
+	 * is encouraged. Remember, Android Not Responding (ANR) exceptions will be invoked if the main app thread is abused
+	 * and the app will be closed down by Android very soon after.
+	 * 
+	 * Although the result of an AsyncTask can be obtained by using <AsyncTask Object>.get() it's not a good idea as 
+	 * it will effectively block the parent method until the result is delivered back and so render the use if the AsyncTask
+	 * class ineffective. Use Intents as an asynchronous callback mechanism.
+	 */
+	
+	private class DomainRegistration extends AsyncTask<String, Void, String[]> {
+		
+		@Override
+		/**
+		 * Carry out compute task 
+		 */
+		protected String[] doInBackground(String... params) {
+			Dbc.require("Four parameters must be supplied", params.length >= 4);
+			Log.d(LOG_TAG, "DomainRegistration - doInBackground");
+			Log.d(LOG_TAG, "DomainRegistration param username: " + params[0]);
+			Log.d(LOG_TAG, "DomainRegistration param domain server: " + params[1]);
+			Log.d(LOG_TAG, "DomainRegistration param password: " + params[2]);
+			Log.d(LOG_TAG, "DomainRegistration param client: " + params[3]);
+			
+			String results [] = new String[4];
+
+			try {
+				INetworkNode networkNode = LocalCSSManagerService.this.ccm.newMainIdentity(params[0], params[1], params[2]);
+				
+				if (null != networkNode && null != networkNode.getDomain() && null != networkNode.getIdentifier()) {
+					Log.d(LOG_TAG, "registration successful");
+					
+					results[0]  = networkNode.getIdentifier();
+					results[1] = networkNode.getDomain();
+					results[2] = params[2];
+					results[3] = params[3];
+				}
+			} catch (XMPPError e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return results;
+		}
+		
+		@Override
+		/**
+		 * Handle the communication of the result
+		 */
+		protected void onPostExecute(String results []) {
+			Log.d(LOG_TAG, "DomainRegistration - onPostExecute");
+			
+			Intent intent = new Intent(LocalCSSManagerService.REGISTER_XMPP_SERVER);
+			
+			if (null != results[0]) {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
+			} else {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, false);
+			}
+
+			AndroidCSSRecord aRecord = new AndroidCSSRecord();
+			aRecord.setCssIdentity(results[0]);
+			aRecord.setDomainServer(results[1]);
+			aRecord.setPassword(results[2]);
+			
+			intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
+			
+			intent.setPackage(results[3]);
+
+			Log.d(LOG_TAG, "DomainRegistration result sent");
+
+			LocalCSSManagerService.this.sendBroadcast(intent);
+
+	    }
+		
 	}
 	/**
 	 * Callback used with Android Comms
@@ -412,21 +581,23 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				
 				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
 		        
-				if (this.returnIntent.equals(LOGIN_CSS)) {
-					LocalCSSManagerService.this.updateDatabase(aRecord);
-				}
+				this.updateLocalPersistence(aRecord);
 			}
+		}
+		
+		/**
+		 * Decide which actions requires a database interaction
+		 * @param record
+		 */
+		private void updateLocalPersistence(AndroidCSSRecord record) {
+			if (this.returnIntent.equals(LOGIN_CSS) || this.returnIntent.equals(SYNCH_PROFILE)) {
+				LocalCSSManagerService.this.updateLocalCSSrecord(record);
+			}
+			
 		}
 	}
 	
-	/**
-	 * Insert or update the database with the new version of the CSS Record
-	 * 
-	 * @param aRecord
-	 */
-	private void updateDatabase(AndroidCSSRecord aRecord) {
-		this.cssRecordDAO.insertRow(aRecord);
-	}
+	
 	/**
 	 * Register for Pubsub events
 	 */
@@ -450,9 +621,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			this.asynchTask.execute(pubsubClient);
 
 
-		} catch (JAXBException e) {
-			Log.e(LOG_TAG, "Error while adding namespace package to Pubsub", e);
-		} catch (Exception e) {
+        } catch (Exception e) {
 			Log.e(LOG_TAG, "Error while adding namespace package to Pubsub", e);
 		}
 
@@ -508,5 +677,55 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     	}
     }
 
+    /**
+     * Convert AndroidCSSRecord to CssRecord. Required for Simple XML
+     * @param record
+     * @return {@link AndroidCSSRecord}
+     */
+    private CssRecord convertAndroidCSSRecord(AndroidCSSRecord record) {
+    	
+    	CssRecord cssRecord = new CssRecord();
+    	
+    	cssRecord.setCssHostingLocation(record.getCssHostingLocation());
+       	cssRecord.setCssIdentity(record.getCssIdentity());
+       	cssRecord.setCssInactivation(record.getCssInactivation());
+       	cssRecord.setCssRegistration(record.getCssRegistration());
+       	cssRecord.setCssUpTime(record.getCssUpTime());
+       	cssRecord.setDomainServer(record.getDomainServer());
+       	cssRecord.setEmailID(record.getEmailID());
+       	cssRecord.setEntity(record.getEntity());
+       	cssRecord.setForeName(record.getForeName());
+       	cssRecord.setHomeLocation(record.getHomeLocation());
+       	cssRecord.setIdentityName(record.getIdentityName());
+       	cssRecord.setImID(record.getImID());
+       	cssRecord.setName(record.getName());
+       	cssRecord.setPassword(record.getPassword());
+       	cssRecord.setPresence(record.getPresence());
+       	cssRecord.setSex(record.getSex());
+       	cssRecord.setSocialURI(record.getSocialURI());
+       	cssRecord.setStatus(record.getStatus());
+       	for (AndroidCSSNode node : record.getArchivedCSSNodes()) {
+       		cssRecord.getArchiveCSSNodes().add(convertAndroidCSSNode(node));
+       	}
+       	for (AndroidCSSNode node : record.getCSSNodes()) {
+       		cssRecord.getCssNodes().add(convertAndroidCSSNode(node));
+       	}
+       	
+       	return cssRecord;
+    }
+    /**
+     * Convert AndroidCSSNode to CssNode. Required for Simple XML
+     * @param node
+     * @return CssNode
+     */
+    private CssNode convertAndroidCSSNode(AndroidCSSNode node) {
+    	CssNode cssNode = new CssNode();
+    	
+    	cssNode.setIdentity(node.getIdentity());
+    	cssNode.setStatus(node.getStatus());
+    	cssNode.setType(node.getType());
+    	
+    	return cssNode;
+    }
 
 }

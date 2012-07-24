@@ -48,5 +48,6 @@
 	<!--Web Applications-->
 	<artifact type="bundle" name="societies-webapp"/> 
     <artifact type="bundle" name="DomainAuthorityWebApp"/>
+    <artifact type="bundle" name="DomainAuthorityRest"/>
 	
 </plan>

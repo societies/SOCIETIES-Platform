@@ -63,15 +63,40 @@ public class UserCtxRefiner implements IUserCtxRefiner {
 	 * (org.societies.api.context.model.CtxAttributeIdentifier)
 	 */
 	@Override
-	public void refineContext(CtxAttributeIdentifier arg0) {
+	public CtxAttribute refineContext(CtxAttributeIdentifier arg0) {
 		
 		CtxAttribute toRefine = null;
 		//TODO retrieve CtxAttribute to modify from its identifier
 		
 		DAG rule = null;
 		
-		bayesianInference.eval(toRefine, rule);
+		return (bayesianInference.eval(toRefine, rule)).iterator().next();
+		
+		
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.context.api.user.refinement.IUserCtxRefiner#getInferableTypes()
+	 */
+	public List <String> getInferableTypes( ){
+		//TODO
+		return new List<String>();
+	}
+	
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.context.api.user.refinement.IUserCtxRefiner#inferContextContinuously
+	 * (org.societies.api.context.model.CtxAttributeIdentifier, double)
+	 */
+	public void inferContextContinuously(CtxAttributeIdentifier id, double updateFreq){
+		//TODO
 	}
 
 }

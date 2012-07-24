@@ -199,4 +199,16 @@ public abstract class TrustEvidence implements ITrustEvidence {
 		
 		return sb.toString();
 	}
+	
+	/*
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(ITrustEvidence that) {
+		
+		if (this == that)
+			return 0;
+		
+		return this.getTimestamp().compareTo(that.getTimestamp());
+	}
 }

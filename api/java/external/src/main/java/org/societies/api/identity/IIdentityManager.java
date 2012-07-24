@@ -52,15 +52,24 @@ public interface IIdentityManager {
 	 */
 	boolean isMine(IIdentity identity);
 	
-	/** Pseudonym mgmt methods
-	 * 
+	/** 
+	 * Create a pseudonym that is human-readable and that can be used by others to initiate communication
 	 * @param memorableIdentifier
 	 * @return
 	 */
 	IIdentity newMemorableIdentity(String memorableIdentifier);
 	
+	/**
+	 *  Release a memorable pseudonym
+	 * @param memorableIdentity
+	 * @return
+	 */
 	boolean releaseMemorableIdentity(IIdentity memorableIdentity);
 	
+	/** 
+	 * Return an identifier to be used temporarily during a communication initiated by the local peer
+	 * @return
+	 */
 	IIdentity newTransientIdentity();
 	
 	// TODO this should be the External method (available to 3rd party services)

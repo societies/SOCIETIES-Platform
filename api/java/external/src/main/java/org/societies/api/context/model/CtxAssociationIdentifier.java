@@ -71,7 +71,7 @@ public class CtxAssociationIdentifier extends CtxIdentifier {
 		super(ownerId, CtxModelType.ASSOCIATION, type, objectNumber);
 	}
 	
-	CtxAssociationIdentifier(String str) throws MalformedCtxIdentifierException {
+	public CtxAssociationIdentifier(String str) throws MalformedCtxIdentifierException {
 		
 		super(str);
 	}
@@ -132,7 +132,7 @@ public class CtxAssociationIdentifier extends CtxIdentifier {
 
 		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
 		super.type = input.substring(typeDelim+1, objectNumberDelim);
-		if (super.type.isEmpty())
+		if (super.type.length()==0)
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Context association type cannot be empty");
 
@@ -152,7 +152,7 @@ public class CtxAssociationIdentifier extends CtxIdentifier {
 					+ super.modelType + "'");
 
 		super.ownerId = input.substring(0, modelTypeDelim);
-		if (super.ownerId.isEmpty())
+		if (super.ownerId.length()==0)
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Owner ID cannot be empty");
 	}

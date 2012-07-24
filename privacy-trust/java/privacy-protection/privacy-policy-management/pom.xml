@@ -75,14 +75,20 @@
 		<!-- Tools -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.1</version>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
 		</dependency>
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>pl.pragmatists</groupId>
+			<artifactId>JUnitParams</artifactId>
+			<version>0.4.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -103,12 +109,23 @@
 			<version>1.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>privacynegotiationmanagement</artifactId>
+			<version>${version.pt}</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
 		</dependency>
 		<!-- Spring -->
 		<dependency>

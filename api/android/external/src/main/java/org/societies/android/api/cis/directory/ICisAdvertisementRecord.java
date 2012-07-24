@@ -28,6 +28,7 @@ package org.societies.android.api.cis.directory;
  * @author Babak.Farshchian@sintef.no
  *
  */
+@Deprecated
 public interface ICisAdvertisementRecord {
 	public String getName();
 	public void setName(String name);

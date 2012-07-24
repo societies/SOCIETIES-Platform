@@ -12,148 +12,145 @@
 	xmlns:tx="http://www.springframework.org/schema/tx">
 
 	<!-- Privacy Data Management Configuration -->
-	
+
 	<bean name="privacyDataManager"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 	</bean>
-	
+
 	<bean name="privacyDataManagerInternal"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-		<!-- Persistance Configuration -->
-		<context:annotation-config />
-		
-		<tx:annotation-driven />
-	
-		<!-- <bean id="PrivacyPermissionRegistryPropertiesConfig"
-			class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-			<property name="ignoreResourceNotFound" value="true"></property>
-			<property name="locations">
-				<list>
-					<value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value>
-				</list>
-			</property>
-		</bean> -->
-	
-		<bean id="sessionFactory"
-			class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-			<property name="dataSource" ref="dataSource" />
-			<property name="annotatedClasses">
-				<list>
-					<value>org.societies.privacytrust.privacyprotection.model.PrivacyPermission</value>
-				</list>
-			</property>
-			<property name="annotatedPackages">
-				<list>
-					<value>org.societies.privacytrust.privacyprotection.model</value>
-				</list>
-			</property>
-			<property name="hibernateProperties">
-				<props>
-					<prop key="hibernate.show_sql">true</prop>
-					<prop key="hibernate.show_dlll">true</prop>
-					<prop key="hibernate.cache.use_second_level_cache">false</prop>
-					<prop key="hibernate.hbm2ddl.auto">update</prop>
-					<prop key="hibernate.format_sql">true</prop>
-				</props>
-			</property>
-		</bean>
-	
-		<tx:annotation-driven transaction-manager="transactionManager" />
-	
-		<bean id="transactionManager"
-			class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-			<property name="sessionFactory" ref="sessionFactory" />
-		</bean>
+	<!-- Persistance Configuration -->
+	<context:annotation-config />
+
+	<tx:annotation-driven />
+
+	<!-- <bean id="PrivacyPermissionRegistryPropertiesConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
+		<property name="ignoreResourceNotFound" value="true"></property> <property 
+		name="locations"> <list> <value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value> 
+		</list> </property> </bean> -->
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<value>org.societies.privacytrust.privacyprotection.model.PrivacyPermission
+				</value>
+			</list>
+		</property>
+		<property name="annotatedPackages">
+			<list>
+				<value>org.societies.privacytrust.privacyprotection.model</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.show_dlll">true</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.format_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
 
 
 
 	<!-- Privacy Policy Manager Configuration -->
-	
-	<bean name="PrivacyPolicyManager"
+
+	<bean name="privacyPolicyManager"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager"
-		depends-on="ctxBroker"
-		init-method="init">
-		<property name="commManager" ref="CommManagerBundle"/>
+		depends-on="ctxBroker" init-method="init">
+		<property name="commManager" ref="commManager" />
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
-	
-	
-	<bean name="PrivacyAgreementManager"
+
+	<bean name="privacyAgreementManager"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManager"
 		depends-on="ctxBroker">
-		<property name="commManager" ref="CommManagerBundle"/>
+		<property name="commManager" ref="commManager" />
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
-	
+
 	<bean name="privacyAgreementManagerInternal"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManagerInternal"
 		depends-on="ctxBroker">
-		<property name="commManager" ref="CommManagerBundle"/>
+		<property name="commManager" ref="commManager" />
 		<property name="ctxBroker" ref="ctxBroker" />
 	</bean>
-	
-	
-	
+
+
+
 	<!-- Privacy Policy Negotiation Manager Configuration -->
-	
-	<bean name="PrivacyNegotiationManager"
-	    class=" org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager"
-	    init-method="initialisePrivacyPolicyNegotiationManager">
-	    <property name="ctxBroker" ref="ctxBroker"></property>
-	    <property name="eventMgr" ref="eventMgr"></property>
-		<property name="commsMgr" ref="commsMgr"></property>
-		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
-		<property name="privacyAgreementManagerInternal" ref="privacyAgreementManagerInternal"></property>
-<!-- 		<property name="negotiationAgentRemote" ref="negotiationAgentRemote"></property> -->
-		<property name="privacyPreferenceManager" ref="privacyPreferenceManager"></property>
-		<property name="identitySelection" ref="IdentitySelection"></property>
-		<!-- also needs IIdentitySelection -->
+
+	<bean name="privacyPolicyNegotiationManager"
+		class=" org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager"
+		init-method="initialisePrivacyPolicyNegotiationManager">
+		<property name="ctxBroker" ref="ctxBroker" />
+		<property name="eventMgr" ref="eventManager" />
+		<property name="commsMgr" ref="commManager" />
+		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
+		<property name="privacyAgreementManagerInternal" ref="privacyAgreementManagerInternal" />
+		<!-- <property name="negotiationAgentRemote" ref="negotiationAgentRemote"></property> -->
+		<property name="negotiationAgent" ref="negotiationAgent" />
+		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
+		<property name="identitySelection" ref="identitySelection" />
+		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
 	</bean>
+
+	<!-- this is the bean for the NegotiationAgent of the current CSS (not the 
+		remote one) -->
+	<bean name="negotiationAgent"
+		class="org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.provider.NegotiationAgent"
+		init-method="initialiseNegotiationAgent">
+		<property name="policyMgr" ref="privacyPolicyManager" />
+		<property name="commsMgr" ref="commManager" />
+	</bean>
+
 
 
 	<!-- Privacy Preference Manager Configuration -->
-	
+
 	<bean name="privacyPreferenceManager"
-		class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager" 
+		class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager"
 		init-method="initialisePrivacyPreferenceManager">
-			<property name="ctxBroker" ref="ctxBroker"></property>
-			<property name="commsMgr" ref="commsMgr"></property>
-			<property name="trustBroker" ref="trustBroker"></property>
-			<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
+		<property name="ctxBroker" ref="ctxBroker"></property>
+		<property name="commsMgr" ref="commManager"></property>
+		<property name="trustBroker" ref="trustBroker"></property>
+		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
 	</bean>
-	
-	<!-- this is the bean for the NegotiationAgent of the current CSS (not the remote one) -->
-	<bean name="NegotiationAgent" class="org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.provider.NegotiationAgent"
-	    init-method="initialiseNegotiationAgent">
-	    <property name="policyMgr" ref="PrivacyPolicyManager"></property>
-		<property name="commsMgr" ref="commsMgr"></property>	    
-	</bean>
-	
+
+
+
 	<!-- Identity Selection Configuration -->
-	
-	<bean name="IdentitySelection"
+
+	<bean name="identitySelection"
 		class="org.societies.privacytrust.privacyprotection.identity.IdentitySelection">
 	</bean>
-	
-	
-	
-	<!-- Privacy Assessment Configuration -->
-	
-	<!--bean id="aopBean" class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr">
-	</bean-->
 
-	<!--bean id="aopBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"/>
-	<bean id="CommsFwTestBean"
-		class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"
-		init-method="init"
-		>
-	</bean-->
-	
+
+
+	<!-- Privacy Assessment Configuration -->
+
+	<!--bean id="aopBean" class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr"> 
+		</bean -->
+
+	<!--bean id="aopBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"/> 
+		<bean id="CommsFwTestBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean" 
+		init-method="init" > </bean -->
+
 	<bean id="catchBeforeMethod"
 		class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwAdvice" />
 	<bean id="pointcut"
@@ -167,8 +164,8 @@
 
 	<bean id="aopBeanProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
 
-		<!--property name="target" ref="aopBean" /-->
-		<property name="target" ref="CommManagerBundle" />
+		<!--property name="target" ref="aopBean" / -->
+		<property name="target" ref="commManager" />
 
 		<property name="interceptorNames">
 			<list>
@@ -177,27 +174,22 @@
 		</property>
 	</bean>
 
-	<bean id="PrivacyLog"
-		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog"
-		>
+	<bean id="privacyLog"
+		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog">
 	</bean>
 
-	<bean id="PrivacyLogAppender"
+	<bean id="privacyLogAppender"
 		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender"
-		init-method="init"
-		depends-on="CommManagerBundle"
-		>
-		<property name="commMgr" ref="CommManagerBundle"/>
-		<property name="privacyLog" ref="PrivacyLog"/>
-		<!--property name="testBean" ref="CommsFwTestBean"/-->
+		init-method="init" depends-on="commManager">
+		<property name="commMgr" ref="commManager" />
+		<property name="privacyLog" ref="privacyLog" />
+		<!--property name="testBean" ref="CommsFwTestBean"/ -->
 	</bean>
 
-	<bean id="Assessment"
+	<bean id="assessment"
 		class="org.societies.privacytrust.privacyprotection.assessment.logic.Assessment"
-		init-method="init"
-		depends-on="PrivacyLog"
-		>
-		<property name="privacyLog" ref="PrivacyLog"/>
+		init-method="init" depends-on="privacyLog">
+		<property name="privacyLog" ref="privacyLog" />
 	</bean>
 
 </beans>

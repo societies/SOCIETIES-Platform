@@ -106,6 +106,10 @@ public class PrivacyTrustCommServer implements IFeatureServer {
 			LOG.error("initBean(): ", e);
 		}
 	}
+	
+	public void destroyBean() {
+		LOG.info("destroyBean()");
+	}
 
 
 	/**

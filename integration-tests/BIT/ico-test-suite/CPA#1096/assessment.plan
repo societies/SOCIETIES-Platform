@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.integration.test.bit.713.plan" version="3.0.0" scoped="false"
+	atomic="false" xmlns="http://www.eclipse.org/virgo/schema/plan"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation=" 
+                http://www.eclipse.org/virgo/schema/plan 
+                http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+	<artifact type="bundle" name="org.societies.api.external.societies-api" />
+	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal" />
+
+	<artifact type="bundle" name="org.societies.comm.CommonLibraries" />
+	<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr" />
+	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
+	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
+
+	<artifact type="bundle" name="org.societies.data-source"/>
+	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
+	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
+	<artifact type="bundle" name="org.societies.slm.SLMCommsManager"/>
+
+	<artifact type="bundle" name="societies-webapp"/>
+
+	<artifact type="bundle" name="org.societies.integration.test.bit.bit-1055-assessment" />
+</plan>

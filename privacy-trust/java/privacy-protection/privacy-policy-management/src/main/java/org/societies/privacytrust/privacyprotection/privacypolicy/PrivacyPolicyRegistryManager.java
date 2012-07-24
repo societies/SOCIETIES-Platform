@@ -51,12 +51,13 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.privacytrust.privacyprotection.privacypolicy.registry.MyIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.RequestPolicyUtils;
 import org.societies.privacytrust.privacyprotection.privacypolicy.registry.PrivacyPolicyRegistry;
 
 /**
@@ -72,7 +73,8 @@ public class PrivacyPolicyRegistryManager {
 	private IIdentity myPublicDPI;
 	private IIdentityManager idm;
 
-	public PrivacyPolicyRegistryManager(ICtxBroker ctxBroker){
+	public PrivacyPolicyRegistryManager(ICtxBroker ctxBroker, IIdentityManager idm){
+		this.idm = idm;
 		this.ctxBroker = ctxBroker;
 		this.loadPolicies();
 	}
@@ -90,22 +92,6 @@ public class PrivacyPolicyRegistryManager {
 			this.policyRegistry = new PrivacyPolicyRegistry();
 		}
 
-		// Change Iidentity to MyIdentity (serializable)
-//		CtxIdentifier id = null;
-//		MyIdentity requestorIdentity = new MyIdentity(policy.getRequestor().getRequestorId());
-//		if (requestor instanceof RequestorService) {
-//			RequestorService requestor2 = new RequestorService(requestorIdentity, ((RequestorService) requestor).getRequestorServiceId());
-//			// Store
-//			policy.setRequestor(requestor2);
-//			id = this.storePolicyToDB(requestor2, policy);
-//		}
-//		else if (requestor instanceof RequestorCis){
-//			MyIdentity requestorCisIdentity = new MyIdentity(((RequestorCis)policy.getRequestor()).getCisRequestorId());
-//			RequestorCis requestor2 = new RequestorCis(requestorIdentity,requestorCisIdentity);
-//			// Store
-//			policy.setRequestor(requestor2);
-//			id = this.storePolicyToDB(requestor2, policy);
-//		}
 		// Global store
 		CtxIdentifier id = this.storePolicyToDB(requestor, policy);
 		this.policyRegistry.addPolicy(requestor,id);
@@ -137,7 +123,7 @@ public class PrivacyPolicyRegistryManager {
 		CtxAttribute ctxAttr;
 		try {
 			ctxAttr = (CtxAttribute) ctxBroker.retrieve(id).get();
-			RequestPolicy policy = (RequestPolicy) SerialisationHelper.deserialise(ctxAttr.getBinaryValue(), this.getClass().getClassLoader());
+			RequestPolicy policy = RequestPolicyUtils.toRequestPolicy((org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy) SerialisationHelper.deserialise(ctxAttr.getBinaryValue(), this.getClass().getClassLoader()), idm);
 			return policy;
 		} catch (CtxException e) {
 			e.printStackTrace();
@@ -152,6 +138,9 @@ public class PrivacyPolicyRegistryManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -186,12 +175,12 @@ public class PrivacyPolicyRegistryManager {
 		try {
 			String name = "";
 			if (requestor instanceof RequestorService){
-				name = ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString();
+				name = "policyOf"+((RequestorService) requestor).hashCode();
 			}else if (requestor instanceof RequestorCis){
-				name = ((RequestorCis) requestor).getCisRequestorId().getJid();
+				name = "policyOf"+((RequestorCis) requestor).hashCode();
 			}
 			//TODO: The name might cause an error. We might need to provide different names for storing the policies as attributes in DB
-			List<CtxIdentifier> ctxIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+name).get();
+			List<CtxIdentifier> ctxIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, name).get();
 			if (ctxIDs.size()==0){
 				List<CtxIdentifier> entityIDs = ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PRIVACY_POLICY).get();
 				if (entityIDs.size()==0){
@@ -206,7 +195,7 @@ public class PrivacyPolicyRegistryManager {
 						assoc = ctxBroker.createAssociation(CtxAssociationTypes.HAS_PRIVACY_POLICIES).get();
 						assoc.setParentEntity(person.getId());
 					}else{
-						assoc = (CtxAssociation) ctxBroker.retrieve(assocIDs.iterator().next());
+						assoc = (CtxAssociation) ctxBroker.retrieve(assocIDs.iterator().next()).get();
 					}
 					CtxEntity policyEntity = ctxBroker.createEntity(CtxEntityTypes.PRIVACY_POLICY).get();
 					assoc.addChildEntity(policyEntity.getId());
@@ -214,8 +203,8 @@ public class PrivacyPolicyRegistryManager {
 					entityIDs.add(policyEntity.getId());
 
 				}
-				CtxAttribute ctxAttr = ctxBroker.createAttribute((CtxEntityIdentifier) entityIDs.get(0), "policyOf"+name).get();
-				ctxAttr.setBinaryValue(SerialisationHelper.serialise(policy));
+				CtxAttribute ctxAttr = ctxBroker.createAttribute((CtxEntityIdentifier) entityIDs.get(0), name).get();
+				ctxAttr.setBinaryValue(SerialisationHelper.serialise(RequestPolicyUtils.toRequestPolicyBean(policy)));
 				ctxBroker.update(ctxAttr);
 				this.log("Created attribute: "+ctxAttr.getType());
 				return ctxAttr.getId();
@@ -223,7 +212,7 @@ public class PrivacyPolicyRegistryManager {
 
 			}else{
 				CtxAttribute ctxAttr = (CtxAttribute) ctxBroker.retrieve(ctxIDs.get(0)).get();
-				ctxAttr.setBinaryValue(SerialisationHelper.serialise(policy));
+				ctxAttr.setBinaryValue(SerialisationHelper.serialise(RequestPolicyUtils.toRequestPolicyBean(policy)));
 				ctxBroker.update(ctxAttr);
 				this.log("Updated attribute:"+ctxAttr.getType());
 				return ctxAttr.getId();
@@ -253,7 +242,7 @@ public class PrivacyPolicyRegistryManager {
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
 					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
-					this.policyRegistry = (PrivacyPolicyRegistry) SerialisationHelper.deserialise(attr.getBinaryValue(),this.getClass().getClassLoader());
+					this.policyRegistry = (PrivacyPolicyRegistry) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
 					if (this.policyRegistry==null){
 						this.policyRegistry = new PrivacyPolicyRegistry();
 						//this.loadPoliciesFromFile();
@@ -332,24 +321,9 @@ public class PrivacyPolicyRegistryManager {
 	private void storePolicies(){
 		try {
 			List<CtxIdentifier> attrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY).get();
-//			// Change Iidentity to MyIdentity (serializable)
-//			Hashtable<Requestor, CtxIdentifier> newPolicyRegistry = new Hashtable<Requestor, CtxIdentifier>();	
-//			for (Entry<Requestor, CtxIdentifier> policyEntry : policyRegistry.getPolicies().entrySet()) {
-//				Requestor newRequestor = null;
-//				if (policyEntry.getKey() instanceof RequestorService) {
-//					MyIdentity requestorIdentity = new MyIdentity(policyEntry.getKey().getRequestorId());
-//					newRequestor = new RequestorService(requestorIdentity, ((RequestorService) policyEntry.getKey()).getRequestorServiceId());
-//				}else if (policyEntry.getKey() instanceof RequestorCis){
-//					MyIdentity requestorIdentity = new MyIdentity(policyEntry.getKey().getRequestorId());
-//					MyIdentity requestorCisIdentity = new MyIdentity(((RequestorCis)policyEntry.getKey()).getCisRequestorId());
-//					newRequestor = new RequestorCis(requestorIdentity,requestorCisIdentity);
-//				}
-//				newPolicyRegistry.put(newRequestor, policyEntry.getValue());
-//			}
-
 			if (attrList.size()>0){
 				CtxIdentifier identifier = attrList.get(0);
-				CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier);
+				CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
 				attr.setBinaryValue(SerialisationHelper.serialise(this.policyRegistry));
 				ctxBroker.update(attr);
 				this.log("Stored service privacy policies");

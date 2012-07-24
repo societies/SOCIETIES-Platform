@@ -48,7 +48,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.societies.activity.ActivityFeed;
-import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
 

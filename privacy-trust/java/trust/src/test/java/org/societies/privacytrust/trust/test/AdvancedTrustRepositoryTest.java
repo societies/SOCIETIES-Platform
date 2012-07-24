@@ -26,6 +26,8 @@ package org.societies.privacytrust.trust.test;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -39,9 +41,6 @@ import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -70,17 +69,17 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	private static final String TRUSTED_SERVICE_ID = BASE_ID + "ServiceResourceIdentifier";
 	private static final String TRUSTED_SERVICE_ID2 = BASE_ID + "ServiceResourceIdentifier2";
 	
-	private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
-	private static final String TRUSTED_SERVICE_TYPE2 = BASE_ID + "ServiceType2";
+	//private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
+	//private static final String TRUSTED_SERVICE_TYPE2 = BASE_ID + "ServiceType2";
 	
-	private static ITrustedCss trustedCss;
-	private static ITrustedCss trustedCss2;
+	private static TrustedEntityId cssTeid;
+	private static TrustedEntityId cssTeid2;
 	
-	private static ITrustedCis trustedCis;
-	private static ITrustedCis trustedCis2;
+	private static TrustedEntityId cisTeid;
+	private static TrustedEntityId cisTeid2;
 	
-	private static ITrustedService trustedService;
-	private static ITrustedService trustedService2;
+	private static TrustedEntityId serviceTeid;
+	private static TrustedEntityId serviceTeid2;
 	
 	@Autowired
 	private ITrustRepository trustRepo;
@@ -91,20 +90,14 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	
-		final TrustedEntityId cssTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID);
-		trustedCss = new TrustedCss(cssTeid);
-		final TrustedEntityId cssTeid2 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID2);
-		trustedCss2 = new TrustedCss(cssTeid2);
+		cssTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID);
+		cssTeid2 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID2);
 		
-		final TrustedEntityId cisTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID);
-		trustedCis = new TrustedCis(cisTeid);
-		final TrustedEntityId cisTeid2 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID2);
-		trustedCis2 = new TrustedCis(cisTeid2);
+		cisTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID);
+		cisTeid2 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CIS, TRUSTED_CIS_ID2);
 		
-		final TrustedEntityId serviceTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
-		trustedService = new TrustedService(serviceTeid, TRUSTED_SERVICE_TYPE);
-		final TrustedEntityId serviceTeid2 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID2);
-		trustedService2 = new TrustedService(serviceTeid2, TRUSTED_SERVICE_TYPE2);
+		serviceTeid = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
+		serviceTeid2 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.SVC, TRUSTED_SERVICE_ID2);
 	}
 
 	/**
@@ -113,12 +106,12 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		
-		trustedCss = null;
-		trustedCss2 = null;
-		trustedCis = null;
-		trustedCis2 = null;
-		trustedService = null;
-		trustedService2 = null;
+		cssTeid = null;
+		cssTeid2 = null;
+		cisTeid = null;
+		cisTeid2 = null;
+		serviceTeid = null;
+		serviceTeid2 = null;
 	}
 	
 	/**
@@ -147,14 +140,12 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		ITrustedCis trustedCis2FromDb;
 		
 		// add CSS
-		this.trustRepo.addEntity(trustedCss);
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss.getTeid());
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.createEntity(cssTeid);
 		assertNotNull(trustedCssFromDb.getCommunities());
 		assertTrue(trustedCssFromDb.getCommunities().isEmpty());
 		
 		// add CIS
-		this.trustRepo.addEntity(trustedCis);
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCis.getTeid());
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.createEntity(cisTeid);
 		assertNotNull(trustedCisFromDb.getMembers());
 		assertTrue(trustedCisFromDb.getMembers().isEmpty());
 		
@@ -182,7 +173,7 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 			assertTrue(community.getMembers().contains(trustedCssFromDb));
 		
 		// verify membership from the side of the CIS
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCis.getTeid());
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(cisTeid);
 		assertNotNull(trustedCisFromDb.getMembers());
 		assertFalse(trustedCisFromDb.getMembers().isEmpty());
 		assertEquals(1, trustedCisFromDb.getMembers().size());
@@ -191,8 +182,7 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 			assertTrue(member.getCommunities().contains(trustedCisFromDb));
 		
 		// add CIS2
-		this.trustRepo.addEntity(trustedCis2);
-		trustedCis2FromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCis2.getTeid());
+		trustedCis2FromDb = (ITrustedCis) this.trustRepo.createEntity(cisTeid2);
 		assertNotNull(trustedCis2FromDb.getMembers());
 		assertTrue(trustedCis2FromDb.getMembers().isEmpty());
 		
@@ -222,7 +212,7 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 			assertTrue(community.getMembers().contains(trustedCssFromDb));
 			
 		// verify membership from the side of CIS2
-		trustedCis2FromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCis2.getTeid());
+		trustedCis2FromDb = (ITrustedCis) this.trustRepo.retrieveEntity(cisTeid2);
 		assertNotNull(trustedCis2FromDb.getMembers());
 		assertFalse(trustedCis2FromDb.getMembers().isEmpty());
 		assertEquals(1, trustedCis2FromDb.getMembers().size());
@@ -252,22 +242,27 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 			assertTrue(community.getMembers().contains(trustedCssFromDb));
 				
 		// verify membership from the side of CIS2
-		trustedCis2FromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCis2.getTeid());
+		trustedCis2FromDb = (ITrustedCis) this.trustRepo.retrieveEntity(cisTeid2);
 		assertNotNull(trustedCis2FromDb.getMembers());
 		assertTrue(trustedCis2FromDb.getMembers().isEmpty());
 		
 		// TODO remove CIS3? from DB
 		
 		// remove CSS from DB
-		this.trustRepo.removeEntity(trustedCss.getTeid());
+		this.trustRepo.removeEntity(cssTeid);
 		// verify CSS is no longer member of CIS
-		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCis.getTeid());
+		trustedCisFromDb = (ITrustedCis) this.trustRepo.retrieveEntity(cisTeid);
 		assertNotNull(trustedCisFromDb.getMembers());
 		assertTrue(trustedCisFromDb.getMembers().isEmpty());
 		// verify CSS is no longer member of CIS2
-		trustedCis2FromDb = (ITrustedCis) this.trustRepo.retrieveEntity(trustedCis2.getTeid());
+		trustedCis2FromDb = (ITrustedCis) this.trustRepo.retrieveEntity(cisTeid2);
 		assertNotNull(trustedCis2FromDb.getMembers());
 		assertTrue(trustedCis2FromDb.getMembers().isEmpty());
+		
+		// remove CIS from DB
+		this.trustRepo.removeEntity(cisTeid);
+		// remove CIS2 from DB
+		this.trustRepo.removeEntity(cisTeid2);
 	}
 	
 	/**
@@ -282,14 +277,12 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		ITrustedService trustedService2FromDb;
 		
 		// add CSS2 to DB
-		this.trustRepo.addEntity(trustedCss2);
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss2.getTeid());
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.createEntity(cssTeid2);
 		assertNotNull(trustedCssFromDb.getServices());
 		assertTrue(trustedCssFromDb.getServices().isEmpty());
 		
 		// add SERVICE to DB
-		this.trustRepo.addEntity(trustedService);
-		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedService.getTeid());
+		trustedServiceFromDb = (ITrustedService) this.trustRepo.createEntity(serviceTeid);
 		assertNull(trustedServiceFromDb.getProvider());
 		// add SERVICE to CSS
 		trustedServiceFromDb.setProvider(trustedCssFromDb);
@@ -311,8 +304,7 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		assertTrue(trustedCssFromDb.getServices().contains(trustedServiceFromDb));
 		
 		// add SERVICE2 to DB
-		this.trustRepo.addEntity(trustedService2);
-		trustedService2FromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedService2.getTeid());
+		trustedService2FromDb = (ITrustedService) this.trustRepo.createEntity(serviceTeid2);
 		assertNull(trustedService2FromDb.getProvider());
 		// add SERVICE2 to CSS
 		trustedService2FromDb.setProvider(trustedCssFromDb);
@@ -367,5 +359,57 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		this.trustRepo.removeEntity(trustedServiceFromDb.getTeid());
 		trustedServiceFromDb = (ITrustedService) this.trustRepo.retrieveEntity(trustedServiceFromDb.getTeid());
 		assertNull(trustedServiceFromDb);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#retrieveEntities(String, Class))}.
+	 * @throws TrustRepositoryException 
+	 */
+	@Test
+	public void testRetrieveTrustedCsss() throws TrustRepositoryException {
+	
+		List<ITrustedCss> entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCss.class);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// add CSS to DB
+		this.trustRepo.createEntity(cssTeid);
+		entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCss.class);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(1, entities.size());
+		
+		// add CSS2 to DB
+		this.trustRepo.createEntity(cssTeid2);
+		entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCss.class);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(2, entities.size());
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#retrieveEntities(String, Class))}.
+	 * @throws TrustRepositoryException 
+	 */
+	@Test
+	public void testRetrieveTrustedCiss() throws TrustRepositoryException {
+	
+		List<ITrustedCis> entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCis.class);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// add CIS to DB
+		this.trustRepo.createEntity(cisTeid);
+		entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCis.class);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(1, entities.size());
+		
+		// add CIS2 to DB
+		this.trustRepo.createEntity(cisTeid2);
+		entities = this.trustRepo.retrieveEntities(TRUSTOR_ID, ITrustedCis.class);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(2, entities.size());
 	}
 }

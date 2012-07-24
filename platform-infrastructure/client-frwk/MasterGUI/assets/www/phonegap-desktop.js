@@ -82,7 +82,7 @@ phonegapdesktop.internal = {
     		
     	}
     	catch (exception) {
-    	    console.log("Parse config file exception: " + exception);
+    	    console.log("Parse config file: " + fileName + " exception: " + exception);
     	}
     },
     

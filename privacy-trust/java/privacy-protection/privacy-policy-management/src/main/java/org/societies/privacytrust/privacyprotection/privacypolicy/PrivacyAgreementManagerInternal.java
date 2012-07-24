@@ -45,13 +45,11 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementEnvelopeUtils;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
-import org.societies.privacytrust.privacyprotection.privacypolicy.registry.MyIdentity;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -84,7 +82,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 		CtxIdentifier agreementId = null;
 		try {
 			// Retrieve existing id (if possible)
-			List<CtxIdentifier> agreementIdList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+requestorId).get();
+			List<CtxIdentifier> agreementIdList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, requestorId).get();
 			CtxAttribute agreementData = null;
 			// - Creation
 			if (null == agreementIdList || agreementIdList.size() <= 0) {
@@ -101,7 +99,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 				}
 
 				// Create the new context attribute to store the agreement
-				agreementData = ctxBroker.createAttribute(agreementEntityId, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+requestorId).get();
+				agreementData = ctxBroker.createAttribute(agreementEntityId, requestorId).get();
 				agreementId = agreementData.getId();
 				LOG.debug("Created attribute: "+agreementData.getType());
 			}
@@ -115,12 +113,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 			}
 
 			// - Save the agreement
-			// Change Iidentity to MyIdentity (serializable)
-			MyIdentity userIdentity = new MyIdentity(agreement.getAgreement().getUserIdentity());
-			agreement.getAgreement().setUserIdentity(userIdentity);
-			MyIdentity userPublicIdentity = new MyIdentity(agreement.getAgreement().getUserPublicIdentity());
-			agreement.getAgreement().setUserPublicIdentity(userPublicIdentity);
-			agreementData.setBinaryValue(SerialisationHelper.serialise(agreement));
+			agreementData.setBinaryValue(SerialisationHelper.serialise(AgreementEnvelopeUtils.toAgreementEnvelopeBean(agreement)));
 			ctxBroker.update(agreementData);
 		} catch (CtxException e) {
 			LOG.error("[Error updateAgreement] Can't find the agreement. Context error.", e);
@@ -153,7 +146,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 		try {
 			// - Retrieve existing id (if possible)
 			String requestorId = getRequestorId(requestor);
-			List<CtxIdentifier> agreementIdList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+requestorId).get();
+			List<CtxIdentifier> agreementIdList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, requestorId).get();
 			CtxIdentifier agreementId = null;
 			// No agreement for this requestor
 			if (null == agreementIdList || agreementIdList.size() <= 0) {
@@ -204,7 +197,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 				hasPrivacyPolicyAgreements.setParentEntity(css.getId());
 			}
 			else {
-				hasPrivacyPolicyAgreements = (CtxAssociation) ctxBroker.retrieve(hasPrivacyPolicyAgreementsList.iterator().next());
+				hasPrivacyPolicyAgreements = (CtxAssociation) ctxBroker.retrieve(hasPrivacyPolicyAgreementsList.iterator().next()).get();
 			}
 			// Add the agreement entity to this association
 			hasPrivacyPolicyAgreements.addChildEntity(agreementEntity.getId());
@@ -228,15 +221,10 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 	 * @throws PrivacyException 
 	 */
 	public static String getRequestorId(Requestor requestor) throws PrivacyException {
-		if (requestor instanceof RequestorService){
-			return requestor.getRequestorId()+"_"+((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString();
-		}
-		else if (requestor instanceof RequestorCis){
-			return requestor.getRequestorId()+"_"+((RequestorCis) requestor).getCisRequestorId().getJid();
-		}
-		else {
+		if (null == requestor) {
 			throw new PrivacyException("Bad requestor, can't store the agreement in the context.");
 		}
+		return CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+requestor.hashCode();
 	}
 
 	// -- Dependency Injection

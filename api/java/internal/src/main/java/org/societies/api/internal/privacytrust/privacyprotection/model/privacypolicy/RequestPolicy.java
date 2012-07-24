@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.Requestor;
 
 /**
@@ -69,7 +70,7 @@ public class RequestPolicy implements Serializable{
 	public String toXMLString(){
 		String str = "<RequestPolicy>";
 		if (this.hasRequestor()){
-			str = str.concat(this.requestor.toXMLString());
+			str = str.concat("<Subject>"+this.requestor.toXMLString()+"</Subject>");
 		}
 		for (RequestItem item : requests){
 			str = str.concat(item.toXMLString());
@@ -84,4 +85,37 @@ public class RequestPolicy implements Serializable{
 	public String toString(){
 		return this.toXMLString();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((requestor == null) ? 0 : requestor.hashCode());
+		result = prime * result
+				+ ((requests == null) ? 0 : requests.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		RequestPolicy rhs = (RequestPolicy) obj;
+		return new EqualsBuilder()
+			.append(this.getRequestor(), rhs.getRequestor())
+			.append(this.getRequests(), rhs.getRequests())
+			.isEquals();
+	}
+
+
 }

@@ -51,7 +51,7 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 
 	public UserIntentAction(ServiceResourceIdentifier serviceID, String serviceType, String par, String val,Long id){
 		super(serviceID, serviceType, par, val);
-		this.actionID = par +"="+val+"/"+id; 
+		this.actionID = serviceID.getServiceInstanceIdentifier()+"#"+par +"="+val+"/"+id; 
 	//	this.transProb = transProb;
 		this.confidenceLevel = 51;
 	}

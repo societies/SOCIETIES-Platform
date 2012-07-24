@@ -27,12 +27,14 @@ package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
 import static org.mockito.Mockito.*;
 
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
 
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
@@ -137,6 +139,8 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 public class EgocentricCommunityDeletionManager //implements ICommCallback
 {
 
+	//private static Logger LOG = LoggerFactory.getLogger(EgocentricCommunityDeletionManager.class);
+	
 	private IIdentity linkedCss;
 	
     private ICis linkedCis;
@@ -174,7 +178,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
-	private IDeviceManager deviceManager;
+//	private IDeviceManager deviceManager;
 	
 	/*
      * Constructor for EgocentricCommunityDeletionManager
@@ -478,13 +482,13 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
     	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
     }
     
-    public IDeviceManager getDeviceManager() {
-    	return deviceManager;
-    }
-    
-    public void setDeviceManager(IDeviceManager deviceManager) {
-    	this.deviceManager = deviceManager;
-    }
+//    public IDeviceManager getDeviceManager() {
+//    	return deviceManager;
+//    }
+//    
+//    public void setDeviceManager(IDeviceManager deviceManager) {
+//    	this.deviceManager = deviceManager;
+//    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

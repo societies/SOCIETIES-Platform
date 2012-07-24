@@ -35,6 +35,7 @@ import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
+import org.societies.android.platform.content.CssRecordDAO;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalBinder;
 import org.societies.utilities.DBC.Dbc;
@@ -74,6 +75,10 @@ public class PluginCSSManager extends Plugin {
 	 */
 	private static final String CONNECT_SERVICE = "connectService";
 	private static final String DISCONNECT_SERVICE = "disconnectService";
+	/**
+	 * Ancilliary functionality
+	 */
+	private static final String READ_CSSRECORD = "readCSSRecord";
 	
 	//Required to match method calls with callbackIds (used by PhoneGap)
 	private HashMap<String, String> methodCallbacks;
@@ -103,6 +108,8 @@ public class PluginCSSManager extends Plugin {
         IntentFilter intentFilter = new IntentFilter() ;
         intentFilter.addAction(LocalCSSManagerService.LOGIN_CSS);
         intentFilter.addAction(LocalCSSManagerService.LOGOUT_CSS);
+        intentFilter.addAction(LocalCSSManagerService.REGISTER_XMPP_SERVER);
+        
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     	
     }
@@ -159,15 +166,31 @@ public class PluginCSSManager extends Plugin {
             return result;
 		} 
 
+		//uses synchronous call to current local cached CSSRecord
+		if (action.equals(READ_CSSRECORD)) {
+			CssRecordDAO cssRecordDAO = new CssRecordDAO(this.ctx.getContext());
+			
+			AndroidCSSRecord record = cssRecordDAO.readCSSrecord();
+			if (null != record) {
+	            result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecordDAO.readCSSrecord()));
+			} else {
+	            result = new PluginResult(PluginResult.Status.ERROR, "no CSS Record");
+			}
+            result.setKeepCallback(false);
 
+            return result;
+			
+		}
+		
 		//uses asynchronous calls
 		if (this.validRemoteCall(action) && this.connectedtoCSSManager) {
 
 			try {
 				Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
-				Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getString("cssIdentity"));
-				Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getString("cssHostingLocation"));
-				Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
+				Log.d(LOG_TAG, "parameter 1 - identity: " + data.getJSONObject(1).getString("cssIdentity"));
+				Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
+				Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
+				Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -178,6 +201,14 @@ public class PluginCSSManager extends Plugin {
 			
 			//Call local service method
 			if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 4))) {
+				
+				try {
+					Log.d(LOG_TAG, "parameter 1 - nodes: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
 				try {
 					this.localCSSManager.loginCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
@@ -187,6 +218,13 @@ public class PluginCSSManager extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5))) {
 				try {
 					this.localCSSManager.logoutCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 0))) {
+				try {
+					this.localCSSManager.registerXMPPServer(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -347,7 +385,6 @@ public class PluginCSSManager extends Plugin {
 		}
     	
     	Log.d(LOG_TAG, "Converted CSSRecord identity: " + aRecord.getCssIdentity());
-    	Log.d(LOG_TAG, "Converted CSSRecord node identity: " + aRecord.getCSSNodes()[0].getIdentity());
     	return aRecord;
     }
 
@@ -369,6 +406,14 @@ public class PluginCSSManager extends Plugin {
 				}
 			} else if (intent.getAction().equals(LocalCSSManagerService.LOGOUT_CSS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+				
+			} else if (intent.getAction().equals(LocalCSSManagerService.REGISTER_XMPP_SERVER)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 0);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {

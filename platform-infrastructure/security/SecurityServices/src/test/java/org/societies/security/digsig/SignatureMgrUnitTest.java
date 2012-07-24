@@ -29,8 +29,13 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.digsig.main.SignatureMgr;
 
+/**
+ * @author Mitja Vardjan
+ */
 public class SignatureMgrUnitTest {
 
 	private SignatureMgr classUnderTest;
@@ -59,7 +64,7 @@ public class SignatureMgrUnitTest {
 		
 		String xml = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
 		String xmlNodeId = "nodeA";
-		String identity = "";
+		IIdentity identity = null;  // FIXME
 		String result;
 		
 		result = classUnderTest.signXml(xml, xmlNodeId, identity);
@@ -68,7 +73,7 @@ public class SignatureMgrUnitTest {
 
 
 	/**
-	 * Test method for {@link ISignatureMgr#verify(String)}.
+	 * Test method for {@link ISignatureMgr#verifyXml(String)}.
 	 */
 	@Test
 	public void testVerify() {
@@ -78,7 +83,7 @@ public class SignatureMgrUnitTest {
 //		String xmlWithInvalidSig = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
 		boolean result;
 		
-		result = classUnderTest.verify(xmlWithValidSig);
+		result = classUnderTest.verifyXml(xmlWithValidSig);
 		assertTrue(result);
 		
 //		result = classUnderTest.verify(xmlWithInvalidSig);

@@ -30,6 +30,7 @@ import java.util.List;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 
 /**
@@ -44,8 +45,18 @@ public class ResourceUtils {
 		}
 		Resource resource = null;
 		try {
-			resource = new Resource((CtxAttributeIdentifier) CtxIdentifierFactory.getInstance().fromString(resourceBean.getCtxUriIdentifier()));
+			if (null != resourceBean.getCtxUriIdentifier() && !"".equals(resourceBean.getCtxUriIdentifier()))  {
+				resource = new Resource((CtxAttributeIdentifier) CtxIdentifierFactory.getInstance().fromString(resourceBean.getCtxUriIdentifier()));
+			}
+			else if (null != resourceBean.getContextType()) {
+				resource = new Resource(resourceBean.getContextType());
+			}
+			else {
+				throw new PrivacyException("The resource id and type can't be null!");
+			}
 		} catch (MalformedCtxIdentifierException e) {
+			return null;
+		} catch (PrivacyException e) {
 			return null;
 		}
 		return resource;
@@ -68,7 +79,7 @@ public class ResourceUtils {
 			return null;
 		}
 		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resourceBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource();
-		resourceBean.setCtxUriIdentifier(resource.getCtxIdentifier().toUriString());
+		resourceBean.setCtxUriIdentifier((null != resource.getCtxIdentifier() ? resource.getCtxIdentifier().toUriString() : null));
 		resourceBean.setContextType(resource.getContextType());
 		return resourceBean;
 	}

@@ -38,6 +38,8 @@ import org.societies.api.identity.IIdentity;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import java.util.concurrent.Future;
+
 /**
  * This is the interface for the Suggested Community Analyser component,
  * and acts as the gateway to Community Lifecycle Management, which
@@ -114,7 +116,21 @@ public interface ISuggestedCommunityAnalyser {
 	 *    parameter 
 	 *  - and an arraylist of matching CIS activities as the 5th parameter..
      */
+    @Deprecated
     public String processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities);
+    
+    /** @param communitySuggestions
+	 * This contains a list of CSSs and the context state model they all match
+	 * which suggests a possible community. If the model is a defined data type
+	 * in the system, then this interface can take 2 parameters: an arraylist of the
+	 * CSSs and the model object. In the meantime the following method can be called:
+	 * 
+	 * This method has the following parameters:
+	 *  - an arraylist of the CSSs as the 1st parameter, 
+	 *  - an arraylist of matching context attributes from the model as the 2nd parameter, 
+     */
+    public String processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes);
+   
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
 	 * which may lead to action being taken for some or all of them.

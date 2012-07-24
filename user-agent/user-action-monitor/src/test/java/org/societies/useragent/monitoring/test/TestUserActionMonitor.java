@@ -45,6 +45,8 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.useragent.monitoring.SnapshotManager;
@@ -59,6 +61,7 @@ public class TestUserActionMonitor extends TestCase{
 	SnapshotManager snpshtMgr;
 
 	//mock values
+	IIdentity mockCssID;
 	String stringId;
 	CtxIdentifier mockPersonId;
 	CtxEntityIdentifier mockEntityId;
@@ -90,6 +93,7 @@ public class TestUserActionMonitor extends TestCase{
 		uam.setCtxBroker(mockCtxBroker);
 
 		stringId = "sarah@societies.org";
+		mockCssID = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
 		snpshtsRegistry = new SnapshotsRegistry();
 
 		/*
@@ -211,7 +215,7 @@ public class TestUserActionMonitor extends TestCase{
 		}
 		//create class under test
 		System.out.println("Creating snpshtManager");
-		snpshtMgr = new SnapshotManager(mockCtxBroker);  //default snapshot created and registry retrieved
+		snpshtMgr = new SnapshotManager(mockCtxBroker, mockCssID);  //default snapshot created and registry retrieved
 		try {
 			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
 			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);

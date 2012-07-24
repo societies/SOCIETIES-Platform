@@ -24,6 +24,8 @@
  */
 package org.societies.platform.FoursquareConnector.impl;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
 
 class Test {
@@ -36,9 +38,10 @@ class Test {
 		FoursquareConnectorImpl f = new FoursquareConnectorImpl(
 				defaultAccessTokenString, "yangdingqi");
 
-		testProfileExtraction(f);
-		testFriendsExtraction(f);
-		testCheckinsExtraction(f);
+//		testProfileExtraction(f);
+//		testFriendsExtraction(f);
+//		testCheckinsExtraction(f);
+		testPostCheckins(f);
 	}
 
 	public static void testProfileExtraction(FoursquareConnectorImpl f) {
@@ -66,6 +69,19 @@ class Test {
 			System.out.println("user recent checkins = null");
 		else
 			System.out.println(r);
+	}
+	
+	public static void testPostCheckins(FoursquareConnectorImpl f) {
+		JSONObject checkin = new JSONObject();
+		try {
+			checkin.put("venueId", "4d6c77ae6fb7a35df4690c0d");
+			checkin.put("broadcast", "twitter");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		System.out.println(tweet.toString());
+		f.post(checkin.toString());
 	}
 
 }

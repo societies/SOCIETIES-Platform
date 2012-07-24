@@ -25,7 +25,12 @@
 
 package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+
+
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import static org.mockito.Mockito.*;
@@ -64,6 +69,7 @@ import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 //import org.societies.api.internal.css.management.ICSSManagerCallback;
 //import org.societies.api.internal.css.management.ICSSRemoteManager;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
@@ -133,6 +139,8 @@ import java.util.List;
 public class EgocentricCommunityConfigurationManager //implements ICommCallback
 {
 	
+	//private static Logger LOG = LoggerFactory.getLogger(EgocentricCommunityConfigurationManager.class);
+	
 	private IIdentity linkedCss;
     
 	//private IIdentity linkedDomain;
@@ -161,7 +169,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
     private ICommCallback commCallback;
     private IIdentityManager identityManager;
 	
-	private IDeviceManager deviceManager;
+//	private IDeviceManager deviceManager;
 	
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
@@ -336,8 +344,20 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	        	//
 		       // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
 	   }
-		return suggestedCommunityAnalyser.processEgocentricConfigurationRecommendations(null, null);
-		
+		try {
+			return suggestedCommunityAnalyser.processEgocentricConfigurationRecommendations(null, null).get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public ArrayList<ICis> getUserFeedbackOnConfiguration(ArrayList<ICis> cissToConfigure) {
@@ -474,13 +494,13 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
     	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
     }
     
-    public IDeviceManager getDeviceManager() {
-    	return deviceManager;
-    }
-    
-    public void setDeviceManager(IDeviceManager deviceManager) {
-    	this.deviceManager = deviceManager;
-    }
+//    public IDeviceManager getDeviceManager() {
+//    	return deviceManager;
+//    }
+//    
+//    public void setDeviceManager(IDeviceManager deviceManager) {
+//    	this.deviceManager = deviceManager;
+//    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

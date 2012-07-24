@@ -25,6 +25,10 @@
 
 package org.societies.api.security.digsig;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
+import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -46,7 +50,7 @@ public interface ISignatureMgr {
 	 * 
 	 * @return XML with embedded signature.
 	 */
-	public String signXml(String xml, String xmlNodeId, String identity);
+	public String signXml(String xml, String xmlNodeId, IIdentity identity);
 	
 	/**
 	 * Verify all digital signatures embedded in given XML. Verify also if the
@@ -57,6 +61,27 @@ public interface ISignatureMgr {
 	 * @return True if all digital signatures and identities are valid.
 	 * False otherwise or if no signatures found.
 	 */
-	public boolean verify(String xml);
+	public boolean verifyXml(String xml);
 
+	/**
+	 * Digitally sign given data.
+	 * 
+	 * @param dataToSign The data to sign
+	 * @param privateKey The private key to use for signing the data
+	 * @return Hex encoded digital signature  
+	 * @throws DigsigException If something is wrong with the given key, or
+	 * (unlikely) the algorithm cannot process the given data
+	 */
+	public String sign(byte[] dataToSign, PrivateKey privateKey) throws DigsigException;
+	
+	/**
+	 * Verify given digital signature against given data.
+	 * 
+	 * @param data The data that given signature is supposed to correspond to.
+	 * @param signature The digital signature to verify
+	 * @param publicKey The public key to use for verification
+	 * @return True if signature is valid. False if signature or public key is invalid, or
+	 * (unlikely) other error occurred.
+	 */
+	public boolean verify(byte[] data, String signature, PublicKey publicKey);
 }

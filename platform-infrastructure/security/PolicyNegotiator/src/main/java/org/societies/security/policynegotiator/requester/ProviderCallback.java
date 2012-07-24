@@ -95,7 +95,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				try {
 					String selectedSop = selectSopOption(sop);
 					// TODO: use real identity when it can be gathered from other components
-					sop = requester.getSignatureMgr().signXml(sop, selectedSop, "identity");
+					sop = requester.getSignatureMgr().signXml(sop, selectedSop, null);
 					ProviderCallback callback = new ProviderCallback(requester, provider,
 							MethodType.ACCEPT_POLICY_AND_GET_SLA, includePrivacyPolicyNegotiation,
 							finalCallback); 
@@ -114,7 +114,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 			if (result.isSuccess()) {
 				String sla;
 				sla = result.getSla();
-				if (requester.getSignatureMgr().verify(sla)) {
+				if (requester.getSignatureMgr().verifyXml(sla)) {
 					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
 					LOG.debug("receiveResult(): final SLA size: {}", sessionId, sla == null ? null : sla.length());
 					
@@ -136,7 +136,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					}
 					else {
 						// Notify successful end of negotiation
-						LOG.debug("invoking final callback");
+						LOG.debug("invoking final callback. Jar URL = {}", jar);
 						finalCallback.onNegotiationComplete(agreementKey, jar);
 						LOG.info("negotiation finished, final callback invoked");
 					}

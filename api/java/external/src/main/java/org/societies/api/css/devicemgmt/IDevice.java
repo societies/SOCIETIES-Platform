@@ -43,6 +43,11 @@ public interface IDevice {
 	 * @return A device name
 	 */
     public String getDeviceName();
+    
+    /**
+	 * @return A device node Id
+	 */
+    public String getDeviceNodeId();
    
     /**
      * 
@@ -66,17 +71,7 @@ public interface IDevice {
      * 
      * @return return a device connection type (e.g. Zigbee, Wi-Fi and so on)
      */
-    public String getDeviceConnetionType();
-    
-    /**
-     * method used to enable a device
-     */
-    public void enable();
-    
-    /**
-     * method used to disable a device
-     */
-    public void disable();
+    public String getDeviceConnectionType();
     
     /**
      * 

@@ -24,17 +24,22 @@
  */
 package org.societies.platform.TwitterConnector.impl;
 
+import org.apache.shindig.social.core.model.ActivityEntryImpl;
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.platform.TwitterConnector.TwitterConnector;
 
 class Test {
 
 	public static void main(String[] args) {
-//		String Token = "468234144-7jBtrulMAriO1yjg2J9POY6aeW2TwnwrEXWeDWYn,1lY5pClLbeJ2MGC8A9995Dlx7gxNqdnLPQarsplwLpU";
-		String Token = "13642262-wzt0KQGjadF1GAK48lUsdigcYHTwn3bjtfnBFWcxh,gbhIavlWyOUBcNY22bWSjextPzPBITJVJ3xPJ7oIliA";
+		String Token = "468234144-7jBtrulMAriO1yjg2J9POY6aeW2TwnwrEXWeDWYn,1lY5pClLbeJ2MGC8A9995Dlx7gxNqdnLPQarsplwLpU";
+//		String Token = "13642262-wzt0KQGjadF1GAK48lUsdigcYHTwn3bjtfnBFWcxh,gbhIavlWyOUBcNY22bWSjextPzPBITJVJ3xPJ7oIliA";
 		TwitterConnectorImpl t = new TwitterConnectorImpl(Token, "dingqi");
 
 		testProfileExtraction(t);
 		testFriendsExtraction(t);
+//		testTweetPost(t);
 //		testFollowersExtraction(t);
 //		testTweetsExtraction(t);
 	}
@@ -73,6 +78,25 @@ class Test {
 			System.out.println("connection error");
 		else
 			System.out.println(r);
+	}
+	
+	public static void testTweetPost(TwitterConnector t){
+//		ActivityEntry entry = new ActivityEntryImpl();
+//		entry.setId("dingqi");
+//		entry.setContent("Hi, I am a tester");
+//		System.out.println(entry.toString());
+		
+		JSONObject tweet = new JSONObject();
+		try {
+			tweet.put("status", "Hi, I am a tester!");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		System.out.println(tweet.toString());
+		t.post(tweet.toString());
+		
+		
 	}
 
 }

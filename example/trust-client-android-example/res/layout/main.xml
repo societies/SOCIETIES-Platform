@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tvTrustor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/trustor_label"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/etTrustor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/trustor_field_hint"
+        android:inputType="textEmailAddress" >
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/tvTrustee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/trustee_label"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/etTrustee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/trustee_field_hint"
+        android:inputType="textEmailAddress" >
+    </EditText>
+
+    <TextView
+        android:id="@+id/tvRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/rating_label"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <RatingBar
+        android:id="@+id/rbTrust"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
+    
+    <View
+  		android:layout_width="0dp"
+  		android:layout_height="fill_parent"
+  		android:layout_weight="1">
+	</View>
+	
+    <ProgressBar
+        android:id="@+id/pbProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="invisible" />
+    
+    <View
+  		android:layout_width="0dp"
+  		android:layout_height="fill_parent"
+  		android:layout_weight="1">
+	</View>
+
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:weightSum="2">
+        <Button
+        	android:id="@+id/buttonSubmit"
+        	android:layout_width="fill_parent"
+        	android:layout_height="fill_parent"
+        	android:layout_weight="1"
+        	android:text="@string/button_submit"
+        	android:enabled="false"
+        	android:onClick="onButtonSubmitClick" />
+		<Button
+        	android:id="@+id/buttonClear"            
+        	android:layout_width="fill_parent"
+        	android:layout_height="fill_parent"
+        	android:layout_weight="1"
+        	android:text="@string/button_clear"
+        	android:enabled="false"
+        	android:onClick="onButtonClearClick" />
+  	</LinearLayout>
+
+</LinearLayout>

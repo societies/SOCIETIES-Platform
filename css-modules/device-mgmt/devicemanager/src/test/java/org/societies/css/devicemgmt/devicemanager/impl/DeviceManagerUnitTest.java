@@ -36,11 +36,10 @@ import static org.mockito.Mockito.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.css.devicemgmt.IDevice;
 
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 /**
@@ -52,6 +51,7 @@ import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 public class DeviceManagerUnitTest {
 
 	private DeviceManager deviceManager;
+	private DmCommManager deviceCommManagerMock;
 	private BundleContext bundleContextMock;
 	private ICommManager commManagerMock;
 	private IIdentityManager identityManagerMock;
@@ -77,11 +77,16 @@ public class DeviceManagerUnitTest {
 		commManagerMock = mock(ICommManager.class);
 		identityManagerMock = mock(IIdentityManager.class);
 		iNetworkNodeMock = mock(INetworkNode.class);
+		
+		deviceCommManagerMock = mock(DmCommManager.class);
 
 		deviceManager = new DeviceManager();
 
 		//Simulate a BundleContext injection
 		deviceManager.setBundleContext(bundleContextMock);
+		
+		//simulate a DmCommManager injection
+		deviceManager.setDeviceCommManager(deviceCommManagerMock);
 
 		//Create a stub to simulate getIdManager method call by returning identityManagerMock
 		when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);

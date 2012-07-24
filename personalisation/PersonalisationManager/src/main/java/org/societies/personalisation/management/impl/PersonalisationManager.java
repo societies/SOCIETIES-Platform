@@ -373,41 +373,51 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	public Future<IAction> getPreference(IIdentity ownerID, String serviceType,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
 		Future<List<IDIANNEOutcome>> futureDianneOuts;
-		try{
+		
 		futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
-		}catch(Exception e){
-			e.printStackTrace();
+		
+		if (futureDianneOuts==null){
 			futureDianneOuts = new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
+			this.logging.debug(".getPreference(...): DIANNE returned null list");
 		}
 		Future<IOutcome> futurePrefOuts;
-		try{
-		 futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
-		}catch(Exception e){
-			e.printStackTrace();
-			 futurePrefOuts = new AsyncResult<IOutcome>(null);
+		
+		futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+		
+		if (futurePrefOuts==null){
+			futurePrefOuts = new AsyncResult<IOutcome>(null);
+			this.logging.debug(".getPreference(...): PCM returned null list");
 		}
 		IAction action;
 		try {
 			List<IDIANNEOutcome> dianneOutList = futureDianneOuts.get();
 			if (dianneOutList.size()>0){
+				
 			IDIANNEOutcome dianneOut = dianneOutList.get(0);
+			this.logging.debug(".getPreference(...): DIANNE returned an outcome: "+dianneOut.toString());
 			IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
 
 			if (null==prefOut){
+				this.logging.debug(".getPreference(...): PCM didn't return an outcome. Returning DIANNE's outcome: "+dianneOut.toString());
 				return new AsyncResult<IAction>(dianneOut);
 			}
+			
+			this.logging.debug(".getPreference(...): PCM returned an outcome "+prefOut.toString());
 			if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())){
 				action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
 				action.setServiceID(serviceID);
 				action.setServiceType(serviceType);
-
+				this.logging.debug(".getPreference(...): returning action: "+action.toString());
 				return new AsyncResult<IAction>(action);
 			}else{
+				this.logging.debug(".getPreference(...): conflict between pcm and dianne.");
 				return new AsyncResult<IAction>(this.resolvePreferenceConflicts(dianneOut, prefOut));
 			}
 			
 			}else{
+				
 				IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
+				this.logging.debug(".getPreference(...): DIANNE didn't return an outcome. Returning PCM's outcome: "+prefOut.toString());
 				return new AsyncResult<IAction>(prefOut);
 			}
 		} catch (InterruptedException e) {
@@ -810,8 +820,10 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		int pConf = this.prefMgrConfidenceLevel * pOut.getConfidenceLevel();
 
 		if (dConf > pConf){
+			this.logging.debug("Conflict Resolved. Returning dianne's outcome: "+dOut.toString());
 			return dOut;
 		}else{
+			this.logging.debug("Conflict Resolved. Returning pcm's outcome:"+pOut.toString());
 			return pOut;
 		}
 
@@ -826,8 +838,12 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		int cristConf = this.cristConfidenceLevel * cristAction.getConfidenceLevel();
 
 		if (cauiConf > cristConf){
+			this.logging.debug("Conflict Resolved. Returning caui's outcome: "+cauiAction.toString());
+
 			return cauiAction;
 		}else{
+			this.logging.debug("Conflict Resolved. Returning crist's outcome: "+cristAction.toString());
+
 			return cristAction;
 		}
 
@@ -953,6 +969,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 
 				if (intentNonOverlapping.size() ==0 & prefNonOverlapping.size() ==0){
 					this.logging.debug("Action Event-> Nothing to send to decisionMaker");
+					return;
 				}else{
 					for (int i=0; i<prefNonOverlapping.size(); i++){
 						this.logging.debug("Preference Outcome "+i+" :"+prefNonOverlapping.get(i));

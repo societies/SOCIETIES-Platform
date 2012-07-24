@@ -35,12 +35,18 @@ import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.css.directory.ICssDirectory;
 
 //import org.societies.api.internal.css.discovery.ICssDiscovery;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 
 /**import org.societies.api.cis.management.ICis;
@@ -124,6 +130,8 @@ import java.util.concurrent.Future;
 
 public class RelevantCommunityAnalyser implements IRelevantCommunityAnalyser
 {
+
+	private static Logger LOG = LoggerFactory.getLogger(RelevantCommunityAnalyser.class);
 	
 	private IIdentity linkedCss;
 	
@@ -153,7 +161,7 @@ public class RelevantCommunityAnalyser implements IRelevantCommunityAnalyser
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
-	private IDeviceManager deviceManager;
+//	private IDeviceManager deviceManager;
 	
 	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
 	private SuggestedCommunityAnalyserResultBean suggestedCommunityAnalyserResultBean;
@@ -221,7 +229,7 @@ public class RelevantCommunityAnalyser implements IRelevantCommunityAnalyser
     }
         
     @Override
-    public ArrayList<IIdentity> processRelevanceRecommendations() {
+    public Future<ArrayList<IIdentity>> processRelevanceRecommendations() {
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>(); 
     	
@@ -269,12 +277,12 @@ public class RelevantCommunityAnalyser implements IRelevantCommunityAnalyser
     }
     
     public void setUserContextBroker(ICtxBroker userContextBroker) {
-    	System.out.println("GOT user context broker" + userContextBroker);
+    	LOG.info("Got user context broker" + userContextBroker);
     	this.userContextBroker = userContextBroker;
     }
     
     public void setExternalContextBroker(org.societies.api.context.broker.ICtxBroker externalContextBroker) {
-    	System.out.println("GOT user context broker" + userContextBroker);
+    	LOG.info("Got external context broker" + externalContextBroker);
     	this.externalContextBroker = externalContextBroker;
     }
     
@@ -338,13 +346,13 @@ public class RelevantCommunityAnalyser implements IRelevantCommunityAnalyser
     	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
     }
     
-    public IDeviceManager getDeviceManager() {
-    	return deviceManager;
-    }
-    
-    public void setDeviceManager(IDeviceManager deviceManager) {
-    	this.deviceManager = deviceManager;
-    }
+//    public IDeviceManager getDeviceManager() {
+//    	return deviceManager;
+//    }
+//    
+//    public void setDeviceManager(IDeviceManager deviceManager) {
+//    	this.deviceManager = deviceManager;
+//    }
     
     public IPrivacyDataManager getPrivacyDataManager() {
     	return privacyDataManager;

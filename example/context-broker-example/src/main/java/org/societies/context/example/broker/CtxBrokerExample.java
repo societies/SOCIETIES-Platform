@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -43,10 +44,14 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeBond;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxBond;
+import org.societies.api.context.model.CtxBondOriginType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
@@ -59,6 +64,9 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
+
 /**
  * This class provides examples for using the internal Context Broker in OSGi. 
  */
@@ -70,26 +78,106 @@ public class CtxBrokerExample 	{
 
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
-	
+
+	private IIdentity cisID;
 	private IIdentity cssOwnerId;
+	private IIdentity cssID1; 
+	private IIdentity cssID2;
+	private IIdentity cssID3;
+
+	private CommunityCtxEntity communityEntity;
+	private IndividualCtxEntity indiEnt1;
+	private IndividualCtxEntity indiEnt2;
+	private IndividualCtxEntity indiEnt3;
+
+	private ICisOwned cisOwned  = null;
+
 	private INetworkNode cssNodeId;
+	
+	private String privacyPolicyWithoutRequestor  = "<RequestPolicy>" +
+			"<Target>" +
+			"<Resource>" +
+			"<Attribute AttributeId=\"contextType\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+			"<AttributeValue>fdsfsf</AttributeValue>" +
+			"</Attribute>" +
+			"</Resource>" +
+			"<Action>" +
+			"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
+			"<AttributeValue>WRITE</AttributeValue>" +
+			"</Attribute>" +
+			"<optional>false</optional>" +
+			"</Action>" +
+			"<Condition>" +
+			"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+			"<AttributeValue DataType=\"SHARE_WITH_3RD_PARTIES\">dfsdf</AttributeValue>" +
+			"</Attribute>" +
+			"<optional>true</optional>" +
+			"</Condition>" +
+			"<Condition>" +
+			"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
+			"<AttributeValue DataType=\"DATA_RETENTION_IN_MINUTES\">412</AttributeValue>" +
+			"</Attribute>" +
+			"<optional>true</optional>" +
+			"</Condition>" +
+			"<optional>false</optional>" +
+			"</Target>" +
+			"</RequestPolicy>";
+
+	String cssPassword = "password.societies.local";
+
 
 	private CtxEntityIdentifier ctxEntityIdentifier = null;
 	private CtxIdentifier ctxAttributeStringIdentifier = null;
 	private CtxIdentifier ctxAttributeBinaryIdentifier = null;
 
 	@Autowired(required=true)
-	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr) throws InvalidFormatException {
+	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr, ICisManager cisManager) throws InvalidFormatException {
 
 		LOG.info("*** CtxBrokerExample instantiated");
 		this.internalCtxBroker = internalCtxBroker;
-		
+
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
-		
+
 		final String cssOwnerStr = this.cssNodeId.getBareJid();
+		LOG.info( "cssOwnerStr "+ cssOwnerStr);
 		this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
-		LOG.info("*** cssOwnerId = " + this.cssOwnerId);
+		LOG.info("*** cssOwnerId = " + this.cssOwnerId.toString());
+		LOG.info("  cssOwnerId id type: "+this.cssOwnerId.getType());
+
+		this.cssID1 =  commMgr.getIdManager().fromJid("boo@societies.local ");
+
+		LOG.info( "this.cssID1 "+ this.cssID1);
+		LOG.info( "this.cssID1.getType() "+ this.cssID1.getType());
+
+		this.cssID2 =  commMgr.getIdManager().fromJid("coo@societies.local");
+		LOG.info( "this.cssID2 "+ this.cssID2);
+		LOG.info( "this.cssID2.getType() "+ this.cssID2.getType());
+
+		this.cssID3 =  commMgr.getIdManager().fromJid("zoo@societies.local");
+		LOG.info( "this.cssID3 "+ this.cssID3);
+		LOG.info( "this.cssID3.getType() "+ this.cssID3.getType());
+
+		try {
+			cisOwned = cisManager.createCis(this.cssOwnerId.toString(), cssPassword, "cisName", "contextTestingCIS", 1, this.privacyPolicyWithoutRequestor).get();
+			LOG.info("*** cisOwned " +cisOwned);
+			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
+			String cisIDString  = cisOwned.getCisId();
+
+			this.cisID = commMgr.getIdManager().fromJid(cisIDString);
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		LOG.info("*** cisManager this.cisID " +this.cisID.toString());
+		LOG.info("*** cisManager this.cisID type " +this.cisID.getType());
 
 		LOG.info("*** Starting examples...");
 		this.retrieveIndividualEntity();
@@ -100,32 +188,179 @@ public class CtxBrokerExample 	{
 		this.lookupContext();
 		this.simpleCtxHistoryTest();
 		this.tuplesCtxHistoryTest();
+		//this.triggerInferenceTest();
+
+		// community context tests
+		this.createCommunityEntity();
+		this.createIndividualEntities();
+		// includes context bond tests
+		this.populateCommunityEntity();
+		
 	}
-	
+
+
+	private void populateCommunityEntity(){
+		LOG.info("*** populateCommunityEntity");
+
+		try {
+		//	this.internalCtxBroker
+			CtxAttributeBond attributeLocationBond = new CtxAttributeBond(CtxAttributeTypes.LOCATION_SYMBOLIC, CtxBondOriginType.MANUALLY_SET);
+			attributeLocationBond.setMinValue("home");
+			attributeLocationBond.setMaxValue("home");
+			attributeLocationBond.setValueType(CtxAttributeValueType.STRING);
+			LOG.info("locationBond created : " + attributeLocationBond.toString());
+			CtxAttributeBond attributeAgeBond = new CtxAttributeBond(CtxAttributeTypes.WEIGHT, CtxBondOriginType.MANUALLY_SET);
+			
+			attributeLocationBond.setValueType(CtxAttributeValueType.INTEGER);
+			attributeAgeBond.setMinValue(new Integer(18));
+			attributeAgeBond.setMinValue(new Integer(20));
+			
+			this.communityEntity.addBond(attributeLocationBond);
+			this.communityEntity.addBond(attributeAgeBond);
+			
+			this.communityEntity.addMember(this.indiEnt1.getId());
+			this.communityEntity.addMember(this.indiEnt2.getId());
+			this.communityEntity.addMember(this.indiEnt3.getId());
+			
+			LOG.info(" BEFORE UPDATE communityEnt.getID():  " +this.communityEntity.getId());
+			LOG.info(" BEFORE UPDATE communityEnt.getMembers():  " +this.communityEntity.getMembers());
+			
+			this.internalCtxBroker.update(this.communityEntity).get();
+
+			CommunityCtxEntity communityEnt = (CommunityCtxEntity) this.internalCtxBroker.retrieve(this.communityEntity.getId()).get();
+			LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt);
+			LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt.getMembers());
+			
+			
+			Set<CtxBond> retrievedBonds = communityEnt.getBonds();
+			LOG.info(" retrievedBonds " +retrievedBonds);
+			for(CtxBond bond : retrievedBonds){
+				LOG.info(" bond type : " +bond.getType());
+				LOG.info(" bond modelType : " +bond.getModelType());
+				LOG.info(" bond origin type : " +bond.getOriginType());
+			}
+			
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+	private void createIndividualEntities(){
+		LOG.info("*** createIndividualEntities");
+		try {
+			this.indiEnt1 = this.internalCtxBroker.createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
+			this.indiEnt2 = this.internalCtxBroker.createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
+			this.indiEnt3 = this.internalCtxBroker.createIndividualEntity(this.cssID3, CtxEntityTypes.PERSON).get();
+
+			LOG.info("individual entity 1 "+this.indiEnt1);		
+			LOG.info("individual entity 2 "+this.indiEnt2);	
+			LOG.info("individual entity 3 "+this.indiEnt3);
+
+			
+			CtxAttribute individualAttr1 = this.internalCtxBroker.createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			CtxAttribute individualAttr2 = this.internalCtxBroker.createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			CtxAttribute individualAttr3 = this.internalCtxBroker.createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			
+			individualAttr1.setStringValue("Athens_Greece");
+			individualAttr2.setStringValue("Athens_Greece");
+			individualAttr3.setStringValue("Athens_Greece");
+
+			this.internalCtxBroker.update(individualAttr1);
+			this.internalCtxBroker.update(individualAttr2);
+			this.internalCtxBroker.update(individualAttr3);
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+	private void createCommunityEntity(){
+		LOG.info("*** createCommunityContext");
+
+		// create community ctx Entity
+		try {
+			LOG.info("this.cisID: "+ this.cisID);
+			this.communityEntity = this.internalCtxBroker.createCommunityEntity(this.cisID).get();
+
+			LOG.info("communityEntity: "+ communityEntity.getId());
+			LOG.info("communityEntity type : "+ communityEntity.getType());
+
+			CtxAttribute communityAttr = this.internalCtxBroker.createAttribute(communityEntity.getId(), "ctxCommunityAttribute").get();
+			LOG.info("communityAttribute id " +communityAttr.getId() );
+			LOG.info("communityAttribute owner id " +communityAttr.getOwnerId() );
+			LOG.info("communityAttribute owner type " +communityAttr.getType() );
+
+			communityAttr.setStringValue("communityValue");
+			communityAttr = (CtxAttribute) this.internalCtxBroker.update(communityAttr).get();
+			
+			CtxAttribute retrievedCommunityAttr = (CtxAttribute) this.internalCtxBroker.retrieve(communityAttr.getId()).get();
+			LOG.info("retrievedCommunityAttr id " +retrievedCommunityAttr.getId());
+			LOG.info("retrievedCommunityAttr get string value " +retrievedCommunityAttr.getStringValue());
+
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+
+
+
 	private void retrieveIndividualEntity() {
-		
+
 		LOG.info("*** retrieveIndividualEntity");
-		
+
 		try {
 			final IndividualCtxEntity operator = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 			LOG.info("*** CSS owner context entity id: " + operator.getId());
-		
+
+			Set<CtxAttribute> attributes = operator.getAttributes();
+			if(attributes.size()>0){
+				for(CtxAttribute ctxAttr : attributes){
+					LOG.info("CtxAttribute "+ctxAttr.getId());
+				}	
+			}
+
 		} catch (Exception e) {
-			
+
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
-	
+
 	private void retrieveCssNode() {
-		
+
 		LOG.info("*** retrieveCssNode");
-		
+
 		try {
 			CtxEntity cssNodeEnt = this.internalCtxBroker.retrieveCssNode(this.cssNodeId).get();
 			LOG.info("*** CSS node context entity id: " + cssNodeEnt.getId());
-		
+
 		} catch (Exception e) {
-			
+
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
@@ -191,7 +426,7 @@ public class CtxBrokerExample 	{
 			// and a ctxAttribute of type "CustomData" with a binary value
 
 		} catch (Exception e) {
-			
+
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
@@ -200,8 +435,9 @@ public class CtxBrokerExample 	{
 	 * This method demonstrates how to retrieve context data from the context database
 	 */
 	private void lookupContext() {
-		try {
 
+		LOG.info("*** lookupContext");
+		try {
 			List<CtxIdentifier> idsEntities =this.internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
 			LOG.info("*** lookup results for Entity type: '" + CtxEntityTypes.DEVICE + "' " +idsEntities);
 
@@ -209,12 +445,10 @@ public class CtxBrokerExample 	{
 			LOG.info("*** lookup results for Attribute type: '" + CtxAttributeTypes.ID + "' " +idsAttribute);
 
 		} catch (Exception e) {
-			
+
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
-
-
 
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
@@ -228,15 +462,15 @@ public class CtxBrokerExample 	{
 			// retrieve ctxEntity
 			// This retrieval is performed based on the known CtxEntity identifier
 			// Retrieve is also possible to be performed based on the type of the CtxEntity. This will be demonstrated in a later example.
-			Future<CtxModelObject> ctxEntityRetrievedFuture = this.internalCtxBroker.retrieve(this.ctxEntityIdentifier);
-			CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
+
+			CtxEntity retrievedCtxEntity = (CtxEntity) this.internalCtxBroker.retrieve(this.ctxEntityIdentifier).get();
 
 			LOG.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
 
 			// retrieve the CtxAttribute contained in the CtxEntity with the string value
 			// again the retrieval is based on an known identifier, it is possible to retrieve it based on type.This will be demonstrated in a later example.
-			Future<CtxModelObject> ctxAttributeRetrievedStringFuture = this.internalCtxBroker.retrieve(this.ctxAttributeStringIdentifier);
-			CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
+			CtxAttribute retrievedCtxAttribute = (CtxAttribute) this.internalCtxBroker.retrieve(this.ctxAttributeStringIdentifier).get();
+
 			LOG.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
 
 			// retrieve ctxAttribute with the binary value
@@ -248,21 +482,18 @@ public class CtxBrokerExample 	{
 			LOG.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
 
 		} catch (Exception e) {
-			
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		}
-
 	}
-
-
 
 	/**
 	 * This method demonstrates how to create and retrieve context history data
 	 */
 	private void simpleCtxHistoryTest() {
 
+		LOG.info("*** simpleCtxHistoryTest");
 		CtxAttribute ctxAttribute;
-		
+
 		final CtxEntity ctxEntity;
 		// Create the attribute's scope
 
@@ -287,11 +518,11 @@ public class CtxBrokerExample 	{
 			for(CtxHistoryAttribute hocAttr: history){
 				System.out.println("history List id:"+hocAttr.getId()+" getLastMod:"+hocAttr.getLastModified() +" hocAttr value:"+hocAttr.getIntegerValue());		
 			}
-			
+
 			//test createHistory methods
 			CtxAttribute fakeAttribute = internalCtxBroker.createAttribute(ctxEntity.getId(), "historyAttribute").get();
 			List<CtxHistoryAttribute> historyList = new ArrayList<CtxHistoryAttribute>();
-			
+
 			Date date = new Date();
 			date.setTime(1000);
 			CtxHistoryAttribute hocAttr1 = internalCtxBroker.createHistoryAttribute(fakeAttribute.getId(), date, "one", CtxAttributeValueType.STRING).get();
@@ -302,14 +533,14 @@ public class CtxBrokerExample 	{
 			historyList.add(hocAttr1);
 			historyList.add(hocAttr2);
 			historyList.add(hocAttr3);
-			
+
 			List<CtxHistoryAttribute> historyListRetrieved = internalCtxBroker.retrieveHistory(fakeAttribute.getId(), null, null).get();
 			if(historyListRetrieved.equals(historyListRetrieved)) System.out.println("Succesfull Retrieval of created hoc Attributes");
-			
+
 			for (CtxHistoryAttribute ctxHistAttr : historyListRetrieved){
 				System.out.println("Hoc attribute value:" +ctxHistAttr.getStringValue()+" time:"+ctxHistAttr.getLastModified().getTime());
 			}
-			
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -326,6 +557,8 @@ public class CtxBrokerExample 	{
 	 * This method demonstrates how to create and retrieve context history data in tuples, and how to update the tuple types.
 	 */
 	private void tuplesCtxHistoryTest() {
+
+		LOG.info("*** tuplesCtxHistoryTest");
 
 		final CtxEntity ctxEntity;
 		CtxAttribute primaryAttribute;
@@ -421,6 +654,37 @@ public class CtxBrokerExample 	{
 		}
 	}	
 
+	@SuppressWarnings("unused")
+	private void triggerInferenceTest() {
+		LOG.info("*** triggerInferenceTest");
+		try {
+			IndividualCtxEntity ownerEnt = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
+
+			Set<CtxAttribute> locationSet = ownerEnt.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
+			List<CtxAttribute> locList = new ArrayList<CtxAttribute>(locationSet);
+			CtxAttribute locAttr = null;
+			if(locList.size()>0){
+				locAttr = locList.get(0);
+				System.out.println("trigger inference for attr: "+locAttr);
+
+				locAttr = (CtxAttribute) this.internalCtxBroker.retrieve(locAttr.getId()).get();
+				System.out.println("after inference " + locAttr);
+			}
+
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+
 	/**
 	 * This method demonstrates how to register for context change events in the context database
 	 */
@@ -434,6 +698,9 @@ public class CtxBrokerExample 	{
 
 			// 1b. Register listener by specifying the context attribute scope and type
 			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, CtxAttributeTypes.ID);
+			
+			// 1c. Register listener by specifying the context attribute scope
+			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, null);
 
 			// 2. Update attribute to see some event action
 			this.internalCtxBroker.updateAttribute((CtxAttributeIdentifier) this.ctxAttributeStringIdentifier, "newDeviceIdValue");
@@ -482,4 +749,6 @@ public class CtxBrokerExample 	{
 			LOG.info(event.getId() + ": *** UPDATED event ***");
 		}
 	}
+
+
 }

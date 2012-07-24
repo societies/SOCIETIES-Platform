@@ -77,7 +77,10 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceIdentifier(),
 						service.getServiceEndpoint(), service.getServiceName(),
 						service.getServiceDescription(),
-						service.getAuthorSignature(), service.getServiceType(),
+						service.getAuthorSignature(),
+						service.getPrivacyPolicy(),
+						service.getServiceCategory(),
+						service.getServiceType(),
 						service.getServiceLocation(),
 						service.getServiceInstance(),
 						service.getServiceStatus());
@@ -113,7 +116,10 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceIdentifier(),
 						service.getServiceEndpoint(), service.getServiceName(),
 						service.getServiceDescription(),
-						service.getAuthorSignature(), service.getServiceType(),
+						service.getAuthorSignature(), 
+						service.getPrivacyPolicy(),
+						service.getServiceCategory(),
+						service.getServiceType(),
 						service.getServiceLocation(),
 						service.getServiceInstance(),
 						service.getServiceStatus());
@@ -227,6 +233,10 @@ public class ServiceRegistry implements IServiceRegistry {
 			c.add(Restrictions.like("serviceDescription", filter.getServiceDescription()));
 		if (filter.getAuthorSignature() != null)
 			c.add(Restrictions.like("authorSignature", filter.getAuthorSignature()));
+		if (filter.getPrivacyPolicy() != null)
+			c.add(Restrictions.like("privacyPolicy", filter.getPrivacyPolicy()));
+		if (filter.getServiceCategory() != null)
+			c.add(Restrictions.like("serviceCategory", filter.getPrivacyPolicy()));
 		if (filter.getServiceEndpoint() != null)
 			c.add(Restrictions.like("serviceEndPoint", filter.getServiceEndpoint()));
 		if (filter.getServiceLocation() != null)
@@ -254,6 +264,12 @@ public class ServiceRegistry implements IServiceRegistry {
 			if (servInst.getFullJid() != null) {
 				c.add(Restrictions.like("servInst.fullJid", servInst.getFullJid()));
 			}
+			if (servInst.getCssJid() != null) {
+				c.add(Restrictions.like("servInst.cssJid", servInst.getXMPPNode()));
+			}
+			if (servInst.getParentJid() != null) {
+				c.add(Restrictions.like("servInst.parentJid", servInst.getXMPPNode()));
+			}
 			if (servInst.getXMPPNode() != null) {
 				c.add(Restrictions.like("servInst.XMPPNode", servInst.getXMPPNode()));
 			}
@@ -268,6 +284,9 @@ public class ServiceRegistry implements IServiceRegistry {
 				}
 				if (si.getServiceVersion() != null) {
 					c.add(Restrictions.like("servImpl.serviceVersion", si.getServiceVersion()));
+				}
+				if (si.getServiceClient() != null) {
+					c.add(Restrictions.like("servImpl.serviceClient", si.getServiceVersion()));
 				}
 			}
 		}

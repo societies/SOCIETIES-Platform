@@ -33,8 +33,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-
-import javax.swing.JOptionPane;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,24 +41,25 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.osgi.event.IEventMgr;
+import org.societies.personalisation.preference.api.IUserPreferenceManagement;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceConditionExtractor;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceEvaluator;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PrivateContextCache;
 import org.societies.personalisation.UserPreferenceManagement.impl.management.PrivatePreferenceCache;
-import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 import org.societies.personalisation.preference.api.model.PreferenceTreeModel;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 
 
 
-public class UserPreferenceManagement{
+public class UserPreferenceManagement implements IUserPreferenceManagement{
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private PrivateContextCache contextCache;
 	private PrivatePreferenceCache preferenceCache;
@@ -239,7 +239,7 @@ public class UserPreferenceManagement{
 		return data;
 	}
 	
-	public void storePreference(IIdentity ownerID, PreferenceDetails details, IPreference preference){
+	public boolean storePreference(IIdentity ownerID, PreferenceDetails details, IPreference preference){
 		
 		logging.debug("request to store preference: for "+details.toString()+"\nPreference:\n"+preference.toTreeString());
 
@@ -249,8 +249,8 @@ public class UserPreferenceManagement{
 			model.setServiceID(details.getServiceID());
 		}
 		model.setServiceType(details.getServiceType());
-		this.preferenceCache.storePreference(ownerID,details,model);
-		this.calculateSizeOfObject(preference);
+		return this.preferenceCache.storePreference(ownerID,details,model);
+		//this.calculateSizeOfObject(preference);
 		
 
 	}
@@ -354,17 +354,27 @@ public class UserPreferenceManagement{
 		return ctxIDs;
 
 	}
-
-	public void deletePreference(IIdentity ownerID,
-			PreferenceDetails details){
-		this.preferenceCache.deletePreference(ownerID, details);
+	
+	
+	@Override
+	public boolean deletePreference(IIdentity ownerID,	PreferenceDetails details){
+		return this.preferenceCache.deletePreference(ownerID, details);
 	}
 	
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.preference.api.IUserPreferenceManagement#getPreferenceDetailsForAllPreferences()
+	 */
+	@Override
 	public List<PreferenceDetails> getPreferenceDetailsForAllPreferences() {
 		return this.preferenceCache.getPreferenceDetailsForAllPreferences();
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.preference.api.IUserPreferenceManagement#getModel(org.societies.api.identity.IIdentity, org.societies.api.internal.personalisation.model.PreferenceDetails)
+	 */
+	@Override
 	public IPreferenceTreeModel getModel(IIdentity ownerDPI,
 			PreferenceDetails details){
 		return this.preferenceCache.getPreference(details);
@@ -378,6 +388,16 @@ public class UserPreferenceManagement{
 	public void updateContext(CtxAttribute attribute) {
 		this.contextCache.updateCache(attribute);
 		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.personalisation.preference.IUserPreferenceManagement#getOutcome(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+	 */
+	@Override
+	public Future<IOutcome> getOutcome(IIdentity ownerId,
+			ServiceResourceIdentifier serviceId, String preferenceName) {
+		return new AsyncResult<IOutcome>(this.getPreference(ownerId, "", serviceId, preferenceName));
 	}
 
 }

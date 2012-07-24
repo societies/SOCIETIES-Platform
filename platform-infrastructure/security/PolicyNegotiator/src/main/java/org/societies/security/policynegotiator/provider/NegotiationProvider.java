@@ -85,18 +85,21 @@ public class NegotiationProvider implements INegotiationProvider {
 		return groupMgr;
 	}
 	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
+		LOG.debug("setGroupMgr()");
 		this.groupMgr = groupMgr;
 	}
 	public ISignatureMgr getSignatureMgr() {
 		return signatureMgr;
 	}
 	public void setSignatureMgr(ISignatureMgr signatureMgr) {
+		LOG.debug("setSignatureMgr()");
 		this.signatureMgr = signatureMgr;
 	}
 	public ProviderServiceMgr getProviderServiceMgr() {
 		return providerServiceMgr;
 	}
 	public void setProviderServiceMgr(ProviderServiceMgr providerServiceMgr) {
+		LOG.debug("setProviderServiceMgr()");
 		this.providerServiceMgr = providerServiceMgr;
 	}
 	
@@ -165,7 +168,7 @@ public class NegotiationProvider implements INegotiationProvider {
 		sla.setSessionId(sessionId);
 		finalSla = signedPolicyOption;  //TODO: add provider's signature
 		
-		if (session != null && signatureMgr.verify(signedPolicyOption)) {
+		if (session != null && signatureMgr.verifyXml(signedPolicyOption)) {
 			
 			sla.setSla(finalSla);
 			serviceId = session.getServiceId();
@@ -182,8 +185,10 @@ public class NegotiationProvider implements INegotiationProvider {
 			LOG.info("acceptPolicyAndGetSla({}): invalid signature", sessionId);
 			sla.setSuccess(false);
 		}
+		
+		Future<SlaBean> result = new AsyncResult<SlaBean>(sla);
 
-		return new AsyncResult<SlaBean>(sla);
+		return result;
 	}
 
 	@Override

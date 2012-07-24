@@ -18,7 +18,9 @@
 	</bean>	
 
 	<bean id="feedback" class="org.societies.useragent.feedback.UserFeedback"
-		name="feedback" init-method="initialiseUserFeedback">
+		name="feedback" depends-on="ctxBroker, commsMgr" init-method="initialiseUserFeedback">
+		<property name="ctxBroker" ref="ctxBroker"/>
+		<property name="commsMgr" ref="commsMgr"/>
 	</bean>
 	
 	<bean id="dm" class="org.societies.useragent.decisionmaking.DecisionMaker"

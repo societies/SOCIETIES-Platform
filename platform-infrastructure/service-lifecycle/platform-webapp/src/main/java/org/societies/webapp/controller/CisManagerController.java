@@ -26,13 +26,18 @@ package org.societies.webapp.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.webapp.models.CisManagerForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,7 +50,9 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Participant;
 
 
 @Controller
@@ -75,6 +82,9 @@ public class CisManagerController {
 
 	//for the callback
 	private String resultCallback;
+	private Community remoteCommunity;
+	private HttpSession m_session;
+	private static Logger LOG = LoggerFactory.getLogger(CisManagerController.class);
 	
 	@RequestMapping(value = "/cismanager.html", method = RequestMethod.GET)
 	public ModelAndView cssManager() {
@@ -86,28 +96,48 @@ public class CisManagerController {
 		//LIST METHODS AVAIABLE TO TEST
 		Map<String, String> methods = new LinkedHashMap<String, String>();
 		methods.put("CreateCis", "Create a CIS ");
-		methods.put("GetCisList", "Search my CIS's");
+		methods.put("GetCisList", "List my CISs");
 		methods.put("JoinRemoteCIS", "Join a remote CIS");
+		methods.put("LeaveRemoteCIS", "Leave a remote CIS");
+		methods.put("GetMemberList", "Get list of members of a CIS");
+		methods.put("GetMemberListRemote", "Get list of members from remote CIS");
+		methods.put("AddMember", "Add member to a CIS");
+		methods.put("RemoveMemberFromCIS", "Remove member from a CIS");
 		model.put("methods", methods);
 		
 		model.put("cmForm", cisForm);
 		remoteCISs = new ArrayList<ICis>();
+		
 		localCISs = new ArrayList<ICisOwned>();
+		
+		localCISs.addAll(this.getCisManager().getListOfOwnedCis());
+		remoteCISs.addAll(this.getCisManager().getRemoteCis());
+		
+		Iterator<ICisOwned> it = localCISs.iterator();
+		ICisOwned thisCis = null;
+		String res = "";
+		String log = "Log ";
+		while(it.hasNext() && thisCis != null){
+			ICisOwned element = it.next();
+			log.concat(("CIS initially added with jid = " + element.getCisId()));
+	     }
+
 		model.put("remoteCISsArray", remoteCISs);
 		model.put("localCISsArray", localCISs);
-		
+		model.put("log", log);
 		model.put("cismanagerResult", "CIS Management Result :");
 		return new ModelAndView("cismanager", model);
 	}
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/cismanager.html", method = RequestMethod.POST)
-	public ModelAndView cssManager(@Valid CisManagerForm cisForm, BindingResult result, Map model) {
+	public ModelAndView cssManager(@Valid CisManagerForm cisForm, BindingResult result, Map model, HttpSession session) {
 
+		m_session = session;
 		model.put("message", "Welcome to the CIS Manager Page");
 
 		if (result.hasErrors()) {
-			model.put("result", "CIS Manager form error");
+			model.put("res", "CIS Manager form error");
 			return new ModelAndView("cismanager", model);
 		}
 
@@ -115,14 +145,16 @@ public class CisManagerController {
 			model.put("errormsg", "CIS Manager Service reference not avaiable");
 			return new ModelAndView("error", model);
 		}
-
+		String res = "Starting...";
 		String method = cisForm.getMethod();
-		String res;
+		res = "Method: " + method;
 
 		try {
 			if (method.equalsIgnoreCase("CreateCis")) {
 				model.put("methodcalled", "CreateCis");
+				res = "Creating CIS...";
 
+				@SuppressWarnings("deprecation")
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
 						cisForm.getCssId(), 
 						cisForm.getCisPassword(), 
@@ -131,7 +163,6 @@ public class CisManagerController {
 						cisForm.getCisMode());
 
 				res = "Successfully created CIS: " + cisResult.get().getCisId();
-				model.put("res", res);
 				localCISs.add(cisResult.get());
 
 			} else if (method.equalsIgnoreCase("GetCisList")) {
@@ -146,46 +177,157 @@ public class CisManagerController {
 				model.put("methodcalled", "JoinRemoteCIS");
 
 				this.getCisManager().joinRemoteCIS(cisForm.getCisJid(), icall);
+				Thread.sleep(5 * 1000);
+				model.put("joinStatus", resultCallback);
 				ICis i = getCisManager().getCis(cisForm.getCssId(), cisForm.getCisJid());
-//				model.put("cisrecords", records);
+				model.put("cis", i);
 
+			} else if (method.equalsIgnoreCase("LeaveRemoteCIS")) {
+				model.put("methodcalled", "LeaveRemoteCIS");
+
+				this.getCisManager().leaveRemoteCIS(cisForm.getCisJid(), icall);
+				res = "left CIS: ";
+
+			} else if (method.equalsIgnoreCase("GetMemberList")) {
+				model.put("methodcalled", "GetMemberList");
+				model.put("cisid", cisForm.getCisJid());
+
+				ICisOwned thisCis = null;
+				List<ICisOwned> ownedCISs = this.getCisManager().getListOfOwnedCis();
+				if (ownedCISs.size() > 0) {
+					res = "before addall";
+					localCISs.addAll(ownedCISs);
+					res = "AfteraddAll";
+					Iterator<ICisOwned> it = localCISs.iterator();
+					
+					res = "Beforewhile";
+					while(it.hasNext() && thisCis == null){
+						ICisOwned element = it.next();
+						res = "BeforeIf";
+						if (element.getCisId().equalsIgnoreCase(cisForm.getCisJid())) {
+							thisCis = element;
+							//break;
+						}
+				    }
+				}
+				if(thisCis == null){
+					res = "thisCIS is null";
+					//NOT LOCAL CIS, SO CALL REMOTE
+					ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid().trim());
+					if (remoteCIS != null) {
+						res = cisForm.getCisJid().trim();
+						remoteCIS.getListOfMembers(icall);
+						res = "After getList";
+					}
+					cisForm.setMethod("GetMemberListRemote");
+					model.put("methodcalled", "GetMemberListRemote");
+					res = "CIS==null: " + cisForm.getMethod();
+				} else {
+					Set<ICisParticipant> records = thisCis.getMemberList().get();
+					model.put("memberRecords", records);
+					res = "CIS is not null";
+				}
+				
+			} else if (method.equalsIgnoreCase("GetMemberListRemote")) {
+				model.put("methodcalled", "GetMemberListRemote");
+				model.put("cisid", cisForm.getCisJid());
+				//CALL REMOTE
+				res += cisForm.getCisJid();
+				res += "Before Remote";
+				ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid());
+				remoteCIS.getListOfMembers(icall);
+				res += "After Remote";
+				
+			} else if (method.equalsIgnoreCase("RefreshRemoteMembers")) {
+				model.put("methodcalled", "RefreshRemoteMembers");
+				model.put("cisid", cisForm.getCisJid());
+				
+				Community remoteCommunity = (Community)m_session.getAttribute("community");
+				List<Participant> membersRemote = (List<Participant>) m_session.getAttribute("remoteMemberRecords");					
+				model.put("remoteMemberRecords", membersRemote);				
+				model.put("community", remoteCommunity);
+				Set<ICisParticipant> records = null;
+				model.put("memberRecords", records);
+
+				
+			} else if (method.equalsIgnoreCase("AddMember")) {
+				model.put("methodcalled", "AddMember");
+				// TODO
+				res = "";
+				List<ICisOwned> listOwned = this.cisManager.getListOfOwnedCis();
+				Iterator<ICisOwned> it = listOwned.iterator();
+				ICisOwned thisCis = null;
+				res +=" owned size " + listOwned.size();
+				while(it.hasNext() ){//&& (thisCis != null)){
+					res +="got in the loop";
+					ICisOwned element = it.next();
+					 if (element.getCisId().equalsIgnoreCase(cisForm.getCisJid())){
+						 res +="found a match";
+						 thisCis = element;
+					 }
+					 else{
+						  res +="CIS being compared = " + element.getCisId() + "and form = " + cisForm.getCssId();
+					 }
+			     }
+				res += " interactor done ";
+				if(thisCis == null){
+					res +="CIS not found: " + cisForm.getCssId();
+				}else{
+					if (thisCis.addMember(cisForm.getCssId(), cisForm.getRole()).get())
+						res += "member added ";
+					else
+						res += "error when adding member";					
+				}
+				model.put("res", res);
+
+			} else if (method.equalsIgnoreCase("RemoveMemberFromCIS")) {
+				model.put("methodcalled", "RemoveMemberFromCIS");
+				// TODO
+				// model.put("cisrecords", records);
+	
 			} else {
 				model.put("methodcalled", "Unknown");
 				res = "error unknown metod";
 			}
+			
+			//ALWAYS RETURN THE LIST OF CIS'S I OWN OR AM MEMBER OF
+			List<ICis> records = this.getCisManager().getCisList();
+			model.put("cisrecords", records);
+			
 		} catch (Exception ex) {
-			res = "Oops!!!! <br/>";
+			res += "Oops!!!! <br/>" + ex.getLocalizedMessage();//.getMessage();
 		}
 
+		model.put("res", res);
 		model.put("cmForm", cisForm);
 		return new ModelAndView("cismanagerresult", model);
 	}
-	
-	
-	
+
 	// callback
-	
-	ICisManagerCallback icall = new ICisManagerCallback()
-	 {
-		public void receiveResult(boolean result){
+	ICisManagerCallback icall = new ICisManagerCallback(){
 
-		}; 
-
-		public void receiveResult(int result) {};
-		
-		public void receiveResult(String result){}
 
 		public void receiveResult(Community communityResultObject) {
 			if(communityResultObject == null){
-				resultCallback = "failure";
-				
+				resultCallback = "Failure getting result from remote node!";
 			}
-			else{
-				resultCallback = "join worked in CIS " + communityResultObject.getCommunityJid();
+			else {
+				if(communityResultObject.getJoinResponse() != null){
+					resultCallback = "Joined CIS: " + communityResultObject.getCommunityJid();
+	
+					remoteCommunity = communityResultObject;
+					m_session.setAttribute("community", remoteCommunity);
+				}
+				if(communityResultObject.getWho() != null){
+					LOG.debug("### " + communityResultObject.getWho().getParticipant().size());
+
+					m_session.setAttribute("community", remoteCommunity);
+					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWho().getParticipant();					
+					m_session.setAttribute("remoteMemberRecords", l);
+				}
+
 			}
-			
-		};
-		
-	 };
+		}
+	};
 	
 }

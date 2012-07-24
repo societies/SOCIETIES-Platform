@@ -214,6 +214,24 @@
 					</artifactItems>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<!-- created after mvn test using the Derby DBMS -->
+							<directory>CISDirectorydb</directory>
+						</fileset>
+						<fileset>
+							<directory>.</directory>
+							<includes>
+								<!-- created after mvn test using the Derby DBMS -->
+								<include>derby.log</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<artifactId>CisDirectory</artifactId>

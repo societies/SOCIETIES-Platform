@@ -52,6 +52,11 @@
 	</parent>
 
 	<dependencies>
+	<dependency>
+		<groupId>org.json</groupId>
+		<artifactId>json</artifactId>
+		<version>20090211</version>
+	</dependency>
 		<dependency>
 			<groupId>org.apache.shindig</groupId>
 			<artifactId>shindig-social-api</artifactId>
@@ -143,6 +148,31 @@
 			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.platform</groupId>
+			<artifactId>facebook_connector</artifactId>
+			<version>${release.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.platform</groupId>
+			<artifactId>socialdata</artifactId>
+			<version>${release.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.1</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -153,7 +183,7 @@
 				<configuration>
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 						<Export-Package>
 						org.societies.activity,
 						org.societies.activity.*,
@@ -170,6 +200,24 @@
 					<descriptors>
 						<descriptor></descriptor>
 					</descriptors>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset> 
+							<!-- created after mvn test using the Derby DBMS -->
+							<directory>activityfeedtest</directory>
+						</fileset>
+						<fileset>
+							<directory>.</directory>
+							<includes> 
+								<!-- created after mvn test using the Derby DBMS -->
+								<include>derby.log</include>
+							</includes>
+						</fileset>
+					</filesets>
 				</configuration>
 			</plugin>
 			<plugin>

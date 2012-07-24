@@ -12,75 +12,55 @@
 
 	<!-- Privacy Policy Manager Configuration -->
 
-	<osgi:service ref="PrivacyPolicyManager"
+	<osgi:service ref="privacyPolicyManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" />
 
-	<osgi:service ref="PrivacyAgreementManager"
+	<osgi:service ref="privacyAgreementManager"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager" />
 
 
 	<!-- Privacy Assessment Configuration -->
 
-	<osgi:service ref="PrivacyLogAppender"
+	<osgi:service ref="privacyLogAppender"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender" />
 
 	<!--osgi:service ref="CommsFwTestBean" interface="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean" 
 		/ -->
-	<osgi:service ref="Assessment"
+	<osgi:service ref="assessment"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment" />
 
 
 	<!-- Privacy Policy Negotiation Manager Configuration -->
 
+	<osgi:service ref="privacyPolicyNegotiationManager"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager" />
+
+	<osgi:service ref="negotiationAgent"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent" />
+		
 
 	<!-- Privacy Preference Manager Configuration -->
 
-	<osgi:service ref="privacyPreferenceManager">
-		<osgi:interfaces>
-			<value>
-				org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager
-			</value>
-		</osgi:interfaces>
-	</osgi:service>
+	<osgi:service ref="privacyPreferenceManager"
+		interface="org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager" />
 
-	<osgi:service ref="NegotiationAgent">
-	    <osgi:interfaces>
-	        <value>
-	            org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent
-	        </value>
-	    </osgi:interfaces>
-	</osgi:service>
 
 	<!-- Needed references -->
 
-	<osgi:reference id="commsMgr"
-		interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
-	</osgi:reference>
-
-	<osgi:reference id="ctxBroker"
-		interface="org.societies.api.internal.context.broker.ICtxBroker">
-	</osgi:reference>
-
-	<osgi:reference id="trustBroker"
-		interface="org.societies.api.internal.privacytrust.trust.ITrustBroker">
-	</osgi:reference>
-
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
 
-	<osgi:reference id="CommManagerBundle"
+	<osgi:reference id="commManager"
 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager"
 		cardinality="0..1" />
 
-	<osgi:reference id="eventMgr"
-		interface="org.societies.api.osgi.event.IEventMgr">
-	</osgi:reference>
+	<osgi:reference id="eventManager"
+		interface="org.societies.api.osgi.event.IEventMgr" cardinality="0..1" />
 
+	<osgi:reference id="ctxBroker"
+		interface="org.societies.api.internal.context.broker.ICtxBroker"
+		cardinality="0..1" />
 
-<!-- 	<osgi:reference id="NegotiationAgentRemote">
-	    <osgi:interfaces>
-	        <value>
-	            
-	        </value>
-	    </osgi:interfaces>
-	</osgi:reference> -->
+	<osgi:reference id="trustBroker"
+		interface="org.societies.api.internal.privacytrust.trust.ITrustBroker"
+		cardinality="0..1" />
 </beans>

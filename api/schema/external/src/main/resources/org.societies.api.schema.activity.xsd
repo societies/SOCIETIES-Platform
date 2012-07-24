@@ -40,17 +40,19 @@ for that reason, Im defining a simpler version here initially.
 	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/api/schema/activity">
 	
 	
-	  <xs:complexType name="Activity">
+	 <xs:element name="Activity">
+	   <xs:complexType>
         <xs:sequence>
         	<xs:element name='actor' type='xs:string' />
-            <xs:element ref='ActivityContext' />
-            <xs:element  name="time" type="xs:dateTime" />
-            <xs:element name="source" type="xs:string" />
+            <!--<xs:element ref='ActivityContext' />-->
+            <xs:element  name="published" type="xs:string" />
+            <!--<xs:element name="source" type="xs:string" />-->
             <xs:element name="verb" type="xs:string" />
             <xs:element name="object" type="xs:string" />
             <xs:element name="target" type="xs:string" />
         </xs:sequence>
     </xs:complexType>
+     </xs:element>
 
 	<xs:element name="ActivityContext">
     <xs:complexType>

@@ -52,12 +52,12 @@ import javax.persistence.Transient;
 //import org.societies.cis.mgmt;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
+import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
-import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -67,15 +67,28 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
-import org.societies.api.schema.cis.community.AddResponse;
+import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.DeleteActivityResponse;
+import org.societies.api.schema.cis.community.AddActivityResponse;
+import org.societies.api.schema.cis.community.AddMemberResponse;
+import org.societies.api.schema.cis.community.CleanUpActivityFeedResponse;
+import org.societies.api.schema.cis.community.DeleteMemberResponse;
+import org.societies.api.schema.cis.community.GetActivitiesResponse;
+import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.GetInfoResponse;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
@@ -84,7 +97,7 @@ import org.societies.api.schema.cis.community.Who;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
-import org.societies.api.schema.cis.community.Add;
+import org.societies.api.schema.cis.community.AddMember;
 import org.societies.api.schema.cis.community.Subscription;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
@@ -109,16 +122,19 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+							"http://societies.org/api/schema/activityfeed",
 					  		"http://societies.org/api/schema/cis/community"));
-			//.singletonList("http://societies.org/api/schema/cis/community");
+	//		.singletonList("http://societies.org/api/schema/cis/community");
 	@Transient
 	private final static List<String> PACKAGES = Collections
 			//.singletonList("org.societies.api.schema.cis.community");
 	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+			"org.societies.api.schema.activityfeed",
 		"org.societies.api.schema.cis.community"));
 	@Transient
 	private SessionFactory sessionFactory;
-	
+	@Transient
+	private Session session;
 	
 	
 	public SessionFactory getSessionFactory() {
@@ -141,13 +157,19 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@OneToOne(cascade=CascadeType.ALL)
 	public CisRecord cisRecord;
 	
-	@OneToOne(cascade=CascadeType.ALL)
-	public ActivityFeed activityFeed;
+	//@OneToOne(cascade=CascadeType.ALL)
+	@Transient
+	public ActivityFeed activityFeed = new ActivityFeed();
 	//TODO: should this be persisted?
 	@Transient
-	public Set<IServiceSharingRecord> sharedServices; 
-	@Transient
 	private ICommManager CISendpoint;
+	@Transient
+	IServiceDiscoveryRemote iServDiscRemote;
+	@Transient
+	IServiceControlRemote iServCtrlRemote;
+	@Transient
+	IPrivacyPolicyManager privacyPolicyManager;
+	
 	@Transient
 	private IIdentity cisIdentity;
 	@Transient
@@ -197,16 +219,23 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.activityFeed = activityFeed;
 	}
 
-
-	public Set<IServiceSharingRecord> getSharedServices() {
-		return sharedServices;
+	public IServiceDiscoveryRemote getiServDiscRemote() {
+		return iServDiscRemote;
 	}
 
-
-	public void setSharedServices(Set<IServiceSharingRecord> sharedServices) {
-		this.sharedServices = sharedServices;
+	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
+		this.iServDiscRemote = iServDiscRemote;
 	}
 
+	public IServiceControlRemote getiServCtrlRemote() {
+		return iServCtrlRemote;
+	}
+
+	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
+		this.iServCtrlRemote = iServCtrlRemote;
+	}
+
+	
 
 
 	private static Logger LOG = LoggerFactory
@@ -233,23 +262,29 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	// maximum constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
-	,String permaLink,String password,String host, String description) {
-		this(cssOwner, cisName, cisType, mode,ccmFactory);
+	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory) {
+		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote,privacyPolicyManager,sessionFactory);
 		this.password = password;
 		this.permaLink = permaLink;
 		this.host = host;
 		this.description = description;
+
 	}
 
 	
 
 	// minimum constructor of a CIS without a pre-determined ID or host
-	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
+	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
+			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory) {
+		
+		this.privacyPolicyManager = privacyPolicyManager;
 		
 		this.owner = cssOwner;
 		this.cisType = cisType;
 		
-		sharedServices = new HashSet<IServiceSharingRecord>();
+		this.iServCtrlRemote = iServCtrlRemote;
+		this.iServDiscRemote = iServDiscRemote;
+		
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
 
@@ -276,6 +311,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		try {
 			CISendpoint.register(this);
+			iServCtrlRemote.registerCISEndpoint(CISendpoint);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 			LOG.info("could not start comm manager!");
@@ -298,14 +334,19 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 		
+		session = sessionFactory.openSession();
+		System.out.println("activityFeed: "+activityFeed);
+		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
 		
-		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
+		this.persist(this);
+		//activityFeed.getActivities("0 1339689547000");
 
 	}
 	
-	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory){
+	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager){
 		
-		sharedServices = new HashSet<IServiceSharingRecord>();
+		
+		this.privacyPolicyManager = privacyPolicyManager;
 		// first Ill try without members
 
 		try {
@@ -326,6 +367,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 		try {
 			CISendpoint.register(this);
+			//iServCtrlRemote.registerCISEndpoint(CISendpoint);
+//			CISendpoint.register((IFeatureServer) iServCtrlRemote);
+//			CISendpoint.register((IFeatureServer) iServDiscRemote);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 			LOG.info("could not start comm manager!");
@@ -333,9 +377,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("CIS listener registered");
 		
 		this.setSessionFactory(sessionFactory);
-		
-		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
-		
+
+		session = sessionFactory.openSession();
+		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
+		activityFeed.getActivities("0 1339689547000");
 	}
 	
 
@@ -350,7 +395,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 
 	@Override
-	public Future<Boolean> addMember(String jid, String role) throws  CommunicationException{
+	public Future<Boolean> addMember(String jid, String role){
 		MembershipType typedRole;
 		try{
 			typedRole = MembershipType.valueOf(role);
@@ -360,22 +405,53 @@ public class Cis implements IFeatureServer, ICisOwned {
 		catch( NullPointerException e) {
 			return new AsyncResult<Boolean>(new Boolean(false)); //the string was not valid
 		}
-		return new AsyncResult<Boolean>(this.addMember(jid, typedRole));
+		boolean ret;
+		ret = this.insertMember(jid, typedRole);
+
 		
+		Stanza sta;
+		LOG.info("new member added, going to notify the user");
+		IIdentity targetCssIdentity = null;
+		try {
+			targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
+		} catch (InvalidFormatException e) {
+			LOG.info("could not send addd notification");
+			e.printStackTrace();
+		}		
+		// 1) Notifying the added user
+
+		
+		CommunityManager cMan = new CommunityManager();
+		Notification n = new Notification();
+		SubscribedTo s = new SubscribedTo();
+		s.setCisJid(this.getCisId());
+		s.setRole(role.toString());
+		n.setSubscribedTo(s);
+		cMan.setNotification(n);
+		
+		LOG.info("finished building notification");
+
+
+		sta = new Stanza(targetCssIdentity);
+		try {
+			CISendpoint.sendMessage(sta, cMan);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			LOG.info("problem sending notification to cis");
+			e.printStackTrace();
+		}
+				
+		LOG.info("notification sent to the new user");		
+
+		
+		return new AsyncResult<Boolean>(new Boolean(ret));
 	}
 	
 	
 	// internal implementation of the method above
-	private boolean addMember(String jid, MembershipType role) throws  CommunicationException{
+	private boolean insertMember(String jid, MembershipType role) {
 		
-		IIdentity targetCssIdentity;
-		try {
-			targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
-		} catch (InvalidFormatException e) {
-			LOG.info("bad jid as input to addMember method");
-			e.printStackTrace();
-			return false;
-		}
+
 		
 		LOG.info("add member invoked");
 		if (role == null)
@@ -389,32 +465,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 			// should we send a XMPP notification to all the users to say that the new member has been added to the group
 			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
 			// and the GUI can be updated with that new member
-			Stanza sta;
-			LOG.info("new member added, going to notify community");
-			
-			// 1) Notifying the added user
 
-			
-			CommunityManager cMan = new CommunityManager();
-			Notification n = new Notification();
-			SubscribedTo s = new SubscribedTo();
-			s.setCisJid(this.getCisId());
-			s.setCisRole(role.toString());
-			n.setSubscribedTo(s);
-			cMan.setNotification(n);
-			
-			LOG.info("finished building notification");
-
-
-			sta = new Stanza(targetCssIdentity);
-			CISendpoint.sendMessage(sta, cMan);
-					
-			LOG.info("notification sent to the new user");
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a pubsub notification
 			
 			//creating payload
-			Participant p = new Participant();
+/*			Participant p = new Participant();
 			p.setJid(jid);
 			p.setRole( ParticipantRole.fromValue(role.toString())  );
 			Community c = new Community();
@@ -441,7 +497,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 		     }
 			LOG.info("notification sents to the existing user");
-
+			*/
 			return true;
 		}else{
 			return false;
@@ -470,10 +526,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		CommunityManager message = new CommunityManager();
 		Notification n = new Notification();
-		DeleteNotification d = new DeleteNotification();
+		DeleteMemberNotification d = new DeleteMemberNotification();
 		d.setCommunityJid(this.getCisId());
+		d.setMemberJid(jid);
 		
-		n.setDeleteNotification(d);
+		n.setDeleteMemberNotification(d);
 		message.setNotification(n);
 
 		try {
@@ -638,12 +695,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 				LOG.info("join received");
 				String senderjid = stanza.getFrom().getBareJid();
 				boolean addresult = false; 
-				try {
-					addresult = this.addMember(senderjid, MembershipType.participant);
-				} catch (CommunicationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				addresult = this.insertMember(senderjid, MembershipType.participant);
+				
 				
 				Community result = new Community();
 				
@@ -654,6 +707,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 				j.setResult(addresult);
 				p.setJid(jid);
 				result.setCommunityJid(this.getCisId()); 
+				result.setCommunityName(this.getName());
+				result.setCommunityType(this.cisType);
+				result.setMembershipMode(this.getMembershipCriteria());
 								
 				if(addresult == true){
 					// information sent on the xmpp just in the case of success
@@ -712,27 +768,27 @@ public class Cis implements IFeatureServer, ICisOwned {
 				return result;
 				// END OF WHO
 			}
-			if (c.getAdd() != null) {
+			if (c.getAddMember() != null) {
 				// ADD
 				Community result = new Community();
-				AddResponse ar = new AddResponse();
+				AddMemberResponse ar = new AddMemberResponse();
 				result.setCommunityJid(this.getCisId());
 				String senderJid = stanza.getFrom().getBareJid();
-				Participant p = c.getAdd().getParticipant();
+				Participant p = c.getAddMember().getParticipant();
 				ar.setParticipant(p);			
 				
 				
-				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+//				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 					//requester is not the owner
-					ar.setResult(false);
-				}else{
+//					ar.setResult(false);
+//				}else{
 					if(p!= null && p.getJid() != null){
 						String role = "";
 						if (p.getRole() != null)				
 							role = p.getRole().value();
 						
 						try{
-							if(this.addMember(p.getJid(), MembershipType.valueOf(role))){
+							if(this.addMember(p.getJid(), role).get()){
 								ar.setParticipant(p);
 								ar.setResult(true);
 							}
@@ -746,13 +802,45 @@ public class Cis implements IFeatureServer, ICisOwned {
 						}
 					}					
 					
-				}
+//				}
 				
-				result.setAddResponse(ar);
+				result.setAddMemberResponse(ar);
 				return result;
 				// END OF ADD
 			}
 
+			if (c.getDeleteMember() != null) {
+				// DELETE MEMBER
+				Community result = new Community();
+				DeleteMemberResponse dr = new DeleteMemberResponse();
+				result.setCommunityJid(this.getCisId());
+				String senderJid = stanza.getFrom().getBareJid();
+				Participant p = c.getDeleteMember().getParticipant();
+				dr.setParticipant(p);			
+				
+				
+//				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+					//requester is not the owner
+//					dr.setResult(false);
+//				}else{
+					try{
+						dr.setResult(this.removeMemberFromCIS(p.getJid()).get());
+					}
+					catch(Exception e){
+						e.printStackTrace();
+						dr.setResult(false);
+					}
+					
+//				}
+				
+				result.setDeleteMemberResponse(dr);
+				return result;
+				// END OF DELETE MEMBER
+			}
+
+			
+			
+			
 			// get Info
 			if (c.getGetInfo()!= null) {
 				Community result = new Community();
@@ -803,14 +891,133 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}				// END OF GET INFO
 
 			
+			// get Activities
+			if (c.getGetActivities() != null) {
+				Community result = new Community();
+				GetActivitiesResponse r = new GetActivitiesResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				List<IActivity> iActivityList;
+				List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+					if(c.getGetActivities().getQuery()!=null  &&  c.getGetActivities().getQuery().isEmpty())
+						iActivityList = activityFeed.getActivities(c.getGetActivities().getTimePeriod());
+					else
+						iActivityList = activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod());										
+				//}
+				
+
+				Iterator<IActivity> it = iActivityList.iterator();
+				
+				while(it.hasNext()){
+					IActivity element = it.next();
+					org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
+					a.setActor(element.getActor());
+					a.setObject(a.getObject());
+					a.setPublished(a.getPublished());
+					a.setVerb(a.getVerb());
+					marshalledActivList.add(a);
+			     }
+				
+				r.setActivity(marshalledActivList);
+				result.setGetActivitiesResponse(r);		
+				return result;
+
+			}				// END OF get ACTIVITIES
+			
+			// add Activity
+
+			if (c.getAddActivity() != null) {
+				Community result = new Community();
+				AddActivityResponse r = new AddActivityResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+				IActivity iActivity = new org.societies.activity.model.Activity();
+				iActivity.setActor(c.getAddActivity().getActivity().getActor());
+				iActivity.setObject(c.getAddActivity().getActivity().getObject());
+				iActivity.setTarget(c.getAddActivity().getActivity().getTarget());
+				iActivity.setPublished(c.getAddActivity().getActivity().getPublished());
+				iActivity.setVerb(c.getAddActivity().getActivity().getVerb());
+
+				activityFeed.addCisActivity(iActivity);
+				
+				r.setResult(true); //TODO. add a return on the activity feed method
+				
+				
+				result.setAddActivityResponse(r);		
+				return result;
+
+			}				// END OF add Activity
+			
+						
+			
+			// cleanup activities
+			if (c.getCleanUpActivityFeed() != null) {
+				Community result = new Community();
+				CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+
+				
+				r.setResult(activityFeed.cleanupFeed(c.getCleanUpActivityFeed().getCriteria())); //TODO. add a return on the activity feed method
+				
+				
+				result.setCleanUpActivityFeedResponse(r);		
+				return result;
+
+			}				// END OF cleanup activities
 			
 		}
+		if (payload.getClass().equals(Activityfeed.class)) {
+			LOG.info("activity feed type received");
+			Activityfeed c = (Activityfeed) payload;
+			
+			// delete Activity
+
+			if (c.getDeleteActivity() != null) {
+				Activityfeed result = new Activityfeed();
+				DeleteActivityResponse r = new DeleteActivityResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+				IActivity iActivity = new org.societies.activity.model.Activity();
+				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
+				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
+				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
+				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
+				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
+
+				r.setResult(activityFeed.deleteActivity(iActivity));
+
+				result.setDeleteActivityResponse(r);		
+				return result;
+
+			}				// END OF delete Activity
+			
+		}
+		
+		
 		return null;
 	}
 
 	
 	@Override 
 	public Future<Set<ICisParticipant>> getMemberList(){
+		LOG.debug("local get member list WITH CALLBACK called");
 		Set<ICisParticipant> s = new  HashSet<ICisParticipant>();
 		s.addAll(this.getMembersCss());
 		return new AsyncResult<Set<ICisParticipant>>(s);
@@ -818,7 +1025,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
-		LOG.debug("local client call to get list of members");
+		LOG.debug("local get member list WITHOUT CALLBACK called");
 
 		
 		Community c = new Community();
@@ -827,7 +1034,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		c.setCommunityType(this.getCisType());
 		c.setOwnerJid(this.getOwnerId());
 		c.setDescription(this.getDescription());
-		c.setGetInfo("");
+		c.setGetInfo(new GetInfo());
 		
 		Who w = new Who();
 		c.setWho(w);
@@ -894,12 +1101,29 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		n.setDeleteNotification(d);
 		message.setNotification(n);
-		//Session session = sessionFactory.openSession();
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();
 
 		// deleting from DB
+		activityFeed.clear();
+		activityFeed = null;
 		this.deletePersisted(this);
+		
+		// unregistering policy
+		IIdentity cssOwnerId;
+		try {
+			cssOwnerId = this.CISendpoint.getIdManager().fromJid(this.getOwnerId());
+			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisIdentity);	
+			this.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			LOG.info("bad format in cis owner jid at delete method");
+			e1.printStackTrace();
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			LOG.info("problem deleting policy");
+			e.printStackTrace();
+		}		
 		
 		while(it.hasNext()){
 			CisParticipant element = it.next();
@@ -927,13 +1151,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		
 
-		
-		//session.close();
+		if(session!=null)
+			session.close();
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
-		sharedServices = null; 
-		activityFeed = null; // TODO: replace with proper way of destroying it
+		//activityFeed = null; // TODO: replace with proper way of destroying it
 		
 		
 		ret = CISendpoint.UnRegisterCommManager();
@@ -952,6 +1175,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 	}
 
+	public boolean unregisterCIS(){
+		boolean ret = CISendpoint.UnRegisterCommManager();
+		return ret;
+		
+	}
+	
 	// getters and setters
 	
 	public Long getId() {
@@ -1001,6 +1230,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		c.setCommunityName(this.getName());
 		c.setCommunityType(this.getCisType());
 		c.setOwnerJid(this.getOwnerId());
+		c.setMembershipMode(this.getMembershipCriteria());
 		c.setDescription(this.getDescription());
 		c.setGetInfoResponse(r);
 		
@@ -1016,12 +1246,16 @@ public class Cis implements IFeatureServer, ICisOwned {
 		SetInfoResponse r = new SetInfoResponse();
 
 		//check if he is not trying to set things which cant be set
-		if( ( (!c.getCommunityJid().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisId()))  ) &&
-				( (!c.getCommunityName().isEmpty()) && (! c.getCommunityName().equalsIgnoreCase(this.getName()))  ) &&
-				 //( (!c.getCommunityType().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisType()))  ) &&
+		if( ( (c.getCommunityJid() !=null) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisId()))  ) ||
+				(( (c.getCommunityName() !=null)) && (! c.getCommunityName().equalsIgnoreCase(this.getName()))  ) ||
+				 //( (!c.getCommunityType().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisType()))  ) ||
 				 ( (c.getMembershipMode() != null) && ( c.getMembershipMode() != this.getMembershipCriteria())  )
 				
 				){
+			r.setResult(false);
+			
+		}
+		else{
 			r.setResult(true);
 			if(c.getDescription() != null &&  !c.getDescription().isEmpty())
 				this.description = c.getDescription();
@@ -1030,15 +1264,14 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			// commit in database
 			this.updatePersisted(this);
-		}
-		else{
-			r.setResult(false);
+			
 		}
 				
 		Community resp = new Community();
 		resp.setCommunityJid(this.getCisId());
 		resp.setCommunityName(this.getName());
 		resp.setCommunityType(this.getCisType());
+		resp.setMembershipMode(this.getMembershipCriteria());
 		resp.setOwnerJid(this.getOwnerId());
 		resp.setDescription(this.getDescription());
 		resp.setSetInfoResponse(r);
@@ -1046,21 +1279,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		callback.receiveResult(resp);	
 	}
 
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-	
-	
 	
 	
 	// session related methods
 
 	private void persist(Object o){
-		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.save(o);
@@ -1074,10 +1297,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.warn("Saving CIS object failed, rolling back");
 		}finally{
 			if(session!=null){
-				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
 			}
 			
 		}
@@ -1085,7 +1304,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	
 	private void deletePersisted(Object o){
-		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.delete(o);
@@ -1098,18 +1316,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			t.rollback();
 			LOG.warn("Deleting object in CisManager failed, rolling back");
 		}finally{
-			if(session!=null){
-				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
-			}
-			
 		}
 	}
 	
 	private void updatePersisted(Object o){
-		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.update(o);
@@ -1122,16 +1332,56 @@ public class Cis implements IFeatureServer, ICisOwned {
 			t.rollback();
 			LOG.warn("Updating CIS object failed, rolling back");
 		}finally{
-			if(session!=null){
-				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
-			}
 			
 		}
 	}
 	
+	
+	// TODO
+	@Override
+	public void addCisActivity(IActivity activity,ICisManagerCallback callback){
+		
+			Community result = new Community();
+			AddActivityResponse r = new AddActivityResponse();
+
+			activityFeed.addCisActivity(activity);
+			
+			r.setResult(true); //TODO. add a return on the activity feed method
+			
+			
+			result.setAddActivityResponse(r);		
+			callback.receiveResult(result);
+		
+	}
+	
+	@Override
+	public void getActivities(String timePeriod,ICisManagerCallback callback){
+		Community result = new Community();
+		GetActivitiesResponse r = new GetActivitiesResponse();
+		List<IActivity> iActivityList;
+		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+		
+		iActivityList = activityFeed.getActivities(timePeriod);
+		
+
+		Iterator<IActivity> it = iActivityList.iterator();
+		
+		while(it.hasNext()){
+			IActivity element = it.next();
+			org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
+			a.setActor(element.getActor());
+			a.setObject(a.getObject());
+			a.setPublished(a.getPublished());
+			a.setVerb(a.getVerb());
+			marshalledActivList.add(a);
+	     }
+		
+		r.setActivity(marshalledActivList);
+		result.setGetActivitiesResponse(r);		
+		
+		callback.receiveResult(result);
+				
+	}
 	
 	
 }

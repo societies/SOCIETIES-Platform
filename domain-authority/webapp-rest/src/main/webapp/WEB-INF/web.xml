@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This web.xml file is not required when using Servlet 3.0 container, 
+     see implementation details http://jersey.java.net/nonav/documentation/latest/jax-rs.html#d4e194 -->
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<!-- OSGI aware web application context declaration -->
+	<context-param>
+		<param-name>contextClass</param-name>
+		<param-value>org.eclipse.virgo.web.dm.ServerOsgiBundleXmlWebApplicationContext</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!--context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/applicationContext.xml</param-value>
+	</context-param>
+	<context-param>
+		<param-name>contextClass</param-name>
+		<param-value>org.eclipse.virgo.web.dm.ServerOsgiBundleXmlWebApplicationContext</param-value>
+	</context-param>	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener-->
+
+	<!--context-param>
+		<param-name>contextConfigLocation</param-name>     
+		<param-value>
+			/WEB-INF/applicationContext.xml,
+			/WEB-INF/clientjar-servlet.xml
+		</param-value>
+	</context-param-->
+
+	<servlet>
+        <servlet-name>clientjar</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+
+		<!--init-param>
+			<param-name>com.sun.jersey.config.feature.Redirect</param-name>
+			<param-value>true</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>com.sun.jersey.config.property.JSPTemplatesBasePath</param-name>
+			<param-value>/views/</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>com.sun.jersey.config.property.WebPageContentRegex</param-name>
+			<param-value>/(images|css|jsp)/.*</param-value>
+		</init-param-->
+
+        <!--init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>org.societies.domainauthority.rest.server</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup-->
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>clientjar</servlet-name>
+        <url-pattern>/webresources/*</url-pattern>
+    </servlet-mapping>
+</web-app>

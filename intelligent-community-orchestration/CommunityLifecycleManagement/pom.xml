@@ -57,7 +57,36 @@
       <!--  <scope>test</scope> -->
     </dependency>
 	
-	
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>org.springframework.context</artifactId>
+		<version>${spring.version}</version>
+		<scope>provided</scope>
+		<exclusions>
+			<exclusion>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+			</exclusion>
+		</exclusions>
+	</dependency>
+
+    <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+	</dependency>
+
+	<dependency>
+		<groupId>org.societies.comm.xmpp</groupId>
+		<artifactId>XCCommunicationMgr</artifactId>
+		<version>0.1-SNAPSHOT</version>
+		<scope>provided</scope>
+	</dependency>
 
 	</dependencies>
 

@@ -92,7 +92,7 @@ public class TestContextEvent  {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		UserPreferenceManagement upm = pcm.getPrefMgr();
+		UserPreferenceManagement upm = pcm.getPreferenceManager();
 		details = new PreferenceDetails();
 		details.setPreferenceName("volume");
 		details.setServiceID(serviceID);

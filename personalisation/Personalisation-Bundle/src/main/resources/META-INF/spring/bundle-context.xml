@@ -32,6 +32,7 @@
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="cauiDiscovery" ref="cauiDiscovery"></property>
 		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
+		<property name="commsMgr" ref="commsMgr"></property>
 	</bean>
 
 	<bean id="cauiDiscovery"
@@ -39,6 +40,7 @@
 		name="cauiDiscovery" init-method="initialiseCAUIDiscovery">
 		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
+		<property name="commsMgr" ref="commsMgr"></property>
 	</bean>
 
 	<bean id="cristPrediction"

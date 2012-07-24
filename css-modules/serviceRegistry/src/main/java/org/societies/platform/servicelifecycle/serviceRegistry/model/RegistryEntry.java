@@ -91,6 +91,10 @@ public class RegistryEntry implements Serializable {
 	private ServiceInstanceDAO serviceInstance;
 
 	private String serviceStatus;
+	
+	private String privacyPolicy;
+	
+	private String serviceCategory;
 
 	/**
 	 * @param serviceEndpointURI
@@ -104,7 +108,7 @@ public class RegistryEntry implements Serializable {
 	 */
 	public RegistryEntry(ServiceResourceIdentifier serviceIdentifier,
 			String serviceEndPoint, String serviceName,
-			String serviceDescription, String authorSignature,
+			String serviceDescription, String authorSignature, String privacyPolicy, String serviceCategory,
 			ServiceType type, ServiceLocation location,
 			ServiceInstance serviceInstance, ServiceStatus serviceStatus) {
 
@@ -118,16 +122,19 @@ public class RegistryEntry implements Serializable {
 		this.serviceDescription = serviceDescription;
 		this.authorSignature = authorSignature;
 		this.serviceEndPoint = serviceEndPoint;
+		this.privacyPolicy = privacyPolicy;
+		this.serviceCategory = serviceCategory;
 
 		this.serviceType = type.toString();
 		this.serviceLocation = location.toString();
 		this.serviceStatus = serviceStatus.toString();
 		this.serviceInstance = new ServiceInstanceDAO(
-				serviceInstance.getFullJid(), serviceInstance.getXMPPNode(),
+				serviceInstance.getFullJid(), serviceInstance.getCssJid(), serviceInstance.getParentJid(),serviceInstance.getXMPPNode(),
 				new ServiceImplementationDAO(serviceInstance.getServiceImpl()
 						.getServiceNameSpace(), serviceInstance
 						.getServiceImpl().getServiceProvider(), serviceInstance
-						.getServiceImpl().getServiceVersion()));
+						.getServiceImpl().getServiceVersion(),serviceInstance
+						.getServiceImpl().getServiceClient().toString()));
 	}
 
 	public RegistryEntry() {
@@ -161,6 +168,24 @@ public class RegistryEntry implements Serializable {
 		this.authorSignature = authorSignature;
 	}
 
+	@Column(name = "PrivacyPolicy")
+	public String getPrivacyPolicy() {
+		return privacyPolicy;
+	}
+
+	public void setPrivacyPolicy(String privacyPolicy) {
+		this.privacyPolicy = privacyPolicy;
+	}
+
+	@Column(name = "ServiceCategory")
+	public String getServiceCategory() {
+		return serviceCategory;
+	}
+
+	public void setServiceCategory(String serviceCategory) {
+		this.serviceCategory = serviceCategory;
+	}
+	
 	// @Column(name = "ServiceIdentifier")
 	// @Id
 	// @Target(value = ServiceResourceIdentiferDAO.class)
@@ -185,12 +210,17 @@ public class RegistryEntry implements Serializable {
 			 * Retrieve the service type from the service and create the
 			 * appropriate enumeration type
 			 */
-			if (serviceType.equals(ServiceType.THIRD_PARTY_SERVICE.toString())) {
-				tmpServiceType = ServiceType.THIRD_PARTY_SERVICE;
+			if (serviceType.equals(ServiceType.THIRD_PARTY_CLIENT.toString())) {
+				tmpServiceType = ServiceType.THIRD_PARTY_CLIENT;
 			} else {
-				if (serviceType.equals(ServiceType.CORE_SERVICE.toString())) {
-					tmpServiceType = ServiceType.CORE_SERVICE;
+				if (serviceType.equals(ServiceType.THIRD_PARTY_SERVER.toString())) {
+					tmpServiceType = ServiceType.THIRD_PARTY_SERVER;
+				} else {
+					if (serviceType.equals(ServiceType.THIRD_PARTY_WEB.toString())) {
+						tmpServiceType = ServiceType.THIRD_PARTY_WEB;
+					}
 				}
+					
 			}
 
 			/* Same as before but for service location */
@@ -217,8 +247,12 @@ public class RegistryEntry implements Serializable {
 			returnedService.setAuthorSignature(this.authorSignature);
 			returnedService.setServiceDescription(this.serviceDescription);
 			returnedService.setServiceEndpoint(serviceEndPoint);
+			returnedService.setPrivacyPolicy(this.privacyPolicy);
+			returnedService.setServiceCategory(this.serviceCategory);
 			ServiceInstance si = new ServiceInstance();
 			si.setFullJid(this.serviceInstance.getFullJid());
+			si.setCssJid(this.serviceInstance.getCssJid());
+			si.setParentJid(this.serviceInstance.getParentJid());
 			si.setXMPPNode(this.serviceInstance.getXMPPNode());
 			ServiceImplementation servImpl = new ServiceImplementation();
 			servImpl.setServiceNameSpace(this.serviceInstance.getServiceImpl()
@@ -227,6 +261,8 @@ public class RegistryEntry implements Serializable {
 					.getServiceProvider());
 			servImpl.setServiceVersion(this.serviceInstance.getServiceImpl()
 					.getServiceVersion());
+			servImpl.setServiceClient(new URI(this.serviceInstance.getServiceImpl()
+					.getServiceClient()));
 			si.setServiceImpl(servImpl);
 			returnedService.setServiceInstance(si);
 			returnedService.setServiceLocation(tmpServiceLocation);
@@ -291,6 +327,9 @@ public class RegistryEntry implements Serializable {
 	}
 
 	public void updateRegistryEntry(Service service) {
+		if (service.getServiceCategory() != null) {
+			this.setServiceCategory(service.getServiceCategory());
+		}
 		if (service.getAuthorSignature() != null) {
 			this.setAuthorSignature(service.getAuthorSignature());
 		}
@@ -301,10 +340,18 @@ public class RegistryEntry implements Serializable {
 		if (service.getServiceEndpoint() != null) {
 			this.setServiceEndPoint(service.getServiceEndpoint());
 		}
-		/*if (service.getServiceInstance() != null) {
+		if (service.getServiceInstance() != null) {
 			if (service.getServiceInstance().getFullJid() != null) {
 				this.getServiceInstance().setFullJid(
 						service.getServiceInstance().getFullJid());
+			}
+			if (service.getServiceInstance().getCssJid() != null) {
+				this.getServiceInstance().setCssJid(
+						service.getServiceInstance().getCssJid());
+			}
+			if (service.getServiceInstance().getParentJid() != null) {
+				this.getServiceInstance().setParentJid(
+						service.getServiceInstance().getParentJid());
 			}
 			if (service.getServiceInstance().getXMPPNode() != null) {
 				this.getServiceInstance().setXMPPNode(
@@ -342,10 +389,20 @@ public class RegistryEntry implements Serializable {
 											.getServiceImpl()
 											.getServiceVersion());
 				}
+				if (service.getServiceInstance().getServiceImpl()
+						.getServiceClient() != null) {
+					this
+							.getServiceInstance()
+							.getServiceImpl()
+							.setServiceClient(
+									service.getServiceInstance()
+											.getServiceImpl()
+											.getServiceClient().toString());
+				}
 
 			}
 
-		}*/
+		}
 		if (service.getServiceLocation()!=null){
 			this.setServiceLocation(service.getServiceLocation().toString());
 		}
@@ -358,6 +415,9 @@ public class RegistryEntry implements Serializable {
 		}
 		if (service.getServiceType()!=null){
 			this.setServiceType(service.getServiceType().toString());
+		}
+		if (service.getPrivacyPolicy() != null) {
+			this.setServiceEndPoint(service.getPrivacyPolicy());
 		}
 	}
 }

@@ -30,7 +30,8 @@
 	
 	<bean id="ProviderServiceMgr"
 		class="org.societies.security.policynegotiator.provider.ProviderServiceMgr"
-	>
+		>
+        <property name="clientJarServer" ref="ClientJarServerRemote"/>
 	</bean>
 	
 	<bean id="NegotiationProvider"

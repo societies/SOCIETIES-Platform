@@ -36,11 +36,13 @@ import static org.mockito.Mockito.*;
 //import org.societies.api.internal.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICis;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 //import org.societies.api.internal.cis.management.ICis;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+//import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 
@@ -86,6 +88,8 @@ import org.societies.api.identity.IIdentityManager;
 public class EgocentricCommunityAnalyser //implements ICommCallback
 {
 	
+	//private static Logger LOG = LoggerFactory.getLogger(EgocentricCommunityAnalyser.class);
+	
 	private EgocentricCommunityCreationManager egocentricCreationManager;
 	private EgocentricCommunityConfigurationManager egocentricConfigurationManager;
 	private EgocentricCommunityDeletionManager egocentricDeletionManager;
@@ -107,7 +111,7 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
-	private IDeviceManager deviceManager;
+//	private IDeviceManager deviceManager;
 	
 	private int temporaryCheckInterval;
 	private int ongoingCheckInterval;
@@ -316,13 +320,13 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
     	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
     }
     
-    public IDeviceManager getDeviceManager() {
-    	return deviceManager;
-    }
-    
-    public void setDeviceManager(IDeviceManager deviceManager) {
-    	this.deviceManager = deviceManager;
-    }
+//    public IDeviceManager getDeviceManager() {
+//    	return deviceManager;
+//    }
+//    
+//    public void setDeviceManager(IDeviceManager deviceManager) {
+//    	this.deviceManager = deviceManager;
+//    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

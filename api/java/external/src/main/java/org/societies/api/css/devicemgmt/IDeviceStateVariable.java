@@ -92,4 +92,11 @@ public interface IDeviceStateVariable {
 	public boolean isEnventable();
 	
 	
+	/**
+	 * 
+	 * @return A humane readable description of the variable
+	 */
+	public String getDescription();
+	
+	
 }

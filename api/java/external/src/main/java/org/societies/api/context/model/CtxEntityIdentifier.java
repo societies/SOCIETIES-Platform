@@ -132,7 +132,9 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 
 		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
 		super.type = input.substring(typeDelim+1, objectNumberDelim);
-		if (super.type.isEmpty())
+// not working for android api 8
+//		if (super.type.isEmpty())
+		if (super.type.length()==0)
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Context entity type cannot be empty");
 
@@ -152,7 +154,9 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 					+ super.modelType + "'");
 
 		super.ownerId = input.substring(0, modelTypeDelim);
-		if (super.ownerId.isEmpty())
+		// not working for android api 8
+//		if (super.ownerId.isEmpty())
+		if (super.ownerId.length()==0)
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Owner ID cannot be empty");
 	}

@@ -66,6 +66,9 @@ public class PrivateContextCache {
 		this.updater = new ContextCacheUpdater(broker,this);
 	}
 	
+	public ContextCacheUpdater getContextCacheUpdater(){
+		return updater;
+	}
 	
 	public String getContextValue(CtxIdentifier id){
 		

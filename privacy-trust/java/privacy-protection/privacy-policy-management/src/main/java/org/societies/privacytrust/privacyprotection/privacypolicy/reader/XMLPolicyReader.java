@@ -142,7 +142,7 @@ public class XMLPolicyReader {
 	
 	public RequestPolicy readPolicyFromFile(Document doc){
 		try {
-			Requestor subject;
+			Requestor subject = null;
 			ArrayList<RequestItem> targets;
 
 			
@@ -157,24 +157,24 @@ public class XMLPolicyReader {
 			
 			if (subjectXML.getLength()>0){
 				subject = this.readSubject(subjectXML);
-			}else{
-				this.log("No Subject in XML file");
-				return null;
-			
 			}
+//			else{
+//				this.log("No Subject in XML file");
+//				return null;
+//			}
 			if (targetXML.getLength()>0){
 				targets = this.readTargets(targetXML);
 			}else{
 				this.log("No requested Targets in XML file");
-				return null;
+				targets = new ArrayList<RequestItem>();
 			}
 			
-			if (subject == null){
-				return null;
-			}
-			if (targets == null){
-				return null;
-			}
+//			if (subject == null){
+//				return null;
+//			}
+//			if (targets == null){
+//				return null;
+//			}
 			
 			return new RequestPolicy(subject,targets);
 			
@@ -310,6 +310,7 @@ public class XMLPolicyReader {
 	private  ArrayList<RequestItem> readTargets(NodeList target){
 		ArrayList<RequestItem> items = new ArrayList<RequestItem>();
 		for (int i=0; i < target.getLength(); i++){
+			logging.info("In a new target");
 			RequestItem item = this.readTarget((Element) target.item(i));
 			if (item!=null){
 				items.add(item);
@@ -325,15 +326,14 @@ public class XMLPolicyReader {
 		NodeList resources = targetElement.getElementsByTagName("Resource");
 		Resource r = this.readResource((Element) resources.item(0));
 		if (r == null){
+			logging.info("No resource");
 			return null;
 		}
 		
 		NodeList actions = targetElement.getElementsByTagName("Action");
 		ArrayList<Action> actionsList = this.readActions(actions);
-		if (actionsList == null){
-			return null;
-		}
-		if (actionsList.size()==0){
+		if (actionsList == null || actionsList.size()==0){
+			logging.info("No action");
 			return null;
 		}
 		
@@ -425,7 +425,7 @@ public class XMLPolicyReader {
 			String attributeId = attributeElement.getAttribute("AttributeId");
 			if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:action-id")==0){
 				String dataType = attributeElement.getAttribute("DataType");
-				if (dataType.compareToIgnoreCase("org.personalsmartspace.spm.preference.api.platform.constants.ActionConstants")==0){
+				if (dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants")==0){
 					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 					Element attributeValueElement = (Element) attributeValueList.item(0);
 					ActionConstants ac = ActionConstants.valueOf(attributeValueElement.getFirstChild().getNodeValue().toUpperCase());
@@ -470,7 +470,7 @@ public class XMLPolicyReader {
 			String attributeId = attributeElement.getAttribute("AttributeId");
 			if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:condition-id")==0){
 				String dataType = attributeElement.getAttribute("DataType");
-				if (dataType.compareToIgnoreCase("org.personalsmartspace.spm.preference.api.platform.constants.ConditionConstants")==0){
+				if (dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants")==0){
 					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 					Element attributeValueElement = (Element) attributeValueList.item(0);
 					ConditionConstants cc = ConditionConstants.valueOf(attributeValueElement.getAttribute("DataType"));

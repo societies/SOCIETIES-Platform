@@ -43,9 +43,12 @@
 		<module>../parent/spring-osgi.xml</module>
 
 		<!-- Utilities -->
+		<module>../common-modules/common-ext-libs</module>
 		<module>../utilities/DBC</module>
 		<module>../utilities/common-mock</module>
 		<module>../utilities/societies-annotations</module>
+		<module>../utilities/maven/SimpleXMLConverters</module>
+		<module>../utilities/maven/Jaxb2SimpleXMLplugin</module>
 		<module>../common-modules/common-data-source</module>
 		<module>../common-modules/data-source</module>
 		<module>../common-modules/hibernate_classes</module>
@@ -57,34 +60,23 @@
 		<module>../api/schema/internal</module>
 		<module>../api/java/internal</module>
 
-
-
-
 		<!-- Platform Infrastructure -->
 		<!-- Communications Infrastructure -->
 		<module>../platform-infrastructure/comms-frwk/CommonLibraries</module>
-		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons
-		</module>
-		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr
-		</module>
-		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle
-		</module>
-		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle
-		</module>
+		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons</module>
+		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr</module>
+		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle</module>
+		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle</module>
 		<module>../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
+		
 		<!-- Domain Authority Modules -->
 		<module>../domain-authority/group-manager</module>
 		<module>../domain-authority/registry</module>
-		<!-- Example 3rd party services <module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module> 
-			<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module> 
-			<module>../platform-infrastructure/comms-frwk/ExampleServices/ComplexServiceBundle</module> 
-			<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module> -->
+		
 		<!-- Service Registry -->
 		<module>../css-modules/serviceRegistry</module>
-		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
-		</module>
-		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
-		</module>
+		<module>../platform-infrastructure/service-lifecycle/service-mgmt/</module>
+		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr</module>
 
 		<!-- Security and Dependability Mgmt -->
 		<module>../platform-infrastructure/security/SecurityServices</module>
@@ -92,7 +84,6 @@
 		<module>../platform-infrastructure/security/SecurityCommsMgr</module>
 
 		<!-- CSS Mgmt -->
-
 		<module>../css-modules/css-registry</module>
 		<module>../css-modules/css-directory</module>
 		<module>../css-modules/css-directory-client</module>
@@ -100,32 +91,26 @@
 		<module>../css-modules/css-mgmt/cssmgmt</module>
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
 
-
 		<!-- CIS Mgmt -->
-		<module>../cis-modules/cis-persistance/</module>
-		<module>../cis-modules/cis-management/cis-manager/cis-manager/
-		</module>
-		<module>../cis-modules/cis-discovery/</module>
-		<module>../cis-modules/cis-collaboration/</module>
+		<module>../cis-modules/cis-management/cis-manager/cis-manager</module>
 		<module>../cis-modules/cis-directory/</module>
 		<module>../cis-modules/cis-directory-client/</module>
 
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
 		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
-		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
+		<!--<module>../css-modules/device-mgmt/RegSynchroniser/</module>-->
 		<module>../css-modules/device-mgmt/DeviceCommsMgr/</module>
 		<module>../css-modules/device-mgmt/DeviceDriverSimulator/</module>
 		<module>../css-modules/device-mgmt/devicemanagerconsumer/</module>
-		<module>../css-modules/device-mgmt/DeviceDriverSimulator3/</module>
-		<module>../css-modules/device-mgmt/DeviceManagerConsumer3/</module>
+		<!-- <module>../css-modules/device-mgmt/DeviceDriverSimulator3/</module>
+		<module>../css-modules/device-mgmt/DeviceManagerConsumer3/</module> -->
 
 		<!-- SNS -->
 		<module>../platform-infrastructure/sns/FacebookConn</module>
 		<module>../platform-infrastructure/sns/FoursquareConnector</module>
 		<module>../platform-infrastructure/sns/TwitterConnector</module>
 		<module>../platform-infrastructure/sns/socialdata</module>
-
 
 		<!-- WP5 Modules -->
 		<!-- Context Management -->
@@ -140,21 +125,19 @@
 
 		<!-- Intelligent Community Orchestration -->
 		<module>../intelligent-community-orchestration/API</module>
-		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
-		</module> 
-		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
-		</module>
-		<module>../intelligent-community-orchestration/CPA</module>      
+		<module>../intelligent-community-orchestration/CommunityLifecycleManagement</module> 
+		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser</module>
+		<module>../intelligent-community-orchestration/CPA</module>
+		      
 		<!-- Privacy & Trust -->
 		<module>../privacy-trust/java/privacy-protection</module>
 		<module>../privacy-trust/java/trust</module>
 		<module>../privacy-trust/java/privacy-trust-comm-manager</module>
 
 		<!-- PlatForm Web App -->
-		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
-		</module>
-		
+		<module>../platform-infrastructure/service-lifecycle/platform-webapp/</module>
 		<module>../domain-authority/webapp</module>
+		<module>../domain-authority/webapp-rest</module>
 
 	</modules>
 </project>

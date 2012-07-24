@@ -30,7 +30,17 @@
   	  <powermock.version>1.4.12</powermock.version>
 	</properties>
 	<dependencies>
-
+<!-- <dependency> -->
+<!--         <groupId>net.sf.json-lib</groupId> -->
+<!--         <artifactId>json-lib</artifactId> -->
+<!--         <version>2.4</version> -->
+<!--         <classifier>jdk15</classifier> -->
+<!--     </dependency> -->
+    <dependency>
+	<groupId>org.json</groupId>
+	<artifactId>json</artifactId>
+	<version>20090211</version>
+</dependency>
 
 		<!-- spring -->
 		<dependency>
@@ -55,6 +65,11 @@
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.societies.cis</groupId>
+		    <artifactId>cis-manager</artifactId>
+		    <version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -152,7 +167,34 @@
 		<artifactId>intelligent-community-orchestration-api</artifactId>
 		<version>${version.ico}</version>
     </dependency>
-
+<!--  graph stuff -->
+<dependency>
+	<groupId>net.sf.jung</groupId>
+	<artifactId>jung-graph-impl</artifactId>
+	<version>2.0.1</version>
+</dependency>
+	<dependency>
+		<groupId>net.sf.jung</groupId>
+		<artifactId>jung-algorithms</artifactId>
+		<version>2.0.1</version>
+		<scope>compile</scope>
+	</dependency>
+	
+<!-- 	<dependency> -->
+<!-- 		<groupId>net.sf.jung</groupId> -->
+<!-- 		<artifactId>jung-io</artifactId> -->
+<!-- 		<version>${project.version}</version> -->
+<!-- 		<scope>compile</scope> -->
+<!-- 	</dependency> -->
+	
+	  	<dependency>
+		<groupId>net.sf.jung</groupId>
+		<artifactId>jung-visualization</artifactId>
+		<version>2.0.1</version>
+		<scope>compile</scope>
+		
+	</dependency>
+	
 	</dependencies>
 
 	<build>
@@ -172,6 +214,24 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<!-- created after mvn test using the Derby DBMS -->
+							<directory>cpatest</directory>
+						</fileset>
+						<fileset>
+							<directory>.</directory>
+							<includes>
+								<!-- created after mvn test using the Derby DBMS -->
+								<include>derby.log</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

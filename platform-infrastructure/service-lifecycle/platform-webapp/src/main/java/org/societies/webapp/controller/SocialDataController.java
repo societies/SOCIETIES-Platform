@@ -25,7 +25,6 @@ package org.societies.webapp.controller;
  */
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +65,11 @@ public class SocialDataController {
 	 * OSGI service get auto injected
 	 */
 	
-	
+	public class connStub{
+		public String image;
+		public String id;
+		
+	}
 
 	
 	public ISocialData getSocialData() {
@@ -75,6 +78,16 @@ public class SocialDataController {
 	
 	public void getSocialData(ISocialData socialData) {
 		this.socialdata = socialData;
+	}
+	
+	
+	private String getIcon(String data){
+		if (data==null) return "";
+		if (data=="")   return "";
+		
+		if (data.contains("facebook"))       return "images/Facebook.png";
+		else if (data.contains("twitter"))   return "images/Twitter.jpg";
+		else return "images/Foursquare.png";
 	}
 
 	@RequestMapping(value = "/socialdata.html", method = RequestMethod.GET)
@@ -85,32 +98,47 @@ public class SocialDataController {
 		
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("message", "Select a Social Newtork");
+		//model.put("message", "Select a Social Newtork");
 		
-		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
+//		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
 		SocialDataForm sdForm = new SocialDataForm();
 		model.put("sdForm", sdForm);
+//		
+//		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
+//		Map<String, String> methods = new LinkedHashMap<String, String>();
+//		methods.put(ADD, 		ADD);
+//		methods.put(REMOVE, 	REMOVE);
+//		methods.put(FRIENDS,    FRIENDS);
+//		methods.put(PROFILES,   PROFILES);
+//		methods.put(ACTIVITIES, ACTIVITIES);
+//		methods.put(GROUPS, 	GROUPS);
+//		methods.put(LIST, 	  	LIST);
+//		
+//		model.put("methods",  methods);
+//		
+//		Map<String, String> snName = new LinkedHashMap<String, String>();
+//		snName.put("FB", "Facebook");
+//		snName.put("TW", "Twitter");
+//		snName.put("FQ", "Foursquare");
+//		model.put(SNNAME, snName);
+//		model.put(TOKEN,  "");
+//		model.put(ID, 	"");
 		
-		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
-		Map<String, String> methods = new LinkedHashMap<String, String>();
-		methods.put(ADD, 		ADD);
-		methods.put(REMOVE, 	REMOVE);
-		methods.put(FRIENDS,    FRIENDS);
-		methods.put(PROFILES,   PROFILES);
-		methods.put(ACTIVITIES, ACTIVITIES);
-		methods.put(GROUPS, 	GROUPS);
-		methods.put(LIST, 	  	LIST);
+		Iterator<ISocialConnector>it = socialdata.getSocialConnectors().iterator();
+		String connLI="";
 		
-		model.put("methods",  methods);
+		while (it.hasNext()){
+			ISocialConnector conn = it.next();
+		    
+		    String image="";
+			if (conn.getConnectorName().equals("facebook"))     image="images/Facebook.png";
+			else if (conn.getConnectorName().equals("twitter")) image="images/Twitter.jpg";
+			else image="images/Foursquare.png";
+			connLI+="<li><img src='"+image+"'> "+conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+conn.getID()+"');\">Click here to disconnect</a></li>";
+			 
+		}
 		
-		Map<String, String> snName = new LinkedHashMap<String, String>();
-		snName.put("FB", "Facebook");
-		snName.put("TW", "Twitter");
-		snName.put("FQ", "Foursquare");
-		model.put(SNNAME, snName);
-		
-		model.put(TOKEN,  "");
-		model.put(ID, 	"");
+		model.put("connectors", connLI);
 		return new ModelAndView("socialdata", model);
 	}
 	
@@ -162,6 +190,27 @@ public class SocialDataController {
 					socialdata.addSocialConnector(con);
 					socialdata.updateSocialData();
 					content   = "<b>Connector</b> ID:"+sdForm.getId() + " for " + sdForm.getSnName() +" with token: "+ sdForm.getToken() + "<br>";
+					
+					
+					
+//					
+					model.put("sdForm", sdForm);
+					Iterator<ISocialConnector>it = socialdata.getSocialConnectors().iterator();
+					String connLI="";
+					
+					while (it.hasNext()){
+						ISocialConnector conn = it.next();
+					    
+					    String image="";
+						if (conn.getConnectorName().equals("facebook"))     image="images/Facebook.png";
+						else if (conn.getConnectorName().equals("twitter")) image="images/Twitter.jpg";
+						else image="images/Foursquare.png";
+						connLI+="<li><img src='"+image+"'> "+conn.getConnectorName()+" <a href=\"#\" onclick=\"disconnect('"+conn.getID()+"');\">Click here to disconnect</a></li>";
+						 
+					}
+					
+					model.put("connectors", connLI);
+					return new ModelAndView("socialdata", model);
 				}
 				
 				catch (Exception e) {
@@ -273,7 +322,7 @@ public class SocialDataController {
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
 					Group g= it.next();
 					String[] id = g.getId().getGroupId().split(":");
-					content +="<li> ["+id[0]+"] ID:" + id[1] +" Title:"+ g.getDescription() + "</li>" ;
+					content +="<li> "+id[0]+"] ID:" + id[1] +" Title:"+ g.getDescription() + "</li>" ;
 				}
 				content   += "</ul>";
 					
@@ -287,12 +336,23 @@ public class SocialDataController {
 				content ="<h4> My Social Activities </h4>";
 				content +="<ul>";
 				Iterator<ActivityEntry> it = list.iterator();
+				
 				while(it.hasNext()){
-					
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
 					ActivityEntry entry= it.next();
-					String id[] = entry.getId().split(":");
-					content +="<li> ["+id[0]+"]" + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
+					try{
+						String id[] = entry.getId().split(":");
+//						if (id[0]!=null) 
+//							content +="<li> <img src='"+getIcon(entry.getId())+"'>"+ entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
+//						else
+ 							content +="<li> <img width='20px' src='"+getIcon(entry.getId().toLowerCase())+"'>" + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
+						    //content +="<li> ["+entry.getId()+"]" + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
+						
+					}
+					catch(Exception ex){
+						content +="<li> " + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
+						
+					}
 				}
 				content   += "</ul>";
 			}

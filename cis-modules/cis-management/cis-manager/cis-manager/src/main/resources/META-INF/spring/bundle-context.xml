@@ -80,6 +80,9 @@
         <property name="ccmFactory" ref="cisCommMgrFactory"/>
         <property name="iCommMgr" ref="xcCommunication"/>
         <property name="iCisDirRemote" ref="CisDirectoryRemote"/>
+        <property name="iServDiscRemote" ref="servDiscRemote"/>
+        <property name="iServCtrlRemote" ref="servCtrlRemote"/>
+        <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
     </bean>
     
    <!-- <bean id="CisClientService" 

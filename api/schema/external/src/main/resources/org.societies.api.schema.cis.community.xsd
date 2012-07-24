@@ -27,14 +27,18 @@
 <xs:schema targetNamespace='http://societies.org/api/schema/cis/community'
 	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"  
 			xmlns:tns="http://societies.org/api/schema/cis/community" 
-	xmlns="http://societies.org/api/schema/cis/community">
+	xmlns="http://societies.org/api/schema/cis/community"
+	
+	xmlns:insact="http://societies.org/api/schema/activityfeed"
+	xmlns:ins="http://societies.org/api/schema/activity"
+	>
 
-	<xs:annotation>
-		<xs:documentation>
-			The protocol documented by this schema is defined in XEP-SOC1.
-		</xs:documentation>
-	</xs:annotation>
+<xs:import namespace="http://societies.org/api/schema/activityfeed" 
+           schemaLocation="org.societies.api.schema.activityfeed.xsd"/>
 
+<xs:import namespace="http://societies.org/api/schema/activity" 
+           schemaLocation="org.societies.api.schema.activity.xsd"/>
+           
 <!--  	<xs:element name='community' type='community-type'></xs:element>
 	
 	<xs:complexType name='community-type'>
@@ -74,17 +78,27 @@
 				<xs:element ref='leave'/>
 				<xs:element ref='invite'/>
 				<xs:element ref='who'/>
-				<xs:element ref='add'/>
+				<xs:element ref='addMember'/>
 				<xs:element ref='subscription'/>
-				<xs:element ref='delete'/>
+				<xs:element ref='deleteMember'/>
 				<xs:element ref='getInfo'/>
 				<xs:element ref='setInfo'/>
 				<xs:element ref='joinResponse'/>
 				<xs:element ref='leaveResponse'/>
-				<xs:element ref='addResponse'/>
-				<xs:element ref='deleteResponse'/>
+				<xs:element ref='addMemberResponse'/>
+				<xs:element ref='deleteMemberResponse'/>
 				<xs:element ref='getInfoResponse'/>
 				<xs:element ref='setInfoResponse'/>
+				<xs:element ref='getActivities'/>
+				<xs:element ref='getActivitiesResponse'/>
+				<xs:element ref='addActivity'/>
+				<xs:element ref='addActivityResponse'/>
+				<xs:element ref='cleanUpActivityFeed'/>
+				<xs:element ref='cleanUpActivityFeedResponse'/>
+				<xs:element ref='insact:activityfeed'/>
+<!-- 				<xs:element ref='deleteActivity'/>
+				<xs:element ref='deleteActivityResponse'/>-->
+			
 			</xs:choice>
 		  <xs:attribute name='owner-jid' type='xs:string'/> 
           <xs:attribute name='community-jid' type='xs:string'/> 
@@ -96,6 +110,71 @@
           <xs:attribute name='description' type='xs:string'/> 
 	</xs:complexType>
 </xs:element>
+
+
+	<xs:element name='getActivities'>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='empty'>
+					<xs:attribute name='timePeriod' type='xs:string' use='required'/>
+					<xs:attribute name='query' type='xs:string'/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name='getActivitiesResponse'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element ref='ins:Activity'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name='addActivity'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='ins:Activity'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name='addActivityResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>
+
+
+<!-- 	<xs:element name='deleteActivity'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='ins:Activity'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name='deleteActivityResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>-->
+
+	<xs:element name='cleanUpActivityFeed'>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='empty'>
+					<xs:attribute name='criteria' type='xs:string' use='required'/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name='cleanUpActivityFeedResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:int'/>
+		</xs:complexType>
+	</xs:element>
+
 
 	<xs:element name='subscription'>
 		<xs:complexType>
@@ -120,7 +199,7 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name='addResponse'>
+	<xs:element name='addMemberResponse'>
 		<xs:complexType>
 			<xs:sequence minOccurs='1' maxOccurs='1'>
 				<xs:element ref='participant'/>
@@ -128,7 +207,7 @@
 			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name='deleteResponse'>
+	<xs:element name='deleteMemberResponse'>
 		<xs:complexType>
 			<xs:sequence minOccurs='1' maxOccurs='1'>
 				<xs:element ref='participant'/>
@@ -198,14 +277,14 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name='add'>
+	<xs:element name='addMember'>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref='participant'/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name='delete'>
+	<xs:element name='deleteMember'>
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref='participant'/>

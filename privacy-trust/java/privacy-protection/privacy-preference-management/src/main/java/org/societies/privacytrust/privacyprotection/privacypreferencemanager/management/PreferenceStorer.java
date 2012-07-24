@@ -224,7 +224,7 @@ public class PreferenceStorer {
 			
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
-					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier);
+					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
 					attr = ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(registry)).get();
 					if (null==attr){
 						this.logging.debug("Preference Registry not updated.");
