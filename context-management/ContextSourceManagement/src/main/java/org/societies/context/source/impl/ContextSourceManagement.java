@@ -147,6 +147,20 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 				eventManager, this);
 		idManager = commMgr.getIdManager();
 		// newDeviceListener.run();
+		
+
+		try {
+			List<CtxEntityIdentifier> shadowEntitiesFuture = ctxBroker
+					.lookupEntities(sensor, "CtxSourceId", null, null).get();
+			counter = shadowEntitiesFuture.size();
+		} catch (CtxException e) {
+			LOG.error(e.getMessage());
+		} catch (InterruptedException e) {
+			LOG.error(e.getMessage());
+		} catch (ExecutionException e) {
+			LOG.error(e.getMessage());
+		}
+		
 		LOG.info("{}", "CSM started");
 	}
 
@@ -188,7 +202,6 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 		if (id==null)
 			id = name + counter++; 
-		//TODO ID counter checking... number of sources registered...
 
 		try {
 			Future<List<CtxEntityIdentifier>> shadowEntitiesFuture = ctxBroker
