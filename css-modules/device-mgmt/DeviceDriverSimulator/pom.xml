@@ -6,7 +6,7 @@
   <artifactId>DeviceDriverSimulator</artifactId>
   <packaging>bundle</packaging>
   <name>Device Deriver Simulator</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>${version.dm}</version>
   
   <developers>
 		<developer>
