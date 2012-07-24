@@ -24,7 +24,9 @@
  */
 package org.societies.context.location.management.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
@@ -33,7 +35,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.comm.EventsType;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-import org.societies.api.schema.css.devicemanagment.DmEvent;
+import org.societies.api.schema.css.devicemanagement.DmEvent;
 import org.societies.context.api.user.location.ILocationManagementAdapter;
 import org.societies.context.api.user.location.ILocationManagementConfigurator;
 
@@ -51,7 +53,12 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 		this.pubSubManager = pubSubManager;
 		this.commManager = commManager;
 		this.deviceRegistry = deviceRegistry;
-		register();
+		
+		/*
+		 * Temp removal of pubSubeventing
+		 * register();
+		 * 
+		 */
 	}
 
 	private DeviceConnected deviceConnected = new DeviceConnected();
@@ -60,10 +67,11 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 	private void register(){
 		try {
 			IIdentity identity = commManager.getIdManager().getThisNetworkNode();
-			
-			
-			//pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_CONNECTED, deviceConnected);
-			//pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_DISCONNECTED, deviceDisconnected);
+			List<String> packageList = new ArrayList<String>();
+			packageList.add("org.societies.api.schema.css.devicemanagement");
+			pubSubManager.addJaxbPackages(packageList);
+			pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_CONNECTED, deviceConnected);
+			pubSubManager.subscriberSubscribe(identity, EventsType.DEVICE_DISCONNECTED, deviceDisconnected);
 		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
