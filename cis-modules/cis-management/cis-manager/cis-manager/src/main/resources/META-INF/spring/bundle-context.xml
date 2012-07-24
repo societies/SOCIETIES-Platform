@@ -83,6 +83,7 @@
         <property name="iServDiscRemote" ref="servDiscRemote"/>
         <property name="iServCtrlRemote" ref="servCtrlRemote"/>
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
+        <property name="eventMgr" ref="eventMgmtRef"/>
     </bean>
     
    <!-- <bean id="CisClientService" 

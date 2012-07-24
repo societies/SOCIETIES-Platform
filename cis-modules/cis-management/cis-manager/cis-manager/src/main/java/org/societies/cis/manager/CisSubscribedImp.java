@@ -67,6 +67,7 @@ import org.societies.api.schema.cis.community.Community;
 //import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.GetInfo;
+import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.SetInfo;
@@ -324,5 +325,12 @@ public class CisSubscribedImp implements ICis {
 	public IActivityFeed getActivityFeed() {
 		return this.iactivityFeed;
 	}
+	
+	// internal method for filling up the Community marshalled object	
+	public void fillCommmunityXMPPobj(Community c){
+		c.setCommunityJid(this.getCisId());
+		c.setCommunityName(this.getName());
+		
+	} 
 
 }

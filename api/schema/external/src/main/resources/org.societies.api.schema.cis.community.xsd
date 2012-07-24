@@ -102,6 +102,7 @@
 	 	 <xs:sequence>
 			<xs:element ref='membershipCrit' minOccurs='0' maxOccurs='1'/>
 		</xs:sequence>
+		<xs:attribute name='result' type='xs:boolean'/>
 	 </xs:complexType>
 	</xs:element>
 	
@@ -201,7 +202,7 @@
 	<xs:element name='joinResponse'>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref='participant' minOccurs='1' maxOccurs='1'/>
+				<xs:element ref='participant' minOccurs='0' maxOccurs='1'/>
 				<xs:element ref='community' minOccurs='1' maxOccurs='1'/>
 			</xs:sequence>
 			<xs:attribute name='result' type='xs:boolean'/>
