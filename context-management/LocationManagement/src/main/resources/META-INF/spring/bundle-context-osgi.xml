@@ -16,9 +16,8 @@
 	<osgi:reference id="ContextBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />
 	<osgi:reference id="DeviceRegistry" interface="org.societies.api.internal.css.devicemgmt.IDeviceRegistry" />
 	<osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
-	
-	
-	<!--  <osgi:reference id="PZWrapper" interface="org.societies.context.location.management.PZWrapper"/>  -->
+	<osgi:reference id="DmCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager"/>
+	<osgi:reference id="PZWrapper" interface="org.societies.context.location.management.PZWrapper"/>
 	
 	
 	
