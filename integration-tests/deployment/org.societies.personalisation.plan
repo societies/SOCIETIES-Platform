@@ -8,5 +8,7 @@
 
     <artifact type="bundle" name="org.societies.useragent.userAgentBundle"/>
     <artifact type="bundle" name="org.societies.personalisation.personalisationBundle"/>
+    <artifact type="bundle" name="org.societies.personalisation.groupmanager"/>
+    
 	
 </plan>

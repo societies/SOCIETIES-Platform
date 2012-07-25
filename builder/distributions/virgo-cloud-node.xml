@@ -65,6 +65,7 @@
 		<module>../../css-modules/device-mgmt/devicemanager/</module>
 		<module>../../css-modules/device-mgmt/DeviceRegistry/</module>
 		<module>../../css-modules/device-mgmt/DeviceCommsMgr/</module>
+		<module>../../css-modules/device-mgmt/RFIDDriver/</module>
 
 		<!-- SNS: 1 bundle -->
 		<module>../../platform-infrastructure/sns/FacebookConn</module>

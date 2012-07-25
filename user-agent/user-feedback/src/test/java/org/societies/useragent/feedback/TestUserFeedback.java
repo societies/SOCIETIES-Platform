@@ -104,7 +104,7 @@ public class TestUserFeedback extends TestCase{
 		Assert.assertTrue(true);
 	}
 
-	public void testAckNackGUI() {
+	/*public void testAckNackGUI() {
 		try {
 			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
 			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
@@ -243,6 +243,6 @@ public class TestUserFeedback extends TestCase{
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 }
