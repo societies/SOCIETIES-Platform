@@ -10,6 +10,7 @@
 	
 	<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceCommsMgr"/>	
 	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
+	<artifact type="bundle" name="org.societies.css.devicemgmt.RFIDDriver"/>
 
 	
 
