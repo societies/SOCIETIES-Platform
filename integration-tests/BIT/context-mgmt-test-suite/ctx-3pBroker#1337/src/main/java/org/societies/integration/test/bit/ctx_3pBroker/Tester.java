@@ -120,12 +120,9 @@ public class Tester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
 		this.requestorService = new RequestorService(serviceIdentity, myServiceID);
+
 		LOG.info("*** requestor service = " + this.requestorService);
-
-
 
 		LOG.info("*** Starting examples...");
 		// TODO createRemoteEntity();
