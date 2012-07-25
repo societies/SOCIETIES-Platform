@@ -131,6 +131,7 @@ public class Tester {
 		// TODO createRemoteEntity();
 		this.retrieveIndividualEntityId();
 		this.updateOperatorAttributeLocation();
+		this.createOperatorAttributeBirthday();
 	}
 
 
@@ -142,31 +143,46 @@ public class Tester {
 		try {
 			cssOwnerEntityId = this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
 
-
 			List<CtxIdentifier> listAttrIds =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
-			//LOG.info("listAttrIds:" + listAttrIds);
 
 			if(listAttrIds.size() == 0){
 				//create location attribute
+				LOG.info("location attribute doesn't exist ... creating");
 				this.externalCtxBroker.createAttribute(this.requestorService, cssOwnerEntityId, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
 			}
 
 			List<CtxIdentifier> listAttrIds2 =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
+			LOG.info("location attribute identifiers "+listAttrIds2);
 
-			if(listAttrIds2.size() > 0){
-				CtxAttributeIdentifier locationAttributeId = (CtxAttributeIdentifier) listAttrIds2.get(0);  
+			CtxAttributeIdentifier locationAttributeId = null;
+
+			//the test will run correct for only one location attribute
+			if(listAttrIds2.size() == 1){
+				locationAttributeId = (CtxAttributeIdentifier) listAttrIds2.get(0);  
 				CtxAttribute locationAttributeRetrieved = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId).get();
 				LOG.info("locationAttributeRetrieved  :" + locationAttributeRetrieved.getId());
 				String locationSymbolicValue  = locationAttributeRetrieved.getStringValue();
+				LOG.info("locationAttributeRetrieved value (should be null) :" + locationSymbolicValue);
+
+				locationAttributeRetrieved.setStringValue("ATHENS");
+				LOG.info("value set...."+locationAttributeRetrieved.getStringValue()+" trying to update location attribute :" +locationAttributeRetrieved.getId());
+				this.externalCtxBroker.update(this.requestorService, locationAttributeRetrieved );				
+				LOG.info("update successfull");
+			}	
+
+			LOG.info("retrieve location attribute based on existing identifier:"+ locationAttributeId);
+			CtxAttribute locationAttributeWithValue = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId).get();
+			LOG.info("locationAttributeWithValue value :" + locationAttributeWithValue.getStringValue());
+
+			LOG.info("retrieve location attribute based on lookup ids ************* ");
+			List<CtxIdentifier> listAttrIds3 =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
+			LOG.info("retrieve location attribute based on lookup ids"+listAttrIds3);
+			if(listAttrIds3.size() == 1){
+				CtxAttributeIdentifier locationAttributeId3 = (CtxAttributeIdentifier) listAttrIds3.get(0); 
+				CtxAttribute locationAttributeRetrieved3 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId3).get();
+				LOG.info("locationAttributeRetrieved  :" + locationAttributeRetrieved3.getId());
+				String locationSymbolicValue  = locationAttributeRetrieved3.getStringValue();
 				LOG.info("locationAttributeRetrieved value :" + locationSymbolicValue);
-				
-				if(locationSymbolicValue == null){
-					locationAttributeRetrieved.setStringValue("ATHENS");
-					this.externalCtxBroker.update(this.requestorService, locationAttributeRetrieved );
-					CtxAttribute locationAttributeWithValue = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId).get();
-					LOG.info("locationAttributeWithValue value :" + locationAttributeWithValue.getStringValue());
-				}
-				
 			}
 
 		} catch (InterruptedException e) {
@@ -182,6 +198,62 @@ public class Tester {
 
 	}
 
+	private void createOperatorAttributeBirthday(){
+
+		LOG.info("createOperatorAttributeBirthday");
+		try {
+			CtxEntityIdentifier cssOwnerEntityId = 
+					this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
+			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
+
+			LOG.info("*** lookup for birthday attribute ");
+			List<CtxIdentifier> listAttrBDays =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BIRTHDAY).get(); 
+			LOG.info("this list should be zero :" + listAttrBDays); 
+
+			//create attribute birthday
+			LOG.info("*** create attribute birthday ");
+			CtxAttribute ctxAttrBirthday = this.externalCtxBroker.createAttribute(this.requestorService, cssOwnerEntityId, CtxAttributeTypes.BIRTHDAY).get(); 
+
+			CtxAttributeIdentifier bDayId = ctxAttrBirthday.getId();
+
+
+			LOG.info("*** set value of attribute birthday and update");
+			ctxAttrBirthday.setStringValue("today"); 
+			ctxAttrBirthday.setValueType(CtxAttributeValueType.STRING);
+
+			this.externalCtxBroker.update(this.requestorService, ctxAttrBirthday).get();
+
+			LOG.info("*** lookup for birthday attribute 2 (after creation-update)");
+			List<CtxIdentifier> listAttrBDays2 =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BIRTHDAY).get(); 
+			LOG.info("should not be zero listAttrBDays :" + listAttrBDays2); 
+
+
+			CtxAttribute ctxAttrBirthdayRetrieved1 = null;
+			CtxAttribute ctxAttrBirthdayRetrieved2 = null;
+			LOG.info("*** retrieve birthday attribute from db ");
+
+			//this one works
+			ctxAttrBirthdayRetrieved1 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, bDayId).get();
+			LOG.info("withoutLookup ctxAttrBirthdayRetrieved:" + ctxAttrBirthdayRetrieved1.getId());
+			String ctxAttrBirthdayRetrievedValue  = ctxAttrBirthdayRetrieved1.getStringValue();
+			LOG.info("withoutLookup ctxAttrBirthdayRetrieved value :" + ctxAttrBirthdayRetrievedValue);
+			assertEquals("today",ctxAttrBirthdayRetrievedValue);
+			//try this one
+			if(listAttrBDays2.size()>0){
+				CtxAttributeIdentifier attrId = (CtxAttributeIdentifier) listAttrBDays2.get(0);
+				ctxAttrBirthdayRetrieved2 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService,attrId ).get();	
+			}
+
+
+			LOG.info("after lookup ctxAttrBirthdayRetrieved:" + ctxAttrBirthdayRetrieved2.getId());
+			String ctxAttrBirthdayRetrievedValue2  = ctxAttrBirthdayRetrieved2.getStringValue();
+			LOG.info("ctxAttrBirthdayRetrieved value :" + ctxAttrBirthdayRetrievedValue2);
+			assertEquals("today",ctxAttrBirthdayRetrievedValue2);
+		} catch (Exception e) {
+
+			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
+		}	
+	}
 
 	private void lookupRetrieveLocationAttributeValue(){
 		List<CtxIdentifier> listAttrIds2;
@@ -214,11 +286,9 @@ public class Tester {
 			CtxEntityIdentifier cssOwnerEntityId = 
 					this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
 			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
-
 			//assertEquals("xcmanager.societies.local/ENTITY/person/0 ",cssOwnerEntityId.toString());
 
 		} catch (Exception e) {
-
 			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
