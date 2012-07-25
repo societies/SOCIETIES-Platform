@@ -114,7 +114,7 @@ public class CisParticipant implements ICisParticipant {
 		if (membersJid == null) {
 			if (other.membersJid != null)
 				return false;
-		} else if (!membersJid.equalsIgnoreCase(other.membersJid))
+		} else if (!membersJid.equals(other.membersJid))
 			return false;
 		return true;
 	}

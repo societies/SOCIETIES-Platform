@@ -1061,10 +1061,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
 				Community inputCommunity = c.getSetInfo().getCommunity();
 					if( (inputCommunity.getCommunityType() != null) &&  (!inputCommunity.getCommunityType().isEmpty()) && 
-							(!inputCommunity.getCommunityType().equalsIgnoreCase(this.getCisType()))) // if is not empty and is different from current value
+							(!inputCommunity.getCommunityType().equals(this.getCisType()))) // if is not empty and is different from current value
 						this.setCisType(inputCommunity.getCommunityType());
 					if( (inputCommunity.getDescription() != null) &&  (!inputCommunity.getDescription().isEmpty()) && 
-							(!inputCommunity.getDescription().equalsIgnoreCase(this.getDescription()))) // if is not empty and is different from current value
+							(!inputCommunity.getDescription().equals(this.getDescription()))) // if is not empty and is different from current value
 						this.setDescription(inputCommunity.getDescription());
 					r.setResult(true);	
 					
@@ -1486,7 +1486,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 		//check if he is not trying to set things which cant be set
 		if( ( (c.getCommunityJid() !=null) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisId()))  ) ||
-				(( (c.getCommunityName() !=null)) && (! c.getCommunityName().equalsIgnoreCase(this.getName()))  ) 
+				(( (c.getCommunityName() !=null)) && (! c.getCommunityName().equals(this.getName()))  ) 
 				 //( (!c.getCommunityType().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisType()))  ) ||
 				//|| ( (c.getMembershipMode() != null) && ( c.getMembershipMode() != this.getMembershipCriteria()))
 				
@@ -1610,7 +1610,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	
 	// internal method for filling up the MembershipCriteria marshalled object
-	private void fillMembershipCritXMPPobj(MembershipCrit m){
+	public void fillMembershipCritXMPPobj(MembershipCrit m){
 		List<Criteria> l = new ArrayList<Criteria>();
 		
 		

@@ -67,6 +67,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 
@@ -130,10 +131,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	IServiceControlRemote iServCtrlRemote;
 	private IPrivacyPolicyManager privacyPolicyManager;
 	private IEventMgr eventMgr;
+	private ICtxBroker internalCtxBroker;
 
 
 	//Autowiring gets and sets
 	
+	public ICtxBroker getInternalCtxBroker() {
+		return internalCtxBroker;
+	}
+	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
+		this.internalCtxBroker = internalCtxBroker;
+	}
 	public IServiceDiscoveryRemote getiServDiscRemote() {
 		return iServDiscRemote;
 	}
@@ -428,10 +436,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
 		//cisAd.setMode(0);//TODO: update this
 		MembershipCrit m = new MembershipCrit();
-		Hashtable<String, MembershipCriteria> h= cis.cisCriteria;
-		// TODO: add membership criteria in CISAdv
-		
-		//cisAd.setMembershipCrit();
+		cis.fillMembershipCritXMPPobj(m);
+		cisAd.setMembershipCrit(m);
 		cisAd.setName(cis.getName());
 		cisAd.setUri(cis.getCisId());
 		cisAd.setType(cis.getCisType());

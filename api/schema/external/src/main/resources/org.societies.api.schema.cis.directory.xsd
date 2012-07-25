@@ -31,7 +31,7 @@ elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"
 			<xs:element name="uri" type="xs:string" minOccurs="0" />
 			<xs:element name="password" type="xs:string" minOccurs="0" />
 			<xs:element name="type" type="xs:string" minOccurs="0" />
-			<xs:element ref='ins:membershipCrit'/>
+			<xs:element ref='ins:membershipCrit' minOccurs='0' maxOccurs='1'/><!--TODO: update to min 1 afterwards-->
 		</xs:sequence>
 	</xs:complexType>
 

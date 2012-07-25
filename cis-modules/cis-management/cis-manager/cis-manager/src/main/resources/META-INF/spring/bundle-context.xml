@@ -84,6 +84,7 @@
         <property name="iServCtrlRemote" ref="servCtrlRemote"/>
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
         <property name="eventMgr" ref="eventMgmtRef"/>
+        <property name="internalCtxBroker" ref="internalCtxBroker"/>
     </bean>
     
    <!-- <bean id="CisClientService" 
