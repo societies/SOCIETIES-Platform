@@ -16,7 +16,6 @@
         <artifact type="bundle" name="org.societies.data-source"/>
 
 		<!-- Service Discovery & Registry  -->
-    	<artifact type="bundle" name="org.societies.data-source"/>
     	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
     	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
     	<artifact type="bundle" name="org.societies.slm.SLMCommsManager"/>
@@ -24,7 +23,7 @@
 
 		<!-- Security -->
 		<artifact type="bundle" name="org.societies.security.secur-services"/>
-		<artifact type="bundle" name="org.societies.security.policy-negotiator"/>
+		<!--artifact type="bundle" name="org.societies.security.policy-negotiator"/-->
 		<artifact type="bundle" name="org.societies.security.secur-commsmgr"/>
 
 		<!-- CSS / CIS Management -->
@@ -32,8 +31,8 @@
     	<artifact type="bundle" name="org.societies.css.CssRegistry"/>
     	<artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
     	<artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>
-		<artifact type="bundle" name="org.societies.cis.CisDirectoryClient"/>
-		<artifact type="bundle" name="org.societies.cis.manager"/>
+		<!--artifact type="bundle" name="org.societies.cis.CisDirectoryClient"/-->
+		<!--artifact type="bundle" name="org.societies.cis.manager"/-->
 
         <!-- Device Mgmt -->
    		<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceCommsMgr"/>
@@ -55,8 +54,14 @@
         <artifact type="bundle" name="org.societies.context-management.context-source-mgmt"/>
 		<artifact type="bundle" name="org.societies.context-management.user-context-inference-mgmt"/>
 		<artifact type="bundle" name="org.societies.context-management.community-context-inference-mgmt"/>
-
-        <!-- Examples -->
-        <artifact type="bundle" name="org.societies.context-management.context-3pbroker-example"/>
-
-</plan>
+	
+<!-- Personalisation Management -->		
+	<artifact type="bundle" name="org.societies.personalisation.personalisationBundle"/>
+	<artifact type="bundle" name="org.societies.personalisation.groupmanager"/>
+	
+<!-- User Agent Monitoring -->		
+	<artifact type="bundle" name="org.societies.useragent.userAgentBundle"/>
+	
+      
+        																				
+		</plan>
