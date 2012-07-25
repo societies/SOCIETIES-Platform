@@ -396,7 +396,7 @@ public class PubsubServiceImpl implements PubsubService {
 		else {
 			// Example 128. NodeID already exists
 			if (nodes.keySet().contains(nodeId))
-				throw new XMPPError(StanzaError.conflict);
+				throw new XMPPError(StanzaError.conflict, "Node: '" + nodeId + "' already exists");
 		}
 		
 		// Create Node
