@@ -291,8 +291,9 @@ public class CommManagerHelper {
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
 			LOG.warn("dispatchIQError: XMPP ERROR!");
-			Element errorElement = iq.getChildElement();
+			Element errorElement = (Element)iq.getElement().elements().get(0); //GIVES US "error" ELEMENT
 			LOG.info("errorElement.getName()="+errorElement.getName()+";errorElement.elements().size()="+errorElement.elements().size());
+			LOG.info("errorElement.elements().get(0)).getName()=" + ((Element)errorElement.elements().get(0)).getName());
 			StanzaError se = StanzaError.valueOf(((Element)errorElement.elements().get(0)).getName()); // TODO assumes the stanza error comes first
 			XMPPError error = new XMPPError(se, null);
 			if (errorElement.elements().size()>1)
