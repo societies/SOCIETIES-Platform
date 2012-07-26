@@ -28,7 +28,7 @@
    depends-on="ctxBroker,deviceManager,eventManager" name="ContextSourceManagement" init-method="activate" destroy-method="deactivate">
 		  <property name="ctxBroker" ref="ctxBroker"></property>
 		  <property name="deviceManager" ref="deviceManager"></property>
-		<property name="eventManager" ref ="EventManager" />
+			<property name="eventManager" ref ="eventManager" />
   </bean>
 
 
