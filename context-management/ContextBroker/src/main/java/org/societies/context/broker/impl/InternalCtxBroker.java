@@ -371,6 +371,27 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		return new AsyncResult<List<CtxIdentifier>>(modObjListReturn);
 	}
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#lookup(org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxModelType, java.lang.String)
+	 */
+	@Override
+	public Future<List<CtxIdentifier>> lookup(final CtxEntityIdentifier entityId, 
+			 final CtxModelType modelType, final String type) throws CtxException {
+		
+		if (entityId == null)
+			throw new NullPointerException("entityId can't be null");
+		if (modelType == null)
+			throw new NullPointerException("modelType can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		
+		if (!CtxModelType.ATTRIBUTE.equals(modelType) || !CtxModelType.ASSOCIATION.equals(modelType))
+			throw new IllegalArgumentException("modelType is not ATTRIBUTE or ASSOCIATION");
+		
+		// TODO implement
+		return null;
+	}
 
 	/*
 	 * returns a list of entities with a specified value for a specified attribute type
