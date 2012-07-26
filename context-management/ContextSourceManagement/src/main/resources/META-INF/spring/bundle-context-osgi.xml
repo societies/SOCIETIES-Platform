@@ -24,4 +24,5 @@
 	<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" cardinality="1..1" />
 	<osgi:reference id="deviceManager" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager" cardinality="1..1" />
 	<osgi:reference id="eventManager" interface="org.societies.api.osgi.event.IEventMgr" cardinality="1..1"/>
+	<osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="1..1"/>
 </beans>
