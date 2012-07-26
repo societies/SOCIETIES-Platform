@@ -31,5 +31,5 @@
 			<property name="eventManager" ref ="eventManager" />
 		      </bean> -->
    
-    <context:component-scan base-package="org.societies.context.source.impl"></context:component-scan> -->
+    <context:component-scan base-package="org.societies.context.source.impl"></context:component-scan>
 </beans>
