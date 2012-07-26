@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 
@@ -838,7 +839,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 	
 	@Override
-	public List<ICis> searchMyCisByName(String name){
+	public List<ICis> searchCisByName(String name){
 		// add subscribed CIS to the list to be returned
 		List<ICis> l = new ArrayList<ICis>();
 		Iterator<Cis> it = getOwnedCISs().iterator();
@@ -879,21 +880,18 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			
 			return l;
 	}
-
+	
 	@Override
-	public ICis[] getCisList(ICis arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<ICisOwned> searchCisByMember(IIdentity css) throws InterruptedException, ExecutionException{
+		List<ICisOwned> l = new ArrayList<ICisOwned>();
+		for (ICisOwned temp : this.ownedCISs) {
+			if(temp.getMemberList().get().contains(new CisParticipant(css.getBareJid())))
+				l.add(temp);
+		}
+		return l;
 	}
 
 
-
-	@Override
-	public boolean requestNewCisOwner(String arg0, String arg1, String arg2,
-			String arg3) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 
 

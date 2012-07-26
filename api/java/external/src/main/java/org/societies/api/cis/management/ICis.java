@@ -130,6 +130,15 @@ public interface ICis {
 	 */
     public void setInfo(Community c, ICisManagerCallback callback);
     
+    /**
+	 * Get a handler of the activityfeed of the CIS. Then you can use
+	 * the interface to search/add/delete activities
+	 *  
+	 * 
+	 * @return {@link IActivityFeed}
+	 */
     public IActivityFeed getActivityFeed();
+    
+    
     
 }

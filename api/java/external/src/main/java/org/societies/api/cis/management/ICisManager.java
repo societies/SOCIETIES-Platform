@@ -26,9 +26,11 @@ package org.societies.api.cis.management;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
@@ -145,9 +147,21 @@ public interface ICisManager {
 	 * @param String name input to search for cis
 	 * @return Array of {@link ICis} that contains the name string .
 	 */
-	public List<ICis> searchMyCisByName(String name);
+	public List<ICis> searchCisByName(String name);
 	
 
+	/**
+	 * Return the list of owned CISs in which the CSS
+	 * represented by {@link IIdentity}  is a member.
+	 * 
+	 * It will return an empty list if no CIS contains that CSS
+	 * 
+	 * @param {@link IIdentity} represensting the CSS
+	 * @return Array of {@link ICisOwned} that contains the CSS .
+	 */
+	public List<ICisOwned> searchCisByMember(IIdentity css) throws InterruptedException, ExecutionException;
+
+	
 	// END OF API implementing server functionality
 	
 	// API implementing client functionality (to be called from webapp)
@@ -184,7 +198,7 @@ public interface ICisManager {
 	
 	// API which is not yet properly defined
 	
-	/**
+	/*
 	 * Return an array of all the CISs that match the query. 
 	 * 
 	 * TODO: DO NOT USE THIS METHOD YET
@@ -194,13 +208,13 @@ public interface ICisManager {
 	 * @param query Defines what to search for.
 	 * @return Array of CIS Records that match the query.
 	 */
-	ICis[] getCisList(ICis query);
+	//ICis[] getCisList(ICis query);
 
 	
 	
 	
 	
-	/**
+	/*
 	 * Method not yet defined. 
 	 * 
 	 * TODO: DO NOT USE THIS METHOD YET - not yet defined
@@ -212,7 +226,7 @@ public interface ICisManager {
 	 * @param cisId JID of the CIS which will have its owner changed
 	 * @return boolean stating if the operation worked or failed
 	 */
-	boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
-		String newOwnerCssId, String cisId);
+	//boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
+	//	String newOwnerCssId, String cisId);
 
 }

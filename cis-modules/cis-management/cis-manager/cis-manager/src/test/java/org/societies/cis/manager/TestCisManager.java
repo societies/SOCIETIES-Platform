@@ -90,6 +90,7 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.identity.IdentityImpl;
 import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -379,7 +380,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		int[] cissCheck = {0,0,0};
 		
 		ciss[0] =  (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1+"aa", TEST_CIS_TYPW ,null,"")).get();
+				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 		ciss[1] = (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_2, TEST_CIS_TYPW ,null,"")).get();
 		ciss[2] = (cisManagerUnderTestInterface.createCis(
@@ -553,6 +554,90 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 	}
 	
+	@Test
+	public void searchCISbyName(){
+		cisManagerUnderTest = new CisManager();
+		this.setMockingOnCISManager(cisManagerUnderTest);
+		cisManagerUnderTestInterface = cisManagerUnderTest;
+		
+		ICisOwned[] ciss = new ICisOwned [3]; 
+		int[] cissCheck = {0,0,0};
+		
+		try {
+			ciss[0] =  (cisManagerUnderTestInterface.createCis(
+					"alfa", TEST_CIS_TYPW ,null,"")).get();
+			ciss[1] = (cisManagerUnderTestInterface.createCis(
+					"alfaromeo", TEST_CIS_TYPW ,null,"")).get();
+			ciss[2] = (cisManagerUnderTestInterface.createCis(
+					"beta", TEST_CIS_TYPW ,null,"")).get();
+			
+			assertEquals(ciss[1],cisManagerUnderTest.searchCisByName("alfaromeo").get(0));
+			assertEquals(2,cisManagerUnderTest.searchCisByName("alfa").size());
+			assertEquals(0,cisManagerUnderTest.searchCisByName("gama").size());
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			fail("exception");
+		} catch (ExecutionException e) {
+
+			e.printStackTrace();
+			fail("exception");
+		}
+		
+		
+		// CLEANING UP
+
+		 for(int i=0;i<ciss.length;i++){
+			 cisManagerUnderTestInterface.deleteCis(ciss[i].getCisId());
+		 }
+
+
+	}
+	
+	@Test
+	public void searchCISbyMember(){
+		
+		cisManagerUnderTest = new CisManager();
+		this.setMockingOnCISManager(cisManagerUnderTest);
+		
+		cisManagerUnderTestInterface = cisManagerUnderTest;
+		ICisOwned[] ciss = new ICisOwned [3]; 
+		
+		try {
+			ciss[0] =  (cisManagerUnderTestInterface.createCis(
+					"alfa", TEST_CIS_TYPW ,null,"")).get();
+			ciss[1] = (cisManagerUnderTestInterface.createCis(
+					"alfaromeo", TEST_CIS_TYPW ,null,"")).get();
+			ciss[2] = (cisManagerUnderTestInterface.createCis(
+					"beta", TEST_CIS_TYPW ,null,"")).get();
+
+			// MEMBER_JID_1
+			ciss[0].addMember(MEMBER_JID_1, MEMBER_ROLE_1);
+			ciss[1].addMember(MEMBER_JID_1, MEMBER_ROLE_1);
+			
+			// MEMBER_JID_2
+			ciss[0].addMember(MEMBER_JID_2, MEMBER_ROLE_1);
+
+			assertEquals(ciss[0],cisManagerUnderTest.searchCisByMember(new IdentityImpl(MEMBER_JID_2)).get(0));
+			assertEquals(2,cisManagerUnderTest.searchCisByMember(new IdentityImpl(MEMBER_JID_1)).size());
+			assertEquals(0,cisManagerUnderTest.searchCisByMember(new IdentityImpl(MEMBER_JID_3)).size());
+
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("exception");
+		} 
+	
+		
+		// CLEANING UP
+
+		 for(int i=0;i<ciss.length;i++){
+			 cisManagerUnderTestInterface.deleteCis(ciss[i].getCisId());
+		 }
+
+
+		
+	}
 	
 	
 	@Test
