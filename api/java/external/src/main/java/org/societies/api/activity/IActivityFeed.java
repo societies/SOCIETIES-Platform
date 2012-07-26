@@ -115,4 +115,7 @@ public interface IActivityFeed {
 
 	public void cleanupFeed(String criteria,IActivityFeedCallback c);
 	public void deleteActivity(IActivity activity,IActivityFeedCallback c);
+	
+	public IActivity getEmptyIActivity();
+	
 }

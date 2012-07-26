@@ -82,6 +82,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	/**
 	 * 
 	 */
+
 	
 //	@Id
 	private String id;
@@ -488,4 +489,11 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		c.receiveResult(result);
 		
 	}
+	
+	@Override
+	public IActivity getEmptyIActivity(){
+		Activity a = new Activity();
+		return a;
+	}
+	
 }

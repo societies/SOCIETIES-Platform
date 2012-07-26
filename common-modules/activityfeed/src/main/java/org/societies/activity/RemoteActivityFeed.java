@@ -172,7 +172,11 @@ public class RemoteActivityFeed implements IActivityFeed {
 	
 	
 	
-	
+	@Override
+	public IActivity getEmptyIActivity(){
+		org.societies.activity.model.Activity a = new org.societies.activity.model.Activity();
+		return a;
+	}
 	
 	
 	
