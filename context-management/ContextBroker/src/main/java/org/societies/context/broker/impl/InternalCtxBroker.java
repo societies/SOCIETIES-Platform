@@ -45,6 +45,7 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -376,6 +377,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * @see org.societies.api.internal.context.broker.ICtxBroker#lookup(org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxModelType, java.lang.String)
 	 */
 	@Override
+	@Async
 	public Future<List<CtxIdentifier>> lookup(final CtxEntityIdentifier entityId, 
 			 final CtxModelType modelType, final String type) throws CtxException {
 		
@@ -386,11 +388,36 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 		
-		if (!CtxModelType.ATTRIBUTE.equals(modelType) || !CtxModelType.ASSOCIATION.equals(modelType))
+		if (!CtxModelType.ATTRIBUTE.equals(modelType) && !CtxModelType.ASSOCIATION.equals(modelType))
 			throw new IllegalArgumentException("modelType is not ATTRIBUTE or ASSOCIATION");
 		
-		// TODO implement
-		return null;
+		if (LOG.isDebugEnabled())
+			LOG.debug("Looking up context " + modelType + "(s) of type '" + type 
+					+ "' under entity " + entityId);
+		
+		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
+		// TODO 1. check CSS or CIS 
+		// TODO 2. check local or remote
+		// TODO if local then CtxDBMgr should provide the method - temp hack
+		try {
+			final CtxEntity entity = (CtxEntity) this.retrieve(entityId).get();
+			if (CtxModelType.ATTRIBUTE.equals(modelType)) {
+				final Set<CtxAttribute> attrs = entity.getAttributes(type);
+				for (final CtxAttribute attr : attrs)
+					result.add(attr.getId());
+			} else /* if (CtxModelType.ASSOCIATION.equals(modelType)) */ {
+				final Set<CtxAssociationIdentifier> assocIds = entity.getAssociations(type);
+				for (final CtxAssociationIdentifier assocId : assocIds)
+					result.add(assocId);
+			}
+		} catch (Exception e) {
+			
+			throw new CtxBrokerException("Could not look up context " + modelType
+					+ "(s) of type '" + type + "' under entity " + entityId
+					+ ": " + e.getLocalizedMessage(), e);
+		}
+		
+		return new AsyncResult<List<CtxIdentifier>>(result);
 	}
 
 	/*
