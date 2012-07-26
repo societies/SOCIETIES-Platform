@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -142,6 +144,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 //		activate();
 	}
 
+	@PostConstruct
 	public void activate() {
 		this.newDeviceListener = new NewDeviceListener(deviceManager,
 				eventManager, this);
@@ -164,6 +167,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		LOG.info("{}", "CSM started");
 	}
 
+	@PreDestroy
 	public void deactivate() {
 		this.newDeviceListener.stop();
 		LOG.info("CSM + DeviceListener stopped");
