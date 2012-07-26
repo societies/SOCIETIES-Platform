@@ -202,7 +202,7 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 		CisDirectoryBean cisDir = new CisDirectoryBean();
 		cisDir.setCisA(cisAdvert);
 		cisDir.setMethod(MethodType.ADD_CIS_ADVERTISEMENT_RECORD);
-		LOG.info("going to send stanza");
+		LOG.info("going to send stanza to" + stanza.getTo().getBareJid());
 		try {
 			commManager.sendMessage(stanza, cisDir);
 			LOG.info("msg sent");

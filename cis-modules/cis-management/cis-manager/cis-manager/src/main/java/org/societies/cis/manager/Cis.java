@@ -103,6 +103,7 @@ import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.Qualification;
 import org.societies.api.schema.cis.community.SetInfoResponse;
+import org.societies.api.schema.cis.community.SetMembershipCriteriaResponse;
 import org.societies.api.schema.cis.community.Who;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
@@ -849,7 +850,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public Object getQuery(Stanza stanza, Object payload) {
 		// all received IQs contain a community element
 		LOG.info("get Query received");
-		if (payload.getClass().equals(Community.class)) {
+		if (payload.getClass().equals(CommunityMethods.class)) {
 			LOG.info("community type received");
 			CommunityMethods c = (CommunityMethods) payload;
 
@@ -866,15 +867,15 @@ public class Cis implements IFeatureServer, ICisOwned {
 				JoinResponse j = new JoinResponse();
 				boolean addresult = false; 
 				p.setJid(jid);
-				com.setCommunityJid(this.getCisId()); 
-				com.setCommunityName(this.getName());
-				com.setCommunityType(this.cisType);
-				com.setOwnerJid(this.owner);
-				// TODO: add the criteria to the response
+				this.fillCommmunityXMPPobj(com);
 				
 				j.setCommunity(com);
 				result.setJoinResponse(j);
+
 				
+				// TEMPORARELY DISABLING THE QUALIFICATION CHECKS
+				// TODO: uncomment this
+				/*
 				
 				// checking the criteria
 				if(this.cisCriteria.size()>0){
@@ -888,12 +889,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 						}
 						
 						
-						// TEMPORARELY DISABLING THE QUALIFICATION CHECKS
-						// TODO: uncomment this
-						//if (this.checkQualification(qualification) == false){
-						//	j.setResult(addresult);
-						//	return result;
-						//}
+						if (this.checkQualification(qualification) == false){
+							j.setResult(addresult);
+							return result;
+						}
 							
 					}
 					else{
@@ -901,7 +900,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 						return result;
 					}
 				}
-				
+				*/
 				
 				
 				
@@ -1041,12 +1040,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				CommunityMethods result = new CommunityMethods();
 				Community com = new Community();
 				GetInfoResponse r = new GetInfoResponse();
-				// TODO: add the criteria to the response
-				com.setOwnerJid(this.getOwnerId());
-				com.setCommunityJid(this.getCisId());
-				com.setCommunityName(this.getName());
-				com.setCommunityType(this.getCisType());
-				com.setDescription(this.getDescription());
+				this.fillCommmunityXMPPobj(com);
 				r.setResult(true);
 				r.setCommunity(com);
 				result.setGetInfoResponse(r);
@@ -1067,10 +1061,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
 				Community inputCommunity = c.getSetInfo().getCommunity();
 					if( (inputCommunity.getCommunityType() != null) &&  (!inputCommunity.getCommunityType().isEmpty()) && 
-							(!inputCommunity.getCommunityType().equalsIgnoreCase(this.getCisType()))) // if is not empty and is different from current value
+							(!inputCommunity.getCommunityType().equals(this.getCisType()))) // if is not empty and is different from current value
 						this.setCisType(inputCommunity.getCommunityType());
 					if( (inputCommunity.getDescription() != null) &&  (!inputCommunity.getDescription().isEmpty()) && 
-							(!inputCommunity.getDescription().equalsIgnoreCase(this.getDescription()))) // if is not empty and is different from current value
+							(!inputCommunity.getDescription().equals(this.getDescription()))) // if is not empty and is different from current value
 						this.setDescription(inputCommunity.getDescription());
 					r.setResult(true);	
 					
@@ -1079,18 +1073,65 @@ public class Cis implements IFeatureServer, ICisOwned {
 					
 				//}
 				
-				// TODO: add the criteria to the response
-					com.setOwnerJid(this.getOwnerId());
-					com.setCommunityJid(this.getCisId());
-					com.setCommunityName(this.getName());
-					com.setCommunityType(this.getCisType());				
-					com.setDescription(this.getDescription());
+					this.fillCommmunityXMPPobj(com);
 					r.setCommunity(com);
 					result.setSetInfoResponse(r);
 				return result;
 
 			}				// END OF GET INFO
+			
+			// get Membership Criteria
+			if (c.getGetMembershipCriteria()!= null) {
+				CommunityMethods result = new CommunityMethods();
+				GetMembershipCriteriaResponse g = new GetMembershipCriteriaResponse();				
+				MembershipCrit m = new MembershipCrit();
+				this.fillMembershipCritXMPPobj(m);
+				g.setMembershipCrit(m);
+				result.setGetMembershipCriteriaResponse(g);
+				return result;
 
+			}	
+			
+			// set Membership Criteria
+			if (c.getSetMembershipCriteria()!= null) {
+				CommunityMethods result = new CommunityMethods();
+				SetMembershipCriteriaResponse r = new SetMembershipCriteriaResponse();
+				result.setSetMembershipCriteriaResponse(r);
+				
+				
+				
+				// retrieving from marshalled object the incoming criteria
+				
+				MembershipCrit m = c.getSetMembershipCriteria().getMembershipCrit();
+				if (m!=null && m.getCriteria() != null && m.getCriteria().size()>0){
+					
+					// populate the hashtable
+					for (Criteria crit : m.getCriteria()) {
+						MembershipCriteria meb = new MembershipCriteria();
+						meb.setRank(crit.getRank());
+						Rule rule = new Rule();
+						if( rule.setOperation(crit.getOperator()) == false) {r.setResult(false); return result;}
+						ArrayList<String> a = new ArrayList<String>();
+						a.add(crit.getValue1());
+						if (crit.getValue2() != null && !crit.getValue2().isEmpty()) a.add(crit.getValue2()); 
+						if( rule.setValues(a) == false) {r.setResult(false); return result;}
+						meb.setRule(rule);
+						if( this.addCriteria(crit.getAttrib(), meb) == false) {r.setResult(false); return result;}
+						
+					}
+				}
+				
+				
+				r.setResult(true);
+				m = new MembershipCrit();
+				this.fillMembershipCritXMPPobj(m);
+				r.setMembershipCrit(m);
+				return result;
+
+
+			}	
+
+			
 			
 		}
 		if (payload.getClass().equals(Activityfeed.class)) {
@@ -1428,12 +1469,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		Community c = new Community();
 		GetInfoResponse r = new GetInfoResponse();
 		r.setResult(true);
-		c.setCommunityJid(this.getCisId());
-		c.setCommunityName(this.getName());
-		c.setCommunityType(this.getCisType());
-		c.setOwnerJid(this.getOwnerId());
-		// TODO: add the criteria to the response
-		c.setDescription(this.getDescription());
+		this.fillCommmunityXMPPobj(c);
 		result.setGetInfoResponse(r);
 		r.setCommunity(c);
 		
@@ -1450,7 +1486,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 		//check if he is not trying to set things which cant be set
 		if( ( (c.getCommunityJid() !=null) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisId()))  ) ||
-				(( (c.getCommunityName() !=null)) && (! c.getCommunityName().equalsIgnoreCase(this.getName()))  ) 
+				(( (c.getCommunityName() !=null)) && (! c.getCommunityName().equals(this.getName()))  ) 
 				 //( (!c.getCommunityType().isEmpty()) && (! c.getCommunityJid().equalsIgnoreCase(this.getCisType()))  ) ||
 				//|| ( (c.getMembershipMode() != null) && ( c.getMembershipMode() != this.getMembershipCriteria()))
 				
@@ -1471,12 +1507,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		}
 		CommunityMethods result = new CommunityMethods();		
 		Community resp = new Community();
-		resp.setCommunityJid(this.getCisId());
-		resp.setCommunityName(this.getName());
-		resp.setCommunityType(this.getCisType());
-// TODO: add the criteria here		resp.setMembershipMode(this.getMembershipCriteria());
-		resp.setOwnerJid(this.getOwnerId());
-		resp.setDescription(this.getDescription());
+		this.fillCommmunityXMPPobj(resp);
 		result.setSetInfoResponse(r);
 		r.setCommunity(resp);
 		
@@ -1569,6 +1600,17 @@ public class Cis implements IFeatureServer, ICisOwned {
 		GetMembershipCriteriaResponse g = new GetMembershipCriteriaResponse();
 		
 		MembershipCrit m = new MembershipCrit();
+		this.fillMembershipCritXMPPobj(m);
+		g.setMembershipCrit(m);
+		result.setGetMembershipCriteriaResponse(g);
+		callback.receiveResult(result);
+	}
+
+	
+	
+	
+	// internal method for filling up the MembershipCriteria marshalled object
+	public void fillMembershipCritXMPPobj(MembershipCrit m){
 		List<Criteria> l = new ArrayList<Criteria>();
 		
 		
@@ -1584,11 +1626,23 @@ public class Cis implements IFeatureServer, ICisOwned {
 			l.add(c);
 		}
 		m.setCriteria(l);
-		g.setMembershipCrit(m);
-		result.setGetMembershipCriteriaResponse(g);
-		callback.receiveResult(result);
 	}
-
+		
+	
+	// internal method for filling up the Community marshalled object	
+	public void fillCommmunityXMPPobj(Community c){
+		c.setCommunityJid(this.getCisId());
+		c.setCommunityName(this.getName());
+		c.setCommunityType(this.getCisType());
+		c.setOwnerJid(this.getOwnerId());
+		c.setDescription(this.getDescription());
+		
+		// fill criteria
+		MembershipCrit m = new MembershipCrit();
+		this.fillMembershipCritXMPPobj(m);
+		c.setMembershipCrit(m);
+		
+	} 
 
 	
 }

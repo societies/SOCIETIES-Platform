@@ -175,7 +175,20 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+	
+	<!-- dependency for internal eventing-->	
+	<dependency>
+    <groupId>org.osgi</groupId>
+    <artifactId>org.osgi.compendium</artifactId>
+    <version>4.1.0</version>
+    <scope>provided</scope>
+  </dependency>
+	
+	
 	</dependencies>
+	
+	
+	
 
 	<build>
 		<plugins>

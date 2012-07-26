@@ -67,6 +67,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 
@@ -78,6 +79,10 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 
 
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.cis.community.Community;
 
 
@@ -125,7 +130,70 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	IServiceDiscoveryRemote iServDiscRemote;
 	IServiceControlRemote iServCtrlRemote;
 	private IPrivacyPolicyManager privacyPolicyManager;
+	private IEventMgr eventMgr;
+	private ICtxBroker internalCtxBroker;
 
+
+	//Autowiring gets and sets
+	
+	public ICtxBroker getInternalCtxBroker() {
+		return internalCtxBroker;
+	}
+	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
+		this.internalCtxBroker = internalCtxBroker;
+	}
+	public IServiceDiscoveryRemote getiServDiscRemote() {
+		return iServDiscRemote;
+	}
+	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
+		this.iServDiscRemote = iServDiscRemote;
+	}
+	public IServiceControlRemote getiServCtrlRemote() {
+		return iServCtrlRemote;
+	}
+	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
+		this.iServCtrlRemote = iServCtrlRemote;
+	}
+
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
+	}
+
+	
+	public ICISCommunicationMgrFactory getCcmFactory() {
+		return ccmFactory;
+	}
+
+
+
+	public void setCcmFactory(ICISCommunicationMgrFactory ccmFactory) {
+		this.ccmFactory = ccmFactory;
+	}
+
+
+	
+	public ICommManager getICommMgr() {
+		return iCommMgr;
+	}
+
+
+
+	public void setICommMgr(ICommManager cSSendpoint) {
+		iCommMgr = cSSendpoint;
+	}
+
+
+	public ICisDirectoryRemote getiCisDirRemote() {
+		return iCisDirRemote;
+	}
+	public void setiCisDirRemote(ICisDirectoryRemote iCisDirRemote) {
+		this.iCisDirRemote = iCisDirRemote;
+	}
+	
 
 	
 	public void startup(){
@@ -210,51 +278,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-	public IServiceDiscoveryRemote getiServDiscRemote() {
-		return iServDiscRemote;
-	}
-	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
-		this.iServDiscRemote = iServDiscRemote;
-	}
-	public IServiceControlRemote getiServCtrlRemote() {
-		return iServCtrlRemote;
-	}
-	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
-		this.iServCtrlRemote = iServCtrlRemote;
-	}
 
-
-
-	
-	public ICISCommunicationMgrFactory getCcmFactory() {
-		return ccmFactory;
-	}
-
-
-
-	public void setCcmFactory(ICISCommunicationMgrFactory ccmFactory) {
-		this.ccmFactory = ccmFactory;
-	}
-
-
-	
-	public ICommManager getICommMgr() {
-		return iCommMgr;
-	}
-
-
-
-	public void setICommMgr(ICommManager cSSendpoint) {
-		iCommMgr = cSSendpoint;
-	}
-
-
-	public ICisDirectoryRemote getiCisDirRemote() {
-		return iCisDirRemote;
-	}
-	public void setiCisDirRemote(ICisDirectoryRemote iCisDirRemote) {
-		this.iCisDirRemote = iCisDirRemote;
-	}
 
 
 	/**
@@ -318,8 +342,25 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		boolean ret = false;
 		if(getOwnedCISs().contains(new Cis(new CisRecord(cisJid)))){
 			Cis cis = this.getOwnedCisByJid(cisJid);
+			
+			// get community object for later eventing
+			Community c = new Community();
+			cis.fillCommmunityXMPPobj(c);
+						
 			ret = cis.deleteCIS();
 			ret = ret && getOwnedCISs().remove(cis);
+			
+			if(ret == true){ // if it works we also send an internal event
+				InternalEvent event = new InternalEvent(EventTypes.CIS_DELETION, "deletion of CIS", this.cisManagerId.getBareJid(), c);
+				try {
+					this.getEventMgr().publishInternalEvent(event);
+				} catch (EMSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					LOG.error("error trying to internally publish CIS DELETE event");
+				}
+
+			}
 		}
 		
 		return ret;
@@ -395,10 +436,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
 		//cisAd.setMode(0);//TODO: update this
 		MembershipCrit m = new MembershipCrit();
-		Hashtable<String, MembershipCriteria> h= cis.cisCriteria;
-		// TODO: add membership criteria in CISAdv
-		
-		//cisAd.setMembershipCrit();
+		cis.fillMembershipCritXMPPobj(m);
+		cisAd.setMembershipCrit(m);
 		cisAd.setName(cis.getName());
 		cisAd.setUri(cis.getCisId());
 		cisAd.setType(cis.getCisType());
@@ -406,6 +445,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
 
 		
+		// sending internal event
+		Community c = new Community();
+		cis.fillCommmunityXMPPobj(c);
+		InternalEvent event = new InternalEvent(EventTypes.CIS_CREATION, "creation of CIS", this.cisManagerId.getBareJid(), c);
+		try {
+			this.getEventMgr().publishInternalEvent(event);
+		} catch (EMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			LOG.error("error trying to internally publish CREATE event");
+		}
 		
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
@@ -425,6 +475,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisName(), i.getCisJID()), this);			
 			this.subscribedCISs.add(csi);
 			this.persist(csi);
+			
+			// internal eventing
+			Community c = new Community();
+			csi.fillCommmunityXMPPobj(c);
+			InternalEvent event = new InternalEvent(EventTypes.CIS_SUBS, "subscription of CIS", this.cisManagerId.getBareJid(), c);
+			try {
+				this.getEventMgr().publishInternalEvent(event);
+			} catch (EMSException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				LOG.error("error trying to internally publish SUBS CIS event");
+			}
+			
 			return true;
 		}
 		return false;
@@ -441,8 +504,23 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			CisSubscribedImp temp = new CisSubscribedImp(new CisRecord(cisjid));
 			temp = subscribedCISs.get(subscribedCISs.indexOf(temp)); // temp now is the real object
 			
+			// create the object for later eventing
+			Community c = new Community();
+			temp.fillCommmunityXMPPobj(c);
+			
 			if(this.subscribedCISs.remove(temp)) {// removing it from the list
 				this.deletePersisted(temp); // removing it from the database
+				
+				//send the local event
+				InternalEvent event = new InternalEvent(EventTypes.CIS_UNSUBS, "unsubscription of CIS", this.cisManagerId.getBareJid(), c);
+				try {
+					this.getEventMgr().publishInternalEvent(event);
+				} catch (EMSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					LOG.error("error trying to internally publish UNSUBS CIS event");
+				}
+				
 				return true;
 			}
 			else{
