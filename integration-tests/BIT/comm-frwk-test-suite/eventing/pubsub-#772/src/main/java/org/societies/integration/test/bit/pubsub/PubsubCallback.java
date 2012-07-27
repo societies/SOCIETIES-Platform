@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.examples.calculatorbean.CalcBeanResult;
 import org.societies.test.Testnode;
 
 /**
@@ -39,10 +40,15 @@ import org.societies.test.Testnode;
 public class PubsubCallback implements Subscriber {
 
 	private static Logger LOG = LoggerFactory.getLogger(PubsubCallback.class);
-	private Testnode eventObject = null;
+	//private Testnode eventObject = null;
+	private CalcBeanResult eventObject = null;
 	
 	/**@return the eventObject */
-	public Testnode getEventObject() {
+	//public Testnode getEventObject() {
+	//	return eventObject;
+	//	}
+	
+	public CalcBeanResult getEventObject() {
 		return eventObject;
 	}
 	
@@ -53,7 +59,7 @@ public class PubsubCallback implements Subscriber {
 		LOG.info("### New Pubsub Event topic: " + node);
 		//CHECK WHAT PAYLOAD IS
 		if (item.getClass().equals(Testnode.class)) {
-			eventObject = (Testnode)item;
+			eventObject = (CalcBeanResult)item;
 			synchronized (this) {
 	            notifyAll( );
 	        }
