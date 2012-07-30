@@ -56,6 +56,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
@@ -218,7 +219,13 @@ public class InternalCtxBroker implements ICtxBroker {
 					|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
 
 				attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
-
+			
+				//TODO origin type should be set in db manager
+				if (attribute.getQuality().getOriginType() == null) {
+					attribute.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+				}
+				
+				
 			} else if (IdentityType.CIS.equals(scopeID.getType())){
 
 				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, type);
@@ -1578,13 +1585,18 @@ public class InternalCtxBroker implements ICtxBroker {
 	//********************************************************************
 	//**************** end of hoc code  **********************************
 
-
+	
+	
+	//******************************************
+	//  service refs used by junit tests
+	//******************************************
+	
 	/**
 	 * Sets the User Context DB Mgmt service reference.
 	 * 
 	 * @param userDB
 	 *            the User Context DB Mgmt service reference to set.
-	 */
+	*/
 	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
 
 		this.userCtxDBMgr = userDB;
@@ -1595,7 +1607,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param userDB
 	 *            the User Context DB Mgmt service reference to set.
-	 */
+	*/
 	public void setCommunityCtxDBMgr(ICommunityCtxDBMgr communityCtxDBMgr) {
 
 		this.communityCtxDBMgr = communityCtxDBMgr;
@@ -1606,7 +1618,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param userCtxHistoryMgr
 	 *            the User Context History Mgmt service reference to set
-	 */
+	*/
 	public void setUserCtxHistoryMgr(IUserCtxHistoryMgr userCtxHistoryMgr) {
 
 		this.userCtxHistoryMgr = userCtxHistoryMgr;
@@ -1617,7 +1629,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param idMgr
 	 *            the IIdentity Mgmt service reference to set.
-	 */
+	*/
 	public void setIdentityMgr(IIdentityManager identityMgr) {
 
 		this.idMgr = identityMgr;
@@ -1631,10 +1643,9 @@ public class InternalCtxBroker implements ICtxBroker {
 	 */
 	public void setUserCtxInferenceMgr(IUserCtxInferenceMgr userCtxInferenceMgr) {
 
-		System.out.println("inf manager set");
 		this.userCtxInferenceMgr = userCtxInferenceMgr;
 	}
-
+	 
 
 	/**
 	 * Sets the {@link IPrivacyLogAppender} service reference.
@@ -1647,6 +1658,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.privacyLogAppender = privacyLogAppender;
 	}
 
+	//******************************************
+	//  service refs used by junit tests
+	//******************************************
+		
+	
+	
+	
 	// TODO remove
 	public void createCssNode(INetworkNode cssNodeId) throws CtxException {
 
@@ -1706,5 +1724,181 @@ public class InternalCtxBroker implements ICtxBroker {
 		} catch (ServiceUnavailableException sue) {
 			// do nothing
 		}
+	}
+
+	
+	
+	
+	//****************************************************************
+	//  Extended external broker implementation
+	//****************************************************************
+	
+	@Override
+	public Future<CtxEntity> createEntity(Requestor requestor,
+			IIdentity targetCss, String type) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<CtxAttribute> createAttribute(Requestor requestor,
+			CtxEntityIdentifier scope, String type) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<CtxAssociation> createAssociation(Requestor requestor,
+			IIdentity targetCss, String type) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	//lookup(Requestor, CtxEntityIdentifer, CtxModelType, String)
+	
+	@Override
+	public Future<List<CtxIdentifier>> lookup(Requestor requestor,
+			IIdentity target, CtxModelType modelType, String type)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxEntityIdentifier>> lookupEntities(
+			Requestor requestor, IIdentity targetCss, String entityType,
+			String attribType, Serializable minAttribValue,
+			Serializable maxAttribValue) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void registerForChanges(Requestor requestor,
+			CtxChangeEventListener listener, CtxIdentifier ctxId)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterFromChanges(Requestor requestor,
+			CtxChangeEventListener listener, CtxIdentifier ctxId)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerForChanges(Requestor requestor,
+			CtxChangeEventListener listener, CtxEntityIdentifier scope,
+			String attrType) throws CtxException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterFromChanges(Requestor requestor,
+			CtxChangeEventListener listener, CtxEntityIdentifier scope,
+			String attrType) throws CtxException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Future<CtxModelObject> remove(Requestor requestor,
+			CtxIdentifier identifier) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<CtxModelObject> retrieve(Requestor requestor,
+			CtxIdentifier identifier) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
+			Requestor requestor, IIdentity cssId) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxAttribute>> retrieveFuture(Requestor requestor,
+			CtxAttributeIdentifier attrId, Date date) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxAttribute>> retrieveFuture(Requestor requestor,
+			CtxAttributeIdentifier attrId, int modificationIndex)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(
+			Requestor requestor, CtxAttributeIdentifier attrId,
+			int modificationIndex) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(
+			Requestor requestor, CtxAttributeIdentifier attrId, Date startDate,
+			Date endDate) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<CtxModelObject> update(Requestor requestor,
+			CtxModelObject object) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<CtxEntity> retrieveAdministratingCSS(Requestor requestor,
+			CtxEntityIdentifier communityEntId) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<Set<CtxBond>> retrieveBonds(Requestor requestor,
+			CtxEntityIdentifier community) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(
+			Requestor requestor, CtxEntityIdentifier community)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
+			Requestor requestor, CtxEntityIdentifier community)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(
+			Requestor requestor, CtxEntityIdentifier community)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

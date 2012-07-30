@@ -30,6 +30,7 @@
 	
 	<bean id="TestCase1064" class="org.societies.integration.test.bit.communication_ctx_frwk.Test1064" init-method="run">
 		<property name="ctxBroker" ref ="ctxBroker" />
+		<property name="commManager" ref="commManager" />
 		
   	</bean>
   	
