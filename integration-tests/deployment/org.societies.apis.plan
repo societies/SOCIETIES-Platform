@@ -6,7 +6,7 @@
 		        http://www.eclipse.org/virgo/schema/plan 
 		        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-	<artifact type="bundle" name="org.societies.api.external.societies-api" version="0.1.0"/>
-	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal" version="0.1.0"/>
+	<artifact type="bundle" name="org.societies.api.external.societies-api"/>
+	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal"/>
 
 </plan>
