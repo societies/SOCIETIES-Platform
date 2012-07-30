@@ -88,97 +88,101 @@ public class ContextCommunicator {
 			try {
 				//get cssOperator (Person)
 				IndividualCtxEntity cssOperator = ctxBroker.retrieveIndividualEntity(owner).get();
-				LOG.debug("Retrieved PERSON entity with ID: "+cssOperator.getId());
+				if(cssOperator != null){
+					LOG.debug("Retrieved PERSON entity with ID: "+cssOperator.getId());
 
-				//get USES_SERVICE associations for this person entity
-				Set<CtxAssociationIdentifier> usesServiceAssocIDs = cssOperator.getAssociations(CtxAssociationTypes.USES_SERVICES);
-				if(usesServiceAssocIDs.size() > 0){  //USES_SERVICE associations found!
-					LOG.debug("Found USES_SERVICES association under PERSON entity");
-					CtxAssociation usesServiceAssoc = (CtxAssociation)ctxBroker.retrieve(usesServiceAssocIDs.iterator().next()).get();
-					
-					//Get SERVICE entities under USES_SERVICE association
-					Set<CtxEntityIdentifier> serviceEntityIDs = usesServiceAssoc.getChildEntities();
-										
-					//find SERVICE entity with correct ID
-					List<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
-					List<CtxEntityIdentifier> returnedServiceIDs = ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceID).get();
-					if(returnedServiceIDs.size() > 0){  //SERVICE entity with this serviceID found!
-						LOG.debug("Found SERVICE entity with serviceID: "+serviceID);
+					//get USES_SERVICE associations for this person entity
+					Set<CtxAssociationIdentifier> usesServiceAssocIDs = cssOperator.getAssociations(CtxAssociationTypes.USES_SERVICES);
+					if(usesServiceAssocIDs.size() > 0){  //USES_SERVICE associations found!
+						LOG.debug("Found USES_SERVICES association under PERSON entity");
+						CtxAssociation usesServiceAssoc = (CtxAssociation)ctxBroker.retrieve(usesServiceAssocIDs.iterator().next()).get();
 						
-						CtxEntity serviceEntity = (CtxEntity)ctxBroker.retrieve(returnedServiceIDs.get(0)).get();
-						
-						//Get HAS_PARAMETER associations for this service entity
-						Set<CtxAssociationIdentifier> hasParamAssocIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS);
-						if(hasParamAssocIDs.size() > 0){  //HAS_PARAMETER associations found!
-							LOG.debug("Found HAS_PARAMETER association under SERVICE entity");
-							CtxAssociation hasParamAssoc = (CtxAssociation)ctxBroker.retrieve(hasParamAssocIDs.iterator().next()).get();
+						//Get SERVICE entities under USES_SERVICE association
+						Set<CtxEntityIdentifier> serviceEntityIDs = usesServiceAssoc.getChildEntities();
+											
+						//find SERVICE entity with correct ID
+						List<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
+						List<CtxEntityIdentifier> returnedServiceIDs = ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceID).get();
+						if(returnedServiceIDs.size() > 0){  //SERVICE entity with this serviceID found!
+							LOG.debug("Found SERVICE entity with serviceID: "+serviceID);
 							
-							//Get SERVICE_PARAMETER entities under HAS_PARAMETER association
-							Set<CtxEntityIdentifier> paramEntityIDs = hasParamAssoc.getChildEntities();
+							CtxEntity serviceEntity = (CtxEntity)ctxBroker.retrieve(returnedServiceIDs.get(0)).get();
 							
-							//find SERVICE_PARAMETER entity with correct name
-							List<CtxEntityIdentifier> paramEntityIDsList = new ArrayList<CtxEntityIdentifier>(paramEntityIDs);
-							List<CtxEntityIdentifier> returnedParamIDs = ctxBroker.lookupEntities(paramEntityIDsList, CtxAttributeTypes.PARAMETER_NAME, parameterName).get();
-							if(returnedParamIDs.size() > 0){  //SERVICE_PARAMETER entity with this name found!
-								LOG.debug("Found SERVICE_PARAMETER entity with parameterName: "+parameterName);
-								CtxEntity parameterEntity = (CtxEntity)ctxBroker.retrieve(returnedParamIDs.get(0)).get();
+							//Get HAS_PARAMETER associations for this service entity
+							Set<CtxAssociationIdentifier> hasParamAssocIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS);
+							if(hasParamAssocIDs.size() > 0){  //HAS_PARAMETER associations found!
+								LOG.debug("Found HAS_PARAMETER association under SERVICE entity");
+								CtxAssociation hasParamAssoc = (CtxAssociation)ctxBroker.retrieve(hasParamAssocIDs.iterator().next()).get();
 								
-								//Get LAST_ACTION attribute
-								Set<CtxAttribute> returnedAttributes = parameterEntity.getAttributes(CtxAttributeTypes.LAST_ACTION);
-								CtxAttribute lastActionAttr = returnedAttributes.iterator().next();
+								//Get SERVICE_PARAMETER entities under HAS_PARAMETER association
+								Set<CtxEntityIdentifier> paramEntityIDs = hasParamAssoc.getChildEntities();
 								
-								//update LAST_ACTION value
-								LOG.debug("Updating LAST_ACTION attribute with action");
-								ctxBroker.updateAttribute(lastActionAttr.getId(), SerialisationHelper.serialise(action));
+								//find SERVICE_PARAMETER entity with correct name
+								List<CtxEntityIdentifier> paramEntityIDsList = new ArrayList<CtxEntityIdentifier>(paramEntityIDs);
+								List<CtxEntityIdentifier> returnedParamIDs = ctxBroker.lookupEntities(paramEntityIDsList, CtxAttributeTypes.PARAMETER_NAME, parameterName).get();
+								if(returnedParamIDs.size() > 0){  //SERVICE_PARAMETER entity with this name found!
+									LOG.debug("Found SERVICE_PARAMETER entity with parameterName: "+parameterName);
+									CtxEntity parameterEntity = (CtxEntity)ctxBroker.retrieve(returnedParamIDs.get(0)).get();
+									
+									//Get LAST_ACTION attribute
+									Set<CtxAttribute> returnedAttributes = parameterEntity.getAttributes(CtxAttributeTypes.LAST_ACTION);
+									CtxAttribute lastActionAttr = returnedAttributes.iterator().next();
+									
+									//update LAST_ACTION value
+									LOG.debug("Updating LAST_ACTION attribute with action");
+									ctxBroker.updateAttribute(lastActionAttr.getId(), SerialisationHelper.serialise(action));
+									
+									//update mappings
+									LOG.debug("Updating mappings table with key: "+key+" and attributeID: "+lastActionAttr.getId());
+									mappings.put(key, lastActionAttr.getId());
+									
+								}else{  //no SERVICE_PARAMETER entity found :(
+									
+									//CREATING NEW SERVICE_PARAMETER
+									//setting as child of HAS_PARAMETER association
+									//adding PARAMETER_NAME attribute
+									//adding LAST_ACTION attribute
+									//adding to mappings with key
+									createServiceParameter(key, hasParamAssoc, parameterName, action);
+								}
 								
-								//update mappings
-								LOG.debug("Updating mappings table with key: "+key+" and attributeID: "+lastActionAttr.getId());
-								mappings.put(key, lastActionAttr.getId());
+							}else{  //no HAS_PARAMETER associations found :(
 								
-							}else{  //no SERVICE_PARAMETER entity found :(
+								//creating new HAS_PARAMETER association and setting SERVICE entity as parent
+								CtxAssociation newHasParamAssoc = createHasParameterAssociation(serviceEntity);
+								//creating new SERVICE_PARAMETER entity, setting as child of HAS_PARAMETER association
+								//adding ID and PARAMETER_NAME attributes
+								createServiceParameter(key, newHasParamAssoc, parameterName, action);
 								
-								//CREATING NEW SERVICE_PARAMETER
-								//setting as child of HAS_PARAMETER association
-								//adding PARAMETER_NAME attribute
-								//adding LAST_ACTION attribute
-								//adding to mappings with key
-								createServiceParameter(key, hasParamAssoc, parameterName, action);
 							}
 							
-						}else{  //no HAS_PARAMETER associations found :(
+						}else{  //no SERVICE entity with this serviceID found :(
 							
-							//creating new HAS_PARAMETER association and setting SERVICE entity as parent
-							CtxAssociation newHasParamAssoc = createHasParameterAssociation(serviceEntity);
+							//creating new SERVICE entity
+							CtxEntity newServiceEntity = createServiceEntity(usesServiceAssoc, serviceID);
+							//creating new HAS_PARAMETER association and setting service entity as parent
+							CtxAssociation newHasParamAssoc = createHasParameterAssociation(newServiceEntity);
 							//creating new SERVICE_PARAMETER entity, setting as child of HAS_PARAMETER association
 							//adding ID and PARAMETER_NAME attributes
 							createServiceParameter(key, newHasParamAssoc, parameterName, action);
-							
 						}
 						
-					}else{  //no SERVICE entity with this serviceID found :(
+					}else{  //no USES_SERVICE associations found :(
 						
+						//creating new USE_SERVICE ASSOCATION
+						CtxAssociation newUsesServiceAssoc = createUsesServiceAssociation(cssOperator);
 						//creating new SERVICE entity
-						CtxEntity newServiceEntity = createServiceEntity(usesServiceAssoc, serviceID);
+						CtxEntity newServiceEntity = createServiceEntity(newUsesServiceAssoc, serviceID);
 						//creating new HAS_PARAMETER association and setting service entity as parent
 						CtxAssociation newHasParamAssoc = createHasParameterAssociation(newServiceEntity);
 						//creating new SERVICE_PARAMETER entity, setting as child of HAS_PARAMETER association
 						//adding ID and PARAMETER_NAME attributes
 						createServiceParameter(key, newHasParamAssoc, parameterName, action);
 					}
-					
-				}else{  //no USES_SERVICE associations found :(
-					
-					//creating new USE_SERVICE ASSOCATION
-					CtxAssociation newUsesServiceAssoc = createUsesServiceAssociation(cssOperator);
-					//creating new SERVICE entity
-					CtxEntity newServiceEntity = createServiceEntity(newUsesServiceAssoc, serviceID);
-					//creating new HAS_PARAMETER association and setting service entity as parent
-					CtxAssociation newHasParamAssoc = createHasParameterAssociation(newServiceEntity);
-					//creating new SERVICE_PARAMETER entity, setting as child of HAS_PARAMETER association
-					//adding ID and PARAMETER_NAME attributes
-					createServiceParameter(key, newHasParamAssoc, parameterName, action);
+				}else{
+					LOG.error("Could not retrieve Person EntityIdentifier from JID");
 				}
-
+				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
@@ -317,7 +321,11 @@ public class ContextCommunicator {
 				ctxBroker.updateAttribute(uidAttrID, myDeviceID);
 			}else{  //no existing UID - create and populate
 				CtxEntity personEntity = ctxBroker.retrieveIndividualEntity(owner).get();
-				ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.UID);
+				if(personEntity != null){
+					ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.UID);
+				}else{
+					LOG.error("Could not retrieve Person EntityIdentifier from JID");
+				}
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();

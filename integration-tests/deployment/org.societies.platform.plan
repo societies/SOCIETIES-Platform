@@ -31,6 +31,8 @@
 	<artifact type="plan" name="org.societies.service-lifecycle"/>
 	
 	<artifact type="plan" name="org.societies.sns"/>
+
+	<artifact type="plan" name="org.societies.useragent"/>
 	
 	<artifact type="plan" name="org.societies.personalisation"/>
 	
