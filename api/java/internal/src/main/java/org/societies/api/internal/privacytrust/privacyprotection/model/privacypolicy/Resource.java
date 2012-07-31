@@ -110,7 +110,17 @@ public class Resource implements Serializable{
 	public String toString(){
 		return this.toXMLString();
 	}
-	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((contextType == null) ? 0 : contextType.hashCode());
+		result = prime * result
+				+ ((ctxIdentifier == null) ? 0 : ctxIdentifier.hashCode());
+		return result;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -130,5 +140,7 @@ public class Resource implements Serializable{
 			.append(this.getCtxIdentifier(), rhs.getCtxIdentifier())
 			.isEquals();
 	}
+	
+	
 }
 

@@ -26,6 +26,7 @@
 package org.societies.integration.test.bit.ctxRetrieve;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -69,9 +70,11 @@ public class HelloWorld implements IHelloWorld{
 	private ICtxBroker ctxBroker;
 
 	private CtxAttribute nameCtxAttribute;
+
+	private List<CtxAttribute> retrievedAttributes;
 	
 	public HelloWorld(){
-
+		this.retrievedAttributes = new ArrayList<CtxAttribute>();
 	}
 
 	
@@ -89,11 +92,13 @@ public class HelloWorld implements IHelloWorld{
 	}
 	@Override
 	public void displayUserLocation() {
-		if (this.nameCtxAttribute==null){
-			JOptionPane.showMessageDialog(null, "Could not retrieve user's name from ctx db");
-			return;
+	
+		String str = "";
+		for (CtxAttribute ctxAttr : this.retrievedAttributes){
+			str = str.concat("Got access to: "+ctxAttr.getStringValue()+" : "+ctxAttr.getId().toUriString());
 		}
-		JOptionPane.showMessageDialog(null, "The user's name is: "+this.nameCtxAttribute.getStringValue());
+		
+		JOptionPane.showMessageDialog(null, str);
 	}
 
 	/**
@@ -119,15 +124,23 @@ public class HelloWorld implements IHelloWorld{
 	}
 
 	@Override
-	public CtxAttribute retrieveCtxAttribute(String ctxType){
+	public List<CtxAttribute> retrieveCtxAttribute(String ctxType){
 	
 		try {
 			Future<List<CtxIdentifier>> flookupResults = this.ctxBroker.lookup(me, userIdentity, CtxModelType.ATTRIBUTE, ctxType);
 			List<CtxIdentifier> lookupResults = flookupResults.get();
+			JOptionPane.showMessageDialog(null, "Retrieved: "+lookupResults.size()+" results from CtxBroker");
 			if (lookupResults.size()==0){
 				return null;
 			}else{
-				this.nameCtxAttribute = (CtxAttribute) this.ctxBroker.retrieve(me, lookupResults.get(0)).get();
+				
+				for (CtxIdentifier ctxId : lookupResults){
+					CtxAttribute ctxAttr = (CtxAttribute) this.ctxBroker.retrieve(me, ctxId).get();
+					if (ctxAttr!=null){
+						this.retrievedAttributes.add(ctxAttr);
+					}
+				}
+				
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

@@ -27,25 +27,135 @@ package org.societies.api.cis.directory;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
+import java.util.HashMap;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.context.model.CtxAttribute;
+
 /**
+ * This interface allows access to the CISAdvertisement record
+ * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-/**
- * 
- * MISSING_JAVADOCS
- */
+
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICisAdvertisementRecord {
+	
+	/**
+     * Description: Gets the name of the CIS from the advertisement record
+     *
+     * @return String Name
+     */
 	public String getName();
+	
+	/**
+     * Description: Sets the name of the CIS in the advertisement record
+     *
+     * @param String Name
+     */
 	public void setName(String name);
-	public String getId();
+
+	/**
+     * Description: Gets the Identity of the CIS from the advertisement record
+     *
+     * @return String ID 
+     */
+	public String getId(); //Can be used to query CIS owner for an ICis to get member list, if CIS is set to public
+
+	
+	/**
+     * Description: Gets the Uri of the CIS from the advertisement record
+     *
+     * 
+     * @return String Uri
+     */
 	public String getUri();
+	
+	
+	/**
+     * Description: Sets the Uri of the CIS from the advertisement record
+     *
+     * @param String Uri
+     */
 	public void setUri(String uri);
+	
+	/**
+     * Description: Gets the password of the CIS from the advertisement record
+     *
+     * 
+     * @return String password
+     */
 	public String getPassword();
+	
+	
+	/**
+     * Description: Sets the password of the CIS in the advertisement record
+     *
+     * @param String password
+     * 
+     * @return:
+     */
 	public String setPassword(String password);
+	
+	/**
+     * Description: Gets the type of the CIS from the advertisement record
+     *
+     * @return String type
+     */
 	public String getType();
+	
+	/**
+     * Description: Sets the type of the CIS in the advertisement record
+     *
+     * @param String type
+     * 
+     */
 	public String setType(String type);
+	
+	/**
+     * Description: Gets the mode of the CIS from the advertisement record
+     *
+     * 
+     * @return String mode
+     */
 	public String getMode();
+	
+	/**
+     *Description: Sets the mode of the CIS in the advertisement record
+     *
+     * @param int mode
+     */
 	public String setMode(int mode);
+	
+	/**
+     * Description: Gets the description of the CIS from the advertisement record
+     *
+     * 
+     * @return String Description
+     */
+	public String getDescription();
+	
+	/**
+     * Description: Sets the Description of the CIS from the advertisement record
+     *
+     * 
+     * @param String Description
+     */
+    public boolean setDescription(String description);
+    
+    /**
+     * Description: Gets the membership criteria of the CIS from the advertisement record
+     *
+     * 
+     * @return HashMap MembershipCriteria
+     */
+    public HashMap<CtxAttribute, MembershipCriteria> getMembershipCriteria();
+    
+    /**
+     * Description: Sets the membership criteria of the CIS from the advertisement record
+     *
+     * 
+     * @param HashMap membershipCriteria
+     */
+    public boolean setMembershipCriteria(HashMap<CtxAttribute, MembershipCriteria> membershipCriteria);
 }

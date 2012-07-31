@@ -48,9 +48,12 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxQuality;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.context.source.impl.ContextSourceManagement;
 
 public class ContextSourceManagementTest {
@@ -79,9 +82,15 @@ public class ContextSourceManagementTest {
 	private static CtxQuality mockQuality = mock(CtxQuality.class);
 	private static Future<CtxAssociation> mockFutureAssociation = mock(Future.class);
 	private static CtxAssociation mockAssociation = mock(CtxAssociation.class);
+	private static INetworkNode mocknetworkNode = mock(INetworkNode.class);
 	
-	private static IIdentityManager mockIdManager = mock(IIdentityManager.class);;
-	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);;
+	private static IIdentityManager mockIdManager = mock(IIdentityManager.class);
+	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);
+	private static IEventMgr mockEventMgr = mock(IEventMgr.class);
+	private static IIdentity mockIIdentity = mock(IIdentity.class);
+	private static Future<IndividualCtxEntity> mockFutureIndividualEntity = mock(Future.class);
+	private static IndividualCtxEntity mockIndividualEntity = mock(IndividualCtxEntity.class);
+	
 
 	/**
 	 * @throws java.lang.Exception
@@ -128,8 +137,10 @@ public class ContextSourceManagementTest {
 
 		when(mockCommMgr.getIdManager()).thenReturn(mockIdManager);
 		when(mockIdManager.getThisNetworkNode()).thenReturn(mockNetworkNode);
+		when(mockIdManager.fromJid(null)).thenReturn(mockIIdentity);
 		when(mockBroker.retrieveCssNode(mockNetworkNode)).thenReturn(mockFutureEntity);
-		when(mockFutureEntity.get()).thenReturn(mockCtxEntity);		
+		when(mockBroker.retrieveIndividualEntity(mockIIdentity)).thenReturn(mockFutureIndividualEntity);
+		when(mockFutureIndividualEntity.get()).thenReturn(mockIndividualEntity);		
 	}
 
 	/**
@@ -149,6 +160,9 @@ public class ContextSourceManagementTest {
     	csm = new ContextSourceManagement();
     	csm.setCtxBroker(mockBroker);
     	csm.setCommManager(mockCommMgr);
+    	csm.setEventManager(mockEventMgr);
+    	
+    	csm.activate();
 	}
  
     @Test
@@ -181,7 +195,7 @@ public class ContextSourceManagementTest {
     public void testWithRegistrationWithEntity() {
     	boolean result =false;
     	try {
-			String id = csm.register(mockCtxEntity, "TemperatureSensor", "Temperature").get();
+			String id = csm.register(mocknetworkNode, "TemperatureSensor", "Temperature").get();
 
 	    	result = csm.sendUpdate(id, "Temperature",mockCtxEntity).get();
 	    	

@@ -39,12 +39,15 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.source.ICtxSourceMgr;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.location.IUserLocation;
 import org.societies.context.api.user.location.IZone;
@@ -54,8 +57,7 @@ import org.societies.context.api.user.location.IZone;
  * 
  * ToDO 
  * 1) The CSM API has to be changed to be able to update atrr on a specific CSS node
- * 2) Find a way to maintain the JID corresponds to a mac address
- * 3) Who creates the GPS attributes in the CSM ? 
+ * 2) Who creates the GPS attributes in the CSM ? 
  * Describe your class here...
  *
  * @author Guy Feigenblat (guyf@il.ibm.com)
@@ -88,9 +90,9 @@ public class LocationManagementContextAccessor {
 		try {
 			CtxEntity ctxEntity = getCtxEntity(cssNodeId);
 			
-			Future<String> id = contextSourceManagement.register(CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_COORDINATES);
+			Future<String> id = contextSourceManagement.register(ctxEntity,CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_COORDINATES);
 			String csmLocationTypeGlobal_internalId = id.get();
-			id = contextSourceManagement.register(CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_SYMBOLIC);
+			id = contextSourceManagement.register(ctxEntity,CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_SYMBOLIC);
 			String csmLocationTypeSymbolic_internalId = id.get();
 			
 			addToDeviceMapping(macAddress,cssNodeId,csmLocationTypeGlobal_internalId,csmLocationTypeSymbolic_internalId);
@@ -116,11 +118,11 @@ public class LocationManagementContextAccessor {
 		removeFromDeviceMapping(macAddress);
 	}
 	
-	private CtxAttribute getAttribute(String attrName, String attrSourceId,CtxOriginType ctxOriginType){
+	private CtxAttribute getAttribute(IIdentity identity, String attrName, String attrSourceId,CtxOriginType ctxOriginType){
 		Future<CtxModelObject> futureCtxModelObject;
 		CtxAttribute ctxAttribute=null;
 		try{
-			Future<List<CtxIdentifier>> futureList = contextBroker.lookup(CtxModelType.ATTRIBUTE,attrName);
+			Future<List<CtxIdentifier>> futureList = contextBroker.lookup(identity,CtxModelType.ATTRIBUTE,attrName);
 			List<CtxIdentifier> ctxIdentifiers= futureList.get();
 			
 			for (CtxIdentifier ctxIdentifier : ctxIdentifiers){
@@ -142,12 +144,12 @@ public class LocationManagementContextAccessor {
 		return null;
 	}
 	
-	private void updatedFusedLocationAttr(){
+	private void updatedFusedLocationAttr(INetworkNode networkNode){
 		CtxAttribute gpsAttr,pzAttr, fusedAttrTobeUpdated, fusedAtrr;
 		
-		gpsAttr = getAttribute(CtxAttributeTypes.LOCATION_COORDINATES,CSM_GPS_SOURCE, CtxOriginType.SENSED);
-		pzAttr = getAttribute(CtxAttributeTypes.LOCATION_COORDINATES, CSM_PZ_SOURCE, CtxOriginType.SENSED);
-		fusedAtrr = getAttribute(LOCATION_TYPE_FUSED,"",CtxOriginType.INFERRED);
+		gpsAttr = getAttribute(networkNode,CtxAttributeTypes.LOCATION_COORDINATES,CSM_GPS_SOURCE, CtxOriginType.SENSED);
+		pzAttr = getAttribute(networkNode,CtxAttributeTypes.LOCATION_COORDINATES, CSM_PZ_SOURCE, CtxOriginType.SENSED);
+		fusedAtrr = getAttribute(networkNode,LOCATION_TYPE_FUSED,"",CtxOriginType.INFERRED);
 		
 				
 		if (gpsAttr.getLastModified().after(pzAttr.getLastModified())){
@@ -185,8 +187,6 @@ public class LocationManagementContextAccessor {
 			e.printStackTrace();
 		}
 	}
-	
-	
 	
 	
 	private void createInferredLocationAttribute(CtxEntity ctxEntity){
@@ -243,10 +243,19 @@ public class LocationManagementContextAccessor {
 				Future<CtxModelObject> futureCtxModelObject;
 				futureCtxModelObject = contextBroker.retrieve(ctxIdentifier);
 				ctxAttribute = (CtxAttribute)futureCtxModelObject.get();
-				
 				//update only if the SENSED changed 
 				if (ctxAttribute.getQuality().getOriginType() == CtxOriginType.SENSED){
-					updatedFusedLocationAttr();
+					
+					CtxEntityIdentifier ctxEntityIdentifier = ctxAttribute.getScope(); 
+					String uri = ctxEntityIdentifier.getUri();
+					INetworkNode networkNode=null;
+					try {
+						networkNode = commManager.getIdManager().fromFullJid(uri);
+					} catch (InvalidFormatException e) {
+						
+						e.printStackTrace();
+					}
+					updatedFusedLocationAttr(networkNode);
 				}
 				
 			} catch (CtxException e) {

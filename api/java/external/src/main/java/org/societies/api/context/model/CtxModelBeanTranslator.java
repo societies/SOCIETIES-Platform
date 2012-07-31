@@ -60,6 +60,10 @@ public final class CtxModelBeanTranslator {
 		
 		CtxEntityBean bean=new CtxEntityBean();
 		bean.setId(fromCtxIdentifier(entity.getId()));
+		
+		XMLGregorianCalendar lastModifiedXML = this.DateToXMLGregorianCalendar(entity.getLastModified());
+		bean.setLastModified(lastModifiedXML);
+		
 		List<CtxAssociationIdentifierBean> assocIdBeans = new ArrayList<CtxAssociationIdentifierBean>();
 		for (CtxAssociationIdentifier assoc : entity.getAssociations()) {
 			assocIdBeans.add((CtxAssociationIdentifierBean) fromCtxIdentifier(assoc));

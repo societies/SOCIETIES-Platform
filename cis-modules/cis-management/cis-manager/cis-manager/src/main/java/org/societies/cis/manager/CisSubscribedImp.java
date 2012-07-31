@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -45,7 +46,9 @@ import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.activity.RemoteActivityFeed;
 import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -61,9 +64,12 @@ import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.cis.community.AddActivity;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.GetActivities;
+import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
+import org.societies.api.schema.cis.community.SetInfo;
 import org.societies.api.schema.cis.community.Who;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * @author Thomas Vilarinho (Sintef)
@@ -146,7 +152,7 @@ public class CisSubscribedImp implements ICis {
 					stanza.getId(), callback, this.cisManag);
 
 			Community c = new Community();
-			c.setGetInfo("");
+			c.setGetInfo(new GetInfo());
 			try {
 				LOG.info("Sending stanza with get info");
 				this.cisManag.iCommMgr.sendIQGet(stanza, c, commsCallback);
@@ -173,7 +179,7 @@ public class CisSubscribedImp implements ICis {
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this.cisManag);
 
-			c.setSetInfo("");
+			c.setSetInfo(new SetInfo());
 		
 			try {
 				LOG.info("Sending stanza with set info");
@@ -315,6 +321,22 @@ public class CisSubscribedImp implements ICis {
 			LOG.info("Problem with the input jid when trying to send");
 			e1.printStackTrace();
 		}	
+	}
+	
+	
+	public Future<IActivityFeed> getCisActivityFeed(){
+		IIdentity remoteCISid;
+		IActivityFeed i = null;
+		try {
+			remoteCISid = this.cisManag.iCommMgr.getIdManager().fromJid(this.getCisId());
+			i = new RemoteActivityFeed(this.cisManag.iCommMgr,remoteCISid);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return new AsyncResult<IActivityFeed>(i);
 	}
 	
 }

@@ -154,6 +154,42 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	}
 	
 	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#updatePermissions(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity)}.
+	 */
+	@Test
+	@Rollback(true)
+	public void testUpdatePermission2Times() {
+		String testTitle = new String("testUpdatePermission2Times");
+		LOG.info("[Test] "+testTitle);
+		boolean dataUpdated1 = false;
+		boolean dataUpdated2 = false;
+		try {
+			IIdentity requestorId = Mockito.mock(IIdentity.class);
+			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
+			Requestor requestor = new Requestor(requestorId);
+			IIdentity ownerId = Mockito.mock(IIdentity.class);
+			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
+			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
+			Mockito.when(dataId.getUri()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			List<Action> actions = new ArrayList<Action>();
+			Decision permission = Decision.PERMIT;
+			if (null == privacyDataManagerInternal) {
+				LOG.info("privacyDataManagerInternal null");
+			}
+			dataUpdated1 = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
+			dataUpdated2 = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		} catch (Exception e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e.getMessage());
+		}
+		assertTrue("Data not updated", dataUpdated1);
+		assertTrue("Data not updated the second time", dataUpdated2);
+	}
+	
+	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#updatePermissions(org.societies.api.identity.Requestor, java.lang.String, org.societies.api.identity.IIdentity, org.societies.api.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)}.
 	 * Using ResponseItem
 	 */

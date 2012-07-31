@@ -56,7 +56,7 @@ public class MessageBox {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		int n =  JOptionPane.showConfirmDialog(null, title, message, messageType);
+		int n =  JOptionPane.showConfirmDialog(null, message, title, messageType);
 		return n;
 	}
 	

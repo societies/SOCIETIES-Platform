@@ -67,6 +67,24 @@
 			<artifactId>org.springframework.context</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-osgi-core</artifactId>
+			<version>1.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
         	<groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -75,17 +93,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -109,8 +117,22 @@
 				<configuration>
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 						<_nouses>true</_nouses>
+<!--              			<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
+              			<Bundle-Name>${pom.artifactId}</Bundle-Name>
+              			<Bundle-Version>${pom.version}</Bundle-Version>
+              			<Import-Package>
+              				org.slf4j.*,
+              				org.societies.api.css.devicemgmt,
+              				org.osgi.framework,
+              				org.osgi.util.tracker,
+              				org.springframework.osgi.context,
+              				org.societies.api.osgi.event
+              			</Import-Package>
+              			<DynamicImport-Package>
+              				org.societies.css.devicemgmt.devicemanager
+              			</DynamicImport-Package> -->
 					</instructions>
 				</configuration>
 			</plugin>

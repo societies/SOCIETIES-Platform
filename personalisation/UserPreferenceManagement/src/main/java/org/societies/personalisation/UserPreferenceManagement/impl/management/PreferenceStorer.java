@@ -68,18 +68,20 @@ public class PreferenceStorer {
 	}
 
 
-	public void deletePreference(IIdentity userId, CtxIdentifier id){
+	public boolean deletePreference(IIdentity userId, CtxIdentifier id){
 		CtxAttribute attrPreference;
 		try {
 			attrPreference = (CtxAttribute) broker.retrieve(id);
 			if (attrPreference == null){
 				this.logging.debug("Cannot delete preference. Doesn't exist");
-			}else{
-				broker.remove(id);
+				return false;
 			}
+				broker.remove(id);
+			return true;
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 
 

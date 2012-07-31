@@ -32,6 +32,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.Key;
+import java.util.Arrays;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -141,7 +142,16 @@ public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 		}
 		return null;
 	}
-	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((agreement == null) ? 0 : agreement.hashCode());
+		result = prime * result + Arrays.hashCode(publicKey);
+		result = prime * result + Arrays.hashCode(signature);
+		return result;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -162,4 +172,6 @@ public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 			.append(this.getPublicKeyAsString(), rhs.getPublicKeyAsString())
 			.isEquals();
 	}
+	
+
 }

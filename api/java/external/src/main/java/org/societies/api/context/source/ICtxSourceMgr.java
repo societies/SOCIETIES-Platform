@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -59,7 +60,7 @@ public interface ICtxSourceMgr {
 	 * @param contextType type of the context information which shall be provided by the updates
 	 * @return identifier to be used in the sendUpdate method
 	 */
-	public Future<String> register(CtxEntity contextOwner, String name, String contextType);
+	public Future<String> register(INetworkNode contextOwner, String name, String contextType);
 
 	/**
 	 * Sends modified context information to the CSM which stores it in the context data base.

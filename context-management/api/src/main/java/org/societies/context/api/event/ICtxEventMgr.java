@@ -109,7 +109,10 @@ public interface ICtxEventMgr {
      * Registers the specified {@link CtxChangeEventListener} for events of the
      * supplied topics. Once registered, the <code>CtxChangeEventListener</code>
      * will handle {@link CtxChangeEvent CtxChangeEvents} associated with the
-     * the context attribute(s) of the specified scope and type.
+     * the context attribute(s) of the specified scope and type. Note that if a 
+     * <code>null</code> type is specified then the supplied listener will
+     * receive events associated with any CtxAttribute under the given scope
+     * regardless of their type.
      * <p>
      * To unregister the specified <code>CtxChangeEventListener</code>, use the
      * {@link #unregisterListener(CtxChangeEventListener, String[], CtxEntityIdentifier, String)}
@@ -124,12 +127,13 @@ public interface ICtxEventMgr {
 	 *            register for. 
 	 * @param attrType
 	 *            the type of the context attribute(s) whose change events to
-	 *            register for.
+	 *            register for, or <code>null</code> to indicate all attributes
      * @throws CtxException
      *             if the registration process of the specified
      *             <code>CtxChangeEventListener</code> fails.
      * @throws NullPointerException
-     *             if any of the specified parameters is <code>null</code>.
+     *             if any of the listener, topics or scope parameter is
+     *             <code>null</code>.
      */
     public void registerChangeListener(final CtxChangeEventListener listener,
             final String[] topics, final CtxEntityIdentifier scope,
@@ -149,12 +153,14 @@ public interface ICtxEventMgr {
 	 *            unregister from. 
 	 * @param attrType
 	 *            the type of the context attribute(s) whose change events to
-	 *            unregister from.
+	 *            unregister from, or <code>null</code> to indicate all
+	 *            attributes.
      * @throws CtxException
      *             if the unregistration process of the specified
      *             <code>CtxChangeEventListener</code> fails.
      * @throws NullPointerException
-     *             if any of the specified parameters is <code>null</code>.
+     *             if any of the listener, topics or scope parameter is
+     *             <code>null</code>.
      * @see #registerListener(CtxChangeEventListener, String[], CtxEntityIdentifier, String)
      */
     public void unregisterChangeListener(final CtxChangeEventListener listener,

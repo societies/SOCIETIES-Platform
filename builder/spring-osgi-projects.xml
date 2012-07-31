@@ -43,6 +43,7 @@
 		<module>../parent/spring-osgi.xml</module>
 
 		<!-- Utilities -->
+		<module>../common-modules/common-ext-libs</module>
 		<module>../utilities/DBC</module>
 		<module>../utilities/common-mock</module>
 		<module>../utilities/societies-annotations</module>
@@ -91,22 +92,18 @@
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
 
 		<!-- CIS Mgmt -->
-		<module>../cis-modules/cis-persistance/</module>
 		<module>../cis-modules/cis-management/cis-manager/cis-manager</module>
-		<module>../cis-modules/cis-discovery/</module>
-		<module>../cis-modules/cis-collaboration/</module>
 		<module>../cis-modules/cis-directory/</module>
 		<module>../cis-modules/cis-directory-client/</module>
 
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
 		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
-		<!--<module>../css-modules/device-mgmt/RegSynchroniser/</module>-->
 		<module>../css-modules/device-mgmt/DeviceCommsMgr/</module>
+		<module>../css-modules/device-mgmt/RFIDDriver/</module>
 		<module>../css-modules/device-mgmt/DeviceDriverSimulator/</module>
 		<module>../css-modules/device-mgmt/devicemanagerconsumer/</module>
-		<!-- <module>../css-modules/device-mgmt/DeviceDriverSimulator3/</module>
-		<module>../css-modules/device-mgmt/DeviceManagerConsumer3/</module> -->
+
 
 		<!-- SNS -->
 		<module>../platform-infrastructure/sns/FacebookConn</module>

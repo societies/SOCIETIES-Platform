@@ -82,4 +82,7 @@ public class EventTypes {
 	/**	Published by the RFIDDriver to notify a change in the location of an RFID tag */
 	public static final String RFID_UPDATE_EVENT = "org/societies/css/device/rfidUpdate";
 	
+	/** Published by the DisplayDriver service to notify when a display is available to use */
+	public static final String DISPLAY_EVENT = "org/societies/css/device/displayUpdate";
+	
 }

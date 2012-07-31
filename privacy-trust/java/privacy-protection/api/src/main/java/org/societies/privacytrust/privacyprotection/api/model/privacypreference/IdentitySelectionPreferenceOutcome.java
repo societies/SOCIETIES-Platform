@@ -37,29 +37,20 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  * @author Elizabeth
  *
  */
-public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
+public class IdentitySelectionPreferenceOutcome extends IPrivacyOutcome{
 
-	private int confidenceLevel;
 	private IIdentity userIdentity;
 	private Requestor requestor;
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getOutcomeType()
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome#getOutcomeType()
 	 */
 	@Override
 	public PrivacyPreferenceTypeConstants getOutcomeType() {
 		return PrivacyPreferenceTypeConstants.IDS;
 	}
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getConfidenceLevel()
-	 */
-	@Override
-	public int getConfidenceLevel() {
-		return this.confidenceLevel;
-	}
-	
-	public void setConfidenceLevel(int c){
-		this.confidenceLevel = c;
-	}
+
 	
 	public void setIdentity(IIdentity userId){
 		this.userIdentity = userId;
@@ -76,6 +67,46 @@ public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 		return requestor;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((requestor == null) ? 0 : requestor.hashCode());
+		result = prime * result
+				+ ((userIdentity == null) ? 0 : userIdentity.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IdentitySelectionPreferenceOutcome other = (IdentitySelectionPreferenceOutcome) obj;
+		if (requestor == null) {
+			if (other.requestor != null)
+				return false;
+		} else if (!requestor.equals(other.requestor))
+			return false;
+		if (userIdentity == null) {
+			if (other.userIdentity != null)
+				return false;
+		} else if (!userIdentity.equals(other.userIdentity))
+			return false;
+		return true;
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
 	public String toString(){
 		return "Select: "+this.userIdentity.toString();
 	}

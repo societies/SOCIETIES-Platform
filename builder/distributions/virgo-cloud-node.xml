@@ -1,0 +1,97 @@
+<!-- Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY 
+	(TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET (SN), GERMAN AEROSPACE CENTRE 
+	(Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne 
+	tehnologije informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE 
+	OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE COMMUNICATIONS (LAKE), 
+	INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, 
+	SA (PTIN), IBM Corp., INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI 
+	KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM ITALIA S.p.a.(TI), 
+	TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC)) All 
+	rights reserved. Redistribution and use in source and binary forms, with 
+	or without modification, are permitted provided that the following conditions 
+	are met: 1. Redistributions of source code must retain the above copyright 
+	notice, this list of conditions and the following disclaimer. 2. Redistributions 
+	in binary form must reproduce the above copyright notice, this list of conditions 
+	and the following disclaimer in the documentation and/or other materials 
+	provided with the distribution. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT 
+	HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
+	BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
+	FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+	HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
+	OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+	STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN 
+	ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+	OF SUCH DAMAGE. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+			http://maven.apache.org/maven-v4_0_0.x">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Setup the identity of this builder -->
+	<groupId>org.societies</groupId>
+	<artifactId>virgo-cloud-node</artifactId>
+	<packaging>pom</packaging>
+	<version>0.1</version>
+	<name>Virgo Cloud Node Distribution Builder</name>
+
+	<!-- All Spring-OSGi Java projects to be included in this distribution -->
+	<modules>
+		
+		<!-- Service Management: 3 bundles (to be merged) -->
+		<module>../../css-modules/serviceRegistry</module>
+		<module>../../platform-infrastructure/service-lifecycle/service-mgmt/</module>
+		<module>../../platform-infrastructure/service-lifecycle/sl-comms-mgr</module>
+
+		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->
+		<module>../../platform-infrastructure/security/SecurityServices</module>
+		<module>../../platform-infrastructure/security/PolicyNegotiator</module>
+		<module>../../platform-infrastructure/security/SecurityCommsMgr</module>
+
+		<!-- Directory Clients: 2 bundles (to be merged) -->
+		<module>../../css-modules/css-directory-client</module>
+		<module>../../cis-modules/cis-directory-client/</module>
+
+		<!-- CSS Mgmt: 3 bundles (to be merged) -->
+		<module>../../css-modules/css-registry</module>
+		<module>../../css-modules/css-mgmt/cssCommsMgmt</module>
+		<module>../../css-modules/css-mgmt/cssmgmt</module>
+
+		<!-- CIS Mgmt: 1 bundle (path to be corrected) -->
+		<module>../../cis-modules/cis-management/cis-manager/cis-manager</module>
+
+		<!-- Device Mgmt: 3 bundles (to be merged) -->
+		<module>../../css-modules/device-mgmt/devicemanager/</module>
+		<module>../../css-modules/device-mgmt/DeviceRegistry/</module>
+		<module>../../css-modules/device-mgmt/DeviceCommsMgr/</module>
+		<module>../../css-modules/device-mgmt/RFIDDriver/</module>
+
+		<!-- SNS: 1 bundle -->
+		<module>../../platform-infrastructure/sns/FacebookConn</module>
+		<module>../../platform-infrastructure/sns/FoursquareConnector</module>
+		<module>../../platform-infrastructure/sns/TwitterConnector</module>
+		<module>../../platform-infrastructure/sns/socialdata</module>
+		
+		<!-- Activity Feed: 1 bundle -->
+		<module>../../common-modules/activityfeed</module>
+
+		<!-- Context Management: 9 bundles (can some be merged?) -->
+		<module>../../context-management</module>
+
+		<!-- User Agent: 3 bundles (can these be merged?)-->
+		<module>../../user-agent</module>
+
+		<!-- Personalisation: 2 bundles (merge?) -->
+		<module>../../personalisation</module>
+		<module>../../personalisation/Personalisation-GroupManager</module>
+	      
+		<!-- Privacy & Trust: 5 bundles (including 1 test bundle & 1 GUI bundle... move to nightly build pom?) -->
+		<module>../../privacy-trust/java/privacy-protection</module>
+		<module>../../privacy-trust/java/trust</module>
+		<module>../../privacy-trust/java/privacy-trust-comm-manager</module>
+
+		<!-- PlatForm Web App: 1 WAR -->
+		<module>../../platform-infrastructure/service-lifecycle/platform-webapp/</module>
+	</modules>
+</project>

@@ -41,7 +41,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 
-@Controller
+
 public class ActivityFeedController {
 
 	/**

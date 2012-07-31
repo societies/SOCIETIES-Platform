@@ -24,15 +24,22 @@
  */
 package org.societies.maven;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,6 +68,10 @@ public class Jaxb2Simple extends AbstractMojo
 	 * @parameter default-value="${project.build.directory}/generated-sources/"
 	 */
 	private String folderInputDirectory = FOLDER_PATH;
+	
+	
+	private Map<String, Set<String>> newClassesOnPackage = new HashMap<String, Set<String>>();
+	private Map<String, String> namespaceForPackage = new HashMap<String, String>();
 
 	public void execute() throws MojoExecutionException
 	{
@@ -73,17 +84,23 @@ public class Jaxb2Simple extends AbstractMojo
 	    try {
 			files = FileListing.getFileListing(startingDirectory);
 
+			// First process ObjectFactories and package-infos
+			for (File javaFile : files) {
+				if (javaFile.isFile() && javaFile.getName().equals("ObjectFactory.java")) {
+						getLog().debug("Processing: " + javaFile.getAbsolutePath());
+						processObjectFactory(javaFile);
+				}
+				if (javaFile.isFile() && javaFile.getName().equals("package-info.java")) {
+					getLog().debug("Processing: " + javaFile.getAbsolutePath());
+					processPackageInfo(javaFile);
+				}
+			}
+			
+			// Process all java files now and delete unwanted ones
 			for (File javaFile : files) {
 				if (javaFile.isFile()) { //IGNORE DIRECTORIES
-					if (javaFile.getName().equals("ObjectFactory.java")) {
-						getLog().debug("Processing and deleting: " + javaFile.getAbsolutePath());
-						// TODO UNCOMMENT BELOW TO ENABLE OBJECTFACTORY PROCESSING
-						//processObjectFactory(javaFile);
-						javaFile.delete();
-					}
-					else if (javaFile.getName().equals("package-info.java")) {
+					if (javaFile.getName().equals("ObjectFactory.java") || javaFile.getName().equals("package-info.java")) {
 						getLog().debug("Deleting: " + javaFile.getAbsolutePath());
-						// TODO?
 						javaFile.delete();
 						
 					}
@@ -116,7 +133,20 @@ public class Jaxb2Simple extends AbstractMojo
 		while (scanner.hasNextLine()) {
 			schemaContent.append(scanner.nextLine()+"\n");
 		}
+		
+		// Main Annotations Replacement
 		newSchemaContent = findReplacePatterns(schemaContent);
+		
+		// Empty Elements Processing
+		Matcher m = packagePattern.matcher(newSchemaContent);
+		m.find();
+		String pkgName = m.group(1);
+		Map<String,String> fieldClasses = detectFields(newSchemaContent, newClassesOnPackage.get(pkgName));
+		for (String fieldName : fieldClasses.keySet()) {
+			String className = fieldClasses.get(fieldName);
+			getLog().debug("Changing class of field '"+fieldName+"' to class '"+className+"'");
+			newSchemaContent = replaceFieldAndAccessors(newSchemaContent, fieldName, className);
+		}
 
 		//ENUM NEEDS TO BE SERIALIZED WITH "VALUE", NOT "NAME"
 		if (newSchemaContent.indexOf("public enum ") > 0) {
@@ -131,7 +161,47 @@ public class Jaxb2Simple extends AbstractMojo
 			String textToReplace = "$1\nimport org.simpleframework.xml.ElementList;";
 			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace); 
 		}
+		
 		return newSchemaContent;
+	}
+
+	private static String replaceFieldAndAccessors(String newSchemaContent, String fieldName, String className) {
+		String textToFind = "protected String "+fieldName+";\n";
+		String textToReplace = "protected "+className+" "+fieldName+";\n";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		String capitalizedfieldName = Character.toUpperCase(fieldName.charAt(0))+fieldName.substring(1);;
+		
+		textToFind = "public String get"+capitalizedfieldName+"\\(\\) \\{\n";
+		textToReplace = "public "+className+" get"+capitalizedfieldName+"() {\n";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		textToFind = "public void set"+capitalizedfieldName+"\\(String value\\) \\{\n";
+		textToReplace = "public void set"+capitalizedfieldName+"("+className+" value) {\n";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		return newSchemaContent;
+	}
+
+	private static final Pattern packagePattern = Pattern.compile("package ([\\d\\w.-]*);");
+	private static final Pattern fieldPattern = Pattern.compile("\\s*protected String (\\w*);\\s*");
+	
+	private Map<String,String> detectFields(String newSchemaContent, Set<String> newClasses) {
+		Map<String,String> fieldClasses = new HashMap<String, String>();
+		
+		Matcher matcher = fieldPattern.matcher(newSchemaContent);
+		while (matcher.find()) {
+			String fieldName = matcher.group(1);
+			for (String cl : newClasses) {
+				if (cl.equalsIgnoreCase(fieldName)) {
+					fieldClasses.put(fieldName,cl);
+					//System.out.println("replace 'protected String "+fieldName+";' with 'protected "+cl+" "+fieldName+";'");
+					break;
+				}
+			}
+		}
+		
+		return fieldClasses;
 	}
 
 	private String findReplacePatterns(StringBuffer schemaContent) {
@@ -161,7 +231,7 @@ public class Jaxb2Simple extends AbstractMojo
 
 		//import javax\.xml\.bind\.annotation\.XmlElement;/import org.simpleframework.xml.Element;/
 		textToFind = "import javax\\.xml\\.bind\\.annotation\\.XmlElement;";
-		textToReplace = "import org.simpleframework.xml.Element;";
+		textToReplace = "import org.simpleframework.xml.Element;\nimport org.simpleframework.xml.Namespace;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//import javax\.xml\.bind\.annotation\.XmlType;/import org.simpleframework.xml.Element;\nimport org.simpleframework.xml.Order;/ 
@@ -250,7 +320,7 @@ public class Jaxb2Simple extends AbstractMojo
 		
 		//@XmlElement(\(.*\))/@Element(required=false,\1)/ 
 		textToFind = "@XmlElement\\((.*?)\\)";
-		textToReplace = "@Element($1)";
+		textToReplace = "@Element($1, required=false)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//NAMESPACE
@@ -260,11 +330,12 @@ public class Jaxb2Simple extends AbstractMojo
 		if (matcherNS.find()) { 
 			String pkgTmp = matcherNS.group();
 			String pkgFinal = pkgTmp.substring(8, pkgTmp.indexOf(";"));
-			String[] nsArr = pkgFinal.split("\\.");
-			ns = "@Namespace(reference=\"http://" + nsArr[1] + "." + nsArr[0];
-			for(int i=2; i<nsArr.length; i++)
-				ns+="/" + nsArr[i];
-			ns += "\")\n"; 
+//			String[] nsArr = pkgFinal.split("\\.");
+//			ns = "@Namespace(reference=\"http://" + nsArr[1] + "." + nsArr[0];
+//			for(int i=2; i<nsArr.length; i++)
+//				ns+="/" + nsArr[i];
+//			ns += "\")\n";
+			ns = "@Namespace(reference=\""+namespaceForPackage.get(pkgFinal)+"\")\n"; // fix for non-default namespaces (eg pubsub#event) issue
 		}
 		
 		// @XmlRootElement -> @Root + @Namespace(reference="http://...)
@@ -275,8 +346,13 @@ public class Jaxb2Simple extends AbstractMojo
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//@XmlType(.*propOrder[    ]*\(=.*\)/@Order(elements\1/  
-		textToFind = "@XmlType\\(.*propOrder";
-		textToReplace = "@Order(elements";
+//		textToFind = "@XmlType\\(.*propOrder";
+//		textToReplace = "@Order(elements";
+//		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
+		// TODO discarding element order information instead of placing @Order annotations
+		textToFind = "@XmlType\\([^\\)]*\\)";
+		textToReplace = "";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		// @XmlAccessorType([ ]*XmlAccessType\.\(.*\))\n@XmlType(\(.*\)[ ]*,[ ]*propOrder[ ]*\(=.*\)/@Default(DefaultType.\1)\n@Order(elements\3/
@@ -312,7 +388,7 @@ public class Jaxb2Simple extends AbstractMojo
 		
 		//@XmlValue -> @Text
 		textToFind = "@XmlValue";
-		textToReplace = "@Text";
+		textToReplace = "@Text(required=false)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 		
 		//REMOVE @XmlSchemaType(name = "anyURI")
@@ -406,9 +482,11 @@ public class Jaxb2Simple extends AbstractMojo
 		}
 	}
 	
-	private static final Pattern elementDeclPattern = Pattern.compile("@XmlElementDecl\\(([^\\)]*)\\)");
-	private static final Pattern namespacePattern = Pattern.compile("namespace\\s*=\\s*\"([^\"]*)\"");
-	private static final Pattern elementNamePattern = Pattern.compile("name\\s*=\\s*\"([^\"]*)\"");
+	// Object factory processing code
+	
+	private static final Pattern elementDeclPattern = Pattern.compile("\\s*@XmlElementDecl\\(([^\\)]*)\\)");
+	private static final Pattern namespacePattern = Pattern.compile(".*namespace\\s*=\\s*\"([^\"]*)\".*");
+	private static final Pattern elementNamePattern = Pattern.compile(".*name\\s*=\\s*\"([^\"]*)\".*");
 	private static final String pkgDecl = "package ";
 	private static final String COMMENT = "// This is a file generated by some gorgeous code in Jaxb2Simple.processObjectFactory(File objectFactoryFile) :(";
 	private static final String IMPORT_NS = "import org.simpleframework.xml.Namespace;";
@@ -418,33 +496,46 @@ public class Jaxb2Simple extends AbstractMojo
 	private static final String ANNOT_END = "\")";
 	
 	private void processObjectFactory(File objectFactoryFile) throws IOException {
+		HashSet<String> newClasses = new HashSet<String>();
+		
 		File parentDirectory = objectFactoryFile.getParentFile();
 		String pkgName = null; 
-		Scanner scanner = new Scanner(objectFactoryFile);
-		while (scanner.hasNext()) {
-			String line = scanner.next();
+		BufferedReader br = new BufferedReader(new FileReader(objectFactoryFile));
+		while (true) {
+			String line = br.readLine();
+			if (line==null)
+				break;
+			//getLog().debug("Going to match: '"+line+"'");
 			if (pkgName==null && line.startsWith(pkgDecl)) {
 				pkgName = line.substring(pkgDecl.length(),line.length()-1);
+				getLog().debug("Got package: '"+pkgName+"'");
 			}
 			else {
-				Matcher edm = elementDeclPattern.matcher(line);
-				if (edm.groupCount()>0) {
-					Matcher nm = namespacePattern.matcher(edm.group());
-					if (nm.groupCount()>0) {
-						Matcher enm = elementNamePattern.matcher(edm.group());
-						if (enm.groupCount()>0) {
-							buildEmptySimpleXmlBean(parentDirectory, pkgName, nm.group(), enm.group());
+				Matcher edm = elementDeclPattern.matcher(line);				
+				if (edm.matches()) {
+					//getLog().debug("Found XmlElementDecl - parsing namespace and elementName of '"+edm.group(1)+"'");
+					Matcher nm = namespacePattern.matcher(edm.group(1));
+					if (nm.matches()) {
+						Matcher enm = elementNamePattern.matcher(edm.group(1));
+						if (enm.matches()) {
+							//getLog().debug("Bulding empty bean for {"+nm.group(1)+"}"+enm.group(1));
+							String newC = buildEmptySimpleXmlBean(parentDirectory, pkgName, nm.group(1), enm.group(1));
+							newClasses.add(newC);
 						}
 					}
 				}
 			}
 		}
+		
+		newClassesOnPackage.put(pkgName,newClasses);
+		
+		br.close();
 	}
 
-	private void buildEmptySimpleXmlBean(File directory, String pkgName,
+	private String buildEmptySimpleXmlBean(File directory, String pkgName,
 			String namespace, String elementName) throws IOException {
 		String className = classifyName(elementName);
-		getLog().debug("Creating empty SimpleXML bean '"+className+"'...");
+		getLog().debug("Creating empty SimpleXML bean '"+pkgName+"."+className+" for element {'"+namespace+"}"+elementName+" in directory "+directory.getAbsolutePath()+"...");
 		File newBeanFile = new File(directory, className+".java");
 		newBeanFile.createNewFile(); // TODO check if className already exists
 		PrintWriter filePw = new PrintWriter(new FileOutputStream(newBeanFile));
@@ -462,6 +553,8 @@ public class Jaxb2Simple extends AbstractMojo
 		filePw.println("}");
 		filePw.flush();
 		filePw.close();
+		
+		return className;
 	}
 
 	private static String classifyName(String elementName) {
@@ -473,5 +566,32 @@ public class Jaxb2Simple extends AbstractMojo
 			sb.append(parts[i].substring(1));
 		}
 		return sb.toString();
+	}
+	
+	private void processPackageInfo(File javaFile) throws IOException {
+		String pkgName = null;
+		String ns = null;
+		BufferedReader br = new BufferedReader(new FileReader(javaFile));
+		while (true) {
+			String line = br.readLine();
+			if (line==null)
+				break;
+			
+			if (pkgName==null && line.startsWith(pkgDecl)) {
+				pkgName = line.substring(pkgDecl.length(),line.length()-1);
+				getLog().debug("Got package: '"+pkgName+"'");
+			}
+			
+			if (ns==null) {
+				Matcher nm = namespacePattern.matcher(line);
+				if (nm.matches())
+					ns = nm.group(1);
+			}
+			
+			if (pkgName!=null && ns!=null) {
+				namespaceForPackage.put(pkgName, ns);
+				return;
+			}
+		}
 	}
 }

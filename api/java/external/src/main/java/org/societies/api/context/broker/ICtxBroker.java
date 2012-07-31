@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -173,7 +174,14 @@ public interface ICtxBroker {
 	
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
-	 * related to the context model object referenced by the specified identifier.
+	 * related to the context model object referenced by the specified
+	 * {@link CtxIdentifier}. Once registered, the CtxChangeEventListener
+     * will receive {@link CtxChangeEvent CtxChangeEvents} associated with the
+     * identified context model object.
+     * <p>
+     * To unregister the specified CtxChangeEventListener, use the
+     * {@link #unregisterFromChanges(CtxChangeEventListener, CtxIdentifier)}
+     * method.
 	 * 
 	 * @param requestor
 	 *            the entity requesting to register for context changes
@@ -182,8 +190,10 @@ public interface ICtxBroker {
 	 * @param ctxId
 	 *            the identifier of the context model object whose change
 	 *            events to register for
-	 * @throws CtxException if the registration process fails
-	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @throws CtxException 
+	 *             if the registration process fails
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
 	public void registerForChanges(final Requestor requestor, 
@@ -201,8 +211,10 @@ public interface ICtxBroker {
 	 * @param ctxId
 	 *            the identifier of the context model object whose change
 	 *            events to unregister from
-	 * @throws CtxException if the unregistration process fails
-	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @throws CtxException 
+	 *             if the unregistration process fails
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
 	public void unregisterFromChanges(final Requestor requestor,
@@ -212,6 +224,16 @@ public interface ICtxBroker {
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
 	 * related to the context attribute(s) with the supplied scope and type.
+	 * Once registered, the CtxChangeEventListener will receive 
+	 * {@link CtxChangeEvent CtxChangeEvents} associated with the context
+	 * attribute(s) of the specified scope and type. Note that if a
+	 * <code>null</code> type is specified then the supplied listener will
+     * receive events associated with any CtxAttribute under the given scope
+     * regardless of their type.
+     * <p>
+     * To unregister the specified CtxChangeEventListener, use the
+     * {@link #unregisterFromChanges(CtxChangeEventListener, CtxEntityIdentifier, String)}
+     * method.
 	 * 
 	 * @param requestor
 	 *            the entity requesting to register for context changes
@@ -222,14 +244,18 @@ public interface ICtxBroker {
 	 *            register for 
 	 * @param attrType
 	 *            the type of the context attribute(s) whose change events to
-	 *            register for
-	 * @throws CtxException if the registration process fails
-	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 *            register for, or <code>null</code> to indicate all attributes
+	 * @throws CtxException 
+	 *             if the registration process fails
+	 * @throws NullPointerException 
+	 *             if any of the listener, topics or scope parameter is
+     *             <code>null</code>
 	 * @since 0.0.3
 	 */
 	public void registerForChanges(final Requestor requestor, 
-			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
-			final String attrType) throws CtxException;
+			final CtxChangeEventListener listener, 
+			final CtxEntityIdentifier scope, final String attrType)
+					throws CtxException;
 	
 	/**
 	 * Unregisters the specified {@link CtxChangeEventListener} from changes
@@ -245,13 +271,16 @@ public interface ICtxBroker {
 	 * @param attrType
 	 *            the type of the context attribute(s) whose change events to
 	 *            unregister from
-	 * @throws CtxException if the unregistration process fails
-	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @throws CtxException 
+	 *             if the unregistration process fails
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
 	public void unregisterFromChanges(final Requestor requestor, 
-			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
-			final String attrType) throws CtxException;
+			final CtxChangeEventListener listener, 
+			final CtxEntityIdentifier scope, final String attrType)
+					throws CtxException;
 
 	/**
 	 * Removes the specified context model object.

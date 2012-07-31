@@ -93,6 +93,8 @@ public class RegistryEntry implements Serializable {
 	private String serviceStatus;
 	
 	private String privacyPolicy;
+	
+	private String serviceCategory;
 
 	/**
 	 * @param serviceEndpointURI
@@ -106,7 +108,7 @@ public class RegistryEntry implements Serializable {
 	 */
 	public RegistryEntry(ServiceResourceIdentifier serviceIdentifier,
 			String serviceEndPoint, String serviceName,
-			String serviceDescription, String authorSignature, String privacyPolicy,
+			String serviceDescription, String authorSignature, String privacyPolicy, String serviceCategory,
 			ServiceType type, ServiceLocation location,
 			ServiceInstance serviceInstance, ServiceStatus serviceStatus) {
 
@@ -121,6 +123,7 @@ public class RegistryEntry implements Serializable {
 		this.authorSignature = authorSignature;
 		this.serviceEndPoint = serviceEndPoint;
 		this.privacyPolicy = privacyPolicy;
+		this.serviceCategory = serviceCategory;
 
 		this.serviceType = type.toString();
 		this.serviceLocation = location.toString();
@@ -174,6 +177,15 @@ public class RegistryEntry implements Serializable {
 		this.privacyPolicy = privacyPolicy;
 	}
 
+	@Column(name = "ServiceCategory")
+	public String getServiceCategory() {
+		return serviceCategory;
+	}
+
+	public void setServiceCategory(String serviceCategory) {
+		this.serviceCategory = serviceCategory;
+	}
+	
 	// @Column(name = "ServiceIdentifier")
 	// @Id
 	// @Target(value = ServiceResourceIdentiferDAO.class)
@@ -236,6 +248,7 @@ public class RegistryEntry implements Serializable {
 			returnedService.setServiceDescription(this.serviceDescription);
 			returnedService.setServiceEndpoint(serviceEndPoint);
 			returnedService.setPrivacyPolicy(this.privacyPolicy);
+			returnedService.setServiceCategory(this.serviceCategory);
 			ServiceInstance si = new ServiceInstance();
 			si.setFullJid(this.serviceInstance.getFullJid());
 			si.setCssJid(this.serviceInstance.getCssJid());
@@ -314,6 +327,9 @@ public class RegistryEntry implements Serializable {
 	}
 
 	public void updateRegistryEntry(Service service) {
+		if (service.getServiceCategory() != null) {
+			this.setServiceCategory(service.getServiceCategory());
+		}
 		if (service.getAuthorSignature() != null) {
 			this.setAuthorSignature(service.getAuthorSignature());
 		}

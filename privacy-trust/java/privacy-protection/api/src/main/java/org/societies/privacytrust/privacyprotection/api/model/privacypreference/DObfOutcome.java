@@ -35,7 +35,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  * @version 1.0
  * @created 11-Nov-2011 17:06:54
  */
-public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
+public class DObfOutcome extends IPrivacyOutcome implements IDObfAction {
 
 	private double obfuscationLevel;
 
@@ -47,9 +47,6 @@ public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
 
 	}
 
-	public int getConfidenceLevel(){
-		return 0;
-	}
 
 	public PrivacyPreferenceTypeConstants getOutcomeType(){
 		return PrivacyPreferenceTypeConstants.DOBF;

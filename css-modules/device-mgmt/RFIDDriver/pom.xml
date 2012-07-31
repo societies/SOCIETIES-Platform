@@ -1,12 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
-	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.css.devicemgmt</groupId>
 	<artifactId>RFIDDriver</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<name>RFID Device Driver Bundle</name>
+	<version>${version.dm}</version>
 
 	<developers>
 		<developer>
@@ -146,8 +146,8 @@
                         <artifactItem>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>${project.artifactId}</artifactId>
-                            <version>0.0.1-SNAPSHOT</version>
-                            <type>bundle</type>
+                            <version>${project.version}</version>
+                            <type>jar</type>
                             <overWrite>true</overWrite>
                             <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
                         </artifactItem>

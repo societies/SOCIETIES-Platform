@@ -52,7 +52,7 @@ import javax.persistence.Transient;
 //import org.societies.cis.mgmt;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
@@ -81,12 +81,14 @@ import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
 import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.DeleteActivityResponse;
 import org.societies.api.schema.cis.community.AddActivityResponse;
 import org.societies.api.schema.cis.community.AddMemberResponse;
 import org.societies.api.schema.cis.community.CleanUpActivityFeedResponse;
-import org.societies.api.schema.cis.community.DeleteActivityResponse;
 import org.societies.api.schema.cis.community.DeleteMemberResponse;
 import org.societies.api.schema.cis.community.GetActivitiesResponse;
+import org.societies.api.schema.cis.community.GetInfo;
 import org.societies.api.schema.cis.community.GetInfoResponse;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
@@ -120,16 +122,19 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+							"http://societies.org/api/schema/activityfeed",
 					  		"http://societies.org/api/schema/cis/community"));
 	//		.singletonList("http://societies.org/api/schema/cis/community");
 	@Transient
 	private final static List<String> PACKAGES = Collections
 			//.singletonList("org.societies.api.schema.cis.community");
 	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+			"org.societies.api.schema.activityfeed",
 		"org.societies.api.schema.cis.community"));
 	@Transient
 	private SessionFactory sessionFactory;
-	
+	@Transient
+	private Session session;
 	
 	
 	public SessionFactory getSessionFactory() {
@@ -152,8 +157,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@OneToOne(cascade=CascadeType.ALL)
 	public CisRecord cisRecord;
 	
-	@OneToOne(cascade=CascadeType.ALL)
-	public ActivityFeed activityFeed;
+	//@OneToOne(cascade=CascadeType.ALL)
+	@Transient
+	public ActivityFeed activityFeed = new ActivityFeed();
 	//TODO: should this be persisted?
 	@Transient
 	private ICommManager CISendpoint;
@@ -256,8 +262,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	// maximum constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
-	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
-		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote,privacyPolicyManager);
+	,String permaLink,String password,String host, String description,	IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory) {
+		this(cssOwner, cisName, cisType, mode,ccmFactory,iServDiscRemote,iServCtrlRemote,privacyPolicyManager,sessionFactory);
 		this.password = password;
 		this.permaLink = permaLink;
 		this.host = host;
@@ -269,7 +275,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	// minimum constructor of a CIS without a pre-determined ID or host
 	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
-			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager) {
+			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory) {
 		
 		this.privacyPolicyManager = privacyPolicyManager;
 		
@@ -328,8 +334,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 		
-
-		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
+		session = sessionFactory.openSession();
+		System.out.println("activityFeed: "+activityFeed);
+		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
+		
+		this.persist(this);
 		//activityFeed.getActivities("0 1339689547000");
 
 	}
@@ -369,8 +378,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		this.setSessionFactory(sessionFactory);
 
-		
-		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
+		session = sessionFactory.openSession();
+		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
 		activityFeed.getActivities("0 1339689547000");
 	}
 	
@@ -947,32 +956,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 			}				// END OF add Activity
 			
-			
-			// delete Activity
-
-			if (c.getDeleteActivity() != null) {
-				Community result = new Community();
-				DeleteActivityResponse r = new DeleteActivityResponse();
-				String senderJid = stanza.getFrom().getBareJid();
-				
-				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
-				//	r.setResult(false);
-				//}else{
-					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-				IActivity iActivity = new org.societies.activity.model.Activity();
-				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
-				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
-				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
-				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
-				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
-
-				r.setResult(activityFeed.deleteActivity(iActivity));
-
-				result.setDeleteActivityResponse(r);		
-				return result;
-
-			}				// END OF delete Activity
-			
+						
 			
 			// cleanup activities
 			if (c.getCleanUpActivityFeed() != null) {
@@ -995,6 +979,38 @@ public class Cis implements IFeatureServer, ICisOwned {
 			}				// END OF cleanup activities
 			
 		}
+		if (payload.getClass().equals(Activityfeed.class)) {
+			LOG.info("activity feed type received");
+			Activityfeed c = (Activityfeed) payload;
+			
+			// delete Activity
+
+			if (c.getDeleteActivity() != null) {
+				Activityfeed result = new Activityfeed();
+				DeleteActivityResponse r = new DeleteActivityResponse();
+				String senderJid = stanza.getFrom().getBareJid();
+				
+				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+				//	r.setResult(false);
+				//}else{
+					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
+				IActivity iActivity = new org.societies.activity.model.Activity();
+				iActivity.setActor(c.getDeleteActivity().getActivity().getActor());
+				iActivity.setObject(c.getDeleteActivity().getActivity().getObject());
+				iActivity.setTarget(c.getDeleteActivity().getActivity().getTarget());
+				iActivity.setPublished(c.getDeleteActivity().getActivity().getPublished());
+				iActivity.setVerb(c.getDeleteActivity().getActivity().getVerb());
+
+				r.setResult(activityFeed.deleteActivity(iActivity));
+
+				result.setDeleteActivityResponse(r);		
+				return result;
+
+			}				// END OF delete Activity
+			
+		}
+		
+		
 		return null;
 	}
 
@@ -1018,7 +1034,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		c.setCommunityType(this.getCisType());
 		c.setOwnerJid(this.getOwnerId());
 		c.setDescription(this.getDescription());
-		c.setGetInfo("");
+		c.setGetInfo(new GetInfo());
 		
 		Who w = new Who();
 		c.setWho(w);
@@ -1085,11 +1101,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		n.setDeleteNotification(d);
 		message.setNotification(n);
-		//Session session = sessionFactory.openSession();
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();
 
 		// deleting from DB
+		activityFeed.clear();
+		activityFeed = null;
 		this.deletePersisted(this);
 		
 		// unregistering policy
@@ -1134,12 +1151,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		
 
-		
-		//session.close();
+		if(session!=null)
+			session.close();
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
-		activityFeed = null; // TODO: replace with proper way of destroying it
+		//activityFeed = null; // TODO: replace with proper way of destroying it
 		
 		
 		ret = CISendpoint.UnRegisterCommManager();
@@ -1267,7 +1284,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	// session related methods
 
 	private void persist(Object o){
-		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.save(o);
@@ -1281,10 +1297,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.warn("Saving CIS object failed, rolling back");
 		}finally{
 			if(session!=null){
-				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
 			}
 			
 		}
@@ -1292,7 +1304,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	
 	private void deletePersisted(Object o){
-		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.delete(o);
@@ -1305,18 +1316,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			t.rollback();
 			LOG.warn("Deleting object in CisManager failed, rolling back");
 		}finally{
-			if(session!=null){
-				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
-			}
-			
 		}
 	}
 	
 	private void updatePersisted(Object o){
-		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.update(o);
@@ -1329,12 +1332,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 			t.rollback();
 			LOG.warn("Updating CIS object failed, rolling back");
 		}finally{
-			if(session!=null){
-				session.close();
-				session = sessionFactory.openSession();
-				LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				session.close();
-			}
 			
 		}
 	}

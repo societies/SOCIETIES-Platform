@@ -167,7 +167,7 @@
 			<groupId>org.societies</groupId>
 			<artifactId>activityfeed</artifactId>
 			<version>${version.cis}</version>
-
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
@@ -201,24 +201,12 @@
 						<Export-Package></Export-Package> -->
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 						<!-- 							org.societies.activity.*, -->
 <!-- 							org.societies.activity.model.*, -->
 <!-- 							org.societies.activity, -->
 <!-- 							org.societies.activity.model, -->
 						<Import-Package>
-							org.springframework.beans.factory.annotation*;version="0",
-							org.springframework.stereotype*;version="0",
-							org.xmpp.packet*,
-							org.societies.api.internal.comm,
-							!org.gjt.*,
-							!org.jaxen.*,
-							!org.mortbay.*,
-							!org.relaxng.*,
-							!org.jvnet.staxex,
-							!org.jvnet.fastinfoset,
-							!com.sun.xml.fastinfoset.*,
-							!com.sun.msv.*,
 							*;resolution:=optional</Import-Package>
 						<Export-Package>
 <!-- 							org.societies.api.schema.cis.community, -->

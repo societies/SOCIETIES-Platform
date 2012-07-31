@@ -306,12 +306,12 @@ public class TrustedEntityId implements Serializable {
     	
     	if (!URN_NID.equals(parts[0]))
     		throw new MalformedTrustedEntityIdException("'" + input + "'"
-    				+ ((parts[0].isEmpty()) 
+    				+ ((parts[0].length() == 0) 
     						? ": Missing URN namespace identifier, expected '" + URN_NID + "'" 
     						: ": '" + parts[0] + "': Invalid URN namespace identifier, expected '" + URN_NID + "'"));
     	
     	this.trustorId = parts[1];
-		if (this.trustorId.isEmpty())
+		if (this.trustorId.length() == 0)
 			throw new MalformedTrustedEntityIdException("'" + input + "'" 
 					+ ": Trustor identifier cannot be empty");
     	
@@ -319,13 +319,13 @@ public class TrustedEntityId implements Serializable {
 			this.entityType = TrustedEntityType.valueOf(parts[2]);
 		} catch (IllegalArgumentException iae) {
 			throw new MalformedTrustedEntityIdException("'" + input + "'"
-					+ ((parts[1].isEmpty()) 
+					+ ((parts[1].length() == 0) 
     						? ": Missing trusted entity type"
     						: ": '" + parts[1] + "': Invalid trusted entity type"), iae);
 		}   
     	
 		this.trusteeId = parts[3];
-		if (this.trusteeId.isEmpty())
+		if (this.trusteeId.length() == 0)
 			throw new MalformedTrustedEntityIdException("'" + input + "'" 
 					+ ": Trustee identifier cannot be empty");
     }

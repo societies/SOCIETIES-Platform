@@ -29,8 +29,6 @@ package org.societies.comm.xmpp.xc.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -38,20 +36,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
-
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.convert.Registry;
+import org.simpleframework.xml.convert.RegistryStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
+import org.simpleframework.xml.strategy.TreeStrategy;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.dom4j.Namespace;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +62,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.xml.sax.InputSource;
+import org.societies.comm.simplexml.XMLGregorianCalendarConverter;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.JID;
@@ -75,7 +71,7 @@ import org.xmpp.packet.Packet;
 import org.xmpp.packet.PacketError;
 
 /**
- * @author Joao M. Goncalves (PTIN), Miquel Martin (NEC)
+ * @author Joao M. Goncalves (PTIN), Miquel Martin (NEC), Alec Leckey (Intel)
  * 
  *         TODO list 
  *         
@@ -108,13 +104,24 @@ public class CommManagerHelper {
 
 	private final Map<String, IFeatureServer> featureServers = new HashMap<String, IFeatureServer>();
 	private final Map<String, ICommCallback> commCallbacks = new HashMap<String, ICommCallback>();
-	private final Map<String, Unmarshaller> nsToUnmarshaller = new HashMap<String, Unmarshaller>();
-	private final Map<String, Marshaller> pkgToMarshaller = new HashMap<String, Marshaller>();
-	private final Map<String, Marshaller> nsToMarshaller = new HashMap<String, Marshaller>();
+	private final Map<String, String> nsToPackage = new HashMap<String, String>();
 	
 	private final Map<String, HostedNode> localToplevelNodes = new HashMap<String, HostedNode>();
 	private final List<XMPPNode> allToplevelNodes = new ArrayList<XMPPNode>();
 
+	private Serializer s;
+	
+	public CommManagerHelper () {
+		Registry registry = new Registry();
+		Strategy strategy = new RegistryStrategy(registry);
+		s = new Persister(strategy);
+		try {
+			registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(),e);
+		}
+	}
+	
 	public String[] getSupportedNamespaces() {
 		String[] returnArray = new String[featureServers.size()];
 		return featureServers.keySet().toArray(returnArray);
@@ -229,20 +236,14 @@ public class CommManagerHelper {
 				"namespace", namespace);
 	}
 
-	private Unmarshaller getUnmarshaller(String namespace)
-			throws UnavailableException {
-		return (Unmarshaller) ifNotNull(nsToUnmarshaller.get(removeFragment(namespace)),
-				"namespace", namespace);
-	}
 
-	private Marshaller getMarshaller(Package pkg) throws UnavailableException {
-		return (Marshaller) ifNotNull(pkgToMarshaller.get(pkg.getName()),
-				"package", pkg.getName());
-	}
-	
-	private Marshaller getMarshaller(String namespace) throws UnavailableException {
-		return (Marshaller) ifNotNull(nsToMarshaller.get(removeFragment(namespace)),
-				"namespace", namespace);
+	/** Retrieves a package from a namespace mapping
+	 * @param namespace
+	 * @return
+	 * @throws UnavailableException
+	 */
+	private String getPackage(String namespace) throws UnavailableException {
+		return nsToPackage.get(namespace);
 	}
 
 	public void dispatchIQResult(IQ iq) {
@@ -262,17 +263,27 @@ public class CommManagerHelper {
 				return;
 			}
 			LOG.info("not disco... callback is "+callback);
-			LOG.info("ns="+ns+" nsToUnmarshaller.keySet()="+Arrays.toString(nsToUnmarshaller.keySet().toArray()));
-			Unmarshaller u = getUnmarshaller(ns);
-			Object bean = u.unmarshal(new InputSource(new StringReader(element
-					.asXML())));
+			LOG.info("ns="+ns+" nsToPackage.keySet()="+Arrays.toString(nsToPackage.keySet().toArray()));
+
+			//GET CLASS TO BE SERIALISED
+			String packageStr = getPackage(ns);
+			String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+			Class<?> c = Class.forName(packageStr + "." + beanName);
+			
+			//GET SIMPLE SERIALISER 
+			//TreeStrategy tree = new TreeStrategy();
+			
+			Object bean = s.read(c, element.asXML() );
+			
 			callback.receiveResult(TinderUtils.stanzaFromPacket(iq), bean);
-		} catch (JAXBException e) {
-			LOG.info("JAXB error unmarshalling an IQ result", e);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
 		} catch (InvalidFormatException e) {
 			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
+		} catch (ClassNotFoundException e) {
+			LOG.warn("Unable to create class", e);
+		} catch (Exception e) {
+			LOG.warn("Unable to serialise Simple element", e);
 		}
 	}
 
@@ -280,8 +291,9 @@ public class CommManagerHelper {
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
 			LOG.warn("dispatchIQError: XMPP ERROR!");
-			Element errorElement = iq.getChildElement();
+			Element errorElement = (Element)iq.getElement().elements().get(0); //GIVES US "error" ELEMENT
 			LOG.info("errorElement.getName()="+errorElement.getName()+";errorElement.elements().size()="+errorElement.elements().size());
+			LOG.info("errorElement.elements().get(0)).getName()=" + ((Element)errorElement.elements().get(0)).getName());
 			StanzaError se = StanzaError.valueOf(((Element)errorElement.elements().get(0)).getName()); // TODO assumes the stanza error comes first
 			XMPPError error = new XMPPError(se, null);
 			if (errorElement.elements().size()>1)
@@ -290,20 +302,30 @@ public class CommManagerHelper {
 			callback.receiveError(TinderUtils.stanzaFromPacket(iq),error);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
-		} catch (JAXBException e) {
-			LOG.info(e.getMessage());
 		} catch (InvalidFormatException e) {
 			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
+		} catch (ClassNotFoundException e) {
+			LOG.warn("Unable to find class during Simple serialisation prep", e);
 		}
 	}
 
-	private XMPPError parseApplicationError(StanzaError error, Element errorElement) throws UnavailableException, JAXBException {
+	private XMPPError parseApplicationError(StanzaError error, Element errorElement) throws UnavailableException, ClassNotFoundException {
 		Element e = (Element) errorElement.elements().get(1); // TODO assume that has text OR application error (not both)
 		if (e.getNamespaceURI().equals(XMPPError.STANZA_ERROR_NAMESPACE_DECL) && e.getName().equals("text")) { // TODO this better
 			return new XMPPError(error, e.getText());
 		} else {
-			Unmarshaller u = getUnmarshaller(e.getNamespaceURI());
-			Object appError = u.unmarshal(new InputSource(new StringReader(e.asXML())));
+			//GET CLASS TO BE SERIALISED
+			String packageStr = getPackage(e.getNamespaceURI());  
+			String beanName = e.getName().substring(0,1).toUpperCase() + e.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+			Class<?> c = Class.forName(packageStr + "." + beanName);
+			
+			Object appError;
+			try {
+				appError = s.read(c, e.asXML());
+			} catch (Exception e1) {
+				throw new UnavailableException(e1.getMessage());
+			}
+			
 			return new XMPPError(error, "", appError);
 		}
 	}
@@ -316,31 +338,26 @@ public class CommManagerHelper {
 		String id = iq.getID();
 
 		try {
+			//GET CLASS FIRST
+			String packageStr = getPackage(namespace);  
+			String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+			Class<?> c = Class.forName(packageStr + "." + beanName);
+			
+			Object bean = s.read(c, element.asXML());
+			
 			IFeatureServer fs = getFeatureServer(namespace);
-			Unmarshaller u = getUnmarshaller(namespace);
-			Object bean = u.unmarshal(new InputSource(new StringReader(element
-					.asXML())));
 			Object responseBean = null;
 			if (iq.getType().equals(IQ.Type.get))
 				responseBean = fs.getQuery(TinderUtils.stanzaFromPacket(iq), bean);
 			if (iq.getType().equals(IQ.Type.set))
 				responseBean = fs.setQuery(TinderUtils.stanzaFromPacket(iq), bean);
-				return buildResponseIQ(originalFrom, id, responseBean);
+			
+			return buildResponseIQ(originalFrom, id, responseBean);
 		} catch (XMPPError e) {
 			return buildApplicationErrorResponse(originalFrom, id, e);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
 			return buildErrorResponse(originalFrom, id, e.getMessage());
-		} catch (JAXBException e) {
-			String message = e.getClass().getName()
-					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.info(message);
-			return buildErrorResponse(originalFrom, id, message);
-		} catch (XMLStreamException e) {
-			String message = e.getClass().getName()
-					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.info(message);
-			return buildErrorResponse(originalFrom, id, message);
 		} catch (DocumentException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
@@ -351,6 +368,14 @@ public class CommManagerHelper {
 					+ "Error (un)marshalling the message:" + e.getMessage();
 			LOG.info(message);
 			return buildErrorResponse(originalFrom, id, message);
+		} catch (ClassNotFoundException e) {
+			String message = e.getClass().getName() + "Unable to create class for serialisation";
+			LOG.warn(message, e);
+			return buildErrorResponse(originalFrom, id, message);
+		} catch (Exception e) {
+			String message = e.getClass().getName() + "Unable to serialise Simple element"; 
+			LOG.warn(message, e);
+			return buildErrorResponse(originalFrom, id, message);
 		}
 	}
 
@@ -358,28 +383,35 @@ public class CommManagerHelper {
 		Element element = getElementAny(message);
 		String namespace = element.getNamespace().getURI();
 		try {
+			//GET CLASS FIRST
+			String packageStr = getPackage(namespace);  
+			String beanName = element.getName().substring(0,1).toUpperCase() + element.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+			Class<?> c = Class.forName(packageStr + "." + beanName);
+			
+			Object bean = s.read(c, element.asXML());
+			
 			IFeatureServer fs = getFeatureServer(namespace);
-			Unmarshaller u = getUnmarshaller(namespace);
-			Object bean = u.unmarshal(new InputSource(new StringReader(element.asXML())));
 			fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
-		} catch (JAXBException e) {
-			String m = e.getClass().getName()
-					+ "Error unmarshalling the message:" + e.getMessage();
-			LOG.info(m);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
 		} catch (InvalidFormatException e) {
 			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
+		} catch (ClassNotFoundException e) {
+			String m = e.getClass().getName() + "Error finding class:" + e.getMessage();
+			LOG.info(m);
+		} catch (Exception e) {
+			String m = e.getClass().getName() + "Error de-serializing the message:" + e.getMessage();
+			LOG.info(m);
 		}
 	}
 
-	public synchronized IQ sendIQ(Stanza stanza, IQ.Type type, Object payload,
-			ICommCallback callback) throws CommunicationException {
+	public synchronized IQ sendIQ(Stanza stanza, IQ.Type type, Object payload, ICommCallback callback) 
+			throws CommunicationException {
 		// Usual disclaimer about how this needs to be optimized ;)
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
-			getMarshaller(payload.getClass().getPackage()).marshal(payload, inxsw);
+			
+			s.write(payload, os);
 
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
 			Document document = reader.read(is);
@@ -399,8 +431,8 @@ public class CommManagerHelper {
 		}
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
-			getMarshaller(payload.getClass().getPackage()).marshal(payload, inxsw);
+
+			s.write(payload, os);
 			
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
 			Document document = reader.read(is);
@@ -433,27 +465,35 @@ public class CommManagerHelper {
 		StringBuilder contextPath = new StringBuilder(packages.get(0));
 		for (int i = 1; i < packages.size(); i++)
 			contextPath.append(":" + packages.get(i));
-
+		/*
 		try {
-			JAXBContext jc = JAXBContext.newInstance(contextPath.toString(),
-					this.getClass().getClassLoader());
+			JAXBContext jc = JAXBContext.newInstance(contextPath.toString(), this.getClass().getClassLoader());
 			Unmarshaller u = jc.createUnmarshaller();
 			Marshaller m = jc.createMarshaller();
-			
 			for (String ns : namespaces) {
 				nsToUnmarshaller.put(ns, u);
 				nsToMarshaller.put(ns, m);
 			}
-
 			for (String packageStr : packages) {
 				pkgToMarshaller.put(packageStr, m);
 			}
-				
-			
 		} catch (JAXBException e) {
 			throw new CommunicationException(
 					"Could not register NamespaceExtension... caused by JAXBException: ",
 					e);
+		}
+		*/
+		//TODO: SIMPLE
+		//assumes a 1:1 mapping between NS and package (for prototyping)
+		try {
+			for (int i=0; i<packages.size(); i++) {
+				String packageStr = packages.get(i);
+				String nsStr = namespaces.get(i); 
+				nsToPackage.put(nsStr, packageStr);
+			}	
+		}
+		catch (Exception ex) {
+			LOG.error("Error in JAXBMapping adding: " + ex.getMessage());
 		}
 	}
 
@@ -493,13 +533,8 @@ public class CommManagerHelper {
 			if (error.getApplicationError()!=null) {
 				InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
 				inxsw.setXmlDeclaration(false);
-				// TODO solve this ugly hack! Dom4j needs XML declaration at the top of the file, but it cannot be repeated (here it would be also in the middle of the file)
-				if (error.getApplicationError() instanceof JAXBElement) {
-					JAXBElement appErrorElement = (JAXBElement)error.getApplicationError();
-					getMarshaller(appErrorElement.getName().getNamespaceURI()).marshal(appErrorElement, inxsw);
-				}
-				else
-					getMarshaller(error.getApplicationError().getClass().getPackage()).marshal(error.getApplicationError(), inxsw);
+
+				s.write(error.getApplicationError(), os);
 			}
 			os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
@@ -508,14 +543,14 @@ public class CommManagerHelper {
 			errorResponse.getElement().add(dom4jError.getRootElement());
 			
 			return errorResponse;
-		} catch (JAXBException e) {
-			return buildErrorResponse(originalFrom, id, "JAXBException while building application error");
 		} catch (XMLStreamException e) {
 			return buildErrorResponse(originalFrom, id, "XMLStreamException while building application error");
 		} catch (DocumentException e) {
 			return buildErrorResponse(originalFrom, id, "DocumentException while building application error");
 		} catch (UnavailableException e) {
 			return buildErrorResponse(originalFrom, id, "UnavailableException while building application error");
+		} catch (Exception e) {
+			return buildErrorResponse(originalFrom, id, "Serializing Exception while building application error");
 		}
 	}
 
@@ -531,13 +566,18 @@ public class CommManagerHelper {
 	}
 
 	private synchronized IQ buildResponseIQ(JID originalFrom, String id, Object responseBean)
-			throws JAXBException, DocumentException, UnavailableException, XMLStreamException {
+			throws DocumentException, UnavailableException, XMLStreamException {
 		IQ responseIq = new IQ(Type.result, id);
 		responseIq.setTo(originalFrom);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
 		if (responseBean!=null) {
-			getMarshaller(responseBean.getClass().getPackage()).marshal(responseBean, inxsw);
+			try {
+				s.write(responseBean, os);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
 			Document document = reader.read(is);
 			responseIq.getElement().add(document.getRootElement());
@@ -587,7 +627,5 @@ public class CommManagerHelper {
 		}
 		commCallbacks.put(itemsIq.getID(), callback);
 		return itemsIq;
-	}
-
-	
+	}	
 }

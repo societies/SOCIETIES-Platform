@@ -60,23 +60,43 @@ public class TestComms {
 	public void initialiseTestComms(){
 		userId = this.getCommsMgr().getIdManager().getThisNetworkNode();
 		requestor = this.getRequestorService();
+		String serviceType = "HelloWorld";
 		this.logging.debug("Requesting preference from Personalisation Manager");
-		Future<IAction> futurePrefAction = this.persoMgr.getPreference(requestor, userId, "", ((RequestorService) requestor).getRequestorServiceId(), "volume");
-		Future<IAction> futureIntentAction = this.persoMgr.getIntentAction(requestor, userId, ((RequestorService) requestor).getRequestorServiceId(), "volume");
+		Future<IAction> futurePrefAction = this.persoMgr.getPreference(requestor, userId, serviceType, ((RequestorService) requestor).getRequestorServiceId(), "bgColour");
+		Future<IAction> futurePrefAction2 = this.persoMgr.getPreference(requestor, userId, serviceType, ((RequestorService) requestor).getRequestorServiceId(), "volume");
+		Future<IAction> futureIntentAction = this.persoMgr.getIntentAction(requestor, userId, ((RequestorService) requestor).getRequestorServiceId(), "bgColour");
+		Future<IAction> futureIntentAction2 = this.persoMgr.getIntentAction(requestor, userId, ((RequestorService) requestor).getRequestorServiceId(), "volume");
 		try {
+			IAction prefAction2 = futurePrefAction2.get();
+			
+			if (prefAction2==null){
+				this.logging.debug("persoMgr returned null action for preference request 2");
+			}else{
+				this.logging.debug("Received pref action 2 from persoMgr: \n"+prefAction2.toString());
+			}
+			
+			
 			IAction prefAction = futurePrefAction.get();
 			if (prefAction==null){
-				this.logging.debug("persoMgr returned null action for preference request");
+				this.logging.debug("persoMgr returned null action for preference request 1 ");
 			}else{
-				this.logging.debug("Received pref action from persoMgr: \n"+prefAction.toString());
+				this.logging.debug("Received pref action 1 from persoMgr: \n"+prefAction.toString());
+			}
+			
+			IAction intentAction2 = futureIntentAction2.get();
+			
+			if (intentAction2==null){
+				this.logging.debug("persoMgr returned null action for intent request 2 ");
+			}else{
+				this.logging.debug("Received intent action 2 from persoMgr: \n"+intentAction2.toString());
 			}
 			
 			IAction intentAction = futureIntentAction.get();
 			
 			if (intentAction==null){
-				this.logging.debug("persoMgr returned null action for intent request");
+				this.logging.debug("persoMgr returned null action for intent request 1 ");
 			}else{
-				this.logging.debug("Received intent action from persoMgr: \n"+intentAction.toString());
+				this.logging.debug("Received intent action 1 from persoMgr: \n"+intentAction.toString());
 			}
 			
 		} catch (InterruptedException e) {

@@ -86,6 +86,17 @@ public class RequestPolicy implements Serializable{
 		return this.toXMLString();
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((requestor == null) ? 0 : requestor.hashCode());
+		result = prime * result
+				+ ((requests == null) ? 0 : requests.hashCode());
+		return result;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -105,4 +116,6 @@ public class RequestPolicy implements Serializable{
 			.append(this.getRequests(), rhs.getRequests())
 			.isEquals();
 	}
+
+
 }

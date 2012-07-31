@@ -25,31 +25,79 @@
 
 package org.societies.useragent.feedback;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
-import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import static org.mockito.Mockito.*;
 
 public class TestUserFeedback extends TestCase{
 
-	IUserFeedback userFeedback;
-	List<String> expFeedback;
-	Boolean impFeedback;
+	UserFeedback userFeedback;
+	ICtxBroker mockCtxBroker;
+	
+	String mockDeviceID;
+	String mockIdentity;
+	
+	//context
+	CtxEntityIdentifier mockPersonId;
+	CtxEntityIdentifier mockEntityId;
+	CtxAttributeIdentifier mockUIDId;
+	CtxAttribute mockUID;
+	Future<CtxModelObject> mockUIDFuture;
+	List<CtxIdentifier> mockUIDIdList;
+	Future<List<CtxIdentifier>> mockUIDIdListFuture;
 
 	public void setUp() throws Exception{
+		mockCtxBroker = mock(ICtxBroker.class);
+		
+		mockDeviceID = "sarah.societies.local/android";
+		mockIdentity = "sarah.societies.local";
+		
 		userFeedback = new UserFeedback();
-		expFeedback = null;
-		impFeedback = null;
+		userFeedback.setCtxBroker(mockCtxBroker);
+		userFeedback.myDeviceID = mockDeviceID;
+		
+		mockPersonId = new CtxEntityIdentifier(mockIdentity, "PERSON", new Long(12345));
+		mockEntityId = new CtxEntityIdentifier(mockIdentity, "testEntity", new Long(12345));
+		mockUIDId = new CtxAttributeIdentifier(mockEntityId, CtxAttributeTypes.UID, new Long(12345));
+		mockUID = new CtxAttribute((CtxAttributeIdentifier)mockUIDId);
+		mockUID.setStringValue(mockDeviceID);
+		mockUIDFuture = new AsyncResult<CtxModelObject>(mockUID);
+		mockUIDIdList = new ArrayList<CtxIdentifier>();
+		mockUIDIdList.add(mockUIDId);
+		mockUIDIdListFuture = new AsyncResult<List<CtxIdentifier>>(mockUIDIdList);
 	}
 
 	public void tearDown() throws Exception{
-		//null
+		userFeedback = null;
+		mockCtxBroker = null;
+		mockDeviceID = null;
+		mockIdentity = null;
+		mockPersonId = null;
+		mockEntityId = null;
+		mockUIDId = null;
+		mockUID = null;
+		mockUIDIdList = null;
+		mockUIDFuture = null;
 	}
 	
 	public void testTmp(){
@@ -57,100 +105,144 @@ public class TestUserFeedback extends TestCase{
 	}
 
 	/*public void testAckNackGUI() {
-		String proposalText = "Press: YES";
-		String[] options = {"YES", "NO"};
-		userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, options), this);
-		while(expFeedback == null){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		try {
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
+			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
+			
+			String proposalText = "Press: YES";
+			String[] options = {"YES", "NO"};
+			List<String> feedback = userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, options)).get();
+			
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
+			verify(mockCtxBroker).retrieve(mockUIDId);
+						
+			//analyse results
+			Assert.assertNotNull(feedback);
+			Assert.assertTrue(feedback.size() == 1);
+			String results = feedback.get(0);
+			Assert.assertEquals("YES", results);
+			
+		} catch (CtxException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-		//analyse results
-		System.out.println("Got here");
-		Assert.assertNotNull(expFeedback);
-		Assert.assertTrue(expFeedback.size() == 1);
-		String results = expFeedback.get(0);
-		Assert.assertEquals("YES", results);
 	}
 
 
 
 	public void testCheckBoxGUI(){
-		String proposalText = "Select: RED, GREEN and BLUE";
-		String[] options = {"RED", "WHITE", "GREEN", "BLUE", "BLACK", "YELLOW"};
-		userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, new ExpProposalContent(proposalText, options), this);
-		while(expFeedback == null){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		try {
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
+			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
+			
+			String proposalText = "Select: RED, GREEN and BLUE";
+			String[] options = {"RED", "WHITE", "GREEN", "BLUE", "BLACK", "YELLOW"};
+			List<String> feedback = userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, new ExpProposalContent(proposalText, options)).get();
+			
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
+			verify(mockCtxBroker).retrieve(mockUIDId);
+			
+			//analyse results
+			Assert.assertNotNull(feedback);
+			Assert.assertTrue(feedback.size() == 3);
+			Assert.assertTrue(feedback.contains("RED"));
+			Assert.assertTrue(feedback.contains("GREEN"));
+			Assert.assertTrue(feedback.contains("BLUE"));
+			Assert.assertTrue(!feedback.contains("WHITE"));
+			Assert.assertTrue(!feedback.contains("BLACK"));
+			Assert.assertTrue(!feedback.contains("YELLOW"));
+			
+		} catch (CtxException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-		//analyse results
-		Assert.assertNotNull(expFeedback);
-		Assert.assertTrue(expFeedback.size() == 3);
-		Assert.assertTrue(expFeedback.contains("RED"));
-		Assert.assertTrue(expFeedback.contains("GREEN"));
-		Assert.assertTrue(expFeedback.contains("BLUE"));
-		Assert.assertTrue(!expFeedback.contains("WHITE"));
-		Assert.assertTrue(!expFeedback.contains("BLACK"));
-		Assert.assertTrue(!expFeedback.contains("YELLOW"));
 	}
 
 
 
 	public void testRadioGUI(){
-		String proposalText = "Select: WHITE";
-		String[] options = {"RED", "WHITE", "GREEN", "BLUE", "BLACK", "YELLOW"};
-		userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, new ExpProposalContent(proposalText, options), this);
-		while(expFeedback == null){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		try {
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
+			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
+			
+			String proposalText = "Select: WHITE";
+			String[] options = {"RED", "WHITE", "GREEN", "BLUE", "BLACK", "YELLOW"};
+			List<String> feedback = userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, new ExpProposalContent(proposalText, options)).get();
+			
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
+			verify(mockCtxBroker).retrieve(mockUIDId);
+			
+			//analyse results
+			Assert.assertNotNull(feedback);
+			Assert.assertTrue(feedback.size() == 1);
+			String results = feedback.get(0);
+			Assert.assertEquals("WHITE", results);
+			
+		} catch (CtxException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-		//analyse results
-		Assert.assertNotNull(expFeedback);
-		Assert.assertTrue(expFeedback.size() == 1);
-		String results = expFeedback.get(0);
-		Assert.assertEquals("WHITE", results);
 	}
 
 	
 	
 	public void testTimedGUI_abort(){
-		String proposalText = "Press: ABORT";
-		userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, new ImpProposalContent(proposalText, 10000), this);
-		while(impFeedback == null){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		try {
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
+			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
+			
+			String proposalText = "Press: ABORT";
+			Boolean feedback = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, new ImpProposalContent(proposalText, 10000)).get();
+			
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
+			verify(mockCtxBroker).retrieve(mockUIDId);
+			
+			//analyse results
+			Assert.assertNotNull(feedback);
+			Assert.assertEquals(false, feedback.booleanValue());
+			
+		} catch (CtxException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-		//analyse results
-		Assert.assertNotNull(impFeedback);
-		Assert.assertEquals(false, impFeedback.booleanValue());
 	}
 
 	
 	
 	public void testTimedGUI_timeout(){
-		String proposalText = "DO NOT press any button";
-		userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, new ImpProposalContent(proposalText, 5000), this);
-		while(impFeedback == null){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		try {
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
+			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
+			
+			String proposalText = "DO NOT press any button";
+			Boolean feedback = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, new ImpProposalContent(proposalText, 5000)).get();
+			
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
+			verify(mockCtxBroker).retrieve(mockUIDId);
+			
+			//analyse results
+			Assert.assertNotNull(feedback);
+			Assert.assertEquals(true, feedback.booleanValue());
+			
+		} catch (CtxException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-		//analyse results
-		Assert.assertNotNull(impFeedback);
-		Assert.assertEquals(true, impFeedback.booleanValue());
 	}*/
 
 }

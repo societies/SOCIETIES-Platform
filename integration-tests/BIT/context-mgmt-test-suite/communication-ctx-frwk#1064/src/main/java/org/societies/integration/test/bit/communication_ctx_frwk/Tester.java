@@ -24,9 +24,9 @@
  */
 
 package org.societies.integration.test.bit.communication_ctx_frwk;
-import java.util.List;
+
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+
 
 import junit.framework.Assert;
 

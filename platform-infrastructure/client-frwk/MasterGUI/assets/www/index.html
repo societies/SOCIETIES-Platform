@@ -14,7 +14,7 @@
 		<link rel="stylesheet" href="societies.css"/> 
 	
 		<!-- Uncomment lines below to enable PhoneGap desktop-->
-		<!-- script type="text/javascript" charset="utf-8" src="pluginjs/cssmanager.js"></script>
+		<!--script type="text/javascript" charset="utf-8" src="pluginjs/cssmanager.js"></script>
 		<script type="text/javascript" charset="utf-8" src="pluginjs/servicemonitor.js"></script>
 		<script type="text/javascript" charset="utf-8" src="pluginjs/devicestatus.js"></script>
 		<script type="text/javascript" charset="utf-8" src="pluginjs/preferences.js"></script-->
@@ -51,13 +51,88 @@
 		    	<input type="password" name="userpass" id="userpass" value="" />
 			</div>
 
+			<div data-role="fieldcontain" >
+		    	<label for="identityDomain">Identity Domain: </label>
+		    	<input type="text" name="identityDomain" id="identityDomain" value="" readonly="readonly" />
+			</div>
+
 			<input id="connectXMPP" type="button" value="Connect" data-icon="gear" data-inline="true" /> 
+			<a href="#xmppDomainReg" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Register</a>
 			
 		</div>
     	
 	</div><!-- /content -->
 
 	<div data-role="footer" data-theme="a"  data-position="fixed" >
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Societies Domain Server registration page -->
+<div data-role="page" id="xmppDomainReg">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Domain Registration</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+   		<div id= "xmppRegDialog">
+			<div data-role="fieldcontain" >
+		    	<label for="regUsername">Username: </label>
+		    	<input type="text" name="regUserLogin" id="regUsername" value=""  />
+			</div>
+
+			<div data-role="fieldcontain" >
+		    	<label for="regUserpass">Password: </label>
+		    	<input type="password" name="regUserPass" id="regUserpass" value="" />
+			</div>
+
+			<div data-role="fieldcontain" >
+		    	<label for="repeatRegUserpass">Repeat Password: </label>
+		    	<input type="password" name="repeatRegUserPass" id="repeatRegUserpass" value="" />
+			</div>
+
+			<div>
+				<label for="domainServers">Societies Domain Servers</label>
+				
+				<select name="domainServersList" id="domainServers">
+		  			<option value="societies.local" selected="selected">societies.local</option>
+		  			<option value="societies.alternative">societies.alternative</option>
+				</select> 
+			</div>
+	
+			<div data-role="collapsible">
+				<h3>SOCIETIES Terms</h3>
+			
+				<label for="societiesTCs">SOCIETIES Terms of Use:</label>
+				<textarea name="textareaSocietiesTCs" id="societiesTCs">
+				Societies Terms & Conditions. 1. You must be mad 2. Paranoid helps 3. Infinite time
+				</textarea>
+			</div>
+			<div>
+				<label for="regSocietiesTerms">I agree with the Terms of Use for SOCIETIES software</label>
+				<input type="checkbox" name="regSocietiesTerms" id="regSocietiesTerms" class="custom" value="true"/>
+			</div>
+			
+			<div data-role="collapsible">
+				<h3>Identity Terms</h3>
+				<label for="domainTCs">Identity Domain Terms of Use:</label>
+				<textarea name="textareaDomainTCs" id="domainTCs">
+				Domain Server Terms & Conditions 1. Exists 2. Free 3. Never goes missing
+				</textarea>
+			</div>
+
+			<div>
+				<label for="regDomainTerms">I agree with the Terms of Use for the Identity Domain:</label>
+				<input type="checkbox" name="regDomainTerms" id="regDomainTerms" class="custom" />
+			</div>
+			
+			<input id="registerXMPP" type="button" value="Register" data-icon="gear" data-inline="true" /> 
+			
+		</div>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#main" data-role="button" data-icon="home" data-inline="true">home</a>
 	</div><!-- /footer -->
 </div><!-- /page -->
 
@@ -212,7 +287,7 @@
 <div data-role="page" id="cssRegistration">
 
 	<div data-role="header" data-theme="a" data-position="fixed">
-		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Manager</p>
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;CSS Registration</p>
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="a">
@@ -240,21 +315,10 @@
 
 			<!-- CSS Identity-->
 			<div data-role="fieldcontain" >
-		    	<label for="cssidentity">Identity: </label>
+		    	<label for="cssidentity">Public Identity: </label>
 		    	<input type="text" name="cssIdentity" id="cssidentity" value=""/>
 			</div>
 
-			<!-- CSS Password-->
-			<div data-role="fieldcontain" >
-		    	<label for="cssuserpass">Password: </label>
-		    	<input type="text" name="cssUserPass" id="cssuserpass" value=""/>
-			</div>
-			
-			<!-- CSS Password-->
-			<div data-role="fieldcontain" >
-		    	<label for="cssuserpassagain">Password (confirm): </label>
-		    	<input type="text" name="cssUserPassAgain" id="cssuserpassagain" value=""/>
-			</div>
 			<div data-role="collapsible-set">
 			
 				<div data-role="collapsible">

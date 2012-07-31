@@ -38,7 +38,7 @@
   <xs:complexType name="ctxModelObjectBean" abstract="true">
     <xs:sequence>
       <xs:element name="id" type="tns:ctxIdentifierBean"/>
-      <xs:element name="lastModified" type="xs:dateTime"/>
+      <xs:element name="lastModified" type="xs:dateTime" nillable="true"/>
     </xs:sequence>
   </xs:complexType>
 

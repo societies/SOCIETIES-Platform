@@ -71,6 +71,29 @@
 	                    "sex": 0,
 	                    "socialURI": "sombody@fb.com",
 	                    "status": 0
+						},
+			
+		"registerXMPPServer" : {
+						"archiveCSSNodes": [],
+	                    "cssIdentity": "android@chosendomain.org",
+	                    "cssInactivation": null,
+	                    "cssNodes": [],
+	                    "cssRegistration": null,
+	                    "cssHostingLocation" : null,
+	                    "domainServer" : "chosendomain.org",
+	                    "cssUpTime": 0,
+	                    "emailID": null,
+	                    "entity": 0,
+	                    "foreName": null,
+	                    "homeLocation": null,
+	                    "identityName": null,
+	                    "imID": null,
+	                    "name": null,
+	                    "password": "secretpassword",
+	                    "presence": 0,
+	                    "sex": 1,
+	                    "socialURI": null,
+	                    "status": 0
 						}
 	}
 }

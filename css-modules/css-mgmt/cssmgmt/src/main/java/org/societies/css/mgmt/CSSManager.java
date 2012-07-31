@@ -72,6 +72,8 @@ public class CSSManager implements ICSSLocalManager {
 	
 	public static final String TEST_IDENTITY_1 = "node11";
 	public static final String TEST_IDENTITY_2 = "node22";
+	public static final String TEST_ARCHIVED_IDENTITY_1 = "archnode11";
+	public static final String TEST_ARCHIVED_IDENTITY_2 = "archnode22";
 
 	public static final String TEST_IDENTITY = "android";
 	public static final String TEST_INACTIVE_DATE = "20121029";
@@ -119,7 +121,8 @@ public class CSSManager implements ICSSLocalManager {
 //		  Supposedly, the correct way to obtain the identity
         this.pubsubID = idManager.getThisNetworkNode();
         
-        this.createPubSubNodes();
+        //TODO re-instate when Pubsub Simple working
+//        this.createPubSubNodes();
         this.subscribeToPubSubNodes();
         
         this.randomGenerator = new Random();
@@ -176,7 +179,8 @@ public class CSSManager implements ICSSLocalManager {
 	private CssRecord createCSSRecord() {
 		
     	CssNode cssNode_1, cssNode_2;
-
+    	CssNode archCSSNode_1, archCSSNode_2;
+    	
 		cssNode_1 = new CssNode();
 		cssNode_1.setIdentity(TEST_IDENTITY_1);
 		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
@@ -186,13 +190,23 @@ public class CSSManager implements ICSSLocalManager {
 		cssNode_2.setIdentity(TEST_IDENTITY_2);
 		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
+
+		archCSSNode_1 = new CssNode();
+		archCSSNode_1.setIdentity(TEST_ARCHIVED_IDENTITY_1);
+		archCSSNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		archCSSNode_1.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
+
+		archCSSNode_2 = new CssNode();
+		archCSSNode_2.setIdentity(TEST_ARCHIVED_IDENTITY_2);
+		archCSSNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+		archCSSNode_2.setType(CSSManagerEnums.nodeType.Rich.ordinal());
 		
 
 		CssRecord cssProfile = new CssRecord();
 		cssProfile.getCssNodes().add(cssNode_1);
 		cssProfile.getCssNodes().add(cssNode_2);
-		cssProfile.getArchiveCSSNodes().add(cssNode_1);
-		cssProfile.getArchiveCSSNodes().add(cssNode_2);
+		cssProfile.getArchiveCSSNodes().add(archCSSNode_1);
+		cssProfile.getArchiveCSSNodes().add(archCSSNode_2);
 		
 		cssProfile.setCssIdentity(TEST_IDENTITY);
 		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
@@ -300,13 +314,22 @@ public class CSSManager implements ICSSLocalManager {
 			// add new node to login to cloud CssRecord
 			this.cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
 
+			try {
+				this.cssRegistry.registerCss(cssRecord);
+				LOG.debug("Registering CSS with local database");
+			} catch (CssRegistrationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			result.setProfile(this.cssRecord);
 			result.setResultStatus(true);
 			CssEvent event = new CssEvent();
 			event.setType(CSSManagerEnums.ADD_CSS_NODE);
 			event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
 			
-			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+	        //TODO re-instate when Pubsub Simple working
+			//			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
 		}
 		
 		return new AsyncResult<CssInterfaceResult>(result);
@@ -351,11 +374,19 @@ public class CSSManager implements ICSSLocalManager {
 				result.setProfile(this.cssRecord);
 				result.setResultStatus(true);
 				
+				try {
+					this.cssRegistry.updateCssRecord(cssRecord);
+				} catch (CssRegistrationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				CssEvent event = new CssEvent();
 				event.setType(CSSManagerEnums.DEPART_CSS_NODE);
 				event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
 				
-				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
+		        //TODO re-instate when Pubsub Simple working
+				//				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
 
 		} 
 	
@@ -624,7 +655,7 @@ public class CSSManager implements ICSSLocalManager {
 		return new AsyncResult<List<Service>>(serviceList);
 	}
 	/**
-	 * Create an event for a fiven Pubsub node
+	 * Create an event for a given Pubsub node
 	 * 
 	 * @param pubsubNodeName
 	 */

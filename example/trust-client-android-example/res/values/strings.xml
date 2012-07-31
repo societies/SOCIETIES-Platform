@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Societies of Trust</string>
+    <string name="trustor_label">Who are you?</string>
+    <string name="trustor_field_hint">alice@societies.local</string>
+    <string name="trustee_label">Whom do you trust?</string>
+    <string name="trustee_field_hint">bob@societies.local</string>
+    <string name="rating_label">How much do you trust them?</string>
+    <string name="button_submit">Submit</string>
+    <string name="button_clear">Clear</string>
+
+</resources>
