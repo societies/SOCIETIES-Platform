@@ -15,6 +15,7 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
@@ -30,13 +31,11 @@ public class TestCase749 extends IntegrationTestCase{
 
 	public static ICtxBroker ctxBroker;
 	public static IUserActionMonitor uam;
-
+	public static ICommManager commsMgr;
+	
 	public TestCase749() {
-		super(749, new Class[]{ContextStorageTest.class, RetrieveLearnedModelTest.class});
+		super(749, new Class[]{Tester.class});
 		System.out.println("Test 749 started : TestCase749() ");
-		//UserIntentLearningTest uil = new UserIntentLearningTest(ctxBroker,uam);
-		//uil.createHistorySet();
-		startTest(); 
 	}
 
 
@@ -47,7 +46,11 @@ public class TestCase749 extends IntegrationTestCase{
 	public void setUam(IUserActionMonitor uam){
 		TestCase749.uam = uam;
 	}
-
+	
+	public void setCommsMgr(ICommManager commsMgr){
+		this.commsMgr = commsMgr;
+	}
+	
 	protected static ICtxBroker getCtxBroker(){
 		return TestCase749.ctxBroker;
 	}
@@ -56,7 +59,7 @@ public class TestCase749 extends IntegrationTestCase{
 		return TestCase749.uam;
 	}
 
-	
+	/*
 	private void startTest() {
 		LOG.info("###749... startTest");
 		jUnitCore = new JUnitCore();
@@ -86,5 +89,5 @@ public class TestCase749 extends IntegrationTestCase{
 
 		LOG.info("###749 " + results);
 	}
-	 
+	 */
 }
