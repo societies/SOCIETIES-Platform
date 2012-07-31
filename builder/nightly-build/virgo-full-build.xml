@@ -53,5 +53,10 @@
 		<module>../../intelligent-community-orchestration/CommunityLifecycleManagement</module> 
 		<module>../../intelligent-community-orchestration/EgocentricCommunityAnalyser</module>
 		<module>../../intelligent-community-orchestration/CPA</module>
+		
+		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->
+		<module>../../platform-infrastructure/security/SecurityServices</module>
+		<module>../../platform-infrastructure/security/PolicyNegotiator</module>
+		<module>../../platform-infrastructure/security/SecurityCommsMgr</module>
 	</modules>
 </project>

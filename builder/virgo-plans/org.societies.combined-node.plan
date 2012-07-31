@@ -14,9 +14,10 @@
 	<artifact type="bundle" name="org.societies.cis.CisDirectory" />
 	<artifact type="bundle"
 		name="org.societies.domain-authority.DomainAuthorityGroupManager" />
+	<!-- 
 	<artifact type="bundle"
 		name="org.societies.domain-authority.DomainAuthorityRegistry" />
 	<artifact type="bundle" name="DomainAuthorityRest" />
 	<artifact type="bundle" name="DomainAuthorityWebApp" />
-
+	 -->
 </plan>
