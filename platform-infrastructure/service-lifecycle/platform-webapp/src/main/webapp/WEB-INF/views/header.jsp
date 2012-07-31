@@ -6,7 +6,7 @@
 	  <tr>
 	  	<td>&nbsp;</td>
 	    <td align="center"><img src="${pageContext.request.contextPath}/images/societiesheader.png" /></td>
-		<td align="right" valign="bottom"><%= session.getAttribute("User") %></td>
+		<td align="right" valign="bottom"></td>
 	  </tr>
 	</table>
 	

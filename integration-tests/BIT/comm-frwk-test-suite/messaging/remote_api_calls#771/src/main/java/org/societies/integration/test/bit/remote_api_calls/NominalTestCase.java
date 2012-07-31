@@ -74,6 +74,7 @@ public class NominalTestCase {
 		calc.setA(1); 
 		calc.setB(2);
 		calc.setMethod(MethodType.ADD);
+		calc.setMessage("Testing body1 - Adding");
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
 			LOG.info("***771... sendIQGet: ADD(1,2)");
@@ -114,6 +115,7 @@ public class NominalTestCase {
 		calc.setA(2); 
 		calc.setB(1);
 		calc.setMethod(MethodType.SUBTRACT);
+		calc.setMessage("Testing body2 - subtract");
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
 			LOG.info("***771... sendIQGet: SUBTRACT(2,1)");
@@ -127,7 +129,7 @@ public class NominalTestCase {
 			LOG.info("Body 2 waiting...");
 			
 			try {
-				callback.wait(9*1000);
+				callback.wait(15*1000);
 			} catch (InterruptedException e) {
 				LOG.info("Body 2 InterruptedException: " + e.getMessage());
 				fail("InterruptedException");
@@ -151,5 +153,5 @@ public class NominalTestCase {
 	@After
 	public void tearDown() {
 		LOG.info("###771... tearDown");
-	}
+ 	}
 }
