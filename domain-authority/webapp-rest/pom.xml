@@ -118,6 +118,12 @@
 			<version>1.2.1</version>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.web.servlet</artifactId>
+			<version>3.0.5.RELEASE</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
 			<version>${jersey-version}</version>

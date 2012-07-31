@@ -137,12 +137,9 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	public Future<UrlBean> shareFiles(URI serviceId, IIdentity provider, String signature, List<String> files) {
 		
 		UrlBean result = new UrlBean();
-		URI url;
-		String urlStr;
 		Service service;
 		String dataToVerify;
 		
-		// TODO: check signature
 		dataToVerify = serviceId.toASCIIString();
 		for (String file : files) {
 			dataToVerify += file;
@@ -150,23 +147,14 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		if (sigMgr.verify(dataToVerify, signature, provider)) {
 			service = new Service(serviceId, provider, files);
 			services.put(serviceId, service);
+			result.setSuccess(true);
 		}
 		else {
 			LOG.warn("Unauthorized attempt to share files for service {}. Data = {}. Signature = " +
 					signature, serviceId, dataToVerify);
-		}
-		
-
-		urlStr = hostname + Path.BASE + ServiceClientJar.PATH + "/" + filePath +
-				"?" + ServiceClientJar.URL_PARAM_SERVICE_ID + "=" + key;
-		try {
-			url = new URI(urlStr);
-			result.setUrl(url);
-			result.setSuccess(true);
-		} catch (URISyntaxException e) {
-			LOG.warn("Could not create URI from {}", urlStr, e);
 			result.setSuccess(false);
 		}
+		
 		
 		return new AsyncResult<UrlBean>(result);
 	}
