@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.css.devicemgmt" version="0.3.0" scoped="false" atomic="false"
+        xmlns="http://www.eclipse.org/virgo/schema/plan"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="
+		        http://www.eclipse.org/virgo/schema/plan 
+		        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+				
+	
+	<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceCommsMgr"/>	
+	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
+	<artifact type="bundle" name="org.societies.css.devicemgmt.RFIDDriver"/>
+
+	
+
+</plan>
