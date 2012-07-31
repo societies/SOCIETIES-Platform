@@ -15,7 +15,7 @@
 	</developers>
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>version-parent</artifactId>
+		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
 	</parent>
 	<dependencies>

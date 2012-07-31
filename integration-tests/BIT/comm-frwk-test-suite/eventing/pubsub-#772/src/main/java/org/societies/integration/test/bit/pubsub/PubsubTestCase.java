@@ -42,7 +42,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.api.identity.IIdentity;
-import org.societies.test.Testnode;
+import org.societies.api.schema.examples.calculatorbean.CalcBeanResult;
 
 /**
  * Describe your class here...
@@ -61,10 +61,15 @@ public class PubsubTestCase {
 	public PubsubTestCase() {
 	}
 
-	private Testnode createTestItem()  {
-		Testnode tn = new Testnode();
-		tn.setTestattribute("testValue");
-		return tn;
+	//private Testnode createTestItem()  {
+	private CalcBeanResult createTestItem()  {
+		//Testnode tn = new Testnode();
+		//tn.setTestattribute("testValue");
+		//return tn;
+		CalcBeanResult calc = new CalcBeanResult();
+		calc.setResult(1);
+		calc.setText(PUBSUB_EVENT_ID);
+		return calc;
 	}
 	
 	@Before
@@ -160,7 +165,7 @@ public class PubsubTestCase {
 		assertNotNull("Timed out", callback.getEventObject());
 				
 		// otherwise, check the result
-		String result = callback.getEventObject().getTestattribute();
+		String result = callback.getEventObject().getText();
 		LOG.info("### result: " + result);	
 		assertEquals(PUBSUB_EVENT_ID, result);
 	}

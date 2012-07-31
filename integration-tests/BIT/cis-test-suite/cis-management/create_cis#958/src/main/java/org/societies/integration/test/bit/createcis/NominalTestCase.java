@@ -153,6 +153,7 @@ public class NominalTestCase {
 		// Create CIS
 		Future<ICisOwned> futureCis = TestCase958.cisManager.createCis(cssId, cssPassword, cisName, cisType, 1, privacyPolicyWithoutRequestor);
 		ICisOwned newCis = null;
+		
 		assertNotNull("Future new CIS is null", futureCis);
 		
 		// Retrieve future CIS
@@ -172,23 +173,37 @@ public class NominalTestCase {
 
 		// Retrieve CIS id
 		cisId =  newCis.getCisId();
+		
 		assertNotNull("New CIS id is null", cisId);
 
 		// Check if the CIS is on the CIS Management registry
 		ICis cisRetrieved =  TestCase958.cisManager.getCis(TestCase958.commManager.getIdManager().getThisNetworkNode().getJid(), cisId);
+		
+		
 		assertNotNull("New CIS is not stored", cisRetrieved);
+		
 		assertTrue("New CIS and retrived CIS should be the same but are not", newCis.equals(cisRetrieved));
+		
 
 		RequestPolicy expectedPrivacyPolicy = null;
 		RequestPolicy retrievedPrivacyPolicy = null;
 		try {
+			
 			// Retrieve privacy policy owner id
 			IIdentity cisIdentity = TestCase958.commManager.getIdManager().fromJid(cisId);
+			
+			
 			RequestorCis requestorCis = new RequestorCis(TestCase958.commManager.getIdManager().getThisNetworkNode(), cisIdentity);
+			
+			
 			expectedPrivacyPolicy = TestCase958.privacyPolicyManager.fromXMLString(privacyPolicyWithoutRequestor);
+			
+			
 			expectedPrivacyPolicy.setRequestor(requestorCis);
+			
 			// Retrieve privacy policy
 			retrievedPrivacyPolicy =  TestCase958.privacyPolicyManager.getPrivacyPolicy(requestorCis);
+			
 		} catch (PrivacyException e) {
 			LOG.error("[Error "+e.getLocalizedMessage()+"] "+testTitle, e);
 			fail("[Error PrivacyException] "+testTitle);
@@ -199,6 +214,11 @@ public class NominalTestCase {
 
 		LOG.info(retrievedPrivacyPolicy.toXMLString());
 		assertNotNull("CIS Privacy policy is null but it should not", retrievedPrivacyPolicy);
-		assertEquals("CIS privacy policy retrieved is not the one that has been sent", expectedPrivacyPolicy, retrievedPrivacyPolicy);
+		
+		//Modified by Rafik
+		//Before:
+		//assertEquals("CIS privacy policy retrieved is not the one that has been sent", expectedPrivacyPolicy, retrievedPrivacyPolicy);
+		//After:
+		assertEquals("CIS privacy policy retrieved is not the one that has been sent", expectedPrivacyPolicy.toXMLString(), retrievedPrivacyPolicy.toXMLString());
 	}
 }
