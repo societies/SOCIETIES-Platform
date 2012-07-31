@@ -122,7 +122,12 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
-		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
+		
+		//Modified by rafik
+		//before:
+		//assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
+		//After:
+		assertNull("Expected null privacy policy, but it is not.", privacyPolicy);
 	}
 
 	/**
@@ -148,7 +153,13 @@ public class PrivacyPolicyManagerTest {
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
+		
+		//Modified by rafik
+		//before:
+		//assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
+		//After:
+		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy.toXMLString(), addedPrivacyPolicy.toXMLString());
+		
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
 
@@ -170,7 +181,13 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
-		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
+		
+		
+		//Modified by rafik
+		//before:
+		//assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
+		//After:
+		assertNull("Expected null privacy policy, but it is not.", privacyPolicy);
 	}
 
 	/**
@@ -196,7 +213,12 @@ public class PrivacyPolicyManagerTest {
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
+		
+		//Modified by Rafik
+		//before:
+		//assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
+		//After:
+		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy.toXMLString(), addedPrivacyPolicy.toXMLString());
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
 
@@ -221,10 +243,16 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
+		
+		LOG.info("$$$$$$ Rafik 1");
 		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
+		LOG.info("$$$$$$ Rafik 2");
 		assertEquals("Privacy policy not updated", cisPolicy, privacyPolicy2);
+		LOG.info("$$$$$$ Rafik 3");
 		assertEquals("Difference between same privacy policies", privacyPolicy1, privacyPolicy2);
+		LOG.info("$$$$$$ Rafik 4");
 		assertTrue("Privacy policy not deleted.", deleteResult);
+		LOG.info("$$$$$$ Rafik 5");
 	}
 
 	/**
@@ -253,10 +281,27 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
-		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
-		assertEquals("Privacy policy not updated", cisPolicy2, privacyPolicy2);
-		assertFalse("Same privacy policies but it should not", privacyPolicy1.equals(privacyPolicy2));
+		
+		//Modified by Rafik
+		//before:
+		//assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
+		//After:
+		assertEquals("Privacy policy not created", cisPolicy.toXMLString(), privacyPolicy1.toXMLString());
+		
+		//Modified by Rafik
+		//before:
+		//assertEquals("Privacy policy not updated", cisPolicy2, privacyPolicy2);
+		//After:
+		assertEquals("Privacy policy not updated", cisPolicy2.toXMLString(), privacyPolicy2.toXMLString());
+		
+		//Modified by Rafik
+		//before:
+		//assertFalse("Same privacy policies but it should not", privacyPolicy1.equals(privacyPolicy2));
+		//After:
+		assertFalse("Same privacy policies but it should not", privacyPolicy1.toXMLString().equals(privacyPolicy2.toXMLString()));
+
 		assertTrue("Privacy policy not deleted.", deleteResult);
+
 	}
 
 
@@ -334,7 +379,14 @@ public class PrivacyPolicyManagerTest {
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
+		
+		//Modified by Rafik
+		//before:
+		//assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
+		//After:
+		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore.toXMLString(), addedPrivacyPolicy.toXMLString());
+		
+		
 		assertTrue("Privacy policy not deleted.", deleteResult);
 		assertNull("Privacy policy not really deleted.", privacyPolicyAfter);
 	}
@@ -364,7 +416,12 @@ public class PrivacyPolicyManagerTest {
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
+		
+		//Modified by Rafik
+		//before:
+		//assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
+		//After:
+		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore.toXMLString(), addedPrivacyPolicy.toXMLString());
 		assertTrue("Privacy policy not deleted.", deleteResult);
 		assertNull("Privacy policy not really deleted.", privacyPolicyAfter);
 	}
@@ -407,7 +464,12 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
-		assertEquals("Privacy policy generated not equal to the original policy", cisPolicy, privacyPolicy);
+		
+		//Modified by Rafik
+		//before:
+		//assertEquals("Privacy policy generated not equal to the original policy", cisPolicy, privacyPolicy);
+		//After:
+		assertEquals("Privacy policy generated not equal to the original policy", cisPolicy.toXMLString(), privacyPolicy.toXMLString());
 	}
 
 	/**
@@ -463,7 +525,12 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
-		assertEquals(expected, actual);
+		
+		//Modified by Rafik
+		//before:
+		//assertEquals(expected, actual);
+		//After:
+		assertEquals(expected.toXMLString(), actual.toXMLString());
 	}
 
 
