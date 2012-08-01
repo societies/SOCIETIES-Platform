@@ -63,10 +63,10 @@
 	
 	<bean id="clientJar"
 		class="org.societies.domainauthority.rest.control.ServiceClientJarAccess"
-		depends-on="CommManagerBundle"
+		depends-on="CommManager"
   		init-method="init"
   		>
-  		<property name="commMgr" ref="CommManagerBundle"/>
+  		<property name="commMgr" ref="CommManager"/>
 	</bean>
 	
 	<!--bean id="viewResolver"

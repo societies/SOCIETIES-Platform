@@ -24,80 +24,49 @@
  */
 package org.societies.domainauthority.rest.control;
 
-import static org.junit.Assert.*;
-
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
+import org.societies.api.identity.IIdentity;
 
 /**
- * 
+ * A model of a service, not service instance.
  *
  * @author Mitja Vardjan
  *
  */
-public class ServiceClientJarAccessTest {
-
-	ServiceClientJarAccess classUnderTest;
+public class Service {
 	
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		classUnderTest = new ServiceClientJarAccess();
+	private URI id;
+	private IIdentity provider;
+	private List<String> files = new ArrayList<String>();
+	
+	public Service(URI id, IIdentity provider, List<String> files) {
+		this.id = id;
+		this.provider = provider;
+		this.files = files;
 	}
 
 	/**
-	 * @throws java.lang.Exception
+	 * @return ID of the service, not ID of a service instance
 	 */
-	@After
-	public void tearDown() throws Exception {
+	public URI getId() {
+		return id;
 	}
 
 	/**
-	 * Test method for {@link ServiceClientJarAccess#addKey(String, String)}.
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 * @throws URISyntaxException 
+	 * @return The provider of this service.
 	 */
-//	@Test
-//	public void testValidKey() throws InterruptedException, ExecutionException, URISyntaxException {
-//		
-//		URI hostname = new URI("http://www.example.com:8080");
-//		String filePath = "foo.jar";
-//		UrlBean result;
-//		String key;
-//		String url;
-//		
-//		result = classUnderTest.addKey(hostname, filePath).get();
-//		assertTrue(result.isSuccess());
-//		assertEquals("www.example.com", result.getUrl().getHost());
-//		assertEquals(8080, result.getUrl().getPort(), 0.0);
-//		
-//		String start = hostname + "/rest/webresources/serviceclient/" + filePath + "?key=";
-//		url = result.getUrl().toString();
-//		assertTrue(url.contains("?key="));
-//		assertTrue(url.startsWith(start));
-//		assertTrue(url.length() > start.length());
-//		
-//		key = url.replace(start, "");
-//		assertTrue(ServiceClientJarAccess.isKeyValid(filePath, key));
-//	}
+	public IIdentity getProvider() {
+		return provider;
+	}
 
 	/**
-	 * Test method for {@link ServiceClientJarAccess#isKeyValid(String, String)}.
+	 * @return Paths to all files that are associated with the service and
+	 * service consumers can potentially download.
 	 */
-//	@Test
-//	public void testInvalidKey() {
-//		
-//		String filePath = "foo.jar";
-//		String key = "d2nuvo";
-//		assertTrue(!ServiceClientJarAccess.isKeyValid(filePath, key));
-//	}
+	public List<String> getFiles() {
+		return files;
+	}
 }

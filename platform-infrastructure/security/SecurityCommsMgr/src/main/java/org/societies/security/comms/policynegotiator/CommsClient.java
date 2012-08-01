@@ -168,7 +168,7 @@ public class CommsClient implements INegotiationProviderRemote {
 		// Create stanza
 		Stanza stanza = new Stanza(toIdentity);
 		stanza.setId(StanzaIdGenerator.next());
-		stanza.setFrom(idMgr.getThisNetworkNode());
+		//stanza.setFrom(idMgr.getThisNetworkNode());
 		
 		// Create message bean
 		ProviderBean provider = new ProviderBean();

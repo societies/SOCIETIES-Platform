@@ -123,12 +123,14 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<!--  
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-data-source</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>hibernate_classes</artifactId>

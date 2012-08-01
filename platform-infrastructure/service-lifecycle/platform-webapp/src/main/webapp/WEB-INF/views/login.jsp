@@ -31,37 +31,15 @@
 	<jsp:include page="leftbar.jsp" />
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
-<h1>${message}</h1>
-	<h3>please user below user name and password</h3>
+<h1>Welcome to your Societies Account</h1>
+	
 	 
 	<FONT color="blue">
 
-		<h6>User Name="userid" and password="password"</h6>
+		
 
 	</FONT>
 
-<form:form method="POST" action="login.html" commandName="loginForm">
-		<form:errors path="*" cssClass="errorblock" element="div" />
-		<table>
-			<tr>
-				<td>UserName :</td>
-				<td><form:input path="userName" value="userid"  />
-				</td>
-				<td><form:errors path="userName" cssClass="error" />
-				</td>
-			</tr>			
-			<tr>
-				<td>Password :</td>
-				<td><form:password path="password" value="password" />
-				</td>
-				<td><form:errors path="password" cssClass="error" />
-				</td>
-			</tr>						
-			<tr>
-				<td colspan="3"><input type="submit" /></td>
-			</tr>
-		</table>
-	</form:form>
 
 <!-- .................END PLACE YOUR CONTENT HERE ................ -->
 	<!-- FOOTER -->

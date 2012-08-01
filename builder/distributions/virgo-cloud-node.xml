@@ -45,9 +45,11 @@
 		<module>../../platform-infrastructure/service-lifecycle/sl-comms-mgr</module>
 
 		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->
+		<!-- 
 		<module>../../platform-infrastructure/security/SecurityServices</module>
 		<module>../../platform-infrastructure/security/PolicyNegotiator</module>
 		<module>../../platform-infrastructure/security/SecurityCommsMgr</module>
+		-->
 
 		<!-- Directory Clients: 2 bundles (to be merged) -->
 		<module>../../css-modules/css-directory-client</module>

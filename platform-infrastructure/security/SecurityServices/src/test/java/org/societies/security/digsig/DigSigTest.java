@@ -124,15 +124,28 @@ public class DigSigTest {
 	 * @throws DigsigException 
 	 */
 	@Test
-	public void testVerifyByteArrayStringPublicKey() throws DigsigException {
+	public void testVerifyValidSig() throws DigsigException {
+
+		String signature;
+		boolean result;
+		
+		signature = digSig.sign(dataToSign, privateKey);
+		result = digSig.verify(dataToSign, signature, publicKey);
+		assertTrue(result);
+	}
+
+	/**
+	 * Test method for {@link DigSig#verify(byte[], String, java.security.PublicKey)}.
+	 * @throws DigsigException 
+	 */
+	@Test
+	public void testVerifyInvalidSig() throws DigsigException {
 
 		String signature;
 		String invalidSignature;
 		boolean result;
 		
 		signature = digSig.sign(dataToSign, privateKey);
-		result = digSig.verify(dataToSign, signature, publicKey);
-		assertTrue(result);
 		if (signature.contains("A")) {
 			invalidSignature = signature.replace("A", "B");
 		}

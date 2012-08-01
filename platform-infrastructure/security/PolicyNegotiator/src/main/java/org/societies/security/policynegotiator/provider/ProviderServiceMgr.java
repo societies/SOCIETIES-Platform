@@ -115,21 +115,21 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	protected URI getClientJarUri(String id) throws NegotiationException {
 
 		// FIXME
-		String uriStr = "http://localhost:8080";
+		String host = "http://localhost:8080";
 		String filePath = "Calculator.jar";
 		URI uri;
 		try {
-			uri = new URI(uriStr);
-			Future<UrlBean> urlBeanFuture = clientJarServer.addKey(uri, filePath);
-			UrlBean urlBean = urlBeanFuture.get();
-			uri = urlBean.getUrl();
+			uri = new URI(host + "/rest/webresources" + "/serviceclient" + "/" + filePath + "?service=xxx&sig=yyy");
+//			Future<UrlBean> urlBeanFuture = clientJarServer.shareFiles();
+//			UrlBean urlBean = urlBeanFuture.get();
+//			uri = urlBean.getUrl();
 			return uri;
 		} catch (URISyntaxException e) {
 			throw new NegotiationException(e);
-		} catch (InterruptedException e) {
-			throw new NegotiationException(e);
-		} catch (ExecutionException e) {
-			throw new NegotiationException(e);
+//		} catch (InterruptedException e) {
+//			throw new NegotiationException(e);
+//		} catch (ExecutionException e) {
+//			throw new NegotiationException(e);
 		}
 		
 //		Service s = getService(id);

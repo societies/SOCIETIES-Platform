@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -48,10 +47,11 @@ public class UIDUpdateTest {
 		LOG.info("Monitor services #747 - Running UIDUpdateTest....");
 
 		//create action
-		IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
+		IIdentity identity = TestCase747.commsMgr.getIdManager().getThisNetworkNode();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		try {
 			serviceId.setIdentifier(new URI("http://testService4"));
+			serviceId.setServiceInstanceIdentifier("http://testService4");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}

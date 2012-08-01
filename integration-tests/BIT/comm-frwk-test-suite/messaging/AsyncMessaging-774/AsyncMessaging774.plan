@@ -10,5 +10,5 @@
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
     
     <!--  Async messaging Test class -->
-    <artifact type="bundle" name="integration.test.bit.pubsub_772"/>
+    <artifact type="bundle" name="org.societies.integration.test.bit.asyncmessage_774"/>
 </plan>

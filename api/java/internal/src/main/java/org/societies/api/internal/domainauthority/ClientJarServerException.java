@@ -22,82 +22,63 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.rest.control;
-
-import static org.junit.Assert.*;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
+package org.societies.api.internal.domainauthority;
 
 /**
- * 
+ * Exception that may get thrown from methods that use digital signatures.
  *
  * @author Mitja Vardjan
  *
  */
-public class ServiceClientJarAccessTest {
+public class ClientJarServerException extends Exception {
 
-	ServiceClientJarAccess classUnderTest;
+	/**
+	 *  The Constant serialVersionUID
+	 */
+	private static final long serialVersionUID = -2334307465917723771L;
+
+	/**
+	 * Instantiates a new exception.
+	 */
+	public ClientJarServerException() {
+		super();
+	}
+
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 */
+	public ClientJarServerException(String msg) {
+		super(msg);
+	}
 	
 	/**
-	 * @throws java.lang.Exception
+	 * Instantiates a new exception.
+	 * 
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-	@Before
-	public void setUp() throws Exception {
-		classUnderTest = new ServiceClientJarAccess();
+	public ClientJarServerException(Throwable e) {
+		super(e);
 	}
-
+	
 	/**
-	 * @throws java.lang.Exception
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-	@After
-	public void tearDown() throws Exception {
+	public ClientJarServerException(String msg, Throwable e) {
+		super(msg, e);
 	}
-
+	
 	/**
-	 * Test method for {@link ServiceClientJarAccess#addKey(String, String)}.
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 * @throws URISyntaxException 
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-//	@Test
-//	public void testValidKey() throws InterruptedException, ExecutionException, URISyntaxException {
-//		
-//		URI hostname = new URI("http://www.example.com:8080");
-//		String filePath = "foo.jar";
-//		UrlBean result;
-//		String key;
-//		String url;
-//		
-//		result = classUnderTest.addKey(hostname, filePath).get();
-//		assertTrue(result.isSuccess());
-//		assertEquals("www.example.com", result.getUrl().getHost());
-//		assertEquals(8080, result.getUrl().getPort(), 0.0);
-//		
-//		String start = hostname + "/rest/webresources/serviceclient/" + filePath + "?key=";
-//		url = result.getUrl().toString();
-//		assertTrue(url.contains("?key="));
-//		assertTrue(url.startsWith(start));
-//		assertTrue(url.length() > start.length());
-//		
-//		key = url.replace(start, "");
-//		assertTrue(ServiceClientJarAccess.isKeyValid(filePath, key));
-//	}
-
-	/**
-	 * Test method for {@link ServiceClientJarAccess#isKeyValid(String, String)}.
-	 */
-//	@Test
-//	public void testInvalidKey() {
-//		
-//		String filePath = "foo.jar";
-//		String key = "d2nuvo";
-//		assertTrue(!ServiceClientJarAccess.isKeyValid(filePath, key));
-//	}
+	public ClientJarServerException(Throwable e, String msg) {
+		super(msg, e);
+	}
 }

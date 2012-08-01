@@ -27,6 +27,7 @@ package org.societies.api.security.digsig;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
@@ -73,6 +74,17 @@ public interface ISignatureMgr {
 	 * (unlikely) the algorithm cannot process the given data
 	 */
 	public String sign(byte[] dataToSign, PrivateKey privateKey) throws DigsigException;
+
+	/**
+	 * Digitally sign given data.
+	 * 
+	 * @param dataToSign The data to sign
+	 * @param identity The identity to use for signing the data
+	 * @return Hex encoded digital signature  
+	 * @throws DigsigException If something is wrong with the given identity,
+	 * its key, or (unlikely) the algorithm cannot process the given data
+	 */
+	public String sign(byte[] dataToSign, IIdentity identity) throws DigsigException;
 	
 	/**
 	 * Verify given digital signature against given data.
@@ -84,4 +96,83 @@ public interface ISignatureMgr {
 	 * (unlikely) other error occurred.
 	 */
 	public boolean verify(byte[] data, String signature, PublicKey publicKey);
+
+	/**
+	 * Verify given digital signature against given data.
+	 * 
+	 * @param data The data that given signature is supposed to correspond to.
+	 * @param signature The digital signature to verify
+	 * @param identity The identity to use for verification
+	 * @return True if signature is valid. False if signature, public key or
+	 * identity is invalid, or (unlikely) other error occurred.
+	 */
+	public boolean verify(byte[] data, String signature, IIdentity identity);
+
+	/**
+	 * Digitally sign given data.
+	 * 
+	 * @param dataToSign The data to sign
+	 * @param privateKey The private key to use for signing the data
+	 * @return Hex encoded digital signature  
+	 * @throws DigsigException If something is wrong with the given key, or
+	 * (unlikely) the algorithm cannot process the given data
+	 */
+	public String sign(String dataToSign, PrivateKey privateKey) throws DigsigException;
+	
+	/**
+	 * Digitally sign given data.
+	 * 
+	 * @param dataToSign The data to sign
+	 * @param identity The identity to use for signing the data
+	 * @return Hex encoded digital signature  
+	 * @throws DigsigException If something is wrong with the given identity,
+	 * its key, or (unlikely) the algorithm cannot process the given data
+	 */
+	public String sign(String dataToSign, IIdentity identity) throws DigsigException;
+
+	/**
+	 * Verify given digital signature against given data.
+	 * 
+	 * @param data The data that given signature is supposed to correspond to.
+	 * @param signature The digital signature to verify
+	 * @param publicKey The public key to use for verification
+	 * @return True if signature is valid. False if signature or public key is invalid, or
+	 * (unlikely) other error occurred.
+	 */
+	public boolean verify(String data, String signature, PublicKey publicKey);
+	
+	/**
+	 * Verify given digital signature against given data.
+	 * 
+	 * @param data The data that given signature is supposed to correspond to.
+	 * @param signature The digital signature to verify
+	 * @param publicKey The identity to use for verification
+	 * @return True if signature is valid. False if signature, public key or
+	 * identity is invalid, or (unlikely) other error occurred.
+	 */
+	public boolean verify(String data, String signature, IIdentity identity);
+
+	/**
+	 * Gets digital certificate for the given identity.
+	 * Any identity can be used, our own or identity of any other CSS or CIS.
+	 * The certificate includes public key associated with the identity.
+	 * 
+	 * @param identity The identity to get certificate for
+	 * 
+	 * @return The certificate, or null if identity not found or no certificate
+	 * is associated with the identity
+	 */
+	@Deprecated
+	public X509Certificate getCertificate(IIdentity identity);
+	
+	/**
+	 * Gets private key for the given identity.
+	 * If the identity is not one of own identities (of this CSS), then null is returned.
+	 * 
+	 * @param identity The identity to get private key for
+	 * 
+	 * @return The private key
+	 */
+	@Deprecated
+	public PrivateKey getPrivateKey(IIdentity identity);
 }

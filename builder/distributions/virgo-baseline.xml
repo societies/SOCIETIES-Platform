@@ -63,9 +63,10 @@
 		<module>../../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
 		
 		<!-- Common External Libraries: 3 bundles -->
+		<!-- Not in use
 		<module>../../common-modules/common-ext-libs</module>
-		<!-- below projects to be merged into the above -->
 		<module>../../common-modules/common-data-source</module>
+		-->
 		<module>../../platform-infrastructure/comms-frwk/CommonLibraries</module>
 	</modules>
 </project>
