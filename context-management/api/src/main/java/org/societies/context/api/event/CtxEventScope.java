@@ -30,8 +30,9 @@ package org.societies.context.api.event;
  * <ul>
  * <li>{@link #LOCAL}: Denotes a context event published locally, i.e. within
  * the container</li>
- * <li>{@link #CSS}: Denotes a context event published to all device nodes of a
+ * <li>{@link #INTRA_CSS}: Denotes a context event published to all device nodes of a
  * CSS</li>
+ * <li>{@link #INTER_CSS}: Denotes a context event published to other CSSs</li>
  * </ul>
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
@@ -48,5 +49,10 @@ public enum CtxEventScope {
 	/**
 	 * The enum constant for context events published to all nodes of a CSS.
 	 */
-	CSS,
+	INTRA_CSS,
+	
+	/**
+	 * The enum constant for context events published to other CSSs.
+	 */
+	INTER_CSS,
 }

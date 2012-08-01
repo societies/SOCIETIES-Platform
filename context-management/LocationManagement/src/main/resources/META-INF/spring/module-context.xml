@@ -13,7 +13,7 @@
        bundle. The configuration of OSGi definitions is kept in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-       
-	<context:component-scan base-package="org.societies.context.api.user.location.ILocationManagementAdapter"></context:component-scan>
-	
+       <!-- 
+       	<context:component-scan base-package="org.societies.context.api.user.location.ILocationManagementAdapter"></context:component-scan>
+	-->
 </beans>

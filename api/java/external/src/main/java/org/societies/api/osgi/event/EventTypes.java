@@ -93,6 +93,8 @@ public class EventTypes {
 	/** CIS unsubscription */
 	public static final String CIS_UNSUBS = "org/societies/cis/unsubscription";	
 
-	
+	/** Published by the DisplayDriver service to notify when a display is available to use */
+	public static final String DISPLAY_EVENT = "org/societies/css/device/displayUpdate";
+
 	
 }

@@ -37,6 +37,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Editable;
@@ -45,6 +46,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
@@ -62,28 +64,22 @@ public class TrustClientActivity extends Activity {
 					
 			TrustClientActivity.this.collector = 
 					((TrustEvidenceCollector.LocalBinder)service).getService();
-	    	Log.i(TAG, "ITrustEvidenceCollector service bound");
-	    	// TODO remove
-	    	Toast.makeText(TrustClientActivity.this, 
-	    			"ITrustEvidenceCollector service bound",
-	                Toast.LENGTH_SHORT).show();
+	    	Log.i(TrustClientActivity.TAG, "ITrustEvidenceCollector service bound");
 		}
 		
 		public void onServiceDisconnected(ComponentName name) {
 			
 			TrustClientActivity.this.collector = null;
-			// TODO remove
-			Toast.makeText(TrustClientActivity.this, 
-	    			"ITrustEvidenceCollector service unbound",
-	                Toast.LENGTH_SHORT).show();
+			Log.i(TrustClientActivity.TAG, "ITrustEvidenceCollector service unbound");
 		}
 	};
 	
-	private EditText trustorText;
-	private EditText trusteeText;
-	private RatingBar trustRatingBar;
+	private EditText etTrustor;
+	private EditText etTrustee;
+	private RatingBar rbTrust;
 	private Button buttonSubmit;
 	private Button buttonClear;
+	private ProgressBar pbProgress;
 	
     /*
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -94,13 +90,14 @@ public class TrustClientActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        this.trustorText = (EditText) findViewById(R.id.trustorField);
-        this.trusteeText = (EditText) findViewById(R.id.trusteeField);
-        this.trustRatingBar = (RatingBar) findViewById(R.id.ratingBar);
+        this.etTrustor = (EditText) findViewById(R.id.etTrustor);
+        this.etTrustee = (EditText) findViewById(R.id.etTrustee);
+        this.rbTrust = (RatingBar) findViewById(R.id.rbTrust);
         this.buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
         this.buttonClear = (Button) findViewById(R.id.buttonClear);
+        this.pbProgress = (ProgressBar) findViewById(R.id.pbProgress);
         
-        this.trustorText.addTextChangedListener(new TextWatcher() {
+        this.etTrustor.addTextChangedListener(new TextWatcher() {
 			
         	/*
         	 * @see android.text.TextWatcher#onTextChanged(java.lang.CharSequence, int, int, int)
@@ -109,13 +106,13 @@ public class TrustClientActivity extends Activity {
 				
 				if (s.length() > 0) {
 					TrustClientActivity.this.buttonClear.setEnabled(true);
-					if (TrustClientActivity.this.trusteeText.getText().length() > 0)
+					if (TrustClientActivity.this.etTrustee.getText().length() > 0)
 						TrustClientActivity.this.buttonSubmit.setEnabled(true);
 					else
 						TrustClientActivity.this.buttonSubmit.setEnabled(false);
 				} else {
 					TrustClientActivity.this.buttonSubmit.setEnabled(false);
-					if (TrustClientActivity.this.trusteeText.getText().length() > 0)
+					if (TrustClientActivity.this.etTrustee.getText().length() > 0)
 						TrustClientActivity.this.buttonClear.setEnabled(true);
 					else
 						TrustClientActivity.this.buttonClear.setEnabled(false);
@@ -138,7 +135,7 @@ public class TrustClientActivity extends Activity {
 			}
 		});
         
-        this.trusteeText.addTextChangedListener(new TextWatcher() {
+        this.etTrustee.addTextChangedListener(new TextWatcher() {
 			
         	/*
         	 * @see android.text.TextWatcher#onTextChanged(java.lang.CharSequence, int, int, int)
@@ -147,13 +144,13 @@ public class TrustClientActivity extends Activity {
 				
 				if (s.length() > 0) {
 					TrustClientActivity.this.buttonClear.setEnabled(true);
-					if (TrustClientActivity.this.trustorText.getText().length() > 0)
+					if (TrustClientActivity.this.etTrustor.getText().length() > 0)
 						TrustClientActivity.this.buttonSubmit.setEnabled(true);
 					else
 						TrustClientActivity.this.buttonSubmit.setEnabled(false);
 				} else {
 					TrustClientActivity.this.buttonSubmit.setEnabled(false);
-					if (TrustClientActivity.this.trustorText.getText().length() > 0)
+					if (TrustClientActivity.this.etTrustor.getText().length() > 0)
 						TrustClientActivity.this.buttonClear.setEnabled(true);
 					else
 						TrustClientActivity.this.buttonClear.setEnabled(false);
@@ -217,27 +214,15 @@ public class TrustClientActivity extends Activity {
      */
     public void onButtonSubmitClick(View view) {
     	
+    	Log.d(TAG, "onButtonSubmitClick");
     	if (this.collector != null) {
 
-    		final String trustor = this.trustorText.getText().toString();
-    		final String trustee = this.trusteeText.getText().toString();
-    		final Double rating = new Double(this.trustRatingBar.getRating());
-    		
-    		String notificationText = "Thanks for your feedback!";
-    		try {
-    			final TrustedEntityId teid = new TrustedEntityId(
-    					trustor, TrustedEntityType.CSS, trustee);
-    			this.collector.addDirectEvidence(teid, TrustEvidenceType.RATED,
-    				new Date(), rating);
-    		} catch (Exception e) {
-    			
-    			notificationText = "Oops! " + e.getLocalizedMessage();
-    		}
-    		Toast.makeText(this, notificationText, Toast.LENGTH_LONG).show();
-    		
+    		new AddTrustEvidenceTask().execute();
     	} else {
     		
-    		Toast.makeText(this, "Noooooooo", Toast.LENGTH_LONG).show();
+    		Toast.makeText(this, 
+    				"No-ooooooo ITrustEvidenceCollector service is not available", 
+    				Toast.LENGTH_LONG).show();
     	}
     }
     
@@ -248,12 +233,13 @@ public class TrustClientActivity extends Activity {
      */
     public void onButtonClearClick(View view) {
     	
-    	this.trustorText.setText("");
-    	this.trusteeText.setText("");
-    	this.trustRatingBar.setRating(0f);
+    	Log.d(TAG, "onButtonClearClick");
+    	this.etTrustor.setText("");
+    	this.etTrustee.setText("");
+    	this.rbTrust.setRating(0f);
     }
     
-    void doBindCollectorService() {
+    private void doBindCollectorService() {
     	
         bindService(new Intent(TrustClientActivity.this, 
                 TrustEvidenceCollector.class), 
@@ -261,12 +247,61 @@ public class TrustClientActivity extends Activity {
                 Context.BIND_AUTO_CREATE);
     }
 
-    void doUnbindCollectorService() {
+    private void doUnbindCollectorService() {
     	
         if (this.collector != null) {
             // Detach our existing connection.
             unbindService(this.collectorServiceConnection);
             this.collector = null;
         }
+    }
+    
+    private class AddTrustEvidenceTask extends AsyncTask<Void, Void, String> {
+
+    	/*
+    	 * @see android.os.AsyncTask#onPreExecute()
+    	 */
+    	@Override
+    	protected void onPreExecute() {
+    		
+    		Log.d(TrustClientActivity.TAG, "AddTrustEvidenceTask.onPreExecute");
+    		TrustClientActivity.this.pbProgress.setVisibility(View.VISIBLE);
+    	}
+    	
+		/*
+		 * @see android.os.AsyncTask#doInBackground(Params[])
+		 */
+		@Override
+		protected String doInBackground(Void... arg0) {
+			
+			Log.d(TrustClientActivity.TAG, "AddTrustEvidenceTask.doInBackground");
+			final String trustor = TrustClientActivity.this.etTrustor.getText().toString();
+    		final String trustee = TrustClientActivity.this.etTrustee.getText().toString();
+    		final Double rating = new Double(TrustClientActivity.this.rbTrust.getRating());
+    		
+    		String result = "Thanks for your feedback!";
+    		try {
+    			final TrustedEntityId teid = new TrustedEntityId(
+    					trustor, TrustedEntityType.CSS, trustee);
+    			TrustClientActivity.this.collector.addDirectEvidence(teid, TrustEvidenceType.RATED,
+    				new Date(), rating);
+    		} catch (Exception e) {
+    			
+    			result = "Oops! " + e.getLocalizedMessage();
+    		}
+    	
+			return result;
+		}
+    	
+		/*
+		 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+		 */
+		@Override
+		protected void onPostExecute(String result) {
+			
+			Log.d(TrustClientActivity.TAG, "AddTrustEvidenceTask.onPostExecute");
+			TrustClientActivity.this.pbProgress.setVisibility(View.INVISIBLE);
+			Toast.makeText(TrustClientActivity.this, result, Toast.LENGTH_LONG).show();
+		}
     }
 }

@@ -147,8 +147,8 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 				// TODO Change to debug once tested
 				if (LOG.isInfoEnabled())
 					LOG.info("addDirectTrustEvidence(teid=" + teid
-							+ ",type=" + type + ",timestamp" + timestamp
-							+ "info=" + info + ")");
+							+ ",type=" + type + ",timestamp=" + timestamp
+							+ ",info=" + info + ")");
 				
 				this.trustEvidenceCollector.addDirectEvidence(teid, type, timestamp, info);
 				
@@ -210,8 +210,8 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 				
 				if (LOG.isDebugEnabled())
 					LOG.debug("addIndirectTrustEvidence(source=" + source
-							+ ",teid=" + teid + ",type=" + type + ",timestamp" 
-							+ timestamp	+ "info=" + info + ")");
+							+ ",teid=" + teid + ",type=" + type + ",timestamp=" 
+							+ timestamp	+ ",info=" + info + ")");
 				
 				this.trustEvidenceCollector.addIndirectEvidence(source, teid, type, timestamp, info);
 				

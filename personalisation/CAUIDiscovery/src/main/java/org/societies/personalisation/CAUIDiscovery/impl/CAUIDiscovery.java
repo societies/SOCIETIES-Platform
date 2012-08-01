@@ -480,7 +480,11 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	}
 
 
-
+	/*
+	 *  Converts history data to a temporary list of mockHistoryData in order to be processed and stored in dictionary and model
+	 *  Escorting context values are converted to string objects. 
+	 */
+	
 	public List<MockHistoryData> convertHistoryData (Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
 
 		List<MockHistoryData> result = new ArrayList<MockHistoryData>();
@@ -490,19 +494,18 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			try {
 				IAction retrievedAction = (IAction) SerialisationHelper.deserialise(primaryHocAttr.getBinaryValue(), this.getClass().getClassLoader());
 				String serviceIdentString = retrievedAction.getServiceID().getServiceInstanceIdentifier();
-				//ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
-				LOG.debug("retrievedAction.getServiceID() "+retrievedAction.getServiceID());
-				LOG.debug("retrievedAction.getServiceID() "+retrievedAction.getServiceID().getServiceInstanceIdentifier());
+			
 				List<CtxHistoryAttribute> listHocAttrs = ctxHocTuples.get(primaryHocAttr);
-				//assume that only one escorting context object exists 
+						
 				Map<String,String> context = new HashMap<String,String>();
 				for(int i=0; i<listHocAttrs.size(); i++){
 					CtxHistoryAttribute escortingHocAttr = listHocAttrs.get(i);
-					String value = castAttrValtoString(escortingHocAttr);
+					String value = castAttrValuetoString(escortingHocAttr);
 					context.put(escortingHocAttr.getType(), value);
 				}
 				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString);
 				result.add(mockHocData);
+				
 			}  catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -515,7 +518,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	}
 
 
-	protected String castAttrValtoString(CtxHistoryAttribute attr){
+	protected String castAttrValuetoString(CtxHistoryAttribute attr){
 
 		String valueStr = "";
 		if (attr.getStringValue() != null) {
@@ -524,7 +527,8 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			valueStr = attr.getIntegerValue().toString();
 		} else if (attr.getDoubleValue() != null) {
 			valueStr = attr.getDoubleValue().toString();
-		}
+		} 
+		
 		return valueStr;
 	}
 

@@ -20,7 +20,6 @@
 		<property name="serviceReg" ref="serviceRegRef" />
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="serviceControl" ref ="serviceControl"/>
-		<property name="negotiationProvider" ref="negotiationProviderRef" />
 		<!--  <property name="privacyManager" ref="privacyManagerProviderRef" />	-->			
 	</bean>
 	
@@ -34,7 +33,6 @@
 	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl" >
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
-		<property name="policyNegotiation" ref="policyNegotiationRef" />
 		<property name="cisManager" ref="cisManagerRef" />
 		<property name="serviceControlRemote" ref="serviceControlRemoteRef" />				
 	</bean>
