@@ -35,9 +35,13 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.domainauthority.IClientJarServerRemote;
+import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.security.digsig.DigsigException;
+import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.policynegotiator.exception.NegotiationException;
 
 /**
@@ -52,9 +56,15 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 //	private IClientJarServerRemote clientJarServer;
 	private IClientJarServer clientJarServer;
+	private ISignatureMgr signatureMgr;
+	private INegotiationProviderRemote groupMgr;
 
 	private HashMap<String, Service> services = new HashMap<String, Service>();
 
+	public ProviderServiceMgr() {
+		LOG.info("ProviderServiceMgr");
+	}
+	
 //	public IClientJarServerRemote getClientJarServer() {
 	public IClientJarServer getClientJarServer() {
 		return clientJarServer;
@@ -63,6 +73,20 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	public void setClientJarServer(IClientJarServer clientJarServer) {
 		LOG.debug("setClientJarServer()");
 		this.clientJarServer = clientJarServer;
+	}
+	public ISignatureMgr getSignatureMgr() {
+		return signatureMgr;
+	}
+	public void setSignatureMgr(ISignatureMgr signatureMgr) {
+		LOG.debug("setSignatureMgr()");
+		this.signatureMgr = signatureMgr;
+	}
+	public INegotiationProviderRemote getGroupMgr() {
+		return groupMgr;
+	}
+	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
+		LOG.debug("setGroupMgr()");
+		this.groupMgr = groupMgr;
 	}
 
 	@Override
@@ -118,8 +142,19 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		String host = "http://localhost:8080";
 		String filePath = "Calculator.jar";
 		URI uri;
+		String sig;
 		try {
-			uri = new URI(host + "/rest/webresources" + "/serviceclient" + "/" + filePath + "?service=xxx&sig=yyy");
+			sig = signatureMgr.sign(id, groupMgr.getIdMgr().getThisNetworkNode());  // TODO: sign also client ID
+		} catch (DigsigException e) {
+			LOG.warn("Failed to sign service " + id + " for client", e);
+			throw new NegotiationException(e);
+		}
+		String uriStr = host + UrlPath.BASE + UrlPath.PATH + "/" + filePath +
+				"?" + UrlPath.URL_PARAM_SERVICE_ID + "=" + id +
+				"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
+		
+		try {
+			uri = new URI(uriStr);
 //			Future<UrlBean> urlBeanFuture = clientJarServer.shareFiles();
 //			UrlBean urlBean = urlBeanFuture.get();
 //			uri = urlBean.getUrl();
