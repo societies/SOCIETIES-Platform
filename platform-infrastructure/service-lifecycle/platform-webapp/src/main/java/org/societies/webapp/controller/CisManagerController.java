@@ -114,7 +114,7 @@ public class CisManagerController {
 		model.put("methods", methods);
 		
 		model.put("cmForm", cisForm);
-		remoteCISs = new ArrayList<ICis>();
+	/*	remoteCISs = new ArrayList<ICis>();
 		
 		localCISs = new ArrayList<ICisOwned>();
 		
@@ -129,7 +129,7 @@ public class CisManagerController {
 			ICisOwned element = it.next();
 			log.concat(("CIS initially added with jid = " + element.getCisId()));
 	     }
-
+		*/
 		// criteria
 		
 		String [] attributeList = {"location", "marital status","hobby","age"};
@@ -144,7 +144,7 @@ public class CisManagerController {
 		
 		model.put("remoteCISsArray", remoteCISs);
 		model.put("localCISsArray", localCISs);
-		model.put("log", log);
+		//model.put("log", log);
 		model.put("cismanagerResult", "CIS Management Result :");
 		return new ModelAndView("cismanager", model);
 	}
