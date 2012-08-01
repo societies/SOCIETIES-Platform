@@ -360,7 +360,10 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		
 		Object response = blockingIQ(stanza, payload);
 		
-		return ((Pubsub)response).getPublish().getItem().getId();
+		if (response!=null)
+			return ((Pubsub)response).getPublish().getItem().getId();
+		else
+			return itemId;
 	}
 
 	@Override
