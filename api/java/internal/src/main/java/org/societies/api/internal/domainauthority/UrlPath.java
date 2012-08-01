@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.rest.server;
+package org.societies.api.internal.domainauthority;
 
 /**
  * 
@@ -30,7 +30,19 @@ package org.societies.domainauthority.rest.server;
  * @author Mitja Vardjan
  *
  */
-public class Path {
+public class UrlPath {
 
 	public static final String BASE = "/rest/webresources";
+	
+	/**
+	 * URL parameter
+	 */
+	public static final String URL_PARAM_SIGNATURE = "sig";
+	
+	/**
+	 * URL parameter
+	 */
+	public static final String URL_PARAM_SERVICE_ID = "service";
+	
+	public static final String PATH = "/serviceclient";
 }

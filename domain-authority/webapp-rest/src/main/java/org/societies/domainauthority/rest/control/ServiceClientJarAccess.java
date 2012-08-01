@@ -40,7 +40,6 @@ import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.domainauthority.rest.server.Path;
 import org.societies.domainauthority.rest.server.ServiceClientJar;
 import org.springframework.scheduling.annotation.AsyncResult;
 

@@ -30,7 +30,8 @@
 	<groupId>org.societies.domain-authority</groupId>
 	<artifactId>DomainAuthorityRest</artifactId>
 	<packaging>war</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<!--version>1.0-SNAPSHOT</version-->
+	<version>${release.version}</version>
 	<name>Domain authority REST Jersey Webapp</name>
 
 	<developers>
