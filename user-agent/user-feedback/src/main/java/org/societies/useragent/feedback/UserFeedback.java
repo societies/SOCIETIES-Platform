@@ -54,6 +54,7 @@ public class UserFeedback implements IUserFeedback{
 	Logger LOG = LoggerFactory.getLogger(UserFeedback.class);
 	ICtxBroker ctxBroker;
 	ICommManager commsMgr;
+	//IUserAgentRemoteMgr remoteUa;
 	String myDeviceID;
 	static String UNDEFINED = "undefined";
 	
@@ -150,4 +151,8 @@ public class UserFeedback implements IUserFeedback{
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
 	}
+	
+	/*public void setRemoteUa(IUserAgentRemoteMgr remoteUa){
+		
+	}*/
 }

@@ -35,12 +35,18 @@
 		<scope>provided</scope>
 	</dependency>
 	<dependency>
+		<groupId>org.societies.useragent</groupId>
+		<artifactId>user-agent-api</artifactId>
+		<version>${version.ua}</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
 		<groupId>org.junit</groupId>
 		<artifactId>com.springsource.junit</artifactId>
 		<version>3.8.2</version>
 	</dependency>
 	<dependency>
-		    <groupId>org.mockito</groupId>
+		<groupId>org.mockito</groupId>
 		    <artifactId>mockito-all</artifactId>
 		    <version>1.9.0</version>
 		    <scope>test</scope>

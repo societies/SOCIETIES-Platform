@@ -39,12 +39,9 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.useragent.monitoring.MethodType;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
@@ -59,9 +56,9 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 
 	//PRIVATE VARIABLES
 	private ICommManager commsMgr;
-	private IIdentityManager idManager;
+	//private IIdentityManager idManager;
 	private Logger LOG = LoggerFactory.getLogger(UACommsClient.class);
-	IIdentity toIdentity = null;
+	IIdentity receiverId = null;  //Identity to send the message to
 
 	//PROPERTIES
 	public ICommManager getCommsMgr() {
@@ -83,21 +80,28 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
-		idManager = commsMgr.getIdManager();
 		
+		
+		/*
+		 * This client will never be requested to send anything to another rich/cloud node
+		 */
 		//Hard coded destination - temporary
+		/*idManager = commsMgr.getIdManager();
 		try {
 			toIdentity = idManager.fromJid("XCManager.societies.local");
 		} catch (InvalidFormatException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 	}
 
+	/*
+	 * This will never be called as there will be no monitored action sent Virgo -> Virgo
+	 */
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
 		LOG.info("monitor method called in UACommsClient");
 		
-		Stanza stanza = new Stanza(toIdentity);
+		Stanza stanza = new Stanza(receiverId);
 
 		//CREATE MESSAGE BEAN
 		LOG.info("Creating message to send to UACommsServer");
@@ -117,11 +121,12 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 		};
 	}
 	
+	
 	@Override
 	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback){
 		LOG.info("getExplicitFB method called in UACommsClient");
 		
-		Stanza stanza = new Stanza(toIdentity);
+		Stanza stanza = new Stanza(receiverId);
 		
 		//CREATE MESSAGE BEAN
 		LOG.info("Creating message to send to UACommsServer");
@@ -141,6 +146,7 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 			e.printStackTrace();
 		};
 	}
+	
 	
 	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback){
 		

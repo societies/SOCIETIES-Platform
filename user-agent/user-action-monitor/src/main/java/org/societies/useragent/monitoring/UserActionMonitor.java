@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.EMSException;
@@ -42,7 +41,7 @@ import org.societies.api.useragent.monitoring.IUserActionMonitor;
 public class UserActionMonitor implements IUserActionMonitor{
 
 	private static Logger LOG = LoggerFactory.getLogger(UserActionMonitor.class);
-	private boolean cloud;
+	private boolean interactable;
 	private ICtxBroker ctxBroker;
 	private IEventMgr eventMgr;
 	private ICommManager commsMgr;
@@ -62,8 +61,8 @@ public class UserActionMonitor implements IUserActionMonitor{
 		//create new entities and attributes if necessary
 		ctxComm.updateHistory(owner, action);
 
-		//update interactionDevice if NOT on cloud node
-		if(!cloud){  //CHANGE
+		//update UID if this device is interactable
+		if(interactable){  
 			ctxComm.updateUID(owner, myDeviceID);
 		}
 
@@ -86,10 +85,16 @@ public class UserActionMonitor implements IUserActionMonitor{
 
 		ctxComm = new ContextCommunicator(ctxBroker, myCssID);
 
-		//get device type from CSS Manager
-		IdentityType nodeType = commsMgr.getIdManager().getThisNetworkNode().getType();
-
-
+		//set interactable value
+		setInteractable();
+	}
+	
+	/*
+	 * TO BE COMPLETED
+	 */
+	private void setInteractable(){
+		//get value from CSS Manager - ask Liam
+		interactable = true;
 	}
 
 	public void setCtxBroker(ICtxBroker broker){

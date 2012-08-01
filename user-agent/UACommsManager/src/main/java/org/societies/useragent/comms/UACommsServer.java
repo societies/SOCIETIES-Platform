@@ -107,9 +107,6 @@ public class UACommsServer implements IFeatureServer{
 	public void receiveMessage(Stanza stanza, Object payload) {
 		LOG.info("UACommsServer received message with no return type!!!");
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
-		if (payload instanceof UserActionMonitorBean){ 
-			this.receiveMessage(stanza, (UserActionMonitorBean)payload);
-		}
 	}
 
 	private void receiveMessage(Stanza stanza, UserActionMonitorBean monitorBean){
@@ -134,14 +131,17 @@ public class UACommsServer implements IFeatureServer{
 		}
 	}
 
-
-
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		LOG.info("UACommsServer received message with a return type!!!");
-		if (payload instanceof UserFeedbackBean){
-			Object result = this.getQuery(stanza, (UserFeedbackBean)payload);
+		Object result = null;
+		if (payload instanceof UserActionMonitorBean){ 
+			this.receiveMessage(stanza, (UserActionMonitorBean)payload);
+			result = true;
 		}
-		return null;
+		if (payload instanceof UserFeedbackBean){
+			result = this.getQuery(stanza, (UserFeedbackBean)payload);
+		}
+		return result;
 	}
 
 	private Object getQuery(Stanza stanza, UserFeedbackBean feedbackBean){
