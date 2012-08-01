@@ -24,6 +24,7 @@
  */
 package org.societies.android.privacytrust.trust.evidence;
 
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -502,5 +503,6 @@ public class TrustEvidenceCollector extends Service
 		oos.writeObject(object);
 		
 		return baos.toByteArray();
+
 	}
 }

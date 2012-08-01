@@ -24,6 +24,8 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.activity.IActivity;
@@ -31,6 +33,7 @@ import org.societies.api.activity.IActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.societies.api.cis.attributes.MembershipCriteria;
 
 /**
  * @author Babak.Farshchian@sintef.no
@@ -63,13 +66,29 @@ public interface ICis {
     //public String getCisType();
     
 	/**
-	 * Returns the membership criteria (also known as mode) of the CIS
+	 * Returns the membership criteria of the CIS
 	 * 
 	 * @param 
 	 * @return name of the CIS as a string
 	 */ 
-    public int getMembershipCriteria();
+ /*   public Hashtable<String,MembershipCriteria> getMembershipCriteria();
+	public boolean addCriteria(String contextAtribute, MembershipCriteria m);
+	public boolean removeCriteria(String contextAtribute, MembershipCriteria m);*/
 
+	/**
+	 * Get membership criteria from a CIS.
+	 * The callback must be able to retrieve a community object
+	 * defined at org.societies.api.schema.cis.community 
+	 * it has the  info from the CIS
+	 * 
+	 * Notice that the membership criteria will be formated as the marshable object
+	 * 
+	 * org.societies.api.schema.cis.community.MembershipCrit
+	 * @param callback callback function
+	 */
+	public void getMembershipCriteria(ICisManagerCallback callback);
+
+	
 	/**
 	 * Get info from a CIS.
 	 * The callback must be able to retrieve a community object
@@ -111,18 +130,15 @@ public interface ICis {
 	 */
     public void setInfo(Community c, ICisManagerCallback callback);
     
-    
-	public void addCisActivity(IActivity activity,ICisManagerCallback callback);
-	
-	public void getActivities(String timePeriod,ICisManagerCallback callback);
-    
-	/**
-	 * Gets the interface for working with the ActivityFeed of the CIS
+    /**
+	 * Get a handler of the activityfeed of the CIS. Then you can use
+	 * the interface to search/add/delete activities
+	 *  
 	 * 
-	 * 
-	 * @param 
-	 * @return {@link IActivityFeed} of that CIS
+	 * @return {@link IActivityFeed}
 	 */
-	public Future<IActivityFeed> getCisActivityFeed();
+    public IActivityFeed getActivityFeed();
+    
+    
     
 }

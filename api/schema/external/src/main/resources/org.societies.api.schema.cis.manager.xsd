@@ -33,8 +33,13 @@
   -->
  
 <xs:schema targetNamespace='http://societies.org/api/schema/cis/manager'
-	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/api/schema/cis/manager">
-<!--	xmlns:ns1="http://societies.org/api/schema/cis/community">-->
+	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				xmlns:tns="http://societies.org/api/schema/cis/manager" 
+	xmlns="http://societies.org/api/schema/cis/manager"
+	xmlns:ins="http://societies.org/api/schema/cis/community">
+
+<xs:import namespace="http://societies.org/api/schema/cis/community" 
+           schemaLocation="org.societies.api.schema.cis.community.xsd"/>
 
 	<xs:annotation>
 		<xs:documentation>
@@ -42,29 +47,13 @@
 		</xs:documentation>
 	</xs:annotation>
 
-<!--  <xs:import namespace="http://societies.org/api/schema/cis/community" 
-  		schemaLocation="org.societies.api.schema.cis.community.xsd"/>-->
 
-	<xs:element name='communities'>
+
+<!-- 	<xs:element name='communities'>
 	   <xs:complexType>
 	       <xs:sequence>
-<!--      		<xs:element name="community" type="ns1:community-type" minOccurs='0' maxOccurs='unbounded'/> -->
 				<xs:element ref="cis-community" minOccurs='0' maxOccurs='unbounded'/>
       		</xs:sequence>
-	    </xs:complexType>
-	</xs:element>
-	
-
-	<xs:element name='community-manager'>
-	   <xs:complexType>
-	      <xs:choice>
-	          <xs:element ref='create'/>
-	          <xs:element ref='delete'/>
-			  <xs:element ref='list'/>
-			  <xs:element ref='search-cis'/>
-			  <xs:element ref='configure'/>
-			  <xs:element ref='notification'/>
-	      </xs:choice>
 	    </xs:complexType>
 	</xs:element>
 	
@@ -76,39 +65,57 @@
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>
-  </xs:element>
+  </xs:element> -->
+
+
+	<xs:element name='communityManager'>
+	   <xs:complexType>
+	      <xs:choice>
+	          <xs:element ref='create'/>
+	          <xs:element ref='delete'/>
+			  <xs:element ref='list'/>
+			  <xs:element ref='listResponse'/>
+			  <xs:element ref='searchCis'/>
+			  <xs:element ref='configure'/>
+			  <xs:element ref='notification'/>
+	      </xs:choice>
+	    </xs:complexType>
+	</xs:element>
+	
+
 
 	
 	<xs:element name='create'>
-    <xs:complexType>
-      <xs:simpleContent>
-        <xs:extension base='empty'>
-          <xs:attribute name='owner-jid' type='xs:string' use='required'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='community-jid' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='community-password' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='owner-password' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='community-type' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='community-name' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-          <xs:attribute name='membership-mode' type='xs:int'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
-        </xs:extension>
-      </xs:simpleContent>
-    </xs:complexType>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref='ins:community'/>
+		</xs:sequence>
+		<xs:attribute name='result' type='xs:boolean'/>
+	</xs:complexType>
   </xs:element>
     
     <xs:element name='configure' type='empty' /><!-- TODO-->
 
 
-	<xs:element name='search-cis' type='empty' /><!-- TODO-->
+	<xs:element name='searchCis' type='empty' /><!-- TODO-->
 
 
     <xs:element name='list'>
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base='empty'>
-          <xs:attribute name='list-criteria' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='listCriteria' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>
+  </xs:element>
+  
+      <xs:element name='listResponse'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element ref='ins:community'/>
+			</xs:sequence>
+		</xs:complexType>
   </xs:element>
   
     <xs:element name='delete'>
@@ -126,7 +133,7 @@
   <xs:element name='notification'>
     <xs:complexType>
       <xs:choice>
-        <xs:element ref='delete-notification'/>
+        <xs:element ref='deleteNotification'/>
         <xs:element ref='subscribedTo'/>
         <xs:element ref='deleteMemberNotification'/>   
       </xs:choice>
@@ -135,7 +142,7 @@
   
   
   
-   <xs:element name='delete-notification'>
+   <xs:element name='deleteNotification'>
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base='empty'>
@@ -159,14 +166,10 @@
 
 	<xs:element name='subscribedTo'>
 	    <xs:complexType>
-	      <xs:simpleContent>
-	        <xs:extension base='empty'>
-	          <xs:attribute name='cis-jid' type='xs:string' use='required'/> 
-	          <xs:attribute name='role' type='xs:string' use='required'/> 
-	          <xs:attribute name='cis-membership-mode' type='xs:int'/> 
-	          <xs:attribute name='cis-name' type='xs:string'/>
-	        </xs:extension>
-	      </xs:simpleContent>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element ref='ins:community'/>
+			</xs:sequence>
+			 <xs:attribute name='role' type='xs:string'  use='required'/> 
 	    </xs:complexType>
 	</xs:element>
 

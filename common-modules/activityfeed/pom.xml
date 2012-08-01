@@ -133,6 +133,7 @@
 		-->
 		<dependency>
 			<groupId>org.societies</groupId>
+
 			<artifactId>hibernate_classes</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>

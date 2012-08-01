@@ -154,7 +154,12 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>activityfeed</artifactId>
+			<version>${version.cis}</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<!-- <dependency> <groupId>org.societies.api.schema</groupId> <artifactId>societies-api-schema</artifactId> 
 			<version>${release.version}</version> <scope>provided</scope> </dependency> -->

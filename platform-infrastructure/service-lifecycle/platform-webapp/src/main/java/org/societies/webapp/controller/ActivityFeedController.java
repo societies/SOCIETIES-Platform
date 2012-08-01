@@ -40,6 +40,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedCallback;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.schema.activityfeed.Activityfeed;
+
 
 
 public class ActivityFeedController {
@@ -48,19 +52,9 @@ public class ActivityFeedController {
 	 * OSGI service get auto injected
 	 */
 	@Autowired
-	private IActivityFeed activtyFeed;
+	private ICisManager cisManager;
 
-	/**
-	 * @return the activtyFeed*/
-	public IActivityFeed getActivtyFeed() {
-		return activtyFeed;
-	}
 
-	/**
-	 * @param activtyFeed the activtyFeed to set*/
-	public void setActivtyFeed(IActivityFeed activtyFeed) {
-		this.activtyFeed = activtyFeed;
-	}
 
 	@RequestMapping(value = "/cisfeed.html", method = RequestMethod.GET)
 	public ModelAndView Servicediscovery() {
@@ -86,31 +80,50 @@ public class ActivityFeedController {
 	@RequestMapping(value = "/cisfeed.html", method = RequestMethod.POST)
 	public ModelAndView serviceDiscovery(@Valid CisFeedForm activityForm, BindingResult result, Map model) {
 
+		
+		
+		class DummyActFeedCback implements IActivityFeedCallback {
+
+			public void receiveResult(Activityfeed activityFeedObject){
+				
+			}
+		}
+		
+		
+		
+		
 		if (result.hasErrors()) {
 			model.put("result", "service discovery form error");
 			return new ModelAndView("cisfeed", model);
 		}
 
-		if (getActivtyFeed() == null) {
+		if (cisManager == null) {
 			model.put("errormsg", "Activity Feed Service reference not avaiable");
 			return new ModelAndView("error", model);
 		}
 
-		String cssId = activityForm.getCssId();
+		String cisId = activityForm.getcIsId();
 		String method = activityForm.getMethod();
 		String res;
 		try {
 		
 			if (method.equalsIgnoreCase("addCisActivity")) {
-				IActivity activity = null; 
-				getActivtyFeed().addCisActivity(activity);
-				res="Activty added for cssID: " + cssId;
+//				IActivityFeed iact = cisManager.getOwnedCis(cisId).getActivityFeed();
+//				IActivity activity = new org.societies.activity.model.Activity();
+//				activity.setActor(activityForm.getActor());
+//				activity.setObject(activityForm.getObject());
+//				activity.setPublished(activityForm.getTimePeriod());
+//				activity.setTarget(activityForm.getTarget());
+//				activity.setVerb(activityForm.getVerb());
+//				iact.addActivity(activity, new DummyActFeedCback()); // TODO: replace 
+				res="Activty added for cssID: " + cisId;
 				
 			}else if (method.equalsIgnoreCase("getActivities")) {
 				
-				String timePeriod = activityForm.getTimePeriod();
-				getActivtyFeed().getActivities(cssId, timePeriod);
-				res="Activities for cssID: " + cssId;
+				// TODO: replace with something that works =D
+				//String timePeriod = activityForm.getTimePeriod();
+				//getActivtyFeed().getActivities(cssId, timePeriod);
+				res="Activities for cisID: " + cisId;
 					
 			}else{
 				res="error unknown metod";
