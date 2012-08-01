@@ -47,6 +47,12 @@ xmlns="http://societies.org/api/schema/activityfeed"
 			<xs:choice minOccurs='0' maxOccurs='1'>
 				<xs:element ref='deleteActivity'/>
 				<xs:element ref='deleteActivityResponse'/>
+				<xs:element ref='getActivities'/>
+				<xs:element ref='getActivitiesResponse'/>
+				<xs:element ref='addActivity'/>
+				<xs:element ref='addActivityResponse'/>
+				<xs:element ref='cleanUpActivityFeed'/>
+				<xs:element ref='cleanUpActivityFeedResponse'/>
 			</xs:choice>
 	</xs:complexType>
 
@@ -66,7 +72,46 @@ xmlns="http://societies.org/api/schema/activityfeed"
 	</xs:element>
 	
 
+	<xs:element name='cleanUpActivityFeed'>
+		<xs:complexType>
+			<xs:attribute name='criteria' type='xs:string' use='required'/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name='cleanUpActivityFeedResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:int'/>
+		</xs:complexType>
+	</xs:element>
 
+	<xs:element name='getActivities'>
+		<xs:complexType>
+					<xs:attribute name='timePeriod' type='xs:string' use='required'/>
+					<xs:attribute name='query' type='xs:string'/>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name='getActivitiesResponse'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element ref='ins:Activity'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name='addActivity'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='ins:Activity'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name='addActivityResponse'>
+		<xs:complexType>
+			<xs:attribute name='result' type='xs:boolean'/>
+		</xs:complexType>
+	</xs:element>
 
 
 </xs:schema>

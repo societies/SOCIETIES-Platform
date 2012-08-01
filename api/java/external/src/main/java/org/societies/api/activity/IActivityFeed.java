@@ -51,9 +51,10 @@ public interface IActivityFeed {
 	 * @return a @List of {@link IActivity} 
 	 * or a empty list if the parameters are wrong or the  timeperiod did not match any activties
 	 */
-	public List<IActivity> getActivities(String timePeriod);
-	@Deprecated
-	public List<IActivity> getActivities(String CssId, String query, String timePeriod);
+	
+	//public List<IActivity> getActivities(String timePeriod);
+	//@Deprecated
+	//public List<IActivity> getActivities(String CssId, String query, String timePeriod);
 	/**
 	 * This method will parse a query and a timeperiod and return a subset of the actitvies
 	 *  in this activityfeed that matches the query constraints and is within the given timeperiod
@@ -77,31 +78,44 @@ public interface IActivityFeed {
 	 * @return a @List of {@link IActivity} 
 	 * or a empty list if the parameters are wrong or the query and/or timeperiod did not match any activties
 	 */
-	public List<IActivity> getActivities(String query, String timePeriod);
+	//public List<IActivity> getActivities(String query, String timePeriod);
 	/**
 	 * This method will add a activity and post it on the associated pubsub service.
 	 *  
 	 * @param {@link IActivity} activity, the activity that will be added.
 	 */
-	public void addCisActivity(IActivity activity);
+//	public void addCisActivity(IActivity activity);
 	/**
 	 * This method will parse a criteria and delete the activities that match the criteria
 	 *  
 	 * @param {@link String} criteria which has the same definition as the query of "getActivities(String query.."
 	 * @return {@link int} number of deleted activities.
 	 */
-	public int cleanupFeed(String criteria);
+	//public int cleanupFeed(String criteria);
 	/**
 	 * 
 	 * 
 	 * @param {@link IAcitivty} activity the activity that should be deleted.
 	 * @return {@link boolean} true if the the activity was found and deleted, false if not.
 	 */
-	public boolean deleteActivity(IActivity activity);
+	//public boolean deleteActivity(IActivity activity);
 	/**
 	 * 
 	 * @param List of ActivityEntry as used by the social data connector, and implemented by shindig.
 	 * @return long number of entries successfully imported
 	 */
 	public long importActivtyEntries(List<?> activityEntries);
+	
+	
+	public void getActivities(String timePeriod, IActivityFeedCallback c);
+	public void getActivities(String query,
+			String timePeriod, IActivityFeedCallback c) ;
+
+	public void addActivity(IActivity activity,IActivityFeedCallback c) ;
+
+	public void cleanupFeed(String criteria,IActivityFeedCallback c);
+	public void deleteActivity(IActivity activity,IActivityFeedCallback c);
+	
+	public IActivity getEmptyIActivity();
+	
 }

@@ -32,6 +32,8 @@
 		class="org.societies.security.policynegotiator.provider.ProviderServiceMgr"
 		>
         <property name="clientJarServer" ref="ClientJarServerRemote"/>
+        <property name="signatureMgr" ref="SignatureMgr"/>
+  		<property name="groupMgr" ref="NegotiationProviderRemote"/>
 	</bean>
 	
 	<bean id="NegotiationProvider"

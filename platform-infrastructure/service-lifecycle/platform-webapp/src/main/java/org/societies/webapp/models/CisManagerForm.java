@@ -40,7 +40,32 @@ public class CisManagerForm {
 	private Integer cisMode;
 	private String cisJid;
 	private String role;
+	
+	private String attribute;
+	private String operator;
+	private String value;
 
+	
+	
+	
+	public String getAttribute() {
+		return attribute;
+	}
+	public void setAttribute(String attribute) {
+		this.attribute = attribute;
+	}
+	public String getOperator() {
+		return operator;
+	}
+	public void setOperator(String operator) {
+		this.operator = operator;
+	}
+	public String getValue() {
+		return value;
+	}
+	public void setValue(String value) {
+		this.value = value;
+	}
 	public String getRole() {
 		return role;
 	}

@@ -24,11 +24,13 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
@@ -92,10 +94,13 @@ public interface ICisOwned extends ICis {
 	public String getOwnerId();
 	public String getCisType();
 	public String setCisType(String type);
-	public int getMembershipCriteria();	
 	public String getDescription();
 	public void setDescription(String description); 
-	public IActivityFeed getActivityFeed();
+	
 
-
+	// TODO: change the visitibility of those methods and add documentation
+	public boolean checkQualification(HashMap<String,String> qualification);
+	
+	public boolean addCriteria(String contextAtribute, MembershipCriteria m);
+	public boolean removeCriteria(String contextAtribute, MembershipCriteria m);
 }

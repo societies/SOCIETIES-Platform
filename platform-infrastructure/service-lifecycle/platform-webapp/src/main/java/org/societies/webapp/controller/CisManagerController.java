@@ -25,7 +25,9 @@
 package org.societies.webapp.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,13 +48,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.societies.api.cis.attributes.Rule;
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+
+import java.security.InvalidParameterException;
 
 
 @Controller
@@ -122,6 +130,18 @@ public class CisManagerController {
 			log.concat(("CIS initially added with jid = " + element.getCisId()));
 	     }
 
+		// criteria
+		
+		String [] attributeList = {"location", "marital status","hobby","age"};
+		
+		String [] operatorList = {"equals", "differentFrom"};
+		
+		model.put("attributeList", attributeList);
+		model.put("operatorList", operatorList);
+		
+		// end of criteria
+		
+		
 		model.put("remoteCISsArray", remoteCISs);
 		model.put("localCISsArray", localCISs);
 		model.put("log", log);
@@ -153,14 +173,23 @@ public class CisManagerController {
 			if (method.equalsIgnoreCase("CreateCis")) {
 				model.put("methodcalled", "CreateCis");
 				res = "Creating CIS...";
-
-				@SuppressWarnings("deprecation")
+				
+				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
+				MembershipCriteria m = new MembershipCriteria();
+				try{
+					Rule r = new Rule(cisForm.getOperator(),new ArrayList(Arrays.asList(cisForm.getValue())));
+					m.setRule(r);
+					cisCriteria.put(cisForm.getAttribute(), m);
+				}
+				catch(InvalidParameterException e){
+					// TODO: treat expection
+					res += " excepation of invalid param " + cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue();
+				}
+				
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
-						cisForm.getCssId(), 
-						cisForm.getCisPassword(), 
 						cisForm.getCisName(),
-						cisForm.getCisType(),
-						cisForm.getCisMode());
+						cisForm.getCisType(),cisCriteria,""
+						); // for some strange reason null instead of cisCriteria did not work
 
 				res = "Successfully created CIS: " + cisResult.get().getCisId();
 				localCISs.add(cisResult.get());
@@ -176,10 +205,12 @@ public class CisManagerController {
 			} else if (method.equalsIgnoreCase("JoinRemoteCIS")) {
 				model.put("methodcalled", "JoinRemoteCIS");
 
-				this.getCisManager().joinRemoteCIS(cisForm.getCisJid(), icall);
+				CisAdvertisementRecord ad = new CisAdvertisementRecord();
+				ad.setId(cisForm.getCisJid());
+				this.getCisManager().joinRemoteCIS(ad, icall);
 				Thread.sleep(5 * 1000);
 				model.put("joinStatus", resultCallback);
-				ICis i = getCisManager().getCis(cisForm.getCssId(), cisForm.getCisJid());
+				ICis i = getCisManager().getCis(cisForm.getCisJid());
 				model.put("cis", i);
 
 			} else if (method.equalsIgnoreCase("LeaveRemoteCIS")) {
@@ -213,7 +244,7 @@ public class CisManagerController {
 				if(thisCis == null){
 					res = "thisCIS is null";
 					//NOT LOCAL CIS, SO CALL REMOTE
-					ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid().trim());
+					ICis remoteCIS = this.getCisManager().getCis(cisForm.getCisJid().trim());
 					if (remoteCIS != null) {
 						res = cisForm.getCisJid().trim();
 						remoteCIS.getListOfMembers(icall);
@@ -234,7 +265,7 @@ public class CisManagerController {
 				//CALL REMOTE
 				res += cisForm.getCisJid();
 				res += "Before Remote";
-				ICis remoteCIS = this.getCisManager().getCis("not.needed.com", cisForm.getCisJid());
+				ICis remoteCIS = this.getCisManager().getCis(cisForm.getCisJid());
 				remoteCIS.getListOfMembers(icall);
 				res += "After Remote";
 				
@@ -307,15 +338,15 @@ public class CisManagerController {
 	ICisManagerCallback icall = new ICisManagerCallback(){
 
 
-		public void receiveResult(Community communityResultObject) {
+		public void receiveResult(CommunityMethods communityResultObject) {
 			if(communityResultObject == null){
 				resultCallback = "Failure getting result from remote node!";
 			}
 			else {
 				if(communityResultObject.getJoinResponse() != null){
-					resultCallback = "Joined CIS: " + communityResultObject.getCommunityJid();
+					resultCallback = "Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
 	
-					remoteCommunity = communityResultObject;
+					remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
 					m_session.setAttribute("community", remoteCommunity);
 				}
 				if(communityResultObject.getWho() != null){

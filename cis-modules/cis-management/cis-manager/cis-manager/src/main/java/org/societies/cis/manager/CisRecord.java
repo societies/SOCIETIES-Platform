@@ -57,8 +57,6 @@ import org.societies.api.cis.management.ICis;
 public class CisRecord {
 	private static final long serialVersionUID = 1L;
 	
-	//public String ownerCss;
-	public int membershipCriteria; // also know as mode
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
@@ -101,10 +99,8 @@ public class CisRecord {
 	
 
 	
-	public CisRecord(
-			int membershipCriteria, String cisName, String cisJid) {
+	public CisRecord(String cisName, String cisJid) {
 		super();
-		this.membershipCriteria = membershipCriteria;
 		this.cisName = cisName;
 		
 		this.cisJID = cisJid;
@@ -150,21 +146,6 @@ public class CisRecord {
 	
 
 	
-
-
-	public int getMembershipCriteria() {
-		return this.membershipCriteria;
-	}
-
-
-
-
-
-
-
-	public void setMembershipCriteria(int membershipCriteria) {
-		this.membershipCriteria = membershipCriteria;
-	}
 
 
 	public String getCisName() {

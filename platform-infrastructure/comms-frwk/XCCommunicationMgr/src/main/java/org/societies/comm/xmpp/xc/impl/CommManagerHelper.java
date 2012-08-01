@@ -251,6 +251,13 @@ public class CommManagerHelper {
 		Element element = getElementAny(iq);
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
+			
+			// payloadless (confirmation) iqs
+			if (element==null) {
+				callback.receiveResult(TinderUtils.stanzaFromPacket(iq), null);
+				return;
+			}
+			
 			String ns = element.getNamespace().getURI();
 			if (ns.equals(XMPPInfo.INFO_NAMESPACE)) {
 				SimpleEntry<String, XMPPInfo> infoMap = ParsingUtils.parseInfoResult(element);
@@ -390,8 +397,13 @@ public class CommManagerHelper {
 			
 			Object bean = s.read(c, element.asXML());
 			
-			IFeatureServer fs = getFeatureServer(namespace);
-			fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
+			ICommCallback cb = getCommCallback(namespace);
+			if (cb!=null)
+				cb.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
+			else {
+				IFeatureServer fs = getFeatureServer(namespace);
+				fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
+			}
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
 		} catch (InvalidFormatException e) {
@@ -502,7 +514,14 @@ public class CommManagerHelper {
 		if (p instanceof IQ) {
 			// According to the schema in RCF6121 IQs only have one
 			// element, unless they have an error
-			return (Element) p.getElement().elements().get(0);
+			switch (p.getElement().elements().size()) {
+				case 0:
+					return null;
+				default:
+					return (Element) p.getElement().elements().get(0);
+				// TODO handle errors
+			}
+				
 		} else if (p instanceof Message) {
 			// according to the schema in RCF6121 messages have an unbounded
 			// number

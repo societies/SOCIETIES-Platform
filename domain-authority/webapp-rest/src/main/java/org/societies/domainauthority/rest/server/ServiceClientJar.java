@@ -40,6 +40,7 @@ import javax.ws.rs.core.Context;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
 import org.societies.domainauthority.rest.util.Files;
 
@@ -48,22 +49,10 @@ import org.societies.domainauthority.rest.util.Files;
  * 
  * @author Mitja Vardjan
  */
-@Path(ServiceClientJar.PATH)
+@Path(UrlPath.PATH)
 public class ServiceClientJar {
     
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJar.class);
-	
-	/**
-	 * URL parameter
-	 */
-	public static final String URL_PARAM_SIGNATURE = "sig";
-	
-	/**
-	 * URL parameter
-	 */
-	public static final String URL_PARAM_SERVICE_ID = "service";
-	
-	public static final String PATH = "/serviceclient";
 	
 	public ServiceClientJar() {
 		LOG.info("Constructor");
@@ -80,8 +69,8 @@ public class ServiceClientJar {
     @GET
     @Produces("application/java-archive")
     public byte[] getJar(@PathParam("name") String name,
-    		@QueryParam(URL_PARAM_SERVICE_ID) String serviceId,
-    		@QueryParam(URL_PARAM_SIGNATURE) String signature) {
+    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
+    		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
 
 		LOG.debug("HTTP GET: name = {}, service ID = {}, signature = " + signature, name, serviceId);
 		
@@ -114,8 +103,8 @@ public class ServiceClientJar {
     public void postIt(@PathParam("name") String name,
     		InputStream is,
     		@Context HttpServletRequest request,
-    		@QueryParam(URL_PARAM_SERVICE_ID) String serviceId,
-    		@QueryParam(URL_PARAM_SIGNATURE) String signature) {
+    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
+    		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
 
 		LOG.debug("HTTP POST: name = {}, service ID = {}, signature = " + signature, name, serviceId);
 		
