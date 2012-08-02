@@ -119,7 +119,7 @@ public class ServiceModelUtils {
 		// Preparing the search filter
 		Service filter = generateEmptyFilter();
 		filter.getServiceIdentifier().setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
-		filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
+		//filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
 		
 		List<Service> listServices = null;
 		
