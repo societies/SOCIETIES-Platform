@@ -23,14 +23,14 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.api.remote.feedback;
+package org.societies.useragent.comms;
 
-import java.util.List;
-
-public interface IUserFeedbackCallback {
+public class RequestIdGenerator {
 	
-	public void handleExpFeedback(List<String> feedbackList);
+	int id = 0;
 	
-	public void handleImpFeedback(Boolean feedbackBool);
-
+	public synchronized String getId(){
+		id++;
+		return String.valueOf(id);
+	}
 }

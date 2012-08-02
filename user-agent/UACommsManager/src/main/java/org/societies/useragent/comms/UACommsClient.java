@@ -28,7 +28,9 @@ package org.societies.useragent.comms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +41,17 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.useragent.monitoring.MethodType;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
+import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.societies.useragent.api.remote.IUserAgentRemoteMgr;
-import org.societies.useragent.api.remote.feedback.IUserFeedbackCallback;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{	
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
@@ -56,8 +61,9 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 
 	//PRIVATE VARIABLES
 	private ICommManager commsMgr;
-	//private IIdentityManager idManager;
 	private Logger LOG = LoggerFactory.getLogger(UACommsClient.class);
+	private RequestIdGenerator idGen = new RequestIdGenerator();
+	private Hashtable<String, Object> results = new Hashtable<String, Object>();
 	IIdentity receiverId = null;  //Identity to send the message to
 
 	//PROPERTIES
@@ -80,18 +86,6 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
-		
-		
-		/*
-		 * This client will never be requested to send anything to another rich/cloud node
-		 */
-		//Hard coded destination - temporary
-		/*idManager = commsMgr.getIdManager();
-		try {
-			toIdentity = idManager.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}*/
 	}
 
 	/*
@@ -100,7 +94,7 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
 		LOG.info("monitor method called in UACommsClient");
-		
+
 		Stanza stanza = new Stanza(receiverId);
 
 		//CREATE MESSAGE BEAN
@@ -120,62 +114,95 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 			e.printStackTrace();
 		};
 	}
-	
-	
+
+
 	@Override
-	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback){
-		LOG.info("getExplicitFB method called in UACommsClient");
-		
-		Stanza stanza = new Stanza(receiverId);
-		
-		//CREATE MESSAGE BEAN
-		LOG.info("Creating message to send to UACommsServer");
-		UserFeedbackBean ufBean = new UserFeedbackBean();
-		ufBean.setType(type);
-		ufBean.setProposalText(content.getProposalText());
-		List<String> optionsList = new ArrayList<String>();
-		for(String nextOption: content.getOptions()){
-			optionsList.add(nextOption);
-		}
-		ufBean.setOptions(optionsList);
+	public Future<List<String>> getExplicitFB(String remoteEndPointId, int type, ExpProposalContent content){
+		LOG.debug("getExplicitFB method called in UACommsClient");
+
+		String requestId = idGen.getId();
+		results.put(requestId, null);
 		try {
-			LOG.info("Sending Feedback message to UACommsServer");
-			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
-			commsMgr.sendMessage(stanza, ufBean);
+			
+			IIdentity endPoint = commsMgr.getIdManager().fromJid(remoteEndPointId);
+			Stanza stanza = new Stanza(endPoint);
+
+			//CREATE MESSAGE BEAN
+			LOG.debug("Creating message to send to UACommsServer");
+			UserFeedbackBean ufBean = new UserFeedbackBean();
+			ufBean.setRequestId(requestId);
+			ufBean.setType(type);
+			ufBean.setProposalText(content.getProposalText());
+			List<String> optionsList = new ArrayList<String>();
+			for(String nextOption: content.getOptions()){
+				optionsList.add(nextOption);
+			}
+			ufBean.setOptions(optionsList);
+			LOG.debug("Sending explicit feedback message to remote UACommsServer");
+			//SEND REQUEST - RESPONSE WILL BE IN "callback.receiveResult()"
+			commsMgr.sendIQGet(stanza, ufBean, this);
+
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
 		} catch (CommunicationException e) {
 			e.printStackTrace();
-		};
-	}
-	
-	
-	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback){
-		
-	}
-
-	/*@Override
-	public void registerForActionUpdates(IUserActionListener listener) {
-		IIdentity toIdentity = null;
-		try {
-			toIdentity = idManager.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
 		}
-		Stanza stanza = new Stanza(toIdentity);
+		
+		while (this.results.get(requestId) == null){
+			try {
+				this.results.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		List<String> requestResult = (List<String>)this.results.get(requestId);
+		this.results.remove(requestId); //remove from results table to minimize size
 
-		//CREATE MESSAGE BEAN
-		UserActionMonitorBean uaBean = new UserActionMonitorBean();
-		//uaBean.setListener(listener);
-		//uaBean.setMethod(MethodType.REGISTER);
+		return new AsyncResult<List<String>>(requestResult);
+	}
+
+
+	public Future<Boolean> getImplicitFB(String remoteEndPointId, int type, ImpProposalContent content){
+		LOG.debug("getImplicitFB method called in UACommsClient");
+
+		String requestId = idGen.getId();
+		results.put(requestId, null);
 		try {
-			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
-			commManager.sendMessage(stanza, uaBean);
+			
+			IIdentity endPoint = commsMgr.getIdManager().fromJid(remoteEndPointId);
+			Stanza stanza = new Stanza(endPoint);
+
+			//CREATE MESSAGE BEAN
+			LOG.debug("Creating message to send to UACommsServer");
+			UserFeedbackBean ufBean = new UserFeedbackBean();
+			ufBean.setRequestId(requestId);
+			ufBean.setType(type);
+			ufBean.setProposalText(content.getProposalText());
+			ufBean.setTimeout(content.getTimeout());
+			LOG.debug("Sending implicit feedback message to remote UACommsServer");
+			//SEND REQUEST - RESPONSE WILL BE IN "callback.receiveResult()"
+			commsMgr.sendIQGet(stanza, ufBean, this);
+
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
 		} catch (CommunicationException e) {
 			e.printStackTrace();
-		};
-	}*/
+		}
+		
+		while (this.results.get(requestId) == null){
+			try {
+				this.results.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		Boolean requestResult = (Boolean)this.results.get(requestId);
+		this.results.remove(requestId); //remove from results table to minimize size
 
-	
-	
+		return new AsyncResult<Boolean>(requestResult);
+	}
+
+
 	@Override
 	public List<String> getJavaPackages() {
 		return PACKAGES;
@@ -211,9 +238,20 @@ public class UACommsClient implements IUserAgentRemoteMgr, ICommCallback{
 	}
 
 	@Override
-	public void receiveResult(Stanza arg0, Object arg1) {
-		// TODO Auto-generated method stub
-
+	public void receiveResult(Stanza stanza, Object bean) {
+		//Received explicit feedback from remote UA
+		if (bean instanceof ExpFeedbackResultBean){
+			String requestId = ((ExpFeedbackResultBean)bean).getRequestId();
+			List<String> result = ((ExpFeedbackResultBean)bean).getFeedback();		
+			this.results.put(requestId, result);
+			this.results.notifyAll();
+			
+		//Received implicit feedback from remote UA
+		}else if (bean instanceof ImpFeedbackResultBean){
+			String requestId = ((ImpFeedbackResultBean)bean).getRequestId();
+			boolean result = ((ImpFeedbackResultBean)bean).isFeedback();
+			this.results.put(requestId, new Boolean(result));
+			this.results.notifyAll();
+		}
 	}
-
 }
