@@ -51,15 +51,15 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
 						   					"http://jabber.org/protocol/pubsub#errors",
-						   					"http://jabber.org/protocol/pubsub#event",
 						   					"http://jabber.org/protocol/pubsub#owner",
-						   					"http://jabber.org/protocol/disco#items"));
+						   					"http://jabber.org/protocol/pubsub#event",
+						   					"jabber:x:data"));
 	private static final List<String> PACKAGES = Collections
-			.unmodifiableList(Arrays.asList("jabber.x.data",
-					"org.jabber.protocol.pubsub",
-					"org.jabber.protocol.pubsub.errors",
-					"org.jabber.protocol.pubsub.owner",
-					"org.jabber.protocol.pubsub.event"));
+			.unmodifiableList(Arrays.asList("org.jabber.protocol.pubsub",
+											"org.jabber.protocol.pubsub.errors",
+											"org.jabber.protocol.pubsub.owner",
+											"org.jabber.protocol.pubsub.event",
+											"jabber.x.data"));
 	
 	private static final List<String> ELEMENTS = Collections.unmodifiableList(
 			Arrays.asList("pubsub", 
@@ -337,8 +337,6 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 			}
 		} catch (ParserConfigurationException e) {
 			throw new CommunicationException("ParserConfigurationException while marshalling item to publish", e);
-//		} catch (JAXBException e) {
-//			throw new CommunicationException("JAXBException while marshalling item to publish", e);
 		} catch (SAXException e) {
 			throw new CommunicationException(e.getMessage(), e);
 		} catch (IOException e) {

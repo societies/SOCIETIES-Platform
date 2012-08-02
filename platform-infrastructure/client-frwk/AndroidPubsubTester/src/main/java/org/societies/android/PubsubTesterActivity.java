@@ -21,6 +21,7 @@ import org.societies.api.schema.examples.calculatorbean.CalcBean;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 
 public class PubsubTesterActivity extends Activity {
 
@@ -40,6 +41,7 @@ public class PubsubTesterActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		log.debug("onCreate");
+		Log.d(this.getClass().getName(), "onCreate");
         setContentView(R.layout.main);
         
         PubsubClientAndroid pubsubClient = new PubsubClientAndroid(this);
@@ -49,7 +51,7 @@ public class PubsubTesterActivity extends Activity {
 			task = new ExampleTask(); 
 			task.execute(pubsubClient);
 			
-		} catch (JAXBException e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
     }
@@ -64,12 +66,12 @@ public class PubsubTesterActivity extends Activity {
 		public void pubsubEvent(IIdentity pubsubService, String node,
 				String itemId, Object item) {
 			try {
-				log.debug("**************pubsubEvent: "+pubsubService.getJid()+" "+node+" "+itemId+" "+item.getClass().getCanonicalName());
+				Log.d(this.getClass().getName(), "**************pubsubEvent: "+pubsubService.getJid()+" "+node+" "+itemId+" "+item.getClass().getCanonicalName());
 				CalcBean calcBean = (CalcBean)item;
-				log.debug("A: "+calcBean.getA());
-				log.debug("B: "+calcBean.getB());
+				Log.d(this.getClass().getName(), "A: "+calcBean.getA());
+				Log.d(this.getClass().getName(), "B: "+calcBean.getB());
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				Log.d(this.getClass().getName(), e.getMessage(), e);
 			}
 		}    	
     };
@@ -79,28 +81,46 @@ public class PubsubTesterActivity extends Activity {
     	protected Void doInBackground(PubsubClientAndroid... args) {
     		PubsubClientAndroid pubsubClient = args[0];	    	
 	        try {
-	        	IIdentity pubsubService = IdentityManagerImpl.staticfromJid("xcmanager.societies.local");
+	        	IIdentity pubsubService = IdentityManagerImpl.staticfromJid("john.societies.local");
 	        	CalcBean item = new CalcBean();
 	        	item.setA(1);
 	        	item.setB(2);
+	        	item.setMessage("Testing");
 	        	
 	        	final String nodeName = "test3"; 
-				pubsubClient.ownerCreate(pubsubService, nodeName);
-				List<String> items = pubsubClient.discoItems(pubsubService, null);
-				for(String i:items)
-					log.debug("DiscoItem: "+i);
-				pubsubClient.subscriberSubscribe(pubsubService, nodeName, subscriber);
-	        	String itemId = pubsubClient.publisherPublish(pubsubService, nodeName, UUID.randomUUID().toString(), item);
-	        	log.debug("ID: "+itemId);
+	        	Log.d(this.getClass().getName(), "### Creating pubsub node");
 	        	try {
-	        		Thread.sleep(1000);
+	        		pubsubClient.ownerCreate(pubsubService, nodeName);
+	        	} catch (Exception ex) {
+	        		Log.d(this.getClass().getName(), "Node already exists");
+	        	}
+	        	Log.d(this.getClass().getName(), "### Listing pubsub nodes");
+	        	List<String> items = pubsubClient.discoItems(pubsubService, null);
+				for(String i:items)
+					Log.d(this.getClass().getName(), "DiscoItem: "+i);
+				Log.d(this.getClass().getName(), "### Subscribing to pubsub node");
+				pubsubClient.subscriberSubscribe(pubsubService, nodeName, subscriber);
+				Log.d(this.getClass().getName(), "### Publishing to pubsub node");
+	        	String itemId = pubsubClient.publisherPublish(pubsubService, nodeName, UUID.randomUUID().toString(), item);
+	        	Log.d(this.getClass().getName(), "### Published ID: "+itemId);
+	        	try {
+	        		Thread.sleep(10 * 1000);
 	        	} catch(InterruptedException e) {}
+	        	Log.d(this.getClass().getName(), "### Deleting event");
 	        	pubsubClient.publisherDelete(pubsubService, nodeName, itemId);
+	        	Log.d(this.getClass().getName(), "### Purging node");
 	        	pubsubClient.ownerPurgeItems(pubsubService, nodeName);
+	        	Log.d(this.getClass().getName(), "### Unsubscribing from pubsub node");
 	        	pubsubClient.subscriberUnsubscribe(pubsubService, nodeName, subscriber);
+	        	Log.d(this.getClass().getName(), "### Deleting pubsub node");
 				pubsubClient.ownerDelete(pubsubService, nodeName);
+				Log.d(this.getClass().getName(), "### Listing pubsub nodes again");
+	        	items = pubsubClient.discoItems(pubsubService, null);
+	        	Log.d(this.getClass().getName(), "Pubsub nodes count: " + items.size());
+				for(String i:items)
+					Log.d(this.getClass().getName(), "DiscoItem: "+i);
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				Log.d(this.getClass().getName(), e.getMessage(), e);
 			}
 	        return null;
     	}
