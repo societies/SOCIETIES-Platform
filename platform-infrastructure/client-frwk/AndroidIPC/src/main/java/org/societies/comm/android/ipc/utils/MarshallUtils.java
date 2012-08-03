@@ -64,4 +64,17 @@ public class MarshallUtils {
 				.parse(new ByteArrayInputStream(xml.getBytes()))
 				.getDocumentElement();
 	}
+
+	/** Returns the Namespace for a Package string
+	 * @param packageString
+	 * @return
+	 */
+	public static String getNSfromPackage(String packageString) {
+		String ns = "";
+		String[] packArr = packageString.split("\\.");
+		ns = "http://" + packArr[1] + "." + packArr[0];
+		for(int i=2; i<packArr.length; i++)
+			ns+="/" + packArr[i]; 
+		return ns;
+	}
 }

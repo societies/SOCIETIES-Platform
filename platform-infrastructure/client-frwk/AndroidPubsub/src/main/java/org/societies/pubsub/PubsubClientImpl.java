@@ -24,6 +24,10 @@ import org.jabber.protocol.pubsub.owner.Affiliations;
 import org.jabber.protocol.pubsub.owner.Delete;
 import org.jabber.protocol.pubsub.owner.Purge;
 import org.jabber.protocol.pubsub.owner.Subscriptions;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -39,10 +43,13 @@ import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
+import org.societies.comm.xmpp.client.impl.PacketMarshaller;
 import org.societies.pubsub.interfaces.ISubscriber;
 import org.societies.pubsub.interfaces.SubscriptionParcelable;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
+import android.util.Log;
 
 public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub, ICommCallback {
 
@@ -68,6 +75,8 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 	
 	private static Logger LOG = LoggerFactory
 			.getLogger(PubsubClientImpl.class);
+	
+	private static final Map<String, String> nsToPackage = new HashMap<String, String>();
 	
 	private ICommManager endpoint;
 	private Map<String,Object> responses;
@@ -323,7 +332,8 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 //			synchronized (contentMarshaller) {
 ////				contentMarshaller.marshal(item, doc);
 //			}
-			i.setAny(MarshallUtils.stringToElement(item));
+//			i.setAny(MarshallUtils.stringToElement(item));
+			i.setAny(unmarshallPayload(MarshallUtils.stringToElement(item)));
 			
 			p.setItem(i);
 			payload.setPublish(p);
@@ -341,7 +351,33 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 			throw new CommunicationException(e.getMessage(), e);
 		} catch (IOException e) {
 			throw new CommunicationException(e.getMessage(), e);
+		} catch (Exception e) {
+			throw new CommunicationException(e.getMessage(), e);
 		}
+	}
+	
+	private Object unmarshallPayload(Element element) throws Exception {
+		if(element == null) // Empty stanza
+			return null;
+		
+		String namespace = element.lookupNamespaceURI(element.getPrefix());
+		String xml = MarshallUtils.nodeToString(element);
+		
+		//GET CLASS FIRST
+		String packageStr = nsToPackage.get(namespace);		
+		String beanName = element.getLocalName().substring(0,1).toUpperCase() + element.getLocalName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+		Log.d(PacketMarshaller.class.getName(), "Trying to unmarshall: " + packageStr + "." + beanName);
+		Log.d(PacketMarshaller.class.getName(), "namespace="+namespace);
+		Log.d(PacketMarshaller.class.getName(), "xml="+xml);
+		Log.d(PacketMarshaller.class.getName(), "packageStr="+packageStr);
+		Log.d(PacketMarshaller.class.getName(), "beanName="+beanName);
+		Class<?> c = Class.forName(packageStr + "." + beanName);
+		
+		//GET SIMPLE SERIALISER 
+		Strategy strategy = new AnnotationStrategy();
+		Serializer s = new Persister(strategy);
+		Object payload = s.read(c, xml);
+		return payload;
 	}
 
 	public void publisherDelete(String pubsubServiceJid, String node,
@@ -480,6 +516,19 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 		
 		// TODO error handling on multiple affiliation changes
 		
+	}
+	
+	public void addJaxbPackages(List<String> packageList){
+		try {
+			for (int i=0; i<packageList.size(); i++) {
+				String packageStr = packageList.get(i);
+				String nsStr = MarshallUtils.getNSfromPackage(packageStr);
+				nsToPackage.put(nsStr, packageStr);				
+			}	
+		}
+		catch (Exception ex) {
+			LOG.error("Error in JAXBMapping adding: " + ex.getMessage());
+		}	
 	}
 	
 	private IIdentity convertStringToIdentity(String jid) throws XMPPError {

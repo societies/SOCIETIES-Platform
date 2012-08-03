@@ -212,7 +212,7 @@ public class PubsubClientAndroid implements PubsubClient {
 		
 	}
 	
-	public synchronized void addJaxbPackages(List<String> packageList) { //throws JAXBException {		
+	public synchronized void addJaxbPackages(final List<String> packageList) { //throws JAXBException {		
 		StringBuilder contextPath = new StringBuilder(packagesContextPath);
 		for (String pack : packageList)
 			contextPath.append(":" + pack);
@@ -226,29 +226,28 @@ public class PubsubClientAndroid implements PubsubClient {
 		try {
 			for (int i=0; i<packageList.size(); i++) {
 				String packageStr = packageList.get(i);
-				String nsStr = getNSfromPackage(packageStr);
+				String nsStr = MarshallUtils.getNSfromPackage(packageStr);
 				nsToPackage.put(nsStr, packageStr);
 			}	
 		}
 		catch (Exception ex) {
 			LOG.error("Error in JAXBMapping adding: " + ex.getMessage());
-		}
+		}		
 		packagesContextPath = contextPath.toString();
+		
+		try {
+			invokeRemoteMethod(new IMethodInvocation<Pubsub>() {
+				public Object invoke(Pubsub pubsub) throws Throwable {
+					pubsub.addJaxbPackages(packageList);				
+					return null;
+				}
+			});
+		} 
+		catch (Exception ex) {
+			LOG.error("Error in calling addJaxbPackages of AndroidPubsub service: " + ex.getMessage());
+		}
 	}
 
-	/** Returns the Namespace for a Package string
-	 * @param packageString
-	 * @return
-	 */
-	private String getNSfromPackage(String packageString) {
-		String ns = "";
-		String[] packArr = packageString.split("\\.");
-		ns = "http://" + packArr[1] + "." + packArr[0];
-		for(int i=2; i<packArr.length; i++)
-			ns+="/" + packArr[i]; 
-		return ns;
-	}
-	
 	private String marshallPayload(Object payload) {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
@@ -324,6 +323,7 @@ public class PubsubClientAndroid implements PubsubClient {
 				//	bean = contentUnmarshaller.unmarshal(element);
 				//}
 				Element element = MarshallUtils.stringToElement(item);
+				
 				bean = unmarshallPayload(element);
 				
 				subscriber.pubsubEvent(pubsubServiceIdentity, node, itemId, bean);

@@ -22,4 +22,6 @@ public interface Pubsub {
 	public SubscriptionParcelable subscriberSubscribe(String pubsubService,	String node, ISubscriber subscriber) throws XMPPError, CommunicationException;
 	
 	public void subscriberUnsubscribe(String pubsubService,	String node, ISubscriber subscriber) throws XMPPError, CommunicationException;
+	
+	public void addJaxbPackages(List<String> packageList);
 }

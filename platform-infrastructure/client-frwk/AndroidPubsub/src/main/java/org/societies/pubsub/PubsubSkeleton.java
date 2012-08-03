@@ -49,4 +49,8 @@ public class PubsubSkeleton implements Pubsub {
 	public void subscriberUnsubscribe(String pubsubService,	String node, final ISubscriber subscriber) throws XMPPError, CommunicationException {		
 		pubsubClientImpl.subscriberUnsubscribe(pubsubService, node, subscriber);
 	}
+	
+	public void addJaxbPackages(List<String> packageList) {
+		pubsubClientImpl.addJaxbPackages(packageList);
+	}
 }
