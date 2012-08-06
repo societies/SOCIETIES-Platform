@@ -51,6 +51,10 @@
 		<module>../../platform-infrastructure/security/SecurityCommsMgr</module>
 		-->
 
+		<!-- Activity Feed: 1 bundle -->
+		<module>../../common-modules/activityfeed</module>
+
+
 		<!-- Directory Clients: 2 bundles (to be merged) -->
 		<module>../../css-modules/css-directory-client</module>
 		<module>../../cis-modules/cis-directory-client/</module>
@@ -75,9 +79,6 @@
 		<module>../../platform-infrastructure/sns/TwitterConnector</module>
 		<module>../../platform-infrastructure/sns/socialdata</module>
 		
-		<!-- Activity Feed: 1 bundle -->
-		<module>../../common-modules/activityfeed</module>
-
 		<!-- Context Management: 9 bundles (can some be merged?) -->
 		<module>../../context-management</module>
 
