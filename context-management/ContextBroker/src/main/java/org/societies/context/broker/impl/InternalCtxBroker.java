@@ -56,6 +56,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
@@ -92,7 +93,7 @@ import org.springframework.stereotype.Service;
  * management 
  */
 @Service
-public class InternalCtxBroker implements ICtxBroker {
+public class InternalCtxBroker extends org.societies.context.broker.impl.CtxBroker implements ICtxBroker {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
@@ -218,7 +219,13 @@ public class InternalCtxBroker implements ICtxBroker {
 					|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
 
 				attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
-
+			
+				//TODO origin type should be set in db manager
+				if (attribute.getQuality().getOriginType() == null) {
+					attribute.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+				}
+				
+				
 			} else if (IdentityType.CIS.equals(scopeID.getType())){
 
 				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, type);
@@ -1578,13 +1585,18 @@ public class InternalCtxBroker implements ICtxBroker {
 	//********************************************************************
 	//**************** end of hoc code  **********************************
 
-
+	
+	
+	//******************************************
+	//  service refs used by junit tests
+	//******************************************
+	
 	/**
 	 * Sets the User Context DB Mgmt service reference.
 	 * 
 	 * @param userDB
 	 *            the User Context DB Mgmt service reference to set.
-	 */
+	*/
 	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
 
 		this.userCtxDBMgr = userDB;
@@ -1595,7 +1607,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param userDB
 	 *            the User Context DB Mgmt service reference to set.
-	 */
+	*/
 	public void setCommunityCtxDBMgr(ICommunityCtxDBMgr communityCtxDBMgr) {
 
 		this.communityCtxDBMgr = communityCtxDBMgr;
@@ -1606,7 +1618,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param userCtxHistoryMgr
 	 *            the User Context History Mgmt service reference to set
-	 */
+	*/
 	public void setUserCtxHistoryMgr(IUserCtxHistoryMgr userCtxHistoryMgr) {
 
 		this.userCtxHistoryMgr = userCtxHistoryMgr;
@@ -1617,7 +1629,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param idMgr
 	 *            the IIdentity Mgmt service reference to set.
-	 */
+	*/
 	public void setIdentityMgr(IIdentityManager identityMgr) {
 
 		this.idMgr = identityMgr;
@@ -1631,10 +1643,9 @@ public class InternalCtxBroker implements ICtxBroker {
 	 */
 	public void setUserCtxInferenceMgr(IUserCtxInferenceMgr userCtxInferenceMgr) {
 
-		System.out.println("inf manager set");
 		this.userCtxInferenceMgr = userCtxInferenceMgr;
 	}
-
+	 
 
 	/**
 	 * Sets the {@link IPrivacyLogAppender} service reference.
@@ -1647,6 +1658,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.privacyLogAppender = privacyLogAppender;
 	}
 
+	//******************************************
+	//  service refs used by junit tests
+	//******************************************
+		
+	
+	
+	
 	// TODO remove
 	public void createCssNode(INetworkNode cssNodeId) throws CtxException {
 
@@ -1707,4 +1725,6 @@ public class InternalCtxBroker implements ICtxBroker {
 			// do nothing
 		}
 	}
+
+
 }
