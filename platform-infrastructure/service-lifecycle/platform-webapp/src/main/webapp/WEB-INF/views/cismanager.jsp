@@ -65,7 +65,7 @@ $(document).ready(function(){
 		// column 
 		var column = $('<td/>', {text: $('#attributeValue').val() + " " + $('#operatorValue').val() + " " + $('#criteriaValue').val() }).appendTo(row);
 		// button
-		var b = $('<button/>',{		  text: "Delete", type: "buton", name: "crit" + i,
+		var b = $('<button/>',{		  text: "Delete", type: "button", 
 			  click: function () { $("#" + "crit" + i).remove(); }
 		}).appendTo(column);
 	}
