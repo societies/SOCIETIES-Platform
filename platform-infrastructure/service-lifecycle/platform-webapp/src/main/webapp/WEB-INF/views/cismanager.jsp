@@ -44,7 +44,7 @@ $(document).ready(function(){
  $("#removeCriteria").hide();
  
  var i = 0;
- var criRowArray = [];
+
  
  function subButton(){
 	                 document.deliveryForm.submit();
@@ -52,10 +52,14 @@ $(document).ready(function(){
  
  document.getElementById("logC").onclick = function logArray(){
 	 
-		var temp = "";
-		jQuery.each(criRowArray, function(i, val) {
-		       temp = temp+  $("td",val).text});
-		       $("#msgid").html(temp);
+	 var data = Array();
+	 $("#existingCriteria tr").each(function(i, v){
+		     $(this).children('td').each(function(ii, vv){
+		         data[i] = $(this).text();
+		     }); 
+		 });
+	 alert(data);
+	 
 	};
  
 
@@ -76,12 +80,11 @@ $(document).ready(function(){
 		// column 
 		var column = $('<td/>', {text: $('#attributeValue').val() + " " + $('#operatorValue').val() + " " + $('#criteriaValue').val() }).appendTo(row);
 		// button
-		var f = function () {row.remove(); criRowArray.splice($.inArray(row, criRowArray),1); };
+		var f = function () {row.remove();};
 		var b = $('<button/>',{		  text: "Delete", type: "button", 
 			  click: f
 		}).appendTo(column);
 		
-		criRowArray.push(row);
 	}
 
 	
