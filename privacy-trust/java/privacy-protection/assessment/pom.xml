@@ -30,7 +30,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.privacytrust.privacyprotection</groupId>
 	<artifactId>assessment</artifactId>
-	<name>Assessment</name>
+	<name>Privacy Assessment</name>
+	<description>A posteriori privacy assessment engine and logger. Logs access to personal data (via Context Broker) and data transmission (via Comms Manager). Performs correlation of data access and data transmission events and estimates data transmission of private data in the past.</description>
 	<packaging>jar</packaging>
 	<version>${version.pt}</version>
 	<developers>

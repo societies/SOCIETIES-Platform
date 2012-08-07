@@ -27,18 +27,21 @@ package org.societies.integration.test.bit.communication_ctx_frwk;
 
 
 import org.societies.integration.test.IntegrationTestCase;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.broker.ICtxBroker;
 
 /**
  * 
  *
- * @author Nikos
+ * @author nikosk
  *
  */
 public class Test1064 extends IntegrationTestCase{
 
 	
 	public static ICtxBroker ctxBroker;
+	public static ICommManager commManager;
+	
 	
 	public Test1064(){
 		super(1064, new Class[]{Tester.class});
@@ -57,5 +60,17 @@ public class Test1064 extends IntegrationTestCase{
 	public  void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
+	/**
+	 * @return the commMgr
+	 */
+	public static ICommManager  getCommManager() {
+		return commManager ;
+	}
 
+	/**
+	 * @param commMgr the commMgr to set
+	 */
+	public  void setCommManager(ICommManager commMgr) {
+		Test1064.commManager = commMgr;
+	}		
 }

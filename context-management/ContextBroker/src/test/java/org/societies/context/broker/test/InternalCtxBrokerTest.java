@@ -710,7 +710,6 @@ public class InternalCtxBrokerTest {
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#lookup(org.societies.api.context.model.CtxModelType)}.
 	 */
-
 	@Test
 	public void testLookupCtxModelTypeString() {
 
@@ -754,11 +753,77 @@ public class InternalCtxBrokerTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#lookup(org.societies.api.context.model.CtxEntityIdentfier,org.societies.api.context.model.CtxModelType,java.lang.String)}.
+	 */
+	@Test
+	public void testLookupByCtxEntityIdentfierCtxModelTypeString() throws Exception {
 
+		final CtxEntity ent1 = this.internalCtxBroker.createEntity("entity1").get();
+		final CtxEntity ent2 = this.internalCtxBroker.createEntity("entity2").get();
+		final CtxEntity ent3 = this.internalCtxBroker.createEntity("entity3").get();
 
+		// Create test attributes:
+		// - entity1
+		final CtxAttribute ent1attr1 = this.internalCtxBroker.createAttribute(ent1.getId(),"attr1").get();
+		final CtxAttribute ent1attr2 = this.internalCtxBroker.createAttribute(ent1.getId(),"attr2").get();
+		final CtxAttribute ent1attr3 = this.internalCtxBroker.createAttribute(ent1.getId(),"attr3").get();
+		final CtxAttribute ent1attr3b = this.internalCtxBroker.createAttribute(ent1.getId(),"attr3").get();
+		// - entity2
+		final CtxAttribute ent2attr1 = this.internalCtxBroker.createAttribute(ent2.getId(),"attr1").get();
+		final CtxAttribute ent2attr2 = this.internalCtxBroker.createAttribute(ent2.getId(),"attr2").get();
+		// - entity3
+		final CtxAttribute ent3attr1 = this.internalCtxBroker.createAttribute(ent3.getId(),"attr1").get();
 
+		// verify lookup under ent1
+		List<CtxIdentifier> ids = this.internalCtxBroker.lookup(
+				ent1.getId(), CtxModelType.ATTRIBUTE, "notexists").get();
+		assertNotNull(ids);
+		assertTrue(ids.isEmpty());
 
+		ids = this.internalCtxBroker.lookup(ent1.getId(), CtxModelType.ATTRIBUTE, "attr1").get();
+		assertEquals(1, ids.size());
+		assertTrue(ids.contains(ent1attr1.getId()));
+		
+		ids = this.internalCtxBroker.lookup(ent1.getId(), CtxModelType.ATTRIBUTE, "attr2").get();
+		assertEquals(1, ids.size());
+		assertTrue(ids.contains(ent1attr2.getId()));
+		
+		ids = this.internalCtxBroker.lookup(ent1.getId(), CtxModelType.ATTRIBUTE, "attr3").get();
+		assertEquals(2, ids.size());
+		assertTrue(ids.contains(ent1attr3.getId()));
+		assertTrue(ids.contains(ent1attr3b.getId()));
+		
+		// verify lookup under ent2
+		ids = this.internalCtxBroker.lookup(ent2.getId(), CtxModelType.ATTRIBUTE, "attr1").get();
+		assertEquals(1, ids.size());
+		assertTrue(ids.contains(ent2attr1.getId()));
 
+		ids = this.internalCtxBroker.lookup(ent2.getId(), CtxModelType.ATTRIBUTE, "attr2").get();
+		assertEquals(1, ids.size());
+		assertTrue(ids.contains(ent2attr2.getId()));
+
+		ids = this.internalCtxBroker.lookup(ent2.getId(), CtxModelType.ATTRIBUTE, "attr3").get();
+		assertTrue(ids.isEmpty());
+
+		// verify lookup under ent3
+		ids = this.internalCtxBroker.lookup(ent3.getId(), CtxModelType.ATTRIBUTE, "attr1").get();
+		assertEquals(1, ids.size());
+		assertTrue(ids.contains(ent3attr1.getId()));
+
+		ids = this.internalCtxBroker.lookup(ent3.getId(), CtxModelType.ATTRIBUTE, "attr2").get();
+		assertTrue(ids.isEmpty());
+
+		ids = this.internalCtxBroker.lookup(ent3.getId(), CtxModelType.ATTRIBUTE, "attr3").get();
+		assertTrue(ids.isEmpty());
+		
+		// test expected IllegalArgumentException
+		try {
+			this.internalCtxBroker.lookup(ent1.getId(), CtxModelType.ENTITY, "foo");
+			fail("Expected IllegalArgumentException");
+		} catch (IllegalArgumentException iae) {}
 	}
 
 	/**

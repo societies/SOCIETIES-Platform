@@ -43,6 +43,7 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
+import org.societies.useragent.api.remote.IUserAgentRemoteMgr;
 import org.societies.useragent.feedback.guis.AckNackGUI;
 import org.societies.useragent.feedback.guis.CheckBoxGUI;
 import org.societies.useragent.feedback.guis.RadioGUI;
@@ -54,6 +55,7 @@ public class UserFeedback implements IUserFeedback{
 	Logger LOG = LoggerFactory.getLogger(UserFeedback.class);
 	ICtxBroker ctxBroker;
 	ICommManager commsMgr;
+	IUserAgentRemoteMgr uaRemote;
 	String myDeviceID;
 	static String UNDEFINED = "undefined";
 	
@@ -70,7 +72,7 @@ public class UserFeedback implements IUserFeedback{
 		
 		//check current UID
 		String uid = getCurrentUID();
-		if(uid.equals(UNDEFINED)){  //don't know what current UID is
+		if(uid.equals(UNDEFINED)){//don't know what current UID is
 			
 		}else if(uid.equals(myDeviceID)){  //local device is current UID
 			//show GUIs on local device
@@ -92,6 +94,13 @@ public class UserFeedback implements IUserFeedback{
 			
 		}else{  //remote device is current UID
 			//show GUIs on remote UID
+			try {
+				result = uaRemote.getExplicitFB(uid, type, content).get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		return new AsyncResult<List<String>>(result);
@@ -118,6 +127,13 @@ public class UserFeedback implements IUserFeedback{
 			}
 		}else{  //remote device is current UID
 			//show GUIs on remote UID
+			try {
+				result = uaRemote.getImplicitFB(uid, type, content).get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		return new AsyncResult<Boolean>(result);
@@ -149,5 +165,9 @@ public class UserFeedback implements IUserFeedback{
 	
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
+	}
+	
+	public void setUaRemote(IUserAgentRemoteMgr uaRemote){
+		this.uaRemote = uaRemote;
 	}
 }

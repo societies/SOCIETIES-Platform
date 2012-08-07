@@ -19,9 +19,10 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 
-	<osgi:service ref="ContextSourceManagement" interface="org.societies.api.context.source.ICtxSourceMgr" />
+	<osgi:service ref="contextSourceManagement" interface="org.societies.api.context.source.ICtxSourceMgr" />
 	
 	<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" cardinality="1..1" />
 	<osgi:reference id="deviceManager" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager" cardinality="1..1" />
-	<osgi:reference id="EventManager" interface="org.societies.api.osgi.event.IEventMgr"/>
+	<osgi:reference id="eventManager" interface="org.societies.api.osgi.event.IEventMgr" cardinality="1..1"/>
+	<osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="1..1"/>
 </beans>

@@ -25,6 +25,7 @@
 package org.societies.security.comms.rest;
 
 import java.net.URI;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,11 +99,12 @@ public class CommsClient implements IClientJarServerRemote {
 
 	@Override
 	@Async
-	public void addKey(IIdentity toIdentity, URI hostname, String filePath, IClientJarServerCallback callback) {
+	public void shareFiles(IIdentity toIdentity, URI serviceId, IIdentity provider,
+			String signature, List<String> files, IClientJarServerCallback callback) {
 		
-		LOG.debug("addKey(..., {}, {}, ...)", hostname, filePath);
+		LOG.debug("shareFiles(..., {}, {}, ...)", serviceId, provider);
 		
-		sendIQ(toIdentity, MethodType.ADD_KEY, hostname, filePath, callback);
+		sendIQ(toIdentity, MethodType.SHARE_FILES, serviceId, provider, signature, files, callback);
 	}
 
 	/**
@@ -111,33 +113,44 @@ public class CommsClient implements IClientJarServerRemote {
 	 * 
 	 * @return Stanza ID for success, null for error
 	 */
-	private String sendIQ(IIdentity toIdentity, MethodType method,
-			URI hostname, String filePath, IClientJarServerCallback callback) {
+	private String sendIQ(IIdentity toIdentity, MethodType method, URI serviceId, IIdentity provider,
+			String signature, List<String> files, IClientJarServerCallback callback) {
 		
-		LOG.debug("send(" + toIdentity + ", " + method + ", " + hostname +
-				", " + filePath + ", ...)");
+		LOG.debug("send(" + toIdentity + ", " + method + ", " + serviceId +
+				", " + provider + ", " + signature + ", ...)");
 		
 		// Create stanza
 		Stanza stanza = new Stanza(toIdentity);
 		stanza.setId(StanzaIdGenerator.next());
-		stanza.setFrom(idMgr.getThisNetworkNode());
+		//stanza.setFrom(idMgr.getThisNetworkNode());
 
 		// Create message bean
-		ClientJarBean provider = new ClientJarBean();
-		provider.setMethod(method);
-		provider.setUrl(hostname);
-		provider.setFilePath(filePath);
+		ClientJarBean payload = new ClientJarBean();
+		payload.setMethod(method);
+		payload.setServiceId(serviceId);
+		payload.setProviderIdentity(provider.getJid());
+		payload.setSignature(signature);
+		payload.setFiles(files);
+		if (files != null && files.size() > 0) {
+			payload.setFile1(files.get(0));
+			if (files.size() > 1) {
+				payload.setFile2(files.get(1));
+			}
+			if (files.size() > 2) {
+				payload.setFile3(files.get(2));
+			}
+		}
 		
 		// Just to avoid theoretical race condition, add callback BEFORE sending IQ
 		clientCallback.addCallback(stanza.getId(), callback);
 		
 		// Send information query
 		try {
-			commMgr.sendIQGet(stanza, provider, clientCallback);
-			LOG.debug("sendIQ({}): IQ sent to {}", hostname, toIdentity.getJid());
+			commMgr.sendIQGet(stanza, payload, clientCallback);
+			LOG.debug("sendIQ({}): IQ sent to {}", serviceId, toIdentity.getJid());
 			return stanza.getId();
 		} catch (CommunicationException e) {
-			LOG.warn("sendIQ({}): could not send IQ to " + toIdentity.getJid(), hostname, e);
+			LOG.warn("sendIQ({}): could not send IQ to " + toIdentity.getJid(), serviceId, e);
 			clientCallback.removeCallback(stanza.getId());
 			return null;
 		}

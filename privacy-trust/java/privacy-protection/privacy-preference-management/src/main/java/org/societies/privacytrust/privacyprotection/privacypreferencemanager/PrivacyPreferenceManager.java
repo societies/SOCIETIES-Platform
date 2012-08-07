@@ -60,6 +60,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
@@ -711,11 +712,63 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 	private ResponseItem createResponseItem(Requestor requestor, CtxAttributeIdentifier ctxId, List<Action> actions, List<Condition> conditions, Decision decision){
+		/*
+		 * sfina: otan to request einai gia create, prosthetoume WRITE, DELETE kai READ
+		 * sfina2: otan to request einai gia write, prosthetoume READ
+		 */
+		actions = this.adjustActions(actions);
+		/*
+		 * telos sfinas
+		 */
 		RequestItem reqItem = new RequestItem(new Resource(ctxId), actions, conditions);
 		ResponseItem respItem = new ResponseItem(reqItem, decision);
+		
+		
 		return respItem;
 	}
+	
+	private List<Action> adjustActions(List<Action> actions){
+		boolean hasCreate = false;
+		boolean hasWrite = false;
+		boolean hasDelete = false;
+		for (Action a: actions){
+			if (a.getActionType().equals(ActionConstants.CREATE)){
+				hasCreate = true;
+			}
+			if (a.getActionType().equals(ActionConstants.WRITE)){
+				hasWrite = true;
+			}
+			
+			if (a.getActionType().equals(ActionConstants.DELETE)){
+				hasDelete = true;
+			}
+		}
+		if (hasCreate){
+			actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.CREATE));
+			actions.add(new Action(ActionConstants.WRITE));
+			actions.add(new Action(ActionConstants.READ));
+			actions.add(new Action(ActionConstants.DELETE));
+		} else 	if (hasWrite){
+			actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.WRITE));
+			actions.add(new Action(ActionConstants.READ));
+			
+			if (hasDelete){
+				actions.add(new Action(ActionConstants.DELETE));
+			}
+		}
+		return actions;
+	}
 	private ResponseItem createResponseItem(Requestor requestor, String ctxType, List<Action> actions, List<Condition> conditions, Decision decision){
+		/*
+		 * sfina: otan to request einai gia create, prosthetoume WRITE, DELETE kai READ
+		 * sfina2: otan to request einai gia write, prosthetoume READ
+		 */
+		actions = this.adjustActions(actions);
+		/*
+		 * telos sfinas
+		 */
 		RequestItem reqItem = new RequestItem(new Resource(ctxType), actions, conditions);
 		ResponseItem respItem = new ResponseItem(reqItem, decision);
 		return respItem;

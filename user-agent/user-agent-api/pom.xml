@@ -5,12 +5,16 @@
 	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.useragent</groupId>
 	<artifactId>user-agent-api</artifactId>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 	<version>${version.ua}</version>
 	<developers>
 		<developer>
 			<name>Haoyi</name>
 			<email>haoyi.xiong@it-sudparis.eu</email>
+		</developer>
+		<developer>
+		    <name>Sarah Gallacher</name>
+		    <email>s.gallacher@hw.ac.uk</email>
 		</developer>
 	</developers>
 
@@ -43,7 +47,7 @@
 		</dependency>
 	</dependencies>
 
-	<build>
+	<!-- <build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -51,7 +55,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>						
-						<!-- the API will export all interfaces packages for the rest of modules -->
+						the API will export all interfaces packages for the rest of modules
 						<Export-Package>org.societies.useragent.**</Export-Package>
 					</instructions>
 				</configuration>
@@ -77,5 +81,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build> -->
 </project>

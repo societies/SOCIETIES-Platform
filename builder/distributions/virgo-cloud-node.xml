@@ -45,9 +45,15 @@
 		<module>../../platform-infrastructure/service-lifecycle/sl-comms-mgr</module>
 
 		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->
+		<!-- 
 		<module>../../platform-infrastructure/security/SecurityServices</module>
 		<module>../../platform-infrastructure/security/PolicyNegotiator</module>
 		<module>../../platform-infrastructure/security/SecurityCommsMgr</module>
+		-->
+
+		<!-- Activity Feed: 1 bundle -->
+		<module>../../common-modules/activityfeed</module>
+
 
 		<!-- Directory Clients: 2 bundles (to be merged) -->
 		<module>../../css-modules/css-directory-client</module>
@@ -72,7 +78,7 @@
 		<module>../../platform-infrastructure/sns/FoursquareConnector</module>
 		<module>../../platform-infrastructure/sns/TwitterConnector</module>
 		<module>../../platform-infrastructure/sns/socialdata</module>
-
+		
 		<!-- Context Management: 9 bundles (can some be merged?) -->
 		<module>../../context-management</module>
 
@@ -82,13 +88,7 @@
 		<!-- Personalisation: 2 bundles (merge?) -->
 		<module>../../personalisation</module>
 		<module>../../personalisation/Personalisation-GroupManager</module>
-
-		<!-- Intelligent Community Orchestration: 4 bundles -->
-		<module>../../intelligent-community-orchestration/API</module>
-		<module>../../intelligent-community-orchestration/CommunityLifecycleManagement</module> 
-		<module>../../intelligent-community-orchestration/EgocentricCommunityAnalyser</module>
-		<module>../../intelligent-community-orchestration/CPA</module>
-		      
+	      
 		<!-- Privacy & Trust: 5 bundles (including 1 test bundle & 1 GUI bundle... move to nightly build pom?) -->
 		<module>../../privacy-trust/java/privacy-protection</module>
 		<module>../../privacy-trust/java/trust</module>

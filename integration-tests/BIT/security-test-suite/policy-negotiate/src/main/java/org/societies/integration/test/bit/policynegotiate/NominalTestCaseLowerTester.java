@@ -16,10 +16,12 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.integration.test.IntegrationTestUtils;
+import org.springframework.web.util.UrlPathHelper;
 
 /**
  * @author Mitja Vardjan
@@ -108,8 +110,11 @@ public class NominalTestCaseLowerTester {
 			public void onNegotiationComplete(String agreementKey, URI jar) {
 				LOG.info("onNegotiationComplete({}, {})", agreementKey, jar);
 				assertNotNull(agreementKey);
-				assertTrue(jar.toString().contains("key="));
-				assertTrue(!jar.toString().endsWith("key="));
+				assertTrue(jar.toString().contains(UrlPath.BASE + UrlPath.PATH));
+				assertTrue(jar.toString().contains(UrlPath.URL_PARAM_SERVICE_ID + "="));
+				assertTrue(!jar.toString().endsWith(UrlPath.URL_PARAM_SERVICE_ID + "="));
+				assertTrue(jar.toString().contains(UrlPath.URL_PARAM_SIGNATURE + "="));
+				assertTrue(!jar.toString().endsWith(UrlPath.URL_PARAM_SIGNATURE + "="));
 				callbackInvokedService = true;
 			}
 			@Override

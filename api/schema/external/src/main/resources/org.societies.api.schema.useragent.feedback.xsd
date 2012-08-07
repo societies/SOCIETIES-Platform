@@ -8,6 +8,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="method" type="methodType" minOccurs="0" />
+				<xs:element name="requestId" type="xs:string" minOccurs="0" />
 				<xs:element name="type" type="xs:int" />
 				<xs:element name="options" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="proposalText" type="xs:string" minOccurs="0" />
@@ -20,14 +21,17 @@
 	<xs:element name="expFeedbackResultBean">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="requestId" type="xs:string" minOccurs="0" />
 				<xs:element name="feedback" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	
+	
 	<xs:element name="impFeedbackResultBean">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="requestId" type="xs:string" minOccurs="0" />
 				<xs:element name="feedback" type="xs:boolean" />
 			</xs:sequence>
 		</xs:complexType>

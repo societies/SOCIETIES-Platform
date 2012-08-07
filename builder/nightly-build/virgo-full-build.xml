@@ -47,5 +47,18 @@
 
 		<module>../../css-modules/device-mgmt/DeviceDriverSimulator/</module>
 		<module>../../css-modules/device-mgmt/devicemanagerconsumer/</module>
+		
+		<!-- Intelligent Community Orchestration: 4 bundles (not included in cloud node distribution until more integrated)-->
+		<!-- 
+		<module>../../intelligent-community-orchestration/API</module>
+		<module>../../intelligent-community-orchestration/CommunityLifecycleManagement</module> 
+		<module>../../intelligent-community-orchestration/EgocentricCommunityAnalyser</module>
+		<module>../../intelligent-community-orchestration/CPA</module>
+		-->
+		
+		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->
+		<module>../../platform-infrastructure/security/SecurityServices</module>
+		<module>../../platform-infrastructure/security/PolicyNegotiator</module>
+		<module>../../platform-infrastructure/security/SecurityCommsMgr</module>
 	</modules>
 </project>
