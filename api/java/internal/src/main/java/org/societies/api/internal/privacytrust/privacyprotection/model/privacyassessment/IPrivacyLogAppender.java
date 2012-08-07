@@ -50,6 +50,20 @@ public interface IPrivacyLogAppender {
 	 * @return true if OK to send the data, false to cancel
 	 */
 	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload);
+
+	/**
+	 * Log any outgoing information that is being sent through Communication Framework with either:<br/>
+	 * - {@link ICommManager#sendIQGet(Stanza, Object, ICommCallback)} <br/>
+	 * - {@link ICommManager#sendMessage(Stanza, Object)} <br/>
+	 * - {@link ICommManager#sendMessage(Stanza, String, Object)} <br/>
+	 * 
+	 * @param sender    CSS ID of the sender
+	 * @param receiver    CSS ID of the receiver
+	 * @param payloadSize The size of payload for sendMessage() or sendIQGet()
+	 * 
+	 * @return true if OK to send the data, false to cancel
+	 */
+	public boolean logCommsFw(IIdentity sender, IIdentity receiver, int payloadSize);
 	
 	/**
 	 * Log any outgoing information that is being sent from local CSS to a social network.
@@ -64,9 +78,9 @@ public interface IPrivacyLogAppender {
 	 * 
 	 * @return true if OK to send the data, false to cancel
 	 */
-	@Deprecated
-	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
-			IIdentity receiver, ChannelType channelId);
+//	@Deprecated
+//	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
+//			IIdentity receiver, ChannelType channelId);
 
 	/**
 	 * Log any read access to context with
