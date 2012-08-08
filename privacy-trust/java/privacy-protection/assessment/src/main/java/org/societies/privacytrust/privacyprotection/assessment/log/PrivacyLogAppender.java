@@ -205,15 +205,15 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	/* (non-Javadoc)
 	 * @see IPrivacyLogAppender#logSN(String, Date, boolean, IIdentity, IIdentity, ChannelType)
 	 */
-	@Override
-	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
-			IIdentity receiver, ChannelType channelId) {
-		
-		LOG.debug("logSN()");
-		LOG.warn("logSN(): not implemented yet");
-
-		return true;
-	}
+//	@Override
+//	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
+//			IIdentity receiver, ChannelType channelId) {
+//		
+//		LOG.debug("logSN()");
+//		LOG.warn("logSN(): not implemented yet");
+//
+//		return true;
+//	}
 
 	/* (non-Javadoc)
 	 * @see IPrivacyLogAppender#log(LogEntry)

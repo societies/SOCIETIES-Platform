@@ -93,7 +93,7 @@ import org.springframework.stereotype.Service;
  * management 
  */
 @Service
-public class InternalCtxBroker extends org.societies.context.broker.impl.CtxBroker implements ICtxBroker {
+public class InternalCtxBroker implements ICtxBroker {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);

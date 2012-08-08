@@ -33,10 +33,59 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+
+<script type="text/javascript">
+ 
+$(document).ready(function(){
+	//startup functionality
+	
+ $("#msgid").html("This is Hello World by JQuery");
+ $("#removeCriteria").hide();
+ 
+ function subButton(){
+	                 document.deliveryForm.submit();
+	             }
+ 
+ var i = 0;
+ 
+ document.getElementById("addCriteria").onclick = function() {
+	 
+	 // test log string
+	 $("#msgid").html( "" + $('#attributeValue').val() + $('#operatorValue').val() + 
+			 $('#criteriaValue').val() );// end of  $("#msgid").html( "" +
+	if(i>9){
+		alert("max of 10 criteria")	
+	}
+	else{
+		i++;
+		
+		// add the row
+		var row = $('<tr/>', {id: "crit" + i}).appendTo("#existingCriteria");
+		// column 
+		var column = $('<td/>', {text: $('#attributeValue').val() + " " + $('#operatorValue').val() + " " + $('#criteriaValue').val() }).appendTo(row);
+		// button
+		var b = $('<button/>',{		  text: "Delete", type: "buton", name: "crit" + i,
+			  click: function () { $("#" + "crit" + i).remove(); }
+		}).appendTo(column);
+	}
+
+	
+ 
+};// end of document.getElementById("addCriteria").onclick = function() {
+
+});// end of $(document).ready(function()
+	 
+</script>
+
+
+<div id="msgid">
+</div>
+
 	<h3>CIS Manager Service</h3>
 
 
-	<form:form method="POST" action="cismanager.html" commandName="cmForm">
+	<form:form method="POST" action="cismanager.html" commandName="cmForm" name="cisManagerForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
 			<tr>
@@ -49,7 +98,7 @@
 				<td><form:errors path="method" cssClass="error" /></td>
 			</tr>
 			<tr>
-				<td colspan="3"><input type="submit" /></td>
+				<td colspan="3"><input id="subBut" type="button" onClick="subButton()" value="Enter"/></td>
 			</tr>
 		</table>
 		<br />
@@ -101,11 +150,25 @@
 			<tr>
 				<td>Criteria:</td>
 				
-				<td><form:select path="attribute" cssClass="textArea"> <option value="Select" label=" - Select - " ></option>
-				<form:options items="${attributeList}"/></form:select></td>
-				<td><form:select path="operator" cssClass="textArea"> <option value="Select" label=" - Select - " ></option>
-				<form:options items="${operatorList}"/></form:select></td>
-				<td><form:input path="value" /></td><td><form:errors path="value" cssClass="error" /></td>
+				<table id="existingCriteria">
+				</table>
+				
+				<table id="critTable">
+					<tbody>
+					<tr id="critFistRow"><td>Attribute</td><td>Operator</td><td>Value</td></tr>
+					
+					<tr>
+					<td><form:select id="attributeValue" path="attribute" cssClass="textArea"><form:options items="${attributeList}"/></form:select></td>
+					<td><form:select id="operatorValue" path="operator" cssClass="textArea"><form:options items="${operatorList}"/></form:select></td>
+					<td><form:input id="criteriaValue" path="value" /></td><td><form:errors path="value" cssClass="error" /></td>
+					<td><button type="button" id="addCriteria">Add Criteria</button></td>
+					<td><button type="button" id="removeCriteria">Remove Criteria</button></td>					
+					
+					</tr>
+	
+				  </tbody>
+				</table>
+				
 				
 			</tr>
 		</table>
