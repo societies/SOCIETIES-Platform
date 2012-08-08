@@ -31,6 +31,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -38,18 +39,18 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 public class PPNPreferenceDetails implements Serializable{
 
 	private String contextType;
-	private CtxAttributeIdentifier affectedCtxID;
+	private DataIdentifier affectedCtxID;
 	private Requestor requestor; 
 	
 	public PPNPreferenceDetails(String contextType){
 		this.setContextType(contextType);
 	}
 
-	public void setAffectedCtxID(CtxAttributeIdentifier affectedCtxID) {
-		this.affectedCtxID = affectedCtxID;
+	public void setAffectedCtxID(DataIdentifier affectedDataId) {
+		this.affectedCtxID = affectedDataId;
 	}
 
-	public CtxAttributeIdentifier getAffectedCtxID() {
+	public DataIdentifier getAffectedCtxID() {
 		return affectedCtxID;
 	}
 

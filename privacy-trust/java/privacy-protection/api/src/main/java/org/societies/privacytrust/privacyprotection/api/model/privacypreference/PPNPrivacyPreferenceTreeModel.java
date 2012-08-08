@@ -31,6 +31,7 @@ import javax.swing.tree.DefaultTreeModel;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
@@ -42,7 +43,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable {
 
 	
-	private CtxAttributeIdentifier affectedCtxId;
+	private DataIdentifier affectedCtxId;
 	private String myContextType;
 	private Requestor requestor;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
@@ -55,7 +56,7 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 		this.pref = preference;
 	}
 	
-	public CtxAttributeIdentifier getAffectedContextIdentifier() {
+	public DataIdentifier getAffectedContextIdentifier() {
 		return this.getAffectedCtxId();
 	}
 
@@ -76,11 +77,11 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 		return this.pref;
 	}
 
-	public void setAffectedCtxId(CtxAttributeIdentifier affectedCtxId) {
-		this.affectedCtxId = affectedCtxId;
+	public void setAffectedCtxId(DataIdentifier affectedDataId) {
+		this.affectedCtxId = affectedDataId;
 	}
 
-	public CtxAttributeIdentifier getAffectedCtxId() {
+	public DataIdentifier getAffectedCtxId() {
 		return affectedCtxId;
 	}
 

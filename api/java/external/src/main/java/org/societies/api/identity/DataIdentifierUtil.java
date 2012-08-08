@@ -35,7 +35,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  */
 public class DataIdentifierUtil {
 	/**
-	 * Generate a URI: type/ownerId/
+	 * Generate a URI: sheme://ownerId/type
 	 * @param dataId
 	 * @return
 	 */
@@ -43,8 +43,8 @@ public class DataIdentifierUtil {
 	{
 		StringBuilder str = new StringBuilder("");
 		str.append((dataId.getScheme() != null ? dataId.getScheme().name()+"://" : "/"));
-		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
 		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
+		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
 		return str.toString();
 	}
 	

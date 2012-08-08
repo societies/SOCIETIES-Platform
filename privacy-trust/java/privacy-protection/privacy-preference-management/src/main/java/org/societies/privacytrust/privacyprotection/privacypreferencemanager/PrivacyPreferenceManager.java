@@ -446,8 +446,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#evaluateDObfPreference(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String)
 	 */
 	@Override
-	public DObfOutcome evaluateDObfPreference(Requestor arg0, IIdentity arg1,
-			String arg2) {
+	public DObfOutcome evaluateDObfPreference(Requestor requestor, String dataType) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -682,7 +681,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	 */
 	
 	
-	private ResponseItem checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Requestor requestor, CtxAttributeIdentifier ctxId, List<Condition> conditions, List<Action> actions){
+	private ResponseItem checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Requestor requestor, DataIdentifier dataId, List<Condition> conditions, List<Action> actions){
 		this.logging.debug("Evaluating preference");
 		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
 		
@@ -691,28 +690,28 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			actionList = actionList.concat(a.toString());
 		}
 		if (null==outcome){
-			this.logging.debug("Evaluation returned no result. Asking the user: "+ctxId.getType());
+			this.logging.debug("Evaluation returned no result. Asking the user: "+dataId.getType());
 			int n = myMessageBox.showConfirmDialog(requestor.getRequestorId().toString()+" is requesting access to: \n"
-					+ "resource:"+ctxId.getType()+"\n("+ctxId.toUriString()+")\nto perform a "+actionList+" operation. \nAllow?", "Access request", JOptionPane.YES_NO_OPTION);
+					+ "resource:"+dataId.getType()+"\n("+dataId.getUri()+")\nto perform a "+actionList+" operation. \nAllow?", "Access request", JOptionPane.YES_NO_OPTION);
 			if (n==JOptionPane.YES_OPTION){
-				this.askToStoreDecision(requestor, ctxId, conditions, actions,  PrivacyOutcomeConstants.ALLOW);
-				return this.createResponseItem(requestor, ctxId, actions, conditions, Decision.PERMIT);
+				this.askToStoreDecision(requestor, dataId, conditions, actions,  PrivacyOutcomeConstants.ALLOW);
+				return this.createResponseItem(requestor, dataId, actions, conditions, Decision.PERMIT);
 			}else{
-				this.askToStoreDecision(requestor, ctxId, conditions, actions, PrivacyOutcomeConstants.BLOCK);
-				return this.createResponseItem(requestor, ctxId, actions, conditions, Decision.DENY);
+				this.askToStoreDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstants.BLOCK);
+				return this.createResponseItem(requestor, dataId, actions, conditions, Decision.DENY);
 			}
 		}else{
 			if (((PPNPOutcome) outcome).getEffect()==PrivacyOutcomeConstants.ALLOW){
-				this.logging.debug("Returning PERMIT decision for resource: "+ctxId.toUriString());
-				return this.createResponseItem(requestor, ctxId, actions, conditions, Decision.PERMIT);
+				this.logging.debug("Returning PERMIT decision for resource: "+dataId.getUri());
+				return this.createResponseItem(requestor, dataId, actions, conditions, Decision.PERMIT);
 			}
-			this.logging.debug("Returning DENY decision for resource: "+ctxId.toUriString());
-			return this.createResponseItem(requestor, ctxId, actions, conditions, Decision.DENY);
+			this.logging.debug("Returning DENY decision for resource: "+dataId.getUri());
+			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.DENY);
 		}
 	}
 
-	private ResponseItem createResponseItem(Requestor requestor, CtxAttributeIdentifier ctxId, List<Action> actions, List<Condition> conditions, Decision decision){
-		RequestItem reqItem = new RequestItem(new Resource(ctxId), actions, conditions);
+	private ResponseItem createResponseItem(Requestor requestor, DataIdentifier dataId, List<Action> actions, List<Condition> conditions, Decision decision){
+		RequestItem reqItem = new RequestItem(new Resource(dataId), actions, conditions);
 		ResponseItem respItem = new ResponseItem(reqItem, decision);
 		return respItem;
 	}
@@ -779,22 +778,22 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			}
 			return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);		}
 	}
-	private void askToStoreDecision(Requestor requestor, CtxAttributeIdentifier ctxID, List<Condition> conditions,List<Action> actions,  PrivacyOutcomeConstants decision){
+	private void askToStoreDecision(Requestor requestor, DataIdentifier dataId, List<Condition> conditions,List<Action> actions,  PrivacyOutcomeConstants decision){
 		int n = myMessageBox.showConfirmDialog("Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
 		if (n==JOptionPane.YES_OPTION){
 			
-			Resource r = new Resource(ctxID);
+			Resource r = new Resource(dataId);
 			List<Requestor> requestors = new ArrayList<Requestor>();
 			requestors.add(requestor);
 			RuleTarget ruleTarget = new RuleTarget(requestors, r, actions);
 			try {
 				PPNPOutcome outcome = new PPNPOutcome(decision, ruleTarget, new ArrayList<Condition>());
 				PrivacyPreference pref = new PrivacyPreference(outcome); 
-				PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(ctxID.getType(), pref);
-				model.setAffectedCtxId(ctxID);
+				PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(dataId.getType(), pref);
+				model.setAffectedCtxId(dataId);
 				model.setRequestor(requestor);
-				PPNPreferenceDetails details = new PPNPreferenceDetails(ctxID.getType());
-				details.setAffectedCtxID(ctxID);
+				PPNPreferenceDetails details = new PPNPreferenceDetails(dataId.getType());
+				details.setAffectedCtxID(dataId);
 				details.setRequestor(requestor);
 				this.prefCache.addPPNPreference(details, model);
 			} catch (URISyntaxException e) {
