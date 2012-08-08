@@ -24,6 +24,7 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
@@ -42,4 +43,13 @@ public interface IPrivacyAgreementManager {
 	 * @throws PrivacyException
 	 */
 	public AgreementEnvelope getAgreement(Requestor requestor) throws PrivacyException;
+	
+	/**
+	 * To verify if an agreement has been correctly done between a CSS and a CIS or a 3P service
+	 * @param requestor Requestor identity. It may be a CIS or a 3P service
+	 * @param ownerId Identity of the CSS
+	 * @return True if an agreement (therefore a privacy negotiation) has been done, false otherwise
+	 * @throws PrivacyException if paramaters are not correct, or if the PrivacyAgreementManager is not ready
+	 */
+	public boolean checkAgreement(Requestor requestor, IIdentity ownerId) throws PrivacyException;
 }

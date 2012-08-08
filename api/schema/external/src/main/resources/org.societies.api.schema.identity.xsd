@@ -44,10 +44,10 @@
 
   <xs:simpleType name="dataIdentifierScheme">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="CONTEXT"/>
-      <xs:enumeration value="DEVICE"/>
-      <xs:enumeration value="CIS"/>
-      <xs:enumeration value="ACTIVITY"/>
+      <xs:enumeration value="context"/>
+      <xs:enumeration value="device"/>
+      <xs:enumeration value="cis"/>
+      <xs:enumeration value="activity"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

@@ -323,7 +323,7 @@ public class NegotiationClient implements INegotiationClient {
 
 				List<ResponseItem> requests = envelope.getAgreement().getRequestedItems();
 				for (ResponseItem responseItem : requests){
-					privacyDataManager.updatePermission(requestor, envelope.getAgreement().getUserIdentity(), responseItem);
+					privacyDataManager.updatePermission(requestor, responseItem);
 				}
 				
 				InternalEvent event = this.createSuccessfulNegotiationEvent(envelope);

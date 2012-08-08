@@ -31,5 +31,5 @@ package org.societies.api.identity;
  *
  */
 public enum DataIdentifierScheme {
-	CONTEXT, DEVICE, CIS, ACTIVITY 
+	context, device, cis, activity 
 }

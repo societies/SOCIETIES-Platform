@@ -44,6 +44,7 @@ import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -225,6 +226,20 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 			throw new PrivacyException("Bad requestor, can't store the agreement in the context.");
 		}
 		return CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+requestor.hashCode();
+	}
+	
+	/**
+	 * To find the agreement id on the context
+	 * @param requestor
+	 * @param ownerId
+	 * @return
+	 * @throws PrivacyException 
+	 */
+	public static String getAgreementIdOnCtx(Requestor requestor, IIdentity ownerId) throws PrivacyException {
+		if (null == requestor) {
+			throw new PrivacyException("Bad requestor, can't store the agreement in the context.");
+		}
+		return CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+requestor.hashCode()+ownerId.hashCode();
 	}
 
 	// -- Dependency Injection
