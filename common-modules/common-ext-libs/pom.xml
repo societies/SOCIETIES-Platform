@@ -39,18 +39,45 @@
 			<artifactId>org.osgi.core</artifactId>
 			<version>4.2.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- databases -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>com.springsource.org.hsqldb</artifactId>
+			<version>1.8.0.10</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.9</version>
+		</dependency>
+
+		<!-- apache commons -->
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.pool</artifactId>
+			<version>1.5.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.collections</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		
 	</dependencies>
 	<build>
 		<plugins>
@@ -78,18 +105,19 @@
 					<instructions>
 					<!-- 
 						<Bundle-Activator>org.societies.comm.common.CommonLibraryActivator</Bundle-Activator>
+					-->
 						<Import-Package>
 							org.osgi.framework,
 							!com.sun.*,
 							!org.gjt.*,!org.jaxen.*,!org.mortbay.*,
 							!org.relaxng.*,
-							org.slf4j*;version="1.5.8",
 							*
 						</Import-Package>
-						-->
+						<!-- 
 						<Export-Package>
 							*
-						</Export-Package>
+						</Export-Package> -->
+						<_exportcontents>*</_exportcontents>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>

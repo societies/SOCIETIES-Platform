@@ -48,6 +48,8 @@
 		<module>../../utilities/maven/SimpleXMLConverters</module>
 		<module>../../utilities/maven/Jaxb2SimpleXMLplugin</module>
 
+		<module>../../common-modules\common-ext-libs</module>
+
 		<!-- API: 2 bundles -->
 		<module>../../api</module>
 		
