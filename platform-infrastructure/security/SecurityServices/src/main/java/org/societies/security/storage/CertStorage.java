@@ -71,7 +71,7 @@ public class CertStorage {
 		try {
 			ksStream = new FileInputStream(fileName);
 		} catch (FileNotFoundException e) {
-			LOG.warn("Certificate not found. Using default built-in certificate.", e);
+			LOG.warn("Certificate file \"{}\" not found. Using default built-in certificate.", fileName);
 			ksStream = getClass().getClassLoader().getResourceAsStream(defaultCertificate);
 		}
 
