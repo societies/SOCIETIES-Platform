@@ -152,4 +152,9 @@ public class NegotiationRequester implements INegotiation {
 		
 		groupMgr.getPolicyOptions(serviceOrCisId, provider, providerCallback);
 	}
+
+	@Override
+	public void startNegotiation(Requestor provider, INegotiationCallback callback) {
+		startNegotiation(provider, true, callback);
+	}
 }
