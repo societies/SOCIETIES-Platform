@@ -59,7 +59,4 @@
 	<artifact type="bundle" name="org.societies.cis.CisDirectoryClient"/>
     <artifact type="bundle" name="org.societies.cis.manager"/>
 
-	<!-- webapp --> 
-	<artifact type="bundle" name="societies-webapp"/>
-
 </plan>
