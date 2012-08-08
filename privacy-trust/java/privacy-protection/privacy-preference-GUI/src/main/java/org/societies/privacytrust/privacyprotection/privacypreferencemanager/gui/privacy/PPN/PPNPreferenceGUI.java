@@ -362,7 +362,7 @@ public class PPNPreferenceGUI extends JFrame implements ActionListener,  WindowL
 
 		txtContextID = new JTextField();
 		if (this.details.getAffectedCtxID()!=null){
-			txtContextID.setText(details.getAffectedCtxID().toUriString());
+			txtContextID.setText(details.getAffectedCtxID().getUri());
 		}else{
 			txtContextID.setText("Generic");
 		}

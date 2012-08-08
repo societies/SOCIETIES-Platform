@@ -26,41 +26,52 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 
 public class PPNPreferenceDetails implements Serializable{
 
-	private String contextType;
-	private DataIdentifier affectedCtxID;
+	private String dataType;
+	private DataIdentifier affectedDataId;
 	private Requestor requestor; 
 	
-	public PPNPreferenceDetails(String contextType){
-		this.setContextType(contextType);
+	public PPNPreferenceDetails(String dataType){
+		this.setDataType(dataType);
+	}
+	
+
+	public String getDataType() {
+		return dataType;
+	}
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
 	}
 
+	public DataIdentifier getAffectedDataId() {
+		return affectedDataId;
+	}
+	public void setAffectedDataId(DataIdentifier affectedDataId) {
+		this.affectedDataId = affectedDataId;
+	}
+
+	@Deprecated
 	public void setAffectedCtxID(DataIdentifier affectedDataId) {
-		this.affectedCtxID = affectedDataId;
+		this.affectedDataId = affectedDataId;
 	}
-
+	@Deprecated
 	public DataIdentifier getAffectedCtxID() {
-		return affectedCtxID;
+		return affectedDataId;
 	}
 
-
+	@Deprecated
 	public void setContextType(String contextType) {
-		this.contextType = contextType;
+		this.dataType = contextType;
 	}
-
+	@Deprecated
 	public String getContextType() {
-		return contextType;
+		return dataType;
 	}
 	
 /*	private boolean compareRequestorIdentities(IIdentity id){
@@ -178,9 +189,9 @@ public class PPNPreferenceDetails implements Serializable{
 	@Override
 	public String toString(){
 		String str = "\n";
-		str = str.concat("Context Type: "+this.contextType);
-		if (this.affectedCtxID!=null){
-			str = str.concat("\nAffected CtxID: "+this.affectedCtxID.toString());
+		str = str.concat("Context Type: "+this.dataType);
+		if (this.affectedDataId!=null){
+			str = str.concat("\nAffected CtxID: "+this.affectedDataId.toString());
 		}
 		
 		if (this.getRequestor()!=null){
@@ -195,9 +206,9 @@ public class PPNPreferenceDetails implements Serializable{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((affectedCtxID == null) ? 0 : affectedCtxID.hashCode());
+				+ ((affectedDataId == null) ? 0 : affectedDataId.hashCode());
 		result = prime * result
-				+ ((contextType == null) ? 0 : contextType.hashCode());
+				+ ((dataType == null) ? 0 : dataType.hashCode());
 		result = prime * result
 				+ ((requestor == null) ? 0 : requestor.hashCode());
 		return result;
@@ -215,18 +226,18 @@ public class PPNPreferenceDetails implements Serializable{
 			return false;
 		}
 		PPNPreferenceDetails other = (PPNPreferenceDetails) obj;
-		if (affectedCtxID == null) {
-			if (other.affectedCtxID != null) {
+		if (affectedDataId == null) {
+			if (other.affectedDataId != null) {
 				return false;
 			}
-		} else if (!affectedCtxID.equals(other.affectedCtxID)) {
+		} else if (!affectedDataId.equals(other.affectedDataId)) {
 			return false;
 		}
-		if (contextType == null) {
-			if (other.contextType != null) {
+		if (dataType == null) {
+			if (other.dataType != null) {
 				return false;
 			}
-		} else if (!contextType.equals(other.contextType)) {
+		} else if (!dataType.equals(other.dataType)) {
 			return false;
 		}
 		if (requestor == null) {

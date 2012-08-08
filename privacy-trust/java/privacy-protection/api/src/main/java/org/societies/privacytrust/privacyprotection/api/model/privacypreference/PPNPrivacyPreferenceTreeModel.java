@@ -43,28 +43,48 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable {
 
 	
-	private DataIdentifier affectedCtxId;
-	private String myContextType;
+	private DataIdentifier affectedDataId;
+	private String dataType;
 	private Requestor requestor;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
 	private IPrivacyPreference pref;
 	
-	public PPNPrivacyPreferenceTreeModel(String myCtxType, IPrivacyPreference preference){
+	public PPNPrivacyPreferenceTreeModel(String dataType, IPrivacyPreference preference){
 		super(preference);
-		this.myContextType = myCtxType;
+		this.dataType = dataType;
 		this.myPrivacyType = PrivacyPreferenceTypeConstants.PPNP;
 		this.pref = preference;
 	}
 	
+
+	public DataIdentifier getAffectedDataId() {
+		return affectedDataId;
+	}
+	public void setAffectedDataId(DataIdentifier affectedDataId) {
+		this.affectedDataId = affectedDataId;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	@Deprecated
 	public DataIdentifier getAffectedContextIdentifier() {
 		return this.getAffectedCtxId();
 	}
-
-	
-	public String getContextType() {
-		return this.myContextType;
+	@Deprecated
+	public void setAffectedCtxId(DataIdentifier affectedDataId) {
+		this.affectedDataId = affectedDataId;
 	}
-
+	@Deprecated
+	public DataIdentifier getAffectedCtxId() {
+		return affectedDataId;
+	}
+	
+	@Deprecated
+	public String getContextType() {
+		return this.dataType;
+	}
 
 	@Override
 	public PrivacyPreferenceTypeConstants getPrivacyType() {
@@ -75,14 +95,6 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 	@Override
 	public IPrivacyPreference getRootPreference() {
 		return this.pref;
-	}
-
-	public void setAffectedCtxId(DataIdentifier affectedDataId) {
-		this.affectedCtxId = affectedDataId;
-	}
-
-	public DataIdentifier getAffectedCtxId() {
-		return affectedCtxId;
 	}
 
 	/**
@@ -104,9 +116,9 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((affectedCtxId == null) ? 0 : affectedCtxId.hashCode());
+				+ ((affectedDataId == null) ? 0 : affectedDataId.hashCode());
 		result = prime * result
-				+ ((myContextType == null) ? 0 : myContextType.hashCode());
+				+ ((dataType == null) ? 0 : dataType.hashCode());
 		result = prime * result
 				+ ((myPrivacyType == null) ? 0 : myPrivacyType.hashCode());
 		result = prime * result + ((pref == null) ? 0 : pref.hashCode());
@@ -124,15 +136,15 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 		if (getClass() != obj.getClass())
 			return false;
 		PPNPrivacyPreferenceTreeModel other = (PPNPrivacyPreferenceTreeModel) obj;
-		if (affectedCtxId == null) {
-			if (other.affectedCtxId != null)
+		if (affectedDataId == null) {
+			if (other.affectedDataId != null)
 				return false;
-		} else if (!affectedCtxId.equals(other.affectedCtxId))
+		} else if (!affectedDataId.equals(other.affectedDataId))
 			return false;
-		if (myContextType == null) {
-			if (other.myContextType != null)
+		if (dataType == null) {
+			if (other.dataType != null)
 				return false;
-		} else if (!myContextType.equals(other.myContextType))
+		} else if (!dataType.equals(other.dataType))
 			return false;
 		if (myPrivacyType != other.myPrivacyType)
 			return false;

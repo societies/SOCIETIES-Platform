@@ -157,15 +157,13 @@ public class PrivacyDataManagerTest {
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
 			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
 			Requestor requestor = new Requestor(requestorId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("context://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			Action action = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(action);
 			Decision decision = Decision.PERMIT;
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, decision);
-			permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
+			permission = privacyDataManager.checkPermission(requestor, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.info("PrivacyException: testCheckPermission\n", e);
 		} catch (MalformedCtxIdentifierException e) {
@@ -189,12 +187,12 @@ public class PrivacyDataManagerTest {
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
 			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
 			Requestor requestor = new Requestor(requestorId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			CtxIdentifier dataId = CtxIdentifierFactory.getInstance().fromString("context://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			Action action = new Action(ActionConstants.READ);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(action);
 			dataDeleted = privacyDataManagerInternal.deletePermission(requestor, dataId);
-			permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
+			permission = privacyDataManager.checkPermission(requestor, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.info("PrivacyException: testCheckPermissionPreviouslyDeleted\n", e);
 		} catch (MalformedCtxIdentifierException e) {

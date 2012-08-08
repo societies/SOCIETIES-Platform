@@ -35,7 +35,9 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -47,6 +49,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -68,11 +71,15 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@Autowired
 	IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
+	// -- Mocked data
+	private DataIdentifier dataId;
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
+		dataId = CtxIdentifierFactory.getInstance().fromString("context://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");;
 	}
 
 	/**
@@ -97,16 +104,9 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
 			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
 			Requestor requestor = new Requestor(requestorId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(new Action(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
-			if (null == privacyDataManagerInternal) {
-				LOG.info("privacyDataManagerInternal null");
-			}
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
 			responseItem = privacyDataManagerInternal.getPermission(requestor, dataId);
 		} catch (PrivacyException e) {
@@ -135,8 +135,6 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			Requestor requestor = new Requestor(requestorId);
 			IIdentity ownerId = Mockito.mock(IIdentity.class);
 			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = new ArrayList<Action>();
 			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
@@ -169,8 +167,6 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			Requestor requestor = new Requestor(requestorId);
 			IIdentity ownerId = Mockito.mock(IIdentity.class);
 			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = new ArrayList<Action>();
 			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
@@ -205,8 +201,6 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			Requestor requestor = new Requestor(requestorId);
 			IIdentity ownerId = Mockito.mock(IIdentity.class);
 			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxAttributeIdentifier dataId = Mockito.mock(CtxAttributeIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = new ArrayList<Action>();
 			Decision decision = Decision.PERMIT;
 			Resource resource = new Resource(dataId);
@@ -246,7 +240,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
 			List<Action> actions = new ArrayList<Action>();
 			Decision decision = Decision.PERMIT;
-			Resource resource = new Resource("locationSymbolic");
+			Resource resource = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
 			RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
 			ResponseItem permission = new ResponseItem(requestItem, decision);
 			if (null == privacyDataManagerInternal) {
@@ -278,10 +272,6 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
 			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
 			Requestor requestor = new Requestor(requestorId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("me@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = null;
 			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
