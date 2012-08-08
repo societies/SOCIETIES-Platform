@@ -46,7 +46,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-//import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
@@ -82,7 +82,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 	private static Logger log = LoggerFactory.getLogger(ServiceRegistryListener.class);
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
-	//private INegotiationProviderServiceMgmt negotiationProvider;
+	private INegotiationProviderServiceMgmt negotiationProvider;
 	private IServiceControl serviceControl;
 	private IPrivacyPolicyManager privacyManager;
 
@@ -102,7 +102,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		this.serviceControl = serviceControl;
 	}
 	
-	/*
+	
 	  public INegotiationProviderServiceMgmt getNegotiationProvider(){
 		return negotiationProvider;
 	}
@@ -110,7 +110,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 	public void setNegotiationProvider(INegotiationProviderServiceMgmt negotiationProvider){
 		this.negotiationProvider = negotiationProvider;
 	}
-*/	
+	
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
 	}
@@ -176,7 +176,6 @@ public class ServiceRegistryListener implements BundleContextAware,
 				log.debug("Property Key: " + key);
 				Object value = event.getServiceReference().getProperty(key);
 				log.debug("Property value: " + value);
-				// serviceMeteData.put(key, value);
 			}
 		
 			log.debug("Bundle Id: " + serBndl.getBundleId() + " Bundle State: "
@@ -286,23 +285,22 @@ public class ServiceRegistryListener implements BundleContextAware,
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
 						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
-				//		getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
+						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
 						
 						if(log.isDebugEnabled())
 							log.debug("Adding privacy policy to the Policy Manager!");
 						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
 						
-						//getPrivacyManager().get
-						//String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyLocation);
+
+						String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyLocation);
 						
 						if(log.isDebugEnabled()){
 							log.debug("Tried to get privacy policy from: " + privacyLocation);
-							//log.debug("The result is: " + privacyPolicy);
+							log.debug("The result is: " + privacyPolicy);
 						}
 						
-						//RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
-						//getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
-						
+						RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
+						getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
 					}
 					
 					//The service is now registered, so we update the hashmap

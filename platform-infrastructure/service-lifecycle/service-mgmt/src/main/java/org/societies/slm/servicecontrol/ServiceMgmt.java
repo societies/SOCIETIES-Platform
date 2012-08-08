@@ -139,7 +139,7 @@ public class ServiceMgmt implements IServices {
 		
 		} catch(Exception ex){
 			ex.printStackTrace();
-			logger.error("Exceptioon occured: " + ex.getMessage());
+			logger.error("Exception occured: " + ex.getMessage());
 			return null;
 		}
 	}
