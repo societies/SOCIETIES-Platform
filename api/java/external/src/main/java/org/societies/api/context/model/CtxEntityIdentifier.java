@@ -24,6 +24,8 @@
  */
 package org.societies.api.context.model;
 
+import org.societies.api.schema.identity.DataIdentifierScheme;
+
 /**
  * This class is used to identify context entities. It provides methods that
  * return information about the identified entity including:
@@ -92,12 +94,14 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 
 		final StringBuilder sb = new StringBuilder();
 
+		sb.append(super.scheme);
+		sb.append(CtxIdentifier.SCHEME_DELIM);
 		sb.append(super.ownerId);
-		sb.append("/");
+		sb.append(CtxIdentifier.DELIM);
 		sb.append(CtxModelType.ENTITY);
-		sb.append("/");
+		sb.append(CtxIdentifier.DELIM);
 		sb.append(super.type);
-		sb.append("/");
+		sb.append(CtxIdentifier.DELIM);
 		sb.append(super.objectNumber);
 
 		super.string = sb.toString();
@@ -119,10 +123,11 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 
 		final int length = input.length();
 
-		final int objectNumberDelim = input.lastIndexOf("/");
+		final int objectNumberDelim = input.lastIndexOf(CtxIdentifier.DELIM);
 		if (objectNumberDelim == -1)
 			throw new MalformedCtxIdentifierException("'" + input + "'");
-		final String objectNumberStr = input.substring(objectNumberDelim+1, length);
+		final String objectNumberStr = input.substring(
+				objectNumberDelim + CtxIdentifier.DELIM.length(), length);
 		try { 
 			super.objectNumber = new Long(objectNumberStr);
 		} catch (NumberFormatException nfe) {
@@ -130,18 +135,18 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 					+ "': Invalid context entity object number", nfe);
 		}
 
-		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
-		super.type = input.substring(typeDelim+1, objectNumberDelim);
-// not working for android api 8
-//		if (super.type.isEmpty())
-		if (super.type.length()==0)
+		final int typeDelim = input.lastIndexOf(CtxIdentifier.DELIM, objectNumberDelim-1);
+		super.type = input.substring(
+				typeDelim + CtxIdentifier.DELIM.length(), objectNumberDelim);
+		if (super.type.length() == 0)
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Context entity type cannot be empty");
 
-		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
+		final int modelTypeDelim = input.lastIndexOf(CtxIdentifier.DELIM, typeDelim-1);
 		if (modelTypeDelim == -1)
 			throw new MalformedCtxIdentifierException("'" + input + "'");
-		final String modelTypeStr = input.substring(modelTypeDelim+1, typeDelim);
+		final String modelTypeStr = input.substring(
+				modelTypeDelim + CtxIdentifier.DELIM.length(), typeDelim);
 		try {
 			super.modelType = CtxModelType.valueOf(modelTypeStr);
 		} catch (IllegalArgumentException iae) {
@@ -153,11 +158,22 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 					+ "': Expected 'ENTITY' but found '"
 					+ super.modelType + "'");
 
-		super.ownerId = input.substring(0, modelTypeDelim);
-		// not working for android api 8
-//		if (super.ownerId.isEmpty())
-		if (super.ownerId.length()==0)
+		final int ownerIdDelim = input.lastIndexOf(CtxIdentifier.SCHEME_DELIM, typeDelim-1);
+		if (ownerIdDelim == -1)
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Schema delimiter not found");
+		super.ownerId = input.substring(
+				ownerIdDelim + CtxIdentifier.SCHEME_DELIM.length(), modelTypeDelim);
+		if (super.ownerId.length() == 0)
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Owner ID cannot be empty");
+		
+		final String schemeStr = input.substring(0, ownerIdDelim);
+		try {
+			super.scheme = DataIdentifierScheme.valueOf(schemeStr);
+		} catch (IllegalArgumentException iae) {
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Malformed context identifier scheme: " + schemeStr, iae);
+		}
 	}
 }
