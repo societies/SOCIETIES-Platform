@@ -62,14 +62,9 @@ public class CertStorage {
 
 			KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
 
-			// String fileName =
-			// xml.getElementContent("/ServiceProviderConfig/Certificates/OurIdentity/PKCS12");
-			// String pass =
-			// xml.getElementContent("/ServiceProviderConfig/Certificates/OurIdentity/Password");
-			String fileName = "Societies_Service_Provider.p12"; // TODO
+			String fileName = "my_certificate.p12"; // TODO
 			String pass = "p"; // TODO
 
-			//ksStream = CertStorage.class.getClassLoader().getResourceAsStream(fileName);
 			File file = new File(fileName);
 			ksStream = new FileInputStream(file);
 			ks.load(ksStream, pass.toCharArray());
