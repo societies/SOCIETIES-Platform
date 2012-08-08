@@ -127,7 +127,11 @@ public class Tester {
 		LOG.info("*** Starting examples...");
 		// TODO createRemoteEntity();
 		this.retrieveIndividualEntityId();
+		
+		// doesn't work
 		this.updateOperatorAttributeLocation();
+		
+		///works
 		this.createOperatorAttributeBirthday();
 	}
 

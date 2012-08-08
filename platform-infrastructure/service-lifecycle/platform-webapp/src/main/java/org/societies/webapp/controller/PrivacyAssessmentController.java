@@ -71,6 +71,10 @@ public class PrivacyAssessmentController {
 	
 	private static final String RESULT = "result";
 
+	// FIXME: The path should not depend on Virgo version, etc.
+	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
+			"global/bundle/societies-webapp/1.0.0.SNAPSHOT/societies-webapp.war/";
+
 	/**
 	 * URL parts without prefix and suffix
 	 */
@@ -315,9 +319,6 @@ public class PrivacyAssessmentController {
 
 		try {
 			final ChartRenderingInfo info = new ChartRenderingInfo(new StandardEntityCollection());
-			// FIXME: The path should not depend on Virgo version, etc.
-			String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
-					"global/bundle/societies-webapp/1.0.0.SNAPSHOT/societies-webapp.war/";
 			final File file1 = new File(contextPath + filename);
 			ChartUtilities.saveChartAsPNG(file1, chart, 600, 400, info);
 		} catch (Exception e) {

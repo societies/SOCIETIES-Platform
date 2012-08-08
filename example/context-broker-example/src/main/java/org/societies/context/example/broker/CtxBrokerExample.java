@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +68,7 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 
@@ -161,8 +163,11 @@ public class CtxBrokerExample 	{
 		LOG.info( "this.cssID3 "+ this.cssID3);
 		LOG.info( "this.cssID3.getType() "+ this.cssID3.getType());
 
+		Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
+		
 		try {
-			cisOwned = cisManager.createCis(this.cssOwnerId.toString(), cssPassword, "cisName", "contextTestingCIS", 1, this.privacyPolicyWithoutRequestor).get();
+			//cisOwned = cisManager.createCis(this.cssOwnerId.toString(), cssPassword, "cisName", "contextTestingCIS", 1, this.privacyPolicyWithoutRequestor).get();
+			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
 			LOG.info("*** cisOwned " +cisOwned);
 			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
 			String cisIDString  = cisOwned.getCisId();

@@ -62,7 +62,7 @@ import org.societies.api.identity.IIdentity;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.2
  */
-public interface ICtxBroker {
+public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker{
 	
 	/**
 	 * Creates a CtxAssociation
