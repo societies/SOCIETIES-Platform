@@ -171,10 +171,10 @@ public class PrivacyPermission implements Serializable {
 			if (requestor instanceof RequestorCis) {
 				this.permissionType = PrivacyPolicyTypeConstants.CIS;
 				this.serviceId = null;
-				this.cisId = ((RequestorCis) requestor).getCisRequestorId().getIdentifier();
+				this.cisId = ((RequestorCis) requestor).getCisRequestorId().getJid();
 			}
 			else if (requestor instanceof RequestorService) {
-				this.permissionType = PrivacyPolicyTypeConstants.CIS;
+				this.permissionType = PrivacyPolicyTypeConstants.SERVICE;
 				this.serviceId = ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString();
 				this.cisId = null;
 			}
@@ -224,7 +224,7 @@ public class PrivacyPermission implements Serializable {
 	 * @param permission ResponseItem permission
 	 */
 	public void setResponseItem(ResponseItem permission) {
-		setDataId(permission.getRequestItem().getResource().getCtxIdentifier());
+		setDataId(permission.getRequestItem().getResource().getDataId());
 		setActions(permission.getRequestItem().getActions());
 		setPermission(permission.getDecision());
 	}
@@ -345,17 +345,21 @@ public class PrivacyPermission implements Serializable {
 		this.actions = actions;
 	}
 
-
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "PrivacyPermission [id=" + id + ", requestorId=" + requestorId
-				+ ", permissionType=" + permissionType + ", serviceId="
-				+ serviceId + ", cisId=" + cisId + ", +"
-				+ ", dataId=" + dataId + ", actions=" + actions
-				+ ", permission=" + permission + "]";
+		return "PrivacyPermission ["
+				+ (id != null ? "id=" + id + ", " : "")
+				+ (requestorId != null ? "requestorId=" + requestorId + ", "
+						: "")
+				+ (permissionType != null ? "permissionType=" + permissionType
+						+ ", " : "")
+				+ (serviceId != null ? "serviceId=" + serviceId + ", " : "")
+				+ (cisId != null ? "cisId=" + cisId + ", " : "")
+				+ (dataId != null ? "dataId=" + dataId + ", " : "")
+				+ (actions != null ? "actions=" + actions + ", " : "")
+				+ (permission != null ? "permission=" + permission : "") + "]";
 	}
 }

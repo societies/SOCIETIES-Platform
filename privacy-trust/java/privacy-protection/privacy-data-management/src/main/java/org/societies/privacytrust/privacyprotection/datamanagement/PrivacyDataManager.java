@@ -77,14 +77,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			throw new NullPointerException("Not enought information: requestor or owner id is missing");
 		}
 		if (null == dataId) {
-			throw new PrivacyException("Not enought information: data id is missing");
+			throw new PrivacyException("Not enought information: data id is missing. At least the data type is expected.");
 		}
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
 
 
-		// -- Create Useful Values for NULL Result
+		// -- Create useful values for default result
 		List<Condition> conditions = new ArrayList<Condition>();
 		Resource resource = new Resource(dataId);
 		RequestItem requestItemNull = new RequestItem(resource, actions, conditions);
@@ -148,7 +148,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			throw new NullPointerException("Not enought information: requestor or owner id is missing");
 		}
 		if (null == dataWrapper || null == dataWrapper.getData()) {
-			throw new PrivacyException("Not enought information: data is missing");
+			throw new PrivacyException("Not enought information: data id missing. At least the data type is expected.");
 		}
 		if (!isDepencyInjectionDone(2)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
@@ -190,7 +190,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			throw new NullPointerException("Not enought information: requestor or owner id is missing");
 		}
 		if (null == dataWrapper || null == dataWrapper.getDataId()) {
-			throw new PrivacyException("Not enought information: data id is missing");
+			throw new PrivacyException("Not enought information: data id is missing. At least the data type is expected.");
 		}
 		return dataWrapper;
 		// Not use at the moment

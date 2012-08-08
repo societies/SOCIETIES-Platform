@@ -73,36 +73,25 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId.getOwnerId()) {
 			throw new PrivacyException("[Parameters] OwnerId is missing");
 		}
-		LOG.info("############getPermission"+dataId.getUri());
 
 		Session session = sessionFactory.openSession();
 		ResponseItem permission = null;
 		Transaction t = session.beginTransaction();
 		try {
 			// -- Retrieve the privacy permission
-			Criteria criteria = session
-					.createCriteria(PrivacyPermission.class)
-					.add(Restrictions.like("requestorId", requestor.getRequestorId().getJid()))
-					.add(Restrictions.like("dataId", dataId.getUri()));
-			if (requestor instanceof RequestorCis) {
-				criteria.add(Restrictions.like("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
-			}
-			else if (requestor instanceof RequestorService) {
-				criteria.add(Restrictions.like("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
-			}
+			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
 			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
 
 
 			// -- Generate the response item
 			// - Privacy Permission doesn't exist
 			if (null == privacyPermission) {
-				LOG.info("PrivacyPermission not available");
+				LOG.debug("PrivacyPermission not available");
 				return null;
 			}
 			// - Privacy permission retrieved
-			LOG.info(privacyPermission.toString());
 			permission = privacyPermission.createResponseItem();
-			LOG.info("PrivacyPermission retrieved.");
+			LOG.debug("PrivacyPermission retrieved: "+privacyPermission.toString());
 		} catch (Exception e) {
 			t.rollback();
 			throw new PrivacyException("Error during the persistance of the privacy permission", e);
@@ -137,23 +126,13 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		Transaction t = session.beginTransaction();
 		try {
 			// -- Retrieve the privacy permission
-			Criteria criteria = session
-					.createCriteria(PrivacyPermission.class)
-					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getJid()))
-					.add(Restrictions.eq("dataId", dataId.getUri()));
-			if (requestor instanceof RequestorCis) {
-				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
-			}
-			else if (requestor instanceof RequestorService) {
-				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
-			}
+			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
 			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
-
 
 			// -- Update this privacy permission
 			// - Privacy Permission doesn't exist: create a new one
 			if (null == privacyPermission) {
-				LOG.info("PrivacyPermission not available: create it");
+				LOG.debug("PrivacyPermission doesn not already exist: create it");
 				privacyPermission = new PrivacyPermission(requestor, dataId, actions, permission);
 			}
 			// - Privacy permission already exists: update it
@@ -166,7 +145,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// - Update
 			session.saveOrUpdate(privacyPermission);
 			t.commit();
-			LOG.info("PrivacyPermission saved.");
+			LOG.debug("PrivacyPermission saved: "+privacyPermission.toString());
 			result = true;
 		} catch (Exception e) {
 			t.rollback();
@@ -185,15 +164,17 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	@Override
 	public boolean updatePermission(Requestor requestor, ResponseItem permission) throws PrivacyException {
 		DataIdentifier dataId;
+		// Data id
 		if (null != permission.getRequestItem().getResource().getDataId()) {
 			dataId = permission.getRequestItem().getResource().getDataId();
 		}
+		// Data type only
 		else if (null != permission.getRequestItem().getResource().getDataType() && !"".equals(permission.getRequestItem().getResource().getDataType())) {
 			dataId = new SimpleDataIdentifier();
 			dataId.setType(permission.getRequestItem().getResource().getDataType());
 		}
 		else {
-			throw new PrivacyException("[Parameters] DataId is missing");
+			throw new PrivacyException("[Parameters] DataId or DataType is missing");
 		}
 		return updatePermission(requestor, dataId, permission.getRequestItem().getActions(), permission.getDecision());
 	}
@@ -214,23 +195,13 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId) {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
-		LOG.info("############deletePermission"+dataId.getUri());
 
 		Session session = sessionFactory.openSession();
 		boolean result = false;
 		Transaction t = session.beginTransaction();
 		try {
 			// -- Retrieve the privacy permission
-			Criteria criteria = session
-					.createCriteria(PrivacyPermission.class)
-					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getJid()))
-					.add(Restrictions.eq("dataId", dataId.getUri()));
-			if (requestor instanceof RequestorCis) {
-				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
-			}
-			else if (requestor instanceof RequestorService) {
-				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
-			}
+			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
 			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
 
 			// -- Delete the privacy permission
@@ -255,6 +226,26 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			}
 		}
 		return result;
+	}
+
+	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId) {
+		Criteria criteria = session
+				.createCriteria(PrivacyPermission.class)
+				.add(Restrictions.like("requestorId", requestor.getRequestorId().getJid()))
+				.add(Restrictions.like("dataId", dataId.getUri()));
+		if (requestor instanceof RequestorCis) {
+			criteria.add(Restrictions.like("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
+			criteria.add(Restrictions.isNull("serviceId"));
+		}
+		else if (requestor instanceof RequestorService) {
+			criteria.add(Restrictions.isNull("cisId"));
+			criteria.add(Restrictions.like("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
+		}
+		else {
+			criteria.add(Restrictions.isNull("cisId"));
+			criteria.add(Restrictions.isNull("serviceId"));
+		}
+		return criteria;
 	}
 
 
