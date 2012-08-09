@@ -46,6 +46,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
@@ -285,22 +286,29 @@ public class ServiceRegistryListener implements BundleContextAware,
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
 						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
+						if(log.isDebugEnabled())
+							log.debug("With the URI: " + clientJar);
 						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
 						
 						if(log.isDebugEnabled())
 							log.debug("Adding privacy policy to the Policy Manager!");
 						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
 						
-
-						String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyLocation);
+						int index = privacyLocation.indexOf('@');	
+						String privacyPath = privacyLocation.substring(index+1);
 						
-						if(log.isDebugEnabled()){
+						String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyPath);
+						
+						if(log.isDebugEnabled())
 							log.debug("Tried to get privacy policy from: " + privacyLocation);
-							log.debug("The result is: " + privacyPolicy);
-						}
+						
 						
 						RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
-						getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
+						RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
+					
+						if(log.isDebugEnabled())
+							log.debug("Privacy Policy result is: " + policyResult.toXMLString());
+						
 					}
 					
 					//The service is now registered, so we update the hashmap
