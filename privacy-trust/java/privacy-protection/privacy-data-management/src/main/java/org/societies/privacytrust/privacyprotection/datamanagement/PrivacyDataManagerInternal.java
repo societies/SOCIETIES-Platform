@@ -30,6 +30,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,11 +55,21 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	private SessionFactory sessionFactory;
 
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier)
 	 */
 	@Override
 	public ResponseItem getPermission(Requestor requestor, DataIdentifier dataId) throws PrivacyException {
+		return getPermission(requestor, dataId, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
+	 */
+	@Override
+	public ResponseItem getPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// Check Dependency injection
 		if (!isDepencyInjectionDone()) {
 			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
@@ -80,18 +91,39 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		try {
 			// -- Retrieve the privacy permission
 			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
-			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
+			List<PrivacyPermission> privacyPermissions = (List<PrivacyPermission>) criteria.list();
 
 
 			// -- Generate the response item
-			// - Privacy Permission doesn't exist
-			if (null == privacyPermission) {
+			// - Privacy Permissions don't exist
+			if (null == privacyPermissions && privacyPermissions.size() <= 0) {
 				LOG.debug("PrivacyPermission not available");
 				return null;
 			}
-			// - Privacy permission retrieved
-			permission = privacyPermission.createResponseItem();
-			LOG.debug("PrivacyPermission retrieved: "+privacyPermission.toString());
+			// - Privacy permissions retrieved
+			PrivacyPermission relevantPrivacyPermission = null;
+			// Check action list
+			if (null != actions) {
+				boolean found = false;
+				for(PrivacyPermission privacyPermission : privacyPermissions) {
+					// Action list is matching: return this one
+					if (containsActions(privacyPermission.getActionsFromString(), actions)) {
+						relevantPrivacyPermission = privacyPermission;
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					LOG.debug("PrivacyPermission (matching ation list) not available");
+					return null;
+				}
+			}
+			else {
+				relevantPrivacyPermission = privacyPermissions.get(0);
+			}
+			// Return the relevant privacy permission
+			permission = relevantPrivacyPermission.createResponseItem();
+			LOG.debug("PrivacyPermission retrieved: "+relevantPrivacyPermission.toString());
 		} catch (Exception e) {
 			t.rollback();
 			throw new PrivacyException("Error during the persistance of the privacy permission", e);
@@ -228,11 +260,27 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		return result;
 	}
 
+
+	// -- Private methods
+
 	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId) {
+		return findPrivacyPermissions(session, requestor, dataId, null);
+	}
+
+	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId, List<Action> actions) {
 		Criteria criteria = session
 				.createCriteria(PrivacyPermission.class)
 				.add(Restrictions.like("requestorId", requestor.getRequestorId().getJid()))
 				.add(Restrictions.like("dataId", dataId.getUri()));
+		if (null != actions && actions.size() > 0) {
+			// All actions
+			Criterion criterionAllActions = null;
+			for(Action action : actions) {
+				criterionAllActions = Restrictions.and(criterionAllActions, Restrictions.like("actions", "%"+action.getActionType().name()+":"+action.isOptional()+"%"));
+			}
+			// Actions without optional ones
+			// TODO
+		}
 		if (requestor instanceof RequestorCis) {
 			criteria.add(Restrictions.like("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
 			criteria.add(Restrictions.isNull("serviceId"));
@@ -246,6 +294,30 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			criteria.add(Restrictions.isNull("serviceId"));
 		}
 		return criteria;
+	}
+
+	private boolean containsAction(List<Action> actions, Action action) {
+		if (null == actions || actions.size() <= 0 || null == action) {
+			return false;
+		}
+		for(Action actionTmp : actions) {
+			if (actionTmp.toXMLString().equals(action.toXMLString())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean containsActions(List<Action> actions, List<Action> subActions) {
+		if (null == actions || actions.size() <= 0 || null == subActions || subActions.size() <= 0 || actions.size() < subActions.size()) {
+			return false;
+		}
+		for(Action subActionTmp : subActions) {
+			if (!containsAction(actions, subActionTmp)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 

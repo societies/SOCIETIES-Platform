@@ -90,24 +90,16 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		RequestItem requestItemNull = new RequestItem(resource, actions, conditions);
 
 		// -- Retrieve a stored permission
-		ResponseItem permission = privacyDataManagerInternal.getPermission(requestor, dataId);
-		// - Permission available: check actions
-		if (null != permission) {
-			// Actions available
-			if (null != permission.getRequestItem() && containsActions(permission.getRequestItem().getActions(), actions)) {
-				LOG.info("RequestItem NOT NULL and actions match");
-				// Return only used actions for this request
-				permission.getRequestItem().setActions(actions);
-			}
-			// Actions not available
-			else if(null != permission.getRequestItem()) {
-				LOG.info("RequestItem NOT NULL but actions doesn't match");
-				permission = new ResponseItem(requestItemNull, Decision.DENY);
-			}
+		ResponseItem permission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
+		// - Permission available
+		if (null != permission && null != permission.getRequestItem()) {
+			LOG.info("RequestItem NOT NULL and actions match");
+			// Return only used actions for this request
+			permission.getRequestItem().setActions(actions);
 		}
 
 		// -- Permission not available: ask to PrivacyPreferenceManager
-		if (null == permission) {
+		if (null == permission || null == permission.getRequestItem()) {
 			LOG.info("No Permission retrieved");
 			try {
 				permission = privacyPreferenceManager.checkPermission(requestor, dataId, actions);
@@ -115,7 +107,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				LOG.error("Error when retrieving permission from PrivacyPreferenceManager", e);
 			}
 			// Permission still not available: deny access
-			if (null == permission) {
+			if (null == permission || null == permission.getRequestItem()) {
 				permission = new ResponseItem(requestItemNull, Decision.DENY);
 			}
 			// Store new permission retrieved from PrivacyPreferenceManager
@@ -219,29 +211,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 
 	// -- Private methods
-	private boolean containsAction(List<Action> actions, Action action) {
-		if (null == actions || actions.size() <= 0 || null == action) {
-			return false;
-		}
-		for(Action actionTmp : actions) {
-			if (actionTmp.toXMLString().equals(action.toXMLString())) {
-				return true;
-			}
-		}
-		return false;
-	}
-	private boolean containsActions(List<Action> actions, List<Action> subActions) {
-		if (null == actions || actions.size() <= 0 || null == subActions || subActions.size() <= 0 || actions.size() < subActions.size()) {
-			return false;
-		}
-		for(Action subActionTmp : subActions) {
-			if (!containsAction(actions, subActionTmp)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
+	
 
 	// --- Dependency Injection
 	public void setPrivacyPreferenceManager(

@@ -83,7 +83,8 @@ public class PrivacyPermission implements Serializable {
 	private String cisId;
 	private String dataId;
 	/**
-	 * Formatted:  [{"action": READ, "optional": true}, ...]
+	 * Format:  value:optional/value:optional/...
+	 * E.g.: READ:true/WRITE:false
 	 */
 	private String actions;
 	@Enumerated
@@ -138,7 +139,7 @@ public class PrivacyPermission implements Serializable {
 	 * @param permission
 	 */
 	public PrivacyPermission(Requestor requestor, ResponseItem permission) {
-		this(requestor, permission.getRequestItem().getResource().getCtxIdentifier(), permission.getRequestItem().getActions(), permission.getDecision());
+		this(requestor, permission.getRequestItem().getResource().getDataId(), permission.getRequestItem().getActions(), permission.getDecision());
 	}
 
 
@@ -208,7 +209,7 @@ public class PrivacyPermission implements Serializable {
 	}
 	
 	/*
-	 * Set a list of actions as a JSOn formatted string
+	 * Set a list of actions as a formatted string value:optional/value:optional/...
 	 */
 	public void setActions(List<Action> actions) {
 		StringBuilder sb = new StringBuilder();

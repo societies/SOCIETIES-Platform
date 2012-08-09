@@ -45,11 +45,21 @@ public interface IPrivacyDataManagerInternal {
 	 * 
 	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
 	 * @param dataId ID of the requested data.
-	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
 	 * @return The ResponseItem of this permission
 	 * @throws PrivacyException
 	 */
 	public ResponseItem getPermission(Requestor requestor, DataIdentifier dataId) throws PrivacyException;
+	
+	/**
+	 * Find the relevant permission
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId ID of the requested data.
+	 * @param actions List of actions
+	 * @return The ResponseItem of this permission
+	 * @throws PrivacyException
+	 */
+	public ResponseItem getPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
 	
 	/**
 	 * Update access control permissions over a data
