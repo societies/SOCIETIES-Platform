@@ -26,7 +26,6 @@ package org.societies.api.internal.security.policynegotiator;
 
 import java.net.URI;
 
-import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -51,10 +50,13 @@ public interface INegotiationProviderServiceMgmt {
 	 * @param clientJarFilePath Path of the JAR file for service client.
 	 * The path is relative on the server.
 	 * If the service does not provide a client, this parameter should be null.
-	 * Example 1: "Calculator.jar"; example 2: "calculator/client.jar"
+	 * Example: "Calculator.jar" if file path on the server is $VIRGO_HOME/Calculator.jar
+	 * 
+	 * @throws Negotia
 	 */
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
-			String clientJarFilePath);
+			String clientJarFilePath)
+			throws NegotiationException;
 
 	/**
 	 * Tells Policy Negotiator that a new service is available for sharing to others.

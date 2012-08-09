@@ -72,12 +72,13 @@ public class ServiceClientJar {
     		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
     		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
 
-		LOG.debug("HTTP GET: name = {}, service ID = {}, signature = " + signature, name, serviceId);
-		
 		String path = name + ".jar";
+
+		LOG.debug("HTTP GET: path = {}, service ID = {}, signature = " + signature, path, serviceId);
+		
 		byte[] file;
 		
-		if (!ServiceClientJarAccess.isAuthorized(serviceId, signature)) {
+		if (!ServiceClientJarAccess.isAuthorized(path, signature)) {
 			LOG.warn("Invalid filename or key");
 			// Return HTTP status code 401 - Unauthorized
 			throw new WebApplicationException(HttpServletResponse.SC_UNAUTHORIZED);
@@ -113,7 +114,8 @@ public class ServiceClientJar {
 		// TODO: verify signature, authorization
 		
 		try {
-			Files.writeFile(is, request.getContentLength(), path);
+			//Files.writeFile(is, request.getContentLength(), path);
+			Files.writeFile(is, path);
 		} catch (IOException e) {
 			LOG.warn("Could not write to file {}", path, e);
 			// Return HTTP status code 500 - Internal Server Error

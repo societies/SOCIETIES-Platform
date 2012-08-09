@@ -26,6 +26,7 @@
         init-method="run">
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="negotiator" ref ="NegotiationRequester" />
+        <property name="negotiationProviderServiceMgmt" ref ="NegotiationProviderServiceMgmt" />
     </bean>
     
     <bean
