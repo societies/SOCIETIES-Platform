@@ -43,11 +43,26 @@ $(document).ready(function(){
  $("#msgid").html("This is Hello World by JQuery");
  $("#removeCriteria").hide();
  
+ var i = 0;
+
+ 
  function subButton(){
 	                 document.deliveryForm.submit();
 	             }
  
- var i = 0;
+ document.getElementById("logC").onclick = function logArray(){
+	 
+	 var data = Array();
+	 $("#existingCriteria tr").each(function(i, v){
+		     $(this).children('td').each(function(ii, vv){
+		         data[i] = $(this).text();
+		     }); 
+		 });
+	 alert(data);
+	 
+	};
+ 
+
  
  document.getElementById("addCriteria").onclick = function() {
 	 
@@ -61,13 +76,15 @@ $(document).ready(function(){
 		i++;
 		
 		// add the row
-		var row = $('<tr/>', {id: "crit" + i}).appendTo("#existingCriteria");
+		var row = $('<tr/>', {class: "critRow"}).appendTo("#existingCriteria");
 		// column 
 		var column = $('<td/>', {text: $('#attributeValue').val() + " " + $('#operatorValue').val() + " " + $('#criteriaValue').val() }).appendTo(row);
 		// button
-		var b = $('<button/>',{		  text: "Delete", type: "buton", name: "crit" + i,
-			  click: function () { $("#" + "crit" + i).remove(); }
+		var f = function () {row.remove();};
+		var b = $('<button/>',{		  text: "Delete", type: "button", 
+			  click: f
 		}).appendTo(column);
+		
 	}
 
 	
@@ -164,6 +181,10 @@ $(document).ready(function(){
 					<td><button type="button" id="addCriteria">Add Criteria</button></td>
 					<td><button type="button" id="removeCriteria">Remove Criteria</button></td>					
 					
+					</tr>
+					
+					<tr>
+					<td colspan="4"><button id="logC" type="button">B </button></td>
 					</tr>
 	
 				  </tbody>
