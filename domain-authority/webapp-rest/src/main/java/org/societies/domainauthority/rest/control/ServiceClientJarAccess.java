@@ -25,11 +25,8 @@
 package org.societies.domainauthority.rest.control;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -38,9 +35,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.domainauthority.rest.server.ServiceClientJar;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
@@ -61,15 +56,6 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	public ServiceClientJarAccess() {
 		
 		LOG.info("Constructor");
-		
-		// TODO: remove when other components do this
-		URI url;
-		try {
-			url = new URI("http://localhost:8080");
-			//addKey(url, "Calculator.jar");
-		} catch (URISyntaxException e) {
-			LOG.error("Could not add key.", e);
-		}
 	}
 
 	public void init() {
@@ -90,7 +76,7 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	}
 	public void setSigMgr(ISignatureMgr sigMgr) {
 		LOG.info("setSigMgr()");
-		this.sigMgr = sigMgr;
+		ServiceClientJarAccess.sigMgr = sigMgr;
 	}
 	
 //	@Override
@@ -147,6 +133,11 @@ public class ServiceClientJarAccess implements IClientJarServer {
 			service = new Service(serviceId, provider, files);
 			services.put(serviceId, service);
 			result.setSuccess(true);
+			String fileList = "";
+			for (String f : files) {
+				fileList += f;
+			}
+			LOG.info("Registered new files for sharing. Service: {}. Files: {}", serviceId, fileList);
 		}
 		else {
 			LOG.warn("Unauthorized attempt to share files for service {}. Data = {}. Signature = " +
@@ -189,13 +180,17 @@ public class ServiceClientJarAccess implements IClientJarServer {
 
 	public static boolean isAuthorized(String filePath, String signature) {
 		
+		LOG.debug("isAuthorized({}, {})", filePath, signature);
+
 		for (Service s : services.values()) {
 			for (String file : s.getFiles()) {
 				if (file.equals(filePath)) {
+					LOG.debug("isAuthorized(): file {} found", filePath);
 					return sigMgr.verify(filePath, signature, s.getProvider());
 				}
 			}
 		}
+		LOG.debug("isAuthorized(): file {} NOT found", filePath);
 		return false;
 	}
 }
