@@ -138,11 +138,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(association.getId()), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
 		} else {
 			LOG.warn("Could not send context change event to topics '" 
 					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.LOCAL + "': "
+					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
 					+ "ICtxEventMgr service is not available");
 		}
 		
@@ -174,11 +174,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(attribute.getId()), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
 		} else {
 			LOG.warn("Could not send context change event to topics '" 
 					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.LOCAL + "': "
+					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
 					+ "ICtxEventMgr service is not available");
 		}
 
@@ -208,11 +208,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(entity.getId()), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
 		} else {
 			LOG.warn("Could not send context change event to topics '" 
 					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.LOCAL + "': "
+					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
 					+ "ICtxEventMgr service is not available");
 		}
 		
@@ -242,11 +242,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 		if (this.ctxEventMgr != null) {
 			this.ctxEventMgr.post(new CtxChangeEvent(entity.getId()), 
-					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.BROADCAST);
 		} else {
 			LOG.warn("Could not send context change event to topics '" 
 					+ CtxChangeEventTopic.CREATED 
-					+ "' with scope '" + CtxEventScope.LOCAL + "': "
+					+ "' with scope '" + CtxEventScope.BROADCAST + "': "
 					+ "ICtxEventMgr service is not available");
 		}
 
@@ -347,11 +347,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			final String[] topics = new String[] { CtxChangeEventTopic.UPDATED, CtxChangeEventTopic.MODIFIED };
 			if (this.ctxEventMgr != null) {
 				this.ctxEventMgr.post(new CtxChangeEvent(modelObject.getId()), 
-						topics, CtxEventScope.LOCAL);
+						topics, CtxEventScope.BROADCAST);
 			} else {
 				LOG.warn("Could not send context change event to topics '" 
 						+ Arrays.toString(topics) 
-						+ "' with scope '" + CtxEventScope.LOCAL 
+						+ "' with scope '" + CtxEventScope.BROADCAST 
 						+ "': ICtxEventMgr service is not available");
 			}
 		}
