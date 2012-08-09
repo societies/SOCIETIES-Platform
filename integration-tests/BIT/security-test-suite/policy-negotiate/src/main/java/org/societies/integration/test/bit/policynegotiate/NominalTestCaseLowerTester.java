@@ -24,6 +24,8 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
+import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.integration.test.IntegrationTestUtils;
 
@@ -37,8 +39,11 @@ public class NominalTestCaseLowerTester {
 
 	private static final long TIME_TO_WAIT_IN_MS = 3000;
 	private static final String SERVICE_CLIENT_FILENAME = "Calculator.jar";
+	private static final String SERVER_HOSTNAME = "http://localhost:8080";
+	private static final String SERVICE_ID = "http://localhost/societies/services/service-1";
 	
 	private static INegotiation negotiator;
+	private static INegotiationProviderServiceMgmt negotiationProviderServiceMgmt;
 	
 	/**
 	 * Tools for integration test
@@ -65,17 +70,26 @@ public class NominalTestCaseLowerTester {
 	 * This method is called only one time, at the very beginning of the process
 	 * (after the constructor) in order to initialize the process.
 	 * Select the relevant service example: the Calculator
+	 * @throws NegotiationException 
+	 * @throws URISyntaxException 
 	 */
 	@BeforeClass
-	public static void initialization() {
+	public static void initialization() throws URISyntaxException, NegotiationException {
 		
 		LOG.info("[#1001] Initialization");
 		LOG.info("[#1001] Prerequisite: The CSS is created");
 		LOG.info("[#1001] Prerequisite: The user is logged to the CSS");
 
 		negotiator = TestCase1001.getNegotiator();
-		
 		assertNotNull(negotiator);
+
+		negotiationProviderServiceMgmt = TestCase1001.getNegotiationProviderServiceMgmt();
+		assertNotNull(negotiationProviderServiceMgmt);
+		
+		LOG.info("Adding service {}", SERVICE_ID);
+		ServiceResourceIdentifier id = new ServiceResourceIdentifier();
+		id.setIdentifier(new URI(SERVICE_ID));
+		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), SERVICE_CLIENT_FILENAME);
 	}
 
 	/**
@@ -110,7 +124,7 @@ public class NominalTestCaseLowerTester {
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		IIdentity myId = idMgr.getThisNetworkNode();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		serviceId.setIdentifier(new URI("http://localhost/societies/services/service-1"));
+		serviceId.setIdentifier(new URI(SERVICE_ID));
 		Requestor provider = new RequestorService(myId, serviceId);
 		negotiator.startNegotiation(provider, false, new INegotiationCallback() {
 			@Override

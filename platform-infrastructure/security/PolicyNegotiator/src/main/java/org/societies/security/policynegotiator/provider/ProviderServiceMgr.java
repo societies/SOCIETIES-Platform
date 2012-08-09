@@ -142,17 +142,17 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	protected URI getClientJarUri(String serviceId) throws NegotiationException {
 
 		// TODO: remove when SLM calls addService()
-		if (services.get(serviceId) == null) {
-			LOG.warn("Temporal solution: adding service {}", serviceId);
-			ServiceResourceIdentifier id = new ServiceResourceIdentifier();
-			try {
-				id.setIdentifier(new URI(serviceId));
-				addService(id, null, new URI("http://localhost:8080"), "Calculator.jar");
-			} catch (URISyntaxException e) {
-				LOG.warn("Could not add service \"{}\" to local registry", serviceId);
-				throw new NegotiationException(e);
-			}
-		}
+//		if (services.get(serviceId) == null) {
+//			LOG.warn("Temporal solution: adding service {}", serviceId);
+//			ServiceResourceIdentifier id = new ServiceResourceIdentifier();
+//			try {
+//				id.setIdentifier(new URI(serviceId));
+//				addService(id, null, new URI("http://localhost:8080"), "Calculator.jar");
+//			} catch (URISyntaxException e) {
+//				LOG.warn("Could not add service \"{}\" to local registry", serviceId);
+//				throw new NegotiationException(e);
+//			}
+//		}
 		// End of temporal code to be removed when SLM calls addService()
 
 		URI uri;
