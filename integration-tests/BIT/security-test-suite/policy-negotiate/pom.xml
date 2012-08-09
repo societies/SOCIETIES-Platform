@@ -60,6 +60,12 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!--dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.io</artifactId>
+			<version>1.4.0</version>
+		</dependency-->
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
