@@ -45,8 +45,38 @@ public class CisManagerForm {
 	private String operator;
 	private String value;
 
+	/*private crit[] critList;
+	
+	public class crit{
+		public String attr;
+		public String op;
+		public String val;
+		public String getAttr() {
+			return attr;
+		}
+		public void setAttr(String attr) {
+			this.attr = attr;
+		}
+		public String getOp() {
+			return op;
+		}
+		public void setOp(String op) {
+			this.op = op;
+		}
+		public String getVal() {
+			return val;
+		}
+		public void setVal(String val) {
+			this.val = val;
+		}
+		
+		
+	}*/
 	
 	
+	public CisManagerForm(){
+		//critList = new crit[10];
+	}
 	
 	public String getAttribute() {
 		return attribute;
