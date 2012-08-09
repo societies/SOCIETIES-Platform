@@ -45,10 +45,16 @@ public interface INegotiationProviderServiceMgmt {
 	 * 
 	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
 	 * 
-	 * @param clientJar Location of the JAR file for service client, if the service provides a client.
-	 * If the service does not provide a client, this parameter should be null (TBD)
+	 * @param clientJarServer Host and port of the server that hosts the JAR file for service client.
+	 * If the service does not provide a client, this parameter should be null.
+	 * 
+	 * @param clientJarFilePath Path of the JAR file for service client.
+	 * The path is relative on the server.
+	 * If the service does not provide a client, this parameter should be null.
+	 * Example 1: "Calculator.jar"; example 2: "calculator/client.jar"
 	 */
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar);
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
+			String clientJarFilePath);
 
 	/**
 	 * Tells Policy Negotiator that a new service is available for sharing to others.
@@ -58,9 +64,9 @@ public interface INegotiationProviderServiceMgmt {
 	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
 	 * 
 	 * @param clientJarServer Location of the JAR file for service client, if the service provides a client.
-	 * If the service does not provide a client, this parameter should be null (TBD)
+	 * If the service does not provide a client, this parameter should be null.
 	 */
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, IIdentity clientJarServer);
+	//public void addService(ServiceResourceIdentifier serviceId, String slaXml, IIdentity clientJarServer);
 	
 	/**
 	 * Tells Policy Negotiator that a service is not available for sharing to others anymore.
