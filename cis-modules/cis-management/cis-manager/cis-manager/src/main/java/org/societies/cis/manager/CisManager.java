@@ -62,6 +62,13 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 
 import org.societies.api.identity.InvalidFormatException;
@@ -91,6 +98,7 @@ import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.Leave;
+import org.societies.api.schema.cis.community.Qualification;
 //import org.societies.api.schema.cis.community.Leave;
 import org.societies.api.schema.cis.community.MembershipCrit;
 
@@ -271,7 +279,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			e.printStackTrace();
 		} // TODO unregister??
 
-		LOG.info("listener registered");	
+		LOG.info("listener registered");
+		
+		// testing to add hard coded context atributtes
+		this.addHardCodedQualifications();
 		//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
 		startup();
 		LOG.info("CISManager started up with "+this.ownedCISs.size()
@@ -373,11 +384,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	// local version of the createCis
 	private ICisOwned localCreateCis(String cisName, String cisType, String description, Hashtable<String, MembershipCriteria> cisCriteria, String privacyPolicy) {
-		// TODO: how do we check fo the cssID/pwd?
-		//if(cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid()) == false){ // if the cssID does not match with the host owner
-		//	LOG.info("cssID does not match with the host owner");
-		//	return null;
-		//}
+
 		
 		LOG.info("creating a CIS");
 		// -- Verification
@@ -391,8 +398,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			return null;
 		}
 				
-		// TODO: review this logic as maybe I should probably check if it exists before creating
-
 
 		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
 		this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
@@ -597,6 +602,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					cisDescription = "";
 				//int cisMode = create.getMembershipMode().intValue();
 
+				// TODO: maybe check if the attributes in the criteria are valid attributes (something from CtxAttributeTypes)
 				if(cisType != null && cisName != null){
 					String pPolicy = "<RequestPolicy></RequestPolicy>";						
 					Hashtable<String, MembershipCriteria> h = null;
@@ -1043,17 +1049,136 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-// client methods
+	// internal method that adds the necessary qualifications into the join message
+	private void getQualificationsForJoin(CisAdvertisementRecord adv,Join j){
+		LOG.debug("getting qualifications for join");
+		
+		List<Qualification> lq = new ArrayList<Qualification>();
+
+		// Internal check of qualifications
+		if(adv.getMembershipCrit()!=null && adv.getMembershipCrit().getCriteria() !=null 
+				&& adv.getMembershipCrit().getCriteria().size()>0){
+			// if there is some memb criteria on the CIS we need to send our qualifications
+			CtxEntityIdentifier memberCssEntityId;
+			try {
+				memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
+			} catch (Exception e) {
+				LOG.debug("exception retrieving 1st data from internal CTX broker");
+				e.printStackTrace();
+				return;
+			}
+			
+			List<Criteria> l = adv.getMembershipCrit().getCriteria();
+			for (Criteria temp : l) { // for each criteria
+				List<CtxIdentifier> ctxIds;
+				try {
+					ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE,temp.getAttrib()).get();
+				} catch (Exception e) {
+					LOG.debug("exception retrieving 2nd data from internal CTX broker");
+					e.printStackTrace();
+					return;
+				}
+				if (!ctxIds.isEmpty()) {
+					  LOG.debug("qualification found ");
+					  CtxIdentifier ctxId = ctxIds.get(0);
+					  // retrieve the attribute
+					  CtxAttribute attribute;
+					try {
+						attribute = (CtxAttribute) this.internalCtxBroker.retrieve(ctxId).get();
+						LOG.debug("qualification is " + attribute.getType());
+					} catch (Exception e) {
+						LOG.debug("exception retrieving 3rd data from internal CTX broker");
+						e.printStackTrace();
+						return;
+					}
+					  if (attribute != null){
+						  // TODO: at the moment we are not checking the criteria here, but just building
+						  // the qualification because it was wanted by privace that just the attribute is
+						  // revealed on Advertisement
+						  Qualification q = new Qualification();
+						  q.setAttrib(temp.getAttrib());
+						  q.setValue(attribute.getStringValue());
+						  lq.add(q);
+						  LOG.debug("qualification value " + attribute.getStringValue());
+					  }
+						  
+				}
+
+				
+				
+			}
+			
+		}
+		
+		
+		// End of qualification retrieaval
+		if (lq.size()>0)
+			j.setQualification(lq);
+		
+	}
+	
+	
+	// TODO just for test purposes, delete later
+	// set the user as a married person from Paris =D
+	private void addHardCodedQualifications(){
+		LOG.info("going to add hard coded qualifications");
+		CtxEntityIdentifier memberCssEntityId;
+		try {
+			memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
+			
+			// first social status
+			List<CtxIdentifier> ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS).get();			
+			if(ctxIds.isEmpty()){
+				LOG.info("non existing social status, gonna create");
+				CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.STATUS).get();
+				ctAtb1.setStringValue("married");
+				ctAtb1.setValueType(CtxAttributeValueType.STRING);
+				this.internalCtxBroker.update(ctAtb1);
+			}else{
+				LOG.info("Already existing status equals to " + ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds.get(0)).get()).getStringValue() );
+			}
+
+			List<CtxIdentifier> ctxIds2 = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
+			if(ctxIds2.isEmpty()){
+				LOG.info("non existing city, gonna create");
+				CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
+				ctAtb1.setStringValue("Paris");
+				ctAtb1.setValueType(CtxAttributeValueType.STRING);
+				this.internalCtxBroker.update(ctAtb1);
+			}else{
+				LOG.info("Already existing status equals to " + ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds2.get(0)).get()).getStringValue() );
+			}
+
+			
+		} catch (Exception e) {
+			LOG.debug("exception retrieving 1st data from internal CTX broker");
+			e.printStackTrace();
+			return;
+		}
+		
+	}
+	
+	
+	// client methods
 	
 	@Override
 	public void joinRemoteCIS(CisAdvertisementRecord adv, ICisManagerCallback callback) {
 		
 		LOG.debug("client call to join a RemoteCIS");
-
+		Join j = new Join();
+		
+		// TODO: remove this addHardCodedQualifications
+		this.addHardCodedQualifications();
+		
+		this.getQualificationsForJoin(adv,j);
+		
 		// TODO: check with privacy
 		
-		// TODO: get qualifications
 		
+		
+		
+		
+		// sending join
 
 		IIdentity toIdentity;
 		try {
@@ -1064,7 +1189,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 			CommunityMethods c = new CommunityMethods();
 
-			c.setJoin(new Join());
+			c.setJoin(j);
 
 			try {
 				LOG.info("Sending stanza with join");

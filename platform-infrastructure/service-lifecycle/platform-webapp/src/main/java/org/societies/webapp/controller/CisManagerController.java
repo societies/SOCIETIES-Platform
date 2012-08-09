@@ -55,8 +55,11 @@ import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisParticipant;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
@@ -132,7 +135,8 @@ public class CisManagerController {
 		*/
 		// criteria
 		
-		String [] attributeList = {"location", "marital status","hobby","age"};
+		// TODO: get from CtxAttributeTypes
+		String [] attributeList = {"addressHomeCity", "interests","music","status"};
 		
 		String [] operatorList = {"equals", "differentFrom"};
 		
@@ -205,9 +209,20 @@ public class CisManagerController {
 			} else if (method.equalsIgnoreCase("JoinRemoteCIS")) {
 				model.put("methodcalled", "JoinRemoteCIS");
 
+				// TODO: get a real advertisement
 				CisAdvertisementRecord ad = new CisAdvertisementRecord();
 				ad.setId(cisForm.getCisJid());
+				// in order to force the join to send qualifications, Ill add some criteria to the AdRecord
+				MembershipCrit membershipCrit = new MembershipCrit();
+				List<Criteria> criteria = new ArrayList<Criteria>();
+				Criteria c1 = new Criteria();c1.setAttrib(CtxAttributeTypes.ADDRESS_HOME_CITY);c1.setOperator("equals");c1.setValue1("something");
+				Criteria c2 = new Criteria();c2.setAttrib(CtxAttributeTypes.STATUS);c2.setOperator("equals");c2.setValue1("something");
+				criteria.add(c1);criteria.add(c2);membershipCrit.setCriteria(criteria);
+				ad.setMembershipCrit(membershipCrit);
+				// done setting membership crit
+				
 				this.getCisManager().joinRemoteCIS(ad, icall);
+				
 				Thread.sleep(5 * 1000);
 				model.put("joinStatus", resultCallback);
 				ICis i = getCisManager().getCis(cisForm.getCisJid());
