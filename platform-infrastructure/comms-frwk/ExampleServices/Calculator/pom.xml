@@ -31,7 +31,7 @@
 			<groupId>org.societies.example</groupId>
 			<artifactId>internalAPI</artifactId>
 			<version>0.1</version>	
-			<scope>provided</scope>			
+			<scope>compile</scope>			
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
