@@ -1,10 +1,12 @@
 package org.societies.integration.test.bit.comm_ctx_estimation;
 
+import java.util.Hashtable;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -199,20 +201,22 @@ public class CreateCommunityCtx {
 	protected  IIdentity createCISid() {
 
 		IIdentity cisID = null; 
-		IIdentity cssOwnerId;
 		ICisOwned cisOwned ;
-
+	
 		try {
 			this.cssNodeId = Test1108.getCommManager().getIdManager().getThisNetworkNode();
 			LOG.info("*** cssNodeId = " + this.cssNodeId);
 			final String cssOwnerStr = this.cssNodeId.getBareJid();
 			cssOwnerId = Test1108.getCommManager().getIdManager().fromJid(cssOwnerStr);
-
-			cisOwned = Test1108.getCisManager().createCis(cssOwnerId.toString(), cssPassword, "cisName", "contextTestingCIS", 1, this.privacyPolicyWithoutRequestor).get();
-
-			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
-			cisID = Test1108.getCommManager().getIdManager().fromJid(cisOwned.getCisId());
-
+		
+			Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
+			
+			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+			LOG.info("*** cisOwned " +cisOwned);
+			String cisIDString  = cisOwned.getCisId();
+			LOG.info("*** cisOwned.getCisId() " +cisIDString);
+			cisID = Test1108.getCommManager().getIdManager().fromJid(cisIDString);
+			
 		} catch (InterruptedException e) {
 
 		} catch (ExecutionException e) {

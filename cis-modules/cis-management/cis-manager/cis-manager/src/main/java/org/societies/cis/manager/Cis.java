@@ -875,7 +875,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				
 				// TEMPORARELY DISABLING THE QUALIFICATION CHECKS
 				// TODO: uncomment this
-				/*
+				
 				
 				// checking the criteria
 				if(this.cisCriteria.size()>0){
@@ -891,16 +891,18 @@ public class Cis implements IFeatureServer, ICisOwned {
 						
 						if (this.checkQualification(qualification) == false){
 							j.setResult(addresult);
+							LOG.info("qualification mismatched");
 							return result;
 						}
 							
 					}
 					else{
 						j.setResult(addresult);
+						LOG.info("qualification not found");
 						return result;
 					}
 				}
-				*/
+				
 				
 				
 				

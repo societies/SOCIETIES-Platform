@@ -59,11 +59,6 @@
 			<artifactId>com.springsource.org.hsqldb</artifactId>
 			<version>1.8.0.10</version>
 		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.9</version>
-		</dependency>
 
 		<!-- apache commons -->
 
@@ -77,6 +72,22 @@
 			<artifactId>com.springsource.org.apache.commons.collections</artifactId>
 			<version>3.2.1</version>
 		</dependency>
+		
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>2.2</version>
+		</dependency>
+		
+		<!-- Simple XML -->
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.4</version>
+			<scope>compile</scope>
+		</dependency>
+		
 		
 	</dependencies>
 	<build>

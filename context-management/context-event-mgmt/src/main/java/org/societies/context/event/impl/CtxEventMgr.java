@@ -152,6 +152,10 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 			case INTER_CSS:
 				this.postRemoteChangeEvent((CtxChangeEvent) event, topics);
 				break;
+			case BROADCAST:
+				this.postLocalChangeEvent((CtxChangeEvent) event, topics);
+				this.postRemoteChangeEvent((CtxChangeEvent) event, topics);
+				break;	
 			default:
 				throw new CtxEventMgrException("Cannot send event to topics "
 						+ Arrays.toString(topics) 
@@ -179,10 +183,11 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 			throw new NullPointerException("ctxId can't be null");
 		
 		try {
-			IIdentity pubsubId = this.idMgr.fromJid(ctxId.getOwnerId());
-			// TODO check if pubsubId is local
-			this.registerLocalChangeListener(listener, topics, ctxId);
-			this.registerRemoteChangeListener(pubsubId, listener, topics, ctxId);
+			final IIdentity pubsubId = this.idMgr.fromJid(ctxId.getOwnerId());
+			if (this.idMgr.isMine(pubsubId))
+				this.registerLocalChangeListener(listener, topics, ctxId);
+			else
+				this.registerRemoteChangeListener(pubsubId, listener, topics, ctxId);
 		} catch (InvalidFormatException ife) {
 			
 			throw new CtxEventMgrException("Could not register context change event listener: "
@@ -223,10 +228,11 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 			throw new NullPointerException("scope can't be null");
 		
 		try {
-			IIdentity pubsubId = this.idMgr.fromJid(scope.getOwnerId());
-			// TODO check if pubsubId is local
-			this.registerLocalChangeListener(listener, topics, scope, attrType);
-			this.registerRemoteChangeListener(pubsubId, listener, topics, scope, attrType);
+			final IIdentity pubsubId = this.idMgr.fromJid(scope.getOwnerId());
+			if (this.idMgr.isMine(pubsubId))
+				this.registerLocalChangeListener(listener, topics, scope, attrType);
+			else
+				this.registerRemoteChangeListener(pubsubId, listener, topics, scope, attrType);
 		} catch (InvalidFormatException ife) {
 			
 			throw new CtxEventMgrException("Could not register context change event listener: "
@@ -386,9 +392,8 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 				
 				final Subscription subscription = this.pubsubClient.subscriberSubscribe(pubsubId, topics[i], 
 						new RemoteChangeEventHandler(listener, filter));
-				// TODO change to debug
-				if (LOG.isInfoEnabled())
-					LOG.info("subscription=" + subscription);
+				if (LOG.isDebugEnabled())
+					LOG.debug("subscription=" + subscription);
 			}
 		} catch (Exception e) {
 			
@@ -475,9 +480,8 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		public void pubsubEvent(IIdentity pubsubService, String node, 
 				String itemId, Object payload) {
 			
-			// TODO change to debug
-			if (LOG.isInfoEnabled())
-				LOG.info("pubsubEvent:pubsubService=" + pubsubService
+			if (LOG.isDebugEnabled())
+				LOG.debug("pubsubEvent:pubsubService=" + pubsubService
 						+ ",node=" + node + ",itemId=" + itemId 
 						+ ",payload=" + payload);
 			

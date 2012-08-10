@@ -84,7 +84,7 @@ public interface IClientJarServer {
 	 * 
 	 * @param serviceId The ID of the service
 	 * @param provider The service provider
-	 * @param signature Digital signature of <b>serviceId</b> and <b>files</b> parameters,
+	 * @param signature Digital signature of <b>serviceId</b> and <b>all file names</b>,
 	 * created with provider's private key
 	 * @param files List of files to be shared. All the files are associated to the given
 	 * service and will not be shared for other services.
