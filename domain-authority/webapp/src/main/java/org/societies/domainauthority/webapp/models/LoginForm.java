@@ -42,7 +42,22 @@ public class LoginForm {
 
 	@Size(min = 1, max = 20)
 	private String password;
+	
+	@Size(min = 1, max = 20)
+	private String passwordConfirm;
+	
+	@Size(min = 1, max = 50)
+	private String name;
+	private String method;
+	
+	public void setName(String name) {
+		this.name = name;
+	}
 
+	public String getName() {
+		return name;
+	}
+	
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
@@ -65,5 +80,33 @@ public class LoginForm {
 
 	public String getSubDomain() {
 		return subdomain;
+	}
+
+	/**
+	 * @return the passwordConfirm
+	 */
+	public String getPasswordConfirm() {
+		return passwordConfirm;
+	}
+
+	/**
+	 * @param passwordConfirm the passwordConfirm to set
+	 */
+	public void setPasswordConfirm(String passwordConfirm) {
+		this.passwordConfirm = passwordConfirm;
+	}
+
+	/**
+	 * @return the method
+	 */
+	public String getMethod() {
+		return method;
+	}
+
+	/**
+	 * @param method the method to set
+	 */
+	public void setMethod(String method) {
+		this.method = method;
 	}
 }
