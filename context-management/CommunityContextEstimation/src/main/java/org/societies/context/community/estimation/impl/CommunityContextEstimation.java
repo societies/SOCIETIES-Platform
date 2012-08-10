@@ -25,13 +25,22 @@
 package org.societies.context.community.estimation.impl;
 
 import java.awt.Point;
+import java.lang.invoke.SwitchPoint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
+import org.societies.context.api.community.estimation.estimationModel;
+import org.societies.context.community.estimation.impl.*;
+import org.societies.context.broker.impl.CtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -58,9 +67,59 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	@Autowired(required = true)
 	private ICtxBroker ctxBroker = null;
 
-
-
+		
+	
 	@Override
+	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier ctxId,
+			CtxAttributeIdentifier ctxAttributeIdentifier, estimationModel model) {
+		// TODO Auto-generated method stub
+		
+		switch (model) {
+		case mean:
+
+			break;
+
+		case median:
+
+			break;
+
+		case mode:
+
+			break;
+
+		case range:
+
+			break;
+
+		case minBB:
+
+			break;
+
+		case stringMode:
+
+			break;
+
+		case convexHull:
+
+			break;
+		default:
+			break;
+		}
+
+		return null;
+	}
+	
+	
+	@Override
+	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier ctxId,
+			CtxAttributeIdentifier ctxAttributeIdentifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	
+	//@Override
 	public double cceNumMean(ArrayList<Integer> inputValuesList) {
 		/**
 		 * Returns the mean value of an integers' ArrayList 
@@ -78,7 +137,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		return res;
 	}
 
-	@Override
+	//@Override
 	public double cceNumMedian(ArrayList<Integer> inputValuesList) {
 		/**
 		 * Returns the median of an integers' ArrayList
@@ -100,7 +159,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		return med;	
 	}
 
-	@Override
+	//@Override
 	public ArrayList<Integer> cceNumMode(ArrayList<Integer> inputValuesList) {
 		/**
 		 * Returns the mode of an integer's ArrayList
@@ -140,7 +199,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		return mode;
 	}
 
-	@Override
+	//@Override
 	public Integer[] cceNumRange(ArrayList<Integer> inputValuesList) {
 		/**
 		 * Returns the range of an integers' ArrayList
@@ -167,7 +226,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		      return r;
 		   }	
 
-	@Override
+	//@Override
 	public ArrayList<Point> cceGeomConvexHull(ArrayList<Point> points) {
 		/**
 		 * Returns the convex hull of a points' ArrayList. It recursively uses the singleSideHulSet method
@@ -295,7 +354,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			
 	}
 
-	@Override
+	//@Override
 	public Point[] cceGeomMinBB(ArrayList<Point> points) {
 		/**
 		 * Returns the minimum bounding box that contains all the given points
@@ -331,7 +390,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		return minBB;      
 	}
 	
-	@Override
+	//@Override
 	public ArrayList<String> cceStringMode(ArrayList<String> inputValuesList) {
 		/**
 		 * Returns the range of a strings' ArrayList
@@ -370,24 +429,25 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	}
 
 
-	@Override
+	//@Override
 	public void cceSpecial1() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	//@Override
 	public void cceSpecial2() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	//@Override
 	public void cceSpecial3() {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+
 
 
 }
