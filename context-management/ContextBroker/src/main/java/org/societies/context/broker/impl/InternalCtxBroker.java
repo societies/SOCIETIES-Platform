@@ -1025,6 +1025,47 @@ public class InternalCtxBroker implements ICtxBroker {
 	//***********************************************
 	//     Community Context Management Methods  
 	//***********************************************
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieveCommunityEntityId(org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	@Async
+	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
+			final IIdentity cisId) throws CtxException {
+		
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		if (!IdentityType.CIS.equals(cisId.getType()))
+			throw new IllegalArgumentException("cisId IdentityType is not CIS");
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving the CtxEntityIdentifier for CIS " + cisId);
+
+		CtxEntityIdentifier communityEntityId = null;
+
+		// TODO if (this.idMgr.isMine(cssId)) {
+
+			final CommunityCtxEntity communityEntity;
+			try {
+				communityEntity = this.communityCtxDBMgr.retrieveCommunityEntity(cisId);
+				if (communityEntity != null)
+					communityEntityId = communityEntity.getId();
+			} catch (CtxException ce) {
+
+				throw new CtxBrokerException(
+						"Could not retrieve CommunityCtxEntity from Community Context DB Mgr: "
+						+ ce.getLocalizedMessage(), ce);
+			}
+		/* TODO	
+		} else {
+
+			LOG.warn("remote call");
+		} */
+
+		return new AsyncResult<CtxEntityIdentifier>(communityEntityId);
+	}
+	
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
 			CtxEntityIdentifier community) throws CtxException {
