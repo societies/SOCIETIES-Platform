@@ -45,10 +45,13 @@ $(document).ready(function(){
  
  var i = 0;
 
+ document.getElementById('subBut').onclick = function() {
+	 document.cisManagerForm.submit();
+	 };
  
- function subButton(){
-	                 document.deliveryForm.submit();
-	             }
+// function subButton(){
+//	                 document.cisManagerForm.submit();
+//	             }
  
  document.getElementById("logC").onclick = function logArray(){
 	 
@@ -115,7 +118,7 @@ $(document).ready(function(){
 				<td><form:errors path="method" cssClass="error" /></td>
 			</tr>
 			<tr>
-				<td colspan="3"><input id="subBut" type="button" onClick="subButton()" value="Enter"/></td>
+				<td colspan="3"><input id="subBut" type="button" value="Enter"/></td>
 			</tr>
 		</table>
 		<br />

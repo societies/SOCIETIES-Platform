@@ -136,7 +136,7 @@ public class CisManagerController {
 		// criteria
 		
 		// TODO: get from CtxAttributeTypes
-		String [] attributeList = {"addressHomeCity", "interests","music","status"};
+		String [] attributeList = {"addressHomeCity", "interests","music","religiouslViews"};
 		
 		String [] operatorList = {"equals", "differentFrom"};
 		
@@ -359,10 +359,15 @@ public class CisManagerController {
 			}
 			else {
 				if(communityResultObject.getJoinResponse() != null){
-					resultCallback = "Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
-	
-					remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
-					m_session.setAttribute("community", remoteCommunity);
+					if(communityResultObject.getJoinResponse().isResult()){
+						resultCallback = "Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
+		
+						remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
+						m_session.setAttribute("community", remoteCommunity);
+					}else{
+						resultCallback = "Failure when trying to joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
+					}
+					
 				}
 				if(communityResultObject.getWho() != null){
 					LOG.debug("### " + communityResultObject.getWho().getParticipant().size());

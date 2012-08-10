@@ -1078,7 +1078,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					e.printStackTrace();
 					return;
 				}
-				if (!ctxIds.isEmpty()) {
+				if (ctxIds!=null && !ctxIds.isEmpty()) {
 					  LOG.debug("qualification found ");
 					  CtxIdentifier ctxId = ctxIds.get(0);
 					  // retrieve the attribute
@@ -1119,7 +1119,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	
 	// TODO just for test purposes, delete later
-	// set the user as a married person from Paris =D
+	// set the user as a protestant from Paris =D
 	private void addHardCodedQualifications(){
 		LOG.info("going to add hard coded qualifications");
 		CtxEntityIdentifier memberCssEntityId;
@@ -1127,26 +1127,28 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
 			
 			// first social status
-			List<CtxIdentifier> ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS).get();			
-			if(ctxIds.isEmpty()){
+			List<CtxIdentifier> ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS).get();			
+			// TODO: investigate why this if fails
+			if(ctxIds!= null && ctxIds.isEmpty() == false){
+				CtxAttribute ctAtb1 = ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds.get(0)).get());
+				LOG.info("Already existing status equals to " + ctAtb1.getStringValue() );
+			}else{
 				LOG.info("non existing social status, gonna create");
-				CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.STATUS).get();
-				ctAtb1.setStringValue("married");
+				CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.RELIGIOUS_VIEWS).get();
+				ctAtb1.setStringValue("protestant");
 				ctAtb1.setValueType(CtxAttributeValueType.STRING);
 				this.internalCtxBroker.update(ctAtb1);
-			}else{
-				LOG.info("Already existing status equals to " + ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds.get(0)).get()).getStringValue() );
 			}
 
 			List<CtxIdentifier> ctxIds2 = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
-			if(ctxIds2.isEmpty()){
+			if(ctxIds2!= null && ctxIds2.isEmpty() == false){
+				LOG.info("Already existing status equals to " + ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds2.get(0)).get()).getStringValue() );
+			}else{
 				LOG.info("non existing city, gonna create");
 				CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
 				ctAtb1.setStringValue("Paris");
 				ctAtb1.setValueType(CtxAttributeValueType.STRING);
 				this.internalCtxBroker.update(ctAtb1);
-			}else{
-				LOG.info("Already existing status equals to " + ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds2.get(0)).get()).getStringValue() );
 			}
 
 			
@@ -1166,9 +1168,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		LOG.debug("client call to join a RemoteCIS");
 		Join j = new Join();
-		
-		// TODO: remove this addHardCodedQualifications
-		this.addHardCodedQualifications();
 		
 		this.getQualificationsForJoin(adv,j);
 		
@@ -1267,6 +1266,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
 			return false;
 		}
+		if (null == internalCtxBroker) {
+			LOG.info("[Dependency Injection] Missing Context Broker");
+			return false;
+		}
+		if (null == eventMgr) {
+			LOG.info("[Dependency Injection] Missing Event Manager");
+			return false;
+		}
+		//TODO: add service ones
+		
 		if (level >= 1) {
 			if (null == privacyPolicyManager) {
 				LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");

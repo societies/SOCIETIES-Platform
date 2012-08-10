@@ -408,10 +408,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		try{
 			Rule r = new Rule("equals",new ArrayList<String>(Arrays.asList("married")));
 			m.setRule(r);
-			cisCriteria.put("civil status", m);
+			cisCriteria.put(CtxAttributeTypes.STATUS, m);
 			r = new Rule("equals",new ArrayList<String>(Arrays.asList("Brazil")));
 			m.setRule(r);
-			cisCriteria.put("location", m);
+			cisCriteria.put(CtxAttributeTypes.ADDRESS_HOME_COUNTRY, m);
 		}catch(InvalidParameterException e){
 			// TODO: treat expection
 			e.printStackTrace();
@@ -1110,7 +1110,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private void setMockingOnCISManager(CisManager cisManagerUnderTest){
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
 		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
-		cisManagerUnderTest.setEventMgr(mockEventMgr);
+		cisManagerUnderTest.setEventMgr(mockEventMgr); cisManagerUnderTest.setInternalCtxBroker(mockContextBroker);
 		cisManagerUnderTest.init();
 	}
 	
