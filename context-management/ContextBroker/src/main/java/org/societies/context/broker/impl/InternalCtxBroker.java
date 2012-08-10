@@ -403,11 +403,17 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ "' under entity " + entityId);
 		
 		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
-		// TODO 1. check CSS or CIS 
-		// TODO 2. check local or remote
-		// TODO if local then CtxDBMgr should provide the method - temp hack
+		final CtxEntity entity;
 		try {
-			final CtxEntity entity = (CtxEntity) this.retrieve(entityId).get();
+			final IIdentity targetId = this.idMgr.fromJid(entityId.getOwnerId());
+			if (IdentityType.CIS.equals(targetId.getType()))
+				entity = (CtxEntity) this.communityCtxDBMgr.retrieve(entityId);
+			else
+				entity = (CtxEntity) this.retrieve(entityId).get();
+
+			// TODO check local or remote
+			// TODO if local then CtxDBMgr should provide the method - temp hack follows
+			
 			if (CtxModelType.ATTRIBUTE.equals(modelType)) {
 				final Set<CtxAttribute> attrs = entity.getAttributes(type);
 				for (final CtxAttribute attr : attrs)
