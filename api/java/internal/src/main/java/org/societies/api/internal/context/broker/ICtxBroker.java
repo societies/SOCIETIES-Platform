@@ -489,7 +489,32 @@ public interface ICtxBroker {
 	
 	//***********************************************
 	//     Community Context Specific Methods  
-	//***********************************************	
+	//***********************************************
+	
+	/**
+	 * Retrieves the {@link CtxEntityIdentifier} of the 
+	 * {@link CommunityCtxEntity} which represents the identified CIS. All
+	 * CommunityCtxEntities share the same context type, i.e.
+	 * {@link org.societies.api.context.model.CtxEntityTypes#COMMUNITY COMMUNITY}.
+	 * The method returns <code>null</code> if there is no CommunityCtxEntity
+	 * representing the identified CIS. 
+	 * 
+	 * @param cisId
+	 *            the {@link IIdentity} identifying the CIS whose 
+	 *            CommunityCtxEntity identifier to retrieve
+	 * @return the CtxEntityEntityIdentifier of the CommunityCtxEntity which
+	 *         represents the identified CIS
+	 * @throws CtxException 
+	 *             if there is a problem retrieving the CtxEntityIdentifier
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the specified cisId is not of type 
+	 *             {@link org.societies.api.identity.IdentityType#CIS CIS}
+	 * @since 0.4
+	 */
+	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
+			final IIdentity cisId) throws CtxException;
 
 	/**
 	 * This method retrieves the CSS that is assigned with the community administration role.
