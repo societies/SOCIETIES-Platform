@@ -71,9 +71,7 @@ public class CisManagerClientCallback implements ICommCallback {
 	
 				}
 				else{ // there is no result field
-					LOG.warn("join response had no result tag");
-					this.sourceCallback.receiveResult( (CommunityMethods)null);
-					return;
+					LOG.warn("join failed =S");
 				}
 			}
 			// end of join response
