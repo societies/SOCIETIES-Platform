@@ -99,4 +99,14 @@ public class MockDataManagerInternal implements IPrivacyDataManagerInternal {
 			return null;
 		}
 	}
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
+	 */
+	@Override
+	public ResponseItem getPermission(Requestor requestor,
+			DataIdentifier dataId, List<Action> actions)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
