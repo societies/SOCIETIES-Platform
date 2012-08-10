@@ -98,7 +98,8 @@ public class CSSManager implements ICSSLocalManager {
 //		  Supposedly, the correct way to obtain the identity
         this.pubsubID = idManager.getThisNetworkNode();
         
-        this.createPubSubNodes();
+        //TODO re-instate when Pubsub Simple working
+//        this.createPubSubNodes();
         this.subscribeToPubSubNodes();
         
         this.randomGenerator = new Random();
@@ -309,7 +310,8 @@ public class CSSManager implements ICSSLocalManager {
 			event.setType(CSSManagerEnums.ADD_CSS_NODE);
 			event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
 			
-			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+	        //TODO re-instate when Pubsub Simple working
+			//			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
 		}
 		
 		return new AsyncResult<CssInterfaceResult>(result);
@@ -372,7 +374,8 @@ public class CSSManager implements ICSSLocalManager {
 				event.setType(CSSManagerEnums.DEPART_CSS_NODE);
 				event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
 				
-				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
+		        //TODO re-instate when Pubsub Simple working
+				//				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
 
 		} 
 	
@@ -696,7 +699,7 @@ public class CSSManager implements ICSSLocalManager {
 		return new AsyncResult<List<Service>>(serviceList);
 	}
 	/**
-	 * Create an event for a fiven Pubsub node
+	 * Create an event for a given Pubsub node
 	 * 
 	 * @param pubsubNodeName
 	 */
