@@ -449,7 +449,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		cisAd.setType(cis.getCisType());
 		cisAd.setId(cis.getCisId()); // TODO: check if the id or uri needs the jid
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
-
+		LOG.info("advertisement sent");
 		
 		// sending internal event
 		Community c = new Community();
@@ -458,9 +458,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		try {
 			this.getEventMgr().publishInternalEvent(event);
 		} catch (EMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			LOG.error("error trying to internally publish CREATE event");
+			e.printStackTrace();
+			
 		}
 		
 		if (getOwnedCISs().add(cis)){
@@ -1128,7 +1128,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			
 			// first social status
 			List<CtxIdentifier> ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS).get();			
-			// TODO: investigate why this if fails
+
 			if(ctxIds!= null && ctxIds.isEmpty() == false){
 				CtxAttribute ctAtb1 = ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds.get(0)).get());
 				LOG.info("Already existing status equals to " + ctAtb1.getStringValue() );

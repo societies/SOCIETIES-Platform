@@ -88,8 +88,8 @@ public class CisManagerController {
 	}
 
 	// store the interfaces of remote and local CISs
-	private ArrayList<ICis> remoteCISs;
-	private ArrayList<ICisOwned> localCISs;
+	//private ArrayList<ICis> remoteCISs;
+	//private ArrayList<ICisOwned> localCISs;
 
 	//for the callback
 	private String resultCallback;
@@ -117,11 +117,11 @@ public class CisManagerController {
 		model.put("methods", methods);
 		
 		model.put("cmForm", cisForm);
-	/*	remoteCISs = new ArrayList<ICis>();
+		//remoteCISs = new ArrayList<ICis>();
 		
-		localCISs = new ArrayList<ICisOwned>();
+		//localCISs = new ArrayList<ICisOwned>();
 		
-		localCISs.addAll(this.getCisManager().getListOfOwnedCis());
+		/*localCISs.addAll(this.getCisManager().getListOfOwnedCis());
 		remoteCISs.addAll(this.getCisManager().getRemoteCis());
 		
 		Iterator<ICisOwned> it = localCISs.iterator();
@@ -146,8 +146,8 @@ public class CisManagerController {
 		// end of criteria
 		
 		
-		model.put("remoteCISsArray", remoteCISs);
-		model.put("localCISsArray", localCISs);
+		//model.put("remoteCISsArray", remoteCISs);
+		//model.put("localCISsArray", localCISs);
 		//model.put("log", log);
 		model.put("cismanagerResult", "CIS Management Result :");
 		return new ModelAndView("cismanager", model);
@@ -196,7 +196,7 @@ public class CisManagerController {
 						); // for some strange reason null instead of cisCriteria did not work
 
 				res = "Successfully created CIS: " + cisResult.get().getCisId();
-				localCISs.add(cisResult.get());
+				//localCISs.add(cisResult.get());
 
 			} else if (method.equalsIgnoreCase("GetCisList")) {
 				model.put("methodcalled", "GetCisList");
@@ -225,8 +225,10 @@ public class CisManagerController {
 				
 				Thread.sleep(5 * 1000);
 				model.put("joinStatus", resultCallback);
-				ICis i = getCisManager().getCis(cisForm.getCisJid());
-				model.put("cis", i);
+				if(!resultCallback.startsWith("Failure") ){
+					ICis i = getCisManager().getCis(cisForm.getCisJid());
+					model.put("cis", i);
+				}
 
 			} else if (method.equalsIgnoreCase("LeaveRemoteCIS")) {
 				model.put("methodcalled", "LeaveRemoteCIS");
@@ -241,10 +243,10 @@ public class CisManagerController {
 				ICisOwned thisCis = null;
 				List<ICisOwned> ownedCISs = this.getCisManager().getListOfOwnedCis();
 				if (ownedCISs.size() > 0) {
-					res = "before addall";
-					localCISs.addAll(ownedCISs);
-					res = "AfteraddAll";
-					Iterator<ICisOwned> it = localCISs.iterator();
+//					res = "before addall";
+//					localCISs.addAll(ownedCISs);
+//					res = "AfteraddAll";
+					Iterator<ICisOwned> it = ownedCISs.iterator();
 					
 					res = "Beforewhile";
 					while(it.hasNext() && thisCis == null){
