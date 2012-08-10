@@ -36,6 +36,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.css.directory.ICssDirectory;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.domainauthority.webapp.models.LoginForm;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,13 +64,19 @@ import org.xml.sax.InputSource;
 @Controller
 public class IndexController {
 
-	private static final String OPENFIRE_PLUGIN = "http://localhost:9090/plugins/societies/societies";
+	private static final String OPENFIRE_PLUGIN = "http://%s:9090/plugins/societies/societies";
 	private Map<String, String> domains = new LinkedHashMap<String, String>();
+	private String xmppDomain;
 	
 	@Autowired
 	private ICommManager commManager;
 	@Autowired
 	DaRegistry daRegistry;
+	@Autowired
+	ICssDirectory cssDir;
+	
+	public ICssDirectory getCssDir() { return cssDir; }
+	public void setCssDir(ICssDirectory cssDir) { this.cssDir = cssDir; }
 	
 	public ICommManager getCommManager() { return commManager; }
 	public void setCommManager(ICommManager commManager) { this.commManager = commManager; }
@@ -79,8 +87,7 @@ public class IndexController {
 	 * @return
 	 */
 	public IndexController() {
-		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
-		domains.put("societies.local", "societies.local");
+		
 	}
 
 	/**
@@ -91,6 +98,10 @@ public class IndexController {
 	 */
 	@RequestMapping(value = "/index.html", method = RequestMethod.GET)
 	public ModelAndView init() {
+		//GET XMPP SERVER DOMAIN
+		xmppDomain = commManager.getIdManager().getThisNetworkNode().getDomain();
+		domains.put(xmppDomain, xmppDomain);
+		
 		// model is nothing but a standard Map object
 		Map<String, Object> model = new HashMap<String, Object>();
 		// data model object to be used for displaying form in html page
@@ -120,6 +131,10 @@ public class IndexController {
 	@RequestMapping(value = "/index.html", method = RequestMethod.POST)
 	public ModelAndView processLogin(@Valid LoginForm loginForm, BindingResult result,  Map model) {
 
+		//GET XMPP SERVER DOMAIN
+		xmppDomain = commManager.getIdManager().getThisNetworkNode().getDomain();
+		domains.put(xmppDomain, xmppDomain);
+		model.put("domains", domains);
 		if (result.hasErrors()) {
 			model.put("result", "Login form error");
 			return new ModelAndView("login", model);
@@ -133,15 +148,15 @@ public class IndexController {
 		
 		////////////////// REGISTER ////////////////
 		if (method.equals("register")) {
-			model.put("domains", domains);
-			
 			// ADD ACCOUNT
 			Map<String, String> params = new LinkedHashMap<String, String>();
 			params.put("username", userName);
 			params.put("password", password);
 			params.put("name", Name);
 			params.put("secret", "defaultSecret");
-			String resp = postData(MethodType.ADD, OPENFIRE_PLUGIN, params);
+			String xmppUrl = new String();
+			xmppUrl = String.format(OPENFIRE_PLUGIN, xmppDomain);
+			String resp = postData(MethodType.ADD, xmppUrl, params);
 			try {
 				// CHECK RESPONSE - DOES ACCOUNT ALREADY EXIST
 				Document respDoc = loadXMLFromString(resp);
@@ -165,8 +180,13 @@ public class IndexController {
 			userRecord.setPassword(password);
 			daRegistry.addXmppIdentityDetails(userRecord);
 
-			model.put("name", userName);
-
+			//CREATE CSS ADVERT
+			CssAdvertisementRecord cssAdvert = new CssAdvertisementRecord();
+			cssAdvert.setId(jid);
+			cssAdvert.setUri(jid);
+			cssAdvert.setName(Name);
+			cssDir.addCssAdvertisementRecord(cssAdvert);
+			
 			model.put("result", "Account Created  - Your cloud node will be created in next 24 hours");
 			return new ModelAndView("index", model);
 		}
@@ -177,7 +197,10 @@ public class IndexController {
 			params.put("username", userName);
 			params.put("password", password);
 			params.put("secret", "defaultSecret");
-			String resp = postData(MethodType.LOGIN, OPENFIRE_PLUGIN, params);
+			
+			String xmppUrl = new String();
+			xmppUrl = String.format(OPENFIRE_PLUGIN, xmppDomain);
+			String resp = postData(MethodType.LOGIN, xmppUrl, params);
 			try {
 				// CHECK RESPONSE - DOES ACCOUNT ALREADY EXIST
 				Document respDoc = loadXMLFromString(resp);
