@@ -25,7 +25,6 @@
 package org.societies.context.community.estimation.impl;
 
 import java.awt.Point;
-import java.lang.invoke.SwitchPoint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -39,8 +38,8 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.context.api.community.estimation.estimationModel;
-import org.societies.context.community.estimation.impl.*;
-import org.societies.context.broker.impl.CtxBroker;
+//import org.societies.context.community.estimation.impl.*;
+//import org.societies.context.broker.impl.CtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
