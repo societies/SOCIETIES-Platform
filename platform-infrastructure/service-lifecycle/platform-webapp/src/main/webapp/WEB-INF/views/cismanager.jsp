@@ -181,13 +181,13 @@ $(document).ready(function(){
 					<td><form:select id="attributeValue" path="attribute" cssClass="textArea"><form:options items="${attributeList}"/></form:select></td>
 					<td><form:select id="operatorValue" path="operator" cssClass="textArea"><form:options items="${operatorList}"/></form:select></td>
 					<td><form:input id="criteriaValue" path="value" /></td><td><form:errors path="value" cssClass="error" /></td>
-					<td><button type="button" id="addCriteria">Add Criteria</button></td>
+					<td><button type="button" id="addCriteria"  disabled="disabled">Do not click me</button></td>
 					<td><button type="button" id="removeCriteria">Remove Criteria</button></td>					
 					
 					</tr>
 					
 					<tr>
-					<td colspan="4"><button id="logC" type="button">B </button></td>
+					<td colspan="4"><button id="logC" type="button"  disabled="disabled">Do not click neither</button></td>
 					</tr>
 	
 				  </tbody>
