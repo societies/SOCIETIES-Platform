@@ -79,6 +79,9 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (null == dataId) {
 			throw new PrivacyException("Not enought information: data id is missing. At least the data type is expected.");
 		}
+		if (!atLeast1MandatoryAction(actions)) {
+			throw new PrivacyException("At least one mandatory action is required, they can't be all optional.");
+		}
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
@@ -91,17 +94,12 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 		// -- Retrieve a stored permission
 		ResponseItem permission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
-		// - Permission available
-		if (null != permission && null != permission.getRequestItem()) {
-			LOG.info("RequestItem NOT NULL and actions match");
-			// Return only used actions for this request
-			permission.getRequestItem().setActions(actions);
-		}
 
 		// -- Permission not available: ask to PrivacyPreferenceManager
 		if (null == permission || null == permission.getRequestItem()) {
 			LOG.info("No Permission retrieved");
 			try {
+				permission = null;
 				permission = privacyPreferenceManager.checkPermission(requestor, dataId, actions);
 			} catch (Exception e) {
 				LOG.error("Error when retrieving permission from PrivacyPreferenceManager", e);
@@ -212,6 +210,22 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 	// -- Private methods
 	
+	/**
+	 * Simple method to check if a list of actions has, at least, one action
+	 * which is not optional
+	 * @param actions List of action
+	 * @return True if the list is ok
+	 */
+	private boolean atLeast1MandatoryAction(List<Action> actions) {
+		boolean oneMandatory = false;
+		for(Action action : actions) {
+			if (!action.isOptional()) {
+				oneMandatory = true;
+				break;
+			}
+		}
+		return oneMandatory;
+	}
 
 	// --- Dependency Injection
 	public void setPrivacyPreferenceManager(

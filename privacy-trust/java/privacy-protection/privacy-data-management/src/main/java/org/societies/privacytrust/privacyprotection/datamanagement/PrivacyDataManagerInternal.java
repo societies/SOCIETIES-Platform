@@ -84,13 +84,16 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId.getOwnerId()) {
 			throw new PrivacyException("[Parameters] OwnerId is missing");
 		}
+		if (null == actions || actions.size() <= 0) {
+			throw new PrivacyException("[Parameters] Actions are missing");
+		}
 
 		Session session = sessionFactory.openSession();
 		ResponseItem permission = null;
 		Transaction t = session.beginTransaction();
 		try {
 			// -- Retrieve the privacy permission
-			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
+			Criteria criteria = findPrivacyPermissions(session, requestor, dataId, actions);
 			List<PrivacyPermission> privacyPermissions = (List<PrivacyPermission>) criteria.list();
 
 
@@ -102,26 +105,23 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			}
 			// - Privacy permissions retrieved
 			PrivacyPermission relevantPrivacyPermission = null;
-			// Check action list
-			if (null != actions) {
-				boolean found = false;
-				for(PrivacyPermission privacyPermission : privacyPermissions) {
-					// Action list is matching: return this one
-					if (containsActions(privacyPermission.getActionsFromString(), actions)) {
-						relevantPrivacyPermission = privacyPermission;
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					LOG.debug("PrivacyPermission (matching ation list) not available");
-					return null;
+			// Find the most relevant PERMIT (even if we need to avoid some optional actions)
+			boolean found = false;
+			for(PrivacyPermission privacyPermission : privacyPermissions) {
+				// If it matches to PERMIT, this is the most relevant
+				if (privacyPermission.getPermission().equals(Decision.PERMIT)) {
+					relevantPrivacyPermission = privacyPermission;
+					found = true;
+					break;
 				}
 			}
-			else {
+			// If no PERMIT has been found: take the most relevant (i.e. the first one)
+			if (!found) {
 				relevantPrivacyPermission = privacyPermissions.get(0);
 			}
-			// Return the relevant privacy permission
+			// - We could also try (in a second loop) to deduce a result by enlarging the research
+			// Not at the moment
+			// - Return the most relevant privacy permission
 			permission = relevantPrivacyPermission.createResponseItem();
 			LOG.debug("PrivacyPermission retrieved: "+relevantPrivacyPermission.toString());
 		} catch (Exception e) {
@@ -157,8 +157,8 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		boolean result = false;
 		Transaction t = session.beginTransaction();
 		try {
-			// -- Retrieve the privacy permission
-			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
+			// -- Retrieve the privacy permission (that matches all actions)
+			Criteria criteria = findPrivacyPermissions(session, requestor, dataId, actions, true);
 			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
 
 			// -- Update this privacy permission
@@ -234,19 +234,18 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		try {
 			// -- Retrieve the privacy permission
 			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
-			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
+			List<PrivacyPermission> privacyPermissions = (List<PrivacyPermission>) criteria.list();
 
 			// -- Delete the privacy permission
 			// - Privacy Permission doesn't exist
-			if (null == privacyPermission) {
-				LOG.debug("PrivacyPermission not available: no need to delete");
+			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
+				LOG.debug("PrivacyPermissions not available: no need to delete");
 			}
 			// - Privacy permission retrieved: delete it
 			else {
-				LOG.info(privacyPermission.toString());
-				session.delete(privacyPermission);
+				session.delete(privacyPermissions);
 				t.commit();
-				LOG.debug("PrivacyPermission deleted.");
+				LOG.debug("PrivacyPermissions deleted.");
 			}
 			result = true;
 		} catch (Exception e) {
@@ -266,21 +265,28 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId) {
 		return findPrivacyPermissions(session, requestor, dataId, null);
 	}
-
 	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId, List<Action> actions) {
+		return findPrivacyPermissions(session, requestor, dataId, actions, false);
+	}
+
+	/**
+	 * Retrieve a list of privacy permission
+	 * 
+	 * @param session
+	 * @param requestor
+	 * @param dataId
+	 * @param actions
+	 * @param mustMatchAllActions True to retrieve only if it matches all actions
+	 * @return  If all actions are mandatory: only one result
+	 * @return If some actions are optional: several results, ordered by relevance
+	 */
+	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId, List<Action> actions, boolean mustMatchAllActions) {
+		// Criteria about data id
 		Criteria criteria = session
 				.createCriteria(PrivacyPermission.class)
-				.add(Restrictions.like("requestorId", requestor.getRequestorId().getJid()))
 				.add(Restrictions.like("dataId", dataId.getUri()));
-		if (null != actions && actions.size() > 0) {
-			// All actions
-			Criterion criterionAllActions = null;
-			for(Action action : actions) {
-				criterionAllActions = Restrictions.and(criterionAllActions, Restrictions.like("actions", "%"+action.getActionType().name()+":"+action.isOptional()+"%"));
-			}
-			// Actions without optional ones
-			// TODO
-		}
+		// Criteria about requestor
+		criteria.add(Restrictions.like("requestorId", requestor.getRequestorId().getJid()));
 		if (requestor instanceof RequestorCis) {
 			criteria.add(Restrictions.like("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
 			criteria.add(Restrictions.isNull("serviceId"));
@@ -292,6 +298,28 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		else {
 			criteria.add(Restrictions.isNull("cisId"));
 			criteria.add(Restrictions.isNull("serviceId"));
+		}
+		// Criteria about action list
+		if (null != actions && actions.size() > 0) {
+			// Result must match all action OR only mandatory actions
+			Criterion criterionAllActions = null;
+			Criterion criterionMandatoryActions = null;
+			StringBuilder strAllActions = new StringBuilder();
+			StringBuilder strMandatoryActions = new StringBuilder();
+			for(Action action : actions) {
+				strAllActions.append(action.getActionType().name()+"/");
+				if (!mustMatchAllActions && !action.isOptional()) {
+					strMandatoryActions.append(action.getActionType().name()+"/");
+				}
+			}
+			criterionAllActions = Restrictions.and(criterionAllActions, Restrictions.like("actions", strAllActions.toString()));
+			criterionMandatoryActions = Restrictions.and(criterionAllActions, Restrictions.like("actions", strMandatoryActions.toString()));
+			if (!mustMatchAllActions) {
+				criteria.add(Restrictions.or(criterionAllActions, criterionMandatoryActions));
+			}
+			else {
+				criteria.add(criterionAllActions);
+			}
 		}
 		return criteria;
 	}

@@ -25,7 +25,6 @@
 package org.societies.privacytrust.privacyprotection.model;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,12 +35,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
@@ -54,9 +49,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.identity.DataIdentifier;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * Entity to store privacy permissions for access control persistence
@@ -83,10 +75,15 @@ public class PrivacyPermission implements Serializable {
 	private String cisId;
 	private String dataId;
 	/**
-	 * Format:  value:optional/value:optional/...
-	 * E.g.: READ:true/WRITE:false
+	 * Format:  value/value/.../
+	 * E.g.: READ/WRITE/
 	 */
 	private String actions;
+	/**
+	 * Format:  value/value/.../
+	 * E.g.: false/true/
+	 */
+	private String actionsOptional;
 	@Enumerated
 	private Decision permission;
 
@@ -103,11 +100,12 @@ public class PrivacyPermission implements Serializable {
 	 * @param ownerId
 	 * @param dataId
 	 * @param actions
+	 * @param actionsStatus
 	 * @param permission
 	 */
 	public PrivacyPermission(String requestorId,
 			PrivacyPolicyTypeConstants permissionType, String serviceId,
-			String cisId, String dataId, String actions,
+			String cisId, String dataId, String actions, String actionsStatus,
 			Decision permission) {
 		super();
 		this.requestorId = requestorId;
@@ -116,6 +114,7 @@ public class PrivacyPermission implements Serializable {
 		this.cisId = cisId;
 		this.dataId = dataId;
 		this.actions = actions;
+		this.actionsOptional = actionsStatus;
 		this.permission = permission;
 	}
 
@@ -195,14 +194,24 @@ public class PrivacyPermission implements Serializable {
 		List<Action> actions = new ArrayList<Action>();
 		if (null != this.actions && !"".equals(this.actions)) {
 			int pos = 0, end;
+			int posOptional = 0, endOptional;
 			// Loop over actions
 			while ((end = this.actions.indexOf('/', pos)) >= 0) {
+//				String action = this.actions.substring(pos, end);
+//				int positionOptional = action.indexOf(':');
+//				ActionConstants actionType = ActionConstants.valueOf(action.substring(0, positionOptional));
+//				boolean optional = "false".equals(action.substring(positionOptional+1, action.length())) ? false : true;
+//				actions.add(new Action(actionType, optional));
+//				pos = end + 1;
 				String action = this.actions.substring(pos, end);
-				int positionOptional = action.indexOf(':');
-				ActionConstants actionType = ActionConstants.valueOf(action.substring(0, positionOptional));
-				boolean optional = "false".equals(action.substring(positionOptional+1, action.length())) ? false : true;
-				actions.add(new Action(actionType, optional));
+				ActionConstants actionType = ActionConstants.valueOf(action.substring(pos, end));
 				pos = end + 1;
+				
+				endOptional = this.actionsOptional.indexOf('/', posOptional);
+				boolean optional = "false".equals(this.actionsOptional.substring(posOptional, endOptional)) ? false : true;
+				posOptional = endOptional + 1;
+				
+				actions.add(new Action(actionType, optional));
 			}
 		}
 		return actions;
@@ -212,13 +221,17 @@ public class PrivacyPermission implements Serializable {
 	 * Set a list of actions as a formatted string value:optional/value:optional/...
 	 */
 	public void setActions(List<Action> actions) {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder strActions = new StringBuilder();
+		StringBuilder strActionsStatus = new StringBuilder();
 		if (null != actions) {
 			for(int i=0; i<actions.size(); i++) {
-				sb.append(actions.get(i).getActionType().name()+":"+actions.get(i).isOptional()+"/");
+//				sb.append(actions.get(i).getActionType().name()+":"+actions.get(i).isOptional()+"/");
+				strActions.append(actions.get(i).getActionType().name()+"/");
+				strActionsStatus.append(actions.get(i).isOptional()+"/");
 			}
 		}
-		this.actions = sb.toString();
+		this.actions = strActions.toString();
+		this.actionsOptional = strActionsStatus.toString();
 	}
 
 	/**
@@ -338,12 +351,24 @@ public class PrivacyPermission implements Serializable {
 	public String getActions() {
 		return actions;
 	}
-
 	/**
 	 * @param actions the actions to set
 	 */
 	public void setActions(String actions) {
 		this.actions = actions;
+	}
+	
+	/**
+	 * @return the actions
+	 */
+	public String getActionsOptional() {
+		return actionsOptional;
+	}
+	/**
+	 * @param actions the actions to set
+	 */
+	public void setActionsOptional(String actionsOptional) {
+		this.actionsOptional = actionsOptional;
 	}
 
 	/* (non-Javadoc)
@@ -361,6 +386,7 @@ public class PrivacyPermission implements Serializable {
 				+ (cisId != null ? "cisId=" + cisId + ", " : "")
 				+ (dataId != null ? "dataId=" + dataId + ", " : "")
 				+ (actions != null ? "actions=" + actions + ", " : "")
+				+ (actionsOptional != null ? "actionsOptional=" + actionsOptional + ", " : "")
 				+ (permission != null ? "permission=" + permission : "") + "]";
 	}
 }
