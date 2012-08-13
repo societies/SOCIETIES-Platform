@@ -18,7 +18,7 @@
 	
 	<!-- Security -->
 	<artifact type="bundle" name="org.societies.security.secur-services"/>
-	<artifact type="bundle" name="org.societies.security.policy-negotiator"/>
 	<artifact type="bundle" name="org.societies.security.secur-commsmgr"/>
+	<artifact type="bundle" name="org.societies.security.policy-negotiator"/>
 
 </plan>

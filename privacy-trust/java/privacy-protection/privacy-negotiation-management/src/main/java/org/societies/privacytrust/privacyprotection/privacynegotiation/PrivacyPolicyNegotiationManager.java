@@ -40,6 +40,7 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
@@ -84,7 +85,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	private ICommManager commsMgr;
 	
 	
-	
+	private IPrivacyPolicyManager privacyPolicyManager;
 	/**
 	 * @return the prefMgr
 	 */
@@ -411,6 +412,18 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	public void setPrivacyAgreementManagerInternal(
 			IPrivacyAgreementManagerInternal privacyAgreementManagerInternal) {
 		this.privacyAgreementManagerInternal = privacyAgreementManagerInternal;
+	}
+	/**
+	 * @return the privacyPolicyManager
+	 */
+	public IPrivacyPolicyManager getPrivacyPolicyManager() {
+		return privacyPolicyManager;
+	}
+	/**
+	 * @param privacyPolicyManager the privacyPolicyManager to set
+	 */
+	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+		this.privacyPolicyManager = privacyPolicyManager;
 	}
 
 

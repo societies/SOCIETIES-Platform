@@ -76,7 +76,7 @@ public class CommsServer implements IFeatureServer {
 //	@PostConstruct
 	public void init() {
 		
-		LOG.debug("init(): commMgr = {}", commMgr.toString());
+		LOG.debug("init()");
 		
 		try {
 			commMgr.register(this);

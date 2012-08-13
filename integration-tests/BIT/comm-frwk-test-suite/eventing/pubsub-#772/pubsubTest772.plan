@@ -7,11 +7,12 @@
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
     <!-- Comms Framework -->
+    <artifact type="configuration" name="xc" />
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
     
-    <!--  Pubsub Test class -->
-    <artifact type="bundle" name="integration.test.bit.pubsub_772"/>
+    <!--  Pubsub Test class integration.test.bit.pubsub_772 -->
+    <artifact type="bundle" name="org.societies.integration.test.bit.pubsub_772"/>
     
 </plan>

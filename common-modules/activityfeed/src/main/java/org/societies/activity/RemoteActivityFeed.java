@@ -41,9 +41,14 @@ import org.societies.api.identity.IIdentity;
 
 import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.AddActivity;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeed;
 import org.societies.api.schema.activityfeed.DeleteActivity;
-import org.societies.api.schema.cis.community.AddActivity;
+import org.societies.api.schema.activityfeed.GetActivities;
 import org.societies.api.schema.cis.community.Community;
+
+
+
 
 
 public class RemoteActivityFeed implements IActivityFeed {
@@ -61,38 +66,8 @@ public class RemoteActivityFeed implements IActivityFeed {
 	}
 	
 
-	@Override
-	public List<IActivity> getActivities(String timePeriod) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public List<IActivity> getActivities(String CssId, String query,
-			String timePeriod) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<IActivity> getActivities(String query, String timePeriod) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addCisActivity(IActivity activity) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int cleanupFeed(String criteria) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
+	/*
 	public boolean deleteActivity(IActivity activity) {
 		LOG.debug("client call to delete activity to a RemoteCIS");
 		Activityfeed ac = new Activityfeed();
@@ -106,12 +81,9 @@ public class RemoteActivityFeed implements IActivityFeed {
 		a.setPublished(activity.getPublished());
 		a.setVerb(activity.getVerb());
 		this.sendXmpp(ac, new delAcCallBack());
-
-		
-
-		
+				
 		return true;
-	}
+	}*/
 	
 	class delAcCallBack implements IActivityFeedCallback{
 
@@ -132,6 +104,84 @@ public class RemoteActivityFeed implements IActivityFeed {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	
+
+	public void getActivities(String timePeriod, IActivityFeedCallback c) {
+		LOG.debug("client call to get activities, without query, from a RemoteCIS");
+		Activityfeed ac = new Activityfeed();
+		GetActivities g = new GetActivities();
+		g.setTimePeriod(timePeriod);
+		ac.setGetActivities(g);
+		this.sendXmpp(ac, c);
+	}
+
+	public void getActivities(String query,
+			String timePeriod, IActivityFeedCallback c) {
+		LOG.debug("client call to get activities, with query, from a RemoteCIS");
+		Activityfeed ac = new Activityfeed();
+		GetActivities g = new GetActivities();
+		g.setTimePeriod(timePeriod);
+		g.setQuery(query);
+		ac.setGetActivities(g);
+		this.sendXmpp(ac, c);
+	}
+
+
+	public void addActivity(IActivity activity,IActivityFeedCallback c) {
+		LOG.debug("client call to add activity to a RemoteCIS");
+		Activityfeed ac = new Activityfeed();
+		AddActivity g = new AddActivity();
+		Activity a = new Activity();
+		a.setActor(activity.getActor());
+		a.setObject(activity.getObject());
+		a.setTarget(activity.getTarget());
+		a.setPublished(activity.getPublished());
+		a.setVerb(activity.getVerb());
+		g.setActivity(a);
+		ac.setAddActivity(g);
+		this.sendXmpp(ac, c);
+		
+	}
+
+	public void cleanupFeed(String criteria,IActivityFeedCallback c) {
+		LOG.debug("client call to clean up an activity feed to a RemoteCIS");
+		Activityfeed ac = new Activityfeed();
+		CleanUpActivityFeed cl = new CleanUpActivityFeed(); 
+		cl.setCriteria(criteria);
+		ac.setCleanUpActivityFeed(cl);
+		this.sendXmpp(ac, c);
+	}
+
+	public void deleteActivity(IActivity activity,IActivityFeedCallback c) {
+		LOG.debug("client call to delete activity to a RemoteCIS");
+		Activityfeed ac = new Activityfeed();
+		DeleteActivity d = new DeleteActivity();
+		ac.setDeleteActivity(d);
+		Activity a = new Activity();
+		d.setActivity(a);
+		a.setActor(activity.getActor());
+		a.setObject(activity.getObject());
+		a.setTarget(activity.getTarget());
+		a.setPublished(activity.getPublished());
+		a.setVerb(activity.getVerb());
+		this.sendXmpp(ac, new delAcCallBack());
+		
+	}
+	
+	
+	
+	
+	@Override
+	public IActivity getEmptyIActivity(){
+		org.societies.activity.model.Activity a = new org.societies.activity.model.Activity();
+		return a;
+	}
+	
+	
+	
+	
+	
 	
 	private void sendXmpp(Activityfeed c, IActivityFeedCallback callback){
 

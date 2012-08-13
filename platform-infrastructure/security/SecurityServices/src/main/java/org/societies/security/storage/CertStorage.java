@@ -24,15 +24,18 @@
  */
 package org.societies.security.storage;
 
-import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.security.storage.StorageException;
 import org.societies.security.digsig.util.StreamUtil;
 
@@ -41,11 +44,16 @@ import org.societies.security.digsig.util.StreamUtil;
  * @author Miroslav Pavleski, Mitja Vardjan
  */
 public class CertStorage {
+
+	private static Logger LOG = LoggerFactory.getLogger(CertStorage.class);
+
+	private static final String defaultCertificate = "default_certificate.p12";
+	
 	private static CertStorage instance;
 
 	// private XmlManipulator xml = Config.getInstance().getXml();
 	private X509Certificate ourCert;
-	private Key ourKey;
+	private PrivateKey ourKey;
 
 	private CertStorage() throws StorageException {
 		initOurIdentity();
@@ -53,29 +61,29 @@ public class CertStorage {
 
 	private void initOurIdentity() throws StorageException {
 		
-		InputStream ksStream = null;
+		InputStream ksStream;
 		
 		Security.addProvider(new BouncyCastleProvider());
 		
+		String fileName = "my_certificate.p12"; // TODO
+		String pass = "p"; // TODO
+
+		try {
+			ksStream = new FileInputStream(fileName);
+		} catch (FileNotFoundException e) {
+			LOG.warn("Certificate file \"{}\" not found. Using default built-in certificate.", fileName);
+			ksStream = getClass().getClassLoader().getResourceAsStream(defaultCertificate);
+		}
+
 		try {
 
 			KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
 
-			// String fileName =
-			// xml.getElementContent("/ServiceProviderConfig/Certificates/OurIdentity/PKCS12");
-			// String pass =
-			// xml.getElementContent("/ServiceProviderConfig/Certificates/OurIdentity/Password");
-			String fileName = "Societies_Service_Provider.p12"; // TODO
-			String pass = "p"; // TODO
-
-			//ksStream = CertStorage.class.getClassLoader().getResourceAsStream(fileName);
-			File file = new File(fileName);
-			ksStream = new FileInputStream(file);
 			ks.load(ksStream, pass.toCharArray());
 
 			String alias = ks.aliases().nextElement();
 			ourCert = (X509Certificate) ks.getCertificate(alias);
-			ourKey = ks.getKey(alias, pass.toCharArray());
+			ourKey = (PrivateKey) ks.getKey(alias, pass.toCharArray());
 
 			if (ourCert == null || ourKey == null)
 				throw new NullPointerException();
@@ -96,7 +104,7 @@ public class CertStorage {
 	 * 
 	 * @return The private key
 	 */
-	public Key getOurKey() {
+	public PrivateKey getOurKey() {
 		return ourKey;
 	}
 

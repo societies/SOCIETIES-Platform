@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.android.platform.content.CssRecordDAO;
@@ -48,12 +49,13 @@ import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
+import org.societies.api.schema.cssmanagement.CssNode;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
-import javax.xml.bind.JAXBException;
 
 import android.app.Service;
 import android.content.Intent;
@@ -133,9 +135,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	public void onCreate () {
 //		Traceview 
 //		Debug.startMethodTracing(ANDROID_PROFILING_NAME);
-		
-		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
-		this.registerForPubsub();
+		//TODO - re-instate when Pubsub simple is working
+//		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
+//		this.registerForPubsub();
 		
 		Log.d(LOG_TAG, "CSSManager opening database");
 		this.cssRecordDAO = new CssRecordDAO(this);
@@ -250,7 +252,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("CSS record cannot be null", record != null);
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-		messageBean.setProfile(record);
+		messageBean.setProfile(convertAndroidCSSRecord(record));
 		messageBean.setMethod(MethodType.LOGIN_CSS);
 
 		Stanza stanza = new Stanza(toXCManager);
@@ -307,7 +309,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGOUT_CSS));
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-		messageBean.setProfile(record);
+		messageBean.setProfile(convertAndroidCSSRecord(record));
 		messageBean.setMethod(MethodType.LOGOUT_CSS);
 
 		Stanza stanza = new Stanza(toXCManager);
@@ -619,9 +621,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			this.asynchTask.execute(pubsubClient);
 
 
-		} catch (JAXBException e) {
-			Log.e(LOG_TAG, "Error while adding namespace package to Pubsub", e);
-		} catch (Exception e) {
+        } catch (Exception e) {
 			Log.e(LOG_TAG, "Error while adding namespace package to Pubsub", e);
 		}
 
@@ -677,5 +677,55 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     	}
     }
 
+    /**
+     * Convert AndroidCSSRecord to CssRecord. Required for Simple XML
+     * @param record
+     * @return {@link AndroidCSSRecord}
+     */
+    private CssRecord convertAndroidCSSRecord(AndroidCSSRecord record) {
+    	
+    	CssRecord cssRecord = new CssRecord();
+    	
+    	cssRecord.setCssHostingLocation(record.getCssHostingLocation());
+       	cssRecord.setCssIdentity(record.getCssIdentity());
+       	cssRecord.setCssInactivation(record.getCssInactivation());
+       	cssRecord.setCssRegistration(record.getCssRegistration());
+       	cssRecord.setCssUpTime(record.getCssUpTime());
+       	cssRecord.setDomainServer(record.getDomainServer());
+       	cssRecord.setEmailID(record.getEmailID());
+       	cssRecord.setEntity(record.getEntity());
+       	cssRecord.setForeName(record.getForeName());
+       	cssRecord.setHomeLocation(record.getHomeLocation());
+       	cssRecord.setIdentityName(record.getIdentityName());
+       	cssRecord.setImID(record.getImID());
+       	cssRecord.setName(record.getName());
+       	cssRecord.setPassword(record.getPassword());
+       	cssRecord.setPresence(record.getPresence());
+       	cssRecord.setSex(record.getSex());
+       	cssRecord.setSocialURI(record.getSocialURI());
+       	cssRecord.setStatus(record.getStatus());
+       	for (AndroidCSSNode node : record.getArchivedCSSNodes()) {
+       		cssRecord.getArchiveCSSNodes().add(convertAndroidCSSNode(node));
+       	}
+       	for (AndroidCSSNode node : record.getCSSNodes()) {
+       		cssRecord.getCssNodes().add(convertAndroidCSSNode(node));
+       	}
+       	
+       	return cssRecord;
+    }
+    /**
+     * Convert AndroidCSSNode to CssNode. Required for Simple XML
+     * @param node
+     * @return CssNode
+     */
+    private CssNode convertAndroidCSSNode(AndroidCSSNode node) {
+    	CssNode cssNode = new CssNode();
+    	
+    	cssNode.setIdentity(node.getIdentity());
+    	cssNode.setStatus(node.getStatus());
+    	cssNode.setType(node.getType());
+    	
+    	return cssNode;
+    }
 
 }

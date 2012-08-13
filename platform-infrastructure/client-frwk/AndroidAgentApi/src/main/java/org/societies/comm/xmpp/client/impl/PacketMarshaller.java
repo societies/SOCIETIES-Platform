@@ -1,34 +1,29 @@
 package org.societies.comm.xmpp.client.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
 import org.societies.impl.RawXmlProvider;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -38,40 +33,39 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import android.util.Log;
+
 public class PacketMarshaller {	
 	
-	private Map<String, Marshaller> pkgToMarshaller = new HashMap<String, Marshaller>();
-	private Map<String, Unmarshaller> nsToUnmarshaller = new HashMap<String, Unmarshaller>();
+	private static final String LOG_TAG = PacketMarshaller.class.getName();
+	private final Map<String, String> nsToPackage = new HashMap<String, String>();
 	
 	public void register(List<String> elementNames, List<String> namespaces, List<String> packages) {
+		Log.d(LOG_TAG, "register");
+		for (String element : elementNames) {
+			Log.d(LOG_TAG, "register element: " + element);
+		}
+		
 		try {
-			StringBuilder contextPath = new StringBuilder(packages.get(0));
-			for (int i = 1; i < packages.size(); i++)
-				contextPath.append(":" + packages.get(i));
-			
-			JAXBContext jc = JAXBContext.newInstance(contextPath.toString(),
-					this.getClass().getClassLoader());
-			Unmarshaller u = jc.createUnmarshaller();
-			Marshaller m = jc.createMarshaller();
-			
-			for (String ns : namespaces) {
-				nsToUnmarshaller.put(ns, u);
+			//TODO: SIMPLE XML
+			for (int i=0; i<packages.size(); i++) {
+				String packageStr = packages.get(i);
+				String nsStr = namespaces.get(i); 
+				nsToPackage.put(nsStr, packageStr);
 			}
-
-			for (String packageStr : packages) {
-				pkgToMarshaller.put(packageStr, m);
-			}
-						
+				
 			RawXmlProvider rawXmlProvider = new RawXmlProvider();
 			for(String elementName:elementNames)
 				for(String namespace:namespaces)
 					ProviderManager.getInstance().addExtensionProvider(elementName, namespace, rawXmlProvider);
-		} catch (JAXBException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
 	public String marshallMessage(Stanza stanza, Message.Type type, Object payload) throws Exception {
+		Log.d(LOG_TAG, "marshallMessage type: " + type.name() + "stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
+		
 		final String xml = marshallPayload(payload);
 		Message message = new Message();
 		if(stanza.getId() != null)
@@ -96,6 +90,7 @@ public class PacketMarshaller {
 	}
 	
 	public String marshallIQ(Stanza stanza, IQ.Type type, Object payload) throws Exception {				
+		Log.d(LOG_TAG, "marshallIQ type: " + type + "stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
 		final String xml = marshallPayload(payload);
 		IQ iq = new IQ() {
 			@Override
@@ -113,30 +108,44 @@ public class PacketMarshaller {
 	}
 	
 	public IQ unmarshallIq(String xml) throws Exception {
+		Log.d(LOG_TAG, "unmarshallIq xml: " + xml);
+		
 		return parseIq(createXmlPullParser(xml));
 	}
 	
 	public Message unmarshallMessage(String xml) throws Exception {			
+		Log.d(LOG_TAG, "unmarshallMessage + xml: " + xml);
+		
 	    return (Message)PacketParserUtils.parseMessage(createXmlPullParser(xml));
 	}
 	
 	public Object unmarshallPayload(Packet packet) throws Exception {
+		Log.d(LOG_TAG, "unmarshallPayload packet: " + packet.getPacketID());
 		Element element = getElementAny(packet);
 		
 		if(element == null) // Empty stanza
 			return null;
 		
 		String namespace = element.lookupNamespaceURI(element.getPrefix());
-		Unmarshaller u = getUnmarshaller(namespace);
-
 		String xml = MarshallUtils.nodeToString(element);
+		Log.d(PacketMarshaller.class.getName() + " ### ", xml);
 		
-		Object payload = u.unmarshal(new InputSource(new StringReader(xml)));
-
+		//GET CLASS FIRST
+		String packageStr = nsToPackage.get(namespace);  
+		String beanName = element.getLocalName().substring(0,1).toUpperCase() + element.getLocalName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+		Log.d(PacketMarshaller.class.getName(), "Trying to unmarshall: " + packageStr + "." + beanName);
+		Class<?> c = Class.forName(packageStr + "." + beanName);
+		
+		//GET SIMPLE SERIALISER 
+		Strategy strategy = new AnnotationStrategy();
+		Serializer s = new Persister(strategy);
+		Object payload = s.read(c, xml);
+		
 		return payload;
 	}
 	
 	public Entry<String, List<String>> parseItemsResult(Packet packet) throws SAXException, IOException, ParserConfigurationException {
+		Log.d(LOG_TAG, "Entry");
 		Element element = getElementAny(packet);
 		final String node = element.getAttribute("node");
 		final List<String> list = new ArrayList<String>();
@@ -162,38 +171,39 @@ public class PacketMarshaller {
 		};
 	}
 	
-	private String marshallPayload(Object payload) throws JAXBException, ParserConfigurationException, TransformerException {
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		Document doc = db.newDocument();
-		Marshaller m = getMarshaller(payload);
-		m.marshal(payload, doc);
-		return MarshallUtils.nodeToString(doc);
+	private String marshallPayload(Object payload) {
+		Log.d(LOG_TAG, "marshallPayload payload: " + payload.getClass().getName());
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		
+		//GET SIMPLE SERIALISER 
+		Strategy strategy = new AnnotationStrategy();
+		Serializer s = new Persister(strategy);
+		try {
+			s.write(payload, os);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Log.d(PacketMarshaller.class.getName() + " ### ", os.toString());
+		return os.toString();
 	}
 	
-	private Marshaller getMarshaller(Object payload) {
-		return pkgToMarshaller.get(payload.getClass().getPackage().getName());	
-	}
-	
-	private Unmarshaller getUnmarshaller(String namespace) {
-		return nsToUnmarshaller.get(namespace);
-	}
-	
-	/** Get the element with the payload out of the XMPP packet. */
+	/** Get the element with the payload out of the XMPP packet. 
+	 * @throws ParserConfigurationException */
 	private Element getElementAny(Packet packet) throws SAXException, IOException, ParserConfigurationException {
+		Log.d(LOG_TAG, "getElementAny packet: " + packet.getPacketID());
+		
 		if (packet instanceof IQ) {
 			// According to the schema in RCF6121 IQs only have one
 			// element, unless they have an error
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(true);
 			return (Element) factory.newDocumentBuilder().parse(new InputSource(new StringReader(packet.toXML()))).getDocumentElement().getFirstChild();
-		} else if (packet instanceof Message) {
+		} 
+		else if (packet instanceof Message) {
 			// according to the schema in RCF6121 messages have an unbounded
 			// number
 			// of "subject", "body" or "thread" elements before the any element
 			// part
-			
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(true);
 			Element element = factory.newDocumentBuilder().parse(new InputSource(new StringReader(packet.toXML()))).getDocumentElement();
@@ -216,6 +226,8 @@ public class PacketMarshaller {
 	}
 	
 	private XmlPullParser createXmlPullParser(String xml) throws XmlPullParserException, IOException {
+		Log.d(LOG_TAG, "createXmlPullParser xml: " + xml);
+		
 		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 	    factory.setNamespaceAware(true);
 	    XmlPullParser parser = factory.newPullParser();
@@ -225,6 +237,7 @@ public class PacketMarshaller {
 	}
 	
 	private IQ parseIq(XmlPullParser parser) throws Exception {
+		Log.d(LOG_TAG, "parseIq");
 		IQ iqPacket = null;
 		String id = parser.getAttributeValue("", "id");
 		String to = parser.getAttributeValue("", "to");

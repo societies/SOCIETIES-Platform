@@ -75,16 +75,6 @@
 				<td><form:input path="id" /></td>
 				<td><form:errors path="id" cssClass="error" /></td>
 			</tr>
-			<tr>
-				<td>CIS Password:</td>
-				<td><form:input path="password" /></td>
-				<td><form:errors path="password" cssClass="error" /></td>
-			</tr>
-			<tr>
-				<td>CIS Mode:</td>
-				<td><form:input path="mode" /></td>
-				<td><form:errors path="mode" cssClass="error" /></td>
-			</tr>	
 			</table>
 	</form:form>
 	

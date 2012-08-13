@@ -29,11 +29,13 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.integration.test.IntegrationTestCase;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 
 public class TestCase747 extends IntegrationTestCase{
 	
 	public static ICtxBroker ctxBroker;
 	public static IUserActionMonitor uam;
+	public static ICommManager commsMgr;
 	public static IEventMgr eventMgr;
 
 	public TestCase747(){
@@ -46,6 +48,10 @@ public class TestCase747 extends IntegrationTestCase{
 	
 	public void setUam(IUserActionMonitor uam){
 		this.uam = uam;
+	}
+	
+	public void setCommsMgr(ICommManager commsMgr){
+		this.commsMgr = commsMgr;
 	}
 	
 	public void setEventMgr(IEventMgr eventMgr){

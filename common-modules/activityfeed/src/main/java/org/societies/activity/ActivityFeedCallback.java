@@ -58,12 +58,23 @@ public class ActivityFeedCallback implements ICommCallback {
 			LOG.info("Callback with result");
 			Activityfeed a = (Activityfeed) payload ;
 			
-			if(a.getDeleteActivityResponse() != null){
+			if(a.getDeleteActivityResponse() != null)
 				LOG.info("Delete Activity Response received and equal to " + a.getDeleteActivityResponse().isResult());
-			}
 			
+			if(a.getAddActivityResponse() != null)
+				LOG.info("Add Activity Response received and equal to " + a.getAddActivityResponse().isResult());
+			
+			if(a.getCleanUpActivityFeedResponse() != null)
+				LOG.info("CleanUp Activity Feed Response received and equal to " + a.getCleanUpActivityFeedResponse().getResult());	
+			
+			if(a.getGetActivitiesResponse() !=null)
+				LOG.info("Get Activities Response received");
 			
 		}
+		
+
+		// return callback for all cases
+		this.sourceCallback.receiveResult((Activityfeed)payload);
 
 	}
 

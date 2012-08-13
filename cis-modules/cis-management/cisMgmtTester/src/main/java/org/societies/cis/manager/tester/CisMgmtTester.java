@@ -25,6 +25,9 @@
 
 package org.societies.cis.manager.tester;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -40,9 +43,21 @@ import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.manager.CommunityManager;
+import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,7 +70,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CisMgmtTester {
 
 	//private IcisManagerClient cisClient;
-	private ICisManager cisClient;
+	//private ICisManager cisClient;
+	private ICommManager iCommMgr;
 	
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisMgmtTester.class);
@@ -74,13 +90,51 @@ public class CisMgmtTester {
 		CisMgmtTester.busy = busy;
 	}
 
-	public CisMgmtTester(ICisManager cisClient, String targetCisId){
+	public CisMgmtTester(ICommManager iCommMgr, String targetCisId){
 
+		this.iCommMgr = iCommMgr;
+		this.targetCisId = targetCisId;
+		IIdentity toIdentity;
+		try {
+			toIdentity =iCommMgr.getIdManager().fromJid(targetCisId);
+			Stanza stanza = new Stanza(toIdentity);
+			
+			CommunityManager c = new CommunityManager();
+			Create cr = new Create();
+			c.setCreate(cr);
+			Community com = new Community();
+			cr.setCommunity(com);
+			com.setCommunityType("futebol");
+			com.setCommunityName("fla");
+			com.setDescription("grupo do fla");
+			
+			MembershipCrit m = new MembershipCrit();
+			List<Criteria> l = new ArrayList<Criteria>();
+			m.setCriteria(l);
+			Criteria crit = new Criteria();
+			crit.setAttrib("status");
+			crit.setOperator("equals");
+			//crit.setRank(0);
+			crit.setValue1("married");
+			l.add(crit);
+			
+			com.setMembershipCrit(m);
+			
+			try {
+				LOG.info("Sending stanza");
+				this.iCommMgr.sendIQGet(stanza, c, new TestIcomCallBack());
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			LOG.info("Problem with the input jid when trying to send");
+			e1.printStackTrace();
+		}	
 		
 		
-
 		
-		JoinCallBack icall = new JoinCallBack(cisClient);
+/*		JoinCallBack icall = new JoinCallBack(cisClient);
 		
 		
 		
@@ -88,7 +142,7 @@ public class CisMgmtTester {
 		this.cisClient = cisClient;
 		LOG.info("got autowired reference, target cisId is " + targetCisId);
 
-		ICis icis = cisClient.getCis("xcmanager1.thomas.local", targetCisId);
+		ICis icis = cisClient.getCis(targetCisId);
 
 		if(icis == null){
 			LOG.info("could not retrieve CIS");
@@ -101,10 +155,10 @@ public class CisMgmtTester {
 		iActivity.setPublished((System.currentTimeMillis() -55) + "");
 		iActivity.setVerb("verb");
 
-		/*LOG.info("calling add activity remote");				
+		LOG.info("calling add activity remote");				
 		AddActivityCallBack h = new AddActivityCallBack();
 		icis.addCisActivity(iActivity, h);
-		LOG.info("add activity remote done");*/
+		LOG.info("add activity remote done");
 
 		
 		LOG.info("del activity remote");
@@ -121,7 +175,7 @@ public class CisMgmtTester {
 	
 				
 		LOG.info("del activity remote done");
-/*		LOG.info("join a remote CIS");
+		LOG.info("join a remote CIS");
 		this.cisClient.joinRemoteCIS(targetCisId, icall);
 		LOG.info("join sent");
 */
@@ -149,10 +203,10 @@ public class CisMgmtTester {
 				LOG.info("good return on JoinCallBack");
 				LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
 				join = 1;
-				ICis icis = cisClient.getCis("xcmanager1.thomas.local", communityResultObject.getCommunityJid());
+				ICis icis = cisClient.getCis(communityResultObject.getCommunityJid());
 				
 				
-				IActivity iActivity = new org.societies.activity.model.Activity();
+				/*					IActivity iActivity = new org.societies.activity.model.Activity();
 				iActivity.setActor("act");
 				iActivity.setObject("obj");
 				iActivity.setTarget("tgt");
@@ -160,7 +214,7 @@ public class CisMgmtTester {
 				iActivity.setVerb("verb");
 
 				LOG.info("calling add activity remote");				
-				AddActivityCallBack h = new AddActivityCallBack();
+							AddActivityCallBack h = new AddActivityCallBack();
 				icis.addCisActivity(iActivity, h);
 				LOG.info("add activity remote done");
 				
@@ -181,31 +235,10 @@ public class CisMgmtTester {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				
-				
-/*				iActivity.setTarget("New tgt");
-				iActivity.setPublished((System.currentTimeMillis()) + "");
-
-				LOG.info("calling 2nds add activity remote");				
-				icis.addCisActivity(iActivity, h);
-				LOG.info("add 2nd activity remote done");
-
-				
-				
-				LOG.info("calling Get Activity Remote");
-				GetActivitiesCallBack g = new GetActivitiesCallBack();
-				String timePeriod = (System.currentTimeMillis() -60000) + " " + System.currentTimeMillis();
-				icis.getActivities(timePeriod, g);
-				LOG.info("remote get activity done");
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 */				
-			
+				
+				
+	
 				
 			}
 
@@ -216,20 +249,58 @@ public class CisMgmtTester {
 
 	}
 	
-	public class AddActivityCallBack implements ICisManagerCallback{
+	public class TestIcomCallBack implements ICommCallback{
 		
+		private final  List<String> NAMESPACES = Collections
+				.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+//									"http://societies.org/api/schema/activity",
+							  		"http://societies.org/api/schema/cis/community"));
+				//.singletonList("http://societies.org/api/schema/cis/manager");
+		private final  List<String> PACKAGES = Collections
+				//.singletonList("org.societies.api.schema.cis.manager");
+				.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+//						"org.societies.api.schema.activity",
+						"org.societies.api.schema.cis.community"));
+		
+		@Override
+		public List<String> getXMLNamespaces() {
+			
+			return this.NAMESPACES;
+		}
 
+		@Override
+		public List<String> getJavaPackages() {
+			// TODO Auto-generated method stub
+			return this.PACKAGES;
+		}
 
-		public void receiveResult(Community communityResultObject) {
-			if(communityResultObject == null){
-				LOG.info("null return on AddActivityCallBack");
-				return;
-			}
-			else{
-				if(communityResultObject.getAddActivityResponse().isResult())
-					LOG.info("good return on AddActivityCallBack Callback");
-				
-			}
+		@Override
+		public void receiveResult(Stanza stanza, Object payload) {
+			LOG.info(payload.toString());
+			
+		}
+
+		@Override
+		public void receiveError(Stanza stanza, XMPPError error) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void receiveItems(Stanza stanza, String node, List<String> items) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void receiveMessage(Stanza stanza, Object payload) {
+			LOG.info(payload.toString());
 			
 		}
 
@@ -249,7 +320,7 @@ public class CisMgmtTester {
 			else{
 				LOG.info("good return on GetActivitiesCallBack  Callback");
 				LOG.info("Result Status: GetListMembersCallBack from CIS " + communityResultObject.getCommunityJid());
-				List<org.societies.api.schema.activity.Activity> l = communityResultObject.getGetActivitiesResponse().getActivity();
+			/*	List<org.societies.api.schema.activity.Activity> l = communityResultObject.getGetActivitiesResponse().getActivity();
 
 				int[] memberCheck = {0,0,0};
 				
@@ -258,7 +329,7 @@ public class CisMgmtTester {
 				while(it.hasNext()){
 					org.societies.api.schema.activity.Activity element = it.next();
 					LOG.info("actor " + element.getActor() + " target "  + element.getTarget() + " time "  + element.getPublished() );
-			     }
+			     }*/
 				
 			}
 			

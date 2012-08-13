@@ -29,10 +29,12 @@ package org.societies.cis.manager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Hashtable;
 
 import java.util.Iterator;
 import java.util.List;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 
@@ -45,6 +47,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.activity.ActivityFeed;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -58,12 +62,20 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 
@@ -75,13 +87,32 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 
 
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.cis.community.Community;
 
+
+import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.Join;
+import org.societies.api.schema.cis.community.Leave;
+import org.societies.api.schema.cis.community.Qualification;
+//import org.societies.api.schema.cis.community.Leave;
+import org.societies.api.schema.cis.community.MembershipCrit;
+
+
+import org.societies.api.schema.cis.community.Join;
+//import org.societies.api.schema.cis.community.Leave;
+import org.societies.api.schema.cis.community.Participant;
+
+
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
-import org.societies.api.schema.cis.manager.Communities;
+
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
-import org.societies.api.schema.cis.manager.CisCommunity;
+
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
 
@@ -108,7 +139,70 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	IServiceDiscoveryRemote iServDiscRemote;
 	IServiceControlRemote iServCtrlRemote;
 	private IPrivacyPolicyManager privacyPolicyManager;
+	private IEventMgr eventMgr;
+	private ICtxBroker internalCtxBroker;
 
+
+	//Autowiring gets and sets
+	
+	public ICtxBroker getInternalCtxBroker() {
+		return internalCtxBroker;
+	}
+	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
+		this.internalCtxBroker = internalCtxBroker;
+	}
+	public IServiceDiscoveryRemote getiServDiscRemote() {
+		return iServDiscRemote;
+	}
+	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
+		this.iServDiscRemote = iServDiscRemote;
+	}
+	public IServiceControlRemote getiServCtrlRemote() {
+		return iServCtrlRemote;
+	}
+	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
+		this.iServCtrlRemote = iServCtrlRemote;
+	}
+
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
+	}
+
+	
+	public ICISCommunicationMgrFactory getCcmFactory() {
+		return ccmFactory;
+	}
+
+
+
+	public void setCcmFactory(ICISCommunicationMgrFactory ccmFactory) {
+		this.ccmFactory = ccmFactory;
+	}
+
+
+	
+	public ICommManager getICommMgr() {
+		return iCommMgr;
+	}
+
+
+
+	public void setICommMgr(ICommManager cSSendpoint) {
+		iCommMgr = cSSendpoint;
+	}
+
+
+	public ICisDirectoryRemote getiCisDirRemote() {
+		return iCisDirRemote;
+	}
+	public void setiCisDirRemote(ICisDirectoryRemote iCisDirRemote) {
+		this.iCisDirRemote = iCisDirRemote;
+	}
+	
 
 	
 	public void startup(){
@@ -185,7 +279,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			e.printStackTrace();
 		} // TODO unregister??
 
-		LOG.info("listener registered");	
+		LOG.info("listener registered");
+		
+		// testing to add hard coded context atributtes
+		this.addHardCodedQualifications();
 		//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
 		startup();
 		LOG.info("CISManager started up with "+this.ownedCISs.size()
@@ -193,51 +290,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-	public IServiceDiscoveryRemote getiServDiscRemote() {
-		return iServDiscRemote;
-	}
-	public void setiServDiscRemote(IServiceDiscoveryRemote iServDiscRemote) {
-		this.iServDiscRemote = iServDiscRemote;
-	}
-	public IServiceControlRemote getiServCtrlRemote() {
-		return iServCtrlRemote;
-	}
-	public void setiServCtrlRemote(IServiceControlRemote iServCtrlRemote) {
-		this.iServCtrlRemote = iServCtrlRemote;
-	}
-
-
-
-	
-	public ICISCommunicationMgrFactory getCcmFactory() {
-		return ccmFactory;
-	}
-
-
-
-	public void setCcmFactory(ICISCommunicationMgrFactory ccmFactory) {
-		this.ccmFactory = ccmFactory;
-	}
-
-
-	
-	public ICommManager getICommMgr() {
-		return iCommMgr;
-	}
-
-
-
-	public void setICommMgr(ICommManager cSSendpoint) {
-		iCommMgr = cSSendpoint;
-	}
-
-
-	public ICisDirectoryRemote getiCisDirRemote() {
-		return iCisDirRemote;
-	}
-	public void setiCisDirRemote(ICisDirectoryRemote iCisDirRemote) {
-		this.iCisDirRemote = iCisDirRemote;
-	}
 
 
 
@@ -261,19 +313,23 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	 * null if the CIS was not created.
 	 */
 	
-	
 	@Override
-	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
+	public Future<ICisOwned> createCis(String cisName, String cisType,
+			Hashtable<String, MembershipCriteria> cisCriteria,
+			String description) {
+
 		String pPolicy = "<RequestPolicy></RequestPolicy>";	
-		ICisOwned i = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode,pPolicy);
+		ICisOwned i = this.localCreateCis(cisName, cisType, description,cisCriteria ,pPolicy);
 			return new AsyncResult<ICisOwned>(i);
-		
 	}
-	
 	@Override
-	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy) {
-		ICisOwned i = this.localCreateCis(cssId, cssPassword, cisName, cisType, mode, privacyPolicy);
-		return new AsyncResult<ICisOwned>(i);
+	public Future<ICisOwned> createCis(String cisName, String cisType,
+			Hashtable<String, MembershipCriteria> cisCriteria,
+			String description, String privacyPolicy) {
+	
+
+		ICisOwned i = this.localCreateCis(cisName, cisType,  description,cisCriteria,privacyPolicy);
+			return new AsyncResult<ICisOwned>(i);
 	}
 	
 	
@@ -283,7 +339,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		 
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 if (element.getCisRecord().getCisJID().equals(jid))
+			 if (element.getCisRecord().getCisJID().equalsIgnoreCase(jid))
 				 return element;
 	     }
 		return null;
@@ -292,14 +348,31 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	
 	// local version of the deleteCIS
-	private boolean deleteOwnedCis(String cssId, String cssPassword, String cisJid){
-		// TODO: how do we check fo the cssID/pwd?
+	private boolean deleteOwnedCis(String cisJid){
+
 		
 		boolean ret = false;
 		if(getOwnedCISs().contains(new Cis(new CisRecord(cisJid)))){
 			Cis cis = this.getOwnedCisByJid(cisJid);
+			
+			// get community object for later eventing
+			Community c = new Community();
+			cis.fillCommmunityXMPPobj(c);
+						
 			ret = cis.deleteCIS();
 			ret = ret && getOwnedCISs().remove(cis);
+			
+			if(ret == true){ // if it works we also send an internal event
+				InternalEvent event = new InternalEvent(EventTypes.CIS_DELETION, "deletion of CIS", this.cisManagerId.getBareJid(), c);
+				try {
+					this.getEventMgr().publishInternalEvent(event);
+				} catch (EMSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					LOG.error("error trying to internally publish CIS DELETE event");
+				}
+
+			}
 		}
 		
 		return ret;
@@ -310,13 +383,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	
 	// local version of the createCis
-	private ICisOwned localCreateCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy) {
-		// TODO: how do we check fo the cssID/pwd?
-		//if(cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid()) == false){ // if the cssID does not match with the host owner
-		//	LOG.info("cssID does not match with the host owner");
-		//	return null;
-		//}
+	private ICisOwned localCreateCis(String cisName, String cisType, String description, Hashtable<String, MembershipCriteria> cisCriteria, String privacyPolicy) {
+
 		
+		LOG.info("creating a CIS");
 		// -- Verification
 		// Dependency injection
 		if (!isDepencyInjectionDone(1)) {
@@ -324,21 +394,21 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			return null;
 		}
 		// Parameters
-		if ((null == cssId || "".equals(cssId))
-				|| (null == privacyPolicy || "".equals(privacyPolicy))) {
+		if ((null == privacyPolicy || "".equals(privacyPolicy))) {
 			return null;
 		}
 				
-		// TODO: review this logic as maybe I should probably check if it exists before creating
 
-		Cis cis = new Cis(cssId, cisName, cisType, mode,this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory);
+		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
+		this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
+		,description,cisCriteria);
 		if(cis == null)
 			return cis;
 
 		// PRIVACY POLICY CODE
 
 		try {
-			IIdentity cssOwnerId = this.iCommMgr.getIdManager().fromJid(cssId);
+			IIdentity cssOwnerId = this.cisManagerId;
 			IIdentity cisId = iCommMgr.getIdManager().fromJid(cis.getCisId());
 			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisId);
 			privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
@@ -349,7 +419,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		} catch (PrivacyException e) {
 			LOG.error("The privacy policy can't be stored.", e);
 			if (null != cis) {
-				cis.unregisterCIS();
+				cis.deleteCIS();
+				//cis.unregisterCIS();
 			}
 			LOG.error("CIS deleted.");
 			e.printStackTrace();
@@ -369,14 +440,28 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		// advertising the CIS to global CIS directory
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
-		cisAd.setMode(cis.getMembershipCriteria());
+		//cisAd.setMode(0);//TODO: update this
+		MembershipCrit m = new MembershipCrit();
+		cis.fillMembershipCritXMPPobj(m);
+		cisAd.setMembershipCrit(m);
 		cisAd.setName(cis.getName());
 		cisAd.setUri(cis.getCisId());
 		cisAd.setType(cis.getCisType());
-		cisAd.setId(cis.getCisId());
+		cisAd.setId(cis.getCisId()); // TODO: check if the id or uri needs the jid
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
-
+		LOG.info("advertisement sent");
 		
+		// sending internal event
+		Community c = new Community();
+		cis.fillCommmunityXMPPobj(c);
+		InternalEvent event = new InternalEvent(EventTypes.CIS_CREATION, "creation of CIS", this.cisManagerId.getBareJid(), c);
+		try {
+			this.getEventMgr().publishInternalEvent(event);
+		} catch (EMSException e) {
+			LOG.error("error trying to internally publish CREATE event");
+			e.printStackTrace();
+			
+		}
 		
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
@@ -393,9 +478,22 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public boolean subscribeToCis(CisRecord i) {
 
 		if(! this.subscribedCISs.contains(new Cis(i))){
-			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getMembershipCriteria(),i.getCisName(), i.getCisJID()), this);			
+			CisSubscribedImp csi = new CisSubscribedImp (new CisRecord(i.getCisName(), i.getCisJID()), this);			
 			this.subscribedCISs.add(csi);
 			this.persist(csi);
+			
+			// internal eventing
+			Community c = new Community();
+			csi.fillCommmunityXMPPobj(c);
+			InternalEvent event = new InternalEvent(EventTypes.CIS_SUBS, "subscription of CIS", this.cisManagerId.getBareJid(), c);
+			try {
+				this.getEventMgr().publishInternalEvent(event);
+			} catch (EMSException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				LOG.error("error trying to internally publish SUBS CIS event");
+			}
+			
 			return true;
 		}
 		return false;
@@ -412,8 +510,23 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			CisSubscribedImp temp = new CisSubscribedImp(new CisRecord(cisjid));
 			temp = subscribedCISs.get(subscribedCISs.indexOf(temp)); // temp now is the real object
 			
+			// create the object for later eventing
+			Community c = new Community();
+			temp.fillCommmunityXMPPobj(c);
+			
 			if(this.subscribedCISs.remove(temp)) {// removing it from the list
 				this.deletePersisted(temp); // removing it from the database
+				
+				//send the local event
+				InternalEvent event = new InternalEvent(EventTypes.CIS_UNSUBS, "unsubscription of CIS", this.cisManagerId.getBareJid(), c);
+				try {
+					this.getEventMgr().publishInternalEvent(event);
+				} catch (EMSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					LOG.error("error trying to internally publish UNSUBS CIS event");
+				}
+				
 				return true;
 			}
 			else{
@@ -467,7 +580,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		if (payload.getClass().equals(org.societies.api.schema.cis.manager.CommunityManager.class)) {
 			CommunityManager c = (CommunityManager) payload;
 
-			if (c.getCreate() != null) {
+			if (c.getCreate() != null && c.getCreate().getCommunity() != null) {
 				
 				// CREATE CIS
 				LOG.info("create received");
@@ -476,30 +589,58 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				
 				//TODO: check if the sender is allowed to create a CIS
 				
-				Create create = c.getCreate();
+				Create create = c.getCreate(); 
 				
-				String ownerJid = create.getOwnerJid();
-				String cisJid = create.getCommunityJid();
-				String cisPassword = create.getCommunityPassword();
-				String ownerPassword = create.getOwnerPassword();
-				String cisType = create.getCommunityType();
-				String cisName = create.getCommunityName();
+				//String ownerJid = create.getCommunity().getOwnerJid(); // TODO: owner must be retrieved other way
+				//String cisJid = create.getCommunityJid();
+				String cisType = create.getCommunity().getCommunityType();
+				String cisName = create.getCommunity().getCommunityName();
+				String cisDescription;
+				if(create.getCommunity().getDescription() != null)
+					cisDescription = create.getCommunity().getDescription();
+				else
+					cisDescription = "";
 				//int cisMode = create.getMembershipMode().intValue();
 
-				if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
-					int cisMode = create.getMembershipMode().intValue();
-					String pPolicy = "<RequestPolicy></RequestPolicy>";	
-					ICisOwned icis = localCreateCis(ownerJid, ownerPassword, cisName, cisType, cisMode,pPolicy);
-
+				// TODO: maybe check if the attributes in the criteria are valid attributes (something from CtxAttributeTypes)
+				if(cisType != null && cisName != null){
+					String pPolicy = "<RequestPolicy></RequestPolicy>";						
+					Hashtable<String, MembershipCriteria> h = null;
 					
-					create.setCommunityJid(icis.getCisId());
+					MembershipCrit m = create.getCommunity().getMembershipCrit();
+					if (m!=null && m.getCriteria() != null && m.getCriteria().size()>0){
+						h =new Hashtable<String, MembershipCriteria>();
+						
+						// populate the hashtable
+						for (Criteria crit : m.getCriteria()) {
+							MembershipCriteria meb = new MembershipCriteria();
+							meb.setRank(crit.getRank());
+							Rule r = new Rule();
+							if( r.setOperation(crit.getOperator()) == false) {create.setResult(false); return c;}
+							ArrayList<String> a = new ArrayList<String>();
+							a.add(crit.getValue1());
+							if (crit.getValue2() != null && !crit.getValue2().isEmpty()) a.add(crit.getValue2()); 
+							if( r.setValues(a) == false) {create.setResult(false); return c;}
+							meb.setRule(r);
+							h.put(crit.getAttrib(), meb);
+							
+						}
+					}
+					
+					ICisOwned icis = localCreateCis( cisName, cisType, cisDescription,h,pPolicy);
+		
+						
+					create.getCommunity().setCommunityJid(icis.getCisId());
 					LOG.info("CIS with self assigned ID Created!!");
+
 					return c;  
-				}else{
-				
-				LOG.info("missing parameter on the create");
-				// if one of those parameters did not come, we should return an error
-				return new CommunityManager();
+				}
+				else{
+					create.setResult(false);
+					LOG.info("missing parameter on the create");
+					
+					// if one of those parameters did not come, we should return an error
+					return c;
 				}
 				// END OF CREATE CIS					
 
@@ -511,8 +652,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				if(c.getList().getListCriteria() !=null)
 					listingType = c.getList().getListCriteria();
 								
-				
-				Communities com = new Communities();
+				// TODO: redo the list
+/*				Communities com = new Communities();
 				
 				if(listingType.equals("owned") || listingType.equals("all")){
 				// GET LIST CODE of ownedCIS
@@ -540,9 +681,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 						com.getCisCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
-				}
+				}*/
 				
-				return com;
+				return c;
 
 			}
 				// END OF LIST
@@ -559,7 +700,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				Delete delete = c.getDelete();
 				Delete d2 = new Delete();
 				
-				if(!this.deleteOwnedCis(senderjid, "", delete.getCommunityJid()))
+				if(!this.deleteOwnedCis(delete.getCommunityJid()))
 					d2.setValue("error"); // TODO: replace for a proper XMPP error message
 
 				c.setDelete(d2);
@@ -598,7 +739,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating getSubscribedTo notifications
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCisMembershipMode(), c.getNotification().getSubscribedTo().getCisName(), c.getNotification().getSubscribedTo().getCisJid()));
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), stanza.getFrom().getBareJid()));
 				
 				
 				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){
@@ -615,7 +756,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating delete CIS notifications
 			if (c.getNotification().getDeleteNotification() != null) {
 				LOG.info("delete notification received");
-				this.unsubscribeToCis(c.getNotification().getDeleteNotification().getCommunityJid());
+				this.unsubscribeToCis(stanza.getFrom().getBareJid());
 /*				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
 				if(!this.subscribedCISs.contains(new CisRecord(d.getCommunityJid()))){
 					LOG.info("CIS is not part of the list of subscribed CISs");
@@ -652,9 +793,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				return;
 			}
 		}
-		if (payload.getClass().equals(Community.class)) {
+		if (payload.getClass().equals(CommunityMethods.class)) {
 
-			Community c = (Community) payload;
+			CommunityMethods c = (CommunityMethods) payload;
 
 			// treating new member notifications
 			if (c.getWho() != null) {
@@ -677,12 +818,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		return null;
 	}
 
+	
+	@Deprecated
+	public boolean deleteCis(String cssId, String cssPassword, String cisId){
+		return false;
+	}
 
 
 	@Override
-	public boolean deleteCis(String cssId, String cssPassword, String cisId) {
+	public boolean deleteCis(String cisId) {
 		// TODO Auto-generated method stub
-		return 	this.deleteOwnedCis(cssId, cssPassword, cisId);
+		return 	this.deleteOwnedCis(cisId);
 	}
 
 	@Override
@@ -692,24 +838,14 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		List<ICis> l = new ArrayList<ICis>();
 		l.addAll(subscribedCISs);
 
-		
-		/*// add owned CIS to the list to be returned
-		List<ICis> l2 = new ArrayList<ICis>();
-
-		Iterator<Cis> it = getOwnedCISs().iterator();
-		 
-		while(it.hasNext()){
-			 Cis element = it.next();
-			 l2.add(element);
-			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
-	     }*/
+	
 		l.addAll(ownedCISs);
 		
 		return l;
 	}
 	
 	@Override
-	public List<ICis> searchMyCisByName(String name){
+	public List<ICis> searchCisByName(String name){
 		// add subscribed CIS to the list to be returned
 		List<ICis> l = new ArrayList<ICis>();
 		Iterator<Cis> it = getOwnedCISs().iterator();
@@ -750,24 +886,22 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			
 			return l;
 	}
-
+	
 	@Override
-	public ICis[] getCisList(ICis arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<ICisOwned> searchCisByMember(IIdentity css) throws InterruptedException, ExecutionException{
+		List<ICisOwned> l = new ArrayList<ICisOwned>();
+		for (ICisOwned temp : this.ownedCISs) {
+			if(temp.getMemberList().get().contains(new CisParticipant(css.getBareJid())))
+				l.add(temp);
+		}
+		return l;
 	}
 
 
 
-	@Override
-	public boolean requestNewCisOwner(String arg0, String arg1, String arg2,
-			String arg3) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 
-
+	
 	
 	/**
 	 * Get a CIS Record with the ID cisId.
@@ -778,13 +912,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
 	 */
 	@Override
-	public ICis getCis(String cssId, String cisId) {
+	public ICis getCis(String cisId) {
 		
 		// first we check it on the owned CISs		
 		Iterator<Cis> it = getOwnedCISs().iterator();
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 if (element.getCisId().equals(cisId))
+			 if (element.getCisId().equalsIgnoreCase(cisId))
 				 return element;
 	     }
 		
@@ -792,7 +926,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		Iterator<CisSubscribedImp> iterator = this.subscribedCISs.iterator();
 		while(iterator.hasNext()){
 			CisSubscribedImp element = iterator.next();
-			 if (element.getCisId().equals(cisId))
+			 if (element.getCisId().equalsIgnoreCase(cisId))
 				 return element;
 	     }
 		
@@ -808,7 +942,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		Iterator<Cis> it = getOwnedCISs().iterator();
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 if (element.getCisId().equals(cisId))
+			 if (element.getCisId().equalsIgnoreCase(cisId))
 				 return element;
 	     }
 		
@@ -915,24 +1049,147 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-// client methods
+	// internal method that adds the necessary qualifications into the join message
+	private void getQualificationsForJoin(CisAdvertisementRecord adv,Join j){
+		LOG.debug("getting qualifications for join");
+		
+		List<Qualification> lq = new ArrayList<Qualification>();
+
+		// Internal check of qualifications
+		if(adv.getMembershipCrit()!=null && adv.getMembershipCrit().getCriteria() !=null 
+				&& adv.getMembershipCrit().getCriteria().size()>0){
+			// if there is some memb criteria on the CIS we need to send our qualifications
+			CtxEntityIdentifier memberCssEntityId;
+			try {
+				memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
+			} catch (Exception e) {
+				LOG.debug("exception retrieving 1st data from internal CTX broker");
+				e.printStackTrace();
+				return;
+			}
+			
+			List<Criteria> l = adv.getMembershipCrit().getCriteria();
+			for (Criteria temp : l) { // for each criteria
+				List<CtxIdentifier> ctxIds;
+				try {
+					ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE,temp.getAttrib()).get();
+				} catch (Exception e) {
+					LOG.debug("exception retrieving 2nd data from internal CTX broker");
+					e.printStackTrace();
+					return;
+				}
+				if (ctxIds!=null && !ctxIds.isEmpty()) {
+					  LOG.debug("qualification found ");
+					  CtxIdentifier ctxId = ctxIds.get(0);
+					  // retrieve the attribute
+					  CtxAttribute attribute;
+					try {
+						attribute = (CtxAttribute) this.internalCtxBroker.retrieve(ctxId).get();
+						LOG.debug("qualification is " + attribute.getType());
+					} catch (Exception e) {
+						LOG.debug("exception retrieving 3rd data from internal CTX broker");
+						e.printStackTrace();
+						return;
+					}
+					  if (attribute != null){
+						  // TODO: at the moment we are not checking the criteria here, but just building
+						  // the qualification because it was wanted by privace that just the attribute is
+						  // revealed on Advertisement
+						  Qualification q = new Qualification();
+						  q.setAttrib(temp.getAttrib());
+						  q.setValue(attribute.getStringValue());
+						  lq.add(q);
+						  LOG.debug("qualification value " + attribute.getStringValue());
+					  }
+						  
+				}
+
+				
+				
+			}
+			
+		}
+		
+		
+		// End of qualification retrieaval
+		if (lq.size()>0)
+			j.setQualification(lq);
+		
+	}
+	
+	
+	// TODO just for test purposes, delete later
+	// set the user as a protestant from Paris =D
+	private void addHardCodedQualifications(){
+		LOG.info("going to add hard coded qualifications");
+		CtxEntityIdentifier memberCssEntityId;
+		try {
+			memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
+			
+			// first social status
+			List<CtxIdentifier> ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS).get();			
+
+			if(ctxIds!= null && ctxIds.isEmpty() == false){
+				CtxAttribute ctAtb1 = ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds.get(0)).get());
+				LOG.info("Already existing status equals to " + ctAtb1.getStringValue() );
+			}else{
+				LOG.info("non existing social status, gonna create");
+				CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.RELIGIOUS_VIEWS).get();
+				ctAtb1.setStringValue("protestant");
+				ctAtb1.setValueType(CtxAttributeValueType.STRING);
+				this.internalCtxBroker.update(ctAtb1);
+			}
+
+			List<CtxIdentifier> ctxIds2 = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
+			if(ctxIds2!= null && ctxIds2.isEmpty() == false){
+				LOG.info("Already existing status equals to " + ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds2.get(0)).get()).getStringValue() );
+			}else{
+				LOG.info("non existing city, gonna create");
+				CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
+				ctAtb1.setStringValue("Paris");
+				ctAtb1.setValueType(CtxAttributeValueType.STRING);
+				this.internalCtxBroker.update(ctAtb1);
+			}
+
+			
+		} catch (Exception e) {
+			LOG.debug("exception retrieving 1st data from internal CTX broker");
+			e.printStackTrace();
+			return;
+		}
+		
+	}
+	
+	
+	// client methods
 	
 	@Override
-	public void joinRemoteCIS(String cisId, ICisManagerCallback callback) {
+	public void joinRemoteCIS(CisAdvertisementRecord adv, ICisManagerCallback callback) {
 		
 		LOG.debug("client call to join a RemoteCIS");
-
+		Join j = new Join();
+		
+		this.getQualificationsForJoin(adv,j);
+		
+		// TODO: check with privacy
+		
+		
+		
+		
+		
+		// sending join
 
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.iCommMgr.getIdManager().fromJid(cisId);
+			toIdentity = this.iCommMgr.getIdManager().fromJid(adv.getId());
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this);
 
-			Community c = new Community();
+			CommunityMethods c = new CommunityMethods();
 
-			c.setJoin("");
+			c.setJoin(j);
+
 			try {
 				LOG.info("Sending stanza with join");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
@@ -958,9 +1215,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this);
 
-			Community c = new Community();
+			CommunityMethods c = new CommunityMethods();
 
-			c.setLeave("");
+			c.setLeave(new Leave());
 			try {
 				LOG.info("Sending stanza with leave");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
@@ -976,8 +1233,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	
 	public void UnRegisterCisManager(){
-		//TODO
-		//this.ccmFactory.
+		// unregister all its CISs
+		for(Cis c : ownedCISs ){
+			c.unregisterCIS();
+		}
+		
 	}
 
 	
@@ -1006,6 +1266,16 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
 			return false;
 		}
+		if (null == internalCtxBroker) {
+			LOG.info("[Dependency Injection] Missing Context Broker");
+			return false;
+		}
+		if (null == eventMgr) {
+			LOG.info("[Dependency Injection] Missing Event Manager");
+			return false;
+		}
+		//TODO: add service ones
+		
 		if (level >= 1) {
 			if (null == privacyPolicyManager) {
 				LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
@@ -1014,4 +1284,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}
 		return true;
 	}
+
+
 }

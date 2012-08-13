@@ -24,44 +24,144 @@
  */
 package org.societies.api.cis.attributes;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class Rule {
+import org.societies.api.context.model.CtxAttributeValueType;
+
+public class Rule{
         
     //could be an enumeration with its own API.
-    private ArrayList<String> operations;
+    //private ArrayList<String> operations;
 
-    private String operation;
+    private OperationType operation;
 
-    private ArrayList<Object> values;
+	public enum OperationType {
+		   equals, greaterThan, lessThan, range, differentFrom;		
+		   
+		   static public boolean isValid(String aName) {
+			   OperationType[] oTypes = OperationType.values();
+		       for (OperationType oType : oTypes)
+		           if (oType.name().equalsIgnoreCase(aName))
+		               return true;
+		       return false;
+		   }
+	}
+    
+    private List<String> values;
 
     //Non-T4.5 components need to be able to create a rule
     public Rule() {
-        operations.add("equals");
-        operations.add("greater than");
-        operations.add("less than");
-        operations.add("range");
+
+    }
+    
+    public Rule(String operation, List<String> values) throws InvalidParameterException {
+    	if(this.setOperation(operation) == false) throw new InvalidParameterException("Operation invalid");
+    	List<String> newStrs = new ArrayList<String>(values);
+    	if(this.setValues(newStrs) == false) throw new InvalidParameterException("Value list invalid");
+
     }
 
 	public String getOperation() {
-        return operation;
+        return operation.name();
     }
 	public boolean setOperation(String operation) {
-        if (operations.contains(operation)) {
-            this.operation = operation;
+        if (OperationType.isValid(operation)) {
+            this.operation = OperationType.valueOf(operation);
             return true;
         }
         else return false;
     }
 
-    public ArrayList<Object> getValues() {
+    public List<String> getValues() {
         return values;
     }
 
-    public boolean setValues(ArrayList<Object> values) {
-        if ((!operation.equals("range")) && (values.size() == 1)) this.values = values;
-        else if ((operations.equals("range")) && (values.size() == 2)) this.values = values;
+    public boolean setValues(List<String> values) {
+        if ((!operation.equals(OperationType.range)) && (values.size() == 1)) this.values = values;
+        else if ((operation.equals(OperationType.range)) && (values.size() == 2)) this.values = values;
         else return false;
         return true;
     }
+    
+    public boolean checkRule(CtxAttributeValueType t, String value){
+		switch (t){
+		case STRING:
+			String v = value;
+			switch (this.operation){
+			case equals:
+				if(v.equalsIgnoreCase(this.values.get(0))) return true;
+				else return false;
+			case differentFrom:
+				if(!v.equalsIgnoreCase(this.values.get(0))) return true;
+				else return false;
+			case lessThan:
+			case greaterThan:
+			case range:
+				return false; // invalid rule TODO: print a warning
+			}
+				
+			break;			//end of String check
+
+		case INTEGER:
+			int i = Integer.valueOf(value);
+			switch (this.operation){
+			case equals:
+				if(i == (Integer.valueOf(this.values.get(0))   )) return true;
+				else return false;
+			case differentFrom:
+				if(i != (Integer.valueOf(this.values.get(0))   ))  return true;
+				else return false;
+			case lessThan:
+				if(i < (Integer.valueOf(this.values.get(0))   ))  return true;
+				else return false;
+			case greaterThan:
+				if(i > (Integer.valueOf(this.values.get(0))   ))  return true;
+				else return false;
+			case range:
+				if((i > (Integer.valueOf(this.values.get(0))   )) && (i < (Integer.valueOf(this.values.get(1))   )))  return true;
+				else return false;
+			}
+			
+			break;			//end of Integer check
+		case DOUBLE:
+		case BINARY:
+		case EMPTY:
+		default:
+		}
+    	return false;
+    }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((operation == null) ? 0 : operation.hashCode());
+		result = prime * result + ((values == null) ? 0 : values.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Rule other = (Rule) obj;
+		if (operation != other.operation)
+			return false;
+		if (values == null) {
+			if (other.values != null)
+				return false;
+		} else if (!values.equals(other.values))
+			return false;
+		return true;
+	}
+    
+    
+    
 }

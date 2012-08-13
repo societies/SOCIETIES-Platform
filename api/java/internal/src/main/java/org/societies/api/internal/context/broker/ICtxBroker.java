@@ -176,6 +176,34 @@ public interface ICtxBroker {
 	  */
 	 public Future<List<CtxIdentifier>> lookup(final IIdentity target, final CtxModelType modelType,
 	   final String type) throws CtxException;
+	 
+	 /**
+	  * Looks up context model objects (i.e. attributes or associations) of the
+	  * specified type associated with the identified context entity. The 
+	  * method returns a list of {@link CtxIdentifier CtxIdentifiers}
+	  * referencing the context model objects that match the supplied criteria.
+	  * 
+	  * @param entityId
+	  *            the {@link CtxEntityIdentifier} of the entity where to
+	  *            lookup for matching model objects 
+	  * @param modelType
+	  *            the {@link CtxModelType} of the context model objects to
+	  *            lookup
+	  * @param type
+	  *            the type of the context model objects to lookup
+	  * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
+	  *         context model objects that match the supplied criteria.
+	  * @throws CtxException
+	  *             if there is a problem performing the look-up operation 
+	  * @throws NullPointerException
+	  *             if any of the specified parameters is <code>null</code>
+	  * @throws IllegalArgumentException
+	  *             if the specified modelType is neither a {@link CtxModelType#ATTRIBUTE}
+	  *             nor a {@link CtxModelType#ASSOCIATION}
+	  * @since 0.3
+	  */
+	 public Future<List<CtxIdentifier>> lookup(final CtxEntityIdentifier entityId, 
+			 final CtxModelType modelType, final String type) throws CtxException;
 		
 	/**
 	 * Looks up for a list of CtxEntities of  the specified type, containing the
@@ -461,7 +489,32 @@ public interface ICtxBroker {
 	
 	//***********************************************
 	//     Community Context Specific Methods  
-	//***********************************************	
+	//***********************************************
+	
+	/**
+	 * Retrieves the {@link CtxEntityIdentifier} of the 
+	 * {@link CommunityCtxEntity} which represents the identified CIS. All
+	 * CommunityCtxEntities share the same context type, i.e.
+	 * {@link org.societies.api.context.model.CtxEntityTypes#COMMUNITY COMMUNITY}.
+	 * The method returns <code>null</code> if there is no CommunityCtxEntity
+	 * representing the identified CIS. 
+	 * 
+	 * @param cisId
+	 *            the {@link IIdentity} identifying the CIS whose 
+	 *            CommunityCtxEntity identifier to retrieve
+	 * @return the CtxEntityEntityIdentifier of the CommunityCtxEntity which
+	 *         represents the identified CIS
+	 * @throws CtxException 
+	 *             if there is a problem retrieving the CtxEntityIdentifier
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the specified cisId is not of type 
+	 *             {@link org.societies.api.identity.IdentityType#CIS CIS}
+	 * @since 0.4
+	 */
+	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
+			final IIdentity cisId) throws CtxException;
 
 	/**
 	 * This method retrieves the CSS that is assigned with the community administration role.

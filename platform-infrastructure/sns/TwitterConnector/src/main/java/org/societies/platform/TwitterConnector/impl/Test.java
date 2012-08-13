@@ -34,12 +34,12 @@ class Test {
 
 	public static void main(String[] args) {
 		String Token = "468234144-7jBtrulMAriO1yjg2J9POY6aeW2TwnwrEXWeDWYn,1lY5pClLbeJ2MGC8A9995Dlx7gxNqdnLPQarsplwLpU";
-		//String Token = "13642262-wzt0KQGjadF1GAK48lUsdigcYHTwn3bjtfnBFWcxh,gbhIavlWyOUBcNY22bWSjextPzPBITJVJ3xPJ7oIliA";
+//		String Token = "13642262-wzt0KQGjadF1GAK48lUsdigcYHTwn3bjtfnBFWcxh,gbhIavlWyOUBcNY22bWSjextPzPBITJVJ3xPJ7oIliA";
 		TwitterConnectorImpl t = new TwitterConnectorImpl(Token, "dingqi");
 
 		testProfileExtraction(t);
 		testFriendsExtraction(t);
-		testTweetPost(t);
+//		testTweetPost(t);
 //		testFollowersExtraction(t);
 //		testTweetsExtraction(t);
 	}

@@ -29,8 +29,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.annotation.PostConstruct;
-
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.source.ICtxSourceMgr;
@@ -118,12 +116,11 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 					userLocation = getEntityFullLocation(macAddress);
 					locationInference.updateCSM(userLocation, macAddress);
 				}
-				/*
+				
 				if (counter == 0){
 					registerCSSdevice(commManager.getIdManager().getThisNetworkNode().getJid(), "aaaaa", "11:11:11:11:11:11");
-				}else{
 					counter++;
-				}*/
+				}
 			
 			}catch (Exception e) {
 				e.printStackTrace();

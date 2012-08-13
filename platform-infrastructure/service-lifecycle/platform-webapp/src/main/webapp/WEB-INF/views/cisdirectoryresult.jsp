@@ -45,7 +45,6 @@
             <td>${advert.type}</td>
             <td>${advert.id}</td> 
             <td>${advert.password}</td>
-            <td>${advert.mode}</td>
              -->           
         </tr>
     </xc:forEach>

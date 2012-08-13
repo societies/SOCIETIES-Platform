@@ -33,18 +33,14 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.CSSEvent;
-import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class UAMEventingTest extends EventListener{
 
@@ -59,7 +55,7 @@ public class UAMEventingTest extends EventListener{
 	public void test() {
 		LOG.info("Monitor services #747 - Running UAMEventingTest");
 		//create action
-		IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
+		IIdentity identity = TestCase747.commsMgr.getIdManager().getThisNetworkNode();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		try {
 			serviceId.setIdentifier(new URI("http://testService3"));

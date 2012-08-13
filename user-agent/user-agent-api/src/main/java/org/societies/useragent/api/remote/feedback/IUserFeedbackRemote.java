@@ -25,12 +25,15 @@
 
 package org.societies.useragent.api.remote.feedback;
 
+import java.util.List;
+import java.util.concurrent.Future;
+
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 
 public interface IUserFeedbackRemote {
 
-	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback);
+	public Future<List<String>> getExplicitFB(String remoteEndPointId, int type, ExpProposalContent content);
 	
-	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback);
+	public Future<Boolean> getImplicitFB(String remoteEndPointId, int type, ImpProposalContent content);
 }

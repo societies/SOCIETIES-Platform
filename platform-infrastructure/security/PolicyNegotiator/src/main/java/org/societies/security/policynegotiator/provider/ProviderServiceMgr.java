@@ -26,19 +26,21 @@ package org.societies.security.policynegotiator.provider;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.domainauthority.IClientJarServer;
-import org.societies.api.internal.domainauthority.IClientJarServerRemote;
-import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
+import org.societies.api.internal.domainauthority.UrlPath;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
+import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.security.policynegotiator.exception.NegotiationException;
+import org.societies.api.security.digsig.DigsigException;
+import org.societies.api.security.digsig.ISignatureMgr;
 
 /**
  * 
@@ -50,39 +52,64 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	private static Logger LOG = LoggerFactory.getLogger(INegotiationProviderServiceMgmt.class);
 
-//	private IClientJarServerRemote clientJarServer;
 	private IClientJarServer clientJarServer;
+	private ISignatureMgr signatureMgr;
+	private INegotiationProviderRemote groupMgr;
 
 	private HashMap<String, Service> services = new HashMap<String, Service>();
 
-//	public IClientJarServerRemote getClientJarServer() {
+	public ProviderServiceMgr() {
+		LOG.info("ProviderServiceMgr");
+	}
+	
 	public IClientJarServer getClientJarServer() {
 		return clientJarServer;
 	}
-//	public void setClientJarServer(IClientJarServerRemote clientJarServer) {
 	public void setClientJarServer(IClientJarServer clientJarServer) {
 		LOG.debug("setClientJarServer()");
 		this.clientJarServer = clientJarServer;
 	}
+	public ISignatureMgr getSignatureMgr() {
+		return signatureMgr;
+	}
+	public void setSignatureMgr(ISignatureMgr signatureMgr) {
+		LOG.debug("setSignatureMgr()");
+		this.signatureMgr = signatureMgr;
+	}
+	public INegotiationProviderRemote getGroupMgr() {
+		return groupMgr;
+	}
+	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
+		LOG.debug("setGroupMgr()");
+		this.groupMgr = groupMgr;
+	}
 
 	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJar) {
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
+			String clientJarFilePath) throws NegotiationException {
+		
+		IIdentity provider = groupMgr.getIdMgr().getThisNetworkNode();
+		String signature;
+		String dataToSign;
+		
+		dataToSign = serviceId.getIdentifier().toASCIIString();
+		dataToSign += clientJarFilePath;
+
+		try {
+			signature = signatureMgr.sign(dataToSign, provider);
+		} catch (DigsigException e) {
+			throw new NegotiationException(e);
+		}
+		List<String> files = new ArrayList<String>();
+		files.add(clientJarFilePath);
+		this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);
 		
 		String idStr = serviceId.getIdentifier().toString();
-		Service s = new Service(idStr, slaXml, clientJar, null);
+		Service s = new Service(idStr, slaXml, clientJarServer, clientJarFilePath, null);
 		
 		services.put(idStr, s);
 	}
 	
-	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, IIdentity clientJarServer) {
-		
-		String idStr = serviceId.getIdentifier().toString();
-		Service s = new Service(idStr, slaXml, null, clientJarServer);
-		
-		services.put(idStr, s);
-	}
-
 	@Override
 	public void removeService(ServiceResourceIdentifier serviceId) {
 		
@@ -108,38 +135,54 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	/**
 	 * 
-	 * @param id
+	 * @param serviceId
 	 * @return
 	 * @throws NegotiationException When service is not found
 	 */
-	protected URI getClientJarUri(String id) throws NegotiationException {
+	protected URI getClientJarUri(String serviceId) throws NegotiationException {
 
-		// FIXME
-		String uriStr = "http://localhost:8080";
-		String filePath = "Calculator.jar";
+		// TODO: remove when SLM calls addService()
+//		if (services.get(serviceId) == null) {
+//			LOG.warn("Temporal solution: adding service {}", serviceId);
+//			ServiceResourceIdentifier id = new ServiceResourceIdentifier();
+//			try {
+//				id.setIdentifier(new URI(serviceId));
+//				addService(id, null, new URI("http://localhost:8080"), "Calculator.jar");
+//			} catch (URISyntaxException e) {
+//				LOG.warn("Could not add service \"{}\" to local registry", serviceId);
+//				throw new NegotiationException(e);
+//			}
+//		}
+		// End of temporal code to be removed when SLM calls addService()
+
 		URI uri;
+		String host;
+		String sig;
+		String filePath;
+		Service s = getService(serviceId);
+		
+		if (s == null) {
+			throw new NegotiationException("Service " + serviceId + " not found");
+		}
+
+		host = s.getClientJarHost().toString();
+		filePath = s.getClientJarFilePath();
+		try {
+			sig = signatureMgr.sign(filePath, groupMgr.getIdMgr().getThisNetworkNode());
+		} catch (DigsigException e) {
+			LOG.warn("Failed to sign service " + serviceId + " for client", e);
+			throw new NegotiationException(e);
+		}
+		String uriStr = host + UrlPath.BASE + UrlPath.PATH + "/" + filePath +
+				"?" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId +
+				"&" + UrlPath.URL_PARAM_SIGNATURE + "=" + sig;
+		
 		try {
 			uri = new URI(uriStr);
-			Future<UrlBean> urlBeanFuture = clientJarServer.addKey(uri, filePath);
-			UrlBean urlBean = urlBeanFuture.get();
-			uri = urlBean.getUrl();
 			return uri;
 		} catch (URISyntaxException e) {
 			throw new NegotiationException(e);
-		} catch (InterruptedException e) {
-			throw new NegotiationException(e);
-		} catch (ExecutionException e) {
-			throw new NegotiationException(e);
 		}
-		
-//		Service s = getService(id);
-//		
-//		if (s != null) {
-//			return s.getClientJarUri();
-//		}
-//		else {
-//			throw new NegotiationException("Service " + id + " not found");
-//		}
 	}
 
 	/**

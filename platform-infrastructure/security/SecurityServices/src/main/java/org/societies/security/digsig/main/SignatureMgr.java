@@ -46,26 +46,27 @@ public class SignatureMgr implements ISignatureMgr {
 
 	private DigSig digSig = new DigSig();
 	private XmlDSig xmlDSig = new XmlDSig();
+	private CertStorage certificates;
 	
-	public SignatureMgr() {
+	public SignatureMgr() throws StorageException {
 		
 		LOG.info("SignatureMgr()");
 		
-//		CertStorage certs;
-//		try {
-//			certs = CertStorage.getInstance();
-//		} catch (StorageException e) {
-//			LOG.error("Could not initialize storage", e);
-//			return;
-//		}
-//		X509Certificate cert = certs.getOurCert();
-//		Key key = certs.getOurKey();
-//		PrivateKey privateKey = (PrivateKey) key;
-//		PublicKey publicKey = cert.getPublicKey();
-//		
-//		LOG.debug("Certificate: {}", cert);
-//		LOG.debug("Public key: {}", publicKey);
-//		LOG.debug("Private key: {}", privateKey);
+		try {
+			certificates = CertStorage.getInstance();
+		} catch (StorageException e) {
+			LOG.error("Could not initialize storage", e);
+			throw e;
+		}
+		
+		X509Certificate cert = certificates.getOurCert();
+		Key key = certificates.getOurKey();
+		PrivateKey privateKey = (PrivateKey) key;
+		PublicKey publicKey = cert.getPublicKey();
+		
+		LOG.debug("Certificate: {}", cert);
+		LOG.debug("Public key: {}", publicKey);
+		LOG.debug("Private key: {}", privateKey);
 	}
 	
 	@Override
@@ -84,7 +85,64 @@ public class SignatureMgr implements ISignatureMgr {
 	}
 	
 	@Override
+	public String sign(byte[] dataToSign, IIdentity identity) throws DigsigException {
+		return digSig.sign(dataToSign, getPrivateKey(identity));
+	}
+	
+	@Override
 	public boolean verify(byte[] data, String signature, PublicKey publicKey) {
 		return digSig.verify(data, signature, publicKey);
+	}
+	
+	@Override
+	public boolean verify(byte[] data, String signature, IIdentity identity) {
+		return digSig.verify(data, signature, getPublicKey(identity));
+	}
+	
+	@Override
+	public String sign(String dataToSign, PrivateKey privateKey) throws DigsigException {
+		return digSig.sign(dataToSign, privateKey);
+	}
+	
+	@Override
+	public String sign(String dataToSign, IIdentity identity) throws DigsigException {
+		return digSig.sign(dataToSign, getPrivateKey(identity));
+	}
+	
+	@Override
+	public boolean verify(String data, String signature, PublicKey publicKey) {
+		return digSig.verify(data, signature, publicKey);
+	}
+	
+	@Override
+	public boolean verify(String data, String signature, IIdentity identity) {
+		return digSig.verify(data, signature, getPublicKey(identity));
+	}
+	
+	@Override
+	public X509Certificate getCertificate(IIdentity identity) {
+		// FIXME: return the correct result for the given identity
+		LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only certificate is used.");
+		return certificates.getOurCert();
+	}
+	
+	@Override
+	public PrivateKey getPrivateKey(IIdentity identity) {
+		// FIXME: return the correct result for the given identity
+		LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only private key is used.");
+		return certificates.getOurKey();
+	}
+	
+	private PublicKey getPublicKey(IIdentity identity) {
+		// FIXME: return the correct result for the given identity
+		LOG.warn("The IIdentity parameter is ignored in current implementation. Our own local and only public key is used.");
+		
+		X509Certificate cert = certificates.getOurCert();
+		
+		if (cert == null) {
+			LOG.warn("Certificate for {} not found", identity);
+			return null;
+		}
+		return cert.getPublicKey();
 	}
 }

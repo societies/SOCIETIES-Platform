@@ -108,7 +108,7 @@
 				<configuration>
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 												<Import-Package>
 							*;resolution:=optional</Import-Package>
 					</instructions>

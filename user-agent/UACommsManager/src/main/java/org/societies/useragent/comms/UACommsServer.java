@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +64,7 @@ public class UACommsServer implements IFeatureServer{
 	//PRIVATE VARIABLES
 	private ICommManager commsMgr;
 	private IUserActionMonitor uam;
-	private IUserFeedback userFeedback;
+	private IUserFeedback feedback;
 	private IIdentityManager idManager;
 	private Logger LOG = LoggerFactory.getLogger(UACommsServer.class);
 
@@ -80,6 +79,10 @@ public class UACommsServer implements IFeatureServer{
 
 	public void setUam(IUserActionMonitor uam) {
 		this.uam = uam;
+	}
+	
+	public void setFeedback(IUserFeedback feedback){
+		this.feedback = feedback;
 	}
 
 	//METHODS
@@ -104,6 +107,10 @@ public class UACommsServer implements IFeatureServer{
 		return NAMESPACES;
 	}
 
+	
+	/*
+	 * USER ACTION MONITOR METHODS
+	 */
 	public void receiveMessage(Stanza stanza, Object payload) {
 		LOG.info("UACommsServer received message with no return type!!!");
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
@@ -134,14 +141,21 @@ public class UACommsServer implements IFeatureServer{
 		}
 	}
 
-
-
+	
+	/*
+	 * USER FEEDBACK METHODS
+	 */
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		LOG.info("UACommsServer received message with a return type!!!");
-		if (payload instanceof UserFeedbackBean){
-			Object result = this.getQuery(stanza, (UserFeedbackBean)payload);
+		Object result = null;
+		if (payload instanceof UserActionMonitorBean){ 
+			this.receiveMessage(stanza, (UserActionMonitorBean)payload);
+			result = true;
 		}
-		return null;
+		if (payload instanceof UserFeedbackBean){
+			result = this.getQuery(stanza, (UserFeedbackBean)payload);
+		}
+		return result;
 	}
 
 	private Object getQuery(Stanza stanza, UserFeedbackBean feedbackBean){
@@ -153,28 +167,55 @@ public class UACommsServer implements IFeatureServer{
 		switch(feedbackBean.getMethod()){
 		case GET_EXPLICIT_FB:
 			try {
+				String requestId = feedbackBean.getRequestId();
 				int expType = feedbackBean.getType();
 				String expProposalText = feedbackBean.getProposalText();
-				String[] options = null; //= feedbackBean.getOptions();
+				List<String> tmp = feedbackBean.getOptions();
+				String[] options = new String[tmp.size()];
+				//create array of options
+				int i = 0;
+				for(String nextOption: tmp){
+					options[i] = nextOption;
+					i++;
+				}
 				LOG.debug("Sending remote message to local User Feedback - explicit");
 				ExpProposalContent expContent = new ExpProposalContent(expProposalText, options);
-				List<String> result = userFeedback.getExplicitFB(expType, expContent).get();
-				ExpFeedbackResultBean expResultBean = new ExpFeedbackResultBean();
-				//expResultBean.setFeedback();
+				List<String> result = feedback.getExplicitFB(expType, expContent).get();
 				
+				//create response bean
+				ExpFeedbackResultBean expResultBean = new ExpFeedbackResultBean();
+				expResultBean.setRequestId(requestId);
+				expResultBean.setFeedback(result);
+				resultBean = expResultBean;
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
 			break;
+			
 		case GET_IMPLICIT_FB:
-			int impType = feedbackBean.getType();
-			String impProposalText = feedbackBean.getProposalText();
-			int timeout = feedbackBean.getTimeout();
-			LOG.debug("Sending remote message to local User Feedback - implicit");
-			ImpProposalContent impContent = new ImpProposalContent(impProposalText, timeout);
-			userFeedback.getImplicitFB(impType, impContent);
+			try {
+				String requestId = feedbackBean.getRequestId();
+				int impType = feedbackBean.getType();
+				String impProposalText = feedbackBean.getProposalText();
+				int timeout = feedbackBean.getTimeout();
+				LOG.debug("Sending remote message to local User Feedback - implicit");
+				ImpProposalContent impContent = new ImpProposalContent(impProposalText, timeout);
+				Boolean result = feedback.getImplicitFB(impType, impContent).get();
+				
+				//create response bean
+				ImpFeedbackResultBean impResultBean = new ImpFeedbackResultBean();
+				impResultBean.setRequestId(requestId);
+				impResultBean.setFeedback(result.booleanValue());
+				resultBean = impResultBean;
+				
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
 			break;
 		}
 

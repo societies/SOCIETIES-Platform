@@ -66,38 +66,38 @@ public class ServiceClientJarAccessTest {
 	 * @throws InterruptedException 
 	 * @throws URISyntaxException 
 	 */
-	@Test
-	public void testValidKey() throws InterruptedException, ExecutionException, URISyntaxException {
-		
-		URI hostname = new URI("http://www.example.com:8080");
-		String filePath = "foo.jar";
-		UrlBean result;
-		String key;
-		String url;
-		
-		result = classUnderTest.addKey(hostname, filePath).get();
-		assertTrue(result.isSuccess());
-		assertEquals("www.example.com", result.getUrl().getHost());
-		assertEquals(8080, result.getUrl().getPort(), 0.0);
-		
-		String start = hostname + "/rest/webresources/serviceclient/" + filePath + "?key=";
-		url = result.getUrl().toString();
-		assertTrue(url.contains("?key="));
-		assertTrue(url.startsWith(start));
-		assertTrue(url.length() > start.length());
-		
-		key = url.replace(start, "");
-		assertTrue(ServiceClientJarAccess.isKeyValid(filePath, key));
-	}
+//	@Test
+//	public void testValidKey() throws InterruptedException, ExecutionException, URISyntaxException {
+//		
+//		URI hostname = new URI("http://www.example.com:8080");
+//		String filePath = "foo.jar";
+//		UrlBean result;
+//		String key;
+//		String url;
+//		
+//		result = classUnderTest.addKey(hostname, filePath).get();
+//		assertTrue(result.isSuccess());
+//		assertEquals("www.example.com", result.getUrl().getHost());
+//		assertEquals(8080, result.getUrl().getPort(), 0.0);
+//		
+//		String start = hostname + "/rest/webresources/serviceclient/" + filePath + "?key=";
+//		url = result.getUrl().toString();
+//		assertTrue(url.contains("?key="));
+//		assertTrue(url.startsWith(start));
+//		assertTrue(url.length() > start.length());
+//		
+//		key = url.replace(start, "");
+//		assertTrue(ServiceClientJarAccess.isKeyValid(filePath, key));
+//	}
 
 	/**
 	 * Test method for {@link ServiceClientJarAccess#isKeyValid(String, String)}.
 	 */
-	@Test
-	public void testInvalidKey() {
-		
-		String filePath = "foo.jar";
-		String key = "d2nuvo";
-		assertTrue(!ServiceClientJarAccess.isKeyValid(filePath, key));
-	}
+//	@Test
+//	public void testInvalidKey() {
+//		
+//		String filePath = "foo.jar";
+//		String key = "d2nuvo";
+//		assertTrue(!ServiceClientJarAccess.isKeyValid(filePath, key));
+//	}
 }

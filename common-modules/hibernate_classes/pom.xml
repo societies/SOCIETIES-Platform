@@ -45,7 +45,7 @@
 	<description>
 		This Generates OSGI bundle which exports following libraries in the runtime container:
 		org.hibernate,javax.persistence,org.dom4j,avax.annotation.*,
-		javax.persistence.*,net.sf.cglib.*,org.apcahe.commons.dbcp.*
+		javax.persistence.*,net.sf.cglib.*,org.apache.commons.dbcp.*
 	</description>
 	
 	<parent>
@@ -82,6 +82,11 @@
 			<version>1.2.2.osgi</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>com.springsource.org.apache.derby</artifactId>
+			<version>10.5.1000001.764942</version>
+		</dependency>
+		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>com.springsource.org.hibernate</artifactId>
 			<version>3.3.2.GA</version>
@@ -103,6 +108,11 @@
 			<groupId>org.dom4j</groupId>
 			<artifactId>com.springsource.org.dom4j</artifactId>
 			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.9</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -138,7 +148,9 @@
 							javax.persistence.*,
 							javax.persistence.spi.*,
 							net.sf.cglib.*,
-							org.apcahe.commons.dbcp.*
+							org.apache.commons.dbcp.*,
+							org.apache.derby.jdbc.*,
+							com.mysql.jdbc.*
 						</Export-Package>
 						<Import-Package>*;resolution:=optional</Import-Package>
 						<_nouses>true</_nouses>						

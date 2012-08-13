@@ -35,7 +35,7 @@ public class DeviceMgmtEventConstants {
 	/**
 	 * Constant used to subscribe to the light sensors events
 	 */
-	public static final String LIGHT_SENSOR_EVENT = "sensor/ligntSensorEvent";
+	public static final String LIGHT_SENSOR_EVENT = "sensor/lightSensorEvent";
 	
 	/**
 	 * Constant used to subscribe to temperature sensor events

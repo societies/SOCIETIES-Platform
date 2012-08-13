@@ -54,4 +54,19 @@ public interface INegotiation {
 	 */
 	public void startNegotiation(Requestor provider, boolean includePrivacyPolicyNegotiation,
 			INegotiationCallback callback);
+
+	/**
+	 * Start policy negotiation procedure.
+	 * Same as calling
+	 * {@link #startNegotiation(Requestor, boolean, INegotiationCallback)}
+	 * with parameter set to true.
+	 * 
+	 * @param provider Includes identity of the service provider and service ID comprehendable by the provider.
+	 * This should be an instance of either:<br/>
+	 * - {@link RequestorCis} if this negotiation is about joining a CIS, or<br/>
+	 * - {@link RequestorService} if this negotiation is about using a new service
+	 * 
+	 * @param callback The callback to be invoked to receive the result of this method
+	 */
+	public void startNegotiation(Requestor provider, INegotiationCallback callback);
 }

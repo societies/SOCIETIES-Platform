@@ -104,7 +104,7 @@ public class CtxBrokerClient implements ICommCallback {
 	private ICommManager commManager;
 
 	private IIdentityManager idMgr;
-	
+
 	private CtxBrokerCommCallback ctxBrokerCommCallback = new CtxBrokerCommCallback();
 
 	public ICommManager getCommManager() {
@@ -129,7 +129,7 @@ public class CtxBrokerClient implements ICommCallback {
 		this.commManager = commManager;
 		this.commManager.register(this);
 		idMgr = this.commManager.getIdManager();
-		
+
 	}
 
 	//createEntity(final Requestor requestor,final IIdentity targetCss, final String type)
@@ -145,50 +145,96 @@ public class CtxBrokerClient implements ICommCallback {
 
 		IIdentity toIdentity;
 		try {
+			//!!!!!!!
+			//TODO this should be removed and substituted by the real target address
 			toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
+			// currently creates everything in local CM system
+
 			//create the message to be sent
 			Stanza stanza = new Stanza(toIdentity);
 			LOG.error("SKATA stanza " + stanza.getTo());
 			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 			cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
 			// use the create entity method : createCtxEntity(String type)
-			//CtxBrokerBeanCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerBeanCreateEntityBean();
+			
 			CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerCreateEntityBean();
 			// add the signatures of the method
 			// TODO ctxBrokerCreateEntityBean.setTargetCss(targetCss.toString());
 			ctxBrokerCreateEntityBean.setTargetCss(cssOwnerStr);
 			ctxBrokerCreateEntityBean.setType(type);
+
 			RequestorBean requestorBean = createRequestorBean(requestor);
 			// TODO ctxBrokerCreateEntityBean.setRequestor(requestorBean);
 
 			cbPacket.setCreateEntity(ctxBrokerCreateEntityBean);
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-	
+
 			LOG.info("SKATA 3 before sendIQGet");
 			//send the message
-			if (cbPacket.getCreateEntity() == null) // TODO remove
-				LOG.error("SKATA cbPacket.getCreate() == nulls");
-			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
 			
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+
 			//this.commManager.sendMessage(stanza, ctxBrokerCreateEntityBean);
 		} catch (Exception e) {
-			
+
 			throw new CtxBrokerException("Could not create remote entity: "
 					+ e.getLocalizedMessage(), e);
 		} 
 	}
 
-	public void /*Future<CtxAttribute>*/ createRemoteAttribute(Requestor requestor, CtxEntityIdentifier scope, String type, ICtxCallback callback){
+	public void createRemoteAttribute(Requestor requestor, IIdentity targetCss, CtxEntityIdentifier scope, String type, ICtxCallback callback) throws CtxBrokerException{
 
-		final CtxAttribute attribute = null;
-		// creating the identity of the CtxBroker that will be contacted
-		IIdentity toIdentity = null;
+		IIdentity toIdentity ;
+
+		// TODO remove following lines 
+		// creating the identity of the local CtxBroker that will be contacted
+		INetworkNode cssNodeId = this.commManager.getIdManager().getThisNetworkNode();
+		final String cssOwnerStr = cssNodeId.getBareJid();
+	
+		// this line is the correct 
+		// toIdentity = targetCss;
+		
 		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
+			//!!!!!!!
+			//TODO this should be removed and substituted by the real target address
+			toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
+			// currently creates everything in local CM system
 
+			//create the message to be sent
+			Stanza stanza = new Stanza(toIdentity);
+			
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+			
+			cbPacket.setMethod(BrokerMethodBean.CREATE_ATTRIBUTE);
+				
+			// use the method : createAttribute(CtxEntityIdentifier scope, String type)
+			CtxBrokerCreateAttributeBean ctxBrokerCreateAttributeBean = new CtxBrokerCreateAttributeBean();
+			// add the signatures of the method
+
+			RequestorBean requestorBean = createRequestorBean(requestor);
+			ctxBrokerCreateAttributeBean.setRequestor(requestorBean);
+			
+			//create the bean
+			CtxEntityIdentifierBean ctxEntIdBean = new CtxEntityIdentifierBean();
+			ctxEntIdBean.setString(scope.toString());
+			ctxBrokerCreateAttributeBean.setScope(ctxEntIdBean);
+
+			ctxBrokerCreateAttributeBean.setType(type);
+			cbPacket.setCreateAttribute(ctxBrokerCreateAttributeBean);
+			LOG.info("1 ctxBrokerCreateAttributeBean ready "+ctxBrokerCreateAttributeBean.toString());
+			
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+			LOG.info("2 before sendIQGet");
+						
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+
+		} catch (Exception e) {
+
+			throw new CtxBrokerException("Could not create remote attribute: "
+					+ e.getLocalizedMessage(), e);
+		} 
+
+		/*
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
 		CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
@@ -218,8 +264,10 @@ public class CtxBrokerClient implements ICommCallback {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		 */
 		//return new AsyncResult<CtxAttribute>(attribute);
 	}
+
 
 	public void /*Future<CtxAssociation>*/ createRemoteAssociation(Requestor requestor, String type, ICtxCallback callback){
 

@@ -6,11 +6,8 @@
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-
-	<artifact type="bundle" name="org.societies.api.external.societies-api"/>
-    <artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
+    <artifact type="configuration" name="xc" />
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-    <artifact type="bundle" name="org.societies.example.internalAPI"/>
     <artifact type="bundle" name="org.societies.integration.test.bit.remote_api_calls_711"/>
     
 </plan>

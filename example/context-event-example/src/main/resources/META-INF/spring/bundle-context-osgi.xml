@@ -16,4 +16,5 @@
 	<osgi:service ref="ctxEventExample" interface="org.societies.context.example.event.CtxEventExample" />
 	
 	<osgi:reference id="ctxEventMgr" interface="org.societies.context.api.event.ICtxEventMgr" cardinality="1..1" />
+	<osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="1..1" />
 </beans>

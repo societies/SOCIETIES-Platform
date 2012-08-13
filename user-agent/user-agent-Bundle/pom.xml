@@ -85,6 +85,11 @@
 			<artifactId>feedback</artifactId>
 			<version>${version.ua}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.useragent</groupId>
+			<artifactId>UACommsManager</artifactId>
+			<version>${version.ua}</version>
+		</dependency>
 	</dependencies>
 
 
@@ -104,21 +109,22 @@
 							user-agent-api;scope=compile|runtime,
 							conflict;scope=compile|runtime,
 							decisionmaking;scope=compile|runtime,
-							resourcesharing;scope=compile|runtime,
 							monitoring;scope=compile|runtime,
 							feedback;scope=compile|runtime,
-							comms;scope=compile|runtime
+							UACommsManager;scope=compile|runtime
 							</Embed-Dependency> 
 						<Embed-Transitive>false</Embed-Transitive>
 
-						<Export-Package>org.societies.useragent.api.monitoring.remote</Export-Package>
+						<Export-Package>
+						    org.societies.useragent.**
+						</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
-			</plugin>
+			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>

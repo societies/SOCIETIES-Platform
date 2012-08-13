@@ -39,6 +39,9 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.ClientJarBean;
 import org.societies.api.internal.schema.domainauthority.rest.ClientJarBeanResult;
@@ -64,6 +67,7 @@ public class CommsServer implements IFeatureServer {
 	
 	private ICommManager commMgr;
 	private IClientJarServer clientJarServer;
+	private IIdentityManager idMgr;
 	
 	public CommsServer() {
 		LOG.info("CommsServer()");
@@ -78,6 +82,12 @@ public class CommsServer implements IFeatureServer {
 			LOG.debug("init(): commMgr registered");
 		} catch (CommunicationException e) {
 			LOG.error("init(): ", e);
+		}
+		
+		idMgr = commMgr.getIdManager();
+
+		if (idMgr == null) {
+			LOG.error("init({}): Could not get IdManager from ICommManager");
 		}
 	}
 
@@ -131,19 +141,28 @@ public class CommsServer implements IFeatureServer {
 		if (messageBean != null && messageBean instanceof ClientJarBean) {
 			
 			// Method parameters
-			ClientJarBean providerBean = (ClientJarBean) messageBean;
-			String filePath = providerBean.getFilePath();
-			URI url = providerBean.getUrl();
+			ClientJarBean clientJarBean = (ClientJarBean) messageBean;
+			List<String> files = clientJarBean.getFiles();
+			URI serviceId = clientJarBean.getServiceId();
+			String providerIdentity = clientJarBean.getProviderIdentity();
+			String signature = clientJarBean.getSignature();
 			
-			MethodType method = providerBean.getMethod();
+			MethodType method = clientJarBean.getMethod();
 			
 			LOG.debug("getQuery(): ClientJarBean. Method: " + method);
-			LOG.debug("getQuery(): ClientJarBean. Params: " + filePath + ", " +	url);
+			LOG.debug("getQuery(): ClientJarBean. Params: " + serviceId + ", " + providerIdentity);
 
-				switch (method) {
-				case ADD_KEY:
-					LOG.debug("getQuery(): ClientJarBean.addKey({})", filePath);
-					resultFuture = clientJarServer.addKey(url, filePath);
+			switch (method) {
+				case SHARE_FILES:
+					LOG.debug("getQuery(): ClientJarBean.shareFiles()");
+					IIdentity provider;
+					try {
+						provider = idMgr.fromJid(providerIdentity);
+						resultFuture = clientJarServer.shareFiles(serviceId, provider, signature, files);
+					} catch (InvalidFormatException e) {
+						LOG.warn("Could not get identity", e);
+						return failure();
+					}
 					break;
 				default:
 					LOG.warn("getQuery(): unrecognized method: {}", method);
@@ -158,6 +177,17 @@ public class CommsServer implements IFeatureServer {
 				LOG.warn("getQuery()", e);
 			}
 		}
+		
+		return result;
+	}
+	
+	private ClientJarBeanResult failure() {
+		
+		UrlBean urlBean = new UrlBean();
+		ClientJarBeanResult result = new ClientJarBeanResult();
+
+		urlBean.setSuccess(false);
+		result.setUrlBean(urlBean);
 		
 		return result;
 	}
@@ -188,16 +218,13 @@ public class CommsServer implements IFeatureServer {
 			
 			// Method parameters
 			ClientJarBean providerBean = (ClientJarBean) messageBean;
-			String filePath = providerBean.getFilePath();
-			URI url = providerBean.getUrl();
 			
 			MethodType method = providerBean.getMethod();
 			
 			LOG.debug("receiveMessage(): NegotiationProvider. Method: " + method);
-			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + filePath + ", " + url);
 			
 			switch (method) {
-			case ADD_KEY:
+			case SHARE_FILES:
 				LOG.warn("receiveMessage(): Method {} returns a value and should not be handled here.", method);
 				break;
 			}

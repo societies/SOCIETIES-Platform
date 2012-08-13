@@ -29,12 +29,10 @@ package org.societies.webapp.models;
 
 
 
-import java.awt.Button;
-
 import javax.validation.constraints.Size;
 
-import org.societies.webapp.models.requests.CssServiceModel;
 import org.societies.webapp.models.requests.CssRequestModel;
+import org.societies.webapp.models.requests.CssServiceModel;
 
 /**
  * 

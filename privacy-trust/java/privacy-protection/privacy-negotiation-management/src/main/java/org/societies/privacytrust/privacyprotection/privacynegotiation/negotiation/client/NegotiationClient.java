@@ -56,6 +56,7 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationClient;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
@@ -106,21 +107,23 @@ public class NegotiationClient implements INegotiationClient {
 	private Hashtable<Requestor, IAgreement> agreements;
 	private IPrivacyAgreementManagerInternal policyAgreementMgr;
 	private IPrivacyDataManagerInternal privacyDataManager;
+	private IPrivacyPolicyManager privacyPolicyManager;
 	private IIdentitySelection idS;
 	private IPrivacyPreferenceManager privPrefMgr;
 	private IIdentityManager idm;
 	private IIdentity userIdentity;
-
-	public NegotiationClient(INegotiationAgent negotiationAgent, PrivacyPolicyNegotiationManager policyMgr){
+	
+	public NegotiationClient(INegotiationAgent negotiationAgent, PrivacyPolicyNegotiationManager privacyPolicyNegotiationManager){
 		this.negotiationAgent = negotiationAgent;
-		this.policyMgr = policyMgr;
-		this.ctxBroker = policyMgr.getCtxBroker();
-		this.eventMgr = policyMgr.getEventMgr();
-		this.policyAgreementMgr = policyMgr.getPrivacyAgreementManagerInternal();
-		this.privacyDataManager = policyMgr.getPrivacyDataManagerInternal();
-		this.idS = policyMgr.getIdentitySelection();
-		this.privPrefMgr = policyMgr.getPrivacyPreferenceManager();
-		this.idm = policyMgr.getIdm();
+		this.policyMgr = privacyPolicyNegotiationManager;
+		this.privacyPolicyManager = privacyPolicyNegotiationManager.getPrivacyPolicyManager();
+		this.ctxBroker = privacyPolicyNegotiationManager.getCtxBroker();
+		this.eventMgr = privacyPolicyNegotiationManager.getEventMgr();
+		this.policyAgreementMgr = privacyPolicyNegotiationManager.getPrivacyAgreementManagerInternal();
+		this.privacyDataManager = privacyPolicyNegotiationManager.getPrivacyDataManagerInternal();
+		this.idS = privacyPolicyNegotiationManager.getIdentitySelection();
+		this.privPrefMgr = privacyPolicyNegotiationManager.getPrivacyPreferenceManager();
+		this.idm = privacyPolicyNegotiationManager.getIdm();
 		this.myPolicies = new Hashtable<Requestor, ResponsePolicy>();
 		this.agreements = new Hashtable<Requestor, IAgreement>();
 		this.userIdentity = idm.getThisNetworkNode();
@@ -135,6 +138,12 @@ public class NegotiationClient implements INegotiationClient {
 
 	@Override
 	public void receiveProviderPolicy(RequestPolicy policy) {
+		try {
+			this.privacyPolicyManager.updatePrivacyPolicy(policy);
+		} catch (PrivacyException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		log("Received Provider RequestPolicy!");
 		log(policy.toString());
 		this.requestPolicy = policy;
@@ -469,7 +478,12 @@ public class NegotiationClient implements INegotiationClient {
 
 	@Override
 	public void startPrivacyPolicyNegotiation(Requestor requestor, RequestPolicy policy) {
-		// TODO Auto-generated method stub
+		if (policy==null){
+			this.startNegotiation(requestor);
+		}else{
+			this.receiveProviderPolicy(policy);
+			
+		}
 		
 	}
 

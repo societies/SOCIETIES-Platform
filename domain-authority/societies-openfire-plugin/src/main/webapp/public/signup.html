@@ -5,17 +5,29 @@
 <meta content="none" name="decorator" />
 <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
+<script language="javascript">
+function ValidateForm(frm) {
+	if (frm.password.value != frm.passwordRepeat.value) {
+		alert("Please correctly re-type the password!");
+		return false;
+	}
+	return true;
+}
+</script>
 <body>
 <div><span><img src="images/societiesheader.png" /></span>
 <p>Welcome to SOCIETIES! If you don't have an account signup here!</p></div>
-<form method="post" action="/plugins/societies/societies">
+<form method="post" action="/plugins/societies/societies" onsubmit="return ValidateForm(this)">
 <input type="hidden" name="type" value="add" />
 <input type="hidden" name="secret" value="defaultSecret" />
-Username: <input type="text" name="username" /><br/>
-Password: <input type="password" name="password" /><br/>
-Repeat Password: <input type="password" name="passwordRepeat" /><br/>
-<input type="hidden" name="name" value="" />
-<input type="hidden" name="email" value="" />
+
+<table>
+	<tr><td>Username: </td><td><input type="text" name="username" /></td></tr>
+	<tr><td>Password: </td><td><input type="password" name="password" /></td></tr>
+	<tr><td>Repeat Password: </td><td><input type="password" name="passwordRepeat" /></td></tr>
+	<tr><td>Name: </td><td><input type="text" name="name" value="" /></td></tr>
+	<tr><td>eMail: </td><td><input type="text" name="email" value="" /></td></tr>
+</table>
 <div class="aggreement"><h3>SOCIETIES Terms of Use</h3><p>
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vestibulum accumsan lectus ut sollicitudin. Nullam elementum ornare pharetra. Curabitur in arcu et purus congue condimentum. Vivamus scelerisque, ipsum vel sollicitudin venenatis, magna augue facilisis odio, quis aliquet quam erat sollicitudin lacus. Donec id tellus aliquam sem euismod lacinia. Nam lobortis ullamcorper lobortis. Ut sit amet velit at nisi consequat tincidunt sit amet vel turpis. Cras posuere eros non turpis imperdiet luctus. Suspendisse potenti. Duis blandit commodo dui nec imperdiet. In hac habitasse platea dictumst.
 </p><p>

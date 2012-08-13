@@ -82,4 +82,19 @@ public class EventTypes {
 	/**	Published by the RFIDDriver to notify a change in the location of an RFID tag */
 	public static final String RFID_UPDATE_EVENT = "org/societies/css/device/rfidUpdate";
 	
+	// CIS RELATED EVENTS
+	
+	/** CIS creation */
+	public static final String CIS_CREATION = "org/societies/cis/create";	
+	/** CIS deletion */
+	public static final String CIS_DELETION = "org/societies/cis/delete";	
+	/** CIS subscription */
+	public static final String CIS_SUBS = "org/societies/cis/subscription";	
+	/** CIS unsubscription */
+	public static final String CIS_UNSUBS = "org/societies/cis/unsubscription";	
+
+	/** Published by the DisplayDriver service to notify when a display is available to use */
+	public static final String DISPLAY_EVENT = "org/societies/css/device/displayUpdate";
+
+	
 }

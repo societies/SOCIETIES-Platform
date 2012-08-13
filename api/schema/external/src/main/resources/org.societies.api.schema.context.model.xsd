@@ -38,7 +38,7 @@
   <xs:complexType name="ctxModelObjectBean" abstract="true">
     <xs:sequence>
       <xs:element name="id" type="tns:ctxIdentifierBean"/>
-      <xs:element name="lastModified" type="xs:dateTime"/>
+      <xs:element name="lastModified" type="xs:dateTime" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -57,15 +57,15 @@
     <xs:complexContent>
       <xs:extension base="tns:ctxModelObjectBean">
         <xs:sequence>
-          <xs:element name="stringValue" type="xs:string" nillable="true"/>
-          <xs:element name="integerValue" type="xs:int" nillable="true"/>
-          <xs:element name="doubleValue" type="xs:double" nillable="true"/>
-          <xs:element name="binaryValue" type="xs:base64Binary" nillable="true"/>
-          <xs:element name="valueType" type="tns:ctxAttributeValueTypeBean"/>
-          <xs:element name="valueMetric" type="xs:string" nillable="true"/>
-          <xs:element name="quality" type="tns:ctxQualityBean"/>
-          <xs:element name="sourceId" type="xs:string" nillable="true"/>
-          <xs:element name="historyRecorded" type="xs:boolean"/>
+          <xs:element name="stringValue" type="xs:string" minOccurs="0"/>
+          <xs:element name="integerValue" type="xs:int"  minOccurs="0"/>
+          <xs:element name="doubleValue" type="xs:double"  minOccurs="0"/>
+          <xs:element name="binaryValue" type="xs:base64Binary"  minOccurs="0"/>
+          <xs:element name="valueType" type="tns:ctxAttributeValueTypeBean" minOccurs="0"/>
+          <xs:element name="valueMetric" type="xs:string" minOccurs="0"/>
+          <xs:element name="quality" type="tns:ctxQualityBean" minOccurs="0"/>
+          <xs:element name="sourceId" type="xs:string" minOccurs="0"/>
+          <xs:element name="historyRecorded" type="xs:boolean" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -73,10 +73,10 @@
 
   <xs:complexType name="ctxQualityBean">
     <xs:sequence>
-      <xs:element name="lastUpdated" type="xs:dateTime" nillable="true"/>
-      <xs:element name="originType" type="tns:ctxOriginTypeBean" nillable="true"/>
-      <xs:element name="precision" type="xs:double" nillable="true"/>
-      <xs:element name="updateFrequency" type="xs:double" nillable="true"/>
+      <xs:element name="lastUpdated" type="xs:dateTime" minOccurs="0" />
+      <xs:element name="originType" type="tns:ctxOriginTypeBean" minOccurs="0"/>
+      <xs:element name="precision" type="xs:double" minOccurs="0"/>
+      <xs:element name="updateFrequency" type="xs:double" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -133,10 +133,10 @@
       <xs:extension base="tns:ctxModelObjectBean">
         <xs:sequence>
           <xs:element name="historyRecordId" type="xs:long"/>
-          <xs:element name="stringValue" type="xs:string" nillable="true"/>
-          <xs:element name="integerValue" type="xs:int" nillable="true"/>
-          <xs:element name="doubleValue" type="xs:double" nillable="true"/>
-          <xs:element name="binaryValue" type="xs:base64Binary" nillable="true"/>
+          <xs:element name="stringValue" type="xs:string"  minOccurs="0"/>
+          <xs:element name="integerValue" type="xs:int"  minOccurs="0"/>
+          <xs:element name="doubleValue" type="xs:double"  minOccurs="0"/>
+          <xs:element name="binaryValue" type="xs:base64Binary" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

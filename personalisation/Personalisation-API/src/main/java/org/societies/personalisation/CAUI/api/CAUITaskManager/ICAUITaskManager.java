@@ -120,6 +120,10 @@ public interface ICAUITaskManager {
 	 */
 	public List<IUserIntentAction> retrieveActionsByType(String par);
 	
+	public List<IUserIntentAction> retrieveActionsByServiceTypeValue(String serviceId,String actionType, String actionValue);
+	
+	public List<IUserIntentAction> retrieveActionsByServiceType (String serviceId,String actionType) ;
+	
 	/**
 	 * Allows any service to request a context-based evaluated preference outcome.
 	 * @return					the outcome in the form of an IAction object
@@ -130,7 +134,7 @@ public interface ICAUITaskManager {
 	 * @param serviceID    the service identifier of the service requesting the
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
-	 */
+	 */	
 	public UserIntentAction retrieveCurrentIntentAction(IIdentity requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**

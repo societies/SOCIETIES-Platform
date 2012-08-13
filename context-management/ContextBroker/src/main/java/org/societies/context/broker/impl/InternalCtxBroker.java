@@ -45,6 +45,7 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -55,6 +56,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
@@ -217,7 +219,13 @@ public class InternalCtxBroker implements ICtxBroker {
 					|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
 
 				attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
-
+			
+				//TODO origin type should be set in db manager
+				if (attribute.getQuality().getOriginType() == null) {
+					attribute.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+				}
+				
+				
 			} else if (IdentityType.CIS.equals(scopeID.getType())){
 
 				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, type);
@@ -243,7 +251,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		final CtxEntity entity = 
 				this.userCtxDBMgr.createEntity(type);
-
+		
 		return new AsyncResult<CtxEntity>(entity);
 	}
 
@@ -370,6 +378,59 @@ public class InternalCtxBroker implements ICtxBroker {
 		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
 
 		return new AsyncResult<List<CtxIdentifier>>(modObjListReturn);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#lookup(org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxModelType, java.lang.String)
+	 */
+	@Override
+	@Async
+	public Future<List<CtxIdentifier>> lookup(final CtxEntityIdentifier entityId, 
+			 final CtxModelType modelType, final String type) throws CtxException {
+		
+		if (entityId == null)
+			throw new NullPointerException("entityId can't be null");
+		if (modelType == null)
+			throw new NullPointerException("modelType can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		
+		if (!CtxModelType.ATTRIBUTE.equals(modelType) && !CtxModelType.ASSOCIATION.equals(modelType))
+			throw new IllegalArgumentException("modelType is not ATTRIBUTE or ASSOCIATION");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Looking up context " + modelType + "(s) of type '" + type 
+					+ "' under entity " + entityId);
+		
+		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
+		final CtxEntity entity;
+		try {
+			final IIdentity targetId = this.idMgr.fromJid(entityId.getOwnerId());
+			if (IdentityType.CIS.equals(targetId.getType()))
+				entity = (CtxEntity) this.communityCtxDBMgr.retrieve(entityId);
+			else
+				entity = (CtxEntity) this.retrieve(entityId).get();
+
+			// TODO check local or remote
+			// TODO if local then CtxDBMgr should provide the method - temp hack follows
+			
+			if (CtxModelType.ATTRIBUTE.equals(modelType)) {
+				final Set<CtxAttribute> attrs = entity.getAttributes(type);
+				for (final CtxAttribute attr : attrs)
+					result.add(attr.getId());
+			} else /* if (CtxModelType.ASSOCIATION.equals(modelType)) */ {
+				final Set<CtxAssociationIdentifier> assocIds = entity.getAssociations(type);
+				for (final CtxAssociationIdentifier assocId : assocIds)
+					result.add(assocId);
+			}
+		} catch (Exception e) {
+			
+			throw new CtxBrokerException("Could not look up context " + modelType
+					+ "(s) of type '" + type + "' under entity " + entityId
+					+ ": " + e.getLocalizedMessage(), e);
+		}
+		
+		return new AsyncResult<List<CtxIdentifier>>(result);
 	}
 
 	/*
@@ -970,6 +1031,47 @@ public class InternalCtxBroker implements ICtxBroker {
 	//***********************************************
 	//     Community Context Management Methods  
 	//***********************************************
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieveCommunityEntityId(org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	@Async
+	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
+			final IIdentity cisId) throws CtxException {
+		
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		if (!IdentityType.CIS.equals(cisId.getType()))
+			throw new IllegalArgumentException("cisId IdentityType is not CIS");
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving the CtxEntityIdentifier for CIS " + cisId);
+
+		CtxEntityIdentifier communityEntityId = null;
+
+		// TODO if (this.idMgr.isMine(cssId)) {
+
+			final CommunityCtxEntity communityEntity;
+			try {
+				communityEntity = this.communityCtxDBMgr.retrieveCommunityEntity(cisId);
+				if (communityEntity != null)
+					communityEntityId = communityEntity.getId();
+			} catch (CtxException ce) {
+
+				throw new CtxBrokerException(
+						"Could not retrieve CommunityCtxEntity from Community Context DB Mgr: "
+						+ ce.getLocalizedMessage(), ce);
+			}
+		/* TODO	
+		} else {
+
+			LOG.warn("remote call");
+		} */
+
+		return new AsyncResult<CtxEntityIdentifier>(communityEntityId);
+	}
+	
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
 			CtxEntityIdentifier community) throws CtxException {
@@ -1530,13 +1632,18 @@ public class InternalCtxBroker implements ICtxBroker {
 	//********************************************************************
 	//**************** end of hoc code  **********************************
 
-
+	
+	
+	//******************************************
+	//  service refs used by junit tests
+	//******************************************
+	
 	/**
 	 * Sets the User Context DB Mgmt service reference.
 	 * 
 	 * @param userDB
 	 *            the User Context DB Mgmt service reference to set.
-	 */
+	*/
 	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
 
 		this.userCtxDBMgr = userDB;
@@ -1547,7 +1654,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param userDB
 	 *            the User Context DB Mgmt service reference to set.
-	 */
+	*/
 	public void setCommunityCtxDBMgr(ICommunityCtxDBMgr communityCtxDBMgr) {
 
 		this.communityCtxDBMgr = communityCtxDBMgr;
@@ -1558,7 +1665,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param userCtxHistoryMgr
 	 *            the User Context History Mgmt service reference to set
-	 */
+	*/
 	public void setUserCtxHistoryMgr(IUserCtxHistoryMgr userCtxHistoryMgr) {
 
 		this.userCtxHistoryMgr = userCtxHistoryMgr;
@@ -1569,7 +1676,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @param idMgr
 	 *            the IIdentity Mgmt service reference to set.
-	 */
+	*/
 	public void setIdentityMgr(IIdentityManager identityMgr) {
 
 		this.idMgr = identityMgr;
@@ -1583,10 +1690,9 @@ public class InternalCtxBroker implements ICtxBroker {
 	 */
 	public void setUserCtxInferenceMgr(IUserCtxInferenceMgr userCtxInferenceMgr) {
 
-		System.out.println("inf manager set");
 		this.userCtxInferenceMgr = userCtxInferenceMgr;
 	}
-
+	 
 
 	/**
 	 * Sets the {@link IPrivacyLogAppender} service reference.
@@ -1599,6 +1705,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.privacyLogAppender = privacyLogAppender;
 	}
 
+	//******************************************
+	//  service refs used by junit tests
+	//******************************************
+		
+	
+	
+	
 	// TODO remove
 	public void createCssNode(INetworkNode cssNodeId) throws CtxException {
 
@@ -1659,4 +1772,6 @@ public class InternalCtxBroker implements ICtxBroker {
 			// do nothing
 		}
 	}
+
+
 }

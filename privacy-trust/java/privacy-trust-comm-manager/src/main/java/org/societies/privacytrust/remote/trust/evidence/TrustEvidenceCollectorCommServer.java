@@ -106,6 +106,11 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 		final TrustEvidenceCollectorRequestBean requestBean = (TrustEvidenceCollectorRequestBean) bean;
 		final TrustEvidenceCollectorResponseBean responseBean = new TrustEvidenceCollectorResponseBean();
 		
+		// TODO Change to debug once tested
+		if (LOG.isInfoEnabled())
+			LOG.info("getQuery(stanza=" + this.stanzaToString(stanza)
+					+ ",methodName=" + requestBean.getMethodName() + ")");
+		
 		if (MethodName.ADD_DIRECT_EVIDENCE.equals(requestBean.getMethodName())) {
 			
 			final AddDirectEvidenceRequestBean addEvidenceRequestBean =
@@ -123,8 +128,10 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 				final TrustEvidenceType type = TrustEvidenceType.valueOf(
 						addEvidenceRequestBean.getType().toString());
 				// 3. timestamp
-				final Date timestamp = addEvidenceRequestBean.
-						getTimestamp().toGregorianCalendar().getTime();
+				// TODO Uncomment once #1310 is resolved
+				//final Date timestamp = addEvidenceRequestBean.
+				//		getTimestamp().toGregorianCalendar().getTime();
+				final Date timestamp = new Date();
 				// 4. info
 				final Serializable info;
 				if (TrustEvidenceType.RATED.equals(type)) {
@@ -136,6 +143,12 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 				} else {
 					info = null;
 				}
+				
+				// TODO Change to debug once tested
+				if (LOG.isInfoEnabled())
+					LOG.info("addDirectTrustEvidence(teid=" + teid
+							+ ",type=" + type + ",timestamp=" + timestamp
+							+ ",info=" + info + ")");
 				
 				this.trustEvidenceCollector.addDirectEvidence(teid, type, timestamp, info);
 				
@@ -194,6 +207,11 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 				} else {
 					info = null;
 				}
+				
+				if (LOG.isDebugEnabled())
+					LOG.debug("addIndirectTrustEvidence(source=" + source
+							+ ",teid=" + teid + ",type=" + type + ",timestamp=" 
+							+ timestamp	+ ",info=" + info + ")");
 				
 				this.trustEvidenceCollector.addIndirectEvidence(source, teid, type, timestamp, info);
 				
@@ -264,6 +282,20 @@ public class TrustEvidenceCollectorCommServer implements IFeatureServer {
 	public void setTrustEvidenceCollector(ITrustEvidenceCollector trustEvidenceCollector) {
 		
 		this.trustEvidenceCollector = trustEvidenceCollector;
+	}
+	
+	private String stanzaToString(Stanza stanza) {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		sb.append("id=" + stanza.getId());
+		sb.append(",");
+		sb.append("from=" + stanza.getFrom());
+		sb.append(",");
+		sb.append("to=" + stanza.getTo());
+		sb.append("]");
+		
+		return sb.toString();
 	}
 	
 	/**

@@ -32,6 +32,9 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,8 +64,8 @@ public class TrustEvidenceCollectorClient {
 		this.trustEvidenceCollector = trustEvidenceCollector;
 		
 		this.trustorId = commMgr.getIdManager().fromJid(
-				"trustorCss@societies.local");
-				// TODO commMgr.getIdManager().getThisNetworkNode().getBareJid());
+				//"trustorCss@societies.local");
+				commMgr.getIdManager().getThisNetworkNode().getBareJid());
 		
 		this.trustedCssId1 = commMgr.getIdManager().fromJid(TRUSTED_CSS_ID1);
 		
@@ -84,8 +87,9 @@ public class TrustEvidenceCollectorClient {
 			LOG.info("*** adding trust rating: '" + this.trustorId + "," 
 					+ this.trustedCssId1 + "," + trustRating1 + "," 
 					+ timestamp1);
-			this.trustEvidenceCollector.addTrustRating(this.trustorId, this.trustedCssId1,
-					trustRating1, timestamp1);
+			this.trustEvidenceCollector.addDirectEvidence(
+					new TrustedEntityId(this.trustorId.toString(), TrustedEntityType.CSS, this.trustedCssId1.toString()),
+					TrustEvidenceType.RATED, timestamp1, trustRating1);
 			/*
 			final Double trustRating2 = 0.8d;
 			final Date timestamp2 = new Date();

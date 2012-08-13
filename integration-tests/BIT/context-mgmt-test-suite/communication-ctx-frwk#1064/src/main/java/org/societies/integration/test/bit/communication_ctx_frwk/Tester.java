@@ -24,20 +24,28 @@
  */
 
 package org.societies.integration.test.bit.communication_ctx_frwk;
-import java.util.List;
+
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+
 
 import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
 
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 
 
@@ -50,20 +58,53 @@ import org.societies.api.identity.Requestor;
 public class Tester {
 	
 	private static Logger LOG = LoggerFactory.getLogger(Test1064.class);
+	Requestor requestor = null;
 	
 	public Tester(){
-		
-		try {			
-			// this can be null for testing
-			Requestor requestor = null;
+		LOG.info("*** " + this.getClass() + " starting");
+	}
+	
+	@Before
+	public void setUp(){
 			
+	}
+	
+	
+	@Test
+	public void Test(){
+		
+		LOG.info("*** REMOTE CM TEST STARTING ***");
+		LOG.info("*** " + this.getClass() + " instantiated");
+		LOG.info("*** ctxBroker service :"+Test1064.getCtxBroker());
+		
+		try {								
+			INetworkNode cssNodeId = Test1064.getCommManager().getIdManager().getThisNetworkNode();
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			IIdentity cssOwnerId = Test1064.getCommManager().getIdManager().fromJid(cssOwnerStr);
+			this.requestor = new Requestor(cssOwnerId);
+			LOG.info("*** requestor = " + this.requestor);
+						
 			// this should be set with the use of identManager
+			// in current test a null targetCss creates the entity in local cm 
 			IIdentity targetCss = null;
-			CtxEntity entity = Test1064.ctxBroker.createEntity(requestor, targetCss, CtxEntityTypes.PERSON).get();
-	    	System.out.println("entity person created based on 3p broker "+entity);
 			
+			CtxEntity entity = Test1064.getCtxBroker().createEntity(requestor, targetCss, CtxEntityTypes.PERSON).get();
+			LOG.info("entity person created based on 3p broker "+entity);
+			LOG.info("entity person created based on 3p broker entity id :"+entity.getId());	
+	    	
+	    	
 		
-		
+	    	CtxEntityIdentifier entityID = entity.getId();
+	       	
+	    	LOG.info(" scope entityID "+entityID.toString());
+	    	// this null is set in order to trigger remote call
+	    	entityID.setOwnerId("null");
+	    	LOG.info(" scope entityID "+entityID.toString());
+	    
+	    	LOG.info("create attribute BIRTHDAY ");
+	    	CtxAttribute attribute = Test1064.getCtxBroker().createAttribute(requestor, entityID, CtxAttributeTypes.BIRTHDAY).get();
+	    	LOG.info("attribute BIRTHDAY created based on 3p broker "+attribute.getId());
+		    	
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -73,20 +114,14 @@ public class Tester {
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		
-	}
-	
-	@Before
-	public void setUp(){
-			
 	}
 	
 	
-	@org.junit.Test
-	public void Test(){
-			
-	}
-		
+	//private createRemoteEntity(){	}
+	
+	
 }

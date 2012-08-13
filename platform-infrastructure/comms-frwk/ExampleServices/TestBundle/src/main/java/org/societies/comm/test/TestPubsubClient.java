@@ -15,6 +15,7 @@ import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.examples.calculatorbean.CalcBean;
 import org.societies.comm.xmpp.event.PubsubEvent;
 import org.societies.comm.xmpp.event.PubsubEventFactory;
 import org.societies.comm.xmpp.event.PubsubEventStream;
@@ -41,22 +42,30 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 		start();
 	}
 
-	private Testnode createTestItem()  {
+	//private Testnode createTestItem()  {
+	private CalcBean createTestItem()  {
 		Testnode tn = new Testnode();
 		tn.setTestattribute("testValue");
-		return tn;
+		//return tn;
+		
+		CalcBean calc = new CalcBean();
+		calc.setMessage("successful");
+		return calc; 
 	}
 
 	@Override
-	public void pubsubEvent(IIdentity pubsubService, String node, String itemId,
-			Object item) {
+	public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
 		LOG.info("### pubsubEvent from "+pubsubService+" referring to node "+node+": "+item.getClass().getName());
+		if (item instanceof CalcBean) {
+			CalcBean calc = (CalcBean)item;
+			LOG.info("###Object Info: " + calc.getMessage());
+		}
 	}
 
 	@Override
 	public void run() {
 		try {
-			IIdentity psService = idm.fromJid("societiespubsub.red.local");
+			IIdentity psService = idm.getThisNetworkNode();
 			String node = "testNode";
 			List<String> packageList = new ArrayList<String>();
 			packageList.add("org.societies.test");
@@ -66,7 +75,11 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 			LOG.info("### going to add JAXB package...");
 			psc.addJaxbPackages(packageList);
 			LOG.info("### going to create testNode...");
-			psc.ownerCreate(psService, node);
+			try {
+				psc.ownerCreate(psService, node);
+			} catch (XMPPError e) {
+				LOG.error("Node already exists", e);
+			}
 			LOG.info("### created testNode! going to subscribe testNode...");
 			psc.subscriberSubscribe(psService, node, this);
 			LOG.info("### subscribed testNode! going to publish in testNode...");
@@ -74,6 +87,7 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 			psc.publisherPublish(psService, node, null, item);
 			LOG.info("### published in testNode! finishing Pubsub tests...");
 			
+			/*
 			LOG.info("### starting events test...");
 			String node2 = "testNode2";
 			PubsubEventFactory pef = PubsubEventFactory.getInstance(idm.getThisNetworkNode());
@@ -85,16 +99,15 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 			PubsubEvent event = new PubsubEvent(this, item);
 			stream.multicastEvent(event);
 			LOG.info("### posted event");
+			*/
 
 		} catch (XMPPError e) {
-			LOG.error(e.getMessage(), e);
+			LOG.error(e.getStanzaErrorString(), e); //.getMessage(), e);
 		} catch (CommunicationException e) {
 			LOG.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
 			LOG.error(e.getMessage(), e);
 		} catch (JAXBException e) {
-			LOG.error(e.getMessage(), e);
-		} catch (InvalidFormatException e) {
 			LOG.error(e.getMessage(), e);
 		}
 	}

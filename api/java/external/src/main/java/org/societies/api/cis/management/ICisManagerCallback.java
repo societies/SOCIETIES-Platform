@@ -26,6 +26,7 @@
 package org.societies.api.cis.management;
 
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -37,7 +38,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 public interface ICisManagerCallback {
 
 
-	void receiveResult(Community communityResultObject );
+	void receiveResult(CommunityMethods communityResultObject );
 
 	
 }

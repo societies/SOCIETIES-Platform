@@ -22,6 +22,9 @@
    	<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
 	</osgi:reference>
 	
+	<osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
+	</osgi:reference>
+	
 	<osgi:reference id="uam" interface="org.societies.api.useragent.monitoring.IUserActionMonitor">
 	</osgi:reference>
 	

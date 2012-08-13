@@ -207,7 +207,7 @@ public class TransitionProbabilitiesCalc {
 	public void printDictionary(LinkedHashMap<List<String>,ActionDictObject> dictionary){
 
 		System.out.println ("**** printing step2 dictionary contents *****");
-		System.out.println ("**** total number of entries:" + dictionary.size());
+	//	System.out.println ("**** total number of entries:" + dictionary.size());
 
 		for(List<String> actions : dictionary.keySet()){
 			ActionDictObject dicObj = dictionary.get(actions);

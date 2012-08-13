@@ -33,7 +33,7 @@ package org.societies.webapp.models;
 public class CisFeedForm {
 
 	private String method;
-	private String cssId;
+	private String cIsId;
 	private String timePeriod;
 	private String query;
 	private String verb;
@@ -55,14 +55,14 @@ public class CisFeedForm {
 	/**
 	 * @return the cssId
 	 */
-	public String getCssId() {
-		return cssId;
+	public String getcIsId() {
+		return cIsId;
 	}
 	/**
 	 * @param cssId the cssId to set
 	 */
-	public void setCssId(String cssId) {
-		this.cssId = cssId;
+	public void setcIsId(String cssId) {
+		this.cIsId = cssId;
 	}
 	/**
 	 * @return the timePeriod

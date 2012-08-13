@@ -37,7 +37,7 @@
 		<xs:sequence>
 			<xs:element name="teid" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 			<xs:element name="type" type="tns:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
-			<xs:element name="timestamp" type="xs:dateTime" nillable="false" minOccurs="1"/>
+ 			<xs:element name="timestamp" type="xs:dateTime" nillable="false" minOccurs="1"/>
 			<xs:element name="info" type="xs:base64Binary" nillable="true" minOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>

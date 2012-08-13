@@ -26,6 +26,7 @@ package org.societies.integration.test.bit.privacypolicymanagement;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -105,7 +106,12 @@ public class PrivacyAgreementManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
-		assertEquals("Expected null privacy Agreement, but it is not", privacyAgreement, expectedPrivacyAgreement);
+		
+		//Modified by Rafik
+		//before:
+		//assertEquals("Expected null privacy Agreement, but it is not", privacyAgreement, expectedPrivacyAgreement);
+		//After:
+		assertNull("Expected null privacy Agreement, but it is not", privacyAgreement);
 	}
 	
 	@Test
@@ -123,7 +129,12 @@ public class PrivacyAgreementManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error");
 		}
-		assertEquals("Expected null privacy Agreement, but it is not", privacyAgreement, expectedPrivacyAgreement);
+		
+		//Modified by Rafik
+		//before:
+		//assertEquals("Expected null privacy Agreement, but it is not", privacyAgreement, expectedPrivacyAgreement);
+		//After:
+		assertNull("Expected null privacy Agreement, but it is not", privacyAgreement);
 	}
 
 

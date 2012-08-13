@@ -26,6 +26,7 @@ package org.societies.context.example.event;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -45,111 +46,249 @@ public class CtxEventExample {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CtxEventExample.class);
 	
-	private static final String IDENTITY = "fooIIdentity";
 	private static final String ENTITY_TYPE = "person";
-	private static final String ATTRIBUTE_TYPE = "location";
+	private static final long SCOPE_OBJECT_NUMBER = 100l;
+	
+	private static final String ATTRIBUTE_TYPE = "name";
+	private static final long ATTRIBUTE_OBJECT_NUMBER = 200l;
+	
+	private static final String ATTRIBUTE_TYPE2 = "location";
+	private static final long ATTRIBUTE_OBJECT_NUMBER2 = 300l;
+	
+	private CtxAttributeIdentifier ctxAttrId;
+	private CtxAttributeIdentifier ctxAttrId2;
 	
 	private ICtxEventMgr ctxEventMgr;
 	
 	@Autowired(required=true)
-	public CtxEventExample(ICtxEventMgr ctxEventMgr) {
+	public CtxEventExample(ICtxEventMgr ctxEventMgr, ICommManager commMgr)
+		throws Exception {
 		
 		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+			LOG.info("*** " + this.getClass() + " instantiated");
 		this.ctxEventMgr = ctxEventMgr;
+		final String localIdentity = commMgr.getIdManager().getThisNetworkNode().getBareJid();
+		final CtxEntityIdentifier scope = new CtxEntityIdentifier(localIdentity, ENTITY_TYPE, SCOPE_OBJECT_NUMBER);
+		this.ctxAttrId = new CtxAttributeIdentifier(scope, ATTRIBUTE_TYPE, ATTRIBUTE_OBJECT_NUMBER);
+		this.ctxAttrId2 = new CtxAttributeIdentifier(scope, ATTRIBUTE_TYPE2, ATTRIBUTE_OBJECT_NUMBER2);
 		this.registerListenerByCtxId();
+		this.registerListenerByScope();
 		this.registerListenerByScopeAttrType();
-		this.sendEvent();
+		this.sendLocalEvent();
+		this.sendLocalEvent2();
+		this.sendRemoteEvent();
+		this.sendRemoteEvent2();
+		this.sendBroadcastEvent();
+		this.sendBroadcastEvent2();
 	}
 
 	private void registerListenerByCtxId() {
 		
-		LOG.info("registerListenerByCtxId");
+		LOG.info("*** registerListenerByCtxId");
 		if (this.ctxEventMgr == null) {
-			LOG.error("Could not register context event listener: CtxEventMgr is not available");
+			LOG.error("*** Could not register context event listener: CtxEventMgr is not available");
 			return;
 		}
 		
-		final CtxEntityIdentifier scope = new CtxEntityIdentifier(IDENTITY, ENTITY_TYPE, 1l);
-		final CtxAttributeIdentifier id = new CtxAttributeIdentifier(scope, ATTRIBUTE_TYPE, 2l);
 		try {
-			this.ctxEventMgr.registerChangeListener(new MyCtxChangeEventListener(), new String[] {CtxChangeEventTopic.UPDATED}, id);
+			this.ctxEventMgr.registerChangeListener(new MyCtxChangeEventListener("registerListenerByCtxId"),
+					new String[] {CtxChangeEventTopic.UPDATED}, this.ctxAttrId);
 		} catch (CtxException ce) {
-			LOG.error("Could not register context event listener", ce);
+			LOG.error("*** Could not register context event listener", ce);
+		}
+	}
+	
+	private void registerListenerByScope() {
+		
+		LOG.info("*** registerListenerByScope");
+		if (this.ctxEventMgr == null) {
+			LOG.error("*** Could not register context event listener: CtxEventMgr is not available");
+			return;
+		}
+		
+		final CtxEntityIdentifier scope = this.ctxAttrId.getScope();
+		try {
+			this.ctxEventMgr.registerChangeListener(new MyCtxChangeEventListener("registerListenerByScope"), 
+					new String[] {CtxChangeEventTopic.UPDATED}, scope, null);
+		} catch (CtxException ce) {
+			LOG.error("*** Could not register context event listener", ce);
 		}
 	}
 	
 	private void registerListenerByScopeAttrType() {
 		
-		LOG.info("registerListenerByScopeAttrType");
+		LOG.info("*** registerListenerByScopeAttrType");
 		if (this.ctxEventMgr == null) {
-			LOG.error("Could not register context event listener: CtxEventMgr is not available");
+			LOG.error("*** Could not register context event listener: CtxEventMgr is not available");
 			return;
 		}
 		
-		final CtxEntityIdentifier scope = new CtxEntityIdentifier(IDENTITY, ENTITY_TYPE, 1l);
+		final CtxEntityIdentifier scope = this.ctxAttrId.getScope();
 		final String attrType = ATTRIBUTE_TYPE;
 		try {
-			this.ctxEventMgr.registerChangeListener(new MyCtxChangeEventListener(), new String[] {CtxChangeEventTopic.UPDATED}, scope, attrType);
+			this.ctxEventMgr.registerChangeListener(new MyCtxChangeEventListener("registerListenerByScopeAttrType"), 
+					new String[] {CtxChangeEventTopic.UPDATED}, scope, attrType);
 		} catch (CtxException ce) {
 			LOG.error("Could not register context event listener", ce);
 		}
 	}
 	
-	private void sendEvent() {
+	private void sendLocalEvent() {
 		
-		LOG.info("sendEvent");
+		LOG.info("*** sendLocalEvent");
 		if (this.ctxEventMgr == null) {
-			LOG.error("Could not send context event: CtxEventMgr is not available");
+			LOG.error("*** Could not send context event: CtxEventMgr is not available");
+			return;
+		}
+
+		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId);
+		try {
+			Thread.sleep(1000l);
+			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, CtxEventScope.LOCAL);
+		} catch (Exception e) {
+			LOG.error("*** Could not send event: " + event + ": " 
+					+ e.getLocalizedMessage(), e);
+		}
+	}
+	
+	private void sendLocalEvent2() {
+		
+		LOG.info("*** sendLocalEvent2");
+		if (this.ctxEventMgr == null) {
+			LOG.error("*** Could not send context event: CtxEventMgr is not available");
 			return;
 		}
 		
-		final CtxEntityIdentifier scope = new CtxEntityIdentifier(IDENTITY, ENTITY_TYPE, 1l);
-		final CtxAttributeIdentifier id = new CtxAttributeIdentifier(scope, ATTRIBUTE_TYPE, 2l);
-		final CtxChangeEvent event = new CtxChangeEvent(id);
+		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId2);
 		try {
+			Thread.sleep(1000l);
 			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, CtxEventScope.LOCAL);
-		} catch (CtxException ce) {
-			LOG.error("Could not send event: " + event, ce);
+
+		} catch (Exception e) {
+			LOG.error("*** Could not send event: " + event + ": " 
+					+ e.getLocalizedMessage(), e);
+		}
+	}
+	
+	private void sendRemoteEvent() {
+		
+		LOG.info("*** sendRemoteEvent");
+		if (this.ctxEventMgr == null) {
+			LOG.error("*** Could not send context event: CtxEventMgr is not available");
+			return;
+		}
+
+		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId);
+		try {
+			Thread.sleep(1000l);
+			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, 
+					CtxEventScope.INTER_CSS);
+		} catch (Exception e) {
+			LOG.error("*** Could not send event: " + event + ": " 
+					+ e.getLocalizedMessage(), e);
+		}
+	}
+	
+	private void sendRemoteEvent2() {
+		
+		LOG.info("*** sendRemoteEvent2");
+		if (this.ctxEventMgr == null) {
+			LOG.error("*** Could not send context event: CtxEventMgr is not available");
+			return;
+		}
+		
+		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId2);
+		try {
+			Thread.sleep(1000l);
+			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, 
+					CtxEventScope.INTER_CSS);
+		} catch (Exception e) {
+			LOG.error("*** Could not send event: " + event + ": " 
+					+ e.getLocalizedMessage(), e);
+		}
+	}
+	
+	private void sendBroadcastEvent() {
+		
+		LOG.info("*** sendBroadcastEvent");
+		if (this.ctxEventMgr == null) {
+			LOG.error("*** Could not send context event: CtxEventMgr is not available");
+			return;
+		}
+
+		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId);
+		try {
+			Thread.sleep(1000l);
+			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, 
+					CtxEventScope.BROADCAST);
+		} catch (Exception e) {
+			LOG.error("*** Could not send event: " + event + ": " 
+					+ e.getLocalizedMessage(), e);
+		}
+	}
+	
+	private void sendBroadcastEvent2() {
+		
+		LOG.info("*** sendBroadcastEvent2");
+		if (this.ctxEventMgr == null) {
+			LOG.error("*** Could not send context event: CtxEventMgr is not available");
+			return;
+		}
+		
+		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId2);
+		try {
+			Thread.sleep(1000l);
+			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, 
+					CtxEventScope.BROADCAST);
+		} catch (Exception e) {
+			LOG.error("*** Could not send event: " + event + ": " 
+					+ e.getLocalizedMessage(), e);
 		}
 	}
 	
 	private class MyCtxChangeEventListener implements CtxChangeEventListener {
 
-		/* (non-Javadoc)
+		private final String name;
+		
+		private MyCtxChangeEventListener(final String name) {
+			
+			this.name = name;
+		}
+		
+		/*
 		 * @see org.societies.api.context.event.CtxChangeEventListener#onCreation(org.societies.api.context.event.CtxChangeEvent)
 		 */
 		@Override
 		public void onCreation(CtxChangeEvent event) {
 			
-			LOG.info("Context CREATED event: " + event.getId());
+			LOG.info("*** " + this.name + ": Context CREATED event: " + event.getId());
 		}
 
-		/* (non-Javadoc)
+		/*
 		 * @see org.societies.api.context.event.CtxChangeEventListener#onUpdate(org.societies.api.context.event.CtxChangeEvent)
 		 */
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
 			
-			LOG.info("Context UPDATED event: " + event.getId());
+			LOG.info("*** " + this.name + ": Context UPDATED event: " + event.getId());
 		}
 
-		/* (non-Javadoc)
+		/*
 		 * @see org.societies.api.context.event.CtxChangeEventListener#onModification(org.societies.api.context.event.CtxChangeEvent)
 		 */
 		@Override
 		public void onModification(CtxChangeEvent event) {
 			
-			LOG.info("Context MODIFIED event: " + event.getId());
+			LOG.info("*** " + this.name + ": Context MODIFIED event: " + event.getId());
 		}
 
-		/* (non-Javadoc)
+		/*
 		 * @see org.societies.api.context.event.CtxChangeEventListener#onRemoval(org.societies.api.context.event.CtxChangeEvent)
 		 */
 		@Override
 		public void onRemoval(CtxChangeEvent event) {
 			
-			LOG.info("Context REMOVED event: " + event.getId());
+			LOG.info("*** " + this.name + ": Context REMOVED event: " + event.getId());
 		}
 	}
 }

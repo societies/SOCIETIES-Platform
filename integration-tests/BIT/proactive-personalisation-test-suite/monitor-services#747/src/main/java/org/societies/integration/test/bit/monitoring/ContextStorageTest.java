@@ -49,7 +49,6 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -62,7 +61,7 @@ public class ContextStorageTest {
 	public void test() {
 		LOG.info("Monitor services #747 - Running ContextStorageTest....");
 		//create actions
-		IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
+		IIdentity identity = TestCase747.commsMgr.getIdManager().getThisNetworkNode();
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
 		try {
@@ -118,7 +117,7 @@ public class ContextStorageTest {
 
 		IndividualCtxEntity person;
 		try {
-			person = TestCase747.ctxBroker.retrieveCssOperator().get();
+			person = TestCase747.ctxBroker.retrieveIndividualEntity(identity).get();
 
 			if(person == null){
 				LOG.error("Person entity is NULL");

@@ -68,7 +68,6 @@ public class NegotiationRequester implements INegotiation {
 		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 
 		LOG.debug("init()");
-		LOG.debug("init(): group manager = {}", groupMgr.toString());
 		
 		// Test: initialization of negotiation. Integration test is available to replace this.
 //		IIdentityManager idMgr = groupMgr.getIdMgr();
@@ -152,5 +151,10 @@ public class NegotiationRequester implements INegotiation {
 				MethodType.GET_POLICY_OPTIONS, includePrivacyPolicyNegotiation, callback);
 		
 		groupMgr.getPolicyOptions(serviceOrCisId, provider, providerCallback);
+	}
+
+	@Override
+	public void startNegotiation(Requestor provider, INegotiationCallback callback) {
+		startNegotiation(provider, true, callback);
 	}
 }

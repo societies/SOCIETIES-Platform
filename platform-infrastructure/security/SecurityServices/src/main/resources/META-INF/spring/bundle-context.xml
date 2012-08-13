@@ -9,14 +9,14 @@
     http://www.springframework.org/schema/context 
     http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-  <!-- regular spring configuration file defining the beans for this
-       bundle. We've kept the osgi definitions in a separate 
-       configuration file so that this file can easily be used
-       for integration testing outside of an OSGi environment -->
-  
-  <context:annotation-config />
+	<!-- regular spring configuration file defining the beans for this
+	bundle. We've kept the osgi definitions in a separate 
+	configuration file so that this file can easily be used
+	for integration testing outside of an OSGi environment -->
+ 
+	<context:annotation-config />
 
-  <bean id="signatureMgr"  class="org.societies.security.digsig.main.SignatureMgr" />
-  <bean id="secureStorage" class="org.societies.security.storage.SecureStorage" />
+	<bean id="signatureMgr"  class="org.societies.security.digsig.main.SignatureMgr" />
+	<bean id="secureStorage" class="org.societies.security.storage.SecureStorage" />
 
 </beans>

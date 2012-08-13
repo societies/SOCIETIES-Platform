@@ -12,6 +12,7 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.CommunityMethods;
 
 
 
@@ -54,24 +55,23 @@ public class CisManagerClientCallback implements ICommCallback {
 		
 		LOG.info("receive result received");
 		// community namespace
-		if (payload instanceof Community) {
+		if (payload instanceof CommunityMethods) {
 			LOG.info("Callback with result");
-			Community c = (Community) payload ;
+			CommunityMethods c = (CommunityMethods) payload ;
 			
 			
 			// join response
 			if(c.getJoinResponse() != null){
 				LOG.info("Join response received");
-				if(c.getJoinResponse().isResult()){
+				if(c.getJoinResponse().isResult() && c.getJoinResponse().getCommunity() != null){
 					// updates the list of CIS where I belong
-					cisManag.subscribeToCis(new CisRecord(c.getMembershipMode(),c.getCommunityName(),c.getCommunityJid()));
+					cisManag.subscribeToCis(new CisRecord(c.getJoinResponse().getCommunity().getCommunityName(),
+							c.getJoinResponse().getCommunity().getCommunityJid()));
 					LOG.info("subscription worked");
 	
 				}
 				else{ // there is no result field
-					LOG.warn("join response had no result tag");
-					this.sourceCallback.receiveResult( (Community)null);
-					return;
+					LOG.warn("join failed =S");
 				}
 			}
 			// end of join response
@@ -80,9 +80,9 @@ public class CisManagerClientCallback implements ICommCallback {
 			// leave response
 			if(c.getLeaveResponse() != null){
 				LOG.info("Leave response received");
-				if(c.getLeaveResponse().isResult() && (c.getCommunityJid() !=null) ){
+				if(c.getLeaveResponse().isResult() ){
 					// updates the list of CIS where I belong
-					if (!cisManag.unsubscribeToCis(c.getCommunityJid()))
+					if (!cisManag.unsubscribeToCis(stanza.getFrom().getBareJid()))
 						LOG.info("unsubscription did not worked");
 						LOG.info("unsubscription worked");
 
@@ -90,7 +90,7 @@ public class CisManagerClientCallback implements ICommCallback {
 				}
 				else{ // there is no result field
 					LOG.warn("unsubscription response was mallformed");
-					this.sourceCallback.receiveResult( (Community)null);
+					this.sourceCallback.receiveResult( (CommunityMethods)null);
 					return;
 				}
 			}
@@ -105,7 +105,7 @@ public class CisManagerClientCallback implements ICommCallback {
 				}
 				else{ // there is no result field
 					LOG.warn("get info failed");
-					this.sourceCallback.receiveResult( (Community)null);
+					this.sourceCallback.receiveResult( (CommunityMethods)null);
 					return;
 				}
 			}

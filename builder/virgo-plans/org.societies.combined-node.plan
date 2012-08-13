@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.combined-node" version="0.3.0" scoped="false"
+	atomic="false" xmlns="http://www.eclipse.org/virgo/schema/plan"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		        http://www.eclipse.org/virgo/schema/plan 
+		        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+	<!-- Cloud Node -->
+	<artifact type="plan" name="org.societies.platform" />
+
+	<!-- Domain Authority Bundles -->
+	<artifact type="bundle" name="org.societies.css.CssDirectory" />
+	<artifact type="bundle" name="org.societies.cis.CisDirectory" />
+	<artifact type="bundle"
+		name="org.societies.domain-authority.DomainAuthorityGroupManager" />
+	<!-- 
+	<artifact type="bundle"
+		name="org.societies.domain-authority.DomainAuthorityRegistry" />
+	<artifact type="bundle" name="DomainAuthorityRest" />
+	<artifact type="bundle" name="DomainAuthorityWebApp" />
+	 -->
+</plan>

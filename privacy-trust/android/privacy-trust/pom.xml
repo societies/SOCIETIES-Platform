@@ -60,5 +60,6 @@
 		<!-- <module>privacy-preference-management</module> -->
 		<module>privacy-negotiation-management</module>
 		<module>assessment</module>
+		<module>trust</module>
 	</modules>
 </project>

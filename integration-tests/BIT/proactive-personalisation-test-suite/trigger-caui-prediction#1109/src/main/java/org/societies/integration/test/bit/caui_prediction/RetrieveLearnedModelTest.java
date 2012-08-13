@@ -20,28 +20,32 @@ import org.societies.api.context.model.IndividualCtxEntity;
 public class RetrieveLearnedModelTest {
 
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1109.class);
-	
+
 	private INetworkNode cssNodeId;
-	
+
 	public void setUp(){
 	}
 
 	@Test
 	public void TestRetrieveModel() {
-				
+		
+		System.out.println("Test 1109 started : TestRetrieveModel");
+		
 		try {
-					
+			
+			
+			this.cssNodeId = TestCase1109.commMgr.getIdManager().getThisNetworkNode();
 			final String cssOwnerStr = this.cssNodeId.getBareJid();
 			IIdentity cssOwnerId = TestCase1109.getCommMgr().getIdManager().fromJid(cssOwnerStr);
-						
+
 			// add code for cssNodeID
 			IndividualCtxEntity operator =  TestCase1109.getCtxBroker().retrieveIndividualEntity(cssOwnerId).get();
-			
-					Set<CtxAttribute> setAttr = operator.getAttributes(CtxAttributeTypes.CAUI_MODEL);
-			
+
+			Set<CtxAttribute> setAttr = operator.getAttributes(CtxAttributeTypes.CAUI_MODEL);
+
 			Assert.assertNotNull(setAttr);
 			Assert.assertEquals(1, setAttr.size());
-			
+
 			LOG.debug("attributes size refering to caui model "+setAttr.size());
 			LOG.debug("attributes refering to caui model "+setAttr);
 

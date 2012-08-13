@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,18 +11,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.validation.Valid;
-
-import org.societies.webapp.models.CssManagerForm;
-import org.societies.webapp.models.CssManagerLoginForm;
-import org.societies.webapp.models.LoginForm;
-import org.societies.webapp.models.requests.CssServiceModel;
-import org.societies.webapp.models.requests.CssRequestModel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.INetworkNode;
@@ -44,7 +31,15 @@ import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.webapp.models.CssManagerLoginForm;
+import org.societies.webapp.models.requests.CssRequestModel;
+import org.societies.webapp.models.requests.CssServiceModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class CssManagerController {

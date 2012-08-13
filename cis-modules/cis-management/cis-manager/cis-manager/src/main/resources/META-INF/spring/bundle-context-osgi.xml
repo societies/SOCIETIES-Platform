@@ -22,9 +22,15 @@
 		<osgi:reference id="dataSource" interface="javax.sql.DataSource"/>
 	 <!--<osgi:reference id="PrivacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"/>-->	
 	
+	<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr" />
+	<osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />
 	
 	<osgi:reference id="servDiscRemote" interface="org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote"/>
 	<osgi:reference id="servCtrlRemote" interface="org.societies.api.internal.servicelifecycle.IServiceControlRemote"/>
 	<osgi:reference id="PrivacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" cardinality="0..1" />
+	
+	<!--<osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
+    <osgi:reference id="serviceControl" interface="org.societies.api.internal.servicelifecycle.IServiceControl"/>-->
+	
 		
 </beans>

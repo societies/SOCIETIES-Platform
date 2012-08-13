@@ -29,10 +29,16 @@
 
 	<tx:annotation-driven />
 
-	<!-- <bean id="PrivacyPermissionRegistryPropertiesConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
-		<property name="ignoreResourceNotFound" value="true"></property> <property 
-		name="locations"> <list> <value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value> 
-		</list> </property> </bean> -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />		
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
+			</list>
+		</property>
+	</bean>
 
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
@@ -50,11 +56,11 @@
 		</property>
 		<property name="hibernateProperties">
 			<props>
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.show_dlll">true</prop>
-				<prop key="hibernate.cache.use_second_level_cache">false</prop>
-				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
+				<prop key="hibernate.show_ddl">true</prop>
+				<prop key="hibernate.show_sql">${show_sql}</prop>
 				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
 			</props>
 		</property>
 	</bean>
@@ -107,6 +113,7 @@
 		<property name="negotiationAgent" ref="negotiationAgent" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 		<property name="identitySelection" ref="identitySelection" />
+		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
 	</bean>
 
 	<!-- this is the bean for the NegotiationAgent of the current CSS (not the 

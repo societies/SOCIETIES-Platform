@@ -30,7 +30,7 @@
 	<groupId>org.societies.comm.event</groupId>
 	<artifactId>eventmgmt</artifactId>
 	<packaging>bundle</packaging>
-	
+	<version>${release.version}</version>
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -93,7 +93,7 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>0.1</version>
+			<version>${release.version}</version>
 			<scope>provided</scope>
 			<type>bundle</type>
 		</dependency>

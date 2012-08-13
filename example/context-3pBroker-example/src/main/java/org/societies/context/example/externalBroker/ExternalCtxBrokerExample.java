@@ -25,6 +25,7 @@
 package org.societies.context.example.externalBroker;
 
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -33,13 +34,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
@@ -69,13 +75,21 @@ public class ExternalCtxBrokerExample 	{
 
 	/** The 3P Context Broker service reference. */
 	private ICtxBroker externalCtxBroker;
+	private ICommManager commMgrService;
 
 	private IIdentity cssOwnerId;
 	private INetworkNode cssNodeId;
+	private ICisOwned cisOwned  = null;
+	private IIdentity cisID;
 
 	private static IndividualCtxEntity owner = null;
 	private static CtxEntity deviceCtxEntity;
 	private static CtxAssociation usesServiceAssoc;
+
+	private CommunityCtxEntity communityEntity;
+	private IndividualCtxEntity indiEnt1;
+	private IndividualCtxEntity indiEnt2;
+	private IndividualCtxEntity indiEnt3;
 
 	private static CtxAttributeIdentifier weightAttrIdentifier = null;
 	private static CtxAttributeIdentifier ctxAttributeDeviceIDIdentifier = null;
@@ -83,12 +97,16 @@ public class ExternalCtxBrokerExample 	{
 	private Requestor requestor = null;
 	private IIdentity remoteTargetCss;
 
+
+
+
 	@Autowired(required=true)
-	public ExternalCtxBrokerExample(ICtxBroker externalCtxBroker, ICommManager commMgr) throws InvalidFormatException {
+	public ExternalCtxBrokerExample(ICtxBroker externalCtxBroker, ICommManager commMgr,ICisManager cisManager) throws InvalidFormatException {
 
 		LOG.info("*** " + this.getClass() + " instantiated");
-		
+
 		this.externalCtxBroker = externalCtxBroker;
+		this.commMgrService = commMgr;
 
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
@@ -97,12 +115,25 @@ public class ExternalCtxBrokerExample 	{
 		this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
 		LOG.info("*** cssOwnerId = " + this.cssOwnerId);
 
-		//IIdentity reqIdentity = commMgr.getIdManager().fromJid("foo@societies.local");
 		this.requestor = new Requestor(this.cssOwnerId);
 		LOG.info("*** requestor = " + this.requestor);
 
-		// TODO this.remoteTargetCss = commMgr.getIdManager().fromJid("BOOO@societies.local");
-		
+		Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
+		try {
+			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		LOG.info("*** cisOwned " +cisOwned);
+		LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
+		String cisIDString  = cisOwned.getCisId();
+
+		this.cisID = commMgr.getIdManager().fromJid(cisIDString);
+
 		LOG.info("*** Starting examples...");
 		// TODO createRemoteEntity();
 		this.retrieveIndividualEntityId();
@@ -112,7 +143,76 @@ public class ExternalCtxBrokerExample 	{
 		this.lookupContextEntities();
 		this.retrieveContext();
 		//simpleCtxHistoryTest();
+
+		LOG.info("*** Starting community context examples...");
+		this.retrieveCommunityEntityBasedOnCisID();
+		this.lookupCommunityEntAttributes();
 	}
+
+	private void lookupCommunityEntAttributes(){
+
+		CtxEntityIdentifier ctxCommunityEntityIdentifier;
+		try {
+			ctxCommunityEntityIdentifier = this.externalCtxBroker.retrieveCommunityEntityId(requestor, this.cisID).get();
+			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
+
+			List<CtxIdentifier> communityAttrIDList = this.externalCtxBroker.lookup(requestor, ctxCommunityEntityIdentifier, CtxModelType.ATTRIBUTE, "ctxCommunityAttribute").get();
+			LOG.info("communityAttrIDList"+ communityAttrIDList);		
+
+			if(communityAttrIDList.size()>0 ){
+				CtxIdentifier communityAttrID = communityAttrIDList.get(0);
+				LOG.info("communityAttrIDList"+ communityAttrID);
+				CtxAttribute communityAttr = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, communityAttrID).get();
+				LOG.info("communityAttr value:"+communityAttr.getStringValue());
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+	private void retrieveCommunityEntityBasedOnCisID(){
+		try {
+			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.externalCtxBroker.retrieveCommunityEntityId(requestor, this.cisID).get();
+			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
+
+			CtxEntity communityEntity = (CtxEntity) this.externalCtxBroker.retrieve(requestor, ctxCommunityEntityIdentifier).get();
+
+			final IIdentity communityEntityId = this.commMgrService.getIdManager().fromJid(communityEntity.getOwnerId());
+
+			if (IdentityType.CIS.equals(communityEntityId.getType())){
+				LOG.info("entity retrieved is a community entity with jid "+ communityEntityId.toString());
+
+				//TODO add communityEntity.getAttributes(); code
+
+			}
+
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+
+
+
 
 
 
@@ -137,18 +237,18 @@ public class ExternalCtxBrokerExample 	{
 	}
 
 	private void retrieveIndividualEntityId() {
-		
+
 		LOG.info("*** retrieveIndividualEntityId");
 		try {
 			CtxEntityIdentifier cssOwnerEntityId = 
 					this.externalCtxBroker.retrieveIndividualEntityId(this.requestor, this.cssOwnerId).get();
 			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
 		} catch (Exception e) {
-			
+
 			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
 	}
-	
+
 	/**
 	 */
 	private void createDeviceEntity(){
@@ -288,13 +388,13 @@ public class ExternalCtxBrokerExample 	{
 				LOG.info("Resoleved ctxAttribute id " + ctxAttr.getId() 
 						+ " and value: " + ctxAttr.getStringValue() 
 						+ " initial value was device1234");
-			
-			// retrieve ctxAttribute with the binary value based on a known identifier
-			CtxAttribute ctxAttributeWeight = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, weightAttrIdentifier).get();
 
-			//deserialise object
-			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeWeight.getBinaryValue(), this.getClass().getClassLoader());
-			LOG.info("Retrieved ctxAttribute id " +ctxAttributeWeight.getId()+ "and value: "+ retrievedBlob.getSeed()+" initial value was 999 ");
+					// retrieve ctxAttribute with the binary value based on a known identifier
+					CtxAttribute ctxAttributeWeight = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, weightAttrIdentifier).get();
+
+					//deserialise object
+					MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeWeight.getBinaryValue(), this.getClass().getClassLoader());
+					LOG.info("Retrieved ctxAttribute id " +ctxAttributeWeight.getId()+ "and value: "+ retrievedBlob.getSeed()+" initial value was 999 ");
 		} catch (Exception e) {
 			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}

@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
+import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.security.policynegotiator.exception.NegotiationException;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.sla.Session;
 import org.societies.security.policynegotiator.sla.SopResource;
@@ -77,7 +77,7 @@ public class NegotiationProvider implements INegotiationProvider {
 		//LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "identity"));
 		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
-		LOG.debug("init(): group manager = {}", groupMgr.toString());
+		LOG.debug("init()");
 	}
 	
 	// Getters and setters for beans

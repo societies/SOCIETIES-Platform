@@ -24,7 +24,10 @@
  */
 package org.societies.context.api.user.refinement;
 
+import java.util.List;
+
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttribute;
 
 
 /**
@@ -33,11 +36,32 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 public interface IUserCtxRefiner {
 
 	/**
-	 * Refines context for an indicate Context Attribute. 
+	 * Refines context for an indicate Context Attribute identifier.
+	 * The CtxAttribute object related to the parameter attrId is manipulated according to the refiner and returned. 
 	 * 
-	 * @param attrId
-	 * @since 0.0.1
+	 * @param attrId ID of context attribute to be inferred/refined.
+	 * @since 0.3
 	 */
-	public void refineContext(CtxAttributeIdentifier attrId);
+	public CtxAttribute refineContext(CtxAttributeIdentifier attrId);
+	
+
+	/**
+	 * Called by the Context Inference Manager. The return parameter List contains strings
+	 * with the names of the context types for which rules exist in the IUserCtxRefiner.
+	 * 
+	 * @since 0.3
+	 */
+	public List <String> getInferableTypes( );
+	
+
+	/**
+	 * Starts continuous inference process of context attributes a user has registered for. 
+	 * 
+	 * @param id ID of context attribute to be inferred/refined continuously.
+	 * @param updateFreq Frequency of re-evaluation of inference/refinement algorithms.
+	 * @since 0.3
+	 */
+	public void inferContextContinuously(CtxAttributeIdentifier id, double updateFreq);
+
 
 }

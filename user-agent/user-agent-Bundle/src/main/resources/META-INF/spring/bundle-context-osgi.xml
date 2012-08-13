@@ -27,7 +27,17 @@
         	<value>org.societies.api.internal.useragent.feedback.IUserFeedback</value>
         </osgi:interfaces>
     </osgi:service>
-
+    
+	<osgi:service ref="uaRemote">
+	    <osgi:interfaces>
+	        <value>org.societies.useragent.api.remote.IUserAgentRemoteMgr</value>
+	    </osgi:interfaces>
+	</osgi:service>
+    
+		
+	
+	<!-- Import External services -->
+	
 	<!-- context Broker is needed by uam (at least) -->
 	<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
 	</osgi:reference>

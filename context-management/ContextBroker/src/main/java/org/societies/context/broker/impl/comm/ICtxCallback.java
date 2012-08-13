@@ -24,8 +24,8 @@
 
 package org.societies.context.broker.impl.comm;
 
-import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 
 
@@ -33,5 +33,7 @@ public interface ICtxCallback {
 
 	public void onCreatedEntity(CtxEntity retObject);
 
+	public void onCreatedAttribute(CtxAttribute retObject);
+	
 	public void receiveCtxResult(Object retObject, String type);
 }

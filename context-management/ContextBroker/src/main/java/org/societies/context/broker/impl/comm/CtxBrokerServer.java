@@ -114,8 +114,8 @@ public class CtxBrokerServer implements IFeatureServer{
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 
-		LOG.error("SKATA 0 brokerserver "+ stanza );
-		LOG.error("SKATA 1 brokerserver "+payload.getClass() );
+		LOG.error("Context Broker server received stanza:"+ stanza );
+		LOG.error("Context Broker server received payload: "+payload.getClass() );
 		CtxBrokerResponseBean beanResponse = new CtxBrokerResponseBean();
 
 		if (!(payload instanceof CtxBrokerRequestBean))
@@ -133,26 +133,33 @@ public class CtxBrokerServer implements IFeatureServer{
 
 			// get the identity based on Jid and the identity manager
 			//String xmppIdentityJid = cbPayload.getCreate().getRequester();
-			LOG.error("SKATA 2 brokerserver");
+		
 			String targetIdentityString = cbPayload.getCreateEntity().getTargetCss();
 			// TODO RequestorBean reqBean = cbPayload.getCreate().getRequestor();
 			// TODo Requestor requestor = getRequestorFromBean( reqBean);
-
+			
+			LOG.error("CREATE_ENTITY   brokerserver "+targetIdentityString);
+			
 			IIdentity targetIdentity;
 			try {
 				targetIdentity = this.identMgr.fromJid(targetIdentityString);
 
 				// TODO Future<CtxEntity> newEntityFuture = ctxbroker.createEntity(requestor,targetIdentity,cbPayload.getCreate().getType());
-				Future<CtxEntity> newEntityFuture = ctxbroker.createEntity(null, targetIdentity, cbPayload.getCreateEntity().getType());
-				CtxEntity newCtxEntity = newEntityFuture.get();
+				CtxEntity newCtxEntity = ctxbroker.createEntity(null, targetIdentity, cbPayload.getCreateEntity().getType()).get();
 				
+				LOG.info("CREATE_ENTITY  brokerserver id :" +newCtxEntity.getId());
+				LOG.info("CREATE_ENTITY  brokerserver getLastModified :" +newCtxEntity.getLastModified());
+				LOG.info("CREATE_ENTITY  brokerserver getLastModified :" +newCtxEntity.getOwnerId());
+				LOG.info("CREATE_ENTITY  brokerserver newCtxEntity :" +newCtxEntity);
 				// the entity is created
 				//create the response based on the created CtxEntity - the response should be a result bean
 				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 				CtxEntityBean ctxBean = ctxBeanTranslator.fromCtxEntity(newCtxEntity);
+				LOG.info("CREATE_ENTITY  ctxBean created :" +ctxBean);
 				//setup the CtxEntityBean from CtxEntity				
 				beanResponse.setCtxBrokerCreateEntityBeanResult(ctxBean);
-
+				LOG.info("CREATE_ENTITY entity beanResponse:" +beanResponse);
+		
 			} catch (CtxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -170,7 +177,46 @@ public class CtxBrokerServer implements IFeatureServer{
 				e.printStackTrace();
 			}
 			break;
-		/*
+		
+		case CREATE_ATTRIBUTE:
+		
+			//CtxEntityIdentifier ctxEntityScope = cbPayload.getCreateAttribute().getScope();
+			
+			try {
+				String ctxEntityScopeBean =  cbPayload.getCreateAttribute().getScope().getString();
+				CtxEntityIdentifier ctxEntityScope = new CtxEntityIdentifier(ctxEntityScopeBean);
+				String type = cbPayload.getCreateAttribute().getType();
+			
+				RequestorBean reqBean = cbPayload.getCreateAttribute().getRequestor();
+				Requestor requestor = getRequestorFromBean(reqBean);
+				
+				CtxAttribute ctxAttribute = ctxbroker.createAttribute(requestor, ctxEntityScope, type).get();
+				LOG.error("CREATE_ATTRIBUTE 1 attribute created in remote cm :" +ctxAttribute.getId());
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				
+				CtxAttributeBean ctxAttributeBean = ctxBeanTranslator.fromCtxAttribute(ctxAttribute); 
+				LOG.error("CREATE_ATTRIBUTE 2 attr translated to bean :" +ctxAttributeBean);
+				LOG.error("CREATE_ATTRIBUTE 3 attr bean has a null value:" +ctxAttributeBean.getStringValue());
+				LOG.error("CREATE_ATTRIBUTE 4 attr bean everything else not null (id):" +ctxAttributeBean.getId());
+				//LOG.error("CREATE_ATTRIBUTE   ctxAttributeBean get string value:" +ctxAttributeBean.getStringValue());
+				beanResponse.setCtxBrokerCreateAttributeBeanResult(ctxAttributeBean);
+				LOG.info("CREATE_ATTRIBUTE 5 beanResponse completed:" +beanResponse);
+				
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (DatatypeConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+			/*
 		else if (cbPayload.getCreateAssoc()!=null) {
 
 
@@ -404,7 +450,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		default: 
 			throw new XMPPError(StanzaError.bad_request, "Nothing to do");
 		}
-
+		//LOG.error(" beanResponse ready:" +beanResponse.getMethod().toString());
 		return beanResponse;
 	}
 

@@ -111,7 +111,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 		iact.setVerb(verb);
 		iact.setObject("message");
 		iact.setTarget("testTarget");
-		actFeed.addCisActivity(iact);
+		actFeed.addActivity(iact);
 
 		List<IActivity> results = null;
 		try {
@@ -169,7 +169,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 		String actor="testFilterUser";
 		Activity act1 = new Activity(); act1.setActor(actor); act1.setPublished(Long.toString(System.currentTimeMillis()-100));
 		String timeSeries = Long.toString(System.currentTimeMillis()-1000)+" "+Long.toString(System.currentTimeMillis());
-		actFeed.addCisActivity(act1);
+		actFeed.addActivity(act1);
 		JSONObject searchQuery = new JSONObject();
 		try {
 			searchQuery.append("filterBy", "actor");
@@ -254,7 +254,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 		iact.setObject("message");
 		iact.setTarget("testTarget");
 
-		actFeed.addCisActivity(iact);
+		actFeed.addActivity(iact);
 //				Session session = ActivityFeed.getStaticSessionFactory().openSession();//getSessionFactory().openSession();
 //				Transaction t = session.beginTransaction();
 //				session.update(actFeed);

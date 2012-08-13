@@ -20,6 +20,6 @@
     	<prop key="targetCisId">xcmanager.thomas.local</prop>
     </osgi-compendium:cm-properties>
     
-    <osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
-       
+     <!-- <osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/> -->
+     <osgi:reference id="xcCommunication" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>  
 </beans>

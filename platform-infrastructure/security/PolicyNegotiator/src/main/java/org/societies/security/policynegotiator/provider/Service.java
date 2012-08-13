@@ -38,13 +38,19 @@ public class Service {
 	
 	private String id;
 	private String slaXmlOptions;
-	private URI clientJarUri;
+	private URI clientJarHost;
+	private String clientJarFilePath;
 	private IIdentity clientJarServer;
 
-	public Service(String id, String slaXmlOptions, URI clientJarUri, IIdentity clientJarServer) {
+	public Service(String id, String slaXmlOptions, URI clientJarHost, String clientJarFilePath,
+			IIdentity clientJarServer) {
+		
 		this.id = id;
 		this.slaXmlOptions = slaXmlOptions;
-		this.clientJarUri = clientJarUri;
+		this.clientJarHost = clientJarHost;
+		//this.clientJarHost = "http://localhost:8080";
+		this.clientJarFilePath = clientJarFilePath;
+		//this.clientJarFilePath = "Calculator.jar";
 		this.clientJarServer = clientJarServer;
 	}
 	
@@ -63,15 +69,23 @@ public class Service {
 	}
 
 	/**
-	 * @return The base URL, without the key parameter
+	 * @return the clientJarHost
 	 */
-	public URI getClientJarUri() {
-		return clientJarUri;
+	public URI getClientJarHost() {
+		return clientJarHost;
+	}
+
+	/**
+	 * @return the clientJarFilePath
+	 */
+	public String getClientJarFilePath() {
+		return clientJarFilePath;
 	}
 
 	/**
 	 * @return the clientJarServer
 	 */
+	@Deprecated
 	public IIdentity getClientJarServer() {
 		return clientJarServer;
 	}

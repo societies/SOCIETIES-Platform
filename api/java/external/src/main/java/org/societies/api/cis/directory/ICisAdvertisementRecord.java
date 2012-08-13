@@ -149,7 +149,7 @@ public interface ICisAdvertisementRecord {
      * 
      * @return HashMap MembershipCriteria
      */
-    public HashMap<CtxAttribute, MembershipCriteria> getMembershipCriteria();
+    public HashMap<String, MembershipCriteria> getMembershipCriteria();
     
     /**
      * Description: Sets the membership criteria of the CIS from the advertisement record
@@ -157,5 +157,5 @@ public interface ICisAdvertisementRecord {
      * 
      * @param HashMap membershipCriteria
      */
-    public boolean setMembershipCriteria(HashMap<CtxAttribute, MembershipCriteria> membershipCriteria);
+    public boolean setMembershipCriteria(HashMap<String, MembershipCriteria> membershipCriteria);
 }

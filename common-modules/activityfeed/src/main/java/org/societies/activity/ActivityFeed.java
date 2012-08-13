@@ -30,6 +30,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -59,8 +60,20 @@ import org.societies.activity.model.Activity;
 import org.societies.activity.model.ActivityString;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.api.schema.activityfeed.AddActivityResponse;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
+import org.societies.api.schema.activityfeed.DeleteActivityResponse;
+import org.societies.api.schema.activityfeed.GetActivities;
+import org.societies.api.schema.activityfeed.GetActivitiesResponse;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.GetInfo;
+import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.community.ParticipantRole;
+import org.societies.api.schema.cis.community.Who;
 import org.springframework.beans.factory.annotation.Autowired;
 
 //@Entity
@@ -69,6 +82,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	/**
 	 * 
 	 */
+
 	
 //	@Id
 	private String id;
@@ -95,7 +109,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	}
 	//timeperiod: "millisecondssinceepoch millisecondssinceepoch+n" 
 	//where n has to be equal to or greater than 0
-	@Override
+
 	public List<IActivity> getActivities(String timePeriod) {
 		ArrayList<IActivity> ret = new ArrayList<IActivity>();
 		String times[] = timePeriod.split(" ",2);
@@ -125,7 +139,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	}
 	//query can be e.g. 'object,contains,"programming"'
 	//TODO: Needs to support specifying that a attribute needs to empty!
-	@Override
+
 	public List<IActivity> getActivities(String query, String timePeriod) {
 		ArrayList<IActivity> ret = new ArrayList<IActivity>();
 		List<IActivity> tmp = this.getActivities(timePeriod);
@@ -189,8 +203,8 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		return ret;
 	}
 
-	@Override
-	public void addCisActivity(IActivity activity) {
+
+	public void addActivity(IActivity activity) {
 
 		//persist.
 		//Session session = sessionFactory.openSession();//getSessionFactory().openSession();
@@ -214,7 +228,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		}		
 	}
 
-	@Override
+
 	synchronized public int cleanupFeed(String criteria) {
 		int ret = 0;
 		String forever = "0 "+Long.toString(System.currentTimeMillis());
@@ -296,15 +310,15 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			String itemId, Object item) {
 		if(item.getClass().equals(Activity.class)){
 			Activity act = (Activity)item;
-			this.addCisActivity(act);
+			this.addActivity(act);
 		}
 	}
-	@Override
+
 	synchronized public List<IActivity> getActivities(String CssId, String query,
 			String timePeriod) {
 		return this.getActivities(query,timePeriod);
 	}
-	@Override
+
 	public boolean deleteActivity(IActivity activity) {
 		if(!list.contains(activity))
 			return false;
@@ -372,4 +386,114 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		}
 		list.clear();
 	}
+
+	/**
+	 * This method just translates an existing list of iActivities (IActivity) into a new list of
+	 *  marshalledActivities org.societies.api.schema.activity.Activity
+	 *  
+	 *  
+	 * @param iActivityList list with iactivities (IActivity) objects
+	 * @param empty but already created list (we will fill it up) that will receive the marshalled objects 
+	 * 
+	 */
+	
+	// TODO: perhaps change to static
+	
+	public void iactivToMarshActv(List<IActivity> iActivityList, List<org.societies.api.schema.activity.Activity> marshalledActivList){
+		
+		Iterator<IActivity> it = iActivityList.iterator();
+		
+		while(it.hasNext()){
+			IActivity element = it.next();
+			org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
+			a.setActor(element.getActor());
+			a.setObject(a.getObject());
+			a.setPublished(a.getPublished());
+			a.setVerb(a.getVerb());
+			marshalledActivList.add(a);
+	     }
+	}
+	
+	
+	@Override
+	public void getActivities(String timePeriod, IActivityFeedCallback c) {
+		LOG.debug("local get activities WITH CALLBACK called");
+
+		List<IActivity> iActivityList = this.getActivities(timePeriod);
+		org.societies.api.schema.activityfeed.Activityfeed ac = new org.societies.api.schema.activityfeed.Activityfeed();
+		GetActivitiesResponse g = new GetActivitiesResponse();
+		ac.setGetActivitiesResponse(g);		
+
+		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+		
+		this.iactivToMarshActv(iActivityList, marshalledActivList);
+
+		g.setActivity(marshalledActivList);
+		
+		c.receiveResult(ac);	
+		
+	}
+	@Override
+	public void getActivities(String query, String timePeriod,
+			IActivityFeedCallback c) {
+		
+		LOG.debug("local get activities using query WITH CALLBACK called");
+
+		List<IActivity> iActivityList = this.getActivities(query,timePeriod);
+		org.societies.api.schema.activityfeed.Activityfeed ac = new org.societies.api.schema.activityfeed.Activityfeed();
+		GetActivitiesResponse g = new GetActivitiesResponse();
+		ac.setGetActivitiesResponse(g);		
+
+		List<org.societies.api.schema.activity.Activity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.Activity>();
+		
+		this.iactivToMarshActv(iActivityList, marshalledActivList);
+
+		g.setActivity(marshalledActivList);
+		
+		c.receiveResult(ac);	
+		
+	}
+	@Override
+	public void addActivity(IActivity activity, IActivityFeedCallback c) {
+		org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
+		AddActivityResponse r = new AddActivityResponse();
+
+		this.addActivity(activity);		
+		r.setResult(true); //TODO. add a return on the activity feed method
+				
+		result.setAddActivityResponse(r);
+		c.receiveResult(result);
+		
+	}
+	@Override
+	public void cleanupFeed(String criteria, IActivityFeedCallback c) {
+		org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
+		CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
+		
+		r.setResult(this.cleanupFeed(criteria)); 
+		
+		
+		result.setCleanUpActivityFeedResponse(r);		
+		c.receiveResult(result);
+
+		
+	}
+	@Override
+	public void deleteActivity(IActivity activity, IActivityFeedCallback c) {
+		org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
+		DeleteActivityResponse r = new DeleteActivityResponse();
+		
+		r.setResult(this.deleteActivity(activity));
+
+		result.setDeleteActivityResponse(r);		
+		c.receiveResult(result);
+		
+	}
+	
+	@Override
+	public IActivity getEmptyIActivity(){
+		Activity a = new Activity();
+		return a;
+	}
+	
 }

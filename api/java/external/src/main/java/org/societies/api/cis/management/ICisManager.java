@@ -24,9 +24,14 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -44,33 +49,35 @@ public interface ICisManager {
 	
 	// API implementing server functionality
 	
-	
 	/**
-	 * Create a new CIS for the CSS whose JID is the one in cssId. Password is needed and is the
-	 * same as the CSS password (at the moment this is not checked).
+	 * Create a new CIS for the CSS whose JID is the one in cssId.
 	 * 
 	 * 
-	 * The CSS who creates the CIS will be added as a meber to the CIS and with the owner role.
+	 * The CSS who creates the CIS will be added as a member to the CIS and with the owner role.
 	 *  Ownership should be possible to be changed later, but it is not right now. 
 	 * 
 	 * At the moment, the creation of the CIS triggers and advertisement record of it to be sent to
 	 * the global cis directory 
 	 * 
-	 * TODO: define what values mode can have and what each means.
-	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
 	 *  
-	 * @param cssId and cssPassword are to recognise the user
 	 * @param cisName is user given name for the CIS, e.g. "Footbal".
 	 * @param cisType E.g. "disaster"
 	 * @param mode membership type, e.g 1= read-only (will be defined in the future).
+	 * @param privacyPolicy (for the second method) should follow the privacy policy schema.
+	 * @param cisCriteria specifies the criterias for one to be a member of the CIS, specified as a Hashtable
+	 *  of Context Attribute (String) and its criteria rule as a {@link MembershipCriteria} object
+	 * @param description is the description of the CIS 
 	 * @return a Future link to the {@link ICisOwned} representing the new CIS, or 
 	 * null if the CIS was not created.
 	 */
 
-	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
+
+	Future<ICisOwned> createCis(String cisName, String cisType, Hashtable<String, MembershipCriteria> cisCriteria, String description);
 	
+	Future<ICisOwned> createCis(String cisName, String cisType, Hashtable<String, MembershipCriteria> cisCriteria, String description
+			,String privacyPolicy);
+
 	
-	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode, String privacyPolicy);
 	
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
@@ -80,23 +87,22 @@ public interface ICisManager {
 	 * But it will trigger a delete notification to be sent to all the members of the CIS
 	 * 
 	 * 
-	 * @param cssId and cssPassword of the owner of the CIS.
 	 * @param cisId The ID of the CIS to be deleted.
 	 * @return true if deleted, false otherwise.
 	 */
-	boolean deleteCis(String cssId, String cssPassword, String cisId);
+	boolean deleteCis(String cisId);
+	
 	
 	/**
 	 * Get a CIS Record with the ID cisId.
 	 * The one calling the api must be aware that he will get a {@link ICis} which
 	 * will not implement all the methods for the case of CIS that the user owns
 	 * 
-	 * @param cssId The ID (jabber ID) of the CSS triggering the command (TODO: do we really need it?).
 	 * @param cisId The ID (jabber ID) of the CIS to get.
 	 * @return the {@link ICis} matching the input cisID, or null if no such CIS is owned or subscribed by the user.
 	 * 
 	 */
-	ICis getCis(String cssId, String cisId);
+	ICis getCis(String cisId);
 	
 	/**
 	 * Get a CIS Owned Interface with the ID cisId.
@@ -141,9 +147,21 @@ public interface ICisManager {
 	 * @param String name input to search for cis
 	 * @return Array of {@link ICis} that contains the name string .
 	 */
-	public List<ICis> searchMyCisByName(String name);
+	public List<ICis> searchCisByName(String name);
 	
 
+	/**
+	 * Return the list of owned CISs in which the CSS
+	 * represented by {@link IIdentity}  is a member.
+	 * 
+	 * It will return an empty list if no CIS contains that CSS
+	 * 
+	 * @param {@link IIdentity} represensting the CSS
+	 * @return Array of {@link ICisOwned} that contains the CSS .
+	 */
+	public List<ICisOwned> searchCisByMember(IIdentity css) throws InterruptedException, ExecutionException;
+
+	
 	// END OF API implementing server functionality
 	
 	// API implementing client functionality (to be called from webapp)
@@ -156,10 +174,10 @@ public interface ICisManager {
 	 * defined at org.societies.api.schema.cis.community 
 	 * it has the result of the join plus some complimentary info from the CIS
 	 *  
-	 * @param cisId JID of the CIS to be joined
+	 * @param adv advertisement Record of the cis (includes the membership criteria and jid)
 	 * @param callback callback function
 	 */
-	public void joinRemoteCIS(String cisId, ICisManagerCallback callback);
+	public void joinRemoteCIS(CisAdvertisementRecord adv, ICisManagerCallback callback);
 	
 	/**
 	 * Leave a CIS, most likely hosted remotely.
@@ -180,7 +198,7 @@ public interface ICisManager {
 	
 	// API which is not yet properly defined
 	
-	/**
+	/*
 	 * Return an array of all the CISs that match the query. 
 	 * 
 	 * TODO: DO NOT USE THIS METHOD YET
@@ -190,13 +208,13 @@ public interface ICisManager {
 	 * @param query Defines what to search for.
 	 * @return Array of CIS Records that match the query.
 	 */
-	ICis[] getCisList(ICis query);
+	//ICis[] getCisList(ICis query);
 
 	
 	
 	
 	
-	/**
+	/*
 	 * Method not yet defined. 
 	 * 
 	 * TODO: DO NOT USE THIS METHOD YET - not yet defined
@@ -208,7 +226,7 @@ public interface ICisManager {
 	 * @param cisId JID of the CIS which will have its owner changed
 	 * @return boolean stating if the operation worked or failed
 	 */
-	boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
-		String newOwnerCssId, String cisId);
+	//boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
+	//	String newOwnerCssId, String cisId);
 
 }

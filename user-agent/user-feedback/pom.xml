@@ -35,10 +35,22 @@
 		<scope>provided</scope>
 	</dependency>
 	<dependency>
+		<groupId>org.societies.useragent</groupId>
+		<artifactId>user-agent-api</artifactId>
+		<version>${version.ua}</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
 		<groupId>org.junit</groupId>
 		<artifactId>com.springsource.junit</artifactId>
 		<version>3.8.2</version>
 	</dependency>
+	<dependency>
+		<groupId>org.mockito</groupId>
+		    <artifactId>mockito-all</artifactId>
+		    <version>1.9.0</version>
+		    <scope>test</scope>
+		</dependency>
 	<dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-simple</artifactId>
@@ -60,14 +72,14 @@
 	</dependencies>
 
 
-	<build>
+	<!-- <build>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-	</build>
+	</build> -->
 
 	<!-- <build>
 		<plugins>

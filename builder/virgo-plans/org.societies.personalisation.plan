@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.personalisation" version="0.3.0" scoped="false" atomic="false" 
+        xmlns="http://www.eclipse.org/virgo/schema/plan" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation=" 
+                http://www.eclipse.org/virgo/schema/plan 
+                http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+    <artifact type="bundle" name="org.societies.personalisation.personalisationBundle"/>
+    <artifact type="bundle" name="org.societies.personalisation.groupmanager"/>
+    
+	
+</plan>
