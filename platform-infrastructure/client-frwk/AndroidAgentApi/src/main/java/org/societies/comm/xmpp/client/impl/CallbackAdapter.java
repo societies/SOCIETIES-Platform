@@ -30,6 +30,7 @@ public class CallbackAdapter implements Callback {
 	private PacketMarshaller marshaller;
 	
 	public CallbackAdapter(ICommCallback callback, Context context, ServiceConnection service, PacketMarshaller marshaller) {
+		Log.d(LOG_TAG, "CallbackAdapter created");
 		this.callback = callback;
 		this.context = context;
 		this.service = service;
@@ -38,6 +39,8 @@ public class CallbackAdapter implements Callback {
 	
 	@Override
 	public void receiveResult(String xml) {
+		Log.d(LOG_TAG, "receiveResult result: " + xml );
+
 		unbindService();
 		
 		try {
@@ -51,6 +54,7 @@ public class CallbackAdapter implements Callback {
 	}
 	@Override
 	public void receiveError(String xml) {
+		Log.d(LOG_TAG, "receiveError error: " + xml );
 		unbindService();
 		
 		try {
@@ -62,6 +66,7 @@ public class CallbackAdapter implements Callback {
 	}
 	
 	public void receiveItems(String xml) {
+		Log.d(LOG_TAG, "receiveItems items: " + xml );
 		unbindService();
 		
 		try {
@@ -74,6 +79,7 @@ public class CallbackAdapter implements Callback {
 	}
 	
 	public void receiveMessage(String xml) {	
+		Log.d(LOG_TAG, "receiveMessage message: " + xml );
 		
 		try {			
 			Packet packet = marshaller.unmarshallMessage(xml);			
@@ -85,10 +91,12 @@ public class CallbackAdapter implements Callback {
 	}
 	
 	private void unbindService() {
+		Log.d(LOG_TAG, "unbindService");
 		context.unbindService(service);
 	}
 	
 	private Stanza stanzaFromPacket(Packet packet) {
+		Log.d(LOG_TAG, "stanzaFromPacket packet: " + packet.getPacketID());
 		try {
 			IIdentity to = IdentityManagerImpl.staticfromJid(packet.getTo().toString());
 			IIdentity from =IdentityManagerImpl.staticfromJid(packet.getFrom().toString());

@@ -60,6 +60,7 @@ public class AgentService extends Service {
     }
     
     private ResourceBundle getConfig() throws IOException {
+    	Log.d(LOG_TAG, "getConfig");
     	ResourceBundle config = null;
 
     	try {
@@ -80,6 +81,7 @@ public class AgentService extends Service {
     }	
     
     private void copyDefaultConfigToExternal() throws IOException {
+    	Log.d(LOG_TAG, "copyDefaultConfigToExternal");
     	InputStream in = getAssets().open(DEFAULT_CONFIG_FILE_NAME);
     	OutputStream out = new FileOutputStream(new File(getExternalFilesDir(null), CONFIG_FILE_NAME));
     	byte[] buffer = new byte[1024];
