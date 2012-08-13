@@ -118,7 +118,7 @@ public class DigSig {
 			LOG.warn("Signature verification failed", e);
 			return false;
 		}
-		LOG.debug("Signature validity: ", valid);
+		LOG.debug("Signature validity: {}", valid);
 		return valid;
 	}
 

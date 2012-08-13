@@ -22,91 +22,45 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.webapp.models;
-
-import javax.validation.constraints.Size;
 
 /**
- * 
- * @author Maria Mannion
- * 
- *         
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
-public class LoginForm {
+package org.societies.css.devicemanager.schema;
 
-	@Size(min = 1, max = 50)
-	private String userName;
+/*
+If any method of your Bean returns a value, you will need to add a property for that
+value below. You can double up your return values if they are the same object type 
+eg, 
+The CalculatorBean returns an int for both the Add() and Subtract() method. We use the generic 
+int getResult() 
 
-	@Size(min = 1, max = 20)
-	private String subdomain;
+We don't need to add a method for each
+int getAddResult() 
+int getSubtractResult()
+*/
 
-	@Size(min = 1, max = 20)
-	private String password;
-	
-	@Size(min = 1, max = 20)
-	private String passwordConfirm;
-	
-	@Size(min = 1, max = 50)
-	private String name;
-	private String method;
-	
-	public void setName(String name) {
-		this.name = name;
-	}
+public class RemoteDeviceBeanResult {
 
-	public String getName() {
-		return name;
+	private int result;
+	private String text;
+
+	public int getResult() {
+		return result;
 	}
 	
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setResult(int result) {
+		this.result = result;
+	}
+	
+	public String getText() {
+		return text;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setSubDomain(String subdomain) {
-		this.subdomain = subdomain;
-	}
-
-	public String getSubDomain() {
-		return subdomain;
-	}
-
-	/**
-	 * @return the passwordConfirm
-	 */
-	public String getPasswordConfirm() {
-		return passwordConfirm;
-	}
-
-	/**
-	 * @param passwordConfirm the passwordConfirm to set
-	 */
-	public void setPasswordConfirm(String passwordConfirm) {
-		this.passwordConfirm = passwordConfirm;
-	}
-
-	/**
-	 * @return the method
-	 */
-	public String getMethod() {
-		return method;
-	}
-
-	/**
-	 * @param method the method to set
-	 */
-	public void setMethod(String method) {
-		this.method = method;
+	public void setText(String text) {
+		this.text = text;
 	}
 }

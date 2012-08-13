@@ -36,6 +36,7 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
@@ -89,18 +90,25 @@ public class CtxBrokerCommCallback implements ICommCallback {
 				if (payload.getCtxBrokerCreateEntityBeanResult()!=null) {
 					CtxEntityBean bean = 
 							(CtxEntityBean) payload.getCtxBrokerCreateEntityBeanResult();
-					LOG.info("inside receiveResult 3");
+					LOG.info("inside receiveResult 23");
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 					CtxEntity result = CtxModelBeanTranslator.getInstance().fromCtxEntityBean(bean);
-					LOG.info("inside receiveResult 4 " +result);
+					LOG.info("inside receiveResult 24 " +result);
 					ctxCallbackClient.onCreatedEntity(result);
-					LOG.info("inside receiveResult 5  ctxCallbackClient " +ctxCallbackClient);
+					LOG.info("inside receiveResult 25  ctxCallbackClient " +ctxCallbackClient);
+				
 				} else if (payload.getCtxBrokerCreateAttributeBeanResult()!=null) {
-					CtxAttributeBean bean = 
+					LOG.info("inside receiveResult create Attribute");
+					CtxAttributeBean attrBean = 
 							(CtxAttributeBean) payload.getCtxBrokerCreateAttributeBeanResult();
-
+					
+					LOG.info("inside receiveResult create Attribute 1 " +attrBean.toString());
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
-					ctxCallbackClient.receiveCtxResult(bean, "attribute");
+					
+					CtxAttribute result = CtxModelBeanTranslator.getInstance().fromCtxAttributeBean(attrBean);
+					LOG.info("inside receiveResult create Attribute 2" +result.getId());
+					ctxCallbackClient.onCreatedAttribute(result);
+				
 				} else if (payload.getCtxBrokerCreateAssociationBeanResult()!=null){
 					CtxAssociationBean bean = 
 							(CtxAssociationBean) payload.getCtxBrokerCreateAssociationBeanResult();

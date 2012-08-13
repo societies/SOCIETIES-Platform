@@ -152,6 +152,38 @@ public interface ICtxBroker {
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
 			final IIdentity target, final CtxModelType modelType,
 			final String type) throws CtxException;
+	
+	/**
+	  * Looks up context model objects (i.e. attributes or associations) of the
+	  * specified type associated with the identified context entity. The 
+	  * method returns a list of {@link CtxIdentifier CtxIdentifiers}
+	  * referencing the context model objects that match the supplied criteria.
+	  * 
+	  * @param requestor
+	  *            the requestor on whose behalf to lookup the context model 
+	  *            objects
+	  * @param entityId
+	  *            the {@link CtxEntityIdentifier} of the entity where to
+	  *            lookup for matching model objects 
+	  * @param modelType
+	  *            the {@link CtxModelType} of the context model objects to
+	  *            lookup
+	  * @param type
+	  *            the type of the context model objects to lookup
+	  * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
+	  *         context model objects that match the supplied criteria.
+	  * @throws CtxException
+	  *             if there is a problem performing the look-up operation 
+	  * @throws NullPointerException
+	  *             if any of the specified parameters is <code>null</code>
+	  * @throws IllegalArgumentException
+	  *             if the specified modelType is neither a {@link CtxModelType#ATTRIBUTE}
+	  *             nor a {@link CtxModelType#ASSOCIATION}
+	  * @since 0.4
+	  */
+	 public Future<List<CtxIdentifier>> lookup(final Requestor requestor, 
+			 final CtxEntityIdentifier entityId, final CtxModelType modelType,
+			 final String type) throws CtxException;
 
 	/**
 	 * Looks up for a list of CtxEntities of  the specified type, containing the
@@ -319,7 +351,7 @@ public interface ICtxBroker {
 			final CtxIdentifier identifier) throws CtxException;
 	
 	/**
-	 * Retrieves the {@link CtxEntityEntityIdentifier} of the 
+	 * Retrieves the {@link CtxEntityIdentifier} of the 
 	 * {@link IndividualCtxEntity} which represents the owner of the identified
 	 * CSS. IndividualCtxEntities are most commonly of type
 	 * CtxEntityTypes.PERSON; however they can also be organisations, smart
@@ -332,7 +364,7 @@ public interface ICtxBroker {
 	 *            entity identifier
 	 * @param cssId
 	 *            the {@link IIdentity} identifying the CSS whose 
-	 *            IndividualCtxEntity CtxEntityIdentifier to retrieve
+	 *            IndividualCtxEntity identifier to retrieve
 	 * @return the CtxEntityEntityIdentifier of the IndividualCtxEntity which
 	 *         represents the owner of the identified CSS
 	 * @throws CtxException 
@@ -343,6 +375,34 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
 			final Requestor requestor, final IIdentity cssId) throws CtxException;
+	
+	/**
+	 * Retrieves the {@link CtxEntityIdentifier} of the 
+	 * {@link CommunityCtxEntity} which represents the identified CIS. All
+	 * CommunityCtxEntities share the same context type, i.e.
+	 * {@link org.societies.api.context.model.CtxEntityTypes#COMMUNITY COMMUNITY}.
+	 * The method returns <code>null</code> if there is no CommunityCtxEntity
+	 * representing the identified CIS. 
+	 * 
+	 * @param requestor
+	 *            the entity requesting to retrieve the CIS context entity
+	 *            identifier
+	 * @param cisId
+	 *            the {@link IIdentity} identifying the CIS whose 
+	 *            CommunityCtxEntity identifier to retrieve
+	 * @return the CtxEntityEntityIdentifier of the CommunityCtxEntity which
+	 *         represents the identified CIS
+	 * @throws CtxException 
+	 *             if there is a problem retrieving the CtxEntityIdentifier
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the specified cisId is not of type 
+	 *             {@link org.societies.api.identity.IdentityType#CIS CIS}
+	 * @since 0.4
+	 */
+	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
+			final Requestor requestor, final IIdentity cisId) throws CtxException;
 
 	/**
 	 * Predicts a future context attribute for the specified time.

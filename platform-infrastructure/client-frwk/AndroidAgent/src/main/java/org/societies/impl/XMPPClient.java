@@ -59,6 +59,14 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public void register(String[] elementNames, String[] namespaces, final Callback callback) {
+		Log.d(LOG_TAG, "register");
+		for (String element : elementNames) {
+			Log.d(LOG_TAG, "register element name: " + element);
+		}
+		for (String namespace : namespaces) {
+			Log.d(LOG_TAG, "register namespace: " + namespace);
+		}
+		
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
 				providerRegistrar.register(new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]));				
@@ -82,6 +90,14 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public void unregister(String[] elementNames, String[] namespaces) {
+		Log.d(LOG_TAG, "unregister");
+		for (String element : elementNames) {
+			Log.d(LOG_TAG, "unregister element name: " + element);
+		}
+		for (String namespace : namespaces) {
+			Log.d(LOG_TAG, "unregister namespace: " + namespace);
+		}
+		
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
 				ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple = new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]);		
@@ -96,6 +112,7 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public boolean UnRegisterCommManager() {
+		Log.d(LOG_TAG, "UnRegisterCommManager");
 		Set<ProviderElementNamespaceRegistrar.ElementNamespaceTuple> tuples = providerRegistrar.getRegists();
 		for(ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple:tuples) {
 			removeProviders(tuple);
@@ -105,11 +122,13 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	private void removeProviders(ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple) {
+		Log.d(LOG_TAG, "removeProviders");
 		ProviderManager.getInstance().removeIQProvider(tuple.elementName, tuple.namespace);
 		ProviderManager.getInstance().removeExtensionProvider(tuple.elementName, tuple.namespace);
 	}
 	
 	public void sendMessage(String messageXml) {
+		Log.d(LOG_TAG, "sendMessage xml: " + messageXml);
 		try {
 			connect();	
 			
@@ -123,6 +142,7 @@ public class XMPPClient implements XMPPAgent {
 	}	
 
 	public void sendIQ(String xml, final Callback callback) {
+		Log.d(LOG_TAG, "sendIQ xml: " + xml);
 		try {
 			connect(); 
 			
@@ -156,10 +176,12 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public String getIdentity() {
+		Log.d(LOG_TAG, "getIdentity");
 		try {
 			connect();			
 			String identity = connection.getUser();			
 			disconnect();			
+			Log.d(LOG_TAG, "getIdentity identity: " + identity);
 			return identity;
 		} catch (XMPPException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
@@ -168,6 +190,7 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public String getItems(String entity, String node, final Callback callback) throws CommunicationException {		
+		Log.d(LOG_TAG, "getItems entity: " + entity);
 		try {
 			connect();
 			
@@ -208,6 +231,7 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	private void connect() throws XMPPException {		
+		Log.d(LOG_TAG, "connect");
 		if(!connection.isConnected()) {
 			connection.connect();
 			connection.login(username, password, resource);
@@ -216,12 +240,14 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	private void disconnect() {
+		Log.d(LOG_TAG, "disconnect");
 		usingConnectionCounter--;
 		if(usingConnectionCounter == 0)
 			connection.disconnect();		
 	}
 	
 	private Packet createPacketFromXml(final String xml) {
+		Log.d(LOG_TAG, "createPacketFromXml xml: " + xml);
 		return new Packet() {
 			@Override
 			public String toXML() {
@@ -231,6 +257,7 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	private boolean isDiscoItem(IQ iq) throws SAXException, IOException, ParserConfigurationException {
+		Log.d(LOG_TAG, "isDiscoItem");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
 		Element element = factory.newDocumentBuilder().parse(new InputSource(new StringReader(iq.toXML()))).getDocumentElement();
@@ -274,10 +301,12 @@ public class XMPPClient implements XMPPAgent {
 	}
 
 	public Boolean isConnected() {
+		Log.d(LOG_TAG, "isConnected + connected: " + connection.isConnected() );
 		return connection.isConnected();
 	}
 	
 	public String newMainIdentity(String identifier, String domain, String password) throws CommunicationException { // TODO this takes no credentials in a private/public key case
+		Log.d(LOG_TAG, "newMainIdentity identity: " + identifier + " domain: " + domain + " password: " + password);
 
 		String serverHost = domain;
 		int port = defaultConfig.getPort();
@@ -303,6 +332,8 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	private void createAccount(Connection connection, String username, String password) throws XMPPException {
+		Log.d(LOG_TAG, "createAccount user: " + username + " password: " + password);
+		
 		AccountManager accountMgr = connection.getAccountManager();
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes.put("username", username);
@@ -311,6 +342,8 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public String login(String identifier, String domain, String password) {
+		Log.d(LOG_TAG, "login identifier: " + identifier + " domain: " + domain + " password: " + password);
+		
 		if(isConnected())
 			logout();
 		String username = username(identifier, domain);
@@ -325,6 +358,7 @@ public class XMPPClient implements XMPPAgent {
 	}	
 	
 	public String loginFromConfig() {
+		Log.d(LOG_TAG, "loginFromConfig");
 		if(isConnected())
 			logout();
 		loadDefaultConfig();
@@ -338,10 +372,12 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	private String username(String identifier, String domain) {
+		Log.d(LOG_TAG, "username identifier: " + identifier + " domain: " + domain);
 		return identifier + "@" + domain;
 	}
 	
 	public boolean logout() {
+		Log.d(LOG_TAG, "logout");
 		UnRegisterCommManager();		
 		connection.disconnect();
 		usingConnectionCounter = 0;
@@ -349,6 +385,7 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public boolean destroyMainIdentity() {
+		Log.d(LOG_TAG, "destroyMainIdentity");
 		return false; // http://code.google.com/p/asmack/issues/detail?id=63
 //		try {
 //			connection.getAccountManager().deleteAccount();
@@ -360,10 +397,13 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	private void loadDefaultConfig() {		
+		Log.d(LOG_TAG, "loadDefaultConfig");
 		loadConfig(defaultConfig.getServer(), defaultConfig.getUsername(), defaultConfig.getPassword());
 	}
 	
 	private void loadConfig(String server, String username, String password) {
+		Log.d(LOG_TAG, "loadConfig server: " + server + " username: " + username + " password: " + password);
+		
 		int port = defaultConfig.getPort();
 		this.username = username;
 		this.password = password;

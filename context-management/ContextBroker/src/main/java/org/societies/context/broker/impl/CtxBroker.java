@@ -368,7 +368,9 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 					individualEntityId = individualEntity.getId();
 			} catch (Exception e) {
 
-				e.printStackTrace();
+				throw new CtxBrokerException(
+						"Could not retrieve IndividualCtxEntity from platform Context Broker: "
+						+ e.getLocalizedMessage(), e);
 			}
 		} else {
 
@@ -376,6 +378,34 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		}
 
 		return new AsyncResult<CtxEntityIdentifier>(individualEntityId);
+	}
+	
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieveCommunityEntityId(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	@Async
+	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
+			final Requestor requestor, final IIdentity cisId) throws CtxException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		if (!IdentityType.CIS.equals(cisId.getType()))
+			throw new IllegalArgumentException("cisId IdentityType is not CIS");
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving the CtxEntityIdentifier for CIS " + cisId);
+
+		// TODO if (this.idMgr.isMine(cssId)) {
+
+			return this.internalCtxBroker.retrieveCommunityEntityId(cisId);
+		/* TODO	
+		} else {
+
+			LOG.warn("remote call");
+		} */
 	}
 
 	@Override
@@ -581,24 +611,28 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return entityList;
 	}
 
-
-
-	public Future<List<CtxIdentifier>> lookup(Requestor requestor, CtxEntityIdentifier ctxEntityIdentifier, CtxModelType modelType, String type){
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#lookup(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxModelType, java.lang.String)
+	 */
+	@Override
+	@Async
+	public Future<List<CtxIdentifier>> lookup(final Requestor requestor, 
+			final CtxEntityIdentifier entityId, 
+			final CtxModelType modelType, String type) throws CtxException {
 
 		if (requestor == null)
 			throw new NullPointerException("requestor can't be null");
-		if (ctxEntityIdentifier == null)
-			throw new NullPointerException("target can't be null");
+		if (entityId == null)
+			throw new NullPointerException("entityId can't be null");
 		if (modelType == null)
 			throw new NullPointerException("modelType can't be null");
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
-		final List<CtxIdentifier> ctxIdList = new ArrayList<CtxIdentifier>();
-		//TODO add implementation
+		// TODO access control
+		// final List<CtxIdentifier> ctxIdList = new ArrayList<CtxIdentifier>();
 
-
-		return new AsyncResult<List<CtxIdentifier>>(ctxIdList);
+		return this.internalCtxBroker.lookup(entityId, modelType, type);
 	}
 
 	/*

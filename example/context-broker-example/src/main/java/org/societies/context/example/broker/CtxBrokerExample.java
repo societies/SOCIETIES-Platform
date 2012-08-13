@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -83,7 +84,8 @@ public class CtxBrokerExample 	{
 
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
-
+	private ICommManager commMgrService;
+	
 	private IIdentity cisID;
 	private IIdentity cssOwnerId;
 	private IIdentity cssID1; 
@@ -138,9 +140,14 @@ public class CtxBrokerExample 	{
 	@Autowired(required=true)
 	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr, ICisManager cisManager) throws InvalidFormatException {
 
-		LOG.info("*** CtxBrokerExample instantiated");
+		LOG.info("*** CtxBrokerExample instantiated "+this.internalCtxBroker);
+		
 		this.internalCtxBroker = internalCtxBroker;
-
+		LOG.info("*** CtxBroker service "+this.internalCtxBroker);
+		
+		this.commMgrService = commMgr;
+		LOG.info("*** commMgrService instantiated "+this.commMgrService);
+		
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
 
@@ -164,7 +171,7 @@ public class CtxBrokerExample 	{
 		LOG.info( "this.cssID3.getType() "+ this.cssID3.getType());
 
 		Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
-		
+
 		try {
 			//cisOwned = cisManager.createCis(this.cssOwnerId.toString(), cssPassword, "cisName", "contextTestingCIS", 1, this.privacyPolicyWithoutRequestor).get();
 			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
@@ -187,7 +194,7 @@ public class CtxBrokerExample 	{
 		LOG.info("*** cisManager this.cisID " +this.cisID.toString());
 		LOG.info("*** cisManager this.cisID type " +this.cisID.getType());
 
-		LOG.info("*** Starting examples...");
+		LOG.info("*** Starting  individual context examples...");
 		this.retrieveIndividualEntity();
 		this.retrieveCssNode();
 		this.createContext();
@@ -198,24 +205,95 @@ public class CtxBrokerExample 	{
 		this.tuplesCtxHistoryTest();
 		//this.triggerInferenceTest();
 
+		LOG.info("*** Starting community context examples...");
 		// community context tests
-		//this.createCommunityEntity();
-		//this.createIndividualEntities();
+		this.createCommunityEntity();
+		this.createIndividualEntities();
 		// includes context bond tests
-		//this.populateCommunityEntity();
-
-
-
+		this.populateCommunityEntity();
+		this.retrieveCommunityEntityBasedOnCisID();
+		this.lookupCommunityEntAttributes();
 	}
 
 
+	private void lookupCommunityEntAttributes(){
+		
+		CtxEntityIdentifier ctxCommunityEntityIdentifier;
+		try {
+			ctxCommunityEntityIdentifier = this.internalCtxBroker.retrieveCommunityEntityId(this.cisID).get();
+			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
+			
+			List<CtxIdentifier> communityAttrIDList = this.internalCtxBroker.lookup(ctxCommunityEntityIdentifier, CtxModelType.ATTRIBUTE, "ctxCommunityAttribute").get();
+			LOG.info("communityAttrIDList"+ communityAttrIDList);		
+			
+			if(communityAttrIDList.size()>0 ){
+				CtxIdentifier communityAttrID = communityAttrIDList.get(0);
+				LOG.info("communityAttrIDList"+ communityAttrID);
+				CtxAttribute communityAttr = (CtxAttribute) this.internalCtxBroker.retrieve(communityAttrID).get();
+				LOG.info("communityAttr value:"+communityAttr.getStringValue());
+			
+			}
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+	}
+	
+	
+	private void retrieveCommunityEntityBasedOnCisID(){
+		try {
+			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.internalCtxBroker.retrieveCommunityEntityId(this.cisID).get();
+			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
+			
+			CtxEntity communityEntity = (CtxEntity) this.internalCtxBroker.retrieve(ctxCommunityEntityIdentifier).get();
+			
+			final IIdentity communityEntityId = this.commMgrService.getIdManager().fromJid(communityEntity.getOwnerId());
+			
+			if (IdentityType.CIS.equals(communityEntityId.getType())){
+				LOG.info("entity retrieved is a community entity with jid "+ communityEntityId.toString());
+			
+				//TODO add communityEntity.getAttributes(); code
+			
+			}
+	
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 
 	private void populateCommunityEntity(){
 		LOG.info("*** populateCommunityEntity");
 
 		try {
-			//	this.internalCtxBroker
+			this.communityEntity.addMember(this.indiEnt1.getId());
+			this.communityEntity.addMember(this.indiEnt2.getId());
+			this.communityEntity.addMember(this.indiEnt3.getId());
+
+			LOG.info(" BEFORE UPDATE communityEnt.getID():  " +this.communityEntity.getId());
+			LOG.info(" BEFORE UPDATE communityEnt.getMembers():  " +this.communityEntity.getMembers());
+	
+			
+			//	create and add bonds
 			CtxAttributeBond attributeLocationBond = new CtxAttributeBond(CtxAttributeTypes.LOCATION_SYMBOLIC, CtxBondOriginType.MANUALLY_SET);
 			attributeLocationBond.setMinValue("home");
 			attributeLocationBond.setMaxValue("home");
@@ -230,19 +308,12 @@ public class CtxBrokerExample 	{
 			this.communityEntity.addBond(attributeLocationBond);
 			this.communityEntity.addBond(attributeAgeBond);
 
-			this.communityEntity.addMember(this.indiEnt1.getId());
-			this.communityEntity.addMember(this.indiEnt2.getId());
-			this.communityEntity.addMember(this.indiEnt3.getId());
-
-			LOG.info(" BEFORE UPDATE communityEnt.getID():  " +this.communityEntity.getId());
-			LOG.info(" BEFORE UPDATE communityEnt.getMembers():  " +this.communityEntity.getMembers());
-
+						
 			this.internalCtxBroker.update(this.communityEntity).get();
 
 			CommunityCtxEntity communityEnt = (CommunityCtxEntity) this.internalCtxBroker.retrieve(this.communityEntity.getId()).get();
-			LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt);
+			LOG.info(" AFTER UPDATE communityEnt id :  " +communityEnt.getId());
 			LOG.info(" AFTER UPDATE communityEnt.getMembers():  " +communityEnt.getMembers());
-
 
 			Set<CtxBond> retrievedBonds = communityEnt.getBonds();
 			LOG.info(" retrievedBonds " +retrievedBonds);
@@ -251,7 +322,6 @@ public class CtxBrokerExample 	{
 				LOG.info(" bond modelType : " +bond.getModelType());
 				LOG.info(" bond origin type : " +bond.getOriginType());
 			}
-
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -267,7 +337,7 @@ public class CtxBrokerExample 	{
 
 
 	private void createIndividualEntities(){
-		LOG.info("*** createIndividualEntities");
+		LOG.info("*** createIndividualEntities ... to be added in a community");
 		try {
 			this.indiEnt1 = this.internalCtxBroker.createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
 			this.indiEnt2 = this.internalCtxBroker.createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
@@ -445,7 +515,7 @@ public class CtxBrokerExample 	{
 			association_uses.setParentEntity(operator.getId());
 			this.internalCtxBroker.update(association_uses);
 
-			
+
 		} catch (Exception e) {
 
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
@@ -464,21 +534,21 @@ public class CtxBrokerExample 	{
 
 			List<CtxIdentifier> idsAttribute = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.ID).get();
 			LOG.info("*** lookup results for Attribute type: '" + CtxAttributeTypes.ID + "' " +idsAttribute);
-			
+
 			final IndividualCtxEntity operator = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
-			
-			
+
+
 			//testing lookup(final CtxEntityIdentifier entityId,final CtxModelType modelType, final String type)
-			
+
 			List<CtxIdentifier> listAttribute = this.internalCtxBroker.lookup( operator.getId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.ID).get();
-			
+
 			if(listAttribute.size()>0){
 				CtxAttributeIdentifier attrID = (CtxAttributeIdentifier) listAttribute.get(0);
 				LOG.info("*** attributeID "+attrID);
 				CtxAttribute ctxAttribute = (CtxAttribute) this.internalCtxBroker.retrieve(attrID).get();
 				LOG.info("attribute type should be 'xcmanager.societies.local' and it is:"+ ctxAttribute.getStringValue());
 			}
-						
+
 			List<CtxIdentifier> listAssociation = this.internalCtxBroker.lookup( operator.getId(), CtxModelType.ASSOCIATION, CtxAssociationTypes.USES_DEVICES).get();
 			if(listAssociation.size()>0){
 				CtxAssociationIdentifier assocID = (CtxAssociationIdentifier) listAssociation.get(0);
@@ -486,8 +556,8 @@ public class CtxBrokerExample 	{
 				CtxAssociation ctxAssociation = (CtxAssociation) this.internalCtxBroker.retrieve(assocID).get();
 				LOG.info("association type should be 'USES_DEVICES' and it is:"+ ctxAssociation.getType());
 			}
-			
-			
+
+
 		} catch (Exception e) {
 
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);

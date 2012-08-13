@@ -78,6 +78,8 @@ public class CtxEventExample {
 		this.sendLocalEvent2();
 		this.sendRemoteEvent();
 		this.sendRemoteEvent2();
+		this.sendBroadcastEvent();
+		this.sendBroadcastEvent2();
 	}
 
 	private void registerListenerByCtxId() {
@@ -179,7 +181,8 @@ public class CtxEventExample {
 		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId);
 		try {
 			Thread.sleep(1000l);
-			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, CtxEventScope.INTER_CSS);
+			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, 
+					CtxEventScope.INTER_CSS);
 		} catch (Exception e) {
 			LOG.error("*** Could not send event: " + event + ": " 
 					+ e.getLocalizedMessage(), e);
@@ -197,8 +200,46 @@ public class CtxEventExample {
 		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId2);
 		try {
 			Thread.sleep(1000l);
-			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, CtxEventScope.INTER_CSS);
+			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, 
+					CtxEventScope.INTER_CSS);
+		} catch (Exception e) {
+			LOG.error("*** Could not send event: " + event + ": " 
+					+ e.getLocalizedMessage(), e);
+		}
+	}
+	
+	private void sendBroadcastEvent() {
+		
+		LOG.info("*** sendBroadcastEvent");
+		if (this.ctxEventMgr == null) {
+			LOG.error("*** Could not send context event: CtxEventMgr is not available");
+			return;
+		}
 
+		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId);
+		try {
+			Thread.sleep(1000l);
+			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, 
+					CtxEventScope.BROADCAST);
+		} catch (Exception e) {
+			LOG.error("*** Could not send event: " + event + ": " 
+					+ e.getLocalizedMessage(), e);
+		}
+	}
+	
+	private void sendBroadcastEvent2() {
+		
+		LOG.info("*** sendBroadcastEvent2");
+		if (this.ctxEventMgr == null) {
+			LOG.error("*** Could not send context event: CtxEventMgr is not available");
+			return;
+		}
+		
+		final CtxChangeEvent event = new CtxChangeEvent(this.ctxAttrId2);
+		try {
+			Thread.sleep(1000l);
+			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, 
+					CtxEventScope.BROADCAST);
 		} catch (Exception e) {
 			LOG.error("*** Could not send event: " + event + ": " 
 					+ e.getLocalizedMessage(), e);
@@ -214,40 +255,40 @@ public class CtxEventExample {
 			this.name = name;
 		}
 		
-		/* (non-Javadoc)
+		/*
 		 * @see org.societies.api.context.event.CtxChangeEventListener#onCreation(org.societies.api.context.event.CtxChangeEvent)
 		 */
 		@Override
 		public void onCreation(CtxChangeEvent event) {
 			
-			LOG.info(this.name + "*** Context CREATED event: " + event.getId());
+			LOG.info("*** " + this.name + ": Context CREATED event: " + event.getId());
 		}
 
-		/* (non-Javadoc)
+		/*
 		 * @see org.societies.api.context.event.CtxChangeEventListener#onUpdate(org.societies.api.context.event.CtxChangeEvent)
 		 */
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
 			
-			LOG.info(this.name + " *** Context UPDATED event: " + event.getId());
+			LOG.info("*** " + this.name + ": Context UPDATED event: " + event.getId());
 		}
 
-		/* (non-Javadoc)
+		/*
 		 * @see org.societies.api.context.event.CtxChangeEventListener#onModification(org.societies.api.context.event.CtxChangeEvent)
 		 */
 		@Override
 		public void onModification(CtxChangeEvent event) {
 			
-			LOG.info(this.name + " *** Context MODIFIED event: " + event.getId());
+			LOG.info("*** " + this.name + ": Context MODIFIED event: " + event.getId());
 		}
 
-		/* (non-Javadoc)
+		/*
 		 * @see org.societies.api.context.event.CtxChangeEventListener#onRemoval(org.societies.api.context.event.CtxChangeEvent)
 		 */
 		@Override
 		public void onRemoval(CtxChangeEvent event) {
 			
-			LOG.info(this.name + " *** Context REMOVED event: " + event.getId());
+			LOG.info("*** " + this.name + ": Context REMOVED event: " + event.getId());
 		}
 	}
 }

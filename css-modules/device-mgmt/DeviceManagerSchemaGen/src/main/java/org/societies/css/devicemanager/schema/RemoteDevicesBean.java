@@ -22,91 +22,59 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.webapp.models;
-
-import javax.validation.constraints.Size;
 
 /**
- * 
- * @author Maria Mannion
- * 
- *         
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
-public class LoginForm {
+package org.societies.css.devicemanager.schema;
 
-	@Size(min = 1, max = 50)
-	private String userName;
+/*
+  Based on the below interface, the task is to generate a Bean that will allow you to
+  query which method was called and what parameters were passed. Do not add the return type here.
+  This is added in the Result bean.
+ 
+  public interface ICalc 
+  {
+      public int Add(int a, int b);
+      public int Subtract(int a, int b);
+  }
+   
+generate XSD, run the maven command:
+> mvn jaxb2:schemagen
 
-	@Size(min = 1, max = 20)
-	private String subdomain;
+The schema.xsd file will be in /target/generated-resources/schemagen directory
 
-	@Size(min = 1, max = 20)
-	private String password;
+ */
+
+public class RemoteDevicesBean {
 	
-	@Size(min = 1, max = 20)
-	private String passwordConfirm;
+	public enum methodType {getDeviceDescription, invokeAction};
+	private methodType method;
+	private String nodeId;
+	private String deviceId;
 	
-	@Size(min = 1, max = 50)
-	private String name;
-	private String method;
-	
-	public void setName(String name) {
-		this.name = name;
+	public String getNodeId() {
+		return nodeId;
+	}
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
 	}
 
-	public String getName() {
-		return name;
+	public String getDeviceId() {
+		return deviceId;
 	}
-	
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getUserName() {
-		return userName;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setSubDomain(String subdomain) {
-		this.subdomain = subdomain;
-	}
-
-	public String getSubDomain() {
-		return subdomain;
-	}
-
-	/**
-	 * @return the passwordConfirm
-	 */
-	public String getPasswordConfirm() {
-		return passwordConfirm;
-	}
-
-	/**
-	 * @param passwordConfirm the passwordConfirm to set
-	 */
-	public void setPasswordConfirm(String passwordConfirm) {
-		this.passwordConfirm = passwordConfirm;
-	}
-
-	/**
-	 * @return the method
-	 */
-	public String getMethod() {
+	public methodType getMethod() {
 		return method;
 	}
-
-	/**
-	 * @param method the method to set
-	 */
-	public void setMethod(String method) {
+	
+	public void setMethod(methodType method) {
 		this.method = method;
 	}
 }

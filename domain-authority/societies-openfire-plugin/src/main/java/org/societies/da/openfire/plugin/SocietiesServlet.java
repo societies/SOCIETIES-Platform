@@ -57,7 +57,8 @@ public class SocietiesServlet extends HttpServlet {
        
         // Check this request is authorized
         if ((plugin.getSecret() != null || !plugin.getSecret().equals("")) && (secret == null || !secret.equals(plugin.getSecret()))) {
-            Log.warn("An unauthorised user service request was received: " + request.getQueryString());
+            String query = request.getQueryString();
+        	Log.warn("An unauthorised user service request was received: " + ((query != null) ? query : ""));
             replyError("RequestNotAuthorised: Provided secret '"+secret+"' did not match", request, response, out);
             return;
          }
@@ -131,6 +132,7 @@ public class SocietiesServlet extends HttpServlet {
 
     private void replyMessage(String message, HttpServletRequest request, HttpServletResponse response, PrintWriter out) throws IOException{
     	String referer = request.getHeader("Referer");
+    	Log.debug("referer: " + referer);
     	if (referer!=null && referer.endsWith("public/signup.html"))
     		response.sendRedirect("public/signup-result.jsp?success="+message);
     	else {
