@@ -29,7 +29,7 @@
  * @author aleckey
  *
  */
-package org.societies.example.calculatorservice.schema;
+package org.societies.css.devicemanager.schema;
 
 /*
   Based on the below interface, the task is to generate a Bean that will allow you to
@@ -49,25 +49,25 @@ The schema.xsd file will be in /target/generated-resources/schemagen directory
 
  */
 
-public class CalcBean {
+public class RemoteDevicesBean {
 	
-	public enum methodType {Add, Subtract, AddAsync};
+	public enum methodType {getDeviceDescription, invokeAction};
 	private methodType method;
-	private int a;
-	private int b;
+	private String nodeId;
+	private String deviceId;
 	
-	public int getA() {
-		return a;
+	public String getNodeId() {
+		return nodeId;
 	}
-	public void setA(int a) {
-		this.a = a;
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
 	}
 
-	public int getB() {
-		return b;
+	public String getDeviceId() {
+		return deviceId;
 	}
-	public void setB(int b) {
-		this.b = b;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
 	public methodType getMethod() {

@@ -29,7 +29,7 @@
  * @author aleckey
  *
  */
-package org.societies.example.calculatorservice.schema;
+package org.societies.css.devicemanager.schema;
 
 /*
 If any method of your Bean returns a value, you will need to add a property for that
@@ -43,7 +43,7 @@ int getAddResult()
 int getSubtractResult()
 */
 
-public class CalcBeanResult {
+public class RemoteDeviceBeanResult {
 
 	private int result;
 	private String text;
