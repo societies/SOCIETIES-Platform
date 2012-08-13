@@ -78,7 +78,10 @@
 			</tr>
 			<tr>
 				<td>CSS Node Interactable</td>
-				<td><form:input path="interactable" /></td>
+				<td><form:select path="interactable" >
+						<form:option value="NONE" label="--- Select ---" />
+						<form:options items="${nodeinteractable}" />
+					</form:select></td>
 				<td><form:errors path="interactable" cssClass="error" /></td>
 			</tr>
 		</table>

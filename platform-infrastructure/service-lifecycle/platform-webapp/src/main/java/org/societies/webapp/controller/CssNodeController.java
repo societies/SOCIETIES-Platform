@@ -78,6 +78,7 @@ public class CssNodeController {
 		Map<String, String> methods = new LinkedHashMap<String, String>();
 		Map<String, String> nodetypes = new LinkedHashMap<String, String>();
 		Map<String, String> nodestatus = new LinkedHashMap<String, String>();
+		Map<String, String> nodeinteractable = new LinkedHashMap<String, String>();
 		
 		
 		
@@ -93,10 +94,13 @@ public class CssNodeController {
 		nodestatus.put("Unavailable", "Unavailable");
 		nodestatus.put("Hibernating", "Hibernating");
 		
+		nodeinteractable.put("True", "True");
+		nodeinteractable.put("False", "False");
 		
 		model.put("methods", methods);
 		model.put("nodetypes", nodetypes);
 		model.put("nodestatus", nodestatus);
+		model.put("nodeinteractable", nodeinteractable);
 		
 		model.put("cssnodemgmtResult", "CSS Node Mgmt Result :");
 		return new ModelAndView("cssnodemgmt", model);
@@ -125,6 +129,7 @@ public class CssNodeController {
 		String nodetypes = cnForm.getnodetypes();
 		String method = cnForm.getMethod();
 		String nodestatus = cnForm.getnodestatus();
+		String nodeinteractable = cnForm.getInteractable();
 		CssRecord cssrecord = null;
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
 		List<Service> nodes =  new ArrayList<Service>();

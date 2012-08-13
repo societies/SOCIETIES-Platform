@@ -84,13 +84,13 @@ public class CssNodeForm {
 		this.cssNodeMAC = cssNodeMAC;
 	}
 	/**
-	 * @return the contextSource
+	 * @return the 
 	 */
 	public String getInteractable() {
 		return interactable;
 	}
 	/**
-	 * @param contextSource the contextSource to set
+	 * @param 
 	 */
 	public void setInteractable(String interactable) {
 		this.interactable = interactable;
