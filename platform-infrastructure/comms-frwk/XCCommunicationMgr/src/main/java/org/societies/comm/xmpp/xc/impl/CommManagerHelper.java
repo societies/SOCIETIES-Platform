@@ -300,8 +300,9 @@ public class CommManagerHelper {
 			LOG.warn("dispatchIQError: XMPP ERROR!");
 			Element errorElement = (Element)iq.getElement().elements().get(0); //GIVES US "error" ELEMENT
 			LOG.info("errorElement.getName()="+errorElement.getName()+";errorElement.elements().size()="+errorElement.elements().size());
-			LOG.info("errorElement.elements().get(0)).getName()=" + ((Element)errorElement.elements().get(0)).getName());
-			StanzaError se = StanzaError.valueOf(((Element)errorElement.elements().get(0)).getName()); // TODO assumes the stanza error comes first
+			String errorElementStr = ((Element)errorElement.elements().get(0)).getName(); // TODO assumes the stanza error comes first
+			LOG.info("errorElement.elements().get(0)).getName()=" + errorElementStr);
+			StanzaError se = StanzaError.valueOf(errorElementStr.replaceAll("-", "_")); //TODO valueOf() parses the name, not value
 			XMPPError error = new XMPPError(se, null);
 			if (errorElement.elements().size()>1)
 				error = parseApplicationError(se, (Element)errorElement.elements());
