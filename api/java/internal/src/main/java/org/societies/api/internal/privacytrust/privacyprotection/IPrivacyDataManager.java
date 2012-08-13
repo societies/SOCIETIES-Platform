@@ -47,11 +47,21 @@ public interface IPrivacyDataManager {
 	 * 
 	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service or a CIS.
 	 * @param dataId Id of the requested data
-	 * @param action Action requested over this data.
-	 * @return A ResponseItem containing permission information
+	 * @param actions List of actions requested over this data. At least one mandatory action is required.
+	 * @return A ResponseItem containing privacy permission information: PERMIT or DENY. Some optional actions may be avoided and may not be covered by this permission.
 	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
 	 */
 	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+	/**
+	 * Check if a requestor has the permission to perform actions under a personal data
+	 * 
+	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service or a CIS.
+	 * @param dataId Id of the requested data
+	 * @param action Action requested over this data. This action can't be optional.
+	 * @return A ResponseItem containing permission information
+	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
+	 */
+	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, Action action) throws PrivacyException;
 	/**
 	 * Check permission to access/use/disclose a data
 	 * Example of use:

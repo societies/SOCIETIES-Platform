@@ -24,6 +24,8 @@
  */
 package org.societies.privacytrust.privacyprotection.datamanagement;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -57,11 +59,54 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermissions(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier)
 	 */
 	@Override
-	public ResponseItem getPermission(Requestor requestor, DataIdentifier dataId) throws PrivacyException {
-		return getPermission(requestor, dataId, null);
+	public List<ResponseItem> getPermissions(Requestor requestor, DataIdentifier dataId) throws PrivacyException {
+		// Check Dependency injection
+		if (!isDepencyInjectionDone()) {
+			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
+		}
+		// Verifications
+		if (null == requestor) {
+			throw new PrivacyException("[Parameters] RequestorId is missing");
+		}
+		if (null == dataId) {
+			throw new PrivacyException("[Parameters] DataId is missing");
+		}
+		if (null == dataId.getOwnerId()) {
+			throw new PrivacyException("[Parameters] OwnerId is missing");
+		}
+
+		Session session = sessionFactory.openSession();
+		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+		Transaction t = session.beginTransaction();
+		try {
+			// -- Retrieve the privacy permission
+			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
+			List<PrivacyPermission> privacyPermissions = (List<PrivacyPermission>) criteria.list();
+
+
+			// -- Generate the response item
+			// - Privacy Permissions don't exist
+			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
+				LOG.debug("PrivacyPermission not available");
+				return null;
+			}
+			// - Privacy permissions retrieved
+			for(PrivacyPermission privacyPermission : privacyPermissions) {
+				permissions.add(privacyPermission.createResponseItem());
+				LOG.debug("PrivacyPermission retrieved: "+privacyPermission.toString());
+			}
+		} catch (Exception e) {
+			t.rollback();
+			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return permissions;
 	}
 
 	/*
@@ -99,7 +144,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 
 			// -- Generate the response item
 			// - Privacy Permissions don't exist
-			if (null == privacyPermissions && privacyPermissions.size() <= 0) {
+			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
 				LOG.debug("PrivacyPermission not available");
 				return null;
 			}
@@ -126,7 +171,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			LOG.debug("PrivacyPermission retrieved: "+relevantPrivacyPermission.toString());
 		} catch (Exception e) {
 			t.rollback();
-			throw new PrivacyException("Error during the persistance of the privacy permission", e);
+			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
 		} finally {
 			if (session != null) {
 				session.close();
@@ -135,8 +180,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		return permission;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier, java.util.List, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision)
 	 */
 	@Override
 	public boolean updatePermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException {
@@ -151,7 +197,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId) {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
-		LOG.info("############updatePermission"+dataId.getUri());
+		if (null == actions || actions.size() <= 0) {
+			throw new PrivacyException("[Parameters] Actions are missing");
+		}
 
 		Session session = sessionFactory.openSession();
 		boolean result = false;
@@ -190,7 +238,8 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
 	 */
 	@Override
@@ -211,11 +260,12 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		return updatePermission(requestor, dataId, permission.getRequestItem().getActions(), permission.getDecision());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermissions(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier)
 	 */
 	@Override
-	public boolean deletePermission(Requestor requestor, DataIdentifier dataId) throws PrivacyException {
+	public boolean deletePermissions(Requestor requestor, DataIdentifier dataId) throws PrivacyException {
 		// Check Dependency injection
 		if (!isDepencyInjectionDone()) {
 			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
@@ -243,7 +293,58 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			}
 			// - Privacy permission retrieved: delete it
 			else {
-				session.delete(privacyPermissions);
+				for(Iterator<PrivacyPermission> it = privacyPermissions.iterator(); it.hasNext();) {
+					session.delete(it.next());
+				}
+				t.commit();
+				LOG.debug("PrivacyPermissions deleted.");
+			}
+			result = true;
+		} catch (Exception e) {
+			t.rollback();
+			throw new PrivacyException("Error during the removal of the privacy permission", e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
+	 */
+	@Override
+	public boolean deletePermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+		// Check Dependency injection
+		if (!isDepencyInjectionDone()) {
+			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
+		}
+		// Verifications
+		if (null == requestor) {
+			throw new PrivacyException("[Parameters] RequestorId is missing");
+		}
+		if (null == dataId) {
+			throw new PrivacyException("[Parameters] DataId is missing");
+		}
+
+		Session session = sessionFactory.openSession();
+		boolean result = false;
+		Transaction t = session.beginTransaction();
+		try {
+			// -- Retrieve the privacy permission
+			Criteria criteria = findPrivacyPermissions(session, requestor, dataId, actions, true);
+			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.list();
+
+			// -- Delete the privacy permission
+			// - Privacy Permission doesn't exist
+			if (null == privacyPermission) {
+				LOG.debug("PrivacyPermission not available: no need to delete");
+			}
+			// - Privacy permission retrieved: delete it
+			else {
+				session.delete(privacyPermission);
 				t.commit();
 				LOG.debug("PrivacyPermissions deleted.");
 			}
@@ -281,11 +382,11 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @return If some actions are optional: several results, ordered by relevance
 	 */
 	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId, List<Action> actions, boolean mustMatchAllActions) {
-		// Criteria about data id
+		// -- Criteria about data id
 		Criteria criteria = session
 				.createCriteria(PrivacyPermission.class)
 				.add(Restrictions.like("dataId", dataId.getUri()));
-		// Criteria about requestor
+		// -- Criteria about requestor
 		criteria.add(Restrictions.like("requestorId", requestor.getRequestorId().getJid()));
 		if (requestor instanceof RequestorCis) {
 			criteria.add(Restrictions.like("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
@@ -299,26 +400,29 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			criteria.add(Restrictions.isNull("cisId"));
 			criteria.add(Restrictions.isNull("serviceId"));
 		}
-		// Criteria about action list
+		// -- Criteria about action list
 		if (null != actions && actions.size() > 0) {
-			// Result must match all action OR only mandatory actions
+			// - Create strings
 			Criterion criterionAllActions = null;
 			Criterion criterionMandatoryActions = null;
 			StringBuilder strAllActions = new StringBuilder();
 			StringBuilder strMandatoryActions = new StringBuilder();
 			for(Action action : actions) {
 				strAllActions.append(action.getActionType().name()+"/");
-				if (!mustMatchAllActions && !action.isOptional()) {
+				if (!action.isOptional()) {
 					strMandatoryActions.append(action.getActionType().name()+"/");
 				}
 			}
-			criterionAllActions = Restrictions.and(criterionAllActions, Restrictions.like("actions", strAllActions.toString()));
-			criterionMandatoryActions = Restrictions.and(criterionAllActions, Restrictions.like("actions", strMandatoryActions.toString()));
-			if (!mustMatchAllActions) {
-				criteria.add(Restrictions.or(criterionAllActions, criterionMandatoryActions));
-			}
-			else {
+			// - Create the query
+			criterionAllActions = Restrictions.like("actions", strAllActions.toString());
+			// If mode: match only mandatory actions OR no optional actions requested
+			if (mustMatchAllActions || strAllActions.toString().equals(strMandatoryActions.toString())) {
 				criteria.add(criterionAllActions);
+			}
+			// Otherwise: match all actions OR only mandatory actions
+			else {
+				criterionMandatoryActions = Restrictions.like("actions", strMandatoryActions.toString());
+				criteria.add(Restrictions.or(criterionAllActions, criterionMandatoryActions));
 			}
 		}
 		return criteria;

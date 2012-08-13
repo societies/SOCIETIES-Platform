@@ -53,23 +53,6 @@ public class MockDataManagerInternal implements IPrivacyDataManagerInternal {
 	public MockDataManagerInternal() {
 		responseItems = new Hashtable<Integer,ResponseItem>();
 	}
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier)
-	 */
-	@Override
-	public boolean deletePermission(Requestor arg0, DataIdentifier arg2) throws PrivacyException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier)
-	 */
-	@Override
-	public ResponseItem getPermission(Requestor arg0, DataIdentifier arg2) throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
@@ -108,5 +91,32 @@ public class MockDataManagerInternal implements IPrivacyDataManagerInternal {
 			throws PrivacyException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermissions(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier)
+	 */
+	@Override
+	public List<ResponseItem> getPermissions(Requestor requestor,
+			DataIdentifier dataId) throws PrivacyException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermissions(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier)
+	 */
+	@Override
+	public boolean deletePermissions(Requestor requestor, DataIdentifier dataId)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
+	 */
+	@Override
+	public boolean deletePermission(Requestor requestor, DataIdentifier dataId,
+			List<Action> actions) throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

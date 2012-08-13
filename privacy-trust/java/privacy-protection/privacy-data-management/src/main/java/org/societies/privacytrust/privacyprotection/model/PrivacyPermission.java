@@ -61,11 +61,9 @@ import org.societies.api.schema.identity.DataIdentifier;
 public class PrivacyPermission implements Serializable {
 	private static final long serialVersionUID = -5745233622018708564L;
 
-
 	@Id
 	@GeneratedValue
 	private Long id;
-
 	private String requestorId;
 	@Enumerated
 	private PrivacyPolicyTypeConstants permissionType; 
@@ -75,11 +73,13 @@ public class PrivacyPermission implements Serializable {
 	private String cisId;
 	private String dataId;
 	/**
+	 * List of actions
 	 * Format:  value/value/.../
 	 * E.g.: READ/WRITE/
 	 */
 	private String actions;
 	/**
+	 * List of action status. In the same order of the list of actions.
 	 * Format:  value/value/.../
 	 * E.g.: false/true/
 	 */
@@ -105,7 +105,7 @@ public class PrivacyPermission implements Serializable {
 	 */
 	public PrivacyPermission(String requestorId,
 			PrivacyPolicyTypeConstants permissionType, String serviceId,
-			String cisId, String dataId, String actions, String actionsStatus,
+			String cisId, String dataId, String actions, String actionsOptional,
 			Decision permission) {
 		super();
 		this.requestorId = requestorId;
@@ -114,7 +114,7 @@ public class PrivacyPermission implements Serializable {
 		this.cisId = cisId;
 		this.dataId = dataId;
 		this.actions = actions;
-		this.actionsOptional = actionsStatus;
+		this.actionsOptional = actionsOptional;
 		this.permission = permission;
 	}
 
@@ -143,7 +143,7 @@ public class PrivacyPermission implements Serializable {
 
 
 
-	/* --- Intelegint Setters --- */
+	/* --- Intelligent Setters --- */
 
 	/**
 	 * Retrieve the access control permission as a ResponseItem
@@ -155,7 +155,7 @@ public class PrivacyPermission implements Serializable {
 		DataIdentifier dataId = DataIdentifierFactory.fromUri(this.dataId);
 		Resource resource = new Resource(dataId);
 
-		// - Create the list of actions from JSON
+		// - Create the list of actions
 		List<Action> actions = getActionsFromString();
 
 		// - Create the ResponseItem
@@ -204,11 +204,11 @@ public class PrivacyPermission implements Serializable {
 //				actions.add(new Action(actionType, optional));
 //				pos = end + 1;
 				String action = this.actions.substring(pos, end);
-				ActionConstants actionType = ActionConstants.valueOf(action.substring(pos, end));
+				ActionConstants actionType = ActionConstants.valueOf(action);
 				pos = end + 1;
 				
 				endOptional = this.actionsOptional.indexOf('/', posOptional);
-				boolean optional = "false".equals(this.actionsOptional.substring(posOptional, endOptional)) ? false : true;
+				boolean optional = "true".equals(this.actionsOptional.substring(posOptional, endOptional));
 				posOptional = endOptional + 1;
 				
 				actions.add(new Action(actionType, optional));
@@ -222,16 +222,16 @@ public class PrivacyPermission implements Serializable {
 	 */
 	public void setActions(List<Action> actions) {
 		StringBuilder strActions = new StringBuilder();
-		StringBuilder strActionsStatus = new StringBuilder();
+		StringBuilder strActionsOptional = new StringBuilder();
 		if (null != actions) {
 			for(int i=0; i<actions.size(); i++) {
 //				sb.append(actions.get(i).getActionType().name()+":"+actions.get(i).isOptional()+"/");
 				strActions.append(actions.get(i).getActionType().name()+"/");
-				strActionsStatus.append(actions.get(i).isOptional()+"/");
+				strActionsOptional.append(actions.get(i).isOptional()+"/");
 			}
 		}
 		this.actions = strActions.toString();
-		this.actionsOptional = strActionsStatus.toString();
+		this.actionsOptional = strActionsOptional.toString();
 	}
 
 	/**

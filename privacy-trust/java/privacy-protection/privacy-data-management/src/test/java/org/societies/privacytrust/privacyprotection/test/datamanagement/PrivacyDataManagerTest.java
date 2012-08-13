@@ -206,7 +206,7 @@ public class PrivacyDataManagerTest {
 			Action action = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(action);
-			dataDeleted = privacyDataManagerInternal.deletePermission(requestor, dataId);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestor, dataId);
 			permission = privacyDataManager.checkPermission(requestor, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle, e);

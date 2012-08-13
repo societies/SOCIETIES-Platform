@@ -74,13 +74,16 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
 		if (null == requestor) {
-			throw new NullPointerException("Not enought information: requestor or owner id is missing");
+			throw new NullPointerException("[Parameters] Not enought information: requestor or owner id is missing");
 		}
 		if (null == dataId) {
-			throw new PrivacyException("Not enought information: data id is missing. At least the data type is expected.");
+			throw new NullPointerException("[Parameters] Not enought information: data id is missing. At least the data type is expected.");
+		}
+		if (null == actions || actions.size() <= 0) {
+			throw new NullPointerException("[Parameters] Actions are missing");
 		}
 		if (!atLeast1MandatoryAction(actions)) {
-			throw new PrivacyException("At least one mandatory action is required, they can't be all optional.");
+			throw new PrivacyException("[Parameters] At least one mandatory action is required, they can't be all optional.");
 		}
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
@@ -98,8 +101,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		// -- Permission not available: ask to PrivacyPreferenceManager
 		if (null == permission || null == permission.getRequestItem()) {
 			LOG.info("No Permission retrieved");
+			permission = null;
 			try {
-				permission = null;
 				permission = privacyPreferenceManager.checkPermission(requestor, dataId, actions);
 			} catch (Exception e) {
 				LOG.error("Error when retrieving permission from PrivacyPreferenceManager", e);
@@ -112,6 +115,17 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			privacyDataManagerInternal.updatePermission(requestor, permission);
 		}
 		return permission;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action)
+	 */
+	@Override
+	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, Action action) throws PrivacyException {
+		// List of actions
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(action);
+		return checkPermission(requestor, dataId, actions);
 	}
 
 	/*
@@ -143,7 +157,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (!isDepencyInjectionDone(2)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
-		
+
 		// -- Retrieve the obfuscation level
 		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, dataWrapper.getDataId().getType());
 		double obfuscationLevel = 1;
@@ -154,7 +168,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (obfuscationLevel >= 1) {
 			return new AsyncResult<IDataWrapper>(dataWrapper);
 		}
-		
+
 		// -- Obfuscate the data
 		IDataWrapper obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(dataWrapper, obfuscationLevel);
 		return new AsyncResult<IDataWrapper>(obfuscatedDataWrapper);
@@ -184,19 +198,19 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 		return dataWrapper;
 		// Not use at the moment
-//		if (!isDepencyInjectionDone(2)) {
-//			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
-//		}
-//		
-//		// -- Retrieve the obfuscation level
-//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, dataWrapper.getDataId().getType());
-//		double obfuscationLevel = 1;
-//		if (null != dataObfuscationPreferences) {
-//			dataObfuscationPreferences.getObfuscationLevel();
-//		}
-//		
-//		// -- Check if an obfuscated version is available
-//		return dataObfuscationManager.hasObfuscatedVersion(dataWrapper, obfuscationLevel);
+		//		if (!isDepencyInjectionDone(2)) {
+		//			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
+		//		}
+		//		
+		//		// -- Retrieve the obfuscation level
+		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, dataWrapper.getDataId().getType());
+		//		double obfuscationLevel = 1;
+		//		if (null != dataObfuscationPreferences) {
+		//			dataObfuscationPreferences.getObfuscationLevel();
+		//		}
+		//		
+		//		// -- Check if an obfuscated version is available
+		//		return dataObfuscationManager.hasObfuscatedVersion(dataWrapper, obfuscationLevel);
 	}
 	/*
 	 * 
@@ -209,7 +223,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 
 	// -- Private methods
-	
+
 	/**
 	 * Simple method to check if a list of actions has, at least, one action
 	 * which is not optional
