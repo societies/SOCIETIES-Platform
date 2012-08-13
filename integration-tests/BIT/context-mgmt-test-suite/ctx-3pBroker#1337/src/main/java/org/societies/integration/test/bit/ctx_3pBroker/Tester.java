@@ -256,7 +256,27 @@ public class Tester {
 		}	
 	}
 
-	private void lookupRetrieveLocationAttributeValue(){
+	
+
+
+	private void retrieveIndividualEntityId() {
+
+		LOG.info("*** retrieveIndividualEntityId");
+		try {
+			CtxEntityIdentifier cssOwnerEntityId = 
+					this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
+			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
+			//assertEquals("xcmanager.societies.local/ENTITY/person/0 ",cssOwnerEntityId.toString());
+
+		} catch (Exception e) {
+			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
+		}
+	}
+	
+		
+	
+	/*
+	 * private void lookupRetrieveLocationAttributeValue(){
 		List<CtxIdentifier> listAttrIds2;
 		try {
 			listAttrIds2 = this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
@@ -278,19 +298,6 @@ public class Tester {
 			e.printStackTrace();
 		} 
 	}
-
-
-	private void retrieveIndividualEntityId() {
-
-		LOG.info("*** retrieveIndividualEntityId");
-		try {
-			CtxEntityIdentifier cssOwnerEntityId = 
-					this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
-			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
-			//assertEquals("xcmanager.societies.local/ENTITY/person/0 ",cssOwnerEntityId.toString());
-
-		} catch (Exception e) {
-			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
-		}
-	}
+	 */
+	
 }
