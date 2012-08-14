@@ -22,22 +22,28 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.Models;
+package org.societies.api.internal.orchestration;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class Models {
+/**
+ * Describe your class here...
+ *
+ * @author John
+ *
+ */
+public interface ICommunitySuggestion {
 
-	private ArrayList<Model> modelList;
+	//
+	public abstract String getSuggestionType();
+
+	//
+	public abstract String getName();
 	
-	public Models(){
-		modelList = new ArrayList<Model>();
-	}
-	
-	public Model getModel(){
-		//not correct need to modify 
-		return modelList.get(0);
-	}
-	
+	//
+	public abstract ArrayList<String> getMembersList();
+
+	//
+	public abstract ArrayList<String> getconditionsList();
+
 }

@@ -49,16 +49,19 @@ import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeBond;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueMetrics;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxBondOriginType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,20 +79,25 @@ public class ExternalCtxBrokerExample 	{
 	/** The 3P Context Broker service reference. */
 	private ICtxBroker externalCtxBroker;
 	private ICommManager commMgrService;
-
+	private org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
 	private IIdentity cssOwnerId;
 	private INetworkNode cssNodeId;
 	private ICisOwned cisOwned  = null;
 	private IIdentity cisID;
 
-	private static IndividualCtxEntity owner = null;
-	private static CtxEntity deviceCtxEntity;
-	private static CtxAssociation usesServiceAssoc;
 
-	private CommunityCtxEntity communityEntity;
+	//	private IIdentity cisID;
+	private IIdentity cssID1; 
+	private IIdentity cssID2;
+	private IIdentity cssID3;
+
 	private IndividualCtxEntity indiEnt1;
 	private IndividualCtxEntity indiEnt2;
 	private IndividualCtxEntity indiEnt3;
+
+	private static IndividualCtxEntity owner = null;
+	private static CtxEntity deviceCtxEntity;
+	private static CtxAssociation usesServiceAssoc;
 
 	private static CtxAttributeIdentifier weightAttrIdentifier = null;
 	private static CtxAttributeIdentifier ctxAttributeDeviceIDIdentifier = null;
@@ -101,11 +109,12 @@ public class ExternalCtxBrokerExample 	{
 
 
 	@Autowired(required=true)
-	public ExternalCtxBrokerExample(ICtxBroker externalCtxBroker, ICommManager commMgr,ICisManager cisManager) throws InvalidFormatException {
+	public ExternalCtxBrokerExample(ICtxBroker externalCtxBroker,org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker , ICommManager commMgr,ICisManager cisManager) throws InvalidFormatException {
 
 		LOG.info("*** " + this.getClass() + " instantiated");
 
 		this.externalCtxBroker = externalCtxBroker;
+		this.internalCtxBroker = internalCtxBroker;
 		this.commMgrService = commMgr;
 
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
@@ -134,37 +143,74 @@ public class ExternalCtxBrokerExample 	{
 
 		this.cisID = commMgr.getIdManager().fromJid(cisIDString);
 
-		LOG.info("*** Starting examples...");
-		// TODO createRemoteEntity();
-		this.retrieveIndividualEntityId();
-		this.createDeviceEntity();
+		LOG.info("*** Starting individual context examples...");
+		
+		//commented until issue with access control and privacy policy is fixed
+		//this.retrieveIndividualEntityId();
+		//this.createDeviceEntity();
 		//createCtxAssociation();
 		//registerForContextChanges();
-		this.lookupContextEntities();
-		this.retrieveContext();
+		//this.lookupContextEntities();
+		//this.retrieveContext();
 		//simpleCtxHistoryTest();
-
+		// TODO createRemoteEntity();
+		
 		LOG.info("*** Starting community context examples...");
-		this.retrieveCommunityEntityBasedOnCisID();
-		this.lookupCommunityEntAttributes();
+		this.createCommunityCtxEnt();
+		this.retrievceLookupCommunityEntAttributes();
 	}
 
-	private void lookupCommunityEntAttributes(){
 
-		CtxEntityIdentifier ctxCommunityEntityIdentifier;
+	private void createCommunityCtxEnt(){
+
+		CommunityCtxEntity communityEntity;
 		try {
-			ctxCommunityEntityIdentifier = this.externalCtxBroker.retrieveCommunityEntityId(requestor, this.cisID).get();
-			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
+			communityEntity = internalCtxBroker.createCommunityEntity(this.cisID).get();
+			this.cssID1 =  this.commMgrService.getIdManager().fromJid("Aris@societies.local ");
+			this.indiEnt1 = this.internalCtxBroker.createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
+			CtxAttribute individualAttr1 = this.internalCtxBroker.createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.INTERESTS).get();
+			individualAttr1.setStringValue("reading,socialnetworking,cinema,sports");
+			this.internalCtxBroker.update(individualAttr1);
 
-			List<CtxIdentifier> communityAttrIDList = this.externalCtxBroker.lookup(requestor, ctxCommunityEntityIdentifier, CtxModelType.ATTRIBUTE, "ctxCommunityAttribute").get();
-			LOG.info("communityAttrIDList"+ communityAttrIDList);		
+			this.cssID2 =  this.commMgrService.getIdManager().fromJid("Babis@societies.local ");
+			this.indiEnt2 = this.internalCtxBroker.createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
+			CtxAttribute individualAttr2 = this.internalCtxBroker.createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.INTERESTS).get();
+			individualAttr2.setStringValue("cooking,horseRiding,restaurants,cinema");
 
-			if(communityAttrIDList.size()>0 ){
-				CtxIdentifier communityAttrID = communityAttrIDList.get(0);
-				LOG.info("communityAttrIDList"+ communityAttrID);
-				CtxAttribute communityAttr = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, communityAttrID).get();
-				LOG.info("communityAttr value:"+communityAttr.getStringValue());
-			}
+			this.cssID3 =  this.commMgrService.getIdManager().fromJid("Chrisa@societies.local ");
+			this.indiEnt3 = this.internalCtxBroker.createIndividualEntity(this.cssID3, CtxEntityTypes.PERSON).get();
+			CtxAttribute individualAttr3 = this.internalCtxBroker.createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.INTERESTS).get();
+			individualAttr3.setStringValue("cooking,horseRiding,socialnetworking,restaurants,cinema");
+
+			communityEntity.addMember(this.indiEnt1.getId());
+			communityEntity.addMember(this.indiEnt2.getId());
+			communityEntity.addMember(this.indiEnt3.getId());
+
+			CtxAttributeBond attributeLocationBond = new CtxAttributeBond(CtxAttributeTypes.LOCATION_SYMBOLIC, CtxBondOriginType.MANUALLY_SET);
+			attributeLocationBond.setMinValue("home");
+			attributeLocationBond.setMaxValue("home");
+			attributeLocationBond.setValueType(CtxAttributeValueType.STRING);
+			LOG.info("locationBond created : " + attributeLocationBond.toString());
+			CtxAttributeBond attributeAgeBond = new CtxAttributeBond(CtxAttributeTypes.WEIGHT, CtxBondOriginType.MANUALLY_SET);
+
+			attributeLocationBond.setValueType(CtxAttributeValueType.INTEGER);
+			attributeAgeBond.setMinValue(new Integer(18));
+			attributeAgeBond.setMinValue(new Integer(20));
+
+			communityEntity.addBond(attributeLocationBond);
+			communityEntity.addBond(attributeAgeBond);
+					
+			
+			this.internalCtxBroker.update(communityEntity);
+
+			CtxAttribute ctxAttr = this.internalCtxBroker.createAttribute(communityEntity.getId(),CtxAttributeTypes.INTERESTS).get();
+			ctxAttr.setStringValue("reading,socialnetworking,sports,cooking,horseRiding,cinema,restaurants");
+			ctxAttr.setValueType(CtxAttributeValueType.STRING);
+			ctxAttr.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+			
+			this.internalCtxBroker.update(ctxAttr).get();
+
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -172,35 +218,6 @@ public class ExternalCtxBrokerExample 	{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-
-	private void retrieveCommunityEntityBasedOnCisID(){
-		try {
-			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.externalCtxBroker.retrieveCommunityEntityId(requestor, this.cisID).get();
-			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
-
-			CtxEntity communityEntity = (CtxEntity) this.externalCtxBroker.retrieve(requestor, ctxCommunityEntityIdentifier).get();
-
-			final IIdentity communityEntityId = this.commMgrService.getIdManager().fromJid(communityEntity.getOwnerId());
-
-			if (IdentityType.CIS.equals(communityEntityId.getType())){
-				LOG.info("entity retrieved is a community entity with jid "+ communityEntityId.toString());
-
-				//TODO add communityEntity.getAttributes(); code
-
-			}
-
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
@@ -208,12 +225,56 @@ public class ExternalCtxBrokerExample 	{
 			e.printStackTrace();
 		}
 
+
+		
+	}
+
+	private void retrievceLookupCommunityEntAttributes(){
+
+		CtxEntityIdentifier ctxCommunityEntityIdentifier;
+		try {
+			ctxCommunityEntityIdentifier = this.externalCtxBroker.retrieveCommunityEntityId(requestor, this.cisID).get();
+			LOG.info("communityEntityIdentifier retrieved: " +ctxCommunityEntityIdentifier.toString()+ " based on cisID: "+ this.cisID);
+
+			List<CtxIdentifier> communityAttrIDList = this.externalCtxBroker.lookup(requestor, ctxCommunityEntityIdentifier, CtxModelType.ATTRIBUTE, CtxAttributeTypes.INTERESTS).get();
+			LOG.info("lookup results communityAttrIDList: "+ communityAttrIDList);		
+
+			if(communityAttrIDList.size()>0 ){
+				CtxIdentifier communityAttrID = communityAttrIDList.get(0);
+				LOG.info("communityAttrID : "+ communityAttrID);
+				CtxAttribute communityAttr = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, communityAttrID).get();
+				String communityInterestsValue = communityAttr.getStringValue();
+				LOG.info("communityAttr current value:"+communityInterestsValue);
+
+				//update a community attribute value
+				communityAttr.setStringValue(communityInterestsValue+",newCommunityInterest");
+				this.externalCtxBroker.update(requestor, communityAttr);
+			}
+			
+			List<CtxIdentifier> communityAttrIDListUpdated = this.externalCtxBroker.lookup(requestor, ctxCommunityEntityIdentifier, CtxModelType.ATTRIBUTE, CtxAttributeTypes.INTERESTS).get();
+			LOG.info("lookup results communityAttrIDListUpdated: "+ communityAttrIDListUpdated);		
+			if(communityAttrIDListUpdated.size()>0 ){
+				CtxIdentifier communityAttrIDupdtd = communityAttrIDList.get(0);
+				LOG.info("communityAttrID : "+ communityAttrIDupdtd);
+				CtxAttribute communityAttrUpdt = (CtxAttribute) this.externalCtxBroker.retrieve(requestor, communityAttrIDupdtd).get();
+				String communityInterestsUpdated = communityAttrUpdt.getStringValue();
+				LOG.info("communityAttr  value updated :"+communityInterestsUpdated);
+			}
+				
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 
-
-
-
+	
 
 
 	private void createRemoteEntity() {

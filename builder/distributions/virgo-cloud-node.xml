@@ -44,12 +44,10 @@
 		<module>../../platform-infrastructure/service-lifecycle/service-mgmt/</module>
 		<module>../../platform-infrastructure/service-lifecycle/sl-comms-mgr</module>
 
-		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->
-		<!-- 
+		<!-- Security and Dependability Mgmt: 3 bundles (to be merged) -->	
 		<module>../../platform-infrastructure/security/SecurityServices</module>
 		<module>../../platform-infrastructure/security/PolicyNegotiator</module>
 		<module>../../platform-infrastructure/security/SecurityCommsMgr</module>
-		-->
 
 		<!-- Activity Feed: 1 bundle -->
 		<module>../../common-modules/activityfeed</module>

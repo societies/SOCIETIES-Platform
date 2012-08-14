@@ -1,10 +1,8 @@
-
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -24,69 +22,51 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.orchestration.CSM.main.java.Models;
 
-package org.societies.orchestration.csm;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
-import org.societies.orchestration.Models.*;
 
-
-/**
- * CIO
- */
-public class CSM {
+public class Model {
+	private String name;
+	private String jId;
+	private HashMap<String, Object> AttributeValues;
+	private HashMap<String, Integer> AttributeRank;
 	
-private Models models;
-private ModelManager modelMang;
-
-	public CSM()  //implements dataCollectListner
-	{
-		// set up models
-		modelMang = new ModelManager();		
-		// register for events from CSS data collector
-		
-		// register for events from CIS data collector
-		
-	}
-			
-	// on model create i.e. new CIS
-		//modelMang.addModel();
-	
-	
-	//on model update
-	
-	//on model remove
-	
-	
-	
-		
-	private void random (){	
-		// ***  TODO    ***  
-		// Change to dynamic load after initial trial
-		ModelManager csModel = new ModelManager();
-				
-		// does event impact on a model
-		HashMap<String, Collection<String>> modelMap = new HashMap<String, Collection<String>>();
-		ArrayList<String> attList = csModel.getAllAttributes();
-		for (String att : attList){
-			if (modelMap.containsKey(att)){
-				Collection<String> modelList = modelMap.get(att);
-				modelList.add("init");
-				modelMap.put(att, modelList);
-			}
-			else {
-				Collection<String> modelList = new ArrayList<String>();
-				modelList.add("init");
-				modelMap.put(att, modelList);
-			}
-			
-		}
-		// act on it
-
+	public Model(String pName){
+		this.name = pName; 
+		AttributeValues = new HashMap<String, Object>();
+		AttributeRank = new HashMap<String, Integer>();
 	}
 	
-
+	public void setName(String name){
+		this.name = name;
+	}
+	
+	public String getName(){
+		return this.name;
+	}
+	
+	public void setJid(String Jid){
+		this.jId = Jid;
+	}
+	
+	public String getJid(){
+		return this.jId;
+	}
+	
+	public void setAttValues(String att, Object value){
+		this.AttributeValues.put(att, value);
+	}
+	
+	public HashMap getAttValues(){
+		return this.AttributeValues;
+	}
+	
+	public void setAttRank(String att, Object value){
+		this.AttributeRank.put(att, value);
+	}
+	
+	public HashMap getAttRank(){
+		return this.AttributeRank;
+	}	
 }
