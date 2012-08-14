@@ -1,5 +1,3 @@
-
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -24,63 +22,58 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.GroupIdentfier;
 
+package org.societies.orchestration.CSM.main.java.csm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.societies.orchestration.GroupIdentfier.GroupManager;
+import org.societies.orchestration.Models.*;
 
-public class GroupManager {
-
-	private Map<String, Integer> attMap; 			// inner index
-	private ArrayList<Integer> ownAttValue;			// actual
-	private Map<String, ArrayList<Integer>> ownAttMap;
-	private ArrayList<Integer> ownerRelationship;   // mapping 
+/**
+ * CIO
+ */
+public class CSM {
 	
-    public GroupManager()
-    {
-    	ownAttMap = new HashMap<String, ArrayList<Integer>>();
-      	attMap = new HashMap<String, Integer>(); 
-    	ownerRelationship  = new ArrayList<Integer>();
-    }
-    
-        
-    public void updateGrouping(Integer id, String att, Integer val)
-    {
-    	updateAttribute(att);
-    	updateOwnerValue(id, att, val);
-    }
-       
-    public HashMap<String, Integer> getAllOwnerAtt(String att){
-    	HashMap<String, Integer> i = new HashMap<String, Integer>();
-    	@SuppressWarnings("rawtypes")
-		Iterator it = ownAttMap.entrySet().iterator();
-        while (it.hasNext()) {
-            @SuppressWarnings("unchecked")
-			Map.Entry<String, ArrayList<Integer>> entry = (Map.Entry<String, ArrayList<Integer>>)it.next();
-            i.put(entry.getKey(), entry.getValue().get(attMap.get(att)));
-            it.remove(); 
-        }
-    	return i;
-    }
-    
-    private void updateAttribute(String att){
-    	//check attribute is in map index 
-    	if (!attMap.containsKey(att)){
-    		attMap.put(att, attMap.size());
-    		//
-    		for (ArrayList<Integer> ownAttValue : ownAttMap.values()) {
-    			ownAttValue.set(attMap.size(), 0);
-    		}
-    	}
-    }
-    
-    private void updateOwnerValue(Integer id, String att, Integer val)
-    {
-    	ownAttMap.get(id).set(attMap.get(att), val);
-    }
-    
-    
+//private Models models;
+private ModelManager modelMang;
+private GroupManager groupMang;
+
+	public CSM()  //implements dataCollectListner
+	{
+		// set up models
+		modelMang = new ModelManager();		
+		groupMang = new GroupManager(modelMang);
+		
+	}
+			
+	// on model create i.e. new CIS
+	//modelMang.addModel();
+	//on model update
+	//on model remove
+		
+	//private void random (){	
+		// ***  TODO    ***  
+		// Change to dynamic load after initial trial
+		//ModelManager csModel = new ModelManager();
+				
+		// does event impact on a model
+		//HashMap<String, Collection<String>> modelMap = new HashMap<String, Collection<String>>();
+		//ArrayList<String> attList = csModel.getAllAttributes();
+		//for (String att : attList){
+		//	if (modelMap.containsKey(att)){
+		//		Collection<String> modelList = modelMap.get(att);
+		//		modelList.add("init");
+		//		modelMap.put(att, modelList);
+		//	}
+		//	else {
+		//		Collection<String> modelList = new ArrayList<String>();
+		//		modelList.add("init");
+		//		modelMap.put(att, modelList);
+		//	}
+			
+		//}
+		// act on it
+
+	//}
+	
+
 }

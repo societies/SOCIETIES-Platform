@@ -21,6 +21,12 @@
 		<dependency>
 			<groupId>org.igniterealtime</groupId>
 			<artifactId>whack</artifactId>
+			<exclusions>
+			 <exclusion>
+			         <groupId>org.eclipse.jetty</groupId>
+			        <artifactId>jetty-server</artifactId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
@@ -79,16 +85,14 @@
 			<artifactId>commons-math</artifactId>
 			<version>2.2</version>
 		</dependency>
-		
-		<!-- Simple XML -->
+			
+			
 		<dependency>
-			<groupId>org.simpleframework</groupId>
-			<artifactId>simple-xml</artifactId>
-			<version>2.6.4</version>
-			<scope>compile</scope>
-		</dependency>
-		
-		
+			<groupId>org.apache.shindig</groupId>
+            <artifactId>shindig-social-api</artifactId>
+            <version>3.0.0-beta4</version>
+        </dependency>
+			
 	</dependencies>
 	<build>
 		<plugins>
@@ -122,7 +126,7 @@
 							!com.sun.*,
 							!org.gjt.*,!org.jaxen.*,!org.mortbay.*,
 							!org.relaxng.*,
-							*
+							*;resolution:=optional
 						</Import-Package>
 						<!-- 
 						<Export-Package>

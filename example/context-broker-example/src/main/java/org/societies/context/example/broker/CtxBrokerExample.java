@@ -295,8 +295,8 @@ public class CtxBrokerExample 	{
 			
 			//	create and add bonds
 			CtxAttributeBond attributeLocationBond = new CtxAttributeBond(CtxAttributeTypes.LOCATION_SYMBOLIC, CtxBondOriginType.MANUALLY_SET);
-			attributeLocationBond.setMinValue("home");
-			attributeLocationBond.setMaxValue("home");
+			attributeLocationBond.setMinValue("Athens_Greece");
+			attributeLocationBond.setMaxValue("Athens_Greece");
 			attributeLocationBond.setValueType(CtxAttributeValueType.STRING);
 			LOG.info("locationBond created : " + attributeLocationBond.toString());
 			CtxAttributeBond attributeAgeBond = new CtxAttributeBond(CtxAttributeTypes.WEIGHT, CtxBondOriginType.MANUALLY_SET);
