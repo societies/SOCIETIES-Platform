@@ -27,6 +27,8 @@ package org.societies.impl;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import android.util.Log;
+
 /**
  * Android Agent XMPP Configuration
  *
@@ -35,33 +37,41 @@ import java.util.ResourceBundle;
  */
 class Configuration {
 	
+	private static final String LOG_TAG = Configuration.class.getName();
 	private ResourceBundle configutationBundle;
 	
 	public Configuration(ResourceBundle configutationBundle) {
+		Log.d(LOG_TAG, "Configuration constructor");
 		this.configutationBundle = configutationBundle;
 	}
 	
 	public String getServer() {
+		Log.d(LOG_TAG, "getServer server: " + configutationBundle.getString("server"));
 		return configutationBundle.getString("server");
 	}
 	
 	public int getPort() {
+		Log.d(LOG_TAG, "getPort port: " + Integer.parseInt(configutationBundle.getString("port")));
 		return Integer.parseInt(configutationBundle.getString("port"));
 	}
 	
 	public String getUsername() {
+		Log.d(LOG_TAG, "getUsername username: " + configutationBundle.getString("username"));
 		return configutationBundle.getString("username");
 	}
 	
 	public String getPassword() {
+		Log.d(LOG_TAG, "getPassword password: " + configutationBundle.getString("password"));
 		return configutationBundle.getString("password");
 	}
 	
 	public String getResource() {
+		Log.d(LOG_TAG, "getResource resource: " + configutationBundle.getString("resource"));
 		return configutationBundle.getString("resource");
 	}
 	
 	public boolean getDebug() {
+		Log.d(LOG_TAG, "getDebug");
 		boolean debug;
 		try {
 			debug = configutationBundle.getString("debug").equalsIgnoreCase("true");

@@ -75,11 +75,14 @@ public abstract class CtxBond implements Serializable {
 			throw new NullPointerException("type can't be null");
 		if (originType == null)
 			throw new NullPointerException("originType can't be null");
-		if (modelType != CtxModelType.ATTRIBUTE || modelType != CtxModelType.ASSOCIATION)
+		
+		
+		/*
+		if (!modelType.toString().equals(CtxModelType.ATTRIBUTE.toString()) || !modelType.toString().equals(CtxModelType.ASSOCIATION.toString()))
 			throw new IllegalArgumentException("invalid modelType: "
 					+ modelType + ": valid values: " + CtxModelType.ATTRIBUTE
 					+ ", " + CtxModelType.ASSOCIATION);
-		
+		*/
 		this.modelType = modelType;
 		this.type = type;
 		this.originType = originType;

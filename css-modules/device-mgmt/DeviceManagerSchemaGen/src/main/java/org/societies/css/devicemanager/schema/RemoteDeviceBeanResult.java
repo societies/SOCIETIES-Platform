@@ -1,10 +1,8 @@
-
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -25,18 +23,44 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.GroupIdentfier;
-
 /**
- * CIO 
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
-public class GroupIdentifier {
+package org.societies.css.devicemanager.schema;
+
+/*
+If any method of your Bean returns a value, you will need to add a property for that
+value below. You can double up your return values if they are the same object type 
+eg, 
+The CalculatorBean returns an int for both the Add() and Subtract() method. We use the generic 
+int getResult() 
+
+We don't need to add a method for each
+int getAddResult() 
+int getSubtractResult()
+*/
+
+public class RemoteDeviceBeanResult {
+
+	private int result;
+	private String text;
+
+	public int getResult() {
+		return result;
+	}
 	
-	public GroupIdentifier(){
-	//
-		
-				
+	public void setResult(int result) {
+		this.result = result;
+	}
+	
+	public String getText() {
+		return text;
 	}
 
-
+	public void setText(String text) {
+		this.text = text;
+	}
 }

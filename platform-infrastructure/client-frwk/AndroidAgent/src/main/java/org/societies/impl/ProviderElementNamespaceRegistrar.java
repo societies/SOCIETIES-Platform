@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import android.util.Log;
+
 public class ProviderElementNamespaceRegistrar {
 	
+	private static final String LOG_TAG = ProviderElementNamespaceRegistrar.class.getName();
 	private Map<ElementNamespaceTuple, Integer> providersElementsAndNamespaces = new HashMap<ElementNamespaceTuple, Integer>();
 			
 	public void register(ElementNamespaceTuple tuple) {
+		Log.d(LOG_TAG, "register tuple: " + tuple.namespace);
 		Integer count = providersElementsAndNamespaces.get(tuple);
 		if(count == null) {
 			count = 1;
@@ -20,6 +24,7 @@ public class ProviderElementNamespaceRegistrar {
 	}
 	
 	public void unregister(ElementNamespaceTuple tuple) {		
+		Log.d(LOG_TAG, "unregister tuple: " + tuple.namespace);
 		Integer count = providersElementsAndNamespaces.get(tuple);
 		count--;
 		if(count == 0)
@@ -29,14 +34,17 @@ public class ProviderElementNamespaceRegistrar {
 	}
 	
 	public boolean isRegistered(ElementNamespaceTuple tuple) {
+		Log.d(LOG_TAG, "isRegistered tuple: " + tuple.namespace);
 		return providersElementsAndNamespaces.keySet().contains(tuple);
 	}
 	
 	public void clear() {
+		Log.d(LOG_TAG, "clear");
 		providersElementsAndNamespaces.clear();
 	}
 	
 	public Set<ElementNamespaceTuple> getRegists() {
+		Log.d(LOG_TAG, "getRegists");
 		return providersElementsAndNamespaces.keySet();
 	}
 			

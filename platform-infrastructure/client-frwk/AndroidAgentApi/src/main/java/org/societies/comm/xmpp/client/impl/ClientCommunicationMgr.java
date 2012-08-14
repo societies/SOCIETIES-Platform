@@ -43,6 +43,7 @@ public class ClientCommunicationMgr {
 	protected IIdentityManager idm;
 	
 	public ClientCommunicationMgr(Context androidContext) {
+		Log.d(LOG_TAG, "");
 		this.androidContext = androidContext;
 		Intent intent = new Intent();
         intent.setComponent(serviceCN);
@@ -50,6 +51,11 @@ public class ClientCommunicationMgr {
 	}
 	
 	public void register(final List<String> elementNames, final ICommCallback callback) {
+		Log.d(LOG_TAG, "register element names");
+		for (String element : elementNames) {
+			Log.d(LOG_TAG, "register element: " + element);
+		}
+
 		final List<String> namespaces = callback.getXMLNamespaces();
 		marshaller.register(elementNames, callback.getXMLNamespaces(), callback.getJavaPackages());
 		registerConnection = new ServiceConnection() {
@@ -66,6 +72,11 @@ public class ClientCommunicationMgr {
 	}
 	
 	public void unregister(final List<String> elementNames, final ICommCallback callback) {
+		Log.d(LOG_TAG, "unregister");
+		for (String element : elementNames) {
+			Log.d(LOG_TAG, "unregister element: " + element);
+		}
+		
 		final List<String> namespaces = callback.getXMLNamespaces();		
 		ServiceConnection connection = new ServiceConnection() {			
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
@@ -87,6 +98,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	public boolean UnRegisterCommManager() {
+		Log.d(LOG_TAG, "UnRegisterCommManager");
 		boolean rv;
 		try {
 			rv = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
@@ -102,6 +114,7 @@ public class ClientCommunicationMgr {
 	
 	public void sendMessage(Stanza stanza, Message.Type type, Object payload)
 			throws CommunicationException {
+		Log.d(LOG_TAG, "sendMessage type: " + type.name());
 		
 		if (payload == null) {
 			throw new InvalidParameterException("Payload cannot be null");
@@ -119,11 +132,14 @@ public class ClientCommunicationMgr {
 	
 	public void sendMessage(Stanza stanza, Object payload)
 			throws CommunicationException {
+		Log.d(LOG_TAG, "sendMessage stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
+		
 		sendMessage(stanza, null, payload);
 	}	
 	
 	public void sendIQ(Stanza stanza, IQ.Type type, Object payload,
 			ICommCallback callback) throws CommunicationException {
+		Log.d(LOG_TAG, "sendIQ IQtype: " + type.toString() + " from: " + stanza.getFrom() + " to: " + stanza.getTo());
 		try {
 			String xml = marshaller.marshallIQ(stanza, type, payload);
 
@@ -135,7 +151,9 @@ public class ClientCommunicationMgr {
 	}
 	
 	public IIdentity getIdentity() {
+		Log.d(LOG_TAG, "getIdentity");
 		String identityJid = getIdentityJid();
+		Log.d(LOG_TAG, "getIdentity identity: " + identityJid);
 		try {
 			return IdentityManagerImpl.staticfromJid(identityJid);
 		} catch (InvalidFormatException e) {
@@ -144,6 +162,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	public IIdentityManager getIdManager() {
+		Log.d(LOG_TAG, "getIdManager");
 		if(idm == null) {
 			try {
 				idm = new IdentityManagerImpl(getIdentityJid());
@@ -155,6 +174,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	public String getItems(final IIdentity entity, final String node, final ICommCallback callback) throws CommunicationException {
+		Log.d(LOG_TAG, "getItems for node: " + node);
 		try {
 			return (String)miServiceConnection.invokeAndKeepBound(new IMethodInvocation<XMPPAgent>() {
 				public Object invoke(XMPPAgent agent) throws Throwable {
@@ -170,6 +190,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void sendMessage(final String xml) {
+		Log.d(LOG_TAG, "sendMessage message" + xml);
 		ServiceConnection connection = new ServiceConnection() {
 
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
@@ -187,6 +208,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void sendIQ(final String xml, final ICommCallback callback) {
+		Log.d(LOG_TAG, "sendIQ message: " + xml);
 		ServiceConnection connection = new ServiceConnection() {
 
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
@@ -203,12 +225,14 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void bindService(ServiceConnection connection) {
+		Log.d(LOG_TAG, "bindService");
 		Intent intent = new Intent();
         intent.setComponent(serviceCN);
         androidContext.bindService(intent, connection, BIND_AUTO_CREATE);
 	}
 	
 	private String getIdentityJid() {
+		Log.d(LOG_TAG, "getIdentityJid");
 		String identityJid;
 		try {
 			identityJid = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
@@ -223,10 +247,12 @@ public class ClientCommunicationMgr {
 	}
 
 	public boolean isConnected() {
+		Log.d(LOG_TAG, "isConnected");
 		boolean connected;
 		try {
 			connected = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
 				public Object invoke(XMPPAgent agent) throws Throwable {
+					Log.d(LOG_TAG, "connect ?: " + agent.isConnected());
 					return agent.isConnected();
 				}
 			});
@@ -237,6 +263,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	public INetworkNode newMainIdentity(final String identifier, final String domain, final String password) throws XMPPError { // TODO this takes no credentials in a private/public key case
+		Log.d(LOG_TAG, "newMainIdentity domain: " + domain + " identifier: " + identifier + " password: " + password);
 		try {
 			String rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
 				public Object invoke(XMPPAgent agent) throws Throwable {
@@ -252,6 +279,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	public INetworkNode login(final String identifier, final String domain, final String password) {		
+		Log.d(LOG_TAG, "login domain: " + domain + " identifier: " + identifier + " password: " + password);
 		try {
 			String rv;
 			rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
@@ -268,6 +296,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	public INetworkNode loginFromConfig() {
+		Log.d(LOG_TAG, "loginFromConfig");
 		try {
 			String rv = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
 				public Object invoke(XMPPAgent agent) throws Throwable {
@@ -283,6 +312,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	public boolean logout() {
+		Log.d(LOG_TAG, "logout");
 		boolean rv;
 		try {
 			rv = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
@@ -297,6 +327,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	public boolean destroyMainIdentity() {
+		Log.d(LOG_TAG, "destroyMainIdentity");
 		boolean rv;
 		try {
 			rv = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {

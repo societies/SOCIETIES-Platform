@@ -52,5 +52,6 @@
 <osgi:reference id="commMngrController" interface="org.societies.api.internal.comm.ICommManagerController" cardinality="0..1"/>
 <osgi:reference id="cisCommMgrFactory" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory"/>
 <osgi:reference id="daRegistry" interface="org.societies.domainauthority.registry.DaRegistry" />
+<osgi:reference id="cssDirRef" interface="org.societies.api.css.directory.ICssDirectory" cardinality="0..1"/>
 	
 </beans>

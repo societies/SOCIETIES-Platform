@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,67 +22,31 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.Models;
 
-import java.util.ArrayList;
+package org.societies.orchestration.CSM.main.test.java;
+
+import org.junit.*;
+import org.societies.orchestration.CSM.main.java.csm.CSM;
+
+import static org.junit.Assert.*;
 
 /**
- * Describe your class here...
- *
- * @author John
- *
+ * CIO
  */
-public class ModelManager {
-
-	//private String modelName;
-	private Models models;
+public class CSMTest {
 	
-	
-	public ModelManager(){
-		
-		models = new Models();
-		
-	}
+	@Test
+	public void testOccupation(){
+		System.out.println("test Occupation");
+		CSM csm = new CSM();
 
-	public Models getAllModel(){
-		return models;
+		//String[] ids = {"jtest1"};//,"jtest2"};
+		//ArrayList<String> attrib = new ArrayList<String>();
+		//attrib.add("Occupation");
+		//cse.evaluateSimilarity(ids, attrib);
+		
 	}
 
-	public Model getModel(String Att){
-		// **** to do  *****
-		return new Model(Att);
-		//return models.getClass()Att;
-	}
-	
-	public void addModel(){
-		getCISAdvert();
-		getCISContext();
-	}
-	
-	public void updateModel(){
-		
-	}
-	
-	private void getCISAdvert(){
-		
-	}
-	
-	private void getCISContext(){
-		
-	}
-	
-	public ArrayList getAllAttributes(){
-		ArrayList<String> att = new ArrayList<String>();
-		//for (modelAttributes ma: csModel){
-		//	att.add(ma.attributeType);
-		//}
-		
-		return att;
-	}
-	
-	private static class modelAttributes{
-		private String attributeType;
-		private Integer rank;
-	}
-	
+
 }
+

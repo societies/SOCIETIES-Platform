@@ -58,6 +58,11 @@ import org.societies.api.schema.cis.community.Leave;
 
 import org.societies.api.schema.cis.community.Participant;
 
+
+// THIS CLASS IS DEPRECATED AND SHOULD BE IGNORED
+// IT IS BEING KEPT ONLY BECAUSE WE MAY DECIDE TO BRING IT BACK
+// IN THE FUTURE
+
 @Deprecated
 public class CisManagerClient implements IcisManagerClient {
 

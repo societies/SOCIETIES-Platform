@@ -1,10 +1,8 @@
-
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -25,68 +23,58 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.csm;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import org.societies.orchestration.Models.*;
-
-
 /**
- * CIO
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
-public class CSM {
-	
-private Models models;
-private ModelManager modelMang;
+package org.societies.css.devicemanager.schema;
 
-	public CSM()  //implements dataCollectListner
-	{
-		// set up models
-		modelMang = new ModelManager();		
-		// register for events from CSS data collector
-		
-		// register for events from CIS data collector
-		
+/*
+  Based on the below interface, the task is to generate a Bean that will allow you to
+  query which method was called and what parameters were passed. Do not add the return type here.
+  This is added in the Result bean.
+ 
+  public interface ICalc 
+  {
+      public int Add(int a, int b);
+      public int Subtract(int a, int b);
+  }
+   
+generate XSD, run the maven command:
+> mvn jaxb2:schemagen
+
+The schema.xsd file will be in /target/generated-resources/schemagen directory
+
+ */
+
+public class RemoteDevicesBean {
+	
+	public enum methodType {getDeviceDescription, invokeAction};
+	private methodType method;
+	private String nodeId;
+	private String deviceId;
+	
+	public String getNodeId() {
+		return nodeId;
 	}
-			
-	// on model create i.e. new CIS
-		//modelMang.addModel();
-	
-	
-	//on model update
-	
-	//on model remove
-	
-	
-	
-		
-	private void random (){	
-		// ***  TODO    ***  
-		// Change to dynamic load after initial trial
-		ModelManager csModel = new ModelManager();
-				
-		// does event impact on a model
-		HashMap<String, Collection<String>> modelMap = new HashMap<String, Collection<String>>();
-		ArrayList<String> attList = csModel.getAllAttributes();
-		for (String att : attList){
-			if (modelMap.containsKey(att)){
-				Collection<String> modelList = modelMap.get(att);
-				modelList.add("init");
-				modelMap.put(att, modelList);
-			}
-			else {
-				Collection<String> modelList = new ArrayList<String>();
-				modelList.add("init");
-				modelMap.put(att, modelList);
-			}
-			
-		}
-		// act on it
+	public void setNodeId(String nodeId) {
+		this.nodeId = nodeId;
+	}
 
+	public String getDeviceId() {
+		return deviceId;
+	}
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public methodType getMethod() {
+		return method;
 	}
 	
-
+	public void setMethod(methodType method) {
+		this.method = method;
+	}
 }

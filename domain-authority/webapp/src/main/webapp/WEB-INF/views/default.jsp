@@ -5,6 +5,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
   <title>Societies Homepage</title>
 </head>
+<script language="javascript">
+window.location.href="index.html";
+</script>
+
 <body >
 	<!-- HEADER -->
 	<jsp:include page="header.jsp" />

@@ -1,10 +1,12 @@
 package org.societies.integration.test.bit.comm_ctx_estimation;
 
+import java.util.Hashtable;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -24,11 +26,8 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 
 public class CreateCommunityCtx {
 
-
-
 	private static Logger LOG = LoggerFactory.getLogger(Test1108.class);
-	//ICtxBroker ctxBroker = null;
-	//ICommManager commManager = null;
+	
 
 	//	private IIdentity cisID;
 	private IIdentity cssID1; 
@@ -48,6 +47,8 @@ public class CreateCommunityCtx {
 
 	private INetworkNode cssNodeId;
 	private ICisManager cisManager;
+	
+	/*
 	private String privacyPolicyWithoutRequestor  = "<RequestPolicy>" +
 			"<Target>" +
 			"<Resource>" +
@@ -76,7 +77,7 @@ public class CreateCommunityCtx {
 			"<optional>false</optional>" +
 			"</Target>" +
 			"</RequestPolicy>";
-
+*/
 	String cssPassword = "password.societies.local";
 
 	public void setUp(){
@@ -87,8 +88,6 @@ public class CreateCommunityCtx {
 	//	LOG.info("cisManager service"+ Test1108.getCisManager());
 
 	}
-
-
 
 
 	@Test
@@ -163,7 +162,7 @@ public class CreateCommunityCtx {
 		CtxAttribute estimatedCommunityAttribute;
 		
 		try {
-			// at this point communityAttrInterests is created and assignet to communityEntity but has a null value 
+			// at this point communityAttrInterests is created and assigned to communityEntity but has a null value 
 			LOG.info("communityAttrInterestsId " + this.communityAttrInterestsId);
 			LOG.info("communityAttrInterestsId getOwnerId " + this.communityAttrInterestsId.getOwnerId());
 			CtxAttribute communityAttr1 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, false).get();
@@ -196,23 +195,29 @@ public class CreateCommunityCtx {
 	}
 
 
+	
+	
+	// helper classes
+	
 	protected  IIdentity createCISid() {
 
 		IIdentity cisID = null; 
-		IIdentity cssOwnerId;
 		ICisOwned cisOwned ;
-
+	
 		try {
 			this.cssNodeId = Test1108.getCommManager().getIdManager().getThisNetworkNode();
 			LOG.info("*** cssNodeId = " + this.cssNodeId);
 			final String cssOwnerStr = this.cssNodeId.getBareJid();
 			cssOwnerId = Test1108.getCommManager().getIdManager().fromJid(cssOwnerStr);
-
-			cisOwned = Test1108.getCisManager().createCis(cssOwnerId.toString(), cssPassword, "cisName", "contextTestingCIS", 1, this.privacyPolicyWithoutRequestor).get();
-
-			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
-			cisID = Test1108.getCommManager().getIdManager().fromJid(cisOwned.getCisId());
-
+		
+			Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
+			
+			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+			LOG.info("*** cisOwned " +cisOwned);
+			String cisIDString  = cisOwned.getCisId();
+			LOG.info("*** cisOwned.getCisId() " +cisIDString);
+			cisID = Test1108.getCommManager().getIdManager().fromJid(cisIDString);
+			
 		} catch (InterruptedException e) {
 
 		} catch (ExecutionException e) {
