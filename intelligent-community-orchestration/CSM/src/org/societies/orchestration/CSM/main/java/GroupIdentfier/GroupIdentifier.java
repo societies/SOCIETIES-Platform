@@ -1,3 +1,5 @@
+
+
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -22,18 +24,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.GroupIdentfier;
 
-public class TensorAttMap {
+package org.societies.orchestration.CSM.main.java.GroupIdentfier;
+
+/**
+ * CIO 
+ */
+public class GroupIdentifier {
 	
-	public TensorAttMap(){
+	public GroupIdentifier(){
+	//
 		
+				
 	}
-	
-	// decompose tensor to linear view
-	
-	// apply sliding window filter
-	
-	// re-compose if appropriate 
+
 
 }

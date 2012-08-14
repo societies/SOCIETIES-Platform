@@ -22,42 +22,37 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.Models;
+package org.societies.orchestration.CSM.main.java.Models;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class Model {
-	private String name;
-	private HashMap<String, Integer> AttributeValues;
-	private HashMap<String, Integer> AttributeRank;
+public class Models {
+
+	private ArrayList<Model> modelList;
 	
-	public Model(String pName){
-		this.name = pName; 
-		AttributeValues = new HashMap<String, Integer>();
-		AttributeRank = new HashMap<String, Integer>();
+	public Models(){
+		modelList = new ArrayList<Model>();
 	}
 	
-	public void setName(String name){
-		this.name = name;
+	public ArrayList<Model> getModels(){
+		//
+
+		return modelList;
+		
 	}
 	
-	public String getName(){
-		return this.name;
+	public void addModel(Model newModel){
+		modelList.add(newModel);
 	}
 	
-	public void setAttValues(String att, Integer value){
-		this.AttributeValues.put(att, value);
+	public HashMap<String, String> getModelNames(){
+		HashMap<String, String> tmp = new HashMap<String, String>();
+		for (Model m : modelList){
+			tmp.put(m.getName(), m.getName());
+		}
+		return tmp; 
 	}
-	
-	public HashMap getAttValues(){
-		return this.AttributeValues;
-	}
-	
-	public void setAttRank(String att, Integer value){
-		this.AttributeRank.put(att, value);
-	}
-	
-	public HashMap getAttRank(){
-		return this.AttributeRank;
-	}	
 }

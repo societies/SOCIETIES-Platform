@@ -55,11 +55,10 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 						   					"http://jabber.org/protocol/pubsub#owner",
 						   					"http://jabber.org/protocol/disco#items"));
 	private static final List<String> PACKAGES = Collections
-			.unmodifiableList(Arrays.asList("jabber.x.data",
-					"org.jabber.protocol.pubsub",
+			.unmodifiableList(Arrays.asList("org.jabber.protocol.pubsub",
 					"org.jabber.protocol.pubsub.errors",
-					"org.jabber.protocol.pubsub.owner",
-					"org.jabber.protocol.pubsub.event"));
+					"org.jabber.protocol.pubsub.event",
+					"org.jabber.protocol.pubsub.owner"));
 	
 	private static final List<String> ELEMENTS = Collections.unmodifiableList(
 			Arrays.asList("pubsub", 
@@ -204,7 +203,10 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 //		String returnedNode = ((SimpleEntry<String, List<XMPPNode>>)response).getKey();
 //		if (returnedNode != node)
 //			throw new CommunicationException("");
-			return ((Entry<String, List<String>>)response).getValue();
+			if (response!=null)
+				return ((Entry<String, List<String>>)response).getValue();
+			else
+				return null;
 	}
 
 	public SubscriptionParcelable subscriberSubscribe(String pubsubService, String node,
@@ -316,33 +318,26 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 		if (itemId!=null)
 			i.setId(itemId);
 
-//		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
-//			DocumentBuilder db = dbf.newDocumentBuilder();
-//			Document doc = db.newDocument();
-//			synchronized (contentMarshaller) {
-////				contentMarshaller.marshal(item, doc);
-//			}
 			i.setAny(MarshallUtils.stringToElement(item));
-			
-			p.setItem(i);
-			payload.setPublish(p);
-			
-			Object response = blockingIQ(stanza, payload);
-			
-			try {
-				return ((Pubsub)response).getPublish().getItem().getId();
-			} catch(NullPointerException e) { // 7.1.2 the IQ-result SHOULD include an empty <item/> element that specifies the ItemID of the published item.
-				return null; 
-			}
-		} catch (ParserConfigurationException e) {
-			throw new CommunicationException("ParserConfigurationException while marshalling item to publish", e);
-//		} catch (JAXBException e) {
-//			throw new CommunicationException("JAXBException while marshalling item to publish", e);
 		} catch (SAXException e) {
-			throw new CommunicationException(e.getMessage(), e);
+			LOG.error("SAXException when parsing string to XML Element", e);
 		} catch (IOException e) {
-			throw new CommunicationException(e.getMessage(), e);
+			LOG.error("IOException when parsing string to XML Element", e);
+		} catch (ParserConfigurationException e) {
+			LOG.error("ParserConfigurationException when parsing string to XML Element", e);
+		}
+		//i.setAny(item); // TODO 
+		
+		p.setItem(i);
+		payload.setPublish(p);
+		
+		Object response = blockingIQ(stanza, payload);
+		
+		try {
+			return ((Pubsub)response).getPublish().getItem().getId();
+		} catch(NullPointerException e) { // 7.1.2 the IQ-result SHOULD include an empty <item/> element that specifies the ItemID of the published item.
+			return null; 
 		}
 	}
 

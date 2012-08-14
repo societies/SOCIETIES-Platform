@@ -26,11 +26,8 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 
 public class CreateCommunityCtx {
 
-
-
 	private static Logger LOG = LoggerFactory.getLogger(Test1108.class);
-	//ICtxBroker ctxBroker = null;
-	//ICommManager commManager = null;
+	
 
 	//	private IIdentity cisID;
 	private IIdentity cssID1; 
@@ -50,6 +47,8 @@ public class CreateCommunityCtx {
 
 	private INetworkNode cssNodeId;
 	private ICisManager cisManager;
+	
+	/*
 	private String privacyPolicyWithoutRequestor  = "<RequestPolicy>" +
 			"<Target>" +
 			"<Resource>" +
@@ -78,7 +77,7 @@ public class CreateCommunityCtx {
 			"<optional>false</optional>" +
 			"</Target>" +
 			"</RequestPolicy>";
-
+*/
 	String cssPassword = "password.societies.local";
 
 	public void setUp(){
@@ -89,8 +88,6 @@ public class CreateCommunityCtx {
 	//	LOG.info("cisManager service"+ Test1108.getCisManager());
 
 	}
-
-
 
 
 	@Test
@@ -165,7 +162,7 @@ public class CreateCommunityCtx {
 		CtxAttribute estimatedCommunityAttribute;
 		
 		try {
-			// at this point communityAttrInterests is created and assignet to communityEntity but has a null value 
+			// at this point communityAttrInterests is created and assigned to communityEntity but has a null value 
 			LOG.info("communityAttrInterestsId " + this.communityAttrInterestsId);
 			LOG.info("communityAttrInterestsId getOwnerId " + this.communityAttrInterestsId.getOwnerId());
 			CtxAttribute communityAttr1 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, false).get();
@@ -198,6 +195,10 @@ public class CreateCommunityCtx {
 	}
 
 
+	
+	
+	// helper classes
+	
 	protected  IIdentity createCISid() {
 
 		IIdentity cisID = null; 
