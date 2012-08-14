@@ -18,12 +18,14 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.util.PacketParserUtils;
 import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.convert.Registry;
+import org.simpleframework.xml.convert.RegistryStrategy;
 import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
 import org.societies.impl.RawXmlProvider;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,6 +41,24 @@ public class PacketMarshaller {
 	
 	private static final String LOG_TAG = PacketMarshaller.class.getName();
 	private final Map<String, String> nsToPackage = new HashMap<String, String>();
+	private Serializer s;
+	
+	public PacketMarshaller() {
+		Registry registry = new Registry();
+		Strategy strategy = new RegistryStrategy(registry);
+		try {
+			Element exampleElementImpl = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("dummy");
+			registry.bind(exampleElementImpl.getClass(), ElementConverter.class);
+		} catch (DOMException e) {
+			Log.e(LOG_TAG, "DOMException trying to get runtime ElementImpl");
+		} catch (ParserConfigurationException e) {
+			Log.e(LOG_TAG, "ParserConfigurationException trying to get runtime ElementImpl");
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Exception trying to register runtime ElementImpl in SimpleXML");
+		}
+		
+		s = new Persister(strategy);
+	}
 	
 	public void register(List<String> elementNames, List<String> namespaces, List<String> packages) {
 		Log.d(LOG_TAG, "register");
@@ -136,9 +156,6 @@ public class PacketMarshaller {
 		Log.d(PacketMarshaller.class.getName(), "Trying to unmarshall: " + packageStr + "." + beanName);
 		Class<?> c = Class.forName(packageStr + "." + beanName);
 		
-		//GET SIMPLE SERIALISER 
-		Strategy strategy = new AnnotationStrategy();
-		Serializer s = new Persister(strategy);
 		Object payload = s.read(c, xml);
 		
 		return payload;
@@ -175,9 +192,6 @@ public class PacketMarshaller {
 		Log.d(LOG_TAG, "marshallPayload payload: " + payload.getClass().getName());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
-		//GET SIMPLE SERIALISER 
-		Strategy strategy = new AnnotationStrategy();
-		Serializer s = new Persister(strategy);
 		try {
 			s.write(payload, os);
 		} catch (Exception e) {

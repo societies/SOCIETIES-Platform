@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.Logger;
@@ -43,15 +42,10 @@ public class PubsubTesterActivity extends Activity {
         setContentView(R.layout.main);
         
         PubsubClientAndroid pubsubClient = new PubsubClientAndroid(this);
-        try {
-			pubsubClient.addJaxbPackages(packageList);
-			
-			task = new ExampleTask(); 
-			task.execute(pubsubClient);
-			
-		} catch (JAXBException e) {
-			log.error(e.getMessage(), e);
-		}
+		pubsubClient.addJaxbPackages(packageList);
+		
+		task = new ExampleTask(); 
+		task.execute(pubsubClient);
     }
     
     @Override
@@ -83,6 +77,7 @@ public class PubsubTesterActivity extends Activity {
 	        	CalcBean item = new CalcBean();
 	        	item.setA(1);
 	        	item.setB(2);
+	        	item.setMessage("testBean");
 	        	
 	        	final String nodeName = "test3"; 
 				pubsubClient.ownerCreate(pubsubService, nodeName);
