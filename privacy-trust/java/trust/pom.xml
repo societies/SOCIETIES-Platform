@@ -27,9 +27,10 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-			<version>2.2</version>
+   			<groupId>org.societies</groupId>
+   			<artifactId>common-ext-libs</artifactId>
+   			<version>0.1</version>
+   			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -143,7 +144,8 @@
 							org.societies.privacytrust.trust.api.**
 						</Export-Package>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>false</Embed-Transitive>						
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package> 
 					</instructions> 
 				</configuration>
 			</plugin>
