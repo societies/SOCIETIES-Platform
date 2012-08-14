@@ -1,5 +1,3 @@
-
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -25,18 +23,30 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.GroupIdentfier;
+package org.societies.orchestration.CSM.main.test.java;
+
+import org.junit.*;
+import org.societies.orchestration.CSM.main.java.csm.CSM;
+
+import static org.junit.Assert.*;
 
 /**
- * CIO 
+ * CIO
  */
-public class GroupIdentifier {
+public class CSMTest {
 	
-	public GroupIdentifier(){
-	//
+	@Test
+	public void testOccupation(){
+		System.out.println("test Occupation");
+		CSM csm = new CSM();
+
+		//String[] ids = {"jtest1"};//,"jtest2"};
+		//ArrayList<String> attrib = new ArrayList<String>();
+		//attrib.add("Occupation");
+		//cse.evaluateSimilarity(ids, attrib);
 		
-				
 	}
 
 
 }
+

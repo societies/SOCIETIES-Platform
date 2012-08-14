@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.Models;
+package org.societies.orchestration.CSM.main.java.csm;
 
 import java.util.ArrayList;
 
@@ -32,57 +32,15 @@ import java.util.ArrayList;
  * @author John
  *
  */
-public class ModelManager {
+public interface ICommunitySuggestion {
 
-	//private String modelName;
-	private Models models;
-	
-	
-	public ModelManager(){
-		
-		models = new Models();
-		
-	}
+	//
+	public abstract String getSuggestionType();
 
-	public Models getAllModel(){
-		return models;
-	}
+	//
+	public abstract ArrayList<String> getMembersList();
 
-	public Model getModel(String Att){
-		// **** to do  *****
-		return new Model(Att);
-		//return models.getClass()Att;
-	}
-	
-	public void addModel(){
-		getCISAdvert();
-		getCISContext();
-	}
-	
-	public void updateModel(){
-		
-	}
-	
-	private void getCISAdvert(){
-		
-	}
-	
-	private void getCISContext(){
-		
-	}
-	
-	public ArrayList getAllAttributes(){
-		ArrayList<String> att = new ArrayList<String>();
-		//for (modelAttributes ma: csModel){
-		//	att.add(ma.attributeType);
-		//}
-		
-		return att;
-	}
-	
-	private static class modelAttributes{
-		private String attributeType;
-		private Integer rank;
-	}
-	
+	//
+	public abstract ArrayList<String> getconditionsList();
+
 }
