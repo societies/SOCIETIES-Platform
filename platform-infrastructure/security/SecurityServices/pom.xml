@@ -70,11 +70,11 @@
 			<version>1.39.0</version>
 		</dependency>
 
-		<dependency>
+		<!--dependency>
 			<groupId>org.apache.xml</groupId>
 			<artifactId>com.springsource.org.apache.xml.security</artifactId>
 			<version>1.4.2</version>
-		</dependency>
+		</dependency-->
 		
 		<dependency>
 			<groupId>org.slf4j</groupId>
