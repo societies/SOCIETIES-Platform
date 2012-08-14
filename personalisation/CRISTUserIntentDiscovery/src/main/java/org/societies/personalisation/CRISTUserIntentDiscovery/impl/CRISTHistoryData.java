@@ -59,7 +59,9 @@ public class CRISTHistoryData {
 		this.situation = situation;
 	}
 	
-
+	public String toString() {
+		return ((CRISTUserAction) this.action).getActionID() + ", " + this.situation.getSituationID();
+	}
 	
 	
 	
