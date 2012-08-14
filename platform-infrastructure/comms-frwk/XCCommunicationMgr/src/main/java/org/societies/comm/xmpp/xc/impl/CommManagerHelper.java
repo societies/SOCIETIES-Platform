@@ -377,7 +377,7 @@ public class CommManagerHelper {
 			LOG.info(message);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (ClassNotFoundException e) {
-			String message = e.getClass().getName() + "Unable to create class for serialisation";
+			String message = e.getClass().getName() + ": Unable to create class for serialisation - " + e.getMessage();
 			LOG.warn(message, e);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (Exception e) {
