@@ -16,7 +16,7 @@
 			<entry key="TargetPlatform" value="SOCIETIES" />
 			<entry key="ServiceProvider" value="ICT-SOCIETIES" />
 			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
-			<entry key="ServiceClient" value="http://societies.local/client.jar" />
+			<entry key="ServiceClient" value="http://localhost:28080/repository/usr/calculator-client.jar" />
 		</osgi:service-properties>
 	</osgi:service>
 

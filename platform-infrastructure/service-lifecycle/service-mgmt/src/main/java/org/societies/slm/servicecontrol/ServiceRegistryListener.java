@@ -286,9 +286,16 @@ public class ServiceRegistryListener implements BundleContextAware,
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
 						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
+						URI clientHost;
+						if(clientJar.getPort()!= -1)
+							clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
+						else
+							clientHost = new URI("http://" + clientJar.getHost() );
+
 						if(log.isDebugEnabled())
-							log.debug("With the URI: " + clientJar);
-						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
+							log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
+						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath());
+						//getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar.getHost(), );
 						
 						if(log.isDebugEnabled())
 							log.debug("Adding privacy policy to the Policy Manager!");
@@ -307,7 +314,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 						RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
 					
 						if(log.isDebugEnabled())
-							log.debug("Privacy Policy result is: " + policyResult.toXMLString());
+							log.debug("Privacy Policy result is: " + policyResult.toXMLString());	
 						
 					}
 					

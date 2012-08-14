@@ -373,13 +373,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 			RequestorService provider = new RequestorService(providerNode, serviceToInstall.getServiceIdentifier());
 		
-			boolean includePrivacyPolicyNegotiation = true;
+			//boolean includePrivacyPolicyNegotiation = true;
 			
-			if(logger.isDebugEnabled())
-				logger.debug("For now, PrivacyPolicyNegotiation is: " + includePrivacyPolicyNegotiation);
+		//	if(logger.isDebugEnabled())
+			//	logger.debug("For now, PrivacyPolicyNegotiation is: " + includePrivacyPolicyNegotiation);
 			
 			ServiceNegotiationCallback negotiationCallback = new ServiceNegotiationCallback();
-			getPolicyNegotiation().startNegotiation(provider, includePrivacyPolicyNegotiation, negotiationCallback);
+			getPolicyNegotiation().startNegotiation(provider, negotiationCallback);
 			ServiceNegotiationResult negotiationResult = negotiationCallback.getResult();
 		
 			if(negotiationResult == null){
