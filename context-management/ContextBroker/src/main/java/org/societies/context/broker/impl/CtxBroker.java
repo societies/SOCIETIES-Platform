@@ -323,8 +323,8 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 			if (this.idMgr.isMine(target)) {
 				// access control commented until bug is fixed
-				//this.ctxAccessController.checkPermission(requestor, target,
-				//		new CtxPermission(identifier, CtxPermission.READ));
+				this.ctxAccessController.checkPermission(requestor, target,
+						new CtxPermission(identifier, CtxPermission.READ));
 				try {
 					obj = internalCtxBroker.retrieve(identifier).get();
 				} catch (Exception e) {

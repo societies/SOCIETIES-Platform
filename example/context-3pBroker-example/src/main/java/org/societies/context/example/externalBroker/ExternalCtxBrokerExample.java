@@ -105,17 +105,21 @@ public class ExternalCtxBrokerExample 	{
 	private Requestor requestor = null;
 	private IIdentity remoteTargetCss;
 
-
+	private IContextAware3pService ca3pService;
 
 
 	@Autowired(required=true)
-	public ExternalCtxBrokerExample(ICtxBroker externalCtxBroker,org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker , ICommManager commMgr,ICisManager cisManager) throws InvalidFormatException {
+	public ExternalCtxBrokerExample(ICtxBroker externalCtxBroker,org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker , ICommManager commMgr,ICisManager cisManager, IContextAware3pService ca3pService) throws InvalidFormatException {
 
 		LOG.info("*** " + this.getClass() + " instantiated");
+
+		LOG.info("*** ca3pService : " + this.ca3pService + " instantiated");
 
 		this.externalCtxBroker = externalCtxBroker;
 		this.internalCtxBroker = internalCtxBroker;
 		this.commMgrService = commMgr;
+		this.ca3pService = ca3pService;
+
 
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
@@ -144,20 +148,23 @@ public class ExternalCtxBrokerExample 	{
 		this.cisID = commMgr.getIdManager().fromJid(cisIDString);
 
 		LOG.info("*** Starting individual context examples...");
+
+
+		// use 3p service methods
+		ca3pService.retrieveIndividualEntityId();
+		ca3pService.createCtxEntityWithCtxAttributes();
 		
-		//commented until issue with access control and privacy policy is fixed
-		//this.retrieveIndividualEntityId();
-		//this.createDeviceEntity();
-		//createCtxAssociation();
-		//registerForContextChanges();
-		//this.lookupContextEntities();
-		//this.retrieveContext();
-		//simpleCtxHistoryTest();
-		// TODO createRemoteEntity();
-		
+		//access control is not working for entities yet
+		//ca3pService.retrieveCtxAttributeBasedOnEntity();
+
+		ca3pService.lookupAndRetrieveCtxAttributes();
+
+
 		LOG.info("*** Starting community context examples...");
+		// creation of communities is only allowed by platform services
 		this.createCommunityCtxEnt();
-		this.retrievceLookupCommunityEntAttributes();
+		
+		ca3pService.retrievceLookupCommunityEntAttributes(this.cisID);
 	}
 
 
@@ -199,18 +206,18 @@ public class ExternalCtxBrokerExample 	{
 
 			communityEntity.addBond(attributeLocationBond);
 			communityEntity.addBond(attributeAgeBond);
-					
-			
+
+
 			this.internalCtxBroker.update(communityEntity);
 
 			CtxAttribute ctxAttr = this.internalCtxBroker.createAttribute(communityEntity.getId(),CtxAttributeTypes.INTERESTS).get();
 			ctxAttr.setStringValue("reading,socialnetworking,sports,cooking,horseRiding,cinema,restaurants");
 			ctxAttr.setValueType(CtxAttributeValueType.STRING);
 			ctxAttr.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
-			
+
 			this.internalCtxBroker.update(ctxAttr).get();
 
-			
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -226,7 +233,7 @@ public class ExternalCtxBrokerExample 	{
 		}
 
 
-		
+
 	}
 
 	private void retrievceLookupCommunityEntAttributes(){
@@ -250,7 +257,7 @@ public class ExternalCtxBrokerExample 	{
 				communityAttr.setStringValue(communityInterestsValue+",newCommunityInterest");
 				this.externalCtxBroker.update(requestor, communityAttr);
 			}
-			
+
 			List<CtxIdentifier> communityAttrIDListUpdated = this.externalCtxBroker.lookup(requestor, ctxCommunityEntityIdentifier, CtxModelType.ATTRIBUTE, CtxAttributeTypes.INTERESTS).get();
 			LOG.info("lookup results communityAttrIDListUpdated: "+ communityAttrIDListUpdated);		
 			if(communityAttrIDListUpdated.size()>0 ){
@@ -260,7 +267,7 @@ public class ExternalCtxBrokerExample 	{
 				String communityInterestsUpdated = communityAttrUpdt.getStringValue();
 				LOG.info("communityAttr  value updated :"+communityInterestsUpdated);
 			}
-				
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -273,29 +280,6 @@ public class ExternalCtxBrokerExample 	{
 		}
 	}
 
-
-	
-
-
-	private void createRemoteEntity() {
-		LOG.info("*** createRemoteEntity");
-
-		try {
-			LOG.info("remote id :"+ this.remoteTargetCss);
-			CtxEntity remoteEntity = this.externalCtxBroker.createEntity(requestor, this.remoteTargetCss, "remoteType").get();
-
-			LOG.info("remote Entity created : "+remoteEntity );
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	private void retrieveIndividualEntityId() {
 
@@ -308,6 +292,7 @@ public class ExternalCtxBrokerExample 	{
 
 			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
+		LOG.info("*** retrieveIndividualEntityId :success");
 	}
 
 	/**
@@ -372,6 +357,7 @@ public class ExternalCtxBrokerExample 	{
 		} catch (Exception e) {
 			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
+		LOG.info("*** createDeviceEntity : success");
 	}
 
 
@@ -380,7 +366,8 @@ public class ExternalCtxBrokerExample 	{
 	 */
 	private void createCtxAssociation(){
 
-		LOG.info("usesServiceAssoc 1 "+usesServiceAssoc);
+
+		LOG.info("*** createCtxAssociation  ");
 		try {
 			usesServiceAssoc = this.externalCtxBroker.createAssociation(requestor, cssOwnerId, CtxAssociationTypes.USES_SERVICES).get();
 			LOG.info("usesServiceAssoc 2 "+usesServiceAssoc);
@@ -404,12 +391,14 @@ public class ExternalCtxBrokerExample 	{
 		} catch (CtxException e) {
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
 		} 
+		LOG.info("createCtxAssociation  success");
 	}	
 
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
 	 */
 	private void lookupContextEntities() {
+		LOG.info("*** lookupContextEntities"); 
 		try {
 			// search for ctxEntity Ids of type device
 			List<CtxIdentifier> idsEntities = this.externalCtxBroker.lookup(requestor, cssOwnerId, CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
@@ -421,6 +410,7 @@ public class ExternalCtxBrokerExample 	{
 		} catch (Exception e) {
 			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
+		LOG.info("*** lookupContextEntities success");
 	}
 
 	/**
@@ -459,12 +449,15 @@ public class ExternalCtxBrokerExample 	{
 		} catch (Exception e) {
 			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
+		LOG.info("*** retrieveContext success");
 	}
 
 	/**
 	 * This method demonstrates how to create and retrieve context history data
 	 */
 	private void simpleCtxHistoryTest() {
+
+		LOG.info("*** simpleCtxHistoryTest");
 
 		CtxAttribute ctxAttribute;
 		final CtxEntity ctxDevEntity;
@@ -509,6 +502,7 @@ public class ExternalCtxBrokerExample 	{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
+		LOG.info("*** simpleCtxHistoryTest success");
 	}
 
 	/**
@@ -540,6 +534,7 @@ public class ExternalCtxBrokerExample 	{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		LOG.info("*** registerForContextChanges success");
 	}
 
 
