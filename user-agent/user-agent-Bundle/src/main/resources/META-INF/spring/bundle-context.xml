@@ -13,11 +13,12 @@
 	<bean id="uam" 
 	    class="org.societies.useragent.monitoring.UserActionMonitor"
 		name="uam" 
-		depends-on="ctxBroker, eventMgr, commsMgr" 
+		depends-on="ctxBroker, eventMgr, commsMgr, cssMgr" 
 		init-method="initialiseUserActionMonitor">
 		<property name="ctxBroker" ref="ctxBroker"/>
 		<property name="eventMgr" ref="eventMgr"/>
 		<property name="commsMgr" ref="commsMgr"/>
+		<property name="cssMgr" ref="cssMgr"/>
 	</bean>	
 
 	<bean id="feedback" 

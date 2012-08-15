@@ -74,7 +74,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		//check current UID
 		String uid = getCurrentUID();
 		if(uid.equals(UNDEFINED)){//don't know what current UID is
-			LOG.error("UID is not defined - sending request to all interactable devices");
+			LOG.error("UID is not defined - sending request to all interactable devices in CSS");
 			
 		}else if(uid.equals(myDeviceID)){  //local device is current UID
 			//show GUIs on local device
