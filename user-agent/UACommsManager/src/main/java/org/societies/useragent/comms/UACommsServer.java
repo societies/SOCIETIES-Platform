@@ -40,7 +40,6 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.personalisation.model.Action;
@@ -50,7 +49,8 @@ import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
+import org.societies.useragent.api.feedback.IInternalUserFeedback;
+import org.societies.useragent.api.monitoring.IInternalUserActionMonitor;
 
 public class UACommsServer implements IFeatureServer{
 
@@ -59,12 +59,12 @@ public class UACommsServer implements IFeatureServer{
 					"http://societies.org/api/schema/useragent/feedback"));
 	public static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.schema.useragent.monitoring",
-					"org.societies.api.schema.ueragent.feedback"));
+					"org.societies.api.schema.useragent.feedback"));
 
 	//PRIVATE VARIABLES
 	private ICommManager commsMgr;
-	private IUserActionMonitor uam;
-	private IUserFeedback feedback;
+	private IInternalUserActionMonitor uam;
+	private IInternalUserFeedback feedback;
 	private IIdentityManager idManager;
 	private Logger LOG = LoggerFactory.getLogger(UACommsServer.class);
 
@@ -77,11 +77,11 @@ public class UACommsServer implements IFeatureServer{
 		this.commsMgr = commsMgr;
 	}
 
-	public void setUam(IUserActionMonitor uam) {
+	public void setUam(IInternalUserActionMonitor uam) {
 		this.uam = uam;
 	}
 	
-	public void setFeedback(IUserFeedback feedback){
+	public void setFeedback(IInternalUserFeedback feedback){
 		this.feedback = feedback;
 	}
 
@@ -126,6 +126,7 @@ public class UACommsServer implements IFeatureServer{
 		switch(monitorBean.getMethod()){
 		case MONITOR:
 			try {
+				String senderDeviceId = monitorBean.getSenderDeviceId();
 				IIdentity owner = idManager.fromJid(monitorBean.getIdentity());
 				ServiceResourceIdentifier serviceId = monitorBean.getServiceResourceIdentifier();
 				String serviceType = monitorBean.getServiceType();
@@ -133,7 +134,7 @@ public class UACommsServer implements IFeatureServer{
 				String value = monitorBean.getValue();
 				IAction action = new Action(serviceId, serviceType, parameterName, value);
 				LOG.info("Sending remote message to local UAM");
-				uam.monitor(owner, action);
+				uam.monitorFromRemoteNode(senderDeviceId, owner, action);
 				break;
 			} catch (InvalidFormatException e) {
 				e.printStackTrace();
@@ -180,7 +181,7 @@ public class UACommsServer implements IFeatureServer{
 				}
 				LOG.debug("Sending remote message to local User Feedback - explicit");
 				ExpProposalContent expContent = new ExpProposalContent(expProposalText, options);
-				List<String> result = feedback.getExplicitFB(expType, expContent).get();
+				List<String> result = feedback.getExplicitFBforRemote(expType, expContent).get();
 				
 				//create response bean
 				ExpFeedbackResultBean expResultBean = new ExpFeedbackResultBean();
@@ -203,7 +204,7 @@ public class UACommsServer implements IFeatureServer{
 				int timeout = feedbackBean.getTimeout();
 				LOG.debug("Sending remote message to local User Feedback - implicit");
 				ImpProposalContent impContent = new ImpProposalContent(impProposalText, timeout);
-				Boolean result = feedback.getImplicitFB(impType, impContent).get();
+				Boolean result = feedback.getImplicitFBforRemote(impType, impContent).get();
 				
 				//create response bean
 				ImpFeedbackResultBean impResultBean = new ImpFeedbackResultBean();

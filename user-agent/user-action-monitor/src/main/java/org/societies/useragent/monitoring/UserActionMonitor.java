@@ -37,8 +37,9 @@ import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
+import org.societies.useragent.api.monitoring.IInternalUserActionMonitor;
 
-public class UserActionMonitor implements IUserActionMonitor{
+public class UserActionMonitor implements IUserActionMonitor, IInternalUserActionMonitor{
 
 	private static Logger LOG = LoggerFactory.getLogger(UserActionMonitor.class);
 	private boolean interactable;
@@ -49,9 +50,22 @@ public class UserActionMonitor implements IUserActionMonitor{
 	String myDeviceID;
 	IIdentity myCssID;
 
+	public void initialiseUserActionMonitor(){
+		System.out.println("Initialising user action monitor!");
+
+		//get myDeviceID from comms Mgr
+		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
+		myCssID = commsMgr.getIdManager().getThisNetworkNode();
+
+		ctxComm = new ContextCommunicator(ctxBroker, myCssID);
+
+		//set interactable value
+		setInteractable();
+	}
+
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
-		LOG.debug("UAM - Received user action!");
+		LOG.debug("UAM - Received local user action!");
 		LOG.debug("action ServiceId: "+action.getServiceID().toString());
 		LOG.debug("action serviceType: "+action.getServiceType());
 		LOG.debug("action parameterName: "+action.getparameterName());
@@ -76,19 +90,39 @@ public class UserActionMonitor implements IUserActionMonitor{
 		}
 	}
 
-	public void initialiseUserActionMonitor(){
-		System.out.println("Initialising user action monitor!");
+
+	/*
+	 * Called by UACommsServer - msg from light node to rich or cloud along with node ID for UID purposes
+	 * 
+	 * (non-Javadoc)
+	 * @see org.societies.useragent.api.monitoring.IInternalUserActionMonitor#monitorFromRemoteNode(java.lang.String, org.societies.api.identity.IIdentity, org.societies.api.personalisation.model.IAction)
+	 */
+	@Override
+	public void monitorFromRemoteNode(String remoteNodeId, IIdentity owner, IAction action) {
+		LOG.debug("UAM - Received remote user action from light node with node ID: "+remoteNodeId);
+		LOG.debug("action ServiceId: "+action.getServiceID().toString());
+		LOG.debug("action serviceType: "+action.getServiceType());
+		LOG.debug("action parameterName: "+action.getparameterName());
+		LOG.debug("action value: "+action.getvalue());
+
+		//save action in context - IIdentity (Person) > ServiceId > paramName
+		//create new entities and attributes if necessary
+		ctxComm.updateHistory(owner, action);
 		
-		//get myDeviceID from comms Mgr
-		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
-		myCssID = commsMgr.getIdManager().getThisNetworkNode();
+		//update UID with remoteNodeId
+		ctxComm.updateUID(owner, remoteNodeId);
 
-		ctxComm = new ContextCommunicator(ctxBroker, myCssID);
-
-		//set interactable value
-		setInteractable();
+		//send local event
+		UIMEvent payload = new UIMEvent(owner, action);
+		InternalEvent event = new InternalEvent(EventTypes.UIM_EVENT, "newaction", "org/societies/useragent/monitoring", payload);
+		try {
+			eventMgr.publishInternalEvent(event);
+		} catch (EMSException e) {
+			e.printStackTrace();
+		}
 	}
-	
+
+
 	/*
 	 * TO BE COMPLETED
 	 */
