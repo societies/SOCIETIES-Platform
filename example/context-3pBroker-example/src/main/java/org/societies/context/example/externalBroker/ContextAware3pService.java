@@ -40,6 +40,8 @@ import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeBond;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -105,22 +107,21 @@ public class ContextAware3pService implements IContextAware3pService{
 
 	private static CtxAttributeIdentifier ctxAttrDevLocationIdentifier = null;
 	private static CtxEntity deviceCtxEntity;
-	
+
 	@Autowired(required=true)
 	public ContextAware3pService( ICtxBroker ctxBroker, ICommManager commsMgr){
+		
+		LOG.info("*** ContextAware3pService started");
 
 		//services
 		this.ctxBroker = ctxBroker;
 		this.commsMgr = commsMgr;
 		this.idMgr = commsMgr.getIdManager();
-
-
-		LOG.info("*** ContextAware3pService started");
+		
 		LOG.info("ctxBroker: "+this.ctxBroker);
 		LOG.info("commsMgr : "+this.commsMgr );
 		LOG.info("idMgr : "+this.idMgr );
-		//LOG.info("privPrefMgr : "+this.privPrefMgr );
-
+	
 		//identities
 		this.userIdentity = this.idMgr.getThisNetworkNode();
 		try {
@@ -138,17 +139,11 @@ public class ContextAware3pService implements IContextAware3pService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
 		requestorService = new RequestorService(serviceIdentity, myServiceID);
 
 		LOG.info("userIdentity : "+ userIdentity.getBareJid());
 		LOG.info("requestor service : "+requestorService);
-
-		this.retrievedAttributes = new ArrayList<CtxAttribute>();
 	}
-
-
 
 	@Override
 	public void retrieveIndividualEntityId(){
@@ -158,14 +153,10 @@ public class ContextAware3pService implements IContextAware3pService{
 		CtxEntityIdentifier cssOwnerEntityId = null;
 		try {
 			cssOwnerEntityId = this.ctxBroker.retrieveIndividualEntityId(requestorService, userIdentity).get();
-			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
 		} catch (Exception e) {
-
 			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
-		LOG.info("*** retrieveIndividualEntityId :success");
-
-		//return cssOwnerEntityId;
+		LOG.info("*** retrieved IndividualEntityId "+ cssOwnerEntityId);
 	}
 
 	@Override
@@ -176,19 +167,17 @@ public class ContextAware3pService implements IContextAware3pService{
 
 		try {
 			deviceCtxEnt = this.ctxBroker.createEntity(requestorService, userIdentity, CtxEntityTypes.DEVICE).get();
-			
+
 			//get the context identifier of the created entity (to be used at the next step)
 			CtxEntityIdentifier deviceCtxEntityIdentifier = deviceCtxEnt.getId();
 			LOG.info("Device entity created: "+ deviceCtxEnt.getId());
-			
+
 			// ignore this for now, it will be used in context update events example
 			deviceCtxEntity = deviceCtxEnt;
-			
+
 			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity
 			CtxAttribute ctxAttributeDeviceLocation = this.ctxBroker.createAttribute(requestorService, deviceCtxEntityIdentifier, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
 			ctxAttrDevLocationIdentifier = ctxAttributeDeviceLocation.getId();
-			//createPPNPreference(ctxAttributeDeviceLocation, requestorService);
-
 
 			// by setting this flag to true the CtxAttribute values will be stored to Context History Database upon update
 			ctxAttributeDeviceLocation.setHistoryRecorded(true);
@@ -196,18 +185,11 @@ public class ContextAware3pService implements IContextAware3pService{
 			// set a string value to CtxAttribute
 			ctxAttributeDeviceLocation.setStringValue("HOME");
 
-			
 			// with this update the attribute is stored in Context DB
 			ctxAttributeDeviceLocation = (CtxAttribute) this.ctxBroker.update(requestorService, ctxAttributeDeviceLocation).get();
 
-			// get the updated CtxAttribute object and identifier (to be used later for retrieval purposes)
-			//CtxAttributeIdentifier ctxAttributeDeviceIDIdentifier = ctxAttributeDeviceID.getId();
-			//LOG.info("*** Device attribute identifier "+ctxAttributeDeviceIDIdentifier.toString());
-
 			//create a ctxAttribute with a Binary value that is assigned to the deviceCtxEntity
 			CtxAttribute ctxAttrWeight = this.ctxBroker.createAttribute(requestorService, deviceCtxEntity.getId(),CtxAttributeTypes.WEIGHT).get();
-
-			//createPPNPreference(ctxAttrWeight, requestorService);
 
 			// this is a mock blob class that contains the value "999"
 			MockBlobClass blob = new MockBlobClass(999);
@@ -217,8 +199,6 @@ public class ContextAware3pService implements IContextAware3pService{
 				ctxAttrWeight.setBinaryValue(blobBytes);
 				ctxAttrWeight = (CtxAttribute) this.ctxBroker.update(requestorService, ctxAttrWeight).get();
 
-				//CtxAttributeIdentifier weightAttrIdentifier = ctxAttrWeight.getId();
-				//LOG.info("*** Weight attribute identifier "+ctxAttrWeight.getId().toString());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -236,13 +216,15 @@ public class ContextAware3pService implements IContextAware3pService{
 			deviceTempAttr = (CtxAttribute) this.ctxBroker.update(requestorService, deviceTempAttr).get();
 
 			// at this point the ctxEntity of type CtxEntityTypes.DEVICE is assigned with CtxAttributes of type : LOCATION, WEIGHT, TEMPERATURE
-			LOG.info("*** created attribute toString "+deviceTempAttr.getId());
+			LOG.info("*** created entity deviceCtxEnt  "+deviceCtxEnt.getId().toString());
+			LOG.info("*** with attributes Location: "+ctxAttributeDeviceLocation.getId());
+			LOG.info("*** with attributes Temperature: "+deviceTempAttr.getId());
+			LOG.info("*** with attributes Weight: "+ctxAttrWeight.getId());
+
 		} catch (Exception e) {
 			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
-		// add if(deviceTempAttr.getId().toString().equals() LOG.info("*** createCtxEntityWithCtxAttributes : success");
 
-		//return deviceCtxEntity;
 	}
 
 
@@ -252,13 +234,10 @@ public class ContextAware3pService implements IContextAware3pService{
 		LOG.info("*** retrieveCtxAttributeBasedOnEntity");
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed using the ctxBroker.retrieve(CtxIdentifier) method
 		// alternatively context identifiers can be retrieved with the help of lookup methods
-
-		/*
-		 * *** retrieveCtxAttributeBasedOnEntity 
-		PrivacyDataManager Can't generate a CtxAttributeId from an other CtxId type (OperatorId: XCManager.societies.local, DataType: device 
-		 */
+		
 		CtxEntityIdentifier deviceCtxEntIdentifier = null;
 		try {
+			//TODO access control is still causing some problems when looking up CtxEntities 
 			List<CtxIdentifier> idsEntities = this.ctxBroker.lookup(requestorService, userIdentity, CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
 			if(idsEntities.size()>0){
 				deviceCtxEntIdentifier = (CtxEntityIdentifier) idsEntities.get(0);
@@ -275,8 +254,8 @@ public class ContextAware3pService implements IContextAware3pService{
 			if(ctxAttrSet.size()>0) {
 				List<CtxAttribute> ctxAttrList = new ArrayList<CtxAttribute>(ctxAttrSet);
 				CtxAttribute ctxAttrLocation = ctxAttrList.get(0);
-				LOG.info("Retrieved ctxAttribute of type" + ctxAttrLocation.getType()	+ " with value: " + ctxAttrLocation.getStringValue()); 
-				LOG.info("The value should be : HOME");
+				LOG.info("retrieveCtxAttributeBasedOnEntity: Retrieved ctxAttribute of type" + ctxAttrLocation.getType()	+ " with value: " + ctxAttrLocation.getStringValue()); 
+				LOG.info("retrieveCtxAttributeBasedOnEntity: The value should be : HOME");
 			}
 
 		} catch (Exception e) {
@@ -299,7 +278,7 @@ public class ContextAware3pService implements IContextAware3pService{
 				CtxAttribute ctxAttributeWeight = (CtxAttribute) this.ctxBroker.retrieve(requestorService, attributeId).get();
 				MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeWeight.getBinaryValue(), this.getClass().getClassLoader());	
 
-				LOG.info("Retrieved ctxAttribute id " +ctxAttributeWeight.getId()+ "and value: "+ retrievedBlob.getSeed()+" initial value was 999 ");
+				LOG.info("lookupAndRetrieveCtxAttributes : Retrieved ctxAttribute id " +ctxAttributeWeight.getId()+ "and value: "+ retrievedBlob.getSeed()+" (must be equal to '999' ");
 			}
 
 			List<CtxIdentifier> idsAttributesList2 = this.ctxBroker.lookup(requestorService, userIdentity, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
@@ -307,7 +286,7 @@ public class ContextAware3pService implements IContextAware3pService{
 				CtxAttributeIdentifier attributeId2 = (CtxAttributeIdentifier) idsAttributesList2.get(0);			
 				CtxAttribute ctxAttributeLocation = (CtxAttribute) this.ctxBroker.retrieve(requestorService, attributeId2).get();
 				String value = ctxAttributeLocation.getStringValue();
-				LOG.info("Retrieved ctxAttribute id " +ctxAttributeLocation.getId()+ "and value: "+ value +" (must be equal to 'home' ");
+				LOG.info("lookupAndRetrieveCtxAttributes : Retrieved ctxAttribute id " +ctxAttributeLocation.getId()+ "and value: "+ value +" (must be equal to 'home' ");
 			}
 
 		} catch (InterruptedException e) {
@@ -442,7 +421,7 @@ public class ContextAware3pService implements IContextAware3pService{
 			LOG.info(event.getId() + ": *** UPDATED event ***");
 		}
 	}
-		
+
 	@Override
 	public void retrievceLookupCommunityEntAttributes(IIdentity cisID){
 
@@ -487,4 +466,31 @@ public class ContextAware3pService implements IContextAware3pService{
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * This method demonstrates how to create an association among context entities
+	 */
+	private void createCtxAssociation(){
+
+		LOG.info("*** createCtxAssociation  ");
+		try {
+			CtxAssociation usesServiceAssoc = this.ctxBroker.createAssociation(requestorService, userIdentity, CtxAssociationTypes.USES_SERVICES).get();
+			usesServiceAssoc.addChildEntity(deviceCtxEntity.getId());
+			LOG.info("usesServiceAssoc "+usesServiceAssoc);
+
+			usesServiceAssoc = (CtxAssociation) this.ctxBroker.update(requestorService, usesServiceAssoc).get();
+			LOG.info("usesServiceAssoc updated: "+usesServiceAssoc);
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
+		} 
+		LOG.info("createCtxAssociation  success");
+	}	
+
 }
