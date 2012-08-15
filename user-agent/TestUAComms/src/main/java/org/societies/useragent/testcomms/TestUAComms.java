@@ -25,29 +25,45 @@
 
 package org.societies.useragent.testcomms;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.useragent.remote.IUserAgentRemoteMgr;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalType;
+import org.societies.useragent.api.remote.IUserAgentRemoteMgr;
 
 public class TestUAComms {
 
 	private IUserAgentRemoteMgr uaRemote;
 	private ICommManager commsMgr;
+	private ICtxBroker ctxBroker;
 	private Logger LOG = LoggerFactory.getLogger(TestUAComms.class);
+	private IIdentity myIdentity;
+	private String remoteDeviceId;
 
 	public void initService(){
-		startTest();
+
+		myIdentity = commsMgr.getIdManager().getThisNetworkNode();
+		remoteDeviceId = "XCManager.societies.local";
+
+		//testMonitor();  REMOVED - monitor will never be sent Virgo -> Virgo
+		setUID();  //set UID to id of other device [XCManager.societies.local]
+		testExplicitFeedback();  //test get explicit feedback from other Virgo device
+		testImplicitFeedback();  //test get implicit feedback from other Virgo device
 	}
 
-	private void startTest(){
-
-		IIdentity myIdentity = commsMgr.getIdManager().getThisNetworkNode();
+	/*private void testMonitor(){
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setServiceInstanceIdentifier("http://testService");
 		try {
@@ -57,7 +73,122 @@ public class TestUAComms {
 		}
 
 		LOG.info("Calling remote UAM interface");
-		uaRemote.monitor(myIdentity,serviceId, "testService", "volume", "high");
+		IAction action = new Action(serviceId, "testService", "volume", "high");
+		uaRemote.monitor(myIdentity, action);
+
+		 This should have caused: 
+	 * - an action to be sent to XCManager for storage with ctx snapshot
+	 * - the UID to be set to XCManager node
+	 * - 
+
+	}*/
+
+	private void setUID(){
+		try {
+			IndividualCtxEntity personEntity = ctxBroker.retrieveIndividualEntity(myIdentity).get();
+			CtxAttribute uidAttr = ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.UID).get();
+			ctxBroker.updateAttribute(uidAttr.getId(), remoteDeviceId);
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void testExplicitFeedback(){
+		//Test ACK/NACK
+		String proposalText = "Click YES";
+		String[] options1 = {"YES", "NO", "Maybe"};
+		ExpProposalContent content = new ExpProposalContent(proposalText, options1);
+		try {
+			if(uaRemote != null){
+				List<String> result = uaRemote.getExplicitFB(ExpProposalType.ACKNACK, content).get();
+				LOG.debug("Result = "+result.get(0));
+			}else{
+				LOG.error("Test1 - uaRemote is null!!");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+
+		//Test Checkbox
+		proposalText = "Select WHITE, BLUE and RED";
+		String[] options2 = {"WHITE", "GREEN", "BLACK", "BLUE", "YELLOW", "RED"};
+		content = new ExpProposalContent(proposalText, options2);
+		try {
+			if(uaRemote != null){
+				List<String> result = uaRemote.getExplicitFB(ExpProposalType.CHECKBOXLIST, content).get();
+				String selected = "";
+				for(String next: result){
+					selected = selected +", "+ next;
+				}
+				LOG.debug("Result = "+selected);
+			}else{
+				LOG.error("Test2 - uaRemote is null!!");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+
+		//Test RadioButtons
+		proposalText = "Select DOG";
+		String[] options3 = {"CAT", "PIG", "DOG", "CHICKEN"};
+		content = new ExpProposalContent(proposalText, options3);
+		try {
+			if(uaRemote != null){
+				List<String> result = uaRemote.getExplicitFB(ExpProposalType.RADIOLIST, content).get();
+				LOG.debug("Result = "+result.get(0));
+			}else{
+				LOG.error("Test3 - uaRemote is null!!");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void testImplicitFeedback(){
+		//Test timeout
+		String proposalText = "Do NOT push anything";
+		int timeout = 5000;
+		ImpProposalContent content = new ImpProposalContent(proposalText, timeout);
+		try {
+			if(uaRemote != null){
+				Boolean result = uaRemote.getImplicitFB(ImpProposalType.TIMED_ABORT, content).get();
+				LOG.debug("Result = "+result.booleanValue());
+			}else{
+				LOG.error("Test4 - uaRemote is null!!");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+
+		//Test abort
+		proposalText = "Click ABORT";
+		timeout = 10000;
+		content = new ImpProposalContent(proposalText, timeout);
+		try {
+			if(uaRemote != null){
+				Boolean result = uaRemote.getImplicitFB(ImpProposalType.TIMED_ABORT, content).get();
+				LOG.debug("Result = "+result.booleanValue());
+			}else{
+				LOG.error("Test5 - uaRemote is null!!");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void setUaRemote(IUserAgentRemoteMgr uaRemote){
@@ -66,5 +197,9 @@ public class TestUAComms {
 
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
+	}
+
+	public void setCtxBroker(ICtxBroker ctxBroker){
+		this.ctxBroker = ctxBroker;
 	}
 }
