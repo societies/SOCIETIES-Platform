@@ -55,5 +55,9 @@
 	<!-- IServiceDiscovery is needed by dm (at least) -->
 	<osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
 	</osgi:reference>
+	
+	<!-- CSS Manager is needed by uam -->
+	<osgi:reference id="cssMgr" interface="org.societies.api.internal.css.management.ICSSLocalManager">
+	</osgi:reference>
 
 </beans>
