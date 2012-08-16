@@ -45,6 +45,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -183,6 +184,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private PubsubClient psc;
 	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER,orphanRemoval=true)
+	@JoinTable(
+            name="org_societies_cis_manager_Cis_CisParticipant",
+            joinColumns = @JoinColumn( name="cis_id"),
+            inverseJoinColumns = @JoinColumn( name="cisparticipant_id")
+    )
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	@Column
 	public String cisType;
