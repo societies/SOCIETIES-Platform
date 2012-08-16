@@ -13,18 +13,19 @@
 	<xs:element name="userActionMonitorBean">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="senderDeviceId" type="xs:string" minOccurs="0" />
 				<xs:element name="identity" type="xs:string" minOccurs="0" />
 				<xs:element name="serviceResourceIdentifier" type="tns:serviceResourceIdentifier" minOccurs="0" />
 				<xs:element name="serviceType" type="xs:string" minOccurs="0" />
 				<xs:element name="parameterName" type="xs:string" minOccurs="0" />
 				<xs:element name="value" type="xs:string" minOccurs="0" />
-				<xs:element name="method" type="methodType" minOccurs="0" />
+				<xs:element name="method" type="monitoringMethodType" minOccurs="0" />
 				
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 
-	<xs:simpleType name="methodType">
+	<xs:simpleType name="monitoringMethodType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="monitor" />
 			<xs:enumeration value="registerForActionUpdates" />

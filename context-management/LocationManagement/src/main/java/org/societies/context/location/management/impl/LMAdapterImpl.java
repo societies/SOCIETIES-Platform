@@ -25,48 +25,76 @@
 package org.societies.context.location.management.impl;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.source.ICtxSourceMgr;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
+import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssNode;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.context.api.user.location.ILocationManagementAdapter;
 import org.societies.context.api.user.location.IUserLocation;
 import org.societies.context.api.user.location.IZone;
 import org.societies.context.api.user.location.IZoneId;
 import org.societies.context.location.management.PZWrapper;
+import org.societies.context.location.management.PzPropertiesReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
-
+@Controller
 public class LMAdapterImpl implements ILocationManagementAdapter {
 	
-	//TODO TEMP - replace with config file  //
-	private static final int UPDATE_CYCLE = 30*1000;
+	/** The logging facility. */
+	private static final Logger log = LoggerFactory.getLogger(LMAdapterImpl.class);
+	
 	
 	private final Timer timer = new Timer();
-	private LocationManagementContextAccessor locationInference;
 	
+	private LocationManagementContextAccessor locationInference;
 	private ICtxSourceMgr contextSourceManagement;
 	private ICtxBroker contextBroker;
 	private ICommManager commManager;
+	private ICommManagerController commMngrController;
 	private PubsubClient pubSubManager; 
 	private IDeviceRegistry deviceRegistry;
+	private ICSSLocalManager cssLocalManager;
+	
+	@Autowired
 	private PZWrapper pzWrapper; 
 	
 	
 	@SuppressWarnings("unused")
 	private void init(){
-		LMConfiguratorImpl lmConfiguratorImpl = new LMConfiguratorImpl();
-		lmConfiguratorImpl.init(pubSubManager, commManager, deviceRegistry, this);
-		locationInference = new LocationManagementContextAccessor();
-		locationInference.init(contextSourceManagement, contextBroker, commManager);
-		timer.scheduleAtFixedRate(new UpdateTask(),UPDATE_CYCLE, UPDATE_CYCLE);
+		int updateCycle;
+		try{
+			locationInference = new LocationManagementContextAccessor();
+			locationInference.init(contextSourceManagement, contextBroker, commManager);
+			
+			LMConfiguratorImpl lmConfiguratorImpl = new LMConfiguratorImpl();
+			lmConfiguratorImpl.init(pubSubManager, commManager, deviceRegistry,commMngrController, this);
+			
+			updateCycle = PzPropertiesReader.instance().getUpdateCycle();
+			
+			//test();
+			timer.scheduleAtFixedRate(new UpdateTask(),updateCycle, updateCycle);
+			
+		}catch (Exception e) {
+			log.error("Exception msg: "+e.getMessage()+" ; Cause: "+e.getCause(),e);
+		}
 	}
 	
 	@Override
@@ -86,15 +114,40 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		
 	}
 	
+	private void getCSSnodesFromCssManager(){
+		Future<CssInterfaceResult> futureCssRecord = cssLocalManager.getCssRecord();
+		CssInterfaceResult cssInterfaceResult= null;
+		List<CssNode> cssNodes;
+		
+		try {
+			cssInterfaceResult = (CssInterfaceResult)futureCssRecord.get();
+			CssRecord cssRecord = cssInterfaceResult.getProfile();
+			cssNodes = cssRecord.getCssNodes();
+			for (CssNode cssNode: cssNodes){
+				System.out.println(cssNode.getIdentity());
+			}
+			
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	@Override
 	public void registerCSSdevice(String entityId,String deviceId,String macAddress) {
 		INetworkNode networkNode;
 		try {
 			networkNode = commManager.getIdManager().fromFullJid(entityId);
 			locationInference.addDevice(networkNode, macAddress);
+			
 		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Exception msg: "+e.getMessage()+" ; Cause: "+e.getCause(),e);
 		}
 		
 	}
@@ -105,27 +158,45 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		
 	}
 	
-	int counter = 0;
+	
 	private class UpdateTask extends TimerTask{
 		@Override
 		public void run() {
+			log.info("---------------- Update task started");
+			
+			IUserLocation userLocation=null;
 			try{
-				IUserLocation userLocation;
-				Collection<String> registeredDevices =  locationInference.getAllRegisteredDevices();
+				
+				Collection<INetworkNode> registeredEntities =  locationInference.getAllRegisteredEntites();
+				
+				for (INetworkNode networkNode : registeredEntities){
+					userLocation = getEntityFullLocation(networkNode.getJid());
+					if (userLocation != null){
+						log.info("update CSM node - "+networkNode.getJid()+" \t location: "+userLocation.toString());
+						locationInference.updateCSM(userLocation, networkNode);
+					}
+				}
+				
+				/**** For testing *****/
+				userLocation = getEntityFullLocation("guy-phone");
+				if (userLocation != null){
+					locationInference.updateCSM(userLocation, commManager.getIdManager().getThisNetworkNode());
+				}
+				
+				/*Collection<String> registeredDevices =  locationInference.getAllRegisteredDevices();
 				for (String macAddress : registeredDevices){
-					userLocation = getEntityFullLocation(macAddress);
+					userLocation = getEntityFullLocation("guy-phone");
 					locationInference.updateCSM(userLocation, macAddress);
 				}
 				
 				if (counter == 0){
 					registerCSSdevice(commManager.getIdManager().getThisNetworkNode().getJid(), "aaaaa", "11:11:11:11:11:11");
 					counter++;
-				}
-			
+				}*/
+				log.info("--------------------- Update task finished");
 			}catch (Exception e) {
-				e.printStackTrace();
+				log.error("Error in update task; Msg: "+e.getMessage()+" \t; cause:  "+e.getCause(),e);
 			}
-			
 		}
 		
 	}
@@ -180,10 +251,24 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		return pzWrapper;
 	}
 
+	public ICommManagerController getCommMngrController() {
+		return commMngrController;
+	}
+
+	public void setCommMngrController(ICommManagerController commMngrController) {
+		this.commMngrController = commMngrController;
+	}
+
+	public ICSSLocalManager getCssLocalManager() {
+		return cssLocalManager;
+	}
+
+	public void setCssLocalManager(ICSSLocalManager cssLocalManager) {
+		this.cssLocalManager = cssLocalManager;
+	}
+
 	@Autowired
 	public void setPzWrapper(PZWrapper pzWrapper) {
 		this.pzWrapper = pzWrapper;
 	}
-	
-
 }

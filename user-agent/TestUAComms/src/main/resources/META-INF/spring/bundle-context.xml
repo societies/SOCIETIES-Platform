@@ -7,10 +7,11 @@
 	 
 	<bean id="testUAComms" 
 	    class="org.societies.useragent.testcomms.TestUAComms" 
-	    depends-on="uaRemote, commsMgr"
+	    depends-on="uaRemote, commsMgr, ctxBroker"
 	    init-method="initService">
   		<property name="uaRemote" ref="uaRemote"/>
   		<property name="commsMgr" ref="commsMgr"/>
+  		<property name="ctxBroker" ref="ctxBroker"/>
 	</bean>
 	
 </beans>

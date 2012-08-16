@@ -36,6 +36,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.societies.useragent</groupId>
+			<artifactId>user-agent-api</artifactId>
+			<version>${version.ua}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>

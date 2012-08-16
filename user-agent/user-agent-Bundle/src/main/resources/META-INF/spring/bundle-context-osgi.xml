@@ -13,6 +13,7 @@
 	<osgi:service ref="uam">
 		<osgi:interfaces>
 			<value>org.societies.api.useragent.monitoring.IUserActionMonitor</value>
+			<value>org.societies.useragent.api.monitoring.IInternalUserActionMonitor</value>
 		</osgi:interfaces>
 	</osgi:service>
 	
@@ -25,6 +26,7 @@
 	<osgi:service ref="feedback">
         <osgi:interfaces>
         	<value>org.societies.api.internal.useragent.feedback.IUserFeedback</value>
+        	<value>org.societies.useragent.api.feedback.IInternalUserFeedback</value>
         </osgi:interfaces>
     </osgi:service>
     
@@ -52,6 +54,10 @@
 	
 	<!-- IServiceDiscovery is needed by dm (at least) -->
 	<osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
+	</osgi:reference>
+	
+	<!-- CSS Manager is needed by uam -->
+	<osgi:reference id="cssMgr" interface="org.societies.api.internal.css.management.ICSSLocalManager">
 	</osgi:reference>
 
 </beans>

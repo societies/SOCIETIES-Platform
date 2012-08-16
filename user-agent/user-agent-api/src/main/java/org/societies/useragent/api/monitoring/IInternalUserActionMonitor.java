@@ -23,17 +23,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.api.remote.feedback;
+package org.societies.useragent.api.monitoring;
 
-import java.util.List;
-import java.util.concurrent.Future;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.personalisation.model.IAction;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-
-public interface IUserFeedbackRemote {
-
-	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
+public interface IInternalUserActionMonitor {
 	
-	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
+	public void monitorFromRemoteNode(String senderNodeId, IIdentity owner, IAction action);
+
 }

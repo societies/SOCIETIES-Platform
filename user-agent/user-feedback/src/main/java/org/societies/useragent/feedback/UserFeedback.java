@@ -43,6 +43,7 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
+import org.societies.useragent.api.feedback.IInternalUserFeedback;
 import org.societies.useragent.api.remote.IUserAgentRemoteMgr;
 import org.societies.useragent.feedback.guis.AckNackGUI;
 import org.societies.useragent.feedback.guis.CheckBoxGUI;
@@ -50,7 +51,7 @@ import org.societies.useragent.feedback.guis.RadioGUI;
 import org.societies.useragent.feedback.guis.TimedGUI;
 import org.springframework.scheduling.annotation.AsyncResult;
 
-public class UserFeedback implements IUserFeedback{
+public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	
 	Logger LOG = LoggerFactory.getLogger(UserFeedback.class);
 	ICtxBroker ctxBroker;
@@ -73,6 +74,7 @@ public class UserFeedback implements IUserFeedback{
 		//check current UID
 		String uid = getCurrentUID();
 		if(uid.equals(UNDEFINED)){//don't know what current UID is
+			LOG.error("UID is not defined - sending request to all interactable devices in CSS");
 			
 		}else if(uid.equals(myDeviceID)){  //local device is current UID
 			//show GUIs on local device
@@ -95,7 +97,7 @@ public class UserFeedback implements IUserFeedback{
 		}else{  //remote device is current UID
 			//show GUIs on remote UID
 			try {
-				result = uaRemote.getExplicitFB(uid, type, content).get();
+				result = uaRemote.getExplicitFB(type, content).get();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
@@ -128,7 +130,7 @@ public class UserFeedback implements IUserFeedback{
 		}else{  //remote device is current UID
 			//show GUIs on remote UID
 			try {
-				result = uaRemote.getImplicitFB(uid, type, content).get();
+				result = uaRemote.getImplicitFB(type, content).get();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
@@ -138,6 +140,63 @@ public class UserFeedback implements IUserFeedback{
 		
 		return new AsyncResult<Boolean>(result);
 	}	
+	
+	/*
+	 *Called by UACommsServer to request explicit feedback for remote User Agent
+	 * 
+	 * (non-Javadoc)
+	 * @see org.societies.useragent.api.feedback.IInternalUserFeedback#getExplicitFBforRemote(int, org.societies.api.internal.useragent.model.ExpProposalContent)
+	 */
+	@Override
+	public Future<List<String>> getExplicitFBforRemote(int type, ExpProposalContent content) {
+		LOG.debug("Request for explicit feedback received from remote User Agent");
+		List<String> result = null;
+		
+		//show GUIs on local device
+		LOG.debug("Returning explicit feedback to UACommsServer");
+		String proposalText = content.getProposalText();
+		String[] options = content.getOptions();
+		if(type == ExpProposalType.RADIOLIST){
+			LOG.debug("Radio list GUI");
+			RadioGUI gui = new RadioGUI();
+			result = gui.displayGUI(proposalText, options);
+		}else if(type == ExpProposalType.CHECKBOXLIST){
+			LOG.debug("Check box list GUI");
+			CheckBoxGUI gui = new CheckBoxGUI();
+			result = gui.displayGUI(proposalText, options);
+		}else{ //ACK-NACK
+			LOG.debug("ACK/NACK GUI");
+			result = AckNackGUI.displayGUI(proposalText, options);
+		}
+		
+		return new AsyncResult<List<String>>(result);
+	}
+
+	/*
+	 * Called by UACommsServer to request implicit feedback for remote User Agent
+	 * 
+	 * (non-Javadoc)
+	 * @see org.societies.useragent.api.feedback.IInternalUserFeedback#getImplicitFBforRemote(int, org.societies.api.internal.useragent.model.ImpProposalContent)
+	 */
+	@Override
+	public Future<Boolean> getImplicitFBforRemote(int type, ImpProposalContent content) {
+		LOG.debug("Request for implicit feedback received from remote User Agent");
+		Boolean result = null;
+		
+		//show GUIs on local device
+		LOG.debug("Returning implicit feedback to UACommsServer");
+		String proposalText = content.getProposalText();
+		int timeout = content.getTimeout();
+		if(type == ImpProposalType.TIMED_ABORT){
+			LOG.debug("Timed Abort GUI");
+			TimedGUI gui = new TimedGUI();
+			result = gui.displayGUI(proposalText, timeout);
+		}
+		
+		return new AsyncResult<Boolean>(result);
+	}	
+	
+	
 	
 	private String getCurrentUID(){
 		String uid = "";

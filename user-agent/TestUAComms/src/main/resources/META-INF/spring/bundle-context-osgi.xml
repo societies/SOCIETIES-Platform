@@ -6,8 +6,10 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
 	 
-	<osgi:reference id="uaRemote" interface="org.societies.api.internal.useragent.remote.IUserAgentRemoteMgr"/>
+	<osgi:reference id="uaRemote" interface="org.societies.useragent.api.remote.IUserAgentRemoteMgr"/>
 	
 	<osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+	
+	<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>
 
 </beans>

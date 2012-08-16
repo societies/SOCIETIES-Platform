@@ -25,33 +25,58 @@
 
 package org.societies.useragent.monitoring;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssNode;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
+import org.societies.useragent.api.monitoring.IInternalUserActionMonitor;
 
-public class UserActionMonitor implements IUserActionMonitor{
+public class UserActionMonitor implements IUserActionMonitor, IInternalUserActionMonitor{
 
 	private static Logger LOG = LoggerFactory.getLogger(UserActionMonitor.class);
 	private boolean interactable;
 	private ICtxBroker ctxBroker;
 	private IEventMgr eventMgr;
 	private ICommManager commsMgr;
+	private ICSSLocalManager cssMgr;
 	private ContextCommunicator ctxComm;
 	String myDeviceID;
 	IIdentity myCssID;
 
+	public void initialiseUserActionMonitor(){
+		System.out.println("Initialising user action monitor!");
+
+		//get myDeviceID from comms Mgr
+		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
+		myCssID = commsMgr.getIdManager().getThisNetworkNode();
+		
+		LOG.debug("My device ID is: "+myDeviceID);
+		LOG.debug("My CSS ID is: "+myCssID);
+
+		ctxComm = new ContextCommunicator(ctxBroker, myCssID);
+
+		//set interactable value
+		setInteractable();
+	}
+
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
-		LOG.debug("UAM - Received user action!");
+		LOG.debug("UAM - Received local user action!");
 		LOG.debug("action ServiceId: "+action.getServiceID().toString());
 		LOG.debug("action serviceType: "+action.getServiceType());
 		LOG.debug("action parameterName: "+action.getparameterName());
@@ -76,25 +101,96 @@ public class UserActionMonitor implements IUserActionMonitor{
 		}
 	}
 
-	public void initialiseUserActionMonitor(){
-		System.out.println("Initialising user action monitor!");
-		
-		//get myDeviceID from comms Mgr
-		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
-		myCssID = commsMgr.getIdManager().getThisNetworkNode();
 
-		ctxComm = new ContextCommunicator(ctxBroker, myCssID);
-
-		//set interactable value
-		setInteractable();
-	}
-	
 	/*
-	 * TO BE COMPLETED
+	 * Called by UACommsServer - msg from light node to rich or cloud along with node ID for UID purposes
+	 * 
+	 * (non-Javadoc)
+	 * @see org.societies.useragent.api.monitoring.IInternalUserActionMonitor#monitorFromRemoteNode(java.lang.String, org.societies.api.identity.IIdentity, org.societies.api.personalisation.model.IAction)
 	 */
+	@Override
+	public void monitorFromRemoteNode(String remoteNodeId, IIdentity owner, IAction action) {
+		LOG.debug("UAM - Received remote user action from light node with node ID: "+remoteNodeId);
+		LOG.debug("action ServiceId: "+action.getServiceID().toString());
+		LOG.debug("action serviceType: "+action.getServiceType());
+		LOG.debug("action parameterName: "+action.getparameterName());
+		LOG.debug("action value: "+action.getvalue());
+
+		//save action in context - IIdentity (Person) > ServiceId > paramName
+		//create new entities and attributes if necessary
+		ctxComm.updateHistory(owner, action);
+		
+		//update UID with remoteNodeId
+		ctxComm.updateUID(owner, remoteNodeId);
+
+		//send local event
+		UIMEvent payload = new UIMEvent(owner, action);
+		InternalEvent event = new InternalEvent(EventTypes.UIM_EVENT, "newaction", "org/societies/useragent/monitoring", payload);
+		try {
+			eventMgr.publishInternalEvent(event);
+		} catch (EMSException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	
 	private void setInteractable(){
-		//get value from CSS Manager - ask Liam
-		interactable = true;
+		LOG.debug("Setting interactable variable in UAM for this device with ID: "+myDeviceID);
+		interactable = false;
+		
+		try {
+			CssInterfaceResult cssInterface = cssMgr.getCssRecord().get();
+			CssRecord record = cssInterface.getProfile();
+			if(record != null){
+				LOG.debug("Got CssRecord, checking nodes...");
+				List<CssNode> cssNodes = record.getCssNodes();
+				if(cssNodes.size() > 0){
+					boolean found = false;
+					for(CssNode nextNode: cssNodes){  //find this node by myDeviceId
+						if(nextNode.getIdentity().equals(myDeviceID)){
+							LOG.debug("Comparing nextNode with ID: "+nextNode.getIdentity()+" against this node with ID: "+myDeviceID);
+							LOG.debug("Found this device in CSS record");
+							found = true;
+							
+							/*
+							 * Temporary use of String
+							 */
+							String tmp = nextNode.getInteractable();
+							if(tmp.equalsIgnoreCase("true")){
+								LOG.debug("This device is interactable");
+								interactable = true;
+							}else if(tmp.equalsIgnoreCase("false")){
+								LOG.debug("This device is not interactable");
+								interactable = false;
+							}else{
+								LOG.error("Interactable variable is not defined for this node, assuming default: not interactable");
+								interactable = false;
+							}
+							/*
+							 * end
+							 */
+							
+							break;
+						}
+					}
+					
+					if(!found){
+						LOG.error("Could not find this device in CssRecord with ID: "+myDeviceID);
+					}
+				}else{
+					LOG.error("There are no CSS Nodes listed in this CssRecord with CSS ID: " +record.getCssIdentity());
+				}
+			}else{
+				LOG.error("The CssRecord is null for this CSS");
+			}
+						
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void setCtxBroker(ICtxBroker broker){
@@ -107,6 +203,10 @@ public class UserActionMonitor implements IUserActionMonitor{
 
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
+	}
+	
+	public void setCssMgr(ICSSLocalManager cssMgr){
+		this.cssMgr = cssMgr;
 	}
 
 }

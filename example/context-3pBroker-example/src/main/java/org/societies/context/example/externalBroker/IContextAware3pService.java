@@ -23,17 +23,30 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.api.remote.feedback;
+package org.societies.context.example.externalBroker;
 
-import java.util.List;
-import java.util.concurrent.Future;
+import org.societies.api.identity.IIdentity;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
+/**
+ * This is a 3p service Ifc that needs to access context through the societies platform ...
+ *
+ * @author nikosk
+ *
+ */
+public interface IContextAware3pService {
 
-public interface IUserFeedbackRemote {
-
-	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
+	public void retrieveIndividualEntityId();
 	
-	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
+	public void createCtxEntityWithCtxAttributes();
+	
+	public void retrieveCtxAttributeBasedOnEntity(); 
+	
+	public void lookupAndRetrieveCtxAttributes();
+	
+	public void createRetrieveCtxHistory();
+	
+	public void registerForContextChanges();
+	
+	public void retrievceLookupCommunityEntAttributes(IIdentity cisID);
+	
 }

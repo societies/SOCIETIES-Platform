@@ -7,7 +7,7 @@
 	<xs:element name="userFeedbackBean">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="method" type="methodType" minOccurs="0" />
+				<xs:element name="method" type="feedbackMethodType" minOccurs="0" />
 				<xs:element name="requestId" type="xs:string" minOccurs="0" />
 				<xs:element name="type" type="xs:int" />
 				<xs:element name="options" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded" />
@@ -38,7 +38,7 @@
 	</xs:element>
 
 
-	<xs:simpleType name="methodType">
+	<xs:simpleType name="feedbackMethodType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="getExplicitFB" />
 			<xs:enumeration value="getImplicitFB" />
