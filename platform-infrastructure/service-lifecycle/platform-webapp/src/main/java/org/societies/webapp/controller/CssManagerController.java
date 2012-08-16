@@ -756,13 +756,19 @@ public class CssManagerController {
 	void doControlCssRequests(CssRequest requestModel, String command)
 	{
 		CssRequest request = new CssRequest();
-		
+		CssRequest requestrecipricol = new CssRequest();
 		
 		if (command.contentEquals("1")) { //accept
 			request.setOrigin(CssRequestOrigin.LOCAL);
 			request.setCssIdentity(requestModel.getCssIdentity());
 			request.setRequestStatus(CssRequestStatusType.ACCEPTED);
 			getCssLocalManager().updateCssRequest(request);
+			
+			//Add accepted friend as friend to local friends list
+			requestrecipricol.setOrigin(CssRequestOrigin.REMOTE);
+			requestrecipricol.setCssIdentity(requestModel.getCssIdentity());
+			requestrecipricol.setRequestStatus(CssRequestStatusType.ACCEPTED);
+			getCssLocalManager().updateCssFriendRequest(requestrecipricol);
 			
 		}else if (command.contentEquals("2")) { //reject
 			

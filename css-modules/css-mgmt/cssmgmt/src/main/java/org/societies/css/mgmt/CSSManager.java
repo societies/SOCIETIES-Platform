@@ -979,6 +979,8 @@ public class CSSManager implements ICSSLocalManager {
 		// This will always be initalliated locally so no need to check origin
 		// db updated ow send it to friend and forget about it
 		//cssManagerRemote.se
+		System.out.println("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
+		LOG.info("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
 		cssManagerRemote.sendCssFriendRequest(cssFriendId);
 		
 		
