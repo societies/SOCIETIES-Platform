@@ -134,7 +134,7 @@ public class RegistryEntry implements Serializable {
 						.getServiceNameSpace(), serviceInstance
 						.getServiceImpl().getServiceProvider(), serviceInstance
 						.getServiceImpl().getServiceVersion(),serviceInstance
-						.getServiceImpl().getServiceClient().toString()));
+						.getServiceImpl().getServiceClient()));
 	}
 
 	public RegistryEntry() {
