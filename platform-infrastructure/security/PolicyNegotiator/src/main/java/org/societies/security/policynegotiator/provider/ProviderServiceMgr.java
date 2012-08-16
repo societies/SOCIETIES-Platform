@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.domainauthority.IClientJarServer;
+import org.societies.api.internal.domainauthority.IClientJarServerRemote;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
@@ -52,7 +53,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	private static Logger LOG = LoggerFactory.getLogger(INegotiationProviderServiceMgmt.class);
 
-	private IClientJarServer clientJarServer;
+	private IClientJarServerRemote clientJarServer;
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;
 
@@ -62,10 +63,10 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		LOG.info("ProviderServiceMgr");
 	}
 	
-	public IClientJarServer getClientJarServer() {
+	public IClientJarServerRemote getClientJarServer() {
 		return clientJarServer;
 	}
-	public void setClientJarServer(IClientJarServer clientJarServer) {
+	public void setClientJarServer(IClientJarServerRemote clientJarServer) {
 		LOG.debug("setClientJarServer()");
 		this.clientJarServer = clientJarServer;
 	}
