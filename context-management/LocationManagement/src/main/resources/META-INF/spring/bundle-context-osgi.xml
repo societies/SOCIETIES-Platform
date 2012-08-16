@@ -12,14 +12,13 @@
        testing of the bundle outside of an OSGi container -->
 
 	<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+	<osgi:reference id="CommMngrController" interface="org.societies.api.internal.comm.ICommManagerController"/>
 	<osgi:reference id="ContextSourceManagement" interface="org.societies.api.context.source.ICtxSourceMgr" />
 	<osgi:reference id="ContextBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />
 	<osgi:reference id="DeviceRegistry" interface="org.societies.api.internal.css.devicemgmt.IDeviceRegistry" />
 	<osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
 	<osgi:reference id="DmCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager"/>
-	<osgi:reference id="PZWrapper" interface="org.societies.context.location.management.PZWrapper"/>
-	
-	
+	<osgi:reference id="CSSLocalManager" interface="org.societies.api.internal.css.management.ICSSLocalManager" />
 	
 	<osgi:service ref="LMAdapterBean" interface="org.societies.context.api.user.location.ILocationManagementAdapter"/>
 	
