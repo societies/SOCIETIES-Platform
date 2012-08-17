@@ -6,7 +6,6 @@
 	<groupId>org.societies.context-management</groupId>
 	<artifactId>community-context-db-mgmt</artifactId>
 	<version>${version.cm}</version>
-	<packaging>bundle</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
@@ -67,7 +66,7 @@
 	</parent>
 
 	<!-- Build Settings -->
-	<build>
+	<!-- build>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -103,7 +102,7 @@
 			</plugin>
 		</plugins>
 	</build>
-
+ -->
 	<!-- More Project Information -->
 	<name>Community Context DB Mgmt</name>
 	<description>

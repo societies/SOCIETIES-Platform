@@ -10,29 +10,30 @@
 
 
   <!--  Mock PZ Wrapper -->
+  <!--
    <bean id="PZWrapperBean" 
        		 class="org.societies.context.location.management.impl.MockPZWrapperImpl" >
    </bean>
-   
+   -->
    
    <!--  PZ Wrapper will be connected using REST to the location server   -->
-   <!-- 
    <bean id="PZWrapperBean" 
        		 class="org.societies.context.location.management.impl.PZWrapperImpl" >
    </bean>
-   -->
+   
    
    
    
    <bean id="LMAdapterBean" 
        		 class="org.societies.context.location.management.impl.LMAdapterImpl" 
-       		 depends-on="CommManager,ContextSourceManagement,ContextBroker,DmCommManager,DeviceRegistry" init-method="init">
+       		 depends-on="CommManager,CommMngrController,ContextSourceManagement,ContextBroker,DmCommManager,DeviceRegistry" init-method="init">
 			<property name="contextSourceManagement" ref="ContextSourceManagement" />
 			<property name="contextBroker" ref="ContextBroker" />
 			<property name="commManager" ref="CommManager" />
 			<property name="deviceRegistry" ref="DeviceRegistry" />
 			<property name="pubSubManager" ref="PubsubClient"/>
-			<property name="pzWrapper" ref="PZWrapper"/>
+			<property name="commMngrController" ref="CommMngrController"/>
+			<property name="cssLocalManager" ref="CSSLocalManager"/>
    </bean>
    
    

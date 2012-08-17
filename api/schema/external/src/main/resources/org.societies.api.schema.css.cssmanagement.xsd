@@ -17,6 +17,8 @@
 			<xs:element name="identity" type="xs:string" minOccurs="0" />
 			<xs:element name="status" type="xs:int" />
 			<xs:element name="type" type="xs:int" />
+			<xs:element name="cssNodeMAC" type="xs:string" minOccurs="0" />
+			<xs:element name="interactable" type="xs:string" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
 

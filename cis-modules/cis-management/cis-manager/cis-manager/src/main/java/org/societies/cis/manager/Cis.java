@@ -45,6 +45,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -183,6 +184,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private PubsubClient psc;
 	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER,orphanRemoval=true)
+	@JoinTable(
+            name="org_societies_cis_manager_Cis_CisParticipant",
+            joinColumns = @JoinColumn( name="cis_id"),
+            inverseJoinColumns = @JoinColumn( name="cisparticipant_id")
+    )
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	@Column
 	public String cisType;
@@ -494,6 +500,16 @@ public class Cis implements IFeatureServer, ICisOwned {
 		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
 		
 		this.persist(this);
+		
+		IActivity iActivity = new org.societies.activity.model.Activity();
+		iActivity.setActor(this.getOwnerId());
+		iActivity.setObject(cisIdentity.getJid());
+		iActivity.setPublished(System.currentTimeMillis()+"");
+		iActivity.setVerb("created");
+		
+		
+		activityFeed.addActivity(iActivity);
+		
 		//activityFeed.getActivities("0 1339689547000");
 
 	}
@@ -627,42 +643,16 @@ public class Cis implements IFeatureServer, ICisOwned {
 			//persist in database
 			this.updatePersisted(this);
 			
-			// should we send a XMPP notification to all the users to say that the new member has been added to the group
-			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
-			// and the GUI can be updated with that new member
-
+			//activityFeed notification
+			IActivity iActivity = new org.societies.activity.model.Activity();
+			iActivity.setActor(jid);
+			iActivity.setObject(cisIdentity.getJid());
+			iActivity.setPublished(System.currentTimeMillis()+"");
+			iActivity.setVerb("joined");
 			
-			//2) Sending a notification to all the other users // TODO: probably change this to a pubsub notification
 			
-			//creating payload
-/*			Participant p = new Participant();
-			p.setJid(jid);
-			p.setRole( ParticipantRole.fromValue(role.toString())  );
-			Community c = new Community();
-			Who w = new Who();
-			w.getParticipant().add(p);// p has been set on the 1st message
-			c.setWho(w);
-			// sending to all members
-			
-			Set<CisParticipant> se = this.getMembersCss();
-			Iterator<CisParticipant> it = se.iterator();
-			
-			while(it.hasNext()){
-				CisParticipant element = it.next();
-				LOG.info("sending notification to " + element.getMembersJid());
-				try {
-					targetCssIdentity = this.CISendpoint.getIdManager().fromJid(element.getMembersJid());
-					sta = new Stanza(targetCssIdentity);
-					CISendpoint.sendMessage(sta, c);
-				} catch (InvalidFormatException e) {
-					e.printStackTrace();
-					LOG.warn("bad jid in between members list in the CIS!");
-				}//new IdentityImpl(element.getMembersJid());
-
-				
-		     }
-			LOG.info("notification sents to the existing user");
-			*/
+			activityFeed.addActivity(iActivity);
+	
 			return true;
 		}else{
 			return false;
@@ -740,40 +730,16 @@ public class Cis implements IFeatureServer, ICisOwned {
 			this.deletePersisted(temp);
 			
 			
-	
+			//activityFeed notification
+			IActivity iActivity = new org.societies.activity.model.Activity();
+			iActivity.setActor(jid);
+			iActivity.setObject(cisIdentity.getJid());
+			iActivity.setPublished(System.currentTimeMillis()+"");
+			iActivity.setVerb("left");
 			
 			
-			//3) Sending a notification to all the other users (maybe replace with pubsub later)
+			activityFeed.addActivity(iActivity);
 			
-/*			CommunityManager cMan = new CommunityManager();
-			Notification n = new Notification();
-			DeleteMemberNotification s = new DeleteMemberNotification();
-			s.setCommunityJid(this.getCisId());
-			s.setMemberJid(jid);
-			n.setDeleteMemberNotification(s);
-			cMan.setNotification(n);
-			
-			LOG.info("finished building notification");
-
-			Set<CisParticipant> se = this.getMembersCss();
-			Iterator<CisParticipant> it = se.iterator();
-			
-			while(it.hasNext()){
-				CisParticipant element = it.next();
-				LOG.info("sending notification to " + element.getMembersJid());
-				IIdentity targetCssIdentity = null;
-				try {
-					targetCssIdentity = this.CISendpoint.getIdManager().fromJid(element.getMembersJid());
-					Stanza sta = new Stanza(targetCssIdentity);
-					CISendpoint.sendMessage(sta, cMan);
-				} catch (InvalidFormatException e) {
-					e.printStackTrace();
-					LOG.warn("bad jid in between members list in the CIS!");
-				}//new IdentityImpl(element.getMembersJid());
-
-				
-		     }
-			LOG.info("notification sents to the existing user");*/
 			
 
 			return true;

@@ -2,19 +2,19 @@ package org.societies.comm.xmpp.client.impl;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -28,12 +28,10 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.android.ipc.IMethodInvocation;
 import org.societies.comm.android.ipc.MethodInvocationServiceConnection;
-import org.societies.comm.android.ipc.utils.MarshallUtils;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.pubsub.interfaces.ISubscriber;
 import org.societies.pubsub.interfaces.Pubsub;
 import org.societies.pubsub.interfaces.SubscriptionParcelable;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import android.content.ComponentName;
@@ -47,9 +45,9 @@ public class PubsubClientAndroid implements PubsubClient {
 	private static final ComponentName serviceCN = new ComponentName("org.societies.pubsub", "org.societies.pubsub.PubsubService"); // TODO	
 
 	private MethodInvocationServiceConnection<Pubsub> miServiceConnection;
-	private Marshaller contentMarshaller;
-	private Unmarshaller contentUnmarshaller;
 	private String packagesContextPath;
+	private Serializer serializer;
+	
 	private Map<Subscriber, SubscriberAdapter> subscribersMap = new HashMap<Subscriber, SubscriberAdapter>();
 	
 	public PubsubClientAndroid(Context androidContext) {
@@ -57,14 +55,9 @@ public class PubsubClientAndroid implements PubsubClient {
 		intent.setComponent(serviceCN);
 		miServiceConnection = new MethodInvocationServiceConnection<Pubsub>(intent, androidContext, BIND_AUTO_CREATE, Pubsub.class);
 		packagesContextPath = "";
-		try {
-			JAXBContext jc = JAXBContext.newInstance();
-			contentUnmarshaller = jc.createUnmarshaller();
-			contentMarshaller = jc.createMarshaller();
-		} catch (JAXBException e) {			
-			throw new RuntimeException(e.getMessage(), e);
-		}
 
+		Strategy strategy = new AnnotationStrategy();
+		serializer = new Persister(strategy);
 	}
 	
 	public void ownerCreate(IIdentity pubsubService, final String node) throws XMPPError, CommunicationException {		
@@ -131,20 +124,17 @@ public class PubsubClientAndroid implements PubsubClient {
 			CommunicationException {
 		final String pubsubServiceJid = pubsubService.getJid();
 		final String itemXml;
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try {	
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.newDocument();
-			synchronized (contentMarshaller) {
-				contentMarshaller.marshal(item, doc);
-			}			
-			itemXml = MarshallUtils.nodeToString(doc.getDocumentElement());			
+		
+		try {			
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			serializer.write(item, os);
+			itemXml = os.toString();
 		} catch (TransformerException e) {
 			throw new CommunicationException(e.getMessage(), e);
 		} catch (ParserConfigurationException e) {
 			throw new CommunicationException("ParserConfigurationException while marshalling item to publish", e);
-		} catch (JAXBException e) {
-			throw new CommunicationException("JAXBException while marshalling item to publish", e);
+		} catch (Exception e) {
+			throw new CommunicationException("Exception while marshalling item to publish", e);
 		}
 		return (String)invokeRemoteMethod(new IMethodInvocation<Pubsub>() {
 			public Object invoke(Pubsub pubsub) throws Throwable {
@@ -211,15 +201,10 @@ public class PubsubClientAndroid implements PubsubClient {
 		
 	}
 	
-	public synchronized void addJaxbPackages(List<String> packageList) throws JAXBException {		
+	public synchronized void addJaxbPackages(List<String> packageList) {		
 		StringBuilder contextPath = new StringBuilder(packagesContextPath);
 		for (String pack : packageList)
 			contextPath.append(":" + pack);
-
-		JAXBContext jc = JAXBContext.newInstance(contextPath.toString(),
-				this.getClass().getClassLoader());
-		contentUnmarshaller = jc.createUnmarshaller();
-		contentMarshaller = jc.createMarshaller();
 		
 		packagesContextPath = contextPath.toString();
 	}
@@ -258,12 +243,10 @@ public class PubsubClientAndroid implements PubsubClient {
 		public void pubsubEvent(String pubsubService, String node, String itemId, String item) {			
 			try {
 				IIdentity pubsubServiceIdentity = IdentityManagerImpl.staticfromJid(pubsubService);
-			
-				Object bean = null;
-				synchronized (contentUnmarshaller) {
-					Element element = MarshallUtils.stringToElement(item);
-					bean = contentUnmarshaller.unmarshal(element);
-				}
+
+				Class<?> c = Class.forName("org.societies.api.schema.examples.calculatorbean.CalcBean");
+				Object bean = serializer.read(c, new ByteArrayInputStream(item.getBytes()));
+				
 				subscriber.pubsubEvent(pubsubServiceIdentity, node, itemId, bean);
 			} catch(InvalidFormatException e) {
 				LOG.error("InvalidFormatException parsing pubsub service JID.", e);

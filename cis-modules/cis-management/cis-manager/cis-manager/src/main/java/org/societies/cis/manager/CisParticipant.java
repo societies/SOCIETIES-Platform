@@ -45,6 +45,7 @@ import org.societies.api.cis.management.ICisParticipant;
 public class CisParticipant implements ICisParticipant {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name="cisparticipant_id")
 	private Long id;
 	public Long getId() {
 		return id;

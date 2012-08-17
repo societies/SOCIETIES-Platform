@@ -50,6 +50,16 @@ public class CSSNode {
 	int type = 0;
 	
 	/**
+	 * MAC address of the Node
+	 */
+	String cssnodeMAC = null;
+	
+	/**
+	 * is the node interactable
+	 */
+	boolean interactable = true;
+	
+	/**
 	 * Default Constructor
 	 */
 	public CSSNode() {
@@ -77,5 +87,21 @@ public class CSSNode {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+	
+	public String getcssNodeMAC() {
+		return cssnodeMAC;
+	}
+
+	public void setcssNodeMAC(String cssnodeMAC) {
+		this.cssnodeMAC = cssnodeMAC;
+	}
+
+	public boolean getInteractable() {
+		return interactable;
+	}
+
+	public void setInteractable(boolean interactable) {
+		this.interactable = interactable;
 	}
 }

@@ -49,6 +49,8 @@ public class CssNodeEntry implements Serializable {
 	private String nodeIdentity;
 	private int status;
 	private int type;
+	private String cssnodeMAC;
+	private String interactable;
 	private boolean archived;
 	/**
 	 * @return the identity
@@ -92,6 +94,37 @@ public class CssNodeEntry implements Serializable {
 	}
 	
 	/**
+	 * @return the node MAC Address
+	 */
+	@Column(name = "cssNodeMAC")
+	public String getcssNodeMAC() {
+		return cssnodeMAC;
+	}
+	/**
+	 * @param the node MAC Address to set
+	 */
+	public void setcssNodeMAC(String cssNodeMAC) {
+		this.cssnodeMAC = cssNodeMAC;
+	}
+	
+	
+	/**
+	 * @return the interactable flag
+	 */
+	
+	
+	@Column(name = "Interactable")
+	public String getInteractable() {
+		return interactable;
+	}
+	/**
+	 * @param sets whether the node is interactable or not
+	 */
+	public void setInteractable(String interactable) {
+		this.interactable = interactable;
+	}
+	
+	/**
 	 * @return the archived flag
 	 */
 	@Column(name = "Archived")
@@ -110,11 +143,13 @@ public class CssNodeEntry implements Serializable {
 	 * @param status
 	 * @param type
 	 */
-	public CssNodeEntry(String nodeIdentity, int status, int type, boolean archived) {
+	public CssNodeEntry(String nodeIdentity, int status, int type, String nodeMac, String interactable, boolean archived) {
 		super();
 		this.nodeIdentity = nodeIdentity;
 		this.status = status;
 		this.type = type;
+		this.cssnodeMAC = nodeMac;
+		this.interactable = interactable;
 		this.archived = archived;
 	}
     

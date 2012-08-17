@@ -45,8 +45,8 @@
 		<module>../../utilities/DBC</module>
 
 		<!-- Android Communication components -->
-		<module>../../platform-infrastructure/client-frwk/JaxbAndroidApi</module>
-		<module>../../platform-infrastructure/client-frwk/JaxbAndroidImpl</module>
+		<module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidApi</module>
+		<module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidImpl</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidIPC</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgentApi</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
@@ -59,9 +59,9 @@
 		<module>../../api/android/internal</module>
 
 		<!-- Client Framework Examples -->
-		<module>../../platform-infrastructure/client-frwk/PhoneGapReference
+		<module>../../platform-infrastructure/client-frwk/Examples/PhoneGapReference
 		</module>
-		<module>../../platform-infrastructure/client-frwk/IPCServiceExample
+		<module>../../platform-infrastructure/client-frwk/Examples/IPCServiceExample
 		</module>
 		<!--module>../../platform-infrastructure/client-frwk/devicestatusgui</module -->
 

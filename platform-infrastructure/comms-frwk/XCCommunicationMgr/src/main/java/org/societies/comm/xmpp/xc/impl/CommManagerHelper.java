@@ -63,6 +63,7 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.simplexml.XMLGregorianCalendarConverter;
+import org.societies.maven.converters.URIConverter;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.JID;
@@ -117,6 +118,7 @@ public class CommManagerHelper {
 		s = new Persister(strategy);
 		try {
 			registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
+			registry.bind(java.net.URI.class,URIConverter.class);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(),e);
 		}

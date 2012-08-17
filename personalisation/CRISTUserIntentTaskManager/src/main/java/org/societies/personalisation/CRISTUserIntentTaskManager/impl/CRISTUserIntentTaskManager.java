@@ -285,6 +285,12 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		try {
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
 
+			if (ctxBroker
+					.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION,
+							listOfEscortingAttributeIds, null, null) == null) {
+				return null;
+			}
+			
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> ctxHocTuples = ctxBroker
 					.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION,
 							listOfEscortingAttributeIds, null, null).get();
@@ -316,7 +322,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	{
 		CtxEntity operator;
 		try {
-			operator = this.ctxBroker.retrieveCssOperator().get();
+			operator = this.ctxBroker.retrieveIndividualEntity(entityID).get();
+			//operator = this.ctxBroker.retrieveCssOperator().get();
 			Set<CtxAttribute> attrSet = operator
 					.getAttributes(ctxAttributeTypeString);
 			List<CtxAttribute> attrList = new ArrayList<CtxAttribute>(attrSet);
@@ -482,7 +489,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			CtxAttribute ctxAttribute) {
 		
 		// null paras are already handled in Prediction class
-		// update the current situation for current context list in DB
+		// update the current situation for current context list in DB. here do not store to DB, ua do.
 		CRISTUserSituation currentUserSituation  = inferUserSituation(entityID);
 
 		if (currentUserSituation != null) {
@@ -501,7 +508,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			if (this.intentModel == null) {
 				// create intent model
 				if (cristDiscovery == null) {
-					LOG.info("The CRIST Taks Manager is NULL. ");
+					LOG.info("The CRIST Discovery is NULL. ");
 					return new ArrayList<CRISTUserAction>();
 				}
 				// this.cristDiscovery.enableCRISTUIDiscovery(true);
@@ -557,14 +564,14 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 		if (currentUserSituation != null) {
 			this.currentUserSituationMap.put(entityID, currentUserSituation);
-			// update local historyList
+			// update local historyList. how about ctxDB? here do not store to DB, ua do.
 			this.historyList.add(new CRISTHistoryData(userAction,
 					currentUserSituation));
 			if (this.intentModel == null
 					|| historyList.size() % UPDATE_TRIGGER_THRESHOLD == 0) {
 				// update intent model
 				if (cristDiscovery == null) {
-					LOG.info("The CRIST Taks Manager is NULL. ");
+					LOG.info("The CRIST Discovery is NULL. ");
 					return new ArrayList<CRISTUserAction>();
 				}
 				// this.cristDiscovery.enableCRISTUIDiscovery(true);
@@ -593,6 +600,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	 * api.schema.servicelifecycle.model.ServiceResourceIdentifier,
 	 * java.lang.String)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public CRISTUserAction getCurrentUserIntent(IIdentity entityID,
 			ServiceResourceIdentifier serviceID, String parameterName) {
@@ -617,8 +625,19 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			currentUserSituation = inferUserSituation(entityID);
 			currentUserSituationMap.put(entityID, currentUserSituation);
 		}
+		if (this.intentModel == null) {
+			// create intent model
+			if (cristDiscovery == null) {
+				LOG.info("The CRIST Discovery is NULL. ");
+				return new CRISTUserAction();
+			}
+			// this.cristDiscovery.enableCRISTUIDiscovery(true);
+			this.intentModel = this.cristDiscovery
+						.generateNewCRISTUIModel(this.historyList);
+			
+		}
 
-		if (currentUserAction != null && currentUserSituation != null) {
+		if (currentUserAction != null && currentUserSituation != null && intentModel != null) {
 			ArrayList<CRISTUserAction> results = getNextActions(entityID, currentUserAction,
 					currentUserSituation);
 
@@ -965,6 +984,22 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			Double arg2) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	public void displayHistoryList() {
+		System.out.println("This is the historyList: ");
+		for (int i = 0; i < historyList.size(); i++) {
+			System.out.println(historyList.get(i).toString());
+		}
+	}
+	
+	public void displayIntentModel() {
+		System.out.println("This is the intentModel: ");
+		Set<String> modelKeys = intentModel.keySet();
+		Object[] keyArray = modelKeys.toArray();
+		for (int i = 0; i < keyArray.length; i++) {
+			System.out.println(keyArray[i].toString() + ": " + intentModel.get(keyArray[i]));
+		}
 	}
 
 }

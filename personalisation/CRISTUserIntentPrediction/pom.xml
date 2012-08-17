@@ -14,6 +14,10 @@
 			<name>Zhu Wang</name>
 			<email>zhu.wang@it-sudparis.com</email>
 		</developer>
+		<developer>
+			<name>Zhiyong Yu</name>
+			<email>zhiyong.yu@it-sudparis.com</email>
+		</developer>
 	</developers>
 
 	<parent>
@@ -59,7 +63,14 @@
 			<version>${version.pm}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		
+		<dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-all</artifactId>
+		    <version>1.9.0</version>
+		    <scope>test</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

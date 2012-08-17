@@ -64,17 +64,24 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
+		<!--dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>com.springsource.org.bouncycastle.jce</artifactId>
 			<version>1.39.0</version>
-		</dependency>
+			<scope>provided</scope>
+		</dependency-->
 
 		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.47</version>
+		</dependency>
+
+		<!--dependency>
 			<groupId>org.apache.xml</groupId>
 			<artifactId>com.springsource.org.apache.xml.security</artifactId>
 			<version>1.4.2</version>
-		</dependency>
+		</dependency-->
 		
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -150,6 +157,26 @@
 						</artifactItem>
 					</artifactItems>
 				</configuration>
+				<!--executions>
+					<execution>
+						<id>copy-installed</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.bouncycastle</groupId>
+									<artifactId>bcprov-jdk15on</artifactId>
+									<version>1.47</version>
+									<type>jar</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions-->
 			</plugin>
 		</plugins>
 	</build>

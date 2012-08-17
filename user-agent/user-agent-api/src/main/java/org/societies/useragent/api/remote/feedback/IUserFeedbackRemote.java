@@ -33,7 +33,7 @@ import org.societies.api.internal.useragent.model.ImpProposalContent;
 
 public interface IUserFeedbackRemote {
 
-	public Future<List<String>> getExplicitFB(String remoteEndPointId, int type, ExpProposalContent content);
+	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
 	
-	public Future<Boolean> getImplicitFB(String remoteEndPointId, int type, ImpProposalContent content);
+	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
 }

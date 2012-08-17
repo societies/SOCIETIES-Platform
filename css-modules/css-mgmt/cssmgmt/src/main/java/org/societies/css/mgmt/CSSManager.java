@@ -1,28 +1,3 @@
-/**
-Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
-
-(SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
-informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
-COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp (IBM),
-INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
-ITALIA S.p.a.(TI), TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
-conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
-   disclaimer in the documentation and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
-SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package org.societies.css.mgmt;
 
 import java.util.ArrayList;
@@ -46,6 +21,7 @@ import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.css.management.CSSManagerEnums;
+import org.societies.api.internal.css.management.CSSNode;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
@@ -66,6 +42,7 @@ import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.utilities.DBC.Dbc;
 
 import org.societies.api.schema.servicelifecycle.model.Service;
+
 
 public class CSSManager implements ICSSLocalManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
@@ -237,14 +214,19 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public Future<CssInterfaceResult> getCssRecord() {
 		CssInterfaceResult result = new CssInterfaceResult();
+		
+		LOG.info("%%%%%%%%%%%%%% CSS Manager getCssRecord Called");
+		
 		try {
 			CssRecord currentCssRecord = cssRegistry.getCssRecord();
 			result.setProfile(currentCssRecord);
+			LOG.info(";;;;;;;;;;;;;;;;;;; CSS Manager getCssRecord Size is : " +currentCssRecord.getCssNodes().size());
 			result.setResultStatus(true);
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//LOG.info("%%%%%%%%%%%%%% CSS Manager getCssRecord Size is : " +result.getProfile().getCssNodes().size()); //getCssNodes().size());
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 //	@Override
@@ -381,6 +363,13 @@ public class CSSManager implements ICSSLocalManager {
 					e.printStackTrace();
 				}
 				
+				try {
+					this.cssRegistry.updateCssRecord(cssRecord);
+				} catch (CssRegistrationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				CssEvent event = new CssEvent();
 				event.setType(CSSManagerEnums.DEPART_CSS_NODE);
 				event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
@@ -448,6 +437,9 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public Future<CssInterfaceResult> modifyCssRecord(CssRecord profile) {
 		CssInterfaceResult result = new CssInterfaceResult();
+		LOG.info("%%%%%%%%%%%%%% CSS Manager modifyCSSrecord Called");
+		LOG.info("%%%%%%%%%%%%%% CSS Manager cssrecord Size is : " +profile.getCssNodes().size());
+		
 		try {
 			cssRegistry.unregisterCss(profile);
 			result = cssRegistry.registerCss(profile);
@@ -462,6 +454,7 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public Future<CssInterfaceResult> registerCSS(CssRecord profile) {
 		CssInterfaceResult result = new CssInterfaceResult();
+		LOG.info("%%%%%%%%%%%%%% CSS Manager registerCSS Called");
 		try {
 			result = cssRegistry.registerCss(profile);
 		} catch (CssRegistrationException e) {
@@ -473,13 +466,53 @@ public class CSSManager implements ICSSLocalManager {
 
 	@Override
 	public Future<CssInterfaceResult> registerCSSNode(CssRecord profile) {
+		
+		LOG.info("+++++++++++++ CSS Manager registerCSSNode Called");
+		String nodeid = null;
+		String identity = null;
+		int status = 0;
+		int type = 0;
 		CssInterfaceResult result = new CssInterfaceResult();
-		try {
-			result = cssRegistry.registerCss(profile);
-		} catch (CssRegistrationException e) {
+		LOG.info("+++++++++++++ CssRecord passed in: " +profile);
+		List<CssNode> cssNodes = new ArrayList<CssNode>();
+		//nodeid = idManager.getThisNetworkNode().toString();
+		//LOG.info("+++++++++++++ nodeid =: " +profile);
+		//LOG.info("+++++++++++++ nodeStatus =: " +status);
+		//LOG.info("+++++++++++++ nodeType =: " +type);
+		//CssNode cssnode = new CssNode();
+		//cssnode.setIdentity(nodeid);
+		//cssnode.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+		//status = cssnode.getStatus();
+		//cssnode.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		//type = cssnode.getType();
+		
+		//LOG.info("############# nodeid =: " +nodeid);
+		//LOG.info("############# nodeStatus =: " +status);
+		//LOG.info("############# nodeType =: " +type);
+		
+		
+		cssNodes = profile.getCssNodes();
+		//cssNodes.add(0, cssnode);
+		//profile.setCssNodes(cssNodes);
+		nodeid = idManager.getThisNetworkNode().toString();
+		//for (CssNode cssNode : profile.getCssNodes()) {
+			//cssNode.setIdentity(identity);
+			//cssNode.setStatus(status);
+			//cssNode.setType(type);
+			
+			LOG.info("~~~~~~~~~~~~~~~ cssNodes Array Size is : " +cssNodes.size());
+			//}
+			
+			this.modifyCssRecord(profile);
+		//try {
+	//		LOG.info("+++++++++++++ Calling cssRegistry Register CSSRecord ");
+		//	result = cssRegistry.registerCss(profile);
+			
+			//result = true;
+	//	} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//	e.printStackTrace();
+	//	}
 		return new AsyncResult<CssInterfaceResult>(result);
 
 	}
@@ -528,9 +561,20 @@ public class CSSManager implements ICSSLocalManager {
 
 	@Override
 	public Future<CssInterfaceResult> unregisterCSSNode(CssRecord profile) {
+		LOG.info("+++++++++++++ CSS Manager UNregisterCSSNode Called");
 		CssInterfaceResult result = new CssInterfaceResult();
+		String nodeid = null;
+		List<CssNode> cssNodes = new ArrayList<CssNode>();
+		nodeid = idManager.getThisNetworkNode().toString();
+		CssNode cssnode = new CssNode();
+			
+		
+		cssNodes = profile.getCssNodes();
+		cssNodes.remove(cssnode); 
+		profile.setCssNodes(cssNodes);
+			
 		try {
-			cssRegistry.unregisterCss(profile);
+			cssRegistry.registerCss(profile);
 			result.setResultStatus(true);
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
@@ -993,4 +1037,162 @@ public class CSSManager implements ICSSLocalManager {
 		return new AsyncResult<List<CssAdvertisementRecordDetailed>>(cssDetailList);
 		
 	}
+	
+	
+	public Future<String> getthisNodeType(String nodeId) {
+		String Type = null, nodeid = null;
+		LOG.info("[][][][][] getthisNodeType has been called   [][][][][]: ");
+		List<CSSNode> cssnodes = new ArrayList<CSSNode>();
+		Future<List<CSSNode>> asyncResult = null;
+		List<CSSNode> incssnodes = null;
+		int android = 0;
+		
+		//nodeid = idManager.getThisNetworkNode().toString();
+		nodeid = nodeId;
+		LOG.info("[][][][][] nodeid is now   [][][][][]: " +nodeid);
+	
+		CssRecord currentCssRecord = null;
+		try {
+			currentCssRecord = cssRegistry.getCssRecord();
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if (currentCssRecord.getCssNodes() != null) {
+			for (CssNode cssNode : currentCssRecord.getCssNodes()) {
+				cssNode.getIdentity();
+				LOG.info("[][][][][] cssNode.getIdentity is returning   [][][][][]: " +cssNode.getIdentity());
+				LOG.info("[][][][][] nodeid is returning   [][][][][]: " +nodeid);
+				if (nodeid.equalsIgnoreCase(cssNode.getIdentity())){
+					LOG.info("[][][][][] cssNode.getType() is returning   [][][][][]: " +cssNode.getType());
+					if (CSSManagerEnums.nodeType.Android.ordinal() == (cssNode.getType())) {
+						Type = "Android";
+					} else if (CSSManagerEnums.nodeType.Rich.ordinal() == (cssNode.getType())) {
+						Type = "Rich";
+					} else if (CSSManagerEnums.nodeType.Cloud.ordinal() == (cssNode.getType())) {
+						Type = "Cloud";
+					}
+				}
+			}
+		}
+		LOG.info("[][][][][] getthisNodeType is returning   [][][][][]: " +Type);
+		return new AsyncResult<String>(Type);
+	}
+
+//	@Override
+	public void setNodeType(CssRecord cssrecord, String nodeId, int nodestatus, int nodetype, String cssnodemac, String interactable) {
+		
+		List<CssNode> cssNodes = new ArrayList<CssNode>();
+		CssNode cssnode = new CssNode();
+		CssNode tmpNode = new CssNode();
+		LOG.info("!!!!!!!!!!!!!!!!!!! From Webapp cssNodes SIZE is: " +cssrecord.getCssNodes().size());
+		/*
+		try {
+			cssrecord = cssRegistry.getCssRecord();
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
+		LOG.info("!!!!!!!!!!!!!!!!!!! from CSSRegistry cssNodes SIZE is: " +cssrecord.getCssNodes().size());
+		
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeId passed in is: " +nodeId );
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodestatus passed in is: " +nodestatus );
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodetype passed in is: " +nodetype);
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeMAC passed in is: " +cssnodemac);
+		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeInteractable passed in is: " +interactable);
+		
+		
+		int index = 0;
+		cssnode.setIdentity(nodeId);
+		cssnode.setStatus(nodestatus);
+		cssnode.setType(nodetype);
+		cssnode.setCssNodeMAC(cssnodemac);
+		cssnode.setInteractable(interactable);
+		
+		//cssnode.setCssNodeMAC(cssnodemac);
+		//cssnode.setInteractable(interactable);
+		
+		
+		
+		cssNodes = cssrecord.getCssNodes();
+		
+		LOG.info("!!!!!!!!!!!!!!!!!!! cssNodes are BEFORE : " +cssNodes);
+		for (index = 0; index < cssrecord.getCssNodes().size(); index ++) {
+			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode BEFORE index: " +index + " identity is now : " +cssNodes.get(index).getIdentity());
+		}
+		
+		//cssNodes.add(tmpNode);
+		cssNodes.add(cssnode);
+		
+		LOG.info("!!!!!!!!!!!!!!!!!!! cssNodes are AFTER : " +cssNodes);
+				
+		cssrecord.setCssNodes(cssNodes);
+		LOG.info("!!!!!!!!!!!!!!!!!!! cssrecord cssNodes SIZE AFTER add node is: " +cssrecord.getCssNodes().size());
+		
+		
+		LOG.info("!!!!!!!!!!!!!!!!!!! cssrecord cssNodes SIZE is now : " +cssrecord.getCssNodes().size());
+		cssNodes = cssrecord.getCssNodes();
+		for (index = 0; index < cssrecord.getCssNodes().size(); index ++) {
+			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index + " identity is now : " +cssNodes.get(index).getIdentity());
+			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index + " Status is now : " +cssNodes.get(index).getStatus());
+			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" type is now : " +cssNodes.get(index).getType());
+			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" MAC is now : " +cssNodes.get(index).getCssNodeMAC());
+			//LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" type is now : " +cssNodes.get(index).isInteractable());
+		}
+		
+		
+		this.modifyCssRecord(cssrecord); 
+	
+	}
+	
+public void removeNode(CssRecord cssrecord, String nodeId ) {
+		
+		List<CssNode> cssNodes = new ArrayList<CssNode>();
+		//List<CssNode> tmpNodes = new ArrayList<CssNode>(cssNodes.size());
+		CssNode cssnode = new CssNode();
+		CssNode tmpNode = new CssNode();
+		//CssRecord newrecord = cssrecord;
+		
+		try {
+			cssRegistry.unregisterCss(cssrecord);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		cssNodes = cssrecord.getCssNodes();
+		
+		
+		LOG.info("~~~~~~~~~~~~~~~~ removeNode cssNodes SIZE is: " +cssrecord.getCssNodes().size());
+		LOG.info("~~~~~~~~~~~~~~~~ removeNode nodeId to remove is : " +nodeId);
+		int index = 0;
+		
+		//LOG.info("~~~~~~~~~~~~~~~~ removeNode cssNodes SIZE is now : " +cssrecord.getCssNodes().size());
+		cssNodes = cssrecord.getCssNodes();
+		for (index = 0; index < cssrecord.getCssNodes().size(); index ++) {
+			if (cssNodes.get(index).getIdentity().equalsIgnoreCase(nodeId)) {
+				LOG.info("~~~~~~~~~~~~~~~~ removeNode loop identity : " +cssNodes.get(index).getIdentity());
+				cssNodes.remove(index); 
+				LOG.info("~~~~~~~~~~~~~~~ removeNode Node Removed : ");
+				//tmpNodes.add(cssnode);
+			}
+			//tmpNodes.add(cssnode);
+			LOG.info("~~~~~~~~~~~~~~~ removeNode cssNodes element is : " +cssNodes.get(index).getIdentity());
+		}
+		cssrecord.setCssNodes(cssNodes);
+		LOG.info("~~~~~~~~~~~~~~~ removeNode cssrecord SIZE final : " +cssrecord.getCssNodes().size());
+		//LOG.info("~~~~~~~~~~~~~~~ removeNode newrecord SIZE final : " +newrecord.getCssNodes().size());
+		
+		try {
+			cssRegistry.registerCss(cssrecord);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//this.modifyCssRecord(cssrecord); 
+	
+	}
+	
 }

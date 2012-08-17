@@ -142,9 +142,34 @@ public class CtxAttributeTypes {
     public static final String LOCATION_COORDINATES = "locationCoordinates";
     
     /**
+     * @since 0.4
+     */
+    public static final String LOCATION_ID = "locationId";
+    
+    /**
+     * @since 0.4
+     */
+    public static final String LOCATION_PARENT_ID = "locationParentId";
+    
+    /**
+     * @since 0.4
+     */
+    public static final String LOCATION_PERSONAL_TAGS = "locationPersonalTags";
+    
+    /**
+     * @since 0.4
+     */
+    public static final String LOCATION_PUBLIC_TAGS = "locationPublicTags";
+    
+    /**
      * @since 0.0.8
      */
     public static final String LOCATION_SYMBOLIC = "locationSymbolic";
+    
+    /**
+     * @since 0.4
+     */
+    public static final String LOCATION_TYPE = "locationType";
         
     /**
      * @since 0.0.8

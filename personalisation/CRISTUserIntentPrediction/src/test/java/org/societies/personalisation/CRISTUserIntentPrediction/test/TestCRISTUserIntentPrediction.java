@@ -20,46 +20,47 @@
 
 package org.societies.personalisation.CRISTUserIntentPrediction.test;
 
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.IPersonalisationManager;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
-import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
+import org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery;
 import org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction;
 import org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager;
+import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 
 /**
@@ -77,223 +78,252 @@ import org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIn
 
 public class TestCRISTUserIntentPrediction {
 
-	
-	private static Logger LOG = LoggerFactory.getLogger(TestCRISTUserIntentPrediction.class);
-	public static ICtxBroker ctxBroker;
-	public static IUserActionMonitor uam;
-	
-	private CRISTUserIntentPrediction cristPredictor;
-	private IIdentity identity;
+	private static ICtxBroker ctxBroker;
+	private static IIdentity userId;
 
 
 	
+	public TestCRISTUserIntentPrediction() {
 
-	public void setCtxBroker(ICtxBroker ctxBroker){
-		TestCRISTUserIntentPrediction.ctxBroker = ctxBroker;
 	}
 
-	protected static ICtxBroker getCtxBroker(){
-		return TestCRISTUserIntentPrediction.ctxBroker;
-	}
-	
-	public void setUam(IUserActionMonitor uam){
-		TestCRISTUserIntentPrediction.uam = uam;
-	}
-	
-	protected static IUserActionMonitor getUam(){
-		return TestCRISTUserIntentPrediction.uam;
-	}
-	
-	
-	@Ignore
+
 	@Test
-	public void monitorActionsContext()
-	{
-		
-		identity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
-		
-		ServiceResourceIdentifier serviceId_music = new ServiceResourceIdentifier();
-		ServiceResourceIdentifier serviceId_checkin = new ServiceResourceIdentifier();
+	public void test() {
 		try {
+			String stringId = "zhiyong@societies.org";
+			CtxEntityIdentifier entityId = new CtxEntityIdentifier(stringId, "testEntity", new Long(123456));
+			CtxAttributeIdentifier lightId = new CtxAttributeIdentifier(entityId, "LIGHT", new Long(123456));
+			CtxAttributeIdentifier soundId = new CtxAttributeIdentifier(entityId, "SOUND", new Long(123456));
+			CtxAttributeIdentifier tempId = new CtxAttributeIdentifier(entityId, CtxAttributeTypes.TEMPERATURE, new Long(123456));
+			CtxAttributeIdentifier gpsId = new CtxAttributeIdentifier(entityId, CtxAttributeTypes.LOCATION_COORDINATES, new Long(123456));
+			CtxAttribute light = new CtxAttribute(lightId);
+			CtxAttribute sound = new CtxAttribute(soundId);
+			CtxAttribute temp = new CtxAttribute(tempId);
+			CtxAttribute gps = new CtxAttribute(gpsId);
+			
+			userId = new MockIdentity(IdentityType.CSS, "zhiyong", "societies.org");
+			IndividualCtxEntity personEntity = new IndividualCtxEntity(entityId);
+
+			CRISTUserIntentPrediction cristPredictor = new CRISTUserIntentPrediction();
+			CRISTUserIntentTaskManager cristMgr = new CRISTUserIntentTaskManager();
+			CRISTUserIntentDiscovery cristDisc = new CRISTUserIntentDiscovery();
+			cristPredictor.setCristTaskManager(cristMgr);
+			ctxBroker = mock(ICtxBroker.class);
+			cristMgr.setCtxBroker(ctxBroker);
+			cristMgr.setCristDiscovery(cristDisc);
+			
+			when(ctxBroker.retrieveIndividualEntity(userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(personEntity));
+			when(ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION,
+					new ArrayList<CtxAttributeIdentifier>(), null, null)).thenReturn(null);		
+			when(ctxBroker.retrieve(lightId)).thenReturn(new AsyncResult<CtxModelObject>(light));
+			when(ctxBroker.retrieve(soundId)).thenReturn(new AsyncResult<CtxModelObject>(sound));
+			when(ctxBroker.retrieve(tempId)).thenReturn(new AsyncResult<CtxModelObject>(temp));
+			when(ctxBroker.retrieve(gpsId)).thenReturn(new AsyncResult<CtxModelObject>(gps));
+
+			
+			ServiceResourceIdentifier serviceId_music = new ServiceResourceIdentifier();
 			serviceId_music.setIdentifier(new URI("http://testService_music"));
+			ServiceResourceIdentifier serviceId_checkin = new ServiceResourceIdentifier();
 			serviceId_checkin.setIdentifier(new URI("http://testService_checkin"));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		
-		LOG.info("#TestCRIST - sending mock actions for storage");
 
-		//set context data
-		//setContext(CtxAttributeTypes.SITUATION, "Study Hall");
-		//setContext(CtxAttributeTypes.LIGHT, 100);
-	setContext("SOUND", 30);
-		setContext(CtxAttributeTypes.TEMPERATURE, 22);
-		//setContext(CtxAttributeTypes.GPS, "N/A");
 
-		//send actions - 1 second apart
-		IAction action1 = new Action(serviceId_music, "musicService", "switch", "on");
-		TestCRISTUserIntentPrediction.uam.monitor(identity, action1);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		
-		
-		//setContext(CtxAttributeTypes.SITUATION, "Study Hall");
-		//setContext(CtxAttributeTypes.LIGHT, 100);
-		//setContext(CtxAttributeTypes.SOUND, 30);
-		setContext(CtxAttributeTypes.TEMPERATURE, 22);
-		//setContext(CtxAttributeTypes.GPS, "N/A");
-		
-		IAction action2 = new Action(serviceId_music, "musicService", "volume", "low");
-		TestCRISTUserIntentPrediction.uam.monitor(identity, action2);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		
-		//...
-		
-		/*
-		 * CHECK HISTORY DATA
-		 */
-		LOG.info("*********** CHECK HISTORY DATA ************");
-		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
-		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
-		try {
-			tupleResults  = TestCRISTUserIntentPrediction.ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, listOfEscortingAttributeIds, null, null).get();
-			Assert.assertTrue(tupleResults.size() == 2);
-			printHocTuplesDB(tupleResults);
-		
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-	private CtxAttribute setContext(String type, Serializable value){
+			
+			System.out.println("Start to input mock history: ");
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "on"));
+			Thread.sleep(100);//0
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "volume", "down"));
+			Thread.sleep(100);//1
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "next"));
+			Thread.sleep(100);//2
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "off"));
+			Thread.sleep(100);//3
+			
+			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "switch", "on"));
+			Thread.sleep(100);//4
+			
+			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "checkin", "current"));
+			Thread.sleep(100);//5
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("80"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "switch", "off"));
+			Thread.sleep(100);//6
+			
+			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "on"));
+			Thread.sleep(100);//7
+			
+			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "volume", "up"));
+			Thread.sleep(100);//8
+			
+			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "next"));
+			Thread.sleep(100);//9
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("26"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "off"));
+			Thread.sleep(100);//10
+			
+			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "switch", "on"));
+			Thread.sleep(100);//11
+			
+			light.setStringValue("120"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("60"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("15"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue("48.9, 2.33"); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "checkin", "current"));
+			Thread.sleep(100);//12
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("80"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_checkin, "checkinService", "switch", "off"));
+			Thread.sleep(100);//13
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "on"));
+			Thread.sleep(100);//14
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "volume", "down"));
+			Thread.sleep(100);//15
 
-		CtxAttribute attr = null; 
-		try {
-			IndividualCtxEntity operator = TestCRISTUserIntentPrediction.ctxBroker.retrieveCssOperator().get();
-
-			Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
-			if(ctxAttrSet.size()>0 ){
-				ArrayList<CtxAttribute> ctxAttrList = new ArrayList<CtxAttribute>(ctxAttrSet);	
-				attr = ctxAttrList.get(0);
-				attr = TestCRISTUserIntentPrediction.ctxBroker.updateAttribute(attr.getId(), value).get();
-			} else {
-				attr = TestCRISTUserIntentPrediction.ctxBroker.createAttribute(operator.getId(), type).get();
-				attr = TestCRISTUserIntentPrediction.ctxBroker.updateAttribute(attr.getId(),value).get();
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "next"));
+			Thread.sleep(100);//16
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "off"));
+			Thread.sleep(100);//17
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "switch", "on"));
+			Thread.sleep(100);//18
+			
+			light.setStringValue("100"); cristPredictor.getCRISTPrediction(userId, light);
+			sound.setStringValue("30"); cristPredictor.getCRISTPrediction(userId, sound);
+			temp.setStringValue("22"); cristPredictor.getCRISTPrediction(userId, temp);
+			gps.setStringValue(""); cristPredictor.getCRISTPrediction(userId, gps);
+			cristPredictor.getCRISTPrediction(userId, new Action(serviceId_music, "musicService", "volume", "down"));
+			Thread.sleep(100);//19
+			
+			cristMgr.displayHistoryList();
+			cristMgr.displayIntentModel();
+			
+			
+			
+			//check the result
+			light.setStringValue("120");
+			Future<List<CRISTUserAction>> results = cristPredictor.getCRISTPrediction(userId, light);
+			for (int i = 0; i < results.get().size(); i++)	{
+				System.out.println("Infer intent by context: ");
+				System.out.println("results.get().get(i).getActionID(): " + results.get().get(i).getActionID());
+				Assert.assertTrue(results.get().get(i).getActionID() != null);
 			}
+			
+			IAction myAction = new Action(serviceId_music, "musicService", "switch", "on");
+			results = cristPredictor.getCRISTPrediction(userId, myAction);
+			for (int i = 0; i < results.get().size(); i++)	{
+				System.out.println("Infer intent by action: ");
+				System.out.println("results.get().get(i).getActionID(): " + results.get().get(i).getActionID());
+				Assert.assertTrue(results.get().get(i).getActionID() != null);
+			}
+			
+			Future<CRISTUserAction> result = cristPredictor.getCurrentUserIntentAction(userId, serviceId_checkin, "switch");
+			System.out.println("result: " + result);
+			System.out.println("result.get(): " + result.get());
+			Assert.assertTrue(result != null); //.getActionID()result.get() != null
+
+/*			
+			verify(ctxBroker).retrieveIndividualEntity(userId);
+			verify(ctxBroker).retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION,
+					new ArrayList<CtxAttributeIdentifier>(), null, null);
+			verify(ctxBroker).retrieve(lightId);
+			verify(ctxBroker).retrieve(soundId);
+			verify(ctxBroker).retrieve(tempId);
+			verify(ctxBroker).retrieve(gpsId);
+*/
+			
+			
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return attr;
-	}
-	
-	protected void printHocTuplesDB(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults){
-
-		LOG.info("printing Tuples");
-		int i = 0;
-		for (CtxHistoryAttribute primary : tupleResults.keySet()){
-
-			try {
-				IAction action = (IAction)SerialisationHelper.deserialise(primary.getBinaryValue(),this.getClass().getClassLoader());
-				LOG.info(i+ " action name: "+action.getparameterName()+" action value: "+action.getvalue()+ " action service "+action.getServiceID().getIdentifier());
-				for(CtxHistoryAttribute escortingAttr: tupleResults.get(primary)){
-					String result = getValue(escortingAttr);
-					LOG.info("escording attribute type: "+escortingAttr.getType()+" value:"+result);
-				}
-				i++;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	protected String getValue(CtxHistoryAttribute attribute){
-
-		String result = "";
-
-		if (attribute.getStringValue()!=null) {
-			result = attribute.getStringValue();
-			return result;             			
-		}
-		else if(attribute.getIntegerValue()!=null) {
-			Integer valueInt = attribute.getIntegerValue();
-			result = valueInt.toString();
-			return result; 
-		} else if (attribute.getDoubleValue()!=null) {
-			Double valueDouble = attribute.getDoubleValue();
-			result = valueDouble.toString();  			
-			return result; 
-		} 
-		return result; 
-	}
-	
-	
-	
-	
-	/*
-	@Before
-	public void setUp() throws Exception {
-		
-		cristPredictor = new CRISTUserIntentPrediction();
-		CRISTUserIntentTaskManager cristTaskManager = (CRISTUserIntentTaskManager) cristPredictor.getCristTaskManager();
-		
-		//mock data
-		cristTaskManager.initialiseCRISTUserIntentManager();
-		//myID = ;//How to construct?
-		//serviceID = 
-		//CtxEntityIdentifier ctxEntityIdentifier = new CtxEntityIdentifier("UserSurrounding"); 
-		//myCtx = new CtxAttribute(new CtxAttributeIdentifier(ctxEntityIdentifier, "Light", 123456789888L));
-		//myCtx.setStringValue("30");//dark
-		//cristPredictor.enableCRISTPrediction(true);
-
 	}
 
-	
-	@Ignore
-	@Test
-	public void testGetCRISTPredictionIIdentityCtxAttribute() {
-		Future<List<CRISTUserAction>> results = cristPredictor
-				.getCRISTPrediction(myID, myCtx);
-		
-		//fail("Not yet implemented");
-	}
 
-	@Ignore
-	@Test
-	public void testGetCRISTPredictionIIdentityIAction() {
-		Future<List<CRISTUserAction>> results = cristPredictor
-				.getCRISTPrediction(myID, myAction);
-		
-	}
 
-	@Ignore("Not yet implemented")
-	@Test
-	public void testGetCurrentUserIntentAction() {
-		Future<CRISTUserAction> result = cristPredictor
-				.getCurrentUserIntentAction(myID, 
-						serviceID, "volume");
-		fail("Not yet implemented");
-	}
-*/
 }
