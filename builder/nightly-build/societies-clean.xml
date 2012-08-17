@@ -31,32 +31,34 @@
 
 	<!-- Setup the identity of this builder -->
 	<groupId>org.societies</groupId>
-	<artifactId>virgo-nightly-builder</artifactId>
+	<artifactId>societies-env-cleaner</artifactId>
 	<packaging>pom</packaging>
 	<version>0.1</version>
-	<name>Virgo Nightly Builder</name>
+	<name>Societies Environment Cleaner</name>
 
 
-	<!-- All Spring-OSGi Java projects to be included in nightly builds -->
-	<modules>
-		<module>societies-clean.xml</module>
-		
-		<module>../distributions/virgo-baseline.xml</module>
-		<module>../distributions/virgo-cloud-node.xml</module>
-		<module>../distributions/virgo-da-node.xml</module>
+    <build>
+    	<plugins>
+        	<plugin>
+        		<artifactId>maven-antrun-plugin</artifactId>
+        		<version>1.7</version>
+        		<executions>
+          			<execution>
+            				<phase>clean</phase>
+            				<configuration>
+              					<target>
+							<ant antfile="${basedir}/ant-societies-clean.xml">
+                  						<target name="clean"/>
+                					</ant>
+              					</target>
+            				</configuration>
+            				<goals>
+              					<goal>run</goal>
+            				</goals>
+          			</execution>
+        		</executions>
+      		</plugin>
+    	</plugins>
+  </build>
 
-		<!-- include here automated integration test modules and other modules which are not to be included in the above distributions -->
-
-		<module>../../css-modules/device-mgmt/DeviceDriverSimulator/</module>
-		<module>../../css-modules/device-mgmt/devicemanagerconsumer/</module>
-		
-		<!-- Intelligent Community Orchestration: 4 bundles (not included in cloud node distribution until more integrated)-->
-		<!-- 
-		<module>../../intelligent-community-orchestration/API</module>
-		<module>../../intelligent-community-orchestration/CommunityLifecycleManagement</module> 
-		<module>../../intelligent-community-orchestration/EgocentricCommunityAnalyser</module>
-		<module>../../intelligent-community-orchestration/CPA</module>
-		-->
-		
-	</modules>
 </project>
