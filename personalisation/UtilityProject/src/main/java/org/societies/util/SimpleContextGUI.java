@@ -337,7 +337,7 @@ public class SimpleContextGUI extends JFrame  implements ActionListener
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			
+			}
 			this.LOG.debug("Updating symLoc attributes to: "+value);
 				for (CtxAttribute ctxAttribute : this.symlocAttributes){
 					ctxAttribute.setStringValue(value);
@@ -354,7 +354,7 @@ public class SimpleContextGUI extends JFrame  implements ActionListener
 						e.printStackTrace();
 					}
 				}
-			}
+			
 		}else if (event.getSource().equals(this.btUpdateCtxAttribute)){
 			Field field = (Field) this.cmbCtxAttr.getSelectedItem();
 			try {
