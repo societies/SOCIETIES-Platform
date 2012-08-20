@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisDirectory;
@@ -93,7 +94,7 @@ public class CisDirectory implements ICisDirectory {
 		try {
 
 			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), 1);
+					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), cisAdRec.getMembershipCrit());
 
 			session.save(tmpEntry);
 
@@ -108,7 +109,6 @@ public class CisDirectory implements ICisDirectory {
 				session.close();
 			}
 		}
-
 	}
 
 	/*
@@ -125,12 +125,10 @@ public class CisDirectory implements ICisDirectory {
 
 		Transaction t = session.beginTransaction();
 		try {
-
 			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), 1);
+					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), cisAdRec.getMembershipCrit());
 
 			session.delete(tmpEntry);
-
 			t.commit();
 			log.debug("Cis Advertisement Record deleted.");
 
@@ -142,7 +140,6 @@ public class CisDirectory implements ICisDirectory {
 				session.close();
 			}
 		}
-
 	}
 
 	/*
@@ -160,12 +157,9 @@ public class CisDirectory implements ICisDirectory {
 		List<CisAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CisAdvertisementRecordEntry>();
 		List<CisAdvertisementRecord> returnList = new ArrayList<CisAdvertisementRecord>();
 		CisAdvertisementRecord record = null;
-
 	
 		try {
-
-			tmpAdvertList = session.createCriteria(
-					CisAdvertisementRecordEntry.class).list();
+			tmpAdvertList = session.createCriteria(CisAdvertisementRecordEntry.class).list();
 
 			for (CisAdvertisementRecordEntry entry : tmpAdvertList) {
 				record = new CisAdvertisementRecord();
@@ -174,12 +168,10 @@ public class CisDirectory implements ICisDirectory {
 				record.setUri(entry.getUri());
 				record.setPassword(entry.getpassword());
 				record.setType(entry.gettype());
-				//record.setMode(entry.getmode()); TODO: replace with membership criteria
+				record.setMembershipCrit(entry.getMembershipCrit()); 
 
 				returnList.add(record);
-
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -188,7 +180,6 @@ public class CisDirectory implements ICisDirectory {
 			}
 		}
 		return new AsyncResult<List<CisAdvertisementRecord>>(returnList);
-
 	}
 
 	/*
@@ -203,16 +194,14 @@ public class CisDirectory implements ICisDirectory {
 	@Async
 	public Future<List<CisAdvertisementRecord>> findForAllCis( CisAdvertisementRecord filteredcis, String filter) {
 
-	//filter by name, search directory and return CISs that match the relevant name
+		//filter by name, search directory and return CISs that match the relevant name
 		Session session = sessionFactory.openSession();
 		List<CisAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CisAdvertisementRecordEntry>();
 		List<CisAdvertisementRecord> returnList = new ArrayList<CisAdvertisementRecord>();
 		CisAdvertisementRecord record = null;
 
 		try {
-
-			tmpAdvertList = session.createCriteria(
-					CisAdvertisementRecordEntry.class).list();
+			tmpAdvertList = session.createCriteria(CisAdvertisementRecordEntry.class).list();
 
 			for (CisAdvertisementRecordEntry entry : tmpAdvertList) {
 				record = new CisAdvertisementRecord();
@@ -222,14 +211,11 @@ public class CisDirectory implements ICisDirectory {
 					record.setUri(entry.getUri());
 					record.setPassword(entry.getpassword());
 					record.setType(entry.gettype());
-					//record.setMode(entry.getmode()); TODO: replace with membership criteria
+					record.setMembershipCrit(entry.getMembershipCrit()); 
 
 					returnList.add(record);
 				}
-					
-
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -258,7 +244,7 @@ public class CisDirectory implements ICisDirectory {
 		try {
 
 			tmpEntry = new CisAdvertisementRecordEntry(oldCisValues.getName(),
-					oldCisValues.getId(), oldCisValues.getUri(), oldCisValues.getPassword(), oldCisValues.getType(), 1);
+					oldCisValues.getId(), oldCisValues.getUri(), oldCisValues.getPassword(), oldCisValues.getType(), oldCisValues.getMembershipCrit());
 			session.delete(tmpEntry);
 
 			tmpEntry.setName(updatedCisValues.getName());
@@ -266,12 +252,11 @@ public class CisDirectory implements ICisDirectory {
 			tmpEntry.setUri(updatedCisValues.getUri());
 			tmpEntry.setPassword(updatedCisValues.getPassword());
 			tmpEntry.setType(updatedCisValues.getType());
-			tmpEntry.setMode(1);
+			tmpEntry.setMembershipCrit(updatedCisValues.getMembershipCrit());
 			session.save(tmpEntry);
 
 			t.commit();
 			log.debug("Cis Advertisement Record updated.");
-
 		} catch (Exception e) {
 			t.rollback();
 			e.printStackTrace();
@@ -280,7 +265,6 @@ public class CisDirectory implements ICisDirectory {
 				session.close();
 			}
 		}
-
 	}
 
 
@@ -338,5 +322,4 @@ public class CisDirectory implements ICisDirectory {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

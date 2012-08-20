@@ -26,11 +26,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  package org.societies.cis.directory.model;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
+import org.societies.api.schema.cis.community.MembershipCrit;
 
 /**
  * This is the Class accepted by the CisDirectory when a cis wants to register
@@ -46,21 +46,14 @@ import javax.persistence.Id;
 @Table(name = "CisAdvertisementRecordEntry")
 public class CisAdvertisementRecordEntry implements Serializable {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 7819484667842436359L;
-	/**
-	 *
-	 */
-
 
 	private String name;
 	private String id;
 	private String uri;
 	private String password;
 	private String type;
-	private int mode;
+	private MembershipCrit membershipCrit;
 
 	/**
 	 * @return the name
@@ -143,43 +136,41 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	public void setType(String type) {
 		this.type = type;
 	}
+
+	/**
+	 * @return the membershipCrit
+	 */
+	@Column(name = "MembershipCrit")
+	public MembershipCrit getMembershipCrit() {
+		return membershipCrit;
+	}
+
+	/**
+	 * @param membershipCrit the membershipCrit to set
+	 */
+	public void setMembershipCrit(MembershipCrit membershipCrit) {
+		this.membershipCrit = membershipCrit;
+	}
 	
-	/**
-	 * @return the mode
-	 */
-	@Column(name = "Mode")
-	public int getmode() {
-		return mode;
-	}
-
-	/**
-	 * @param Mode
-	 *            the mode to set
-	 */
-	public void setMode(int mode) {
-		this.mode = mode;
-	}
-
 	/**
 	 * @param name
 	 * @param id
 	 * @param uri
 	 * @param password
 	 * @param type
-	 * @param mode
+	 * @param membershipCriteria
 	 */
-	public CisAdvertisementRecordEntry(String name, String id, String uri, String password, String type, int mode) {
+	public CisAdvertisementRecordEntry(String name, String id, String uri, String password, String type, MembershipCrit membershipCrit) {
 		super();
 		this.name = name;
 		this.id = id;
 		this.uri = uri;
 		this.password = password;
 		this.type = type;
-		this.mode = mode;
+		this.membershipCrit = membershipCrit;
 	}
 
 	public CisAdvertisementRecordEntry(){
 		super();
 	}
-
 }
