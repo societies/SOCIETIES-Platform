@@ -1,45 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-   <parent>
+	<parent>
         <groupId>org.societies</groupId>
         <artifactId>android-parent</artifactId>
         <version>0.1</version>
         <relativePath>../../../parent/android.xml</relativePath>
-   </parent>
+	</parent>
 
-   <groupId>org.societies.android.platform.servicemonitor</groupId>
-   <artifactId>SocietiesServiceMonitor</artifactId>
-   <name>ServiceMonitor</name>
-   <version>${release.version}</version>
-   <packaging>apklib</packaging>
-
-   <developers>
-      <developer>
-		 <name>WP4 Client Framework Team</name>
+	<groupId>org.societies.android.platform.servicemonitor</groupId>
+	<artifactId>SocietiesServiceMonitor</artifactId>
+	<name>ServiceMonitor</name>
+	<version>${release.version}</version>
+	<packaging>apklib</packaging>
+	
+	<developers>
+	    <developer>
+		<name>WP4 Client Framework Team</name>
 		<!-- Name of component author-->
 		 <email>http://www.ict-societies.eu</email>
 		<!-- Component author e-mail-->
-	  </developer>
-   </developers>
-
+		</developer>
+	</developers>
 
     <dependencies>
-      <!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
-        <dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>android</artifactId>
+	<!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.societies.android.api.internal</groupId>
 			<artifactId>societies-android-api-internal</artifactId>
 			<version>${release.version}</version>
 		</dependency>
-		
-        
-    </dependencies>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+	</dependencies>
 
     <build>
         <finalName>${project.artifactId}</finalName>
