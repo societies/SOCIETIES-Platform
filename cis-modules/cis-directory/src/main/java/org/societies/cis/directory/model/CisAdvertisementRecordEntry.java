@@ -26,11 +26,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  package org.societies.cis.directory.model;
 
 import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Id;
-import org.societies.api.schema.cis.community.MembershipCrit;
 
 /**
  * This is the Class accepted by the CisDirectory when a cis wants to register
@@ -43,28 +46,40 @@ import org.societies.api.schema.cis.community.MembershipCrit;
  */
 
 @Entity
-@Table(name = "CisAdvertisementRecordEntry")
+@Table(name = "org_societies_cis_directory_advertisementrecords")
 public class CisAdvertisementRecordEntry implements Serializable {
 
 	private static final long serialVersionUID = 7819484667842436359L;
 
-	private String name;
 	private String id;
+	private String name;
 	private String uri;
 	private String password;
 	private String type;
-	private MembershipCrit membershipCrit;
+	List<CriteriaRecordEntry> criteriaRecords;
 
-	/**
-	 * @return the name
+	/**@return the id
 	 */
-	@Column(name = "Name")
+	@Id
+	@Column(name = "cis_id")
+	public String getId() {
+		return id;
+	}
+
+	/**@param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**@return the name */
+	@Column(name = "cis_name")
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name
+	/**@param name
 	 *            the name to set
 	 */
 	public void setName(String name) {
@@ -72,26 +87,9 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	}
 
 	/**
-	 * @return the id
-	 */
-	@Id
-	@Column(name = "ID")
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	/**
 	 * @return the uri
 	 */
-	@Column(name = "Uri")
+	@Column(name = "uri")
 	public String getUri() {
 		return uri;
 	}
@@ -108,7 +106,7 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	/**
 	 * @return the password
 	 */
-	@Column(name = "Password")
+	@Column(name = "password")
 	public String getpassword() {
 		return password;
 	}
@@ -124,32 +122,27 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	/**
 	 * @return the Type
 	 */
-	@Column(name = "Type")
+	@Column(name = "type")
 	public String gettype() {
 		return type;
 	}
 
-	/**
-	 * @param Type
+	/**@param Type
 	 *            the Type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
 	}
 
-	/**
-	 * @return the membershipCrit
-	 */
-	@Column(name = "MembershipCrit")
-	public MembershipCrit getMembershipCrit() {
-		return membershipCrit;
+	/** @return the criteriaRecords */
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "org_societies_cis_directory_advertisementrecords")
+	public List<CriteriaRecordEntry> getCriteriaRecords() {
+		return criteriaRecords;
 	}
 
-	/**
-	 * @param membershipCrit the membershipCrit to set
-	 */
-	public void setMembershipCrit(MembershipCrit membershipCrit) {
-		this.membershipCrit = membershipCrit;
+	/** @param criteriaRecords the criteriaRecords to set */
+	public void setCriteriaRecords(List<CriteriaRecordEntry> criteriaRecords) {
+		this.criteriaRecords = criteriaRecords;
 	}
 	
 	/**
@@ -158,16 +151,15 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	 * @param uri
 	 * @param password
 	 * @param type
-	 * @param membershipCriteria
+	 * @param criteriaRecords
 	 */
-	public CisAdvertisementRecordEntry(String name, String id, String uri, String password, String type, MembershipCrit membershipCrit) {
+	public CisAdvertisementRecordEntry(String name, String id, String uri, String password, String type) {
 		super();
 		this.name = name;
 		this.id = id;
 		this.uri = uri;
 		this.password = password;
 		this.type = type;
-		this.membershipCrit = membershipCrit;
 	}
 
 	public CisAdvertisementRecordEntry(){

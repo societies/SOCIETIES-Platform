@@ -37,11 +37,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisDirectory;
 import org.societies.cis.directory.model.CisAdvertisementRecordEntry;
+import org.societies.cis.directory.model.CriteriaRecordEntry;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -88,16 +90,25 @@ public class CisDirectory implements ICisDirectory {
 		System.out.println("+++++++++++++++++++++++ Uri is  = " + cisAdRec.getUri());
 		
 		Session session = sessionFactory.openSession();
-		CisAdvertisementRecordEntry tmpEntry = null;
+		CisAdvertisementRecordEntry advertEntry = null;
 
 		Transaction t = session.beginTransaction();
 		try {
-
-			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), cisAdRec.getMembershipCrit());
-
-			session.save(tmpEntry);
-
+			//ADVERTISEMENT RECORD
+			advertEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
+					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType());
+			session.save(advertEntry);
+			
+			//LIST OF CRITERIA RECORDS
+			List<CriteriaRecordEntry> criteriaRecords = new ArrayList<CriteriaRecordEntry>(); 
+			for(Criteria tmpCrit: cisAdRec.getMembershipCrit().getCriteria()) {
+				CriteriaRecordEntry critEntry = new CriteriaRecordEntry(tmpCrit.getAttrib(), tmpCrit.getOperator(), tmpCrit.getValue1(), tmpCrit.getValue2(), tmpCrit.getRank());
+				critEntry.setCisAdvertRecord(advertEntry);
+				criteriaRecords.add(critEntry);
+			}
+			advertEntry.setCriteriaRecords(criteriaRecords);
+			
+			session.save(criteriaRecords);
 			t.commit();
 			log.debug("Cis Advertisement Record Saved.");
 
