@@ -5,7 +5,7 @@
 	<groupId>org.societies</groupId>
 	<artifactId>spring-osgi-parent</artifactId>
 	<packaging>pom</packaging>
-
+	<version>RELEASE</version>
 	<!-- All platform projects should inherit from version-parent - so that 
 		a common versioning can be applied -->
 	<parent>
