@@ -34,6 +34,12 @@ public interface IIdentityManager {
 	 */
 	INetworkNode getThisNetworkNode();
 	
+	/**
+	 * Returns the identifier for the cloud node of this account
+	 * @return
+	 */
+	INetworkNode getCloudNode();
+	
 	/** Ctx Requirement
 	 * @return
 	 */
