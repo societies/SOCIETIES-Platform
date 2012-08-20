@@ -80,4 +80,13 @@ class Configuration {
 		}
 		return debug;
 	}
+	
+	public String getDomainAuthorityNode() {
+		String daNode = null;
+		try {
+			daNode = configutationBundle.getString("daNode");
+		} catch(MissingResourceException e) {
+		}
+		return daNode;
+	}
 }

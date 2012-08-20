@@ -22,6 +22,8 @@ public interface XMPPAgent {
 	
 	public String getIdentity();
 	
+	public String getDomainAuthorityNode();
+	
 	public String getItems(String entity, String node, Callback callback) throws CommunicationException;
 	
 	public Boolean isConnected();
