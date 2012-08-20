@@ -312,6 +312,23 @@
 				<scope>test</scope>
 			</dependency>
 
+
+			<!--  Common external libraries -->
+			<dependency>
+				<groupId>org.societies</groupId>
+				<artifactId>common-ext-libs</artifactId>
+				<version>${release.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<!--  Common external database libraries -->
+			
+			<dependency>
+				<groupId>org.societies</groupId>
+				<artifactId>hibernate_classes</artifactId>
+				<version>${release.version}</version>
+				<scope>provided</scope>
+			</dependency>
+		
 		</dependencies>
 	</dependencyManagement>
 
