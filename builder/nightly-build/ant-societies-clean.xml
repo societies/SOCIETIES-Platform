@@ -20,32 +20,32 @@
   </target>
 
   <target name="clean-database">
-	<echo message="clean location ${virgo.home}/Databases"/>
-	<delete dir="${virgo.home}/Databases"/>
+	<echo message="clean location ${spring.osgi.deploy.dir}/../../Databases"/>
+	<delete dir="${spring.osgi.deploy.dir}/../../Databases"/>
   </target>
 
   <target name="clean-virgo-jars">
-	<echo message="clean location ${virgo.home}/repository/usr/*.jar"/>
+	<echo message="clean location ${spring.osgi.deploy.dir}/*.jar"/>
 	<delete>
-		<fileset dir="${virgo.home}/repository/usr">
+		<fileset dir="${spring.osgi.deploy.dir}">
  			<include name="*.jar"/>
 		</fileset>
 	</delete>
   </target>
 
   <target name="clean-virgo-wars">
-	<echo message="clean location ${virgo.home}/repository/usr/*.war"/>
+	<echo message="clean location ${spring.osgi.deploy.dir}/*.war"/>
 	<delete>
-		<fileset dir="${virgo.home}/repository/usr">
+		<fileset dir="${spring.osgi.deploy.dir}">
  			<include name="*.war"/>
 		</fileset>
 	</delete>
   </target>
 
   <target name="clean-virgo-libd">
-	<echo message="clean location ${virgo.home}/repository/usr/*.libd"/>
+	<echo message="clean location ${spring.osgi.deploy.dir}/*.libd"/>
 	<delete>
-		<fileset dir="${virgo.home}/repository/usr">
+		<fileset dir="${spring.osgi.deploy.dir}">
  			<include name="*.libd"/>
 		</fileset>
 	</delete>
