@@ -53,7 +53,7 @@ public interface IPrivacyDataManager {
 	 */
 	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
 	/**
-	 * Check if a requestor has the permission to perform actions under a personal data
+	 * Check if a requestor has the permission to perform action under a personal data
 	 * 
 	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service or a CIS.
 	 * @param dataId Id of the requested data

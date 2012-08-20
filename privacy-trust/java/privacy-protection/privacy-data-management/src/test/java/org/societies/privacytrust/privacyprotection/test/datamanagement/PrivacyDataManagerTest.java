@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -70,28 +71,39 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "PrivacyDataManagerInternalTest-context.xml" })
 public class PrivacyDataManagerTest {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class.getSimpleName());
-	
+
 	@Autowired
 	IPrivacyDataManager privacyDataManager;
 	@Autowired
 	IPrivacyDataManagerInternal privacyDataManagerInternal;
-	
-	// - Mocked data
+
+	// -- Mocked data
 	private DataIdentifier dataId;
-	
-	
+	private Requestor requestor;
+	private Requestor requestorCis;
+
+
+
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
+		// Data Id
 		try {
-			dataId = CtxIdentifierFactory.getInstance().fromString(DataIdentifierScheme.CONTEXT+"://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 		}
 		catch (MalformedCtxIdentifierException e) {
 			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
 			fail("setUp(): DataId creation error "+e.getMessage());
 		} 
+		// Requestor
+		IIdentity requestorId = Mockito.mock(IIdentity.class);
+		Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
+		IIdentity requestorCisId = Mockito.mock(IIdentity.class);
+		Mockito.when(requestorCisId.getJid()).thenReturn("cis.societies.local");
+		requestor = new Requestor(requestorId);
+		requestorCis = new RequestorCis(requestorId, requestorCisId);
 	}
 
 	/**
@@ -102,6 +114,140 @@ public class PrivacyDataManagerTest {
 	}
 
 
+	/* --- CHECK PERMISSION --- */
+
+	@Test
+	@Rollback(true)
+	public void CheckPermissionPreviouslyAdded() {
+		String testTitle = new String("CheckPermission: previously added permission");
+		LOG.info("[TEST] "+testTitle);
+		boolean dataUpdated = false;
+		ResponseItem permission = null;
+		try {
+			Action action = new Action(ActionConstants.READ);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(action);
+			Decision decision = Decision.PERMIT;
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, decision);
+			permission = privacyDataManager.checkPermission(requestor, dataId, actions);
+		} catch (PrivacyException e) {
+			LOG.error("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		}
+		assertTrue("Data permission not updated", dataUpdated);
+		assertNotNull("No permission retrieved", permission);
+		LOG.debug("Permission retrieved: "+permission.toString());
+		assertNotNull("No permission decision retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
+	}
+	
+	@Test
+	@Rollback(true)
+	public void CheckPermissionPreviouslyAddedRequestorCis() {
+		String testTitle = new String("CheckPermission: previously added permission, the requestor is a CIS");
+		LOG.info("[TEST] "+testTitle);
+		boolean dataUpdated = false;
+		ResponseItem permission = null;
+		try {
+			Action action = new Action(ActionConstants.READ);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(action);
+			Decision decision = Decision.PERMIT;
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, decision);
+			permission = privacyDataManager.checkPermission(requestorCis, dataId, actions);
+		} catch (PrivacyException e) {
+			LOG.error("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		}
+		assertTrue("Data permission not updated", dataUpdated);
+		assertNotNull("No permission retrieved", permission);
+		LOG.debug("Permission retrieved: "+permission.toString());
+		assertNotNull("No permission decision retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
+	}
+	
+	@Test
+	@Rollback(true)
+	public void CheckPermissionPreviouslyAddedRequestorCisError() {
+		String testTitle = new String("CheckPermission: the requestor is a CIS, previously added permission with a CSS requestor");
+		LOG.info("[TEST] "+testTitle);
+		boolean dataUpdated = false;
+		ResponseItem permission = null;
+		try {
+			Action read = new Action(ActionConstants.READ);
+			Action write = new Action(ActionConstants.WRITE);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(read);
+			actions.add(write);
+			Decision decision = Decision.PERMIT;
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, decision);
+			permission = privacyDataManager.checkPermission(requestorCis, dataId, actions);
+		} catch (PrivacyException e) {
+			LOG.error("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		}
+		assertTrue("Data permission not updated", dataUpdated);
+		assertNotNull("No permission retrieved", permission);
+		LOG.debug("Permission retrieved: "+permission.toString());
+		assertNotNull("No permission decision retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
+	}
+
+	@Test
+	@Rollback(true)
+	public void CheckPermissionPreviouslyDeleted() {
+		String testTitle = new String("CheckPermission: permission previously deleted, it is sure that it doesn't exist");
+		LOG.info("[TEST] "+testTitle);
+		boolean dataDeleted = false;
+		ResponseItem permission = null;
+		try {
+			Action action = new Action(ActionConstants.READ);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(action);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestor, dataId);
+			permission = privacyDataManager.checkPermission(requestor, dataId, actions);
+		} catch (PrivacyException e) {
+			LOG.error("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		}
+		assertTrue("Data permission not deleted", dataDeleted);
+		assertNotNull("No permission retrieved", permission);
+		LOG.info("Permission retrieved: "+permission.toString());
+		assertNotNull("No permission decision retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
+	}
+	@Test
+	@Rollback(true)
+	public void CheckPermissionPreviouslyDeletedRequestorCis() {
+		String testTitle = new String("CheckPermission: permission previously deleted, it is sure that it doesn't exist. The requestor is a CIS.");
+		LOG.info("[TEST] "+testTitle);
+		boolean dataUpdated = false;
+		boolean dataDeleted = false;
+		ResponseItem permission = null;
+		try {
+			Action read = new Action(ActionConstants.READ);
+			Action write = new Action(ActionConstants.WRITE, true);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(read);
+			actions.add(write);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, Decision.PERMIT);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId);
+			permission = privacyDataManager.checkPermission(requestorCis, dataId, actions);
+		} catch (PrivacyException e) {
+			LOG.error("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		}
+		assertTrue("Data permission not updated", dataUpdated);
+		assertTrue("Data permission not deleted", dataDeleted);
+		assertNotNull("No permission retrieved", permission);
+		LOG.info("Permission retrieved: "+permission.toString());
+		assertNotNull("No permission decision retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
+	}
+
+
+	/* --- OBFUSCATION --- */
+
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)}.
 	 * @throws PrivacyException 
@@ -110,7 +256,7 @@ public class PrivacyDataManagerTest {
 	@Ignore("PrivacyPreferenceManager not ready yet")
 	public void testObfuscateData() {
 		String testTitle = new String("testObfuscateData");
-		LOG.info("[Test] "+testTitle);
+		LOG.info("[TEST] "+testTitle);
 		IDataWrapper<Name> wrapper = DataWrapperFactory.getNameWrapper("Olivier", "Maridat");
 		wrapper.setDataId(dataId);
 		IDataWrapper<Name> obfuscatedDataWrapper = null;
@@ -130,7 +276,7 @@ public class PrivacyDataManagerTest {
 			LOG.error("[Test ExecutionException] "+testTitle+": Async execution error "+e.getMessage()+"\n", e);
 			fail("[Error "+testTitle+"] Privacy error: Async execution error "+e.getMessage());
 		}
-		
+
 		// Verify
 		LOG.info("### Orginal name:\n"+wrapper.getData().toString());
 		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
@@ -144,7 +290,7 @@ public class PrivacyDataManagerTest {
 	@Ignore
 	public void testHasObfuscatedVersion() {
 		String testTitle = new String("testHasObfuscatedVersion");
-		LOG.info("[Test] "+testTitle);
+		LOG.info("[TEST] "+testTitle);
 		String actual = "";
 		boolean expection = false;
 		try {
@@ -156,70 +302,7 @@ public class PrivacyDataManagerTest {
 		assertNull(actual);
 	}
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, IIdentity, IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)}.
-	 */
-	@Test
-	@Rollback(true)
-	public void testCheckPermissionPreviouslyAdded() {
-		String testTitle = new String("testCheckPermissionPreviouslyAdded");
-		LOG.info("[Test] "+testTitle);
-		boolean dataUpdated = false;
-		ResponseItem permission = null;
-		try {
-			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			IIdentity cisRequestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(cisRequestorId.getJid()).thenReturn("acis@societies.local");
-			Requestor requestor = new RequestorCis(requestorId, cisRequestorId);
-			Action action = new Action(ActionConstants.READ);
-			List<Action> actions = new ArrayList<Action>();
-			actions.add(action);
-			Decision decision = Decision.PERMIT;
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, decision);
-			permission = privacyDataManager.checkPermission(requestor, dataId, actions);
-		} catch (PrivacyException e) {
-			LOG.error("[Test PrivacyException] "+testTitle, e);
-			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
-		}
-		assertTrue("Data permission not updated", dataUpdated);
-		assertNotNull("No permission retrieved", permission);
-		LOG.info("Permission retrieved: "+permission.toString());
-		assertNotNull("No permission decision retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
-	}
-	
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, IIdentity, IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)}.
-	 */
-	@Test
-	@Rollback(true)
-	public void testCheckPermissionPreviouslyDeleted() {
-		String testTitle = new String("testCheckPermissionPreviouslyDeleted");
-		LOG.info("[Test] "+testTitle);
-		boolean dataDeleted = false;
-		ResponseItem permission = null;
-		try {
-			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			Requestor requestor = new Requestor(requestorId);
-			Action action = new Action(ActionConstants.READ);
-			List<Action> actions = new ArrayList<Action>();
-			actions.add(action);
-			dataDeleted = privacyDataManagerInternal.deletePermissions(requestor, dataId);
-			permission = privacyDataManager.checkPermission(requestor, dataId, actions);
-		} catch (PrivacyException e) {
-			LOG.error("[Test PrivacyException] "+testTitle, e);
-			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
-		}
-		assertTrue("Data permission not deleted", dataDeleted);
-		assertNotNull("No permission retrieved", permission);
-		LOG.info("Permission retrieved: "+permission.toString());
-		assertNotNull("No permission decision retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
-	}
-	
-	
+
 	// -- Dependency Injection
 	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
 		this.privacyDataManager = privacyDataManager;

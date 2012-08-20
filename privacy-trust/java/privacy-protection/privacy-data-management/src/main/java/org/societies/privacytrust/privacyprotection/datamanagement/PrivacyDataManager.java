@@ -152,7 +152,10 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			throw new NullPointerException("Not enought information: requestor or owner id is missing");
 		}
 		if (null == dataWrapper || null == dataWrapper.getData()) {
-			throw new PrivacyException("Not enought information: data id missing. At least the data type is expected.");
+			throw new PrivacyException("Not enought information: data missing");
+		}
+		if (null == dataWrapper.getDataId()) {
+			throw new PrivacyException("Not enought information: data id missing. At least the data type is expected");
 		}
 		if (!isDepencyInjectionDone(2)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
@@ -162,7 +165,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, dataWrapper.getDataId().getType());
 		double obfuscationLevel = 1;
 		if (null != dataObfuscationPreferences) {
-			dataObfuscationPreferences.getObfuscationLevel();
+			obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
 		}
 		// If no obfuscation is required: return directly the wrapped data
 		if (obfuscationLevel >= 1) {
@@ -206,7 +209,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, dataWrapper.getDataId().getType());
 		//		double obfuscationLevel = 1;
 		//		if (null != dataObfuscationPreferences) {
-		//			dataObfuscationPreferences.getObfuscationLevel();
+		//			obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
 		//		}
 		//		
 		//		// -- Check if an obfuscated version is available

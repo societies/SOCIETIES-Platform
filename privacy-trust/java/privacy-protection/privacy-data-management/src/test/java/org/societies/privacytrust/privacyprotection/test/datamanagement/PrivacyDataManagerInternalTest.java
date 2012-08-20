@@ -39,6 +39,8 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -51,6 +53,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.ExpectedException;
@@ -79,10 +82,18 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	private Requestor requestorCis;
 
 
-	
+
 	@Before
 	public void setUp() throws Exception {
-		dataId = CtxIdentifierFactory.getInstance().fromString("context://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+		// Data Id
+		try {
+			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+		}
+		catch (MalformedCtxIdentifierException e) {
+			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
+			fail("setUp(): DataId creation error "+e.getMessage());
+		} 
+		// Requestor
 		IIdentity requestorId = Mockito.mock(IIdentity.class);
 		Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
 		IIdentity requestorCisId = Mockito.mock(IIdentity.class);
@@ -90,13 +101,13 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		requestor = new Requestor(requestorId);
 		requestorCis = new RequestorCis(requestorId, requestorCisId);
 	}
-	
+
 	@After
 	public void tearDown() throws Exception {
 		//		privacyDataManagerInternal = null;
 	}
 
-	
+
 	@Test(expected = PrivacyException.class)  
 	@Rollback(true)
 	public void testUpdatePermissionNoActions() throws PrivacyException {
@@ -211,8 +222,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		}
 		assertTrue("Data has not been updated", dataUpdated);
 	}
-	
-	
+
+
 	@Test
 	@Rollback(true)
 	public void testGetPermission1Action() {
@@ -300,7 +311,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 
 
 	/* --- Dependency Injection -- */
-	
+
 	public void setPrivacyDataManagerInternal(
 			IPrivacyDataManagerInternal privacyDataManagerInternal) {
 		this.privacyDataManagerInternal = privacyDataManagerInternal;

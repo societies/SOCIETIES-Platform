@@ -428,6 +428,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		return criteria;
 	}
 
+	@Deprecated
 	private boolean containsAction(List<Action> actions, Action action) {
 		if (null == actions || actions.size() <= 0 || null == action) {
 			return false;
@@ -440,6 +441,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		return false;
 	}
 
+	@Deprecated
 	private boolean containsActions(List<Action> actions, List<Action> subActions) {
 		if (null == actions || actions.size() <= 0 || null == subActions || subActions.size() <= 0 || actions.size() < subActions.size()) {
 			return false;
