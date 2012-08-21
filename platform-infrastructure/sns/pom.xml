@@ -50,6 +50,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>TwitterConnector</module>
 		<module>FoursquareConnector</module>
 		<module>FacebookConn</module>
+		<module>LinkedinConn</module>
 		<module>socialdata</module>
 	</modules>
 </project>
