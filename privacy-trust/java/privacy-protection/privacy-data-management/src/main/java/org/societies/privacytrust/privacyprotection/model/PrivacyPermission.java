@@ -25,7 +25,6 @@
 package org.societies.privacytrust.privacyprotection.model;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
@@ -53,9 +51,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.identity.DataIdentifier;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * Entity to store privacy permissions for access control persistence
@@ -219,7 +214,7 @@ public class PrivacyPermission implements Serializable {
 		}
 		return actions;
 	}
-	
+
 	/*
 	 * Set a list of actions as a JSOn formatted string
 	 */
