@@ -30,6 +30,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -46,7 +47,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Table(name = "org_societies_cis_directory_membershipcriteria")
 public class CriteriaRecordEntry implements Serializable {
 
-	private static final long serialVersionUID = 7819484667842436359L;
+	private static final long serialVersionUID = 1819484667842436359L;
 	
     private Integer criteria_id;
 	protected String attrib;
@@ -54,13 +55,13 @@ public class CriteriaRecordEntry implements Serializable {
     protected String value1;
     protected String value2;
     protected Integer rank;
-    private CisAdvertisementRecordEntry cisAdvertRecord;
+    //private CisAdvertisementRecordEntry cisAdvertRecord;
 
 	/**@return the criteria_id
 	 */
     @Id
-    @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "criteria_id", unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name="criteria_id", unique=true, nullable=false)
     public Integer getCriteria_id() {
 		return criteria_id;
 	}
@@ -72,7 +73,7 @@ public class CriteriaRecordEntry implements Serializable {
 	}
 	
     /**Gets the attrib property. */
-    @Column(name = "attrib")
+    @Column(name="attrib")
     public String getAttrib() {
         return attrib;
     }
@@ -83,7 +84,7 @@ public class CriteriaRecordEntry implements Serializable {
     }
 
     /**Gets the value of the operator property */
-    @Column(name = "operator")
+    @Column(name="operator")
     public String getOperator() {
         return operator;
     }
@@ -94,7 +95,7 @@ public class CriteriaRecordEntry implements Serializable {
     }
 
     /**Gets the value of the value1 property */
-    @Column(name = "value1")
+    @Column(name="value1")
     public String getValue1() {
         return value1;
     }
@@ -105,7 +106,7 @@ public class CriteriaRecordEntry implements Serializable {
     }
 
     /**Gets the value of the value2 property */
-    @Column(name = "value2")
+    @Column(name="value2")
     public String getValue2() {
         return value2;
     }
@@ -116,7 +117,7 @@ public class CriteriaRecordEntry implements Serializable {
     }
 
     /**Gets the value of the rank property */
-    @Column(name = "rank")
+    @Column(name="rank")
     public Integer getRank() {
         return rank;
     }
@@ -128,18 +129,18 @@ public class CriteriaRecordEntry implements Serializable {
     
 	/**@return the cisAdvertRecord
 	 */
-    @ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "cis_id", nullable = false)
-	public CisAdvertisementRecordEntry getCisAdvertRecord() {
-		return cisAdvertRecord;
-	}
+    //@ManyToOne(fetch=FetchType.LAZY)
+	//@JoinColumn(name="cis_id", nullable=false)
+	//public CisAdvertisementRecordEntry getCisAdvertRecord() {
+//		return cisAdvertRecord;
+//	}
 
 	/**
 	 * @param cisAdvertRecord the cisAdvertRecord to set
 	 */
-	public void setCisAdvertRecord(CisAdvertisementRecordEntry cisAdvertRecord) {
-		this.cisAdvertRecord = cisAdvertRecord;
-	}
+//	public void setCisAdvertRecord(CisAdvertisementRecordEntry cisAdvertRecord) {
+//		this.cisAdvertRecord = cisAdvertRecord;
+//	}
 	
 	/**
 	 * @param attrib
@@ -156,5 +157,9 @@ public class CriteriaRecordEntry implements Serializable {
 		this.value1 = value1;
 		this.value2 = value2;
 		this.rank = rank;
+	}
+	
+	public CriteriaRecordEntry() {
+		super();
 	}
 }

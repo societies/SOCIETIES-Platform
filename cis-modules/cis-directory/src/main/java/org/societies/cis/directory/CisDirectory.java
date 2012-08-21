@@ -103,7 +103,7 @@ public class CisDirectory implements ICisDirectory {
 			List<CriteriaRecordEntry> criteriaRecords = new ArrayList<CriteriaRecordEntry>(); 
 			for(Criteria tmpCrit: cisAdRec.getMembershipCrit().getCriteria()) {
 				CriteriaRecordEntry critEntry = new CriteriaRecordEntry(tmpCrit.getAttrib(), tmpCrit.getOperator(), tmpCrit.getValue1(), tmpCrit.getValue2(), tmpCrit.getRank());
-				critEntry.setCisAdvertRecord(advertEntry);
+				//critEntry.setCisAdvertRecord(advertEntry);
 				criteriaRecords.add(critEntry);
 			}
 			advertEntry.setCriteriaRecords(criteriaRecords);
@@ -132,14 +132,24 @@ public class CisDirectory implements ICisDirectory {
 	@Override
 	public void deleteCisAdvertisementRecord(CisAdvertisementRecord cisAdRec) {
 		Session session = sessionFactory.openSession();
-		CisAdvertisementRecordEntry tmpEntry = null;
+		CisAdvertisementRecordEntry advertEntry = null;
 
 		Transaction t = session.beginTransaction();
 		try {
-			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), cisAdRec.getMembershipCrit());
+			//ADVERTISEMENT RECORD
+			advertEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
+					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType());
+			
+			//LIST OF CRITERIA RECORDS
+			List<CriteriaRecordEntry> criteriaRecords = new ArrayList<CriteriaRecordEntry>(); 
+			for(Criteria tmpCrit: cisAdRec.getMembershipCrit().getCriteria()) {
+				CriteriaRecordEntry critEntry = new CriteriaRecordEntry(tmpCrit.getAttrib(), tmpCrit.getOperator(), tmpCrit.getValue1(), tmpCrit.getValue2(), tmpCrit.getRank());
+				//critEntry.setCisAdvertRecord(advertEntry);
+				criteriaRecords.add(critEntry);
+			}
+			advertEntry.setCriteriaRecords(criteriaRecords);
 
-			session.delete(tmpEntry);
+			session.delete(advertEntry);
 			t.commit();
 			log.debug("Cis Advertisement Record deleted.");
 
@@ -179,7 +189,18 @@ public class CisDirectory implements ICisDirectory {
 				record.setUri(entry.getUri());
 				record.setPassword(entry.getpassword());
 				record.setType(entry.gettype());
-				record.setMembershipCrit(entry.getMembershipCrit()); 
+				//MEMBERSHIP CRITERIA
+				MembershipCrit memberCrit = new MembershipCrit();
+				for(CriteriaRecordEntry critRecord: entry.getCriteriaRecords()) {
+					Criteria crit = new Criteria();
+					crit.setAttrib(critRecord.getAttrib());
+					crit.setOperator(critRecord.getOperator());
+					crit.setRank(critRecord.getRank());
+					crit.setValue1(critRecord.getValue1());
+					crit.setValue2(critRecord.getValue2());
+					memberCrit.getCriteria().add(crit);
+				}
+				record.setMembershipCrit(memberCrit); 
 
 				returnList.add(record);
 			}
@@ -221,8 +242,19 @@ public class CisDirectory implements ICisDirectory {
 					record.setId(entry.getId());
 					record.setUri(entry.getUri());
 					record.setPassword(entry.getpassword());
-					record.setType(entry.gettype());
-					record.setMembershipCrit(entry.getMembershipCrit()); 
+					record.setType(entry.gettype()); 
+					//MEMBERSHIP CRITERIA
+					MembershipCrit memberCrit = new MembershipCrit();
+					for(CriteriaRecordEntry critRecord: entry.getCriteriaRecords()) {
+						Criteria crit = new Criteria();
+						crit.setAttrib(critRecord.getAttrib());
+						crit.setOperator(critRecord.getOperator());
+						crit.setRank(critRecord.getRank());
+						crit.setValue1(critRecord.getValue1());
+						crit.setValue2(critRecord.getValue2());
+						memberCrit.getCriteria().add(crit);
+					}
+					record.setMembershipCrit(memberCrit); 
 
 					returnList.add(record);
 				}
@@ -249,23 +281,31 @@ public class CisDirectory implements ICisDirectory {
 	public void updateCisAdvertisementRecord(CisAdvertisementRecord oldCisValues,
 		CisAdvertisementRecord updatedCisValues) {
 		Session session = sessionFactory.openSession();
-		CisAdvertisementRecordEntry tmpEntry = null;
+		CisAdvertisementRecordEntry advertEntry = null;
 
 		Transaction t = session.beginTransaction();
 		try {
 
-			tmpEntry = new CisAdvertisementRecordEntry(oldCisValues.getName(),
-					oldCisValues.getId(), oldCisValues.getUri(), oldCisValues.getPassword(), oldCisValues.getType(), oldCisValues.getMembershipCrit());
-			session.delete(tmpEntry);
-
-			tmpEntry.setName(updatedCisValues.getName());
-			tmpEntry.setId(updatedCisValues.getId());
-			tmpEntry.setUri(updatedCisValues.getUri());
-			tmpEntry.setPassword(updatedCisValues.getPassword());
-			tmpEntry.setType(updatedCisValues.getType());
-			tmpEntry.setMembershipCrit(updatedCisValues.getMembershipCrit());
-			session.save(tmpEntry);
-
+			//DELETE OLD ADVERTISEMENT RECORD
+			advertEntry = new CisAdvertisementRecordEntry(oldCisValues.getName(),
+					oldCisValues.getId(), oldCisValues.getUri(), oldCisValues.getPassword(), oldCisValues.getType());
+			session.delete(advertEntry);
+			
+			//CREATE NEW ADVERTISEMENT RECORD
+			advertEntry = new CisAdvertisementRecordEntry(updatedCisValues.getName(),
+					updatedCisValues.getId(), updatedCisValues.getUri(), updatedCisValues.getPassword(), updatedCisValues.getType());
+			session.save(advertEntry);
+			
+			//NEW LIST OF CRITERIA RECORDS
+			List<CriteriaRecordEntry> criteriaRecords = new ArrayList<CriteriaRecordEntry>(); 
+			for(Criteria tmpCrit: updatedCisValues.getMembershipCrit().getCriteria()) {
+				CriteriaRecordEntry critEntry = new CriteriaRecordEntry(tmpCrit.getAttrib(), tmpCrit.getOperator(), tmpCrit.getValue1(), tmpCrit.getValue2(), tmpCrit.getRank());
+				//critEntry.setCisAdvertRecord(advertEntry);
+				criteriaRecords.add(critEntry);
+			}
+			advertEntry.setCriteriaRecords(criteriaRecords);
+			session.save(criteriaRecords);
+			
 			t.commit();
 			log.debug("Cis Advertisement Record updated.");
 		} catch (Exception e) {

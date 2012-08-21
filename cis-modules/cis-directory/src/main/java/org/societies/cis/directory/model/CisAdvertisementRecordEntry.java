@@ -28,9 +28,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Id;
@@ -135,7 +138,11 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	}
 
 	/** @return the criteriaRecords */
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "org_societies_cis_directory_advertisementrecords")
+	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "org_societies_cis_directory_advertisementrecords", orphanRemoval=true) doesn't work!
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
+	@JoinTable(name="org_societies_cis_directory_membershipcriteria",
+               joinColumns = @JoinColumn( name="cis_id"),
+               inverseJoinColumns = @JoinColumn( name="criteria_id"))
 	public List<CriteriaRecordEntry> getCriteriaRecords() {
 		return criteriaRecords;
 	}
