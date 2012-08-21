@@ -96,7 +96,6 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	}
 
 	//Service API
-	@Override
 	public List<RunningServiceInfo> activeServices(String client) {
 		Log.d(LOG_TAG, "Calling activeServices");
 		Dbc.require("client cannot be null", client != null && client.length() > 0);
@@ -143,7 +142,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 		
 		return null;
 	}
-	@Override
+	
 	public List<RunningServiceInfo> activeServices(String client, String serviceFilter) {
 		Log.d(LOG_TAG, "Calling activeServices with filter: " + serviceFilter);
 		
@@ -186,7 +185,6 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 		return filteredServices; 
 	}
 
-	@Override
 	public List<RunningTaskInfo> activeTasks(String client) {
 		Log.d(LOG_TAG, "Calling activeTasks");
 		
@@ -225,7 +223,6 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 		return runningTasks;
 	}
 
-	@Override
 	public List<RunningTaskInfo> activeTasks(String client, String taskFilter) {
 		Log.d(LOG_TAG, "Calling activeTasks with filter: " + taskFilter);
 		
@@ -263,33 +260,38 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 		return filteredTasks; 
 	}
 
-	@Override
-	public AndroidParcelable getNodeDetails(String client, AndroidParcelable arg1) {
-		// TODO Auto-generated method stub
+	/* (non-Javadoc)
+	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#getNodeDetails(java.lang.String, org.societies.android.api.internal.examples.AndroidParcelable)
+	 */
+	public AndroidParcelable getNodeDetails(String arg0, AndroidParcelable arg1) {
 		return null;
 	}
 
-	@Override
-	public boolean startActivity(String client, String activity) {
-		// TODO Auto-generated method stub
+	/* (non-Javadoc)
+	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#startActivity(java.lang.String, java.lang.String)
+	 */
+	public boolean startActivity(String arg0, String arg1) {
 		return false;
 	}
 
-	@Override
-	public boolean startService(String client, String service) {
-		// TODO Auto-generated method stub
+	/* (non-Javadoc)
+	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#startService(java.lang.String, java.lang.String)
+	 */
+	public boolean startService(String arg0, String arg1) {
 		return false;
 	}
 
-	@Override
-	public boolean stopActivity(String client, String activity) {
-		// TODO Auto-generated method stub
+	/* (non-Javadoc)
+	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#stopActivity(java.lang.String, java.lang.String)
+	 */
+	public boolean stopActivity(String arg0, String arg1) {
 		return false;
 	}
 
-	@Override
-	public boolean stopService(String client, String service) {
-		// TODO Auto-generated method stub
+	/* (non-Javadoc)
+	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#stopService(java.lang.String, java.lang.String)
+	 */
+	public boolean stopService(String arg0, String arg1) {
 		return false;
 	}
 }
