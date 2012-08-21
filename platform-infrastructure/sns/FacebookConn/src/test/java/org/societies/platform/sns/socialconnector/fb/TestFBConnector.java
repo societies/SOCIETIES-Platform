@@ -81,31 +81,31 @@ public class TestFBConnector {
 	}
 	
 	
-	@Test
-	public void postATestMessage(){
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Date date = new Date();
-		String value="[TEST] Hello World! It's "+dateFormat.format(date);
-		connector.post(value);
-		logger.info("Facebook POST test:"+  value);
-		
-	}
-	
-	@Test
-	public void postATestEvent(){
-		
-		String value="{ \"event\": {"+
-        "\"name\": \"JUNIT Test Event\","+
-        "\"from\": \"2013-08-11\","+
-        "\"to\": \"2013-08-12\","+
-        "\"location\": \"NoWhere\","+
-        "\"description\": \"Social Network connector post test (FB)\"}"+
-        "}";
-		
-		connector.post(value);
-		logger.info("Facebook POST test: " + value);
-		
-	}
+//	@Test
+//	public void postATestMessage(){
+//		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//		Date date = new Date();
+//		String value="[TEST] Hello World! It's "+dateFormat.format(date);
+//		connector.post(value);
+//		logger.info("Facebook POST test:"+  value);
+//		
+//	}
+//	
+//	@Test
+//	public void postATestEvent(){
+//		
+//		String value="{ \"event\": {"+
+//        "\"name\": \"JUNIT Test Event\","+
+//        "\"from\": \"2013-08-11\","+
+//        "\"to\": \"2013-08-12\","+
+//        "\"location\": \"NoWhere\","+
+//        "\"description\": \"Social Network connector post test (FB)\"}"+
+//        "}";
+//		
+//		connector.post(value);
+//		logger.info("Facebook POST test: " + value);
+//		
+//	}
 	
 //	@Test
 //	public void postATestCheckin(){
