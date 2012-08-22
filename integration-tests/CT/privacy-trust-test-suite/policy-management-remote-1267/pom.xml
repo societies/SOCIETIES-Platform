@@ -2,28 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.integration.test.bit</groupId>
-	<artifactId>createcis</artifactId>
-	<name>#958 Create CIS Test Suite Bundle</name>
+	<artifactId>privacypolicymanagementremote</artifactId>
+	<name>#1267 Privacy Policy Management Remote Test Suite</name>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 
 	<developers>
-		<developer>
-			<name>Rafik Said Mansour</name>
-			<email>rafik.saidmansour@trialog.com</email>
-			<organization>Trialog</organization>
-			<timezone>+1</timezone>
-			<roles>
-				<role>Owner</role>
-				<role>Developer</role>
-			</roles>
-		</developer>
 		<developer>
 			<name>Olivier Maridat</name>
 			<email>olivier.maridat@trialog.com</email>
 			<organization>Trialog</organization>
 			<timezone>+1</timezone>
 			<roles>
+				<role>Owner</role>
 				<role>Developer</role>
 			</roles>
 		</developer>
@@ -36,7 +27,6 @@
 	</parent>
 
 	<dependencies>
-		<!-- SOCIETIES -->
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -49,25 +39,19 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>	
 		<!-- Test -->
 		<dependency>
-    		<groupId>org.societies.integration.test.util</groupId>
-    		<artifactId>integrationtestutil</artifactId>
-    		<version>1.0-SNAPSHOT</version>
-    		<scope>compile</scope>
+			<groupId>org.societies.integration.test.util</groupId>
+			<artifactId>integrationtestutil</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.0</version>
+			<version>4.1</version>
 			<scope>compile</scope>
-		</dependency>		
+		</dependency>
 		<!-- Tools -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -75,6 +59,7 @@
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+		<!-- Logs -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
@@ -82,22 +67,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>spring-osgi-core</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<version>4.1.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-			<version>4.0.0</version>
-		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -106,18 +81,14 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
-						<Bundle-Name>${pom.artifactId}</Bundle-Name>
-						<Bundle-Version>${pom.version}</Bundle-Version>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.artifactId}</Bundle-Name>
+						<Bundle-Version>${project.version}</Bundle-Version>
 						<Embed-Dependency>
-							integrationtestutil, junit;scope=compile|runtime, 
+							junit;scope=compile|runtime,
+							integrationtestutil;scope=compile|runtime,
 						</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<!-- <Import-Package>
-							org.slf4j.*,
-							org.junit.*
-						</Import-Package> -->
-
 					</instructions>
 				</configuration>
 			</plugin>
@@ -159,4 +130,5 @@
 			</plugin>
 		</plugins>
 	</build>
+
 </project>

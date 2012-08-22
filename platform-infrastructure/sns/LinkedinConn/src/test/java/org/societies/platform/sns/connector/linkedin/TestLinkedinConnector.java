@@ -1,34 +1,32 @@
-package org.societies.platform.sns.socialconnector.fb;
+package org.societies.platform.sns.connector.linkedin;
 
 import static org.junit.Assert.assertNotNull;
 
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
+import org.societies.platform.sns.connecor.linkedin.LinkedinConnector;
 
-import com.restfb.json.JsonObject;
-
-public class TestFBConnector {
+public class TestLinkedinConnector {
 
 	private static ISocialConnector connector = null;
-	private static final Logger logger = LoggerFactory.getLogger(TestFBConnector.class);
+	private final Logger logger = LoggerFactory.getLogger(TestLinkedinConnector.class);
     
-	private String TEST_TOKEN = "AAAFs43XOj3IBANAuFLLTycEWZCiHLvqN1BH9f4OGyhQbWJ2GZC7D57XbITHafLpisDjx0B9OtZCx3hhoxZANUNqOl8FK6tzchZAthmjTQVwZDZD";
+	
+	// get your token at http://dev.lucasimone.eu
+	private String TEST_TOKEN = "";
 	
 	@Before
 	public void setUp() {
-		//connector = new FacebookConnectorImpl("PUT HERE YOUR TOKEN", "Societies Username ");
+		//connector = new LinkedinConnectorImpl("PUT HERE YOUR TOKEN", "Societies Username ");
 		
-		connector = new FacebookConnectorImpl(TEST_TOKEN, "societies.project@gmail.com");
+		connector = new LinkedinConnector(TEST_TOKEN, "societies.project@gmail.com");
 		logger.info("Connector name: " + connector.getConnectorName());
 		logger.info("Connector id: " + connector.getID());
 		assertNotNull(connector);
@@ -37,13 +35,14 @@ public class TestFBConnector {
 
 	@After
 	public void tearDown() throws Exception {
-		logger.info("Facebook test copleted");
+		logger.info("Linkedin test copleted");
 		connector = null;
 	}
 
 	@Test
 	public void getSocialFriendTest() {
 		String friends = connector.getUserFriends();
+
 		logger.info("Social Friends (JSON STRING):\n" + friends);
 		assertNotNull("Social Friends (JSON STRING)", friends);
 	}
@@ -51,33 +50,37 @@ public class TestFBConnector {
 	@Test
 	public void getSocialProfileTest() {
 		String profile = connector.getUserProfile();
-		logger.info("Facebook Profile (JSON STRING):\n" + profile);
+
+		logger.info("Linkedin Profile (JSON STRING):\n" + profile);
 		assertNotNull("Social Profile (JSON STRING)", profile);
 	}
 
 	@Test
 	public void getSocialGroupTest() {
 		String groups = connector.getUserGroups();
-		logger.info("Facebook Groups (JSON STRING):\n" + groups);
+		logger.info("Linkedin Groups (JSON STRING):\n" + groups);
 		assertNotNull("Social Groups (JSON STRING)", groups);
 	}
 
 	@Test
 	public void getSocialActivitiesTest() {
 		String activities = connector.getUserActivities();
-		logger.info("Facebook activities (JSON STRING):\n" + activities);
+		logger.info("Linkedin activities (JSON STRING):\n" + activities);
 		assertNotNull("Social activities (JSON STRING)", activities);
 
 		logger.info(activities);
-		JsonObject jactivities = new JsonObject(activities);
+		try{
+		JSONObject jactivities = new JSONObject(activities);
 		assertNotNull(jactivities);
 		if (jactivities.has("error"))
 			logger.info("Connector return the following error:\n"
-					+ jactivities.getJsonObject("error").toString(1));
+					+ jactivities.getJSONObject("error").toString(1));
 		else
 			logger.info("Connector return the following activities:\n"
 					+ jactivities.toString(1));
-
+		}catch(Exception ex){
+			
+		}
 	}
 	
 	
@@ -87,10 +90,10 @@ public class TestFBConnector {
 //		Date date = new Date();
 //		String value="[TEST] Hello World! It's "+dateFormat.format(date);
 //		connector.post(value);
-//		logger.info("Facebook POST test:"+  value);
+//		logger.info("Linkedin POST test:"+  value);
 //		
 //	}
-//	
+	
 //	@Test
 //	public void postATestEvent(){
 //		
@@ -103,7 +106,7 @@ public class TestFBConnector {
 //        "}";
 //		
 //		connector.post(value);
-//		logger.info("Facebook POST test: " + value);
+//		logger.info("Linkedin POST test: " + value);
 //		
 //	}
 	
@@ -118,7 +121,7 @@ public class TestFBConnector {
 //        "}";
 //		
 //		connector.post(value);
-//		logger.info("Facebook POST test:"+ value);
+//		logger.info("Linkedin POST test:"+ value);
 //		
 //	}
 
