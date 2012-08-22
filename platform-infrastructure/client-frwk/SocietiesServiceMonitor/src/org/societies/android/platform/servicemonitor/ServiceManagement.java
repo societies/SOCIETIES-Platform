@@ -25,19 +25,20 @@
 package org.societies.android.platform.servicemonitor;
 
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
-import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
@@ -45,7 +46,6 @@ import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscove
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -58,22 +58,26 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class ServiceDiscovery extends Service implements IServiceDiscovery {
+public class ServiceManagement extends Service implements IServiceDiscovery, IServiceControl {
 
 	//COMMS REQUIRED VARIABLES
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("ServiceDiscoveryMsgBean", "ServiceDiscoveryResultBean");
-    private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/servicelifecycle/servicediscovery");
-    private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.servicelifecycle.servicediscovery");
+    private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/servicelifecycle/model",
+															  	  "http://societies.org/api/schema/servicelifecycle/servicediscovery",
+															  	  "http://societies.org/api/schema/servicelifecycle/servicecontrol");
+    private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.servicelifecycle.model",
+															   "org.societies.api.schema.servicelifecycle.servicediscovery",
+															   "org.societies.api.schema.servicelifecycle.servicecontrol");
     private ClientCommunicationMgr commMgr;
     
     //SERVICE LIFECYCLE INTENTS
-	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.servicediscovery.ReturnValue";
+	public static final String INTENT_RETURN_VALUE_KEY =  "org.societies.android.platform.servicediscovery.ReturnValue";
 	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.servicediscovery.ReturnStatus";
 	public static final String GET_SERVICE     = "org.societies.android.platform.servicediscovery.GET_SERVICE";
 	public static final String GET_SERVICES    = "org.societies.android.platform.servicediscovery.GET_SERVICES";
 	public static final String SEARCH_SERVICES = "org.societies.android.platform.servicediscovery.SEARCH_SERVICES";
 	
-    private static final String LOG_TAG = ServiceDiscovery.class.getName();
+    private static final String LOG_TAG = ServiceManagement.class.getName();
     private IBinder binder = null;
     
     @Override
@@ -95,8 +99,8 @@ public class ServiceDiscovery extends Service implements IServiceDiscovery {
 
 	/**Create Binder object for local service invocation */
 	public class LocalBinder extends Binder {
-		public ServiceDiscovery getService() {
-			return ServiceDiscovery.this;
+		public ServiceManagement getService() {
+			return ServiceManagement.this;
 		}
 	}
 	
@@ -105,9 +109,10 @@ public class ServiceDiscovery extends Service implements IServiceDiscovery {
 		return this.binder;
 	}
 	
-	public ServiceDiscovery() {
+	public ServiceManagement() {
 	}
 	
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceDiscovery >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)
 	 */
@@ -141,6 +146,28 @@ public class ServiceDiscovery extends Service implements IServiceDiscovery {
 	public List<org.societies.api.schema.servicelifecycle.model.Service> searchService(String client, org.societies.api.schema.servicelifecycle.model.Service filter, IIdentity identity) {
 		return null;
 	}
+
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceControl >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	
+	public ServiceControlResult installService(String client, URL arg1, IIdentity identity) {
+		return null;
+	}
+
+	public ServiceControlResult shareService(String client, org.societies.api.schema.servicelifecycle.model.Service service, IIdentity identity) {
+		return null;
+	}
+
+	public ServiceControlResult startService(String client, ServiceResourceIdentifier sri, IIdentity identity) {
+		return null;
+	}
+
+	public ServiceControlResult stopService(String client, ServiceResourceIdentifier sri, IIdentity identity) {
+		return null;
+	}
+
+	public ServiceControlResult unshareService(String client, org.societies.api.schema.servicelifecycle.model.Service arg1, IIdentity arg2) {
+		return null;
+	}
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/**
@@ -168,24 +195,19 @@ public class ServiceDiscovery extends Service implements IServiceDiscovery {
 		}
 
 		public void receiveError(Stanza arg0, XMPPError arg1) {
-			Log.d(LOG_TAG, "Callback receiveError");
-			
+			Log.d(LOG_TAG, "Callback receiveError");			
 		}
 
 		public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
 			Log.d(LOG_TAG, "Callback receiveInfo");
-			
 		}
 
 		public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
 			Log.d(LOG_TAG, "Callback receiveItems");
-			
 		}
 
 		public void receiveMessage(Stanza arg0, Object arg1) {
-			Log.d(LOG_TAG, "Callback receiveMessage");
-			
-			
+			Log.d(LOG_TAG, "Callback receiveMessage");	
 		}
 
 		public void receiveResult(Stanza returnStanza, Object msgBean) {
@@ -197,36 +219,27 @@ public class ServiceDiscovery extends Service implements IServiceDiscovery {
 				// --------- Service Discovery Bean ---------
 				if (msgBean.getClass().equals(ServiceDiscoveryResultBean.class)) {
 					Log.d(LOG_TAG, "ServiceDiscoveryBeanResult!");
-					ServiceDiscoveryResultBean serviceDiscoveryResult = (ServiceDiscoveryResultBean) msgBean;
-					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = serviceDiscoveryResult.getServices();
-					
+					ServiceDiscoveryResultBean discoResult = (ServiceDiscoveryResultBean) msgBean;
+					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
+
+					//NOTIFY CALLING CLIENT
 					intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) serviceList);
 					intent.setPackage(client);
-					Log.d(LOG_TAG, "Callback receiveResult sent return value: " + retValue);
-					LocalCSSManagerService.this.sendBroadcast(intent);
-					LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
-					//IServiceDiscoveryCallback serviceDiscoveryClient = getRequestingClient(returnStanza.getId());
-					//serviceDiscoveryClient.getResult(serviceDiscoveryResult.getServices());
 				} 
 				// --------- Service Control Bean ---------
 				if(msgBean.getClass().equals(ServiceControlResultBean.class)){
 					Log.d(LOG_TAG, "ServiceControlBeanResult!");
-					ServiceControlResultBean serviceControlResult = (ServiceControlResultBean) msgBean;
-					IServiceControlCallback serviceControlClient = getRequestingControlClient(returnStanza.getId());
-					Log.d(LOG_TAG, "ServiceControlBeanResult: " + serviceControlResult.getControlResult().getMessage());
-					serviceControlClient.setResult(serviceControlResult.getControlResult());
+					ServiceControlResultBean controlResult = (ServiceControlResultBean)msgBean;
+					ServiceControlResult resultObj = controlResult.getControlResult();
+					Log.d(LOG_TAG, "ServiceControlBeanResult: " + resultObj.getMessage());
+					
+					//NOTIFY CALLING CLIENT
+					intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) resultObj);
+					intent.setPackage(client);
 				}
-				//CssManagerResultBean resultBean = (CssManagerResultBean) retValue;
-				intent.putExtra(INTENT_RETURN_STATUS_KEY, resultBean.getResult().isResultStatus());
-				AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(resultBean.getResult().getProfile());
-				intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
-				intent.setPackage(client);
-				Log.d(LOG_TAG, "Callback receiveResult sent return value: " + retValue);
-				LocalCSSManagerService.this.sendBroadcast(intent);
-				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
-				this.updateLocalPersistence(aRecord);
+				ServiceManagement.this.sendBroadcast(intent);
+				ServiceManagement.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
 		}
-	}
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	}//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
