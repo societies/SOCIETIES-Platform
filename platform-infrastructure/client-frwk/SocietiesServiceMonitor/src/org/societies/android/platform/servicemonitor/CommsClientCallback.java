@@ -85,6 +85,14 @@ public class CommsClientCallback implements ICommCallback {
 		serviceControlClients.put(clientID, serviceControlClient);
 	}
 
+	/**
+	 * @param client
+	 * @param getServices
+	 */
+	public CommsClientCallback(String client, String getServices) {
+		// TODO Auto-generated constructor stub
+	}
+
 	/**Returns the correct service discovery client callback for this request 
 	 * @param requestID the id of the initiating request
 	 * @return
