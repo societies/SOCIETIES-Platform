@@ -295,10 +295,10 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		}
 		
 		IPerformanceMessage m = new PerformanceMessage();
-		m.setTestContext("CSM_Delay_SendUpdate");
+		m.setTestContext("CSM_Delay_ComponentInternal");
 		m.setSourceComponent(this.getClass()+"");
 		m.setPerformanceType(IPerformanceMessage.Delay);
-		m.setOperationType("DemoOpFromContext");
+		m.setOperationType("Register");
 		m.setD82TestTableName("S11");
 		m.setPerformanceNameValue("Delay="+(System.nanoTime()-timestamp ));
 
@@ -483,10 +483,10 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		}
 		
 		IPerformanceMessage m = new PerformanceMessage();
-		m.setTestContext("CSM_Delay_SendUpdate");
+		m.setTestContext("CSM_Delay_ComponentInternal");
 		m.setSourceComponent(this.getClass()+"");
 		m.setPerformanceType(IPerformanceMessage.Delay);
-		m.setOperationType("DemoOpFromContext");
+		m.setOperationType("SendUpdate");
 		m.setD82TestTableName("S11");
 		m.setPerformanceNameValue("Delay="+(System.nanoTime()-timestamp ));
 
