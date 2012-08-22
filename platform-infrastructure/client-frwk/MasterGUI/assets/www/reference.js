@@ -658,6 +658,24 @@ var Societies = {
 				'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 				'activeTasks',              //Telling the plugin, which action we want to perform
 				["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
+			},
+			
+			/**
+			 * @methodOf Societies.CoreServiceMonitorService#
+			 * @description Get a list of 3P Services for a given CSS or CIS
+			 * @param {Object} successCallback The callback which will be called when result is successful
+			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+			 * @returns List of 3P Service
+			 */
+			getServices: function(successCallback, failureCallback) {
+				var clientPackage = "org.societies.android.platform.gui";
+				console.log("Call CoreServiceMonitorService - getServices");
+
+				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     					//Callback which will be called when plugin action encounters an error
+				'PluginCoreServiceMonitor',  			//Telling PhoneGap that we want to run specified plugin
+				'getServices',              			//Telling the plugin, which action we want to perform
+				["org.societies.android.platform.gui", jQuery("#identity").val()]);//Passing a list of arguments to the plugin
 			}
 		}
 };
@@ -1233,9 +1251,67 @@ var SocietiesGUI = {
 
 				jQuery('#cssNodesTable').append(tableEntry);
 			}
+		},
+		
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Refresh the Active Service page with currently active services
+		 * @returns null
+		 */
 
+		refreshActiveServices: function() {
+			console.log("Refresh Active Service");
+
+			function success(data) {
+				//empty table
+				jQuery('#activeServicesTable tbody').remove();
+				
+				for (i  = 0; i < data.length; i++) {
+					var tableEntry = "<tr>" + 
+					"<td>" + data[i].className + "</td>" + 
+					"<td>" + SocietiesGUI.convertMilliseconds(data[i].activeSince) + "</td>" + 
+						+ "</tr>"
+
+					jQuery('#activeServicesTable').append(tableEntry);
+				}
+			}
+			
+			function failure(data) {
+				alert("refreshActiveServices - failure: " + data);
+			}
+			
+			window.plugins.CoreServiceMonitorService.activeServices(success, failure);
+			
+		},
+		
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Refresh the 3P Service page with currently active services
+		 * @returns null
+		 */
+
+		refresh3PServices: function() {
+			console.log("Refreshing 3P Services");
+
+			function success(data) {
+				//empty table
+				jQuery('#societiesServicesTable tbody').remove();
+				//SERVICE
+				for (i  = 0; i < data.length; i++) {
+					var tableEntry = "<tr>" + 
+					"<td>" + data[i].serviceName + "</td>" + 
+					"<td>" + data[i].serviceDescription + "</td>" + 
+					</tr>"
+					jQuery('#societiesServicesTable').append(tableEntry);
+				}
+			}
+			
+			function failure(data) {
+				alert("refresh3PServices - failure: " + data);
+			}
+			
+			window.plugins.CoreServiceMonitorService.activeServices(success, failure);
 		}
-
 };
 
 
@@ -1307,4 +1383,8 @@ jQuery(function() {
 		SocietiesGUI.getAppPref();
 	});
 
+	$('#List3PServices').click(function() {
+		SocietiesGUI.connectToCoreServiceMonitor(SocietiesGUI.refresh3PServices);;
+	});
+	
 });

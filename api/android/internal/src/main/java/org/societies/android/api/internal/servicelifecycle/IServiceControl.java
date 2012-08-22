@@ -41,41 +41,44 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlRe
  */
 public interface IServiceControl {
 
+	public String methodsArray[] = {"startService(String client, ServiceResourceIdentifier serviceId, String identity)", 
+								    "stopService(String client, ServiceResourceIdentifier serviceId, String identity)",
+								    "installService(String client, URL bundleLocation, String identity)",
+								    "shareService(String client, Service service, String identity)",
+								    "unshareService(String client, Service service, String identity)"
+								   };
+	
 	/**
 	 * This method starts the service that is identified by the </code>ServiceResourceIdentifier</code>
 	 * 
 	 * @param serviceId unique service identifier
-	 * @param node The node where the service is located
-	 * @param callback The callback object
+	 * @param identity The target node where service is installed
 	 */
 	
-	public ServiceControlResult startService(String client, ServiceResourceIdentifier serviceId, IIdentity node);
+	public ServiceControlResult startService(String client, ServiceResourceIdentifier serviceId, String identity);
 
 	
 	/**
 	 * This method stops the service running in the container that is identified by the </code>ServiceResourceIdentifier</code>
 	 * 
 	 * @param serviceId unique service identifier
-	 * @param node The node where the service is located
-	 * @param callback The callback object
+	 * @param identity The target node where service is installed
 	 */
-	public ServiceControlResult stopService(String client, ServiceResourceIdentifier serviceId, IIdentity node);
+	public ServiceControlResult stopService(String client, ServiceResourceIdentifier serviceId, String identity);
 	
 	/**
 	 * This method install a new service into the container
 	 * 
 	 * @param bundleLocation the URL of the bundle to install
-	 * @param node The node where the service should be installed
-	 * @param callback The callback object
+	 * @param identity The target node where service is to be installed
 	 */
-	public ServiceControlResult installService(String client, URL bundleLocation, IIdentity node);
+	public ServiceControlResult installService(String client, URL bundleLocation, String identity);
 
 	
 	/**
 	 * This method installs a shared service into the container
 	 * 
 	 * @param service the Service to install
-	 * @param node The node where the service should be installed.
 	 * @param callback The callback object
 	 */
 	//public void installService(String client, Service service, IIdentity node);
@@ -84,7 +87,6 @@ public interface IServiceControl {
 	 * This method removes a service from the container.
 	 * 
 	 * @param serviceId unique service identifier
-	 * @param node The node where the service is located
 	 * @param callback The callback object
 	 */
 	//public void uninstallService(String client, ServiceResourceIdentifier serviceId, IIdentity node);
@@ -94,19 +96,17 @@ public interface IServiceControl {
 	 * This method shares a service with a given CSS or CIS
 	 * 
 	 * @param service the Service to share
-	 * @param node The node we are sharing with
-	 * @param callback The callback object
+	 * @param identity The target node where service is to be shared
 	 */
-	public ServiceControlResult shareService(String client, Service service, IIdentity node);
+	public ServiceControlResult shareService(String client, Service service, String identity);
 
 	/**
 	 * This method removes the sharing of a service with a given CSS or CIS
 	 * 
 	 * @param service the Service to share
-	 * @param node The node we are sharing with
-	 * @param callback The callback object
+	 * @param identity The target node where service is to be unshared
 	 */
-	public ServiceControlResult unshareService(String client, Service service, IIdentity node);
+	public ServiceControlResult unshareService(String client, Service service, String identity);
 	
 	/**
 	 * This method is used to register a new CIS Endpoint with Service Control. It will allow service control to receive

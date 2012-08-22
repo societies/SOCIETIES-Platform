@@ -39,30 +39,29 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  */
 public interface IServiceDiscovery {
 
-	String methodsArray[] = {"getServices(String client, IIdentity node)", 
-							 "getService(String client, ServiceResourceIdentifier serviceId, IIdentity node)",
-							 "searchService(String client, Service filter, IIdentity node)" 
+	public String methodsArray[] = {"getServices(String client, String identity)", 
+							 "getService(String client, ServiceResourceIdentifier serviceId, String identity)",
+							 "searchService(String client, Service filter, String identity)" 
 							};
 	
 	/**
 	 * Gets list of 3rd party services available
 	 * @param client component package calling this method
-	 * @param node target CSS or CIS of request
+	 * @param identity The target node where search is to occur
 	 */
-    public List<Service> getServices(String client, IIdentity node);
+    public List<Service> getServices(String client, String identity);
     
     /**
 	 * Gets details of a 3rd party service
 	 * @param client component package calling this method
-	 * @param node target CSS or CIS of request
+	 * @param identity The target node where search is to occur
 	 */
-    public Service getService(String client, ServiceResourceIdentifier serviceId, IIdentity node);
+    public Service getService(String client, ServiceResourceIdentifier serviceId, String identity);
     
     /**
 	 * Searches list of 3rd party services available based on a filter
 	 * @param client component package calling this method
-	 * @param node target CSS or CIS of request
+	 * @param identity The target node where search is to occur
 	 */
-    public List<Service> searchService(String client, Service filter, IIdentity node);
-	
+    public List<Service> searchService(String client, Service filter, String identity);	
 }

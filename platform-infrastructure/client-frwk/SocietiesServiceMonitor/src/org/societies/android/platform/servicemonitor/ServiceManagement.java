@@ -37,6 +37,7 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
@@ -71,8 +72,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
     private ClientCommunicationMgr commMgr;
     
     //SERVICE LIFECYCLE INTENTS
-	public static final String INTENT_RETURN_VALUE_KEY =  "org.societies.android.platform.servicediscovery.ReturnValue";
-	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.servicediscovery.ReturnStatus";
+	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.servicediscovery.ReturnValue";
 	public static final String GET_SERVICE     = "org.societies.android.platform.servicediscovery.GET_SERVICE";
 	public static final String GET_SERVICES    = "org.societies.android.platform.servicediscovery.GET_SERVICES";
 	public static final String SEARCH_SERVICES = "org.societies.android.platform.servicediscovery.SEARCH_SERVICES";
@@ -116,7 +116,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)
 	 */
-	public List<org.societies.api.schema.servicelifecycle.model.Service> getServices(String client, IIdentity identity) {
+	public List<org.societies.api.schema.servicelifecycle.model.Service> getServices(String client, String identity) {
 		Log.d(LOG_TAG, "getServices called by client: " + client);
 		
 		//MESSAGE BEAN
@@ -125,7 +125,14 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 
 		//COMMS STUFF
 		ICommCallback discoCallback = new ServiceLifecycleCallback(client, GET_SERVICES); 
-		Stanza stanza = new Stanza(identity);
+		IIdentity toID;
+		try {
+			toID = commMgr.getIdManager().fromJid(identity);
+		} catch (InvalidFormatException e1) {
+			toID = commMgr.getIdManager().getCloudNode();
+			e1.printStackTrace();
+		}
+		Stanza stanza = new Stanza(toID);
         try {
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
 			Log.d(LOG_TAG, "Sending stanza");
@@ -137,35 +144,35 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.identity.IIdentity)*/
-	public org.societies.api.schema.servicelifecycle.model.Service getService(String client, ServiceResourceIdentifier sri, IIdentity identity) {
+	public org.societies.api.schema.servicelifecycle.model.Service getService(String client, ServiceResourceIdentifier sri, String identity) {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#searchService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, org.societies.api.identity.IIdentity) */
-	public List<org.societies.api.schema.servicelifecycle.model.Service> searchService(String client, org.societies.api.schema.servicelifecycle.model.Service filter, IIdentity identity) {
+	public List<org.societies.api.schema.servicelifecycle.model.Service> searchService(String client, org.societies.api.schema.servicelifecycle.model.Service filter, String identity) {
 		return null;
 	}
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceControl >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	
-	public ServiceControlResult installService(String client, URL arg1, IIdentity identity) {
+	public ServiceControlResult installService(String client, URL arg1, String identity) {
 		return null;
 	}
 
-	public ServiceControlResult shareService(String client, org.societies.api.schema.servicelifecycle.model.Service service, IIdentity identity) {
+	public ServiceControlResult shareService(String client, org.societies.api.schema.servicelifecycle.model.Service service, String identity) {
 		return null;
 	}
 
-	public ServiceControlResult startService(String client, ServiceResourceIdentifier sri, IIdentity identity) {
+	public ServiceControlResult startService(String client, ServiceResourceIdentifier sri, String identity) {
 		return null;
 	}
 
-	public ServiceControlResult stopService(String client, ServiceResourceIdentifier sri, IIdentity identity) {
+	public ServiceControlResult stopService(String client, ServiceResourceIdentifier sri, String identity) {
 		return null;
 	}
 
-	public ServiceControlResult unshareService(String client, org.societies.api.schema.servicelifecycle.model.Service arg1, IIdentity arg2) {
+	public ServiceControlResult unshareService(String client, org.societies.api.schema.servicelifecycle.model.Service arg1, String identity) {
 		return null;
 	}
 	
@@ -223,7 +230,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
 
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) serviceList);
+					intent.putExtra(INTENT_RETURN_VALUE, (Parcelable) serviceList);
 					intent.setPackage(client);
 				} 
 				// --------- Service Control Bean ---------
@@ -234,7 +241,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 					Log.d(LOG_TAG, "ServiceControlBeanResult: " + resultObj.getMessage());
 					
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) resultObj);
+					intent.putExtra(INTENT_RETURN_VALUE, (Parcelable) resultObj);
 					intent.setPackage(client);
 				}
 				ServiceManagement.this.sendBroadcast(intent);
