@@ -7,8 +7,8 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>RELEASE</version>
+	<!--	<relativePath>../../parent/spring-osgi.xml</relativePath>-->
 	</parent>
 
 	<!-- groupId is set in parent pom -->
@@ -34,13 +34,17 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
@@ -50,33 +54,9 @@
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.context-management</groupId>
-			<artifactId>user-context-db-mgmt</artifactId>
-			<version>${version.cm}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.beans</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>spring-osgi-core</artifactId>
-			<version>1.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>4.2.0</version>
-			<scope>provided</scope>
-		</dependency>
+
+
+
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.compendium</artifactId>
@@ -84,15 +64,21 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-        	<groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-osgi-core</artifactId>
+			<version>1.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -102,12 +88,14 @@
 		</dependency>
 	</dependencies>
 
-	<!-- build>
+	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
+
+
 
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -115,9 +103,17 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<_nouses>true</_nouses>
+						<Import-Package>*;resolution:=optional</Import-Package>
+						<!--<Import-Package> org.slf4j.*, org.societies.api.css.devicemgmt, 
+							org.osgi.framework, org.osgi.util.tracker, org.springframework.osgi.context, 
+							org.societies.api.osgi.event </Import-Package> <DynamicImport-Package> org.societies.css.devicemgmt.devicemanager 
+							</DynamicImport-Package> -->
+						<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${pom.artifactId}</Bundle-Name>
+						<Bundle-Version>${pom.version}</Bundle-Version>
+						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -139,7 +135,7 @@
 			</plugin>
 
 		</plugins>
-	</build> -->
+	</build>
 
 
 	<name>Context Source Management</name>

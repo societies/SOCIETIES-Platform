@@ -11,7 +11,6 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -24,7 +23,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
@@ -37,8 +36,11 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${pom.artifactId}</Bundle-Name>
+						<Bundle-Version>${pom.version}</Bundle-Version>
+						<Export-Package></Export-Package>
+						<Embed-Transitive>false</Embed-Transitive>
 						<_nouses>true</_nouses>
 					</instructions>
 				</configuration>
