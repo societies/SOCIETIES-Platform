@@ -1310,7 +1310,7 @@ var SocietiesGUI = {
 				alert("refresh3PServices - failure: " + data);
 			}
 			
-			window.plugins.CoreServiceMonitorService.activeServices(success, failure);
+			window.plugins.CoreServiceMonitorService.getServices(success, failure);
 		}
 };
 
