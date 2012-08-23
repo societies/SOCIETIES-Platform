@@ -98,8 +98,7 @@ public class CSSManager implements ICSSLocalManager {
 //		  Supposedly, the correct way to obtain the identity
         this.pubsubID = idManager.getThisNetworkNode();
         
-        //TODO re-instate when Pubsub Simple working
-//        this.createPubSubNodes();
+        this.createPubSubNodes();
         this.subscribeToPubSubNodes();
         
         this.randomGenerator = new Random();
@@ -215,18 +214,17 @@ public class CSSManager implements ICSSLocalManager {
 	public Future<CssInterfaceResult> getCssRecord() {
 		CssInterfaceResult result = new CssInterfaceResult();
 		
-		LOG.info("%%%%%%%%%%%%%% CSS Manager getCssRecord Called");
+		LOG.info("CSS Manager getCssRecord Called");
 		
 		try {
 			CssRecord currentCssRecord = cssRegistry.getCssRecord();
 			result.setProfile(currentCssRecord);
-			LOG.info(";;;;;;;;;;;;;;;;;;; CSS Manager getCssRecord Size is : " +currentCssRecord.getCssNodes().size());
+			LOG.info("CSS Manager getCssRecord Size is : " +currentCssRecord.getCssNodes().size());
 			result.setResultStatus(true);
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//LOG.info("%%%%%%%%%%%%%% CSS Manager getCssRecord Size is : " +result.getProfile().getCssNodes().size()); //getCssNodes().size());
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 //	@Override
@@ -272,9 +270,10 @@ public class CSSManager implements ICSSLocalManager {
 //
 	@Override
 	/**
-	 * Requires that CssRecord parameter has one node in its collection and that 
-	 * the node corresponds to the node being logged in. The CSS identity and password
-	 * must also be set to appropriate values
+	 * There is now no longer any validation of a node contacting a
+	 * cloud node of a CSS. Since the other node has logged into the 
+	 * chosen XMPP Domain server only messages from this JID domain
+	 * can be routed to the cloud node.
 	 */
 	public Future<CssInterfaceResult> loginCSS(CssRecord profile) {
 		LOG.debug("Calling loginCSS");
@@ -291,28 +290,24 @@ public class CSSManager implements ICSSLocalManager {
 		result.setProfile(profile);
 		result.setResultStatus(false);
 
-		if (profile.getCssIdentity().equals(this.cssRecord.getCssIdentity())
-				&& profile.getPassword().equals(this.cssRecord.getPassword())) {
-			// add new node to login to cloud CssRecord
-			this.cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
+		// add new node to login to cloud CssRecord
+		this.cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
 
-			try {
-				this.cssRegistry.registerCss(cssRecord);
-				LOG.debug("Registering CSS with local database");
-			} catch (CssRegistrationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			result.setProfile(this.cssRecord);
-			result.setResultStatus(true);
-			CssEvent event = new CssEvent();
-			event.setType(CSSManagerEnums.ADD_CSS_NODE);
-			event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
-			
-	        //TODO re-instate when Pubsub Simple working
-			//			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+		try {
+			this.cssRegistry.registerCss(cssRecord);
+			LOG.debug("Registering CSS with local database");
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		result.setProfile(this.cssRecord);
+		result.setResultStatus(true);
+		CssEvent event = new CssEvent();
+		event.setType(CSSManagerEnums.ADD_CSS_NODE);
+		event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
+		
+		this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
 		
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -340,44 +335,41 @@ public class CSSManager implements ICSSLocalManager {
 		result.setResultStatus(false);
 
 
-		if (profile.getCssIdentity().equals(this.cssRecord.getCssIdentity())) {
-				// remove new node to login to cloud CssRecord
-				for (Iterator<CssNode> iter = this.cssRecord.getCssNodes().iterator(); iter
-						.hasNext();) {
-					CssNode node = (CssNode) iter.next();
-					CssNode logoutNode = profile.getCssNodes().get(0);
-					if (node.getIdentity().equals(logoutNode.getIdentity())
-							&& node.getType() == logoutNode.getType()) {
-						iter.remove();
-						break;
-					}
-				}
+		// remove new node to login to cloud CssRecord
+		for (Iterator<CssNode> iter = this.cssRecord.getCssNodes().iterator(); iter
+				.hasNext();) {
+			CssNode node = (CssNode) iter.next();
+			CssNode logoutNode = profile.getCssNodes().get(0);
+			if (node.getIdentity().equals(logoutNode.getIdentity())
+					&& node.getType() == logoutNode.getType()) {
+				iter.remove();
+				break;
+			}
+		}
 
-				result.setProfile(this.cssRecord);
-				result.setResultStatus(true);
-				
-				try {
-					this.cssRegistry.updateCssRecord(cssRecord);
-				} catch (CssRegistrationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				try {
-					this.cssRegistry.updateCssRecord(cssRecord);
-				} catch (CssRegistrationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				CssEvent event = new CssEvent();
-				event.setType(CSSManagerEnums.DEPART_CSS_NODE);
-				event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
-				
-		        //TODO re-instate when Pubsub Simple working
-				//				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
+		result.setProfile(this.cssRecord);
+		result.setResultStatus(true);
+		
+		try {
+			this.cssRegistry.updateCssRecord(cssRecord);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			this.cssRegistry.updateCssRecord(cssRecord);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		CssEvent event = new CssEvent();
+		event.setType(CSSManagerEnums.DEPART_CSS_NODE);
+		event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
+		
+		this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
 
-		} 
 	
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -437,8 +429,8 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public Future<CssInterfaceResult> modifyCssRecord(CssRecord profile) {
 		CssInterfaceResult result = new CssInterfaceResult();
-		LOG.info("%%%%%%%%%%%%%% CSS Manager modifyCSSrecord Called");
-		LOG.info("%%%%%%%%%%%%%% CSS Manager cssrecord Size is : " +profile.getCssNodes().size());
+		LOG.info("CSS Manager modifyCSSrecord Called");
+		LOG.info("CSS Manager cssrecord Size is : " +profile.getCssNodes().size());
 		
 		try {
 			cssRegistry.unregisterCss(profile);
@@ -454,7 +446,7 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public Future<CssInterfaceResult> registerCSS(CssRecord profile) {
 		CssInterfaceResult result = new CssInterfaceResult();
-		LOG.info("%%%%%%%%%%%%%% CSS Manager registerCSS Called");
+		LOG.info("CSS Manager registerCSS Called");
 		try {
 			result = cssRegistry.registerCss(profile);
 		} catch (CssRegistrationException e) {
@@ -467,13 +459,13 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public Future<CssInterfaceResult> registerCSSNode(CssRecord profile) {
 		
-		LOG.info("+++++++++++++ CSS Manager registerCSSNode Called");
+		LOG.info("CSS Manager registerCSSNode Called");
 		String nodeid = null;
 		String identity = null;
 		int status = 0;
 		int type = 0;
 		CssInterfaceResult result = new CssInterfaceResult();
-		LOG.info("+++++++++++++ CssRecord passed in: " +profile);
+		LOG.info("CssRecord passed in: " +profile);
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
 		//nodeid = idManager.getThisNetworkNode().toString();
 		//LOG.info("+++++++++++++ nodeid =: " +profile);
@@ -500,7 +492,7 @@ public class CSSManager implements ICSSLocalManager {
 			//cssNode.setStatus(status);
 			//cssNode.setType(type);
 			
-			LOG.info("~~~~~~~~~~~~~~~ cssNodes Array Size is : " +cssNodes.size());
+			LOG.info("cssNodes Array Size is : " +cssNodes.size());
 			//}
 			
 			this.modifyCssRecord(profile);
@@ -561,7 +553,7 @@ public class CSSManager implements ICSSLocalManager {
 
 	@Override
 	public Future<CssInterfaceResult> unregisterCSSNode(CssRecord profile) {
-		LOG.info("+++++++++++++ CSS Manager UNregisterCSSNode Called");
+		LOG.info("CSS Manager UNregisterCSSNode Called");
 		CssInterfaceResult result = new CssInterfaceResult();
 		String nodeid = null;
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
@@ -948,11 +940,7 @@ public class CSSManager implements ICSSLocalManager {
 				//called updateCssFriendRequest on remote
 				request.setOrigin(CssRequestOrigin.REMOTE);
 				cssManagerRemote.updateCssRequest(request);
-	
 		}
-		
-		
-				
 	}
 
 
@@ -980,8 +968,6 @@ public class CSSManager implements ICSSLocalManager {
 		// db updated ow send it to friend and forget about it
 		//cssManagerRemote.se
 		cssManagerRemote.sendCssFriendRequest(cssFriendId);
-		
-		
 	}
 	
 	
@@ -1041,7 +1027,7 @@ public class CSSManager implements ICSSLocalManager {
 	
 	public Future<String> getthisNodeType(String nodeId) {
 		String Type = null, nodeid = null;
-		LOG.info("[][][][][] getthisNodeType has been called   [][][][][]: ");
+		LOG.info("getthisNodeType has been called: ");
 		List<CSSNode> cssnodes = new ArrayList<CSSNode>();
 		Future<List<CSSNode>> asyncResult = null;
 		List<CSSNode> incssnodes = null;
@@ -1049,7 +1035,7 @@ public class CSSManager implements ICSSLocalManager {
 		
 		//nodeid = idManager.getThisNetworkNode().toString();
 		nodeid = nodeId;
-		LOG.info("[][][][][] nodeid is now   [][][][][]: " +nodeid);
+		LOG.info("nodeid is now : " +nodeid);
 	
 		CssRecord currentCssRecord = null;
 		try {
@@ -1086,7 +1072,7 @@ public class CSSManager implements ICSSLocalManager {
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
 		CssNode cssnode = new CssNode();
 		CssNode tmpNode = new CssNode();
-		LOG.info("!!!!!!!!!!!!!!!!!!! From Webapp cssNodes SIZE is: " +cssrecord.getCssNodes().size());
+		LOG.info("From Webapp cssNodes SIZE is: " +cssrecord.getCssNodes().size());
 		/*
 		try {
 			cssrecord = cssRegistry.getCssRecord();
@@ -1095,13 +1081,13 @@ public class CSSManager implements ICSSLocalManager {
 			e.printStackTrace();
 		}
 		*/
-		LOG.info("!!!!!!!!!!!!!!!!!!! from CSSRegistry cssNodes SIZE is: " +cssrecord.getCssNodes().size());
+		LOG.info("from CSSRegistry cssNodes SIZE is: " +cssrecord.getCssNodes().size());
 		
-		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeId passed in is: " +nodeId );
-		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodestatus passed in is: " +nodestatus );
-		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodetype passed in is: " +nodetype);
-		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeMAC passed in is: " +cssnodemac);
-		LOG.info("!!!!!!!!!!!!!!!!!!! setNodeType nodeInteractable passed in is: " +interactable);
+		LOG.info("setNodeType nodeId passed in is: " +nodeId );
+		LOG.info("setNodeType nodestatus passed in is: " +nodestatus );
+		LOG.info("setNodeType nodetype passed in is: " +nodetype);
+		LOG.info("setNodeType nodeMAC passed in is: " +cssnodemac);
+		LOG.info("setNodeType nodeInteractable passed in is: " +interactable);
 		
 		
 		int index = 0;
@@ -1118,28 +1104,28 @@ public class CSSManager implements ICSSLocalManager {
 		
 		cssNodes = cssrecord.getCssNodes();
 		
-		LOG.info("!!!!!!!!!!!!!!!!!!! cssNodes are BEFORE : " +cssNodes);
+		LOG.info(" cssNodes are BEFORE : " +cssNodes);
 		for (index = 0; index < cssrecord.getCssNodes().size(); index ++) {
-			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode BEFORE index: " +index + " identity is now : " +cssNodes.get(index).getIdentity());
+			LOG.info(" cssNode BEFORE index: " +index + " identity is now : " +cssNodes.get(index).getIdentity());
 		}
 		
 		//cssNodes.add(tmpNode);
 		cssNodes.add(cssnode);
 		
-		LOG.info("!!!!!!!!!!!!!!!!!!! cssNodes are AFTER : " +cssNodes);
+		LOG.info("cssNodes are AFTER : " +cssNodes);
 				
 		cssrecord.setCssNodes(cssNodes);
-		LOG.info("!!!!!!!!!!!!!!!!!!! cssrecord cssNodes SIZE AFTER add node is: " +cssrecord.getCssNodes().size());
+		LOG.info(" cssrecord cssNodes SIZE AFTER add node is: " +cssrecord.getCssNodes().size());
 		
 		
-		LOG.info("!!!!!!!!!!!!!!!!!!! cssrecord cssNodes SIZE is now : " +cssrecord.getCssNodes().size());
+		LOG.info(" cssrecord cssNodes SIZE is now : " +cssrecord.getCssNodes().size());
 		cssNodes = cssrecord.getCssNodes();
 		for (index = 0; index < cssrecord.getCssNodes().size(); index ++) {
-			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index + " identity is now : " +cssNodes.get(index).getIdentity());
-			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index + " Status is now : " +cssNodes.get(index).getStatus());
-			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" type is now : " +cssNodes.get(index).getType());
-			LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" MAC is now : " +cssNodes.get(index).getCssNodeMAC());
-			//LOG.info("!!!!!!!!!!!!!!!!!!! cssNode index: " +index +" type is now : " +cssNodes.get(index).isInteractable());
+			LOG.info("cssNode index: " +index + " identity is now : " +cssNodes.get(index).getIdentity());
+			LOG.info("cssNode index: " +index + " Status is now : " +cssNodes.get(index).getStatus());
+			LOG.info("cssNode index: " +index +" type is now : " +cssNodes.get(index).getType());
+			LOG.info("cssNode index: " +index +" MAC is now : " +cssNodes.get(index).getCssNodeMAC());
+			//LOG.info(" cssNode index: " +index +" type is now : " +cssNodes.get(index).isInteractable());
 		}
 		
 		
@@ -1165,25 +1151,25 @@ public void removeNode(CssRecord cssrecord, String nodeId ) {
 		cssNodes = cssrecord.getCssNodes();
 		
 		
-		LOG.info("~~~~~~~~~~~~~~~~ removeNode cssNodes SIZE is: " +cssrecord.getCssNodes().size());
-		LOG.info("~~~~~~~~~~~~~~~~ removeNode nodeId to remove is : " +nodeId);
+		LOG.info("removeNode cssNodes SIZE is: " +cssrecord.getCssNodes().size());
+		LOG.info("removeNode nodeId to remove is : " +nodeId);
 		int index = 0;
 		
-		//LOG.info("~~~~~~~~~~~~~~~~ removeNode cssNodes SIZE is now : " +cssrecord.getCssNodes().size());
+		//LOG.info("removeNode cssNodes SIZE is now : " +cssrecord.getCssNodes().size());
 		cssNodes = cssrecord.getCssNodes();
 		for (index = 0; index < cssrecord.getCssNodes().size(); index ++) {
 			if (cssNodes.get(index).getIdentity().equalsIgnoreCase(nodeId)) {
-				LOG.info("~~~~~~~~~~~~~~~~ removeNode loop identity : " +cssNodes.get(index).getIdentity());
+				LOG.info("removeNode loop identity : " +cssNodes.get(index).getIdentity());
 				cssNodes.remove(index); 
-				LOG.info("~~~~~~~~~~~~~~~ removeNode Node Removed : ");
+				LOG.info("removeNode Node Removed : ");
 				//tmpNodes.add(cssnode);
 			}
 			//tmpNodes.add(cssnode);
-			LOG.info("~~~~~~~~~~~~~~~ removeNode cssNodes element is : " +cssNodes.get(index).getIdentity());
+			LOG.info("removeNode cssNodes element is : " +cssNodes.get(index).getIdentity());
 		}
 		cssrecord.setCssNodes(cssNodes);
-		LOG.info("~~~~~~~~~~~~~~~ removeNode cssrecord SIZE final : " +cssrecord.getCssNodes().size());
-		//LOG.info("~~~~~~~~~~~~~~~ removeNode newrecord SIZE final : " +newrecord.getCssNodes().size());
+		LOG.info("removeNode cssrecord SIZE final : " +cssrecord.getCssNodes().size());
+		//LOG.info("removeNode newrecord SIZE final : " +newrecord.getCssNodes().size());
 		
 		try {
 			cssRegistry.registerCss(cssrecord);
