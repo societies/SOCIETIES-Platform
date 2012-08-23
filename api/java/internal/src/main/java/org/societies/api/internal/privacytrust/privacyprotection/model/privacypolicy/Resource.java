@@ -106,25 +106,24 @@ public class Resource implements Serializable{
 	private String ctxTypeToXMLString(){
 		String str = "";
 		if (scheme.equals(DataIdentifierScheme.CONTEXT)){
-			str = str.concat("\n\t<Attribute AttributeId=\"CONTEXT\"" +
+			str = str.concat("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CONTEXT+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		}
 		if (scheme.equals(DataIdentifierScheme.CIS)){
-			str = str.concat("\n\t<Attribute AttributeId=\"CIS\"" +
+			str = str.concat("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CIS+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		}
 		
 		if (scheme.equals(DataIdentifierScheme.DEVICE)){
-			str = str.concat("\n\t<Attribute AttributeId=\"DEVICE\"" +
+			str = str.concat("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.DEVICE+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		}
 		
 		if (scheme.equals(DataIdentifierScheme.ACTIVITY)){
-			str = str.concat("\n\t<Attribute AttributeId=\"ACTIVITY\"" +
+			str = str.concat("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.ACTIVITY+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		}
-		str = str.concat("\n\t<Attribute AttributeId=\"contextType\"" +
-				"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+
 		str = str.concat("\n\t\t<AttributeValue>");
 		str = str.concat(this.dataType);
 		str = str.concat("</AttributeValue>");
