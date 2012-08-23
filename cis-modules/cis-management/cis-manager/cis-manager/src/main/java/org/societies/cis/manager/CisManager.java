@@ -26,6 +26,7 @@
 
 package org.societies.cis.manager;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -72,6 +73,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
@@ -79,6 +81,8 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 
+import org.societies.api.internal.security.policynegotiator.INegotiation;
+import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.Cis;
@@ -142,6 +146,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private IEventMgr eventMgr;
 	private ICtxBroker internalCtxBroker;
 
+	private INegotiation negotiator;
 
 	//Autowiring gets and sets
 	
@@ -1173,9 +1178,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		// TODO: check with privacy
 		
-		
-		
-		
+		negotiator.startNegotiation(new Requestor(this.cisManagerId), new INegCallBack());
 		
 		// sending join
 
@@ -1202,6 +1205,27 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			e1.printStackTrace();
 		}
 	}
+	
+	class INegCallBack implements INegotiationCallback{
+		
+		//ICisManagerCallback IcisCallback;
+		
+		public INegCallBack (){
+			//IcisCallback = IcisCallback;
+		}
+		
+		@Override
+		public void onNegotiationError(String msg) {
+			LOG.debug("privacy negotiation error");
+		}
+
+		@Override
+		public void onNegotiationComplete(String agreementKey, URI jar) {
+			if(agreementKey!=null && !agreementKey.isEmpty())
+				LOG.debug("privacy negotiation success");
+		}
+	}
+	
 
 	@Override
 	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback){

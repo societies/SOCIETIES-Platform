@@ -16,7 +16,7 @@
    <version>${release.version}</version> 
    <!-- still being discussed -->
    <name>SocialProvider</name>
-   <packaging>apk</packaging>
+   <packaging>apklib</packaging>
 
    <developers>
 	    <developer>
@@ -46,17 +46,12 @@
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-            <scope>provided</scope>
 		</dependency>
 		<dependency>
 	    	<groupId>org.societies.api.external</groupId>
 	    	<artifactId>societies-api</artifactId>
 	    	<version>${release.version}</version>
 		</dependency>
-		<dependency>
-		   <groupId>org.societies.api.internal</groupId>
-		   <artifactId>societies-api-internal</artifactId>
-        </dependency>
 		<dependency>
 	    	<groupId>org.societies.android.api.external</groupId>
 	    	<artifactId>societies-android-api</artifactId>
@@ -67,26 +62,10 @@
 	        <artifactId>asmack</artifactId>
 		</dependency>
 		<dependency>
-	    	<groupId>xerces</groupId>
-	    	<artifactId>xercesImpl</artifactId>
-	    	<version>2.10.0</version>
-	    	<exclusions>
-			<exclusion>
-		    	<groupId>xml-apis</groupId> 
-		    	<artifactId>xml-apis</artifactId>
-			</exclusion>
-	    	</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
 			<version>${version.comm}</version>
 		</dependency>
-    	<dependency>
-			<groupId>org.societies.android.platform</groupId>
-			<artifactId>CoreInterfaces</artifactId>
-			<version>${release.version}</version>
-    	</dependency>
         <dependency>
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
@@ -106,60 +85,6 @@
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>android-maven-plugin</artifactId>
             </plugin>
-		    <plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-shade-plugin</artifactId>
-		    	<version>1.5</version>
-		    	<configuration>
-			    	<shadedArtifactAttached>true</shadedArtifactAttached>
-			    	<finalName>${project.artifactId}.${project.version}-shaded</finalName>
-			    	<relocations>
-				    	<relocation>
-					    	<pattern>javax.xml.bind</pattern>
-					    	<shadedPattern>jaxb</shadedPattern>
-				    	</relocation>
-				    	<relocation>
-					    	<pattern>javax.xml.stream</pattern>
-					    	<shadedPattern>stax</shadedPattern>
-				    	</relocation>
-			    	</relocations>
-		    	</configuration>
-	    	</plugin>
         </plugins>
-        <pluginManagement>
-        	<plugins>
-        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        		<plugin>
-        			<groupId>org.eclipse.m2e</groupId>
-        			<artifactId>lifecycle-mapping</artifactId>
-        			<version>1.0.0</version>
-        			<configuration>
-        				<lifecycleMappingMetadata>
-        					<pluginExecutions>
-        						<pluginExecution>
-        							<pluginExecutionFilter>
-        								<groupId>
-        									com.jayway.maven.plugins.android.generation2
-        								</groupId>
-        								<artifactId>
-        									android-maven-plugin
-        								</artifactId>
-        								<versionRange>
-        									[3.0.0,)
-        								</versionRange>
-        								<goals>
-        									<goal>proguard</goal>
-        								</goals>
-        							</pluginExecutionFilter>
-        							<action>
-        								<ignore></ignore>
-        							</action>
-        						</pluginExecution>
-        					</pluginExecutions>
-        				</lifecycleMappingMetadata>
-        			</configuration>
-        		</plugin>
-        	</plugins>
-        </pluginManagement>
     </build>
 </project>

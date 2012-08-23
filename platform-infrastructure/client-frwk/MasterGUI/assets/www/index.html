@@ -534,5 +534,70 @@
 	</div><!-- /footer -->
 </div><!-- /page -->
 
+<!-- Societies CIS mgmgt page -->
+<div data-role="page" id="cisManagementPage">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;CIS Management</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+   		<div id= "CisMgmt">
+			<div data-role="fieldcontain" >
+		    	<label for="cisname">Cis Name: </label>
+		    	<input type="text" name="cisName" id="cisname" value=""  />
+			</div>
+			
+			<input id="createCIS" type="button" value="CreateCIS" data-icon="gear" data-inline="true" /> 
+			<input id="listCIS" type="button" value="ListCIS" data-icon="gear" data-inline="true" />
+			<input id="joinCIS" type="button" value="JoinCIS" data-icon="gear" data-inline="true" />
+		</div>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#main" data-role="button" data-icon="home" data-inline="true">home</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of CIS Record page -->
+<div data-role="page" id="cisRecordPage">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;CIS Record</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">
+			<button id="refreshCssRecord" data-theme="a">Refresh Profile</button>	
+	
+			<div data-role="fieldcontain" >
+
+
+			<!-- CIS Owner Name 
+				Can be an individual, organisation or some other entity -->
+			<div data-role="fieldcontain">
+		    	<label for="cisowner">Name: </label>
+		    	<input type="text" name="cisOwner" id="cisowner" value="" disabled="true"/>
+			</div>
+
+			<!-- CIS Identity-->
+			<div data-role="fieldcontain" >
+		    	<label for="cisrecordidentity">Identity: </label>
+		    	<input type="text" name="cisRecordIdentity" id="cisrecordidentity" value="" disabled="true"/>
+			</div>
+
+			<!-- CSS e-mail Details-->
+			<div data-role="fieldcontain" >
+		    	<label for="cisname">e-Mail: </label>
+		    	<input type="text" name="cisName" id="cisname" value="" disabled="true"/>
+			</div>
+				
+	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
 </body>
 </html>
