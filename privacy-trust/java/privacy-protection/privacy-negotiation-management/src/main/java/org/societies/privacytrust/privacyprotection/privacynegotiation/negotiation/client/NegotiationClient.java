@@ -73,6 +73,7 @@ import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
@@ -81,6 +82,7 @@ import org.societies.privacytrust.privacyprotection.api.identity.IIdentityOption
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
+import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.data.DataHelper;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.ClientResponseChecker;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.ClientResponsePolicyGenerator;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.TimedNotificationGUI;
@@ -138,14 +140,14 @@ public class NegotiationClient implements INegotiationClient {
 		log("Received Provider RequestPolicy!");
 		log(policy.toString());
 		this.requestPolicy = policy;
-		List<String> notFoundTypes = this.contextTypesExist(policy);
+		List<String> notFoundTypes = this.dataTypesExist(policy);
 		String str = "";
 		for (String s : notFoundTypes){
 			str = str.concat(s+"\n");
 		}
 		if (notFoundTypes.size()>0){
 			log("Service requires these contextTypes\n"+str+"which don't exist");
-			JOptionPane.showMessageDialog(null, "Service requires these contextTypes\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Service requires these data types\n"+str+"which don't exist", "Error Starting service", JOptionPane.ERROR_MESSAGE);
 			InternalEvent evt = this.createFailedNegotiationEvent(policy.getRequestor());
 			try {
 				this.eventMgr.publishInternalEvent(evt);
@@ -382,41 +384,20 @@ public class NegotiationClient implements INegotiationClient {
 	 */
 
 	
-	private List<String> contextTypesExist(RequestPolicy policy){
+	private List<String> dataTypesExist(RequestPolicy policy){
 		List<String> notFoundContextTypes = new ArrayList<String>();
 		List<RequestItem> items = policy.getRequests();
 		for (RequestItem item : items){
 			if (!item.isOptional()){
-				String contextType = item.getResource().getContextType();
-				try {
-					Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveCssOperator();
-					CtxEntity person = futurePerson.get();
-					Set<CtxAttribute> resultSet = person.getAttributes(contextType);
-					if (resultSet.isEmpty()){
-						boolean containsCreate = false;
-						for (Action a : item.getActions()){
-							if (a.getActionType().equals(ActionConstants.CREATE)){
-								containsCreate = true;
-							}
-						}
-						if (!containsCreate){
-							notFoundContextTypes.add(contextType);
-						}
-					}
-				} catch (CtxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				String dataType = item.getResource().getDataType();
+				DataIdentifierScheme scheme = item.getResource().getDataId().getScheme();
+				DataHelper helper = new DataHelper(ctxBroker, userIdentity);
+				if (!helper.dataTypeExists(item)){
+					notFoundContextTypes.add(dataType);
 				}
+				
 			}
 		}
-
-
 		return notFoundContextTypes;
 	}
 	

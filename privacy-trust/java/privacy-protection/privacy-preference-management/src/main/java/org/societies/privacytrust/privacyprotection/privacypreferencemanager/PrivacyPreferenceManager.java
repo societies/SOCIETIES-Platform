@@ -186,7 +186,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 		List<Condition> conditions = new ArrayList<Condition>();
 		PPNPreferenceDetails details = new PPNPreferenceDetails(dataId.getType());
-		details.setAffectedCtxID(dataId);
+		details.setAffectedDataId(dataId);
 		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel model = prefCache.getPPNPreference(details);
 		if (model!=null){
@@ -204,7 +204,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}		
 
 		details = new PPNPreferenceDetails(dataId.getType());
-		details.setAffectedCtxID(dataId);
+		details.setAffectedDataId(dataId);
 		model = this.prefCache.getPPNPreference(details);
 		if (model!=null){
 			this.logging.debug("Preference found specific to ctxId but not for requestor");
@@ -590,9 +590,9 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	@Override
 	public void storePPNPreference(PPNPreferenceDetails details, IPrivacyPreference preference){
 
-		PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(details.getContextType(), preference);
-		if (details.getAffectedCtxID()!=null){
-			model.setAffectedCtxId(details.getAffectedCtxID());
+		PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(details.getDataType(), preference);
+		if (details.getAffectedDataId()!=null){
+			model.setAffectedDataId(details.getAffectedDataId());
 		}
 		if (details.getRequestor()!=null){
 			model.setRequestor(details.getRequestor());
@@ -648,7 +648,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	@Override
 	public void deletePPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID) {
 		PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
-		details.setAffectedCtxID(affectedCtxID);
+		details.setAffectedDataId(affectedCtxID);
 		this.prefCache.removePPNPreference(details);
 
 	}
@@ -660,7 +660,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	@Override
 	public void deletePPNPreference(Requestor requestor, String contextType, CtxAttributeIdentifier affectedCtxID){
 		PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
-		details.setAffectedCtxID(affectedCtxID);
+		details.setAffectedDataId(affectedCtxID);
 		details.setRequestor(requestor);
 		this.prefCache.removePPNPreference(details);
 	}
@@ -790,10 +790,10 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 				PPNPOutcome outcome = new PPNPOutcome(decision, ruleTarget, new ArrayList<Condition>());
 				PrivacyPreference pref = new PrivacyPreference(outcome); 
 				PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(dataId.getType(), pref);
-				model.setAffectedCtxId(dataId);
+				model.setAffectedDataId(dataId);
 				model.setRequestor(requestor);
 				PPNPreferenceDetails details = new PPNPreferenceDetails(dataId.getType());
-				details.setAffectedCtxID(dataId);
+				details.setAffectedDataId(dataId);
 				details.setRequestor(requestor);
 				this.prefCache.addPPNPreference(details, model);
 			} catch (URISyntaxException e) {

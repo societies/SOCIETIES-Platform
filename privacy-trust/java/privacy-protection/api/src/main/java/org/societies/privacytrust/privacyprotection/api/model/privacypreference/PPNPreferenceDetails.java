@@ -56,23 +56,6 @@ public class PPNPreferenceDetails implements Serializable{
 		this.affectedDataId = affectedDataId;
 	}
 
-	@Deprecated
-	public void setAffectedCtxID(DataIdentifier affectedDataId) {
-		this.affectedDataId = affectedDataId;
-	}
-	@Deprecated
-	public DataIdentifier getAffectedCtxID() {
-		return affectedDataId;
-	}
-
-	@Deprecated
-	public void setContextType(String contextType) {
-		this.dataType = contextType;
-	}
-	@Deprecated
-	public String getContextType() {
-		return dataType;
-	}
 	
 /*	private boolean compareRequestorIdentities(IIdentity id){
 		if (id==null){

@@ -108,7 +108,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 	private JTable	conditionsTable;	
 	private ConditionsTableModel	conditionsModel;
 	
-	private String contextType;
+	private String dataType;
 	private Requestor requestor;
 	
 	private IPrivacyPreference pref = null;
@@ -160,7 +160,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		//super( new JFrame(),"Privacy Policy Negotiation Preference Outcome GUI" );
 		super(new JFrame(), "Privacy Policy Negotiation - Privacy Preference GUI", true);
 		this.requestItem = item;
-		this.contextType = item.getResource().getContextType();
+		this.dataType = item.getResource().getContextType();
 		this.requestor = requestor;
 		this.sourceClassName = sourceClassName;
 		this.privPrefMgr = pMgr;
@@ -170,7 +170,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 	PPNPOutcomeDialog(String contextType){
 		//super( new JFrame(), "Privacy Policy Negotiation Preference Outcome GUI" );
 		super(new JFrame(), "Privacy Policy Negotiation - Privacy Preference GUI", true);
-		this.contextType = contextType;
+		this.dataType = contextType;
 		this.sourceClassName = ClientResponsePolicyGenerator.class.getName();
 		this.showGUI();
 		
@@ -208,7 +208,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		DetailsPanel.add( resourceLbl );
 
 		resourceTxt = new JTextField( );
-		resourceTxt.setText(contextType);
+		resourceTxt.setText(dataType);
 		resourceTxt.setEditable(false);
 		gbcDetails.gridx = 1;
 		gbcDetails.gridy = 0;
@@ -476,7 +476,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 			if (answer==JOptionPane.YES_OPTION){
 				log("Will try to save this preference in the PolicyManager");
 				try{
-					PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
+					PPNPreferenceDetails details = new PPNPreferenceDetails(dataType);
 					details.setRequestor(requestor);
 					this.privPrefMgr.storePPNPreference(details, pref);
 					
@@ -496,7 +496,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 			if (answer==JOptionPane.YES_OPTION){
 				log("Will try to save this preference in the PolicyManager");
 				try{
-					PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
+					PPNPreferenceDetails details = new PPNPreferenceDetails(dataType);
 					details.setRequestor(requestor);
 					this.privPrefMgr.storePPNPreference(details,pref);
 
@@ -514,7 +514,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 	private CtxIdentifier getCtxIdentifier(){
 		CtxIdentifier id = null;		
 		try {
-			List<CtxIdentifier> list = broker.lookup(CtxModelType.ATTRIBUTE, this.contextType).get();
+			List<CtxIdentifier> list = broker.lookup(CtxModelType.ATTRIBUTE, this.dataType).get();
 			if (list.size()>0){
 				return CtxIdentifierFactory.getInstance().fromString(list.get(0).toString());
 				//return broker.parseIdentifier(list.get(0).toUriString());
@@ -531,7 +531,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		log("Error while trying to locate CtxIdentifier for resource:"+this.contextType);
+		log("Error while trying to locate CtxIdentifier for resource:"+this.dataType);
 		return null;
 	}
 	
@@ -600,7 +600,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		if (this.requestor!=null){
 			subjects.add(this.requestor);
 		}
-		Resource r = new Resource(this.contextType);
+		Resource r = new Resource(this.dataType);
 		
 		return new RuleTarget(subjects, r, this.gatherActions());
 		

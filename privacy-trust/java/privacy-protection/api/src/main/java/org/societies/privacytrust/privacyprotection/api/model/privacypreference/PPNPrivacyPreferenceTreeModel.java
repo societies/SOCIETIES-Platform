@@ -68,23 +68,6 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 		return dataType;
 	}
 
-	@Deprecated
-	public DataIdentifier getAffectedContextIdentifier() {
-		return this.getAffectedCtxId();
-	}
-	@Deprecated
-	public void setAffectedCtxId(DataIdentifier affectedDataId) {
-		this.affectedDataId = affectedDataId;
-	}
-	@Deprecated
-	public DataIdentifier getAffectedCtxId() {
-		return affectedDataId;
-	}
-	
-	@Deprecated
-	public String getContextType() {
-		return this.dataType;
-	}
 
 	@Override
 	public PrivacyPreferenceTypeConstants getPrivacyType() {

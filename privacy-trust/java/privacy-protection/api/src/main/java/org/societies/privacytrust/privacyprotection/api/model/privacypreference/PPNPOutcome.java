@@ -28,7 +28,7 @@ import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.societies.api.context.model.CtxAttributeIdentifier;
+
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
