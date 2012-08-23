@@ -169,9 +169,9 @@ public class PPNPreferenceGUI extends JFrame implements ActionListener,  WindowL
 		IPrivacyPreferenceManager privPrefMgr = (IPrivacyPreferenceManager) this.masterGUI.getPrivPrefMgr();
 		preferenceTreeModel = (PPNPrivacyPreferenceTreeModel) privPrefMgr.getPPNPreference(d);
 		if (this.preferenceTreeModel==null){
-			this.preferenceTreeModel = new PPNPrivacyPreferenceTreeModel(d.getContextType(),new PrivacyPreference());
-			if (d.getAffectedCtxID()!=null){
-				this.preferenceTreeModel.setAffectedCtxId(d.getAffectedCtxID());
+			this.preferenceTreeModel = new PPNPrivacyPreferenceTreeModel(d.getDataType(),new PrivacyPreference());
+			if (d.getAffectedDataId()!=null){
+				this.preferenceTreeModel.setAffectedDataId(d.getAffectedDataId());
 			}
 			
 			if (d.getRequestor()!=null){
@@ -334,7 +334,7 @@ public class PPNPreferenceGUI extends JFrame implements ActionListener,  WindowL
 		pnPanel8.add( lbContextType );
 
 		txtContextType = new JTextField();
-		txtContextType.setText(details.getContextType());
+		txtContextType.setText(details.getDataType());
 		txtContextType.setEditable(false);
 		gbcPanel8.gridx = 1;
 		gbcPanel8.gridy = 0;
@@ -361,8 +361,8 @@ public class PPNPreferenceGUI extends JFrame implements ActionListener,  WindowL
 		pnPanel8.add( lbContextID );
 
 		txtContextID = new JTextField();
-		if (this.details.getAffectedCtxID()!=null){
-			txtContextID.setText(details.getAffectedCtxID().getUri());
+		if (this.details.getAffectedDataId()!=null){
+			txtContextID.setText(details.getAffectedDataId().getUri());
 		}else{
 			txtContextID.setText("Generic");
 		}
@@ -544,9 +544,9 @@ public class PPNPreferenceGUI extends JFrame implements ActionListener,  WindowL
 	}
 
 	private void clearPreferenceTreeModel(){
-		this.preferenceTreeModel = new PPNPrivacyPreferenceTreeModel(this.details.getContextType(),new PrivacyPreference());
-		if (this.details.getAffectedCtxID()!=null){
-			this.preferenceTreeModel.setAffectedCtxId(this.details.getAffectedCtxID());
+		this.preferenceTreeModel = new PPNPrivacyPreferenceTreeModel(this.details.getDataType(),new PrivacyPreference());
+		if (this.details.getAffectedDataId()!=null){
+			this.preferenceTreeModel.setAffectedDataId(this.details.getAffectedDataId());
 		}
 		
 		if (this.details.getRequestor()!=null){
