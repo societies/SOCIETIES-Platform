@@ -213,6 +213,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			fail("[Error testGetCisPrivacyPolicy] Privacy error");
 		} catch (Exception e) {
 			LOG.error("[Test PrivacyException] testGetCisPrivacyPolicy: add and retrieve a privacy policy", e);
+			e.printStackTrace();
 			fail("[Error testDeletePrivacyPolicy] error");
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
@@ -259,6 +260,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			LOG.info("[Test PrivacyException] testGetServicePrivacyPolicy: add and retrieve a privacy policy", e);
 			fail("[Error testGetServicePrivacyPolicy] Privacy error");
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail("[Error testDeletePrivacyPolicy] error");
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);

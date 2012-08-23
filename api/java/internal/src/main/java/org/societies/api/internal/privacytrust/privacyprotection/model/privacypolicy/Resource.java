@@ -26,6 +26,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
+import javax.swing.JOptionPane;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
@@ -44,18 +46,36 @@ public class Resource implements Serializable{
 	private DataIdentifierScheme scheme;
 	
 	private Resource(){
-		
+		if (scheme==null){
+			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+			throw new NullPointerException();
+		}else{
+			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+		}
 	}
 	public Resource(DataIdentifier dataId){
 		this.dataId = dataId;
 		this.dataType = dataId.getType();
+
 		this.scheme = dataId.getScheme();
+		if (scheme==null){
+			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+			throw new NullPointerException();
+		}else{
+			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+		}
 	}
 
 	
 	public Resource(DataIdentifierScheme scheme, String type){
 		this.dataType = type;
 		this.scheme = scheme;
+		if (scheme==null){
+			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+			throw new NullPointerException();
+		}else{
+			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+		}
 	}
 	public TargetMatchConstants getType(){
 		return TargetMatchConstants.RESOURCE;
@@ -105,6 +125,9 @@ public class Resource implements Serializable{
 	
 	private String ctxTypeToXMLString(){
 		String str = "";
+		if(scheme==null){
+			JOptionPane.showMessageDialog(null, "SCHEME IS NULL");
+		}
 		if (scheme.equals(DataIdentifierScheme.CONTEXT)){
 			str = str.concat("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CONTEXT+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");

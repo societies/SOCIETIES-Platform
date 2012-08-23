@@ -387,7 +387,7 @@ public class XMLPolicyReader {
 					}
 				}
 			}
-			else if ((attributeId.compareToIgnoreCase("CONTEXT")==0)){
+			else if ((attributeId.equals(DataIdentifierScheme.CONTEXT))){
 				scheme = DataIdentifierScheme.CONTEXT;
 				String dataType = attributeElement.getAttribute("DataType");
 				if (dataType.compareToIgnoreCase("http://www.w3.org/2001/XMLSchema#string")==0){
@@ -396,7 +396,7 @@ public class XMLPolicyReader {
 					ctxType = attributeValueElement.getFirstChild().getNodeValue();
 
 				}
-			}else if ((attributeId.compareToIgnoreCase("CIS")==0)){
+			}else if ((attributeId.equals(DataIdentifierScheme.CIS))){
 				scheme = DataIdentifierScheme.CIS;
 				String dataType = attributeElement.getAttribute("DataType");
 				if (dataType.compareToIgnoreCase("http://www.w3.org/2001/XMLSchema#string")==0){
@@ -404,7 +404,7 @@ public class XMLPolicyReader {
 					Element attributeValueElement = (Element) attributeValueList.item(0);
 					ctxType = attributeValueElement.getFirstChild().getNodeValue();
 				}
-			}else if ((attributeId.compareToIgnoreCase("DEVICE")==0)){
+			}else if ((attributeId.equals(DataIdentifierScheme.DEVICE))){
 				scheme = DataIdentifierScheme.DEVICE;
 				String dataType = attributeElement.getAttribute("DataType");
 				if (dataType.compareToIgnoreCase("http://www.w3.org/2001/XMLSchema#string")==0){
@@ -413,7 +413,7 @@ public class XMLPolicyReader {
 					ctxType = attributeValueElement.getFirstChild().getNodeValue();
 				}
 
-			}else if ((attributeId.compareToIgnoreCase("ACTIVITY")==0)){
+			}else if ((attributeId.equals(DataIdentifierScheme.ACTIVITY))){
 				scheme  = DataIdentifierScheme.ACTIVITY;
 				String dataType = attributeElement.getAttribute("DataType");
 				if (dataType.compareToIgnoreCase("http://www.w3.org/2001/XMLSchema#string")==0){
