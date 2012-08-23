@@ -141,8 +141,7 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "org_societies_cis_directory_advertisementrecords", orphanRemoval=true) doesn't work!
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
 	@JoinTable(name="org_societies_cis_directory_membershipcriteria",
-               joinColumns = @JoinColumn( name="cis_id"),
-               inverseJoinColumns = @JoinColumn( name="criteria_id"))
+               joinColumns = @JoinColumn( name="cis_id"))
 	public List<CriteriaRecordEntry> getCriteriaRecords() {
 		return criteriaRecords;
 	}

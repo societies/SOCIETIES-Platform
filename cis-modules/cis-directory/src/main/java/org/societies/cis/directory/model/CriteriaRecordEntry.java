@@ -60,8 +60,7 @@ public class CriteriaRecordEntry implements Serializable {
 	/**@return the criteria_id
 	 */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="criteria_id", unique=true, nullable=false)
+    @Column(name="criteria_id")
     public Integer getCriteria_id() {
 		return criteria_id;
 	}

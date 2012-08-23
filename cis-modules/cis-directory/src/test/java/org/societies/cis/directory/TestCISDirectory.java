@@ -43,13 +43,13 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 	private CisAdvertisementRecord cisAdvert2;
 	private CisAdvertisementRecord cisAdvert2new;
 	
-	private static SessionFactory sessionfactory;
-	private static Configuration configuration;
+//	private static SessionFactory sessionfactory;
+//	private static Configuration configuration;
 
 	@Before
 	public void setUp() throws Exception {
 		//CIS DIR INSTANCE
-		cisDir = CisDirectory.class.newInstance();
+	//	cisDir = CisDirectory.class.newInstance();
 		assertTrue(null != cisDir);
 		
 		//CIS ADVERT 1
@@ -103,21 +103,20 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 		crit2b.setValue1("23");
 		criteria2.add(crit2b);
 		
+		cisAdvert2 = CisAdvertisementRecord.class.newInstance();
 		cisAdvert2.setName("record2");
 		cisAdvert2.setId("olympics.societies.org");
 		cisAdvert2.setUri("/home/advert2");
 		memberCrit2.setCriteria(criteria2);
 		cisAdvert2.setMembershipCrit(memberCrit2);
 		
-		cisAdvert2 = CisAdvertisementRecord.class.newInstance();
 		assertTrue(null != cisAdvert2);
 		
 		//create CIS Advertisement 2 new
+		cisAdvert2new = CisAdvertisementRecord.class.newInstance();
 		cisAdvert2new.setName("record2new");
 		cisAdvert2new.setId("leona2@societies.org");
 		cisAdvert2new.setUri("/home/advert2");
-		
-		cisAdvert2new = CisAdvertisementRecord.class.newInstance();
 		assertTrue(null != cisAdvert2new);
 	}
 
@@ -199,21 +198,12 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 		}
 	}
 	
-	public static SessionFactory getsessionfactory(){
-		if (sessionfactory == null)
-			buildSessionFactory();
-		return sessionfactory;
-	}
+//	public static SessionFactory getSessionFactory(){
+//		return sessionfactory;
+//	}
+
+//	public static SessionFactory setSessionFactory(){
+//		return sessionfactory;
+//	}
 	
-	public static Configuration getconfiguration(){
-		if (configuration == null)
-			configuration = new Configuration();
-		return configuration;
-	}
-	
-	public static void buildSessionFactory(){
-		if (sessionfactory != null && !sessionfactory.isClosed())
-			sessionfactory.close();
-		sessionfactory = getconfiguration().buildSessionFactory();
-	}
 }
