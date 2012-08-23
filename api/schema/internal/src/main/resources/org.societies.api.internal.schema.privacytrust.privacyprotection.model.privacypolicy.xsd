@@ -42,6 +42,7 @@
     <xs:sequence>
       <xs:element name="dataIdUri" type="xs:string" minOccurs="0"/>
       <xs:element name="dataType" type="xs:string" minOccurs="0"/>
+      <xs:element name="scheme" type="ns1:dataIdentifierScheme" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 

@@ -600,7 +600,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		if (this.requestor!=null){
 			subjects.add(this.requestor);
 		}
-		Resource r = new Resource(this.dataType);
+		Resource r = new Resource(this.requestItem.getResource().getScheme(),this.dataType);
 		
 		return new RuleTarget(subjects, r, this.gatherActions());
 		

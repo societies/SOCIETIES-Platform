@@ -75,6 +75,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager;
 import org.societies.util.commonmock.MockIdentity;
@@ -507,7 +508,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	public void testRequestPolicyEquals() {
 		LOG.info("[Test] testRequestPolicyEquals");
 		List<RequestItem> requestItems2 = new ArrayList<RequestItem>();
-		Resource resource2 = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource resource2 = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions2 = new ArrayList<Action>();
 		actions2.add(new Action(ActionConstants.READ));
 		RequestItem requestItem2 = new RequestItem(resource2, actions2, new ArrayList<Condition>());
@@ -516,7 +517,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		actual.setRequestor(requestorCis);
 
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
-		Resource resource = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource resource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
@@ -538,7 +539,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		String privacyPolicy = "<RequestPolicy>" +
 				"<Target>" +
 				"<Resource>" +
-				"<Attribute AttributeId=\"contextType\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+				"<Attribute AttributeId=\"CONTEXT\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
 				"<AttributeValue>fdsfsf</AttributeValue>" +
 				"</Attribute>" +
 				"</Resource>" +
@@ -636,7 +637,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 				"</Subject>"+
 				"<Target>" +
 				"<Resource>" +
-				"<Attribute AttributeId=\"contextType\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+				"<Attribute AttributeId=\"CONTEXT\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
 				"<AttributeValue>fdsfsf</AttributeValue>" +
 				"</Attribute>" +
 				"</Resource>" +
@@ -703,14 +704,14 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 
 	private List<RequestItem> getRequestItems() {
 		List<RequestItem> items = new ArrayList<RequestItem>();
-		Resource locationResource = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource locationResource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Condition> conditions = new ArrayList<Condition>();
 		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		RequestItem rItem = new RequestItem(locationResource, actions, conditions, false);
 		items.add(rItem);
-		Resource someResource = new Resource("someResource");
+		Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, "someResource");
 		List<Condition> extendedConditions = new ArrayList<Condition>();
 		extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
 		extendedConditions.add(new Condition(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "YES"));

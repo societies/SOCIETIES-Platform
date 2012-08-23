@@ -50,7 +50,7 @@ public class ResourceUtils {
 			}
 			// Dara type
 			else if (null != resourceBean.getDataType()) {
-				resource = new Resource(resourceBean.getDataType());
+				resource = new Resource(resourceBean.getScheme(), resourceBean.getDataType());
 			}
 			else {
 				throw new PrivacyException("The resource id or type can't be null!");

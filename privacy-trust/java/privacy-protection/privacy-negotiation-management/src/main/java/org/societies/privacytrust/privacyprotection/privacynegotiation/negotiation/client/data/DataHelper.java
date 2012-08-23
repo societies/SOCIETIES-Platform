@@ -59,7 +59,7 @@ public class DataHelper{
 	}
 	public boolean dataTypeExists(RequestItem item){
 		String dataType = item.getResource().getDataType();
-		DataIdentifierScheme scheme = item.getResource().getDataId().getScheme();
+		DataIdentifierScheme scheme = item.getResource().getScheme();
 		if (scheme.equals(DataIdentifierScheme.CONTEXT)){
 			return checkContext(item);
 		}
@@ -78,7 +78,7 @@ public class DataHelper{
 	private boolean checkContext(RequestItem item) {
 		
 		String dataType = item.getResource().getDataType();
-		DataIdentifierScheme scheme = item.getResource().getDataId().getScheme();
+		DataIdentifierScheme scheme = item.getResource().getScheme();
 		try {
 			
 			Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveIndividualEntity(userIdentity);

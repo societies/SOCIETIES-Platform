@@ -253,6 +253,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		else if (null != permission.getRequestItem().getResource().getDataType() && !"".equals(permission.getRequestItem().getResource().getDataType())) {
 			dataId = new SimpleDataIdentifier();
 			dataId.setType(permission.getRequestItem().getResource().getDataType());
+			dataId.setScheme(permission.getRequestItem().getResource().getScheme());
 		}
 		else {
 			throw new PrivacyException("[Parameters] DataId or DataType is missing");
