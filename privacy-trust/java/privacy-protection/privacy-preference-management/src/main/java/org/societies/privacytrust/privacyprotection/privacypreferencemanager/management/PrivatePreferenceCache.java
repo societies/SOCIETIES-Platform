@@ -199,7 +199,7 @@ public class PrivatePreferenceCache {
 	
 	public IPrivacyPreferenceTreeModel getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, Requestor requestor){
 		PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
-		details.setAffectedCtxID(affectedCtxID);
+		details.setAffectedDataId(affectedCtxID);
 		details.setRequestor(requestor);
 		return this.getPPNPreference(details);
 	}

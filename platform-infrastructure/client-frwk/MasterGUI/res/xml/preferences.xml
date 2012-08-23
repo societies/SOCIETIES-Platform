@@ -37,17 +37,17 @@
     		<EditTextPreference 
    		    	android:title="Domain Authority URI" 
    		    	android:key="daURI" 
-   		    	android:defaultValue="URI" 
+   		    	android:defaultValue="societies.local" 
    		    	android:summary="URI of Domain Authority"/>
            	<EditTextPreference 
    		    	android:title="CSS Identity" 
    		    	android:key="cssIdentity" 
-   		    	android:defaultValue="value" 
+   		    	android:defaultValue="" 
    		    	android:summary="CSS XMPP identity"/>
            	<EditTextPreference 
    		    	android:title="Identity Password" 
    		    	android:key="cssPassword" 
-   		    	android:defaultValue="value" 
+   		    	android:defaultValue="" 
    		    	android:summary="CSS XMPP password"/>
             <EditTextPreference 
    		    	android:title="Domain Authority Port" 
@@ -55,6 +55,17 @@
    		    	android:key="daPort" 
    		    	android:defaultValue="5222" 
    		    	android:summary="Domain Authority Port"/>
-            <EditTextPreference android:key="nodeType" android:title="Node Type" android:selectable="false" android:summary="CSS Node Type - Android" android:defaultValue="0" android:enabled="true"/>
+            <EditTextPreference 
+            	android:key="nodeType" 
+            	android:title="Node Type" 
+            	android:summary="CSS Node Type - Android" 
+            	android:defaultValue="0" 
+            	android:enabled="true"/>
+            <EditTextPreference 
+            	android:key="cloudNode" 
+            	android:enabled="true" 
+            	android:summary="CSS Cloud Node" 
+           		android:defaultValue="xcmanager" 
+            	android:title="Cloud Node"/>
    	</PreferenceCategory>
 </PreferenceScreen>

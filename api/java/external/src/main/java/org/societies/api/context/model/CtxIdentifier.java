@@ -31,11 +31,14 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
  * This abstract class is used to identify context model objects. It provides
  * methods that return information about the identified model object including:
  * <ul>
+ * <li><tt>Scheme</tt>: The URI scheme of all CtxIdentifiers, i.e. 
+ * {@link DataIdentifierScheme.CONTEXT CONTEXT}.</li>
  * <li><tt>OwnerId</tt>: A unique identifier of the CSS or CIS where the 
  * identified context model object is stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
@@ -55,6 +58,9 @@ import org.societies.api.schema.identity.DataIdentifier;
 public abstract class CtxIdentifier extends DataIdentifier implements Serializable {
 
 	private static final long serialVersionUID = 3552976823045895472L;
+	
+	protected static final String SCHEME_DELIM = "://";
+	protected static final String DELIM        = "/";
 	
 	/** The type of the identified context model object. */
 	protected transient CtxModelType modelType;
@@ -81,6 +87,7 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
 	 */
 	CtxIdentifier(String ownerId, CtxModelType modelType, String type, Long objectNumber) {
 		
+		super.scheme = DataIdentifierScheme.CONTEXT;
 		super.ownerId = ownerId;
 		this.modelType = modelType;
 		super.type = type;
@@ -178,6 +185,8 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
         int result = 1;
         
         result = prime * result
+                + ((super.scheme == null) ? 0 : super.scheme.hashCode());
+        result = prime * result
                 + ((super.ownerId == null) ? 0 : super.ownerId.hashCode());
         result = prime * result
                 + ((this.modelType == null) ? 0 : this.modelType.hashCode());
@@ -204,6 +213,11 @@ public abstract class CtxIdentifier extends DataIdentifier implements Serializab
             return false;
         
         CtxIdentifier other = (CtxIdentifier) that;
+        if (super.scheme == null) {
+            if (other.scheme != null)
+                return false;
+        } else if (!super.scheme.equals(other.scheme))
+            return false;
         if (super.ownerId == null) {
             if (other.ownerId != null)
                 return false;

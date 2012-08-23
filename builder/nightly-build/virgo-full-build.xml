@@ -39,6 +39,8 @@
 
 	<!-- All Spring-OSGi Java projects to be included in nightly builds -->
 	<modules>
+		<module>societies-clean.xml</module>
+		
 		<module>../distributions/virgo-baseline.xml</module>
 		<module>../distributions/virgo-cloud-node.xml</module>
 		<module>../distributions/virgo-da-node.xml</module>

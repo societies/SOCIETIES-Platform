@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>integration.test.bit.ctx_src_registration_1028</artifactId>
 	<name>Context Source Registration Integration Test</name>
@@ -12,7 +12,7 @@
 			<name>Korbinian Frank</name>
 			<organization>DLR</organization>
 			<roles>
-			    <role>owner</role>
+				<role>owner</role>
 				<role>developer</role>
 			</roles>
 			<timezone>+1</timezone>
@@ -22,11 +22,33 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+	<!--	<relativePath>../../parent/spring-osgi.xml</relativePath>-->
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -34,32 +56,10 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-osgi-core</artifactId>
+			<version>1.1.0</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.beans</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -94,7 +94,7 @@
 						<Embed-Transitive>false</Embed-Transitive>
 						<!-- <Import-Package> org.slf4j.*, org.societies.service.api, org.societies.integration.test.*, 
 							org.junit.*, </Import-Package> -->
-
+                        <Export-Package></Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -137,6 +137,6 @@
 		</plugins>
 	</build>
 
-	
+
 	<groupId>org.societies</groupId>
 </project>

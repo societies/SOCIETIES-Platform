@@ -1,0 +1,8 @@
+To launch this test case:
+* compile this test case
+* put the Virgo <policy-management-remote-1266>.plan on Virgo "pickup" directory
+* don't forget to add the xc.properties on Virgo "pickup" directory
+* start Openfire
+* start Virgo
+* put the Virgo <policy-management-remote-1266>.test.plan on Virgo "pickup" directory
+* Follow the tag [#1266] on the log

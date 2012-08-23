@@ -36,6 +36,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -97,6 +98,49 @@ public class PrivacyAgreementManager implements IPrivacyAgreementManager {
 			LOG.error("[Error getAgreement] Can't transform the agreement into a bean for serialization.", e);
 		}
 		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager#checkAgreement(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public boolean checkAgreement(Requestor requestor, IIdentity ownerId) throws PrivacyException {
+		// -- Verify
+		if (null == requestor || null == requestor.getRequestorId()) {
+			throw new PrivacyException("Not enought information to search a privacy policy agreement. Requestor needed.");
+		}
+		if (null == ownerId) {
+			throw new PrivacyException("Not enought information to search a privacy policy agreement. Owner id needed.");
+		}
+		// Dependency injection not ready
+		if (!isDepencyInjectionDone()) {
+			throw new PrivacyException("[Dependency Injection] PrivacyPolicyAgreementManager not ready");
+		}
+		
+		try {
+			List<CtxIdentifier> agreementIdList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, PrivacyAgreementManagerInternal.getAgreementIdOnCtx(requestor, ownerId)).get();
+			if (null == agreementIdList || agreementIdList.size() <= 0) {
+				return false;
+			}
+			CtxIdentifier agreementId = agreementIdList.get(0);
+			CtxAttribute agreementData = (CtxAttribute) ctxBroker.retrieve(agreementId).get();
+			org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreementTmp = (org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope) SerialisationHelper.deserialise(agreementData.getBinaryValue(), this.getClass().getClassLoader()); //ClassLoader.getSystemClassLoader());
+			if (null == agreementTmp) {
+				return false;
+			}
+			return true;
+		} catch (CtxException e) {
+			LOG.error("[Error getAgreement] Can't find the agreement. Context error.", e);
+		} catch (IOException e) {
+			LOG.error("[Error getAgreement] Can't find the agreement. IO error.", e);
+		} catch (ClassNotFoundException e) {
+			LOG.error("[Error getAgreement] Can't find the agreement. ClassNotFound error.", e);
+		} catch (InterruptedException e) {
+			LOG.error("[Error getAgreement] Can't find the agreement.", e);
+		} catch (ExecutionException e) {
+			LOG.error("[Error getAgreement] Can't find the agreement.", e);
+		}
+		return false;
 	}
 
 

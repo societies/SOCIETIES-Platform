@@ -6,7 +6,6 @@
 	<groupId>org.societies.context-management</groupId>
 	<artifactId>user-context-db-mgmt</artifactId>
 	<version>${version.cm}</version>
-	<packaging>bundle</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
@@ -95,7 +94,7 @@
 	</parent>
 	
 	<!-- Build Settings -->
-	<build>
+	<!-- build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -130,7 +129,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build>  -->
 	
 	<!-- More Project Information -->
 	<name>User Context DB Mgmt</name>

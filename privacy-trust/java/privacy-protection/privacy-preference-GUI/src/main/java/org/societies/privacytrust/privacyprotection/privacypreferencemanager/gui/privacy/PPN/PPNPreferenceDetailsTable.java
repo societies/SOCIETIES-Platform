@@ -70,12 +70,12 @@ public class PPNPreferenceDetailsTable extends AbstractTableModel{
 		PPNPreferenceDetails d = this.details.get(rowIndex);
 		
 		if (columnIndex==0){
-			return d.getContextType();
+			return d.getDataType();
 		}
 		
 		if (columnIndex == 1){
-			if (d.getAffectedCtxID()!=null){
-				return d.getAffectedCtxID();
+			if (d.getAffectedDataId()!=null){
+				return d.getAffectedDataId();
 			}else{
 				return "";
 			}
@@ -108,13 +108,13 @@ public class PPNPreferenceDetailsTable extends AbstractTableModel{
 		PPNPreferenceDetails d = this.details.get(row);
 		
 		if (col==0){
-			d.setContextType(value.getContextType());
+			d.setDataType(value.getDataType());
 			fireTableCellUpdated(row, col);
 		}
 		
 		if (col==1){
-			if (value.getAffectedCtxID()!=null){
-				d.setAffectedCtxID(value.getAffectedCtxID());
+			if (value.getAffectedDataId()!=null){
+				d.setAffectedDataId(value.getAffectedDataId());
 				fireTableCellUpdated(row, col);
 			}
 		}

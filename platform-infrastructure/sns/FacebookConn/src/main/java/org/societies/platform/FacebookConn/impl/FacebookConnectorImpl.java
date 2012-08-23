@@ -24,6 +24,7 @@ import com.restfb.batch.BatchRequest.BatchRequestBuilder;
 import com.restfb.batch.BatchResponse;
 import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
+import com.restfb.types.FacebookType;
 
 
 
@@ -41,8 +42,19 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	private long				tokenExpiration = 0;
 	private boolean				firstTime = true;
 	
+	
+	/**
+	 * Empty conctructor
+	 */
 	public FacebookConnectorImpl(){}
 	
+	/**
+	 * Facebook connector construtor. Initialize the minimum set of parameter to 
+	 * generate an instance of Facebook connector.
+	 * @param access_token - the use token to grant read/write access to his FB account
+	 * @param identity     - societies Identity
+	 * 
+	 */
 	public FacebookConnectorImpl (String access_token, String identity){
 		
 		this.identity		= identity;
@@ -416,9 +428,54 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		
 	}
 
+	
+	
 	@Override
 	public void post(String value) {
-	
+		JsonObject complexValue = null;
+		try{
+			complexValue = new JsonObject(value);
+		}catch (Exception e) {
+			
+		}
+		if (complexValue != null){
+			if (complexValue.has("event")){
+//				Date tomorrow 		= DateFormat.parse(complexValue.getInt("from") + 1000L * 60L * 60L * 24L);
+//				Date twoDaysFromNow = DateFormat.parse(complexValue.getInt("to") + 1000L * 60L * 60L * 48L);
+//				
+				
+				JsonObject jEvt = complexValue.getJsonObject("event");
+				FacebookType publishEventResponse = facebookClient.publish( EVENTS, FacebookType.class,
+						Parameter.with("name",jEvt.getString("name")), 
+						Parameter.with("start_time", jEvt.getString("from")),
+						Parameter.with("end_time",   jEvt.getString("to")),
+						Parameter.with("location",   jEvt.getString("location")),
+						Parameter.with("description",   jEvt.getString("description"))
+				
+				);
+				
+			}
+			else if (complexValue.has("checkin")){
+				Map<String, String> coordinates = new HashMap<String, String>();
+				JsonObject jCK = complexValue.getJsonObject("checkin");
+				coordinates.put("latitude", jCK.getString("lat"));
+				coordinates.put("longitude", jCK.getString("lon"));
+				                        
+				FacebookType publishCheckinResponse = facebookClient.publish(CHECKINS,
+				FacebookType.class, Parameter.with("message", jCK.getString("message")),
+			    Parameter.with("coordinates", coordinates), 
+			    Parameter.with("place", jCK.getString("place")));
+
+				System.out.println("Published checkin ID: " + publishCheckinResponse.getId());
+				
+			}
+		}
+		else{
+			System.out.println(" Just a post! ==> "+value );
+			FacebookType publishMessageResponse = facebookClient.publish(FEED, FacebookType.class, Parameter.with("message", value));
+		}
+		
+		
 		
 	}
 	

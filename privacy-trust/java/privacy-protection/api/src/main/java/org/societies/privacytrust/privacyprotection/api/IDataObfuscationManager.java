@@ -69,5 +69,5 @@ public interface IDataObfuscationManager {
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws PrivacyException
 	 */
-	public String hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
+	public IDataWrapper hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
 }

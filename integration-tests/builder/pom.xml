@@ -23,8 +23,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<modules>
@@ -32,6 +31,9 @@
 	    <module>../util</module>
 	    <module>../BIT/css-services-test-suite/use-service-759</module>
 	    <module>../BIT/css-services-test-suite/install-service-713</module>
+	    <module>../BIT/privacy-trust-test-suite</module>
+	    
+	    <module>../CT/privacy-trust-test-suite</module>
 	</modules>
 
 </project>

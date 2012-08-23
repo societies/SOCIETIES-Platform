@@ -175,7 +175,7 @@ public class TestPCM {
 	private void setupPrivacyPreference(){
 
 		details = new PPNPreferenceDetails(this.ctxResourceId.getType());
-		details.setAffectedCtxID(ctxResourceId);
+		details.setAffectedDataId(ctxResourceId);
 		RuleTarget targetBLOCK;
 		List<Requestor> subjects = new ArrayList<Requestor>();
 		subjects = new ArrayList<Requestor>();

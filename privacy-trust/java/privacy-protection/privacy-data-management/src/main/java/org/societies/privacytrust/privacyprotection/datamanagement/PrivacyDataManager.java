@@ -30,10 +30,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
@@ -45,6 +42,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
@@ -73,73 +71,73 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.CtxIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier)
 	 */
 	@Override
-	public ResponseItem checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action) throws PrivacyException {
+	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
-		verifyParemeters(requestor, ownerId, null, dataId);
+		if (null == requestor) {
+			throw new NullPointerException("[Parameters] Not enought information: requestor or owner id is missing");
+		}
 		if (null == dataId) {
-			throw new PrivacyException("Not enought information: data id is missing");
+			throw new NullPointerException("[Parameters] Not enought information: data id is missing. At least the data type is expected.");
+		}
+		if (null == actions || actions.size() <= 0) {
+			throw new NullPointerException("[Parameters] Actions are missing");
+		}
+		if (!atLeast1MandatoryAction(actions)) {
+			throw new PrivacyException("[Parameters] At least one mandatory action is required, they can't be all optional.");
 		}
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
 
 
-		// -- Create Useful Values for NULL Result
-		// CtxAttributeId
-		CtxAttributeIdentifier dataAttributeId = null;
-		try {
-			if (dataId instanceof CtxAttributeIdentifier) {
-				dataAttributeId = (CtxAttributeIdentifier) dataId;
-			}
-			else {
-				CtxEntityIdentifier dataEntityId = new CtxEntityIdentifier(dataId.getOperatorId());
-				dataAttributeId = new CtxAttributeIdentifier(dataEntityId, dataId.getType(), dataId.getObjectNumber());
-			}
-		} catch (MalformedCtxIdentifierException e) {
-			LOG.error("Can't generate a CtxAttributeId from an other CtxId type (OperatorId: "+dataId.getOperatorId()+", DataType: "+dataId.getType());
-		}
-		// List of actions
-		List<Action> actions = new ArrayList<Action>();
-		actions.add(action);
+		// -- Create useful values for default result
 		List<Condition> conditions = new ArrayList<Condition>();
-		// RequestItem
-		Resource resource = new Resource(dataAttributeId);
+		Resource resource = new Resource(dataId);
 		RequestItem requestItemNull = new RequestItem(resource, actions, conditions);
 
 		// -- Retrieve a stored permission
-		ResponseItem permission = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
-		// - Permission available: check actions
-		if (null != permission) {
-			// Actions available
-			if (null != permission.getRequestItem() && containsAction(permission.getRequestItem().getActions(), action)) {
-				LOG.info("RequestItem NOT NULL and action match");
-				// Return only used actions for this request
-				permission.getRequestItem().setActions(actions);
-			}
-			// Actions not available
-			else if(null != permission.getRequestItem()) {
-				LOG.info("RequestItem NOT but action doesn't match NULL");
-				permission = new ResponseItem(requestItemNull, Decision.DENY);
-			}
-		}
-
+		ResponseItem permission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
 
 		// -- Permission not available: ask to PrivacyPreferenceManager
-		if (null == permission) {
+		if (null == permission || null == permission.getRequestItem()) {
 			LOG.info("No Permission retrieved");
+			permission = null;
 			try {
-				permission = privacyPreferenceManager.checkPermission(requestor, dataAttributeId, actions);
+				permission = privacyPreferenceManager.checkPermission(requestor, dataId, actions);
 			} catch (Exception e) {
 				LOG.error("Error when retrieving permission from PrivacyPreferenceManager", e);
 			}
 			// Permission still not available: deny access
-			if (null == permission) {
+			if (null == permission || null == permission.getRequestItem()) {
 				permission = new ResponseItem(requestItemNull, Decision.DENY);
 			}
 			// Store new permission retrieved from PrivacyPreferenceManager
-			privacyDataManagerInternal.updatePermission(requestor, ownerId, permission);
+			privacyDataManagerInternal.updatePermission(requestor, permission);
 		}
 		return permission;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action)
+	 */
+	@Override
+	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, Action action) throws PrivacyException {
+		// List of actions
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(action);
+		return checkPermission(requestor, dataId, actions);
+	}
+
+	/*
+	 * 
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.CtxIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier)
+	 */
+	@Override
+	public ResponseItem checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action) throws PrivacyException {
+		// List of actions
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(action);
+		return checkPermission(requestor, dataId, actions);
 	}
 
 	/*
@@ -148,24 +146,29 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 */
 	@Async
 	@Override
-	public Future<IDataWrapper> obfuscateData(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+	public Future<IDataWrapper> obfuscateData(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
-		verifyParemeters(requestor, ownerId, dataWrapper, null);
+		if (null == requestor) {
+			throw new NullPointerException("Not enought information: requestor or owner id is missing");
+		}
 		if (null == dataWrapper || null == dataWrapper.getData()) {
-			throw new PrivacyException("Not enought information: data is missing");
+			throw new PrivacyException("Not enought information: data missing");
+		}
+		if (null == dataWrapper.getDataId()) {
+			throw new PrivacyException("Not enought information: data id missing. At least the data type is expected");
 		}
 		if (!isDepencyInjectionDone(2)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
 
 		// -- Retrieve the obfuscation level
-		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId());
+		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, dataWrapper.getDataId().getType());
 		double obfuscationLevel = 1;
 		if (null != dataObfuscationPreferences) {
-			dataObfuscationPreferences.getObfuscationLevel();
+			obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
 		}
 		// If no obfuscation is required: return directly the wrapped data
-		if (1 == obfuscationLevel) {
+		if (obfuscationLevel >= 1) {
 			return new AsyncResult<IDataWrapper>(dataWrapper);
 		}
 
@@ -173,53 +176,73 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		IDataWrapper obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(dataWrapper, obfuscationLevel);
 		return new AsyncResult<IDataWrapper>(obfuscatedDataWrapper);
 	}
+	/*
+	 * 
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
+	 */
+	@Async
+	@Override
+	public Future<IDataWrapper> obfuscateData(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+		return obfuscateData(requestor, dataWrapper);
+	}
 
 	/*
 	 * 
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public String hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+	public IDataWrapper hasObfuscatedVersion(Requestor requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
-		verifyParemeters(requestor, ownerId, dataWrapper, null);
-		if (null == dataWrapper || null == dataWrapper.getDataId()) {
-			throw new PrivacyException("Not enought information: data id is missing");
-		}
-		if (!isDepencyInjectionDone(2)) {
-			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
-		}
-
-		// -- Retrieve the obfuscation level
-		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, ownerId, dataWrapper.getDataId());
-		double obfuscationLevel = 1;
-		if (null != dataObfuscationPreferences) {
-			dataObfuscationPreferences.getObfuscationLevel();
-		}
-
-		// -- Check if an obfuscated version is available
-		return dataObfuscationManager.hasObfuscatedVersion(dataWrapper, obfuscationLevel);
-	}
-
-
-	private void verifyParemeters(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper, CtxIdentifier dataId) throws PrivacyException {
-		if (null == requestor || null == ownerId) {
+		if (null == requestor) {
 			throw new NullPointerException("Not enought information: requestor or owner id is missing");
 		}
+		if (null == dataWrapper || null == dataWrapper.getDataId()) {
+			throw new PrivacyException("Not enought information: data id is missing. At least the data type is expected.");
+		}
+		return dataWrapper;
+		// Not use at the moment
+		//		if (!isDepencyInjectionDone(2)) {
+		//			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
+		//		}
+		//		
+		//		// -- Retrieve the obfuscation level
+		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, dataWrapper.getDataId().getType());
+		//		double obfuscationLevel = 1;
+		//		if (null != dataObfuscationPreferences) {
+		//			obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
+		//		}
+		//		
+		//		// -- Check if an obfuscated version is available
+		//		return dataObfuscationManager.hasObfuscatedVersion(dataWrapper, obfuscationLevel);
 	}
+	/*
+	 * 
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
+	 */
+	@Override
+	public String hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+		return hasObfuscatedVersion(requestor, dataWrapper).getDataId().getUri();
+	}
+
 
 	// -- Private methods
-	private boolean containsAction(List<Action> actions, Action action) {
-		if (null == actions || actions.size() <= 0 || null == action) {
-			return false;
-		}
-		for(Action actionTmp : actions) {
-			if (actionTmp.toXMLString().equals(action.toXMLString())) {
-				return true;
+
+	/**
+	 * Simple method to check if a list of actions has, at least, one action
+	 * which is not optional
+	 * @param actions List of action
+	 * @return True if the list is ok
+	 */
+	private boolean atLeast1MandatoryAction(List<Action> actions) {
+		boolean oneMandatory = false;
+		for(Action action : actions) {
+			if (!action.isOptional()) {
+				oneMandatory = true;
+				break;
 			}
 		}
-		return false;
+		return oneMandatory;
 	}
-
 
 	// --- Dependency Injection
 	public void setPrivacyPreferenceManager(

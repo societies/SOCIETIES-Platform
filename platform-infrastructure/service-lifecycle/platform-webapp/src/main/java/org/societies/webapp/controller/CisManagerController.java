@@ -216,7 +216,7 @@ public class CisManagerController {
 				MembershipCrit membershipCrit = new MembershipCrit();
 				List<Criteria> criteria = new ArrayList<Criteria>();
 				Criteria c1 = new Criteria();c1.setAttrib(CtxAttributeTypes.ADDRESS_HOME_CITY);c1.setOperator("equals");c1.setValue1("something");
-				Criteria c2 = new Criteria();c2.setAttrib(CtxAttributeTypes.STATUS);c2.setOperator("equals");c2.setValue1("something");
+				Criteria c2 = new Criteria();c2.setAttrib(CtxAttributeTypes.RELIGIOUS_VIEWS);c2.setOperator("equals");c2.setValue1("something");
 				criteria.add(c1);criteria.add(c2);membershipCrit.setCriteria(criteria);
 				ad.setMembershipCrit(membershipCrit);
 				// done setting membership crit

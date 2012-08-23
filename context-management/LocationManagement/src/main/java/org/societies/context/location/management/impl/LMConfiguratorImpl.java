@@ -28,10 +28,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.comm.EventsType;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
@@ -41,26 +45,52 @@ import org.societies.context.api.user.location.ILocationManagementConfigurator;
 
 
 public class LMConfiguratorImpl implements ILocationManagementConfigurator{
-
+	/** The logging facility. */
+	private static final Logger log = LoggerFactory.getLogger(LMConfiguratorImpl.class);
+	
 	private PubsubClient pubSubManager; 
 	private ICommManager commManager;
+	private ICommManagerController commManagerController;
 	private IDeviceRegistry deviceRegistry;
 	private ILocationManagementAdapter iLocationManagementAdapter; 
 	 
-	public void init(PubsubClient pubSubManager,ICommManager commManager, IDeviceRegistry deviceRegistry, ILocationManagementAdapter callback){
+	public void init(PubsubClient pubSubManager,ICommManager commManager, IDeviceRegistry deviceRegistry, ICommManagerController commMngrController, ILocationManagementAdapter callback){
 		this.iLocationManagementAdapter = callback;
 		this.deviceRegistry = deviceRegistry;
 		this.pubSubManager = pubSubManager;
 		this.commManager = commManager;
 		this.deviceRegistry = deviceRegistry;
+		this.commManagerController = commMngrController;
 		
+		registerWithoutPubSub();
 		/*
-		 * Temp removal of pubSubeventing
+		 * TODO Temp removal of pubSub eventing
 		 * register();
 		 * 
 		 */
 	}
 
+	private void registerWithoutPubSub(){
+		log.info("start 'registerWithoutPubSub'");
+		try{
+			String otherNetworkNodes = "";
+			for (INetworkNode networkNode : commManagerController.getOtherNodes()){
+				iLocationManagementAdapter.registerCSSdevice(networkNode.getJid(),"", "00:00:00:00:00");
+				otherNetworkNodes += networkNode.getJid() +" , \t";
+			}
+			log.info("Related network nodes: "+otherNetworkNodes);
+			
+			String thisNodeId = commManager.getIdManager().getThisNetworkNode().getJid();
+			iLocationManagementAdapter.registerCSSdevice(thisNodeId,"", "00:00:00:00:00");
+			
+			log.info("This network node: "+thisNodeId);
+			
+		}catch (Exception e) {
+			log.error("Exception msg: "+e.getMessage()+"\t cause: "+e.getCause(),e);
+		}
+		log.info("finish 'registerWithoutPubSub'");
+		
+	}
 	private DeviceConnected deviceConnected = new DeviceConnected();
 	private DeviceDisconnected deviceDisconnected = new DeviceDisconnected();
 	
