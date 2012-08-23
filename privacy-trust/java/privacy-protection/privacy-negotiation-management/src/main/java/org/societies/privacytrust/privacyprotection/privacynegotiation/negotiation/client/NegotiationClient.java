@@ -399,7 +399,8 @@ public class NegotiationClient implements INegotiationClient {
 		for (RequestItem item : items){
 			if (!item.isOptional()){
 				String dataType = item.getResource().getDataType();
-				DataIdentifierScheme scheme = item.getResource().getDataId().getScheme();
+
+				DataIdentifierScheme scheme = item.getResource().getScheme();
 				DataHelper helper = new DataHelper(ctxBroker, userIdentity);
 				if (!helper.dataTypeExists(item)){
 					notFoundContextTypes.add(dataType);

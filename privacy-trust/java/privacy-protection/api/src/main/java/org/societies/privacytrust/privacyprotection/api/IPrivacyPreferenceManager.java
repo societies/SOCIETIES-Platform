@@ -67,7 +67,7 @@ public interface IPrivacyPreferenceManager {
 	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions)
 	  throws PrivacyException;
 
-	/**
+/*	*//**
 	 * Method to check the access control permission
 	 * @return	responseItem that indicates the resource, the Actions and Conditions and the Decision to permit or deny
 	 * 
@@ -75,10 +75,10 @@ public interface IPrivacyPreferenceManager {
 	 * @param contextType    the affected context identifier
 	 * @param actions    the actions requested
 	 * @exception PrivacyPreferenceException PrivacyPreferenceException
-	 */
+	 *//*
 	public ResponseItem checkPermission(Requestor requestor, String contextType, List<Action> actions)
 	  throws PrivacyException;
-
+*/
 	
 	/**
 	 * Method to retrieve the evaluated outcome of identity selection preferences based on 

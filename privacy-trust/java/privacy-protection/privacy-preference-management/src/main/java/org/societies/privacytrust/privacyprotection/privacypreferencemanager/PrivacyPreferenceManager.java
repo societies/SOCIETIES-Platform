@@ -237,7 +237,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#checkPermission(java.lang.String, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action, org.societies.api.comm.xmpp.datatypes.IIdentity)
 	 */
-	@Override
+/*	@Override
 	public ResponseItem checkPermission(Requestor requestor, String ctxType, List<Action> actions) throws PrivacyException{
 		this.logging.debug("checkPermission: \nRequestor: "+requestor.toString()+"\nctxType : "+ctxType+"\n and actions...");
 		PPNPreferenceDetails details = new PPNPreferenceDetails(ctxType);
@@ -301,7 +301,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 		}
 
-	}
+	}*/
 
 	/*
 	 * (non-Javadoc)
@@ -762,20 +762,20 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 		return actions;
 	}
-	private ResponseItem createResponseItem(Requestor requestor, String ctxType, List<Action> actions, List<Condition> conditions, Decision decision){
-		/*
+/*	private ResponseItem createResponseItem(Requestor requestor, String ctxType, List<Action> actions, List<Condition> conditions, Decision decision){
+		
 		 * sfina: otan to request einai gia create, prosthetoume WRITE, DELETE kai READ
 		 * sfina2: otan to request einai gia write, prosthetoume READ
-		 */
+		 
 		actions = this.adjustActions(actions);
-		/*
+		
 		 * telos sfinas
-		 */
+		 
 		RequestItem reqItem = new RequestItem(new Resource(ctxType), actions, conditions);
 		ResponseItem respItem = new ResponseItem(reqItem, decision);
 		return respItem;
-	}
-	private ResponseItem checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Requestor requestor, String ctxType, List<Condition> conditions, List<Action> actions){
+	}*/
+/*	private ResponseItem checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Requestor requestor, String ctxType, List<Condition> conditions, List<Action> actions){
 		this.logging.debug("Evaluating preference");
 		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
 		if (null==outcome){
@@ -832,7 +832,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 				return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.PERMIT);
 			}
 			return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);		}
-	}
+	}*/
 	private void askToStoreDecision(Requestor requestor, DataIdentifier dataId, List<Condition> conditions,List<Action> actions,  PrivacyOutcomeConstants decision){
 		int n = myMessageBox.showConfirmDialog("Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
 		if (n==JOptionPane.YES_OPTION){
@@ -858,7 +858,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 	}
 
-	private void askToStoreDecision(Requestor requestor, String ctxType, List<Action> actions, List<Condition> conditions, PrivacyOutcomeConstants decision){
+/*	private void askToStoreDecision(Requestor requestor, String ctxType, List<Action> actions, List<Condition> conditions, PrivacyOutcomeConstants decision){
 		int n = myMessageBox.showConfirmDialog("Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
 		if (n==JOptionPane.YES_OPTION){
 			
@@ -879,7 +879,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 	
 	private IPrivacyOutcome evaluatePreference(IPrivacyPreference privPref){
 		PreferenceEvaluator ppE = new PreferenceEvaluator(this.contextCache, trustBroker);

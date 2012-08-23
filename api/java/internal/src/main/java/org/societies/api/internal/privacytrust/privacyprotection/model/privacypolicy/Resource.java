@@ -30,6 +30,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 /**
  * the Resource class is used to represent  a piece of data type belonging to the user 
  * (i.e context data, preference data, profile data). It contains the id of the data and the type of data. 
@@ -40,6 +41,7 @@ public class Resource implements Serializable{
 
 	private DataIdentifier dataId;
 	private String dataType;
+	private DataIdentifierScheme scheme;
 	
 	private Resource(){
 		
@@ -47,15 +49,13 @@ public class Resource implements Serializable{
 	public Resource(DataIdentifier dataId){
 		this.dataId = dataId;
 		this.dataType = dataId.getType();
+		this.scheme = dataId.getScheme();
 	}
-	@Deprecated
-	public Resource(CtxAttributeIdentifier ctxId){
-		this.dataId = ctxId;
-		this.dataType = ctxId.getType();
-	}
+
 	
-	public Resource(String type){
+	public Resource(DataIdentifierScheme scheme, String type){
 		this.dataType = type;
+		this.scheme = scheme;
 	}
 	public TargetMatchConstants getType(){
 		return TargetMatchConstants.RESOURCE;
@@ -64,16 +64,9 @@ public class Resource implements Serializable{
 	public String getDataType(){
 		return this.dataType;
 	}
-	@Deprecated
-	public String getContextType(){
-		return this.dataType;
-	}
+
 	
 	public DataIdentifier getDataId(){
-		return this.dataId;
-	}
-	@Deprecated
-	public DataIdentifier getCtxIdentifier(){
 		return this.dataId;
 	}
 	
@@ -112,6 +105,24 @@ public class Resource implements Serializable{
 	
 	private String ctxTypeToXMLString(){
 		String str = "";
+		if (scheme.equals(DataIdentifierScheme.CONTEXT)){
+			str = str.concat("\n\t<Attribute AttributeId=\"CONTEXT\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		if (scheme.equals(DataIdentifierScheme.CIS)){
+			str = str.concat("\n\t<Attribute AttributeId=\"CIS\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		
+		if (scheme.equals(DataIdentifierScheme.DEVICE)){
+			str = str.concat("\n\t<Attribute AttributeId=\"DEVICE\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		
+		if (scheme.equals(DataIdentifierScheme.ACTIVITY)){
+			str = str.concat("\n\t<Attribute AttributeId=\"ACTIVITY\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
 		str = str.concat("\n\t<Attribute AttributeId=\"contextType\"" +
 				"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		str = str.concat("\n\t\t<AttributeValue>");
@@ -150,10 +161,18 @@ public class Resource implements Serializable{
 		// -- Verify obj type
 		Resource rhs = (Resource) obj;
 		return new EqualsBuilder()
-			.append(this.getContextType(), rhs.getContextType())
-			.append(this.getCtxIdentifier(), rhs.getCtxIdentifier())
+			.append(this.getDataType(), rhs.getDataType())
+			.append(this.getDataId(), rhs.getDataId())
 			.isEquals();
 	}
+
+	/**
+	 * @return the scheme
+	 */
+	public DataIdentifierScheme getScheme() {
+		return scheme;
+	}
+
 	
 	
 }

@@ -209,7 +209,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(new Action(ActionConstants.READ));
 			Decision decision = Decision.PERMIT;
-			Resource resource = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
+			Resource resource = new Resource(DataIdentifierScheme.CONTEXT,CtxAttributeTypes.LOCATION_SYMBOLIC);
 			RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
 			ResponseItem permission = new ResponseItem(requestItem, decision);
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, permission);

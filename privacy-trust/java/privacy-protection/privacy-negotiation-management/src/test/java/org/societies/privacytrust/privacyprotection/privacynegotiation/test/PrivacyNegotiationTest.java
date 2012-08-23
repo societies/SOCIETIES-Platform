@@ -50,6 +50,7 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -76,6 +77,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
@@ -102,6 +104,7 @@ public class PrivacyNegotiationTest {
 	private IUserPreferenceManagement prefMgr = Mockito.mock(IUserPreferenceManagement.class);
 	private ICtxBroker ctxBroker = Mockito.mock(ICtxBroker.class);
 	private IEventMgr eventMgr = Mockito.mock(IEventMgr.class);
+	private IIdentityManager idm = Mockito.mock(IIdentityManager.class);
 	private IPrivacyPreferenceManager privacyPreferenceManager = Mockito.mock(IPrivacyPreferenceManager.class);
 	private PrivacyPolicyNegotiationManager negotiationMgr;
 	private IPrivacyDataManagerInternal privacyDataManager = Mockito.mock(IPrivacyDataManagerInternal.class);
@@ -113,7 +116,7 @@ public class PrivacyNegotiationTest {
 	private RequestorCis requestorCis;
 	private RequestPolicy servicePolicy;
 	private RequestPolicy cisPolicy;
-	private MyIdentity userId;
+	private INetworkNode userId;
 	private IndividualCtxEntity userCtxEntity;
 	private CtxAttributeIdentifier ctxLocationAttributeId;
 	private CtxAttribute locationAttribute;
@@ -129,6 +132,7 @@ public class PrivacyNegotiationTest {
 	private PPNPOutcome statusOutcomeForCis;
 	private PPNegotiationEvent successfulEvent;
 	private FailedNegotiationEvent failedEvent;
+	
 
 	@Before
 	public void setUp(){
@@ -145,7 +149,7 @@ public class PrivacyNegotiationTest {
 		this.negotiationMgr.setCtxBroker(ctxBroker);
 		this.negotiationMgr.setEventMgr(eventMgr);
 		this.negotiationMgr.setIdentitySelection(Mockito.mock(IIdentitySelection.class));
-		this.negotiationMgr.setIdm(Mockito.mock(IIdentityManager.class));
+		this.negotiationMgr.setIdm(idm);
 		this.negotiationMgr.setPrefMgr(prefMgr);
 		this.negotiationMgr.setPrivacyDataManagerInternal(privacyDataManager);
 		this.negotiationMgr.setPrivacyAgreementManagerInternal(policyAgreementMgr );
@@ -166,7 +170,7 @@ public class PrivacyNegotiationTest {
 		subjectsService.add(requestorService);		
 		List<Requestor> subjectsCis = new ArrayList<Requestor>();
 		subjectsCis.add(requestorCis);	
-		Resource rLocation = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource rLocation = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		List<Condition> conditions = new ArrayList<Condition>();
@@ -178,7 +182,7 @@ public class PrivacyNegotiationTest {
 		RuleTarget targetLocationForService = new RuleTarget(subjectsService, rLocation, actions);
 		
 		
-		Resource rStatus = new Resource(CtxAttributeTypes.STATUS);
+		Resource rStatus = new Resource(DataIdentifierScheme.CONTEXT,CtxAttributeTypes.STATUS);
 		
 		RuleTarget targetStatusForService = new RuleTarget(subjectsService, rStatus, actions);
 		
@@ -239,7 +243,9 @@ public class PrivacyNegotiationTest {
 		
 
 		try {
+			Mockito.when(idm.getThisNetworkNode()).thenReturn(this.userId);
 			Mockito.when(ctxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(userCtxEntity));
+			Mockito.when(ctxBroker.retrieveIndividualEntity(userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(userCtxEntity));
 			List<IPrivacyOutcome> locationOutcomes = new ArrayList<IPrivacyOutcome>();
 			locationOutcomes.add(locationOutcomeForService);
 			locationOutcomes.add(locationOutcomeForCis);
@@ -340,7 +346,7 @@ public class PrivacyNegotiationTest {
 		/*
 		 * location requestItem
 		 */
-		Resource rLocation = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource rLocation = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		List<Condition> conditions = new ArrayList<Condition>();
@@ -355,7 +361,7 @@ public class PrivacyNegotiationTest {
 		 * status requestItem
 		 */
 		
-		Resource rStatus = new Resource(CtxAttributeTypes.STATUS);
+		Resource rStatus = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.STATUS);
 		List<Action> actions1 = new ArrayList<Action>();
 		actions1.add(new Action(ActionConstants.READ));
 		List<Condition> conditions1 = new ArrayList<Condition>();
@@ -383,7 +389,7 @@ public class PrivacyNegotiationTest {
 		/*
 		 * location requestItem
 		 */
-		Resource rLocation = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource rLocation = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		List<Condition> conditions = new ArrayList<Condition>();
@@ -398,7 +404,7 @@ public class PrivacyNegotiationTest {
 		 * status requestItem
 		 */
 		
-		Resource rStatus = new Resource(CtxAttributeTypes.STATUS);
+		Resource rStatus = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.STATUS);
 		List<Action> actions1 = new ArrayList<Action>();
 		actions1.add(new Action(ActionConstants.READ));
 		List<Condition> conditions1 = new ArrayList<Condition>();
@@ -428,11 +434,13 @@ public class PrivacyNegotiationTest {
 		
 		
 		ctxLocationAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC, new Long(1));
+		ctxLocationAttributeId.setScheme(DataIdentifierScheme.CONTEXT);
 		locationAttribute = new CtxAttribute(ctxLocationAttributeId);
 		locationAttribute.setStringValue("home");
 		
 		
 		ctxStatusAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.STATUS, new Long(1));
+		ctxStatusAttributeId.setScheme(DataIdentifierScheme.CONTEXT);
 		statusAttribute = new CtxAttribute(ctxStatusAttributeId);
 		statusAttribute.setStringValue("busy");
 		

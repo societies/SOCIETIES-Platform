@@ -160,7 +160,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		//super( new JFrame(),"Privacy Policy Negotiation Preference Outcome GUI" );
 		super(new JFrame(), "Privacy Policy Negotiation - Privacy Preference GUI", true);
 		this.requestItem = item;
-		this.dataType = item.getResource().getContextType();
+		this.dataType = item.getResource().getDataType();
 		this.requestor = requestor;
 		this.sourceClassName = sourceClassName;
 		this.privPrefMgr = pMgr;
@@ -600,7 +600,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		if (this.requestor!=null){
 			subjects.add(this.requestor);
 		}
-		Resource r = new Resource(this.dataType);
+		Resource r = new Resource(this.requestItem.getResource().getScheme(),this.dataType);
 		
 		return new RuleTarget(subjects, r, this.gatherActions());
 		
