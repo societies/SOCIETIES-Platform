@@ -29,7 +29,6 @@ package org.societies.android.platform.cssmanager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
@@ -46,7 +45,6 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.schema.cssmanagement.CssEvent;
-import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssNode;
@@ -61,7 +59,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
-import android.os.Debug;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
@@ -89,7 +86,6 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     //currently hard coded destination of communication
     private static final String DESTINATION = "xcmanager.societies.local";
     
-	private SubscribeToPubsub asynchTask;
 
 	/**
 	 * CSS Manager intents
@@ -135,10 +131,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	public void onCreate () {
 //		Traceview 
 //		Debug.startMethodTracing(ANDROID_PROFILING_NAME);
-		//TODO - re-instate when Pubsub simple is working
-//		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
-//		this.registerForPubsub();
 		
+		Log.d(LOG_TAG, "Thread is: " + Thread.currentThread());
+
 		Log.d(LOG_TAG, "CSSManager opening database");
 		this.cssRecordDAO = new CssRecordDAO(this);
 
@@ -251,8 +246,18 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
+		//delay subscribing for Pubsub events until successful login to Domain Server
+		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
+		this.registerForPubsub();
+
+		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-		messageBean.setProfile(convertAndroidCSSRecord(record));
+		CssRecord localCssrecord = convertAndroidCSSRecord(record);
+		
+		//add the local Android node information
+		localCssrecord.setCssNodes(createAndroidLocalNode());
+		
+		messageBean.setProfile(localCssrecord);
 		messageBean.setMethod(MethodType.LOGIN_CSS);
 
 		Stanza stanza = new Stanza(toXCManager);
@@ -276,27 +281,15 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
-		boolean retValue = true;
 		
-//		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGIN_XMPP_SERVER));
-//		
-//		/**
-//		 * Create intent to broadcast results to interested receivers in the event 
-//		 * of a client binding to the service using Android IPC
-//		 */
-//		if (client != null) {
-//			Intent intent = new Intent(LOGIN_XMPP_SERVER);
-//			intent.putExtra(INTENT_RETURN_KEY, retValue);
-//			intent.setPackage(client);
-//
-//			
-//			Log.d(LOG_TAG, "loginXMPPServer sent return value: " + retValue);
-//			this.sendBroadcast(intent);
-//		}
-//		/**
-//		 * Return value returned to client binding using a local bind
-//		 */
-//		Log.d(LOG_TAG, "loginXMPPServer return value: " + retValue);
+		
+		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
+
+		
+		DomainLogin domainLogin = new DomainLogin();
+		
+		domainLogin.execute(params);
+
 	}
 
 	@Override
@@ -309,7 +302,13 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGOUT_CSS));
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-		messageBean.setProfile(convertAndroidCSSRecord(record));
+		CssRecord localCssrecord = convertAndroidCSSRecord(record);
+		
+		//add the local Android node information
+		localCssrecord.setCssNodes(createAndroidLocalNode());
+		
+		messageBean.setProfile(localCssrecord);
+
 		messageBean.setMethod(MethodType.LOGOUT_CSS);
 
 		Stanza stanza = new Stanza(toXCManager);
@@ -332,25 +331,13 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
-		boolean retValue = true;
-//		ccm.unregister(ELEMENT_NAMES, new CSSManagerCallback(client, LOGOUT_XMPP_SERVER));
-//		/**
-//		 * Create intent to broadcast results to interested receivers in the event 
-//		 * of a client binding to the service using Android IPC
-//		 */
-//		if (client != null) {
-//			Intent intent = new Intent(LOGOUT_XMPP_SERVER);
-//			intent.putExtra(INTENT_RETURN_KEY, retValue);
-//			intent.setPackage(client);
-//
-//			Log.d(LOG_TAG, "logoutXMPPServer sent return value: " + retValue);
-//
-//			this.sendBroadcast(intent);
-//		}
-//		/**
-//		 * Return value returned to client binding using a local bind
-//		 */
-//		Log.d(LOG_TAG, "logoutXMPPServer return value: " + retValue);
+		
+		String params [] = {client};
+
+		
+		DomainLogout domainLogout = new DomainLogout();
+		
+		domainLogout.execute(params);
 
 	}
 
@@ -374,12 +361,13 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	@Override
 	public void registerXMPPServer(String client, AndroidCSSRecord record) {
-		AndroidCSSRecord retValue = null;
 		Log.d(LOG_TAG, "registerXMPPServer called with client: " + client);
 		Log.d(LOG_TAG, "registering user: " + record.getCssIdentity() + " at domain: " + record.getDomainServer());
 		
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 
+		Log.d(LOG_TAG, "Thread is: " + Thread.currentThread());
+		
 		DomainRegistration domainRegister = new DomainRegistration();
 		
 		domainRegister.execute(params);
@@ -433,6 +421,17 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	@Override
 	public void unregisterXMPPServer(String client,	AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "unregisterXMPPServer called with client: " + client);
+
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
+		Dbc.require("CSS record cannot be null", record != null);
+		
+		
+		String params [] = {client};
+		
+		DomainLogout domainLogout = new DomainLogout();
+		
+		domainLogout.execute(params);
+
 	}
 	
 	
@@ -448,6 +447,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	 * class ineffective. Use Intents as an asynchronous callback mechanism.
 	 */
 	
+	/**
+	 * This class carries out the registration of a CSS (XMPP) identity for a given domain server
+	 */
 	private class DomainRegistration extends AsyncTask<String, Void, String[]> {
 		
 		@Override
@@ -468,7 +470,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				INetworkNode networkNode = LocalCSSManagerService.this.ccm.newMainIdentity(params[0], params[1], params[2]);
 				
 				if (null != networkNode && null != networkNode.getDomain() && null != networkNode.getIdentifier()) {
-					Log.d(LOG_TAG, "registration successful");
+					Log.d(LOG_TAG, "domain registration successful");
 					
 					results[0]  = networkNode.getIdentifier();
 					results[1] = networkNode.getDomain();
@@ -511,8 +513,180 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			LocalCSSManagerService.this.sendBroadcast(intent);
 
 	    }
-		
 	}
+	/**
+	 * This class carries out the un-registration of a CSS (XMPP) identity for a given domain server
+	 */
+	private class DomainUnRegistration extends AsyncTask<String, Void, String[]> {
+		
+		@Override
+		/**
+		 * Carry out compute task 
+		 */
+		protected String[] doInBackground(String... params) {
+			Dbc.require("Four parameters must be supplied", params.length >= 1);
+			Log.d(LOG_TAG, "DomainUnRegistration - doInBackground");
+			Log.d(LOG_TAG, "DomainUnRegistration param client: " + params[0]);
+			
+			String results [] = new String[1];
+
+			if (LocalCSSManagerService.this.ccm.destroyMainIdentity()) {
+				Log.d(LOG_TAG, "domain unregistration successful");
+				
+				results[0] = params[0];
+			}
+			
+			return results;
+		}
+		
+		@Override
+		/**
+		 * Handle the communication of the result
+		 */
+		protected void onPostExecute(String results []) {
+			Log.d(LOG_TAG, "DomainUnRegistration - onPostExecute");
+			
+			Intent intent = new Intent(LocalCSSManagerService.UNREGISTER_XMPP_SERVER);
+			
+			if (null != results[0]) {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
+			} else {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, false);
+			}
+
+			AndroidCSSRecord aRecord = new AndroidCSSRecord();
+			
+			intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
+			
+			intent.setPackage(results[0]);
+
+			Log.d(LOG_TAG, "DomainUnRegistration result sent");
+
+			LocalCSSManagerService.this.sendBroadcast(intent);
+
+	    }
+	}
+	/**
+	 * 
+	 * This class handles the logging in to a previously registered domain and identity
+	 *
+	 */
+	private class DomainLogin extends AsyncTask<String, Void, String[]> {
+		
+		@Override
+		/**
+		 * Carry out compute task 
+		 */
+		protected String[] doInBackground(String... params) {
+			Dbc.require("Four parameters must be supplied", params.length >= 4);
+			Log.d(LOG_TAG, "DomainLogin - doInBackground");
+			Log.d(LOG_TAG, "DomainLogin param username: " + params[0]);
+			Log.d(LOG_TAG, "DomainLogin param domain server: " + params[1]);
+			Log.d(LOG_TAG, "DomainLogin param password: " + params[2]);
+			Log.d(LOG_TAG, "DomainLogin param client: " + params[3]);
+			
+			String results [] = new String[4];
+
+			INetworkNode networkNode = LocalCSSManagerService.this.ccm.login(params[0], params[1], params[2]);
+			
+			if (null != networkNode && null != networkNode.getDomain() && null != networkNode.getIdentifier() && LocalCSSManagerService.this.ccm.isConnected()) {
+				Log.d(LOG_TAG, "domain login successful");
+				
+				results[0]  = networkNode.getIdentifier();
+				results[1] = networkNode.getDomain();
+				results[2] = params[2];
+				results[3] = params[3];
+			}
+			
+			return results;
+		}
+		
+		@Override
+		/**
+		 * Handle the communication of the result
+		 */
+		protected void onPostExecute(String results []) {
+			Log.d(LOG_TAG, "DomainLogin - onPostExecute");
+			
+			Intent intent = new Intent(LocalCSSManagerService.LOGIN_XMPP_SERVER);
+			
+			if (null != results[0]) {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
+			} else {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, false);
+			}
+
+			AndroidCSSRecord aRecord = new AndroidCSSRecord();
+			aRecord.setCssIdentity(results[0]);
+			aRecord.setDomainServer(results[1]);
+			aRecord.setPassword(results[2]);
+			
+			intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
+			
+			intent.setPackage(results[3]);
+
+			Log.d(LOG_TAG, "DomainLogin result sent");
+
+			LocalCSSManagerService.this.sendBroadcast(intent);
+
+	    }
+	}
+
+	/**
+	 * 
+	 * This class handles the logging out of a previously registered domain and identity
+	 *
+	 */
+	private class DomainLogout extends AsyncTask<String, Void, String[]> {
+		
+		@Override
+		/**
+		 * Carry out compute task 
+		 */
+		protected String[] doInBackground(String... params) {
+			Dbc.require("Four parameters must be supplied", params.length >= 1);
+			Log.d(LOG_TAG, "DomainLogout - doInBackground");
+			Log.d(LOG_TAG, "DomainLogout param client: " + params[0]);
+			
+			String results [] = new String[1];
+				
+			if (LocalCSSManagerService.this.ccm.logout()) {
+				Log.d(LOG_TAG, "domain logout successful");
+				
+				results[0] = params[0];
+			}
+			
+			return results;
+		}
+		
+		@Override
+		/**
+		 * Handle the communication of the result
+		 */
+		protected void onPostExecute(String results []) {
+			Log.d(LOG_TAG, "DomainLogout - onPostExecute");
+			
+			Intent intent = new Intent(LocalCSSManagerService.LOGOUT_XMPP_SERVER);
+			
+			if (null != results[0]) {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
+			} else {
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, false);
+			}
+
+			AndroidCSSRecord aRecord = new AndroidCSSRecord();
+			
+			intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
+			
+			intent.setPackage(results[0]);
+
+			Log.d(LOG_TAG, "DomainLogout result sent");
+
+			LocalCSSManagerService.this.sendBroadcast(intent);
+
+	    }
+	}
+
 	/**
 	 * Callback used with Android Comms
 	 *
@@ -617,8 +791,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	        Log.i(LOG_TAG, "Subscribing to pubsub");
 	        
 	        
-			this.asynchTask = new SubscribeToPubsub(); 
-			this.asynchTask.execute(pubsubClient);
+	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(); 
+	    	subPubSub.execute(pubsubClient);
 
 
         } catch (Exception e) {
@@ -726,6 +900,25 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     	cssNode.setType(node.getType());
     	
     	return cssNode;
+    }
+    /**
+     * Create the node information of the Android node logging into the CSS
+     * @return List<CssNode>
+     */
+    private List<CssNode> createAndroidLocalNode() {
+    	CssNode localNode = new CssNode();
+    	List<CssNode> listNodes= new ArrayList<CssNode>();
+    	
+    	localNode.setIdentity(this.ccm.getIdManager().getThisNetworkNode().getJid());
+    	localNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+    	localNode.setType(CSSManagerEnums.nodeType.Android.ordinal());
+    	
+    	Log.d(LOG_TAG, "Android Node register info - id: " + localNode.getIdentity() + 
+    			" status: " + CSSManagerEnums.nodeStatus.Available.name() + " type: " + CSSManagerEnums.nodeType.Android.name());
+    	
+    	listNodes.add(localNode);
+    	
+    	return listNodes;
     }
 
 }

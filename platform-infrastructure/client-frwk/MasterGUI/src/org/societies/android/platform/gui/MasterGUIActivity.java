@@ -33,6 +33,7 @@ import org.apache.cordova.DroidGap;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -50,6 +51,7 @@ public class MasterGUIActivity extends DroidGap {
         super.onCreate(savedInstanceState);
 //          setContentView(R.layout.main);
       super.setIntegerProperty("loadUrlTimeoutValue", 60000);
+      PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
       super.loadUrl("file:///android_asset/www/index.html");
     }
     

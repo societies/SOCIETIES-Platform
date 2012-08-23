@@ -44,6 +44,7 @@ public class PacketMarshaller {
 	private Serializer s;
 	
 	public PacketMarshaller() {
+		Log.d(LOG_TAG, "Constructor");
 		Registry registry = new Registry();
 		Strategy strategy = new RegistryStrategy(registry);
 		try {
@@ -61,7 +62,7 @@ public class PacketMarshaller {
 	}
 	
 	public void register(List<String> elementNames, List<String> namespaces, List<String> packages) {
-		Log.d(LOG_TAG, "register");
+//		Log.d(LOG_TAG, "register");
 		for (String element : elementNames) {
 			Log.d(LOG_TAG, "register element: " + element);
 		}
@@ -162,7 +163,7 @@ public class PacketMarshaller {
 	}
 	
 	public Entry<String, List<String>> parseItemsResult(Packet packet) throws SAXException, IOException, ParserConfigurationException {
-		Log.d(LOG_TAG, "Entry");
+//		Log.d(LOG_TAG, "Entry");
 		Element element = getElementAny(packet);
 		final String node = element.getAttribute("node");
 		final List<String> list = new ArrayList<String>();

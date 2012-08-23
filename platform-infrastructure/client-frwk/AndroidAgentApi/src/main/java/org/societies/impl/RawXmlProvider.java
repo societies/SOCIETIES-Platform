@@ -17,7 +17,7 @@ public class RawXmlProvider implements IQProvider, PacketExtensionProvider {
 	private static final String LOG_TAG = RawXmlProvider.class.getName();
 
 	public IQ parseIQ(XmlPullParser parser) throws Exception {
-		Log.d(LOG_TAG, "parseIQ");
+//		Log.d(LOG_TAG, "parseIQ");
 		final XmlElement element = parseRootElement(parser);
 				
 		return new IQ() {
@@ -29,7 +29,7 @@ public class RawXmlProvider implements IQProvider, PacketExtensionProvider {
 	}	
 
 	public PacketExtension parseExtension(XmlPullParser parser) throws Exception {
-		Log.d(LOG_TAG, "parseExtension");
+//		Log.d(LOG_TAG, "parseExtension");
 		final XmlElement element = parseRootElement(parser);
 				
 		return new PacketExtension() {			
@@ -46,7 +46,7 @@ public class RawXmlProvider implements IQProvider, PacketExtensionProvider {
 	}
 	
 	private XmlElement parseRootElement(XmlPullParser parser) throws XmlPullParserException, IOException {
-		Log.d(LOG_TAG, "parseRootElement");
+//		Log.d(LOG_TAG, "parseRootElement");
 		List<String> prefixes = new ArrayList<String>();
 		String rootElementName = parser.getName();
 		String rootNS = parser.getNamespace();
@@ -62,14 +62,14 @@ public class RawXmlProvider implements IQProvider, PacketExtensionProvider {
 	}
 
 	private boolean atRootEndTag(XmlPullParser parser,String rootElementName) throws XmlPullParserException {		
-		Log.d(LOG_TAG, "atRootEndTag");
+//		Log.d(LOG_TAG, "atRootEndTag");
 		return parser.getEventType() == XmlPullParser.END_TAG && 
 				parser.getName() != null &&
 				parser.getName().equals(rootElementName);
 	}	
 
 	private String getText(XmlPullParser parser, List<String> prefixes) throws XmlPullParserException {
-		Log.d(LOG_TAG, "getText");
+//		Log.d(LOG_TAG, "getText");
 		String returnValue = parser.getText();
 		if (returnValue!=null)
 			return returnValue;
