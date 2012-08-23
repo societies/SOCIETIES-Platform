@@ -20,10 +20,7 @@
 package org.societies.integration.test.bit.privacydatamanagement;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
@@ -35,17 +32,13 @@ import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.DataIdentifierUtil;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -57,6 +50,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -68,11 +63,11 @@ public class PrivacyDataManagerTest
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class.getSimpleName());
 	public static Integer testCaseNumber = 0;
 
-	private CtxIdentifier dataId;
+	private DataIdentifier dataId;
 	private IIdentity ownerId;
 	private RequestorCis requestorCis;
 	private RequestorService requestorService;
-	
+
 
 	@Before
 	public void setUp() throws Exception
@@ -86,7 +81,14 @@ public class PrivacyDataManagerTest
 		ownerId = TestCase1266.commManager.getIdManager().getThisNetworkNode();
 		requestorCis = getRequestorCis();
 		requestorService = getRequestorService();
-		dataId = CtxIdentifierFactory.getInstance().fromString("red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");;
+		// Data Id
+		try {
+			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+		}
+		catch (MalformedCtxIdentifierException e) {
+			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
+			fail("setUp(): DataId creation error "+e.getMessage());
+		} 
 	}
 
 	@After
@@ -95,75 +97,71 @@ public class PrivacyDataManagerTest
 		LOG.info("[#"+testCaseNumber+"] "+getClass().getSimpleName()+"::tearDown");
 	}
 
-	
+
 	@Test
-	public void testCheckPermissionFirstTime()
+	public void CheckPermissionFirstTime()
 	{
-		String testTitle = new String("testCheckPermissionFirstTime: retrieve a privacy for the first time");
+		String testTitle = new String("CheckPermission: retrieve a privacy for the first time");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 		boolean dataUpdated = false;
 		ResponseItem permission = null;
 		try {
-			Action action = new Action(ActionConstants.READ);
+			Action read = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
-			actions.add(action);
-			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, ownerId, dataId, action);
+			actions.add(read);
+			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
 		}
 		assertNotNull("No permission retrieved", permission);
 		assertNotNull("No (real) permission retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", permission.getDecision().name(), Decision.PERMIT.name());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
 	}
 
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, IIdentity, IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)}.
 	 */
 	@Test
-	public void testCheckPermissionPreviouslyAdded()
+	public void CheckPermissionPreviouslyAdded()
 	{
-		String testTitle = new String("testCheckPermissionPreviouslyAdded: retrieve a privacy two times");
+		String testTitle = new String("CheckPermission: retrieve a privacy two times");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		
+
 		boolean dataUpdated = false;
 		ResponseItem permission1 = null;
 		ResponseItem permission2 = null;
 		try {
-			Action action = new Action(ActionConstants.READ);
+			Action read = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
-			actions.add(action);
+			actions.add(read);
 			Decision decision = Decision.PERMIT;
-			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorCis, ownerId, dataId, action);
-			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorCis, ownerId, dataId, action);
+			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actions);
+			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
 		}
 		assertNotNull("No permission retrieved", permission1);
 		assertNotNull("No (real) permission retrieved", permission1.getDecision());
-		assertEquals("Bad permission retrieved", permission1.getDecision().name(), Decision.PERMIT.name());
+		assertEquals("Bad permission retrieved",  Decision.PERMIT.name(), permission1.getDecision().name());
 		assertNotNull("No permission retrieved", permission2);
 		assertNotNull("No (real) permission retrieved", permission2.getDecision());
-		assertEquals("Bad permission retrieved", permission2.getDecision().name(), Decision.PERMIT.name());
-		//Modified by rafik
-		//Before:
-		//assertEquals("Two requests, not the same answer", permission1, permission2);
-		//After:
-		assertEquals("Two requests, not the same answer", permission1.toXMLString(), permission2.toXMLString());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission2.getDecision().name());
+		assertEquals("Two requests, not the same answer", permission1, permission2);
 	}
 
 	@Test
-	public void testObfuscateData()
+	public void ObfuscateData()
 	{
-		String testTitle = new String("testObfuscateData");
+		String testTitle = new String("ObfuscateData");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		
+
 		IDataWrapper<Name> wrapper = DataWrapperFactory.getNameWrapper("Olivier", "Maridat");
 		Future<IDataWrapper> obfuscatedDataWrapperAsync = null;
 		IDataWrapper<Name> obfuscatedDataWrapper = null;
 		try {
-			obfuscatedDataWrapperAsync = TestCase1266.privacyDataManager.obfuscateData(requestorCis, ownerId, wrapper);
+			obfuscatedDataWrapperAsync = TestCase1266.privacyDataManager.obfuscateData(requestorCis, wrapper);
 			obfuscatedDataWrapper = obfuscatedDataWrapperAsync.get();
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException obfuscator error] "+testTitle, e);
@@ -177,32 +175,32 @@ public class PrivacyDataManagerTest
 		}
 
 		// Verify
-		LOG.info("### Orginal name:\n"+wrapper.getData().toString());
-		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
+		LOG.debug("### Orginal name:\n"+wrapper.getData().toString());
+		LOG.debug("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
 		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 	}
 
 	@Test
 	public void testHasObfuscatedVersion()
 	{
-		String testTitle = new String("testHasObfuscatedVersion");
+		String testTitle = new String("HasObfuscatedVersion");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		
-		IDataWrapper<Name> wrapper = new DataWrapper<Name>(dataId.getUri(), null);
+
+		IDataWrapper<Name> wrapper = new DataWrapper<Name>(dataId, null);
 		LOG.info("[#"+testCaseNumber+"] "+wrapper);
-		String actual = "";
+		IDataWrapper actual = null;
 		try {
-			actual = TestCase1266.privacyDataManager.hasObfuscatedVersion(requestorCis, ownerId, wrapper);
+			actual = TestCase1266.privacyDataManager.hasObfuscatedVersion(requestorCis, wrapper);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException obfuscator error] "+testTitle, e);
 			fail("PrivacyException obfuscator error ("+e.getMessage()+") "+testTitle);
 		}
 		assertNotNull("Expected data id is not null", actual);
-		assertEquals("Retrieved data id is not same as the first", dataId.getUri(), actual);
+		assertEquals("Retrieved data id is not same as the first", dataId.getUri(), actual.getDataId().getUri());
 	}
-	
-	
-	
+
+
+
 	/* ****************************
 	 *            Tools           *
 	 ******************************/

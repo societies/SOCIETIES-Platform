@@ -40,8 +40,8 @@
 
   <xs:complexType name="resource">
     <xs:sequence>
-      <xs:element name="contextType" type="xs:string" minOccurs="0"/>
-      <xs:element name="ctxUriIdentifier" type="xs:string" minOccurs="0"/>
+      <xs:element name="dataIdUri" type="xs:string" minOccurs="0"/>
+      <xs:element name="dataType" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 

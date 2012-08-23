@@ -24,12 +24,13 @@
  */
 package org.societies.privacytrust.remote.privacydatamanagement;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -42,6 +43,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.util.model.priv
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.privacytrust.remote.PrivacyTrustCommClientCallback;
 /**
  * Comms Client that initiates the remote communication
@@ -65,7 +67,7 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote#checkPermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener)
 	 */
 	@Override
-	public void checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action, IPrivacyDataManagerListener listener) throws PrivacyException {
+	public void checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, IPrivacyDataManagerListener listener) throws PrivacyException {
 		LOG.info("#### checkPermission remote called");
 		IIdentity toIdentity = commManager.getIdManager().getThisNetworkNode();
 		Stanza stanza = new Stanza(toIdentity);
@@ -76,9 +78,8 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 		PrivacyDataManagerBean bean = new PrivacyDataManagerBean();
 		bean.setMethod(MethodType.CHECK_PERMISSION);
 		bean.setRequestor(Util.createRequestorBean(requestor));
-		bean.setOwnerId(ownerId.getJid());
-		bean.setDataId(dataId.toUriString());
-		bean.setAction(ActionUtils.toActionBean(action));
+		bean.setDataIdUri(dataId.getUri());
+		bean.setActions(ActionUtils.toActionBeans(actions));
 		try {
 			this.commManager.sendIQGet(stanza, bean, privacyTrustCommClientCallback);
 		} catch (CommunicationException e) {
@@ -92,7 +93,7 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote#obfuscateData(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public void obfuscateData(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper, IDataObfuscationListener listener) throws PrivacyException {
+	public void obfuscateData(Requestor requestor, IDataWrapper dataWrapper, IDataObfuscationListener listener) throws PrivacyException {
 		LOG.info("#### obfuscateData remote called");
 		
 		IIdentity toIdentity = commManager.getIdManager().getThisNetworkNode();
@@ -104,8 +105,7 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 		PrivacyDataManagerBean bean = new PrivacyDataManagerBean();
 		bean.setMethod(MethodType.OBFUSCATE_DATA);
 		bean.setRequestor(Util.createRequestorBean(requestor));
-		bean.setOwnerId(ownerId.getJid());
-		bean.setDataId(dataWrapper.getDataId());
+		bean.setDataIdUri(dataWrapper.getDataId().getUri());
 		try {
 			this.commManager.sendIQGet(stanza, bean, privacyTrustCommClientCallback);
 		} catch (CommunicationException e) {

@@ -27,9 +27,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.util.model.pri
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 
@@ -45,14 +44,16 @@ public class ResourceUtils {
 		}
 		Resource resource = null;
 		try {
-			if (null != resourceBean.getCtxUriIdentifier() && !"".equals(resourceBean.getCtxUriIdentifier()))  {
-				resource = new Resource((CtxAttributeIdentifier) CtxIdentifierFactory.getInstance().fromString(resourceBean.getCtxUriIdentifier()));
+			// Data id
+			if (null != resourceBean.getDataIdUri() && !"".equals(resourceBean.getDataIdUri()))  {
+				resource = new Resource(DataIdentifierFactory.fromUri(resourceBean.getDataIdUri()));
 			}
-			else if (null != resourceBean.getContextType()) {
-				resource = new Resource(resourceBean.getContextType());
+			// Dara type
+			else if (null != resourceBean.getDataType()) {
+				resource = new Resource(resourceBean.getDataType());
 			}
 			else {
-				throw new PrivacyException("The resource id and type can't be null!");
+				throw new PrivacyException("The resource id or type can't be null!");
 			}
 		} catch (MalformedCtxIdentifierException e) {
 			return null;
@@ -79,8 +80,8 @@ public class ResourceUtils {
 			return null;
 		}
 		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resourceBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource();
-		resourceBean.setCtxUriIdentifier((null != resource.getCtxIdentifier() ? resource.getCtxIdentifier().toUriString() : null));
-		resourceBean.setContextType(resource.getContextType());
+		resourceBean.setDataIdUri((null != resource.getDataId() ? resource.getDataId().getUri() : null));
+		resourceBean.setDataType(resource.getDataType());
 		return resourceBean;
 	}
 	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource> toResourceBeans(List<Resource> resources)

@@ -22,82 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection;
-
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlElement;
-
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.schema.identity.RequestorBean;
+package org.societies.api.identity;
 
 /**
+ * List all data providers
+ *
  * @author Olivier Maridat (Trialog)
  *
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-public class PrivacyDataManagerBean {
-	public enum methodType  {checkPermission, obfuscateData};
-	
-	@XmlElement(required = true)
-	private methodType  method;
-	
-	@XmlElement(required = true)
-	private RequestorBean requestor;
-	/**
-	 * String formatted ID of the requested Data
-	 */
-	@XmlElement(required = true)
-	private String dataIdUri;
-	
-	@XmlElement(required = true)
-	private List<Action> actions;
-
-	
-	/**
-	 * @return the requestor
-	 */
-	public RequestorBean getRequestor() {
-		return requestor;
-	}
-	/**
-	 * @param requestor the requestor to set
-	 */
-	public void setRequestor(RequestorBean requestor) {
-		this.requestor = requestor;
-	}
-	/**
-	 * @return the dataId
-	 */
-	public String getDataIdUri() {
-		return dataIdUri;
-	}
-	/**
-	 * @param dataId the dataId to set
-	 */
-	public void setDataIdUri(String dataIdUri) {
-		this.dataIdUri = dataIdUri;
-	}
-	/**
-	 * @return the action
-	 */
-	public List<Action> getActions() {
-		return actions;
-	}
-	/**
-	 * @param action the action to set
-	 */
-	public void setActions(List<Action> actions) {
-		this.actions = actions;
-	}
-	
-	
-	public methodType  getMethod() {
-		return method;
-	}
-	public void setMethod(methodType  method) {
-		this.method = method;
-	}
+public enum DataIdentifierScheme {
+	context, device, cis, activity 
 }

@@ -124,7 +124,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 			return false;
 		if (this.getClass() != that.getClass())
 			return false;
-		
+		  
 		CtxAttributeIdentifier other = (CtxAttributeIdentifier) that;
 		if (this.scope == null) {
 			if (other.scope != null)
@@ -152,11 +152,11 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 		final StringBuilder sb = new StringBuilder();
 
 		sb.append(this.scope);
-		sb.append("/");
+		sb.append(CtxIdentifier.DELIM);
 		sb.append(CtxModelType.ATTRIBUTE);
-		sb.append("/");
+		sb.append(CtxIdentifier.DELIM);
 		sb.append(super.type);
-		sb.append("/");
+		sb.append(CtxIdentifier.DELIM);
 		sb.append(super.objectNumber);
 
 		super.string = sb.toString();
@@ -178,27 +178,30 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 
 		final int length = input.length();
 
-		final int objectNumberDelim = input.lastIndexOf("/");
+		final int objectNumberDelim = input.lastIndexOf(CtxIdentifier.DELIM);
 		if (objectNumberDelim == -1)
 			throw new MalformedCtxIdentifierException("'" + input + "'");
-		final String objectNumberStr = input.substring(objectNumberDelim+1, length);
+		final String objectNumberStr = input.substring(
+				objectNumberDelim + CtxIdentifier.DELIM.length(), length);
 		try { 
 			super.objectNumber = new Long(objectNumberStr);
 		} catch (NumberFormatException nfe) {
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Invalid context attribute object number", nfe);
 		}
-
-		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
-		super.type = input.substring(typeDelim+1, objectNumberDelim);
+		   
+		final int typeDelim = input.lastIndexOf(CtxIdentifier.DELIM, objectNumberDelim-1);
+		super.type = input.substring(
+				typeDelim + CtxIdentifier.DELIM.length(), objectNumberDelim);
 		if (super.type.length()==0)
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Context attribute type cannot be empty");
 
-		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
+		final int modelTypeDelim = input.lastIndexOf(CtxIdentifier.DELIM, typeDelim-1);
 		if (modelTypeDelim == -1)
 			throw new MalformedCtxIdentifierException("'" + input + "'");
-		final String modelTypeStr = input.substring(modelTypeDelim+1, typeDelim);
+		final String modelTypeStr = input.substring(
+				modelTypeDelim + CtxIdentifier.DELIM.length(), typeDelim);
 		try {
 			super.modelType = CtxModelType.valueOf(modelTypeStr);
 		} catch (IllegalArgumentException iae) {
@@ -220,6 +223,9 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 			throw new MalformedCtxIdentifierException("'" + input
 					+ "': Malformed context attribute scope", mcie);
 		}
+		
 		super.ownerId = this.scope.getOwnerId();
+		
+		super.scheme = this.scope.getScheme();
 	}
 }

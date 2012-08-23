@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
-
 /**
  * This class is used to represent a CIS requesting access to resources.
  *

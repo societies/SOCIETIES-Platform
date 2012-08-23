@@ -44,9 +44,13 @@ import org.societies.context.broker.api.security.CtxPermission;
  */
 public class CtxPermissionTest {
 	
-	private static final String CTX_ENTITY_ID_STR = "myCSS/ENTITY/person/3";
-	private static final String CTX_ATTRIBUTE_ID_STR = "myCSS/ENTITY/person/3/ATTRIBUTE/Name/6";
-	private static final String CTX_ASSOCIATION_ID_STR = "myCSS/ASSOCIATION/hasFriends/9";
+	private static final String CTX_OWNER_ID = "foo@societies.org";
+	private static final String CTX_ENTITY_TYPE = "person";
+	private static final long CTX_ENTITY_OBJECT_NUMBER = 0l;
+	private static final String CTX_ATTRIBUTE_TYPE = "name";
+	private static final long CTX_ATTRIBUTE_OBJECT_NUMBER = 1l;
+	private static final String CTX_ASSOCIATION_TYPE = "hasFriends";
+	private static final long CTX_ASSOCIATION_OBJECT_NUMBER = 2l;
 	
 	private static CtxEntityIdentifier ctxEntityId;
     private static CtxAttributeIdentifier ctxAttributeId;    
@@ -58,9 +62,12 @@ public class CtxPermissionTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
-		ctxEntityId = new CtxEntityIdentifier(CTX_ENTITY_ID_STR);
-		ctxAttributeId = new CtxAttributeIdentifier(CTX_ATTRIBUTE_ID_STR);
-		ctxAssociationId = new CtxAssociationIdentifier(CTX_ASSOCIATION_ID_STR);
+		ctxEntityId = new CtxEntityIdentifier(
+				CTX_OWNER_ID, CTX_ENTITY_TYPE, CTX_ENTITY_OBJECT_NUMBER);
+		ctxAttributeId = new CtxAttributeIdentifier(
+				ctxEntityId, CTX_ATTRIBUTE_TYPE, CTX_ATTRIBUTE_OBJECT_NUMBER);
+		ctxAssociationId = new CtxAssociationIdentifier(
+				CTX_OWNER_ID, CTX_ASSOCIATION_TYPE, CTX_ASSOCIATION_OBJECT_NUMBER);
 	}
 
 	/**

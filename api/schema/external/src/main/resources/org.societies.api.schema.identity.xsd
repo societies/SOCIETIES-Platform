@@ -26,6 +26,7 @@
   <xs:complexType name="dataIdentifier" abstract="true">
     <xs:sequence>
       <xs:element name="ownerId" type="xs:string" minOccurs="0"/>
+      <xs:element name="scheme" type="tns:dataIdentifierScheme" minOccurs="0"/>
       <xs:element name="type" type="xs:string" minOccurs="0"/>
       <xs:element name="uri" type="xs:string" minOccurs="0"/>
     </xs:sequence>
@@ -40,5 +41,14 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+
+  <xs:simpleType name="dataIdentifierScheme">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="context"/>
+      <xs:enumeration value="device"/>
+      <xs:enumeration value="cis"/>
+      <xs:enumeration value="activity"/>
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>
 
