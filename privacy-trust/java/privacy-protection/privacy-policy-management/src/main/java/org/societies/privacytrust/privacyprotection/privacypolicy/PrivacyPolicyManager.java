@@ -247,6 +247,16 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			LOG.debug("Empty privacy policy. Return a null java object.");
 			return null;
 		}
+		// Fill XML header if necessary
+		String encoding = "UTF-8";
+		if (!privacyPolicy.startsWith("<?xml")) {
+			privacyPolicy = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicy;
+		}
+		// If only contains the XML header: empty privacy policy
+		if (privacyPolicy.endsWith("?>")) {
+			LOG.debug("Empty privacy policy. Return a null java object.");
+			return null;
+		}
 		// Dependency injection not ready
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyPolicyManager not ready");
@@ -255,11 +265,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		// -- Convert Xml to Java
 		RequestPolicy result = null;
 		XMLPolicyReader xmlPolicyReader = new XMLPolicyReader(ctxBroker, commManager.getIdManager());
-		// Fill XML header if necessary
-		String encoding = "UTF-8";
-		if (!privacyPolicy.startsWith("<?xml")) {
-			privacyPolicy = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicy;
-		}
 		try {
 			// -- Create XMLDocument version of the privacy policy
 			DocumentBuilder xmlDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

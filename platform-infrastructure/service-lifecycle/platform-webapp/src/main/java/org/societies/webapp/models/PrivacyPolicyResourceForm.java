@@ -40,6 +40,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
  */
 public class PrivacyPolicyResourceForm {
 	private String resourceType;
+	private String resourceSchemeCustom;
 	private String resourceTypeCustom;
 	private boolean optional;
 	private List<PrivacyActionForm> actions;
@@ -72,6 +73,18 @@ public class PrivacyPolicyResourceForm {
 	 */
 	public void setResourceTypeCustom(String resourceTypeCustom) {
 		this.resourceTypeCustom = resourceTypeCustom;
+	}
+	/**
+	 * @return the resourceSchemeCustom
+	 */
+	public String getResourceSchemeCustom() {
+		return resourceSchemeCustom;
+	}
+	/**
+	 * @param resourceSchemeCustom the resourceSchemeCustom to set
+	 */
+	public void setResourceSchemeCustom(String resourceSchemeCustom) {
+		this.resourceSchemeCustom = resourceSchemeCustom;
 	}
 	/**
 	 * @return the optional

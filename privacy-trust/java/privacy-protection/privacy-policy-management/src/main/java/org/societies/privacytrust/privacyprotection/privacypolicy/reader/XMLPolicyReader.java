@@ -69,7 +69,7 @@ import org.xml.sax.SAXException;
 
 public class XMLPolicyReader {
 
-	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private Logger logging = LoggerFactory.getLogger(this.getClass().getSimpleName());
 	private ICtxBroker ctxBroker;
 	private IIdentityManager iDM;
 
@@ -311,12 +311,10 @@ public class XMLPolicyReader {
 	private  ArrayList<RequestItem> readTargets(NodeList target){
 		ArrayList<RequestItem> items = new ArrayList<RequestItem>();
 		for (int i=0; i < target.getLength(); i++){
-			logging.info("In a new target");
+			logging.info("In a new target ("+(i+1)+"/"+target.getLength()+")");
 			RequestItem item = this.readTarget((Element) target.item(i));
-			if (item!=null){
+			if (null != item) {
 				items.add(item);
-			}else{
-				return new ArrayList<RequestItem>();
 			}
 		}
 
@@ -387,39 +385,17 @@ public class XMLPolicyReader {
 					}
 				}
 			}
-			else if ((attributeId.compareToIgnoreCase("CONTEXT")==0)){
-				scheme = DataIdentifierScheme.CONTEXT;
+			else if (DataIdentifierScheme.CONTEXT.value().equals(attributeId)
+					|| DataIdentifierScheme.CIS.value().equals(attributeId)
+					|| DataIdentifierScheme.DEVICE.value().equals(attributeId)
+					|| DataIdentifierScheme.ACTIVITY.value().equals(attributeId)) {
+				scheme = DataIdentifierScheme.fromValue(attributeId);
 				String dataType = attributeElement.getAttribute("DataType");
 				if (dataType.compareToIgnoreCase("http://www.w3.org/2001/XMLSchema#string")==0){
 					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 					Element attributeValueElement = (Element) attributeValueList.item(0);
 					ctxType = attributeValueElement.getFirstChild().getNodeValue();
 
-				}
-			}else if ((attributeId.compareToIgnoreCase("CIS")==0)){
-				scheme = DataIdentifierScheme.CIS;
-				String dataType = attributeElement.getAttribute("DataType");
-				if (dataType.compareToIgnoreCase("http://www.w3.org/2001/XMLSchema#string")==0){
-					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
-					Element attributeValueElement = (Element) attributeValueList.item(0);
-					ctxType = attributeValueElement.getFirstChild().getNodeValue();
-				}
-			}else if ((attributeId.compareToIgnoreCase("DEVICE")==0)){
-				scheme = DataIdentifierScheme.DEVICE;
-				String dataType = attributeElement.getAttribute("DataType");
-				if (dataType.compareToIgnoreCase("http://www.w3.org/2001/XMLSchema#string")==0){
-					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
-					Element attributeValueElement = (Element) attributeValueList.item(0);
-					ctxType = attributeValueElement.getFirstChild().getNodeValue();
-				}
-
-			}else if ((attributeId.compareToIgnoreCase("ACTIVITY")==0)){
-				scheme  = DataIdentifierScheme.ACTIVITY;
-				String dataType = attributeElement.getAttribute("DataType");
-				if (dataType.compareToIgnoreCase("http://www.w3.org/2001/XMLSchema#string")==0){
-					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
-					Element attributeValueElement = (Element) attributeValueList.item(0);
-					ctxType = attributeValueElement.getFirstChild().getNodeValue();
 				}
 			}
 		}
@@ -527,7 +503,7 @@ public class XMLPolicyReader {
 		}
 
 		private void log(String message){
-			this.logging.info(this.getClass().getName()+" : "+message);
+			this.logging.info(message);
 
 		}
 
