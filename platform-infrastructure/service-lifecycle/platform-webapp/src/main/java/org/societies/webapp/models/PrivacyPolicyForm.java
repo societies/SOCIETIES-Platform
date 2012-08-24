@@ -27,9 +27,12 @@ package org.societies.webapp.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
@@ -37,6 +40,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.springframework.util.AutoPopulatingList;
 
 /**
@@ -130,16 +135,24 @@ public class PrivacyPolicyForm {
 	/**
 	 * @return
 	 * @throws InvalidFormatException 
+	 * @throws MalformedCtxIdentifierException 
 	 */
-	public RequestPolicy toRequestPolicy(IIdentityManager idManager) throws InvalidFormatException {
+	public RequestPolicy toRequestPolicy(IIdentityManager idManager) throws InvalidFormatException, MalformedCtxIdentifierException {
 		RequestorCis requestor = new RequestorCis(idManager.fromJid(cssOwnerId), idManager.fromJid(cisId));
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
 		for(PrivacyPolicyResourceForm resourceForm : resources) {
 			String type = resourceForm.getResourceType();
+			DataIdentifierScheme scheme;
 			if (null == resourceForm.getResourceType() || "".equals(resourceForm)) {
+				scheme = DataIdentifierScheme.fromValue(resourceForm.getResourceSchemeCustom());
 				type = resourceForm.getResourceTypeCustom();
 			}
-			Resource resource = new Resource(type);
+			else {
+				DataIdentifier dataType = DataIdentifierFactory.fromUri(type);
+				type = dataType.getType();
+				scheme = dataType.getScheme();
+			}
+			Resource resource = new Resource(scheme, type);
 			List<Action> actions = new ArrayList<Action>();
 			for(PrivacyActionForm actionForm : resourceForm.getActions()) {
 				actions.add((Action) actionForm);
