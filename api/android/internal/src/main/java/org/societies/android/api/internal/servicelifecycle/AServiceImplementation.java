@@ -25,41 +25,54 @@
 
 package org.societies.android.api.internal.servicelifecycle;
 
-import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+public class AServiceImplementation extends ServiceImplementation implements Parcelable {
 
-/**
- *  Each method requires a callback to receive the result
+	private static final long serialVersionUID = -3863142958575222945L;
 
- * @author aleckey
- *
- */
-public interface IServiceDiscovery {
-
-	public String methodsArray[] = {"getServices(String client, String identity)", 
-							 "getService(String client, ServiceResourceIdentifier serviceId, String identity)",
-							 "searchService(String client, Service filter, String identity)" 
-							};
+	public AServiceImplementation() {
+		super();
+	}
 	
-	/**
-	 * Gets list of 3rd party services available
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public List<AService> getServices(String client, String identity);
-    
-    /**
-	 * Gets details of a 3rd party service
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public AService getService(String client, ServiceResourceIdentifier serviceId, String identity);
-    
-    /**
-	 * Searches list of 3rd party services available based on a filter
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public List<AService> searchService(String client, AService filter, String identity);	
+	/* (non-Javadoc)
+	 * @see android.os.Parcelable#describeContents()*/
+	public int describeContents() {
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int) */
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.getServiceNameSpace());
+		dest.writeString(this.getServiceProvider());
+		dest.writeString(this.getServiceVersion());
+		dest.writeString(this.getServiceClient().toString());
+	}
+	
+	private AServiceImplementation(Parcel in) {
+		super();
+		this.setServiceNameSpace(in.readString());
+		this.setServiceProvider(in.readString());
+		this.setServiceVersion(in.readString());
+		try {
+			this.setServiceClient(new URI(in.readString()));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static final Parcelable.Creator<AServiceImplementation> CREATOR = new Parcelable.Creator<AServiceImplementation>() {
+		public AServiceImplementation createFromParcel(Parcel in) {
+			return new AServiceImplementation(in);
+		}
+
+		public AServiceImplementation[] newArray(int size) {
+			return new AServiceImplementation[size];
+		}
+	};
 }

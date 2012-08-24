@@ -22,44 +22,60 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.android.api.internal.servicelifecycle;
 
-import java.util.List;
+import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+public class AServiceInstance extends ServiceInstance implements Parcelable {
 
-/**
- *  Each method requires a callback to receive the result
+	private static final long serialVersionUID = 8132643014462359734L;
 
- * @author aleckey
- *
- */
-public interface IServiceDiscovery {
+	public AServiceImplementation getServiceImpl() {
+		return (AServiceImplementation)super.getServiceImpl();
+	}
 
-	public String methodsArray[] = {"getServices(String client, String identity)", 
-							 "getService(String client, ServiceResourceIdentifier serviceId, String identity)",
-							 "searchService(String client, Service filter, String identity)" 
-							};
+	public void setServiceImpl(AServiceImplementation aserviceImpl) {
+		super.setServiceImpl(aserviceImpl);
+	}
 	
-	/**
-	 * Gets list of 3rd party services available
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public List<AService> getServices(String client, String identity);
-    
-    /**
-	 * Gets details of a 3rd party service
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public AService getService(String client, ServiceResourceIdentifier serviceId, String identity);
-    
-    /**
-	 * Searches list of 3rd party services available based on a filter
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public List<AService> searchService(String client, AService filter, String identity);	
+	public AServiceInstance() {
+		super();
+	}
+
+	/* (non-Javadoc)
+	 * @see android.os.Parcelable#describeContents() */
+	public int describeContents() {
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int) */
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.getCssJid());
+		dest.writeString(this.getFullJid());
+		dest.writeString(this.getParentJid());
+		dest.writeString(this.getXMPPNode());
+		dest.writeParcelable(this.getServiceImpl(), flags);
+	}
+	
+	private AServiceInstance(Parcel in) {
+		super();
+		this.setCssJid(in.readString());
+		this.setFullJid(in.readString());
+		this.setParentJid(in.readString());
+		this.setXMPPNode(in.readString());
+		this.setServiceImpl( (AServiceImplementation)in.readParcelable(this.getClass().getClassLoader()) );
+	}
+
+	public static final Parcelable.Creator<AServiceInstance> CREATOR = new Parcelable.Creator<AServiceInstance>() {
+		public AServiceInstance createFromParcel(Parcel in) {
+			return new AServiceInstance(in);
+		}
+
+		public AServiceInstance[] newArray(int size) {
+			return new AServiceInstance[size];
+		}
+	};
 }

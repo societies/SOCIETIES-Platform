@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.internal.servicelifecycle.AService;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -116,7 +117,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)
 	 */
-	public List<org.societies.api.schema.servicelifecycle.model.Service> getServices(String client, String identity) {
+	public List<AService> getServices(String client, String identity) {
 		Log.d(LOG_TAG, "getServices called by client: " + client);
 		
 		//MESSAGE BEAN
@@ -144,13 +145,13 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.identity.IIdentity)*/
-	public org.societies.api.schema.servicelifecycle.model.Service getService(String client, ServiceResourceIdentifier sri, String identity) {
+	public AService getService(String client, ServiceResourceIdentifier sri, String identity) {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#searchService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, org.societies.api.identity.IIdentity) */
-	public List<org.societies.api.schema.servicelifecycle.model.Service> searchService(String client, org.societies.api.schema.servicelifecycle.model.Service filter, String identity) {
+	public List<AService> searchService(String client, AService filter, String identity) {
 		return null;
 	}
 
@@ -228,9 +229,13 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 					Log.d(LOG_TAG, "ServiceDiscoveryBeanResult!");
 					ServiceDiscoveryResultBean discoResult = (ServiceDiscoveryResultBean) msgBean;
 					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
-
+					
+					//do parcel stuff
+					
+					//convert to simple 
+					AService serviceArray[] = AService.CREATOR.newArray(serviceList.size());
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE, (Parcelable) serviceList);
+					intent.putExtra(INTENT_RETURN_VALUE, serviceArray); //(Parcelable) 
 					intent.setPackage(client);
 				} 
 				// --------- Service Control Bean ---------

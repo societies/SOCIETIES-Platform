@@ -22,44 +22,55 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.android.api.internal.servicelifecycle;
 
-import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-/**
- *  Each method requires a callback to receive the result
+import android.os.Parcel;
+import android.os.Parcelable;
 
- * @author aleckey
- *
- */
-public interface IServiceDiscovery {
+public class AServiceResourceIdentifier extends ServiceResourceIdentifier implements Parcelable {
 
-	public String methodsArray[] = {"getServices(String client, String identity)", 
-							 "getService(String client, ServiceResourceIdentifier serviceId, String identity)",
-							 "searchService(String client, Service filter, String identity)" 
-							};
+	private static final long serialVersionUID = 8662675717162503985L;
+
+	public AServiceResourceIdentifier() {
+		super();
+	}
 	
-	/**
-	 * Gets list of 3rd party services available
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
+	/* (non-Javadoc)
+	 * @see android.os.Parcelable#describeContents()
 	 */
-    public List<AService> getServices(String client, String identity);
-    
-    /**
-	 * Gets details of a 3rd party service
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public AService getService(String client, ServiceResourceIdentifier serviceId, String identity);
-    
-    /**
-	 * Searches list of 3rd party services available based on a filter
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public List<AService> searchService(String client, AService filter, String identity);	
+	public int describeContents() {
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)*/
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.getServiceInstanceIdentifier());
+		dest.writeString(this.getIdentifier().toString());
+	}
+	
+	private AServiceResourceIdentifier(Parcel in) {
+		super();
+		this.setServiceInstanceIdentifier(in.readString());
+		try {
+			this.setIdentifier(new URI(in.readString()));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static final Parcelable.Creator<AServiceResourceIdentifier> CREATOR = new Parcelable.Creator<AServiceResourceIdentifier>() {
+		public AServiceResourceIdentifier createFromParcel(Parcel in) {
+			return new AServiceResourceIdentifier(in);
+		}
+
+		public AServiceResourceIdentifier[] newArray(int size) {
+			return new AServiceResourceIdentifier[size];
+		}
+	};
 }
