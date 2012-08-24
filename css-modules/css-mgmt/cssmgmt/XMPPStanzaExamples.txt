@@ -46,3 +46,8 @@
 	</cssManagerMessageBean>
 </iq>
 
+<iq type="get" id="7e6d30f4-1438-4390-a86b-7e18c384056a" to="jane.societies.local" from="john.societies.local">
+	<cssManagerMessageBean xmlns="http://societies.org/api/schema/cssmanagement">   
+		<method>GET_CSS_FRIENDS</method>   
+	</cssManagerMessageBean>
+</iq>
