@@ -98,8 +98,8 @@
 					minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="resultCssRequestList" type="tns:cssRequest"
 					minOccurs="0" maxOccurs="unbounded" />
-
-
+				<xs:element name="resultCssFriendList" type="xs:string"
+					minOccurs="0" maxOccurs="unbounded" />	
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -133,8 +133,7 @@
 			<xs:enumeration value="updateCssFriendRequest" />
 
 			<xs:enumeration value="sendCssFriendRequest" />
-
-
+			<xs:enumeration value="getCssFriends" />
 
 		</xs:restriction>
 	</xs:simpleType>
