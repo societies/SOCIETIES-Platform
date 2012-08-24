@@ -46,36 +46,36 @@ public class Resource implements Serializable{
 	private DataIdentifierScheme scheme;
 	
 	private Resource(){
-		if (scheme==null){
-			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
-			throw new NullPointerException();
-		}else{
-			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
-		}
+//		if (scheme==null){
+//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+//			throw new NullPointerException();
+//		}else{
+//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+//		}
 	}
 	public Resource(DataIdentifier dataId){
 		this.dataId = dataId;
 		this.dataType = dataId.getType();
 
 		this.scheme = dataId.getScheme();
-		if (scheme==null){
-			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
-			throw new NullPointerException();
-		}else{
-			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
-		}
+//		if (scheme==null){
+//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+//			throw new NullPointerException();
+//		}else{
+//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+//		}
 	}
 
 	
 	public Resource(DataIdentifierScheme scheme, String type){
 		this.dataType = type;
 		this.scheme = scheme;
-		if (scheme==null){
-			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
-			throw new NullPointerException();
-		}else{
-			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
-		}
+//		if (scheme==null){
+//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+//			throw new NullPointerException();
+//		}else{
+//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+//		}
 	}
 	public TargetMatchConstants getType(){
 		return TargetMatchConstants.RESOURCE;
@@ -99,59 +99,62 @@ public class Resource implements Serializable{
 	}
 	
 	public String toXMLString(){
-		String str = "\n<Resource>";
+		StringBuilder str = new StringBuilder("\n<Resource>");
 		if (this.dataId!=null){
-			str = str.concat(this.ctxIDToXMLString());
+			str.append(this.ctxIDToXMLString());
 		}
 		if (this.dataType!=null){
-			str = str.concat(this.ctxTypeToXMLString());
+			str.append(this.ctxTypeToXMLString());
 		}
-		str = str.concat("\n</Resource>");
-		return str;
+		str.append("\n</Resource>");
+		return str.toString();
 	}
 	
 	private String ctxIDToXMLString(){
-		String str = "";
-		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
+		StringBuilder str = new StringBuilder();
+		str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
 		"\n \t\t\tDataType=\"org.societies.api.context.model.CtxIdentifier\">");
 
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(dataId.getUri());
-		str = str.concat("</AttributeValue>");
+		str.append("\n\t\t<AttributeValue>");
+		str.append(dataId.getUri());
+		str.append("</AttributeValue>");
 
-		str = str.concat("\n\t</Attribute>");
-		return str;
+		str.append("\n\t</Attribute>");
+		return str.toString();
 	}
 	
 	private String ctxTypeToXMLString(){
-		String str = "";
-		if(scheme==null){
-			JOptionPane.showMessageDialog(null, "SCHEME IS NULL");
-		}
+		StringBuilder str = new StringBuilder();
+//		if(scheme==null){
+//			JOptionPane.showMessageDialog(null, "SCHEME IS NULL");
+//		}
 		if (scheme.equals(DataIdentifierScheme.CONTEXT)){
-			str = str.concat("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CONTEXT+"\"" +
+			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CONTEXT+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		}
-		if (scheme.equals(DataIdentifierScheme.CIS)){
-			str = str.concat("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CIS+"\"" +
-					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
-		}
-		
-		if (scheme.equals(DataIdentifierScheme.DEVICE)){
-			str = str.concat("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.DEVICE+"\"" +
+		else if (scheme.equals(DataIdentifierScheme.CIS)){
+			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CIS+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		}
 		
-		if (scheme.equals(DataIdentifierScheme.ACTIVITY)){
-			str = str.concat("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.ACTIVITY+"\"" +
+		else if (scheme.equals(DataIdentifierScheme.DEVICE)){
+			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.DEVICE+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		}
-
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.dataType);
-		str = str.concat("</AttributeValue>");
-		str = str.concat("\n\t</Attribute>");
-		return str;	
+		
+		else if (scheme.equals(DataIdentifierScheme.ACTIVITY)){
+			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.ACTIVITY+"\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		else {
+			str.append("\n\t<Attribute AttributeId=\"unknown\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		str.append("\n\t\t<AttributeValue>");
+		str.append(this.dataType);
+		str.append("</AttributeValue>");
+		str.append("\n\t</Attribute>");
+		return str.toString();	
 		}
 	
 	public String toString(){

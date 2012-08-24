@@ -181,7 +181,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testGetCisPrivacyPolicyNonExisting() {
-		LOG.info("[Test] testGetCisPrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
+		LOG.info("[[TEST]] testGetCisPrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
 		RequestPolicy expectedPrivacyPolicy = null;
 		RequestPolicy privacyPolicy = null;
 		try {
@@ -200,13 +200,13 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testGetCisPrivacyPolicy() {
-		LOG.info("[Test] testGetCisPrivacyPolicy: add and retrieve a privacy policy");
+		LOG.info("[[TEST]] testGetCisPrivacyPolicy: add and retrieve a privacy policy");
 		RequestPolicy addedPrivacyPolicy = null;
-		RequestPolicy privacyPolicy = null;
+		RequestPolicy retrievedPrivacyPolicy = null;
 		boolean deleteResult = false;
 		try {
 			addedPrivacyPolicy = privacyPolicyManager.updatePrivacyPolicy(cisPolicy);
-			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
+			retrievedPrivacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
 			deleteResult = privacyPolicyManager.deletePrivacyPolicy(requestorCis);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] testGetCisPrivacyPolicy: add and retrieve a privacy policy", e);
@@ -217,10 +217,10 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			fail("[Error testDeletePrivacyPolicy] error");
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
-		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
-		LOG.info(privacyPolicy.toString());
-		LOG.info(addedPrivacyPolicy.toString());
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
+		assertNotNull("Privacy policy retrieved is null, but it should not.", retrievedPrivacyPolicy);
+		LOG.info("Added privacy policy: "+addedPrivacyPolicy.toString());
+		LOG.info("Retrieved privacy policy: "+retrievedPrivacyPolicy.toString());
+		assertEquals("Expected a privacy policy, but it was not the good one.", retrievedPrivacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
 
@@ -229,7 +229,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testGetServicePrivacyPolicyNonExisting() {
-		LOG.info("[Test] testGetServicePrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
+		LOG.info("[[TEST]] testGetServicePrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
 		RequestPolicy expectedPrivacyPolicy = null;
 		RequestPolicy privacyPolicy = null;
 		try {
@@ -248,13 +248,13 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testGetServicePrivacyPolicy() {
-		LOG.info("[Test] testGetServicePrivacyPolicy: add and retrieve a privacy policy");
+		LOG.info("[[TEST]] testGetServicePrivacyPolicy: add and retrieve a privacy policy");
 		RequestPolicy addedPrivacyPolicy = null;
-		RequestPolicy privacyPolicy = null;
+		RequestPolicy retrievedPrivacyPolicy = null;
 		boolean deleteResult = false;
 		try {
 			addedPrivacyPolicy = privacyPolicyManager.updatePrivacyPolicy(servicePolicy);
-			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorService);
+			retrievedPrivacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorService);
 			deleteResult = privacyPolicyManager.deletePrivacyPolicy(requestorService);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] testGetServicePrivacyPolicy: add and retrieve a privacy policy", e);
@@ -264,8 +264,8 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			fail("[Error testDeletePrivacyPolicy] error");
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
-		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
+		assertNotNull("Privacy policy retrieved is null, but it should not.", retrievedPrivacyPolicy);
+		assertEquals("Expected a privacy policy, but it what not the good one.", retrievedPrivacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
 	
@@ -274,7 +274,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testUpdatesCisPrivacyPolicy() {
-		LOG.info("[Test] testUpdatePrivacyPolicy: update the same privacy policy");
+		LOG.info("[[TEST]] testUpdatesCisPrivacyPolicy: update the same privacy policy");
 		RequestPolicy privacyPolicy1 = null;
 		RequestPolicy privacyPolicy2 = null;
 		try {
@@ -295,7 +295,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testUpdatesCisPrivacyPolicies() {
-		LOG.info("[Test] testUpdatePrivacyPolicy: update the same privacy policy");
+		LOG.info("[[TEST]] testUpdatesCisPrivacyPolicies: update the same privacy policy");
 		RequestPolicy privacyPolicy1 = null;
 		RequestPolicy privacyPolicy2 = null;
 		RequestPolicy servicePolicy2 = new RequestPolicy(cisPolicy.getRequests());
@@ -319,7 +319,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testDeleteServicePrivacyPolicyNotExisting() {
-		LOG.info("[Test] testDeleteServicePrivacyPolicyNotExisting: delete a non-existing privacy policy");
+		LOG.info("[[TEST]] testDeleteServicePrivacyPolicyNotExisting: delete a non-existing privacy policy");
 		RequestPolicy privacyPolicy = null;
 		boolean deleteResult = false;
 		try {
@@ -340,7 +340,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testDeleteCisPrivacyPolicyNotExisting() {
-		LOG.info("[Test] testDeleteCisPrivacyPolicyNotExisting: delete a non-existing privacy policy");
+		LOG.info("[[TEST]] testDeleteCisPrivacyPolicyNotExisting: delete a non-existing privacy policy");
 		RequestPolicy privacyPolicy = null;
 		boolean deleteResult = false;
 		try {
@@ -361,7 +361,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testDeleteServicePrivacyPolicy() {
-		LOG.info("[Test] testDeletePrivacyPolicy: add and retrieve and delete a privacy policy");
+		LOG.info("[[TEST]] testDeletePrivacyPolicy: add and retrieve and delete a privacy policy");
 		RequestPolicy addedPrivacyPolicy = null;
 		RequestPolicy privacyPolicyBefore = null;
 		RequestPolicy privacyPolicyAfter = null;
@@ -389,7 +389,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testDeleteCisPrivacyPolicy() {
-		LOG.info("[Test] testDeleteCisPrivacyPolicy: add and retrieve and delete a privacy policy");
+		LOG.info("[[TEST]] testDeleteCisPrivacyPolicy: add and retrieve and delete a privacy policy");
 		RequestPolicy addedPrivacyPolicy = null;
 		RequestPolicy privacyPolicyBefore = null;
 		RequestPolicy privacyPolicyAfter = null;
@@ -412,23 +412,33 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		assertNull("Privacy policy not really deleted.", privacyPolicyAfter);
 	}
 	
+	@Test
+	public void testDataIdentifierSchemeEquals() {
+		LOG.info("[[TEST]] testDataIdentifierSchemeEquals");
+		assertEquals("Expected equals", DataIdentifierScheme.CONTEXT, DataIdentifierScheme.CONTEXT);
+		assertTrue("Expected equals", DataIdentifierScheme.CONTEXT.equals(DataIdentifierScheme.CONTEXT));
+	}
+	
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#fromXMLString(org.lang.String privacyPolicy)}.
 	 */
 	@Test
 	public void testFromXmlNull() {
-		LOG.info("[Test] testFromXmlNull");
-		RequestPolicy privacyPolicy = null;
+		LOG.info("[[TEST]] testFromXmlNull");
+		RequestPolicy privacyPolicy1 = null;
+		RequestPolicy privacyPolicy2 = null;
 		try {
-			privacyPolicy = privacyPolicyManager.fromXMLString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			privacyPolicy1 = privacyPolicyManager.fromXMLString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			privacyPolicy2 = privacyPolicyManager.fromXMLString("");
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] testFromXmlNull", e);
 			fail("[Error testFromXmlNull] Privacy error");
 		} catch (Exception e) {
-			LOG.info("[Test Exception] testFromXmlNull", e);
-			fail("[Error testFromXmlNull] error");
+			LOG.info("[Test Exception] testFromXmlNull: "+e.getMessage(), e);
+			fail("[Error testFromXmlNull] error: "+e.getMessage());
 		}
-		assertNull("Privacy policy not null, but it should", privacyPolicy);
+		assertNull("Privacy policy should be null", privacyPolicy1);
+		assertNull("Privacy policy should be null", privacyPolicy2);
 	}
 	
 	
@@ -437,17 +447,26 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testFromXml() {
-		LOG.info("[Test] testFromXml");
+		String testTitle = "testFromXml: generated a RequestPolicy from a XML privacy policy";
+		LOG.info("[[TEST]] "+testTitle);
 		RequestPolicy privacyPolicy = null;
 		try {
-			privacyPolicy = privacyPolicyManager.fromXMLString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString());
+			privacyPolicy = privacyPolicyManager.fromXMLString(cisPolicy.toXMLString());
 		} catch (PrivacyException e) {
-			LOG.info("[Test PrivacyException] testFromXml", e);
-			fail("[Error testFromXml] Privacy error");
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("Privacy error "+e.getMessage()+": "+testTitle);
 		} catch (Exception e) {
-			LOG.info("[Test Exception] testFromXml", e);
-			fail("[Error testFromXml] error");
+			LOG.error("[Test Exception] "+testTitle, e);
+			fail("Error "+e.getMessage()+": "+testTitle);
 		}
+		assertNotNull("Privacy policy generated should not be null", privacyPolicy);
+		LOG.info("**** Original XML privacy policy ****");
+		LOG.info(""+cisPolicy.toXMLString());
+		LOG.info("**** Generated RequestPolicy ****");
+		LOG.info(privacyPolicy.toXMLString());
+		LOG.info("**** Generated RequestPolicy (second time)****");
+		LOG.info(""+privacyPolicy.toXMLString());
+		assertEquals("Privacy policy generated (xml) not equal to the original policy", cisPolicy.toXMLString(), privacyPolicy.toXMLString());
 		assertEquals("Privacy policy generated not equal to the original policy", cisPolicy, privacyPolicy);
 	}
 	
@@ -456,7 +475,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testToXmlNull() {
-		LOG.info("[Test] testToXmlNull");
+		LOG.info("[[TEST]] testToXmlNull");
 		String privacyPolicy = null;
 		try {
 			privacyPolicy = privacyPolicyManager.toXMLString(null);
@@ -472,7 +491,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testToXml() {
-		LOG.info("[Test] testToXml");
+		LOG.info("[[TEST]] testToXml");
 		String privacyPolicy = null;
 		try {
 			privacyPolicy = privacyPolicyManager.toXMLString(cisPolicy);
@@ -480,10 +499,10 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			LOG.info("[Test Exception] testToXml", e);
 			fail("[Error testFromXml] error");
 		}
-		LOG.info("***************************");
+		LOG.info("***** Original Privacy Policy *****");
 		LOG.info("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString());
+		LOG.info("***** Generated Privacy Policy *****");
 		LOG.info(privacyPolicy);
-		LOG.info("***************************");
 		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString(), privacyPolicy);
 	}
 
@@ -493,7 +512,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	 */
 	@Test
 	public void testInferPrivacyPolicy() {
-		LOG.info("[Test] testInferPrivacyPolicy");
+		LOG.info("[[TEST]] testInferPrivacyPolicy");
 		RequestPolicy expected = new RequestPolicy(new ArrayList<RequestItem>());
 		RequestPolicy actual = null;
 		try {
@@ -508,7 +527,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 
 	@Test
 	public void testRequestPolicyEquals() {
-		LOG.info("[Test] testRequestPolicyEquals");
+		LOG.info("[[TEST]] testRequestPolicyEquals");
 		List<RequestItem> requestItems2 = new ArrayList<RequestItem>();
 		Resource resource2 = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions2 = new ArrayList<Action>();
@@ -537,11 +556,11 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	@Test
 	public void testUpdatePrivacyPolicyFromXml() {
 		String testTitle = "testUpdatePrivacyPolicyFromXml: add and retrieve a privacy policy created from a XML string";
-		LOG.info("[Test] "+testTitle);
+		LOG.info("[[TEST]] "+testTitle);
 		String privacyPolicy = "<RequestPolicy>" +
 				"<Target>" +
 				"<Resource>" +
-				"<Attribute AttributeId=\"CONTEXT\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+				"<Attribute AttributeId=\""+DataIdentifierScheme.CONTEXT+"\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
 				"<AttributeValue>fdsfsf</AttributeValue>" +
 				"</Attribute>" +
 				"</Resource>" +
@@ -582,9 +601,9 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", readPrivacyPolicy);
-		LOG.info(privacyPolicy);
-		LOG.info(addedPrivacyPolicy.toString());
-		LOG.info(readPrivacyPolicy.toString());
+		LOG.info(" *** Original Privacy Policy: \n"+privacyPolicy);
+		LOG.info(" *** Added Privacy Policy: \n"+addedPrivacyPolicy.toString());
+		LOG.info(" *** Retrieved Privacy Policy: \n"+readPrivacyPolicy.toString());
 		assertEquals("Expected a privacy policy, but it what not the good one.", readPrivacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
@@ -595,7 +614,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	@Test
 	public void testUpdatePrivacyPolicyFromEmptyXml() {
 		String testTitle = "testUpdatePrivacyPolicyFromEmptyXml: add and retrieve a privacy policy created from a XML string representing an empty privacy policy";
-		LOG.info("[Test] "+testTitle);
+		LOG.info("[[TEST]] "+testTitle);
 		String privacyPolicy = "<RequestPolicy></RequestPolicy>";
 		RequestPolicy addedPrivacyPolicy = null;
 		RequestPolicy readPrivacyPolicy = null;
@@ -613,9 +632,9 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", readPrivacyPolicy);
-		LOG.info(privacyPolicy);
-		LOG.info(addedPrivacyPolicy.toString());
-		LOG.info(readPrivacyPolicy.toString());
+		LOG.info(" *** Original Privacy Policy: \n"+privacyPolicy);
+		LOG.info(" *** Added Privacy Policy: \n"+addedPrivacyPolicy.toString());
+		LOG.info(" *** Retrieved Privacy Policy: \n"+readPrivacyPolicy.toString());
 		assertEquals("Expected a privacy policy, but it what not the good one.", readPrivacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
@@ -627,7 +646,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 	@Ignore
 	public void testGetPrivacyPolicyFromJar() {
 		String testTitle = "testGetPrivacyPolicyFromJar: retrieve a privacy policy contained in a JAR";
-		LOG.info("[Test] "+testTitle);
+		LOG.info("[[TEST]] "+testTitle);
 		String expectedPrivacyPolicy = "<RequestPolicy>" +
 				"<Subject>" +
 				"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\" DataType=\""+IIdentity.class.getCanonicalName()+"\">" +
@@ -639,7 +658,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 				"</Subject>"+
 				"<Target>" +
 				"<Resource>" +
-				"<Attribute AttributeId=\"CONTEXT\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
+				"<Attribute AttributeId=\""+DataIdentifierScheme.CONTEXT+"\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
 				"<AttributeValue>fdsfsf</AttributeValue>" +
 				"</Attribute>" +
 				"</Resource>" +
