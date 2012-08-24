@@ -51,8 +51,6 @@ import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
-import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO;
-import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceInstanceDAO;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceResourceIdentiferDAO;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceSharedInCISDAO;
 
