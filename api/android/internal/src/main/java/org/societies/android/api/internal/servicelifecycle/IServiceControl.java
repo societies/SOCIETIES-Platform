@@ -26,8 +26,6 @@ package org.societies.android.api.internal.servicelifecycle;
 
 import java.net.URL;
 
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;

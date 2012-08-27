@@ -25,10 +25,6 @@
 
 package org.societies.android.api.internal.servicelifecycle;
 
-import java.util.List;
-
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
 /**
  *  Each method requires a callback to receive the result
 
@@ -47,19 +43,19 @@ public interface IServiceDiscovery {
 	 * @param client component package calling this method
 	 * @param identity The target node where search is to occur
 	 */
-    public List<AService> getServices(String client, String identity);
+    public AService[] getServices(String client, String identity);
     
     /**
 	 * Gets details of a 3rd party service
 	 * @param client component package calling this method
 	 * @param identity The target node where search is to occur
 	 */
-    public AService getService(String client, ServiceResourceIdentifier serviceId, String identity);
+    public AService getService(String client, AServiceResourceIdentifier serviceId, String identity);
     
     /**
 	 * Searches list of 3rd party services available based on a filter
 	 * @param client component package calling this method
 	 * @param identity The target node where search is to occur
 	 */
-    public List<AService> searchService(String client, AService filter, String identity);	
+    public AService[] searchService(String client, AService filter, String identity);	
 }

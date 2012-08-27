@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.servicelifecycle.AService;
+import org.societies.android.api.internal.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -39,7 +40,6 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
@@ -60,7 +60,7 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class ServiceManagement extends Service implements IServiceDiscovery, IServiceControl {
+public class ServiceManagement extends Service implements IServiceDiscovery {// , IServiceControl {
 
 	//COMMS REQUIRED VARIABLES
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("ServiceDiscoveryMsgBean", "ServiceDiscoveryResultBean");
@@ -117,7 +117,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)
 	 */
-	public List<AService> getServices(String client, String identity) {
+	public AService[] getServices(String client, String identity) {
 		Log.d(LOG_TAG, "getServices called by client: " + client);
 		
 		//MESSAGE BEAN
@@ -145,13 +145,13 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.identity.IIdentity)*/
-	public AService getService(String client, ServiceResourceIdentifier sri, String identity) {
+	public AService getService(String client, AServiceResourceIdentifier sri, String identity) {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#searchService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, org.societies.api.identity.IIdentity) */
-	public List<AService> searchService(String client, AService filter, String identity) {
+	public AService[] searchService(String client, AService filter, String identity) {
 		return null;
 	}
 
@@ -165,11 +165,11 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 		return null;
 	}
 
-	public ServiceControlResult startService(String client, ServiceResourceIdentifier sri, String identity) {
+	public ServiceControlResult startService(String client, AServiceResourceIdentifier sri, String identity) {
 		return null;
 	}
 
-	public ServiceControlResult stopService(String client, ServiceResourceIdentifier sri, String identity) {
+	public ServiceControlResult stopService(String client, AServiceResourceIdentifier sri, String identity) {
 		return null;
 	}
 
@@ -229,13 +229,15 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 					Log.d(LOG_TAG, "ServiceDiscoveryBeanResult!");
 					ServiceDiscoveryResultBean discoResult = (ServiceDiscoveryResultBean) msgBean;
 					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
-					
-					//do parcel stuff
-					
-					//convert to simple 
+					//CONVERT TO PARCEL BEANS
+					int i=0;
 					AService serviceArray[] = AService.CREATOR.newArray(serviceList.size());
+					for(org.societies.api.schema.servicelifecycle.model.Service tmpService: serviceList) {
+						serviceArray[i] = (AService)tmpService;
+						i++;
+					}
 					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE, serviceArray); //(Parcelable) 
+					intent.putExtra(INTENT_RETURN_VALUE, serviceArray); 
 					intent.setPackage(client);
 				} 
 				// --------- Service Control Bean ---------

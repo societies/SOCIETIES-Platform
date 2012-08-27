@@ -32,6 +32,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONTokener;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.api.internal.servicelifecycle.AService;
+import org.societies.android.api.internal.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.servicemonitor.AndroidActiveServices;
@@ -234,13 +236,13 @@ public class PluginCoreServiceMonitor extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 1))) {
 				try {
-					this.serviceDisco.getService(data.getString(0), (ServiceResourceIdentifier) data.get(1), data.getString(2));
+					this.serviceDisco.getService(data.getString(0), (AServiceResourceIdentifier) data.get(1), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 2))) {
 				try {
-					this.serviceDisco.searchService(data.getString(0), (org.societies.api.schema.servicelifecycle.model.Service) data.get(1), data.getString(2));
+					this.serviceDisco.searchService(data.getString(0), (AService) data.get(1), data.getString(2));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -332,12 +334,12 @@ public class PluginCoreServiceMonitor extends Plugin {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(ServiceManagement.INTENT_RETURN_VALUE);
-					org.societies.api.schema.servicelifecycle.model.Service services[] = new org.societies.api.schema.servicelifecycle.model.Service[parcels.length];
+					AService services[] = new AService[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
-						services[i] = (org.societies.api.schema.servicelifecycle.model.Service) parcels[i];
+						services[i] = (AService) parcels[i];
 					}
 					
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertToJSONArray(services));
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAServiceToJSONArray(services));
 					result.setKeepCallback(false);
 					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
 					
@@ -394,7 +396,7 @@ public class PluginCoreServiceMonitor extends Plugin {
      * @param node
      * @return JSONArray 
      */
-    private JSONArray convertToJSONArray(Object array[]) {
+    private JSONArray convertAServiceToJSONArray(AService array[]) {
     	JSONArray jObj = new JSONArray();
 		Gson gson = new Gson();
 		try {
