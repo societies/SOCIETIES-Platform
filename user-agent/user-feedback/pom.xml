@@ -17,23 +17,29 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
+		<!-- <relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>0.1</version> -->
 	</parent>
 
 	<dependencies>
 	<dependency>
 		<groupId>org.societies.api.external</groupId>
 		<artifactId>societies-api</artifactId>
-		<version>${release.version}</version>
+		<!-- <version>${release.version}</version> -->
 		<scope>provided</scope>
 	</dependency>
 	<dependency>
 		<groupId>org.societies.api.internal</groupId>
 		<artifactId>societies-api-internal</artifactId>
-		<version>${release.version}</version>
+		<!-- <version>${release.version}</version> -->
 		<scope>provided</scope>
 	</dependency>
+	<dependency>
+		    <groupId>org.societies</groupId>
+		    <artifactId>common-ext-libs</artifactId>
+		    <scope>provided</scope>
+		</dependency>
 	<dependency>
 		<groupId>org.societies.useragent</groupId>
 		<artifactId>user-agent-api</artifactId>
@@ -44,6 +50,7 @@
 		<groupId>org.junit</groupId>
 		<artifactId>com.springsource.junit</artifactId>
 		<version>3.8.2</version>
+		<scope>test</scope>
 	</dependency>
 	<dependency>
 		<groupId>org.mockito</groupId>
@@ -51,12 +58,12 @@
 		    <version>1.9.0</version>
 		    <scope>test</scope>
 		</dependency>
-	<dependency>
+	<!-- <dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-simple</artifactId>
 		<version>${slf4j.version}</version>
 		<scope>provided</scope>
-	</dependency>
+	</dependency> -->
 	<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.context</artifactId>
