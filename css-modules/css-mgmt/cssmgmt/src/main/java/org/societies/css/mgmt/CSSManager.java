@@ -1026,6 +1026,20 @@ public class CSSManager implements ICSSLocalManager {
 		
 	}
 	
+		@Override
+	public Future<List<String>> getCssFriends() {
+		List<String> friendList = new ArrayList<String>();
+		
+		try {
+				friendList = cssRegistry.getCssFriends();
+			} catch (CssRegistrationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		return new AsyncResult<List<String>>(friendList);
+		
+	}
 	
 	public Future<String> getthisNodeType(String nodeId) {
 		String Type = null, nodeid = null;

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	<groupId>org.societies.domain-authority</groupId>
 	<packaging>bundle</packaging>
@@ -39,20 +39,17 @@
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
-			<version>0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 

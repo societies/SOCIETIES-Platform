@@ -596,6 +596,43 @@ public class CssRegistry implements ICssRegistry {
 
 	}
 
+
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<String> getCssFriends()
+			throws CssRegistrationException {
+
+		Session session = sessionFactory.openSession();
+		String friendID = null;
+		List<String> friendList = new ArrayList<String>();
+
+		try {
+
+			List<CssFriendEntry> tmpRegistryEntryList = session.createCriteria(CssFriendEntry.class)
+					.add(Restrictions.eq("requestStatus",CssRequestStatusType.ACCEPTED.toString())).list();
+			
+			if (tmpRegistryEntryList != null) {
+				for (CssFriendEntry tmpEn : tmpRegistryEntryList) {
+					friendID = new String(tmpEn.getFriendIdentity());
+					friendList.add(friendID);
+				}
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			throw new CssRegistrationException(e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+
+		return friendList;
+
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

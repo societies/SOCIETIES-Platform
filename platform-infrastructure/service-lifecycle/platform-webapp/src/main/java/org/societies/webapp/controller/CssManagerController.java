@@ -304,14 +304,15 @@ public class CssManagerController {
 					.findAllCssFriendRequests();
 			Future<List<CssRequest>> cssRequests = getCssLocalManager()
 					.findAllCssRequests();
-			
+			Future<List<String>> asynchCssFriends = getCssLocalManager().getCssFriends();
+						
 			Future<List<Service>> asynchServices = null;
 			List<Service> friendServices =  new ArrayList<Service>();
 			
 
 			List<CssAdvertisementRecordDetailed> dbCssAds = cssadverts.get();
 			CssRequestModel cssRM = null;
-
+			
 			cmControllerLoginForm.getCssAdRequests1().setActive(false);
 			cmControllerLoginForm.getCssAdRequests2().setActive(false);
 			cmControllerLoginForm.getCssAdRequests3().setActive(false);
@@ -520,7 +521,9 @@ public class CssManagerController {
 			}
 			model.put("cssadverts", cssadverts.get());
 			// model.put("cssads", cssads);
-
+			
+			model.put("cssFriends", asynchCssFriends.get());
+			
 			
 			List<CssRequest> dbCssRequests = cssRequests.get();
 			

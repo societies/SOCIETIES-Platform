@@ -22,69 +22,35 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.cssRegistry;
+package org.societies.api.cis.orchestration;
 
 import java.util.List;
 
-import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
-import org.societies.api.schema.cssmanagement.CssInterfaceResult;
-import org.societies.api.schema.cssmanagement.CssRecord;
-import org.societies.api.schema.cssmanagement.CssRequest;
-
-
+import org.societies.api.cis.orchestration.model.DataParameters;
+import org.societies.api.identity.IIdentity;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
- * @author Maria Mannion - Intel
+ * 
+ *
+ * @author Eliza
+ *
  */
-public interface ICssRegistry {
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
+public interface ICommunityRecommendationManager {
 
 	/**
-	 * Description: This method provides the interface to add a new Css.
-	 * 				
-	 * @param cssDetails
-	 * @throws CssRegistrationException
+	 * This method provides functionality that allows a 3p or platform service to retrieve
+	 *   a list of CSSs that have a number of parameters in common. These parameters are 
+	 *   context information such as location, occupation, DoB, homeTown, age, interests, 
+	 *   hobbies etc. See org.societies.api.context.model.CtxAttributeTypes for a list of 
+	 *   known parameter types.   
+	 * @param parameters	the parameters and scope for searching for relevant CSSs
+	 * @return				the list of relevant CSSs in IIdentity format.
 	 */
-	public CssInterfaceResult registerCss (CssRecord cssDetails) throws CssRegistrationException;
+	public List<IIdentity> getRelevantCSSs(DataParameters parameters);
 	
-	/**
-	 * Description: This method permits you to unregister a css
-	 * @param cssDetails
-	 * @throws CssRegistrationException
-	 */
-	public void unregisterCss (CssRecord cssDetails) throws CssRegistrationException;
-
-	/**
-	 * Description: This method permits you to update the css Record
-	 * @param cssDetails
-	 * @throws CssRegistrationException
-	 */
-	public void updateCssRecord(CssRecord cssDetails) throws CssRegistrationException; 
-		
-
-	/**
-	 * Description: Returns the css record details
-	 * @param none
-	 * @throws CssRegistrationException
-	 */
-	public CssRecord getCssRecord() throws CssRegistrationException; 
-
 	
-	List<CssRequest>  getCssFriendRequests()
-			throws CssRegistrationException;
 	
-	void updateCssFriendRequestRecord(CssRequest cssRequest)
-			throws CssRegistrationException ;
-	
-	List<CssRequest>  getCssRequests()
-			throws CssRegistrationException;
-	
-	void updateCssRequestRecord(CssRequest cssRequest)
-			throws CssRegistrationException;
-	
-	CssRequest  getCssFriendRequest(String friendId)
-			throws CssRegistrationException;
-	
-	List<String>  getCssFriends()
-			throws CssRegistrationException;
-			
 }
