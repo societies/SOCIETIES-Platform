@@ -54,6 +54,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -68,14 +69,14 @@ import org.xml.sax.SAXException;
 
 public class XMLPolicyReader {
 
-	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private Logger logging = LoggerFactory.getLogger(this.getClass().getSimpleName());
 	private ICtxBroker ctxBroker;
 	private IIdentityManager iDM;
-	
+
 	public XMLPolicyReader(ICtxBroker broker, IIdentityManager idm){
 		iDM = idm;
 		this.ctxBroker = broker;
-		
+
 	}
 	/**
 	 * @return the ctxBroker
@@ -90,7 +91,7 @@ public class XMLPolicyReader {
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
-	
+
 	/**
 	 * @return the iDM
 	 */
@@ -114,9 +115,9 @@ public class XMLPolicyReader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}catch (IOException ioe){
-			
+
 		}catch (SAXException se){
-			
+
 		}
 		return null;		
 	}
@@ -132,20 +133,20 @@ public class XMLPolicyReader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}catch (IOException ioe){
-			
+
 		}catch (SAXException se){
-			
+
 		}
 		return null;
 
 	}
-	
+
 	public RequestPolicy readPolicyFromFile(Document doc){
 		try {
 			Requestor subject = null;
 			ArrayList<RequestItem> targets;
 
-			
+
 			doc.getDocumentElement().normalize();
 			log("Root element " + doc.getDocumentElement().getNodeName());
 			NodeList subjectXML = doc.getElementsByTagName("Subject");
@@ -154,37 +155,37 @@ public class XMLPolicyReader {
 			//NodeList conditionsXML = doc.getElementsByTagName("Condition");
 			//NodeList nodeLst = doc.getElementsByTagName("employee");
 			//log("Information of all employees");
-			
+
 			if (subjectXML.getLength()>0){
 				subject = this.readSubject(subjectXML);
 			}
-//			else{
-//				this.log("No Subject in XML file");
-//				return null;
-//			}
+			//			else{
+			//				this.log("No Subject in XML file");
+			//				return null;
+			//			}
 			if (targetXML.getLength()>0){
 				targets = this.readTargets(targetXML);
 			}else{
 				this.log("No requested Targets in XML file");
 				targets = new ArrayList<RequestItem>();
 			}
-			
-//			if (subject == null){
-//				return null;
-//			}
-//			if (targets == null){
-//				return null;
-//			}
-			
+
+			//			if (subject == null){
+			//				return null;
+			//			}
+			//			if (targets == null){
+			//				return null;
+			//			}
+
 			return new RequestPolicy(subject,targets);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		//return policy;
 		return null;
 	}
-	
+
 	private Requestor readSubject(NodeList subjectList){
 		Element subjectElement = (Element) subjectList.item(0);
 		log("subjectElement.getTagName: "+subjectElement.getTagName());
@@ -196,14 +197,14 @@ public class XMLPolicyReader {
 			ServiceResourceIdentifier serviceID = null;
 			NodeList attributeList = subjectElement.getElementsByTagName("Attribute");
 			log("attributeList.getLength: "+attributeList.getLength());
-			
+
 			for (int i=0; i < attributeList.getLength(); i++){
 				//NodeList elementNodeList = attributeList.item(i);
 				Element attributeElement = (Element) attributeList.item(i);
 				this.log("reading Subject Attribute: "+attributeElement.getTextContent());
 				String attributeIdAttribute = attributeElement.getAttribute("AttributeId");
 				this.log("Element.getTagName: "+attributeElement.getTagName());
-				
+
 				if (attributeIdAttribute.compareToIgnoreCase("urn:oasis:names:tc:xacml:1.0:subject:subject-id")==0){
 					this.log("Reading: "+attributeIdAttribute);
 					String dataType = attributeElement.getAttribute("DataType");
@@ -220,50 +221,50 @@ public class XMLPolicyReader {
 						String dpiStr = attributeValueElement.getFirstChild().getNodeValue();
 						log("attributeValue.getNodeValue() : "+dpiStr);
 						try{
-							
+
 							providerIdentity = iDM.fromJid(dpiStr); 
-									
+
 						}catch(InvalidFormatException e){
 							log("Could not parse identity from xml policy. Replacing with current Public Identity from IDM");
 							//TODO: Ask the user!
 							providerIdentity = (IIdentity) iDM.getPublicIdentities().toArray()[0];
 						}
 						this.log("2. Read Identity : "+providerIdentity.toString());
-						
+
 					}
 
 				}else if (attributeIdAttribute.compareToIgnoreCase("serviceID")==0){
 					this.log("Reading: "+attributeIdAttribute);
 					String dataType = attributeElement.getAttribute("DataType");
-					
+
 					if (dataType.compareToIgnoreCase("org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier")==0){
 						this.log("Reading: "+dataType);
 						//NodeList nl = attributeElement.getElementsByTagName("AttributeValue");
 						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
-						
+
 						Element attributeValueElement = (Element) attributeValueList.item(0);
-						
+
 						serviceID = new ServiceResourceIdentifier();
 						serviceID.setServiceInstanceIdentifier(attributeValueElement.getFirstChild().getNodeValue());
 					}
-					
+
 				}else if (attributeIdAttribute.compareToIgnoreCase("CisId")==0){
 					this.log("Reading: "+attributeIdAttribute);
 					String dataType = attributeElement.getAttribute("DataType");
-					
+
 					if (dataType.compareToIgnoreCase("org.societies.api.identity.IIdentity")==0){
 						this.log("Reading: "+dataType);
 						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
-						
+
 						Element attributeValueElement = (Element) attributeValueList.item(0);
-						
+
 						String identityStr = attributeValueElement.getFirstChild().getNodeValue();
 						try{
 							cisIdentity = iDM.fromJid(identityStr);
 						}catch (InvalidFormatException e){
 							log("Could not parse CIS identity from xml policy. Asking the user");
 							cisIdentity = this.getCISIdentityFromUser(cisIdentity);
-							
+
 						}
 					}
 				}
@@ -273,13 +274,13 @@ public class XMLPolicyReader {
 					return new RequestorService(providerIdentity, serviceID);
 				}else if (cisIdentity!=null){
 					return new RequestorCis(providerIdentity, cisIdentity);
-					
+
 				}
 			}else{
 				throw new PrivacyException("Could not parse IIdentity");
 			}
 		} catch (PrivacyException e) {
-			
+
 			e.printStackTrace();
 			this.log("Could not parse IIdentity");
 			return null;
@@ -291,8 +292,8 @@ public class XMLPolicyReader {
 
 		return null;
 	}
-	
-	
+
+
 	private IIdentity getCISIdentityFromUser(IIdentity cisIdentity){
 		while (cisIdentity==null){
 			String s = (String) JOptionPane.showInputDialog(null, "Could not read CIS ID from XML file. Please type the CIS ID below", "Error reading CIS Identity", JOptionPane.PLAIN_MESSAGE, null, null, "");
@@ -306,22 +307,20 @@ public class XMLPolicyReader {
 		}
 		return cisIdentity;
 	}
-	
+
 	private  ArrayList<RequestItem> readTargets(NodeList target){
 		ArrayList<RequestItem> items = new ArrayList<RequestItem>();
 		for (int i=0; i < target.getLength(); i++){
-			logging.info("In a new target");
+			logging.info("In a new target ("+(i+1)+"/"+target.getLength()+")");
 			RequestItem item = this.readTarget((Element) target.item(i));
-			if (item!=null){
+			if (null != item) {
 				items.add(item);
-			}else{
-				return new ArrayList<RequestItem>();
 			}
 		}
-		
+
 		return items;
 	}
-	
+
 	private RequestItem readTarget(Element targetElement){
 		NodeList resources = targetElement.getElementsByTagName("Resource");
 		Resource r = this.readResource((Element) resources.item(0));
@@ -329,23 +328,23 @@ public class XMLPolicyReader {
 			logging.info("No resource");
 			return null;
 		}
-		
+
 		NodeList actions = targetElement.getElementsByTagName("Action");
 		ArrayList<Action> actionsList = this.readActions(actions);
 		if (actionsList == null || actionsList.size()==0){
 			logging.info("No action");
 			return null;
 		}
-		
+
 		NodeList conditions = targetElement.getElementsByTagName("Condition");
 		ArrayList<Condition> conditionsList = new ArrayList<Condition>(); 
 		if (conditions.getLength()!=0){
 			conditionsList = this.readConditions(conditions);
 		}
-		
+
 		boolean isOptional = false;
 		NodeList optionalNodeList = targetElement.getElementsByTagName("optional");
-		
+
 		//JOptionPane.showMessageDialog(null, "in Target: "+optionalNodeList.getLength());
 		if (optionalNodeList!=null){
 			if (optionalNodeList.getLength()>0){
@@ -359,10 +358,11 @@ public class XMLPolicyReader {
 		}
 		RequestItem rItem = new RequestItem(r,actionsList, conditionsList, isOptional);
 		return rItem;
-		
+
 	}
-	
+
 	private Resource readResource(Element resourceElement){
+		DataIdentifierScheme scheme = DataIdentifierScheme.CONTEXT;
 		NodeList attributeList = resourceElement.getElementsByTagName("Attribute");
 		CtxIdentifier ctxID = null;
 		String ctxType = null;
@@ -374,7 +374,7 @@ public class XMLPolicyReader {
 				if (dataType.compareToIgnoreCase("org.societies.api.context.model.CtxIdentifier")==0){
 					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 					Element attributeValueElement = (Element) attributeValueList.item(0);
-					
+
 					String strCtxId = attributeValueElement.getFirstChild().getNodeValue();
 					try {
 						ctxID = CtxIdentifierFactory.getInstance().fromString(strCtxId);
@@ -385,149 +385,155 @@ public class XMLPolicyReader {
 					}
 				}
 			}
-			else if (attributeId.compareToIgnoreCase("contextType")==0){
+			else if (DataIdentifierScheme.CONTEXT.value().equals(attributeId)
+					|| DataIdentifierScheme.CIS.value().equals(attributeId)
+					|| DataIdentifierScheme.DEVICE.value().equals(attributeId)
+					|| DataIdentifierScheme.ACTIVITY.value().equals(attributeId)) {
+				scheme = DataIdentifierScheme.fromValue(attributeId);
 				String dataType = attributeElement.getAttribute("DataType");
 				if (dataType.compareToIgnoreCase("http://www.w3.org/2001/XMLSchema#string")==0){
 					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
 					Element attributeValueElement = (Element) attributeValueList.item(0);
 					ctxType = attributeValueElement.getFirstChild().getNodeValue();
-					
+
 				}
 			}
 		}
-			
-		if (ctxType == null){
-			if (ctxID == null){
-				return null;
+
+			if (ctxType == null){
+				if (ctxID == null){
+					return null;
+				}else{
+
+					return new Resource(scheme, ctxID.getType());
+				}
 			}else{
-				return new Resource(ctxID.getType());
+				//TODO: make the necessary changes to include the scheme in the privacy policy			
+				return new Resource(scheme,ctxType);
 			}
-		}else{
-			return new Resource(ctxType);
 		}
-	}
-	
-	private ArrayList<Action> readActions(NodeList actionList){
-		ArrayList<Action> actions = new ArrayList<Action>();
-		for (int i = 0; i<actionList.getLength(); i++){
-			Action a = this.readAction((Element) actionList.item(i));
+
+		private ArrayList<Action> readActions(NodeList actionList){
+			ArrayList<Action> actions = new ArrayList<Action>();
+			for (int i = 0; i<actionList.getLength(); i++){
+				Action a = this.readAction((Element) actionList.item(i));
+				if (a!=null){
+					actions.add(a);
+				}
+			}
+			return actions;
+		}
+		private Action readAction(Element actionElement){
+			NodeList attributeList = actionElement.getElementsByTagName("Attribute");
+			Action a = null;
+			for (int i = 0; i< attributeList.getLength(); i++){
+				Element attributeElement = (Element) attributeList.item(i);
+				String attributeId = attributeElement.getAttribute("AttributeId");
+				if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:action-id")==0){
+					String dataType = attributeElement.getAttribute("DataType");
+					if (dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants")==0){
+						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
+						Element attributeValueElement = (Element) attributeValueList.item(0);
+						ActionConstants ac = ActionConstants.valueOf(attributeValueElement.getFirstChild().getNodeValue().toUpperCase());
+						a = new Action(ac);
+					}
+				}
+			}
+
 			if (a!=null){
-				actions.add(a);
-			}
-		}
-		return actions;
-	}
-	private Action readAction(Element actionElement){
-		NodeList attributeList = actionElement.getElementsByTagName("Attribute");
-		Action a = null;
-		for (int i = 0; i< attributeList.getLength(); i++){
-			Element attributeElement = (Element) attributeList.item(i);
-			String attributeId = attributeElement.getAttribute("AttributeId");
-			if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:action-id")==0){
-				String dataType = attributeElement.getAttribute("DataType");
-				if (dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants")==0){
-					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
-					Element attributeValueElement = (Element) attributeValueList.item(0);
-					ActionConstants ac = ActionConstants.valueOf(attributeValueElement.getFirstChild().getNodeValue().toUpperCase());
-					a = new Action(ac);
-				}
-			}
-		}
-		
-		if (a!=null){
-			NodeList optionalNodeList = actionElement.getElementsByTagName("optional");
-			//JOptionPane.showMessageDialog(null, "in Action: "+optionalNodeList.getLength());
-			if (optionalNodeList!=null){
-				if (optionalNodeList.getLength()>0){
-					Element valueOptional = (Element) optionalNodeList.item(0);
-					String value = valueOptional.getFirstChild().getNodeValue();
-					if (value.equalsIgnoreCase("true")){
-						a.setOptional(true);
+				NodeList optionalNodeList = actionElement.getElementsByTagName("optional");
+				//JOptionPane.showMessageDialog(null, "in Action: "+optionalNodeList.getLength());
+				if (optionalNodeList!=null){
+					if (optionalNodeList.getLength()>0){
+						Element valueOptional = (Element) optionalNodeList.item(0);
+						String value = valueOptional.getFirstChild().getNodeValue();
+						if (value.equalsIgnoreCase("true")){
+							a.setOptional(true);
+						}
 					}
 				}
 			}
+			return a;
 		}
-		return a;
-	}
-	
-	private ArrayList<Condition> readConditions(NodeList conditionList){
-		ArrayList<Condition> conditions = new ArrayList<Condition>();
-		for (int i = 0; i<conditionList.getLength(); i++){
-			Condition c = this.readCondition((Element) conditionList.item(i));
+
+		private ArrayList<Condition> readConditions(NodeList conditionList){
+			ArrayList<Condition> conditions = new ArrayList<Condition>();
+			for (int i = 0; i<conditionList.getLength(); i++){
+				Condition c = this.readCondition((Element) conditionList.item(i));
+				if (c!=null){
+					conditions.add(c);
+				}
+			}
+			return conditions;		
+		}
+
+		private Condition readCondition(Element conditionElement){
+			NodeList attributeList = conditionElement.getElementsByTagName("Attribute");
+			Condition c = null;
+			String conditionValue = null;
+			for (int i = 0; i< attributeList.getLength(); i++){
+				Element attributeElement = (Element) attributeList.item(i);
+				String attributeId = attributeElement.getAttribute("AttributeId");
+				if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:condition-id")==0){
+					String dataType = attributeElement.getAttribute("DataType");
+					if (dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants")==0){
+						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
+						Element attributeValueElement = (Element) attributeValueList.item(0);
+						ConditionConstants cc = ConditionConstants.valueOf(attributeValueElement.getAttribute("DataType"));
+
+						conditionValue = attributeValueElement.getFirstChild().getNodeValue();
+						c = new Condition(cc,conditionValue);
+					}
+				}
+			}
 			if (c!=null){
-				conditions.add(c);
-			}
-		}
-		return conditions;		
-	}
-	
-	private Condition readCondition(Element conditionElement){
-		NodeList attributeList = conditionElement.getElementsByTagName("Attribute");
-		Condition c = null;
-		String conditionValue = null;
-		for (int i = 0; i< attributeList.getLength(); i++){
-			Element attributeElement = (Element) attributeList.item(i);
-			String attributeId = attributeElement.getAttribute("AttributeId");
-			if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:condition-id")==0){
-				String dataType = attributeElement.getAttribute("DataType");
-				if (dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants")==0){
-					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
-					Element attributeValueElement = (Element) attributeValueList.item(0);
-					ConditionConstants cc = ConditionConstants.valueOf(attributeValueElement.getAttribute("DataType"));
-					
-					conditionValue = attributeValueElement.getFirstChild().getNodeValue();
-					c = new Condition(cc,conditionValue);
-				}
-			}
-		}
-		if (c!=null){
-			NodeList optionalNodeList = conditionElement.getElementsByTagName("optional");
-			//JOptionPane.showMessageDialog(null, "in Condition: "+optionalNodeList.getLength());
-			if (optionalNodeList!=null){
-				if (optionalNodeList.getLength()>0){
-					Element valueOptional = (Element) optionalNodeList.item(0);
-					String value = valueOptional.getFirstChild().getNodeValue();
-					if (value.equalsIgnoreCase("false")){
-						c.setOptional(false);
+				NodeList optionalNodeList = conditionElement.getElementsByTagName("optional");
+				//JOptionPane.showMessageDialog(null, "in Condition: "+optionalNodeList.getLength());
+				if (optionalNodeList!=null){
+					if (optionalNodeList.getLength()>0){
+						Element valueOptional = (Element) optionalNodeList.item(0);
+						String value = valueOptional.getFirstChild().getNodeValue();
+						if (value.equalsIgnoreCase("false")){
+							c.setOptional(false);
+						}
 					}
 				}
 			}
-		}
-		return c;		
-	}
-	
-	private void log(String message){
-		this.logging.info(this.getClass().getName()+" : "+message);
-		
-	}
-
-	public static void main(String[] args) throws IOException{
-		if (args.length>0){
-			String filePath = "";
-
-			try{
-				filePath = args[0];
-				XMLPolicyReader reader = new XMLPolicyReader(null, null);
-				reader.read(filePath);
-				//JOptionPane.showMessageDialog(null, "Read "+filePath);
-			}
-			catch(Exception e){
-				//JOptionPane.showMessageDialog(null, "Failed: "+filePath);
-				e.printStackTrace();
-			}
+			return c;		
 		}
 
+		private void log(String message){
+			this.logging.info(message);
+
+		}
+
+		public static void main(String[] args) throws IOException{
+			if (args.length>0){
+				String filePath = "";
+
+				try{
+					filePath = args[0];
+					XMLPolicyReader reader = new XMLPolicyReader(null, null);
+					reader.read(filePath);
+					//JOptionPane.showMessageDialog(null, "Read "+filePath);
+				}
+				catch(Exception e){
+					//JOptionPane.showMessageDialog(null, "Failed: "+filePath);
+					e.printStackTrace();
+				}
+			}
+
+
+		}
+
+		private void read(String filepath){
+			System.out.println(filepath);
+			File file = new File(filepath);
+
+			RequestPolicy policy = readPolicyFromFile(file);
+			System.out.println("Policy read OK: \n");
+			System.out.println(policy.toString());		
+		}
+
 
 	}
-	
-	private void read(String filepath){
-		System.out.println(filepath);
-		File file = new File(filepath);
-		
-		RequestPolicy policy = readPolicyFromFile(file);
-		System.out.println("Policy read OK: \n");
-		System.out.println(policy.toString());		
-	}
-	
-	
-}

@@ -81,45 +81,45 @@ public class TestFBConnector {
 	}
 	
 	
-	@Test
-	public void postATestMessage(){
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Date date = new Date();
-		String value="[TEST] Hello World! It's "+dateFormat.format(date);
-		connector.post(value);
-		logger.info("Facebook POST test:"+  value);
-		
-	}
+//	@Test
+//	public void postATestMessage(){
+//		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//		Date date = new Date();
+//		String value="[TEST] Hello World! It's "+dateFormat.format(date);
+//		connector.post(value);
+//		logger.info("Facebook POST test:"+  value);
+//		
+//	}
+//	
+//	@Test
+//	public void postATestEvent(){
+//		
+//		String value="{ \"event\": {"+
+//        "\"name\": \"JUNIT Test Event\","+
+//        "\"from\": \"2013-08-11\","+
+//        "\"to\": \"2013-08-12\","+
+//        "\"location\": \"NoWhere\","+
+//        "\"description\": \"Social Network connector post test (FB)\"}"+
+//        "}";
+//		
+//		connector.post(value);
+//		logger.info("Facebook POST test: " + value);
+//		
+//	}
 	
-	@Test
-	public void postATestEvent(){
-		
-		String value="{ \"event\": {"+
-        "\"name\": \"JUNIT Test Event\","+
-        "\"from\": \"2013-08-11\","+
-        "\"to\": \"2013-08-12\","+
-        "\"location\": \"NoWhere\","+
-        "\"description\": \"Social Network connector post test (FB)\"}"+
-        "}";
-		
-		connector.post(value);
-		logger.info("Facebook POST test: " + value);
-		
-	}
-	
-	@Test
-	public void postATestCheckin(){
-		
-		String value="{ \"checkin\": {"+
-        "\"lat\": \"53.345149444145\","+
-        "\"lon\": \"-6.2539714878708\","+
-        "\"message\": \"Trinity Capital Hotel Dublin\","+
-        "\"place\": 171512719546772}"+
-        "}";
-		
-		connector.post(value);
-		logger.info("Facebook POST test:"+ value);
-		
-	}
+//	@Test
+//	public void postATestCheckin(){
+//		
+//		String value="{ \"checkin\": {"+
+//        "\"lat\": \"53.345149444145\","+
+//        "\"lon\": \"-6.2539714878708\","+
+//        "\"message\": \"Trinity Capital Hotel Dublin\","+
+//        "\"place\": 171512719546772}"+
+//        "}";
+//		
+//		connector.post(value);
+//		logger.info("Facebook POST test:"+ value);
+//		
+//	}
 
 }

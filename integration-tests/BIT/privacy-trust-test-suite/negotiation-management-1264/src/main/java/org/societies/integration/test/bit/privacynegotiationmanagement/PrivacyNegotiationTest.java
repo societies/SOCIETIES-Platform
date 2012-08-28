@@ -60,6 +60,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -211,7 +212,7 @@ public class PrivacyNegotiationTest {
 		/*
 		 * location requestItem
 		 */
-		Resource rLocation = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource rLocation = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		List<Condition> conditions = new ArrayList<Condition>();
@@ -226,7 +227,7 @@ public class PrivacyNegotiationTest {
 		 * status requestItem
 		 */
 
-		Resource rStatus = new Resource(CtxAttributeTypes.STATUS);
+		Resource rStatus = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.STATUS);
 		List<Action> actions1 = new ArrayList<Action>();
 		actions1.add(new Action(ActionConstants.READ));
 		List<Condition> conditions1 = new ArrayList<Condition>();
@@ -274,7 +275,7 @@ public class PrivacyNegotiationTest {
 		/*
 		 * location requestItem
 		 */
-		Resource rLocation = new Resource(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource rLocation = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		List<Condition> conditions = new ArrayList<Condition>();
@@ -288,7 +289,7 @@ public class PrivacyNegotiationTest {
 		/*
 		 * status requestItem
 		 */
-		Resource rStatus = new Resource(CtxAttributeTypes.STATUS);
+		Resource rStatus = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.STATUS);
 		List<Action> actions1 = new ArrayList<Action>();
 		actions1.add(new Action(ActionConstants.READ));
 		List<Condition> conditions1 = new ArrayList<Condition>();
@@ -301,7 +302,7 @@ public class PrivacyNegotiationTest {
 		/*
 		 * birthday requestItem
 		 */
-		Resource rBirthday = new Resource(CtxAttributeTypes.BIRTHDAY);
+		Resource rBirthday = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.BIRTHDAY);
 		List<Action> actions2 = new ArrayList<Action>();
 		actions2.add(new Action(ActionConstants.WRITE));
 		actions2.add(new Action(ActionConstants.CREATE));

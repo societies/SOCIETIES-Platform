@@ -121,7 +121,7 @@ public class ProviderResponsePolicyGenerator {
 				RequestItem myRequest = null;
 				//get the Actions I have stated in my service privacy policy for this particular resource 
 				for (RequestItem item : myRequests){
-					if (item.getResource().getContextType().equals(resource.getContextType())){
+					if (item.getResource().getDataType().equals(resource.getDataType())){
 						myRequest = item;
 					}
 				}

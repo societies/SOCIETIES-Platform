@@ -34,7 +34,6 @@
 		<!-- Invoke a new page via an icon -->
 		<a href="#device" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Device</a>
 		<a href="#information" data-role="button" data-icon="info" data-inline="true" data-theme="a">Info</a>
-		<a href="#cssRecord" data-role="button" data-icon="info" data-inline="true" data-theme="a">Profile</a>
 		
 	</div><!-- /header -->
 
@@ -42,8 +41,8 @@
 
    		<div id= "loginDialog">
 			<div data-role="fieldcontain" >
-		    	<label for="username">User JID: </label>
-		    	<input type="text" name="userLogin" id="username" value=""  />
+		    	<label for="username">User Name: </label>
+		    	<input type="text" name="userLogin" id="username" value="" />
 			</div>
 
 			<div data-role="fieldcontain" >
@@ -51,11 +50,17 @@
 		    	<input type="password" name="userpass" id="userpass" value="" />
 			</div>
 
-			<div data-role="fieldcontain" >
-		    	<label for="identityDomain">Identity Domain: </label>
-		    	<input type="text" name="identityDomain" id="identityDomain" value="" readonly="readonly" />
-			</div>
 
+				<div data-role="fieldcontain" >
+			    	<label for="cloudNode">Cloud Node: </label>
+			    	<input type="text" name="cloudNode" id="cloudnode" value="" />
+				</div>
+	
+				<div data-role="fieldcontain" >
+			    	<label for="identityDomain">Identity Domain: </label>
+			    	<input type="text" name="identityDomain" id="identitydomain" value="" readonly="readonly" />
+				</div>
+			
 			<input id="connectXMPP" type="button" value="Connect" data-icon="gear" data-inline="true" /> 
 			<a href="#xmppDomainReg" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Register</a>
 			

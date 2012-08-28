@@ -68,15 +68,15 @@ public class RequestPolicy implements Serializable{
 		this.requestor = subject;
 	}
 	public String toXMLString(){
-		String str = "<RequestPolicy>";
+		StringBuilder str = new StringBuilder("<RequestPolicy>");
 		if (this.hasRequestor()){
-			str = str.concat("<Subject>"+this.requestor.toXMLString()+"</Subject>");
+			str.append("<Subject>"+this.requestor.toXMLString()+"</Subject>");
 		}
 		for (RequestItem item : requests){
-			str = str.concat(item.toXMLString());
+			str.append(item.toXMLString());
 		}
-		str = str.concat("</RequestPolicy>");
-		return str;
+		str.append("</RequestPolicy>");
+		return str.toString();
 	}
 
 	public boolean hasRequestor(){

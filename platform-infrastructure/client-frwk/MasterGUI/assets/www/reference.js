@@ -306,7 +306,7 @@ var Societies = {
 			 * @returns value of preference
 			 */
 			putStringPrefValue: function(successCallback, failureCallback, prefName, value) {
-				console.log("Call Preferences - putStringPrefValue");
+				console.log("Call Preferences - putStringPrefValue for preference: " + prefName + " value: " + value);
 				
 				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 				failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -454,14 +454,12 @@ var Societies = {
 			 */
 			loginCSS: function(successCallback, failureCallback) {
 				var client = "org.societies.android.platform.gui";
+				var cssIdentity = jQuery("#username").val() + "@" + jQuery("#identitydomain").val();
 				var cssRecord = {
 						  			"archiveCSSNodes": [],
-				                    "cssIdentity": jQuery("#username").val(),
+				                    "cssIdentity": cssIdentity ,
 				                    "cssInactivation": null,
-				                    "cssNodes": [{
-				                        "identity": "android@societies.local/androidOne",
-				                        "status": 0,
-				                        "type": 0}],
+				                    "cssNodes": [],
 				                    "cssRegistration": null,
 				                    "cssHostingLocation" : null,
 				                    "domainServer" : null,
@@ -473,7 +471,7 @@ var Societies = {
 				                    "identityName": null,
 				                    "imID": null,
 				                    "name": null,
-				                    "password": jQuery("#userpass").val(),
+				                    "password": null,
 				                    "presence": 0,
 				                    "sex": 0,
 				                    "socialURI": null,
@@ -530,6 +528,47 @@ var Societies = {
 				'registerXMPPServer',          //Telling the plugin, which action we want to perform
 				[client, cssRecord]);        //Passing a list of arguments to the plugin
 			},
+			/**
+			 * @methodOf Societies.LocalCSSManagerService#
+			 * @description Login to a user's chosen Identity Domain 
+			 * @param {Object} successCallback The callback which will be called when result is successful
+			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+			 * @returns CSSrecord with registered values
+			 */
+			loginXMPPServer: function(successCallback, failureCallback) {
+				var client = "org.societies.android.platform.gui";
+				var cssRecord = {
+						  			"archiveCSSNodes": [],
+				                    "cssIdentity": jQuery("#username").val(),
+				                    "cssInactivation": null,
+				                    "cssNodes": [],
+				                    "cssRegistration": null,
+				                    "cssHostingLocation" : null,
+				                    "domainServer" : jQuery("#identitydomain").val(),
+				                    "cssUpTime": 0,
+				                    "emailID": null,
+				                    "entity": 0,
+				                    "foreName": null,
+				                    "homeLocation": null,
+				                    "identityName": null,
+				                    "imID": null,
+				                    "name": null,
+				                    "password": jQuery("#userpass").val(),
+				                    "presence": 0,
+				                    "sex": 0,
+				                    "socialURI": null,
+				                    "status": 0
+						                  }
+
+
+				console.log("Call LocalCSSManagerService - loginXMPPServer");
+
+				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+				'loginXMPPServer',          //Telling the plugin, which action we want to perform
+				[client, cssRecord]);        //Passing a list of arguments to the plugin
+			},
 
 			/**
 			 * @methodOf Societies.LocalCSSManagerService#
@@ -541,14 +580,12 @@ var Societies = {
 
 			logoutCSS: function(successCallback, failureCallback) {
 				var client = "org.societies.android.platform.gui";
+				var cssIdentity = jQuery("#username").val() + "@" + jQuery("#identitydomain").val();
 				var cssRecord = {
 						  			"archiveCSSNodes": [],
-				                    "cssIdentity": "android",
+				                    "cssIdentity": cssIdentity,
 				                    "cssInactivation": null,
-				                    "cssNodes": [{
-				                        "identity": "android@societies.local/androidOne",
-				                        "status": 0,
-				                        "type": 0}],
+				                    "cssNodes": [],
 				                    "cssRegistration": null,
 				                    "cssHostingLocation" : null,
 				                    "domainServer" : null,
@@ -560,7 +597,7 @@ var Societies = {
 				                    "identityName": null,
 				                    "imID": null,
 				                    "name": null,
-				                    "password": "androidpass",
+				                    "password": null,
 				                    "presence": 0,
 				                    "sex": 0,
 				                    "socialURI": null,
@@ -822,6 +859,7 @@ var SocietiesGUI = {
 			SocietiesGUI.getCSSIdentity();
 			SocietiesGUI.getCSSIdentityPassword();
 			SocietiesGUI.getCSSIdentityDomain();
+			SocietiesGUI.getCSSCloudNode();
 		},
 		
 		/**
@@ -869,7 +907,7 @@ var SocietiesGUI = {
 		getCSSIdentityDomain: function () {
 			function success(data) {
 				console.log("getCSSIdentityDomain - successful: " + data.value);
-				jQuery("#identityDomain").val(data.value);
+				jQuery("#identitydomain").val(data.value);
 			}
 			
 			function failure(data) {
@@ -877,23 +915,68 @@ var SocietiesGUI = {
 			}
 			window.plugins.AppPreferences.getStringPrefValue(success, failure, "daURI");
 		},
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Gets the CSS Cloud Node preference value. This value is the name 
+		 * of the Cloud node and is required as a destination point for XMPP traffic to the
+		 * cloud.
+		 * @returns null
+		 */
+
+		getCSSCloudNode: function () {
+			function success(data) {
+				console.log("getCSSCloudNode - successful: " + data.value);
+				jQuery("#cloudnode").val(data.value);
+			}
+			
+			function failure(data) {
+				alert("getCSSCloudNode - failure: " + data);
+			}
+			window.plugins.AppPreferences.getStringPrefValue(success, failure, "cloudNode");
+		},
 		
 		/**
 		 * @methodOf SocietiesGUI#
 		 * @description updates the registered user credentials and domain server for future login purposes
 		 * @returns null
 		 */
-		updateCredentialPreferences: function () {
+		updateRegisteredCredentialPreferences: function () {
 			function success(data) {
-				console.log("updateCredentialPreferences - successful: " + data.value);
+				console.log("updateRegisteredCredentialPreferences - successful: " + data.value);
 			}
 			
 			function failure(data) {
-				alert("updateCredentialPreferences - failure: " + data);
+				alert("updateRegisteredCredentialPreferences - failure: " + data);
 			}
 			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#regUsername").val());
 			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#regUserpass").val());
 			window.plugins.AppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#domainServers").val());
+			
+			//Update the login page with XMPP registered values
+			jQuery("#username").val(jQuery("#regUsername").val());
+			jQuery("#userpass").val(jQuery("#regUserpass").val());
+			jQuery("#identitydomain").val(jQuery("#domainServers").val());
+	
+		},
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description updates the login user credentials and associated information for future login purposes
+		 * @returns null
+		 */
+		updateLoginCredentialPreferences: function () {
+			function success(data) {
+				console.log("updateLoginCredentialPreferences - successful: " + data.value);
+			}
+			
+			function failure(data) {
+				alert("updateLoginCredentialPreferences - failure: " + data);
+			}
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#username").val());
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#userpass").val());
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#identitydomain").val());
+			window.plugins.AppPreferences.putStringPrefValue(success, failure, "cloudNode", jQuery("#cloudnode").val());
+			
+	
 		},
 		
 		/**
@@ -918,27 +1001,48 @@ var SocietiesGUI = {
 		},
 		/**
 		 * @methodOf SocietiesGUI#
-		 * @description Actions carried in the event that a successful CSS login occurs
+		 * @description Actions carried in the event that a successful CSS Cloud login occurs
 		 * @returns null
 		 */
 
-		successfulLogin: function() {
-			console.log("Login to CSS");
+		successfulCSSCloudLogin: function() {
+			console.log("Login to CSS Cloud node");
 
 			function success(data) {
 				
 				SocietiesGUI.populateCSSRecordpage(data);
 				
+				SocietiesGUI.updateLoginCredentialPreferences();
+				
 				console.log("Current page: " + $.mobile.activePage[0].id);
-
 				
 				$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
 			}
 			
 			function failure(data) {
-				alert("successfulLogin - failure: " + data);
+				alert("successfulCSSCloudLogin - failure: " + data);
 			}
 		    window.plugins.LocalCSSManagerService.loginCSS(success, failure);
+
+		},
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Actions carried in the event that a successful XMPP Domain login occurs. A successfull login
+		 * to the XMPP server will then try to login into the defined Cloud server
+		 * @returns null
+		 */
+
+		successfulXMPPDomainLogin: function() {
+			console.log("Login to the chosen XMPP domain");
+
+			function success(data) {
+				SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.successfulCSSCloudLogin);
+			}
+			
+			function failure(data) {
+				alert("successfulXMPPDomainLogin - failure: " + data);
+			}
+		    window.plugins.LocalCSSManagerService.loginXMPPServer(success, failure);
 
 		},
 		/**
@@ -951,13 +1055,12 @@ var SocietiesGUI = {
 			console.log("Regsister identity with chosen Identity domain");
 
 			function success(data) {
-				SocietiesGUI.updateCredentialPreferences();
+				SocietiesGUI.updateRegisteredCredentialPreferences();
 				
 				
 				console.log("Current page: " + $.mobile.activePage[0].id);
-
 				
-				$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
+				$.mobile.changePage( ($("#main")), { transition: "slideup"} );
 			}
 			
 			function failure(data) {
@@ -1105,15 +1208,21 @@ var SocietiesGUI = {
 		 * @description Validate that viable login credentials have been entered
 		 * @param {Object} username
 		 * @param {Object} password
+		 * @param {Object} domain
+		 * @param {Object} cloudNodeName
 		 * @returns boolean true if credentials viable
 		 */
 
-		validateLoginCredentials: function(name, password) {
+		validateLoginCredentials: function(name, password, cloudNodeName, domain) {
 			var retValue = true;
-
-			if (name.length === 0 || password.length === 0) {
+			console.log("validateLoginCredentials user: " + name);
+			console.log("validateLoginCredentials pass: " + password);
+			console.log("validateLoginCredentials cloud node: " + cloudNodeName);
+			console.log("validateLoginCredentials domain: " + domain);
+			
+			if (name.length === 0 || password.length === 0 || domain.length === 0 || cloudNodeName.length === 0) {
 				retValue  = false;
-				alert("validateLoginCredentials: " + "User credentials must be entered");
+				alert("validateLoginCredentials: " + "User credentials and CSS related information must be entered");
 			} 
 			return retValue;
 		},
@@ -1129,7 +1238,8 @@ var SocietiesGUI = {
 		validateRegistrationCredentials: function(name, password, repeatPassword, termsAck) {
 			var retValue = true;
 			alert ("checkbox value: " + termsAck);
-			if (SocietiesGUI.validateLoginCredentials(name, password)) {
+			
+			if (name.length > 0 && password.length > 0) {
 				if (repeatPassword.length === 0) {
 					retValue  = false;
 					alert("validateRegistrationCredentials: " + "repeat entry of password must be completed");
@@ -1142,6 +1252,7 @@ var SocietiesGUI = {
 					alert("validateRegistrationCredentials: " + "Terms & Conditions must be acknowledged");
 				}
 			} else {
+				alert("validateRegistrationCredentials: " + "User credentials must be entered");
 				retValue  = false;
 			}
 			return retValue;
@@ -1334,8 +1445,8 @@ jQuery(function() {
 	});
 
 	$('#connectXMPP').click(function() {
-		if (SocietiesGUI.validateLoginCredentials(jQuery("#username").val(), jQuery("#userpass").val())) {
-			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.successfulLogin);
+		if (SocietiesGUI.validateLoginCredentials(jQuery("#username").val(), jQuery("#userpass").val(), jQuery("#cloudnode").val(), jQuery("#identitydomain").val())) {
+			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.successfulXMPPDomainLogin);
 		}
 	});
 	

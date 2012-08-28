@@ -84,5 +84,7 @@ public interface ICssRegistry {
 	CssRequest  getCssFriendRequest(String friendId)
 			throws CssRegistrationException;
 	
+	List<String>  getCssFriends()
+			throws CssRegistrationException;
 			
 }

@@ -190,8 +190,8 @@ public class PersonalisationCommsClient implements IPersonalisationManager, ICom
 			String serviceType, ServiceResourceIdentifier serviceID, String parameterName) {
 		String id = getId(serviceID,parameterName);
 		this.results.put(id, new Action());
-		IIdentity toIdentity = idMgr.getThisNetworkNode();
-		Stanza stanza = new Stanza(toIdentity);
+
+		Stanza stanza = new Stanza(userIdentity);
 		
 		PersonalisationManagerBean bean = new PersonalisationManagerBean();
 		bean.setMethod(PersonalisationMethodType.GET_PREFERENCE);

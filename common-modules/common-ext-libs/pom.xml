@@ -98,7 +98,13 @@
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.47</version>
 		</dependency>
-			
+		
+		<dependency>
+	        <groupId>nz.ac.waikato.cms.weka</groupId>
+    	    <artifactId>weka-stable</artifactId>
+	        <version>3.6.8</version>
+    	</dependency>
+ 	
 	</dependencies>
 	<build>
 		<plugins>

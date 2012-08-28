@@ -167,7 +167,7 @@ public class Registry implements Serializable{
 			
 		}
 		return null;
-		//return this.getPPNPreference(details.getContextType(), details.getAffectedCtxID(), details.getRequestorDPI(), details.getServiceID());
+		//return this.getPPNPreference(details.getDataType(), details.getAffectedDataId(), details.getRequestorDPI(), details.getServiceID());
 		
 	}
 
@@ -202,7 +202,7 @@ public class Registry implements Serializable{
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
-			if (d.getContextType().equals(contextType)){
+			if (d.getDataType().equals(contextType)){
 				preferenceCtxIDs.add(this.ppnpMappings.get(d));
 			}
 		}
@@ -232,7 +232,7 @@ public class Registry implements Serializable{
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
-			if (d.getContextType().equals(contextType)){
+			if (d.getDataType().equals(contextType)){
 				if (d.getRequestor().equals(requestor)){
 					preferenceCtxIDs.add(this.ppnpMappings.get(d));
 				}
@@ -260,9 +260,9 @@ public class Registry implements Serializable{
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
-			if (d.getContextType().equals(contextType)){
-				if (d.getAffectedCtxID()!=null){
-					if (d.getAffectedCtxID().toString().equalsIgnoreCase(affectedCtxID.toString())){
+			if (d.getDataType().equals(contextType)){
+				if (d.getAffectedDataId()!=null){
+					if (d.getAffectedDataId().toString().equalsIgnoreCase(affectedCtxID.toString())){
 						preferenceCtxIDs.add(this.ppnpMappings.get(d));
 
 					}
@@ -279,9 +279,9 @@ public class Registry implements Serializable{
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
-			if (d.getContextType().equals(contextType)){
-				if (d.getAffectedCtxID()!=null){
-					if (d.getAffectedCtxID().toString().equalsIgnoreCase(affectedCtxID.toString())){
+			if (d.getDataType().equals(contextType)){
+				if (d.getAffectedDataId()!=null){
+					if (d.getAffectedDataId().toString().equalsIgnoreCase(affectedCtxID.toString())){
 						if (d.getRequestor().equals(requestor))
 							preferenceCtxIDs.add(ppnpMappings.get(d));
 					}
@@ -299,7 +299,7 @@ public class Registry implements Serializable{
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
-			if (d.getContextType().equals(contextType)){
+			if (d.getDataType().equals(contextType)){
 				if (d.getRequestorDPI()!=null){
 					if (d.getRequestorDPI().toString().equalsIgnoreCase(dpi.toString())){
 						if (d.getServiceID().toString().equalsIgnoreCase(serviceID.toString())){
@@ -320,9 +320,9 @@ public class Registry implements Serializable{
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
-			if (d.getContextType().equals(contextType)){
-				if (d.getAffectedCtxID()!=null){
-					if (d.getAffectedCtxID().toString().equalsIgnoreCase(affectedCtxID.toString())){
+			if (d.getDataType().equals(contextType)){
+				if (d.getAffectedDataId()!=null){
+					if (d.getAffectedDataId().toString().equalsIgnoreCase(affectedCtxID.toString())){
 						if (d.getRequestor().equals(requestor)){
 							return this.ppnpMappings.get(d);
 						}						

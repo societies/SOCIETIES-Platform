@@ -27,9 +27,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.util.model.pri
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 
@@ -45,18 +44,21 @@ public class ResourceUtils {
 		}
 		Resource resource = null;
 		try {
-			if (null != resourceBean.getCtxUriIdentifier() && !"".equals(resourceBean.getCtxUriIdentifier()))  {
-				resource = new Resource((CtxAttributeIdentifier) CtxIdentifierFactory.getInstance().fromString(resourceBean.getCtxUriIdentifier()));
+			// Data id
+			if (null != resourceBean.getDataIdUri() && !"".equals(resourceBean.getDataIdUri()) && null!=resourceBean.getScheme())  {
+				resource = new Resource(DataIdentifierFactory.fromUri(resourceBean.getDataIdUri()));
 			}
-			else if (null != resourceBean.getContextType()) {
-				resource = new Resource(resourceBean.getContextType());
+			// Data type
+			else if (null != resourceBean.getDataType() && null!=resourceBean.getScheme()) {
+				resource = new Resource(resourceBean.getScheme(), resourceBean.getDataType());
 			}
 			else {
-				throw new PrivacyException("The resource id and type can't be null!");
+				throw new PrivacyException("The resource id or type and DataIdentifierScheme can't be null!");
 			}
 		} catch (MalformedCtxIdentifierException e) {
 			return null;
 		} catch (PrivacyException e) {
+			e.printStackTrace();
 			return null;
 		}
 		return resource;
@@ -72,16 +74,26 @@ public class ResourceUtils {
 		}
 		return resources;
 	}
-	
+
 	public static org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource toResourceBean(Resource resource)
 	{
-		if (null == resource) {
+		try
+		{
+			if (null == resource) {
+				return null;
+			}
+			org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resourceBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource();
+			resourceBean.setDataIdUri((null != resource.getDataId() ? resource.getDataId().getUri() : null));
+			resourceBean.setDataType(resource.getDataType());
+			if (resource.getScheme()==null){
+				throw new PrivacyException("The DataIdentifierScheme cannot be null!");
+			}
+			resourceBean.setScheme(resource.getScheme());
+			return resourceBean;
+		}catch(PrivacyException e){
+			e.printStackTrace();
 			return null;
 		}
-		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource resourceBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource();
-		resourceBean.setCtxUriIdentifier((null != resource.getCtxIdentifier() ? resource.getCtxIdentifier().toUriString() : null));
-		resourceBean.setContextType(resource.getContextType());
-		return resourceBean;
 	}
 	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Resource> toResourceBeans(List<Resource> resources)
 	{

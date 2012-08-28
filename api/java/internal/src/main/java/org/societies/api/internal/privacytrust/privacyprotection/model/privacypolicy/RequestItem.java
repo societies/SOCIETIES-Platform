@@ -93,17 +93,17 @@ public class RequestItem implements Serializable{
 		this.actions = actions;
 	}
 	public String toXMLString(){
-		String str = "\n<Target>";
-		str = str.concat(this.resource.toXMLString());
+		StringBuilder str = new StringBuilder("\n<Target>");
+		str.append(this.resource.toXMLString());
 		for (Action action : actions){
-			str = str.concat(action.toXMLString());
+			str.append(action.toXMLString());
 		}
 		for (Condition con : conditions){
-			str = str.concat(con.toXMLString());
+			str.append(con.toXMLString());
 		}
-		str = str.concat(this.printOptional());
-		str = str.concat("\n</Target>");
-		return str;
+		str.append(this.printOptional());
+		str.append("\n</Target>");
+		return str.toString();
 	}
 
 	public boolean isOptional(){

@@ -26,9 +26,13 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
+import javax.swing.JOptionPane;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 /**
  * the Resource class is used to represent  a piece of data type belonging to the user 
  * (i.e context data, preference data, profile data). It contains the id of the data and the type of data. 
@@ -37,74 +41,120 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
  */
 public class Resource implements Serializable{
 
-	private CtxAttributeIdentifier ctxIdentifier;
-	private String contextType;
+	private DataIdentifier dataId;
+	private String dataType;
+	private DataIdentifierScheme scheme;
 	
 	private Resource(){
-		
+//		if (scheme==null){
+//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+//			throw new NullPointerException();
+//		}else{
+//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+//		}
 	}
-	public Resource(CtxAttributeIdentifier ctxId){
-		this.ctxIdentifier = ctxId;
-		this.contextType = ctxId.getType();
+	public Resource(DataIdentifier dataId){
+		this.dataId = dataId;
+		this.dataType = dataId.getType();
+
+		this.scheme = dataId.getScheme();
+//		if (scheme==null){
+//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+//			throw new NullPointerException();
+//		}else{
+//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+//		}
 	}
+
 	
-	public Resource(String type){
-		this.contextType = type;
+	public Resource(DataIdentifierScheme scheme, String type){
+		this.dataType = type;
+		this.scheme = scheme;
+//		if (scheme==null){
+//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+//			throw new NullPointerException();
+//		}else{
+//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+//		}
 	}
 	public TargetMatchConstants getType(){
 		return TargetMatchConstants.RESOURCE;
 	}
 	
-	public String getContextType(){
-		return this.contextType;
+	public String getDataType(){
+		return this.dataType;
 	}
+
 	
-	public CtxAttributeIdentifier getCtxIdentifier(){
-		return this.ctxIdentifier;
+	public DataIdentifier getDataId(){
+		return this.dataId;
 	}
 	
 	public void stripIdentifier(){
-		this.ctxIdentifier = null;
+		this.dataId = null;
 	}
 	
-	public void setPublicCtxIdentifier(CtxAttributeIdentifier ctxId){
-		this.ctxIdentifier = ctxId;
+	public void setPublicCtxIdentifier(DataIdentifier ctxId){
+		this.dataId = ctxId;
 	}
 	
 	public String toXMLString(){
-		String str = "\n<Resource>";
-		if (this.ctxIdentifier!=null){
-			str = str.concat(this.ctxIDToXMLString());
+		StringBuilder str = new StringBuilder("\n<Resource>");
+		if (this.dataId!=null){
+			str.append(this.ctxIDToXMLString());
 		}
-		if (this.contextType!=null){
-			str = str.concat(this.ctxTypeToXMLString());
+		if (this.dataType!=null){
+			str.append(this.ctxTypeToXMLString());
 		}
-		str = str.concat("\n</Resource>");
-		return str;
+		str.append("\n</Resource>");
+		return str.toString();
 	}
 	
 	private String ctxIDToXMLString(){
-		String str = "";
-		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
+		StringBuilder str = new StringBuilder();
+		str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
 		"\n \t\t\tDataType=\"org.societies.api.context.model.CtxIdentifier\">");
 
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.ctxIdentifier.toUriString());
-		str = str.concat("</AttributeValue>");
+		str.append("\n\t\t<AttributeValue>");
+		str.append(dataId.getUri());
+		str.append("</AttributeValue>");
 
-		str = str.concat("\n\t</Attribute>");
-		return str;
+		str.append("\n\t</Attribute>");
+		return str.toString();
 	}
 	
 	private String ctxTypeToXMLString(){
-		String str = "";
-		str = str.concat("\n\t<Attribute AttributeId=\"contextType\"" +
-				"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.contextType);
-		str = str.concat("</AttributeValue>");
-		str = str.concat("\n\t</Attribute>");
-		return str;	
+		StringBuilder str = new StringBuilder();
+//		if(scheme==null){
+//			JOptionPane.showMessageDialog(null, "SCHEME IS NULL");
+//		}
+		if (scheme.equals(DataIdentifierScheme.CONTEXT)){
+			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CONTEXT+"\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		else if (scheme.equals(DataIdentifierScheme.CIS)){
+			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CIS+"\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		
+		else if (scheme.equals(DataIdentifierScheme.DEVICE)){
+			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.DEVICE+"\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		
+		else if (scheme.equals(DataIdentifierScheme.ACTIVITY)){
+			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.ACTIVITY+"\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		else {
+			str.append("\n\t<Attribute AttributeId=\"unknown\"" +
+					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		}
+		str.append("\n\t\t<AttributeValue>");
+		str.append(this.dataType);
+		str.append("</AttributeValue>");
+		str.append("\n\t</Attribute>");
+		return str.toString();	
 		}
 	
 	public String toString(){
@@ -115,9 +165,9 @@ public class Resource implements Serializable{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((contextType == null) ? 0 : contextType.hashCode());
+				+ ((dataType == null) ? 0 : dataType.hashCode());
 		result = prime * result
-				+ ((ctxIdentifier == null) ? 0 : ctxIdentifier.hashCode());
+				+ ((dataId == null) ? 0 : dataId.hashCode());
 		return result;
 	}
 
@@ -136,10 +186,18 @@ public class Resource implements Serializable{
 		// -- Verify obj type
 		Resource rhs = (Resource) obj;
 		return new EqualsBuilder()
-			.append(this.getContextType(), rhs.getContextType())
-			.append(this.getCtxIdentifier(), rhs.getCtxIdentifier())
+			.append(this.getDataType(), rhs.getDataType())
+			.append(this.getDataId(), rhs.getDataId())
 			.isEquals();
 	}
+
+	/**
+	 * @return the scheme
+	 */
+	public DataIdentifierScheme getScheme() {
+		return scheme;
+	}
+
 	
 	
 }

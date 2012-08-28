@@ -28,6 +28,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.logging.Logger;
 
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -75,6 +76,23 @@ public class TestTWConnector {
 		assertNotNull("Social Profile (JSON):\n", profile);
 	}
 
+	
+	
+	@Test
+	public void postTest(){
+		
+		try{
+			JSONObject post = new JSONObject("activity");
+			post.put("status", "I'm feel good!");
+			
+			connector.post(post.toString());
+		}
+		catch(Exception ex){}
+		
+		
+	}
+	
+	
 	@After
 	public void tearDown() throws Exception {
 		connector = null;

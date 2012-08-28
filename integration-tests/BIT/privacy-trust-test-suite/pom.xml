@@ -30,6 +30,7 @@
 	    <module>assessment</module>
 	    <module>data-management-1266</module>
 	    <module>policy-management-1244</module>
+	    <module>negotiation-management-1264</module>
 	</modules>
 
 </project>

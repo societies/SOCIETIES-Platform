@@ -146,7 +146,7 @@ public class PPNMonitor implements CtxChangeEventListener {
 						List<Requestor> requestors = ((PPNPOutcome) outcome).getRuleTarget().getRequestors();
 						for (Requestor requestor : requestors){
 							try {
-								this.privDataManager.updatePermission(requestor, userIdentity, responseItem);
+								this.privDataManager.updatePermission(requestor, responseItem);
 							} catch (PrivacyException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();

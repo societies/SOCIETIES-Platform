@@ -8,8 +8,11 @@ import java.util.concurrent.Future;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.internal.css.cssRegistry.ICssRegistry;
+
 
 public class TestCSSManager {
 	public static final String TEST_IDENTITY_1 = "node11";
@@ -27,10 +30,14 @@ public class TestCSSManager {
 	public static final String TEST_NAME = "TestCSS";
 	public static final String TEST_PASSWORD = "P455W0RD";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
+	private ICssRegistry cssRegistry;
+	
 
 
 	@Before
 	public void setUp() throws Exception {
+		
+		
 	}
 
 	@After
@@ -66,10 +73,17 @@ public class TestCSSManager {
 		
 		CSSManager manager = new CSSManager();
 		
-		Future<CssInterfaceResult> result = manager.registerXMPPServer(profile);
 		
-		assertNotNull(result);
+		manager.setCssRegistry(cssRegistry);
 		
+		//Future<CssInterfaceResult> result = manager.registerXMPPServer(profile);
+		//ICSSRemoteManager cssManagerRemote = null;
+		manager.sendCssFriendRequest(TEST_IDENTITY_2);
+		//cssManagerRemote.sendCssFriendRequest(TEST_IDENTITY_2);
+		
+		
+		//assertNotNull(result);
+		/*
 		try {
 			CssInterfaceResult  interfaceResult = result.get();
 			assertTrue(interfaceResult.isResultStatus());
@@ -90,7 +104,7 @@ public class TestCSSManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		*/
 		
 	}
 }

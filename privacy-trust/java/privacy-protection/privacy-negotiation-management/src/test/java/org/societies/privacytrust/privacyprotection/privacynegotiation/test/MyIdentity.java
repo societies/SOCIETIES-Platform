@@ -27,6 +27,7 @@ package org.societies.privacytrust.privacyprotection.privacynegotiation.test;
 import java.io.Serializable;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 
 
@@ -36,7 +37,7 @@ import org.societies.api.identity.IdentityType;
  * @author Eliza
  *
  */
-public class MyIdentity implements IIdentity, Serializable{
+public class MyIdentity implements INetworkNode,IIdentity, Serializable{
 
 	
 	private final IdentityType type;
@@ -77,6 +78,12 @@ public class MyIdentity implements IIdentity, Serializable{
 	@Override
 	public IdentityType getType() {
 		return type;
+	}
+
+	@Override
+	public String getNodeIdentifier() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

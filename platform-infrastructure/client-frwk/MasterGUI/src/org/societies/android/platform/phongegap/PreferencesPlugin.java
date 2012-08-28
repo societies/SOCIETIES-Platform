@@ -44,6 +44,7 @@ import android.util.Log;
 
 /**
  * This plugin allows Preferences maintained by {@link MasterPreferences} to be retrieved
+ * and updated
  */
 
 public class PreferencesPlugin extends Plugin {
@@ -90,11 +91,12 @@ public class PreferencesPlugin extends Plugin {
 		
 		if (action.equals(GET_STRING_PREF_VALUE)) {
 			try {
-				Set<String> allPrefNames = this.getPrefNames();
-				
-				for (String prefName : allPrefNames) {
-					Log.d(LOG_TAG, "Pref name: " + prefName);
-				}
+				//uncomment to log all existing preferences
+//				Set<String> allPrefNames = this.getPrefNames();
+//				
+//				for (String prefName : allPrefNames) {
+//					Log.d(LOG_TAG, "Pref name: " + prefName);
+//				}
 				result = new PluginResult(PluginResult.Status.OK, new JSONObject().put(JSON_RETURN_VALUE, getStringPrefValue(parameters.getString(0))));
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -171,6 +173,7 @@ public class PreferencesPlugin extends Plugin {
 	 * @return Set<String> of preference names
 	 */
 	private Set<String> getPrefNames() {
+		Log.d(LOG_TAG, "getPrefNames");
 		Set<String> prefNames = null;
 		
 		HashMap<String,?> allPrefs  = this.getAllPrefs();
@@ -213,6 +216,9 @@ public class PreferencesPlugin extends Plugin {
 			editor.commit();
 			retValue = this.sharedPrefs.getString(prefName, UNDEFINED_PREF_STRING_VALUE);
 			Log.d(LOG_TAG, "putStringPrefValue updated value: " + retValue);
+			
+		} else {
+			Log.d(LOG_TAG, "Unable to find preference: " + prefName);
 			
 		}
 		return retValue;
