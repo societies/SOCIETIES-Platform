@@ -10,6 +10,6 @@ public class PhoneGapReference extends DroidGap {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //      setContentView(R.layout.main);
-      super.loadUrl("file:///android_asset/www/index.html");
+      super.loadUrl("file:///android_asset/www/mainmenu.html");
     }
 }

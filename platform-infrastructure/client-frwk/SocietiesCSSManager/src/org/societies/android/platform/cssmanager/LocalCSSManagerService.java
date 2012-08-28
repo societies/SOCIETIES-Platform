@@ -325,13 +325,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	@Override
-	public void logoutXMPPServer(String client, AndroidCSSRecord record) {
+	public void logoutXMPPServer(String client) {
 		Log.d(LOG_TAG, "logoutXMPPServer called with client: " + client);
 
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
-		Dbc.require("CSS record cannot be null", record != null);
-		
-		
+				
 		String params [] = {client};
 
 		

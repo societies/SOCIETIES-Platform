@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+<link href="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="includes/societies.css"/>
+<script src="jquery-mobile/jquery-1.7.2.js" type="text/javascript"></script>
+<script src="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.min.js" type="text/javascript"></script>
+<!--JQM SlideMenu-->
+<link rel="stylesheet" href="includes/jqm.css"/>
+<script src="js/jqm.slidemenu.js"></script>
+</head>
+<body>
+<div id="slidemenu">
+	<h3>MENU</h3>
+	<ul>
+		<li><a href="#" rel="external">Inbox</a></li>
+		<li><a href="#" rel="external">Chat</a></li>
+		<li><a href="#" rel="external">RSS Feeds</a></li>
+		<li><a href="#" rel="external">Help</a></li>
+		<li><a href="#" rel="external">Log Out</a></li>
+	</ul>
+</div>
+
+<div data-role="page" id="friends">
+	<!-- header -->
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="images/societies_header.png" alt="logo" />
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
+	</div>
+	<!-- /header -->
+	<div data-role="content">
+		<input type="search" name="search" id="search-basic" value="Search Friends" data-theme="b"/>
+		<br/><br/>
+		<ul data-role="listview" data-theme="d" data-divider-theme="b">
+			<li data-role="list-divider">Your Societies Friends</li>
+			<li><a href="friend_profile.html" rel="external">
+			<img src="images/profile_pic_sample.jpg" class="profile_list" alt="profile picture" />
+			<h2>Sara Weber</h2>
+			<p>
+				Communities: 10
+			</p>
+			<p>
+				Location: 10
+			</p>
+			</a></li>
+			<li><a href="friend_profile.html" rel="external">
+			<img src="images/profile_pic_sample2.jpg" class="profile_list" alt="profile picture"/>
+			<h2>JOE BLOGGS</h2>
+			<p>
+				Communities: 10
+			</p>
+			<p>
+				Location: 10
+			</p>
+			</a></li>
+			<li><a href="friend_profile.html" rel="external">
+			<img src="images/profile_pic_sample3.jpg" class="profile_list" alt="profile picture"/>
+			<h2>JOE BLOGGS</h2>
+			<p>
+				Communities: 10
+			</p>
+			<p>
+				Location: 10
+			</p>
+			</a></li>
+			<li><a href="friend_profile.html" rel="external">
+			<img src="images/profile_pic_sample4.jpg" class="profile_list" alt="profile picture"/>
+			<h2>JOE BLOGGS</h2>
+			<p>
+				Communities: 10
+			</p>
+			<p>
+				Location: 10
+			</p>
+			</a></li>
+		</ul>
+		<br/><br/>
+		<div class="terms">
+			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
+		</div>
+	</div>
+	<!-- /content -->
+	<br/><br/>
+	<!-- footer -->
+	<div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home"><a href="landing.html">
+			<span class="ico"><img src="images/icons/home_logo.png" alt="home"/></span>
+			</a>
+			</li>
+			<li class="btn-profile"><a href="myProfile.html">
+			<span class="ico"><img src="images/icons/my_profile.png" alt="profile"/></span>
+			</a>
+			</li>
+			<li class="btn-settings"><a href="settings.html">
+			<span class="ico"><img src="images/icons/settings.png" alt="settings"/></span>
+			</a>
+			</li>
+			<li class="btn-about"><a href="about.html">
+			<span class="ico"><img src="images/icons/about.png" alt="about"/></span>
+			</a>
+			</li>
+		</ul>
+	</div>
+	<!-- end footer -->
+</div>
+</body>
+</html>

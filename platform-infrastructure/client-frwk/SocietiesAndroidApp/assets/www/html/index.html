@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+<link rel="stylesheet" type="text/css" href="includes/custom-theme-societies.css"/>
+<link href="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="includes/societies.css"/>
+<script src="jquery-mobile/jquery-1.7.2.js" type="text/javascript"></script>
+<script src="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.min.js" type="text/javascript"></script>
+</head>
+<body>
+<!-- Start of first page: #one -->
+<div data-role="page" id="one">
+	<div data-role="content" class="login">
+		<div class="logo_login_wrapper">
+			<img class="logo_login" src="images/societies_landing.png" alt="societies logo"/>
+		</div>
+		<div class="form_wrapper">
+			<form id="login" action="index2.html" method="post" data-ajax="false">
+				<div data-role="fieldcontain">
+					<input type="text" value="Enter your Username" id="name" name="name" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
+				</div>
+				<div data-role="fieldcontain" class="ui-field-contain ui-body ui-br">
+					<input type="text" value="Enter your Password" id="password" name="password" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
+				</div>
+				<a href="landing.html" data-role="button" data-theme="h" data-inline="true" rel="external">LOGIN </a>
+			</form>
+			<div class="sign_up">
+				Don't have a login? <a href="new_account.html">Sign Up</a>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

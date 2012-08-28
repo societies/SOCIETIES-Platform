@@ -26,18 +26,26 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.android.platform.phongegap;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONTokener;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.api.internal.servicelifecycle.AService;
+import org.societies.android.api.internal.servicelifecycle.AServiceResourceIdentifier;
+import org.societies.android.api.internal.servicelifecycle.IServiceControl;
+import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.servicemonitor.AndroidActiveServices;
 import org.societies.android.api.internal.servicemonitor.AndroidActiveTasks;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
+import org.societies.android.platform.servicemonitor.ServiceManagement;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor.LocalBinder;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -81,6 +89,10 @@ public class PluginCoreServiceMonitor extends Plugin {
 
     private ICoreServiceMonitor coreServiceMonitor;
     private boolean connectedtoCoreMonitor = false;
+    
+    private IServiceDiscovery serviceDisco;
+    private boolean serviceDiscoConnected = false;
+    private IServiceControl serviceControl;
 
     /**
      * Constructor
@@ -88,23 +100,75 @@ public class PluginCoreServiceMonitor extends Plugin {
     public PluginCoreServiceMonitor() {
     	super();
     	this.methodCallbacks = new HashMap<String, String>();
-
     }
 
+    /**
+     * CoreServiceMonitor service connection
+     */
+    private ServiceConnection coreServiceMonitorConnection = new ServiceConnection() {
+
+        public void onServiceDisconnected(ComponentName name) {
+        	Log.d(LOG_TAG, "Disconnecting from CoreServiceMonitor service");
+        	connectedtoCoreMonitor = false;
+        }
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        	Log.d(LOG_TAG, "Connecting to CoreServiceMonitor service");
+        	//get a local binder
+            LocalBinder binder = (LocalBinder) service;
+            //obtain the service's API
+            coreServiceMonitor = (ICoreServiceMonitor) binder.getService();
+            connectedtoCoreMonitor = true;
+        }
+    };
+    
+    /**
+     * IServiceDiscovery service connection
+     */
+    private ServiceConnection serviceDiscoConnection = new ServiceConnection() {
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        	Log.d(LOG_TAG, "Connecting to IServiceDiscovery service");
+
+        	//GET LOCAL BINDER
+            LocalBinder binder = (LocalBinder) service;
+
+            //OBTAIN SERVICE DISCOVERY API
+            serviceDisco = (IServiceDiscovery) binder.getService();
+            serviceDiscoConnected = true;
+        }
+        
+        public void onServiceDisconnected(ComponentName name) {
+        	Log.d(LOG_TAG, "Disconnecting from ServiceDiscovery service");
+        	serviceDiscoConnected = false;
+        }
+    };
+    
     /**
      * Bind to the target service
      */
     private void initialiseServiceBinding() {
-    	//Create intent to select service to bind to
-    	Intent intent = new Intent(this.ctx.getContext(), CoreServiceMonitor.class);
-    	//bind to the service
-    	this.ctx.getContext().bindService(intent, coreServiceMonitorConnection, Context.BIND_AUTO_CREATE);
-    	//register broad
+    	//CREATE INTENT FOR EACH SERVICE
+    	Intent intentServiceMon = new Intent(this.ctx.getContext(), CoreServiceMonitor.class);
+    	Intent intentServiceDisco = new Intent(this.ctx.getContext(), ServiceManagement.class);
+    	
+    	//BIND TO SERVICES
+    	this.ctx.getContext().bindService(intentServiceMon, coreServiceMonitorConnection, Context.BIND_AUTO_CREATE);
+    	this.ctx.getContext().bindService(intentServiceDisco, serviceDiscoConnection, Context.BIND_AUTO_CREATE);
+    	
+    	//REGISTER BROADCAST
         IntentFilter intentFilter = new IntentFilter() ;
+        
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_SERVICES);
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_TASKS);
+        
+        intentFilter.addAction(ServiceManagement.GET_SERVICES);
+        intentFilter.addAction(ServiceManagement.GET_SERVICE);
+        intentFilter.addAction(ServiceManagement.SEARCH_SERVICES);
+        
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     }
+    
     /**
      * Unbind from service
      */
@@ -112,12 +176,15 @@ public class PluginCoreServiceMonitor extends Plugin {
     	if (connectedtoCoreMonitor) {
     		this.ctx.getContext().unbindService(coreServiceMonitorConnection);
     	}
+    	if (serviceDiscoConnected) {
+    		this.ctx.getContext().unbindService(serviceDiscoConnection);
+    	}
     }
     
 
 	@Override
 	public PluginResult execute(String action, JSONArray data, String callbackId) {
-		Log.d(LOG_TAG, "execute: " + action);
+		Log.d(LOG_TAG, "Phonegap Plugin executing: " + action);
 		PluginResult result = null;
 		
 		if (action.equals(CONNECT_SERVICE)) {
@@ -140,29 +207,48 @@ public class PluginCoreServiceMonitor extends Plugin {
 			try {
 				Log.d(LOG_TAG, "parameters: " + data.getString(0));
 			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
 			Log.d(LOG_TAG, "adding to Map store: " + callbackId + " for action: " + action);
 			this.methodCallbacks.put(action, callbackId);
 			
-			//Call local service method
+			//>>>>>>>>>  CoreServiceMonitor METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (action.equals(ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, 2))) {
 				try {
 					this.coreServiceMonitor.activeServices(data.getString(0));
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, 0))) {
 				try {
 					this.coreServiceMonitor.activeTasks(data.getString(0));
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
+			//>>>>>>>>>  IServiceDiscovery METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
+			else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 0))) {
+				try {
+					this.serviceDisco.getServices(data.getString(0), data.getString(1));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 1))) {
+				try {
+					this.serviceDisco.getService(data.getString(0), (AServiceResourceIdentifier) data.get(1), data.getString(2));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 2))) {
+				try {
+					this.serviceDisco.searchService(data.getString(0), (AService) data.get(1), data.getString(2));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			//>>>>>>>>>  IServiceDiscovery METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
+			//TODO
 			
             // Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -170,16 +256,15 @@ public class PluginCoreServiceMonitor extends Plugin {
 		} else {
             result = new PluginResult(PluginResult.Status.ERROR);
             result.setKeepCallback(false);
-
 		}
 		return result;	
 	}
 
 	
-	@Override
 	/**
 	 * Unbind from service to prevent service being kept alive
 	 */
+	@Override
 	public void onDestroy() {
 		disconnectServiceBinding();
     }
@@ -193,6 +278,7 @@ public class PluginCoreServiceMonitor extends Plugin {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, intent.getAction());
 			
+			//>>>>>>>>>  CoreServiceMonitor METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			if (intent.getAction().equals(CoreServiceMonitor.ACTIVE_SERVICES)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, 2);
 				
@@ -205,7 +291,6 @@ public class PluginCoreServiceMonitor extends Plugin {
 					for (int i = 0; i < parcels.length; i++) {
 						services[i] = (ActivityManager.RunningServiceInfo) parcels[i];
 					}
-
 
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAndroidActiveServices(getActiveServices(services)));
 					result.setKeepCallback(false);
@@ -230,7 +315,6 @@ public class PluginCoreServiceMonitor extends Plugin {
 						tasks[i] = (ActivityManager.RunningTaskInfo) parcels[i];
 					}
 
-
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAndroidActiveTasks(getActiveTasks((tasks))));
 					result.setKeepCallback(false);
 					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
@@ -239,10 +323,32 @@ public class PluginCoreServiceMonitor extends Plugin {
 					PluginCoreServiceMonitor.this.methodCallbacks.remove(mapKey);
 
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
-
 				}
 			} 
+			//>>>>>>>>>  IServiceDiscovery METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
+			else if (intent.getAction().equals(ServiceManagement.GET_SERVICES)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 0);
+				
+				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					
+					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(ServiceManagement.INTENT_RETURN_VALUE);
+					AService services[] = new AService[parcels.length];
+					for (int i = 0; i < parcels.length; i++) {
+						services[i] = (AService) parcels[i];
+					}
+					
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAServiceToJSONArray(services));
+					result.setKeepCallback(false);
+					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
+					
+					//remove callback ID for given method invocation
+					PluginCoreServiceMonitor.this.methodCallbacks.remove(mapKey);
 
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			}
 		}
 	};
 	
@@ -290,6 +396,25 @@ public class PluginCoreServiceMonitor extends Plugin {
      * @param node
      * @return JSONArray 
      */
+    private JSONArray convertAServiceToJSONArray(AService array[]) {
+    	JSONArray jObj = new JSONArray();
+		Gson gson = new Gson();
+		try {
+			jObj =  (JSONArray) new JSONTokener(gson.toJson(array)).nextValue();
+			
+			Log.d(LOG_TAG, jObj.toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        return jObj;
+    }
+    
+    /**
+     * Creates a JSONArray for a given AndroidActiveServices array
+     * 
+     * @param node
+     * @return JSONArray 
+     */
     private JSONArray convertAndroidActiveServices(AndroidActiveServices services []) {
     	JSONArray jObj = new JSONArray();
 		Gson gson = new Gson();
@@ -298,12 +423,11 @@ public class PluginCoreServiceMonitor extends Plugin {
 			
 			Log.d(LOG_TAG, jObj.toString());
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
         return jObj;
     }
+    
     /**
      * Creates a JSONArray for a given AndroidActiveTasks array
      * 
@@ -325,27 +449,6 @@ public class PluginCoreServiceMonitor extends Plugin {
         return jObj;
     }
 
-	
-    /**
-     * CoreServiceMonitor service connection
-     */
-    private ServiceConnection coreServiceMonitorConnection = new ServiceConnection() {
-
-        public void onServiceDisconnected(ComponentName name) {
-        	Log.d(LOG_TAG, "Disconnecting from CoreServiceMonitor service");
-        	connectedtoCoreMonitor = false;
-        }
-
-        public void onServiceConnected(ComponentName name, IBinder service) {
-        	Log.d(LOG_TAG, "Connecting to CoreServiceMonitor service");
-        	//get a local binder
-            LocalBinder binder = (LocalBinder) service;
-            //obtain the service's API
-            coreServiceMonitor = (ICoreServiceMonitor) binder.getService();
-            connectedtoCoreMonitor = true;
-        }
-    };
-
     /**
      * Determine if the Javascript action is a valid.
      * 
@@ -357,11 +460,19 @@ public class PluginCoreServiceMonitor extends Plugin {
      */
     private boolean validRemoteCall(String action) {
     	boolean retValue = false;
-    	for (int i = 0; i < ICoreServiceMonitor.methodsArray.length; i++) {
-        	if (action.equals(ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, i))) {
-        		retValue = true;
+    	//CHECK IServiceDisovery METHODS
+    	for (int i = 0; i < IServiceDiscovery.methodsArray.length; i++) {
+        	if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, i))) {
+        		return true;
         	}
     	}
+    	//CHECK ICoreServiceMonitor METHODS
+    	for (int i = 0; i < ICoreServiceMonitor.methodsArray.length; i++) {
+        	if (action.equals(ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, i))) {
+        		return true;
+        	}
+    	}
+    	
     	if (!retValue) {
     		Log.d(LOG_TAG, "Unable to find method name for given action: " + action);
     	}
