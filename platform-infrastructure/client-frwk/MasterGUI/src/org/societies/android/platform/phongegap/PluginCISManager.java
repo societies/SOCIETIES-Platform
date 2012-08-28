@@ -44,7 +44,11 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.provider.Contacts.People;
+import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
 
@@ -125,13 +129,20 @@ public class PluginCISManager extends Plugin {
 		Log.d(LOG_TAG, "execute: " + action + " for callback: " + callbackId);
 
 		
-
+		
 		PluginResult result = null;
 
 		if (action.equals(CREATE_CIS)) {
 
+			Log.d(LOG_TAG, "create cis inside cis plugin");
 			ContentResolver cr = this.ctx.getContentResolver();
-			AsynchronousQueryHandler qr = new AsynchronousQueryHandler(cr);
+			/*Log.d(LOG_TAG, "run async");
+			RunAsync ru = new RunAsync(cr);
+			Log.d(LOG_TAG, "run");
+			this.ctx.runOnUiThread(ru);
+			Log.d(LOG_TAG, "runt");
+			AsynchronousQueryHandler qr = ru.getQr();
+			Log.d(LOG_TAG, "async handler");*/
 			
 			ContentValues createCISValue = new ContentValues();
 			createCISValue.put(SocialContract.Community.GLOBAL_ID , "flamengo.societies.org");
@@ -143,16 +154,20 @@ public class PluginCISManager extends Plugin {
 			createCISValue.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
 			createCISValue.put(SocialContract.Community.DIRTY , "yes");
 			
+			cr.query(RawContacts.CONTENT_URI, null, null, null, null);
 			
 			Uri COMUNITIES_URI = Uri.parse(COMUNITIES__STRING_URI);
-			qr.startInsert(1, callbackId, COMUNITIES_URI, createCISValue);
+			Log.d(LOG_TAG, "before start insert");
+			cr.insert(COMUNITIES_URI, createCISValue);
+			Log.d(LOG_TAG, "inserted ok");
+			//qr.startInsert(1, callbackId, COMUNITIES_URI, createCISValue);
 			
 
-			//this.methodCallbacks.put(action, callbackId);
-
-			result = new PluginResult(PluginResult.Status.NO_RESULT);
-			result.setKeepCallback(true);
-
+			//result = new PluginResult(PluginResult.Status.NO_RESULT);
+			//result.setKeepCallback(true);
+			result = new PluginResult(PluginResult.Status.OK);
+			result.setKeepCallback(false);
+			Log.d(LOG_TAG, "going to return");
 
             return result;
 		} 
@@ -167,6 +182,27 @@ public class PluginCISManager extends Plugin {
 	 */
 	public void onDestroy() {
 		disconnectServiceBinding();
+	}
+	
+	class RunAsync implements Runnable{
+
+		ContentResolver cr;
+		AsynchronousQueryHandler qr;
+		
+		RunAsync(ContentResolver cr){
+			this.cr = cr;
+		}
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			qr = new AsynchronousQueryHandler(cr);
+		}
+		
+		public AsynchronousQueryHandler getQr(){
+			return qr;
+		}
+		
 	}
 	
 	
@@ -226,6 +262,10 @@ public class PluginCISManager extends Plugin {
 	   				PluginResult result = new PluginResult(PluginResult.Status.OK, cisJson); // TODO: change last string to json cis
 	   				result.setKeepCallback(false);
 	   				PluginCISManager.this.success(result, cookie.toString());
+	   				
+//	   				Handler handler = new Handler(Looper.getMainLooper());
+//	   				handler.getLooper().getThread().
+	   				
     			} else {
     			  // content Uri was invalid or some other error occurred 
     			}

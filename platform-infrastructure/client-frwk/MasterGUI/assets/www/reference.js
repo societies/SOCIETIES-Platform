@@ -401,17 +401,33 @@ var Societies = {
 			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 			 * @returns CIS record
 			 */
-			crateCIS: function(successCallback, failureCallback) {
+			createCIS: function(successCallback, failureCallback) {
 				var clientPackage = "org.societies.android.platform.gui";
+				
+				var cisRecord = {
+	                    "cisName": jQuery("#cisname").val(),
+	                    "cisType": "futebol",
+	                    "cisCriteria": [{
+	                        "attribute": "location",
+	                        "operation": "equals",
+	                        "value": "Paris"}],
+	                    "cisDescription": "desc",
+	                    "cisJid" : null
+	                    }
 
-				console.log("Call CoreServiceMonitorService - activeTasks");
+				console.log("Call LocalCISManagerService - createCIS");
+
 
 				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-				failureCallback,     //Callback which will be called when plugin action encounters an error
-				'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
-				'activeTasks',              //Telling the plugin, which action we want to perform
-				["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
+						failureCallback,     //Callback which will be called when plugin action encounters an error
+						'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+						'createCIS',          //Telling the plugin, which action we want to perform
+						[cisRecord]);        //Passing a list of arguments to the plugin
 			}
+		
+		
+
+		
 		
 		},
 			
@@ -476,40 +492,7 @@ var Societies = {
 				'readCSSRecord',          //Telling the plugin, which action we want to perform
 				[]);        //Passing a list of arguments to the plugin
 			},
-
-			
-			/**
-			 * @methodOf Societies.LocalCSISManagerService#
-			 * @description Create a CIS
-			 * @param {Object} successCallback The callback which will be called when result is successful
-			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-			 * @returns CIS record 
-			 */
-			createCIS: function(successCallback, failureCallback) {
-				var client = "org.societies.android.platform.gui";
-				var cisRecord = {
-						String cisName, String cisType, Hashtable<String, MembershipCriteria> cisCriteria, String description);
-				                    "cisName": jQuery("#cisname").val(),
-				                    "cisType": "futebol",
-				                    "cisCriteria": [{
-				                        "attribute": "location",
-				                        "operation": "equals",
-				                        "value": "Paris"}],
-				                    "cisDescription": "desc",
-				                    "cisJid" : null
-				                    }
-
-
-				console.log("Call LocalCISManagerService - createCIS");
-
-				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-				failureCallback,     //Callback which will be called when plugin action encounters an error
-				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
-				'createCIS',          //Telling the plugin, which action we want to perform
-				[client, cisRecord]);        //Passing a list of arguments to the plugin
-			},
-
-			
+		
 			
 			/**
 			 * @methodOf Societies.LocalCSSManagerService#
@@ -1000,7 +983,7 @@ var SocietiesGUI = {
 		 * @returns null
 		 */
 
-		successfulCreateCIS: function() {
+		guiCreateCIS: function() {
 			console.log("create CIS");
 
 			function success(data) {
@@ -1014,7 +997,7 @@ var SocietiesGUI = {
 			}
 			
 			function failure(data) {
-				alert("successfulLogin - failure: " + data);
+				alert("createCIS - failure: " + data);
 			}
 		    window.plugins.LocalCISManagerService.createCIS(success, failure);
 
@@ -1332,26 +1315,27 @@ var SocietiesGUI = {
 				jQuery('#cssNodesTable').append(tableEntry);
 			}
 
+		},
+		
+		
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Populate the CIS Record page
+		 * @returns null
+		 */
+		populateCISRecordpage: function(data) {
+			var status = ["Available for Use", "Unavailable", "Not active but on alert"];
+			var type = ["Android based client", "Cloud Node", "JVM based client"];
+			
+			jQuery("#cisowner").val(data.cisOwner);
+			jQuery("#cisrecordidentity").val(data.cisRecordIdentity);
+			jQuery("#cisname").val(data.cisName);
+
 		}
 
 };
 
-/**
- * @methodOf SocietiesGUI#
- * @description Populate the CIS Record page
- * @returns null
- */
-populateCISRecordpage: function(data) {
-	var status = ["Available for Use", "Unavailable", "Not active but on alert"];
-	var type = ["Android based client", "Cloud Node", "JVM based client"];
-	
-	jQuery("#cisowner").val(data.cisOwner);
-	jQuery("#cisrecordidentity").val(data.cisRecordIdentity);
-	jQuery("#cisname").val(data.cisName);
 
-}
-
-};
 
 /**
  * JQuery boilerplate to attach JS functions to relevant HTML elements
@@ -1384,7 +1368,7 @@ jQuery(function() {
 	});
 
 	$('#createCIS').click(function() {
-			SocietiesGUI.connectToLocalCISManager(SocietiesGUI.successfulCreateCIS);
+			SocietiesGUI.guiCreateCIS();
 	});
 
 /*

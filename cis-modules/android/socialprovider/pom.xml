@@ -67,10 +67,6 @@
 			<version>${version.comm}</version>
 		</dependency>
         <dependency>
-            <groupId>com.phonegap</groupId>
-            <artifactId>phonegap</artifactId>
-        </dependency>
-        <dependency>
 	    	<groupId>org.societies.utilities</groupId>
 	    	<artifactId>DBC</artifactId>
 	    	<version>${release.version}</version>
