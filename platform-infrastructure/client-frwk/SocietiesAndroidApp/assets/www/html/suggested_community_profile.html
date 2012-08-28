@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+<link rel="stylesheet" type="text/css" href="includes/custom-theme-societies.css"/>
+<link href="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="includes/societies.css"/>
+<script src="jquery-mobile/jquery-1.7.2.js" type="text/javascript"></script>
+<script src="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.min.js" type="text/javascript"></script>
+<!--JQM SlideMenu-->
+<link rel="stylesheet" href="includes/jqm.css"/>
+<script src="js/jqm.slidemenu.js"></script>
+</head>
+<body>
+<div id="slidemenu">
+	<h3>MENU</h3>
+	<ul>
+		<li><a href="#" rel="external">Inbox</a></li>
+		<li><a href="#" rel="external">Chat</a></li>
+		<li><a href="#" rel="external">RSS Feeds</a></li>
+		<li><a href="#" rel="external">Help</a></li>
+		<li><a href="#" rel="external">Log Out</a></li>
+	</ul>
+</div>
+<!-- Start of first page: #friends -->
+<div data-role="page" id="friends">
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="images/societies_header.png" alt="logo" />
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
+		<!-- /header -->
+	</div>
+	<div data-role="content">
+		<ul data-role="listview" data-theme="c" data-divider-theme="b">
+			<li data-role="list-divider">General Information</li>
+			<li>
+			<div class="profile_pic">
+				<img src="images/community_profile_img_relevance.png" alt="community icon" />
+			</div>
+			<div class="star_rating">
+			</div>
+			<div class="profile_txt">
+				<h1>ICT</h1>
+				<p>
+					Category: ICT
+				</p>
+				<p>
+					Location:Dublin, Ireland
+				</p>
+				<p>
+					Admin: Sara Weber
+				</p>
+			</div>
+			<p>
+				<a href="join_community_notification.html" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Join </a>
+			</p>
+			</li>
+			<li data-role="list-divider">Additional Info</li>
+			<li>
+			<br/>
+			<p>
+				Societies ICT Community
+			</p>
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a nulla nunc. <br/> Cras elit nulla, varius vitae blandit sed, hendrerit vel nibh. Curabitur commodo vulputate dolor, sit amet lacinia felis ullamcorper ut.
+			</p>
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br/> Fusce a nulla nunc. Cras elit nulla, varius vitae blandit sed, hendrerit vel nibh. Curabitur commodo vulputate dolor, sit amet lacinia felis ullamcorper ut.
+			</p>
+			</li>
+		</ul>
+	</div>
+	<!-- /content -->
+	<br/><br/>
+	<!-- footer -->
+	<div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home"><a href="landing.html">
+			<span class="ico"><img src="images/icons/home_logo.png" alt="home"/></span>
+			</a>
+			</li>
+			<li class="btn-profile"><a href="myProfile.html">
+			<span class="ico"><img src="images/icons/my_profile.png" alt="profile"/></span>
+			</a>
+			</li>
+			<li class="btn-settings"><a href="settings.html">
+			<span class="ico"><img src="images/icons/settings.png" alt="settings"/></span>
+			</a>
+			</li>
+			<li class="btn-about"><a href="about.html">
+			<span class="ico"><img src="images/icons/about.png" alt="about"/></span>
+			</a>
+			</li>
+		</ul>
+	</div>
+	<!-- end footer -->
+</div>
+</body>
+</html>

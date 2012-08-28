@@ -1,7 +1,7 @@
 phonegapdesktop.internal.parseConfigFile('pluginjs/preferences.json');
 
 
-window.plugins.AppPreferences = {
+window.plugins.SocietiesAppPreferences = {
 		getStringPrefValue: function(successCallback, errorCallback, prefName){
 			if (phonegapdesktop.internal.randomException("Preferences")) {
 				errorCallback('A random error was generated');
