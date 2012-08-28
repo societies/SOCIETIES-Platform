@@ -22,42 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.webapp.models;
+package org.societies.api.identity;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
- * Describe your class here...
+ * Util method that helps manipulating DataIdentifier objects
  *
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  *
  */
-public class PrivacyActionForm extends Action {
-
-	public PrivacyActionForm() {
-		this(ActionConstants.READ);
-	}
+public class DataTypeFactory {
 	/**
-	 * @param action
+	 * Create the relevant data type using a correct URI
+	 *
+	 * @param dataIdUri URI format sheme://ownerId/type
+	 * @return the relevant DataIdentifier type instance
+	 * @throws MalformedCtxIdentifierException 
 	 */
-	public PrivacyActionForm(ActionConstants action) {
-		super(action);
-		// TODO Auto-generated constructor stub
-	}
-	/**
-	 * @param read
-	 * @param b
-	 */
-	public PrivacyActionForm(ActionConstants action, boolean optional) {
-		super(action, optional);
-	}
-	
-	public ActionConstants getAction() {
-		return super.getActionType();
-	}
-	public void setAction(ActionConstants action) {
-		this.action = action;
-	}
+	public static DataIdentifier fromUri(String dataIdUri) throws MalformedCtxIdentifierException
+	{
+		String[] uri = dataIdUri.split("://");
+		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
 
+		DataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(scheme);
+		String path = uri[1];
+		int pos = 0, end = 0;
+		if ((end = path.indexOf('/', pos)) >= 0) {
+			dataId.setOwnerId(path.substring(pos, end));
+		}
+		dataId.setType(path.substring(end+1, path.length()));
+		return dataId;
+	}
 }
