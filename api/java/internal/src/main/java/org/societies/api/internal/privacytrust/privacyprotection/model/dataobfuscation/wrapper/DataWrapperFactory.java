@@ -29,6 +29,7 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 
 /**
@@ -48,6 +49,9 @@ public class DataWrapperFactory {
 	 * @throw RuntimeException
 	 */
 	public static IDataWrapper selectDataWrapper(CtxAttribute contextData) throws RuntimeException{
+		if (null == contextData || null == contextData.getId() || null == contextData.getId().getType()) {
+			return null;
+		}
 		if (CtxAttributeTypes.LOCATION_COORDINATES.equals(contextData.getId().getType())) {
 			return getLocationCoordinatesWrapper(contextData.getDoubleValue(), 0, 0);
 		}
@@ -68,6 +72,7 @@ public class DataWrapperFactory {
 	 */
 	public static IDataWrapper<LocationCoordinates> getLocationCoordinatesWrapper(double latitude, double longitude, double accuracy) {
 		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
 		dataId.setType(CtxAttributeTypes.LOCATION_COORDINATES);
 		LocationCoordinates data = new LocationCoordinates(latitude, longitude, accuracy);
 		return new DataWrapper<LocationCoordinates>(dataId, data);
@@ -93,6 +98,7 @@ public class DataWrapperFactory {
 			String department, String region, String country, String continent,
 			String planet) {
 		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
 		dataId.setType(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		PostalLocation data = new PostalLocation(logicalName, streetNumber, streetName, district, town, postalCode, department, region, country, continent, planet);
 		return new DataWrapper<PostalLocation>(dataId, data);
@@ -110,6 +116,7 @@ public class DataWrapperFactory {
 	 */
 	public static IDataWrapper<Name> getNameWrapper(String firstName, String lastName) {
 		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
 		dataId.setType(CtxAttributeTypes.NAME);
 		Name data = new Name(firstName, lastName);
 		return new DataWrapper<Name>(dataId, data);
@@ -126,6 +133,7 @@ public class DataWrapperFactory {
 	 */
 	public static IDataWrapper<Temperature> getTemperatureWrapper(double degree) {
 		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
 		dataId.setType(CtxAttributeTypes.TEMPERATURE);
 		Temperature data = new Temperature(degree);
 		return new DataWrapper<Temperature>(dataId, data);
@@ -138,6 +146,7 @@ public class DataWrapperFactory {
 	 */
 	public static IDataWrapper<Temperature> getTemperatureWrapper(String degree) {
 		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
 		dataId.setType(CtxAttributeTypes.TEMPERATURE);
 		Temperature data = new Temperature(degree);
 		return new DataWrapper<Temperature>(dataId, data);
@@ -155,6 +164,7 @@ public class DataWrapperFactory {
 	 */
 	public static IDataWrapper<Activity> getActivityWrapper(String actor, String verb, String object) {
 		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
 		dataId.setType(CtxAttributeTypes.ACTION);
 		Activity data = new Activity();
 		data.setActor(actor);
@@ -173,6 +183,7 @@ public class DataWrapperFactory {
 	 */
 	public static IDataWrapper<Status> getStatusWrapper(String status) {
 		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
 		dataId.setType(CtxAttributeTypes.STATUS);
 		Status data = new Status(status);
 		return new DataWrapper<Status>(dataId, data);

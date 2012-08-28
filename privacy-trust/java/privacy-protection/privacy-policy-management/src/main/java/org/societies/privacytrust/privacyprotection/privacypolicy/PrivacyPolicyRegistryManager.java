@@ -69,7 +69,7 @@ public class PrivacyPolicyRegistryManager {
 	private PrivacyPolicyRegistry policyRegistry;
 	private ICtxBroker ctxBroker;
 
-	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private Logger logging = LoggerFactory.getLogger(this.getClass().getSimpleName());
 	private IIdentity myPublicDPI;
 	private IIdentityManager idm;
 
@@ -349,7 +349,7 @@ public class PrivacyPolicyRegistryManager {
 		}	
 	}
 	private void log(String message){
-		this.logging.info(this.getClass().getName()+" : "+message);
+		this.logging.info(message);
 	}
 
 	private void storePolicyToFile(RequestPolicy policy){

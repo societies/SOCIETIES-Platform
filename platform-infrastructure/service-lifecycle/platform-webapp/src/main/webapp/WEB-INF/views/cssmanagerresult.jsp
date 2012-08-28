@@ -22,7 +22,7 @@ Tabview code from www.javascriptsource.com css tab-view.html -->div.TabView div.
 div.TabView div.Tabs a {
 	float: left;
 	display: block;
-	width: 200px;
+	width: 150px;
 	text-align: left;
 	height: 24px;
 	line-height: 28px;
@@ -89,7 +89,7 @@ div.TabView div.Pages div.Page div.Pad {
 
 		<div class="Tabs" style="width: 800px;">
 			<a>&nbsp; &nbsp; Css Admin </a> <a>&nbsp; &nbsp; Yellow Pages</a> <a>&nbsp; &nbsp; Services</a> <a>&nbsp; &nbsp; Css 
-				Requests</a>
+				Requests</a> <a>&nbsp; &nbsp; Css Friends </a>
 		</div>
 
 		<!-- *** Pages ************************************************************* -->
@@ -808,57 +808,32 @@ div.TabView div.Pages div.Page div.Pad {
 						
 						</table>
 						
-						
-<!--  
-<xc:forEach var="cssPendingRequests" items="${cssPendingRequests}">
-							<tr>
-								<td>${cssPendingRequests.cssIdentity}</td>
-								<td>${cssPendingRequests.requestStatus}</td>
-
-								
-								
-								
-							
-
-
-							<xc:if test="${cssPendingRequests.cssRequestObj.status == 'PENDING'}">
-									
-									<td>
-										<form:radiobutton type="radio"
-											path="${cssPendingRequests.value}"
-											value="1"  /> Accept<br />
-										</td>
-										<form:radiobutton type="radio"
-											path="${cssPendingRequests.value}"
-											value="2"  /> Reject<br />
-										</td>
-										<td><form:errors path="${cssPendingRequests.value}" cssClass="error" /></td>
-									</xc:if>
-									<xc:if test="${cssPendingRequests.adRecObj.status == 'ACCEPTED'}">
-									<td>
-										<form:radiobutton type="radio"
-											path="${cssPendingRequests.value}"
-											value="3"  /> Cancel<br />
-										</td>
-										<td><form:errors path="${cssPendingRequests.value}" cssClass="error" /></td>
-									</xc:if>
-									
-	
-
-
-
-
-
-								</tr>
-							</xc:forEach>
--->
-						</table>
-						
-
-					
 
 					<!-- *** Page3 End ***** -->
 
+				</div>
+			</div>
+<div class="Page">
+				<div class="Pad">
+
+					<!-- *** Page5 Start *** -->
+						<table>
+						<tr> 
+							<td> 
+								Just Temporary screen to show that new functionality working 
+							</td>
+						</tr>
+						<xc:forEach var="cssFriend" items="${cssFriends}">
+        				<tr>
+        					<td>${cssFriend}</td>
+        				</tr>	
+        				</xc:forEach>
+						</table>
+						
+					<!-- *** Page5 End ***** -->
+
+					</table>
+						
 				</div>
 			</div>
 

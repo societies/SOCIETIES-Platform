@@ -59,6 +59,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
@@ -70,6 +71,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.comm.xmpp.xc.impl.CommManagerHelper;
 import org.societies.webapp.models.PrivacyPolicyForm;
 
@@ -79,6 +81,9 @@ public class PrivacyPolicyController {
 
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyController.class);
 
+	private static String[] resourceList;
+	private static String[] resourceHumanList;
+	
 	/**
 	 * OSGI service get auto injected
 	 */
@@ -102,10 +107,13 @@ public class PrivacyPolicyController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		PrivacyPolicyForm privacyPolicyFrom = new PrivacyPolicyForm();
 		privacyPolicyFrom.createEmptyPrivacyPolicyFrom();
+		generateResourceLists();
 		model.put("privacyPolicy", privacyPolicyFrom);
 		model.put("ActionList", ActionConstants.values());
 		model.put("ConditionList", ConditionConstants.values());
-		model.put("ResourceTypeList", CtxAttributeTypes.class.getDeclaredFields());
+		model.put("ResourceList", resourceList);
+		model.put("ResourceHumanList", resourceHumanList);
+		model.put("ResourceSchemeList", DataIdentifierScheme.values());
 		return new ModelAndView("privacy/privacy-policy/update", model);
 	}
 
@@ -136,6 +144,9 @@ public class PrivacyPolicyController {
 			} catch (PrivacyException e) {
 				resultMsg.append("Error during privacy policy saving: "+e.getLocalizedMessage());
 				LOG.error("Error during privacy policy saving", e);
+			} catch (MalformedCtxIdentifierException e) {
+				resultMsg.append("Error during privacy policy saving: can't retrieve data type (scheme) "+e.getMessage());
+				LOG.error("Error during privacy policy saving: can't retrieve data type (scheme)", e);
 			}
 		}
 		else {
@@ -143,56 +154,29 @@ public class PrivacyPolicyController {
 			LOG.error("Error with dependency injection");
 		}
 
+
+
 		// -- Display the privacy policy
+		generateResourceLists();
 		model.put("privacyPolicy", privacyPolicyFrom);
 		model.put("ActionList", ActionConstants.values());
 		model.put("ConditionList", ConditionConstants.values());
-		model.put("ResourceTypeList", CtxAttributeTypes.class.getDeclaredFields());
+		model.put("ResourceList", resourceList);
+		model.put("ResourceHumanList", resourceHumanList);
+		model.put("ResourceSchemeList", DataIdentifierScheme.values());
 		model.put("ResultMsg", CtxAttributeTypes.class.getDeclaredFields());
 		return new ModelAndView("privacy/privacy-policy/update", model);
 	}
-	//
-	//	@SuppressWarnings("unchecked")
-	//	@RequestMapping(value = "/privacy-assessment-settings.html", method = RequestMethod.POST)
-	//	public ModelAndView privacyAssessmentSettings(@Valid PrivacyAssessmentForm assForm,
-	//			BindingResult result, Map model) {
-	//
-	//		LOG.debug("privacyAssessmentSettings HTTP POST");
-	//
-	//		if (result.hasErrors()) {
-	//			LOG.warn("BindingResult has errors");
-	//			model.put("result", "privacy assessment form error");
-	//			return new ModelAndView("error", model);
-	//		}
-	//
-	//		if (assessment == null) {
-	//			LOG.warn("Privacy Assessment Service reference not avaiable");
-	//			model.put("errormsg", "Privacy Assessment Service reference not avaiable");
-	//			return new ModelAndView("error", model);
-	//		}
-	//
-	//		int autoAssessmentPeriod = assForm.getAutoReassessmentInSecs();
-	//		boolean assessNow = assForm.isAssessNow();
-	//		LOG.debug("autoReassessmentInSecs = {}, assessNow = {}", autoAssessmentPeriod, assessNow);
-	//
-	//		try {
-	//			if (assessNow) {
-	//				assessment.assessAllNow();
-	//			}
-	//
-	//			if (!assForm.isAutoReassessment()) {
-	//				autoAssessmentPeriod = -1;
-	//			}
-	//			assessment.setAutoPeriod(autoAssessmentPeriod);
-	//		}
-	//		catch (Exception ex)
-	//		{
-	//			LOG.warn("", ex);
-	//		};
-	//
-	//		LOG.debug("privacyAssessmentSettings HTTP POST end");
-	//		return privacyAssessment();
-	//	}
+
+	public static void generateResourceLists() {
+		Field[] resourceTypeList = CtxAttributeTypes.class.getDeclaredFields();
+		resourceList = new String[resourceTypeList.length];
+		resourceHumanList = new String[resourceTypeList.length];
+		for(int i=0; i<resourceTypeList.length; i++) {
+			resourceList[i] = DataIdentifierScheme.CONTEXT+"://"+resourceTypeList[i].getName();
+			resourceHumanList[i] = DataIdentifierScheme.CONTEXT+": "+resourceTypeList[i].getName();
+		}
+	}
 
 	private boolean isDepencyInjectionDone() {
 		return isDepencyInjectionDone(0);

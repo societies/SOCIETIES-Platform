@@ -5,8 +5,9 @@
    <parent>
         <groupId>org.societies</groupId>
         <artifactId>android-parent</artifactId>
-        <version>0.1</version>
-        <relativePath>../../../parent/android.xml</relativePath>
+        <version>RELEASE</version>
+        <!-- <version>0.1</version> -->
+        <!-- <relativePath>../../../parent/android.xml</relativePath> -->
 	<!-- modify if project root directory different to other projects-->
    </parent>
 
@@ -34,12 +35,13 @@
 	    	<groupId>com.google.android</groupId>
            	<artifactId>android</artifactId> 
            	<exclusions>
-			<!-- Provided by Android -->
-			<exclusion>
-				<artifactId>xpp3</artifactId>
-				<groupId>xpp3</groupId>
-			</exclusion>
-		</exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+			<scope>provided</scope>
 	</dependency>
        <!--  <dependency>
             <groupId>com.phonegap</groupId>
@@ -49,46 +51,59 @@
 	    	<groupId>org.societies.api.external</groupId>
 	    	<artifactId>societies-api</artifactId>
 	    	<version>${release.version}</version>
+	    	<scope>provided</scope>
 		</dependency>
 		<dependency>
 		   <groupId>org.societies.api.internal</groupId>
 		   <artifactId>societies-api-internal</artifactId>
+		   <scope>provided</scope>
         </dependency>
         <dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
    			<groupId>org.societies.android.api.external</groupId>
    			<artifactId>societies-android-api</artifactId>
   			<version>${release.version}</version>
+  			<scope>provided</scope>
 		</dependency> 
+		<!-- <dependency>
+		    <groupId>org.societies</groupId>
+		    <artifactId>common-ext-libs</artifactId>
+		    <scope>provided</scope>
+		</dependency> -->
 		<dependency>
  			<groupId>org.slf4j</groupId>
   			<artifactId>slf4j-api</artifactId>
 			<version>1.6.2</version>
+			<scope>provided</scope>
 		</dependency>
-		
-		
+
+
         
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
 		    <version>${version.comm}</version>
+		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
 			<version>${version.comm}</version>
+			<scope>provided</scope>
 		</dependency>
-		
-		
-		
-		<dependency>
+
+
+
+		<!-- <dependency>
 			<groupId>org.asmack</groupId>
 	    	<artifactId>asmack</artifactId>
-		</dependency>
+	    	<scope>provided</scope>
+		</dependency> -->
 		<!--dependency>
 	    	<groupId>org.societies.android.jaxb</groupId>
 	    	<artifactId>jaxb-android-societies</artifactId>
@@ -113,20 +128,20 @@
 				<!-- StAX is not available on Android -->
 				<exclusion>
 					<artifactId>stax</artifactId>
-			        	<groupId>stax</groupId>
+			       	<groupId>stax</groupId>
 				</exclusion>
-			<exclusion>
-			<artifactId>stax-api</artifactId>
-			<groupId>stax</groupId>
-			</exclusion>
-			    <!-- Provided by Android -->
-			<exclusion>
-			<artifactId>xpp3</artifactId>
-			        <groupId>xpp3</groupId>
-			</exclusion>
-		</exclusions>
-	</dependency>
-
+				<exclusion>
+					<artifactId>stax-api</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+			   	<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+			       	<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+			<scope>provided</scope>	
+		</dependency>
     </dependencies>
 
     <build>

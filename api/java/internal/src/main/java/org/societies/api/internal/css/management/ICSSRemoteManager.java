@@ -176,4 +176,8 @@ public interface ICSSRemoteManager {
 	
 		/* Called by remote css is response t your request to join*/
 		void updateCssRequest(CssRequest request);
+		
+		/* Get a list of Friend Css's from cloud Css Manger */
+		void getCssFriends(ICSSManagerCallback callback);
+		
 }

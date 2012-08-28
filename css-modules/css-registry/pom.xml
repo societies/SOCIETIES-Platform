@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	<properties>
 		<slf4j-version>1.6.4</slf4j-version>
@@ -34,7 +34,6 @@
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
-			<version>0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		
@@ -42,7 +41,6 @@
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>hibernate_classes</artifactId>
-			<version>0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		
@@ -65,13 +63,11 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	

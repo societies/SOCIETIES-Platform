@@ -81,15 +81,26 @@ text-align: center
 				<form:label path="resources[${status.index}].resourceType">Resource Type</form:label>
 				<form:select path="resources[${status.index}].resourceType" class="resources${status.index}resourceType">
 					<option value="NONE">--- Select ---</option>
-					<c:forEach var="resourceType" items="${ResourceTypeList}">
-						<form:option value="${resourceType.name}">${resourceType.name}</form:option>
+					<c:forEach var="resourceType" items="${ResourceList}" varStatus="statusResource">
+						<form:option value="${ResourceHumanList[statusResource.index]}">${resourceType}</form:option>
 					</c:forEach>
 				</form:select>
 				<form:errors path="resources[${status.index}].resourceType" cssClass="error" />
 				<form:label path="resources[${status.index}].resourceTypeCustom" class="inline">or tip a custom one</form:label>
+				<!--Scheme-->
+				<form:select path="resources[${status.index}].resourceSchemeCustom" class="resources${status.index}resourceSchemeCustom">
+					<option value="NONE">--- Select ---</option>
+					<c:forEach var="resourceScheme" items="${ResourceSchemeList}">
+						<form:option value="${resourceScheme.name}">${resourceScheme.name}</form:option>
+					</c:forEach>
+				</form:select>
+				<span class="resources${status.index}resourceSchemeError error"></span>
+				<form:errors path="resources[${status.index}].resourceSchemeCustom" cssClass="error" />
+				<!-- Type -->
 				<form:input path="resources[${status.index}].resourceTypeCustom"  class="resources${status.index}resourceTypeCustom" placeholder="e.g. mood"/>
 				<span class="resources${status.index}resourceTypeError error"></span>
 				<form:errors path="resources[${status.index}].resourceTypeCustom" cssClass="error" />
+				
 				
 				<div class="clear"></div>
 
@@ -184,7 +195,9 @@ text-align: center
 	$(document).ready(function(){
 		var actionList = [<c:forEach var="action" items="${ActionList}">"${action}", </c:forEach>];
 		var conditionList = [<c:forEach var="condition" items="${ConditionList}">"${condition}", </c:forEach>];
-		var resourceTypeList = [<c:forEach var="resourceType" items="${ResourceTypeList}">"${resourceType.name}", </c:forEach>];
+		var resourceTypeList = [<c:forEach var="resourceType" items="${ResourceList}">"${resourceType}", </c:forEach>];
+		var resourceTypeHumanList = [<c:forEach var="resourceType" items="${ResourceHumanList}">"${resourceType}", </c:forEach>];
+		var resourceSchemeList = [<c:forEach var="resourceScheme" items="${ResourceSchemeList}">"${resourceScheme.name}", </c:forEach>];
 		var lastResourceId = ${fn:length(privacyPolicy.resources)};
 		
 		// -- Update a privacy policy
@@ -234,15 +247,33 @@ text-align: center
 					.appendTo(selectResourceType);
 			for(var i=0; i<resourceTypeList.length; i++) {
 				$('<option>').attr('value', resourceTypeList[i])
-							.html(resourceTypeList[i])
+							.html(resourceTypeHumanList[i])
 							.appendTo(selectResourceType);
 			}
 			selectResourceType.appendTo(newRequestedData);
-			// Resource Custom Type
+			// Resource Custom Type and Scheme
 			$('<label>').attr('for', 'resources'+lastResourceId+'.resourceTypeCustom')
 						.addClass('inline')
 						.html('or tip a custom one')
 						.appendTo(newRequestedData);
+			// Scheme
+			var selectResourceSchemeCustom = $('<select>').attr('name', 'resources['+lastResourceId+'].resourceSchemeCustom')
+						.addClass('resources'+lastResourceId+'resourceSchemeCustom')
+						.attr('id', 'resources'+lastResourceId+'.resourceSchemeCustom');
+			$('<option>').attr('value', 'NONE')
+					.html('--- Select ---')
+					.appendTo(selectResourceSchemeCustom);
+			for(var i=0; i<resourceSchemeList.length; i++) {
+				$('<option>').attr('value', resourceSchemeList[i])
+							.html(resourceSchemeList[i])
+							.appendTo(selectResourceSchemeCustom);
+			}
+			selectResourceSchemeCustom.appendTo(newRequestedData);
+			// Resource scheme error
+			$('<span>').addClass('resources'+lastResourceId+'resourceSchemeError')
+						.addClass('error')
+						.appendTo(newRequestedData);
+			// Type
 			$('<input>').attr('type', 'text')
 						.attr('name', 'resources['+lastResourceId+'].resourceTypeCustom')
 						.attr('id', 'resources'+lastResourceId+'.resourceTypeCustom')
