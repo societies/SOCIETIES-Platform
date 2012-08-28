@@ -12,23 +12,26 @@
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>useragent</artifactId>
-   <version>${version.ua}</version> 
-   <name>Android-user-agent</name>
+   <artifactId>personalisation</artifactId>
+   <version>${version.pm}</version> 
+   <name>Android-personalisation</name>
    <packaging>apk</packaging>
    
    
    
 	<developers>
-	    <developer>
-	      <name>S Gallacher</name>
-	      <email>S.Gallacher@hw.ac.uk</email>
-	      <organization>HWU</organization>
-	      <roles>
-	        <role>senior developer</role>
-	      </roles>
-	    </developer>
-	</developers>	
+		<developer>
+			<name>Elizabeth Papadopoulou</name>
+			<email>E.Papadopoulou@hw.ac.uk</email>
+			<organization>HWU</organization>
+			<organizationUrl>http://www.hw.ac.uk/</organizationUrl>
+			<roles>
+				<role>Senior Developer</role>
+			</roles>
+			<timezone>+0</timezone>
+		</developer>
+	</developers>
+
 
     <dependencies>
 	<dependency>
