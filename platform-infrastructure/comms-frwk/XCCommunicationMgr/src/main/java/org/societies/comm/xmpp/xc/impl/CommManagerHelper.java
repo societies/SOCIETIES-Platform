@@ -104,7 +104,8 @@ public class CommManagerHelper {
 	private SAXReader reader = new SAXReader(); // TODO the sax reader is not threadsafe either so I turned every method where it is used to synchronized :(
 
 	private final Map<String, IFeatureServer> featureServers = new HashMap<String, IFeatureServer>();
-	private final Map<String, ICommCallback> commCallbacks = new HashMap<String, ICommCallback>();
+	private final Map<String, ICommCallback> iqCommCallbacks = new HashMap<String, ICommCallback>();
+	private final Map<String, ICommCallback> nsCommCallbacks = new HashMap<String, ICommCallback>();
 	private final Map<String, String> nsToPackage = new HashMap<String, String>();
 	
 	private final Map<String, HostedNode> localToplevelNodes = new HashMap<String, HostedNode>();
@@ -231,10 +232,22 @@ public class CommManagerHelper {
 		return (IFeatureServer) ifNotNull(featureServers.get(removeFragment(namespace)),
 				"namespace", namespace);
 	}
-
-	private ICommCallback getCommCallback(String namespace)
+	
+	private IFeatureServer getMessageFeatureServer(String namespace)
 			throws UnavailableException {
-		return (ICommCallback) ifNotNull(commCallbacks.get(removeFragment(namespace)),
+		return (IFeatureServer) ifNotNull(featureServers.get(namespace),
+				"namespace", namespace);
+	}
+
+	private ICommCallback getCommCallback(String iqId)
+			throws UnavailableException {
+		return (ICommCallback) ifNotNull(iqCommCallbacks.get(iqId),
+				"IQ id", iqId);
+	}
+	
+	private ICommCallback getMessageCommCallback(String namespace)
+			throws UnavailableException {
+		return (ICommCallback) ifNotNull(nsCommCallbacks.get(namespace),
 				"namespace", namespace);
 	}
 
@@ -401,11 +414,11 @@ public class CommManagerHelper {
 			Object bean = s.read(c, element.asXML());
 			
 			try {
-				ICommCallback cb = getCommCallback(namespace);
-				cb.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
-			} catch (UnavailableException e) {
-				IFeatureServer fs = getFeatureServer(namespace);
+				IFeatureServer fs = getMessageFeatureServer(namespace);
 				fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
+			} catch (UnavailableException e) {
+				ICommCallback cb = getMessageCommCallback(namespace);
+				cb.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
 			}
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
@@ -432,7 +445,7 @@ public class CommManagerHelper {
 			Document document = reader.read(is);
 			IQ iq = TinderUtils.createIQ(stanza, type); // ???
 			iq.getElement().add(document.getRootElement());
-			commCallbacks.put(iq.getID(), callback);
+			iqCommCallbacks.put(iq.getID(), callback);
 			return iq;
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending IQ message", e);
@@ -461,18 +474,20 @@ public class CommManagerHelper {
 
 	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
-		for (String ns : fs.getXMLNamespaces()) {
-			LOG.info("registering FeatureServer for namespace " + ns);
-			featureServers.put(ns, fs);
-		}
+//		for (String ns : fs.getXMLNamespaces()) {
+//			LOG.info("registering FeatureServer for namespace " + ns);
+//			featureServers.put(ns, fs);
+//		}
+		featureServers.put(fs.getXMLNamespaces().get(0), fs);
 	}
 	
 	public void register(ICommCallback messageCallback) throws CommunicationException {
 		jaxbMapping(messageCallback.getXMLNamespaces(), messageCallback.getJavaPackages());
-		for (String ns : messageCallback.getXMLNamespaces()) {
-			LOG.info("registering CommCallback for namespace" + ns);
-			commCallbacks.put(ns, messageCallback);
-		}
+//		for (String ns : messageCallback.getXMLNamespaces()) {
+//			LOG.info("registering CommCallback for namespace" + ns);
+//			iqCommCallbacks.put(ns, messageCallback);
+//		}
+		nsCommCallbacks.put(messageCallback.getXMLNamespaces().get(0), messageCallback);
 	}
 	
 	private void jaxbMapping(List<String> namespaces, List<String> packages) throws CommunicationException {
@@ -629,7 +644,7 @@ public class CommManagerHelper {
 		} catch (DocumentException e) {
 			throw new CommunicationException("Error building disco#info request", e);
 		}
-		commCallbacks.put(infoIq.getID(), callback);
+		iqCommCallbacks.put(infoIq.getID(), callback);
 		return infoIq;
 	}
 
@@ -647,7 +662,7 @@ public class CommManagerHelper {
 		} catch (DocumentException e) {
 			throw new CommunicationException("Error building disco#items request", e);
 		}
-		commCallbacks.put(itemsIq.getID(), callback);
+		iqCommCallbacks.put(itemsIq.getID(), callback);
 		return itemsIq;
 	}	
 }
