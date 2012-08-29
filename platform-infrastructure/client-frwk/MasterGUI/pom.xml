@@ -5,8 +5,7 @@
    <parent>
         <groupId>org.societies</groupId>
         <artifactId>android-parent</artifactId>
-        <version>0.1</version>
-        <relativePath>../../../parent/android.xml</relativePath>
+        <version>RELEASE</version>
    </parent>
 
    <groupId>org.societies.android.platform.gui</groupId>
@@ -65,35 +64,6 @@
 		</dependency>
 	
 	
-		<!--dependency>
- 			<groupId>org.slf4j</groupId>
-  			<artifactId>slf4j-api</artifactId>
-			<version>1.6.2</version>
-		</dependency-->	
-	
-		<!--dependency>
-	    	<groupId>xerces</groupId>
-	    	<artifactId>xercesImpl</artifactId>
-	    	<version>2.10.0</version>
-	    	<exclusions>
-				<exclusion>
-		    		<groupId>xml-apis</groupId> 
-		    		<artifactId>xml-apis</artifactId>
-				</exclusion>
-	    	</exclusions>
-		</dependency-->
-		
-		<!--dependency>
-	    	<groupId>org.societies.android.jaxb</groupId>
-	    	<artifactId>jaxb-android-societies</artifactId>
-	    	<version>0.1</version>
-		</dependency-->
-
-		<!--dependency>
-	    	<groupId>org.societies.comm.android</groupId>
-	    	<artifactId>JaxbAndroidApi</artifactId>
-	    	<version>${version.comm}</version>
-		</dependency-->
 	<dependency>
 		<groupId>org.simpleframework</groupId>
 		<artifactId>simple-xml</artifactId>
