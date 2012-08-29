@@ -26,7 +26,6 @@ package org.societies.platform.socialdata.converters;
 
 import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
-import org.apache.shindig.social.opensocial.model.Address;
 import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
@@ -34,65 +33,66 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Describe your class here...
+ * Convert data from Google+ in JSON to Person.
  *
  * @author Edgar Domingues (PTIN)
  *
  */
 public class PersonConverterFromGooglePlus implements PersonConverter {
 
-	public static String ID = "id";
-	public static String DISPLAY_NAME = "displayName";
-	public static String NAME = "name";
-	public static String FORMATTED = "formatted";
-	public static String FAMILY_NAME = "familyName";
-	public static String GIVEN_NAME = "givenName";
-	public static String MIDDLE_NAME = "middleName";
-	public static String HONORIFIC_PREFIX = "honorificPrefix";
-	public static String HONORIFIC_SUFFIX = "honorificSufix";
-	public static String NICKNAME = "nickname";
-	public static String GENDER = "gender";
-	public static String MALE = "male";
-	public static String FEMALE = "female";
-	public static String OTHER = "other";
-	public static String BIRTHDAY = "birthday";
-	public static String CURRENT_LOCATION = "currentLocation";
-	public static String URL = "url";
-	public static String IMAGE = "image";
-	public static String LANGUAGES_SPOKEN = "languagesSpoken";
-	public static String HAS_APP = "hasApp";
-	public static String ABOUT_ME = "aboutMe";
-	public static String RELATIONSHIP_STATUS = "relationshipStatus";
-	public static String SINGLE = "single";
-	public static String IN_A_RELATIONSHIP = "in_a_relationship";
-	public static String ENGAGED = "engaged";
-	public static String MARRIED = "married";
-	public static String ITS_COMPLICATED = "its_complicated";
-	public static String OPEN_RELATIONSHIP = "open_relationship";
-	public static String WINDOWED = "windowed";
-	public static String IN_DOMESTIC_PARTNERSHIP = "in_domestic_partnership";
-	public static String IN_CIVIL_UNION = "in_civil_union";
-	public static String URLS = "urls";
-	public static String VALUE = "value";
-	public static String TYPE = "type";
-	public static String HOME = "home";
-	public static String WORK = "work";
-	public static String BLOG = "blog";
-	public static String PROFILE = "profile";
-	public static String PRIMARY = "primary";
-	public static String ORGANIZATIONS = "organizations";
-	public static String DEPARTMENT = "department";
-	public static String TITLE = "title";
-	public static String SCHOOL = "school";
-	public static String START_DATE = "startDate";
-	public static String END_DATE = "endDate";
-	public static String LOCATION = "location";
-	public static String DESCRIPTION = "description";
-	public static String PLACES_LIVED = "placesLived";
-	public static String TAGLINE = "tagline";
-	public static String EMAILS = "emails";
-	public static String OBJECT_TYPE = "objectType";
-	public static String ETAG = "etag";
+	public static final String ID = "id";
+	public static final String DISPLAY_NAME = "displayName";
+	public static final String NAME = "name";
+	public static final String FORMATTED = "formatted";
+	public static final String FAMILY_NAME = "familyName";
+	public static final String GIVEN_NAME = "givenName";
+	public static final String MIDDLE_NAME = "middleName";
+	public static final String HONORIFIC_PREFIX = "honorificPrefix";
+	public static final String HONORIFIC_SUFFIX = "honorificSufix";
+	public static final String NICKNAME = "nickname";
+	public static final String GENDER = "gender";
+	public static final String MALE = "male";
+	public static final String FEMALE = "female";
+	public static final String OTHER = "other";
+	public static final String BIRTHDAY = "birthday";
+	public static final String CURRENT_LOCATION = "currentLocation";
+	public static final String URL = "url";
+	public static final String IMAGE = "image";
+	public static final String LANGUAGES_SPOKEN = "languagesSpoken";
+	public static final String HAS_APP = "hasApp";
+	public static final String ABOUT_ME = "aboutMe";
+	public static final String RELATIONSHIP_STATUS = "relationshipStatus";
+	public static final String SINGLE = "single";
+	public static final String IN_A_RELATIONSHIP = "in_a_relationship";
+	public static final String ENGAGED = "engaged";
+	public static final String MARRIED = "married";
+	public static final String ITS_COMPLICATED = "its_complicated";
+	public static final String OPEN_RELATIONSHIP = "open_relationship";
+	public static final String WINDOWED = "windowed";
+	public static final String IN_DOMESTIC_PARTNERSHIP = "in_domestic_partnership";
+	public static final String IN_CIVIL_UNION = "in_civil_union";
+	public static final String URLS = "urls";
+	public static final String VALUE = "value";
+	public static final String TYPE = "type";
+	public static final String HOME = "home";
+	public static final String WORK = "work";
+	public static final String BLOG = "blog";
+	public static final String PROFILE = "profile";
+	public static final String PRIMARY = "primary";
+	public static final String ORGANIZATIONS = "organizations";
+	public static final String DEPARTMENT = "department";
+	public static final String TITLE = "title";
+	public static final String SCHOOL = "school";
+	public static final String START_DATE = "startDate";
+	public static final String END_DATE = "endDate";
+	public static final String LOCATION = "location";
+	public static final String DESCRIPTION = "description";
+	public static final String PLACES_LIVED = "placesLived";
+	public static final String TAGLINE = "tagline";
+	public static final String EMAILS = "emails";
+	public static final String OBJECT_TYPE = "objectType";
+	public static final String ETAG = "etag";
+	public static final String ERROR = "error";
 	
 	@Override
 	public Person load(String data) {
@@ -101,7 +101,7 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 		try{
 			JSONObject db = new JSONObject(data);
 			
-			if (db.has("error"))
+			if (db.has(ERROR))
 				return person;
 			
 			person.setId(db.getString(ID));

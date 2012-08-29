@@ -53,7 +53,7 @@ public class GooglePlusConnector implements ISocialConnector {
 	public static final String MAX_POST_LIMIT_PARAMETER = "maxResults";
 	
 	private String access_token = null;
-	private String name;
+	private String name = ISocialConnector.GOOGLEPLUS_CONN;
 	private String id;
 	private String lastUpdate = "yesterday";
 	private GooglePlusTokenManager token=null;
@@ -65,7 +65,6 @@ public class GooglePlusConnector implements ISocialConnector {
 	public GooglePlusConnector(String access_token, String identity){
 		this.access_token = access_token;
 		this.token = new GooglePlusTokenManager(access_token);
-		this.name = ISocialConnector.GOOGLEPLUS_CONN;
 		this.id	= this.name + "_" + UUID.randomUUID();
 		this.service = token.getAuthService();
 	}

@@ -29,11 +29,18 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.junit.Test;
+import org.societies.platform.socialdata.converters.ActivityConverter;
+import org.societies.platform.socialdata.converters.ActivityConverterFactory;
+import org.societies.platform.socialdata.converters.ActivityConverterFromGooglePlus;
 import org.societies.platform.socialdata.converters.PersonConverter;
+import org.societies.platform.socialdata.converters.PersonConverterFactory;
 import org.societies.platform.socialdata.converters.PersonConverterFromGooglePlus;
+import org.societies.platform.sns.connector.googleplus.GooglePlusConnector;
 
 /**
  * Describe your class here...
@@ -43,9 +50,14 @@ import org.societies.platform.socialdata.converters.PersonConverterFromGooglePlu
  */
 public class GooglePlusConvertersTest {
 
-//	@Test
-	public void testPersonFactoryCorrectConverter() {
+	@Test
+	public void testPersonFactoryCorrectConverter() {		
+		assertTrue(PersonConverterFactory.getPersonConverter(new GooglePlusConnector()) instanceof PersonConverterFromGooglePlus);
+	}
 	
+	@Test
+	public void testActivityFactoryCorrectConverter() {		
+		assertTrue(ActivityConverterFactory.getActivityConverter(new GooglePlusConnector()) instanceof ActivityConverterFromGooglePlus);
 	}
 	
 	@Test
@@ -56,6 +68,18 @@ public class GooglePlusConvertersTest {
 		Person person = converter.load(JSON);
 		
 		assertEquals("Edgar Domingues", person.getDisplayName());
+	}
+	
+	@Test
+	public void testActivitiesConverter() throws Exception {
+		final String JSON = readStringFromFile("activities.json");
+		ActivityConverter converter = new ActivityConverterFromGooglePlus();
+		
+		List<ActivityEntry> activities = converter.load(JSON);
+		
+		assertEquals(2, activities.size());
+		assertEquals("Edgar Domingues", activities.get(0).getActor().getDisplayName());
+		assertEquals("Edgar Domingues", activities.get(1).getActor().getDisplayName());
 	}
 	
 	private String readStringFromFile(String fileName) throws IOException {		
