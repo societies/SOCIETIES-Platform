@@ -45,7 +45,6 @@ import org.societies.api.schema.activityfeed.AddActivity;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeed;
 import org.societies.api.schema.activityfeed.DeleteActivity;
 import org.societies.api.schema.activityfeed.GetActivities;
-import org.societies.api.schema.cis.community.Community;
 
 
 
@@ -100,7 +99,7 @@ public class RemoteActivityFeed implements IActivityFeed {
 	}
 
 	@Override
-	public long importActivtyEntries(List<?> activityEntries) {
+	public long importActivityEntries(List<?> activityEntries) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

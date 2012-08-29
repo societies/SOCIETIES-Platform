@@ -150,7 +150,7 @@ public class TestStoreRetrievePreferences {
 	@Test
 	public void testStoreRetrieve(){
 		PPNPreferenceDetails details = new PPNPreferenceDetails(locationAttribute.getType());
-		details.setAffectedCtxID(locationAttribute.getId());
+		details.setAffectedDataId(locationAttribute.getId());
 		Requestor requestor = getRequestorService();
 		details.setRequestor(requestor);
 		

@@ -5,7 +5,7 @@
 	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.useragent</groupId>
 	<artifactId>resourcesharing</artifactId>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 	<version>${version.ua}</version>
 	<developers>
 		<developer>
@@ -17,8 +17,9 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
+		<!-- <relativePath>../../parent/spring-osgi.xml</relativePath> -->
+		<!-- <version>0.1</version> -->
 	</parent>
 
 	<dependencies>
@@ -26,19 +27,19 @@
 	<dependency>
 	<groupId>org.societies.api.external</groupId>
 	<artifactId>societies-api</artifactId>
-	<version>${release.version}</version>
+	<!-- <version>${release.version}</version> -->
 	<scope>provided</scope>
 	</dependency>
 	<dependency>
 	<groupId>org.societies.api.internal</groupId>
 	<artifactId>societies-api-internal</artifactId>
-	<version>${release.version}</version>
+	<!-- <version>${release.version}</version> -->
 	<scope>provided</scope>
 	</dependency>
 
 	</dependencies>
 
-	<build>
+	<!-- <build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -73,5 +74,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build> -->
 </project>

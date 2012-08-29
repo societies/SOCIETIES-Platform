@@ -109,6 +109,7 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(LocalCSSManagerService.LOGIN_CSS);
         intentFilter.addAction(LocalCSSManagerService.LOGOUT_CSS);
         intentFilter.addAction(LocalCSSManagerService.REGISTER_XMPP_SERVER);
+        intentFilter.addAction(LocalCSSManagerService.LOGIN_XMPP_SERVER);
         
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     	
@@ -225,6 +226,20 @@ public class PluginCSSManager extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 0))) {
 				try {
 					this.localCSSManager.registerXMPPServer(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 2))) {
+				try {
+					this.localCSSManager.loginXMPPServer(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3))) {
+				try {
+					this.localCSSManager.logoutXMPPServer(data.getString(0));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -420,6 +435,13 @@ public class PluginCSSManager extends Plugin {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
 				
+			} else if (intent.getAction().equals(LocalCSSManagerService.LOGIN_XMPP_SERVER)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 2);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
 			}
 		}
 	};

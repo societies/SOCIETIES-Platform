@@ -10,9 +10,30 @@
 		<link rel="stylesheet" href="jquery.mobile.structure-1.1.0.css" /> 
 		<script type="text/javascript" src="jquery-1.7.1.js"></script>
 		<script src="jquery.mobile-1.1.0.js"></script>
-		<script type="text/javascript" src="reference.js"></script>
-		<link rel="stylesheet" href="societies.css"/> 
-	
+		<link rel="stylesheet" href="css/societies.css"/> 
+
+		<!-- App specific JS -->
+		
+		<!-- PhoneGap plugins -->
+		<script type="text/javascript" src="javascript/plugins/apppreferences_plugin.js"></script>
+		<script type="text/javascript" src="javascript/plugins/coreservicemonitor_plugin.js"></script>
+		<script type="text/javascript" src="javascript/plugins/cssmanager_plugin.js"></script>
+		<script type="text/javascript" src="javascript/plugins/devicestatus_plugin.js"></script>
+		
+		<!-- Page Specific -->
+		<script type="text/javascript" src="javascript/pagespecific/mainpage.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/activeservices.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/activetasks.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/apppreferences.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/deviceinfo.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/devicemanager.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/devicestatus.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/login.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/logout.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/refreshcssrecord.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/registerxmpp.js"></script>
+		
+			
 		<!-- Uncomment lines below to enable PhoneGap desktop-->
 		<!--script type="text/javascript" charset="utf-8" src="pluginjs/cssmanager.js"></script>
 		<script type="text/javascript" charset="utf-8" src="pluginjs/servicemonitor.js"></script>
@@ -34,7 +55,6 @@
 		<!-- Invoke a new page via an icon -->
 		<a href="#device" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Device</a>
 		<a href="#information" data-role="button" data-icon="info" data-inline="true" data-theme="a">Info</a>
-		<a href="#cssRecord" data-role="button" data-icon="info" data-inline="true" data-theme="a">Profile</a>
 		
 	</div><!-- /header -->
 
@@ -42,8 +62,8 @@
 
    		<div id= "loginDialog">
 			<div data-role="fieldcontain" >
-		    	<label for="username">User JID: </label>
-		    	<input type="text" name="userLogin" id="username" value=""  />
+		    	<label for="username">User Name: </label>
+		    	<input type="text" name="userLogin" id="username" value="" />
 			</div>
 
 			<div data-role="fieldcontain" >
@@ -51,11 +71,17 @@
 		    	<input type="password" name="userpass" id="userpass" value="" />
 			</div>
 
-			<div data-role="fieldcontain" >
-		    	<label for="identityDomain">Identity Domain: </label>
-		    	<input type="text" name="identityDomain" id="identityDomain" value="" readonly="readonly" />
-			</div>
 
+				<div data-role="fieldcontain" >
+			    	<label for="cloudNode">Cloud Node: </label>
+			    	<input type="text" name="cloudNode" id="cloudnode" value="" />
+				</div>
+	
+				<div data-role="fieldcontain" >
+			    	<label for="identityDomain">Identity Domain: </label>
+			    	<input type="text" name="identityDomain" id="identitydomain" value=""  />
+				</div>
+			
 			<input id="connectXMPP" type="button" value="Connect" data-icon="gear" data-inline="true" /> 
 			<a href="#xmppDomainReg" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Register</a>
 			

@@ -6,7 +6,6 @@
 	<groupId>org.societies.context-management</groupId>
 	<artifactId>community-context-inference-mgmt</artifactId>
 	<version>${version.cm}</version>
-	<packaging>bundle</packaging>
 
 	<dependencies>
 		<dependency>
@@ -26,7 +25,6 @@
 			<artifactId>context-mgmt-api</artifactId>
 			<version>${version.cm}</version>
 			<scope>provided</scope>
-			<type>bundle</type>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -58,7 +56,7 @@
 	</parent>
 
 	<!-- Build Settings -->
-	<build>
+	<!-- build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -93,7 +91,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build> -->
 	
 	<!-- More Project Information -->
 	<name>Community Context Inference Mgmt</name>

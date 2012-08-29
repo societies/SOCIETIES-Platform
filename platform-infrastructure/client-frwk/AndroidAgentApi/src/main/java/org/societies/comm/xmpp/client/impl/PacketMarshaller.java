@@ -44,6 +44,7 @@ public class PacketMarshaller {
 	private Serializer s;
 	
 	public PacketMarshaller() {
+//		Log.d(LOG_TAG, "Constructor");
 		Registry registry = new Registry();
 		Strategy strategy = new RegistryStrategy(registry);
 		try {
@@ -61,7 +62,7 @@ public class PacketMarshaller {
 	}
 	
 	public void register(List<String> elementNames, List<String> namespaces, List<String> packages) {
-		Log.d(LOG_TAG, "register");
+//		Log.d(LOG_TAG, "register");
 		for (String element : elementNames) {
 			Log.d(LOG_TAG, "register element: " + element);
 		}
@@ -84,7 +85,7 @@ public class PacketMarshaller {
 	}
 	
 	public String marshallMessage(Stanza stanza, Message.Type type, Object payload) throws Exception {
-		Log.d(LOG_TAG, "marshallMessage type: " + type.name() + "stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
+//		Log.d(LOG_TAG, "marshallMessage type: " + type.name() + "stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
 		
 		final String xml = marshallPayload(payload);
 		Message message = new Message();
@@ -110,7 +111,7 @@ public class PacketMarshaller {
 	}
 	
 	public String marshallIQ(Stanza stanza, IQ.Type type, Object payload) throws Exception {				
-		Log.d(LOG_TAG, "marshallIQ type: " + type + "stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
+//		Log.d(LOG_TAG, "marshallIQ type: " + type + "stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
 		final String xml = marshallPayload(payload);
 		IQ iq = new IQ() {
 			@Override
@@ -128,19 +129,19 @@ public class PacketMarshaller {
 	}
 	
 	public IQ unmarshallIq(String xml) throws Exception {
-		Log.d(LOG_TAG, "unmarshallIq xml: " + xml);
+//		Log.d(LOG_TAG, "unmarshallIq xml: " + xml);
 		
 		return parseIq(createXmlPullParser(xml));
 	}
 	
 	public Message unmarshallMessage(String xml) throws Exception {			
-		Log.d(LOG_TAG, "unmarshallMessage + xml: " + xml);
+//		Log.d(LOG_TAG, "unmarshallMessage + xml: " + xml);
 		
 	    return (Message)PacketParserUtils.parseMessage(createXmlPullParser(xml));
 	}
 	
 	public Object unmarshallPayload(Packet packet) throws Exception {
-		Log.d(LOG_TAG, "unmarshallPayload packet: " + packet.getPacketID());
+//		Log.d(LOG_TAG, "unmarshallPayload packet: " + packet.getPacketID());
 		Element element = getElementAny(packet);
 		
 		if(element == null) // Empty stanza
@@ -162,7 +163,7 @@ public class PacketMarshaller {
 	}
 	
 	public Entry<String, List<String>> parseItemsResult(Packet packet) throws SAXException, IOException, ParserConfigurationException {
-		Log.d(LOG_TAG, "Entry");
+//		Log.d(LOG_TAG, "Entry");
 		Element element = getElementAny(packet);
 		final String node = element.getAttribute("node");
 		final List<String> list = new ArrayList<String>();
@@ -204,7 +205,7 @@ public class PacketMarshaller {
 	/** Get the element with the payload out of the XMPP packet. 
 	 * @throws ParserConfigurationException */
 	private Element getElementAny(Packet packet) throws SAXException, IOException, ParserConfigurationException {
-		Log.d(LOG_TAG, "getElementAny packet: " + packet.getPacketID());
+//		Log.d(LOG_TAG, "getElementAny packet: " + packet.getPacketID());
 		
 		if (packet instanceof IQ) {
 			// According to the schema in RCF6121 IQs only have one
@@ -240,7 +241,7 @@ public class PacketMarshaller {
 	}
 	
 	private XmlPullParser createXmlPullParser(String xml) throws XmlPullParserException, IOException {
-		Log.d(LOG_TAG, "createXmlPullParser xml: " + xml);
+//		Log.d(LOG_TAG, "createXmlPullParser xml: " + xml);
 		
 		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 	    factory.setNamespaceAware(true);
@@ -251,7 +252,7 @@ public class PacketMarshaller {
 	}
 	
 	private IQ parseIq(XmlPullParser parser) throws Exception {
-		Log.d(LOG_TAG, "parseIq");
+//		Log.d(LOG_TAG, "parseIq");
 		IQ iqPacket = null;
 		String id = parser.getAttributeValue("", "id");
 		String to = parser.getAttributeValue("", "to");

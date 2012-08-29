@@ -10,7 +10,10 @@ import java.util.Map;
 
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
@@ -24,6 +27,8 @@ import org.societies.platform.socialdata.converters.GroupConveterFactory;
 import org.societies.platform.socialdata.converters.PersonConverter;
 import org.societies.platform.socialdata.converters.PersonConverterFactory;
 
+import com.restfb.json.JsonObject;
+
 
 
 public class SocialData implements ISocialData{
@@ -33,9 +38,11 @@ public class SocialData implements ISocialData{
     Map<String, Object> 			socialFriends;
     Map<String, Object>				socialGroups;
     Map<String, Object>				socialProfiles;
-    
     Map<String, Object>	 			socialActivities;
     
+    
+    private static final Logger logger = LoggerFactory.getLogger(SocialData.class);
+
     long lastUpate ;
     
     
@@ -47,8 +54,7 @@ public class SocialData implements ISocialData{
     	socialActivities		= new HashMap<String, Object>();
     	
     	lastUpate				= new Date().getTime();
-    	
-    	System.out.println("SocialData Bundle is started");
+    	logger.info("SocialData Bundle is started");
     }
     
 
@@ -209,7 +215,7 @@ public class SocialData implements ISocialData{
     
     
     private void log(String out){
-    	System.out.println("SocialData - " +out);
+    	logger.info("SocialData - " +out);
     }
 
 	@Override
@@ -239,7 +245,7 @@ public class SocialData implements ISocialData{
 		
 		
 		
-		System.out.println("Create a new connector");
+		logger.info("Create a new connector with "+snName + " name");
 		switch(snName){
 				case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
 				
@@ -256,10 +262,100 @@ public class SocialData implements ISocialData{
 
 				default : return null;
 		}
-		
-		
 
 	}
+
+
+	@Override
+	public void postData(SocialNetwork snName, Map<String, ?> data) {
+		String message = genJsonPostMessage(data);
+		logger.info("Post "+message+" to "+ snName + " SN");
+		List<ISocialConnector> results = getConnectorsByName(snName);
+		Iterator<ISocialConnector> it = results.iterator();
+		while (it.hasNext()){
+			ISocialConnector conn = it.next();
+			logger.debug("Posting using "+conn.getID() +" connector");
+			conn.post(message);
+		}
+	}
+
+
+	
+	
+	@Override
+	public void postMessage(SocialNetwork snName, String data) {
+		logger.info("Post a Message to "+ snName + " SN");
+		List<ISocialConnector> results = getConnectorsByName(snName);
+		Iterator<ISocialConnector> it = results.iterator();
+		while (it.hasNext()){
+			ISocialConnector conn = it.next();
+			conn.post(data);
+			logger.debug("Posting using "+conn.getID() +" connector");
+		}
+		
+	}
+	
+	
+	private List<ISocialConnector> getConnectorsByName(SocialNetwork name){
+		Iterator <ISocialConnector> it = connectors.values().iterator();
+		ArrayList<ISocialConnector> results = new ArrayList<ISocialConnector>();
+		while (it.hasNext()){
+			ISocialConnector conn = it.next();
+			if (conn.getID().contains(name.toString())){
+				results.add(conn);
+			}
+		}
+		return results;
+	}
+	
+	private String genJsonPostMessage(Map<String,?> map){
+		String type = map.get(ISocialData.POST_TYPE).toString();
+		JsonObject result= new JsonObject(type);
+		if (type.equals(ISocialData.CHECKIN)){
+			
+//			Example:
+//			String value="{ \"checkin\": {"+
+//			        "\"lat\": \"45.473272\","+
+//			        "\"lon\": \"9.187519\","+
+//			        "\"message\": \"Milano City\","+
+//			        "\"place\": 1234}"+
+//			        "}";
+			
+			if (map.containsKey(ISocialData.POST_DESCR))
+			result.put(ISocialData.POST_DESCR, map.get(ISocialData.POST_DESCR).toString());
+			result.put(ISocialData.POST_LAT, map.get(ISocialData.POST_LAT).toString());
+			result.put(ISocialData.POST_LON, map.get(ISocialData.POST_LON).toString());
+			if (map.containsKey(ISocialData.POST_MESSAGE))
+			result.put(ISocialData.POST_MESSAGE, map.get(ISocialData.POST_MESSAGE).toString());
+			if (map.containsKey(ISocialData.POST_PLACE))
+			result.put(ISocialData.POST_PLACE, map.get(ISocialData.POST_PLACE).toString());
+		}
+		else{
+			
+//			Example:
+//			String value="{ \"event\": {"+
+//			        "\"name\": \"Party\","+
+//			        "\"from\": \"2013-08-12 10:45\","+
+//			        "\"to\": \"2013-08-12 18:45\","+
+//			        "\"location\": \"HOME\","+
+//			        "\"description\": \"My Birthday Party\"}"+
+//			        "}";
+			
+			if (map.containsKey(ISocialData.POST_NAME))
+				result.put(ISocialData.POST_NAME, map.get(ISocialData.POST_NAME).toString());
+			result.put(ISocialData.POST_FROM, map.get(ISocialData.POST_FROM).toString());
+			result.put(ISocialData.POST_TO, map.get(ISocialData.POST_TO).toString());
+			if (map.containsKey(ISocialData.POST_DESCR))
+				result.put(ISocialData.POST_DESCR, map.get(ISocialData.POST_DESCR).toString());
+			if (map.containsKey(ISocialData.POST_LOCATION))
+				result.put(ISocialData.POST_LOCATION, map.get(ISocialData.POST_LOCATION).toString());
+			if (map.containsKey(ISocialData.POST_PLACE))
+				result.put(ISocialData.POST_PLACE, map.get(ISocialData.POST_PLACE).toString());
+		}
+		
+		return result.toString(1);
+	}
+	
  
 	
 

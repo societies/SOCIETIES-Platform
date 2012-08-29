@@ -19,6 +19,7 @@
  */
 package org.societies.privacytrust.privacyprotection.test.datamanagement;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -35,7 +36,11 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -47,8 +52,11 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.ExpectedException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -64,65 +72,53 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "PrivacyDataManagerInternalTest-context.xml" })
 public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerInternalTest.class.getSimpleName());
-	
+
 	@Autowired
 	IPrivacyDataManagerInternal privacyDataManagerInternal;
-	
-	/**
-	 * @throws java.lang.Exception
-	 */
+
+	// -- Mocked data
+	private DataIdentifier dataId;
+	private Requestor requestor;
+	private Requestor requestorCis;
+
+
+
 	@Before
 	public void setUp() throws Exception {
+		// Data Id
+		try {
+			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+		}
+		catch (MalformedCtxIdentifierException e) {
+			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
+			fail("setUp(): DataId creation error "+e.getMessage());
+		} 
+		// Requestor
+		IIdentity requestorId = Mockito.mock(IIdentity.class);
+		Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
+		IIdentity requestorCisId = Mockito.mock(IIdentity.class);
+		Mockito.when(requestorCisId.getJid()).thenReturn("cis.societies.local");
+		requestor = new Requestor(requestorId);
+		requestorCis = new RequestorCis(requestorId, requestorCisId);
 	}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@After
 	public void tearDown() throws Exception {
-//		privacyDataManagerInternal = null;
-	}
-	
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#updatePermissions(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity)}.
-	 */
-	@Test
-	@Rollback(true)
-	public void testGetPermission() {
-		String testTitle = new String("testGetPermission");
-		LOG.info("[Test] "+testTitle);
-		boolean dataUpdated = false;
-		ResponseItem responseItem = null;
-		try {
-			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			Requestor requestor = new Requestor(requestorId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
-			List<Action> actions = new ArrayList<Action>();
-			actions.add(new Action(ActionConstants.READ));
-			Decision permission = Decision.PERMIT;
-			if (null == privacyDataManagerInternal) {
-				LOG.info("privacyDataManagerInternal null");
-			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
-			responseItem = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
-		} catch (PrivacyException e) {
-			LOG.info("[Test PrivacyException] "+testTitle, e);
-			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.info("[Test PrivacyException] "+testTitle, e);
-			fail("[Error "+testTitle+"] error: "+e.getMessage());
-		}
-		assertTrue("Data not updated", dataUpdated);
-		assertNotNull("ResponseItem permission can't be retrieved", responseItem);
+		//		privacyDataManagerInternal = null;
 	}
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#updatePermissions(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity)}.
-	 */
+
+	@Test(expected = PrivacyException.class)  
+	@Rollback(true)
+	public void testUpdatePermissionNoActions() throws PrivacyException {
+		String testTitle = new String("testUpdatePermission: with an empty action list");
+		LOG.info("[Test] "+testTitle);
+		boolean dataUpdated = false;
+		List<Action> actions = new ArrayList<Action>();
+		Decision permission = Decision.PERMIT;
+		dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
+		assertFalse("Data has been updated but should not", dataUpdated);
+	}
 	@Test
 	@Rollback(true)
 	public void testUpdatePermission() {
@@ -130,19 +126,10 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		LOG.info("[Test] "+testTitle);
 		boolean dataUpdated = false;
 		try {
-			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			Requestor requestor = new Requestor(requestorId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
-			if (null == privacyDataManagerInternal) {
-				LOG.info("privacyDataManagerInternal null");
-			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -152,7 +139,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		}
 		assertTrue("Data not updated", dataUpdated);
 	}
-	
+
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#updatePermissions(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity)}.
 	 */
@@ -164,20 +151,11 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		boolean dataUpdated1 = false;
 		boolean dataUpdated2 = false;
 		try {
-			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			Requestor requestor = new Requestor(requestorId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
-			if (null == privacyDataManagerInternal) {
-				LOG.info("privacyDataManagerInternal null");
-			}
-			dataUpdated1 = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
-			dataUpdated2 = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
+			dataUpdated1 = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
+			dataUpdated2 = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -188,7 +166,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		assertTrue("Data not updated", dataUpdated1);
 		assertTrue("Data not updated the second time", dataUpdated2);
 	}
-	
+
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#updatePermissions(org.societies.api.identity.Requestor, java.lang.String, org.societies.api.identity.IIdentity, org.societies.api.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)}.
 	 * Using ResponseItem
@@ -200,22 +178,13 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		LOG.info("[Test] "+testTitle);
 		boolean dataUpdated = false;
 		try {
-			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			Requestor requestor = new Requestor(requestorId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxAttributeIdentifier dataId = Mockito.mock(CtxAttributeIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.READ));
 			Decision decision = Decision.PERMIT;
 			Resource resource = new Resource(dataId);
 			RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
 			ResponseItem permission = new ResponseItem(requestItem, decision);
-			if (null == privacyDataManagerInternal) {
-				LOG.info("privacyDataManagerInternal null");
-			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, permission);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -225,7 +194,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		}
 		assertTrue("Data not updated", dataUpdated);
 	}
-	
+
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#updatePermissions(org.societies.api.identity.Requestor, java.lang.String, org.societies.api.identity.IIdentity, org.societies.api.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)}.
 	 * Using ResponseItem
@@ -237,22 +206,13 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		LOG.info("[Test] "+testTitle);
 		boolean dataUpdated = false;
 		try {
-			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			IIdentity requestorCisId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorCisId.getJid()).thenReturn("cis.societies.local");
-			RequestorCis requestor = new RequestorCis(requestorId, requestorCisId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
 			List<Action> actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.READ));
 			Decision decision = Decision.PERMIT;
-			Resource resource = new Resource("locationSymbolic");
+			Resource resource = new Resource(DataIdentifierScheme.CONTEXT,CtxAttributeTypes.LOCATION_SYMBOLIC);
 			RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
 			ResponseItem permission = new ResponseItem(requestItem, decision);
-			if (null == privacyDataManagerInternal) {
-				LOG.info("privacyDataManagerInternal null");
-			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, permission);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -262,7 +222,63 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		}
 		assertTrue("Data has not been updated", dataUpdated);
 	}
-	
+
+
+	@Test
+	@Rollback(true)
+	public void testGetPermission1Action() {
+		String testTitle = new String("testGetPermission: only 1 action");
+		LOG.info("[Test] "+testTitle);
+		boolean dataUpdated = false;
+		ResponseItem responseItem = null;
+		Decision permission = Decision.PERMIT;
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(new Action(ActionConstants.READ));
+		try {
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
+			responseItem = privacyDataManagerInternal.getPermission(requestorCis, dataId, actions);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		} catch (Exception e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e.getMessage());
+		}
+		assertTrue("Data not updated", dataUpdated);
+		assertNotNull("ResponseItem permission can't be retrieved", responseItem);
+		assertEquals("Permission result not as expected", permission, responseItem.getDecision());
+		assertEquals("Permission action list not as expected", actions, responseItem.getRequestItem().getActions());
+	}
+
+	@Test
+	@Rollback(true)
+	public void testGetPermission3Actions() {
+		String testTitle = new String("testGetPermission: 3 actions with 1 optional");
+		LOG.info("[Test] "+testTitle);
+		boolean dataUpdated = false;
+		ResponseItem responseItem = null;
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(new Action(ActionConstants.READ));
+		actions.add(new Action(ActionConstants.WRITE));
+		actions.add(new Action(ActionConstants.CREATE, true));
+		Decision permission = Decision.PERMIT;
+		try {
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
+			responseItem = privacyDataManagerInternal.getPermission(requestorCis, dataId, actions);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		} catch (Exception e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e.getMessage());
+		}
+		assertTrue("Data not updated", dataUpdated);
+		assertNotNull("ResponseItem permission can't be retrieved", responseItem);
+		assertEquals("Permission result not as expected", permission, responseItem.getDecision());
+		assertEquals("Permission action list not as expected", actions, responseItem.getRequestItem().getActions());
+	}
+
+
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#deletePermissionsorg.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity)}.
 	 */
@@ -275,21 +291,12 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		boolean dataDeleted = false;
 		ResponseItem responseItem = null;
 		try {
-			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			Requestor requestor = new Requestor(requestorId);
-			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
-			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.getUri()).thenReturn("me@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
-			List<Action> actions = null;
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
-			if (null == privacyDataManagerInternal) {
-				LOG.info("privacyDataManagerInternal null");
-			}
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
-			dataDeleted = privacyDataManagerInternal.deletePermission(requestor, ownerId, dataId);
-			responseItem = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId);
+			responseItem = privacyDataManagerInternal.getPermission(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -302,11 +309,12 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		assertNull("ResponseItem permission still available", responseItem);
 	}
 
-	
+
+	/* --- Dependency Injection -- */
+
 	public void setPrivacyDataManagerInternal(
 			IPrivacyDataManagerInternal privacyDataManagerInternal) {
 		this.privacyDataManagerInternal = privacyDataManagerInternal;
 		LOG.info("[Dependency Injection] PrivacyDataManagerInternal injected");
 	}
-	
 }

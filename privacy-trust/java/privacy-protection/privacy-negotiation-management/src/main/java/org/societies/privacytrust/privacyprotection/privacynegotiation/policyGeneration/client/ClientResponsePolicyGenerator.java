@@ -141,7 +141,7 @@ public class ClientResponsePolicyGenerator {
 			//if this item DOES NOT have a CREATE action
 			if (!this.hasCreate(item.getActions())){
 				//if this attribute DOES NOT exist in the context DB
-				if (!this.attrExistsInContext(item.getResource().getContextType())){
+				if (!this.attrExistsInContext(item.getResource().getDataType())){
 					
 					//boolean attrCreated = this.createAttribute(requestor,item.getResource().getContextType());
 					//if (!attrCreated){
@@ -164,7 +164,7 @@ public class ClientResponsePolicyGenerator {
 					myResponse.addResponseItem(new ResponseItem(item, Decision.DENY));
 					isExactMatch = false;
 				}else{
-					int n = JOptionPane.showConfirmDialog(null, "Preference for item: "+item.getResource().getContextType()
+					int n = JOptionPane.showConfirmDialog(null, "Preference for item: "+item.getResource().getDataType()
 							+"\nfound but will most probably fail the negotiation.\n"
 							+"\nWould you like to setup a different Privacy Preference?", 
 							"Privacy Policy Negotiation",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE
@@ -199,12 +199,12 @@ public class ClientResponsePolicyGenerator {
 							if (requestor instanceof RequestorCis){
 								question = "The Administrator :"+requestor.getRequestorId().toString()+"\nof CIS: "+((RequestorCis) requestor).getCisRequestorId()+"\n"
 										+"requests access for a "+action.getActionType()+" operation\n"
-										+"to resource: "+item.getResource().getContextType()
+										+"to resource: "+item.getResource().getDataType()
 										+"\nAllow?";
 							}else if (requestor instanceof RequestorService){
 								question = "The Provider :"+requestor.getRequestorId().toString()+"\nof service: "+((RequestorService) requestor).getRequestorServiceId()+"\n"
 										+"requests access for a "+action.getActionType()+" operation\n"
-										+"to resource: "+item.getResource().getContextType()
+										+"to resource: "+item.getResource().getDataType()
 										+"\nAllow?";
 							}
 							

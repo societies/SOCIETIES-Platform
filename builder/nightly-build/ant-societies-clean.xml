@@ -1,0 +1,55 @@
+
+<project name="societies-env-clean" default="clean" basedir=".">
+    <description>
+        Cleans the Societies Virgo container - database and build artefacts. Also cleans the 
+	local Maven Societies repository segment
+    </description>
+  <!-- set global properties for this build -->
+
+  <target name="clean">
+	<antcall target="clean-maven-repo"></antcall>  
+	<antcall target="clean-database"></antcall>  
+	<antcall target="clean-virgo-jars"></antcall>  
+	<antcall target="clean-virgo-wars"></antcall>  
+	<antcall target="clean-virgo-libd"></antcall>  
+  </target>
+
+  <target name="clean-maven-repo">
+	<echo message="clean location ${settings.localRepository}/org/societies"/>
+	<delete dir="${settings.localRepository}/org/societies"/>
+  </target>
+
+  <target name="clean-database">
+	<echo message="clean location ${spring.osgi.deploy.dir}/../../Databases"/>
+	<delete dir="${spring.osgi.deploy.dir}/../../Databases"/>
+  </target>
+
+  <target name="clean-virgo-jars">
+	<echo message="clean location ${spring.osgi.deploy.dir}/*.jar"/>
+	<delete>
+		<fileset dir="${spring.osgi.deploy.dir}">
+ 			<include name="*.jar"/>
+		</fileset>
+	</delete>
+  </target>
+
+  <target name="clean-virgo-wars">
+	<echo message="clean location ${spring.osgi.deploy.dir}/*.war"/>
+	<delete>
+		<fileset dir="${spring.osgi.deploy.dir}">
+ 			<include name="*.war"/>
+		</fileset>
+	</delete>
+  </target>
+
+  <target name="clean-virgo-libd">
+	<echo message="clean location ${spring.osgi.deploy.dir}/*.libd"/>
+	<delete>
+		<fileset dir="${spring.osgi.deploy.dir}">
+ 			<include name="*.libd"/>
+		</fileset>
+	</delete>
+  </target>
+
+</project>
+

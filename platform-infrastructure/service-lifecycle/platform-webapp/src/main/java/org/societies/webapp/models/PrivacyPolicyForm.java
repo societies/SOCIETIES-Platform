@@ -27,9 +27,13 @@ package org.societies.webapp.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
+import org.societies.api.identity.DataTypeFactory;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
@@ -37,6 +41,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.springframework.util.AutoPopulatingList;
 
 /**
@@ -58,7 +64,6 @@ public class PrivacyPolicyForm {
 		resources = new AutoPopulatingList<PrivacyPolicyResourceForm>(PrivacyPolicyResourceForm.class);
 		
 		PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
-		resource.setOptional(true);
 		
 		AutoPopulatingList<PrivacyActionForm> actions = new AutoPopulatingList<PrivacyActionForm>(PrivacyActionForm.class);
 		actions.add(new PrivacyActionForm());
@@ -130,23 +135,50 @@ public class PrivacyPolicyForm {
 	/**
 	 * @return
 	 * @throws InvalidFormatException 
+	 * @throws MalformedCtxIdentifierException 
 	 */
-	public RequestPolicy toRequestPolicy(IIdentityManager idManager) throws InvalidFormatException {
-		RequestorCis requestor = new RequestorCis(idManager.fromJid(cssOwnerId), idManager.fromJid(cisId));
+	public RequestPolicy toRequestPolicy(IIdentityManager idManager) throws InvalidFormatException, MalformedCtxIdentifierException {
+		clean();
+		
+		// -- Requestor
+		RequestorCis requestor = null;
+		if (null != cssOwnerId && !"".equals(cssOwnerId) && null != cisId && !"".equals(cisId)) {
+			requestor = new RequestorCis(idManager.fromJid(cssOwnerId), idManager.fromJid(cisId));
+		}
+		// -- Resources
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
 		for(PrivacyPolicyResourceForm resourceForm : resources) {
+			// Data Id
 			String type = resourceForm.getResourceType();
-			if (null == resourceForm.getResourceType() || "".equals(resourceForm)) {
+			DataIdentifierScheme scheme;
+			if (null == resourceForm.getResourceType() || "".equals(resourceForm.getResourceType()) || "NONE".equals(resourceForm.getResourceType())) {
+				try {
+					scheme = DataIdentifierScheme.fromValue(resourceForm.getResourceSchemeCustom());
+				}
+				catch (IllegalArgumentException e) {
+					scheme = DataIdentifierScheme.valueOf(resourceForm.getResourceSchemeCustom());
+				}
 				type = resourceForm.getResourceTypeCustom();
 			}
-			Resource resource = new Resource(type);
+			else {
+				DataIdentifier dataType = DataTypeFactory.fromUri(type);
+				type = dataType.getType();
+				scheme = dataType.getScheme();
+			}
+			Resource resource = new Resource(scheme, type);
+			// Actions
 			List<Action> actions = new ArrayList<Action>();
 			for(PrivacyActionForm actionForm : resourceForm.getActions()) {
-				actions.add((Action) actionForm);
+				if (null != actionForm && null != actionForm.getAction()) {
+					actions.add(new Action(actionForm.getAction(), actionForm.isOptional()));
+				}
 			}
+			// Conditions
 			List<Condition> conditions = new ArrayList<Condition>();
 			for(PrivacyConditionForm conditionForm : resourceForm.getConditions()) {
-				conditions.add((Condition) conditionForm);
+				if (null != conditionForm && null != conditionForm.getConditionName()) {
+					conditions.add(new Condition(conditionForm.getConditionName(), conditionForm.getValue(), conditionForm.isOptional()));
+				}
 			}
 			requestItems.add(new RequestItem(resource, actions, conditions));
 		}
@@ -155,7 +187,15 @@ public class PrivacyPolicyForm {
 		return privacyPolicy;
 	}
 	
-	
+	public void clean() {
+		AutoPopulatingList<PrivacyPolicyResourceForm> resourcesTmp = new AutoPopulatingList<PrivacyPolicyResourceForm>(PrivacyPolicyResourceForm.class);
+		for(PrivacyPolicyResourceForm resourceForm : resources) {
+			if (!resourceForm.isEmpty()) {
+				resourcesTmp.add(resourceForm);
+			}
+		}
+		resources = resourcesTmp;
+	}
 
 
 	

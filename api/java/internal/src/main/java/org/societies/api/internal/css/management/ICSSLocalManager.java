@@ -219,4 +219,10 @@ public interface ICSSLocalManager {
  
  public void removeNode(CssRecord cssrecord, String nodeId);
 
+ /**
+  * Returns a list of Css id's of people who we have accepted/have accepted friend requests
+  */
+ public Future<List<String>> getCssFriends();
+ 
+ 
 }

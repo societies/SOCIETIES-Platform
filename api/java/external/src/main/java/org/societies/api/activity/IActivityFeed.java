@@ -41,31 +41,35 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  */
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IActivityFeed {
-//	@Deprecated //cannot deprecate at the method signature matches the signature of getActivities(String query, String timePeriod);
-//	public List<IActivity> getActivities(String CssId, String timePeriod);
+
 	/**
-	 * This method will parse a timeperiod and return a subset of the actitvies
-	 *  in this activityfeed that is within the given timeperiod
-	 *  
-	 * @param {@link String} timeperiod can be: "millisecondssinceepoch millisecondssinceepoch+n" 
-	 * @return a @List of {@link IActivity} 
-	 * or a empty list if the parameters are wrong or the  timeperiod did not match any activties
-	 */
-	
-	//public List<IActivity> getActivities(String timePeriod);
-	//@Deprecated
-	//public List<IActivity> getActivities(String CssId, String query, String timePeriod);
-	/**
-	 * This method will parse a query and a timeperiod and return a subset of the actitvies
-	 *  in this activityfeed that matches the query constraints and is within the given timeperiod
-	 *  
-	 * @param {@link String} is defined as such (as per {@link http://opensocial-resources.googlecode.com/svn/spec/2.0.1/Core-API-Server.xml#Request-Parameter-FilterBy-Value} but with one addition):
-	 * The Query String should be a JSON String that is structured as follows:
-     * { ... "filterBy" : "name", "filterOp" : "startsWith", "filterValue" : "John" ... }@
-	 * Thus it needs to contain the keys (and their corresponding values) "filterBy", "filterOp" and "filterValue" (the last one can have a empty value given certain filterOps, see below)
 	 * 
+	 * @param activityEntries List of ActivityEntry as used by the social data connector, and implemented by shindig.
+	 * @return long number of entries successfully imported
+	 */
+	public long importActivityEntries(List<?> activityEntries);
+
+    /**
+     * This method will parse a timeperiod and return a subset of the actitvies
+     *  in this activityfeed that is within the given timeperiod
+     *
+     * @param {@link String} timeperiod can be: "millisecondssinceepoch millisecondssinceepoch+n"
+     * @param {@link IActivityFeedCallback} c the callback object for remote calls.
+     * @return a @List of {@link IActivity}
+     * or a empty list if the parameters are wrong or the  timeperiod did not match any activties
+     */
+	public void getActivities(String timePeriod, IActivityFeedCallback c);
+    /**
+     * This method will parse a query and a timeperiod and return a subset of the actitvies
+     *  in this activityfeed that matches the query constraints and is within the given timeperiod
+     *
+     * @param {@link String} is defined as such (as per http://opensocial-resources.googlecode.com/svn/spec/2.0.1/Core-API-Server.xml#Request-Parameter-FilterBy-Value but with one addition):
+     * The Query String should be a JSON String that is structured as follows:
+     * { ... "filterBy" : "name", "filterOp" : "startsWith", "filterValue" : "John" ... }@
+     * Thus it needs to contain the keys (and their corresponding values) "filterBy", "filterOp" and "filterValue" (the last one can have a empty value given certain filterOps, see below)
+     *
      * Filter operators:
-     * 
+     *
      * The operation to use when filtering a collection by a field specified in 'filterBy', defaults to "contains". Valid values:
      * contains Return elements where filterValue appears somewhere in the element's filterBy field value.
      * equals Return elements where filterValue exactly matches the element's filterBy field value.
@@ -73,47 +77,31 @@ public interface IActivityFeed {
      * present Return elements where the element's filterBy field value is not empty or null.
      * isNull The exact opposite of "present", NOTE: this is in addition to the opensocial specification.
 
-	 * The last two filterOperators does not need to have a value for the "filterValue" values.
-	 * @param {@link String} timeperiod can be: "millisecondssinceepoch millisecondssinceepoch+n" 
-	 * @return a @List of {@link IActivity} 
-	 * or a empty list if the parameters are wrong or the query and/or timeperiod did not match any activties
-	 */
-	//public List<IActivity> getActivities(String query, String timePeriod);
-	/**
-	 * This method will add a activity and post it on the associated pubsub service.
-	 *  
-	 * @param {@link IActivity} activity, the activity that will be added.
-	 */
-//	public void addCisActivity(IActivity activity);
-	/**
-	 * This method will parse a criteria and delete the activities that match the criteria
-	 *  
-	 * @param {@link String} criteria which has the same definition as the query of "getActivities(String query.."
-	 * @return {@link int} number of deleted activities.
-	 */
-	//public int cleanupFeed(String criteria);
-	/**
-	 * 
-	 * 
-	 * @param {@link IAcitivty} activity the activity that should be deleted.
-	 * @return {@link boolean} true if the the activity was found and deleted, false if not.
-	 */
-	//public boolean deleteActivity(IActivity activity);
-	/**
-	 * 
-	 * @param List of ActivityEntry as used by the social data connector, and implemented by shindig.
-	 * @return long number of entries successfully imported
-	 */
-	public long importActivtyEntries(List<?> activityEntries);
-	
-	
-	public void getActivities(String timePeriod, IActivityFeedCallback c);
+     * The last two filterOperators does not need to have a value for the "filterValue" values.
+     * @param {@link String} timeperiod can be: "millisecondssinceepoch millisecondssinceepoch+n"
+     * @param {@link IActivityFeedCallback} c the callback object for remote calls.
+     * @return a @List of {@link IActivity}
+     * or a empty list if the parameters are wrong or the query and/or timeperiod did not match any activties
+     */
 	public void getActivities(String query,
 			String timePeriod, IActivityFeedCallback c) ;
 
 	public void addActivity(IActivity activity,IActivityFeedCallback c) ;
-
+    /**
+     * This method will parse a criteria and delete the activities that match the criteria
+     *
+     * @param {@link String} criteria which has the same definition as the query of "getActivities(String query.."
+     * @param {@link IActivityFeedCallback} c the callback object for remote calls.
+     * @return {@link int} number of deleted activities.
+     */
 	public void cleanupFeed(String criteria,IActivityFeedCallback c);
+    /**
+     * This method will delete the activity matching the input parameter activity.
+     *
+     * @param {@link IActivity} activity the activity that should be deleted.
+     * @param {@link IActivityFeedCallback} c the callback object for remote calls.
+     * @return {@link boolean} true if the the activity was found and deleted, false if not.
+     */
 	public void deleteActivity(IActivity activity,IActivityFeedCallback c);
 	
 	public IActivity getEmptyIActivity();

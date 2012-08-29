@@ -5,8 +5,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 
@@ -32,39 +31,37 @@
         </dependency>
 	
 	    <dependency>
-  			<groupId>org.societies.utilities</groupId>
-  			<artifactId>DBC</artifactId>
-  			<version>${release.version}</version>
-            <scope>compile</scope>
+  		<groupId>org.societies.utilities</groupId>
+  		<artifactId>DBC</artifactId>
+  		<version>${release.version}</version>
+            	<scope>compile</scope>
         </dependency>
 	
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
-        <dependency>
-            <groupId>org.societies.comm.xmpp.pubsub</groupId>
-            <artifactId>PubsubClientBundle</artifactId>
-            <version>${version.comm}</version>
-            <scope>provided</scope>
-        </dependency>
+        	<dependency>
+            		<groupId>org.societies.comm.xmpp.pubsub</groupId>
+            		<artifactId>PubsubClientBundle</artifactId>
+            		<version>${version.comm}</version>
+            		<scope>provided</scope>
+        	</dependency>
         
-        <dependency>
-            <groupId>org.societies.comm.xmpp</groupId>
-            <artifactId>CommunicationFrameworkCommons</artifactId>
-            <version>${version.comm}</version>
-            <scope>compile</scope>
-        </dependency>
+        	<dependency>
+            		<groupId>org.societies.comm.xmpp</groupId>
+            		<artifactId>CommunicationFrameworkCommons</artifactId>
+            		<version>${version.comm}</version>
+            		<scope>provided</scope>
+        	</dependency>
         
 
 		<dependency>
@@ -74,36 +71,33 @@
 			<scope>provided</scope>
 		</dependency>
 
+		
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
+		
 
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Export-Package>
-							org.societies.css.mgmt.CSSmanager
-						</Export-Package>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-					</instructions>
-				</configuration>
+    				<groupId>org.apache.felix</groupId>
+    				<artifactId>maven-bundle-plugin</artifactId>
+    				<extensions>true</extensions>
+    				<configuration>
+        				<instructions>
+            					<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
+            					<Bundle-Name>${pom.artifactId}</Bundle-Name>
+            					<Bundle-Version>${pom.version}</Bundle-Version>
+             			
+                        			<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+                        			<Embed-Transitive>false</Embed-Transitive>
+            					<Import-Package>*;resolution:=optional</Import-Package>
+        				</instructions>
+    				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

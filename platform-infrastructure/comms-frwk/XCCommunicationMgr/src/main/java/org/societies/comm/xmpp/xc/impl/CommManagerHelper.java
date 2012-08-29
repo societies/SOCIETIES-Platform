@@ -400,10 +400,10 @@ public class CommManagerHelper {
 			
 			Object bean = s.read(c, element.asXML());
 			
-			ICommCallback cb = getCommCallback(namespace);
-			if (cb!=null)
+			try {
+				ICommCallback cb = getCommCallback(namespace);
 				cb.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
-			else {
+			} catch (UnavailableException e) {
 				IFeatureServer fs = getFeatureServer(namespace);
 				fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
 			}

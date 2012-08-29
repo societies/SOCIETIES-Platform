@@ -67,6 +67,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
@@ -148,7 +149,7 @@ public class PPNPOutcomeGUI extends JDialog implements ActionListener
 		this.privPrefMgr=this.masterGUI.getPrivPrefMgr();
 		this.broker = this.masterGUI.getCtxBroker();
 		
-		this.contextType = details.getContextType();
+		this.contextType = details.getDataType();
 		
 		this.showGUI();
 	}
@@ -485,8 +486,9 @@ public class PPNPOutcomeGUI extends JDialog implements ActionListener
 		List<Requestor> requestors = new ArrayList<Requestor>();
 		requestors.add(this.details.getRequestor());
 		
-		Resource r = new Resource(details.getContextType());
-		if (this.details.getAffectedCtxID()!=null){
+		//TODO: add a scheme field
+		Resource r = new Resource(DataIdentifierScheme.CONTEXT, details.getDataType());
+		if (this.details.getAffectedDataId()!=null){
 			r = new Resource(this.getCtxIdentifier());
 		}
 		return new RuleTarget(requestors, r, this.gatherActions());

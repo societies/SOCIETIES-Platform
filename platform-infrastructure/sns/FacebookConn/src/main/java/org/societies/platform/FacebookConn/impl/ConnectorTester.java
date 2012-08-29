@@ -31,7 +31,7 @@ public class ConnectorTester {
 	 */
 	public static void main(String[] args) {
 		String access_token = "AAAFs43XOj3IBANAuFLLTycEWZCiHLvqN1BH9f4OGyhQbWJ2GZC7D57XbITHafLpisDjx0B9OtZCx3hhoxZANUNqOl8FK6tzchZAthmjTQVwZDZD";
-		FacebookConnectorImpl connector = new FacebookConnectorImpl(access_token,null);
+		FacebookConnectorImpl connector = new FacebookConnectorImpl(access_token, "Societies User");
 		
 		
 		/*
@@ -45,9 +45,20 @@ public class ConnectorTester {
 		//System.out.println(" GROUP:\n" + connector.getUserGroups());
 	//	System.out.println(" Friends:\n" + connector.getUserFriends());
 		
-		String data = connector.getUserActivities();
-		writeToFile("activities.txt", data);
+//		String data = connector.getUserActivities();
+//		writeToFile("activities.txt", data);
 		
+		//connector.post("Test for societies");
+		
+		String value="{ \"checkin\": {"+
+		        "\"lat\": \"53.345149444145\","+
+		        "\"lon\": \"-6.2539714878708\","+
+		        "\"message\": \"Hello!!!!\","+
+		        "\"place\": \"173684349321759\"}"+
+		        "}";
+				
+				connector.post(value);
+				
 
 	}
 

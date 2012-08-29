@@ -1,0 +1,165 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>0.1</version>
+	</parent>
+	<!-- groupId is set in parent pom -->
+	<groupId>org.societies.context-management</groupId>
+	<artifactId>context-mgmt-cloud-bundle</artifactId>
+	<version>${version.cm}</version>
+	<name>Context Management Cloud Bundle</name>
+	<packaging>bundle</packaging>
+
+	<developers>
+		<developer>
+			<id>NicolasLiampotis</id>
+			<name>Nicolas Liampotis</name>
+			<email>nicolas.liampotis@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+      		<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+
+		<developer>
+			<name>Nikos Kalatzis</name>
+			<email>nikosk@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>Senior Developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	</developers>
+
+	<!-- List dependencies here -->
+	<dependencies>
+
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- CONTEXT MANAGEMENT COMPONENTS: -->
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-mgmt-api</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-event-mgmt</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-db-mgmt</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>community-context-db-mgmt</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-history-mgmt</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-broker</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-source-mgmt</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-inference-mgmt</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>community-context-inference-mgmt</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.name}</Bundle-Name>
+						<Bundle-Version>${project.version}</Bundle-Version>
+
+						<Embed-Dependency>
+							*;scope=compile|runtime,
+							
+						</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+
+						<Export-Package>
+							org.societies.context-management.**
+						</Export-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${project.version}</version>
+							<type>jar</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>

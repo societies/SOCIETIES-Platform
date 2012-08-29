@@ -14,7 +14,6 @@
 	<!-- groupId is set in parent pom -->
 	<artifactId>user-context-history-mgmt</artifactId>
 	<version>${version.cm}</version>
-	<packaging>bundle</packaging>
 
 	<developers>
 	    <developer>
@@ -63,7 +62,7 @@
 		</dependency>
 	</dependencies>
 
-	<build>
+	<!-- build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -99,7 +98,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>	
+	</build>	 -->
 
 
 	<name>User Context History Management</name>

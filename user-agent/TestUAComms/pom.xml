@@ -5,8 +5,9 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
+		<!-- <relativePath>../../../parent/spring-osgi.xml</relativePath> -->
+		<!-- <version>0.1</version> -->
 	</parent>
 	
 	<groupId>org.societies.useragent</groupId>
@@ -27,14 +28,19 @@
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
+			<!-- <version>${release.version}</version> -->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
+			<!-- <version>${release.version}</version> -->
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.societies</groupId>
+		    <artifactId>common-ext-libs</artifactId>
+		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.useragent</groupId>
@@ -42,12 +48,12 @@
 			<version>${version.ua}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
 
 	</dependencies>
 

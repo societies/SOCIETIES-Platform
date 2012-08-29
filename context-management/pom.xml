@@ -35,11 +35,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	</parent>
 
 	<!-- Setup the identity of this builder -->
-	<groupId>org.societies</groupId>
-	<artifactId>context</artifactId>
+	<groupId>org.societies.context-management</groupId>
+	<artifactId>builder</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1</version>
+	<version>${version.cm}</version>
 	<name>Context Mgmt builder</name>
+	
 
 	<!-- All Context Management projects to be included in nightly builds -->
 	<modules>

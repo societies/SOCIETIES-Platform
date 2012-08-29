@@ -100,7 +100,7 @@ public class LocalServiceStartedListener extends EventListener{
 		List<String> contextTypes = new ArrayList<String>();
 		
 		for (RequestItem item : requestItems){
-			contextTypes.add(item.getResource().getContextType());
+			contextTypes.add(item.getResource().getDataType());
 		}
 		/**
 		 * TODO: adapt!

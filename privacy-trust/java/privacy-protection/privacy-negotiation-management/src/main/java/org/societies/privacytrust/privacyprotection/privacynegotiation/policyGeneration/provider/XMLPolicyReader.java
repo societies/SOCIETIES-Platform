@@ -54,6 +54,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -400,10 +401,12 @@ public class XMLPolicyReader {
 			if (ctxID == null){
 				return null;
 			}else{
-				return new Resource(ctxID.getType());
+				//hardcoded context type until the policy editor is modified
+				return new Resource(DataIdentifierScheme.CONTEXT,ctxID.getType());
 			}
 		}else{
-			return new Resource(ctxType);
+			//hardcoded context type until the policy editor is modified			
+			return new Resource(DataIdentifierScheme.CONTEXT, ctxType);
 		}
 	}
 	
