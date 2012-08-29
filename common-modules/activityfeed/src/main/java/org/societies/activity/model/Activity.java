@@ -24,19 +24,10 @@
  */
 package org.societies.activity.model;
 
-import java.util.HashMap;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivity;
+
+import javax.persistence.*;
+import java.util.HashMap;
 
 @Entity
 @Table(name = "org_societies_cis_activity_model_Activity")
@@ -72,7 +63,7 @@ public class Activity implements IActivity {
 		this.setObject("");
 		this.setTarget("");
 		this.setVerb("");
-		this.setPublished("");
+		this.setPublished("0");
 	}
 	public Activity(IActivity iact)
 	{
@@ -112,6 +103,7 @@ public class Activity implements IActivity {
 	@Column(name="actor")
 	@Override
 	public void setActor(String actor) {
+//        System.out.println("this: "+this.hashCode()+ " in setActor oldactor:"+this.actor+ " newactor: "+actor);
 		this.actor = actor;
 		data.put("actor", new ActivityString(actor));
 	}
@@ -159,10 +151,14 @@ public class Activity implements IActivity {
 	@Override
 	public void setPublished(String published) {
 		this.published = published;
+		this.time = Long.parseLong(published);
 		data.put("published", new ActivityString(published));
 		
 	}
 	public ActivityString getValue(String key){
 		return data.get(key);
 	}
+    public String toString(){
+        return getPublished()+":"+getActor()+":"+getVerb()+":"+getObject()+":"+getTarget();
+    }
 }

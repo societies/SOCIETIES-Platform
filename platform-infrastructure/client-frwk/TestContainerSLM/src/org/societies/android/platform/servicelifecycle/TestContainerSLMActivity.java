@@ -1,16 +1,11 @@
 package org.societies.android.platform.servicelifecycle;
 
-import org.apache.cordova.api.PluginResult;
 import org.societies.android.api.internal.servicelifecycle.AService;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
-import org.societies.android.api.utilities.ServiceMethodTranslator;
-import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.ServiceManagement;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor.LocalBinder;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -35,6 +30,10 @@ public class TestContainerSLMActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
+        //CREATE INTENT FOR SERVICE AND BIND
+        Intent intentServiceDisco = new Intent(this.getApplicationContext(), ServiceManagement.class);
+        this.getApplicationContext().bindService(intentServiceDisco, serviceDiscoConnection, Context.BIND_AUTO_CREATE);
+        
         //REGISTER BROADCAST
         IntentFilter intentFilter = new IntentFilter() ;
         intentFilter.addAction(ServiceManagement.GET_SERVICES);
@@ -56,12 +55,16 @@ public class TestContainerSLMActivity extends Activity {
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to IServiceDiscovery service");
 
-        	//GET LOCAL BINDER
-            LocalBinder binder = (LocalBinder) service;
-
-            //OBTAIN SERVICE DISCOVERY API
-            serviceDisco = (IServiceDiscovery) binder.getService();
-            serviceDiscoConnected = true;
+        	try {
+	        	//GET LOCAL BINDER
+	            LocalBinder binder = (LocalBinder) service;
+	
+	            //OBTAIN SERVICE DISCOVERY API
+	            serviceDisco = (IServiceDiscovery) binder.getService();
+	            serviceDiscoConnected = true;
+        	} catch (Exception ex) {
+        		Log.d(LOG_TAG, "Error binding to service: " + ex.getMessage());
+        	}
         }
         
         public void onServiceDisconnected(ComponentName name) {
@@ -79,7 +82,8 @@ public class TestContainerSLMActivity extends Activity {
     	}
     	
     	protected Void doInBackground(Void... args) {
-			serviceDisco.getServices("TestContainerSLMActivity", "john.societies.local");
+    		if (serviceDiscoConnected)
+    			serviceDisco.getServices("TestContainerSLMActivity", "john.societies.local");
     		return null;
     	}
     }

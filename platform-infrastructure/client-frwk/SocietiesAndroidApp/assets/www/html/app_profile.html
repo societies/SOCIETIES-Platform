@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+<link rel="stylesheet" type="text/css" href="includes/custom-theme-societies.css"/>
+<link href="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="includes/societies.css"/>
+<script src="jquery-mobile/jquery-1.7.2.js" type="text/javascript"></script>
+<script src="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.min.js" type="text/javascript"></script>
+<!--JQM SlideMenu-->
+<link rel="stylesheet" href="includes/jqm.css"/>
+<script src="js/jqm.slidemenu.js"></script>
+</head>
+<body>
+<div id="slidemenu">
+
+	<h3>MENU</h3>
+	<ul>
+		<li><a href="#" rel="external">Inbox</a></li>
+		<li><a href="#" rel="external">Chat</a></li>
+		<li><a href="#" rel="external">RSS Feeds</a></li>
+		<li><a href="#" rel="external">Help</a></li>
+		<li><a href="#" rel="external">Log Out</a></li>
+	</ul>
+</div>
+<!-- Start of first page: #friends -->
+<div data-role="page" id="friends">
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="../images/societies_header.png" alt="logo" />
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
+		<!-- /header -->
+	</div>
+	<div data-role="content">
+		<ul data-role="listview" data-theme="c" data-divider-theme="b">
+			<li data-role="list-divider">General Information</li>
+			<li>
+			<div class="profile_pic">
+				<img src="../images/printer_icon.png" alt="printer-icon" />
+			</div>
+			<div class="profile_txt">
+				<h1>HP Printer z200</h1>
+				<p>
+					TSSG Building, Waterford
+				</p>
+				<p>
+					Status: Not Enabled
+				</p>
+				<p>
+					Rating: <img src="../images/star_rating.png" alt="rating" />
+				</p>
+			</div>
+			<p>
+				<a href="app_uninstalled_dialog.html" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Uninstall</a>
+			</p>
+			</li>
+			<li data-role="list-divider">How to use</li>
+			<li>
+			<br/>
+			<p>
+				Instructions
+			</p>
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a nulla nunc. Cras elit nulla, varius vitae blandit sed, hendrerit vel nibh. Curabitur commodo vulputate dolor, sit amet lacinia felis ullamcorper ut.
+			</p>
+			</li>
+			<li data-role="list-divider">Recent Activity<span class="ui-li-count">2</span></li>
+			<li>
+			<h3>Sara connected to this <br/>printer from room 103</h3>
+			<p class="ui-li-aside">
+				2:24PM
+			</p>
+			</li>
+			<li data-role="list-divider">Similar Apps you might like</li>
+			<li>
+			<h3>HP Colour Printer</h3>
+			<p>
+				HP SmartPrint Z200a
+			</p>
+			<p class="ui-li-aside">
+				<a href="installed.html" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Install App</a>
+			</p>
+			<br/>
+			</li>
+			<li data-role="list-divider">My shared Apps</li>
+			<li>
+			<h3>HP Colour Printer</h3>
+			<p>
+				HP SmartPrint Z200a
+			</p>
+			<p class="ui-li-aside">
+			</p>
+			<br/>
+			</li>
+			<li data-role="list-divider">Share this App</li>
+			<li>
+			<h3></h3>
+			<p class="ui-li-middle">
+				<a href="#" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Share</a>
+			</p>
+			</li>
+		</ul>
+	</div>
+	<!-- /content -->
+	<br/><br/>
+    <!-- footer -->
+	<div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home"><a href="landing.html">
+			<span class="ico"><img src="../images/icons/home_logo.png" alt="home"/></span>
+			</a>
+			</li>
+			<li class="btn-profile"><a href="myProfile.html">
+			<span class="ico"><img src="../images/icons/my_profile.png" alt="profile"/></span>
+			</a>
+			</li>
+			<li class="btn-settings"><a href="settings.html">
+			<span class="ico"><img src="../images/icons/settings.png" alt="settings"/></span>
+			</a>
+			</li>
+			<li class="btn-about"><a href="about.html">
+			<span class="ico"><img src="../images/icons/about.png" alt="about"/></span>
+			</a>
+			</li>
+		</ul>
+	</div>
+	<!-- end footer -->
+</div>
+</body>
+</html>

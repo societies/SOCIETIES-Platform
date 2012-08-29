@@ -1,7 +1,7 @@
 phonegapdesktop.internal.parseConfigFile('pluginjs/devicestatus.json');
 
 
-window.plugins.DeviceStatus = {
+window.plugins.SocietiesDeviceStatusPlugin = {
 		getConnectivityStatus : function(successCallback, errorCallback){
 			if (phonegapdesktop.internal.randomException("DeviceStatusService")) {
 				errorCallback('A random error was generated');

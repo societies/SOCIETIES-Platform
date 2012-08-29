@@ -1,0 +1,23 @@
+{
+	"Preferences" : {
+		"exceptionThreshold" : 0,
+		"getStringPrefValue" : {
+			"value" : "A string value"
+			},
+		"getIntegerPrefValue" : {
+			"value" : "An integer value"
+			},
+		"getLongPrefValue" : {
+			"value" : "A long value"
+			},
+		"getFloatPrefValue" : {
+			"value" : "A float value"
+			},
+		"getBooleanPrefValue" : {
+			"value" : "A boolean value"
+			},
+		"putStringPrefValue" : {
+			"value" : "updated"
+			}
+	}
+}

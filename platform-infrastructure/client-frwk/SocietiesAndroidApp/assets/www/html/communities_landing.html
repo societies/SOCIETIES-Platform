@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+<link rel="stylesheet" type="text/css" href="includes/custom-theme-societies.css"/>
+<link href="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="includes/societies.css"/>
+<script src="jquery-mobile/jquery-1.7.2.js" type="text/javascript"></script>
+<script src="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.min.js" type="text/javascript"></script>
+<!--JQM SlideMenu-->
+<link rel="stylesheet" href="includes/jqm.css"/>
+<script src="js/jqm.slidemenu.js"></script>
+</head>
+<body>
+<div id="slidemenu">
+	<h3>MENU</h3>
+	<ul>
+		<li><a href="#" rel="external">Inbox</a></li>
+		<li><a href="#" rel="external">My Feeds</a></li>
+		<li><a href="#" rel="external">Help</a></li>
+		<li><a href="#" rel="external">Log Out</a></li>
+	</ul>
+</div>
+
+<div data-role="page" id="friends" data-add-back-btn='true'>
+	<!-- header -->
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="../images/societies_header.png" alt="logo" />
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
+	</div>
+	<!-- /header -->
+	<div data-role="content">
+		<input type="search" name="search" id="search-basic" value="Search Communities" data-theme="b"/>
+		<br/><br/>
+		<ul data-role="listview" id="listview" data-theme="c" data-divider-theme="b" data-count-theme="b">
+			<li data-role="list-divider">Communities</li>
+			<li data-theme="d"><a href="your_communities_list.html" rel="external">
+			<h2>Your Communities</h2>
+			<p>
+				A list of your communities <span class="ui-li-count">15</span>
+			</p>
+			<p>
+			</p>
+			</a></li>
+			<li><a href="manage_communities.html" rel="external">
+			<h2>Manage your Communities</h2>
+			<p>
+				Edit profile details and settings <span class="ui-li-count">5</span>
+			</p>
+			<p>
+			</p>
+			</a></li>
+			<li><a href="create_community.html" rel="external">
+			<h2>Create a new Community</h2>
+			<p>
+				Setup a new Community
+			</p>
+			<p>
+			</p>
+			</a></li>
+			<li><a href="your_suggested_communities_list.html" rel="external">
+			<h2>Suggested Communities</h2>
+			<p>
+				Some communities we think you might <br/>be interested in joining <span class="ui-li-count">4</span>
+			</p>
+			<p>
+			</p>
+			</a></li>
+		</ul>
+		<br/><br/>
+		<div class="terms">
+			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
+		</div>
+	</div>
+	<!-- /content -->
+	<br/><br/>
+ <!-- footer -->
+	<div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home"><a href="landing.html">
+			<span class="ico"><img src="../images/icons/home_logo.png" alt="home"/></span>
+			</a>
+			</li>
+			<li class="btn-profile"><a href="myProfile.html">
+			<span class="ico"><img src="../images/icons/my_profile.png" alt="profile"/></span>
+			</a>
+			</li>
+			<li class="btn-settings"><a href="settings.html">
+			<span class="ico"><img src="../images/icons/settings.png" alt="settings"/></span>
+			</a>
+			</li>
+			<li class="btn-about"><a href="about.html">
+			<span class="ico"><img src="../images/icons/about.png" alt="about"/></span>
+			</a>
+			</li>
+		</ul>
+	</div>
+	<!-- end footer -->
+</div>
+</body>
+</html>

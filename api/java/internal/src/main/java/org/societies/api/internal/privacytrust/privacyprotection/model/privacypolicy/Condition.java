@@ -62,6 +62,9 @@ public class Condition implements Serializable{
 	public boolean isOptional(){
 		return this.optional;
 	}
+	public boolean getOptional(){
+		return this.optional;
+	}
 	
 	public void setOptional(boolean isOptional){
 		this.optional = isOptional;

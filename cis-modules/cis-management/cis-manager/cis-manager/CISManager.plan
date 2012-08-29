@@ -27,7 +27,8 @@
 	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager" />
 
 	<!-- Context (needed by Privacy & Trust) -->
-	<artifact type="bundle"
+	<artifact type="bundle" name="org.societies.context-management.context-mgmt-cloud-bundle"/>
+	<!--<artifact type="bundle"
 		name="org.societies.context-management.context-event-mgmt" />
 	<artifact type="bundle"
 		name="org.societies.context-management.user-context-db-mgmt" />
@@ -42,12 +43,16 @@
 		name="org.societies.context-management.context-source-mgmt" />
   <artifact type="bundle"
 		name="org.societies.context-management.user-context-inference-mgmt" />
-		
+		-->
 	<!-- Privacy & Trust -->
 	<artifact type="bundle" name="org.societies.privacytrust.trust" />
 	<artifact type="bundle" name="org.societies.privacytrust.privacyprotection" />
     
-    
+    <!-- Security Negotiation -->
+    <artifact type="bundle" name="org.societies.privacytrust.privacytrustcommmanagement"/>
+    <artifact type="bundle" name="org.societies.security.secur-services"/>
+	<artifact type="bundle" name="org.societies.security.secur-commsmgr"/>
+	<artifact type="bundle" name="org.societies.security.policy-negotiator"/>
     
 	<!-- from services -->     
 

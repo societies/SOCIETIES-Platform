@@ -110,9 +110,6 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 		return this.binder;
 	}
 	
-	public ServiceManagement() {
-	}
-	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceDiscovery >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)

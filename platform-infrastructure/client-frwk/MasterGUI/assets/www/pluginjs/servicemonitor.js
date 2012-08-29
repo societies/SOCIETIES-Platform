@@ -1,7 +1,7 @@
 phonegapdesktop.internal.parseConfigFile('pluginjs/servicemonitor.json');
 
 
-window.plugins.CoreServiceMonitorService = {
+window.plugins.SocietiesCoreServiceMonitor = {
 	connectService: function(successCallback, errorCallback){
 		if (phonegapdesktop.internal.randomException("CoreServiceMonitorService")) {
 			errorCallback('A random error was generated');
