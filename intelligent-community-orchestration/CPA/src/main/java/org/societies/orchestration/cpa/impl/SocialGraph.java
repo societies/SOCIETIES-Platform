@@ -27,6 +27,12 @@ package org.societies.orchestration.cpa.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeedCallback;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
@@ -123,5 +129,41 @@ public class SocialGraph implements Collection<SocialGraphVertex> {
 			ret.addEdge(edge, edge.getFrom(), edge.getTo());
 		}
 		return ret;
+	}
+	public void populateFromNewData(List<IActivity> actDiff , long lastTime, ActorComparator actComp){
+
+		//creating the vertices
+		//this make take a while the first time..
+
+
+		//actDiff = cis.getActivityFeed().getActivities(lastTimeStr+" "+nowStr);
+		for(IActivity act : actDiff){
+			if(hasVertex(act.getActor()) == null){
+				getVertices().add(new SocialGraphVertex(act.getActor()));
+			}
+			if(hasVertex(act.getTarget()) == null){
+				getVertices().add(new SocialGraphVertex(act.getTarget()));
+			}
+		}
+		//creating the edges..
+		//this aswell !
+		System.out.println("actDiff size:"+actDiff.size()+" getVertices().size():"+getVertices().size());
+		int newEdges=0; int hasEdges=0;
+		SocialGraphEdge edge = null; SocialGraphEdge searchEdge = null;
+		for(SocialGraphVertex vertex1 : getVertices()){
+			for(SocialGraphVertex vertex2 : getVertices()){
+				edge = new SocialGraphEdge(vertex1,vertex2);
+				searchEdge = hasEdge(edge);
+				if(searchEdge == null){
+					newEdges++;
+					edge.setWeight(actComp.compare(vertex1,vertex2,actDiff));
+					getEdges().add(edge);
+				}else{
+					hasEdges++;
+					searchEdge.addToWeight(actComp.compare(vertex1,vertex2,actDiff));
+				}
+			}
+		}
+		System.out.println("newEdges: "+newEdges);
 	}
 }

@@ -1127,6 +1127,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
 			
 			// first social status
+            LOG.info("memberCssEntityId:"+memberCssEntityId.hashCode());
+            LOG.info("this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS): "+this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS));
 			List<CtxIdentifier> ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS).get();			
 
 			if(ctxIds!= null && ctxIds.isEmpty() == false){

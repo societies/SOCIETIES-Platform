@@ -6,6 +6,7 @@
 .classpath
 # ignore java compile time files:
 *.class
+out/
 bin/
 gen/
 target/
@@ -21,9 +22,14 @@ R.java
 # ignore temporary Linux files
 *.swp
 
+# ignore OSX temp files
+.DS_store
 # ignore thumbnails created by windows
 Thumbs.db
 
+# ignore intellij build files
+*.iml
+.idea
 # ignore files build by Visual Studio
 *.obj
 *.exe
