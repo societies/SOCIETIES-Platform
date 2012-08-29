@@ -51,6 +51,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.osgi.event.IEventMgr;
@@ -105,6 +106,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private IServiceDiscoveryRemote mockIServDiscRemote;
 	private IServiceControlRemote mockIServCtrlRemote;
 	private ICtxBroker mockContextBroker;
+	private INegotiation mockNegotiation;
 	
 	public static String CIS_MANAGER_CSS_ID = "testXcmanager.societies.local";
 	
@@ -238,6 +240,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockIServCtrlRemote = mock(IServiceControlRemote.class);
 		mockPrivacyPolicyManager = mock(IPrivacyPolicyManager.class);		
 		mockEventMgr = mock(IEventMgr.class);
+		mockNegotiation = mock(INegotiation.class);
+		
 		
 		// mocking the IcomManagers
 		mockCISendpoint1 = mock (ICommManager.class);

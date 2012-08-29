@@ -6,7 +6,6 @@
         <groupId>org.societies</groupId>
         <artifactId>android-parent</artifactId>
         <version>RELEASE</version>
-        <relativePath>../../../parent/android.xml</relativePath>
    </parent>
 
    <groupId>org.societies.android.platform.cssmanager</groupId>
