@@ -62,8 +62,19 @@ text-align: center
 	<p>
 		<pre><c:out value="${ResultMsg}" /></pre>
 	</p>
-		<fieldset>
-			<legend>Requested data</legend>
+		<%-- <fieldset class="simple-mode">
+			<legend>Simple mode: CIS</legend>
+			<label for="mode1">Actions to apply on this resource</label>
+			<form:checkbox path="mode" value="PRIVATE" />
+			<label for="mode1" class="inline">Private: nobody can access CIS data</label>
+			<form:checkbox path="mode" value="SHARED" />
+			<label for="mode2" class="inline">Shared: only CIS members can access CIS data</label>
+			<form:checkbox path="mode" value="PUBLIC" />
+			<label for="mode3" class="inline">Public: everybody can access CIS data</label>
+			<form:errors path="mode" cssClass="error" />
+		</fiedlset> --%>
+		<fieldset class="advanced-mode">
+			<legend>Advanced mode: Requested data by the CIS</legend>
 			<c:forEach var="resource" items="${cisCreationForm.resources}" varStatus="status">
 				<c:choose>
 					<c:when test="${status.count == fn:length(cisCreationForm.resources)}">
@@ -79,8 +90,7 @@ text-align: center
 					<form:select path="resources[${status.index}].resourceType"
 						class="resources${status.index}resourceType">
 						<option value="NONE">--- Select ---</option>
-						<c:forEach var="resourceType" items="${ResourceList}"
-							varStatus="statusResource">
+						<c:forEach var="resourceType" items="${ResourceList}" varStatus="statusResource">
 							<form:option value="${resourceType}">${ResourceHumanList[statusResource.index]}</form:option>
 						</c:forEach>
 					</form:select>
