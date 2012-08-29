@@ -25,38 +25,35 @@
 package org.societies.platform.activityfeed;
 
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.activity.ActivityFeed;
+import org.societies.activity.PersistedActivityFeed;
+import org.societies.activity.model.Activity;
+import org.societies.api.activity.IActivity;
+import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.platform.socialdata.SocialData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.activity.ActivityFeed;
-import org.societies.activity.model.Activity;
-import org.societies.api.activity.IActivity;
-import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
-import org.societies.platform.socialdata.SocialData;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 /**
  * 
@@ -69,16 +66,27 @@ public class ActivityFeedTest extends
 AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger LOG = LoggerFactory
 			.getLogger(ActivityFeedTest.class);
+
+    @Qualifier(value = "test")
 	@Autowired
 	private ActivityFeed actFeed;
+    @Autowired
+    private PersistedActivityFeed pFeed;
 	private SessionFactory sessionFactory=null;
 	private Session session=null;
 	static {
 		ClassLoader.getSystemClassLoader().setDefaultAssertionStatus(true);
 	}
 	int feedid=0;
-	@Before
+
+    public ActivityFeedTest() {
+        LOG.info("in actfeedtest constructor");
+        actFeed = pFeed;
+    }
+
+    @Before
 	public void setupBefore() throws Exception {
+        actFeed = pFeed;
 		if(sessionFactory==null){
 			sessionFactory = actFeed.getSessionFactory();
 		}
@@ -102,7 +110,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testAddCisActivity() {
 		LOG.info("@@@@@@@ IN TESTADDACTIVITY @@@@@@@");
-		actFeed.startUp(session, Integer.toString(1));
+		actFeed.startUp(sessionFactory, Integer.toString(1));
 		String actor="testUsertestAddCisActivity";
 		String verb="published";
 		IActivity iact = new Activity();
@@ -142,7 +150,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testCleanupFeed() {
 		LOG.info("@@@@@@@ IN TESTCLEANUPFEED @@@@@@@");
-		actFeed.startUp(session, Integer.toString(2));
+		actFeed.startUp(sessionFactory, Integer.toString(2));
 		JSONObject searchQuery = new JSONObject();
 		String timeSeries = "0 "+Long.toString(System.currentTimeMillis());
 		try {
@@ -165,7 +173,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testFilter(){
 		LOG.info("@@@@@@@ IN TESTFILTER @@@@@@@");
-		actFeed.startUp(session, Integer.toString(3));
+		actFeed.startUp(sessionFactory, Integer.toString(3));
 		String actor="testFilterUser";
 		Activity act1 = new Activity(); act1.setActor(actor); act1.setPublished(Long.toString(System.currentTimeMillis()-100));
 		String timeSeries = Long.toString(System.currentTimeMillis()-1000)+" "+Long.toString(System.currentTimeMillis());
@@ -206,7 +214,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 	@Rollback(false)
 	public void testSNImporter(){
 		LOG.info("@@@@@@@ IN TESTSNIMPORTER @@@@@@@");
-		actFeed.startUp(session, Integer.toString(4));
+		actFeed.startUp(sessionFactory, Integer.toString(4));
 		LOG.info("actFeedcontent: "+ actFeed.getActivities("0 " + Long.toString(System.currentTimeMillis())).size());
 		ISocialConnector mockedSocialConnector; 
 		mockedSocialConnector = mock(ISocialConnector.class);
@@ -221,7 +229,6 @@ AbstractTransactionalJUnit4SpringContextTests {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		LOG.info("@@@@@@@ IN TESTSNIMPORTER 3 @@@@@@@");
 		SocialData data = new SocialData();
 		try {
 			data.addSocialConnector(mockedSocialConnector);
@@ -230,7 +237,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 		}
 		
 		data.updateSocialData();
-		actFeed.importActivtyEntries(data.getSocialActivity());
+		actFeed.importActivityEntries(data.getSocialActivity());
 		LOG.info("testing importing from facebook, raw activities: " + mockedSocialConnector.getUserActivities());
 		LOG.info("testing importing from facebook, activities: " + data.getSocialActivity().size() );
 		
@@ -246,7 +253,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 		LOG.info("@@@@@@@ IN TESTREBOOT @@@@@@@");
 		String actor="testRebootActor";
 		String verb="published";
-		actFeed.startUp(session, Integer.toString(5));
+		actFeed.startUp(sessionFactory, Integer.toString(5));
 		IActivity iact = new Activity();
 		iact.setActor(actor);
 		iact.setPublished(Long.toString(System.currentTimeMillis()));

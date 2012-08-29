@@ -36,8 +36,16 @@ public class JungBetweennessAnalyser implements GraphAnalyser {
 	}
 	@Override
 	public Set<Set<SocialGraphVertex>> cluster(SocialGraph sg) {
+		int numEdgesToRemoveNow = numEdgesToRemove;
+		if(sg.getEdges().size()<numEdgesToRemoveNow){
+			System.out.println("something wrong w.r.t. the edges and the numEdgesToRemove: "+this.numEdgesToRemove+" sg.getEdges().size(): "+sg.getEdges().size());
+			if(sg.getEdges().size()!=1){
+				numEdgesToRemoveNow = sg.getEdges().size()-2;
+			}
+		}
+		
 		EdgeBetweennessClusterer<SocialGraphVertex,SocialGraphEdge> clusterer =
-				new EdgeBetweennessClusterer<SocialGraphVertex,SocialGraphEdge>(numEdgesToRemove);
+				new EdgeBetweennessClusterer<SocialGraphVertex,SocialGraphEdge>(numEdgesToRemoveNow);
 		Set<Set<SocialGraphVertex>> clusterSet = clusterer.transform(sg.toJung());
 		List<SocialGraphEdge> edges = clusterer.getEdgesRemoved();
 		return clusterSet;
