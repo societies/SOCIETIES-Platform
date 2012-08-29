@@ -9,7 +9,7 @@
 * This file is based on the JUNG project's example
 */
 
-package org.societies.orchestration.cpa.impl;
+package org.societies.orchestration.cpa.test;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -29,11 +29,7 @@ import java.awt.event.ItemListener;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -54,6 +50,13 @@ import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.apache.commons.collections15.functors.MapTransformer;
 import org.apache.commons.collections15.map.LazyMap;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeedCallback;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.orchestration.cpa.impl.CPACreationPatterns;
+import org.societies.orchestration.cpa.impl.SocialGraphEdge;
+import org.societies.orchestration.cpa.impl.SocialGraphVertex;
 
 import edu.uci.ics.jung.algorithms.cluster.EdgeBetweennessClusterer;
 import edu.uci.ics.jung.algorithms.layout.AggregateLayout;
@@ -114,45 +117,71 @@ public class JungTest extends JApplet
 		}
 	}
 	public UndirectedSparseGraph makeGraph(){
-		UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> g = new UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge>();
-		SocialGraphVertex v1 = new SocialGraphVertex("BM");
-		SocialGraphVertex v2 = new SocialGraphVertex("Thomas");
-		SocialGraphVertex v3 = new SocialGraphVertex("Babak");
-		SocialGraphVertex v4 = new SocialGraphVertex("Kevin");
-		SocialGraphVertex v5 = new SocialGraphVertex("Alec");
-		SocialGraphVertex v6 = new SocialGraphVertex("Jaqueline");
-		SocialGraph sg = new SocialGraph();
-		sg.add(v1);sg.add(v2);sg.add(v3);sg.add(v4);sg.add(v5);sg.add(v6);
-		g.addVertex(v1);
-		g.addVertex(v2);
-		g.addVertex(v3);
-		g.addVertex(v4);
-		g.addVertex(v5);
-		g.addVertex(v6);
-		
-		g.addEdge(new SocialGraphEdge(v1,v2,1.0),v1,v2);
-		g.addEdge(new SocialGraphEdge(v1,v3,1.0),v1,v3);
-		//g.addEdge(new SocialGraphEdge(v1,v4,0.1),v1,v4);
-		g.addEdge(new SocialGraphEdge(v1,v5,0.6),v1,v5);
-		g.addEdge(new SocialGraphEdge(v1,v5,0.6),v1,v6);
-		
-		g.addEdge(new SocialGraphEdge(v2,v3,1.0),v2,v3);
-		g.addEdge(new SocialGraphEdge(v2,v4,0.1),v2,v4);
-		g.addEdge(new SocialGraphEdge(v2,v5,0.8),v2,v5);
-		g.addEdge(new SocialGraphEdge(v2,v5,0.7),v2,v6);
-		
-		g.addEdge(new SocialGraphEdge(v3,v4,0.1),v3,v4);
-		g.addEdge(new SocialGraphEdge(v3,v5,0.6),v3,v5);
-		g.addEdge(new SocialGraphEdge(v3,v5,0.5),v3,v6);
-		
-		g.addEdge(new SocialGraphEdge(v4,v5,0.7),v4,v5);
-		g.addEdge(new SocialGraphEdge(v4,v6,0.3),v4,v6);
-		
-		g.addEdge(new SocialGraphEdge(v5,v6,0.2),v5,v6);
-		
-		System.out.println(""+g.toString());
-		return g;
+//		UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> g = new UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge>();
+//		SocialGraphVertex v1 = new SocialGraphVertex("BM");
+//		SocialGraphVertex v2 = new SocialGraphVertex("Thomas");
+//		SocialGraphVertex v3 = new SocialGraphVertex("Babak");
+//		SocialGraphVertex v4 = new SocialGraphVertex("Kevin");
+//		SocialGraphVertex v5 = new SocialGraphVertex("Alec");
+//		SocialGraphVertex v6 = new SocialGraphVertex("Jaqueline");
+//		SocialGraph sg = new SocialGraph();
+//		sg.add(v1);sg.add(v2);sg.add(v3);sg.add(v4);sg.add(v5);sg.add(v6);
+//		g.addVertex(v1);
+//		g.addVertex(v2);
+//		g.addVertex(v3);
+//		g.addVertex(v4);
+//		g.addVertex(v5);
+//		g.addVertex(v6);
+//		
+//		g.addEdge(new SocialGraphEdge(v1,v2,1.0),v1,v2);
+//		g.addEdge(new SocialGraphEdge(v1,v3,1.0),v1,v3);
+//		//g.addEdge(new SocialGraphEdge(v1,v4,0.1),v1,v4);
+//		g.addEdge(new SocialGraphEdge(v1,v5,0.6),v1,v5);
+//		g.addEdge(new SocialGraphEdge(v1,v5,0.6),v1,v6);
+//		
+//		g.addEdge(new SocialGraphEdge(v2,v3,1.0),v2,v3);
+//		g.addEdge(new SocialGraphEdge(v2,v4,0.1),v2,v4);
+//		g.addEdge(new SocialGraphEdge(v2,v5,0.8),v2,v5);
+//		g.addEdge(new SocialGraphEdge(v2,v5,0.7),v2,v6);
+//		
+//		g.addEdge(new SocialGraphEdge(v3,v4,0.1),v3,v4);
+//		g.addEdge(new SocialGraphEdge(v3,v5,0.6),v3,v5);
+//		g.addEdge(new SocialGraphEdge(v3,v5,0.5),v3,v6);
+//		
+//		g.addEdge(new SocialGraphEdge(v4,v5,0.7),v4,v5);
+//		g.addEdge(new SocialGraphEdge(v4,v6,0.3),v4,v6);
+//		
+//		g.addEdge(new SocialGraphEdge(v5,v6,0.2),v5,v6);
+//		
+//		System.out.println(""+g.toString());
+CISSimulator sim = new CISSimulator(10,10);
+		final ArrayList<IActivity> actDiff = new ArrayList<IActivity>();
+        ApplicationContextLoader loader = new ApplicationContextLoader();
+        loader.load(sim, "SimTest-context.xml");
+		sim.getActFeed().setSession(sim.getSessionFactory().openSession());
+		cises = new ArrayList<ICisOwned>();
+		sim.setMaxActs(2000);
+		cises.add(sim.simulate(1));
+        final CPACreationPatterns cpa = new CPACreationPatterns();
+        class GetActFeedCB implements IActivityFeedCallback{
+
+            @Override
+            public void receiveResult(Activityfeed activityFeedObject) {
+                actDiff.addAll((Collection<? extends IActivity>) activityFeedObject.getGetActivitiesResponse().getActivity());
+                cpa.init();
+                cpa.analyze(actDiff);
+            }
+        }
+        GetActFeedCB dummyFeedback = new GetActFeedCB();
+        cises.get(0).getActivityFeed().getActivities("0"+Long.toString(System.currentTimeMillis()+100000L),dummyFeedback);
+
+        System.out.println("cises.get(0).getActivityFeed(): "+cises.get(0).getActivityFeed());
+        
+
+
+		return cpa.getGraph().toJung();
 	}
+	List<ICisOwned> cises;
 	private void setUpView(UndirectedSparseGraph graph) throws IOException {
 		
     	Factory<SocialGraphVertex> vertexFactory = new Factory<SocialGraphVertex>() {

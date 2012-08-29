@@ -25,72 +25,33 @@
 
 package org.societies.cis.manager;
 
-import static org.junit.Assert.*;
-
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.ActivityFeed;
-import org.societies.activity.ActivityFeedCallback;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisManagerCallback;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisParticipant;
-import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.*;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.identity.IIdentity;
+import org.societies.api.context.model.*;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.osgi.event.IEventMgr;
@@ -99,16 +60,19 @@ import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
-import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.identity.IdentityImpl;
 import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.security.InvalidParameterException;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -142,6 +106,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private IServiceDiscoveryRemote mockIServDiscRemote;
 	private IServiceControlRemote mockIServCtrlRemote;
 	private ICtxBroker mockContextBroker;
+	private INegotiation mockNegotiation;
 	
 	public static String CIS_MANAGER_CSS_ID = "testXcmanager.societies.local";
 	
@@ -204,14 +169,19 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	List<CtxIdentifier> statusList;
 	Future<List<CtxIdentifier>> futureCityList;
 	List<CtxIdentifier> cityList;
+    Future<List<CtxIdentifier>> futureReligiousList;
+    List<CtxIdentifier> religionList;
 
 	CtxAttributeIdentifier mockCityId;
 	CtxAttributeIdentifier mockStatusId;
+    CtxAttributeIdentifier mockReligionId;
 	CtxAttribute mockCity;
 	CtxAttribute mockStatus;
+    CtxAttribute mockReligion;
 	
 	String city = "Paris";
 	String status = "married";
+    String religion = "jedi";
 		
 	void mockingContext() throws InterruptedException, ExecutionException, CtxException{
 		 mockContextBroker = mock(ICtxBroker.class);
@@ -226,28 +196,37 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 
 		 
 		 // mocking attributes and attribute list
-		 mockCityId = new CtxAttributeIdentifier(mockCtxEntityIdentifier, CtxAttributeTypes.ADDRESS_HOME_CITY, new Long(12345));
+		 mockCityId = new CtxAttributeIdentifier(mockCtxEntityIdentifier, CtxAttributeTypes.ADDRESS_HOME_CITY, new Long(12344));
 		 mockStatusId = new CtxAttributeIdentifier(mockCtxEntityIdentifier, CtxAttributeTypes.STATUS, new Long(12345));
+         mockReligionId = new CtxAttributeIdentifier(mockCtxEntityIdentifier, CtxAttributeTypes.RELIGIOUS_VIEWS,new Long(12346));
 		 mockCity = new CtxAttribute(mockCityId);
 		 mockStatus = new CtxAttribute(mockStatusId);
+         mockReligion = new CtxAttribute(mockReligionId);
 		 mockCity.setStringValue(city);
 		 mockStatus.setStringValue(status);
+         mockReligion.setStringValue(religion);
 		 statusList = new ArrayList<CtxIdentifier>();
 		 cityList = new ArrayList<CtxIdentifier>();
+         religionList = new ArrayList<CtxIdentifier>();
 		 statusList.add(mockStatusId);
 		 cityList.add(mockCityId);
+         religionList.add(mockReligionId);
 		 futureStatusList= mock(Future.class);
 		 futureCityList= mock(Future.class);
+         futureReligiousList = mock(Future.class);
 		 when(futureStatusList.get()).thenReturn(statusList );
 		 when(futureCityList.get()).thenReturn(cityList );
-
+        when(futureReligiousList.get()).thenReturn(religionList );
 		 
 		 // mocking context broker
+        LOG.info("mocking with: mockCtxEntityIdentifier = "+mockCtxEntityIdentifier.hashCode());
 		 when(mockContextBroker.lookup(mockCtxEntityIdentifier, CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS)).thenReturn(futureStatusList);
+         when(mockContextBroker.lookup(mockCtxEntityIdentifier, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS)).thenReturn(futureReligiousList);
 		 when(mockContextBroker.lookup(mockCtxEntityIdentifier, CtxModelType.ATTRIBUTE, CtxAttributeTypes.ADDRESS_HOME_CITY)).thenReturn(futureCityList);
 		 when(mockContextBroker.retrieveIndividualEntity(testCisManagerId)).thenReturn(futMockCtxEntityIdentifier);
 		 when(mockContextBroker.retrieve(mockCityId)).thenReturn(new AsyncResult<CtxModelObject>(mockCity));
 		 when(mockContextBroker.retrieve(mockStatusId)).thenReturn(new AsyncResult<CtxModelObject>(mockStatus));
+        when(mockContextBroker.retrieve(mockReligionId)).thenReturn(new AsyncResult<CtxModelObject>(mockReligion));
 		// (CtxAttribute) this.internalCtxBroker.retrieve(ctxId).get()
 		 
 		// when(mockCtxBroker.retrieveIndividualEntity(mockIdentity)).thenReturn(new AsyncResult<IndividualCtxEntity>(mockPersonEntity));
@@ -261,6 +240,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockIServCtrlRemote = mock(IServiceControlRemote.class);
 		mockPrivacyPolicyManager = mock(IPrivacyPolicyManager.class);		
 		mockEventMgr = mock(IEventMgr.class);
+		mockNegotiation = mock(INegotiation.class);
+		
 		
 		// mocking the IcomManagers
 		mockCISendpoint1 = mock (ICommManager.class);
@@ -839,7 +820,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		
 		
-		Iciss.getActivityFeed().getActivities((System.currentTimeMillis() -20000) + " " + System.currentTimeMillis(), new getActivitiesCallback(Iciss.getCisId()));
+		Iciss.getActivityFeed().getActivities((System.currentTimeMillis() -2000000) + " " + System.currentTimeMillis(), new getActivitiesCallback(Iciss.getCisId()));
 		
 		
 	}

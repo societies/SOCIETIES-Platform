@@ -25,11 +25,16 @@
 
 package org.societies.orchestration.cpa.impl;
 
+import org.societies.api.activity.IActivity;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.identity.IIdentity;
+import org.societies.orchestration.api.ICisProposal;
+import org.societies.orchestration.api.IDataCollectorSubscriber;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.orchestration.api.ICisProposal;
-import org.societies.api.identity.IIdentity;
 
 /**
  * This is the class for the Egocentric Community Analyser component
@@ -42,7 +47,7 @@ import org.societies.api.identity.IIdentity;
  * 
  */
 
-public class CPA
+public class CPA implements IDataCollectorSubscriber
 {
 	public CPA(){}
 	private CPACreationPatterns cpaCreationPatterns;
@@ -66,7 +71,7 @@ public class CPA
 	}
 	private void process() {
 		
-		sendToCSM(cpaCreationPatterns.analyze(currentCises));
+		sendToCSM(cpaCreationPatterns.analyze(null));
 
 	}
 	
@@ -76,8 +81,33 @@ public class CPA
 		new SleepThread().start();
 		
 	}
-	
-	class SleepThread extends Thread {
+    private List<IActivity> newActivities;
+    private List<CtxChangeEvent> newContext;
+    @Override
+    public void receiveNewData(List<?> newData) {
+        if(newData.get(0) instanceof IActivity){
+           List<IActivity> tmpActList = (List<IActivity>)newData;
+           this.newActivities.addAll(tmpActList);
+        }else if(newData.get(0) instanceof CtxChangeEvent){
+           List<CtxChangeEvent> tmpCtxList = (List<CtxChangeEvent>)newData;
+           this.newContext.addAll(tmpCtxList);
+        }
+    }
+
+//    @Override
+//    public void receiveResult(Activityfeed activityFeedObject) {
+//        String lastTimeStr = Long.toString(lastTime);
+//        String nowStr = Long.toString(System.currentTimeMillis());
+//        = new ArrayList<IActivity>();
+//        System.out.println("icis.getActivityFeed(): "+cises.get(0).getActivityFeed());
+//        for(ICisOwned icis : cises){
+//            IActivityFeedCallback c = new ActivityFeedCallback();
+//            icis.getActivityFeed().getActivities(lastTimeStr+" "+nowStr,null)
+//            actDiff.addAll(); //getting the diff.
+//        }
+//    }
+
+    class SleepThread extends Thread {
 		
 		public void run() {
 			while (true) {
@@ -109,7 +139,9 @@ public class CPA
     public void setCPACreationPatterns(CPACreationPatterns cpaCreationPatterns) {
     	this.cpaCreationPatterns = cpaCreationPatterns;
     }
-    public void init(){}
+    public void init(){
+        this.newActivities = new ArrayList<IActivity>();
+    }
     
     
 }
