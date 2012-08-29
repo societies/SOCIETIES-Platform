@@ -42,6 +42,12 @@ display block;
 th{
 text-align: center
 }
+h4{
+	color: silver;
+}
+h4 strong{
+	color: black;
+}
 </style>
 </head>
 
@@ -55,26 +61,38 @@ text-align: center
 	<!-- END LEFTBAR -->
 	<!-- .................PLACE YOUR CONTENT HERE ................ -->
 
-	<h3>CIS Manager Service</h3>
-	<h4><strong>CIS Creation</strong> - Step 1 > <strong>Step 2: privacy policy</strong> > Step 3</h4>
+	<h3>CIS Manager Service - CIS Creation</h3>
+	<h4>Step 1: Configuration > <strong>Step 2: Privacy policy</strong> > Step 3: Finish</h4>
 
 	<form:form method="POST" action="create-cis-step-3.html" commandName="cisCreationForm" class="updatePrivacyPolicy">
 	<p>
 		<pre><c:out value="${ResultMsg}" /></pre>
 	</p>
-		<%-- <fieldset class="simple-mode">
-			<legend>Simple mode: CIS</legend>
-			<label for="mode1">Actions to apply on this resource</label>
-			<form:checkbox path="mode" value="PRIVATE" />
-			<label for="mode1" class="inline">Private: nobody can access CIS data</label>
-			<form:checkbox path="mode" value="SHARED" />
-			<label for="mode2" class="inline">Shared: only CIS members can access CIS data</label>
-			<form:checkbox path="mode" value="PUBLIC" />
-			<label for="mode3" class="inline">Public: everybody can access CIS data</label>
+		<fieldset class="simple">
+			<legend class="simple-handler">Simple: Select a pre-configured mode</legend>
+			<div class="simple-box">
+			<p class="mode-private">
+				<form:radiobutton path="mode" value="PRIVATE" />
+				<label for="mode1" class="inline"><strong>Private</strong>: nobody can access CIS data</label>
+			</p>
+			<p class="mode-shared">
+				<form:radiobutton path="mode" value="SHARED" />
+				<label for="mode2" class="inline"><strong>Shared</strong>: only CIS members can access CIS data</label>
+			</p>
+			<p class="mode-public">
+				<form:radiobutton path="mode" value="PUBLIC" />
+				<label for="mode3" class="inline"><strong>Public</strong>: everybody can access CIS data</label>
+			</p>
+			<p class="mode-custom">
+				<form:radiobutton path="mode" class="custom-radio" value="CUSTOM" />
+				<label for="mode4" class="inline"><strong>Custom</strong>: configure exactly what you want below</label>
+			</p>
 			<form:errors path="mode" cssClass="error" />
-		</fiedlset> --%>
-		<fieldset class="advanced-mode">
-			<legend>Advanced mode: Requested data by the CIS</legend>
+			</div>
+		</fiedlset>
+		<fieldset class="advanced">
+			<legend class="advanced-handler">Advanced: Configure the requested data list</legend>
+			<div class="advanced-box">
 			<c:forEach var="resource" items="${cisCreationForm.resources}" varStatus="status">
 				<c:choose>
 					<c:when test="${status.count == fn:length(cisCreationForm.resources)}">
@@ -227,6 +245,7 @@ text-align: center
 
 			<input type="button" value="Add a requested data"
 				class="addRequestedData" />
+			</div>
 		</fieldset>
 		<!-- CIS Creation Data -->
 		<input type="hidden" name="method" value="${cisCreationForm.method}" />

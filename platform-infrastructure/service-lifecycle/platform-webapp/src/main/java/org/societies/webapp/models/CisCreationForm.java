@@ -51,6 +51,7 @@ import org.springframework.util.AutoPopulatingList;
  */
 public class CisCreationForm extends CisManagerForm {
 	// -- CIS
+	private String mode;
 	
 	// -- Privacy Policy
 	private AutoPopulatingList<PrivacyPolicyResourceForm> resources;
@@ -64,6 +65,10 @@ public class CisCreationForm extends CisManagerForm {
 	 * @param cisForm
 	 */
 	public CisCreationForm(CisManagerForm cisForm) {
+		fillCisConfiguration(cisForm.getMethod(), cisForm.getCisName(), cisForm.getCisType(), cisForm.getAttribute(), cisForm.getOperator(), cisForm.getValue());
+	}
+	
+	public void fillCisConfiguration(CisManagerForm cisForm) {
 		fillCisConfiguration(cisForm.getMethod(), cisForm.getCisName(), cisForm.getCisType(), cisForm.getAttribute(), cisForm.getOperator(), cisForm.getValue());
 	}
 
@@ -109,6 +114,20 @@ public class CisCreationForm extends CisManagerForm {
 		this.resources.add(resource);
 	}
 	
+	/**
+	 * @return the mode
+	 */
+	public String getMode() {
+		return mode;
+	}
+
+	/**
+	 * @param mode the mode to set
+	 */
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
