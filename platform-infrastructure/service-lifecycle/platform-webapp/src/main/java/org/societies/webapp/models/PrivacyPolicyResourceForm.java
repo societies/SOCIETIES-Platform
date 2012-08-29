@@ -31,6 +31,7 @@ import java.util.List;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.springframework.util.AutoPopulatingList;
 
 /**
  * Describe your class here...
@@ -119,6 +120,13 @@ public class PrivacyPolicyResourceForm {
 	public void setActions(List<PrivacyActionForm> actions) {
 		this.actions = actions;
 	}
+	public void addAction(PrivacyActionForm action) {
+		if (null == actions) {
+			actions = new ArrayList<PrivacyActionForm>();
+		}
+		this.actions.add(action);
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

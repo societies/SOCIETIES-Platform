@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpSession;
@@ -40,7 +41,11 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.webapp.models.CisCreationForm;
 import org.societies.webapp.models.CisManagerForm;
+import org.societies.webapp.models.PrivacyActionForm;
+import org.societies.webapp.models.PrivacyConditionForm;
+import org.societies.webapp.models.PrivacyPolicyResourceForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -55,14 +60,23 @@ import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisParticipant;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
+import java.lang.reflect.Field;
 import java.security.InvalidParameterException;
 
 
@@ -74,18 +88,15 @@ public class CisManagerController {
 	 */
 	@Autowired
 	private ICisManager cisManager;
-
-	/**
-	 * @return the cisManager */
-	public ICisManager getCisManager() {
-		return cisManager;
-	}
-
-	/**
-	 * @param cisManager the cisManager to set */
-	public void setCisManager(ICisManager cisManager) {
-		this.cisManager = cisManager;
-	}
+	@Autowired(required=false)
+	private IPrivacyPolicyManager privacyPolicyManager;
+	@Autowired(required=false)
+	private ICommManager commMngrRef;
+	
+	// -- Data for the Privacy Policy Form
+	private static String[] resourceList;
+	private static String[] resourceHumanList;
+	private static String[] resourceSchemeList;
 
 	// store the interfaces of remote and local CISs
 	//private ArrayList<ICis> remoteCISs;
@@ -175,28 +186,72 @@ public class CisManagerController {
 
 		try {
 			if (method.equalsIgnoreCase("CreateCis")) {
+				
 				model.put("methodcalled", "CreateCis");
 				res = "Creating CIS...";
 				
+				// -- Retrieve CIS Configuration
 				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
 				MembershipCriteria m = new MembershipCriteria();
 				try{
 					Rule r = new Rule(cisForm.getOperator(),new ArrayList(Arrays.asList(cisForm.getValue())));
 					m.setRule(r);
 					cisCriteria.put(cisForm.getAttribute(), m);
+					LOG.info("Membership criteria rule #1: "+ cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue());
 				}
 				catch(InvalidParameterException e){
-					// TODO: treat expection
-					res += " excepation of invalid param " + cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue();
+					throw new Exception(" excepation of invalid param " + cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue());
 				}
 				
-				Future<ICisOwned> cisResult = this.getCisManager().createCis(
-						cisForm.getCisName(),
-						cisForm.getCisType(),cisCriteria,""
-						); // for some strange reason null instead of cisCriteria did not work
-
-				res = "Successfully created CIS: " + cisResult.get().getCisId();
-				//localCISs.add(cisResult.get());
+				// -- Fill CisCreationForm for next step
+				CisCreationForm cisCreationForm = new CisCreationForm(cisForm);
+				
+				// -- Infer first version of the privacy policy: using membership criteria
+				if (null != cisCriteria && cisCriteria.size() > 0) {
+					PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
+					resource.setResourceSchemeCustom(DataIdentifierScheme.CONTEXT.name());
+					resource.setResourceTypeCustom(cisCreationForm.getAttribute());
+					resource.addAction(new PrivacyActionForm(ActionConstants.READ));
+					resource.addCondition(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
+					cisCreationForm.addResource(resource);
+				}
+				else {
+					cisCreationForm.createEmptyPrivacyPolicyFrom();
+				}
+				
+				// Send page to generate the privacy policy
+				generateResourceLists();
+				model.put("res", res);
+				model.put("cisCreationForm", cisCreationForm);
+				model.put("ActionList", ActionConstants.values());
+				model.put("ConditionList", ConditionConstants.values());
+				model.put("ResourceList", resourceList);
+				model.put("ResourceHumanList", resourceHumanList);
+				model.put("ResourceSchemeList", resourceSchemeList);
+				return new ModelAndView("privacy/privacy-policy/create-cis-step-2", model);
+				
+//				model.put("methodcalled", "CreateCis");
+//				res = "Creating CIS...";
+//				
+//				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
+//				MembershipCriteria m = new MembershipCriteria();
+//				try{
+//					Rule r = new Rule(cisForm.getOperator(),new ArrayList(Arrays.asList(cisForm.getValue())));
+//					m.setRule(r);
+//					cisCriteria.put(cisForm.getAttribute(), m);
+//				}
+//				catch(InvalidParameterException e){
+//					// TODO: treat expection
+//					res += " excepation of invalid param " + cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue();
+//				}
+//				
+//				Future<ICisOwned> cisResult = this.getCisManager().createCis(
+//						cisForm.getCisName(),
+//						cisForm.getCisType(),cisCriteria,""
+//						); // for some strange reason null instead of cisCriteria did not work
+//
+//				res = "Successfully created CIS: " + cisResult.get().getCisId();
+//				//localCISs.add(cisResult.get());
 
 			} else if (method.equalsIgnoreCase("GetCisList")) {
 				model.put("methodcalled", "GetCisList");
@@ -343,12 +398,100 @@ public class CisManagerController {
 			model.put("cisrecords", records);
 			
 		} catch (Exception ex) {
-			res += "Oops!!!! <br/>" + ex.getLocalizedMessage();//.getMessage();
+			res += "Oops!!!! <br/>" + ex.getMessage();//.getMessage();
 		}
 
 		model.put("res", res);
 		model.put("cmForm", cisForm);
 		return new ModelAndView("cismanagerresult", model);
+	}
+	
+	@RequestMapping(value = "/create-cis-step-3.html", method = RequestMethod.POST)
+	public ModelAndView createCisEnd(@Valid CisCreationForm cisCreationForm, BindingResult result, Map model, HttpSession session) {
+		LOG.debug("Create CIS Step 3: CIS creation");
+		
+		// -- Verification
+		if (result.hasErrors()) {
+			LOG.warn("BindingResult has errors");
+			model.put("errormsg", "Create CIS Step 2: privacy policy form error<br />"+result.toString()+"<br />"+result.getFieldErrors().get(0).getObjectName());
+			return new ModelAndView("error", model);
+		}
+		LOG.debug(cisCreationForm.toString());
+
+		// -- Storage
+		RequestPolicy privacyPolicy;
+		StringBuffer resultMsg = new StringBuffer();
+		if (!isDepencyInjectionDone()) {
+			resultMsg.append("Error with dependency injection");
+			LOG.error("Error with dependency injection");
+		}
+		else {
+			try {
+				// CIS Configuration
+				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
+				MembershipCriteria m = new MembershipCriteria();
+				Rule r = new Rule(cisCreationForm.getOperator(), new ArrayList(Arrays.asList(cisCreationForm.getValue())));
+				m.setRule(r);
+				cisCriteria.put(cisCreationForm.getAttribute(), m);
+
+				// Privacy Policy
+				privacyPolicy = cisCreationForm.toRequestPolicy(commMngrRef.getIdManager());
+				
+				// CIS creation
+				Future<ICisOwned> cisResult = this.getCisManager().createCis(
+						cisCreationForm.getCisName(),
+						cisCreationForm.getCisType(),
+						cisCriteria,
+						"",
+						privacyPolicy.toXMLString()
+						); // for some strange reason null instead of cisCriteria did not work
+
+				ICisOwned newCis = cisResult.get();
+				if (null == newCis) {
+					throw new NullPointerException("Can't create the CIS");
+				}
+				
+				// Result
+				resultMsg.append("The CIS '"+cisCreationForm.getCisName()+"' has been successfully created!");
+				resultMsg.append("New CIS Id "+newCis.getCisId());
+			} catch(InvalidParameterException e){
+				resultMsg.append("Error during the CIS creation: "+e.getMessage());
+				LOG.error("Error during the CIS creation", e);
+			} catch (InterruptedException e) {
+				resultMsg.append("Error during the CIS creation: "+e.getMessage());
+				LOG.error("Error during the CIS creation (interrupted)", e);
+			} catch (ExecutionException e) {
+				resultMsg.append("Error during the CIS creation: "+e.getMessage());
+				LOG.error("Error during the CIS creation (excecution)", e);
+			} catch (InvalidFormatException e) {
+				resultMsg.append("Error during the CIS privacy policy saving: "+e.getMessage());
+				LOG.error("Error during the CIS privacy policy saving", e);
+			} catch (MalformedCtxIdentifierException e) {
+				resultMsg.append("Error during the CIS privacy policy (retrieve resource) saving: "+e.getMessage());
+				LOG.error("Error during the CIS privacy policy (retrieve resource) saving", e);
+			}
+		}
+
+		// -- Display the result
+		model.put("res", resultMsg.toString());
+		model.put("methodcalled", "CreateCis");
+		return new ModelAndView("cismanagerresult", model);
+	}
+	
+	public static void generateResourceLists() {
+		Field[] resourceTypeList = CtxAttributeTypes.class.getDeclaredFields();
+		resourceList = new String[resourceTypeList.length];
+		resourceHumanList = new String[resourceTypeList.length];
+		for(int i=0; i<resourceTypeList.length; i++) {
+			resourceList[i] = DataIdentifierScheme.CONTEXT+":///"+resourceTypeList[i].getName();
+			resourceHumanList[i] = DataIdentifierScheme.CONTEXT+": "+resourceTypeList[i].getName();
+		}
+		
+		DataIdentifierScheme[] schemes = DataIdentifierScheme.values();
+		resourceSchemeList = new String[schemes.length];
+		for(int j=0; j<schemes.length; j++) {
+			resourceSchemeList[j] = schemes[j].name();
+		}
 	}
 
 	// callback
@@ -382,5 +525,40 @@ public class CisManagerController {
 			}
 		}
 	};
+	
+	// -- Dependency Injection
+		private boolean isDepencyInjectionDone() {
+			return isDepencyInjectionDone(0);
+		}
+		private boolean isDepencyInjectionDone(int level) {
+			if (null == commMngrRef) {
+				LOG.info("[Dependency Injection] Missing ICommManager");
+				return false;
+			}
+			if (null == commMngrRef.getIdManager()) {
+				LOG.info("[Dependency Injection] Missing IIdentityManager");
+				return false;
+			}
+			if (null == cisManager) {
+				LOG.info("[Dependency Injection] Missing ICisManager");
+				return false;
+			}
+			return true;
+		}
+
+		public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+			this.privacyPolicyManager = privacyPolicyManager;
+			LOG.info("[DepencyInjection] IPrivacyPolicyManager injected");
+		}
+		public void setCommMngrRef(ICommManager commMngrRef) {
+			this.commMngrRef = commMngrRef;
+			LOG.info("[DepencyInjection] ICommManager injected");
+		}
+		public ICisManager getCisManager() {
+			return cisManager;
+		}
+		public void setCisManager(ICisManager cisManager) {
+			this.cisManager = cisManager;
+		}
 	
 }
