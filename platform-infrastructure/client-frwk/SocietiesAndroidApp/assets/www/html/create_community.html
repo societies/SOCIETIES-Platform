@@ -24,30 +24,30 @@
 			<li data-role="list-divider">Create a New Community</li>
 		</ul>
 		<br/>
-		<form id="form1">
-			<div id="fnameDiv" data-role="fieldcontain">
+		<form id="createCISform">
+			<!-- <div id="fnameDiv" data-role="fieldcontain">
 				<label for="fname" id="fnameLabel" name="fnameLabel">Admin name*</label>
 				<input id="fname" name="fname_r" type="text"/>
-			</div>
+			</div>-->
 			<div id="lnameDiv" data-role="fieldcontain">
 				<label for="lname">Community name*</label>
-				<input id="lname" name="lname_r" type="text"/>
+				<input id="cisNameOnCisCreate" name="lname_r" type="text"/>
 			</div>
 			<div id="category-typeDiv" data-role="fieldcontain">
 				<label for="select-choice-0" class="select">Category:</label>
-				<select name="select-choice-0" id="select-choice-0">
+				<select name="select-choice-0" id="cisCategoryOnCisCreate">
 					<option value="ICT">ICT</option>
 					<option value="education">Education</option>
 					<option value="sports">Sports</option>
 				</select>
 			</div>
-			<div id="community-typeDiv" data-role="fieldcontain">
+			<!--<div id="community-typeDiv" data-role="fieldcontain">
 				<label for="select-choice-0" class="select">Comunity Type:</label>
 				<select name="select-choice-0" id="select-choice-0">
 					<option value="open">Open</option>
 					<option value="invite">Invite Only</option>
 				</select>
-			</div>
+			</div>-->
 			<div data-role="fieldcontain">
 				<fieldset data-role="controlgroup">
 					<legend>Agree to the terms:</legend>
@@ -56,7 +56,7 @@
 				</fieldset>
 			</div>
 			<div id="create_account" data-role="fieldcontain">
-				<a href="#"><input type="submit" value="Create Community" data-inline="true" data-theme="b" data-icon="check"/></a>
+				<a href="#createCISbutton"><input type="submit" value="Create Community" data-inline="true" data-theme="b" data-icon="check"/></a>
 			</div>
 		</form>
 		<br/>
