@@ -30,17 +30,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisDirectory;
 import org.societies.cis.directory.model.CisAdvertisementRecordEntry;
+import org.societies.cis.directory.model.CriteriaRecordEntry;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -71,13 +74,8 @@ public class CisDirectory implements ICisDirectory {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.societies.api.cis.directory.ICisDirectory#addCisAdvertisementRecord
-	 * (org.societies.api.schema.cis.directory.CisAdvertisementRecord)
-	 */
+	/* @see org.societies.api.cis.directory.ICisDirectory#addCisAdvertisementRecord
+	 * (org.societies.api.schema.cis.directory.CisAdvertisementRecord) */
 	@Override
 	public void addCisAdvertisementRecord(CisAdvertisementRecord cisAdRec) {
 		
@@ -87,16 +85,22 @@ public class CisDirectory implements ICisDirectory {
 		System.out.println("+++++++++++++++++++++++ Uri is  = " + cisAdRec.getUri());
 		
 		Session session = sessionFactory.openSession();
-		CisAdvertisementRecordEntry tmpEntry = null;
+		CisAdvertisementRecordEntry advertEntry = null;
 
 		Transaction t = session.beginTransaction();
 		try {
-
-			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), 1);
-
-			session.save(tmpEntry);
-
+			//ADVERTISEMENT RECORD
+			advertEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
+					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType());
+			session.save(advertEntry);
+			
+			//SET OF CRITERIA RECORDS 
+			for(Criteria tmpCrit: cisAdRec.getMembershipCrit().getCriteria()) {
+				CriteriaRecordEntry critEntry = new CriteriaRecordEntry(tmpCrit.getAttrib(), tmpCrit.getOperator(), tmpCrit.getValue1(), tmpCrit.getValue2(), tmpCrit.getRank());
+				critEntry.setCisAdvertRecord(advertEntry);
+				advertEntry.getCriteriaRecords().add(critEntry);
+				session.save(critEntry);
+			}
 			t.commit();
 			log.debug("Cis Advertisement Record Saved.");
 
@@ -108,29 +112,21 @@ public class CisDirectory implements ICisDirectory {
 				session.close();
 			}
 		}
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.societies.api.cis.directory.ICisDirectory#deleteCisAdvertisementRecord
-	 * (org.societies.api.schema.cis.directory.CisAdvertisementRecord)
-	 */
+	/*@see org.societies.api.cis.directory.ICisDirectory#deleteCisAdvertisementRecord
+	 * (org.societies.api.schema.cis.directory.CisAdvertisementRecord) */
 	@Override
 	public void deleteCisAdvertisementRecord(CisAdvertisementRecord cisAdRec) {
 		Session session = sessionFactory.openSession();
-		CisAdvertisementRecordEntry tmpEntry = null;
 
 		Transaction t = session.beginTransaction();
 		try {
-
-			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), 1);
-
-			session.delete(tmpEntry);
-
+			Query dbQuery = session.createQuery("FROM CisAdvertisementRecordEntry WHERE id = :CisId");
+			dbQuery.setParameter("CisId", cisAdRec.getId());
+			CisAdvertisementRecordEntry advertEntry = (CisAdvertisementRecordEntry)dbQuery.list().get(0);
+			
+			session.delete(advertEntry);
 			t.commit();
 			log.debug("Cis Advertisement Record deleted.");
 
@@ -142,16 +138,9 @@ public class CisDirectory implements ICisDirectory {
 				session.close();
 			}
 		}
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.societies.api.cis.directory.ICisDirectory#findAllCisAdvertisementRecords
-	 * ()
-	 */
+	/*@see org.societies.api.cis.directory.ICisDirectory#findAllCisAdvertisementRecords() */
 	@SuppressWarnings("unchecked")
 	@Override
 	@Async
@@ -160,12 +149,9 @@ public class CisDirectory implements ICisDirectory {
 		List<CisAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CisAdvertisementRecordEntry>();
 		List<CisAdvertisementRecord> returnList = new ArrayList<CisAdvertisementRecord>();
 		CisAdvertisementRecord record = null;
-
 	
 		try {
-
-			tmpAdvertList = session.createCriteria(
-					CisAdvertisementRecordEntry.class).list();
+			tmpAdvertList = session.createCriteria(CisAdvertisementRecordEntry.class).list();
 
 			for (CisAdvertisementRecordEntry entry : tmpAdvertList) {
 				record = new CisAdvertisementRecord();
@@ -174,12 +160,21 @@ public class CisDirectory implements ICisDirectory {
 				record.setUri(entry.getUri());
 				record.setPassword(entry.getpassword());
 				record.setType(entry.gettype());
-				//record.setMode(entry.getmode()); TODO: replace with membership criteria
+				//MEMBERSHIP CRITERIA
+				MembershipCrit memberCrit = new MembershipCrit();
+				for(CriteriaRecordEntry critRecord: entry.getCriteriaRecords()) {
+					Criteria crit = new Criteria();
+					crit.setAttrib(critRecord.getAttrib());
+					crit.setOperator(critRecord.getOperator());
+					crit.setRank(critRecord.getRank());
+					crit.setValue1(critRecord.getValue1());
+					crit.setValue2(critRecord.getValue2());
+					memberCrit.getCriteria().add(crit);
+				}
+				record.setMembershipCrit(memberCrit); 
 
 				returnList.add(record);
-
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -188,31 +183,23 @@ public class CisDirectory implements ICisDirectory {
 			}
 		}
 		return new AsyncResult<List<CisAdvertisementRecord>>(returnList);
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.societies.api.cis.directory.ICisDirectory#findForAllCis(org.societies
-	 * .api.schema.cis.directory.CisAdvertisementRecord)
-	 */
+	/*@see org.societies.api.cis.directory.ICisDirectory#findForAllCis(org.societies
+	 * .api.schema.cis.directory.CisAdvertisementRecord) */
 	@SuppressWarnings("unchecked")
 	@Override
 	@Async
 	public Future<List<CisAdvertisementRecord>> findForAllCis( CisAdvertisementRecord filteredcis, String filter) {
 
-	//filter by name, search directory and return CISs that match the relevant name
+		//filter by name, search directory and return CISs that match the relevant name
 		Session session = sessionFactory.openSession();
 		List<CisAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CisAdvertisementRecordEntry>();
 		List<CisAdvertisementRecord> returnList = new ArrayList<CisAdvertisementRecord>();
 		CisAdvertisementRecord record = null;
 
 		try {
-
-			tmpAdvertList = session.createCriteria(
-					CisAdvertisementRecordEntry.class).list();
+			tmpAdvertList = session.createCriteria(CisAdvertisementRecordEntry.class).list();
 
 			for (CisAdvertisementRecordEntry entry : tmpAdvertList) {
 				record = new CisAdvertisementRecord();
@@ -221,15 +208,23 @@ public class CisDirectory implements ICisDirectory {
 					record.setId(entry.getId());
 					record.setUri(entry.getUri());
 					record.setPassword(entry.getpassword());
-					record.setType(entry.gettype());
-					//record.setMode(entry.getmode()); TODO: replace with membership criteria
+					record.setType(entry.gettype()); 
+					//MEMBERSHIP CRITERIA
+					MembershipCrit memberCrit = new MembershipCrit();
+					for(CriteriaRecordEntry critRecord: entry.getCriteriaRecords()) {
+						Criteria crit = new Criteria();
+						crit.setAttrib(critRecord.getAttrib());
+						crit.setOperator(critRecord.getOperator());
+						crit.setRank(critRecord.getRank());
+						crit.setValue1(critRecord.getValue1());
+						crit.setValue2(critRecord.getValue2());
+						memberCrit.getCriteria().add(crit);
+					}
+					record.setMembershipCrit(memberCrit); 
 
 					returnList.add(record);
 				}
-					
-
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -240,38 +235,38 @@ public class CisDirectory implements ICisDirectory {
 		return new AsyncResult<List<CisAdvertisementRecord>>(returnList);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.societies.api.cis.directory.ICisDirectory#updateCisAdvertisementRecord(org.societies
-	 * .api.schema.cis.directory.CisAdvertisementRecord,
-	 * org.societies.api.schema.cis.directory.CisAdvertisementRecord)
-	 */
+	/* @see org.societies.api.cis.directory.ICisDirectory#updateCisAdvertisementRecord(org.societies.api.schema.cis.directory.CisAdvertisementRecord,
+	 * org.societies.api.schema.cis.directory.CisAdvertisementRecord) */
 	@Override
-	public void updateCisAdvertisementRecord(CisAdvertisementRecord oldCisValues,
-		CisAdvertisementRecord updatedCisValues) {
-		Session session = sessionFactory.openSession();
-		CisAdvertisementRecordEntry tmpEntry = null;
-
+	public void updateCisAdvertisementRecord(CisAdvertisementRecord oldCisValues, CisAdvertisementRecord updatedCisValues) {
+		this.deleteCisAdvertisementRecord(oldCisValues);
+		this.addCisAdvertisementRecord(updatedCisValues);
+		/*
+		 Session session = sessionFactory.openSession();
+		 
 		Transaction t = session.beginTransaction();
 		try {
-
-			tmpEntry = new CisAdvertisementRecordEntry(oldCisValues.getName(),
-					oldCisValues.getId(), oldCisValues.getUri(), oldCisValues.getPassword(), oldCisValues.getType(), 1);
-			session.delete(tmpEntry);
-
-			tmpEntry.setName(updatedCisValues.getName());
-			tmpEntry.setId(updatedCisValues.getId());
-			tmpEntry.setUri(updatedCisValues.getUri());
-			tmpEntry.setPassword(updatedCisValues.getPassword());
-			tmpEntry.setType(updatedCisValues.getType());
-			tmpEntry.setMode(1);
-			session.save(tmpEntry);
-
+			//DELETE OLD ADVERTISEMENT RECORD
+			Query dbQuery = session.createQuery("FROM CisAdvertisementRecordEntry WHERE id = :CisId");
+			dbQuery.setParameter("CisId", oldCisValues.getId());
+			CisAdvertisementRecordEntry advertEntry = (CisAdvertisementRecordEntry)dbQuery.list().get(0);
+			System.out.println("+++++++++++++++++++++++ Deleting Record" + oldCisValues.getId());
+			session.delete(advertEntry);
+			
+			//NEW ADVERTISEMENT RECORD
+			CisAdvertisementRecordEntry newAdvertEntry = new CisAdvertisementRecordEntry(updatedCisValues.getName(), updatedCisValues.getId(), 
+					updatedCisValues.getUri(), updatedCisValues.getPassword(), updatedCisValues.getType());
+			session.save(newAdvertEntry);
+			
+			//SET OF CRITERIA RECORDS 
+			for(Criteria tmpCrit: updatedCisValues.getMembershipCrit().getCriteria()) {
+				CriteriaRecordEntry critEntry = new CriteriaRecordEntry(tmpCrit.getAttrib(), tmpCrit.getOperator(), tmpCrit.getValue1(), tmpCrit.getValue2(), tmpCrit.getRank());
+				critEntry.setCisAdvertRecord(advertEntry);
+				newAdvertEntry.getCriteriaRecords().add(critEntry);
+				session.save(critEntry);
+			}
 			t.commit();
 			log.debug("Cis Advertisement Record updated.");
-
 		} catch (Exception e) {
 			t.rollback();
 			e.printStackTrace();
@@ -280,7 +275,7 @@ public class CisDirectory implements ICisDirectory {
 				session.close();
 			}
 		}
-
+		*/
 	}
 
 
@@ -338,5 +333,4 @@ public class CisDirectory implements ICisDirectory {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
