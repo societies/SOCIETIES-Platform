@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -22,31 +22,52 @@
 	padding: 8px;
 	margin: 16px;
 }
-label{
-display: block;
-padding: 0;
-margin:  2px 0;
-text-align: left;
-font-size: 1.2em;
+
+label {
+	display: block;
+	padding: 0;
+	margin: 2px 0;
+	text-align: left;
+	font-size: 1.2em;
 }
-label.inline{
-display: inline;
+
+label.inline {
+	display: inline;
 }
-input, select{
-margin-bottom: 20px;
-padding: 5px;
+
+input,select {
+	margin-bottom: 20px;
+	padding: 5px;
 }
-.clear{
-display block;
+
+.clear {display block;
+	
 }
-th{
-text-align: center
+
+th {
+	text-align: center
 }
-h4{
+
+h4 {
 	color: silver;
 }
-h4 strong{
+
+h4 strong {
 	color: black;
+}
+.simple-box {
+text-align: center;
+}
+.mode-box {
+border: 1px solid black;
+border-radius: 8px;
+padding: 5px;
+text-align: center;
+margin: 10px;
+display: inline-block;
+}
+.advanced-handler{
+cursor: pointer;
 }
 </style>
 </head>
@@ -64,51 +85,66 @@ h4 strong{
 	<h3>CIS Manager Service - CIS Creation</h3>
 	<h4>Step 1: Configuration > <strong>Step 2: Privacy policy</strong> > Step 3: Finish</h4>
 
-	<form:form method="POST" action="create-cis-step-3.html" commandName="cisCreationForm" class="updatePrivacyPolicy">
-	<p>
-		<pre><c:out value="${ResultMsg}" /></pre>
-	</p>
+	<form:form method="POST" action="create-cis-step-3.html"
+		commandName="cisCreationForm" class="updatePrivacyPolicy">
+		<pre>
+			<c:out value="${ResultMsg}" />
+		</pre>
+		<p>
+		<input type="submit" value="Submit" />
+		<a href="cismanager.html">Cancel</a>
+		</p>
 		<fieldset class="simple">
-			<legend class="simple-handler">Simple: Select a pre-configured mode</legend>
+			<legend class="simple-handler">Simple: Select a
+				pre-configured mode</legend>
 			<div class="simple-box">
-			<p class="mode-private">
-				<form:radiobutton path="mode" value="PRIVATE" />
-				<label for="mode1" class="inline"><strong>Private</strong>: nobody can access CIS data</label>
-			</p>
-			<p class="mode-shared">
-				<form:radiobutton path="mode" value="SHARED" />
-				<label for="mode2" class="inline"><strong>Shared</strong>: only CIS members can access CIS data</label>
-			</p>
-			<p class="mode-public">
-				<form:radiobutton path="mode" value="PUBLIC" />
-				<label for="mode3" class="inline"><strong>Public</strong>: everybody can access CIS data</label>
-			</p>
-			<p class="mode-custom">
-				<form:radiobutton path="mode" class="custom-radio" value="CUSTOM" />
-				<label for="mode4" class="inline"><strong>Custom</strong>: configure exactly what you want below</label>
-			</p>
-			<form:errors path="mode" cssClass="error" />
+				<p class="mode-box mode-private">
+					<form:radiobutton path="mode" value="PRIVATE" />
+					<label for="mode1" class="inline"><strong>Private</strong></label>
+					<label for="mode1">nobody can access CIS data</label>
+				</p>
+				<p class="mode-box mode-shared">
+					<form:radiobutton path="mode" value="SHARED" />
+					<label for="mode2" class="inline"><strong>Members Only</strong></label>
+					<label for="mode2">only CIS members can access CIS data</label>
+				</p>
+				<p class="mode-box mode-public">
+					<form:radiobutton path="mode" value="PUBLIC" />
+					<label for="mode3" class="inline"><strong>Public</strong></label>
+					<label for="mode3">everybody can access CIS data</label>
+				</p>
+				<p class="mode-box mode-custom">
+					<form:radiobutton path="mode" class="custom-radio" value="CUSTOM" />
+					<label for="mode4" class="inline"><strong>Custom</strong></label>
+					<label for="mode4">configure exactly what you want below</label>
+				</p>
+				<form:errors path="mode" cssClass="error" />
 			</div>
-		</fiedlset>
+		</fieldset>
 		<fieldset class="advanced">
-			<legend class="advanced-handler">Advanced: Configure the requested data list</legend>
+			<legend class="advanced-handler">Advanced: Configure the
+				requested data list</legend>
 			<div class="advanced-box">
-			<c:forEach var="resource" items="${cisCreationForm.resources}" varStatus="status">
-				<c:choose>
-					<c:when test="${status.count == fn:length(cisCreationForm.resources)}">
-						<fieldset class="requestedData lastResource resource${status.index}">
-					</c:when>
-					<c:otherwise>
-						<fieldset class="requestedData resource${status.index}">
-					</c:otherwise>
-				</c:choose>
-				<legend>Resource #${status.count}</legend>
+				<c:forEach var="resource" items="${cisCreationForm.resources}"
+					varStatus="status">
+					<c:choose>
+						<c:when
+							test="${status.count == fn:length(cisCreationForm.resources)}">
+							<fieldset
+								class="requestedData lastResource resource${status.index}">
+						</c:when>
+						<c:otherwise>
+							<fieldset class="requestedData resource${status.index}">
+						</c:otherwise>
+					</c:choose>
+					<legend>Resource #${status.count}</legend>
 
 					<form:label path="resources[${status.index}].resourceType">Resource Type</form:label>
 					<form:select path="resources[${status.index}].resourceType"
 						class="resources${status.index}resourceType">
 						<option value="NONE">--- Select ---</option>
-						<c:forEach var="resourceType" items="${ResourceList}" varStatus="statusResource">
+						<c:forEach var="resourceType" items="${ResourceList}"
+							varStatus="statusResource">
 							<form:option value="${resourceType}">${ResourceHumanList[statusResource.index]}</form:option>
 						</c:forEach>
 					</form:select>
@@ -141,17 +177,22 @@ h4 strong{
 				<form:checkbox path="resources[${status.index}].optional" value="1" />
 				<form:errors path="resources[${status.index}].optional" cssClass="error" /> --%>
 
-					<label for="resources[${status.index}].actions1">Actions to apply on this resource</label>
+					<label for="resources[${status.index}].actions1">Actions to
+						apply on this resource</label>
 					<c:forEach var="action" items="${ActionList}"
 						varStatus="statusAction">
 						<form:checkbox
 							path="resources[${status.index}].actions[${statusAction.index}].action"
 							value="${action}" />
-						<label for="resources${status.index}.actions${statusAction.index}.action1'" class="inline">${action}</label>
+						<label
+							for="resources${status.index}.actions${statusAction.index}.action1'"
+							class="inline">${action}</label>
 					(<form:checkbox
 							path="resources[${status.index}].actions[${statusAction.index}].optional"
 							value="1" />
-						<label for="resources${status.index}.actions${statusAction.index}.optional1" class="inline">Optional?</label>)
+						<label
+							for="resources${status.index}.actions${statusAction.index}.optional1"
+							class="inline">Optional?</label>)
 					<div class="clear"></div>
 					</c:forEach>
 					<form:errors path="resources[${status.index}].actions"
@@ -186,20 +227,23 @@ h4 strong{
 									name="resources${status.index}.conditionOptionalAdd"
 									id="resources${status.index}conditionOptionalAdd" value="1" />
 								</td>
-								<td><input type="button" name="resources${status.index}"
-									class="addCondition" value="Add" /></td>
+								<td><input type="button" name="resources${status.index}" class="addCondition" value="Add" /></td>
 							</tr>
-							<c:forEach var="condition" items="${cisCreationForm.resources[status.index].conditions}" varStatus="statusCondition">
+							<c:forEach var="condition"
+								items="${cisCreationForm.resources[status.index].conditions}"
+								varStatus="statusCondition">
 								<c:choose>
 									<c:when
 										test="${statusCondition.count == fn:length(cisCreationForm.resources[status.index].conditions)}">
-										<tr class="conditionFromResource${status.index} lastCondition${status.index}">
+										<tr
+											class="conditionFromResource${status.index} lastCondition${status.index}">
 									</c:when>
 									<c:otherwise>
 										<tr class="conditionFromResource${status.index}">
 									</c:otherwise>
 								</c:choose>
-								<td><form:select path="resources[${status.index}].conditions[${statusCondition.index}].theCondition">
+								<td><form:select
+										path="resources[${status.index}].conditions[${statusCondition.index}].theCondition">
 										<form:option value="NONE">--- Select ---</form:option>
 										<c:forEach var="conditionType" items="${ConditionList}"
 											varStatus="statusConditionList">
@@ -234,27 +278,27 @@ h4 strong{
 								value="${ConditionNumber}" />
 						</tbody>
 					</table>
-					<%-- <c:if test="${status.count == fn:length(cisCreationForm.resources)}"> --%>
-						<input type="button" name="resource${status.index}"
-							class="removeResource removeResource${status.index}"
-							value="Remove this resource" />
-						<input type="hidden" name="resource${status.index}" id="resource${status.index}" value="${status.index}" />
-					<%-- </c:if> --%>
-				</fieldset>
-			</c:forEach>
+					<input type="button" name="resource${status.index}"
+						class="removeResource removeResource${status.index}"
+						value="Remove this resource" />
+					<input type="hidden" id="resource${status.index}" value="${status.index}" />
+		</fieldset>
+		</c:forEach>
 
-			<input type="button" value="Add a requested data"
-				class="addRequestedData" />
-			</div>
+		<input type="button" value="Add a requested data"
+			class="addRequestedData" />
+		</div>
 		</fieldset>
 		<!-- CIS Creation Data -->
 		<input type="hidden" name="method" value="${cisCreationForm.method}" />
 		<input type="hidden" name="cisName" value="${cisCreationForm.cisName}" />
 		<input type="hidden" name="cisType" value="${cisCreationForm.cisType}" />
-		<input type="hidden" name="attribute" value="${cisCreationForm.attribute}" />
-		<input type="hidden" name="operator" value="${cisCreationForm.operator}" />
+		<input type="hidden" name="attribute"
+			value="${cisCreationForm.attribute}" />
+		<input type="hidden" name="operator"
+			value="${cisCreationForm.operator}" />
 		<input type="hidden" name="value" value="${cisCreationForm.value}" />
-		
+
 		<input type="submit" value="Submit" />
 		<a href="cismanager.html">Cancel</a>
 		<span class="globalError error"></span>
@@ -265,16 +309,18 @@ h4 strong{
 	<!-- FOOTER -->
 	<jsp:include page="../../footer.jsp" />
 	<!-- END FOOTER -->
-	<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+	<script type="text/javascript"
+		src="${pageContext.request.contextPath}/js/jquery.js"></script>
 	<script type="text/javascript">
 	var actionList = [<c:forEach var="action" items="${ActionList}">"${action}", </c:forEach>];
 	var conditionList = [<c:forEach var="condition" items="${ConditionList}">"${condition}", </c:forEach>];
 	var resourceTypeList = [<c:forEach var="resourceType" items="${ResourceList}">"${resourceType}", </c:forEach>];
 	var resourceTypeHumanList = [<c:forEach var="resourceType" items="${ResourceHumanList}">"${resourceType}", </c:forEach>];
 	var resourceSchemeList = [<c:forEach var="resourceScheme" items="${ResourceSchemeList}">"${resourceScheme}", </c:forEach>];
-	var lastResourceId = ${fn:length(privacyPolicy.resources)};
+	var lastResourceId = ${fn:length(cisCreationForm.resources)};
 	</script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/js/privacypolicy/form.js"></script>
+	<script type="text/javascript"
+		src="${pageContext.request.contextPath}/js/privacypolicy/form.js"></script>
 </body>
 </html>
 

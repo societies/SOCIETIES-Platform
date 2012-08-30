@@ -133,7 +133,7 @@ public class CisCreationForm extends CisManagerForm {
 	 */
 	@Override
 	public String toString() {
-		StringBuffer str = new StringBuffer("PrivacyPolicyForm [");
+		StringBuffer str = new StringBuffer("PrivacyPolicyForm ("+mode+") [");
 		int i = 0;
 		if (null != resources && resources.size() > 0) {
 			str.append("Resources=\n");

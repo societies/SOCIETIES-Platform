@@ -424,19 +424,24 @@ public class CisManagerController {
 				cisCriteria.put(cisCreationForm.getAttribute(), m);
 
 				// -- Generate Privacy Policy
+				CisCreationForm cisData;
 				// If custom: keep like it is
 				// Else: generate a pre-configured privacy policy
 				if (!"CUSTOM".equals(cisCreationForm.getMode())) {
-					cisCreationForm = generateCisCreationForm(cisCreationForm, cisCriteria, cisCreationForm.getMode());
+					LOG.info("Not CUSTOM mode, but "+cisCreationForm.getMode()+" mode");
+					cisData = generateCisCreationForm(cisCreationForm, cisCriteria, cisCreationForm.getMode());
+				}
+				else {
+					cisData = cisCreationForm;
 				}
 				
 				// Generate a real privacy policy
-				privacyPolicy = cisCreationForm.toRequestPolicy(commMngrRef.getIdManager());
+				privacyPolicy = cisData.toRequestPolicy(commMngrRef.getIdManager());
 
 				// -- CIS creation
 				Future<ICisOwned> cisResult = this.getCisManager().createCis(
-						cisCreationForm.getCisName(),
-						cisCreationForm.getCisType(),
+						cisData.getCisName(),
+						cisData.getCisType(),
 						cisCriteria,
 						"",
 						privacyPolicy.toXMLString()
@@ -511,6 +516,7 @@ public class CisManagerController {
 		List<PrivacyConditionForm> conditionsCisMembershipCriteria = new ArrayList<PrivacyConditionForm>();
 		List<PrivacyConditionForm> conditionsCisCommunityContext = new ArrayList<PrivacyConditionForm>();
 		if ("SHARED".equals(mode)) {
+			LOG.info("SHARED mode");
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
 //			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1", false));
@@ -523,6 +529,7 @@ public class CisManagerController {
 //			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1", false));
 		}
 		else if ("PUBLIC".equals(mode)) {
+			LOG.info("PUBLIC mode");
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
@@ -535,6 +542,7 @@ public class CisManagerController {
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
 		}
 		else {
+			LOG.info("PRIVATE mode");
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
 			

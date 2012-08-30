@@ -13,6 +13,11 @@ $(document).ready(function(){
 			}
 		});
 	});
+	$('.mode-custom').click(function(){
+		if ($('.advanced-box').is(':hidden')) {
+			$('.advanced-box').show('slow');
+		}
+	});
 	
 	
 	// -- Update a privacy policy
@@ -26,7 +31,7 @@ $(document).ready(function(){
 			$('.resources'+i+'resourceTypeError').hide();
 			$('.globalError').hide();
 			// Verify
-			if (0 == $('.resources'+i+'resourceType').attr('selectedIndex')
+			if (0 == $('.resources'+i+'resourceType').prop('selectedIndex')
 					&& (null == $('.resources'+i+'resourceTypeCustom').val()
 							|| '' == $('.resources'+i+'resourceTypeCustom').val()
 							|| undefined == $('.resources'+i+'resourceTypeCustom').val())) {
@@ -46,7 +51,8 @@ $(document).ready(function(){
 
 	// -- Add a new requested data
 	$('.addRequestedData').click(function(){
-		var newRequestedData = $('<fieldset>').addClass('requestedData');
+		$('.requestedData').removeClass('lastResource');
+		var newRequestedData = $('<fieldset>').addClass('requestedData').addClass('resource'+lastResourceId).addClass('lastResource');
 		$('<legend>').html('Resource #'+(lastResourceId+1))
 					.appendTo(newRequestedData);
 		
@@ -197,7 +203,7 @@ $(document).ready(function(){
 		// -- Verification
 		// - reset last verification error
 		$('#'+addConditionClass+'conditionTypeAdd').css({'border': '1px inset gray'});
-		if (0 == $('#'+addConditionClass+'conditionTypeAdd').attr('selectedIndex')) {
+		if (0 == $('#'+addConditionClass+'conditionTypeAdd').prop('selectedIndex')) {
 			$('#'+addConditionClass+'conditionTypeAdd').css('border-color', 'red');
 			return;
 		}
@@ -206,7 +212,7 @@ $(document).ready(function(){
 		var conditionId = Math.round($('#'+addConditionClass+'conditionId').attr('value'));
 		var conditionValue = $('#'+addConditionClass+'conditionValueAdd').val();
 		var conditionOptional = $('#'+addConditionClass+'conditionOptionalAdd').val();//resources${status.index}.conditionOptionalAdd
-		var selectedConditionType = $('#'+addConditionClass+'conditionTypeAdd').attr('selectedIndex');
+		var selectedConditionType = $('#'+addConditionClass+'conditionTypeAdd').prop('selectedIndex');
 		
 		// -- Remove some information of the last condition added
 		$('.conditionFromResource'+resourceId).removeClass('lastCondition'+resourceId);
@@ -219,7 +225,7 @@ $(document).ready(function(){
 		// Incr Condition ID
 		$('#'+addConditionClass+'conditionId').attr('value', (conditionId+1));
 		// Reinit
-		$('#'+addConditionClass+'conditionTypeAdd').attr('selectedIndex', 0);
+		$('#'+addConditionClass+'conditionTypeAdd').prop('selectedIndex', 0);
 		$('#'+addConditionClass+'conditionValueAdd').val('');
 		$('#'+addConditionClass+'conditionOptionalAdd').attr('checked', '');
 	});
@@ -248,21 +254,19 @@ $(document).ready(function(){
 		var btnRemoveResource = $(this);
 		var removeResourceMarker = btnRemoveResource.attr('name');
 		var resourceId = $('#'+removeResourceMarker).val();
-		console.log(removeResourceMarker);
-		console.log(resourceId);
+		
+		
+		// If it was the last resource
+		if ($('.'+removeResourceMarker).hasClass('lastResource')) {
+			var prevOne = $('.'+removeResourceMarker).prev();
+			lastResourceId--;
+			// Mark the previous one as "last"
+			prevOne.addClass('lastResource');
+		}
+		
 		
 		// Remove this resource
 		$('.'+removeResourceMarker).remove();
-		if (lastResourceId == resourceId) {
-			lastResourceId--;
-		}
-
-		// Mark the previous one as "last"
-		$('.resource'+lastResourceId).addClass('lastResource');
-//			prevOne.children('.action').html('<input type="button" name="resources'+resourceId+'" class="removeCondition removeCondition'+resourceId+'" value="Remove" />');
-		
-		//
-		
 	});
 });
 	
@@ -284,7 +288,7 @@ $(document).ready(function(){
 						.html(conditionList[i])
 						.appendTo(selectCondition);
 		}
-		selectCondition.attr('selectedIndex', 0);
+		selectCondition.prop('selectedIndex', 0);
 		selectCondition.appendTo(tdSelectionCondition);
 		tdSelectionCondition.appendTo(tr);
 		// - Condition value
@@ -331,7 +335,7 @@ $(document).ready(function(){
 						.html(conditionList[i])
 						.appendTo(selectCondition);
 		}
-		selectCondition.attr('selectedIndex', selectedConditionType);
+		selectCondition.prop('selectedIndex', selectedConditionType);
 		selectCondition.appendTo(tdSelectionCondition);
 		return tdSelectionCondition;
 	}
