@@ -101,7 +101,7 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 	}
 	@Override
 	public void addActivity(IActivity activity) {
-        LOG.error("In addActivity for PeristedActivityFeed published:"+activity.getPublished()+" time: "+activity.getTime());
+//        LOG.error("In addActivity for PeristedActivityFeed published:"+activity.getPublished()+" time: "+activity.getTime());
         Session session = this.sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		Activity newAct = new Activity(activity);
