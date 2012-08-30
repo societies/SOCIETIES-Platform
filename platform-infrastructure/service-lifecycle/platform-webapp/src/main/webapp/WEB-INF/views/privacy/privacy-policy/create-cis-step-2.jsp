@@ -90,10 +90,8 @@ cursor: pointer;
 		<pre>
 			<c:out value="${ResultMsg}" />
 		</pre>
-		<p>
 		<input type="submit" value="Submit" />
 		<a href="cismanager.html">Cancel</a>
-		</p>
 		<fieldset class="simple">
 			<legend class="simple-handler">Simple: Select a
 				pre-configured mode</legend>
