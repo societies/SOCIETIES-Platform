@@ -136,11 +136,11 @@ public class Activity implements IActivity {
 	private void setId(Long id) {
 		this.id = id;
 	}
-	@Override
+
 	public long getTime() {
 		return time;
 	}
-	@Override
+
 	public void setTime(long time) {
 		this.time = time;
 	}
