@@ -17,15 +17,15 @@ configAVD() {
 	echo "--------------------------"
  	
 	adb shell cat /etc/hosts
-	echo ""
-	echo "Push customised AndroidAgent XMPP properties"
-	echo "--------------------------------------------"
+#	echo ""
+#	echo "Push customised AndroidAgent XMPP properties"
+#	echo "--------------------------------------------"
 
-	adb push AndroidAgent.properties /sdcard/Android/data/org.societies/files/AndroidAgent.properties
-	echo ""	
-	echo "Contents of customised AndroidAgent XMPP properties"
-	echo "---------------------------------------------------"
-	adb shell cat /sdcard/Android/data/org.societies/files/AndroidAgent.properties
+#	adb push AndroidAgent.properties /sdcard/Android/data/org.societies/files/AndroidAgent.properties
+#	echo ""	
+#	echo "Contents of customised AndroidAgent XMPP properties"
+#	echo "---------------------------------------------------"
+#	adb shell cat /sdcard/Android/data/org.societies/files/AndroidAgent.properties
 }
 
 configAVD	

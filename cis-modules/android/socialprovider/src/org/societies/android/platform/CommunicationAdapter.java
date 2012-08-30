@@ -24,10 +24,30 @@
  */
 package org.societies.android.platform;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.jivesoftware.smack.packet.IQ;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.cis.manager.CommunityManager;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+
+import android.app.Service;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+import android.os.Binder;
+import android.os.IBinder;
+import android.os.Parcelable;
+import android.util.Log;
 
 
 /**
@@ -37,50 +57,82 @@ import android.net.Uri;
  * provides a generic DB-based interface based on the same classes 
  * that are provided in a content provider.
  * 
- * TODO: This should be generalized later for different types of connections.
- * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-class CommunicationAdapter implements ISocialAdapter{
+public class CommunicationAdapter extends Service implements ISocialAdapter{
 
-//    private boolean online = false;
-//	
-//    // Get an identifier for log messages:
-//    private static final String LOG_TAG = CommunicationAdapter.class.getName();
-//    //CIS manager relevant messages:
-//    private static final List<String> ELEMENT_NAMES = Arrays.asList("communities", "subscribedTo",
-//	    	"community-manager", "community", "create", "configure", "search-cis", "list", "delete");
-//    //Specify the XCCom name spaces you understand:
-//    private static final List<String> NAME_SPACES = Arrays.asList(
-//	    		"http://societies.org/api/schema/cis/manager",
-//	    		"http://societies.org/api/schema/cis/community");
-//    // TODO: What does this mean?
-//    private static final List<String> PACKAGES = Arrays.asList(
-//			"org.societies.api.schema.cis.manager",
-//			"org.societies.api.schema.cis.community");
-//    //TODO: Address of the cloud node? I thought this was set in the comms manager?
-//    private static final String DESTINATION = "xcmanager.jabber.sintef9013.com";
-//
-//    private final IIdentity toXCManager;
-//    private final ICommCallback callback;
-//   // private ClientCommunicationMgr ccm;
-//    private Context context;
-//
-//    public CommunicationAdapter(Context _context){
-//	context = _context;
-//	//Create a callback class that will handle incoming messages:
-//	callback = new CommunicationCallback(context, NAME_SPACES,PACKAGES);
-//	//Get a JID-compatible identity for the XCManager in the cloud node:
-//	// TODO: Why can't I use DESTINATION directly?
-//   	try {
-//  	    toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
-//    	    } catch (InvalidFormatException e) {
-//    		Log.e(LOG_TAG, e.getMessage(), e);
-//		throw new RuntimeException(e);
-//		}     
-//    }
-	    
+	//COMMS REQUIRED VARIABLES
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("CommunityManager", "ServiceDiscoveryResultBean");
+    private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cis/manager",
+														    	  "http://societies.org/api/schema/activityfeed",	  		
+																  "http://societies.org/api/schema/cis/community");
+    private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.cis.manager",
+													    	   "org.societies.api.schema.activityfeed",
+															   "org.societies.api.schema.cis.community");
+    private ClientCommunicationMgr commMgr;
+    private IBinder binder = null;
+    private static final String LOG_TAG = CommunicationAdapter.class.getName();
+    
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Android Service methods >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    @Override
+	public void onCreate () {
+		this.binder = new LocalBinder();
+		Log.d(LOG_TAG, "CommunicationAdapter service starting");
+		try {
+			//INSTANTIATE COMMS MANAGER
+			commMgr = new ClientCommunicationMgr(this);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage());
+        }    
+	}
+    
+    @Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "CommunicationAdapter service terminating");
+	}
+    
+    /**Create Binder object for local service invocation */
+	public class LocalBinder extends Binder {
+		public CommunicationAdapter getService() {
+			return CommunicationAdapter.this;
+		}
+	}
+	
+	/* @see android.app.Service#onBind(android.content.Intent) */
+	@Override
+	public IBinder onBind(Intent intent) {
+		return this.binder;
+	}
+
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ISocialAdapter Methods >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	
+	/* @see org.societies.android.platform.ISocialAdapter#getListOfOwnedCis(org.societies.android.platform.ISocialAdapterCallback)*/
+	public void getListOfOwnedCis(ISocialAdapterCallback callback) {
+		Log.d(LOG_TAG, "getListOfOwnedCis called");
+		
+		//MESSAGE BEAN
+		CommunityManager messageBean = new CommunityManager();
+		org.societies.api.schema.cis.manager.List listCISs = new org.societies.api.schema.cis.manager.List();
+		messageBean.setList(listCISs);
+		
+		//COMMS STUFF
+		IIdentity toID = commMgr.getIdManager().getCloudNode();
+		Stanza stanza = new Stanza(toID);
+		
+		//MANAGE THE CALLBACKS
+		ICommCallback commCallback = new CommunityCallback(stanza.getId(), callback);
+        try {
+        	Log.d(LOG_TAG, "Sending stanza");
+        	commMgr.register(ELEMENT_NAMES, commCallback);
+        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, commCallback);
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "ERROR sending message: " + e.getMessage());
+        }
+	}
+
+	
+	
     /**
      * TODO: Need to implement this. It is going to be either done through a presence
      * value or through rela XMPP login.
@@ -105,9 +157,9 @@ class CommunicationAdapter implements ISocialAdapter{
      * @return
      */
     public int disconnect(){
-//	online = false;
-	// TODO: clean up network
-	return 0;
+    	//	online = false;
+    	// TODO: clean up network
+    	return 0;
     }
     
     public Cursor query(Uri uri, 
@@ -126,10 +178,10 @@ class CommunicationAdapter implements ISocialAdapter{
 
 	public Uri insert(Uri uri, ContentValues values) {
 		// TODO Auto-generated method stub
-//	    ContentValues testValues = null;
+		// ContentValues testValues = null;
 	    long testID = 1;
 
-  //  	testValues = new ContentValues(values);
+	    // testValues = new ContentValues(values);
     	return Uri.withAppendedPath(uri, Long.toString(testID));    	
 	}
 
@@ -143,109 +195,81 @@ class CommunicationAdapter implements ISocialAdapter{
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	@Override
+	
 	public int connect(String username, String password) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-    
-    
-    /**
-     * Starts an asynch task to go out in the network and create a group
-     * in the CisManager cloud.
-     * 
-     * TODO This method should return possible error message code
-     * @param _record
-     */
-//    public void createGroup(ICisRecord _record){
-//	CreateGroupTask task = new CreateGroupTask(context);
-//	task.execute(_record);
-//	
-//    }
-//    
-    //public ICisRecord getGroupInfo(String _name){
-	//GetGroupInfoTask task = new GetGroupInfoTask(context);
-	//task.execute(_name);
-    //}
-    /**
-     * Parameters to generic AsynchTask:
-     * 1- ICisRecord (Params): This is the group to be created. Param to execute method.
-     * 2- Integer (Progress): The type of progress units used to check task progress.
-     * 3- Integer (Result): The type of the result returned by the task i.e. by doInBackground.
-     * 
-     * @author Babak.Farshchian@sintef.no
-     *
-     */
-//    private class CreateGroupTask extends AsyncTask<ICisRecord, Integer, Integer> {
-//
-//    	private Context context;
-//    	private ICisRecord group;
-//    	
-//    	public CreateGroupTask(Context _context) {
-//    		context = _context;
-//    	}
-//
-//    	protected Integer doInBackground(ICisRecord... args) {
-//    		ccm = new ClientCommunicationMgr(context);
-//    		//We create only one group:
-//    		group = args[0];
-//    		//Create bean to send over:
-//    		Create messageBean = new Create();
-//    		//Populate the data from provided CisRecord:
-//    		messageBean.setCommunityName(group.getName());
-//    		messageBean.setOwnerJid(group.getOwnerId());
-//    		
-//    		Stanza stanza = new Stanza(toXCManager);
-//    		//Try to send the message:
-//    		try {
-//    			ccm.register(ELEMENT_NAMES, callback);
-//    			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-//    			Log.d(LOG_TAG, "Send stanza");
-//    			} catch (Exception e) {
-//    			    Log.e(this.getClass().getName(), e.getMessage());
-//    			    }
-//            return null;
-//    	}
-//    }
- 
-    /**
-     * Parameters to generic AsynchTask:
-     * 1- String (Params): This is the ID to look for.
-     * 2- Integer (Progress): The type of progress units used to check task progress.
-     * 3- Integer (Result): The type of the result returned by the task i.e. by doInBackground.
-     * 
-     * @author Babak.Farshchian@sintef.no
-     *
-     */
-//    private class GetGroupInfoTask extends AsyncTask<String, Integer, ICisRecord> {
-//
-//    	private Context context;
-//    	private ICisRecord group;
-//    	
-//    	public GetGroupInfoTask(Context _context) {
-//    		context = _context;
-//    	}
-//
-//    	protected ICisRecord doInBackground(String... args) {
-//    		ccm = new ClientCommunicationMgr(context);
-//    		//We create only one group:
-//    		String groupNames = args[0];
-//    		//Create bean to send over:
-//    		Create messageBean = new Create();
-//    		//Populate the data from provided CisRecord:
-//    		messageBean.setCommunityName(group.getName());
-//    		messageBean.setOwnerJid(group.getOwnerId());
-//    		
-//    		Stanza stanza = new Stanza(toXCManager);
-//    		//Try to send the message:
-//    		try {
-//    			ccm.register(ELEMENT_NAMES, callback);
-//    			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
-//    			Log.d(LOG_TAG, "Send stanza");
-//    			} catch (Exception e) {
-//    			    Log.e(this.getClass().getName(), e.getMessage());
-//    			    }
-//            return null;
-//    	}
-//    }
+	
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	/**
+	 * Callback required for Android Comms Manager
+	 */
+	private class CommunityCallback implements ICommCallback {
+		
+		//MAP TO STORE THE ALL THE CLIENT CALLBACKS
+		private final Map<String, ISocialAdapterCallback> clientCallbacks = new HashMap<String, ISocialAdapterCallback>();
+
+		/** Constructor for callback
+		 * @param clientID unique ID of send request to comms framework
+		 * @param clientCallback callback from originating client
+		 */
+		public CommunityCallback(String clientID, ISocialAdapterCallback clientCallback) {
+			//STORE THIS CALLBACK FOR THIS CLIENT ID
+			clientCallbacks.put(clientID, clientCallback);
+		}
+
+		/**Returns the correct ISocialAdapterCallback client for this request 
+		 * @param requestID the id of the initiating request
+		 * @return
+		 * @throws UnavailableException
+		 */
+		private ISocialAdapterCallback getRequestingClient(String requestID) {
+			ISocialAdapterCallback requestingClient = (ISocialAdapterCallback) clientCallbacks.get(requestID);
+			clientCallbacks.remove(requestID);
+			return requestingClient;
+		}
+
+		public List<String> getXMLNamespaces() {
+			return NAME_SPACES;
+		}
+
+		public List<String> getJavaPackages() {
+			return PACKAGES;
+		}
+
+		public void receiveResult(Stanza returnStanza, Object msgBean) {
+			Log.d(LOG_TAG, "Callback receiveResult");
+	
+			// --------- COMMUNITY MANAGEMENT BEAN ---------
+			if (msgBean instanceof CommunityManager) {
+				Log.d(LOG_TAG, "CommunityManager Result!");
+				
+				CommunityManager communityResult = (CommunityManager) msgBean;
+				//GET CORRECT CLIENT'S ISocialAdapterCallback FOR THIS REQUEST
+				ISocialAdapterCallback clientCallback = getRequestingClient(returnStanza.getId());
+				clientCallback.receiveResult(communityResult.getList());	
+			}
+			// --------- ACTIVITY BEAN ---------
+			//else if (msgBean instanceof ActivityBean)) {
+			//	DO SOMETHING ELSE
+			//}
+		}
+
+		public void receiveError(Stanza returnStanza, XMPPError error) {
+			Log.d(LOG_TAG, "Callback receiveError");			
+		}
+
+		public void receiveInfo(Stanza returnStanza, String arg1, XMPPInfo info) {
+			Log.d(LOG_TAG, "Callback receiveInfo");
+		}
+
+		public void receiveItems(Stanza returnStanza, String arg1, List<String> items) {
+			Log.d(LOG_TAG, "Callback receiveItems");
+		}
+
+		public void receiveMessage(Stanza returnStanza, Object messageBean) {
+			Log.d(LOG_TAG, "Callback receiveMessage");	
+		}
+	}//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

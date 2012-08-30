@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies - New Account</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+	<link rel="stylesheet" type="text/css" href="../css/custom/custom-theme-societies.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/jquerymobile/jquery.mobile.structure-1.1.0.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/custom/societies.css"/>
+	
+	<script type="text/javascript" src="../javascript/jquery/jquery-1.7.1.js" ></script>
+	<script type="text/javascript" src="../javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
+
+</head>
+<body>
+<!-- Page starts here -->
+<div data-role="page" id="one">
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="../images/societies_header.png" alt="societies logo"/>
+		<!-- /header -->
+	</div>
+	<div data-role="content" id="contentMain" name="contentMain">
+		<ul data-role="listview" id="listview" data-theme="c" data-divider-theme="b">
+			<li data-role="list-divider">Create a New Community</li>
+		</ul>
+		<br/>
+		<form id="form1">
+			<div id="fnameDiv" data-role="fieldcontain">
+				<label for="fname" id="fnameLabel" name="fnameLabel">Admin name*</label>
+				<input id="fname" name="fname_r" type="text"/>
+			</div>
+			<div id="lnameDiv" data-role="fieldcontain">
+				<label for="lname">Community name*</label>
+				<input id="lname" name="lname_r" type="text"/>
+			</div>
+			<div id="category-typeDiv" data-role="fieldcontain">
+				<label for="select-choice-0" class="select">Category:</label>
+				<select name="select-choice-0" id="select-choice-0">
+					<option value="ICT">ICT</option>
+					<option value="education">Education</option>
+					<option value="sports">Sports</option>
+				</select>
+			</div>
+			<div id="community-typeDiv" data-role="fieldcontain">
+				<label for="select-choice-0" class="select">Comunity Type:</label>
+				<select name="select-choice-0" id="select-choice-0">
+					<option value="open">Open</option>
+					<option value="invite">Invite Only</option>
+				</select>
+			</div>
+			<div data-role="fieldcontain">
+				<fieldset data-role="controlgroup">
+					<legend>Agree to the terms:</legend>
+					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
+					<label for="checkbox-1">I agree</label>
+				</fieldset>
+			</div>
+			<div id="create_account" data-role="fieldcontain">
+				<a href="#"><input type="submit" value="Create Community" data-inline="true" data-theme="b" data-icon="check"/></a>
+			</div>
+		</form>
+		<br/>
+		<div class="terms">
+			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
+		</div>
+	</div>
+	<!-- contentMain -->
+<!-- footer -->
+	<div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home"><a href="landing.html">
+			<span class="ico"><img src="../images/icons/home_logo.png" alt="home"/></span>
+			</a>
+			</li>
+			<li class="btn-profile"><a href="myProfile.html">
+			<span class="ico"><img src="../images/icons/my_profile.png" alt="profile"/></span>
+			</a>
+			</li>
+			<li class="btn-settings"><a href="settings.html">
+			<span class="ico"><img src="../images/icons/settings.png" alt="settings"/></span>
+			</a>
+			</li>
+			<li class="btn-about"><a href="about.html">
+			<span class="ico"><img src="../images/icons/about.png" alt="about"/></span>
+			</a>
+			</li>
+		</ul>
+	</div>
+	<!-- end footer -->
+</div>
+<!-- Page ends here -->
+</body>
+</html>

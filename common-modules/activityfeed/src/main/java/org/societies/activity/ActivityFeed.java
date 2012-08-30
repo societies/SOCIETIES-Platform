@@ -24,29 +24,8 @@
  */
 package org.societies.activity;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-
-import org.apache.shindig.social.core.model.ActivityEntryImpl;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.ActivityObject;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -63,31 +42,26 @@ import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.activityfeed.AddActivityResponse;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
 import org.societies.api.schema.activityfeed.DeleteActivityResponse;
-import org.societies.api.schema.activityfeed.GetActivities;
 import org.societies.api.schema.activityfeed.GetActivitiesResponse;
-import org.societies.api.schema.cis.community.Community;
-import org.societies.api.schema.cis.community.GetInfo;
-import org.societies.api.schema.cis.community.Participant;
-import org.societies.api.schema.cis.community.ParticipantRole;
-import org.societies.api.schema.cis.community.Who;
 import org.springframework.beans.factory.annotation.Autowired;
 
-//@Entity
-//@Table(name = "org_societies_activity_ActivityFeed")
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 public class ActivityFeed implements IActivityFeed, Subscriber {
 	/**
 	 * 
 	 */
 
-	
-//	@Id
-	private String id;
-//	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
-	private
+
+    protected String id;
+    protected
 	Set<Activity> list;
 	public ActivityFeed()
 	{
@@ -98,11 +72,14 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		list = new HashSet<Activity>();// from Thomas
 	}
 	@Autowired 
-	private SessionFactory sessionFactory;
-	private static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
-	private Session session;
+	protected SessionFactory sessionFactory;
+    protected static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
+    protected Session session;
 	public Session getSession() {
 		return session;
+	}
+	public int count(){
+		return list.size();
 	}
 	public void setSession(Session session) {
 		this.session = session;
@@ -114,7 +91,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		ArrayList<IActivity> ret = new ArrayList<IActivity>();
 		String times[] = timePeriod.split(" ",2);
 		if(times.length < 2){
-			LOG.error("timeperiod string was malformed: "+timePeriod);
+			LOG.error("time period string was malformed: "+timePeriod);
 			return ret;
 		}
 		long fromTime = 0;long toTime = 0;
@@ -122,10 +99,10 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			fromTime = Long.parseLong(times[0]);
 			toTime = Long.parseLong(times[1]);
 		}catch(Exception e){
-			LOG.error("timeperiod string was malformed, could not parse long");
+			LOG.error("time period string was malformed, could not parse long");
 			return ret;
 		}
-		LOG.info("timeperiod: "+fromTime+" - " + toTime);
+		LOG.info("time period: "+fromTime+" - " + toTime);
 		if(list != null){
 			LOG.info(" list size: "+list.size());
 			for(Activity act : list){
@@ -190,6 +167,10 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 					ret.add(act);
 				}
 			}
+            LOG.error("((Activity)tmp.get(0)).getValue(filterBy).toString(): "+((Activity)tmp.get(0)).getValue(filterBy).toString());
+            LOG.error("((Activity)tmp.get(0)):"+((Activity)tmp.get(0)));
+            LOG.error("((Activity)tmp.get(0)).getValue(\"actor\"):" + ((Activity)tmp.get(0)).getValue("actor"));
+            LOG.error(((Activity)tmp.get(0)).hashCode()+": ((Activity)tmp.get(0)).getActor():" + ((Activity)tmp.get(0)).getActor());
 		} catch (IllegalArgumentException e) {
 			LOG.error("Illegal argument for the filterOp");
 			e.printStackTrace();
@@ -206,14 +187,12 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 
 	public void addActivity(IActivity activity) {
 
-		//persist.
-		//Session session = sessionFactory.openSession();//getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		Activity newact = new Activity(activity);
 		newact.setOwnerId(this.id);
 		try{
 			list.add(newact);
-			//session.save(newact);
+			session.save(newact);
 			//session.save(this);
 			t.commit();
 		}catch(Exception e){
@@ -222,9 +201,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			LOG.warn("Saving activity failed, rolling back");
 			e.printStackTrace();
 		}finally{
-			
-//			if(session!=null)
-//				session.close();
+
 		}		
 	}
 
@@ -255,31 +232,33 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		this.sessionFactory = sessionFactory;
 	}
 	
-	synchronized public void startUp(Session session, String id){
-		this.session = session;
-		LOG.info("starting loading activities from db with ownerId: "+ id );
-		//Session session = sessionFactory.openSession();
-		try{
-			list.addAll(session.createCriteria(Activity.class).add(Property.forName("ownerId").eq(id)).list());
-			if(list.size() == 0){
-				LOG.error("did not find actitivties with ownerId: "+ id ) ;
-			}else if(list.size() > 1){
-				LOG.error("activityfeed startup with ownerId: "+id+" gave more than one activityfeed!! ");
-			}
-		}catch(Exception e){
-			LOG.warn("Query for actitvies failed..");
+	synchronized public void startUp(SessionFactory sessionFactory, String id){
+        this.id = id;
+        Session session = sessionFactory.openSession();
+        list = new HashSet<Activity>();
+        LOG.info("starting loading activities from db with ownerId: "+ id );
+        //Session session = sessionFactory.openSession();
+        try{
+            list.addAll(session.createCriteria(Activity.class).add(Property.forName("ownerId").eq(id)).list());
+            if(list.size() == 0){
+                LOG.error("did not find actitivties with ownerId: "+ id ) ;
+            }else if(list.size() > 1){
+                LOG.error("activityfeed startup with ownerId: "+id+" gave more than one activityfeed!! ");
+            }
+        }catch(Exception e){
+            LOG.warn("Query for actitvies failed..");
 
-		}finally{
-//			if(session!=null)
-//				session.close();
-		}
-		LOG.info("loaded activityfeed with ownerId: " + id + " with "+list.size()+" activities.");
-		for(Activity act : list){
-			act.repopHash();
-			LOG.info("act actor: " + act.getActor());
-			LOG.info("act verb: " + act.getVerb());
-		}
-	}
+        }finally{
+            if(session!=null)
+                session.close();
+        }
+        LOG.info("loaded activityfeed with ownerId: " + id + " with "+list.size()+" activities.");
+        for(Activity act : list){
+            act.repopHash();
+            LOG.info("act actor: " + act.getActor());
+            LOG.info("act verb: " + act.getVerb());
+        }
+    }
 
 	public String getId() {
 		return id;
@@ -328,7 +307,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		return ret;
 	}
 	@Override
-	synchronized public long importActivtyEntries(List<?> activityEntries) {
+	synchronized public long importActivityEntries(List<?> activityEntries) {
 		long ret = 0;
 		if(activityEntries.size() == 0){
 			LOG.error("list is empty, exiting");
@@ -393,7 +372,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	 *  
 	 *  
 	 * @param iActivityList list with iactivities (IActivity) objects
-	 * @param empty but already created list (we will fill it up) that will receive the marshalled objects 
+	 * @param marshalledActivList but already created list (we will fill it up) that will receive the marshalled objects
 	 * 
 	 */
 	

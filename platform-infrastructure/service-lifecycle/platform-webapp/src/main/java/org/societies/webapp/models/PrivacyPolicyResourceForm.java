@@ -42,7 +42,6 @@ public class PrivacyPolicyResourceForm {
 	private String resourceType;
 	private String resourceSchemeCustom;
 	private String resourceTypeCustom;
-	private boolean optional;
 	private List<PrivacyActionForm> actions;
 	private List<PrivacyConditionForm> conditions;
 
@@ -87,18 +86,6 @@ public class PrivacyPolicyResourceForm {
 		this.resourceSchemeCustom = resourceSchemeCustom;
 	}
 	/**
-	 * @return the optional
-	 */
-	public boolean isOptional() {
-		return optional;
-	}
-	/**
-	 * @param optional the optional to set
-	 */
-	public void setOptional(boolean optional) {
-		this.optional = optional;
-	}
-	/**
 	 * @return the conditions
 	 */
 	public List<PrivacyConditionForm> getConditions() {
@@ -138,9 +125,7 @@ public class PrivacyPolicyResourceForm {
 	@Override
 	public String toString() {
 		StringBuffer str = new StringBuffer("PrivacyPolicyResourceForm ["
-				+ (resourceType != null ? "resourceType=" + resourceType + ", " : "")
-				+ "optional="
-				+ optional);
+				+ (resourceType != null ? "resourceType=" + resourceType + ", " : ""));
 		int j = 0;
 		if (null != actions && actions.size() > 0) {
 			str.append(", actions=\n");
@@ -157,6 +142,12 @@ public class PrivacyPolicyResourceForm {
 		}
 		str.append("]");
 		return str.toString();
+	}
+	
+	public boolean isEmpty() {
+		return (null == resourceType
+				&& (null == actions || actions.size() <= 0)
+				&& (null == conditions || conditions.size() <= 0));
 	}
 	
 	

@@ -24,6 +24,7 @@
  */
 package org.societies.orchestration.cpa.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import org.societies.api.cis.management.ICisOwned;
 
 public class SimpleTextSearch {
 	private HashMap<String,HashMap<String,Double>> topicToUserMap;
+    private String[] textPosts = {"posted","said"};      //TODO: set this ..
 	public SimpleTextSearch(){
 
 	}
@@ -61,45 +63,43 @@ public class SimpleTextSearch {
 
 		return distance[str1.length()][str2.length()];
 	}
-	public int userDistance(ICisOwned cis, String user1, String user2){
+	public int userDistance(List<IActivity> actList, String user1, String user2){
 		int ret = Integer.MAX_VALUE;
-		String userText[] = gatherUserText(cis,user1,user2);
+		String userText[] = gatherUserText(actList,user1,user2);
 		ret = this.computeLevenshteinDistance(userText[0], userText[1]);
 		return ret;
 	}
-	private String[] gatherUserText(ICisOwned cis, String user1, String user2){
-		String ret[] = new String[2];
-		JSONObject searchQuery = new JSONObject();
-		//TODO: check if this query is correct, it needs to be aligned with how "chat" is using activityfeed.
-		try {
-			searchQuery.append("filterBy", "actor");
-			searchQuery.append("filterOp", "equals");
-			searchQuery.append("filterValue", user1);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		String timeSeries = "0 "+Long.toString(System.currentTimeMillis()+1000);
-		List<IActivity> user1acts = cis.getActivityFeed().getActivities(searchQuery.toString(), timeSeries);
-		try {
-			searchQuery.append("filterBy", "actor");
-			searchQuery.append("filterOp", "equals");
-			searchQuery.append("filterValue", user2);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		List<IActivity> user2acts = cis.getActivityFeed().getActivities(searchQuery.toString(), timeSeries);
-		String user1text = "";
-		String user2text = "";
+	private String[] gatherUserText(List<IActivity> actList, String user1, String user2){
+		List<IActivity> user1acts = new ArrayList<IActivity>();
+		List<IActivity> user2acts = new ArrayList<IActivity>();
+        //sort the activities into two heaps, one for user1 and one for user2
+        for(IActivity act : actList){
+            if(act.getActor().contains(user1))
+                user1acts.add(act);
+            else if(act.getActor().contains(user2))
+                user2acts.add(act);
+        }
+        String ret[] = new String[2];
+        String user1text="";
+        String user2text="";
+        //sort out the "posted", this should be generalized a bit more, to capture all textual interaction
 		for(IActivity user1act : user1acts)
-			if(user1act.getVerb().contains("posted"))
+			if(checkIfTextPost(user1act.getVerb()))
 				user1text += user1act.getObject();
 		for(IActivity user2act : user1acts)
-			if(user2act.getVerb().contains("posted"))
+			if(checkIfTextPost(user2act.getVerb()))
 				user1text += user2act.getObject();
 		ret[0] = user1text;
 		ret[1] = user2text;
 		return ret;
 	}
+    private boolean checkIfTextPost(String s){
+        for(String candidates : this.textPosts)
+            if(s.contains(candidates))
+                return true;
+        return false;
+
+    }
 	public static void main(String args[]){
 		String s="kitten"; String t="sitting";
 		String s2="burdeikkeligne"; String t2="paadette";
