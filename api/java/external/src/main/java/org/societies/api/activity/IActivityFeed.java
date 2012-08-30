@@ -35,10 +35,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * @author Babak.Farshchian@sintef.no
  *
  */
-/**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
- */
+
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IActivityFeed {
 
