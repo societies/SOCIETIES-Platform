@@ -9,14 +9,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
-import static org.mockito.Mockito.*;
 import org.societies.cis.directory.CisDirectory;
-import org.societies.cis.directory.model.CisAdvertisementRecordEntry;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
@@ -25,11 +21,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.annotation.Rollback;
-
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-
-
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -125,11 +116,11 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 	}
 
 	@Test
-	@Rollback(false)
+	@Rollback(true)
 	public void addCISREcordtest() {
 		
 		try {
-			System.out.println("ADDING CIS_ADVERT1...");
+			System.out.println("+++++++++++++++++++++++ ADDING CIS_ADVERT1...");
 			System.out.println("Name is  = " + cisAdvert1.getName());
 			System.out.println("ID is  = " + cisAdvert1.getId());
 			System.out.println("Uri is  = " + cisAdvert1.getUri());
@@ -153,8 +144,10 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 			e.printStackTrace();
 			assert(false);
 		}
-		System.out.println("Result Count=" + listResults.size());
-		assert(true);
+		String returnedCISid = listResults.get(0).getId();
+		System.out.println("Result found =" + listResults.get(0).getId());
+		assert(returnedCISid.equals(cisAdvert1.getId()) );
+		cisDir.deleteCisAdvertisementRecord(cisAdvert1);
 	}
 
 	@Ignore
@@ -162,48 +155,76 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 		
 	}
 	
-	@Ignore
+	@Test
+	@Rollback(true)
 	public void deleteCISREcordtest() {
-		
+		System.out.println("+++++++++++++++++++++++ Test Delete Record");
 		try {
 			cisDir.addCisAdvertisementRecord(cisAdvert1);
-			cisDir.addCisAdvertisementRecord(cisAdvert2);
 		}catch (Exception e) {
 			assert(false);
 			e.printStackTrace();
 		}
 		
 		try {
-			cisDir.deleteCisAdvertisementRecord(cisAdvert2);
+			cisDir.deleteCisAdvertisementRecord(cisAdvert1);
 		}catch (Exception e) {
 			assert(false);
 			e.printStackTrace();
 		}
-		assert(true);		
+		
+		List<CisAdvertisementRecord> listResults = null;
+		Future<List<CisAdvertisementRecord>> asyncResult = cisDir.findAllCisAdvertisementRecords();
+		try {
+			listResults = asyncResult.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			assert(false);
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+			assert(false);
+		}
+		int count = listResults.size();
+		if (count==0) 
+			assert(true);
+		else {
+			String returnedCISid = listResults.get(0).getId();
+			System.out.println("Result found = " + returnedCISid);
+			assert(false);
+		}
 	}
 	
-	@Ignore
+	@Test
+	@Rollback(true)
 	public void modifyCISREcordtest() {
-		
-		CisAdvertisementRecord oldCisValues = cisAdvert1;
-		CisAdvertisementRecord updatedCisValues = cisAdvert2new;
-		
+		System.out.println("+++++++++++++++++++++++ Test UPDATE Record");
 		try {
 			cisDir.addCisAdvertisementRecord(cisAdvert1);
-			cisDir.addCisAdvertisementRecord(cisAdvert2);
-			cisDir.updateCisAdvertisementRecord(oldCisValues, updatedCisValues);
 		}catch (Exception e) {
-			// TODO Auto-generated catch block
+			assert(false);
 			e.printStackTrace();
 		}
+		
+		try {
+			cisDir.updateCisAdvertisementRecord(cisAdvert1, cisAdvert2);
+		}catch (Exception e) {
+			assert(false);
+			e.printStackTrace();
+		}
+		
+		List<CisAdvertisementRecord> listResults = null;
+		Future<List<CisAdvertisementRecord>> asyncResult = cisDir.findAllCisAdvertisementRecords();
+		try {
+			listResults = asyncResult.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			assert(false);
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+			assert(false);
+		}
+		String returnedCISid = listResults.get(0).getId();
+		System.out.println("Result found = " + returnedCISid);
+		assert(returnedCISid.equals(cisAdvert2.getId()));
 	}
-	
-//	public static SessionFactory getSessionFactory(){
-//		return sessionfactory;
-//	}
-
-//	public static SessionFactory setSessionFactory(){
-//		return sessionfactory;
-//	}
-	
 }
