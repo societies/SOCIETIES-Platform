@@ -148,7 +148,7 @@
 							privacypreferencemanagement;scope=compile|runtime,
 							privacynegotiationmanagement;scope=compile|runtime
 						</Embed-Dependency>
-						<Embed-Transitive>fase</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>

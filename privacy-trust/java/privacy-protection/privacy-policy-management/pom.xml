@@ -77,11 +77,11 @@
 			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>1.3.2</version>
-		</dependency>
+		</dependency> -->
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
