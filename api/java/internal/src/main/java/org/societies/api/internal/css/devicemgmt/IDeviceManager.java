@@ -26,6 +26,7 @@ package org.societies.api.internal.css.devicemgmt;
 
 import java.util.Dictionary;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 /**
  * Interface used by the device deriver bundles to inform the device manager about a state of devices
@@ -64,6 +65,21 @@ public interface IDeviceManager {
 	public String fireNewDataReceived (String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data);
 	
 	
+	/**
+	 * BJB : 30/08/2012, (remove this when tested)
+	 * Method used to inform the Device Manager about a new remote device shared through SLM. The DM will create a local OSGi IDevice service to represent this remote device 
+	 * @param deviceCommonInfo
+	 * @param deviceNodeId: the JID of the CSS Node on which the device is connected.
+	 * @return a deviceId (or null)
+	 */
+	public String fireNewSharedDevice (DeviceCommonInfo deviceCommonInfo, IIdentity deviceNodeId);
 	
-
+	/**
+	 * BJB : 30/08/2012 (remove this once tested)
+	 * Method used to inform the Device Manager about an uninstall of shared device through SLM. The DM will destroy the local OSGi IDevice service 
+	 * @param a deviceId
+	 * @return true or false. False if the deviceId does not exist.
+	 */
+	public boolean fireDisconnectedSharedDevice (String deviceId);
+	
 }

@@ -6,7 +6,7 @@
 	<groupId>org.societies.security</groupId>
 	<!-- If name starts with "security" it gets cut off -->
 	<artifactId>secur-services</artifactId>
-	<version>${release.version}</version>
+	<version>0.1</version>
 	<packaging>bundle</packaging>
 	<name>Security Services Bundle</name>
 

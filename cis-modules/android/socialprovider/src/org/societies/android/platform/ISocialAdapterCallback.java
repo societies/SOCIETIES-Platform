@@ -24,6 +24,7 @@
  */
 package org.societies.android.platform;
 
+
 /**
  * This is the interface to implement for the {@link SocialProvider}
  * in order to receive information changes in the social data.
@@ -31,6 +32,8 @@ package org.societies.android.platform;
  * @author Babak.Farshchian at sintef dot no
  *
  */
-public interface ISocialAdapterListener {
 
+public interface ISocialAdapterCallback {
+	
+	public void receiveResult(Object returnValue);
 }
