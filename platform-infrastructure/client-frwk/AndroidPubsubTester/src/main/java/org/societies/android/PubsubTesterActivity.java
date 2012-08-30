@@ -1,5 +1,6 @@
 package org.societies.android;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class PubsubTesterActivity extends Activity {
 
 	private static final Logger log = LoggerFactory.getLogger(PubsubTesterActivity.class);
     
-	private static final List<String> packageList = Collections.singletonList("org.societies.api.schema.examples.calculatorbean");
+	private static final List<String> classList = Collections.singletonList("org.societies.api.schema.examples.calculatorbean.CalcBean");
 	
 	private ExampleTask task;
 
@@ -42,7 +43,11 @@ public class PubsubTesterActivity extends Activity {
         setContentView(R.layout.main);
         
         PubsubClientAndroid pubsubClient = new PubsubClientAndroid(this);
-		pubsubClient.addJaxbPackages(packageList);
+        try {
+        	pubsubClient.addSimpleClasses(classList);
+        } catch (ClassNotFoundException e) {
+        	log.error("ClassNotFoundException loading "+Arrays.toString(classList.toArray()), e);
+        }
 		
 		task = new ExampleTask(); 
 		task.execute(pubsubClient);
@@ -73,7 +78,7 @@ public class PubsubTesterActivity extends Activity {
     	protected Void doInBackground(PubsubClientAndroid... args) {
     		PubsubClientAndroid pubsubClient = args[0];	    	
 	        try {
-	        	IIdentity pubsubService = IdentityManagerImpl.staticfromJid("xcmanager.societies.local");
+	        	IIdentity pubsubService = IdentityManagerImpl.staticfromJid("pubsub.societies.local");
 	        	CalcBean item = new CalcBean();
 	        	item.setA(1);
 	        	item.setB(2);
