@@ -108,13 +108,24 @@ public class PrivacyPolicyController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		PrivacyPolicyForm privacyPolicyFrom = new PrivacyPolicyForm();
 		privacyPolicyFrom.createEmptyPrivacyPolicyFrom();
-		generateResourceLists();
-		model.put("privacyPolicy", privacyPolicyFrom);
-		model.put("ActionList", ActionConstants.values());
-		model.put("ConditionList", ConditionConstants.values());
-		model.put("ResourceList", resourceList);
-		model.put("ResourceHumanList", resourceHumanList);
-		model.put("ResourceSchemeList", resourceSchemeList);
+		StringBuffer resultMsg = new StringBuffer();
+		try {
+			generateResourceLists();
+			model.put("privacyPolicy", privacyPolicyFrom);
+			model.put("ActionList", ActionConstants.values());
+			model.put("ConditionList", ConditionConstants.values());
+			model.put("ResourceList", resourceList);
+			model.put("ResourceHumanList", resourceHumanList);
+			model.put("ResourceSchemeList", DataIdentifierScheme.values());
+		}
+		catch(IllegalArgumentException e) {
+			resultMsg.append("Error during the generation of the privacy policy form: can't retrieve data type (scheme) "+e.getMessage());
+			LOG.error("Error during the generation of the privacy policy form: can't retrieve data type (scheme)", e);
+		} catch (IllegalAccessException e) {
+			resultMsg.append("Error during the generation of the privacy policy form: error when retrievint data type (scheme) "+e.getMessage());
+			LOG.error("Error during the generation of the privacy policy form: error when retrievint data type (scheme)", e);
+		}
+		model.put("ResultMsg", resultMsg.toString());
 		return new ModelAndView("privacy/privacy-policy/update", model);
 	}
 
@@ -157,30 +168,39 @@ public class PrivacyPolicyController {
 
 
 		// -- Display the privacy policy
-		generateResourceLists();
-		model.put("privacyPolicy", privacyPolicyFrom);
-		model.put("ActionList", ActionConstants.values());
-		model.put("ConditionList", ConditionConstants.values());
-		model.put("ResourceList", resourceList);
-		model.put("ResourceHumanList", resourceHumanList);
-		model.put("ResourceSchemeList", DataIdentifierScheme.values());
+		try {
+			generateResourceLists();
+			model.put("privacyPolicy", privacyPolicyFrom);
+			model.put("ActionList", ActionConstants.values());
+			model.put("ConditionList", ConditionConstants.values());
+			model.put("ResourceList", resourceList);
+			model.put("ResourceHumanList", resourceHumanList);
+			model.put("ResourceSchemeList", DataIdentifierScheme.values());
+		}
+		catch(IllegalArgumentException e) {
+			resultMsg.append("Error during the generation of the privacy policy form: can't retrieve data type (scheme) "+e.getMessage());
+			LOG.error("Error during the generation of the privacy policy form: can't retrieve data type (scheme)", e);
+		} catch (IllegalAccessException e) {
+			resultMsg.append("Error during the generation of the privacy policy form: error when retrievint data type (scheme) "+e.getMessage());
+			LOG.error("Error during the generation of the privacy policy form: error when retrievint data type (scheme)", e);
+		}
 		model.put("ResultMsg", resultMsg.toString());
 		return new ModelAndView("privacy/privacy-policy/update", model);
 	}
 
-	public static void generateResourceLists() {
+	public static void generateResourceLists() throws IllegalArgumentException, IllegalAccessException {
 		Field[] resourceTypeList = CtxAttributeTypes.class.getDeclaredFields();
 		resourceList = new String[resourceTypeList.length];
 		resourceHumanList = new String[resourceTypeList.length];
 		for(int i=0; i<resourceTypeList.length; i++) {
-			resourceList[i] = DataIdentifierScheme.CONTEXT+":///"+resourceTypeList[i].getName();
-			resourceHumanList[i] = DataIdentifierScheme.CONTEXT+": "+resourceTypeList[i].getName();
+			resourceList[i] = DataIdentifierScheme.CONTEXT+":///"+((String)resourceTypeList[i].get(null));
+			resourceHumanList[i] = DataIdentifierScheme.CONTEXT+": "+((String)resourceTypeList[i].get(null));
 		}
 		
 		DataIdentifierScheme[] schemes = DataIdentifierScheme.values();
 		resourceSchemeList = new String[schemes.length];
 		for(int j=0; j<schemes.length; j++) {
-			resourceSchemeList[j] = schemes[j].name();
+			resourceSchemeList[j] = schemes[j].value();
 		}
 	}
 
