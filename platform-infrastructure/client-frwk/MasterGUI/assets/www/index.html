@@ -5,19 +5,41 @@
 		<script type="text/javascript" charset="utf-8" src="cordova-1.7.0.js"></script>
 
 		<!-- Uncomment line below to enable PhoneGap desktop and comment out real PhoneGap jS library-->
-		<!--script type="text/javascript" charset="utf-8" src="phonegap-desktop.js"></script-->
+		<!--<script type="text/javascript" charset="utf-8" src="phonegap-desktop.js"></script>-->
 		<link rel="stylesheet" href="themes/Kilkenny-1.10.css"/>
 		<link rel="stylesheet" href="jquery.mobile.structure-1.1.0.css" /> 
 		<script type="text/javascript" src="jquery-1.7.1.js"></script>
 		<script src="jquery.mobile-1.1.0.js"></script>
-		<script type="text/javascript" src="reference.js"></script>
-		<link rel="stylesheet" href="societies.css"/> 
-	
+		<link rel="stylesheet" href="css/societies.css"/> 
+
+		<!-- App specific JS -->
+		
+		<!-- PhoneGap plugins -->
+		<script type="text/javascript" src="javascript/plugins/apppreferences_plugin.js"></script>
+		<script type="text/javascript" src="javascript/plugins/coreservicemonitor_plugin.js"></script>
+		<script type="text/javascript" src="javascript/plugins/cssmanager_plugin.js"></script>
+		<script type="text/javascript" src="javascript/plugins/devicestatus_plugin.js"></script>
+		
+		<!-- Page Specific -->
+		<script type="text/javascript" src="javascript/pagespecific/mainpage.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/activeservices.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/activetasks.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/apppreferences.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/deviceinfo.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/devicemanager.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/devicestatus.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/login.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/logout.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/refreshcssrecord.js"></script>
+		<script type="text/javascript" src="javascript/pagespecific/registerxmpp.js"></script>
+		
+			
 		<!-- Uncomment lines below to enable PhoneGap desktop-->
-		<!--script type="text/javascript" charset="utf-8" src="pluginjs/cssmanager.js"></script>
+		<!--<script type="text/javascript" charset="utf-8" src="pluginjs/cssmanager.js"></script>
+		<script type="text/javascript" charset="utf-8" src="pluginjs/cismanager.js"></script>
 		<script type="text/javascript" charset="utf-8" src="pluginjs/servicemonitor.js"></script>
 		<script type="text/javascript" charset="utf-8" src="pluginjs/devicestatus.js"></script>
-		<script type="text/javascript" charset="utf-8" src="pluginjs/preferences.js"></script-->
+		<script type="text/javascript" charset="utf-8" src="pluginjs/preferences.js"></script>-->
 
 
 		<!-- Ignore -->
@@ -34,7 +56,7 @@
 		<!-- Invoke a new page via an icon -->
 		<a href="#device" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Device</a>
 		<a href="#information" data-role="button" data-icon="info" data-inline="true" data-theme="a">Info</a>
-		<a href="#cssRecord" data-role="button" data-icon="info" data-inline="true" data-theme="a">Profile</a>
+		<a href="#cisManagementPage" data-role="button" data-icon="info" data-inline="true" data-theme="a">Create CIS</a>
 		
 	</div><!-- /header -->
 
@@ -42,8 +64,8 @@
 
    		<div id= "loginDialog">
 			<div data-role="fieldcontain" >
-		    	<label for="username">User JID: </label>
-		    	<input type="text" name="userLogin" id="username" value=""  />
+		    	<label for="username">User Name: </label>
+		    	<input type="text" name="userLogin" id="username" value="" />
 			</div>
 
 			<div data-role="fieldcontain" >
@@ -51,11 +73,17 @@
 		    	<input type="password" name="userpass" id="userpass" value="" />
 			</div>
 
-			<div data-role="fieldcontain" >
-		    	<label for="identityDomain">Identity Domain: </label>
-		    	<input type="text" name="identityDomain" id="identityDomain" value="" readonly="readonly" />
-			</div>
 
+				<div data-role="fieldcontain" >
+			    	<label for="cloudNode">Cloud Node: </label>
+			    	<input type="text" name="cloudNode" id="cloudnode" value="" />
+				</div>
+	
+				<div data-role="fieldcontain" >
+			    	<label for="identityDomain">Identity Domain: </label>
+			    	<input type="text" name="identityDomain" id="identitydomain" value=""  />
+				</div>
+			
 			<input id="connectXMPP" type="button" value="Connect" data-icon="gear" data-inline="true" /> 
 			<a href="#xmppDomainReg" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Register</a>
 			
@@ -149,6 +177,8 @@
     	<a href="#deviceManager" data-theme="a" data-transition="pop" data-role="button" >Device Manager</a>
     	<a href="#cssRegistration" data-theme="a" data-transition="pop" data-role="button" >CSS Registration</a>
     	<a href="#cssRecord" data-theme="a" data-transition="pop" data-role="button" >CSS Record</a>
+    	<a href="#cisRecordPage" data-theme="a" data-transition="pop" data-role="button" >CIS Record</a>
+    	<a href="#cisManagementPage" data-theme="a" data-transition="pop" data-role="button" >Cis Mgmt</a>
     	<a href="#activeServices" data-theme="a" data-transition="pop" data-role="button" >Active Services Monitor</a>
     	<a href="#activeTasks" data-theme="a" data-transition="pop" data-role="button" >Active Tasks Monitor</a>
     	<a href="#deviceMonitor" data-theme="a" data-transition="pop" data-role="button" >Device Monitor</a>
@@ -526,6 +556,70 @@
 
 		<label for="prefValue">Value: </label>
 		<input type="text" name="preferenceValue" id="prefValue" value="" disabled="true"/>
+	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Societies CIS mgmgt page -->
+<div data-role="page" id="cisManagementPage">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;CIS Management</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+   		<div id= "CisMgmt">
+			<div data-role="fieldcontain" >
+		    	<label for="cisname">Cis Name: </label>
+		    	<input type="text" name="cisName" id="cisname" value=""  />
+			</div>
+			
+			<input id="createCIS" type="button" value="CreateCIS" data-icon="gear" data-inline="true" /> 
+			<input id="listCIS" type="button" value="ListCIS" data-icon="gear" data-inline="true" />
+			<input id="joinCIS" type="button" value="JoinCIS" data-icon="gear" data-inline="true" />
+		</div>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" >
+		<a href="#main" data-role="button" data-icon="home" data-inline="true">home</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of CIS Record page -->
+<div data-role="page" id="cisRecordPage">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;CIS Record</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">
+	
+			<div data-role="fieldcontain" >
+
+
+			<!-- CIS Owner Name 
+				Can be an individual, organisation or some other entity -->
+			<div data-role="fieldcontain">
+		    	<label for="cisowner">Name: </label>
+		    	<input type="text" name="cisOwner" id="cisowner" value="" disabled="true"/>
+			</div>
+
+			<!-- CIS Identity-->
+			<div data-role="fieldcontain" >
+		    	<label for="cisrecordidentity">Identity: </label>
+		    	<input type="text" name="cisRecordIdentity" id="cisrecordidentity" value="" disabled="true"/>
+			</div>
+
+			<!-- CIS Name-->
+			<div data-role="fieldcontain" >
+		    	<label for="cisname">e-Mail: </label>
+		    	<input type="text" name="cisName" id="cisname" value="" disabled="true"/>
+			</div>
+				
 	
 	</div><!-- /content -->
 

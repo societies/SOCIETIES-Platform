@@ -132,56 +132,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return privacyPolicy;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFrom3PServiceJar(java.lang.String)
-	 */
-	@Override
-	public String getPrivacyPolicyFrom3PServiceJar(String jarLocation)
-			throws PrivacyException {
-		return getPrivacyPolicyFrom3PServiceJar(jarLocation, null);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFrom3PServiceJar(java.lang.String, java.util.Map)
-	 */
-	@Override
-	public String getPrivacyPolicyFrom3PServiceJar(String jarLocation, Map<String, String> options) throws PrivacyException {
-		// -- Read options (and create default options)
-		String jarTypeField = "jarType";
-		String privacyPolicyFileLocationField = "ppfLocation";
-		String privacyPolicyFileNameField = "ppfName";
-		String privacyPolicyFileEncodingField = "ppfEncoding";
-		if (null == options) {
-			options = new HashMap<String, String>();
-		}
-		if (!options.containsKey(jarTypeField)) {
-			options.put(jarTypeField, "osgi");
-		}
-		if (!options.containsKey(privacyPolicyFileLocationField)) {
-			options.put(privacyPolicyFileLocationField, "/");
-		}
-		if (!options.containsKey(privacyPolicyFileNameField)) {
-			options.put(privacyPolicyFileNameField, "privacy-policy.xml");
-		}
-		if (!options.containsKey(privacyPolicyFileEncodingField)) {
-			options.put(privacyPolicyFileEncodingField, "UTF-8");
-		}
-
-		// -- Retrieve the privacy policy file
-		URL url;
-		String privacyPolicy = null;
-		try {
-			url = new URL("jar:file:"+jarLocation+"!"+options.get(privacyPolicyFileLocationField)+options.get(privacyPolicyFileNameField));
-			InputStream privacyPolicyStream = url.openStream();
-			privacyPolicy = IOUtils.toString(privacyPolicyStream, options.get(privacyPolicyFileEncodingField));
-		} catch (MalformedURLException e) {
-			throw new PrivacyException("Can't find the privacy policy file: \"jar:file:"+jarLocation+"!"+options.get(privacyPolicyFileLocationField)+options.get(privacyPolicyFileNameField)+"\"", e);
-		} catch (IOException e) {
-			throw new PrivacyException("Can't read the privacy policy file: \"jar:file:"+jarLocation+"!"+options.get(privacyPolicyFileLocationField)+options.get(privacyPolicyFileNameField)+"\"", e);
-		}
-		return privacyPolicy;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
@@ -297,6 +247,16 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 			LOG.debug("Empty privacy policy. Return a null java object.");
 			return null;
 		}
+		// Fill XML header if necessary
+		String encoding = "UTF-8";
+		if (!privacyPolicy.startsWith("<?xml")) {
+			privacyPolicy = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicy;
+		}
+		// If only contains the XML header: empty privacy policy
+		if (privacyPolicy.endsWith("?>")) {
+			LOG.debug("Empty privacy policy. Return a null java object.");
+			return null;
+		}
 		// Dependency injection not ready
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyPolicyManager not ready");
@@ -305,11 +265,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		// -- Convert Xml to Java
 		RequestPolicy result = null;
 		XMLPolicyReader xmlPolicyReader = new XMLPolicyReader(ctxBroker, commManager.getIdManager());
-		// Fill XML header if necessary
-		String encoding = "UTF-8";
-		if (!privacyPolicy.startsWith("<?xml")) {
-			privacyPolicy = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicy;
-		}
 		try {
 			// -- Create XMLDocument version of the privacy policy
 			DocumentBuilder xmlDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

@@ -36,7 +36,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 public class PrivacyActionForm extends Action {
 
 	public PrivacyActionForm() {
-		this(ActionConstants.READ, true);
+		this(ActionConstants.READ);
 	}
 	/**
 	 * @param action

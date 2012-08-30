@@ -54,8 +54,7 @@ public class SocialData implements ISocialData{
     	socialActivities		= new HashMap<String, Object>();
     	
     	lastUpate				= new Date().getTime();
-    	
-    	System.out.println("SocialData Bundle is started");
+    	logger.info("SocialData Bundle is started");
     }
     
 
@@ -216,7 +215,7 @@ public class SocialData implements ISocialData{
     
     
     private void log(String out){
-    	System.out.println("SocialData - " +out);
+    	logger.info("SocialData - " +out);
     }
 
 	@Override

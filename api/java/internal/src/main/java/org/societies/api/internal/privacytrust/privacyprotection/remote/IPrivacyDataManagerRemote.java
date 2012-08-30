@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.remote;
 
+import java.util.List;
+
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
@@ -32,6 +34,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.schema.identity.DataIdentifier;
 
 /**
  * Interface exposed to Societies components in order to remotely manage access control over resources
@@ -44,11 +47,10 @@ public interface IPrivacyDataManagerRemote {
 	 * 
 	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
 	 * @param dataId ID of the requested data.
-	 * @param ownerId ID of the owner of the data. This is the CSS which will receive this remote call.
-	 * @param action Action requested over this data.
+	 * @param actions Actions requested over this data.
 	 * @param listener The callback object
 	 */
-	public void checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action, IPrivacyDataManagerListener listener) throws PrivacyException;
+	public void checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, IPrivacyDataManagerListener listener) throws PrivacyException;
 
 	/**
 	 * Remote call to protect a data following the user preferences by obfuscating it to a correct
@@ -58,5 +60,5 @@ public interface IPrivacyDataManagerRemote {
 	 * @param dataWrapper Data wrapped in a relevant data wrapper. Use DataWrapperFactory to select the relevant DataWrapper
 	 * @param listener The callback object
 	 */
-	public void obfuscateData(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper, IDataObfuscationListener listener) throws PrivacyException;
+	public void obfuscateData(Requestor requestor, IDataWrapper dataWrapper, IDataObfuscationListener listener) throws PrivacyException;
 }

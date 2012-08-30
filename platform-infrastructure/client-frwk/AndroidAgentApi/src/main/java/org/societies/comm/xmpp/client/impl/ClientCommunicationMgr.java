@@ -165,7 +165,7 @@ public class ClientCommunicationMgr {
 		Log.d(LOG_TAG, "getIdManager");
 		if(idm == null) {
 			try {
-				idm = new IdentityManagerImpl(getIdentityJid());
+				idm = createIdentityManager(getIdentityJid(), getDomainAuthorityNode());
 			} catch (InvalidFormatException e) {
 				throw new RuntimeException(e);
 			}
@@ -245,6 +245,21 @@ public class ClientCommunicationMgr {
 		}
 		return identityJid;
 	}
+	
+	private String getDomainAuthorityNode() {
+		Log.d(LOG_TAG, "getIdentityJid");
+		String daNode;
+		try {
+			daNode = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.getDomainAuthorityNode();
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		return daNode;
+	}
 
 	public boolean isConnected() {
 		Log.d(LOG_TAG, "isConnected");
@@ -272,7 +287,8 @@ public class ClientCommunicationMgr {
 			});
 			if(rv == null)
 				return null;
-			return new IdentityManagerImpl(rv).getThisNetworkNode();
+			idm = createIdentityManager(rv, getDomainAuthorityNode());
+			return idm.getThisNetworkNode();
 		} catch (Throwable e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -289,7 +305,8 @@ public class ClientCommunicationMgr {
 			});
 			if(rv == null)
 				return null;
-			return new IdentityManagerImpl(rv).getThisNetworkNode();
+			idm = createIdentityManager(rv, getDomainAuthorityNode());
+			return idm.getThisNetworkNode();
 		} catch (Throwable e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -305,7 +322,8 @@ public class ClientCommunicationMgr {
 			});
 			if(rv == null)
 				return null;
-			return new IdentityManagerImpl(rv).getThisNetworkNode();
+			idm = createIdentityManager(rv, getDomainAuthorityNode());
+			return idm.getThisNetworkNode();
 		} catch (Throwable e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -340,4 +358,13 @@ public class ClientCommunicationMgr {
 		}
 		return rv;
 	}	
+	
+	private static IIdentityManager createIdentityManager(String thisNode, String daNode) throws InvalidFormatException {
+		IIdentityManager idm;
+		if(daNode == null)
+			idm = new IdentityManagerImpl(thisNode);
+		else
+			idm = new IdentityManagerImpl(thisNode, daNode);
+		return idm;
+	}
 }

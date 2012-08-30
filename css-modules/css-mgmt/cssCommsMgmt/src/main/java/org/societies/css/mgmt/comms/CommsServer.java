@@ -107,6 +107,9 @@ public class CommsServer implements IFeatureServer {
 			Future<CssInterfaceResult> asyncResult = null;
 			CssInterfaceResult result = null;
 			
+			Future<List<String>> asyncGetFriendsResult = null;
+			List<String> getFriendsResult = null;
+		
 			LOG.debug("CSSManager remote invocation of method "
 					+ bean.getMethod().name());
 
@@ -153,14 +156,22 @@ public class CommsServer implements IFeatureServer {
 			case REGISTER_CSS_NODE:
 				asyncResult = this.cssManager.registerCSSNode((CssRecord) bean.getProfile());
 				break;
-				
-				
-				default:
+			case GET_CSS_FRIENDS:
+				asyncGetFriendsResult = this.cssManager.getCssFriends();
+				break;
+			default:
 				break;
 			}
 			
 			try {
-				result = asyncResult.get();
+				switch (bean.getMethod()) {
+				case GET_CSS_FRIENDS:
+					getFriendsResult = asyncGetFriendsResult.get();
+					break;
+				default:
+					// Since everything else seems to use this!!
+					result = asyncResult.get();
+				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -173,6 +184,7 @@ public class CommsServer implements IFeatureServer {
 
 			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
+			resultBean.setResultCssFriendList(getFriendsResult);
 
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;

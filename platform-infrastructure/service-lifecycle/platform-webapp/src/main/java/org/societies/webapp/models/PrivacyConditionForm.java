@@ -40,7 +40,7 @@ public class PrivacyConditionForm extends Condition {
 		this(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "0");
 	}
 	public PrivacyConditionForm(ConditionConstants conditionName, String value){
-		super(conditionName, value);
+		this(conditionName, value, false);
 	}
 	
 	public PrivacyConditionForm(ConditionConstants conditionName, String value, boolean isOptional){

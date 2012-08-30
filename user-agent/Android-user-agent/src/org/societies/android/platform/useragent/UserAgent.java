@@ -37,7 +37,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.useragent.monitoring.MethodType;
+import org.societies.api.schema.useragent.monitoring.MonitoringMethodType;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
@@ -113,7 +113,7 @@ public class UserAgent extends Service implements IAndroidUserAgent{
 		uamBean.setServiceType(action.getServiceType());
 		uamBean.setParameterName(action.getparameterName());
 		uamBean.setValue(action.getvalue());
-		uamBean.setMethod(MethodType.MONITOR);
+		uamBean.setMethod(MonitoringMethodType.MONITOR);
 		
 		Stanza stanza = new Stanza(toXCManager);
 		

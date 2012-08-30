@@ -25,6 +25,7 @@
 package org.societies.api.identity;
 
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
  * Util method that helps manipulating DataIdentifier objects
@@ -34,24 +35,30 @@ import org.societies.api.schema.identity.DataIdentifier;
  */
 public class DataIdentifierUtil {
 	/**
-	 * Generate a URI: type/ownerId/
+	 * Generate a URI: sheme://ownerId/type
 	 * @param dataId
 	 * @return
 	 */
 	public static String toUriString(DataIdentifier dataId)
 	{
 		StringBuilder str = new StringBuilder("");
-		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
+		str.append((dataId.getScheme() != null ? dataId.getScheme().name()+"://" : "/"));
 		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
+		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
 		return str.toString();
 	}
 	
 	public static DataIdentifier fromUri(String dataIdUri)
 	{
-		String[] infos = dataIdUri.split("/");
+		String[] uri = dataIdUri.split("://");
 		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setType(infos[0]);
-		dataId.setOwnerId(infos[1]);
+		dataId.setScheme(DataIdentifierScheme.fromValue(uri[0]));
+		String path = uri[1];
+		int pos = 0, end = 0;
+		if ((end = path.indexOf('/', pos)) >= 0) {
+			dataId.setOwnerId(path.substring(pos, end));
+		}
+		dataId.setType(path.substring(end+1, path.length()));
 		return dataId;
 	}
 }

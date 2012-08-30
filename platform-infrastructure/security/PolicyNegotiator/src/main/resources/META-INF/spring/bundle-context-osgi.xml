@@ -15,12 +15,8 @@
 		interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote"
 		cardinality="0..1"
 		/>
-	<!--osgi:reference id="ClientJarServerRemote"
-		interface="org.societies.api.internal.domainauthority.IClientJarServerRemote"
-		cardinality="0..1"
-		/-->
 	<osgi:reference id="ClientJarServerRemote"
-		interface="org.societies.api.internal.domainauthority.IClientJarServer"
+		interface="org.societies.api.internal.domainauthority.IClientJarServerRemote"
 		cardinality="0..1"
 		/>
 	<osgi:reference id="PersonalizationMgr"

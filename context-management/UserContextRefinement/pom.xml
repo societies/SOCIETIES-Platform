@@ -24,15 +24,18 @@
 	<packaging>bundle</packaging>
 	<dependencies>
 		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -41,26 +44,28 @@
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
+
+
 		<dependency>
-			<groupId>org.societies.context-management</groupId>
-			<artifactId>user-context-db-mgmt</artifactId>
-			<version>${version.cm}</version>
-			<scope>test</scope>
+			<groupId>concurrent</groupId>
+			<artifactId>concurrent</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>weka</groupId>
+			<artifactId>weka</artifactId>
+			<version>3.6.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>colt</groupId>
+			<artifactId>colt</artifactId>
+			<version>1.2.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 
-  		<dependency>
-  		  <groupId>colt</groupId>
-  		  <artifactId>colt</artifactId>
-  		  <version>1.0</version>
-  		</dependency>
-  		<dependency>
-  		  <groupId>concurrent</groupId>
-  		  <artifactId>concurrent</artifactId>
-  		  <version>1.0</version>
-  		</dependency>
-  		
-  		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.beans</artifactId>
@@ -74,29 +79,13 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-		</dependency>
 
 	</dependencies>
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>RELEASE</version>
+	<!--	<relativePath>../../parent/spring-osgi.xml</relativePath>-->
 	</parent>
 
 	<!-- Build Settings -->
@@ -108,8 +97,10 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${pom.artifactId}</Bundle-Name>
+						<Bundle-Version>${pom.version}</Bundle-Version>
+						<Export-Package></Export-Package>
 						<_nouses>true</_nouses>
 					</instructions>
 				</configuration>

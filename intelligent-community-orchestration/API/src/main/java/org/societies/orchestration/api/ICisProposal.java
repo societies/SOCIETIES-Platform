@@ -182,7 +182,7 @@ public class ICisProposal {
 	 * @param IActivityFeed: the proposed activity feed for the CIS proposal 
 	 */
 	public void addActivity(IActivity activity) {
-		activityFeed.addCisActivity(activity);
+		activityFeed.addActivity(activity,null);
 	}
 	
 	/**

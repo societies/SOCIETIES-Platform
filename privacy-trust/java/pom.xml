@@ -54,7 +54,7 @@
 
 	<modules>
 		<module>privacy-protection</module>
-		<module>trust</module>
+		<!-- <module>trust</module>-->
 		<module>privacy-trust-comm-manager</module>
 	</modules>
 </project>

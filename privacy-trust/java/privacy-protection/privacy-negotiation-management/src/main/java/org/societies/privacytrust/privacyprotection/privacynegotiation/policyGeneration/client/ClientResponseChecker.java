@@ -102,7 +102,7 @@ public class ClientResponseChecker {
 	
 	private ResponseItem containsItem(ResponseItem item, List<ResponseItem> list){
 		for (ResponseItem r : list){
-			if (item.getRequestItem().getResource().getContextType().equals(r.getRequestItem().getResource().getContextType())){
+			if (item.getRequestItem().getResource().getDataType().equals(r.getRequestItem().getResource().getDataType())){
 				return r;
 			}
 		}

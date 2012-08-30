@@ -162,7 +162,7 @@ public class PPNPOutcomeLocator {
 	 */
 	PPNPOutcome getPPNPOutcome(Requestor theRequestor, RequestItem item){
 
-		String contextType = item.getResource().getContextType();
+		String contextType = item.getResource().getDataType();
 
 		List<IPrivacyOutcome> outcomeList = this.privPrefMgr.evaluatePPNPreference(contextType);
 		//JOptionPane.showMessageDialog(null, "PrivPrefMgr returned "+outcomeList.size()+" outcomes for "+contextType);

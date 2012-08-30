@@ -189,6 +189,11 @@ public class XMPPClient implements XMPPAgent {
 		}
 	}
 	
+	public String getDomainAuthorityNode() {
+		Log.d(LOG_TAG, "getDomainAuthorityNode");
+		return defaultConfig.getDomainAuthorityNode();
+	}
+	
 	public String getItems(String entity, String node, final Callback callback) throws CommunicationException {		
 		Log.d(LOG_TAG, "getItems entity: " + entity);
 		try {

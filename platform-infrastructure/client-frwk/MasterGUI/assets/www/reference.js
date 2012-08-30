@@ -385,6 +385,54 @@ var Societies = {
 				}
 		},
 		
+		
+		/**
+		 * Provides an API to the local CIS Manager
+		 * 
+		 * @memberOf Societies
+		 * @namespace Societies.LocalCISManagerService
+		 */
+		LocalCISManagerService: {
+			
+			/**
+			 * @methodOf Societies.LocalCISManagerService#
+			 * @description create a CIS
+			 * @param {Object} successCallback The callback which will be called when result is successful
+			 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+			 * @returns CIS record
+			 */
+			createCIS: function(successCallback, failureCallback) {
+				var clientPackage = "org.societies.android.platform.gui";
+				
+				var cisRecord = {
+	                    "cisName": jQuery("#cisname").val(),
+	                    "cisType": "futebol",
+	                    "cisCriteria": [{
+	                        "attribute": "location",
+	                        "operation": "equals",
+	                        "value": "Paris"}],
+	                    "cisDescription": "desc",
+	                    "cisJid" : null
+	                    }
+
+				console.log("Call LocalCISManagerService - createCIS");
+
+
+				return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+						failureCallback,     //Callback which will be called when plugin action encounters an error
+						'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+						'createCIS',          //Telling the plugin, which action we want to perform
+						[cisRecord]);        //Passing a list of arguments to the plugin
+			}
+		
+		
+
+		
+		
+		},
+			
+		
+		
 		/**
 		 * Provides an API to the local CSS Manager
 		 * 
@@ -444,6 +492,7 @@ var Societies = {
 				'readCSSRecord',          //Telling the plugin, which action we want to perform
 				[]);        //Passing a list of arguments to the plugin
 			},
+		
 			
 			/**
 			 * @methodOf Societies.LocalCSSManagerService#
@@ -775,6 +824,9 @@ var SocietiesGUI = {
 				console.log("Register LocalCSSManagerService plugin ");
 				cordova.addPlugin('LocalCSSManagerService', Societies.LocalCSSManagerService);
 				
+				console.log("Register LocalCISManagerService plugin ");
+				cordova.addPlugin('LocalCISManagerService', Societies.LocalCISManagerService);
+				
 				console.log("Register DeviceStatus Service plugin ");
 				cordova.addPlugin("DeviceStatus", Societies.DeviceStatus);
 
@@ -923,6 +975,35 @@ var SocietiesGUI = {
 		    window.plugins.LocalCSSManagerService.loginCSS(success, failure);
 
 		},
+		
+		
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Actions carried in the event that a successful create CIS
+		 * @returns null
+		 */
+
+		guiCreateCIS: function() {
+			console.log("create CIS");
+
+			function success(data) {
+				
+				SocietiesGUI.populateCISRecordpage(data);
+				
+				console.log("Current page: " + $.mobile.activePage[0].id);
+
+				
+				$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
+			}
+			
+			function failure(data) {
+				alert("createCIS - failure: " + data);
+			}
+		    window.plugins.LocalCISManagerService.createCIS(success, failure);
+
+		},
+		
+		
 		/**
 		 * @methodOf SocietiesGUI#
 		 * @description Actions carried in the event that a successful Identity Domain registration occurs
@@ -1234,9 +1315,26 @@ var SocietiesGUI = {
 				jQuery('#cssNodesTable').append(tableEntry);
 			}
 
+		},
+		
+		
+		/**
+		 * @methodOf SocietiesGUI#
+		 * @description Populate the CIS Record page
+		 * @returns null
+		 */
+		populateCISRecordpage: function(data) {
+			var status = ["Available for Use", "Unavailable", "Not active but on alert"];
+			var type = ["Android based client", "Cloud Node", "JVM based client"];
+			
+			jQuery("#cisowner").val(data.cisOwner);
+			jQuery("#cisrecordidentity").val(data.cisRecordIdentity);
+			jQuery("#cisname").val(data.cisName);
+
 		}
 
 };
+
 
 
 /**
@@ -1262,12 +1360,24 @@ jQuery(function() {
 			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.successfulLogin);
 		}
 	});
-	
+
 	$('#registerXMPP').click(function() {
 		if (SocietiesGUI.validateRegistrationCredentials(jQuery("#regUsername").val(), jQuery("#regUserpass").val(), jQuery("#repeatRegUserpass").val(), jQuery("#regSocietiesTerms").val())) {
 			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.xmppRegistration);
 	}
 	});
+
+	$('#createCIS').click(function() {
+			SocietiesGUI.guiCreateCIS();
+	});
+
+/*
+	$('#listCIS').click(function() {
+		if (SocietiesGUI.validateLoginCredentials(jQuery("#username").val(), jQuery("#userpass").val())) {
+			SocietiesGUI.connectToLocalCSSManager(SocietiesGUI.successfulLogin);
+		}
+	});
+*/
 	
 	$('#refreshCssRecord').click(function() {
 		SocietiesGUI.refreshCssProfile();

@@ -1,0 +1,139 @@
+{
+	"DeviceStatusService" : {
+		"exceptionThreshold" : 0,
+		"registerToBatteryStatus" : {
+			   	"name":"BatteryStatus",
+			   	"properties":{
+			   		"scale":{
+			   			"required":false,
+			   			"type":"number",
+			   			"min":0,
+			   			"description":"Scale"
+			   		},
+			   		"plugged":{
+			   			"required":false,
+			   			"type":"number",
+			   			"enum": ["BATTERY_NOT_PLUGGED", "BATTERY_PLUGGED_AC", "BATTERY_PLUGGED_USB"],
+			   			"description":"To know if the mobile is plugged or not"
+			   		},
+			   		"level":{
+			   			"required":false,
+			   			"type":"number",
+			   			"min":0,
+			   			"max":100,
+			   			"description":"Level of battery (%)"
+			   		},
+			   		"status":{
+			   			"required":false,
+			   			"type":"number",
+			   			"min":1,
+			   			"max":5,
+			   			"enum": ["BATTERY_STATUS_UNKNOWN", "BATTERY_STATUS_CHARGING", "BATTERY_STATUS_DISCHARGING", "BATTERY_STATUS_NOT_CHARGING", "BATTERY_STATUS_FULL"],
+			   			"description":"Level of battery (%)"
+			   		},
+			   		"voltage":{
+			   			"required":false,
+			   			"type":"number",
+			   			"description":"Voltage"
+			   		},
+			   		"temperature":{
+			   			"required":false,
+			   			"type":"number",
+			   			"description":"Temperatue (°C)"
+			   		}
+			   	}
+			  },
+		
+		"batteryStatus" : {
+			   	"name":"BatteryStatus",
+			   	"properties":{
+			   		"scale":{
+			   			"required":false,
+			   			"type":"number",
+			   			"min":0,
+			   			"description":"Scale"
+			   		},
+			   		"plugged":{
+			   			"required":false,
+			   			"type":"number",
+			   			"enum": ["BATTERY_NOT_PLUGGED", "BATTERY_PLUGGED_AC", "BATTERY_PLUGGED_USB"],
+			   			"description":"To know if the mobile is plugged or not"
+			   		},
+			   		"level":{
+			   			"required":false,
+			   			"type":"number",
+			   			"min":0,
+			   			"max":100,
+			   			"description":"Level of battery (%)"
+			   		},
+			   		"status":{
+			   			"required":false,
+			   			"type":"number",
+			   			"min":1,
+			   			"max":5,
+			   			"enum": ["BATTERY_STATUS_UNKNOWN", "BATTERY_STATUS_CHARGING", "BATTERY_STATUS_DISCHARGING", "BATTERY_STATUS_NOT_CHARGING", "BATTERY_STATUS_FULL"],
+			   			"description":"Level of battery (%)"
+			   		},
+			   		"voltage":{
+			   			"required":false,
+			   			"type":"nomber",
+			   			"description":"Voltage"
+			   		},
+			   		"temperature":{
+			   			"required":false,
+			   			"type":"number",
+			   			"description":"Temperatue (°C)"
+			   		}
+			   	}
+			  },
+		"locationStatus" : {
+			   	"name":"LocationProviderStatus",
+			   	"properties":{
+			   		"providerList":{
+			   			"required":false,
+			   			"type":"array",
+			   			"description":"List of location providers",
+			   			"items":{
+			   				"name":{
+			   					"required":true,
+			   					"type":"string",
+			   					"description":"Name of the location provider"
+			   				},
+			   				"enabled":{
+			   					"required":true,
+			   					"type":"boolean",
+			   					"description":"To know if this provider is available or not"
+			   				}
+			   			}
+			   		}
+			   	}
+			  },
+		"connectivityStatus" : {
+				"name":"ConnectivityProviderStatus",
+	   			"properties":{
+	   				"isInternetEnabled":{
+	   				"required":true,
+	   				"type":"boolean",
+	   				"description":"To know if Internet is available or not"
+	   				},
+	   				"providerList":{
+	   					"required":false,
+	   					"type":"array",
+	   					"description":"List of connectivity providers",
+	   					"items":{
+	   						"name":{
+	   							"required":true,
+	   							"type":"string",
+	   							"description":"Name of the connectivity provider"
+	   						},
+	   					"enabled":{
+	   						"required":true,
+	   						"type":"boolean",
+	   						"description":"To know if this provider is available or not"
+	   					}
+	   				}
+	   			}
+	   		}
+		}
+	}
+}

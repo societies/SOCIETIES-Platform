@@ -33,9 +33,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.domainauthority.IClientJarServer;
+import org.societies.api.internal.domainauthority.IClientJarServerCallback;
+import org.societies.api.internal.domainauthority.IClientJarServerRemote;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -52,7 +54,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	private static Logger LOG = LoggerFactory.getLogger(INegotiationProviderServiceMgmt.class);
 
-	private IClientJarServer clientJarServer;
+	private IClientJarServerRemote clientJarServer;
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;
 
@@ -62,10 +64,10 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		LOG.info("ProviderServiceMgr");
 	}
 	
-	public IClientJarServer getClientJarServer() {
+	public IClientJarServerRemote getClientJarServer() {
 		return clientJarServer;
 	}
-	public void setClientJarServer(IClientJarServer clientJarServer) {
+	public void setClientJarServer(IClientJarServerRemote clientJarServer) {
 		LOG.debug("setClientJarServer()");
 		this.clientJarServer = clientJarServer;
 	}
@@ -86,7 +88,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	@Override
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
-			String clientJarFilePath) throws NegotiationException {
+			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
 		IIdentity provider = groupMgr.getIdMgr().getThisNetworkNode();
 		String signature;
@@ -102,12 +104,23 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		}
 		List<String> files = new ArrayList<String>();
 		files.add(clientJarFilePath);
-		this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);
+		IClientJarServerCallback cb = new ClientJarServerCallback(callback);
+		//this.clientJarServer.shareFiles(serviceId.getIdentifier(), provider, signature, files);  // local OSGi call
+		this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
+				serviceId.getIdentifier(), provider, signature, files, cb);
 		
 		String idStr = serviceId.getIdentifier().toString();
 		Service s = new Service(idStr, slaXml, clientJarServer, clientJarFilePath, null);
 		
 		services.put(idStr, s);
+	}
+	
+	@Override
+	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI clientJarServer,
+			String clientJarFilePath) throws NegotiationException {
+		
+		LOG.warn("Obsolete version of INegotiationProviderServiceMgmt.addService() is being called.");
+		addService(serviceId, slaXml, clientJarServer, clientJarFilePath, null);
 	}
 	
 	@Override

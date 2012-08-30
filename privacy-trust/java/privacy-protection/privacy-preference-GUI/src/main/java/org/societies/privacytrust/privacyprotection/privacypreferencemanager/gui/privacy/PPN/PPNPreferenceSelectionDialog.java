@@ -370,7 +370,7 @@ public class PPNPreferenceSelectionDialog extends JDialog implements ActionListe
 			
 			for (CtxAttributeIdentifier temp : attrIDList){
 				if (temp.getUri().equalsIgnoreCase(ctxIDStr)){
-					details.setAffectedCtxID(temp);
+					details.setAffectedDataId(temp);
 					break;
 				}
 			}

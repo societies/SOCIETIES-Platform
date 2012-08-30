@@ -50,9 +50,11 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.internal.context.broker.*;
+import org.societies.api.internal.css.devicemgmt.IDeviceManager;
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +69,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 	private static Logger LOG = LoggerFactory
 			.getLogger(ContextSourceManagement.class);
+	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
+
 
 	/**
 	 * The Communication Manager service reference.
@@ -198,6 +202,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	@Async
 	Future<String> registerFull(INetworkNode contextOwner, String name,
 			String contextType, String id) {
+		long timestamp = System.nanoTime();
+		
 		if (ctxBroker == null) {
 			LOG.error("Could not register " + contextType
 					+ ": Context Broker cannot be found");
@@ -287,6 +293,16 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		} catch (InvalidFormatException e) {
 			LOG.error(e.getMessage());
 		}
+		
+		IPerformanceMessage m = new PerformanceMessage();
+		m.setTestContext("CSM_Delay_ComponentInternal");
+		m.setSourceComponent(this.getClass()+"");
+		m.setPerformanceType(IPerformanceMessage.Delay);
+		m.setOperationType("Register");
+		m.setD82TestTableName("S11");
+		m.setPerformanceNameValue("Delay="+(System.nanoTime()-timestamp ));
+
+		PERF_LOG.trace(m.toString());
 
 		return new AsyncResult<String>(id);
 	}
@@ -294,6 +310,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	private Future<Boolean> completeSendUpdate(String identifier,
 			Serializable data, CtxEntity owner, boolean inferred,
 			double precision, double frequency, boolean USE_QOC) {
+		long timestamp = System.nanoTime();
 
 		if (this.ctxBroker == null) {
 			LOG.error("Could not handle update from " + identifier
@@ -464,6 +481,16 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			LOG.error(e.getMessage());
 			return new AsyncResult<Boolean>(false);
 		}
+		
+		IPerformanceMessage m = new PerformanceMessage();
+		m.setTestContext("CSM_Delay_ComponentInternal");
+		m.setSourceComponent(this.getClass()+"");
+		m.setPerformanceType(IPerformanceMessage.Delay);
+		m.setOperationType("SendUpdate");
+		m.setD82TestTableName("S11");
+		m.setPerformanceNameValue("Delay="+(System.nanoTime()-timestamp ));
+
+		PERF_LOG.trace(m.toString());
 
 		return new AsyncResult<Boolean>(true);
 
@@ -484,6 +511,12 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 
 		return completeSendUpdate(identifier, data, owner, inferred, precision,
 				frequency, true);
+	}
+
+	@Override
+	@Async
+	public Future<Boolean> sendUpdate(String identifier, Serializable data) {
+		return completeSendUpdate(identifier, data, null, false, 0, 0, false);
 	}
 
 	private void updateData(Serializable value, CtxAttribute attr)
@@ -579,12 +612,6 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 			return new AsyncResult<Boolean>(false);
 		}
 		return new AsyncResult<Boolean>(true);
-	}
-
-	@Override
-	@Async
-	public Future<Boolean> sendUpdate(String identifier, Serializable data) {
-		return sendUpdate(identifier, data, null);
 	}
 
 }

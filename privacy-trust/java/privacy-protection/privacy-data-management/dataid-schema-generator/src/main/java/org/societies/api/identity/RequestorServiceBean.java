@@ -43,7 +43,7 @@ public class RequestorServiceBean extends RequestorBean {
 	 */
 	@XmlElement(required = true)
 	private ServiceResourceIdentifier requestorServiceId;
-	
+
 
 	/**
 	 * @return the requestorServiceId

@@ -24,9 +24,12 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.schema.activity.Activity;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 
 /**
@@ -45,23 +48,19 @@ public class DataWrapperFactory {
 	 * @return A relevant DataWrapper
 	 * @throw RuntimeException
 	 */
-	public static IDataWrapper selectDataWrapper(CtxIdentifier contextData) throws RuntimeException{
-		try {
-			if (contextData.getType().equals(CtxAttributeTypes.NAME)) {
-				//				return new [A Data Type]Wrapper(data);
-				// TODO
-			}
+	public static IDataWrapper selectDataWrapper(CtxAttribute contextData) throws RuntimeException{
+		if (null == contextData || null == contextData.getId() || null == contextData.getId().getType()) {
 			return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("No Obfuscator to obfuscate that type of data");
 		}
-		//		throw new RuntimeException("No Obfuscator to obfuscate that type of data");
+		if (CtxAttributeTypes.LOCATION_COORDINATES.equals(contextData.getId().getType())) {
+			return getLocationCoordinatesWrapper(contextData.getDoubleValue(), 0, 0);
+		}
+		return null;
 	}
 
-	
+
 	// -- GEOLOCATION
-	
+
 	/**
 	 * To get a LocationCoordinatesWrapper
 	 * The persistence is disabled by default, the obfuscated geolocation will not
@@ -72,10 +71,13 @@ public class DataWrapperFactory {
 	 * @return A LocationCoordinatesWrapper
 	 */
 	public static IDataWrapper<LocationCoordinates> getLocationCoordinatesWrapper(double latitude, double longitude, double accuracy) {
+		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
+		dataId.setType(CtxAttributeTypes.LOCATION_COORDINATES);
 		LocationCoordinates data = new LocationCoordinates(latitude, longitude, accuracy);
-		return new DataWrapper<LocationCoordinates>(data);
+		return new DataWrapper<LocationCoordinates>(dataId, data);
 	}
-	
+
 	/**
 	 * To get the Postal location wrapper
 	 * @param logicalName
@@ -95,13 +97,16 @@ public class DataWrapperFactory {
 			String streetName, String district, String town, String postalCode,
 			String department, String region, String country, String continent,
 			String planet) {
+		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
+		dataId.setType(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		PostalLocation data = new PostalLocation(logicalName, streetNumber, streetName, district, town, postalCode, department, region, country, continent, planet);
-		return new DataWrapper<PostalLocation>(data);
+		return new DataWrapper<PostalLocation>(dataId, data);
 	}
 
 
 	// -- NAME
-	
+
 	/**
 	 * To get a NameWrapper
 	 * The persistence is disabled by default, the obfuscated name will not
@@ -110,13 +115,16 @@ public class DataWrapperFactory {
 	 * @return the NameWrapper
 	 */
 	public static IDataWrapper<Name> getNameWrapper(String firstName, String lastName) {
+		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
+		dataId.setType(CtxAttributeTypes.NAME);
 		Name data = new Name(firstName, lastName);
-		return new DataWrapper<Name>(data);
+		return new DataWrapper<Name>(dataId, data);
 	}
 
-	
+
 	// -- TEMPERATURE
-	
+
 	/**
 	 * To get a TemperatureWrapper
 	 * The persistence is disabled by default
@@ -124,8 +132,11 @@ public class DataWrapperFactory {
 	 * @return the Temperature wrapper
 	 */
 	public static IDataWrapper<Temperature> getTemperatureWrapper(double degree) {
+		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
+		dataId.setType(CtxAttributeTypes.TEMPERATURE);
 		Temperature data = new Temperature(degree);
-		return new DataWrapper<Temperature>(data);
+		return new DataWrapper<Temperature>(dataId, data);
 	}
 	/**
 	 * To get a TemperatureWrapper
@@ -134,13 +145,16 @@ public class DataWrapperFactory {
 	 * @return the Temperature wrapper
 	 */
 	public static IDataWrapper<Temperature> getTemperatureWrapper(String degree) {
+		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
+		dataId.setType(CtxAttributeTypes.TEMPERATURE);
 		Temperature data = new Temperature(degree);
-		return new DataWrapper<Temperature>(data);
+		return new DataWrapper<Temperature>(dataId, data);
 	}
-	
-	
+
+
 	// -- ACTION
-	
+
 	/**
 	 * To get a ActivityWrapper
 	 * @param actor
@@ -149,23 +163,29 @@ public class DataWrapperFactory {
 	 * @return
 	 */
 	public static IDataWrapper<Activity> getActivityWrapper(String actor, String verb, String object) {
+		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
+		dataId.setType(CtxAttributeTypes.ACTION);
 		Activity data = new Activity();
 		data.setActor(actor);
 		data.setVerb(verb);
 		data.setObject(object);
-		return new DataWrapper<Activity>(data);
+		return new DataWrapper<Activity>(dataId, data);
 	}
-	
-	
+
+
 	// -- STATUS
-	
+
 	/**
 	 * 
 	 * @param status
 	 * @return
 	 */
 	public static IDataWrapper<Status> getStatusWrapper(String status) {
+		SimpleDataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.CONTEXT);
+		dataId.setType(CtxAttributeTypes.STATUS);
 		Status data = new Status(status);
-		return new DataWrapper<Status>(data);
+		return new DataWrapper<Status>(dataId, data);
 	}
 }
