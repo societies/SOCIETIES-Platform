@@ -6,7 +6,7 @@
 	<groupId>org.societies.security</groupId>
 	<!-- If name starts with "security" it gets cut off -->
 	<artifactId>secur-services</artifactId>
-	<version>${release.version}</version>
+	<version>0.1</version>
 	<packaging>bundle</packaging>
 	<name>Security Services Bundle</name>
 
@@ -30,8 +30,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -39,14 +38,18 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
@@ -66,16 +69,9 @@
 
 		<!--dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>com.springsource.org.bouncycastle.jce</artifactId>
-			<version>1.39.0</version>
-			<scope>provided</scope>
-		</dependency-->
-
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.47</version>
-		</dependency>
+		</dependency-->
 
 		<!--dependency>
 			<groupId>org.apache.xml</groupId>
@@ -83,12 +79,12 @@
 			<version>1.4.2</version>
 		</dependency-->
 		
-		<dependency>
+		<!--dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency-->
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -115,7 +111,7 @@
 				<configuration>
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 						<Import-Package>
 							org.springframework.beans.factory.annotation;version="0",
 							org.springframework.stereotype;version="0",
@@ -157,26 +153,6 @@
 						</artifactItem>
 					</artifactItems>
 				</configuration>
-				<!--executions>
-					<execution>
-						<id>copy-installed</id>
-						<phase>install</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.bouncycastle</groupId>
-									<artifactId>bcprov-jdk15on</artifactId>
-									<version>1.47</version>
-									<type>jar</type>
-								</artifactItem>
-							</artifactItems>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-						</configuration>
-					</execution>
-				</executions-->
 			</plugin>
 		</plugins>
 	</build>

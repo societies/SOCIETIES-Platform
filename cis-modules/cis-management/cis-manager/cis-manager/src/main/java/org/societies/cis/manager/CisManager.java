@@ -26,6 +26,7 @@
 
 package org.societies.cis.manager;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -72,6 +73,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
@@ -79,6 +81,8 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 
+import org.societies.api.internal.security.policynegotiator.INegotiation;
+import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.cis.manager.Cis;
@@ -112,6 +116,8 @@ import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
+import org.societies.api.schema.cis.manager.ListCrit;
+import org.societies.api.schema.cis.manager.ListResponse;
 
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
@@ -142,6 +148,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private IEventMgr eventMgr;
 	private ICtxBroker internalCtxBroker;
 
+	//private INegotiation negotiator;
 
 	//Autowiring gets and sets
 	
@@ -648,42 +655,43 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			if (c.getList() != null) {
 				LOG.info("list received");
 				
-				String listingType = "owned"; // default is owned
+				ListCrit listingType = ListCrit.OWNED; // default is owned
+				ListResponse l = new ListResponse();
+				List<Community> comList = new  ArrayList<Community>();
+				
+				
 				if(c.getList().getListCriteria() !=null)
 					listingType = c.getList().getListCriteria();
-								
-				// TODO: redo the list
-/*				Communities com = new Communities();
-				
-				if(listingType.equals("owned") || listingType.equals("all")){
+												
+				if(listingType.equals(ListCrit.OWNED) || listingType.equals(ListCrit.ALL)){
 				// GET LIST CODE of ownedCIS
 					
 					Iterator<Cis> it = ownedCISs.iterator();
 					
 					while(it.hasNext()){
-						CisRecord element = it.next().getCisRecord();
-						CisCommunity community = new CisCommunity();
-						community.setCommunityJid(element.getCisJID());
-						com.getCisCommunity().add(community);
-						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+						Cis element = it.next();
+						Community community = new Community();
+						element.fillCommmunityXMPPobj(community);
+						comList.add(community);
 				     }
 				}
 
 				// GET LIST CODE of subscribedCIS
-				if(listingType.equals("subscribed") || listingType.equals("all")){
+				if(listingType.equals(ListCrit.SUBSCRIBED) || listingType.equals(ListCrit.ALL)){
 					//List<CisRecord> li = this.getSubscribedCisList();
 					Iterator<CisSubscribedImp> it = subscribedCISs.iterator();
 					
 					while(it.hasNext()){
 						CisSubscribedImp element = it.next();
-						CisCommunity community = new CisCommunity();
-						community.setCommunityJid(element.getCisId());
-						com.getCisCommunity().add(community);
-						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+						Community community = new Community();
+						element.fillCommmunityXMPPobj(community);
+						comList.add(community);
+						
 				     }
-				}*/
+				}
+				l.setCommunity(comList);
 				
-				return c;
+				return l;
 
 			}
 				// END OF LIST
@@ -1127,6 +1135,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
 			
 			// first social status
+            LOG.info("memberCssEntityId:"+memberCssEntityId.hashCode());
+            LOG.info("this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS): "+this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS));
 			List<CtxIdentifier> ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS).get();			
 
 			if(ctxIds!= null && ctxIds.isEmpty() == false){
@@ -1173,9 +1183,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		// TODO: check with privacy
 		
-		
-		
-		
+//		negotiator.startNegotiation(new Requestor(this.cisManagerId), new INegCallBack());
 		
 		// sending join
 
@@ -1202,6 +1210,27 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			e1.printStackTrace();
 		}
 	}
+	
+/*	class INegCallBack implements INegotiationCallback{
+		
+		//ICisManagerCallback IcisCallback;
+		
+		public INegCallBack (){
+			//IcisCallback = IcisCallback;
+		}
+		
+		@Override
+		public void onNegotiationError(String msg) {
+			LOG.debug("privacy negotiation error");
+		}
+
+		@Override
+		public void onNegotiationComplete(String agreementKey, URI jar) {
+			if(agreementKey!=null && !agreementKey.isEmpty())
+				LOG.debug("privacy negotiation success");
+		}
+	}
+	*/
 
 	@Override
 	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback){

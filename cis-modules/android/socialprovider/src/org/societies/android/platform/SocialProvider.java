@@ -44,7 +44,7 @@ import android.net.Uri;
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class SocialProvider extends ContentProvider implements ISocialAdapterListener {
+public class SocialProvider extends ContentProvider implements ISocialAdapterCallback {
     
 	//For logging:
     private static final String TAG = "SocialProvider";
@@ -351,7 +351,15 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterLis
     
     public boolean isOnline(){
 	return online;
-    };
+    }
+
+	/* (non-Javadoc)
+	 * @see org.societies.android.platform.ISocialAdapterCallback#receiveResult(java.lang.Object)
+	 */
+	public void receiveResult(Object returnValue) {
+		// TODO Auto-generated method stub
+		
+	};
 
 }
 

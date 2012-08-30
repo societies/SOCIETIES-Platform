@@ -49,8 +49,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -74,16 +73,21 @@
 		</dependency>
 		<!-- Tools -->
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.1</version>
-			<scope>compile</scope>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+			<!-- <scope>provided</scope> -->
+		</dependency>
+<!-- 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
 			<version>3.1</version>
-		</dependency>
+		</dependency> -->
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -116,12 +120,12 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- Logging -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -133,10 +137,17 @@
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>hibernate_classes</artifactId>
-			<version>0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>com.springsource.javax.transaction</artifactId>
+			<version>1.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		
+		<!-- <dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>com.springsource.org.apache.derby</artifactId>
 			<version>10.5.1000001.764942</version>
@@ -195,7 +206,7 @@
 			<artifactId>com.springsource.org.hibernate.annotations.common</artifactId>
 			<version>3.3.0.ga</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 
 	<build>

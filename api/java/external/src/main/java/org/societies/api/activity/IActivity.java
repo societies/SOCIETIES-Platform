@@ -24,18 +24,25 @@
  */
 package org.societies.api.activity;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
+
 /**
- * @author Babak.Farshchian@sintef.no
- *
- */
-/**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
+ * This interface is mainly a container for passing the parameter
+ * Activity into the {@link IActivityFeed} calls. This interface
+ * only provides getters and setters to the activity container.
+ * 
+ * @author      Babak.Farshchian@sintef.no
+ * @author      Bjørn Magnus
+ * @author      Thomas Vilarinho
+ * 
  */
 
+
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IActivity {
 	public Long getId();
-	public void setId(Long id);
 	public String getVerb();
 	public void setVerb(String verb);
 	public String getActor();
@@ -44,10 +51,7 @@ public interface IActivity {
 	public void setObject(String object);
 	public String getTarget();
 	public void setTarget(String target);
-	@Deprecated
-	public long getTime();
-	@Deprecated
-	public void setTime(long time);
+
 	public String getPublished();
 	public void setPublished(String published);
 }

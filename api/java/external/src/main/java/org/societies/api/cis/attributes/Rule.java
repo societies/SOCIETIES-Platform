@@ -29,7 +29,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
+
+/**
+ * This interface is mainly a container for passing the parameter
+ * Rule into the {@link MembershipCriteria}  
+ * class. This interface only provides getters and setters 
+ * to the rule.
+ * 
+ * @author      John McGovern
+ * @author      Thomas Vilarinho
+ * 
+ */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public class Rule{
         
     //could be an enumeration with its own API.

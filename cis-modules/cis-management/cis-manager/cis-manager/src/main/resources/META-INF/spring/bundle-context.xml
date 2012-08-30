@@ -85,7 +85,8 @@
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
         <property name="eventMgr" ref="eventMgmtRef"/>
         <property name="internalCtxBroker" ref="internalCtxBroker"/>
-       <!-- <property name="iServDiscLocal" ref="serviceDiscovery"/>
+        <!-- <property name="negotiator" ref="NegotiationRequester"/>
+       <property name="iServDiscLocal" ref="serviceDiscovery"/>
         <property name="iServCtrlLocal" ref="serviceControl"/>-->
                 
         
