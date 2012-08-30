@@ -50,6 +50,7 @@ import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.apache.commons.collections15.functors.MapTransformer;
 import org.apache.commons.collections15.map.LazyMap;
+import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.management.ICisOwned;
@@ -167,7 +168,9 @@ CISSimulator sim = new CISSimulator(10,10);
 
             @Override
             public void receiveResult(Activityfeed activityFeedObject) {
-                actDiff.addAll((Collection<? extends IActivity>) activityFeedObject.getGetActivitiesResponse().getActivity());
+                for(org.societies.api.schema.activity.Activity act : activityFeedObject.getGetActivitiesResponse().getActivity())  {
+                    actDiff.add(new Activity(act));
+                }
                 cpa.init();
                 cpa.analyze(actDiff);
             }
