@@ -148,7 +148,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private IEventMgr eventMgr;
 	private ICtxBroker internalCtxBroker;
 
-	private INegotiation negotiator;
+	//private INegotiation negotiator;
 
 	//Autowiring gets and sets
 	
@@ -1183,7 +1183,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		// TODO: check with privacy
 		
-		negotiator.startNegotiation(new Requestor(this.cisManagerId), new INegCallBack());
+//		negotiator.startNegotiation(new Requestor(this.cisManagerId), new INegCallBack());
 		
 		// sending join
 
@@ -1211,7 +1211,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}
 	}
 	
-	class INegCallBack implements INegotiationCallback{
+/*	class INegCallBack implements INegotiationCallback{
 		
 		//ICisManagerCallback IcisCallback;
 		
@@ -1230,7 +1230,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				LOG.debug("privacy negotiation success");
 		}
 	}
-	
+	*/
 
 	@Override
 	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback){
