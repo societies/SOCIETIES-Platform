@@ -104,11 +104,22 @@
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base='empty'>
-          <xs:attribute name='listCriteria' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+          <xs:attribute name='listCriteria' type='tns:listCrit'/>
+          <!-- xs:attribute name='listCriteria' type='xs:string'/ --> 
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
+  
+  
+  	<xs:simpleType name="listCrit">
+ 		 <xs:restriction base="xs:string">
+		      <xs:enumeration value="owned"/>
+		      <xs:enumeration value=" subscribed"/>
+		      <xs:enumeration value="all"/>
+		 </xs:restriction>
+	</xs:simpleType>
+    
   
       <xs:element name='listResponse'>
 		<xs:complexType>

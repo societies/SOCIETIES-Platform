@@ -116,6 +116,8 @@ import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
+import org.societies.api.schema.cis.manager.ListCrit;
+import org.societies.api.schema.cis.manager.ListResponse;
 
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
@@ -653,42 +655,43 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			if (c.getList() != null) {
 				LOG.info("list received");
 				
-				String listingType = "owned"; // default is owned
+				ListCrit listingType = ListCrit.OWNED; // default is owned
+				ListResponse l = new ListResponse();
+				List<Community> comList = new  ArrayList<Community>();
+				
+				
 				if(c.getList().getListCriteria() !=null)
 					listingType = c.getList().getListCriteria();
-								
-				// TODO: redo the list
-/*				Communities com = new Communities();
-				
-				if(listingType.equals("owned") || listingType.equals("all")){
+												
+				if(listingType.equals(ListCrit.OWNED) || listingType.equals(ListCrit.ALL)){
 				// GET LIST CODE of ownedCIS
 					
 					Iterator<Cis> it = ownedCISs.iterator();
 					
 					while(it.hasNext()){
-						CisRecord element = it.next().getCisRecord();
-						CisCommunity community = new CisCommunity();
-						community.setCommunityJid(element.getCisJID());
-						com.getCisCommunity().add(community);
-						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+						Cis element = it.next();
+						Community community = new Community();
+						element.fillCommmunityXMPPobj(community);
+						comList.add(community);
 				     }
 				}
 
 				// GET LIST CODE of subscribedCIS
-				if(listingType.equals("subscribed") || listingType.equals("all")){
+				if(listingType.equals(ListCrit.SUBSCRIBED) || listingType.equals(ListCrit.ALL)){
 					//List<CisRecord> li = this.getSubscribedCisList();
 					Iterator<CisSubscribedImp> it = subscribedCISs.iterator();
 					
 					while(it.hasNext()){
 						CisSubscribedImp element = it.next();
-						CisCommunity community = new CisCommunity();
-						community.setCommunityJid(element.getCisId());
-						com.getCisCommunity().add(community);
-						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+						Community community = new Community();
+						element.fillCommmunityXMPPobj(community);
+						comList.add(community);
+						
 				     }
-				}*/
+				}
+				l.setCommunity(comList);
 				
-				return c;
+				return l;
 
 			}
 				// END OF LIST
