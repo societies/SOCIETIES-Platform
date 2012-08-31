@@ -190,7 +190,7 @@ var	SocietiesLocalCSSManager = {
 		                    "identityName": null,
 		                    "imID": null,
 		                    "name": null,
-		                    "password": jQuery("#userpass").val(),
+		                    "password": jQuery("#password").val(),
 		                    "presence": 0,
 		                    "sex": 0,
 		                    "socialURI": null,
