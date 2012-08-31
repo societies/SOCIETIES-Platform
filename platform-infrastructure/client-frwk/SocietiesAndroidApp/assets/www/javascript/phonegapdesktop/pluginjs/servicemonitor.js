@@ -1,5 +1,5 @@
-phonegapdesktop.internal.parseConfigFile('pluginjs/servicemonitor.json');
-
+phonegapdesktop.internal.parseConfigFile('servicemonitor.json');
+phonegapdesktop.internal.parseConfigFile('servicemanagement.json');
 
 window.plugins.SocietiesCoreServiceMonitor = {
 	connectService: function(successCallback, errorCallback){
@@ -47,4 +47,25 @@ window.plugins.SocietiesCoreServiceMonitor = {
 		}
 	}
 }
+
+var SocietiesCoreServiceMonitorHelper = {
+	/**
+	 * @methodOf SocietiesCoreServiceMonitorHelper#
+	 * @description Connect to Service Monitor native service
+	 * @param {Object} function to be executed if connection successful
+	 * @returns null
+	 */
+
+	connectToCoreServiceMonitor: function(actionFunction) {
+		console.log("Connect to CoreServiceMonitor");
+			
+		function success(data) {
+			actionFunction();
+		}
+		
+		function failure(data) {
+			alert("connectToCoreServiceMonitor - failure: " + data);
+		}
+	    window.plugins.SocietiesCoreServiceMonitor.connectService(success, failure);
+	}
 

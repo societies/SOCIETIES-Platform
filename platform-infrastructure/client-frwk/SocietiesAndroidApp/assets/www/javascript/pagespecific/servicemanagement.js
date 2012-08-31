@@ -16,14 +16,14 @@ var Societies3PServices = {
 
 		function success(data) {
 			//empty table
-			jQuery('#societiesServicesTable tbody').remove();
+			//jQuery('#SocietiesServicesDiv tbody').remove();
 			//SERVICE
 			for (i  = 0; i < data.length; i++) {
-				var tableEntry = "<tr>" + 
-				"<td>" + data[i].serviceName + "</td>" + 
-				"<td>" + data[i].serviceDescription + "</td>" + 
-				</tr>"
-				jQuery('#societiesServicesTable').append(tableEntry);
+				var tableEntry = "<li><a href=""#appdetails""><img src=""../images/printer_icon.png"" class=""profile_list"" alt=""logo"" />" +
+				"<h2>" + data[i].serviceName + "</h2>" + 
+				"<h3>" + data[i].serviceDescription + "</h3>" + 
+				"<br/></a></li>";
+				jQuery('#SocietiesServicesDiv').add(tableEntry);
 			}
 		}
 		
@@ -45,6 +45,10 @@ var Societies3PServices = {
 jQuery(function() {
 	console.log("Active Services jQuery calls");
 
+	$(document).ready(function() {
+		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);;
+	}); 
+	
 	$('#List3PServices').click(function() {
 		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);;
 	});
