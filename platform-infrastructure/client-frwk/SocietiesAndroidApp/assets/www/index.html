@@ -7,21 +7,37 @@
 
 	<script type="text/javascript" src="javascript/cordova/cordova-1.7.0.js"></script>
 	<!-- Uncomment line below to enable PhoneGap desktop and comment out real PhoneGap/Cordova JS library-->
-	<!--script type="text/javascript" src="javascript/phonegapdesktop/phonegap-desktop.js"></script-->
+	<!-- script type="text/javascript" src="javascript/phonegapdesktop/phonegap-desktop.js"></script> -->
+
 	
 	<link rel="stylesheet" type="text/css" href="css/custom/custom-theme-societies.css"/>
-	<link rel="stylesheet" type="text/css" href="css/jquerymobile/jquery.mobile.structure-1.1.0.css"/>
+	<link rel="stylesheet" type="text/css" href="css/jquerymobile/jquery.mobile-1.1.0.css"/>
 	<link rel="stylesheet" type="text/css" href="css/custom/societies.css"/>
 	
 	<script type="text/javascript" src="javascript/jquery/jquery-1.7.1.js" ></script>
 	<script type="text/javascript" src="javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/mainpage.js"></script>
+	
+	<!-- App specific JS -->
+	
+	<!-- PhoneGap plugins -->
+	<!--script type="text/javascript" src="javascript/plugins/apppreferences_plugin.js"></script>
+	<script type="text/javascript" src="javascript/plugins/coreservicemonitor_plugin.js"></script-->
+	<script type="text/javascript" src="javascript/plugins/cssmanager_plugin.js"></script>
+	<!--<script type="text/javascript" src="javascript/plugins/cismanager_plugin.js"></script-->
+	<!--script type="text/javascript" src="javascript/plugins/devicestatus_plugin.js"></script-->
+	
+	<!-- Functionality JS -->
+	<script type="text/javascript" src="javascript/pagespecific/login.js"></script>
 	
 	<!-- Uncomment lines below to enable PhoneGap desktop-->
-	<!--script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/cssmanager.js"></script>
+
+	<!-- 
+	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/cssmanager.js"></script>
 	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/servicemonitor.js"></script>
 	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/devicestatus.js"></script>
-	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/preferences.js"></script-->
-
+	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/preferences.js"></script>
+	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/cismanager.js"></script>-->
 
 </head>
 <body>
@@ -34,15 +50,26 @@
 		<div class="form_wrapper">
 			<form id="login" action="index2.html" method="post" data-ajax="false">
 				<div data-role="fieldcontain">
-					<input type="text" value="Enter your Username" id="name" name="name" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
+			    	<label for="name">Username</label>
+					<input type="text" value="" id="username" name="name" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
 				</div>
 				<div data-role="fieldcontain" class="ui-field-contain ui-body ui-br">
-					<input type="text" value="Enter your Password" id="password" name="password" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
+			    	<label for="password">Password</label>
+					<input type="text" value="" id="password" name="password" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
 				</div>
-				<a href="html/landing.html" data-role="button" data-theme="h" data-inline="true" rel="external">LOGIN </a>
+				<div data-role="fieldcontain">
+			    	<label for="cloudnode">Cloud Node</label>
+			    	<input type="text" value="" name="cloudNode" id="cloudnode" name="cloudnode" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c"/>
+				</div>
+				<div data-role="fieldcontain">
+			    	<label for="identitydomain">Identity Domain</label>
+			    	<input type="text" name="identityDomain" id="identitydomain" />
+				</div>
+				<input id="connectXMPP" type="button" value="LOGIN" data-inline="true" data-theme="h"/> 
+				<!--a href="html/landing.html" id="connectXMPP" data-role="button" data-theme="h" data-inline="true" rel="external">LOGIN </a-->
 			</form>
 			<div class="sign_up">
-				Don't have a login? <a href="html/new_account.html">Sign Up</a>
+				Don't have a login? <a href="html/new_identity.html" data-ajax="false">Sign Up</a>
 			</div>
 		</div>
 	</div>
