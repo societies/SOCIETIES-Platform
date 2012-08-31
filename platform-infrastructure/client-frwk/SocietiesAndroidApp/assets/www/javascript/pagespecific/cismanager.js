@@ -18,18 +18,17 @@ var	SocietiesCISManagerService = {
 
 		function success(data) {
 			
-			SocietiesGUI.populateCISRecordpage(data);
-			
-			console.log("Current page: " + $.mobile.activePage[0].id);
+			//SocietiesGUI.populateCISRecordpage(data);
+			console.log("create CIS where data has name = " + data.cisName);
 
 			
-			$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
+			//$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
 		}
 		
 		function failure(data) {
 			alert("createCIS - failure: " + data);
 		}
-	    window.plugins.LocalCISManagerService.createCIS(success, failure);
+	    window.plugins.SocietiesLocalCISManager.createCIS(success, failure);
 
 	}
 			
