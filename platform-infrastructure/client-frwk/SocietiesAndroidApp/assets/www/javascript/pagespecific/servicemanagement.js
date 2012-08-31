@@ -31,7 +31,7 @@ var Societies3PServices = {
 			alert("refresh3PServices - failure: " + data);
 		}
 		
-		window.plugins.CoreServiceMonitorService.getServices(success, failure);
+		window.plugins.SocietiesCoreServiceMonitor.getServices(success, failure);
 	}
 }
 
@@ -46,6 +46,6 @@ jQuery(function() {
 	console.log("Active Services jQuery calls");
 
 	$('#List3PServices').click(function() {
-		SocietiesGUI.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);;
+		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);;
 	});
 });

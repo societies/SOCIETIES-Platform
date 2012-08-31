@@ -36,7 +36,15 @@ window.plugins.SocietiesCoreServiceMonitor = {
 		else {
 			successCallback(phonegapdesktop.internal.getDebugValue('CoreServiceMonitorService', 'activeTasks'));
 		}
-		
+	},
+	
+	getServices: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('ServiceManagementService', 'getServices'));
+		}
 	}
 }
 
