@@ -227,6 +227,7 @@ public class CssManagerController {
 				 cssAdvert.setUri(" ");
 				 getCssLocalManager().addAdvertisementRecord(cssAdvert);
 				
+				
 				model.put("message", "created Css Record");
 			} else {
 				if (((CssInterfaceResult) loginResult.get()).isResultStatus() == false) {
@@ -275,7 +276,7 @@ public class CssManagerController {
 						 cssAdNew.setUri(cmLoginForm.getCssAdUri());
 						 
 						 getCssLocalManager().updateAdvertisementRecord(cssAdOld, cssAdNew);
-						 
+						 getCssLocalManager().suggestedFriends();
 						 
 					}
 					
@@ -296,6 +297,7 @@ public class CssManagerController {
 			
 			
 		
+			
 			
 				// Update all data
 			Future<List<CssAdvertisementRecordDetailed>> cssadverts = getCssLocalManager()
@@ -351,6 +353,9 @@ public class CssManagerController {
 								try {
 									asynchServices = this.getSDService().getServices(cssAdDetails.getResultCssAdvertisementRecord().getId());
 									friendServices = asynchServices.get();
+									System.out.println("~~~~~~~~~~~~~~~ asynchServices is : " +asynchServices);
+									System.out.println("~~~~~~~~~~~~~~~ getId() is : " +cssAdDetails.getResultCssAdvertisementRecord().getId());
+									System.out.println("~~~~~~~~~~~~~~~ friendServices size is : " +friendServices);
 								} catch (ServiceDiscoveryException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();

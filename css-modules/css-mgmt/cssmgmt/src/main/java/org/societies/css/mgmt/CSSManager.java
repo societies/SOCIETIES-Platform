@@ -3,6 +3,7 @@ package org.societies.css.mgmt;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -33,6 +34,7 @@ import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.societies.api.internal.css.cssRegistry.ICssRegistry;
@@ -42,6 +44,15 @@ import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.utilities.DBC.Dbc;
 
 import org.societies.api.schema.servicelifecycle.model.Service;
+
+import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.internal.sns.ISocialData;
+//import org.societies.platform.socialdata.SocialData;
+
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.Group;
+import org.apache.shindig.social.opensocial.model.Person;
 
 
 public class CSSManager implements ICSSLocalManager {
@@ -735,8 +746,18 @@ public class CSSManager implements ICSSLocalManager {
 		
 	}
 
+	@Autowired
+	private ISocialData socialdata;
 
 	//Spring injection
+	
+	public ISocialData getSocialData() {
+		return socialdata;
+	}
+	
+	public void setSocialData(ISocialData socialData) {
+		this.socialdata = socialData;
+	}
 	
 	/**
 	 * @return the cssRegistry
@@ -1196,5 +1217,90 @@ public void removeNode(CssRecord cssrecord, String nodeId ) {
 		//this.modifyCssRecord(cssrecord); 
 	
 	}
+
+@SuppressWarnings("unchecked")
+public List<String> suggestedFriends( ) {
+	
+	ISocialData socialData = null;
+	//ISocialConnector connector = null;
+	
+	//socialData  = new SocialData();
+	
+	List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
+	List<String> cssFriends = new ArrayList<String>();
+	List<Person> snFriends = new ArrayList<Person>();
+	List<String> socialFriends = new ArrayList<String>();
+	List<String> commonFriends = new ArrayList<String>();
+		
+	LOG.info("CSSManager getFriends method called ");
+	
+	LOG.info("Contacting CSS Directory to get list of CSSs");
+	
+	// first get all the cssdirectory records
+	CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+
+	getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
+	recordList = callback.getResultList();
+	
+	for (CssAdvertisementRecord cssAdd : recordList) {
+		cssFriends.add((cssAdd.getName()));
+		LOG.info("cssAdd.getName contains " +cssAdd.getName());
+		LOG.info("cssFriends contains " +cssFriends +" entries");
+	}
+	
+	LOG.info("cssFriends contains " +cssFriends);
+	LOG.info("CSS Directory contains " +cssFriends.size() +" entries");
+	
+	LOG.info("Contacting SN Connector to get list");
+	
+	Iterator<ISocialConnector>iter = socialdata.getSocialConnectors().iterator();
+		
+	String  token = " .... ";
+	// MAP with the needed params.
+	HashMap <String, String> params = new HashMap<String, String>();
+	params.put(ISocialConnector.AUTH_TOKEN, token);
+	
+	
+	//this.getSocialData();
+	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ getSocialData() returns " +getSocialData());
+	// Generate the connector
+	ISocialConnector con = socialdata.createConnector(ISocialConnector.SocialNetwork.Facebook, params);
+	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ SocialNetwork contains " +ISocialConnector.SocialNetwork.Facebook);
+	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ params contains " +params);
+	//ISocialConnector con = getSocialData().createConnector(ISocialConnector.SocialNetwork.Facebook, params);
+	try {
+		socialdata.addSocialConnector(con);
+	} catch (Exception e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	// Fetch data from it
+	socialdata.updateSocialData();
+	
+	snFriends = (List<Person>) socialdata.getSocialPeople();
+	
+    Iterator<Person> it = snFriends.iterator();
+    int index =1;
+    while(it.hasNext()){
+    	Person p =null;
+    	try{
+    	p = (Person) it.next();
+    	LOG.info(index +" FriendsID:" +p.getId() + " -->"+p.getName().getFormatted() );
+    	socialFriends.add(p.getName().getFormatted());
+    	index++;
+    	}
+    	catch(Exception e){
+    	    e.printStackTrace();
+    	}
+    }
+    
+    //compare the lists to create
+    
+    LOG.info("CSS Friends List contains" +cssFriends.size() +"entries");
+    LOG.info("Social Friends List contains" +socialFriends.size() +"entries");
+	return commonFriends;
+
+	}
 	
 }
+

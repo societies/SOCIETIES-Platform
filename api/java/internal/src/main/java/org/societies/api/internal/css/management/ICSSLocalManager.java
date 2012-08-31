@@ -224,5 +224,7 @@ public interface ICSSLocalManager {
   */
  public Future<List<String>> getCssFriends();
  
+ public List<String> suggestedFriends();
+ 
  
 }
