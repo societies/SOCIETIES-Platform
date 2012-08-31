@@ -134,7 +134,7 @@ jQuery(function() {
 	document.addEventListener("deviceready", SocietiesUtility.onDeviceReady, false);
 	
 	$('#connectXMPP').click(function() {
-		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#userpass").val(), jQuery("#cloudnode").val(), jQuery("#identitydomain").val())) {
+		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#cloudnode").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 	});

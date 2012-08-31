@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies - New Identity</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+
+	<link rel="stylesheet" type="text/css" href="../css/jquerymobile/jquery.mobile-1.1.0.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/custom/societies.css"/>
+	
+	<script type="text/javascript" src="../javascript/jquery/jquery-1.7.1.js" ></script>
+	<script type="text/javascript" src="../javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
+
+</head>
+<body>
+<!-- Page starts here -->
+<div data-role="page" id="one">
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="../images/societies_header.png" alt="societies logo"/>
+		<!-- /header -->
+	</div>
+	<div data-role="content" id="contentMain">
+		<ul data-role="listview" data-theme="c" data-divider-theme="b">
+			<li data-role="list-divider">Create a New Societies Identity</li>
+		</ul>
+		<br/>
+		<form id="form1">
+			<div data-role="fieldcontain" >
+			</div>
+		
+			<div id="fnameDiv" data-role="fieldcontain">
+		    	<label for="regUsername">Username: </label>
+		    	<input type="text" name="regUserLogin" id="regUsername" />
+			</div>
+			<div id="lnameDiv" data-role="fieldcontain">
+		    	<label for="regUserpass">Password: </label>
+		    	<input type="password" name="regUserPass" id="regUserpass" value="" />
+			</div>
+			<div id="usernameDiv" data-role="fieldcontain">
+		    	<label for="repeatRegUserpass">Repeat Password: </label>
+		    	<input type="password" name="repeatRegUserPass" id="repeatRegUserpass" value="" />
+			</div>
+			
+			<div>
+				<label for="domainServers">Societies Domain Servers</label>
+				
+				<select name="domainServersList" id="domainServers">
+		  			<option value="societies.local" selected="selected">societies.local</option>
+		  			<option value="societies.alternative">societies.alternative</option>
+				</select> 
+			</div>
+			
+			<div data-role="collapsible">
+				<h3>SOCIETIES Terms</h3>
+			
+				<label for="societiesTCs">SOCIETIES Terms of Use:</label>
+				<textarea name="textareaSocietiesTCs" id="societiesTCs">
+				Societies Terms & Conditions. 1. You must be mad 2. Paranoid helps 3. Infinite time
+				</textarea>
+			</div>
+			<div>
+				<label for="regSocietiesTerms">I agree with the Terms of Use for SOCIETIES software</label>
+				<input type="checkbox" name="regSocietiesTerms" id="regSocietiesTerms" class="custom" value="true"/>
+			</div>
+			
+			<div data-role="collapsible">
+				<h3>Identity Terms</h3>
+				<label for="domainTCs">Identity Domain Terms of Use:</label>
+				<textarea name="textareaDomainTCs" id="domainTCs">
+				Domain Server Terms & Conditions 1. Exists 2. Free 3. Never goes missing
+				</textarea>
+			</div>
+
+			<div>
+				<label for="regDomainTerms">I agree with the Terms of Use for the Identity Domain:</label>
+				<input type="checkbox" name="regDomainTerms" id="regDomainTerms" class="custom" />
+			</div>
+
+
+			<div id="create_identity" data-role="fieldcontain">
+				<a href="thank_you.html"><input id="registerXMPP" type="submit" value="Create Identity" data-inline="true" data-theme="b"/></a>
+			</div>
+		</form>
+		<br/>
+		<div class="terms">
+			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
+		</div>
+	</div>
+    </div>
+	<!-- contentMain -->
+	</body>
+	</html>

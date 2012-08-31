@@ -77,12 +77,12 @@
 			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
-			<!-- <scope>provided</scope> -->
-		</dependency>
+			<scope>provided</scope>
+		</dependency> -->
 <!-- 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
