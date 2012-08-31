@@ -747,7 +747,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// treating getSubscribedTo notifications
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), stanza.getFrom().getBareJid()));
+				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), c.getNotification().getSubscribedTo().getCommunity().getCommunityJid()));
 				
 				
 				/*	if(this.subscribedCISs.contains(new CisRecord(c.getNotification().getSubscribedTo().getCisJid()))){
