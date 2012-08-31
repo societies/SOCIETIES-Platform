@@ -57,11 +57,22 @@ public interface PubsubClient {
 	
 	/**
 	 * Add the list of package names that will be used as payloads for pubsub events.
+	 * 
+	 * DEPRECATED METHOD
 	 *
 	 * @param packageList List of package names
 	 * @throws JAXBException the JAXB exception
 	 */
 	public void addJaxbPackages(List<String> packageList) throws JAXBException;
+	
+	
+	/**
+	 * Add the list of classes that will be used as payloads for pubsub events.
+	 * 
+	 * @param classList
+	 * @throws ClassNotFoundException
+	 */
+	public void addSimpleClasses(List<String> classList) throws ClassNotFoundException;
 	
 	/**
 	 * Disco items.

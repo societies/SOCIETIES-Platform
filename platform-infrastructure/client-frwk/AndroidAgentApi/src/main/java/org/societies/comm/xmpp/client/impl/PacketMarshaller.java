@@ -25,6 +25,7 @@ import org.simpleframework.xml.strategy.Strategy;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
 import org.societies.impl.RawXmlProvider;
+import org.societies.simple.converters.EventItemsConverter;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -50,6 +51,8 @@ public class PacketMarshaller {
 		try {
 			Element exampleElementImpl = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("dummy");
 			registry.bind(exampleElementImpl.getClass(), ElementConverter.class);
+			registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
+			
 		} catch (DOMException e) {
 			Log.e(LOG_TAG, "DOMException trying to get runtime ElementImpl");
 		} catch (ParserConfigurationException e) {

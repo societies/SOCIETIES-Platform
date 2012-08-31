@@ -8,9 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.simpleframework.xml.Namespace;
+import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
@@ -45,8 +48,8 @@ public class PubsubClientAndroid implements PubsubClient {
 	private static final ComponentName serviceCN = new ComponentName("org.societies.pubsub", "org.societies.pubsub.PubsubService"); // TODO	
 
 	private MethodInvocationServiceConnection<Pubsub> miServiceConnection;
-	private String packagesContextPath;
 	private Serializer serializer;
+	private Map<String,Class<?>> elementToClass;
 	
 	private Map<Subscriber, SubscriberAdapter> subscribersMap = new HashMap<Subscriber, SubscriberAdapter>();
 	
@@ -54,8 +57,7 @@ public class PubsubClientAndroid implements PubsubClient {
 		Intent intent = new Intent();
 		intent.setComponent(serviceCN);
 		miServiceConnection = new MethodInvocationServiceConnection<Pubsub>(intent, androidContext, BIND_AUTO_CREATE, Pubsub.class);
-		packagesContextPath = "";
-
+		elementToClass = new HashMap<String, Class<?>>();
 		Strategy strategy = new AnnotationStrategy();
 		serializer = new Persister(strategy);
 	}
@@ -201,12 +203,16 @@ public class PubsubClientAndroid implements PubsubClient {
 		
 	}
 	
-	public synchronized void addJaxbPackages(List<String> packageList) {		
-		StringBuilder contextPath = new StringBuilder(packagesContextPath);
-		for (String pack : packageList)
-			contextPath.append(":" + pack);
+	public synchronized void addSimpleClasses(List<String> classList) throws ClassNotFoundException {		
+		for (String c : classList) {
+			Class<?> clazz = Class.forName(c);
+			Root rootAnnotation = clazz.getAnnotation(Root.class);
+			Namespace namespaceAnnotation = clazz.getAnnotation(Namespace.class);
+			if (rootAnnotation!=null && namespaceAnnotation!=null) {
+				elementToClass.put("{"+namespaceAnnotation.reference()+"}"+rootAnnotation.name(),clazz);
+			}
+		}
 		
-		packagesContextPath = contextPath.toString();
 	}
 	
 	private Object invokeRemoteMethod(IMethodInvocation<Pubsub> methodInvocation) throws XMPPError, CommunicationException {		
@@ -244,7 +250,7 @@ public class PubsubClientAndroid implements PubsubClient {
 			try {
 				IIdentity pubsubServiceIdentity = IdentityManagerImpl.staticfromJid(pubsubService);
 
-				Class<?> c = Class.forName("org.societies.api.schema.examples.calculatorbean.CalcBean");
+				Class<?> c = elementToClass.get(getElementIdentifier(item));
 				Object bean = serializer.read(c, new ByteArrayInputStream(item.getBytes()));
 				
 				subscriber.pubsubEvent(pubsubServiceIdentity, node, itemId, bean);
@@ -254,5 +260,20 @@ public class PubsubClientAndroid implements PubsubClient {
 				LOG.error("Exception while unmarshalling pubsub event payload",e);
 			}
 		}
+
+		private String getElementIdentifier(String item) {
+			String trimmedItem = item.trim();
+			String elementName = trimmedItem.substring(1, trimmedItem.indexOf(" "));
+			String nsStr = trimmedItem.substring(trimmedItem.indexOf("xmlns=")+7);
+			int endIndex = nsStr.indexOf("\"");
+			if (endIndex<0)
+				endIndex = nsStr.indexOf("'");
+			nsStr = nsStr.substring(0,endIndex);
+			return "{"+nsStr+"}"+elementName;
+		}
+	}
+
+	public void addJaxbPackages(List<String> packageList) throws JAXBException {
+		// TODO DEPRECATED
 	}
 }

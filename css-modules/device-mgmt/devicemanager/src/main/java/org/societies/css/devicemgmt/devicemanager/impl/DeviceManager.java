@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
@@ -374,6 +375,21 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	public String fireNewDataReceived(String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data) {
 
 		return null;
+	}
+
+
+	@Override
+	public String fireNewSharedDevice(DeviceCommonInfo deviceCommonInfo,
+			IIdentity deviceNodeId) {
+		LOG.info("-- Device Manager : create a new local device " + deviceCommonInfo.getDeviceName() + " representing a remote device connected to CSS Node "+ deviceNodeId);
+		return "device A";
+	}
+
+
+	@Override
+	public boolean fireDisconnectedSharedDevice(String deviceId) {
+		// TODO Auto-generated method stub
+		return true;
 	}
 
 

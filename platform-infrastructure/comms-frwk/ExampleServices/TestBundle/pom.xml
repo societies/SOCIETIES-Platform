@@ -167,6 +167,7 @@
     						!org.jvnet.fastinfoset,
     						!com.sun.xml.fastinfoset.*,
     						!com.sun.msv.*,
+    						org.societies.api.identity,
 							*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
