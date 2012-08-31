@@ -36,6 +36,8 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.cis.manager.CommunityManager;
+import org.societies.api.schema.cis.manager.ListCrit;
+import org.societies.api.schema.cis.manager.ListResponse;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Service;
@@ -63,7 +65,7 @@ import android.util.Log;
 public class CommunicationAdapter extends Service implements ISocialAdapter{
 
 	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("CommunityManager", "ServiceDiscoveryResultBean");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("CommunityManager", "ListResponse");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cis/manager",
 														    	  "http://societies.org/api/schema/activityfeed",	  		
 																  "http://societies.org/api/schema/cis/community");
@@ -114,6 +116,7 @@ public class CommunicationAdapter extends Service implements ISocialAdapter{
 		//MESSAGE BEAN
 		CommunityManager messageBean = new CommunityManager();
 		org.societies.api.schema.cis.manager.List listCISs = new org.societies.api.schema.cis.manager.List();
+		listCISs.setListCriteria(ListCrit.OWNED);
 		messageBean.setList(listCISs);
 		
 		//COMMS STUFF
@@ -239,16 +242,16 @@ public class CommunicationAdapter extends Service implements ISocialAdapter{
 		}
 
 		public void receiveResult(Stanza returnStanza, Object msgBean) {
-			Log.d(LOG_TAG, "Callback receiveResult");
+			Log.d(LOG_TAG, "Callback receiveResult of type: " + msgBean.getClass().getName());
 	
-			// --------- COMMUNITY MANAGEMENT BEAN ---------
-			if (msgBean instanceof CommunityManager) {
-				Log.d(LOG_TAG, "CommunityManager Result!");
+			// --------- COMMUNITY MANAGEMENT ListResponse BEAN ---------
+			if (msgBean instanceof ListResponse) {
+				Log.d(LOG_TAG, "ListResponse Result!");
 				
-				CommunityManager communityResult = (CommunityManager) msgBean;
+				ListResponse communityResult = (ListResponse) msgBean; 
 				//GET CORRECT CLIENT'S ISocialAdapterCallback FOR THIS REQUEST
 				ISocialAdapterCallback clientCallback = getRequestingClient(returnStanza.getId());
-				clientCallback.receiveResult(communityResult.getList());	
+				clientCallback.receiveResult(communityResult.getCommunity());	
 			}
 			// --------- ACTIVITY BEAN ---------
 			//else if (msgBean instanceof ActivityBean)) {

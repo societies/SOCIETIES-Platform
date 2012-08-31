@@ -553,4 +553,10 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			ns+="/" + packArr[i]; 
 		return ns;
 	}
+
+	@Override
+	public void addSimpleClasses(List<String> classList)
+			throws ClassNotFoundException {
+		// TODO Auto-generated method stub
+	}
 }

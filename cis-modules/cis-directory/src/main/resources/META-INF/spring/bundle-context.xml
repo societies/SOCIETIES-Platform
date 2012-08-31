@@ -33,12 +33,12 @@
 		<property name="annotatedClasses">
 			<list>
 				<value>org.societies.cis.directory.model.CisAdvertisementRecordEntry</value>
+				<value>org.societies.cis.directory.model.CriteriaRecordEntry</value>
 			</list>
 		</property>
 
 		<property name="annotatedPackages">
-			<list>
-				
+			<list>				
 				<value>org.societies.cis.directory.model
 				</value>
 			</list>
@@ -68,6 +68,4 @@
 	<bean id="cisDir" class="org.societies.cis.directory.CisDirectory">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-
-
 </beans>
