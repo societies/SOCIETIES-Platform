@@ -148,7 +148,7 @@ public class PrivacyDataManagerTest
 		assertNotNull("No permission retrieved", permission2);
 		assertNotNull("No (real) permission retrieved", permission2.getDecision());
 		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission2.getDecision().name());
-//		assertEquals("Two requests, not the same answer", permission1, permission2);
+		assertEquals("Two requests, not the same answer", permission1, permission2);
 	}
 
 	@Test
