@@ -160,7 +160,13 @@ public class Activity implements IActivity {
 	@Override
 	public void setPublished(String published) {
 		this.published = published;
+        try{
 		this.time = Long.parseLong(published);
+        }catch (Exception e){
+            System.out.println("parsing long failed : "+published);
+            e.printStackTrace();
+        }
+
 		data.put("published", new ActivityString(published));
 		
 	}

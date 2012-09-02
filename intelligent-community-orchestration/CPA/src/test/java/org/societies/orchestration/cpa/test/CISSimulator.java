@@ -111,6 +111,7 @@ public class CISSimulator implements IActivityFeedCallback {
 	public ICisOwned simulate(long days){
 		ICISSimulated ret = new ICISSimulated();
 		ret.setFeed(actFeed);
+        actFeed.setId("simId");
 		for(String user : userToUserMap.keySet()){
 			try {
 				ret.addMember(user,"member");
@@ -180,7 +181,7 @@ public class CISSimulator implements IActivityFeedCallback {
         
         CPACreationPatterns cpa = new CPACreationPatterns();
         cpa.init();
-        cpa.analyze(sim.getActFeed().getActivities("0"+Long.toString(System.currentTimeMillis()+100000000L)));
+        cpa.analyze(sim.getActFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()+100000000L)));
         
 	}
 

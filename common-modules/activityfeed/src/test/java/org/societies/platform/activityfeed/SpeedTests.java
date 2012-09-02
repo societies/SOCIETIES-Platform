@@ -66,10 +66,10 @@ AbstractTransactionalJUnit4SpringContextTests implements IActivityFeedCallback {
 		if(sessionFactory==null){
 			sessionFactory = actFeed.getSessionFactory();
 		}
-		if(session==null){
-			session = sessionFactory.openSession();
-			actFeed.setSession(session);
-		}
+//		if(session==null){
+//			session = sessionFactory.openSession();
+//			actFeed.setSession(session);
+//		}
 		if(!session.isOpen())
 			session = sessionFactory.openSession();
 		LOG.info("i startup ");

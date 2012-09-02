@@ -23,7 +23,7 @@
        for integration testing outside of an OSGi environment -->
 
 
-  	<bean id="TestCase958" 
+  	<bean id="TestCase"
   		class="org.societies.integration.test.bit.createcis.TestCase" init-method="run">
 		<property name="commManager" ref="CommManagerBundle"/>
 		<property name="cisManager" ref="cisManager"/>
