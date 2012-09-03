@@ -28,7 +28,7 @@ var	SocietiesCISManagerService = {
 		function failure(data) {
 			alert("createCIS - failure: " + data);
 		}
-	    window.plugins.SocietiesLocalCISManager.createCIS(success, failure);
+	    SocietiesLocalCISManager.createCIS(success, failure);
 
 	}
 			
