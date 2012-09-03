@@ -22,17 +22,97 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.location.management;
+package org.societies.context.location.management.api.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
-import org.societies.context.location.management.api.*;
+import org.societies.context.location.management.api.ITag;
+import org.societies.context.location.management.api.IZone;
+import org.societies.context.location.management.api.IZoneId;
 
 
-public interface PZWrapper {
+
+/**
+ *
+ * @author guyf@il.ibm.com
+ * 
+ */
+public class ZoneImpl implements IZone {
+
+	IZoneId zoneId;
+	String description;
+	String name; 
+	String type;
+	ITag personalTag;
+	Collection<ITag> tags;
 	
-	public Collection<IZone> getActiveZones();
-	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
-	public IUserLocation getEntityFullLocation(String entityId); 
+	
+	@Override
+	public IZoneId getId() {
+		// TODO Auto-generated method stub
+		return zoneId;
+	}
+
+	@Override
+	public void setId(IZoneId zoneId) {
+		this.zoneId = zoneId;
+	}
+
+	@Override
+	public String getDescription() {
+		return this.description;
+	}
+
+	@Override
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	@Override
+	public String getName() {
+		return name;
+	}
+	
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	@Override
+	public String getType() {
+		return type;
+	}
+	
+	@Override
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	@Override
+	public void setPersonalTag(ITag personalTag) {
+		this.personalTag = personalTag;
+		
+	}
+
+	@Override
+	public ITag getPersonalTag() {
+		return this.personalTag;
+	}
+
+	@Override
+	public void setTags(Collection<ITag> tags) {
+		this.tags = new ArrayList<ITag>();
+		this.tags.addAll(tags);
+	}
+
+	@Override
+	public Collection<ITag> getTags() {
+		List<ITag> tagsBuffer = new ArrayList<ITag>();
+		tagsBuffer.addAll(this.tags);
+		return tagsBuffer;
+	}
+
+
 }

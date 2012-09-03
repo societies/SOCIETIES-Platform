@@ -22,17 +22,68 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.location.management;
+package org.societies.context.location.management.api.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
-import org.societies.context.location.management.api.*;
+import org.societies.context.location.management.api.ICoordinate;
+import org.societies.context.location.management.api.IUserLocation;
+import org.societies.context.location.management.api.IZone;
 
 
-public interface PZWrapper {
+/**
+*
+* @author guyf@il.ibm.com
+* 
+*/
+public class UserLocationImpl implements IUserLocation{
+	private ICoordinate xCoordinate;
+	private ICoordinate yCoordinate;
+	private Collection<IZone> zones;
+	private String id;
 	
-	public Collection<IZone> getActiveZones();
-	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
-	public IUserLocation getEntityFullLocation(String entityId); 
+	@Override
+	public ICoordinate getXCoordinate() {
+		return xCoordinate;
+	}
+
+	@Override
+	public ICoordinate getYCoordinate() {
+		return yCoordinate;
+	}
+
+	@Override
+	public void setXCoordinate(ICoordinate coordinate) {
+		this.xCoordinate = coordinate;
+	}
+
+	@Override
+	public void setYCoordinate(ICoordinate coordinate) {
+		this.yCoordinate = coordinate;
+	}
+
+	@Override
+	public Collection<IZone> getZones() {
+		List<IZone> tempZones = new ArrayList<IZone>();
+		tempZones.addAll(zones);
+		return tempZones;
+	}
+
+	@Override
+	public void setZones(Collection<IZone> zones) {
+		this.zones = new ArrayList<IZone>();
+		this.zones.addAll(zones);
+	}
+
+	@Override
+	public String getId() {
+		return this.id;
+	}
+
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
 }
