@@ -233,11 +233,11 @@ public class CommManagerHelper {
 				"namespace", namespace);
 	}
 	
-	private IFeatureServer getMessageFeatureServer(String namespace)
-			throws UnavailableException {
-		return (IFeatureServer) ifNotNull(featureServers.get(namespace),
-				"namespace", namespace);
-	}
+//	private IFeatureServer getMessageFeatureServer(String namespace)
+//			throws UnavailableException {
+//		return (IFeatureServer) ifNotNull(featureServers.get(namespace),
+//				"namespace", namespace);
+//	}
 
 	private ICommCallback getCommCallback(String iqId)
 			throws UnavailableException {
@@ -414,11 +414,11 @@ public class CommManagerHelper {
 			Object bean = s.read(c, element.asXML());
 			
 			try {
-				IFeatureServer fs = getMessageFeatureServer(namespace);
-				fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
-			} catch (UnavailableException e) {
 				ICommCallback cb = getMessageCommCallback(namespace);
 				cb.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
+			} catch (UnavailableException e) {
+				IFeatureServer fs = getFeatureServer(namespace);
+				fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
 			}
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
@@ -474,11 +474,10 @@ public class CommManagerHelper {
 
 	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
-//		for (String ns : fs.getXMLNamespaces()) {
-//			LOG.info("registering FeatureServer for namespace " + ns);
-//			featureServers.put(ns, fs);
-//		}
-		featureServers.put(fs.getXMLNamespaces().get(0), fs);
+		for (String ns : fs.getXMLNamespaces()) {
+			LOG.info("registering FeatureServer for namespace " + ns);
+			featureServers.put(ns, fs);
+		}
 	}
 	
 	public void register(ICommCallback messageCallback) throws CommunicationException {
@@ -487,7 +486,9 @@ public class CommManagerHelper {
 //			LOG.info("registering CommCallback for namespace" + ns);
 //			iqCommCallbacks.put(ns, messageCallback);
 //		}
-		nsCommCallbacks.put(messageCallback.getXMLNamespaces().get(0), messageCallback);
+		String mainNs = messageCallback.getXMLNamespaces().get(0);
+		if (mainNs.indexOf("#")>-1)
+			nsCommCallbacks.put(messageCallback.getXMLNamespaces().get(0), messageCallback);
 	}
 	
 	private void jaxbMapping(List<String> namespaces, List<String> packages) throws CommunicationException {
