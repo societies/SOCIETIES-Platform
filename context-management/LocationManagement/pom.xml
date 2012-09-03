@@ -58,17 +58,33 @@
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<!-- <dependency>
+   			<groupId>org.societies</groupId>
+   			<artifactId>common-ext-libs</artifactId>
+   			<scope>provided</scope>
+		</dependency> -->
+	
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
 		</dependency>
+		
 		 <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
@@ -95,7 +111,7 @@
     		<artifactId>com.springsource.org.json</artifactId>
     		<version>1.0.0</version>
 		</dependency>
-
+	
 		
 	</dependencies>
 	

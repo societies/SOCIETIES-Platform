@@ -8,5 +8,5 @@
 		
 		
         <artifact type="bundle" name="org.societies.context-management.context-mgmt-cloud-bundle"/>
-    
+    	<artifact type="bundle" name="org.societies.context.location.management"/>
 </plan>

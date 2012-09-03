@@ -285,7 +285,10 @@ var	SocietiesLocalCSSManagerHelper = {
 		console.log("Disconnect from LocalCSSManager");
 			
 		function success(data) {
-			$.mobile.changePage( ($("#main")), { transition: "slideup"} );
+			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
+
+//			$.mobile.changePage( ($("#main")), { transition: "slideup"} );
+//			window.open("../index.html");
 
 			console.log(data);
 		}

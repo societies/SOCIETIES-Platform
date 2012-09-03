@@ -48,9 +48,10 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.source.ICtxSourceMgr;
+import org.societies.api.context.source.CtxSourceNames;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.context.api.user.location.IUserLocation;
+import org.societies.context.location.management.api.IUserLocation;
 
 /**
  * 
@@ -67,8 +68,8 @@ public class LocationManagementContextAccessor {
 	/** The logging facility. */
 	private static final Logger log = LoggerFactory.getLogger(LocationManagementContextAccessor.class);
 	
-	private final static String CSM_PZ_SOURCE = "PZ";
-	private final static String CSM_GPS_SOURCE = "GPS";
+	private final static String CSM_PZ_SOURCE = CtxSourceNames.PZ;
+	private final static String CSM_GPS_SOURCE = CtxSourceNames.GPS;
 	
 	private final static String LOCATION_TYPE_FUSED = "location_fused";
 	
@@ -86,8 +87,6 @@ public class LocationManagementContextAccessor {
 		this.contextSourceManagement = contextSourceManagement;
 		this.contextBroker = contextBroker; 
 		this.commManager = commManager;
-		
-		
 	}
 	
 	public void addDevice(INetworkNode cssNodeId,String macAddress){
@@ -99,21 +98,33 @@ public class LocationManagementContextAccessor {
 			id = contextSourceManagement.register(cssNodeId,CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_SYMBOLIC);
 			String csmLocationTypeSymbolic_internalId = id.get();
 			
+			id = contextSourceManagement.register(cssNodeId,CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_PUBLIC_TAGS);
+			String csmLocationTypePublicTags_internalId = id.get();
 			
-			String csmLocationTypePublicTags_internalId = "location_public_tags";
-			String csmLocationTypePersonalTag_internalId = "location_personal_tag";
-			String csmLocationTypeZoneId_internalId = "location_zones_id";
-			String csmLocationTypeZoneType_internalId = "location_zones_type";
+			id = contextSourceManagement.register(cssNodeId,CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_PERSONAL_TAGS);
+			String csmLocationTypePersonalTag_internalId = id.get();
+			
+			id = contextSourceManagement.register(cssNodeId,CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_ID);
+			String csmLocationTypeZoneId_internalId = id.get();
+			
+			id = contextSourceManagement.register(cssNodeId,CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_TYPE);
+			String csmLocationTypeZoneType_internalId = id.get();
+			
+			id = contextSourceManagement.register(cssNodeId,CSM_PZ_SOURCE, CtxAttributeTypes.LOCATION_PARENT_ID);
+			String csmLocationTypeParent_internalId = id.get();
+			
 			
 			addToDeviceMapping(macAddress,cssNodeId,
 							   csmLocationTypeGlobal_internalId,csmLocationTypeSymbolic_internalId, 
 							   csmLocationTypePublicTags_internalId,csmLocationTypePersonalTag_internalId,
-							   csmLocationTypeZoneId_internalId,csmLocationTypeZoneType_internalId );
+							   csmLocationTypeZoneId_internalId,csmLocationTypeZoneType_internalId,
+							   csmLocationTypeParent_internalId);
 			
 			createInferredLocationAttribute(ctxEntity);
 			
+			//currently only the Location coordinates can be changed by another source 
 			contextBroker.registerForChanges(new MyCtxChangeEventListener(),ctxEntity.getId(),CtxAttributeTypes.LOCATION_COORDINATES);
-			//contextBroker.registerForChanges(new MyCtxChangeEventListener(),ctxEntity.getId(),CtxAttributeTypes.LOCATION_SYMBOLIC);
+			
 			
 		} catch (InterruptedException e) {
 			log.error("Exception msg: "+e.getMessage()+" \t exception cause: "+e.getCause(),e);
@@ -162,8 +173,8 @@ public class LocationManagementContextAccessor {
 			DeviceInternalObject deviceInternalObject = getNodeObject(networkNode);
 			CtxEntity ctxEntity = getCtxEntity(deviceInternalObject.getCssNodeId());
 			
-			String csmLocationTypeGlobal = deviceInternalObject.getCsmLocationTypeGlobal_internalId();
-			String csmLocationTypeSymbolic = deviceInternalObject.getCsmLocationTypeSymbolic_internalId();
+			String csmLocationTypeGlobal = deviceInternalObject.csmLocationTypeGlobal_internalId;
+			String csmLocationTypeSymbolic = deviceInternalObject.csmLocationTypeSymbolic_internalId;
 			contextSourceManagement.sendUpdate(csmLocationTypeGlobal,locationString, ctxEntity,false , 0, 0);
 			contextSourceManagement.sendUpdate(csmLocationTypeSymbolic,symbolicLocationString, ctxEntity,false , 0, 0);
 			
@@ -172,17 +183,19 @@ public class LocationManagementContextAccessor {
 			String tagsValue = LMDataEncoding.encodePublicTags(userLocation);
 			String zonesValue = LMDataEncoding.encodeZones(userLocation);
 			String zoneTypeValue = LMDataEncoding.encodeZoneType(userLocation);
+			String parentZoneValue = LMDataEncoding.encodeParentZones(userLocation);
 			
 			String csmLocationType_personalTag = deviceInternalObject.csmLocationTypePersonalTag_internalId;
 			String csmLocationType_tags =   deviceInternalObject.csmLocationTypePublicTags_internalId;
 			String csmLocationType_zonesId = 	deviceInternalObject.csmLocationTypeZoneId_internalId;
 			String csmLocationType_zoneType = 	deviceInternalObject.csmLocationTypeZoneType_internalId;
+			String csmLocationType_parentId = 	deviceInternalObject.csmLocationTypeParent_internalId;
 			
 			contextSourceManagement.sendUpdate(csmLocationType_personalTag,presonalTagValue, ctxEntity,false , 0, 0);
 			contextSourceManagement.sendUpdate(csmLocationType_tags,tagsValue, ctxEntity,false , 0, 0);
 			contextSourceManagement.sendUpdate(csmLocationType_zonesId,zonesValue, ctxEntity,false , 0, 0);
 			contextSourceManagement.sendUpdate(csmLocationType_zoneType,zoneTypeValue, ctxEntity,false , 0, 0);
-			
+			contextSourceManagement.sendUpdate(csmLocationType_parentId,parentZoneValue, ctxEntity,false , 0, 0);
 			
 		}catch (Exception e) {
 			log.error("Exception msg: "+e.getMessage()+" \t exception cause: "+e.getCause(),e);
@@ -387,7 +400,9 @@ public class LocationManagementContextAccessor {
 	private void addToDeviceMapping(String macAddress, INetworkNode networkNodeId, 
 									String csmLocationTypeGlobal_internalId, String csmLocationTypeSymbolic_internalId, 
 									String csmLocationTypePublicTags_internalId, String csmLocationTypePersonalTag_internalId, 
-									String csmLocationTypeZoneId_internalId, String csmLocationTypeZoneType_internalId){
+									String csmLocationTypeZoneId_internalId, String csmLocationTypeZoneType_internalId, 
+									String csmLocationTypeParent_internalId){
+		
 		synchronized (deviceMapping) {
 			
 			DeviceInternalObject deviceObject = new DeviceInternalObject();
@@ -397,6 +412,8 @@ public class LocationManagementContextAccessor {
 			deviceObject.setCsmLocationTypePersonalTag_internalId(csmLocationTypePersonalTag_internalId);
 			deviceObject.setCsmLocationTypeZoneId_internalId(csmLocationTypeZoneId_internalId);
 			deviceObject.setCsmLocationTypeZoneType_internalId(csmLocationTypeZoneType_internalId);
+			deviceObject.setCsmLocationTypeParent_internalId(csmLocationTypeParent_internalId);
+			
 			deviceObject.setCssNodeId(networkNodeId);
 			deviceObject.setMacAddress(macAddress);
 			
@@ -421,6 +438,12 @@ public class LocationManagementContextAccessor {
 	}
 	
 	
+	/**
+	 * Describe your class here...
+	 *
+	 * @author guyf
+	 *
+	 */
 	private class DeviceInternalObject{
 		private INetworkNode cssNodeId;
 		private String macAddress;
@@ -430,12 +453,9 @@ public class LocationManagementContextAccessor {
 		private String csmLocationTypePersonalTag_internalId;
 		private String csmLocationTypeZoneType_internalId;
 		private String csmLocationTypeZoneId_internalId;
+		private String csmLocationTypeParent_internalId;
 		
-		public String getCsmLocationTypeZoneType_internalId() {
-			return csmLocationTypeZoneType_internalId;
-		}
-		public void setCsmLocationTypeZoneType_internalId(
-				String csmLocationTypeZoneType_internalId) {
+		public void setCsmLocationTypeZoneType_internalId(String csmLocationTypeZoneType_internalId) {
 			this.csmLocationTypeZoneType_internalId = csmLocationTypeZoneType_internalId;
 		}
 		public INetworkNode getCssNodeId() {
@@ -447,39 +467,28 @@ public class LocationManagementContextAccessor {
 		public void setMacAddress(String macAddress) {
 			this.macAddress = macAddress;
 		}
-		public String getCsmLocationTypeGlobal_internalId() {
-			return csmLocationTypeGlobal_internalId;
-		}
 		public void setCsmLocationTypeGlobal_internalId(String csmLocationTypeGlobal_internalId) {
 			this.csmLocationTypeGlobal_internalId = csmLocationTypeGlobal_internalId;
 		}
-		public String getCsmLocationTypeSymbolic_internalId() {
-			return csmLocationTypeSymbolic_internalId;
-		}
 		public void setCsmLocationTypeSymbolic_internalId(String csmLocationTypeSymbolic_internalId) {
 			this.csmLocationTypeSymbolic_internalId = csmLocationTypeSymbolic_internalId;
-		}
-		public String getCsmLocationTypePublicTags_internalId() {
-			return csmLocationTypePublicTags_internalId;
 		}
 		public void setCsmLocationTypePublicTags_internalId(
 				String csmLocationTypePublicTags_internalId) {
 			this.csmLocationTypePublicTags_internalId = csmLocationTypePublicTags_internalId;
 		}
-		public String getCsmLocationTypePersonalTag_internalId() {
-			return csmLocationTypePersonalTag_internalId;
-		}
 		public void setCsmLocationTypePersonalTag_internalId(
 				String csmLocationTypePersonalTag_internalId) {
 			this.csmLocationTypePersonalTag_internalId = csmLocationTypePersonalTag_internalId;
-		}
-		public String getCsmLocationTypeZoneId_internalId() {
-			return csmLocationTypeZoneId_internalId;
 		}
 		public void setCsmLocationTypeZoneId_internalId(
 				String csmLocationTypeZoneId_internalId) {
 			this.csmLocationTypeZoneId_internalId = csmLocationTypeZoneId_internalId;
 		}
+		public void setCsmLocationTypeParent_internalId(String csmLocationTypeParent_internalId) {
+			this.csmLocationTypeParent_internalId = csmLocationTypeParent_internalId;
+		}
+		
 	}
 	
 	
