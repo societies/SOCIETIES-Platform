@@ -31,12 +31,9 @@ import java.util.List;
 import org.apache.shindig.social.core.model.ActivityEntryImpl;
 import org.apache.shindig.social.core.model.ActivityObjectImpl;
 import org.apache.shindig.social.core.model.MediaLinkImpl;
-import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.apache.shindig.social.opensocial.model.MediaLink;
-import org.apache.shindig.social.opensocial.model.Name;
-import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -103,7 +100,7 @@ public class ActivityConverterFromGooglePlus implements ActivityConverter {
 			if(json.has(URL)) activity.setUrl(json.getString(URL));
 			parseActor(json.getJSONObject(ACTOR), activity);
 			if(json.has(VERB)) activity.setVerb(json.getString(VERB));
-			parseObject(json, activity);
+			parseObject(json, activity);			
 //			annotation 	string 	Additional content added by the person who shared this activity, applicable only when resharing an activity.			
 //			crosspostSource 	string 	If this activity is a crosspost from another system, this property specifies the ID of the original activity.
 			parseProvider(json, activity);
@@ -137,12 +134,11 @@ public class ActivityConverterFromGooglePlus implements ActivityConverter {
 		}
 	}
 	
-	private void parseActor(JSONObject json, ActivityEntry activity) throws JSONException {
+	private void parseActor(JSONObject json, ActivityEntry activity) throws JSONException {	// name.familyName name.givenName not supported
 		ActivityObject actor = new ActivityObjectImpl();
 		activity.setActor(actor);
 		actor.setId(json.getString(ID));
 		if(json.has(DISPLAY_NAME)) actor.setDisplayName(json.getString(DISPLAY_NAME));
-		// TODO parse name.familyName name.givenName
 		if(json.has(URL)) actor.setUrl(json.getString(URL));
 		if(json.has(IMAGE)) {
 			MediaLink image = new MediaLinkImpl();
@@ -151,7 +147,7 @@ public class ActivityConverterFromGooglePlus implements ActivityConverter {
 		}
 	}
 
-	private void parseObject(JSONObject json, ActivityEntry activity) throws JSONException { // TODO originalContent, replies, plusoner, reshares not supported
+	private void parseObject(JSONObject json, ActivityEntry activity) throws JSONException { // originalContent, replies, plusoner, reshares not supported
 		if(json.has(OBJECT)) {
 			ActivityObject object = new ActivityObjectImpl();
 			activity.setObject(object);
@@ -190,7 +186,7 @@ public class ActivityConverterFromGooglePlus implements ActivityConverter {
 		}
 	}
 	
-	private void parseAttachment(JSONObject json, ActivityObject attachment) throws JSONException { // TODO image.type, fullImage, embed not supported
+	private void parseAttachment(JSONObject json, ActivityObject attachment) throws JSONException { // image.type, fullImage, embed not supported
 		if(json.has(OBJECT_TYPE)) attachment.setObjectType(json.getString(OBJECT_TYPE));
 		if(json.has(DISPLAY_NAME)) attachment.setDisplayName(json.getString(DISPLAY_NAME));
 		if(json.has(ID)) attachment.setId(json.getString(ID));
