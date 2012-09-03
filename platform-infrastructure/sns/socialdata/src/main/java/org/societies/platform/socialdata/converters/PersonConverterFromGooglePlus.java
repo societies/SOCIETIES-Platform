@@ -24,13 +24,30 @@
  */
 package org.societies.platform.socialdata.converters;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.shindig.social.core.model.AddressImpl;
+import org.apache.shindig.social.core.model.ListFieldImpl;
 import org.apache.shindig.social.core.model.NameImpl;
+import org.apache.shindig.social.core.model.OrganizationImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
+import org.apache.shindig.social.core.model.UrlImpl;
+import org.apache.shindig.social.opensocial.model.Address;
+import org.apache.shindig.social.opensocial.model.ListField;
 import org.apache.shindig.social.opensocial.model.Name;
+import org.apache.shindig.social.opensocial.model.Organization;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
+import org.apache.shindig.social.opensocial.model.Url;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convert data from Google+ in JSON to Person.
@@ -39,6 +56,8 @@ import org.json.JSONObject;
  *
  */
 public class PersonConverterFromGooglePlus implements PersonConverter {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(PersonConverterFromGooglePlus.class);
 
 	public static final String ID = "id";
 	public static final String DISPLAY_NAME = "displayName";
@@ -55,6 +74,7 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 	public static final String FEMALE = "female";
 	public static final String OTHER = "other";
 	public static final String BIRTHDAY = "birthday";
+	public static final String BIRTHDAY_DATE_FORMAT = "yyyy-MM-dd";
 	public static final String CURRENT_LOCATION = "currentLocation";
 	public static final String URL = "url";
 	public static final String IMAGE = "image";
@@ -79,12 +99,14 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 	public static final String BLOG = "blog";
 	public static final String PROFILE = "profile";
 	public static final String PRIMARY = "primary";
-	public static final String ORGANIZATIONS = "organizations";
+	public static final String ORGANIZATIONS = "organizations";	
 	public static final String DEPARTMENT = "department";
 	public static final String TITLE = "title";
 	public static final String SCHOOL = "school";
 	public static final String START_DATE = "startDate";
 	public static final String END_DATE = "endDate";
+	public static final String ORGANIZATION_START_DATE_FORMAT = "yyyy-MM-dd";
+	public static final String ORGANIZATION_END_DATE_FORMAT = "yyyy-MM-dd";
 	public static final String LOCATION = "location";
 	public static final String DESCRIPTION = "description";
 	public static final String PLACES_LIVED = "placesLived";
@@ -108,77 +130,20 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 			person.setDisplayName(db.getString(DISPLAY_NAME));			
 			parseName(db, person);
 			if(db.has(NICKNAME)) person.setNickname(NICKNAME);
-//			parseBirthday(db, person);
+			parseBirthday(db, person);
 			parseGender(db, person);
-//			parseCurrentLocation(db, person);
+			parseCurrentLocation(db, person);
 			if(db.has(URL)) person.setProfileUrl(db.getString(URL));
-			if(db.has(IMAGE)) person.setThumbnailUrl(db.getJSONObject(IMAGE).getString(URL));			 	
-//			languagesSpoken[] 	list 	The languages spoken by this person. 	check if complies with ISO 639-1
+			if(db.has(IMAGE)) person.setThumbnailUrl(db.getJSONObject(IMAGE).getString(URL));	
+			parseLanguagesSpoken(db, person);
 			if(db.has(HAS_APP)) person.setHasApp(db.getBoolean(HAS_APP));
 			if(db.has(ABOUT_ME)) person.setAboutMe(db.getString(ABOUT_ME));
-//			parseRelationshipStatus(db, person);			
-//			relationshipStatus 	string 	The person's relationship status. Possible values are:
-//
-//			    "single" - Person is single.
-//			    "in_a_relationship" - Person is in a relationship.
-//			    "engaged" - Person is engaged.
-//			    "married" - Person is married.
-//			    "its_complicated" - The relationship is complicated.
-//			    "open_relationship" - Person is in an open relationship.
-//			    "widowed" - Person is widowed.
-//			    "in_domestic_partnership" - Person is in a domestic partnership.
-//			    "in_civil_union" - Person is in a civil union.
-		
-//			urls[] 	list 	A list of URLs for this person. 	
-//			urls[].value 	string 	The URL value. 	
-//			urls[].type 	string 	The type of URL. Possible values are:
-//
-//			    "home" - URL for home.
-//			    "work" - URL for work.
-//			    "blog" - URL for blog.
-//			    "profile" - URL for profile.
-//			    "other" - Other.
-//
-//				
-//			urls[].primary 	boolean 	If "true", this URL is the person's primary URL.
-//			parseOrganizations(db, person);			
-//			organizations[] 	list 	A list of current or past organizations with which this person is associated. 	
-//			organizations[].name 	string 	The name of the organization. 	
-//			organizations[].department 	string 	The department within the organization. 	
-//			organizations[].title 	string 	The person's job title or role within the organization. 	
-//			organizations[].type 	string 	The type of organization. Possible values are:
-//
-//			    "work" - Work.
-//			    "school" - School.
-//			organizations[].startDate 	string 	The date the person joined this organization. 	
-//			organizations[].endDate 	string 	The date the person left this organization. 	
-//			organizations[].location 	string 	The location of this organization. 	
-//			organizations[].description 	string 	A short description of the person's role in this organization. 	
-//			organizations[].primary 	boolean 	If "true", indicates this organization is the person's primary one (typically interpreted as current one).
-			
-//			placesLived[] 	list 	A list of places where this person has lived. 	
-//			placesLived[].value 	string 	A place where this person has lived. For example: "Seattle, WA", "Near Toronto". 	
-//			placesLived[].primary 	boolean 	If "true", this place of residence is this person's primary residence.
-			
-//			tagline 	string 	The brief description (tagline) of this person. 	
-//			emails[] 	list 	A list of email addresses for this person. 	
-//			emails[].value 	string 	The email address. 	
-//			emails[].type 	string 	The type of address. Possible values are:
-//
-//			    "home" - Home email address.
-//			    "work" - Work email address.
-//			    "other" - Other.
-//
-//				
-//			emails[].primary 	boolean 	If "true", indicates this email address is the person's primary one. 	
-//			objectType 	string 	Type of person within Google+. Possible values are:
-//
-//			    "person" - represents an actual person.
-//			    "page" - represents a page.
-//
-//				
-//			etag 	etag 	ETag of this response for caching purposes.
-			
+			if(db.has(RELATIONSHIP_STATUS)) person.setRelationshipStatus(db.getString(RELATIONSHIP_STATUS));
+			parseUrls(db, person);
+			parseOrganizations(db, person);			
+			parsePlacesLived(db, person);
+			if(db.has(TAGLINE)) person.setStatus(db.getString(TAGLINE));
+			parseEmails(db, person);			
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
@@ -187,7 +152,7 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 		return person;
 	}
 	
-	private void parseName(JSONObject json, Person person) throws JSONException {
+	private void parseName(JSONObject json, Person person) throws JSONException { // middleName not supported by shindig
 		if(json.has(NAME)) {
 			JSONObject jsonName = json.getJSONObject(NAME);	
 			Name name = new NameImpl();
@@ -196,8 +161,7 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 			if(jsonName.has(FAMILY_NAME))
 				name.setFamilyName(jsonName.getString(FAMILY_NAME));
 			if(jsonName.has(GIVEN_NAME))
-				name.setGivenName(jsonName.getString(GIVEN_NAME));
-																			// TODO middleName not supported by shindig 	
+				name.setGivenName(jsonName.getString(GIVEN_NAME));																			 	
 			if(jsonName.has(HONORIFIC_PREFIX))
 				name.setHonorificPrefix(jsonName.getString(HONORIFIC_PREFIX));
 			if(jsonName.has(HONORIFIC_SUFFIX))
@@ -206,7 +170,16 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 		}
 	}
 	
-	private void parseGender(JSONObject json, Person person) throws JSONException { // TODO gender 'other' not supported by shindig 
+	private void parseBirthday(JSONObject json, Person person) throws JSONException {
+		if(json.has(BIRTHDAY)) {
+			String birthday = json.getString(BIRTHDAY);
+			Date birthdayDate = parseDate(birthday, BIRTHDAY_DATE_FORMAT);
+			if(birthdayDate != null)
+				person.setBirthday(birthdayDate);
+		}
+	}
+	
+	private void parseGender(JSONObject json, Person person) throws JSONException { // gender 'other' not supported by shindig 
 		if(json.has(GENDER)) {
 			String gender = json.getString(GENDER);
 			if(gender.equals("male"))
@@ -214,6 +187,132 @@ public class PersonConverterFromGooglePlus implements PersonConverter {
 			else if(gender.equals("female"))
 				person.setGender(Gender.male);
 		}
+	}
+	
+	private void parseCurrentLocation(JSONObject json, Person person) throws JSONException {
+		if(json.has(CURRENT_LOCATION)) {
+			String currentLocation = json.getString(CURRENT_LOCATION);
+			Address currentLocationAddress = parseAddress(currentLocation);
+			person.setCurrentLocation(currentLocationAddress);
+		}
+	}
+	
+	private void parseLanguagesSpoken(JSONObject json, Person person) throws JSONException {
+		if(json.has(LANGUAGES_SPOKEN)) {
+			JSONArray jsonLanguages = json.getJSONArray(LANGUAGES_SPOKEN);
+			List<String> languagesSpoken = new ArrayList<String>(jsonLanguages.length());
+			for(int i=0; i<jsonLanguages.length(); i++)
+				languagesSpoken.add(jsonLanguages.getString(i));
+			person.setLanguagesSpoken(languagesSpoken);
+		}
+	}
+	
+	private void parseUrls(JSONObject json, Person person) throws JSONException {
+		if(json.has(URLS)) {
+			JSONArray jsonUrls = json.getJSONArray(URLS);
+			List<Url> urls = new ArrayList<Url>(jsonUrls.length());
+			for(int i=0; i<jsonUrls.length(); i++) {
+				Url url = new UrlImpl();
+				if(jsonUrls.getJSONObject(i).has(VALUE))
+					url.setValue(jsonUrls.getJSONObject(i).getString(VALUE));	
+				if(jsonUrls.getJSONObject(i).has(TYPE))
+					url.setType(jsonUrls.getJSONObject(i).getString(TYPE));
+				if(jsonUrls.getJSONObject(i).has(PRIMARY))
+					url.setPrimary(jsonUrls.getJSONObject(i).getBoolean(PRIMARY));
+				urls.add(url);
+			}
+			person.setUrls(urls);
+		}
+	}
+	
+	private void parseOrganizations(JSONObject json, Person person) throws JSONException { // organizations[].department 	not supported by shindig
+		if(json.has(ORGANIZATIONS)) {
+			JSONArray jsonOrganizations = json.getJSONArray(ORGANIZATIONS);			
+			List<Organization> organizations = new ArrayList<Organization>(jsonOrganizations.length());
+			for(int i=0; i<jsonOrganizations.length(); i++) {
+				Organization organization = new OrganizationImpl();
+				if(jsonOrganizations.getJSONObject(i).has(NAME))
+					organization.setName(jsonOrganizations.getJSONObject(i).getString(NAME));
+				if(jsonOrganizations.getJSONObject(i).has(TITLE))
+					organization.setTitle(jsonOrganizations.getJSONObject(i).getString(TITLE));
+				if(jsonOrganizations.getJSONObject(i).has(TYPE))
+					organization.setType(jsonOrganizations.getJSONObject(i).getString(TYPE));
+				if(jsonOrganizations.getJSONObject(i).has(START_DATE)) {
+					Date startDate = parseDate(jsonOrganizations.getJSONObject(i).getString(START_DATE), ORGANIZATION_START_DATE_FORMAT);
+					if(startDate != null)
+						organization.setStartDate(startDate);
+				}
+				if(jsonOrganizations.getJSONObject(i).has(END_DATE)) {
+					Date endDate = parseDate(jsonOrganizations.getJSONObject(i).getString(END_DATE), ORGANIZATION_END_DATE_FORMAT);
+					if(endDate != null)
+						organization.setEndDate(endDate);
+				}
+				if(jsonOrganizations.getJSONObject(i).has(LOCATION))
+					organization.setAddress(parseAddress(jsonOrganizations.getJSONObject(i).getString(LOCATION)));
+				if(jsonOrganizations.getJSONObject(i).has(DESCRIPTION))
+					organization.setDescription(jsonOrganizations.getJSONObject(i).getString(DESCRIPTION));
+				if(jsonOrganizations.getJSONObject(i).has(PRIMARY))
+					organization.setPrimary(jsonOrganizations.getJSONObject(i).getBoolean(PRIMARY));
+				
+				organizations.add(organization);
+			}
+			
+			person.setOrganizations(organizations);	
+		}
+	}
+	
+	private void parsePlacesLived(JSONObject json, Person person) throws JSONException {
+		if(json.has(PLACES_LIVED)) {
+			JSONArray jsonPlaces = json.getJSONArray(PLACES_LIVED);
+			List<Address> addresses = new ArrayList<Address>(jsonPlaces.length());
+			for(int i=0; i<jsonPlaces.length(); i++) {
+				Address address;
+				if(jsonPlaces.getJSONObject(i).has(VALUE))
+					address = parseAddress(jsonPlaces.getJSONObject(i).getString(VALUE));
+				else
+					address = new AddressImpl();
+				if(jsonPlaces.getJSONObject(i).has(PRIMARY))
+					address.setPrimary(jsonPlaces.getJSONObject(i).getBoolean(PRIMARY));
+				addresses.add(address);
+			}				
+			person.setAddresses(addresses);
+			
+		}
+	}
+	
+	private void parseEmails(JSONObject json, Person person) throws JSONException {
+		if(json.has(EMAILS)) {
+			JSONArray jsonEmails = json.getJSONArray(EMAILS);
+			List<ListField> emails = new ArrayList<ListField>(jsonEmails.length());
+			for(int i=0; i<jsonEmails.length(); i++) {
+				ListField email = new ListFieldImpl();
+				if(jsonEmails.getJSONObject(i).has(VALUE))
+					email.setValue(jsonEmails.getJSONObject(i).getString(VALUE));
+				if(jsonEmails.getJSONObject(i).has(TYPE))
+					email.setType(jsonEmails.getJSONObject(i).getString(TYPE));
+				if(jsonEmails.getJSONObject(i).has(PRIMARY))
+					email.setPrimary(jsonEmails.getJSONObject(i).getBoolean(PRIMARY));
+				emails.add(email);
+			}
+			person.setEmails(emails);
+		}
+	}
+	
+	private Date parseDate(String dateString, String format) {
+		Date date = null;
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		try {
+			date = sdf.parse(dateString);
+			
+		} catch (ParseException e) {
+			LOG.error("Invalid date '"+dateString+"' for format '"+format+"'.", e);
+		}
+		return date;
+	}
+	
+	private Address parseAddress(String addressString) {
+		Address address = new AddressImpl(addressString);
+		return address;
 	}
 
 }
