@@ -49,4 +49,7 @@
 	<artifact type="bundle" name="org.societies.cis.CisDirectoryClient" />
 	<artifact type="bundle" name="org.societies.cis.manager" />
 
+    <artifact type="bundle" name="org.societies.integration.test.bit.createcis" />
+
+
 </plan>

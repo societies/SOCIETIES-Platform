@@ -138,7 +138,7 @@ CISSimulator sim = new CISSimulator(10,10);
 		final ArrayList<IActivity> actDiff = new ArrayList<IActivity>();
         ApplicationContextLoader loader = new ApplicationContextLoader();
         loader.load(sim, "SimTest-context.xml");
-		sim.getActFeed().setSession(sim.getSessionFactory().openSession());
+		sim.getActFeed().setSessionFactory(sim.getSessionFactory());
 		cises = new ArrayList<ICisOwned>();
 		sim.setMaxActs(2000);
 		cises.add(sim.simulate(1));

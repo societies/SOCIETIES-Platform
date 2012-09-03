@@ -175,7 +175,7 @@ public class CISSimulator implements IActivityFeedCallback {
 		
         ApplicationContextLoader loader = new ApplicationContextLoader();
         loader.load(sim, "SimTest-context.xml");
-		sim.getActFeed().setSession(sim.getSessionFactory().openSession());
+		sim.getActFeed().setSessionFactory(sim.getSessionFactory());
         sim.simulate(1);
         sim.maxActs = 2000;
         
