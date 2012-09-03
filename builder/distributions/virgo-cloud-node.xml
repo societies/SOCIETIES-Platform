@@ -80,6 +80,7 @@
 		<!-- Context Management: 9 bundles (can some be merged?) -->
 		<module>../../context-management</module>
 		<module>../../context-management/context-cloud-bundle/</module>
+		<module>../../context-management/LocationManagement/</module>
 
 		<!-- User Agent: 3 bundles (can these be merged?)-->
 		<module>../../user-agent</module>
