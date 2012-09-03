@@ -47,7 +47,7 @@ public interface IAndroidCSSManager {
 	String methodsArray [] = {"registerXMPPServer(String client, AndroidCSSRecord profile)",
 			"unregisterXMPPServer(String client, AndroidCSSRecord profile)",
 			"loginXMPPServer(String client, AndroidCSSRecord profile)",
-			"logoutXMPPServer(String client, AndroidCSSRecord profile)",
+			"logoutXMPPServer(String client)",
 			"loginCSS(String client, AndroidCSSRecord profile)", 
 			"logoutCSS(String client, AndroidCSSRecord profile)",
 			"registerCSS(String client, AndroidCSSRecord profile)",
@@ -86,7 +86,7 @@ public interface IAndroidCSSManager {
 	 * @param client component package calling method
 	 * @param profile
 	 */
-	void logoutXMPPServer(String client, AndroidCSSRecord profile);
+	void logoutXMPPServer(String client);
 
 	
 	/**

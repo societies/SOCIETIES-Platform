@@ -28,16 +28,26 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 import java.util.HashMap;
+
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.context.model.CtxAttribute;
 
+
+
 /**
- *
- */
-/**
+ * This interface is mainly a container for passing the parameter
+ * Membership Criteria into the {@link ICisManager} and {@link ICis} 
+ * related calls. This interface only provides getters and setters 
+ * to the membership criteria.
  * 
- * MISSING_JAVADOCS
+ * @author      John McGovern
+ * @author      Thomas Vilarinho
+ * 
  */
+
+
+
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public class MembershipCriteria {
 	private Rule theRule;

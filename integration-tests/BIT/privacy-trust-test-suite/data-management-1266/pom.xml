@@ -40,6 +40,12 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- Tools -->
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Test -->
 		<dependency>
 			<groupId>org.societies.integration.test.util</groupId>
@@ -61,17 +67,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<!-- Logs -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>4.1.0</version>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 
 	<build>

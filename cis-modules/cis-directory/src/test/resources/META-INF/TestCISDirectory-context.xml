@@ -42,14 +42,13 @@
 		<property name="annotatedClasses">
 			<list>
 				<value>org.societies.cis.directory.model.CisAdvertisementRecordEntry</value>
+				<value>org.societies.cis.directory.model.CriteriaRecordEntry</value>
 			</list>
 		</property>
 
 		<property name="annotatedPackages">
-			<list>
-				
-				<value>org.societies.cis.directory.model
-				</value>
+			<list>				
+				<value>org.societies.cis.directory.model</value>
 			</list>
 		</property>
 

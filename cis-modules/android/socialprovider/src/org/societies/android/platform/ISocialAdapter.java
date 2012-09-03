@@ -77,4 +77,10 @@ public interface ISocialAdapter {
      */
     public int connect(String username, String password);
     public int disconnect();
+    
+    /**
+	 * Retrieves the list of CISs owned by CIS Manager
+	 * 
+	 * @return list of {@link ICisOwned} in the callback object*/
+	public void getListOfOwnedCis(ISocialAdapterCallback callback);
     }

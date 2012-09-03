@@ -24,17 +24,45 @@
  */
 package org.societies.orchestration.cpa.test;
 
-import java.util.HashMap;
-import java.util.Set;
-
+import org.hibernate.SessionFactory;
+import org.societies.activity.ActivityFeed;
+import org.societies.activity.model.Activity;
+import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.schema.activity.Activity;
-import org.societies.cis.manager.Cis;
+import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.orchestration.cpa.impl.CPACreationPatterns;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class CISSimulator {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+public class CISSimulator implements IActivityFeedCallback {
 	private HashMap<String,HashMap<String,Double>> userToUserMap;
 	private int messagesperuserperday;
+	private int users;
+	@Autowired
+	private ActivityFeed actFeed;
+	@Autowired
+	private SessionFactory sessionFactory;
+	private int maxActs = 2000;
+	public int getMaxActs() {
+		return maxActs;
+	}
+
+	public void setMaxActs(int maxActs) {
+		this.maxActs = maxActs;
+	}
+
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
 	public CISSimulator(int initUsers, int messagesperuserperday)
 	{
 		this.messagesperuserperday = messagesperuserperday;
@@ -42,6 +70,14 @@ public class CISSimulator {
 		init(initUsers);
 	}
 	
+	public ActivityFeed getActFeed() {
+		return actFeed;
+	}
+
+	public void setActFeed(ActivityFeed actFeed) {
+		this.actFeed = actFeed;
+	}
+
 	public void init(int initUsers){
 		String base = "user";
 		for(int i = 0;i<initUsers;i++){
@@ -51,11 +87,14 @@ public class CISSimulator {
 		Object[] keyArr = keySet.toArray();
 		int arrsize = keyArr.length;
 		for(int i=0;i<arrsize;i++){
-			for(int i2=0;i2<arrsize/2;i2++){
-				if(i!=i2)
-					setUserToUserRate((String)keyArr[i],(String)keyArr[i2],Math.random());
+			for(int i2=0;i2<arrsize;i2++){
+				if(i!=i2){
+					System.out.println("adding connection from "+(String)keyArr[i]+" to "+(String)keyArr[i2]);
+					setUserToUserRate((String)keyArr[i],(String)keyArr[i2],Math.abs(Math.random()-0.31d));
+				}
 			}
 		}
+		this.users = initUsers;
 	}
 	/*
 	 * 
@@ -69,15 +108,55 @@ public class CISSimulator {
 		userToUserMap.put(user, new HashMap<String,Double>());
 	}
 	public ICisOwned simulate(long days){
-		ICisOwned ret = new Cis();
+		ICISSimulated ret = new ICISSimulated();
+		ret.setFeed(actFeed);
 		for(String user : userToUserMap.keySet()){
-//			try {
-//				ret.addMember(user,"member");
-//			} catch (CommunicationException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+			try {
+				ret.addMember(user,"member");
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		//sample every "minute"
+		long daysGone=0;
+		List<String> usersList = ret.getUsers();
+		Activity act = null; String user1, user2;
+		long timecounter = System.currentTimeMillis()-(daysGone*24L*3600L*1000L);
+		long msgCounter = 0;
+		while(daysGone<days){
+			for(int i=0;i<(24*60);i++){
+				for(int u1=0;u1<users;u1++){
+					for(int u2=0;u2<users;u2++){
+						if(u1==u2)
+							continue;
+						
+						user1=usersList.get(u1);
+						user2=usersList.get(u2);
+						if(Math.random()>this.userToUserMap.get(user1).get(user2)){
+							System.out.println("msgCounter: "+ (++msgCounter) + " maxActs: "+maxActs+" count: "+((ActivityFeed)ret.getFeed()).count());
+							ret.getActivityFeed().addActivity(makeMessage(user1,user2,"message",Long.toString((long)(Math.random()*(24L*3600L*1000L)))),this); //add message to random time of this day given probabilities in the table..
+						}
+						if(msgCounter > this.maxActs){
+							break;
+						}
+					}
+					if(msgCounter > this.maxActs){
+						break;
+					}
+					
+				}
+				if(msgCounter > this.maxActs){
+					break;
+				}
+				
+			}
+			if(msgCounter > this.maxActs){
+				break;
+			}
+			timecounter += (24L*3600L*1000L);
+		}
+		System.out.println("ret.getFeed(): "+ret.getFeed()+ " ret.getFeed().count(): "+((ActivityFeed)ret.getFeed()).count());
 		return ret;
 	}
 	public Activity makeMessage(String user1, String user2, String message, String published){
@@ -92,7 +171,20 @@ public class CISSimulator {
 	public static void main(String[] args){
 		CISSimulator sim = new CISSimulator(10,10);
 		
-		
-		
+        ApplicationContextLoader loader = new ApplicationContextLoader();
+        loader.load(sim, "SimTest-context.xml");
+		sim.getActFeed().setSession(sim.getSessionFactory().openSession());
+        sim.simulate(1);
+        sim.maxActs = 2000;
+        
+        CPACreationPatterns cpa = new CPACreationPatterns();
+        cpa.init();
+        cpa.analyze(sim.getActFeed().getActivities("0"+Long.toString(System.currentTimeMillis()+100000000L)));
+        
 	}
+
+    @Override
+    public void receiveResult(Activityfeed activityFeedObject) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

@@ -179,7 +179,7 @@ public class Tester {
 			IPrivacyPreference privacyPreference = new PrivacyPreference(outcome);
 			PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(CtxAttributeTypes.NAME, privacyPreference);
 			model.setRequestor(requestor);
-			model.setAffectedCtxId(nameAttribute.getId());
+			model.setAffectedDataId(nameAttribute.getId());
 			PPNPreferenceDetails details = new PPNPreferenceDetails(CtxAttributeTypes.NAME);
 			details.setRequestor(requestor);
 			this.privPrefMgr.storePPNPreference(details, privacyPreference);
@@ -209,7 +209,7 @@ public class Tester {
 			IPrivacyPreference privacyPreference2 = new PrivacyPreference(outcome2);
 			PPNPrivacyPreferenceTreeModel model2 = new PPNPrivacyPreferenceTreeModel(CtxAttributeTypes.NAME, privacyPreference2);
 			model2.setRequestor(requestor);
-			model2.setAffectedCtxId(nameAttribute2.getId());
+			model2.setAffectedDataId(nameAttribute2.getId());
 			PPNPreferenceDetails details2 = new PPNPreferenceDetails(CtxAttributeTypes.NAME);
 			details2.setRequestor(requestor);
 			this.privPrefMgr.storePPNPreference(details2, privacyPreference2);

@@ -61,16 +61,16 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	public static final int TIMEOUT = 10000;
 	
 	private final static List<String> NAMESPACES = Collections
-			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
+			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub#event",
+					"http://jabber.org/protocol/pubsub",
    					"http://jabber.org/protocol/pubsub#errors",
    					"http://jabber.org/protocol/pubsub#owner",
-   					"http://jabber.org/protocol/pubsub#event",
    					"jabber:x:data"));
 	private static final List<String> PACKAGES = Collections
-			.unmodifiableList(Arrays.asList("org.jabber.protocol.pubsub",
+			.unmodifiableList(Arrays.asList("org.jabber.protocol.pubsub.event",
+					"org.jabber.protocol.pubsub",
 					"org.jabber.protocol.pubsub.errors",
 					"org.jabber.protocol.pubsub.owner",
-					"org.jabber.protocol.pubsub.event",
 					"jabber.x.data"));
 	
 	private static Logger LOG = LoggerFactory
@@ -552,5 +552,11 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		for(int i=2; i<packArr.length; i++)
 			ns+="/" + packArr[i]; 
 		return ns;
+	}
+
+	@Override
+	public void addSimpleClasses(List<String> classList)
+			throws ClassNotFoundException {
+		// TODO Auto-generated method stub
 	}
 }

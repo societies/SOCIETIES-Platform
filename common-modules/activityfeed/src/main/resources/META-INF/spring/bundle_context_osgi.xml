@@ -31,7 +31,4 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-<!-- 	<osgi:reference id="societiesDataSource" interface="javax.sql.DataSource"/>
-	<osgi:service ref="actFeed" interface="org.societies.api.activity.IActivityFeed"/>
-	<osgi:reference id="sessionFactory" interface="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"/> -->
 </beans>

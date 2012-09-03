@@ -1,0 +1,22 @@
+{
+	"CISManagerService" : {
+		"exceptionThreshold" : 0,
+		"createCIS" : {
+
+						"cisName": "barcelona fc",
+	                    "cisType": "futebol",
+	                    "cisOwner": "thomas@soc.com",
+	                    "cisCriteria": [
+	                    	{
+	                        "attribute": "religion",
+	                        "operation": "equals",
+	                        "value": "Protestant"},
+	                        {
+	                        "attribute": "location",
+	                        "operation": "equals",
+	                        "value": "Peru"}
+	                        ],
+	                    "cisDescription": "soh barca",
+	                    "cisRecordIdentity" : "barca.soc.com"}
+	}
+}

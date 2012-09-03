@@ -158,7 +158,6 @@ public class LocalDBAdapter implements ISocialAdapter {
 	 * @see org.societies.android.platform.ISocialAdapter#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
 	 */
 	
-	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
 		// TODO Delete.
@@ -198,7 +197,6 @@ public class LocalDBAdapter implements ISocialAdapter {
 /* (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#insert(android.net.Uri, android.content.ContentValues)
 	 */
-	@Override
 	public Uri insert(Uri uri, ContentValues values) {
 		// TODO Make a case and call proper private method with values.
 		
@@ -240,7 +238,6 @@ public class LocalDBAdapter implements ISocialAdapter {
 	/* (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
 	 */
-	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
 		// TODO Auto-generated method stub
@@ -289,7 +286,6 @@ public class LocalDBAdapter implements ISocialAdapter {
 	/* (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#delete(android.net.Uri, java.lang.String, java.lang.String[])
 	 */
-	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		// TODO Auto-generated method stub
 		return 0;
@@ -336,7 +332,6 @@ public class LocalDBAdapter implements ISocialAdapter {
 /* (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#isOnline()
 	 */
-	@Override
 	public boolean isConnected() {
 		// TODO Auto-generated method stub
 		return false;
@@ -347,7 +342,6 @@ public class LocalDBAdapter implements ISocialAdapter {
 	 * (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#connect()
 	 */
-	@Override
 	public int connect() {
 		//TODO: try not to keep the DB open. just test getWritable here. then let methods open and close.
 		try{
@@ -367,7 +361,6 @@ public class LocalDBAdapter implements ISocialAdapter {
 	 * (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#disconnect()
 	 */
-	@Override
 	public int disconnect(){
 		if (db.isOpen()){
 		db.close();
@@ -383,7 +376,6 @@ public class LocalDBAdapter implements ISocialAdapter {
 	 * (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#connect(java.lang.String, java.lang.String)
 	 */
-	@Override
 	public int connect(String username, String password) {
 		// TODO Auto-generated method stub
 		return connect();
@@ -397,5 +389,13 @@ public class LocalDBAdapter implements ISocialAdapter {
 			android.util.Log.d(TAG, ": Checked that DB does not exist:"+e.getMessage());
 			return true;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.android.platform.ISocialAdapter#getListOfOwnedCis(org.societies.android.platform.ISocialAdapterCallback)
+	 */
+	public void getListOfOwnedCis(ISocialAdapterCallback callback) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<controller
+    id="1"
+    IPAddress="192.168.0.30"
+    location="LearningZone" >
+
+    <mats>
+
+        <mat
+            id="IN1" type="bool"
+            location="FrontOfScreen1" />
+
+        <mat
+            id="IN2" type="bool"
+            location="RightOfScreen1" />
+
+        <mat
+            id="IN3" type="bool"
+            location="LeftOfScreen1" />
+    </mats>
+
+</controller>

@@ -25,40 +25,13 @@
 
 package org.societies.cis.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Future;
-
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.JoinColumn;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.annotations.CollectionOfElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.activity.ActivityFeed;
+import org.societies.activity.PersistedActivityFeed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.attributes.MembershipCriteria;
@@ -81,38 +54,18 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyM
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
-import org.societies.api.schema.activityfeed.Activityfeed;
-import org.societies.api.schema.activityfeed.AddActivityResponse;
-import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
-import org.societies.api.schema.activityfeed.DeleteActivityResponse;
-import org.societies.api.schema.activityfeed.GetActivitiesResponse;
-import org.societies.api.schema.cis.community.AddMemberResponse;
-import org.societies.api.schema.cis.community.Community;
-import org.societies.api.schema.cis.community.Criteria;
-import org.societies.api.schema.cis.community.DeleteMemberResponse;
-//import org.societies.api.schema.cis.community.GetInfo;
-import org.societies.api.schema.cis.community.CommunityMethods;
-import org.societies.api.schema.cis.community.GetInfo;
-import org.societies.api.schema.cis.community.GetInfoResponse;
-import org.societies.api.schema.cis.community.GetMembershipCriteria;
-import org.societies.api.schema.cis.community.GetMembershipCriteriaResponse;
-import org.societies.api.schema.cis.community.Join;
-import org.societies.api.schema.cis.community.JoinResponse;
-import org.societies.api.schema.cis.community.LeaveResponse;
-import org.societies.api.schema.cis.community.MembershipCrit;
-import org.societies.api.schema.cis.community.Participant;
-import org.societies.api.schema.cis.community.ParticipantRole;
-import org.societies.api.schema.cis.community.Qualification;
-import org.societies.api.schema.cis.community.SetInfoResponse;
-import org.societies.api.schema.cis.community.SetMembershipCriteriaResponse;
-import org.societies.api.schema.cis.community.Who;
-import org.societies.api.schema.cis.manager.CommunityManager;
-import org.societies.api.schema.cis.manager.DeleteMemberNotification;
-import org.societies.api.schema.cis.manager.DeleteNotification;
-import org.societies.api.schema.cis.manager.Notification;
-import org.societies.api.schema.cis.manager.SubscribedTo;
+import org.societies.api.schema.activityfeed.*;
+import org.societies.api.schema.cis.community.*;
+import org.societies.api.schema.cis.manager.*;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.springframework.scheduling.annotation.AsyncResult;
+
+import javax.persistence.*;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Future;
+
+//import org.societies.api.schema.cis.community.GetInfo;
 
 /**
  * @author Thomas Vilarinho (Sintef)
@@ -168,7 +121,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	//@OneToOne(cascade=CascadeType.ALL)
 	@Transient
-	public ActivityFeed activityFeed = new ActivityFeed();
+	public PersistedActivityFeed activityFeed = new PersistedActivityFeed();
 	//TODO: should this be persisted?
 	@Transient
 	private ICommManager CISendpoint;
@@ -358,7 +311,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 
 
-	private void setActivityFeed(ActivityFeed activityFeed) {
+	private void setActivityFeed(PersistedActivityFeed activityFeed) {
 		this.activityFeed = activityFeed;
 	}
 
@@ -495,10 +448,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 		
-		session = sessionFactory.openSession();
+		//session = sessionFactory.openSession();
 		System.out.println("activityFeed: "+activityFeed);
-		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
-		
+		activityFeed.startUp(sessionFactory,this.getCisId()); // this must be called just after the CisRecord has been set
+		this.sessionFactory = sessionFactory;
+        //activityFeed.setSessionFactory(this.sessionFactory);
 		this.persist(this);
 		
 		IActivity iActivity = new org.societies.activity.model.Activity();
@@ -551,7 +505,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		this.setSessionFactory(sessionFactory);
 
-		session = sessionFactory.openSession();
+		//session = sessionFactory.openSession();
 		
 		LOG.info("building criteria from db");
 		cisCriteria = new Hashtable<String, MembershipCriteria> ();
@@ -559,7 +513,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("done building criteria from db");
 		
 		
-		activityFeed.startUp(session,this.getCisId()); // this must be called just after the CisRecord has been set
+		activityFeed.startUp(sessionFactory,this.getCisId()); // this must be called just after the CisRecord has been set
 		activityFeed.getActivities("0 1339689547000");
 	}
 	
@@ -605,8 +559,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 		Notification n = new Notification();
 		SubscribedTo s = new SubscribedTo();
 		Community com = new Community();
-		com.setCommunityJid(this.getCisId());
+		this.fillCommmunityXMPPobj(com);
 		s.setRole(role.toString());
+		s.setCommunity(com);
 		n.setSubscribedTo(s);
 		cMan.setNotification(n);
 		
@@ -1366,8 +1321,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		
 
-		if(session!=null)
-			session.close();
+		//if(session!=null)
+		//	session.close();
 		//**** end of delete all members and send them a xmpp notification 
 		
 		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
@@ -1487,6 +1442,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	// session related methods
 
 	private void persist(Object o){
+        Session session = this.sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.save(o);
@@ -1500,6 +1456,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			LOG.warn("Saving CIS object failed, rolling back");
 		}finally{
 			if(session!=null){
+                session.close();
 			}
 			
 		}
@@ -1507,6 +1464,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	
 	
 	private void deletePersisted(Object o){
+        Session session = this.sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.delete(o);
@@ -1519,10 +1477,14 @@ public class Cis implements IFeatureServer, ICisOwned {
 			t.rollback();
 			LOG.warn("Deleting object in CisManager failed, rolling back");
 		}finally{
+            if(session!=null){
+                session.close();
+            }
 		}
 	}
 	
 	private void updatePersisted(Object o){
+        Session session = this.sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			session.update(o);
@@ -1535,6 +1497,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 			t.rollback();
 			LOG.warn("Updating CIS object failed, rolling back");
 		}finally{
+            if(session!=null){
+                session.close();
+            }
 			
 		}
 	}

@@ -237,6 +237,13 @@ public class PluginCSSManager extends Plugin {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3))) {
+				try {
+					this.localCSSManager.logoutXMPPServer(data.getString(0));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 

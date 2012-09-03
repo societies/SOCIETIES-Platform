@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Societies</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="Societies"/>
+
+	<script type="text/javascript" src="javascript/cordova/cordova-1.7.0.js"></script>
+	<!-- Uncomment line below to enable PhoneGap desktop and comment out real PhoneGap/Cordova JS library-->
+	<!-- script type="text/javascript" src="javascript/phonegapdesktop/phonegap-desktop.js"></script> -->
+
+	<link rel="stylesheet" type="text/css" href="css/custom/custom-theme-societies.css"/>
+	<link rel="stylesheet" type="text/css" href="css/jquerymobile/jquery.mobile-1.1.0.css"/>
+	<link rel="stylesheet" type="text/css" href="css/custom/societies.css"/>
+	
+	<script type="text/javascript" src="javascript/jquery/jquery-1.7.1.js" ></script>
+	<script type="text/javascript" src="javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
+		<!--JQM SlideMenu-->
+	<link rel="stylesheet" href="css/custom/jqm.css" />
+	<script src="javascript/jquerymobile/jqm.slidemenu.js"></script>
+	
+	<!-- App specific JS -->
+	
+	<!-- PhoneGap plugins -->
+	<script type="text/javascript" src="javascript/plugins/apppreferences_plugin.js"></script>
+	<script type="text/javascript" src="javascript/plugins/coreservicemonitor_plugin.js"></script>
+	<script type="text/javascript" src="javascript/plugins/cssmanager_plugin.js"></script>
+	<!--<script type="text/javascript" src="javascript/plugins/cismanager_plugin.js"></script-->
+	<!--script type="text/javascript" src="javascript/plugins/devicestatus_plugin.js"></script-->
+	
+	<!-- Functionality JS -->
+	<script type="text/javascript" src="javascript/pagespecific/mainpage.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/activeservices.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/activetasks.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/apppreferences.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/deviceinfo.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/devicemanager.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/devicestatus.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/login.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/logout.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/refreshcssrecord.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/registerxmpp.js"></script>
+	
+	<!-- Uncomment lines below to enable PhoneGap desktop-->
+	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/cssmanager.js"></script>
+	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/servicemonitor.js"></script>
+	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/devicestatus.js"></script>
+	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/preferences.js"></script>
+	<script type="text/javascript" src="javascript/phonegapdesktop/pluginjs/cismanager.js"></script>-->
+
+</head>
+<body>
+
+
+<!-- Start of first page: #index -->
+<div data-role="page" id="index">
+	<div data-role="content" class="login">
+		<div class="logo_login_wrapper">
+			<img class="logo_login" src="images/societies_landing.png" alt="societies logo"/>
+		</div>
+		<div class="form_wrapper">
+			<form id="login" action="index2.html" method="post" data-ajax="false">
+				<div data-role="fieldcontain">
+					<input type="text" value="Enter your Username" id="username" name="name" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
+				</div>
+				<div data-role="fieldcontain" class="ui-field-contain ui-body ui-br">
+					<input type="text" value="Enter your Password" id="password" name="password" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
+				</div>
+				<div data-role="fieldcontain">
+			    	<input type="text" value="Enter your Cloud Node" name="cloudNode" id="cloudnode" name="cloudnode" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c"/>
+				</div>
+				<div data-role="fieldcontain">
+			    	<input type="text" value="Chosen Identity Domain" name="identityDomain" id="identitydomain" />
+				</div>
+				<input id="connectXMPP" type="button" value="LOGIN" data-inline="true" data-theme="h"/> 
+				<!--a href="html/landing.html" id="connectXMPP" data-role="button" data-theme="h" data-inline="true" rel="external">LOGIN </a-->
+			</form>
+			<div class="sign_up">
+				Don't have a login? <a href="html/new_identity.html" data-ajax="false">Sign Up</a>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
