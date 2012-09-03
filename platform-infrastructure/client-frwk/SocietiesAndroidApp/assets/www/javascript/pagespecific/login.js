@@ -67,8 +67,8 @@ var SocietiesLogin = {
 		};
 
 		
-		SocietiesLogin.getCSSIdentity();
-		SocietiesLogin.getCSSIdentityPassword();
+//		SocietiesLogin.getCSSIdentity();
+//		SocietiesLogin.getCSSIdentityPassword();
 		SocietiesLogin.getCSSIdentityDomain();
 		SocietiesLogin.getCSSCloudNode();
 	},
@@ -162,6 +162,23 @@ var SocietiesLogin = {
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#password").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#identitydomain").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cloudNode", jQuery("#cloudnode").val());
+	},
+	/**
+	 * @methodOf SocietiesLogin#
+	 * @description clears the value of a given HTML element specified by its id
+	 * @returns null
+	 */
+	clearElementValue: function(elementId) {
+		jQuery(elementId).val("");
+	},
+	/**
+	 * @methodOf SocietiesLogin#
+	 * @description appends a value the value of a given HTML element specified by its id
+	 * @returns null
+	 */
+	appendElementValue: function(elementId, postfix) {
+		var currentValue = jQuery(elementId).val();
+		jQuery(elementId).val(currentValue + ": " + postfix);
 	},
 	/**
 	 * @methodOf SocietiesLogin#

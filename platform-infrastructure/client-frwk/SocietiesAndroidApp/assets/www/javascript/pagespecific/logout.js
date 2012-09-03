@@ -63,7 +63,7 @@ var SocietiesLogout = {
 jQuery(function() {
 	console.log("Logout jQuery calls");
 
-	$("#logoutIcon").click(function() {
+	$("#slide-logout").click(function() {
 		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulCSSCloudLogout);
 	});
 });
