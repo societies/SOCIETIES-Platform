@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="so_hello">Benvenuto, Welcome!!</string>
+    <string name="app_name">SocialApp</string>
+    <color name="white">#f8f8ff</color>
+    <string name="the_description_1">Per utilizzare al meglio l\'applicazione completa la procedura di registrazione</string>
+    <string name="sns_title">Add your Social Network</string>
+    <string name="sn_descr">Click on the icon and follow the instruction to connect your social network</string>
+</resources>
