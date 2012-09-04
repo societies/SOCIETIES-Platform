@@ -22,17 +22,28 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.location.management;
+package org.societies.context.location.management.api;
 
 import java.util.Collection;
-import java.util.Set;
-
-import org.societies.context.location.management.api.*;
 
 
-public interface PZWrapper {
+/**
+ * 
+ * This interface represents a full location of an entity in the system
+ *
+ * @author guyf@il.ibm.com
+ *
+ */
+public interface IUserLocation {
+	String getId();
+	void setId(String id);
+	ICoordinate getXCoordinate();
+	ICoordinate getYCoordinate();
+	void setXCoordinate(ICoordinate coordinate);
+	void setYCoordinate(ICoordinate coordinate);
+	Collection<IZone> getZones();
+	void setZones(Collection<IZone> zones);
 	
-	public Collection<IZone> getActiveZones();
-	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
-	public IUserLocation getEntityFullLocation(String entityId); 
+	
+	
 }

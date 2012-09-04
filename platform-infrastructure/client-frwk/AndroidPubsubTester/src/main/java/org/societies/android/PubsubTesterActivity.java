@@ -78,7 +78,7 @@ public class PubsubTesterActivity extends Activity {
     	protected Void doInBackground(PubsubClientAndroid... args) {
     		PubsubClientAndroid pubsubClient = args[0];	    	
 	        try {
-	        	IIdentity pubsubService = IdentityManagerImpl.staticfromJid("pubsub.societies.local");
+	        	IIdentity pubsubService = IdentityManagerImpl.staticfromJid("xcmanager.societies.local");
 	        	CalcBean item = new CalcBean();
 	        	item.setA(1);
 	        	item.setB(2);

@@ -1,0 +1,25 @@
+{
+	"kind": "plus#person",
+	"etag": "\"UJ7IJisMJ4TJsdYqocLXDCFnju0/y-8AyIuniaC_E8IhGAY9Z9Gnpwc\"",
+	"gender": "male",
+	"urls": [
+	{
+	"value": "https://plus.google.com/115778337721730871709",
+	"type": "profile"
+	},
+	{
+	"value": "https://www.googleapis.com/plus/v1/people/115778337721730871709",
+	"type": "json"
+	}
+	],
+	"id": "115778337721730871709",
+	"displayName": "Edgar Domingues",
+	"name": {
+	"familyName": "Domingues",
+	"givenName": "Edgar"
+	},
+	"url": "https://plus.google.com/115778337721730871709",
+	"image": {
+	"url": "https://lh5.googleusercontent.com/-fSaGRWburAI/AAAAAAAAAAI/AAAAAAAAAAA/v79LlZgAiyY/photo.jpg?sz=50"
+	}
+}

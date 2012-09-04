@@ -201,7 +201,8 @@ public class CreateCommunityCtx {
 	
 	protected  IIdentity createCISid() {
 
-		IIdentity cisID = null; 
+		IIdentity cisID = null;
+		IIdentity cssOwnerId = null;
 		ICisOwned cisOwned ;
 	
 		try {

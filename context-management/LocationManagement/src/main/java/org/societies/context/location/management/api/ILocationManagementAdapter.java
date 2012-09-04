@@ -1,3 +1,5 @@
+package org.societies.context.location.management.api;
+
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -22,17 +24,57 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.location.management;
+
 
 import java.util.Collection;
 import java.util.Set;
 
-import org.societies.context.location.management.api.*;
+/**
+ * 
+ * This is the API to interact with the backed location management system. 
+ * More methods to be followed. 
+ *
+ * @author guyf@il.ibm.com
+ *
+ */
 
-
-public interface PZWrapper {
-	
+public interface ILocationManagementAdapter {
+	/**
+	 * Returns all the active zone in the system, those that at least one device was identified in them.
+	 * @return
+	 */
 	public Collection<IZone> getActiveZones();
+	
+	/**
+	 * Returns all the devices' entity ids that were identified in the given zones. 
+	 * @return
+	 */
 	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
-	public IUserLocation getEntityFullLocation(String entityId); 
+	
+	/**
+	 * Returns the location of the given entity id.
+	 * @param entityId
+	 * @return
+	 */
+	public IUserLocation getEntityFullLocation(String entityId);
+	
+	
+	/**
+	 * Registers the given CSS device in the location management system
+	 * @param entityId
+	 * @param deviceId
+	 * @param macAddress
+	 * @return
+	 */
+	public void registerCSSdevice(String entityId,String deviceId,String macAddress);
+	
+	/**
+	 * Removes the given CSS device from the location management system
+	 * @param entityId
+	 * @param deviceId
+	 * @param macAddress
+	 * @return
+	 */
+	public void removeCSSdevice(String entityId,String deviceId,String macAddress);
+
 }

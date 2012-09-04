@@ -22,17 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.location.management;
+package org.societies.context.location.management.api.impl;
 
-import java.util.Collection;
-import java.util.Set;
-
-import org.societies.context.location.management.api.*;
+import org.societies.context.location.management.api.IZoneId;
 
 
-public interface PZWrapper {
+
+/**
+*
+* @author guyf@il.ibm.com
+* 
+*/
+public class ZoneIdImpl implements IZoneId{
 	
-	public Collection<IZone> getActiveZones();
-	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
-	public IUserLocation getEntityFullLocation(String entityId); 
+	long id;
+	
+	@Override
+	public long getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(long id) {
+		this.id = id;
+	}
+
 }

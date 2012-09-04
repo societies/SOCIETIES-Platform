@@ -22,17 +22,34 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.location.management;
+package org.societies.context.location.management.api;
 
 import java.util.Collection;
-import java.util.Set;
 
-import org.societies.context.location.management.api.*;
+/**
+ * 
+ * This interface represents a zone in the system. It contains some metadata attributes as description, name, type
+ * and in addition the zone Tags and a user personal tag.  
+ * The tagging concept is similar concept to the tagging in Gmail. A zone can have multiple tags such as 
+ * IBM zone, IBM Tel-Aviv zone, IBM office or Office number 10. Nevertheless it can have only one 
+ * personal tag, which is the personal tag the user gave to the zone (e.g. "Dan's room" or "My room").
+ *
+ * @author guyf@il.ibm.com
+ *
+ */
 
-
-public interface PZWrapper {
+public interface IZone {
+	IZoneId getId();
+	void setId(IZoneId zoneId);
+	String getDescription();
+	void setDescription(String description);
+	void setPersonalTag(ITag personalTag);
+	ITag getPersonalTag();
+	void setTags(Collection<ITag>tags);
+	Collection<ITag> getTags();
+	void setName(String name);
+	String getName();
+	void setType(String type);
+	String getType();
 	
-	public Collection<IZone> getActiveZones();
-	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
-	public IUserLocation getEntityFullLocation(String entityId); 
 }

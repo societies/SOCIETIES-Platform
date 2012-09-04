@@ -22,17 +22,32 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.location.management;
+package org.societies.context.location.management.api.impl;
 
-import java.util.Collection;
-import java.util.Set;
-
-import org.societies.context.location.management.api.*;
+import org.societies.context.location.management.api.ITag;
 
 
-public interface PZWrapper {
+/**
+*
+* @author guyf@il.ibm.com
+* 
+*/
+public class TagImpl implements ITag {
+
+	String tag;
 	
-	public Collection<IZone> getActiveZones();
-	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
-	public IUserLocation getEntityFullLocation(String entityId); 
+	public TagImpl(String tag){
+		this.tag = tag;
+	}
+	
+	@Override
+	public String getTag() {
+		return this.tag;
+	}
+
+	@Override
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
 }

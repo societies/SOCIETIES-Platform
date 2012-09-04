@@ -1,0 +1,165 @@
+{
+	"kind": "plus#activityFeed",
+	"etag": "\"UJ7IJisMJ4TJsdYqocLXDCFnju0/F1ujZQsCqWS75RP5knPfNkycMC8\"",
+	"nextPageToken": "CAIQ9d-938CMsgIgAg",
+	"selfLink": "https://www.googleapis.com/plus/v1/people/115778337721730871709/activities/public?",
+	"nextLink": "https://www.googleapis.com/plus/v1/people/115778337721730871709/activities/public?maxResults=20&pageToken=CAIQ9d-938CMsgIgAg",
+	"title": "Plus Public Activity Feed for Edgar Domingues",
+	"updated": "2012-08-29T09:21:11.844Z",
+	"id": "tag:google.com,2010:/plus/people/115778337721730871709/activities/public",
+	"items": [
+	{
+	"kind": "plus#activity",
+	"etag": "\"UJ7IJisMJ4TJsdYqocLXDCFnju0/808kHamo7pmkQJ7DPrhcpqK8G_o\"",
+	"title": "",
+	"published": "2012-08-29T09:21:11.000Z",
+	"updated": "2012-08-29T09:21:11.844Z",
+	"id": "z13rtf3afpalv34ax04chlvz4zyxuhaz5mw0k",
+	"url": "https://plus.google.com/115778337721730871709/posts/dzDgc4bvZNe",
+	"actor": {
+	"id": "115778337721730871709",
+	"displayName": "Edgar Domingues",
+	"name": {
+	"familyName": "Domingues",
+	"givenName": "Edgar"
+	},
+	"url": "https://plus.google.com/115778337721730871709",
+	"image": {
+	"url": "https://lh5.googleusercontent.com/-fSaGRWburAI/AAAAAAAAAAI/AAAAAAAAAAA/v79LlZgAiyY/photo.jpg?sz=50"
+	}
+	},
+	"verb": "post",
+	"object": {
+	"objectType": "note",
+	"content": "",
+	"originalContent": "",
+	"url": "https://plus.google.com/115778337721730871709/posts/dzDgc4bvZNe",
+	"replies": {
+	"totalItems": 0,
+	"selfLink": "https://www.googleapis.com/plus/v1/activities/z13rtf3afpalv34ax04chlvz4zyxuhaz5mw0k/comments"
+	},
+	"plusoners": {
+	"totalItems": 0,
+	"selfLink": "https://www.googleapis.com/plus/v1/activities/z13rtf3afpalv34ax04chlvz4zyxuhaz5mw0k/people/plusoners"
+	},
+	"resharers": {
+	"totalItems": 0,
+	"selfLink": "https://www.googleapis.com/plus/v1/activities/z13rtf3afpalv34ax04chlvz4zyxuhaz5mw0k/people/resharers"
+	},
+	"attachments": [
+	{
+	"objectType": "video",
+	"displayName": "Bootstrapping an agile project with continuous deployment using cloudbees",
+	"content": "Starting from scratch, this video demos how to quickly get to a fully agile project setup with continuous deployment. Everything is in the cloud - GIT repo, ...",
+	"url": "http://www.youtube.com/watch?v=hnCNJ5IYWFM",
+	"image": {
+	"url": "https://images0-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&gadget=a&resize_h=100&url=http%3A%2F%2Fi1.ytimg.com%2Fvi%2FhnCNJ5IYWFM%2Fhqdefault.jpg",
+	"type": "image/jpeg"
+	},
+	"embed": {
+	"url": "http://www.youtube.com/v/hnCNJ5IYWFM?version=3&autohide=1",
+	"type": "application/x-shockwave-flash"
+	}
+	}
+	]
+	},
+	"crosspostSource": "oz:115778337721730871709.13971b0c7c7.0",
+	"provider": {
+	"title": "Google+"
+	},
+	"access": {
+	"kind": "plus#acl",
+	"items": [
+	{
+	"type": "public"
+	},
+	{
+	"type": "person",
+	"id": "115778337721730871709"
+	}
+	]
+	}
+	},
+	{
+	"kind": "plus#activity",
+	"etag": "\"UJ7IJisMJ4TJsdYqocLXDCFnju0/6UQhgD3pmqrJVMzOw0_ud75mIKg\"",
+	"title": "Reshared post from Edgar Domingues",
+	"published": "2012-08-29T09:18:49.368Z",
+	"updated": "2012-08-29T09:18:49.368Z",
+	"id": "z12stxdpjpu1fn2ce23giztbzrindrtgr04",
+	"url": "https://plus.google.com/115778337721730871709/posts/2gjFN36tH1i",
+	"actor": {
+	"id": "115778337721730871709",
+	"displayName": "Edgar Domingues",
+	"name": {
+	"familyName": "Domingues",
+	"givenName": "Edgar"
+	},
+	"url": "https://plus.google.com/115778337721730871709",
+	"image": {
+	"url": "https://lh5.googleusercontent.com/-fSaGRWburAI/AAAAAAAAAAI/AAAAAAAAAAA/v79LlZgAiyY/photo.jpg?sz=50"
+	}
+	},
+	"verb": "share",
+	"object": {
+	"objectType": "activity",
+	"id": "z13pjtnxttqzv51rf04chlvz4zyxuhaz5mw0k",
+	"actor": {
+	"id": "115778337721730871709",
+	"displayName": "Edgar Domingues",
+	"url": "https://plus.google.com/115778337721730871709",
+	"image": {
+	"url": "https://lh5.googleusercontent.com/-fSaGRWburAI/AAAAAAAAAAI/AAAAAAAAAAA/v79LlZgAiyY/photo.jpg?sz=50"
+	}
+	},
+	"content": "",
+	"url": "https://plus.google.com/115778337721730871709/posts/gKHBd1cPjJ9",
+	"replies": {
+	"totalItems": 0,
+	"selfLink": "https://www.googleapis.com/plus/v1/activities/z12stxdpjpu1fn2ce23giztbzrindrtgr04/comments"
+	},
+	"plusoners": {
+	"totalItems": 0,
+	"selfLink": "https://www.googleapis.com/plus/v1/activities/z12stxdpjpu1fn2ce23giztbzrindrtgr04/people/plusoners"
+	},
+	"resharers": {
+	"totalItems": 0,
+	"selfLink": "https://www.googleapis.com/plus/v1/activities/z12stxdpjpu1fn2ce23giztbzrindrtgr04/people/resharers"
+	},
+	"attachments": [
+	{
+	"objectType": "video",
+	"displayName": "KOK in portugal O meeting",
+	"content": "Kok løperne gjorde en god jobb i POM 2012.\nHer ser du storløpere, som for eksempel: Holger Hott, Daniel Hubman og baptist rollier m fl.",
+	"url": "http://www.youtube.com/watch?v=yHo1cSSswy0",
+	"image": {
+	"url": "https://images0-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&gadget=a&resize_h=100&url=http%3A%2F%2Fytimg.googleusercontent.com%2Fvi%2FyHo1cSSswy0%2Fdefault.jpg",
+	"type": "image/jpeg"
+	},
+	"embed": {
+	"url": "http://www.youtube.com/v/yHo1cSSswy0?hl=en&fs=1&autoplay=1",
+	"type": "application/x-shockwave-flash"
+	}
+	}
+	]
+	},
+	"annotation": "",
+	"crosspostSource": "15794514385225146436",
+	"provider": {
+	"title": "Google+"
+	},
+	"access": {
+	"kind": "plus#acl",
+	"items": [
+	{
+	"type": "public"
+	},
+	{
+	"type": "person",
+	"id": "115778337721730871709"
+	}
+	]
+	}
+	}
+	]
+}
