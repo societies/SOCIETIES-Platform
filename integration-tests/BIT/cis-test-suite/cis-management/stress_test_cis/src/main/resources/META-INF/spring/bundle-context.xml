@@ -27,7 +27,7 @@
   		class="org.societies.integration.test.bit.createcis.TestCase" init-method="run">
 		<property name="commManager" ref="CommManagerBundle"/>
 		<property name="cisManager" ref="cisManager"/>
-		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
+		<!--<property name="privacyPolicyManager" ref="privacyPolicyManager"/>-->
   	</bean>
   	
   	
