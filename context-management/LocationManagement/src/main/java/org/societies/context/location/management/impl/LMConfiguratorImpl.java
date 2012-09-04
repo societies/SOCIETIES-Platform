@@ -36,12 +36,11 @@ import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.comm.ICommManagerController;
-import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.comm.EventsType;
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.schema.css.devicemanagement.DmEvent;
-import org.societies.context.api.user.location.ILocationManagementAdapter;
-import org.societies.context.api.user.location.ILocationManagementConfigurator;
+import org.societies.context.location.management.api.ILocationManagementAdapter;
+import org.societies.context.location.management.api.ILocationManagementConfigurator;
+
 
 
 public class LMConfiguratorImpl implements ILocationManagementConfigurator{
@@ -51,15 +50,15 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 	private PubsubClient pubSubManager; 
 	private ICommManager commManager;
 	private ICommManagerController commManagerController;
-	private IDeviceRegistry deviceRegistry;
+	//private IDeviceRegistry deviceRegistry;
 	private ILocationManagementAdapter iLocationManagementAdapter; 
 	 
-	public void init(PubsubClient pubSubManager,ICommManager commManager, IDeviceRegistry deviceRegistry, ICommManagerController commMngrController, ILocationManagementAdapter callback){
+	public void init(PubsubClient pubSubManager,ICommManager commManager, ICommManagerController commMngrController, ILocationManagementAdapter callback){
 		this.iLocationManagementAdapter = callback;
-		this.deviceRegistry = deviceRegistry;
+		//this.deviceRegistry = deviceRegistry;
 		this.pubSubManager = pubSubManager;
 		this.commManager = commManager;
-		this.deviceRegistry = deviceRegistry;
+		//this.deviceRegistry = deviceRegistry;
 		this.commManagerController = commMngrController;
 		
 		registerWithoutPubSub();
@@ -120,11 +119,11 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 			try{
 				dmEvent = (DmEvent)item;
 				
-				DeviceCommonInfo deviceCommonInfo = deviceRegistry.findDevice(dmEvent.getDeviceId());
-				String macAddress = deviceCommonInfo.getDevicePhysicalAddress();
-				String senderNodeId = dmEvent.getSenderNetworkNode();
+				//DeviceCommonInfo deviceCommonInfo = deviceRegistry.findDevice(dmEvent.getDeviceId());
+				//String macAddress = deviceCommonInfo.getDevicePhysicalAddress();
+				//String senderNodeId = dmEvent.getSenderNetworkNode();
 				
-				iLocationManagementAdapter.registerCSSdevice(senderNodeId, dmEvent.getDeviceId(), macAddress);
+				//iLocationManagementAdapter.registerCSSdevice(senderNodeId, dmEvent.getDeviceId(), macAddress);
 				
 				
 			}catch (Exception e) {
@@ -142,11 +141,11 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 			try{
 				dmEvent = (DmEvent)item;
 				
-				DeviceCommonInfo deviceCommonInfo = deviceRegistry.findDevice(dmEvent.getDeviceId());
-				String macAddress = deviceCommonInfo.getDevicePhysicalAddress();
-				String senderNodeId = dmEvent.getSenderNetworkNode();
+				//DeviceCommonInfo deviceCommonInfo = deviceRegistry.findDevice(dmEvent.getDeviceId());
+				//String macAddress = deviceCommonInfo.getDevicePhysicalAddress();
+				//String senderNodeId = dmEvent.getSenderNetworkNode();
 				
-				iLocationManagementAdapter.removeCSSdevice(senderNodeId, dmEvent.getDeviceId(), macAddress);
+				//iLocationManagementAdapter.removeCSSdevice(senderNodeId, dmEvent.getDeviceId(), macAddress);
 				
 			}catch (Exception e) {
 				e.printStackTrace();
@@ -155,14 +154,14 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 		}
 		
 	}
-	
+	/*
 	public IDeviceRegistry getDeviceRegistry() {
 		return deviceRegistry;
 	}
 
 	public void setDeviceRegistry(IDeviceRegistry deviceRegistry) {
 		this.deviceRegistry = deviceRegistry;
-	}
+	}*/
 
 	@Override
 	public Collection<String> getEntityIds() {

@@ -96,7 +96,13 @@
 		    <version>${release.version}</version>
 		    <scope>compile</scope>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.societies.platform</groupId>
+			<artifactId>GooglePlusConnector</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>	
 		
 		<!-- 
 		

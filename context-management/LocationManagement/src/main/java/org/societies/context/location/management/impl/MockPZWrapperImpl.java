@@ -31,16 +31,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.societies.context.api.user.location.ITag;
-import org.societies.context.api.user.location.IUserLocation;
-import org.societies.context.api.user.location.IZone;
-import org.societies.context.api.user.location.IZoneId;
-import org.societies.context.api.user.location.impl.CoordinateImpl;
-import org.societies.context.api.user.location.impl.TagImpl;
-import org.societies.context.api.user.location.impl.UserLocationImpl;
-import org.societies.context.api.user.location.impl.ZoneIdImpl;
-import org.societies.context.api.user.location.impl.ZoneImpl;
+import org.societies.context.location.management.api.*;
+import org.societies.context.location.management.api.impl.CoordinateImpl;
+import org.societies.context.location.management.api.impl.TagImpl;
+import org.societies.context.location.management.api.impl.UserLocationImpl;
+import org.societies.context.location.management.api.impl.ZoneIdImpl;
+import org.societies.context.location.management.api.impl.ZoneImpl;
 import org.societies.context.location.management.PZWrapper;
 
 

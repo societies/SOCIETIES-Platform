@@ -11,6 +11,7 @@ import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.stream.InputNode;
 import org.simpleframework.xml.stream.OutputNode;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -25,8 +26,6 @@ public class ItemConverterHelper {
 	private DocumentBuilder builder;
 	
 	public ItemConverterHelper(Serializer serializer) throws ParserConfigurationException {
-//		AnnotationStrategy stragegy = new AnnotationStrategy();
-//		this.serializer = new Persister(stragegy);
 		this.serializer = serializer;
 		builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	}
@@ -36,9 +35,11 @@ public class ItemConverterHelper {
 		if (node.getAttribute("id")!=null)
 			item.setId(node.getAttribute("id").getValue());
 		InputNode payloadNode = node.getNext();
-		Document d = builder.newDocument();
-		Element e = getElement(d, payloadNode);
-		item.setAny(e);
+		if (payloadNode!=null) {
+			Document d = builder.newDocument();
+			Element e = getElement(d, payloadNode);
+			item.setAny(e);
+		}
 		return item;
 	}
 	
@@ -47,9 +48,11 @@ public class ItemConverterHelper {
 		if (node.getAttribute("id")!=null)
 			item.setId(node.getAttribute("id").getValue());
 		InputNode payloadNode = node.getNext();
-		Document d = builder.newDocument();
-		Element e = getElement(d, payloadNode);
-		item.setAny(e);
+		if (payloadNode!=null) {
+			Document d = builder.newDocument();
+			Element e = getElement(d, payloadNode);
+			item.setAny(e);
+		}
 		return item;
 	}
 	
@@ -58,30 +61,27 @@ public class ItemConverterHelper {
 	}
 
 	public void write(OutputNode node, org.jabber.protocol.pubsub.Item value) throws Exception {
-		System.out.println("!!!!!!!!!! ItemConverterHelper.write pubsub.Item");
-		node.setAttribute("id", value.getId());
+		if (value.getId()!=null)
+			node.setAttribute("id", value.getId());
 		Object anyObject = value.getAny();
 		
 		if (anyObject!=null) {
 			Root rootAnnotation = anyObject.getClass().getAnnotation(Root.class);
 			Namespace namespaceAnnotation = anyObject.getClass().getAnnotation(Namespace.class);
 			if (rootAnnotation!=null && namespaceAnnotation!=null) {
-				System.out.println("!!!!!!!!!! anyObject is annotated");
-				System.out.println(anyObject.toString());
 				// simplexml annotated class
 				serializer.write(anyObject, node);
 			} else if (anyObject instanceof Element) {
-				System.out.println("!!!!!!!!!! anyObject is Element");
 				// generic xml container
 				writeElement(node,(Element) anyObject);
 			} else {
-				System.out.println("BODE A ESCREVER!");
+				throw new CommunicationException("Unable to serialize Pubsub Item of class "+anyObject.getClass());
 			}
 		}
 	}
 	
 	public void write(OutputNode node, org.jabber.protocol.pubsub.event.Item value) throws Exception {
-		System.out.println("!!!!!!!!!! ItemConverterHelper.write event.Item");
+		// when a notification is triggered "id" must be set
 		node.setAttribute("id", value.getId());
 		Object anyObject = value.getAny();
 		
@@ -89,16 +89,13 @@ public class ItemConverterHelper {
 			Root rootAnnotation = anyObject.getClass().getAnnotation(Root.class);
 			Namespace namespaceAnnotation = anyObject.getClass().getAnnotation(Namespace.class);
 			if (rootAnnotation!=null && namespaceAnnotation!=null) {
-				System.out.println("!!!!!!!!!! anyObject is annotated");
-				System.out.println(anyObject.toString());
 				// simplexml annotated class
 				serializer.write(anyObject, node);
 			} else if (anyObject instanceof Element) {
-				System.out.println("!!!!!!!!!! anyObject is Element");
 				// generic xml container
 				writeElement(node,(Element) anyObject);
 			} else {
-				System.out.println("BODE A ESCREVER!");
+				throw new CommunicationException("Unable to serialize Pubsub Item of class "+anyObject.getClass());
 			}
 		}
 	}

@@ -139,5 +139,16 @@ jQuery(function() {
 		}
 	});
 
+	$('#username').focus(function() {
+		SocietiesLogin.clearElementValue('#username')
+	});
+
+	$('#password').focus(function() {
+		SocietiesLogin.clearElementValue('#password')
+	});
+
+	$('#cloudnode').focus(function() {
+		SocietiesLogin.clearElementValue('#cloudnode')
+	});
 
 });

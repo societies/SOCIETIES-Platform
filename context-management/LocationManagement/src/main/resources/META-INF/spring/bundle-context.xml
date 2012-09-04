@@ -26,11 +26,11 @@
    
    <bean id="LMAdapterBean" 
        		 class="org.societies.context.location.management.impl.LMAdapterImpl" 
-       		 depends-on="CommManager,CommMngrController,ContextSourceManagement,ContextBroker,DmCommManager,DeviceRegistry" init-method="init">
+       		 depends-on="CommManager,CommMngrController,ContextSourceManagement,ContextBroker" init-method="init">
 			<property name="contextSourceManagement" ref="ContextSourceManagement" />
 			<property name="contextBroker" ref="ContextBroker" />
 			<property name="commManager" ref="CommManager" />
-			<property name="deviceRegistry" ref="DeviceRegistry" />
+			<!-- <property name="deviceRegistry" ref="DeviceRegistry" /> -->
 			<property name="pubSubManager" ref="PubsubClient"/>
 			<property name="commMngrController" ref="CommMngrController"/>
 			<property name="cssLocalManager" ref="CSSLocalManager"/>
