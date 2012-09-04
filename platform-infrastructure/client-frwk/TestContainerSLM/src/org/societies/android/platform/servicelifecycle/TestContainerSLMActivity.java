@@ -3,7 +3,7 @@ package org.societies.android.platform.servicelifecycle;
 import org.societies.android.api.internal.servicelifecycle.AService;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.platform.servicemonitor.ServiceManagement;
-import org.societies.android.platform.servicemonitor.CoreServiceMonitor.LocalBinder;
+import org.societies.android.platform.servicemonitor.ServiceManagement.LocalBinder;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -62,6 +62,10 @@ public class TestContainerSLMActivity extends Activity {
 	            //OBTAIN SERVICE DISCOVERY API
 	            serviceDisco = (IServiceDiscovery) binder.getService();
 	            serviceDiscoConnected = true;
+	            Log.d(LOG_TAG, "Successfully connected to IServiceDiscovery service");
+	            
+	            //EXECUTE NATIVE SERVICE API
+	            serviceDisco.getServices("TestContainerSLMActivity", "john.societies.local");
         	} catch (Exception ex) {
         		Log.d(LOG_TAG, "Error binding to service: " + ex.getMessage());
         	}
@@ -82,8 +86,6 @@ public class TestContainerSLMActivity extends Activity {
     	}
     	
     	protected Void doInBackground(Void... args) {
-    		if (serviceDiscoConnected)
-    			serviceDisco.getServices("TestContainerSLMActivity", "john.societies.local");
     		return null;
     	}
     }

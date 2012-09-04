@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="org.societies.platfrom.sns.android.socialapp"
+      android:versionCode="1"
+      android:versionName="1.0" android:installLocation="preferExternal">
+      
+	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
+    <application android:label="@string/app_name" android:icon="@drawable/keys_icon">
+        <activity android:name="org.societies.platfrom.sns.android.socialapp.SelectSNActivity"
+                  android:label="@string/app_name" android:theme="@android:style/Theme.Dialog">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+         
+         <!--    
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+				<category android:name="android.intent.category.BROWSABLE"></category>
+				<data android:scheme="CASingleSignon" android:host="ssoreturn" ></data>
+			</intent-filter>
+			             -->
+        </activity>
+        
+        <!--  <activity android:name=".WebActivity" android:label="web"></activity>  -->
+        <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity"></activity>
+        
+    </application>
+</manifest>
