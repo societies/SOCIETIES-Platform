@@ -1,16 +1,21 @@
-$(document).on("pageinit",":jqmData(role='page')", function(){
+$(document).on("pageinit",$("div[data-role='page'] [class*='ui-page-active']"), function(){
+
+	console.log("slide menu page init");
 
 	$(":jqmData(slidemenu)").addClass('slidemenu_btn');
 	var sm = $($(":jqmData(slidemenu)").data('slidemenu'));
 	sm.addClass('slidemenu');
 
-	$(document).on("swipeleft",":jqmData(role='page')", function(){
+	$(document).on("swipeleft",$("div[data-role='page'] [class*='ui-page-active']"), function(){
+		console.log("slide menu swipe left");
 		slidemenu(sm);
 	});
-	$(document).on("swiperight",":jqmData(role='page')", function(){
+	$(document).on("swiperight",$("div[data-role='page'] [class*='ui-page-active']"), function(){
+		console.log("slide menu swipe right");
 		slidemenu(sm);
 	});
 	$(document).on("click", ":jqmData(slidemenu)", function(event) {
+		console.log("slide menu click");
 		event.stopImmediatePropagation();
 		slidemenu(sm);
 	});
@@ -29,7 +34,7 @@ $(document).on("pageinit",":jqmData(role='page')", function(){
 			sm.css('width', w);
 			sm.height(viewport().height);
 
-			$(":jqmData(role='page')").css('left', w);
+			$("div[data-role='page'] [class*='ui-page-active']").css('left', w);
 		}
 
 	});
@@ -37,6 +42,7 @@ $(document).on("pageinit",":jqmData(role='page')", function(){
 });
 
 function slidemenu(sm, only_close) {
+	console.log("Current page: " + $.mobile.activePage[0].id);
 
 	sm.height(viewport().height);
 
@@ -45,7 +51,7 @@ function slidemenu(sm, only_close) {
 		sm.show();
 		var w = '240px';
 		sm.animate({width: w, avoidTransforms: false, useTranslate3d: true}, 'fast');
-		$(":jqmData(role='page')").css('left', w);
+		$("div[data-role='page'] [class*='ui-page-active']").css('left', w);
 		$(this).data('slideopen', true);
 
 		if ($(":jqmData(role='header')").data('position') == 'fixed') {
@@ -57,7 +63,7 @@ function slidemenu(sm, only_close) {
 	} else {
 		var w = '0px';
 		sm.animate({width: w, avoidTransforms: false, useTranslate3d: true}, 'fast', function(){sm.hide()});
-		$(":jqmData(role='page')").css('left', w);
+		$("div[data-role='page'] [class*='ui-page-active']").css('left', w);
 		$(this).data('slideopen', false);
 		$(":jqmData(slidemenu)").css('margin-left', '0px');
 	}
