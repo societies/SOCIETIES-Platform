@@ -129,7 +129,12 @@
 						<Export-Package>org.societies.api.internal.security.policynegotiator.*</Export-Package>
 						<_nouses>true</_nouses-->
 						<Embed-Transitive>false</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>
+						<Import-Package>
+							org.societies.api.identity,
+							org.societies.api.internal.domainauthority,
+							org.societies.api.internal.privacytrust.privacyprotection,
+							*;resolution:=optional
+						</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

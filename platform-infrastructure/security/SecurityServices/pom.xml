@@ -150,7 +150,26 @@
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>
+						<Import-Package>
+<!--							org.societies.api.identity,
+							org.societies.api.security.digsig,
+							org.societies.api.security.storage,
+							org.societies.api.internal.security.storage,
+							java.security,
+							java.security.cert,
+							org.slf4j,
+							java.io,
+							org.bouncycastle.jce.provider,
+							javax.xml.namespace,
+							javax.xml.parsers,
+							javax.xml.transform,
+							javax.xml.transform.dom,
+							javax.xml.transform.stream,
+							javax.xml.xpath,
+							org.w3c.dom,
+							org.xml.sax,-->
+							*;resolution:=optional
+						</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
