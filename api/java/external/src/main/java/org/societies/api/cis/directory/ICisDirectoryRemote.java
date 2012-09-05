@@ -78,6 +78,15 @@ public interface ICisDirectoryRemote {
 	 */
 	public void findForAllCis(CisAdvertisementRecord filteredcis, String filter, ICisDirectoryCallback callback);
 	
+	
+	/**
+	 * Search for a advertisement record based on CisID  in the CisDirectory
+	 *
+	 * @param cis_id ID of cis advertisment to return
+	 */
+	public void searchByID(String cisID, ICisDirectoryCallback callback);
+	
+	
 }
 
 

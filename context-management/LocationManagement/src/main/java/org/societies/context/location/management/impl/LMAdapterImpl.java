@@ -177,10 +177,10 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 				}
 				
 				/**** For testing *****/
-				userLocation = getEntityFullLocation("guy-phone");
+				/*userLocation = getEntityFullLocation("guy-phone");
 				if (userLocation != null){
 					locationInference.updateCSM(userLocation, commManager.getIdManager().getThisNetworkNode());
-				}
+				}*/
 				
 				log.info("--------------------- Update task finished");
 			}catch (Exception e) {
