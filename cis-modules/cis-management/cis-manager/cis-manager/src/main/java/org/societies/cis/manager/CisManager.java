@@ -272,6 +272,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	}
 	public void init(){
+		
+		this.isDepencyInjectionDone(); // TODO: move this to other parts of the code and
+		// throw exceptions
+		
 		while (iCommMgr.getIdManager() ==null)
 			;//just wait untill the XCommanager is ready
 		
@@ -611,7 +615,14 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 				// TODO: maybe check if the attributes in the criteria are valid attributes (something from CtxAttributeTypes)
 				if(cisType != null && cisName != null){
-					String pPolicy = "<RequestPolicy></RequestPolicy>";						
+					String pPolicy;
+					if(create.getCommunity().getPrivacyPolicy() != null && 
+							create.getCommunity().getPrivacyPolicy().isEmpty() == false){
+						pPolicy = create.getCommunity().getPrivacyPolicy();
+					}else{
+						pPolicy = "<RequestPolicy></RequestPolicy>";	
+					};
+											
 					Hashtable<String, MembershipCriteria> h = null;
 					
 					MembershipCrit m = create.getCommunity().getMembershipCrit();
@@ -1295,19 +1306,40 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
 			return false;
 		}
-		if (null == internalCtxBroker) {
-			LOG.info("[Dependency Injection] Missing Context Broker");
+		if (null == ccmFactory) {
+			LOG.info("[Dependency Injection] Missing ICISCommunicationMgrFactory");
 			return false;
 		}
-		if (null == eventMgr) {
-			LOG.info("[Dependency Injection] Missing Event Manager");
+		if (null == sessionFactory) {
+			LOG.info("[Dependency Injection] Missing SessionFactory");
 			return false;
 		}
-		//TODO: add service ones
+
 		
 		if (level >= 1) {
+			if (null == iCisDirRemote) {
+				LOG.info("[Dependency Injection] Missing ICisDirectoryRemote");
+				return false;
+			}
+			if (null == iServDiscRemote) {
+				LOG.info("[Dependency Injection] Missing IServiceDiscoveryRemote");
+				return false;
+			}
+			if (null == iServCtrlRemote) {
+				LOG.info("[Dependency Injection] Missing IServiceControlRemote");
+				return false;
+			}
 			if (null == privacyPolicyManager) {
 				LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
+				return false;
+			}
+
+			if (null == internalCtxBroker) {
+				LOG.info("[Dependency Injection] Missing Context Broker");
+				return false;
+			}
+			if (null == eventMgr) {
+				LOG.info("[Dependency Injection] Missing Event Manager");
 				return false;
 			}
 		}

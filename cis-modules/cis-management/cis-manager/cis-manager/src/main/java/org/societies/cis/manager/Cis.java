@@ -48,10 +48,12 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.schema.activityfeed.*;
@@ -1569,6 +1571,17 @@ public class Cis implements IFeatureServer, ICisOwned {
 		c.setCommunityType(this.getCisType());
 		c.setOwnerJid(this.getOwnerId());
 		c.setDescription(this.getDescription());
+		RequestPolicy p;
+		try {
+			p = this.privacyPolicyManager.getPrivacyPolicy(new Requestor(this.cisIdentity));
+			if (p != null && p.toXMLString().isEmpty()==false){
+				c.setPrivacyPolicy(p.toXMLString());
+			}
+		} catch (PrivacyException e) {
+			LOG.warn("Privacy excpetion when getting privacy on fillCommmunityXMPPobj");
+			e.printStackTrace();
+		}  
+		
 		
 		// fill criteria
 		MembershipCrit m = new MembershipCrit();
