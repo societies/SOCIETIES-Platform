@@ -62,6 +62,8 @@ public class GooglePlusConnectorTest {
 	public void testGetUserProfile() throws Exception {
 		String profileJson = connector.getUserProfile();
 		
+		System.out.println("getUserProfile="+profileJson);
+		
 		assertTrue(new JSONObject(profileJson).has("name"));
 	}
 
@@ -83,7 +85,7 @@ public class GooglePlusConnectorTest {
 	}
 	
 	@Test
-	public void testParameterss() throws Exception {
+	public void testParameters() throws Exception {
 		final int POST_LIMIT = 2;
 		
 		connector.setMaxPostLimit(POST_LIMIT);

@@ -41,17 +41,17 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
-import org.societies.context.api.user.location.ILocationManagementAdapter;
-import org.societies.context.api.user.location.IUserLocation;
-import org.societies.context.api.user.location.IZone;
-import org.societies.context.api.user.location.IZoneId;
 import org.societies.context.location.management.PZWrapper;
 import org.societies.context.location.management.PzPropertiesReader;
+import org.societies.context.location.management.api.ILocationManagementAdapter;
+import org.societies.context.location.management.api.IUserLocation;
+import org.societies.context.location.management.api.IZone;
+import org.societies.context.location.management.api.IZoneId;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -70,7 +70,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	private ICommManager commManager;
 	private ICommManagerController commMngrController;
 	private PubsubClient pubSubManager; 
-	private IDeviceRegistry deviceRegistry;
+	//private IDeviceRegistry deviceRegistry;
 	private ICSSLocalManager cssLocalManager;
 	
 	@Autowired
@@ -85,11 +85,10 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 			locationInference.init(contextSourceManagement, contextBroker, commManager);
 			
 			LMConfiguratorImpl lmConfiguratorImpl = new LMConfiguratorImpl();
-			lmConfiguratorImpl.init(pubSubManager, commManager, deviceRegistry,commMngrController, this);
+			lmConfiguratorImpl.init(pubSubManager, commManager,commMngrController, this);
 			
 			updateCycle = PzPropertiesReader.instance().getUpdateCycle();
 			
-			//test();
 			timer.scheduleAtFixedRate(new UpdateTask(),updateCycle, updateCycle);
 			
 		}catch (Exception e) {
@@ -178,21 +177,11 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 				}
 				
 				/**** For testing *****/
-				userLocation = getEntityFullLocation("guy-phone");
+				/*userLocation = getEntityFullLocation("guy-phone");
 				if (userLocation != null){
 					locationInference.updateCSM(userLocation, commManager.getIdManager().getThisNetworkNode());
-				}
-				
-				/*Collection<String> registeredDevices =  locationInference.getAllRegisteredDevices();
-				for (String macAddress : registeredDevices){
-					userLocation = getEntityFullLocation("guy-phone");
-					locationInference.updateCSM(userLocation, macAddress);
-				}
-				
-				if (counter == 0){
-					registerCSSdevice(commManager.getIdManager().getThisNetworkNode().getJid(), "aaaaa", "11:11:11:11:11:11");
-					counter++;
 				}*/
+				
 				log.info("--------------------- Update task finished");
 			}catch (Exception e) {
 				log.error("Error in update task; Msg: "+e.getMessage()+" \t; cause:  "+e.getCause(),e);
@@ -238,7 +227,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	public void setPubSubManager(PubsubClient pubSubManager) {
 		this.pubSubManager = pubSubManager;
 	}
-
+/*
 	public IDeviceRegistry getDeviceRegistry() {
 		return deviceRegistry;
 	}
@@ -246,7 +235,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	public void setDeviceRegistry(IDeviceRegistry deviceRegistry) {
 		this.deviceRegistry = deviceRegistry;
 	}
-
+*/
 	public PZWrapper getPzWrapper() {
 		return pzWrapper;
 	}

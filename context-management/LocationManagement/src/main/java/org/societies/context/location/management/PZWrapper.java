@@ -27,9 +27,7 @@ package org.societies.context.location.management;
 import java.util.Collection;
 import java.util.Set;
 
-import org.societies.context.api.user.location.IZone;
-import org.societies.context.api.user.location.IUserLocation;
-import org.societies.context.api.user.location.IZoneId;
+import org.societies.context.location.management.api.*;
 
 
 public interface PZWrapper {
