@@ -87,6 +87,7 @@ public class SocialDataController {
 		
 		if (data.contains("facebook"))       return "images/Facebook.png";
 		else if (data.contains("twitter"))   return "images/Twitter.jpg";
+		else if (data.contains("linkedin"))  return "images/Linkedin.png";
 		else return "images/Foursquare.png";
 	}
 
@@ -151,6 +152,7 @@ public class SocialDataController {
 		if ("TW".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.twitter;
 		if ("foursquare".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
 		if ("FQ".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
+		
 		return null;
 	}
 	
