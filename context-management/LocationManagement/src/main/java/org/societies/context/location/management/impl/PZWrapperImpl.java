@@ -41,15 +41,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.context.api.user.location.ITag;
-import org.societies.context.api.user.location.IUserLocation;
-import org.societies.context.api.user.location.IZone;
-import org.societies.context.api.user.location.IZoneId;
-import org.societies.context.api.user.location.impl.CoordinateImpl;
-import org.societies.context.api.user.location.impl.TagImpl;
-import org.societies.context.api.user.location.impl.UserLocationImpl;
-import org.societies.context.api.user.location.impl.ZoneIdImpl;
-import org.societies.context.api.user.location.impl.ZoneImpl;
+import org.societies.context.location.management.api.*;
+import org.societies.context.location.management.api.impl.CoordinateImpl;
+import org.societies.context.location.management.api.impl.TagImpl;
+import org.societies.context.location.management.api.impl.UserLocationImpl;
+import org.societies.context.location.management.api.impl.ZoneIdImpl;
+import org.societies.context.location.management.api.impl.ZoneImpl;
+import org.societies.context.location.management.coordinates.convertor.Pix2Geo;
+import org.societies.context.location.management.coordinates.convertor.Point;
 import org.societies.context.location.management.PZWrapper;
 import org.societies.context.location.management.PzPropertiesReader;
 
@@ -64,10 +63,31 @@ public class PZWrapperImpl implements PZWrapper  {
 	private final String PZ_FULL_ENTITY;
 	private final String ENTITY_ID;
 	
+	Pix2Geo pix2GeoConvertor = null;
+	private boolean convertToGeo= false;
+	
 	public PZWrapperImpl(){
-		PZ_URL = PzPropertiesReader.instance().getPzURL();
-		PZ_FULL_ENTITY = PZ_URL + PzPropertiesReader.instance().getEntityFullQuery();
-		ENTITY_ID = PzPropertiesReader.instance().getEntityId();
+		PzPropertiesReader pzPropertiesReader = PzPropertiesReader.instance();
+		PZ_URL =pzPropertiesReader.getPzURL();
+		PZ_FULL_ENTITY = PZ_URL + pzPropertiesReader.getEntityFullQuery();
+		ENTITY_ID = pzPropertiesReader.getEntityId();
+		
+		try{
+			initialPixel2GeoConvertor();
+			convertToGeo = true;
+		}catch (Exception e) {
+			log.error("can't initial pix2GeoConvertor ; coordinates will be given as in PZ server",e);
+		}
+	}
+	
+	
+	private void initialPixel2GeoConvertor() throws Exception{
+		
+		PzPropertiesReader pzPropertiesReader = PzPropertiesReader.instance();
+		String url = pzPropertiesReader.getPzAdminURL() + pzPropertiesReader.getMapQuery();
+		JSONObject jsonObject = restCallHelperMethod(url);
+		pix2GeoConvertor = new Pix2Geo(jsonObject);
+		
 	}
 	
 	/**************************************************************/
@@ -102,7 +122,19 @@ public class PZWrapperImpl implements PZWrapper  {
 			
 			JSONObject jsonResponse = restCallHelperMethod(url);
 			if (jsonResponse != null){
+				
 				userLocation = toIUserLocation(jsonResponse);
+				
+				if (convertToGeo){
+					Point point = pix2GeoConvertor.convertPixToGeo(new Point(userLocation.getXCoordinate().getCoordinate(),
+														   				     userLocation.getYCoordinate().getCoordinate())
+																   );
+					
+					log.debug("user Location coverted to "+point.toString()+" \t original Json "+jsonResponse);
+					userLocation.setXCoordinate(new CoordinateImpl(point.getX()));
+					userLocation.setYCoordinate(new CoordinateImpl(point.getY()));
+				}
+				
 			}else{
 				log.error("error in method 'getEntityFullLocation' with entity '"+entityId+"' , returned JSON object is NULL" );
 			}
@@ -146,8 +178,6 @@ public class PZWrapperImpl implements PZWrapper  {
 				ITag personalTag = new TagImpl(value);
 				zone.setPersonalTag(personalTag);
 				
-				
-				@SuppressWarnings("unchecked")
 				JSONArray jSONArrayTags = currZoneObject.getJSONArray("tags");
 				List<ITag> tagCollection = new ArrayList<ITag>();
 				for (int j=0; j < jSONArrayTags.length(); j++){
@@ -202,6 +232,7 @@ public class PZWrapperImpl implements PZWrapper  {
 		return true;
 	}
 
+	
 	private JSONObject restCallHelperMethod(String url){
 		
 		HttpGet httpGetRequest = new HttpGet(url);

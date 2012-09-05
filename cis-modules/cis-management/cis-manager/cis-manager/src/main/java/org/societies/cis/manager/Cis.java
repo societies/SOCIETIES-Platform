@@ -559,8 +559,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 		Notification n = new Notification();
 		SubscribedTo s = new SubscribedTo();
 		Community com = new Community();
-		com.setCommunityJid(this.getCisId());
+		this.fillCommmunityXMPPobj(com);
 		s.setRole(role.toString());
+		s.setCommunity(com);
 		n.setSubscribedTo(s);
 		cMan.setNotification(n);
 		

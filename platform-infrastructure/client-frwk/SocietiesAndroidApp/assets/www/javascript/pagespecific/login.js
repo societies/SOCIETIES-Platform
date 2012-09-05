@@ -67,8 +67,8 @@ var SocietiesLogin = {
 		};
 
 		
-		SocietiesLogin.getCSSIdentity();
-		SocietiesLogin.getCSSIdentityPassword();
+//		SocietiesLogin.getCSSIdentity();
+//		SocietiesLogin.getCSSIdentityPassword();
 		SocietiesLogin.getCSSIdentityDomain();
 		SocietiesLogin.getCSSCloudNode();
 	},
@@ -100,7 +100,7 @@ var SocietiesLogin = {
 	getCSSIdentityPassword: function () {
 		function success(data) {
 			console.log("getCSSIdentityPassword - successful: " + data.value);
-			jQuery("#userpass").val(data.value);
+			jQuery("#password").val(data.value);
 		}
 		
 		function failure(data) {
@@ -159,9 +159,26 @@ var SocietiesLogin = {
 			alert("updateLoginCredentialPreferences - failure: " + data);
 		}
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#username").val());
-		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#userpass").val());
+		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#password").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#identitydomain").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cloudNode", jQuery("#cloudnode").val());
+	},
+	/**
+	 * @methodOf SocietiesLogin#
+	 * @description clears the value of a given HTML element specified by its id
+	 * @returns null
+	 */
+	clearElementValue: function(elementId) {
+		jQuery(elementId).val("");
+	},
+	/**
+	 * @methodOf SocietiesLogin#
+	 * @description appends a value the value of a given HTML element specified by its id
+	 * @returns null
+	 */
+	appendElementValue: function(elementId, postfix) {
+		var currentValue = jQuery(elementId).val();
+		jQuery(elementId).val(currentValue + ": " + postfix);
 	},
 	/**
 	 * @methodOf SocietiesLogin#
@@ -174,13 +191,13 @@ var SocietiesLogin = {
 
 		function success(data) {
 			
-			SocietiesCSSRecord.populateCSSRecordpage(data);
+			//SocietiesCSSRecord.populateCSSRecordpage(data);
 			
 			SocietiesLogin.updateLoginCredentialPreferences();
 			
 			console.log("Current page: " + $.mobile.activePage[0].id);
 			
-			$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
+			$.mobile.changePage("html/landing.html", { transition: "slideup"} );
 		}
 		
 		function failure(data) {

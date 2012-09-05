@@ -64,6 +64,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.simplexml.XMLGregorianCalendarConverter;
 import org.societies.maven.converters.URIConverter;
+import org.societies.simple.converters.EventItemsConverter;
+import org.societies.simple.converters.PubsubItemConverter;
+import org.societies.simple.converters.PubsubItemsConverter;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.JID;
@@ -120,6 +123,9 @@ public class CommManagerHelper {
 		try {
 			registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
 			registry.bind(java.net.URI.class,URIConverter.class);
+			registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
+			registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));
+			registry.bind(org.jabber.protocol.pubsub.Item.class, new PubsubItemConverter(s));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(),e);
 		}
@@ -233,11 +239,11 @@ public class CommManagerHelper {
 				"namespace", namespace);
 	}
 	
-	private IFeatureServer getMessageFeatureServer(String namespace)
-			throws UnavailableException {
-		return (IFeatureServer) ifNotNull(featureServers.get(namespace),
-				"namespace", namespace);
-	}
+//	private IFeatureServer getMessageFeatureServer(String namespace)
+//			throws UnavailableException {
+//		return (IFeatureServer) ifNotNull(featureServers.get(namespace),
+//				"namespace", namespace);
+//	}
 
 	private ICommCallback getCommCallback(String iqId)
 			throws UnavailableException {
@@ -414,11 +420,11 @@ public class CommManagerHelper {
 			Object bean = s.read(c, element.asXML());
 			
 			try {
-				IFeatureServer fs = getMessageFeatureServer(namespace);
-				fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
-			} catch (UnavailableException e) {
 				ICommCallback cb = getMessageCommCallback(namespace);
 				cb.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
+			} catch (UnavailableException e) {
+				IFeatureServer fs = getFeatureServer(namespace);
+				fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
 			}
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
@@ -474,11 +480,10 @@ public class CommManagerHelper {
 
 	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
-//		for (String ns : fs.getXMLNamespaces()) {
-//			LOG.info("registering FeatureServer for namespace " + ns);
-//			featureServers.put(ns, fs);
-//		}
-		featureServers.put(fs.getXMLNamespaces().get(0), fs);
+		for (String ns : fs.getXMLNamespaces()) {
+			LOG.info("registering FeatureServer for namespace " + ns);
+			featureServers.put(ns, fs);
+		}
 	}
 	
 	public void register(ICommCallback messageCallback) throws CommunicationException {
@@ -487,7 +492,9 @@ public class CommManagerHelper {
 //			LOG.info("registering CommCallback for namespace" + ns);
 //			iqCommCallbacks.put(ns, messageCallback);
 //		}
-		nsCommCallbacks.put(messageCallback.getXMLNamespaces().get(0), messageCallback);
+		String mainNs = messageCallback.getXMLNamespaces().get(0);
+		if (mainNs.indexOf("#")>-1)
+			nsCommCallbacks.put(messageCallback.getXMLNamespaces().get(0), messageCallback);
 	}
 	
 	private void jaxbMapping(List<String> namespaces, List<String> packages) throws CommunicationException {

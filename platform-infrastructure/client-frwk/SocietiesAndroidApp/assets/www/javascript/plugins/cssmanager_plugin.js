@@ -190,7 +190,7 @@ var	SocietiesLocalCSSManager = {
 		                    "identityName": null,
 		                    "imID": null,
 		                    "name": null,
-		                    "password": jQuery("#userpass").val(),
+		                    "password": jQuery("#password").val(),
 		                    "presence": 0,
 		                    "sex": 0,
 		                    "socialURI": null,
@@ -285,7 +285,10 @@ var	SocietiesLocalCSSManagerHelper = {
 		console.log("Disconnect from LocalCSSManager");
 			
 		function success(data) {
-			$.mobile.changePage( ($("#main")), { transition: "slideup"} );
+			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
+
+//			$.mobile.changePage( ($("#main")), { transition: "slideup"} );
+//			window.open("../index.html");
 
 			console.log(data);
 		}

@@ -63,6 +63,13 @@ public interface ICisDirectory {
 	ICisAdvertisementRecord[] searchByUri(String uri);
 	
 	/**
+	 * Description: Search method to search by CIS ID for CIS Advertisements that return an array of CISAdvertisementRecords ( will at most return 1, as cis id is unique).
+	 * 
+	 * @return list of CisAdvertisementRecord from CIS directory
+	 */
+	Future<List<CisAdvertisementRecord>> searchByID(String cisID);
+	
+	/**
 	 * Description: Register a CIS 
 	 * 
 	 * @param: CisAdevertisementRecord
