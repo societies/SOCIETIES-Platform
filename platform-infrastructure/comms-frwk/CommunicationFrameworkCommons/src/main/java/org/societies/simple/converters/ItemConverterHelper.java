@@ -65,37 +65,25 @@ public class ItemConverterHelper {
 			node.setAttribute("id", value.getId());
 		Object anyObject = value.getAny();
 		
-		if (anyObject!=null) {
-			Root rootAnnotation = anyObject.getClass().getAnnotation(Root.class);
-			Namespace namespaceAnnotation = anyObject.getClass().getAnnotation(Namespace.class);
-			if (rootAnnotation!=null && namespaceAnnotation!=null) {
-				// simplexml annotated class
-				serializer.write(anyObject, node);
-			} else if (anyObject instanceof Element) {
-				// generic xml container
-				writeElement(node,(Element) anyObject);
-			} else {
-				throw new CommunicationException("Unable to serialize Pubsub Item of class "+anyObject.getClass());
-			}
-		}
+		serializeAnyObject(node, anyObject);
 	}
-	
+
 	public void write(OutputNode node, org.jabber.protocol.pubsub.event.Item value) throws Exception {
 		// when a notification is triggered "id" must be set
 		node.setAttribute("id", value.getId());
 		Object anyObject = value.getAny();
 		
+		serializeAnyObject(node, anyObject);
+	}
+	
+	private void serializeAnyObject(OutputNode node, Object anyObject) throws Exception {
 		if (anyObject!=null) {
-			Root rootAnnotation = anyObject.getClass().getAnnotation(Root.class);
-			Namespace namespaceAnnotation = anyObject.getClass().getAnnotation(Namespace.class);
-			if (rootAnnotation!=null && namespaceAnnotation!=null) {
-				// simplexml annotated class
-				serializer.write(anyObject, node);
-			} else if (anyObject instanceof Element) {
+			if (anyObject instanceof Element) {
 				// generic xml container
 				writeElement(node,(Element) anyObject);
 			} else {
-				throw new CommunicationException("Unable to serialize Pubsub Item of class "+anyObject.getClass());
+				// fallback to default serializer
+				serializer.write(anyObject, node);
 			}
 		}
 	}

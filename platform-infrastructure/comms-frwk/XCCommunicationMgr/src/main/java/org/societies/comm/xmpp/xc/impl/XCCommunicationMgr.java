@@ -89,6 +89,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 			probePresence();
 			log.info("Connected to '"+host+"' as '"+subDomain+"'!");
 		} catch (ComponentException e) {
+			System.out.println("Could not connect to '"+host+"' as '"+subDomain+"'. Check Openfire service: "+e.getMessage());
 			log.warn("Could not connect to '"+host+"' as '"+subDomain+"': "+e.getMessage());
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {

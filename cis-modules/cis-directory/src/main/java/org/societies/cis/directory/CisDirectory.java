@@ -34,6 +34,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -332,5 +333,56 @@ public class CisDirectory implements ICisDirectory {
 	public ICisAdvertisementRecord[] searchByUri(String arg0) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public Future<List<CisAdvertisementRecord>> searchByID(String cisID) {
+		//filter by id, search directory and return CISs that match the relevant cis id 
+		// should only be one, but easier to return a list of one as that is
+		// what all other searches will return a list
+		Session session = sessionFactory.openSession();
+		List<CisAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CisAdvertisementRecordEntry>();
+		List<CisAdvertisementRecord> returnList = new ArrayList<CisAdvertisementRecord>();
+		CisAdvertisementRecord record = null;
+
+		try {
+			tmpAdvertList = session.createCriteria(CisAdvertisementRecordEntry.class)
+					.add(Restrictions.eq("id", cisID).ignoreCase()).list();
+
+			if ((tmpAdvertList != null) && (tmpAdvertList.size() > 0))
+			{
+				for (CisAdvertisementRecordEntry entry : tmpAdvertList) {
+						
+					// Since it's uniquer we should only get one
+					record = new CisAdvertisementRecord();
+					record.setName(entry.getName());
+					record.setId(entry.getId());
+					record.setUri(entry.getUri());
+					record.setPassword(entry.getpassword());
+					record.setType(entry.gettype()); 
+					//MEMBERSHIP CRITERIA
+					MembershipCrit memberCrit = new MembershipCrit();
+					for(CriteriaRecordEntry critRecord: entry.getCriteriaRecords()) {
+						Criteria crit = new Criteria();
+						crit.setAttrib(critRecord.getAttrib());
+						crit.setOperator(critRecord.getOperator());
+						crit.setRank(critRecord.getRank());
+						crit.setValue1(critRecord.getValue1());
+						crit.setValue2(critRecord.getValue2());
+						memberCrit.getCriteria().add(crit);
+					}
+					record.setMembershipCrit(memberCrit); 
+
+					returnList.add(record);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return new AsyncResult<List<CisAdvertisementRecord>>(returnList);
 	}
 }
