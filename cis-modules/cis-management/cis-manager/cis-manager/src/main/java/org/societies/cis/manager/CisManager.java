@@ -148,10 +148,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private IEventMgr eventMgr;
 	private ICtxBroker internalCtxBroker;
 
-	//private INegotiation negotiator;
+	private INegotiation negotiator;
 
 	//Autowiring gets and sets
 	
+	public INegotiation getNegotiator() {
+		return negotiator;
+	}
+	public void setNegotiator(INegotiation negotiator) {
+		this.negotiator = negotiator;
+	}
+	public IPrivacyPolicyManager getPrivacyPolicyManager() {
+		return privacyPolicyManager;
+	}
 	public ICtxBroker getInternalCtxBroker() {
 		return internalCtxBroker;
 	}
@@ -1194,7 +1203,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		// TODO: check with privacy
 		
-//		negotiator.startNegotiation(new Requestor(this.cisManagerId), new INegCallBack());
+		negotiator.startNegotiation(new Requestor(this.cisManagerId), new INegCallBack());
 		
 		// sending join
 
@@ -1222,7 +1231,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}
 	}
 	
-/*	class INegCallBack implements INegotiationCallback{
+	class INegCallBack implements INegotiationCallback{
 		
 		//ICisManagerCallback IcisCallback;
 		
@@ -1241,7 +1250,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				LOG.debug("privacy negotiation success");
 		}
 	}
-	*/
+	
 
 	@Override
 	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback){
@@ -1342,6 +1351,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				LOG.info("[Dependency Injection] Missing Event Manager");
 				return false;
 			}
+			if (null == negotiator) {
+				LOG.info("[Dependency Injection] Missing INegotiation");
+				return false;
+			}
+
 		}
 		return true;
 	}
