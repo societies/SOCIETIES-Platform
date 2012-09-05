@@ -103,7 +103,11 @@ public class ServiceControlUnitTest {
 		testService = new Service();
 		testService.setAuthorSignature("authorSignature");
 		testService.setServiceDescription("Description");
-		testService.setServiceLocation(ServiceLocation.LOCAL);
+		testService.setServiceLocation("somewhere");
+		testService.setContextSource("isContextSource");
+		testService.setPrivacyPolicy("privacy");
+		testService.setSecurityPolicy("security");
+		testService.setServiceCategory("testService");
 		testService.setServiceName("ServiceName");
 		testService.setServiceType(ServiceType.THIRD_PARTY_SERVER);
 		hostJid = new String("testnode.societies.local");
