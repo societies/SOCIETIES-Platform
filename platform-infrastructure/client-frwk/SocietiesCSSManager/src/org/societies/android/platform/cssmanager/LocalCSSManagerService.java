@@ -83,8 +83,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     		"http://societies.org/api/schema/cssmanagement");
     private static final List<String> PACKAGES = Arrays.asList(
 		"org.societies.api.schema.cssmanagement");
-    //currently hard coded destination of communication
-    private static final String DESTINATION = "xcmanager.societies.local";
+    //default destination of communication
+    private static final String DEFAULT_DESTINATION = "xcmanager.societies.local";
     
 
 	/**
@@ -124,6 +124,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	
 	private CssRecordDAO cssRecordDAO;
 	
+	private String commsDestination = DEFAULT_DESTINATION;
+	
 	
 	//Service API overrides
 	
@@ -144,13 +146,6 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		//This should replaced with persisted value if available
 		this.cssRecord = null;
 		this.ccm = new ClientCommunicationMgr(this);
-		
-    	try {
-			toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
-		} catch (InvalidFormatException e) {
-			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
-			throw new RuntimeException(e);
-		}     
 		
 		Log.d(LOG_TAG, "CSSManager service starting");
 	}
@@ -250,6 +245,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Log.d(LOG_TAG, "CSSManager registering for Pubsub events");
 		this.registerForPubsub();
 
+		this.assignConnectionParameters();
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		CssRecord localCssrecord = convertAndroidCSSRecord(record);
@@ -282,6 +278,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Dbc.require("CSS record cannot be null", record != null);
 		
+
 		
 		String params [] = {record.getCssIdentity(), record.getDomainServer(), record.getPassword(), client};
 
@@ -825,7 +822,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     		IIdentity pubsubService = null;
     		
     		try {
-    	    	pubsubService = IdentityManagerImpl.staticfromJid(DESTINATION);
+    	    	pubsubService = IdentityManagerImpl.staticfromJid(LocalCSSManagerService.this.commsDestination);
     			
     		} catch (InvalidFormatException e) {
     			Log.e(LOG_TAG, "Unable to obtain CSS node identity", e);
@@ -919,4 +916,21 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     	return listNodes;
     }
 
+    /**
+     * Assign connection parameters (must happen after successful XMPP login)
+     */
+    private void assignConnectionParameters() {
+		//Get the Cloud destination
+		INetworkNode cloudNode = this.ccm.getIdManager().getCloudNode();
+		this.commsDestination = cloudNode.getJid();
+		Log.d(LOG_TAG, "Cloud Node: " + this.commsDestination);
+    	try {
+			toXCManager = IdentityManagerImpl.staticfromJid(this.commsDestination);
+			Log.d(LOG_TAG, "toXCManager: " + toXCManager);
+			
+		} catch (InvalidFormatException e) {
+			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
+			throw new RuntimeException(e);
+		}     
+    }
 }
