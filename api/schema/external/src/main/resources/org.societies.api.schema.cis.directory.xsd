@@ -18,6 +18,8 @@ elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"
 					minOccurs="0" />
 				<xs:element name="cisB" type="tns:cisAdvertisementRecord"
 					minOccurs="0" />
+				<xs:element name="filter" type="xs:string"
+					minOccurs="0" />	
 				<xs:element name="method" type="tns:methodType"
 					minOccurs="0" />
 			</xs:sequence>
@@ -51,6 +53,7 @@ elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"
 			<xs:enumeration value="updateCisAdvertisementRecord" />
 			<xs:enumeration value="findAllCisAdvertisementRecords" />
 			<xs:enumeration value="findForAllCis" />
+			<xs:enumeration value="searchByID" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>
