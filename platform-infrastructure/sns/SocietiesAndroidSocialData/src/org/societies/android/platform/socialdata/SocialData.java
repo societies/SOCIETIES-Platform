@@ -1,0 +1,209 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.societies.android.platform.socialdata;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.internal.sns.ISocialData;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.schema.sns.socialdata.SocialDataMethod;
+import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
+import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
+import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.identity.IdentityManagerImpl;
+import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
+
+/**
+ * Android service to communicate with the SocialData bundle.
+ *
+ * @author Edgar Domingues (PTIN)
+ *
+ */
+public class SocialData extends Service implements ISocialData {
+
+	private static final String LOG_TAG = SocialData.class.getName();
+	
+	//COMMS REQUIRED VARIABLES
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("SocialdataMessageBean", "SocialdataResultBean");
+    private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/internal/schema/sns/socialdata");
+    private static final List<String> PACKAGES = Arrays.asList("org.societies.api.internal.schema.sns.socialdata");   
+
+	/**
+	 * CoreServiceMonitor intents
+	 * Used to create to create Intents to signal return values of a called method
+	 * If the method is locally bound it is possible to directly return a value but is discouraged
+	 * as called methods usually involve making asynchronous calls. 
+	 */
+	public static final String ADD_SOCIAL_NETWORK = "org.societies.android.platform.sns.ADD_SOCIAL_CONNECTOR";
+	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.sns.ReturnValue";
+	
+	private IBinder binder = null;
+	
+	private static final String SOCIALDATA_NODE_JID = "xcmanager.societies.local";
+	
+	private ClientCommunicationMgr commMgr;
+	private IIdentity toId;
+
+	@Override
+	public void onCreate () {
+		this.binder = new LocalBinder();
+		
+		try {
+			//INSTANTIATE COMMS MANAGER
+			commMgr = new ClientCommunicationMgr(this);
+			commMgr.register(ELEMENT_NAMES, nullCallback);
+			toId = IdentityManagerImpl.staticfromJid(SOCIALDATA_NODE_JID);			
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Exception creating ClientCommunicationMgr instance.", e);
+        }  
+
+		Log.d(LOG_TAG, "SocialData service starting");
+	}
+
+	@Override
+	public void onDestroy() {
+		commMgr.unregister(ELEMENT_NAMES, nullCallback);
+		
+		Log.d(LOG_TAG, "SocialData service terminating");
+	}
+
+	/**
+	 * Create Binder object for local service invocation
+	 */
+	public class LocalBinder extends Binder {
+		public ISocialData getService() {
+			return SocialData.this;
+		}
+	}
+
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
+	}
+	
+	//Service API
+
+	public void addSocialConnector(String client, SocialNetwork socialNetwork, String token, long validity) {
+		Log.d(LOG_TAG, "addSocialConnector");	
+		
+		//MESSAGE BEAN
+		SocialdataMessageBean messageBean = SocialDataCommsUtils.createAddConnectorMessageBean(socialNetwork, token, validity);
+
+		//COMMS STUFF
+		Stanza stanza = new Stanza(toId);
+        try {
+        	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback());
+			Log.d(LOG_TAG, "Sending stanza");
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Exception sending message: " + e.getMessage(), e);
+        }
+	}	
+		
+	private ICommCallback createCallback() {
+		
+		return new ICommCallback() {
+
+			public List<String> getXMLNamespaces() {
+				return NAME_SPACES;
+			}
+
+			public List<String> getJavaPackages() {
+				return PACKAGES;
+			}
+
+			public void receiveResult(Stanza stanza, Object payload) {
+				Log.d(LOG_TAG, "receiveResult");
+				if(payload instanceof SocialdataResultBean) {
+					Log.d(LOG_TAG, "Id="+((SocialdataResultBean)payload).getId());
+				}
+			}
+
+			public void receiveError(Stanza stanza, XMPPError error) {
+				Log.d(LOG_TAG, "receiveError: "+error.getGenericText());
+			}
+
+			public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+				Log.d(LOG_TAG, "receiveInfo");
+			}
+
+			public void receiveItems(Stanza stanza, String node,
+					List<String> items) {
+				Log.d(LOG_TAG, "receiveItems");
+			}
+
+			public void receiveMessage(Stanza stanza, Object payload) {
+				Log.d(LOG_TAG, "receiveMessage");
+			}
+			
+		};
+	}
+	
+	private ICommCallback nullCallback = new ICommCallback() {
+
+		public List<String> getXMLNamespaces() {
+			return NAME_SPACES;
+		}
+
+		public List<String> getJavaPackages() {
+			return PACKAGES;
+		}
+
+		public void receiveResult(Stanza stanza, Object payload) {
+			Log.d(LOG_TAG, "receiveResult");
+		}
+
+		public void receiveError(Stanza stanza, XMPPError error) {
+			Log.d(LOG_TAG, "receiveError: "+error.getGenericText());
+		}
+
+		public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+			Log.d(LOG_TAG, "receiveInfo");
+		}
+
+		public void receiveItems(Stanza stanza, String node,
+				List<String> items) {
+			Log.d(LOG_TAG, "receiveItems");
+		}
+
+		public void receiveMessage(Stanza stanza, Object payload) {
+			Log.d(LOG_TAG, "receiveMessage");
+		}
+		
+	};
+
+}
