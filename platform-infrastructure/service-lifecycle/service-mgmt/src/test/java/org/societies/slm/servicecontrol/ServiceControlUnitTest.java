@@ -49,7 +49,6 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegis
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
-import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
