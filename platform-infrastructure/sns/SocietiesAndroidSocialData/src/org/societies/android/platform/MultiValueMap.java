@@ -22,24 +22,41 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.sns;
+package org.societies.android.platform;
 
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 
+ * A multi value map implementation.
  *
  * @author Edgar Domingues (PTIN)
  *
  */
-public interface ISocialData {
-	String methodsArray [] = {"addSocialConnector(SocialNetwork socialNetwork, String token, long validity)",
-							  "removeSocialConnector(String client, String connectorId)",
-							  "getSocialConnectors(String client)"};
+public class MultiValueMap<K, V> {
 	
-	void addSocialConnector(String client, SocialNetwork socialNetwork, String token, long validity);
+	private Map<K, List<V>> map = new HashMap<K, List<V>>();
 	
-	void removeSocialConnector(String client, String connectorId);
+	public void put(K key, V value) {
+		List<V> list;
+		if(map.containsKey(key)) {		
+			list = map.get(key);
+		}
+		else {
+			list = new ArrayList<V>();
+			map.put(key, list);
+		}
+		list.add(value);
+	}
 	
-	void getSocialConnectors(String client);
+	public List<V> get(K key) {
+		if(map.containsKey(key))
+			return map.get(key);
+		else
+			return Collections.emptyList();
+	}
+
 }

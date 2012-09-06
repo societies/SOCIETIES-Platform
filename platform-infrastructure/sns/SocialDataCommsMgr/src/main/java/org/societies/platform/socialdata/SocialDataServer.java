@@ -24,6 +24,7 @@
  */
 package org.societies.platform.socialdata;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.internal.schema.sns.socialdata.Ids;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
@@ -104,37 +106,93 @@ public class SocialDataServer implements IFeatureServer {
 
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
-		return null;
+		if(payload instanceof SocialdataMessageBean)
+			return getQuery(stanza, (SocialdataMessageBean)payload);
+
+		throw new XMPPError(StanzaError.bad_request);
 	}
 
 	@Override
 	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
 		if(payload instanceof SocialdataMessageBean)
 			return setQuery(stanza, (SocialdataMessageBean)payload);
-		return null;
+
+		throw new XMPPError(StanzaError.bad_request);
 	}
 	
-	private Object setQuery(Stanza stanza, SocialdataMessageBean messageBean) throws XMPPError {		
-		SocialdataResultBean resultBean = new SocialdataResultBean();
+	private Object getQuery(Stanza stanza, SocialdataMessageBean messageBean) throws XMPPError {
+		validateMessageBean(messageBean);
 		
-		switch(messageBean.getMethod()) {
-		case ADD_CONNECTOR:
-			SocialNetwork socialNetwork = SocialDataCommsUtils.socialNetwork(messageBean.getSnName());
-			long validity = messageBean.getValidity(); // TODO if 0 remove connector
-			Map<String, String> params = new HashMap<String, String>();
-			params.put(ISocialConnector.AUTH_TOKEN, messageBean.getToken());
-			try {
+		try {
+		
+			SocialdataResultBean resultBean = new SocialdataResultBean();
+			
+			switch(messageBean.getMethod()) {	
+			case GET_CONNECTOR_LIST:
+				List<ISocialConnector> connectors = socialData.getSocialConnectors();
+								
+				Ids ids = new Ids();
+				ids.setId(getIdsFromConnectorsList(connectors));
+				resultBean.setIds(ids);
+				break;
+			default:
+				throw new XMPPError(StanzaError.bad_request);
+			}
+			return resultBean;
+			
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			throw new XMPPError(StanzaError.internal_server_error, e.getMessage());
+		}
+	}
+	
+	private Object setQuery(Stanza stanza, SocialdataMessageBean messageBean) throws XMPPError {
+		validateMessageBean(messageBean);
+		
+		try {
+		
+			SocialdataResultBean resultBean = new SocialdataResultBean();
+			
+			switch(messageBean.getMethod()) {
+			case ADD_CONNECTOR:
+				SocialNetwork socialNetwork = SocialDataCommsUtils.socialNetwork(messageBean.getSnName());
+				long validity = messageBean.getValidity(); // TODO if 0 remove connector
+				Map<String, String> params = new HashMap<String, String>();
+				params.put(ISocialConnector.AUTH_TOKEN, messageBean.getToken());
+
 				ISocialConnector connector = socialData.createConnector(socialNetwork, params);
 				connector.setTokenExpiration(validity);
-				socialData.addSocialConnector(connector);				
+				
+				socialData.addSocialConnector(connector);			
+				
 				resultBean.setId(connector.getID());
-			} catch (Exception e) {
-				LOG.error(e.getMessage(), e);
-				throw new XMPPError(StanzaError.internal_server_error, e.getMessage());
+
+				break;
+			case REMOVE_CONNECTOR:
+				socialData.removeSocialConnector(messageBean.getId());
+				break;
+			default:
+				throw new XMPPError(StanzaError.bad_request);
 			}
-			break;
+			return resultBean;
+			
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			throw new XMPPError(StanzaError.internal_server_error, e.getMessage());
 		}
-		return resultBean;
+	}
+	
+	private void validateMessageBean(SocialdataMessageBean messageBean) throws XMPPError {
+		// TODO
+	}
+	
+	private List<String> getIdsFromConnectorsList(List<ISocialConnector> connectors) {
+		List<String> ids = new ArrayList<String>(connectors.size());
+		
+		for(ISocialConnector connector:connectors)
+			ids.add(connector.getID());
+		
+		return ids;
 	}
 
 }

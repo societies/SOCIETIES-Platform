@@ -34,7 +34,6 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.schema.sns.socialdata.SocialDataMethod;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
@@ -43,6 +42,7 @@ import org.societies.identity.IdentityManagerImpl;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -69,7 +69,9 @@ public class SocialData extends Service implements ISocialData {
 	 * If the method is locally bound it is possible to directly return a value but is discouraged
 	 * as called methods usually involve making asynchronous calls. 
 	 */
-	public static final String ADD_SOCIAL_NETWORK = "org.societies.android.platform.sns.ADD_SOCIAL_CONNECTOR";
+	public static final String ADD_SOCIAL_CONNECTOR = "org.societies.android.platform.sns.ADD_SOCIAL_CONNECTOR";
+	public static final String REMOVE_SOCIAL_CONNECTOR = "org.societies.android.platform.sns.REMOVE_SOCIAL_CONNECTOR";
+	public static final String GET_SOCIAL_CONNECTORS = "org.societies.android.platform.sns.GET_SOCIAL_CONNECTORS";
 	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.sns.ReturnValue";
 	
 	private IBinder binder = null;
@@ -127,14 +129,46 @@ public class SocialData extends Service implements ISocialData {
 		//COMMS STUFF
 		Stanza stanza = new Stanza(toId);
         try {
-        	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback());
+        	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, ADD_SOCIAL_CONNECTOR, client));
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception sending message: " + e.getMessage(), e);
         }
 	}	
+	
+	public void removeSocialConnector(String client, String connectorId) {
+		Log.d(LOG_TAG, "removeSocialConnector");	
 		
-	private ICommCallback createCallback() {
+		//MESSAGE BEAN
+		SocialdataMessageBean messageBean = SocialDataCommsUtils.createRemoveConnectorMessageBean(connectorId);
+
+		//COMMS STUFF
+		Stanza stanza = new Stanza(toId);
+        try {
+        	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, REMOVE_SOCIAL_CONNECTOR, client));
+			Log.d(LOG_TAG, "Sending stanza");
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Exception sending message: " + e.getMessage(), e);
+        }
+	}
+	
+	public void getSocialConnectors(String client) {
+		Log.d(LOG_TAG, "getSocialConnectors");	
+		
+		//MESSAGE BEAN
+		SocialdataMessageBean messageBean = SocialDataCommsUtils.createGetConnectorsMessageBean();
+
+		//COMMS STUFF
+		Stanza stanza = new Stanza(toId);
+        try {
+        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, createCallback(this, GET_SOCIAL_CONNECTORS, client));
+			Log.d(LOG_TAG, "Sending stanza");
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Exception sending message: " + e.getMessage(), e);
+        }
+	}
+		
+	private ICommCallback createCallback(final Context context, final String action, final String client) {
 		
 		return new ICommCallback() {
 
@@ -149,7 +183,18 @@ public class SocialData extends Service implements ISocialData {
 			public void receiveResult(Stanza stanza, Object payload) {
 				Log.d(LOG_TAG, "receiveResult");
 				if(payload instanceof SocialdataResultBean) {
-					Log.d(LOG_TAG, "Id="+((SocialdataResultBean)payload).getId());
+					
+					SocialdataResultBean resultBean = (SocialdataResultBean)payload;
+					
+					Intent intent = new Intent(action);
+					
+					if(action.equals(ADD_SOCIAL_CONNECTOR)) {
+						intent.putExtra(INTENT_RETURN_KEY, resultBean.getId());
+					}
+					
+					intent.setPackage(client);
+					context.sendBroadcast(intent);
+					
 				}
 			}
 

@@ -10,6 +10,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
          <service android:name="org.societies.android.platform.socialdata.SocialData" />
+         <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />
+         <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
+         <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
     </application>
 
 </manifest>

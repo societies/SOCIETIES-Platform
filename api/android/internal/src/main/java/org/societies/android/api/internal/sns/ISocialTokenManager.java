@@ -27,19 +27,13 @@ package org.societies.android.api.internal.sns;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 
 /**
- * 
+ * Interface to manager access tokens of social networks.
  *
  * @author Edgar Domingues (PTIN)
  *
  */
-public interface ISocialData {
-	String methodsArray [] = {"addSocialConnector(SocialNetwork socialNetwork, String token, long validity)",
-							  "removeSocialConnector(String client, String connectorId)",
-							  "getSocialConnectors(String client)"};
+public interface ISocialTokenManager {
 	
-	void addSocialConnector(String client, SocialNetwork socialNetwork, String token, long validity);
-	
-	void removeSocialConnector(String client, String connectorId);
-	
-	void getSocialConnectors(String client);
+	public void getToken(String client, SocialNetwork socialNetwork);
+
 }

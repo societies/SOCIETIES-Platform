@@ -81,4 +81,17 @@ public class SocialDataCommsUtils {
 		messageBean.setValidity(validity);
 		return messageBean;
 	}
+
+	public static SocialdataMessageBean createRemoveConnectorMessageBean(String connectorId) {
+		SocialdataMessageBean messageBean = new SocialdataMessageBean();
+		messageBean.setMethod(SocialDataMethod.REMOVE_CONNECTOR);
+		messageBean.setId(connectorId);
+		return messageBean;
+	}
+	
+	public static SocialdataMessageBean createGetConnectorsMessageBean() {
+		SocialdataMessageBean messageBean = new SocialdataMessageBean();
+		messageBean.setMethod(SocialDataMethod.GET_CONNECTOR_LIST);
+		return messageBean;
+	}
 }

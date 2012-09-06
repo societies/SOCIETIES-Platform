@@ -23,9 +23,10 @@
  <xs:element name="SocialdataResultBean">
 	 <xs:complexType>
 	     <xs:choice minOccurs='0'>
-	      <xs:element name="id" type="xs:string" minOccurs="0"/>
-	      <xs:element name="timestamp" type="xs:long" minOccurs="0"/>
+	      <xs:element name="id" type="xs:string"/>
+	      <xs:element name="timestamp" type="xs:long"/>
 	      <xs:element ref='ids'/>
+	      <xs:element name='available' type="xs:boolean"/>
 	     </xs:choice>
 	  </xs:complexType>
  </xs:element>

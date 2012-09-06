@@ -1,8 +1,9 @@
 package org.societies.android.platform.socialdata;
 
 import org.societies.android.api.internal.sns.ISocialData;
-import org.societies.android.platform.socialdata.SocialData;
-import org.societies.android.platform.socialdata.SocialData.LocalBinder;
+import org.societies.android.api.internal.sns.ISocialTokenManager;
+import org.societies.android.platform.socialdata.SocialTokenManager;
+import org.societies.android.platform.socialdata.SocialTokenManager.LocalBinder;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 
 import android.app.Activity;
@@ -19,12 +20,12 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.widget.TextView;
 
-public class TestContainerSocialDataActivity extends Activity {
+public class TestSocialTokenManagerActivity extends Activity {
 
-	private static final String LOG_TAG = TestContainerSocialDataActivity.class.getName();
+	private static final String LOG_TAG = TestSocialTokenManagerActivity.class.getName();
 	
-    private ISocialData socialData;
-    private boolean socialDataConnected = false;
+    private ISocialTokenManager socialTokenMgr;
+    private boolean connected = false;
     private TextView text;  
     private TestTask testTask;
 	
@@ -40,14 +41,12 @@ public class TestContainerSocialDataActivity extends Activity {
         
         //REGISTER BROADCAST
         IntentFilter intentFilter = new IntentFilter() ;
-        intentFilter.addAction(SocialData.ADD_SOCIAL_CONNECTOR);        
-        intentFilter.addAction(SocialData.REMOVE_SOCIAL_CONNECTOR);
-        intentFilter.addAction(SocialData.GET_SOCIAL_CONNECTORS);
+        intentFilter.addAction(SocialTokenManager.GET_TOKEN);      
         this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
         
         //CREATE INTENT FOR SERVICE AND BIND
-        Intent intentSocialData = new Intent(this.getApplicationContext(), SocialData.class);
-        this.getApplicationContext().bindService(intentSocialData, socialDataConnection, Context.BIND_AUTO_CREATE);
+        Intent intentSocialData = new Intent(this.getApplicationContext(), SocialTokenManager.class);
+        this.getApplicationContext().bindService(intentSocialData, connection, Context.BIND_AUTO_CREATE);
         
         Log.d(LOG_TAG, "Test in progress...");
 		text.setText("Test in progress...");
@@ -56,7 +55,7 @@ public class TestContainerSocialDataActivity extends Activity {
     /**
      * IServiceDiscovery service connection
      */
-    private ServiceConnection socialDataConnection = new ServiceConnection() {
+    private ServiceConnection connection = new ServiceConnection() {
 
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to service");
@@ -66,8 +65,8 @@ public class TestContainerSocialDataActivity extends Activity {
 	            LocalBinder binder = (LocalBinder) service;
 	
 	            //OBTAIN SERVICE API
-	            socialData = (ISocialData) binder.getService();
-	            socialDataConnected = true;
+	            socialTokenMgr = (ISocialTokenManager) binder.getService();
+	            connected = true;
 	            	        	
 	            testTask.execute();
         	} catch (Exception ex) {
@@ -77,7 +76,7 @@ public class TestContainerSocialDataActivity extends Activity {
         
         public void onServiceDisconnected(ComponentName name) {
         	Log.d(LOG_TAG, "Disconnecting from service");
-        	socialDataConnected = false;
+        	connected = false;
         }
     };
     
@@ -90,17 +89,14 @@ public class TestContainerSocialDataActivity extends Activity {
     	}
     	
     	protected Void doInBackground(Void... args) {
-    		testAddConnector();
+    		testGetToken();
     		
     		return null;
     	}    	
     }
 
-    private void testAddConnector() {
-    	
-		long testValidity = 1000;
-		socialData.addSocialConnector("TestContainerSocialDataActivity", SocialNetwork.Facebook, "testToken", testValidity);
-		
+    private void testGetToken() {
+    	socialTokenMgr.getToken("TestSocialTokenManagerActivity", SocialNetwork.Facebook);
     }
     
     private class bReceiver extends BroadcastReceiver  {
@@ -109,10 +105,13 @@ public class TestContainerSocialDataActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, intent.getAction());
 			
-			if (intent.getAction().equals(SocialData.ADD_SOCIAL_CONNECTOR)) {
-				int id = intent.getIntExtra(SocialData.INTENT_RETURN_KEY, -1);				
-				Log.d(LOG_TAG, "id="+id);
-				text.setText("id="+id);
+			if (intent.getAction().equals(SocialTokenManager.GET_TOKEN)) {
+				String token = intent.getStringExtra(SocialTokenManager.INTENT_RETURN_KEY);
+				String expires = intent.getStringExtra(SocialTokenManager.EXTRA_EXPIRES);
+				Log.d(LOG_TAG, "token="+token);
+				text.setText("token="+token);
+				Log.d(LOG_TAG, "expires="+expires);
+				text.setText("expires="+expires);
 			}
 		}
 	};
