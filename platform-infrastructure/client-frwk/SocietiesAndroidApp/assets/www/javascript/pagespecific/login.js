@@ -38,20 +38,18 @@ var SocietiesLogin = {
 	 * @param {Object} username
 	 * @param {Object} password
 	 * @param {Object} domain
-	 * @param {Object} cloudNodeName
 	 * @returns boolean true if credentials viable
 	 */
 
-	validateLoginCredentials: function(name, password, cloudNodeName, domain) {
+	validateLoginCredentials: function(name, password, domain) {
 		var retValue = true;
 		console.log("validateLoginCredentials user: " + name);
 		console.log("validateLoginCredentials pass: " + password);
-		console.log("validateLoginCredentials cloud node: " + cloudNodeName);
 		console.log("validateLoginCredentials domain: " + domain);
 		
-		if (name.length === 0 || password.length === 0 || domain.length === 0 || cloudNodeName.length === 0) {
+		if (name.length === 0 || password.length === 0 || domain.length === 0) {
 			retValue  = false;
-			alert("validateLoginCredentials: " + "User credentials and CSS related information must be entered");
+			alert("validateLoginCredentials: " + "User credentials and Identity Domain must be entered");
 		} 
 		return retValue;
 	},
@@ -94,7 +92,6 @@ var SocietiesLogin = {
 //		SocietiesLogin.getCSSIdentity();
 //		SocietiesLogin.getCSSIdentityPassword();
 		SocietiesLogin.getCSSIdentityDomain();
-		SocietiesLogin.getCSSCloudNode();
 	},
 	
 	/**
@@ -150,25 +147,7 @@ var SocietiesLogin = {
 		}
 		window.plugins.SocietiesAppPreferences.getStringPrefValue(success, failure, "daURI");
 	},
-	/**
-	 * @methodOf SocietiesLogin#
-	 * @description Gets the CSS Cloud Node preference value. This value is the name 
-	 * of the Cloud node and is required as a destination point for XMPP traffic to the
-	 * cloud.
-	 * @returns null
-	 */
 
-	getCSSCloudNode: function () {
-		function success(data) {
-			console.log("getCSSCloudNode - successful: " + data.value);
-			jQuery("#cloudnode").val(data.value);
-		}
-		
-		function failure(data) {
-			alert("getCSSCloudNode - failure: " + data);
-		}
-		window.plugins.SocietiesAppPreferences.getStringPrefValue(success, failure, "cloudNode");
-	},
 	/**
 	 * @methodOf SocietiesLogin#
 	 * @description updates the login user credentials and associated information for future login purposes
@@ -185,7 +164,6 @@ var SocietiesLogin = {
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#username").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#password").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#identitydomain").val());
-		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cloudNode", jQuery("#cloudnode").val());
 	},
 	/**
 	 * @methodOf SocietiesLogin#
