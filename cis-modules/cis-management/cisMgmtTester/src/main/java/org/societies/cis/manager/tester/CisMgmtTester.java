@@ -53,6 +53,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
@@ -75,6 +76,8 @@ public class CisMgmtTester {
 	
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisMgmtTester.class);
+	
+	private String policy = "<![CDATA[  <RequestPolicy></RequestPolicy> ]]>";
 	
 	private String targetCisId = null;
 	
@@ -117,6 +120,8 @@ public class CisMgmtTester {
 			//crit.setRank(0);
 			crit.setValue1("married");
 			l.add(crit);
+			
+			com.setPrivacyPolicy(policy);
 			
 			com.setMembershipCrit(m);
 			
@@ -193,7 +198,7 @@ public class CisMgmtTester {
 			this.cisClient = cisClient;
 		}
 
-		public void receiveResult(Community communityResultObject) {
+		public void receiveResult(CommunityMethods communityResultObject) {
 			 
 			if(communityResultObject == null){
 				LOG.info("null return on JoinCallBack");
@@ -201,9 +206,9 @@ public class CisMgmtTester {
 			}
 			else{
 				LOG.info("good return on JoinCallBack");
-				LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
+				//LOG.info("Result Status: joined CIS " + communityResultObject.getCommunityJid());
 				join = 1;
-				ICis icis = cisClient.getCis(communityResultObject.getCommunityJid());
+				//ICis icis = cisClient.getCis(communityResultObject.getCommunityJid());
 				
 				
 				/*					IActivity iActivity = new org.societies.activity.model.Activity();
@@ -312,14 +317,14 @@ public class CisMgmtTester {
 		
 	
 
-		public void receiveResult(Community communityResultObject) {
+		public void receiveResult(CommunityMethods communityResultObject) {
 			if(communityResultObject == null){
 				LOG.info("null return on GetListMembersCallBack");
 				return;
 			}
 			else{
 				LOG.info("good return on GetActivitiesCallBack  Callback");
-				LOG.info("Result Status: GetListMembersCallBack from CIS " + communityResultObject.getCommunityJid());
+				//LOG.info("Result Status: GetListMembersCallBack from CIS " + communityResultObject.getCommunityJid());
 			/*	List<org.societies.api.schema.activity.Activity> l = communityResultObject.getGetActivitiesResponse().getActivity();
 
 				int[] memberCheck = {0,0,0};

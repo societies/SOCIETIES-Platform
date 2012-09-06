@@ -48,6 +48,8 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.*;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
@@ -872,7 +874,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 					return;
 				}
 				else{
-					List<Participant> l = communityResultObject.getWho().getParticipant();
+					List<Participant> l = communityResultObject.getWhoResponse().getParticipant();
 					int[] memberCheck = {0,0,0};
 					
 					Iterator<Participant> it = l.iterator();
@@ -907,7 +909,13 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 
 		// call and wait for callback
-		Iciss.getListOfMembers(new GetListCallBack(cisJid));
+		try {
+			Iciss.getListOfMembers(new RequestorCis(this.cisManagerUnderTest.cisManagerId,this.cisManagerUnderTest.iCommMgr.getIdManager().fromJid(cisJid)
+					) ,new GetListCallBack(cisJid));
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	
 	

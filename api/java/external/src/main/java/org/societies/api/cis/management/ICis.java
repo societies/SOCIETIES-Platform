@@ -34,6 +34,7 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.identity.Requestor;
 
 /**
  * @author Babak.Farshchian@sintef.no
@@ -107,11 +108,10 @@ public interface ICis {
 	 * defined at org.societies.api.schema.cis.community 
 	 * which will have a Who with a list of Participant objects
 	 * 
-	 *  IMPORTANT: this function is still under tests
-	 * 
+	 * @param {@link Requestor} requestor object identifying if the user is 
 	 * @param callback callback function
 	 */
-    public void getListOfMembers(ICisManagerCallback callback);
+    public void getListOfMembers(Requestor req, ICisManagerCallback callback);
 
     
 	/**

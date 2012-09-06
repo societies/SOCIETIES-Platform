@@ -54,11 +54,13 @@ import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.schema.activityfeed.*;
 import org.societies.api.schema.cis.community.*;
 import org.societies.api.schema.cis.manager.*;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -866,13 +868,14 @@ public class Cis implements IFeatureServer, ICisOwned {
 				result.setLeaveResponse(l);
 				return result;
 			}
-			if (c.getWho() != null) {
+			if (c.getWhoRequest() != null) {
 				// WHO
 				LOG.info("get who received");
 				CommunityMethods result = new CommunityMethods();
-				Who who = new Who();
+				WhoResponse who = new WhoResponse();
 				this.getMembersCss();
 		
+				// TODO: add privacy call
 				
 				Set<CisParticipant> s = this.getMembersCss();
 				Iterator<CisParticipant> it = s.iterator();
@@ -885,7 +888,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 					who.getParticipant().add(p);
 			     }
 				
-				result.setWho(who);
+				result.setWhoResponse(who);
 				return result;
 				// END OF WHO
 			}
@@ -1196,20 +1199,18 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 	
 	@Override
-	public void getListOfMembers(ICisManagerCallback callback){
+	public void getListOfMembers(Requestor req, ICisManagerCallback callback){
 		LOG.debug("local get member list WITH CALLBACK called");
 
 		
 		CommunityMethods c = new CommunityMethods();
-	//	c.setCommunityJid(this.getCisId());
-	//	c.setCommunityName(this.getName());
-	//	c.setCommunityType(this.getCisType());
-	//	c.setOwnerJid(this.getOwnerId());
-	//	c.setDescription(this.getDescription());
-	//	c.setGetInfo(new GetInfo());
 		
-		Who w = new Who();
-		c.setWho(w);
+		WhoResponse w = new WhoResponse();
+		c.setWhoResponse(w);
+		//RequestorBean reqB = Util.createRequestorBean(req);
+		//w.setRequestor(reqB);
+		
+		//TODO: add a privacy call?
 		
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();

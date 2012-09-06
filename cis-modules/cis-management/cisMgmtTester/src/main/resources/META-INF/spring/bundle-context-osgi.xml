@@ -17,7 +17,7 @@
        
     <osgi-compendium:cm-properties id="componentConfig" persistent-id="testciscli">
     	<!-- Default values if none found -->
-    	<prop key="targetCisId">xcmanager.thomas.local</prop>
+    	<prop key="targetCisId">xcmanager.societies.local</prop>
     </osgi-compendium:cm-properties>
     
      <!-- <osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/> -->
