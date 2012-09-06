@@ -33,8 +33,8 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.useragent.monitoring.MethodType;
-import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
+//import org.societies.api.schema.useragent.monitoring.MethodType;
+//import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 
