@@ -42,22 +42,25 @@ import org.osgi.framework.ServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-//import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
-import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
@@ -82,7 +85,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 	private static Logger log = LoggerFactory.getLogger(ServiceRegistryListener.class);
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
-	//private INegotiationProviderServiceMgmt negotiationProvider;
+	private INegotiationProviderServiceMgmt negotiationProvider;
 	private IServiceControl serviceControl;
 	private IPrivacyPolicyManager privacyManager;
 
@@ -102,7 +105,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		this.serviceControl = serviceControl;
 	}
 	
-	/*
+	
 	  public INegotiationProviderServiceMgmt getNegotiationProvider(){
 		return negotiationProvider;
 	}
@@ -110,7 +113,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 	public void setNegotiationProvider(INegotiationProviderServiceMgmt negotiationProvider){
 		this.negotiationProvider = negotiationProvider;
 	}
-*/	
+	
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
 	}
@@ -191,9 +194,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			if(log.isDebugEnabled()) log.debug("**Service MetadataModel object is null**");
 			return;
 		}
-		
-		service.setServiceLocation(ServiceLocation.LOCAL);
-	
+			
 		//TODO DEAL WITH THIS
 		service.setServiceEndpoint(commMngr.getIdManager().getThisNetworkNode().getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
 
@@ -201,14 +202,43 @@ public class ServiceRegistryListener implements BundleContextAware,
 		ServiceInstance si = new ServiceInstance();
 		
 		INetworkNode myNode = commMngr.getIdManager().getThisNetworkNode();
-		si.setFullJid(myNode.getJid());
-		si.setCssJid(myNode.getBareJid());
-		si.setParentJid(myNode.getBareJid()); //This is later changed!
-		si.setXMPPNode(myNode.getNodeIdentifier());
 		
+		if(service.getServiceType().equals(ServiceType.DEVICE)){
+			String nodeId = (String)event.getServiceReference().getProperty(DeviceMgmtConstants.DEVICE_NODE_ID);
+			
+			if(log.isDebugEnabled())
+				log.debug("This is device... : " + nodeId);
+				
+			try{
+				INetworkNode serviceNode = getCommMngr().getIdManager().fromFullJid(nodeId);
+				
+				si.setFullJid(serviceNode.getJid());
+				si.setCssJid(serviceNode.getBareJid());
+				si.setParentJid(serviceNode.getBareJid()); //This is later changed!
+				si.setXMPPNode(serviceNode.getNodeIdentifier());
+			
+			}catch(Exception ex){
+				ex.printStackTrace();
+				log.warn("Exception in IdManager, doing alternate solution!");
+				si.setFullJid(nodeId);
+				si.setCssJid(nodeId);
+				si.setParentJid(nodeId); //This is later changed!
+				//si.setXMPPNode(myNode.getNodeIdentifier());
+			}
+			
+		} else{
+			si.setFullJid(myNode.getJid());
+			si.setCssJid(myNode.getBareJid());
+			si.setParentJid(myNode.getBareJid()); //This is later changed!
+			si.setXMPPNode(myNode.getNodeIdentifier());
+		}
 		ServiceImplementation servImpl = new ServiceImplementation();
 		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
-		servImpl.setServiceNameSpace(serBndl.getSymbolicName());
+		if(service.getServiceType().equals(ServiceType.DEVICE))
+			servImpl.setServiceNameSpace("device."+service.getServiceName()+"."+myNode.getBareJid());
+		else
+			servImpl.setServiceNameSpace(serBndl.getSymbolicName());
+		
 		servImpl.setServiceProvider((String) event.getServiceReference().getProperty("ServiceProvider"));
 		try {
 			String serviceClient = (String) event.getServiceReference().getProperty("ServiceClient");
@@ -232,9 +262,11 @@ public class ServiceRegistryListener implements BundleContextAware,
 			log.debug("Service Name: "+service.getServiceName());
 			log.debug("Service Description: "+service.getServiceDescription());
 			log.debug("Service type: "+service.getServiceType().toString());
-			log.debug("Service Location: "+service.getServiceLocation().toString());
+			log.debug("Service Location: "+service.getServiceLocation());
 			log.debug("Service Endpoint: "+service.getServiceEndpoint());
 			log.debug("Service PrivacyPolicy: "+service.getPrivacyPolicy());
+			log.debug("Service SecurityPolicy: "+service.getSecurityPolicy());
+			log.debug("Service SecurityPolicy: "+service.getContextSource());
 			log.debug("Service Provider: "+service.getServiceInstance().getServiceImpl().getServiceProvider());
 			log.debug("Service Namespace: "+service.getServiceInstance().getServiceImpl().getServiceNameSpace());
 			log.debug("Service ServiceClient: "+service.getServiceInstance().getServiceImpl().getServiceClient());
@@ -246,12 +278,25 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		service.setServiceStatus(ServiceStatus.STARTED);
 		
+		String deviceId = null;
+		deviceId = (String) event.getServiceReference().getProperty("DeviceId");
+		if(service.getServiceType().equals(ServiceType.DEVICE) && deviceId == null){
+			log.warn("Service Type is DEVICE but no device Id. Aborting");
+			return;
+		}
+		
+		if(!service.getServiceType().equals(ServiceType.DEVICE))
+			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
+		else
+			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifierForDevice(service, deviceId));
+		
 		List<Service> serviceList = new ArrayList<Service>();
 		switch (event.getType()) {
 
 		case ServiceEvent.MODIFIED:
 			if(log.isDebugEnabled()) log.debug("Service Modification");
-			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
+
+			// Probably should check to see something if the service is shared
 			
 			try {
 				serviceList.add(service);
@@ -266,7 +311,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 		case ServiceEvent.REGISTERED:
 			
 			if(log.isDebugEnabled()) log.debug("Service Registered");			
-			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
+			//service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
+			
 			if(log.isDebugEnabled())
 				log.debug("Service Identifier generated: " + service.getServiceIdentifier().getIdentifier().toString()+"_"+service.getServiceIdentifier().getServiceInstanceIdentifier());
 			
@@ -281,27 +327,39 @@ public class ServiceRegistryListener implements BundleContextAware,
 					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
 					this.getServiceReg().registerServiceList(serviceList);
 					
-					if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && service.getServiceType() != ServiceType.THIRD_PARTY_CLIENT){
+					if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
 						if(log.isDebugEnabled())
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
 						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
-				//		getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientJar );
+						URI clientHost;
+						if(clientJar.getPort()!= -1)
+							clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
+						else
+							clientHost = new URI("http://" + clientJar.getHost() );
+
+						if(log.isDebugEnabled())
+							log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
+						//getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath());
 						
 						if(log.isDebugEnabled())
 							log.debug("Adding privacy policy to the Policy Manager!");
 						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
 						
-						//getPrivacyManager().get
-						//String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyLocation);
+						int index = privacyLocation.indexOf('@');	
+						String privacyPath = privacyLocation.substring(index+1);
 						
-						if(log.isDebugEnabled()){
+						String privacyPolicy = getPrivacyManager().getPrivacyPolicyFromLocation(privacyPath);
+						
+						if(log.isDebugEnabled())
 							log.debug("Tried to get privacy policy from: " + privacyLocation);
-							//log.debug("The result is: " + privacyPolicy);
-						}
 						
-						//RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
-						//getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
+						
+						RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
+						RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
+					
+						if(log.isDebugEnabled())
+							log.debug("Privacy Policy result is: " + policyResult.toXMLString());	
 						
 					}
 					
@@ -324,15 +382,58 @@ public class ServiceRegistryListener implements BundleContextAware,
 			break;
 			
 		case ServiceEvent.UNREGISTERING:
-			if(log.isDebugEnabled()) log.debug("Service Unregistered, so we set it to stopped but do not remove from registry");			
-			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
 			
-			try {
-				this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STOPPED);
-			} catch (ServiceNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(!service.getServiceType().equals(ServiceType.DEVICE)){
+				
+				if(log.isDebugEnabled()) log.debug("Service Unregistered, so we set it to stopped but do not remove from registry");			
+				//service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
+				
+				try {
+					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STOPPED);
+				} catch (ServiceNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				if(log.isDebugEnabled()) log.debug("It's a DEVICE, so we need to remove it.");
+				
+				List<Service> servicesToRemove = new ArrayList<Service>();
+				servicesToRemove.add(service);
+							
+				try {
+					
+					if(log.isDebugEnabled()) log.debug("Checking if service is shared with any CIS, and removing that");
+					List<String> cisSharedList = getServiceReg().retrieveCISSharedService(service.getServiceIdentifier());
+					
+					if(!cisSharedList.isEmpty()){
+						for(String cisShared: cisSharedList){
+							if(log.isDebugEnabled()) log.debug("Removing sharing to CIS: " + cisShared);
+							try {
+								getServiceControl().unshareService(service, cisShared);
+							} catch (ServiceControlException e) {
+								e.printStackTrace();
+								log.error("Couldn't unshare from that CIS!");
+							}
+						}
+					} else{
+						if(log.isDebugEnabled()) log.debug("Service not shared with any CIS!");
+					}
+					
+					if(log.isDebugEnabled())
+						log.debug("Removing the shared service from the policy provider!");
+				getNegotiationProvider().removeService(service.getServiceIdentifier());
+				
+				if(log.isDebugEnabled()) log.debug("Removing service: " + service.getServiceName() + " from SOCIETIES Registry");
+
+				getServiceReg().unregisterServiceList(servicesToRemove);
+				log.info("Service " + service.getServiceName() + " has been uninstalled");
+				
+				} catch (ServiceRegistrationException e) {
+					e.printStackTrace();
+					log.error("Exception while unregistering service: " + e.getMessage());
+				}
 			}
+			
 		}
 	}
 
@@ -381,7 +482,20 @@ public class ServiceRegistryListener implements BundleContextAware,
 			
 			if(log.isDebugEnabled())
 					log.debug("Removing the shared service from the policy provider!");
-		//	getNegotiationProvider().removeService(serviceToRemove.getServiceIdentifier());
+			//getNegotiationProvider().removeService(serviceToRemove.getServiceIdentifier());
+			
+			
+			if(log.isDebugEnabled())
+				log.debug("Removing the privacy policy for the service!");
+			IIdentity myNode = getCommMngr().getIdManager().getThisNetworkNode();
+			RequestorService requestService = new RequestorService(myNode , serviceToRemove.getServiceIdentifier());
+
+			try{
+				getPrivacyManager().deletePrivacyPolicy(requestService);
+			} catch (PrivacyException e) {
+				log.error("Exception while removing privacy policy: " + e.getMessage());
+				e.printStackTrace();
+			}
 			
 			if(log.isDebugEnabled()) log.debug("Removing service: " + serviceToRemove.getServiceName() + " from SOCIETIES Registry");
 
