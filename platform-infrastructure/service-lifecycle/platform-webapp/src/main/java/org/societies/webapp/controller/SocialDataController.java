@@ -283,8 +283,28 @@ public class SocialDataController {
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
 					Person p= it.next();
 					String[] id = p.getId().split(":");
+					String name = "";
+					try{
 					
-					content +="<li>[" + id[0] +"] " + p.getName().getFormatted() + " id:"+ id[1] + "</li>" ;
+						if (p.getName()!=null){
+							if (p.getName().getFormatted()!=null)
+								name = p.getName().getFormatted();
+							else {
+								if(p.getName().getFamilyName()!=null) name = p.getName().getFamilyName();
+								if(p.getName().getGivenName()!=null){
+									if (name.length()>0)  name+=" ";
+									name +=p.getName().getGivenName();
+								}
+									  
+							
+							}
+								
+						}
+					}catch(Exception ex){name = "- NOT AVAILABLE -";}
+					
+					content +="<li>[" + id[0] +"] " + name + " id:"+ id[1] + "</li>" ;
+					
+					
 				}
 				content   += "</ul>";
 					
