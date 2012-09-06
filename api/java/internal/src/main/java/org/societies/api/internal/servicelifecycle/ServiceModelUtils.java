@@ -256,4 +256,20 @@ public class ServiceModelUtils {
 
 	}
 
+
+	public static ServiceResourceIdentifier generateServiceResourceIdentifierForDevice(
+			Service service, String deviceId) {
+		
+		ServiceResourceIdentifier serResId=new ServiceResourceIdentifier();		
+		try {
+			serResId.setIdentifier(new URI(service.getServiceInstance().getFullJid()));
+			//This next line is for solving https://redmine.ict-societies.eu/issues/619
+			serResId.setServiceInstanceIdentifier(deviceId);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return serResId;
+	}
+
 }
