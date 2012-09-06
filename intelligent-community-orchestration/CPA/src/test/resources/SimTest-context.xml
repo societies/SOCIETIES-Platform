@@ -74,7 +74,7 @@
        for integration testing outside of an OSGi environment -->
     <context:annotation-config />
     <tx:annotation-driven />
-   <bean id="actFeed" class="org.societies.activity.ActivityFeed">
+   <bean id="actFeed" class="org.societies.activity.PersistedActivityFeed">
    </bean>
    
 </beans>

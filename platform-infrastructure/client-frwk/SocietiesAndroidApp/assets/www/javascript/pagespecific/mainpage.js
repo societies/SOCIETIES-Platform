@@ -45,11 +45,11 @@ var SocietiesUtility = {
 		
 		console.log("Back button handling on page: " + $.mobile.activePage[0].id );
 		
-	    if ($.mobile.activePage[0].id === "main"){
+	    if ($.mobile.activePage[0].id === "index"){
 	        e.preventDefault();
 	        navigator.app.exitApp();
 	    }
-	    else if ($.mobile.activePage[0].id === "menu"){
+	    else if ($.mobile.activePage[0].id === "index"){
 	        e.preventDefault();
 	        SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulCSSCloudLogout);
 	    } else {
@@ -149,7 +149,7 @@ $(document).bind('pageinit',function(){
 	console.log("jQuery pageinit action(s)");
 
 	$('#connectXMPP').click(function() {
-		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#cloudnode").val(), jQuery("#identitydomain").val())) {
+		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 	});
@@ -162,7 +162,4 @@ $(document).bind('pageinit',function(){
 		SocietiesLogin.clearElementValue('#password')
 	});
 
-	$('#cloudnode').focus(function() {
-		SocietiesLogin.clearElementValue('#cloudnode')
-	});
 });
