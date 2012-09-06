@@ -39,6 +39,7 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="SUCCESS"/>
       <xs:enumeration value="SERVICE_NOT_FOUND"/>
+      <xs:enumeration value="SERVICE_TYPE_NOT_SUPPORTED"/>      
       <xs:enumeration value="BUNDLE_NOT_FOUND"/>
       <xs:enumeration value="OSGI_PROBLEM"/>
       <xs:enumeration value="COMMUNICATION_ERROR"/>

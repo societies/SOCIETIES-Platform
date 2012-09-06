@@ -243,6 +243,7 @@ public class ClientCommunicationMgr {
 		} catch (Throwable e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
+		Log.d(LOG_TAG, "getIdentityJid: " + identityJid);
 		return identityJid;
 	}
 	

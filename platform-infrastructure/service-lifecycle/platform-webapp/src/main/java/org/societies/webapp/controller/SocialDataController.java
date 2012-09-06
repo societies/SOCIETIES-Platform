@@ -87,6 +87,7 @@ public class SocialDataController {
 		
 		if (data.contains("facebook"))       return "images/Facebook.png";
 		else if (data.contains("twitter"))   return "images/Twitter.jpg";
+		else if (data.contains("linkedin"))  return "images/Linkedin.png";
 		else return "images/Foursquare.png";
 	}
 
@@ -151,6 +152,7 @@ public class SocialDataController {
 		if ("TW".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.twitter;
 		if ("foursquare".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
 		if ("FQ".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
+		
 		return null;
 	}
 	
@@ -281,8 +283,28 @@ public class SocialDataController {
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
 					Person p= it.next();
 					String[] id = p.getId().split(":");
+					String name = "";
+					try{
 					
-					content +="<li>[" + id[0] +"] " + p.getName().getFormatted() + " id:"+ id[1] + "</li>" ;
+						if (p.getName()!=null){
+							if (p.getName().getFormatted()!=null)
+								name = p.getName().getFormatted();
+							else {
+								if(p.getName().getFamilyName()!=null) name = p.getName().getFamilyName();
+								if(p.getName().getGivenName()!=null){
+									if (name.length()>0)  name+=" ";
+									name +=p.getName().getGivenName();
+								}
+									  
+							
+							}
+								
+						}
+					}catch(Exception ex){name = "- NOT AVAILABLE -";}
+					
+					content +="<li>[" + id[0] +"] " + name + " id:"+ id[1] + "</li>" ;
+					
+					
 				}
 				content   += "</ul>";
 					

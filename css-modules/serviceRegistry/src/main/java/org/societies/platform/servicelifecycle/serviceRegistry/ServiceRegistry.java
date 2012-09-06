@@ -79,9 +79,11 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceDescription(),
 						service.getAuthorSignature(),
 						service.getPrivacyPolicy(),
+						service.getSecurityPolicy(),
 						service.getServiceCategory(),
 						service.getServiceType(),
 						service.getServiceLocation(),
+						service.getContextSource(),
 						service.getServiceInstance(),
 						service.getServiceStatus());
 
@@ -118,9 +120,11 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceDescription(),
 						service.getAuthorSignature(), 
 						service.getPrivacyPolicy(),
+						service.getSecurityPolicy(),
 						service.getServiceCategory(),
 						service.getServiceType(),
 						service.getServiceLocation(),
+						service.getContextSource(),
 						service.getServiceInstance(),
 						service.getServiceStatus());
 				// tmpRegistryEntry = (RegistryEntry)
@@ -235,12 +239,16 @@ public class ServiceRegistry implements IServiceRegistry {
 			c.add(Restrictions.like("authorSignature", filter.getAuthorSignature()));
 		if (filter.getPrivacyPolicy() != null)
 			c.add(Restrictions.like("privacyPolicy", filter.getPrivacyPolicy()));
+		if (filter.getSecurityPolicy() != null)
+			c.add(Restrictions.like("securityPolicy", filter.getSecurityPolicy()));
 		if (filter.getServiceCategory() != null)
-			c.add(Restrictions.like("serviceCategory", filter.getPrivacyPolicy()));
+			c.add(Restrictions.like("serviceCategory", filter.getServiceCategory()));
 		if (filter.getServiceEndpoint() != null)
 			c.add(Restrictions.like("serviceEndPoint", filter.getServiceEndpoint()));
+		if (filter.getContextSource() != null)
+			c.add(Restrictions.like("contextSource", filter.getContextSource()));
 		if (filter.getServiceLocation() != null)
-			c.add(Restrictions.like("serviceLocation", filter.getServiceLocation().toString()));
+			c.add(Restrictions.like("serviceLocation", filter.getServiceLocation()));
 		if (filter.getServiceStatus() != null) 
 			c.add(Restrictions.like("serviceStatus", filter.getServiceStatus().toString()));
 		if (filter.getServiceType() != null) 

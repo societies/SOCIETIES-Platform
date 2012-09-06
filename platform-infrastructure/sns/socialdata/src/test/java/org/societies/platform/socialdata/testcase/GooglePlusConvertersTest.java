@@ -29,6 +29,7 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
@@ -82,8 +83,8 @@ public class GooglePlusConvertersTest {
 		assertEquals("Edgar Domingues", activities.get(1).getActor().getDisplayName());
 	}
 	
-	private String readStringFromFile(String fileName) throws IOException {		
-        BufferedReader reader = new BufferedReader(new FileReader(this.getClass().getResource("/"+fileName).getFile()));
+	private String readStringFromFile(String fileName) throws IOException {	
+        BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/"+fileName)));
 		StringBuilder content = new StringBuilder();
         char[] buf = new char[1024];
         int numRead=0;
