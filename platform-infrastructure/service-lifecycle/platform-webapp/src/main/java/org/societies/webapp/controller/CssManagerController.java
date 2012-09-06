@@ -276,7 +276,7 @@ public class CssManagerController {
 						 cssAdNew.setUri(cmLoginForm.getCssAdUri());
 						 
 						 getCssLocalManager().updateAdvertisementRecord(cssAdOld, cssAdNew);
-						 getCssLocalManager().suggestedFriends();
+						 
 						 
 					}
 					
