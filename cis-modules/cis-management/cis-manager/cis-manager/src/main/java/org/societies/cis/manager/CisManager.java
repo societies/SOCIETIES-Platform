@@ -1201,9 +1201,14 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		this.getQualificationsForJoin(adv,j);
 		
-		// TODO: check with privacy
 		
-		negotiator.startNegotiation(new Requestor(this.cisManagerId), new INegCallBack());
+		// TODO: HARDCODED!! CANT BE COMMITED THIS WAY
+		try {
+			negotiator.startNegotiation(new RequestorCis(this.iCommMgr.getIdManager().fromJid("xcmanager.societies.local") ,this.iCommMgr.getIdManager().fromJid(adv.getId())), new INegCallBack());
+		} catch (InvalidFormatException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 		
 		// sending join
 
