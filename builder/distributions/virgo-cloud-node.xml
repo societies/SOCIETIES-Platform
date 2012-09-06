@@ -72,6 +72,7 @@
 		<module>../../css-modules/device-mgmt/RFIDDriver/</module>
 
 		<!-- SNS: 1 bundle -->
+		<module>../../platform-infrastructure/sns/GooglePlusConnector</module>
 		<module>../../platform-infrastructure/sns/FacebookConn</module>
 		<module>../../platform-infrastructure/sns/FoursquareConnector</module>
 		<module>../../platform-infrastructure/sns/TwitterConnector</module>
@@ -80,6 +81,7 @@
 		<!-- Context Management: 9 bundles (can some be merged?) -->
 		<module>../../context-management</module>
 		<module>../../context-management/context-cloud-bundle/</module>
+		<module>../../context-management/LocationManagement/</module>
 
 		<!-- User Agent: 3 bundles (can these be merged?)-->
 		<module>../../user-agent</module>

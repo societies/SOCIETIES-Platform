@@ -19,7 +19,9 @@ public class PzPropertiesReader {
 	private final static String PZ_PRD_SERVER_URL = "PZ_PRD_SERVER_URL";
 	private final static String PZ_QUERY_GET_ENTITY_FULL = "PZ_QUERY_GET_ENTITY_FULL";
 	private final static String PZ_ENTITY_ID = "PZ_ENTITY_ID";
-			
+	private final static String PZ_PRD_SERVER_ADMIN_URL = "PZ_PRD_SERVER_ADMIN_URL";
+	private final static String PZ_MAP_QUERY_SUFFIX = "PZ_MAP_QUERY_SUFFIX";
+		
 	static PzPropertiesReader instance = new PzPropertiesReader();
 	private final Properties prop;
 	
@@ -77,4 +79,11 @@ public class PzPropertiesReader {
 		return prop.getProperty(PZ_QUERY_GET_ENTITY_FULL);
 	}
 	
+	public String getPzAdminURL(){
+		return prop.getProperty(PZ_PRD_SERVER_ADMIN_URL);
+	}
+	
+	public String getMapQuery(){
+		return prop.getProperty(PZ_MAP_QUERY_SUFFIX);
+	}
 }

@@ -97,7 +97,7 @@ public class MainActivity extends DroidGap {
      */
     public void onDestroy() {
     	super.onDestroy();
-    	Log.d(LOG_TAG, "MasterGUIActivity being destroyed");
+    	Log.d(LOG_TAG, "MasterActivity being destroyed");
     }
 
 }

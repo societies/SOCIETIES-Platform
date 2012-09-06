@@ -96,7 +96,13 @@
 		    <version>${release.version}</version>
 		    <scope>compile</scope>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.societies.platform</groupId>
+			<artifactId>GooglePlusConnector</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>	
 		
 		<!-- 
 		
@@ -129,7 +135,11 @@
     					<Export-Package>	  
     <!-- 				   org.apache.shindig.social*,
     					   org.json.*, -->
+    					   org.scribe.*,
+    					   com.restfb.*,
     					   org.societies.platform.socialdata.*;
+    					   
+    					   
     					</Export-Package>
 		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>

@@ -64,6 +64,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.simplexml.XMLGregorianCalendarConverter;
 import org.societies.maven.converters.URIConverter;
+import org.societies.simple.converters.EventItemsConverter;
+import org.societies.simple.converters.PubsubItemConverter;
+import org.societies.simple.converters.PubsubItemsConverter;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.JID;
@@ -120,6 +123,9 @@ public class CommManagerHelper {
 		try {
 			registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
 			registry.bind(java.net.URI.class,URIConverter.class);
+			registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
+			registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));
+			registry.bind(org.jabber.protocol.pubsub.Item.class, new PubsubItemConverter(s));
 		} catch (Exception e) {
 			LOG.error(e.getMessage(),e);
 		}

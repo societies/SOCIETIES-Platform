@@ -119,6 +119,11 @@ public class CtxAttributeTypes {
     /**
      * @since 0.0.8
      */
+    public static final String EMAIL = "email";
+    
+    /**
+     * @since 0.0.8
+     */
     public static final String FAVOURITE_QUOTES = "favoriteQuotes";
         
 	/**
