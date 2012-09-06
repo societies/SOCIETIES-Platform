@@ -27,9 +27,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.android.api.internal.servicemonitor;
 
 import java.util.List;
-
 import org.societies.android.api.internal.examples.AndroidParcelable;
-
 import android.app.ActivityManager;
 
 
@@ -42,7 +40,8 @@ public interface ICoreServiceMonitor {
 								"startActivity(String client, String activity)",
 								"stopService(String client, String service)",
 								"stopActivity(String client, String activity)",
-								"getNodeDetails(String client, org.societies.api.android.internal.model.AndroidParcelable node)"};
+								"getNodeDetails(String client, org.societies.api.android.internal.model.AndroidParcelable node)",
+								"getInstalledApplications(String client)"};
 
 	/**
 	 * Generate a list of tasks currently "running" on the Android device
@@ -81,11 +80,24 @@ public interface ICoreServiceMonitor {
 
 	List<ActivityManager.RunningServiceInfo> activeServices(String client, String serviceFilter);
 	
-	boolean startService(String client, String service);
-	boolean startActivity(String client, String activity);
-	boolean stopService(String client, String service);
+	/**
+	 * Retrieves a list of installed applications on the android device
+	 * @return array of InstallAppInfo objects
+	 */
+	public InstalledAppInfo[] getInstalledApplications(String Client);
+	
+	/**
+	 * Starts the default activity of the provided package name
+	 * @param client
+	 * @param packageName
+	 * @return
+	 */
+	boolean startActivity(String client, String packageName);
+	
 	boolean stopActivity(String client, String activity);
-
+	boolean startService(String client, String service);
+	boolean stopService(String client, String service);
+	
 	/**
 	 * Parcelable example method
 	 * Non primitive and String parameters must be fully qualified
