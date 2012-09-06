@@ -3,7 +3,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<!-- change the artifactid to your project artifactid -->
-	<groupId>ac.hw.controller</groupId>
+	<groupId>org.societies.css.devicemgmt</groupId>
 	<artifactId>HWUController</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.0.1-SNAPSHOT</version>

@@ -20,17 +20,17 @@
 		http://www.springframework.org/schema/tx/spring-tx.xsd" >
 
     <bean
-        id="TestCase1055"
-        class="org.societies.integration.test.bit.assessment.TestCase1055"
-		depends-on="PrivacyLogAppender"
+        id="TestCase1096"
+        class="org.societies.integration.test.bit.cpa.TestCase1096"
+		depends-on=""
         init-method="run">
-  		<property name="privacyLogAppender" ref="PrivacyLogAppender"/>
-  		<property name="identityManager" ref="IdentityManager"/>
+        <property name="commManager" ref="CommManagerBundle"/>
+        <property name="cisManager" ref="cisManager"/>
     </bean>
     
     <bean
-        id="NominalTestCaseLowerTester"
-        class="org.societies.integration.test.bit.assessment.NominalTestCaseLowerTester">
+        id="NominalTestCase"
+        class="org.societies.integration.test.bit.cpa.NominalTestCase">
     </bean>
 
 </beans>

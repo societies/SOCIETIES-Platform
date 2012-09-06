@@ -24,7 +24,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.integration.test.bit.assessment;
+package org.societies.integration.test.bit.cpa;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;

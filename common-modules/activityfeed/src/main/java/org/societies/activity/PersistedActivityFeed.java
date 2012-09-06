@@ -99,6 +99,21 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		}
 		return ret;
 	}
+    @Override
+    public int count(){
+        Session session = this.sessionFactory.openSession();
+        LOG.info("in persistedactivityfeedcount");
+        int ret = -1;
+        try {
+            ret = session.createCriteria(Activity.class).add(Restrictions.eq("ownerId",this.getId())).list().size();
+        }catch  (Exception e)
+        {
+            LOG.error("Error while trying to count activities");
+        } finally {
+            session.close();
+        }
+        return ret;
+    }
 	@Override
 	public void addActivity(IActivity activity) {
 //        LOG.error("In addActivity for PeristedActivityFeed published:"+activity.getPublished()+" time: "+activity.getTime());
@@ -167,8 +182,16 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		if(!list.contains(activity))
 			return false;
 		boolean ret = list.remove(activity);
+        Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
-		session.delete(activity);
+        try{
+            session.delete(activity);
+        }catch (Exception e){
+            LOG.error("Error when trying to delete activity");
+        }finally {
+            if(session!=null)
+                session.close();
+        }
 		return ret;
 	}
 	@Override
@@ -184,6 +207,7 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		}
 		List<ActivityEntry> castedList = (List<ActivityEntry>) activityEntries;
 		Activity newAct = null;
+        Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		ParsePosition pp = new ParsePosition(0);
@@ -207,6 +231,8 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 			e.printStackTrace();
 
 		}finally{
+            if(session!=null)
+                session.close();
 		}
 
 		return ret;
@@ -222,11 +248,16 @@ public class PersistedActivityFeed extends ActivityFeed implements IActivityFeed
 		return a.getContent();
 	}
 	public void clear(){
-		for(Activity act : list){
-			Transaction t = session.beginTransaction();
-			session.delete(act);
-			t.commit();
-		}
-		list.clear();
+        Session session = sessionFactory.openSession();
+        try{
+            List<Activity> l = session.createCriteria(Activity.class).list();
+            for(Activity a : l)
+                session.delete(a);
+        } catch (Exception e) {
+
+        } finally {
+            if(session!=null)
+                session.close();
+        }
 	}
 }

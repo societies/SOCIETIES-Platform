@@ -13,7 +13,7 @@
                       	http://www.springframework.org/schema/osgi 
                       	http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <osgi:reference id="PrivacyLogAppender" interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender" />
-    <osgi:reference id="IdentityManager" interface="org.societies.api.identity.IIdentityManager" />
+    <osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+    <osgi:reference id="cisManager" interface="org.societies.api.cis.management.ICisManager"/>
 
 </beans>
