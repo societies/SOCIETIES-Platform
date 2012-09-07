@@ -1222,9 +1222,6 @@ public void removeNode(CssRecord cssrecord, String nodeId ) {
 public List<String> suggestedFriends( ) {
 	
 	ISocialData socialData = null;
-	//ISocialConnector connector = null;
-	
-	//socialData  = new SocialData();
 	
 	List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
 	List<String> cssFriends = new ArrayList<String>();
@@ -1252,35 +1249,19 @@ public List<String> suggestedFriends( ) {
 	LOG.info("CSS Directory contains " +cssFriends.size() +" entries");
 	
 	LOG.info("Contacting SN Connector to get list");
-	
-	//Iterator<ISocialConnector>iter = socialdata.getSocialConnectors().iterator();
-		
-	//String  token = " .... ";
-	// MAP with the needed params.
-	//HashMap <String, String> params = new HashMap<String, String>();
-	//params.put(ISocialConnector.AUTH_TOKEN, token);
-	
-	
-	//this.getSocialData();
 	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ getSocialData() returns " +getSocialData());
+	
 	// Generate the connector
 	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
+	socialdata.updateSocialData();
 	
 	while (it.hasNext()){
 	  ISocialConnector conn = it.next();
   	  
-  	  
-	//ISocialConnector con = socialdata.createConnector(ISocialConnector.SocialNetwork.Facebook, params);
 	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ SocialNetwork connector contains " +conn.getConnectorName());
-	//ISocialConnector con = getSocialData().createConnector(ISocialConnector.SocialNetwork.Facebook, params);
-//	try {
-//		socialdata.addSocialConnector(con);
-//	} catch (Exception e1) {
-		// TODO Auto-generated catch block
-//		e1.printStackTrace();
-//	}
-	// Fetch data from it
-	socialdata.updateSocialData();
+	
+	//socialdata.updateSocialData();
+	}
 	
 	snFriends = (List<Person>) socialdata.getSocialPeople();
 	LOG.info("snFriends size is :" +snFriends.size());
@@ -1288,17 +1269,33 @@ public List<String> suggestedFriends( ) {
     int index =1;
     while(itt.hasNext()){
     	Person p =null;
+    	String name = "";
     	try{
-    	p = (Person) itt.next();
-    	LOG.info(index +" Friends:" +p.getName().getFormatted());
-    	socialFriends.add(p.getName().getFormatted());
+        	p = (Person) itt.next();
+        	if (p.getName()!=null){
+    			if (p.getName().getFormatted()!=null){
+    				name = p.getName().getFormatted();
+    				LOG.info(index +" Friends:" +name);
+    				socialFriends.add(name);
+    			}
+    				
+    			else {
+    				if(p.getName().getFamilyName()!=null) name = p.getName().getFamilyName();
+    				if(p.getName().getGivenName()!=null){
+    					if (name.length()>0)  name+=" ";
+    					name +=p.getName().getGivenName();
+    					LOG.info(index +" Friends:" +name);
+    					socialFriends.add(name);
+    				}
+    					  
+    			
+    			}
+    				
+    		}
+    	}catch(Exception ex){name = "- NOT AVAILABLE -";}
     	index++;
-    	}
-    	catch(Exception e){
-    	    e.printStackTrace();
-    	}
     }
-	}
+	//}
     
     //compare the lists to create
     
@@ -1309,16 +1306,16 @@ public List<String> suggestedFriends( ) {
     //compare the two lists
     LOG.info("Compare the two lists to generate a common Friends list");
     int i = 1;
-    for (int index =0; index <= cssFriends.size(); index++)
-    {
-    //for (String friend : cssFriends.get(index)) {
-    	LOG.info("[]][][][][][] CSS Friends iterator List contains " +cssFriends.get(index) +" int " +index);
-        if (socialFriends.contains(cssFriends.get(index))) {
-        	commonFriends.add(cssFriends.get(index));
-     //   }
-     //   i++;
+   // for (int index =0; index < cssFriends.size(); index++)
+   // {
+    for (String friend : cssFriends) {
+    	LOG.info("[]][][][][][] CSS Friends iterator List contains " +friend);
+        if (socialFriends.contains(friend)) {
+        	commonFriends.add(friend);
+        }
+       // i++;
     }
-    }
+    //}
     LOG.info("common Friends List NOW contains " +commonFriends.size() +" entries");
 	return commonFriends;
 

@@ -120,13 +120,6 @@ public class CssSuggestedFriendsController {
 				model.put("result", res);
 				model.put("cssfriends", cssfriends);
 				
-			}else if (method.equalsIgnoreCase("sendfriendreq")) {
-				res="CSS Send Friend Request Result ";
-				String FriendId = null;
-				FriendId = sfForm.getFriendId();
-				getCssLocalManager().sendCssFriendRequest(FriendId);
-				
-				
 			}else{
 				res="error unknown metod";
 			}

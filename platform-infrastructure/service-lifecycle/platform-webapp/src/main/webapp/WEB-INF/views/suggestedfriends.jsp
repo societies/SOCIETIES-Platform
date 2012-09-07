@@ -39,7 +39,7 @@
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
 			<tr>
-				<td>CSS Directory Methods :</td>
+				<td>CSS Suggested Friends Methods:</td>
 					<td><form:select path="method" >
 					   <form:option value="NONE" label="--- Select ---" />
 					   <form:options items="${methods}" />

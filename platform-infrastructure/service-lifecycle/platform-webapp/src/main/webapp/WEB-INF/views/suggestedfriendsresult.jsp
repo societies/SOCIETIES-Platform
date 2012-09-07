@@ -21,25 +21,13 @@
 <h4>${result}</h4>
 <br/>
 <br/>
-<script language="javascript">
-	function updateForm(FriendId) {    
-		document.forms["suggestedfriends"]["friend"].value = FriendId;
-		document.forms["suggestedfriends"].submit();
-	} 
-</script>
-
-<form id="suggestedfriends" name="suggestedfriends" method="post" action="suggestedfriends.html">
-<input type="hidden" name="friendId" id="friendId">
-<input type="hidden" name="method" id="method" value="sendfriendreq">
 <Table border="1">
 <tr><td><B>Friend Name</B></td>
 </tr> 
 
 	<xc:forEach var="cssfriend" items="${cssfriends}">
         <tr>
-        	<td>${cssfriend}</td>	
-        	<td><input type="button" value="submit" onclick="updateForm('${cssfriend}')" ></td>					
-         	       
+        	<td>${cssfriend}</td>	         	       
         </tr>
     </xc:forEach>
     	
