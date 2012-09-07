@@ -4,7 +4,7 @@ phonegapdesktop.internal.parseConfigFile('pluginjs/cismanager.json');
 window.plugins.SocietiesLocalCISManager = {
 	createCIS: function(successCallback, failureCallback) {
 		console.log("create CIS desktop invoked");
-		if (phonegapdesktop.internal.randomException("CISManagerService")) {
+		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {
 			errorCallback('A random error was generated');
 		}
 		else {
