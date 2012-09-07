@@ -71,10 +71,7 @@ var SocietiesLogout = {
 		}
 		
 	    window.plugins.SocietiesLocalCSSManager.logoutXMPPServer(success, failure);
-
 	}
-
-
 }
 
 
@@ -85,11 +82,11 @@ var SocietiesLogout = {
  * N.B. this event is fired once per page load
  * @returns null
  */
+
 $(document).bind('pageinit',function(){
+	console.log("jQuery pageinit action(s) for logout");
 
-	console.log("jQuery pageinit action(s)");
-
-	$("#slide-logout").click(function() {
+	$('#slide-logout').off('click').on('click', function(){
 		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulCSSCloudLogout);
 	});
 });

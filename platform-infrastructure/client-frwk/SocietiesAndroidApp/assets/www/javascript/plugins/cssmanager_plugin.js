@@ -287,9 +287,6 @@ var	SocietiesLocalCSSManagerHelper = {
 		function success(data) {
 			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
 
-//			$.mobile.changePage( ($("#main")), { transition: "slideup"} );
-//			window.open("../index.html");
-
 			console.log(data);
 		}
 		

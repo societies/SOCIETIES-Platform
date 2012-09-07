@@ -39,7 +39,7 @@ public class CallbackAdapter implements Callback {
 	
 	@Override
 	public void receiveResult(String xml) {
-		Log.d(LOG_TAG, "receiveResult result: " + xml );
+//		Log.d(LOG_TAG, "receiveResult result: " + xml );
 
 		unbindService();
 		
@@ -54,7 +54,7 @@ public class CallbackAdapter implements Callback {
 	}
 	@Override
 	public void receiveError(String xml) {
-		Log.d(LOG_TAG, "receiveError error: " + xml );
+//		Log.d(LOG_TAG, "receiveError error: " + xml );
 		unbindService();
 		
 		try {
@@ -66,7 +66,7 @@ public class CallbackAdapter implements Callback {
 	}
 	
 	public void receiveItems(String xml) {
-		Log.d(LOG_TAG, "receiveItems items: " + xml );
+//		Log.d(LOG_TAG, "receiveItems items: " + xml );
 		unbindService();
 		
 		try {
@@ -79,7 +79,7 @@ public class CallbackAdapter implements Callback {
 	}
 	
 	public void receiveMessage(String xml) {	
-		Log.d(LOG_TAG, "receiveMessage message: " + xml );
+//		Log.d(LOG_TAG, "receiveMessage message: " + xml );
 		
 		try {			
 			Packet packet = marshaller.unmarshallMessage(xml);			

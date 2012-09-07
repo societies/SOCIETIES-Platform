@@ -70,19 +70,19 @@ var SocietiesDeviceStatus = {
  */
 $(document).bind('pageinit',function(){
 
-	console.log("jQuery pageinit action(s)");
-	$('#connectivity').click(function() {
+	console.log("jQuery pageinit action(s) for device status");
+	$('#connectivity').off('click').on('click', function(){
 		window.plugins.SocietiesDeviceStatus.getConnectivityStatus(SocietiesDeviceStatus.onSuccess, SocietiesDeviceStatus.onFailure);
 	});
 	
-	$('#location').click(function() {
+	$('#location').off('click').on('click', function(){
 		window.plugins.SocietiesDeviceStatus.getLocationStatus(SocietiesDeviceStatus.onSuccess, SocietiesDeviceStatus.onFailure);
 	});
 	
-	$('#battery').click(function() {
+	$('#battery').off('click').on('click', function(){
 		window.plugins.SocietiesDeviceStatus.getBatteryStatus(SocietiesDeviceStatus.onSuccess, SocietiesDeviceStatus.onFailure);
 	});
-	$('#registerBattery').click(function() {
+	$('#registerBattery').off('click').on('click', function(){
 		window.plugins.SocietiesDeviceStatus.registerToBatteryStatus(SocietiesDeviceStatus.onSuccess, SocietiesDeviceStatus.onFailure);
 	});
 
