@@ -25,7 +25,6 @@
 package org.societies.android.api.internal.servicelifecycle;
 
 import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
@@ -92,7 +91,7 @@ public class AService extends Service implements Parcelable {
 	    this.setServiceEndpoint(in.readString());
 	    this.setServiceIdentifier((AServiceResourceIdentifier) in.readParcelable(this.getClass().getClassLoader()) );
 	    this.setServiceInstance((AServiceInstance) in.readParcelable(this.getClass().getClassLoader()) );
-	    this.setServiceLocation(ServiceLocation.fromValue(in.readString()));
+	    this.setServiceLocation(in.readString());
 	    this.setServiceName(in.readString());
 		this.setServiceCategory(in.readString());
 		this.setServiceStatus(ServiceStatus.fromValue(in.readString()));
