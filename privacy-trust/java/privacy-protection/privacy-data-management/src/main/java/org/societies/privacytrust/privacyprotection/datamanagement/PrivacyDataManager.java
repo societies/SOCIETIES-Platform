@@ -26,23 +26,37 @@ package org.societies.privacytrust.privacyprotection.datamanagement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisParticipant;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ActionUtils;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.ConditionUtils;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
@@ -60,6 +74,9 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	private IPrivacyPreferenceManager privacyPreferenceManager;
 	private IDataObfuscationManager dataObfuscationManager;
+	private IPrivacyPolicyManager privacyPolicyManager;
+	private ICommManager commManager;
+	private ICisManager cisManager;
 
 	public PrivacyDataManager()  {
 		dataObfuscationManager = new DataObfuscationManager();
@@ -89,7 +106,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
 
-
 		// -- Create useful values for default result
 		List<Condition> conditions = new ArrayList<Condition>();
 		Resource resource = new Resource(dataId);
@@ -98,16 +114,37 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		// -- Retrieve a stored permission
 		ResponseItem permission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
 
-		// -- Permission not available: ask to PrivacyPreferenceManager
+		// -- Permission not available
 		if (null == permission || null == permission.getRequestItem()) {
 			LOG.info("No Permission retrieved");
 			permission = null;
-			try {
-				permission = privacyPreferenceManager.checkPermission(requestor, dataId, actions);
-			} catch (Exception e) {
-				LOG.error("Error when retrieving permission from PrivacyPreferenceManager", e);
+
+			// - Check access control type: CSS or CIS
+			boolean cssAccessControl = true;
+			if (null != dataId.getOwnerId()) {
+				// Retrieve Owner IIdentity
+				IIdentity ownerId = null;
+				try {
+					ownerId = commManager.getIdManager().fromJid(dataId.getOwnerId());
+				} catch (InvalidFormatException e) {
+					LOG.error("[From JID Error] IIdentity can not be understand.", e);
+				}
+				// Check if the owner IIdentity has a CIS type
+				if (null != ownerId && IdentityType.CIS.equals(ownerId.getType())) {
+					cssAccessControl = false;
+				}
 			}
-			// Permission still not available: deny access
+
+			// - Access control for CIS data: use the CIS privacy policy
+			if (!cssAccessControl) {
+				permission = checkPermissionCisData(requestor, dataId, actions);
+			}
+			// - Access control for CSS data: ask to PrivacyPreferenceManager
+			else {
+				permission = checkPermissionCssData(requestor, dataId, actions);
+			}
+
+			// - Still no permission available: deny access
 			if (null == permission || null == permission.getRequestItem()) {
 				permission = new ResponseItem(requestItemNull, Decision.DENY);
 			}
@@ -116,6 +153,138 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 		return permission;
 	}
+
+	private ResponseItem checkPermissionCisData(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+		// -- Create useful values for default result
+		List<Condition> conditions = new ArrayList<Condition>();
+		Resource resource = new Resource(dataId);
+		RequestItem requestItemNull = new RequestItem(resource, actions, conditions);
+		ResponseItem permission = new ResponseItem(requestItemNull, Decision.DENY);
+		// -- Internal call (requestor == current node)
+		IIdentity cssId = commManager.getIdManager().getThisNetworkNode();
+		if (cssId.equals(requestor.getRequestorId())) {
+			return new ResponseItem(requestItemNull, Decision.PERMIT);
+		}
+		// -- Verify parameters
+		if (!isDepencyInjectionDone(3)) {
+			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
+		}
+
+		// -- Retrieve the CIS Privacy Policy
+		IIdentity cisId;
+		try {
+			cisId = commManager.getIdManager().fromJid(dataId.getOwnerId());
+		} catch (InvalidFormatException e) {
+			throw new PrivacyException("[From JID] CIS Id can not be understand.", e);
+		}
+		RequestPolicy privacyPolicy = privacyPolicyManager.getPrivacyPolicy(new RequestorCis(cssId, cisId));
+
+		// -- Search data request in the privacy policy
+		/*
+		 * ALOGIRTHM
+		 * If the requested data is not in the privacy policy: DENY
+		 * The requested data is in the privacy policy:
+		 * * If this data is private: DENY
+		 * * If all requested actions are matching AND if this data is public: PERMIT
+		 * * If all requested actions are matching AND if this data is members only: retrieve CIS member list
+		 * ** If the requestor is in the CIS member list: PERMIT
+		 * ** Otherwise: DENY
+		 * * If partial requested actions are matching AND if this data is public: remove these actions and continue
+		 * * If partial requested actions are matching AND if this data is members only: if PERMIT with the CIS member list, remove these actions and continue
+		 */
+		List<ICisParticipant> cisMemberList = null;
+		List<Action> actionsDeepCopy = new ArrayList<Action>();
+		for(int i = 0; i<actions.size(); i++) {
+			actionsDeepCopy.add(new Action(actions.get(i)));
+		}
+		for(RequestItem request : privacyPolicy.getRequests()) {
+			// - Match data id or data type
+			if ((null != request.getResource().getDataId() && dataId.equals(request.getResource().getDataId()))
+					|| (dataId.getScheme().equals(request.getResource().getScheme()) && dataId.getType().equals(request.getResource().getDataType()))) {
+
+				List<Action> actionsThatMatch = new ArrayList<Action>();
+				boolean allRequestedActionsMatch = ActionUtils.contains(actionsDeepCopy, request.getActions(), actionsThatMatch);
+				boolean canBeSharedWith3pServices = ConditionUtils.contains(ConditionConstants.SHARE_WITH_3RD_PARTIES, request.getConditions());
+				// All requested actions are matching AND if this data is public
+				if (allRequestedActionsMatch && canBeSharedWith3pServices) {
+					return new ResponseItem(requestItemNull, Decision.PERMIT);
+				}
+				boolean canBeSharedWithCisMembersOnly = ConditionUtils.contains(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, request.getConditions());
+				//  All requested actions are matching AND if this data is members only
+				if (allRequestedActionsMatch && canBeSharedWithCisMembersOnly) {
+					// Is it a CIS member?
+					if (isCisMember(cisMemberList, dataId.getOwnerId(), requestor.getRequestorId().getJid())) {
+						return new ResponseItem(requestItemNull, Decision.PERMIT);
+					}
+					return new ResponseItem(requestItemNull, Decision.DENY);
+				}
+				// Requested actions are partially matching AND if this data is public
+				if (actionsThatMatch.size() > 0 && canBeSharedWith3pServices) {
+					actionsDeepCopy.removeAll(actionsThatMatch);
+					continue;
+				}
+				// Requested actions are partially matching AND if this data is members only
+				if (actionsThatMatch.size() > 0 && canBeSharedWithCisMembersOnly) {
+					// Is it a CIS member?
+					if (isCisMember(cisMemberList, dataId.getOwnerId(), requestor.getRequestorId().getJid())) {
+						actionsDeepCopy.removeAll(actionsThatMatch);
+						continue;
+					}
+					return new ResponseItem(requestItemNull, Decision.DENY);
+				}
+			}
+		}
+
+		return permission;
+	}
+
+	/**
+	 * @param cisMemberList
+	 * @param ownerId
+	 * @throws PrivacyException 
+	 */
+	private boolean isCisMember(List<ICisParticipant> cisMemberList, String cisId, String cssId) throws PrivacyException {
+		retrieveCisMemberList(cisMemberList, cisId);
+		for (ICisParticipant cisMember : cisMemberList) {
+			if (cisMember.getMembersJid().equals(cssId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	/**
+	 * @return
+	 * @throws PrivacyException 
+	 */
+	private void retrieveCisMemberList(List<ICisParticipant> cisMemberList, String cisId) throws PrivacyException {
+		if (null != cisMemberList) {
+			return;
+		}
+		Future<Set<ICisParticipant>> ciMemberListFuture = cisManager.getOwnedCis(cisId).getMemberList();
+		try {
+			cisMemberList = new ArrayList<ICisParticipant>(ciMemberListFuture.get());
+		} catch (InterruptedException e) {
+			throw new PrivacyException("[Interrupted Future] Can't retrieve the member list of CIS '"+cisId+"'.", e);
+		} catch (ExecutionException e) {
+			throw new PrivacyException("[Future Execution Error] Can't retrieve the member list of CIS '"+cisId+"'.", e);
+		}
+	}
+
+
+	private ResponseItem checkPermissionCssData(Requestor requestor, DataIdentifier dataId, List<Action> actions) {
+		// -- Retrieve a permission using the PrivacyPreferenceManager
+		ResponseItem permission = null;
+		try {
+			permission = privacyPreferenceManager.checkPermission(requestor, dataId, actions);
+		} catch (Exception e) {
+			LOG.error("Error when retrieving permission from PrivacyPreferenceManager", e);
+		}
+		return permission;
+	}
+
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action)
@@ -255,6 +424,21 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		this.privacyDataManagerInternal = privacyDataManagerInternal;
 		LOG.info("[Dependency Injection] PrivacyDataManagerInternal injected");
 	}
+	public void setPrivacyPolicyManager(
+			IPrivacyPolicyManager privacyPolicyManager) {
+		this.privacyPolicyManager = privacyPolicyManager;
+		LOG.info("[Dependency Injection] PrivacyPolicyManager injected");
+	}
+	public void setCommManager(
+			ICommManager commManager) {
+		this.commManager = commManager;
+		LOG.info("[Dependency Injection] CommManager injected");
+	}
+	public void setCisManager(
+			ICisManager cisManager) {
+		this.cisManager = cisManager;
+		LOG.info("[Dependency Injection] ICisManager injected");
+	}
 
 
 	private boolean isDepencyInjectionDone() {
@@ -270,10 +454,28 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				LOG.info("[Dependency Injection] Missing PrivacyDataManagerInternal");
 				return false;
 			}
+			if (null == commManager) {
+				LOG.info("[Dependency Injection] Missing CommManager");
+				return false;
+			}
 		}
 		if (level == 0 || level == 2) {
 			if (null == dataObfuscationManager) {
 				LOG.info("[Dependency Injection] Missing DataObfuscationManager");
+				return false;
+			}
+		}
+		if (level == 0 || level == 3) {
+			if (null == privacyPolicyManager) {
+				LOG.info("[Dependency Injection] Missing PrivacyPolicyManager");
+				return false;
+			}
+			if (null == commManager) {
+				LOG.info("[Dependency Injection] Missing CommManager");
+				return false;
+			}
+			if (null == cisManager) {
+				LOG.info("[Dependency Injection] Missing CisManager");
 				return false;
 			}
 		}

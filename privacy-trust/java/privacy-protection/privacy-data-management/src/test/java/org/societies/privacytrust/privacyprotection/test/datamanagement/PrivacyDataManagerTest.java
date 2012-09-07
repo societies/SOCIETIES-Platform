@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
+import org.societies.api.identity.DataIdentifierUtil;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -301,6 +302,38 @@ public class PrivacyDataManagerTest {
 		assertNull(actual);
 	}
 
+	
+	/* --- Data Id --- */
+	@Test
+	@Rollback(true)
+	public void testFromUriString() {
+		String testTitle = new String("testFromUriString: multiple test of DataId parsing");
+		LOG.info("[TEST] "+testTitle);
+		
+		String ownerId = "owner@domain.com";
+		String dataId1 = "context://"+ownerId+"/locationSymbolic/";
+		String dataId2 = "context://owner@domain.com/locationSymbolic";
+		String dataId3 = "context:///locationSymbolic/";
+		String dataId4 = "context:///locationSymbolic";
+		String dataId5 = "context:///";
+		
+		assertNotNull("Data id from "+dataId1+" should not be null", DataIdentifierUtil.fromUri(dataId1));
+		assertEquals("Owner id from "+dataId1+" not retrieved", ownerId, DataIdentifierUtil.fromUri(dataId1).getOwnerId());
+
+		assertNotNull("Data id from "+dataId2+" should not be null", DataIdentifierUtil.fromUri(dataId2));
+		assertEquals("Owner id from "+dataId2+" not retrieved", ownerId, DataIdentifierUtil.fromUri(dataId2).getOwnerId());
+		
+		assertNotNull("Data id from "+dataId3+" should not be null", DataIdentifierUtil.fromUri(dataId3));
+		assertEquals("Owner id from "+dataId3+" not retrieved", "", DataIdentifierUtil.fromUri(dataId3).getOwnerId());
+		
+		assertNotNull("Data id from "+dataId4+" should not be null", DataIdentifierUtil.fromUri(dataId4));
+		assertEquals("Owner id from "+dataId4+" not retrieved", "", DataIdentifierUtil.fromUri(dataId4).getOwnerId());
+		assertEquals("Data type from "+dataId4+" not retrieved", "locationSymbolic", DataIdentifierUtil.fromUri(dataId4).getType());
+		
+		assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierUtil.fromUri(dataId5));
+		assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierUtil.fromUri(dataId5).getOwnerId());
+		assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierUtil.fromUri(dataId5).getType());
+	}
 
 	// -- Dependency Injection
 	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {

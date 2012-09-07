@@ -119,6 +119,12 @@
 			<version>${version.pt}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>privacypolicymanagement</artifactId>
+			<version>${version.pt}</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- Logging -->
 		<!-- <dependency>
 			<groupId>org.slf4j</groupId>

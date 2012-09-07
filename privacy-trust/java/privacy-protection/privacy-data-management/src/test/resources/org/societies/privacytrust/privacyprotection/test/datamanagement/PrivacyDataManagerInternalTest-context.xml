@@ -16,10 +16,15 @@
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
 		<property name="privacyDataManagerInternal" ref="PrivacyDataManagerInternal" />
 		<property name="privacyPreferenceManager" ref="PrivacyPreferenceManager" />
+		<property name="privacyPolicyManager" ref="PrivacyPolicyManager" />
 	</bean>
 	
 	<bean name="PrivacyPreferenceManager"
 		class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager">
+	</bean>
+	
+	<bean name="PrivacyPolicyManager"
+		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager">
 	</bean>
 	
 	<bean name="PrivacyDataManagerInternal"

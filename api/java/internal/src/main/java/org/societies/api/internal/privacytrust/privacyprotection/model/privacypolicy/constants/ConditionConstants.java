@@ -30,6 +30,9 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
  */
 public enum ConditionConstants {
 	SHARE_WITH_3RD_PARTIES,
+	SHARE_WITH_CIS_MEMBERS_ONLY,
+	SHARE_WITH_CIS_OWNER_ONLY,
+	MAY_BE_INFERRED,
 	DATA_RETENTION_IN_SECONDS,
 	DATA_RETENTION_IN_MINUTES,
 	DATA_RETENTION_IN_HOURS,
@@ -37,5 +40,4 @@ public enum ConditionConstants {
 	STORE_IN_SECURE_STORAGE,
 	RIGHT_TO_ACCESS_HELD_DATA,
 	RIGHT_TO_CORRECT_INCORRECT_DATA,
-	SHARE_WITH_CIS_MEMBERS_ONLY
 }
