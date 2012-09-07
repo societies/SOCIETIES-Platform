@@ -8,7 +8,7 @@ window.plugins.SocietiesLocalCISManager = {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(phonegapdesktop.internal.getDebugValue('CISManagerService', 'createCIS'));
+			successCallback(phonegapdesktop.internal.getDebugValue('CISDesktopManagerService', 'createdCIS'));
 		}
 	}	
 

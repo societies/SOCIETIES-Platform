@@ -47,12 +47,11 @@ var	SocietiesLocalCISManager = {
                         "attribute": "location",
                         "operation": "equals",
                         "value": "Paris"}],
-                    "cisDescription": "desc",
+                    "cisDescription": jQuery("#cisDescOnCisCreate").val(),
                     "cisJid" : null
-                    }
+                    };
 
-			console.log("Call LocalCISManagerService - createCIS with cisName = " + cisRecord.cisName + 
-					"and cisype = " cisRecord.cisType);
+			console.log("Call LocalCISManagerService - createCIS with cisRecod = " + cisRecord);
 
 
 			return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful

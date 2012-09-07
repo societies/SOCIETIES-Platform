@@ -1,10 +1,10 @@
 {
-	"CISManagerService" : {
+	"CISDesktopManagerService" : {
 		"exceptionThreshold" : 0,
-		"createCIS" : {
+		"createdCIS" : {
 
 						"cisName": "barcelona fc",
-	                    "cisType": "futebol",
+	                    "cisType": "soccer",
 	                    "cisOwner": "thomas@soc.com",
 	                    "cisCriteria": [
 	                    	{
@@ -17,6 +17,6 @@
 	                        "value": "Peru"}
 	                        ],
 	                    "cisDescription": "soh barca",
-	                    "cisRecordIdentity" : "barca.soc.com"}
+	                    "cisJid" : "barca.soc.com"}
 	}
 }
