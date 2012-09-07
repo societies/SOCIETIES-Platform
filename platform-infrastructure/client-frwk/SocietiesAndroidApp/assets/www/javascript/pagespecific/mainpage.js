@@ -149,17 +149,17 @@ $(document).bind('pageinit',function(){
 
 	console.log("jQuery pageinit action(s) for mainpage");
 
-	$('#connectXMPP').off('click').on('click', function() {
+	$('#connectXMPP').off('click').on('click', function(){
 		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 	});
 
-	$('#username').off('focus').on('focus', function() {
+	$('#username').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#username')
 	});
 
-	$('#password').off('focus').on('focus', function() {
+	$('#password').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#password')
 	});
 

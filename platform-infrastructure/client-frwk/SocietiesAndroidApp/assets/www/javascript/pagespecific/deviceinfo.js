@@ -65,7 +65,7 @@ $(document).bind('pageinit',function(){
 
 	console.log("jQuery pageinit action(s) for device info");
 
-	$('#deviceChar').click(function() {
+	$('#deviceChar').off('click').on('click', function(){
 		SocietiesDeviceInfo.deviceInfo();
 	});
 

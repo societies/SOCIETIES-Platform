@@ -86,7 +86,7 @@ var SocietiesLogout = {
 $(document).bind('pageinit',function(){
 	console.log("jQuery pageinit action(s) for logout");
 
-	$('#slide-logout').off('click').on('click', function() {
+	$('#slide-logout').off('click').on('click', function(){
 		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulCSSCloudLogout);
 	});
 });

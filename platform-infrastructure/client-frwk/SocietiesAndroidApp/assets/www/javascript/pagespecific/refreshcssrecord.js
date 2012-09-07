@@ -98,7 +98,7 @@ $(document).bind('pageinit',function(){
 
 	console.log("jQuery pageinit action(s) for refreshcssrecord");
 
-	$('#refreshCssRecord').click(function() {
+	$('#refreshCssRecord').off('click').on('click', function(){
 		SocietiesCSSRecord.refreshCssProfile();
 	});
 

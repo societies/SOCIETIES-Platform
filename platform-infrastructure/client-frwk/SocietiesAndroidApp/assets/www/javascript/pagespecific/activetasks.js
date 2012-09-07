@@ -74,7 +74,7 @@ $(document).bind('pageinit',function(){
 
 	console.log("jQuery pageinit action(s)for activetasks");
 
-	$('#refreshTasks').click(function() {
+	$('#refreshTasks').off('click').on('click', function(){
 		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(SocietiesActiveTasks.refreshActiveTasks);
 	});
 

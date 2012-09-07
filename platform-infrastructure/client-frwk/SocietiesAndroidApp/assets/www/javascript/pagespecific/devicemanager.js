@@ -56,7 +56,7 @@ $(document).bind('pageinit',function(){
 
 	console.log("jQuery pageinit action(s) for devicemanager");
 
-	$('#resetDeviceManager').click(function() {
+	$('#resetDeviceManager').off('click').on('click', function(){
 		SocietiesDeviceManager.resetDeviceMgr();
 	});
 });

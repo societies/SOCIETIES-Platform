@@ -141,7 +141,7 @@ $(document).bind('pageinit',function(){
 	//	SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);
 	//}); 
 	
-	$('#List3PServices').click(function() {
+	$('#List3PServices').off('click').on('click', function(){
 		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
 	});
 	
