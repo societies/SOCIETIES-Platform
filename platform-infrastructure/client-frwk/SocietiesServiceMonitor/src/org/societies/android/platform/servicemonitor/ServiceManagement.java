@@ -39,6 +39,7 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
@@ -116,6 +117,12 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 	 */
 	public AService[] getServices(String client, String identity) {
 		Log.d(LOG_TAG, "getServices called by client: " + client);
+		
+		INetworkNode node = commMgr.login("john", "societies.local", "1234");
+		if(node==null) 
+			Log.d(LOG_TAG, ">>>>>>>>Login failed");
+		else
+			Log.d(LOG_TAG, ">>>>>>>>Login success");
 		
 		//MESSAGE BEAN
 		ServiceDiscoveryMsgBean messageBean = new ServiceDiscoveryMsgBean();
