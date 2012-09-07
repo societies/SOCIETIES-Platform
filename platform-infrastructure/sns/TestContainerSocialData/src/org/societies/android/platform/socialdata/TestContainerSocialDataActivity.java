@@ -23,6 +23,8 @@ public class TestContainerSocialDataActivity extends Activity {
 
 	private static final String LOG_TAG = TestContainerSocialDataActivity.class.getName();
 	
+	private static final String PACKAGE_NAME = "org.societies.android.platform.socialdata";
+	
     private ISocialData socialData;
     private boolean socialDataConnected = false;
     private TextView text;  
@@ -99,7 +101,7 @@ public class TestContainerSocialDataActivity extends Activity {
     private void testAddConnector() {
     	
 		long testValidity = 1000;
-		socialData.addSocialConnector("TestContainerSocialDataActivity", SocialNetwork.Facebook, "testToken", testValidity);
+		socialData.addSocialConnector(PACKAGE_NAME, SocialNetwork.Facebook, "testToken", testValidity);
 		
     }
     
@@ -110,7 +112,7 @@ public class TestContainerSocialDataActivity extends Activity {
 			Log.d(LOG_TAG, intent.getAction());
 			
 			if (intent.getAction().equals(SocialData.ADD_SOCIAL_CONNECTOR)) {
-				int id = intent.getIntExtra(SocialData.INTENT_RETURN_KEY, -1);				
+				String id = intent.getStringExtra(SocialData.INTENT_RETURN_KEY);				
 				Log.d(LOG_TAG, "id="+id);
 				text.setText("id="+id);
 			}

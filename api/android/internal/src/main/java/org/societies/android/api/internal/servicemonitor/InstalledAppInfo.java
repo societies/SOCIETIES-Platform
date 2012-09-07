@@ -24,9 +24,6 @@
  */
 package org.societies.android.api.internal.servicemonitor;
 
-import org.societies.android.api.internal.servicelifecycle.AService;
-
-import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -38,12 +35,12 @@ import android.os.Parcelable;
  */
 public class InstalledAppInfo implements Parcelable {
 
-	private String applicationName;
-	private String packageName;
-	private String applicationDescription;
-	private String versionName;
+	private String applicationName="";
+	private String packageName="";
+	private String applicationDescription="";
+	private String versionName="";
 	private int versionCode = 0;
-	private String iconAsB64string;
+	private String iconAsB64string="";
 
 	public InstalledAppInfo() {
 		super();
@@ -111,7 +108,7 @@ public class InstalledAppInfo implements Parcelable {
 
 	@Override
 	public String toString() {
-		return (applicationName + "\t" + packageName + "\t" + applicationDescription + "\t" + versionName + "\t" + versionCode);
+		return (applicationName + "\t" + packageName + "\t" + applicationDescription + "\t" + versionName + "\t" + versionCode + "\n");// + iconAsB64string);
 	}
 
 	/* @see android.os.Parcelable#describeContents() */

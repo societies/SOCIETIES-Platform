@@ -139,6 +139,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 		}
 		Stanza stanza = new Stanza(toID);
         try {
+        	commMgr.register(ELEMENT_NAMES, discoCallback);
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {

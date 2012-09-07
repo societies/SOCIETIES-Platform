@@ -46,6 +46,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Base64;
 import android.util.Log;
 
@@ -272,19 +273,22 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	public InstalledAppInfo[] getInstalledApplications(String client) {
 		Log.d(LOG_TAG, "Calling getInstalledApplications from client: " + client);
 		
-		InstalledAppInfo apps[] = getInstalledApps(false); /* false = no system packages */
-		final int max = apps.length;
-		for (int i=0; i<max; i++) {
-			Log.d(LOG_TAG, apps[i].toString());
+		List<InstalledAppInfo> apps = getInstalledApps(false, "org.societies."); /* false = no system packages */
+		Parcelable returnArray[] = new Parcelable[apps.size()];
+		for (int i=0; i<apps.size(); i++) {
+			InstalledAppInfo tmpApp = apps.get(i); 
+			returnArray[i] = tmpApp;
+			Log.d(LOG_TAG, tmpApp.toString());
 		}
-		
+
 		//SETUP RETURN INTENT STUFF
 		if (client != null) {
 			Intent intent = new Intent(INSTALLED_APPLICATIONS);
-			intent.putExtra(INTENT_RETURN_KEY, apps);
+			intent.putExtra(INTENT_RETURN_KEY, returnArray);
+			intent.setPackage(client);
 			this.sendBroadcast(intent);
 		}
-		return apps;
+		return null;
 	}
 	
 	/**
@@ -292,15 +296,21 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	 * @param getSysPackages true if 
 	 * @return
 	 */
-	private InstalledAppInfo[] getInstalledApps(boolean getSysPackages) { 
+	private List<InstalledAppInfo> getInstalledApps(boolean getSysPackages, String packageNameFilter) { 
 		List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
-		InstalledAppInfo res[] = new InstalledAppInfo[packs.size()];
+		List<InstalledAppInfo> res = new ArrayList<InstalledAppInfo>();
 		
 		for(int i=0;i<packs.size();i++) {
 			PackageInfo p = packs.get(i);
 			if ((!getSysPackages) && (p.versionName == null)) {
 				continue ;
 			}
+			//FILTER PACKAGES
+			String pack = p.packageName;
+			if (!packageNameFilter.equals(""))
+				if (!pack.contains(packageNameFilter))
+					continue;
+			
 			//CONVERT ICON TO BASE64 STRING
 			Drawable icon = p.applicationInfo.loadIcon(getPackageManager());
 			Bitmap bitmap = ((BitmapDrawable)icon).getBitmap(); 
@@ -313,11 +323,17 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 			InstalledAppInfo newInfo = new InstalledAppInfo();
 			newInfo.setApplicationName(p.applicationInfo.loadLabel(getPackageManager()).toString());
 			newInfo.setPackageName(p.packageName);
-			newInfo.setApplicationDescription(p.applicationInfo.loadDescription(getPackageManager()).toString());
+			String desc = "";
+			try {
+				desc = p.applicationInfo.loadDescription(getPackageManager()).toString();
+			}
+			catch(Exception ex) {
+			}
+			newInfo.setApplicationDescription(desc);
 			newInfo.setVersionName(p.versionName);
 			newInfo.setVersionCode(p.versionCode);
 			newInfo.setIconAsB64string(base64String);
-			res[i] = newInfo;
+			res.add(newInfo);
 		}
 		return res;
 	}
