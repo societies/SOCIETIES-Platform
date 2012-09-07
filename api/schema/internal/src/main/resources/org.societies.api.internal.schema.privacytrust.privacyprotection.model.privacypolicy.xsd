@@ -92,6 +92,9 @@
   <xs:simpleType name="conditionConstants">
     <xs:restriction base="xs:string">
       <xs:enumeration value="SHARE_WITH_3RD_PARTIES"/>
+      <xs:enumeration value="SHARE_WITH_CIS_MEMBERS_ONLY"/>
+      <xs:enumeration value="SHARE_WITH_CIS_OWNER_ONLY"/>
+      <xs:enumeration value="MAY_BE_INFERRED"/>
       <xs:enumeration value="DATA_RETENTION_IN_SECONDS"/>
       <xs:enumeration value="DATA_RETENTION_IN_MINUTES"/>
       <xs:enumeration value="DATA_RETENTION_IN_HOURS"/>

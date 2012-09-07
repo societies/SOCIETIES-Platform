@@ -129,6 +129,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				} catch (InvalidFormatException e) {
 					LOG.error("[From JID Error] IIdentity can not be understand.", e);
 				}
+				LOG.info("Check CSS/CIS Data Owner for using identity: "+ownerId);
 				// Check if the owner IIdentity has a CIS type
 				if (null != ownerId && IdentityType.CIS.equals(ownerId.getType())) {
 					cssAccessControl = false;
@@ -137,10 +138,12 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 			// - Access control for CIS data: use the CIS privacy policy
 			if (!cssAccessControl) {
+				LOG.info("CIS Data Access Control");
 				permission = checkPermissionCisData(requestor, dataId, actions, ownerId);
 			}
 			// - Access control for CSS data: ask to PrivacyPreferenceManager
 			else {
+				LOG.info("CIS Data Access Control");
 				permission = checkPermissionCssData(requestor, dataId, actions);
 			}
 

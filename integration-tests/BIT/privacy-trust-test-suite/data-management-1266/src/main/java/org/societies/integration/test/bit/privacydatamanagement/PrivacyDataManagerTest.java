@@ -41,6 +41,7 @@ import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -83,6 +84,8 @@ public class PrivacyDataManagerTest
 	private List<Condition> conditionsMembersOnly;
 	private List<Condition> conditionsPrivate;
 	private RequestPolicy privacyPolicy;
+	private RequestPolicy privacyPolicyMembersOnly;
+	private RequestPolicy privacyPolicyPrivate;
 
 
 	@Before
@@ -102,34 +105,41 @@ public class PrivacyDataManagerTest
 		// Data Id
 		try {
 			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId+"/ENTITY/person/1/ATTRIBUTE/name/13");
-			cisDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId+"/ENTITY/person/1/ATTRIBUTE/name/13");
+			cisDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId+"/cis-member-list");
 		}
 		catch (MalformedCtxIdentifierException e) {
 			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
 			fail("setUp(): DataId creation error "+e.getMessage());
 		}
-		
+
 		// - Actions
 		actionsRead = new ArrayList<Action>();
 		actionsRead.add(new Action(ActionConstants.READ));
-		
+
 		// - Conditions
 		conditionsPublic = new ArrayList<Condition>();
 		conditionsPublic.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
 		conditionsPublic.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
-		
+
 		conditionsMembersOnly = new ArrayList<Condition>();
-		conditionsPublic.add(new Condition(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1"));
-		conditionsPublic.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
-		
+		conditionsMembersOnly.add(new Condition(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1"));
+		conditionsMembersOnly.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+
 		conditionsPrivate = new ArrayList<Condition>();
-		conditionsPublic.add(new Condition(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1"));
-		conditionsPublic.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
-		
+		conditionsPrivate.add(new Condition(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1"));
+		conditionsPrivate.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+
 		// - Privacy Policy
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
 		requestItems.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsPublic));
+		List<RequestItem> requestItemsMembersOnly = new ArrayList<RequestItem>();
+		requestItemsMembersOnly.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsMembersOnly));
+		List<RequestItem> requestItemsPrivate = new ArrayList<RequestItem>();
+		requestItemsPrivate.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsPrivate));
+
 		privacyPolicy = new RequestPolicy(requestorCis, requestItems);
+		privacyPolicyMembersOnly = new RequestPolicy(requestorCis, requestItemsMembersOnly);
+		privacyPolicyPrivate = new RequestPolicy(requestorCis, requestItemsPrivate);
 	}
 
 	@After
@@ -186,13 +196,13 @@ public class PrivacyDataManagerTest
 	}
 
 	/* --- CHECK PERMISSION CIS --- */
-	
+
 	@Test
-	public void testCheckPermissionCisFirstTime()
+	public void testCheckPermissionPublicCis()
 	{
-		String testTitle = new String("CheckPermissionCis: retrieve a privacy for the first time");
+		String testTitle = new String("CheckPermission public Cis: retrieve a privacy for the first time");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		
+
 		RequestPolicy privacyPolicyAdded = null;
 		boolean privacyPolicyDeleted = false;
 		ResponseItem permission = null;
@@ -206,21 +216,18 @@ public class PrivacyDataManagerTest
 		}
 		assertNotNull("No privacy policy added", privacyPolicyAdded);
 		assertEquals("Privacy policy added: not the good one", privacyPolicy.toXMLString(), privacyPolicyAdded.toXMLString());
-		
+
 		assertNotNull("No permission retrieved", permission);
 		assertNotNull("No (real) permission retrieved", permission.getDecision());
 		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
-		
+
 		assertTrue("Privacy policy not deleted", privacyPolicyDeleted);
 	}
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, IIdentity, IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)}.
-	 */
 	@Test
-	public void testCheckPermissionCisPreviouslyAdded()
+	public void testCheckPermissionPublicCisPreviouslyAdded()
 	{
-		String testTitle = new String("CheckPermission: retrieve a privacy two times");
+		String testTitle = new String("CheckPermission public Cis: retrieve a privacy two times");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 
 		RequestPolicy privacyPolicyAdded = null;
@@ -238,7 +245,7 @@ public class PrivacyDataManagerTest
 		}
 		assertNotNull("No privacy policy added", privacyPolicyAdded);
 		assertEquals("Privacy policy added: not the good one", privacyPolicy.toXMLString(), privacyPolicyAdded.toXMLString());
-		
+
 		assertNotNull("No permission retrieved", permission1);
 		assertNotNull("No (real) permission retrieved", permission1.getDecision());
 		assertEquals("Bad permission retrieved",  Decision.PERMIT.name(), permission1.getDecision().name());
@@ -249,10 +256,88 @@ public class PrivacyDataManagerTest
 
 		assertTrue("Privacy policy not deleted", privacyPolicyDeleted);
 	}
-	
-	
+
+	@Test
+	public void testCheckPermissionPrivateCis()
+	{
+		String testTitle = new String("CheckPermission Private Cis: retrieve a privacy for the first time");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		RequestPolicy privacyPolicyAdded = null;
+		boolean privacyPolicyDeleted = false;
+		ResponseItem permissionOther = null;
+		ResponseItem permissionMe = null;
+		try {
+			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicyPrivate);
+			permissionOther = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			permissionMe = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
+			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicyPrivate.getRequestor());
+		} catch (PrivacyException e) {
+			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
+			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
+		}
+		assertNotNull("No privacy policy added", privacyPolicyAdded);
+		assertEquals("Privacy policy added: not the good one", privacyPolicyPrivate.toXMLString(), privacyPolicyAdded.toXMLString());
+
+		assertNotNull("No permission retrieved", permissionOther);
+		assertNotNull("No (real) permission retrieved", permissionOther.getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissionOther.getDecision().name());
+		
+		assertNotNull("No permission retrieved", permissionMe);
+		assertNotNull("No (real) permission retrieved", permissionMe.getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissionMe.getDecision().name());
+
+		assertTrue("Privacy policy not deleted", privacyPolicyDeleted);
+	}
+
+	@Test
+	public void testCheckPermissionPrivateCisPreviouslyAdded()
+	{
+		String testTitle = new String("CheckPermission Private Cis: retrieve a privacy two times");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		RequestPolicy privacyPolicyAdded = null;
+		boolean privacyPolicyDeleted = false;
+		ResponseItem permissionOther1 = null;
+		ResponseItem permissionMe1 = null;
+		ResponseItem permissionOther2 = null;
+		ResponseItem permissionMe2 = null;
+		try {
+			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicyPrivate);
+			permissionOther1 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			permissionMe1 = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
+			permissionOther2 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			permissionMe2 = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
+			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicyPrivate.getRequestor());
+		} catch (PrivacyException e) {
+			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
+			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
+		}
+		assertNotNull("No privacy policy added", privacyPolicyAdded);
+		assertEquals("Privacy policy added: not the good one", privacyPolicyPrivate.toXMLString(), privacyPolicyAdded.toXMLString());
+
+		assertNotNull("No permission retrieved", permissionOther1);
+		assertNotNull("No (real) permission retrieved", permissionOther1.getDecision());
+		assertEquals("Bad permission retrieved",  Decision.DENY.name(), permissionOther1.getDecision().name());
+		assertNotNull("No permission retrieved", permissionOther2);
+		assertNotNull("No (real) permission retrieved", permissionOther2.getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissionOther2.getDecision().name());
+		assertEquals("Two requests, not the same answer", permissionOther1.toXMLString(), permissionOther2.toXMLString());
+		
+		assertNotNull("No permission retrieved", permissionMe1);
+		assertNotNull("No (real) permission retrieved", permissionMe1.getDecision());
+		assertEquals("Bad permission retrieved",  Decision.PERMIT.name(), permissionMe1.getDecision().name());
+		assertNotNull("No permission retrieved", permissionMe2);
+		assertNotNull("No (real) permission retrieved", permissionMe2.getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissionMe2.getDecision().name());
+		assertEquals("Two requests, not the same answer", permissionMe1.toXMLString(), permissionMe2.toXMLString());
+
+		assertTrue("Privacy policy not deleted", privacyPolicyDeleted);
+	}
+
+
 	/* --- OBFUSCATION --- */
-	
+
 	@Test
 	public void testObfuscateData()
 	{
