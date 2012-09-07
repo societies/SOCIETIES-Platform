@@ -24,9 +24,10 @@
  */
 
 package org.societies.css.devicemgmt.RegSynchroniser;
-import java.util.Collection;
-import org.societies.css.devicemgmt.*;
+
 import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
+
+import java.util.Collection;
 
 
 

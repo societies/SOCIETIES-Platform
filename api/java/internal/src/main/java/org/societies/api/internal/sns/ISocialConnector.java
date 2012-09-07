@@ -16,7 +16,9 @@ public interface ISocialConnector {
 	public enum SocialNetwork{
 		Facebook,
 		Foursquare,
-		twitter
+		twitter,
+		linkedin,
+		googleplus
 	}
 	
 	
