@@ -68,10 +68,7 @@ public class SocialData extends Service implements ISocialData {
 
 	private IBinder binder = null;
 	
-	private static final String SOCIALDATA_NODE_JID = "xcmanager.societies.local";
-	
 	private ClientCommunicationMgr commMgr;
-	private IIdentity toId;
 
 	@Override
 	public void onCreate () {
@@ -80,8 +77,7 @@ public class SocialData extends Service implements ISocialData {
 		try {
 			//INSTANTIATE COMMS MANAGER
 			commMgr = new ClientCommunicationMgr(this);
-			commMgr.register(ELEMENT_NAMES, nullCallback);
-			toId = IdentityManagerImpl.staticfromJid(SOCIALDATA_NODE_JID);			
+			commMgr.register(ELEMENT_NAMES, nullCallback);		
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception creating ClientCommunicationMgr instance.", e);
         }  
@@ -119,6 +115,7 @@ public class SocialData extends Service implements ISocialData {
 		SocialdataMessageBean messageBean = SocialDataCommsUtils.createAddConnectorMessageBean(socialNetwork, token, validity);
 
 		//COMMS STUFF
+		IIdentity toId = commMgr.getIdManager().getCloudNode();	
 		Stanza stanza = new Stanza(toId);
         try {
         	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, ADD_SOCIAL_CONNECTOR, client));
@@ -135,6 +132,7 @@ public class SocialData extends Service implements ISocialData {
 		SocialdataMessageBean messageBean = SocialDataCommsUtils.createRemoveConnectorMessageBean(connectorId);
 
 		//COMMS STUFF
+		IIdentity toId = commMgr.getIdManager().getCloudNode();	
 		Stanza stanza = new Stanza(toId);
         try {
         	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, REMOVE_SOCIAL_CONNECTOR, client));
@@ -151,6 +149,7 @@ public class SocialData extends Service implements ISocialData {
 		SocialdataMessageBean messageBean = SocialDataCommsUtils.createGetConnectorsMessageBean();
 
 		//COMMS STUFF
+		IIdentity toId = commMgr.getIdManager().getCloudNode();	
 		Stanza stanza = new Stanza(toId);
         try {
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, createCallback(this, GET_SOCIAL_CONNECTORS, client));
