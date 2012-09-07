@@ -48,7 +48,8 @@ import org.societies.api.internal.sns.ISocialData;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
 /**
- * Describe your class here...
+ * Comms manager server for SociaData bundle.
+ * Receives comms messages and calls the corresponding socialdata bundle methods. 
  *
  * @author Edgar Domingues (PTIN)
  *
@@ -183,7 +184,18 @@ public class SocialDataServer implements IFeatureServer {
 	}
 	
 	private void validateMessageBean(SocialdataMessageBean messageBean) throws XMPPError {
-		// TODO
+		switch(messageBean.getMethod()) {
+		case ADD_CONNECTOR:
+			if(messageBean.getSnName() == null
+			|| messageBean.getValidity() == null
+			|| messageBean.getToken() == null)
+				throw new XMPPError(StanzaError.bad_request);
+			break;
+		case REMOVE_CONNECTOR:
+			if(messageBean.getId() == null)
+				throw new XMPPError(StanzaError.bad_request);
+			break;
+		}
 	}
 	
 	private List<String> getIdsFromConnectorsList(List<ISocialConnector> connectors) {
