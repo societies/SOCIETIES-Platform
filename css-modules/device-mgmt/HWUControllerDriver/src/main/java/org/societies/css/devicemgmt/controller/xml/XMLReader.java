@@ -33,6 +33,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.css.devicemgmt.controller.ContextDataManager;
@@ -53,12 +55,13 @@ import org.xml.sax.SAXException;
 public class XMLReader {
 
 	private final ContextDataManager ctxDataMgr;
-
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	public XMLReader(ContextDataManager ctxDataMgr){
 		this.ctxDataMgr = ctxDataMgr;
 		
 	}
 	public ArrayList<Controller> getConfiguration(File file){
+		logging.debug("Reading configuration file:"+file.getPath());
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db;
 		try {
@@ -110,6 +113,7 @@ public class XMLReader {
 					}
 				}
 				controllers.add(controller);
+				this.logging.debug("Added controller with id: "+controller.getControllerId());
 				ctxDataMgr.addController(controller);
 			}
 		}
