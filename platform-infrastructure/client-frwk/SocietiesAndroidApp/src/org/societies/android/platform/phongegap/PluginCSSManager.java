@@ -110,6 +110,7 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(LocalCSSManagerService.LOGOUT_CSS);
         intentFilter.addAction(LocalCSSManagerService.REGISTER_XMPP_SERVER);
         intentFilter.addAction(LocalCSSManagerService.LOGIN_XMPP_SERVER);
+        intentFilter.addAction(LocalCSSManagerService.LOGOUT_XMPP_SERVER);
         
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     	
@@ -266,12 +267,27 @@ public class PluginCSSManager extends Plugin {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3))) {
+				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				try {
+					this.localCSSManager.logoutXMPPServer(data.getString(0));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);
 		} else {
+			Log.d(LOG_TAG, "Plugin target method not supported");
 			//if method does not exist send synchronous error result
             result = new PluginResult(PluginResult.Status.ERROR);
             result.setKeepCallback(false);
@@ -459,6 +475,13 @@ public class PluginCSSManager extends Plugin {
 				
 			} else if (intent.getAction().equals(LocalCSSManagerService.LOGIN_XMPP_SERVER)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 2);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(LocalCSSManagerService.LOGOUT_XMPP_SERVER)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {

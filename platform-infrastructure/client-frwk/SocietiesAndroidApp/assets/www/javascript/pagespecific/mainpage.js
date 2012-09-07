@@ -159,7 +159,7 @@ $(document).bind('pageinit',function(){
 		SocietiesLogin.clearElementValue('#username')
 	});
 
-	$('#username').off('focus').on('focus', function() {
+	$('#password').off('focus').on('focus', function() {
 		SocietiesLogin.clearElementValue('#password')
 	});
 
