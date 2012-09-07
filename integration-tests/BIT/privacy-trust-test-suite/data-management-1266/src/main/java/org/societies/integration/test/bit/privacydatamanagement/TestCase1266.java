@@ -35,12 +35,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.integration.test.IntegrationTestCase;
 
 public class TestCase1266 extends IntegrationTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1266.class.getSimpleName());
 
 	public static IPrivacyDataManager privacyDataManager;
+	public static IPrivacyPolicyManager privacyPolicyManager;
 	public static ICommManager commManager;
 	
 	
@@ -57,6 +59,10 @@ public class TestCase1266 extends IntegrationTestCase {
 	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
 		this.privacyDataManager = privacyDataManager;
 		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] IPrivacyDataManager injected");
+	}
+	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+		this.privacyPolicyManager = privacyPolicyManager;
+		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] IPrivacyPolicyManager injected");
 	}
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
@@ -77,6 +83,10 @@ public class TestCase1266 extends IntegrationTestCase {
 		}
 		if (null == privacyDataManager) {
 			LOG.info("[Dependency Injection] Missing IPrivacyDataManager");
+			return false;
+		}
+		if (null == privacyPolicyManager) {
+			LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
 			return false;
 		}
 		return true;

@@ -21,6 +21,7 @@
 		depends-on="privacyDataManager, commManager" init-method="run">
 		<property name="commManager" ref="commManager" />
 		<property name="privacyDataManager" ref="privacyDataManager" />
+		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
 	</bean>
 
 </beans>

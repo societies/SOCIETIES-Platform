@@ -121,9 +121,9 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 			// - Check access control type: CSS or CIS
 			boolean cssAccessControl = true;
+			IIdentity ownerId = null;
 			if (null != dataId.getOwnerId()) {
 				// Retrieve Owner IIdentity
-				IIdentity ownerId = null;
 				try {
 					ownerId = commManager.getIdManager().fromJid(dataId.getOwnerId());
 				} catch (InvalidFormatException e) {
@@ -137,7 +137,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 			// - Access control for CIS data: use the CIS privacy policy
 			if (!cssAccessControl) {
-				permission = checkPermissionCisData(requestor, dataId, actions);
+				permission = checkPermissionCisData(requestor, dataId, actions, ownerId);
 			}
 			// - Access control for CSS data: ask to PrivacyPreferenceManager
 			else {
@@ -154,7 +154,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return permission;
 	}
 
-	private ResponseItem checkPermissionCisData(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+	private ResponseItem checkPermissionCisData(Requestor requestor, DataIdentifier dataId, List<Action> actions, IIdentity cisId) throws PrivacyException {
 		// -- Create useful values for default result
 		List<Condition> conditions = new ArrayList<Condition>();
 		Resource resource = new Resource(dataId);
@@ -171,13 +171,17 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 
 		// -- Retrieve the CIS Privacy Policy
-		IIdentity cisId;
-		try {
-			cisId = commManager.getIdManager().fromJid(dataId.getOwnerId());
-		} catch (InvalidFormatException e) {
-			throw new PrivacyException("[From JID] CIS Id can not be understand.", e);
+		RequestorCis requestorCis = new RequestorCis(cssId, cisId);
+		RequestPolicy privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
+		// Can't retrieve the privacy policy
+		if (null == privacyPolicy) {
+			LOG.error("The privacy policy can not be retrieved for this CIS: "+requestorCis.toString());
+			return permission;
 		}
-		RequestPolicy privacyPolicy = privacyPolicyManager.getPrivacyPolicy(new RequestorCis(cssId, cisId));
+		// Empty privacy policy: DENY all
+		if (null == privacyPolicy.getRequests() || privacyPolicy.getRequests().size() <= 0) {
+			return permission;
+		}
 
 		// -- Search data request in the privacy policy
 		/*

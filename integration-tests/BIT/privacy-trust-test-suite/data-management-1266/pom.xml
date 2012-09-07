@@ -59,6 +59,12 @@
 			<version>4.1</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.util</groupId>
+			<artifactId>commonmock</artifactId>
+			<version>1.0</version>
+			<scope>compile</scope>
+		</dependency>
 		<!-- Tools -->
 		<dependency>
 			<groupId>org.springframework</groupId>
