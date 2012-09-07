@@ -1290,7 +1290,7 @@ public List<String> suggestedFriends( ) {
     	Person p =null;
     	try{
     	p = (Person) itt.next();
-    	LOG.info(index +" Friends:" +p.getName().getFormatted() );
+    	LOG.info(index +" Friends:" +p.getName().getFormatted());
     	socialFriends.add(p.getName().getFormatted());
     	index++;
     	}
