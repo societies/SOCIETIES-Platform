@@ -1,8 +1,10 @@
 package org.societies.android.platform.socialdata;
 
+import org.societies.android.api.internal.sns.AConnectorBean;
 import org.societies.android.api.internal.sns.ISocialData;
 import org.societies.android.platform.socialdata.SocialData;
 import org.societies.android.platform.socialdata.SocialData.LocalBinder;
+import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 
 import android.app.Activity;
@@ -29,6 +31,8 @@ public class TestContainerSocialDataActivity extends Activity {
     private boolean socialDataConnected = false;
     private TextView text;  
     private TestTask testTask;
+    private String addedConnectorId = null;
+    private AConnectorBean[] connectors = null;
 	
 	/** Called when the activity is first created. */
     @Override
@@ -42,9 +46,9 @@ public class TestContainerSocialDataActivity extends Activity {
         
         //REGISTER BROADCAST
         IntentFilter intentFilter = new IntentFilter() ;
-        intentFilter.addAction(SocialData.ADD_SOCIAL_CONNECTOR);        
-        intentFilter.addAction(SocialData.REMOVE_SOCIAL_CONNECTOR);
-        intentFilter.addAction(SocialData.GET_SOCIAL_CONNECTORS);
+        intentFilter.addAction(ISocialData.ADD_SOCIAL_CONNECTOR);        
+        intentFilter.addAction(ISocialData.REMOVE_SOCIAL_CONNECTOR);
+        intentFilter.addAction(ISocialData.GET_SOCIAL_CONNECTORS);
         this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
         
         //CREATE INTENT FOR SERVICE AND BIND
@@ -92,17 +96,42 @@ public class TestContainerSocialDataActivity extends Activity {
     	}
     	
     	protected Void doInBackground(Void... args) {
-    		testAddConnector();
+    		try {
+    			
+    			addConnector();
+    			
+				while(addedConnectorId == null) 
+					Thread.sleep(1000);
+				
+				getConnectors();
+				
+				while(connectors == null) 
+					Thread.sleep(1000);
+				
+				removeConnector(addedConnectorId);
+				
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
     		
     		return null;
     	}    	
-    }
+    	
+    };
 
-    private void testAddConnector() {
+    private void addConnector() {
     	
 		long testValidity = 1000;
 		socialData.addSocialConnector(PACKAGE_NAME, SocialNetwork.Facebook, "testToken", testValidity);
 		
+    }
+    
+    private void getConnectors() {
+    	socialData.getSocialConnectors(PACKAGE_NAME);
+    }
+    
+    private void removeConnector(String id) {
+    	socialData.removeSocialConnector(PACKAGE_NAME, id);
     }
     
     private class bReceiver extends BroadcastReceiver  {
@@ -111,11 +140,33 @@ public class TestContainerSocialDataActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, intent.getAction());
 			
-			if (intent.getAction().equals(SocialData.ADD_SOCIAL_CONNECTOR)) {
-				String id = intent.getStringExtra(SocialData.INTENT_RETURN_KEY);				
+			if (intent.getAction().equals(ISocialData.ADD_SOCIAL_CONNECTOR)) {
+				String id = intent.getStringExtra(ISocialData.INTENT_RETURN_KEY);
+				addedConnectorId = id;
+				
 				Log.d(LOG_TAG, "id="+id);
 				text.setText("id="+id);
 			}
+			else if(intent.getAction().equals(ISocialData.GET_SOCIAL_CONNECTORS)) {
+				connectors = castArray(intent.getParcelableArrayExtra(ISocialData.INTENT_RETURN_KEY));
+				
+				for(int i=0; i<connectors.length; i++) {					
+					Log.d(LOG_TAG, "connector.getID()="+connectors[i].getId());
+					text.append("\nconnector.getID()="+connectors[i].getId());
+				}
+			} 
+			else if(intent.getAction().equals(ISocialData.REMOVE_SOCIAL_CONNECTOR)) {
+				Log.d(LOG_TAG, "connector removed");
+				text.append("\nconnector removed");
+			}
+			
 		}
 	};
+	
+	private AConnectorBean[] castArray(Parcelable[] parcelables) {
+		AConnectorBean[] rv = new AConnectorBean[parcelables.length];
+		for(int i=0; i<parcelables.length; i++)
+			rv[i] = (AConnectorBean)parcelables[i];
+		return rv;
+	}
 }

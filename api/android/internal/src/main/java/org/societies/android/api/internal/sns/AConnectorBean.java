@@ -24,47 +24,58 @@
  */
 package org.societies.android.api.internal.sns;
 
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
- * Android interface for access SocialData bundle.
+ * Parceable implementation of the ConnectorBean.
  *
  * @author Edgar Domingues (PTIN)
  *
  */
-public interface ISocialData {
-	String methodsArray [] = {"addSocialConnector(SocialNetwork socialNetwork, String token, long validity)",
-							  "removeSocialConnector(String client, String connectorId)",
-							  "getSocialConnectors(String client)"};
+public class AConnectorBean extends ConnectorBean implements Parcelable {
+
+	private static final long serialVersionUID = 1L;
+
+	public AConnectorBean() {
+	}
 	
-	public static final String ADD_SOCIAL_CONNECTOR = "org.societies.android.platform.sns.ADD_SOCIAL_CONNECTOR";
-	public static final String REMOVE_SOCIAL_CONNECTOR = "org.societies.android.platform.sns.REMOVE_SOCIAL_CONNECTOR";
-	public static final String GET_SOCIAL_CONNECTORS = "org.societies.android.platform.sns.GET_SOCIAL_CONNECTORS";
-	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.sns.ReturnValue";
-		
-	/**
-	 * Create and add a new social connector.
-	 * A broadcast intent is sent with the Action ADD_SOCIAL_CONNECTOR 
-	 * and the Extra INTENT_RETURN_KEY with the ID of the added connector.
-	 * @param client Package name of the application that will receive the intent with the asynchronous return value.
-	 * @param socialNetwork Social network to add.
-	 * @param token Token for the connector.
-	 * @param validity Validity of the connector.
-	 */
-	void addSocialConnector(String client, SocialNetwork socialNetwork, String token, long validity);
+	public AConnectorBean(Parcel in) {
+		id = in.readString();
+		name = in.readString();
+		token = in.readString();
+		expires = in.readLong();
+		identity = in.readString();
+	}
 	
-	/**
-	 * Remove the social connector. 
-	 * @param client Package name of the application that will receive the intent with the asynchronous return value.
-	 * @param connectorId ID of the connector to remove.
-	 */
-	void removeSocialConnector(String client, String connectorId);
+	public AConnectorBean(ConnectorBean bean) {
+		id = bean.getId();
+		identity = bean.getIdentity();
+		name = bean.getName();
+		token = bean.getToken();
+		expires = bean.getExpires();
+	}
 	
-	/**
-	 * Get a list of existing social connectors.
-	 * A broadcast intent is sent with the Action GET_SOCIAL_CONNECTORS 
-	 * and the Extra INTENT_RETURN_KEY with an Array of AConnectorBean.
-	 * @param client Package name of the application that will receive the intent with the asynchronous return value.
-	 */
-	void getSocialConnectors(String client);
+	public int describeContents() {
+		return 0;
+	}
+
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(id);
+		dest.writeString(name);
+		dest.writeString(token);
+		dest.writeLong(expires);
+		dest.writeString(identity);
+	}
+	
+	public static final Parcelable.Creator<AConnectorBean> CREATOR = new Parcelable.Creator<AConnectorBean>() {
+		public AConnectorBean createFromParcel(Parcel in) {
+			return new AConnectorBean(in);
+		}
+		public AConnectorBean[] newArray(int size) {
+			return new AConnectorBean[size];
+		}
+	};
 }

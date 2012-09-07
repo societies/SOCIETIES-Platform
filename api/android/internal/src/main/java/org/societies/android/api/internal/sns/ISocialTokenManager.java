@@ -27,13 +27,29 @@ package org.societies.android.api.internal.sns;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 
 /**
- * Interface to manager access tokens of social networks.
+ * Interface to manage access tokens of social networks.
  *
  * @author Edgar Domingues (PTIN)
  *
  */
-public interface ISocialTokenManager {
+public interface ISocialTokenManager {	
+	String methodsArray [] = {"getToken(String client, SocialNetwork socialNetwork)"};
 	
+
+	public static final String GET_TOKEN = "org.societies.android.platform.socialdata.GET_TOKEN";
+	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.socialdata.ReturnValue";
+	public static final String SOCIAL_NETWORK_KEY = "org.societies.android.platform.socialdata.SocialNetwork";
+	public static final String EXTRA_EXPIRES = "org.societies.android.platform.socialdata.SocialTokenManager.extra.EXPIRES";
+	
+	/**
+	 * Get an access token for the desired social network.
+	 * A broadcast intent is sent with the Action GET_TOKEN, 
+	 * and the Extra SOCIAL_NETWORK_KEY with the value of the socialNetwork parameter, 
+	 * the Extra INTENT_RETURN_KEY with the token 
+	 * and the Extra EXTRA_EXPIRES with the expire time of the token. 
+	 * @param client Package name of the application that will receive the intent with the asynchronous return value.
+	 * @param socialNetwork Social network to get the token.
+	 */
 	public void getToken(String client, SocialNetwork socialNetwork);
 
 }

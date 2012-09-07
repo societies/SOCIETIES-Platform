@@ -24,14 +24,19 @@
  */
 package org.societies.platform.socialdata.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
+import org.societies.api.internal.schema.sns.socialdata.ConnectorsList;
 import org.societies.api.internal.schema.sns.socialdata.SocialDataMethod;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.platform.socialdata.SocialConnectorDTO;
 
 /**
  * Utility class with common code for sending/receiving SocialData Comms beans.
@@ -93,5 +98,27 @@ public class SocialDataCommsUtils {
 		SocialdataMessageBean messageBean = new SocialdataMessageBean();
 		messageBean.setMethod(SocialDataMethod.GET_CONNECTOR_LIST);
 		return messageBean;
+	}
+	
+	public static ConnectorBean convertSocialConnectorToBean(ISocialConnector socialConnector) {
+		ConnectorBean connectorBean = new ConnectorBean();
+		
+		connectorBean.setId(socialConnector.getID());
+		connectorBean.setName(socialConnector.getConnectorName());
+		connectorBean.setExpires(socialConnector.getTokenExpiration());
+		
+		return connectorBean;
+	}
+	
+	public static List<ISocialConnector> convertConnectorBeanListToSocialConnectorList(ConnectorsList connectorsList) {
+		List<ConnectorBean> connectorBeanList = connectorsList.getConnectorBean();
+		List<ISocialConnector> socialConnectorsList = new ArrayList<ISocialConnector>(connectorBeanList.size());
+		for(ConnectorBean connectorBean:connectorBeanList)
+			socialConnectorsList.add(convertBeanToSocialConnector(connectorBean));
+		return socialConnectorsList;
+	}
+	
+	public static ISocialConnector convertBeanToSocialConnector(ConnectorBean connectorBean) {
+		return SocialConnectorDTO.createFromBean(connectorBean);
 	}
 }

@@ -39,7 +39,8 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.internal.schema.sns.socialdata.Ids;
+import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
+import org.societies.api.internal.schema.sns.socialdata.ConnectorsList;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
@@ -131,10 +132,16 @@ public class SocialDataServer implements IFeatureServer {
 			switch(messageBean.getMethod()) {	
 			case GET_CONNECTOR_LIST:
 				List<ISocialConnector> connectors = socialData.getSocialConnectors();
-								
-				Ids ids = new Ids();
-				ids.setId(getIdsFromConnectorsList(connectors));
-				resultBean.setIds(ids);
+						
+				List<ConnectorBean> connectorBeanList = new ArrayList<ConnectorBean>(connectors.size());
+				for(ISocialConnector connector:connectors) 
+					connectorBeanList.add(SocialDataCommsUtils.convertSocialConnectorToBean(connector));
+				
+				ConnectorsList connectorsList = new ConnectorsList();				
+				connectorsList.setConnectorBean(connectorBeanList);
+				
+				resultBean.setConnectorsList(connectorsList);				
+			
 				break;
 			default:
 				throw new XMPPError(StanzaError.bad_request);
@@ -197,14 +204,4 @@ public class SocialDataServer implements IFeatureServer {
 			break;
 		}
 	}
-	
-	private List<String> getIdsFromConnectorsList(List<ISocialConnector> connectors) {
-		List<String> ids = new ArrayList<String>(connectors.size());
-		
-		for(ISocialConnector connector:connectors)
-			ids.add(connector.getID());
-		
-		return ids;
-	}
-
 }
