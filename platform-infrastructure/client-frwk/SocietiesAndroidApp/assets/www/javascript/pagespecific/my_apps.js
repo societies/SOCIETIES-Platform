@@ -98,8 +98,15 @@ var Societies3PServices = {
  * @returns null
  */
 
-jQuery(function() {
-	console.log("Active Services jQuery calls");
+/**
+ * JQuery boilerplate to attach JS functions to relevant HTML elements
+ * 
+ * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pageinit
+ * N.B. this event is fired once per page load
+ * @returns null
+ */
+$(document).bind('pageinit',function(){
+	console.log("jQuery pageinit action(s) for active my_apps");
 
 	//$(document).ready(function() {
 	//	SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);

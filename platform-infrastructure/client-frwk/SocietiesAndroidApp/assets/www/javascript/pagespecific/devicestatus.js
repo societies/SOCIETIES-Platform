@@ -70,7 +70,7 @@ var SocietiesDeviceStatus = {
  */
 $(document).bind('pageinit',function(){
 
-	console.log("jQuery pageinit action(s)");
+	console.log("jQuery pageinit action(s) for device status");
 	$('#connectivity').click(function() {
 		window.plugins.SocietiesDeviceStatus.getConnectivityStatus(SocietiesDeviceStatus.onSuccess, SocietiesDeviceStatus.onFailure);
 	});

@@ -49,7 +49,7 @@ var SocietiesUtility = {
 	        e.preventDefault();
 	        navigator.app.exitApp();
 	    }
-	    else if ($.mobile.activePage[0].id === "index"){
+	    else if ($.mobile.activePage[0].id === "landing"){
 	        e.preventDefault();
 	        SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulCSSCloudLogout);
 	    } else {
@@ -133,7 +133,6 @@ jQuery(function() {
 	console.log("jQuery document ready action(s)");
 
 	document.addEventListener("deviceready", SocietiesUtility.onDeviceReady, false);
-	
 
 });
 
@@ -144,22 +143,25 @@ jQuery(function() {
  * N.B. this event is fired once per page load
  * @returns null
  */
+
+
 $(document).bind('pageinit',function(){
 
-	console.log("jQuery pageinit action(s)");
+	console.log("jQuery pageinit action(s) for mainpage");
 
-	$('#connectXMPP').click(function() {
+	$('#connectXMPP').off('click').on('click', function() {
 		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 	});
 
-	$('#username').focus(function() {
+	$('#username').off('focus').on('focus', function() {
 		SocietiesLogin.clearElementValue('#username')
 	});
 
-	$('#password').focus(function() {
+	$('#username').off('focus').on('focus', function() {
 		SocietiesLogin.clearElementValue('#password')
 	});
+
 
 });

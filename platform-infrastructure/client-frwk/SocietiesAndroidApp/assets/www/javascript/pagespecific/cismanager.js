@@ -68,7 +68,7 @@ var	SocietiesCISManagerService = {
  */
 $(document).bind('pageinit',function(){
 
-	console.log("jQuery pageinit action(s)");
+	console.log("jQuery pageinit action(s) for cismanager");
 
 	$('#createCISbutton').click(function() {
 		SocietiesCISManagerService.CreateCIS();

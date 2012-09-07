@@ -24,13 +24,13 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 $(document).on("pageinit",$("div[data-role='page'] [class*='ui-page-active']"), function(){
 
 	console.log("slide menu page init");
 
 	$(":jqmData(slidemenu)").addClass('slidemenu_btn');
 	var sm = $($(":jqmData(slidemenu)").data('slidemenu'));
-	console.log("sm :" + sm);
 	sm.addClass('slidemenu');
 
 	$(document).on("swipeleft",$("div[data-role='page'] [class*='ui-page-active']"), function(){

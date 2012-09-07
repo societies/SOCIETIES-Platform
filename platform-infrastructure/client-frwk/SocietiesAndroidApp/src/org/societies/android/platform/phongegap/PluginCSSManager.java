@@ -186,16 +186,6 @@ public class PluginCSSManager extends Plugin {
 		//uses asynchronous calls
 		if (this.validRemoteCall(action) && this.connectedtoCSSManager) {
 
-			try {
-				Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
-				Log.d(LOG_TAG, "parameter 1 - identity: " + data.getJSONObject(1).getString("cssIdentity"));
-				Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
-				Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
-				Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
-			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			
 			Log.d(LOG_TAG, "adding to Map store: " + callbackId + " for action: " + action);
 			this.methodCallbacks.put(action, callbackId);
@@ -203,6 +193,17 @@ public class PluginCSSManager extends Plugin {
 			//Call local service method
 			if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 4))) {
 				
+				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+					Log.d(LOG_TAG, "parameter 1 - identity: " + data.getJSONObject(1).getString("cssIdentity"));
+					Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
+					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
+					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
 				try {
 					Log.d(LOG_TAG, "parameter 1 - nodes: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
 				} catch (JSONException e1) {
@@ -218,6 +219,17 @@ public class PluginCSSManager extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5))) {
 				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+					Log.d(LOG_TAG, "parameter 1 - identity: " + data.getJSONObject(1).getString("cssIdentity"));
+					Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
+					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
+					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				try {
 					this.localCSSManager.logoutCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -225,12 +237,29 @@ public class PluginCSSManager extends Plugin {
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 0))) {
 				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				try {
 					this.localCSSManager.registerXMPPServer(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 2))) {
+				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+					Log.d(LOG_TAG, "parameter 1 - identity: " + data.getJSONObject(1).getString("cssIdentity"));
+					Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
+					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
+					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
 				try {
 					this.localCSSManager.loginXMPPServer(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {

@@ -68,7 +68,7 @@ var Societies3PServices = {
  */
 $(document).bind('pageinit',function(){
 
-	console.log("jQuery pageinit action(s)");
+	console.log("jQuery pageinit action(s) for servicemanagement");
 	
 	$(document).ready(function() {
 		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);;
