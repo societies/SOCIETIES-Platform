@@ -90,12 +90,12 @@ AbstractTransactionalJUnit4SpringContextTests {
 		if(sessionFactory==null){
 			sessionFactory = actFeed.getSessionFactory();
 		}
-		if(session==null){
-			session = sessionFactory.openSession();
-			actFeed.setSession(session);
-		}
-		if(!session.isOpen())
-			session = sessionFactory.openSession();
+//		if(session==null){
+//			session = sessionFactory.openSession();
+//			actFeed.setSession(session);
+//		}
+//		if(!session.isOpen())
+//			session = sessionFactory.openSession();
 		LOG.info("i startup ");
 		
 	}
@@ -103,7 +103,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 	public void tearDownAfter() throws Exception {
 		
 		actFeed.clear();
-		session.close();
+//		session.close();
 		actFeed = null;
 	}
 	@Test

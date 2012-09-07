@@ -74,6 +74,15 @@ public class Activity implements IActivity {
 		this.setVerb(iact.getVerb());
 		this.setPublished(iact.getPublished());
 	}
+    public Activity(org.societies.api.schema.activity.Activity iAct)
+    {
+        data = new HashMap<String,ActivityString>();
+        this.setActor(iAct.getActor());
+        this.setObject(iAct.getObject());
+        this.setTarget(iAct.getTarget());
+        this.setVerb(iAct.getVerb());
+        this.setPublished(iAct.getPublished());
+    }
 	public void repopHash(){
 		this.setActor(this.getActor());
 		this.setObject(this.getObject());
@@ -151,7 +160,13 @@ public class Activity implements IActivity {
 	@Override
 	public void setPublished(String published) {
 		this.published = published;
+        try{
 		this.time = Long.parseLong(published);
+        }catch (Exception e){
+            System.out.println("parsing long failed : "+published);
+            e.printStackTrace();
+        }
+
 		data.put("published", new ActivityString(published));
 		
 	}

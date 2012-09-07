@@ -43,6 +43,35 @@ var Societies3PServices = {
 		
 		window.plugins.ServiceManagementService.getServices(success, failure);
 	},
+	
+	/**
+	 * @methodOf Societies3PServices#
+	 * @description Refresh the 3P Service page with currently active services
+	 * @returns null
+	 */
+	refreshLocalApps: function() {
+		console.log("Refreshing Local Apps");
+
+		function success(data) {			
+			//EMPTY TABLE
+			$('ul#LocalServicesDiv li:last').remove();
+			//DISPLAY SERVICES
+			for (i  = 0; i < data.length; i++) {
+				var tableEntry = '<li><a href="#localapp-item?pos=' + i + '"><img src="' + data[i].icon + '" class="profile_list" alt="logo" >' +
+				'<h2>' + data[i].applicationName + '</h2>' + 
+				'<p>' + data[i].packageName+ '</p>' + 
+				'</a></li>';
+				jQuery('ul#LocalServicesDiv').append(tableEntry);
+			}
+			$('#LocalServicesDiv').listview('refresh');
+		}
+		
+		function failure(data) {
+			alert("refresh3PServices - failure: " + data);
+		}
+		
+		window.plugins.ServiceManagementService.getInstalledApps(success, failure);
+	},
 
 	// Load the data for a specific category, based on
 	// the URL passed in. Generate markup for the items in the
@@ -111,6 +140,7 @@ jQuery(function() {
 	
 	setTimeout(function(){
 		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
+		Societies3PServices.refreshLocalApps();
     }, 500);
 	
 	//Listen for any attempts to call changePage().

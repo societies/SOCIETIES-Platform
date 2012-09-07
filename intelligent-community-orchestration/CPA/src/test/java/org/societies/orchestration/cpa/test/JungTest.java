@@ -11,53 +11,6 @@
 
 package org.societies.orchestration.cpa.test;
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.geom.Point2D;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.*;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.JApplet;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JToggleButton;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.apache.commons.collections15.Factory;
-import org.apache.commons.collections15.Transformer;
-import org.apache.commons.collections15.functors.ConstantTransformer;
-import org.apache.commons.collections15.functors.MapTransformer;
-import org.apache.commons.collections15.map.LazyMap;
-import org.societies.api.activity.IActivity;
-import org.societies.api.activity.IActivityFeedCallback;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.schema.activityfeed.Activityfeed;
-import org.societies.orchestration.cpa.impl.CPACreationPatterns;
-import org.societies.orchestration.cpa.impl.SocialGraphEdge;
-import org.societies.orchestration.cpa.impl.SocialGraphVertex;
-
 import edu.uci.ics.jung.algorithms.cluster.EdgeBetweennessClusterer;
 import edu.uci.ics.jung.algorithms.layout.AggregateLayout;
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
@@ -70,6 +23,33 @@ import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import org.apache.commons.collections15.Factory;
+import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections15.functors.ConstantTransformer;
+import org.apache.commons.collections15.functors.MapTransformer;
+import org.apache.commons.collections15.map.LazyMap;
+import org.societies.activity.model.Activity;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeedCallback;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.schema.activityfeed.Activityfeed;
+import org.societies.orchestration.cpa.impl.CPACreationPatterns;
+import org.societies.orchestration.cpa.impl.SocialGraphEdge;
+import org.societies.orchestration.cpa.impl.SocialGraphVertex;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.geom.Point2D;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 public class JungTest extends JApplet 
 {
@@ -158,7 +138,7 @@ CISSimulator sim = new CISSimulator(10,10);
 		final ArrayList<IActivity> actDiff = new ArrayList<IActivity>();
         ApplicationContextLoader loader = new ApplicationContextLoader();
         loader.load(sim, "SimTest-context.xml");
-		sim.getActFeed().setSession(sim.getSessionFactory().openSession());
+		sim.getActFeed().setSessionFactory(sim.getSessionFactory());
 		cises = new ArrayList<ICisOwned>();
 		sim.setMaxActs(2000);
 		cises.add(sim.simulate(1));
@@ -167,13 +147,16 @@ CISSimulator sim = new CISSimulator(10,10);
 
             @Override
             public void receiveResult(Activityfeed activityFeedObject) {
-                actDiff.addAll((Collection<? extends IActivity>) activityFeedObject.getGetActivitiesResponse().getActivity());
+                System.out.println("in receiveresult: "+activityFeedObject.getGetActivitiesResponse().getActivity().size());
+                for(org.societies.api.schema.activity.Activity act : activityFeedObject.getGetActivitiesResponse().getActivity())  {
+                    actDiff.add(new Activity(act));
+                }
                 cpa.init();
                 cpa.analyze(actDiff);
             }
         }
         GetActFeedCB dummyFeedback = new GetActFeedCB();
-        cises.get(0).getActivityFeed().getActivities("0"+Long.toString(System.currentTimeMillis()+100000L),dummyFeedback);
+        cises.get(0).getActivityFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()+100000L),dummyFeedback);
 
         System.out.println("cises.get(0).getActivityFeed(): "+cises.get(0).getActivityFeed());
         
