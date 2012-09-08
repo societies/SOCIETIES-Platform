@@ -22,12 +22,12 @@
 <br/>
 <br/>
 <Table border="1">
-<tr><td><B>Friend Name</B></td>
-</tr> 
+<tr><td><B>Friend Name</B></td><td><B>CSS Identity</B></td></tr>
 
 	<xc:forEach var="cssfriend" items="${cssfriends}">
         <tr>
-        	<td>${cssfriend}</td>	         	       
+        	<td>${cssfriend.getName()}</td>
+        	<td>${cssfriend.getId()}</td>	         	       
         </tr>
     </xc:forEach>
     	

@@ -1219,15 +1219,15 @@ public void removeNode(CssRecord cssrecord, String nodeId ) {
 	}
 
 @SuppressWarnings("unchecked")
-public List<String> suggestedFriends( ) {
+public List<CssAdvertisementRecord> suggestedFriends( ) {
 	
 	ISocialData socialData = null;
 	
 	List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
-	List<String> cssFriends = new ArrayList<String>();
+	List<CssAdvertisementRecord> cssFriends = new ArrayList<CssAdvertisementRecord>();
 	List<Person> snFriends = new ArrayList<Person>();
 	List<String> socialFriends = new ArrayList<String>();
-	List<String> commonFriends = new ArrayList<String>();
+	List<CssAdvertisementRecord> commonFriends = new ArrayList<CssAdvertisementRecord>();
 	String MyId = "";	
 	MyId = idManager.getThisNetworkNode().toString();
 	LOG.info("@#@#@#@#@#@# ==== MyId contains " +MyId);
@@ -1247,7 +1247,7 @@ public List<String> suggestedFriends( ) {
 		if (cssAdd.getId().equalsIgnoreCase(MyId)) {
 			LOG.info("This is my OWN ID not adding it #########  ");
 		}else {
-			cssFriends.add((cssAdd.getName()));
+			cssFriends.add((cssAdd));
 		}
 		
 		LOG.info("cssAdd.getName contains " +cssAdd.getName());
@@ -1317,9 +1317,9 @@ public List<String> suggestedFriends( ) {
     int i = 1;
    // for (int index =0; index < cssFriends.size(); index++)
    // {
-    for (String friend : cssFriends) {
+    for (CssAdvertisementRecord friend : cssFriends) {
     	LOG.info("[]][][][][][] CSS Friends iterator List contains " +friend);
-        if (socialFriends.contains(friend)) {
+        if (socialFriends.contains(friend.getName())) {
         	commonFriends.add(friend);
         }
        // i++;

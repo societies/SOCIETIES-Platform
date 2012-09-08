@@ -115,7 +115,7 @@ public class CssSuggestedFriendsController {
 			if (method.equalsIgnoreCase("findFriends")) {
 				res="CSS Suggested Friends Result ";
 				
-				List<String> cssfriends = getCssLocalManager().suggestedFriends();
+				List<CssAdvertisementRecord> cssfriends = getCssLocalManager().suggestedFriends();
 				
 				model.put("result", res);
 				model.put("cssfriends", cssfriends);
