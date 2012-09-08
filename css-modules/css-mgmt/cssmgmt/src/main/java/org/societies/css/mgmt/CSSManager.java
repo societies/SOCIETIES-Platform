@@ -1228,7 +1228,10 @@ public List<String> suggestedFriends( ) {
 	List<Person> snFriends = new ArrayList<Person>();
 	List<String> socialFriends = new ArrayList<String>();
 	List<String> commonFriends = new ArrayList<String>();
-		
+	String MyId = "";	
+	MyId = idManager.getThisNetworkNode().toString();
+	LOG.info("@#@#@#@#@#@# ==== MyId contains " +MyId);
+	
 	LOG.info("CSSManager getFriends method called ");
 	
 	LOG.info("Contacting CSS Directory to get list of CSSs");
@@ -1240,7 +1243,13 @@ public List<String> suggestedFriends( ) {
 	recordList = callback.getResultList();
 	
 	for (CssAdvertisementRecord cssAdd : recordList) {
-		cssFriends.add((cssAdd.getName()));
+		LOG.info("@#@#@#@#@#@# ==== Comparing Id contains " +cssAdd.getId());
+		if (cssAdd.getId().equalsIgnoreCase(MyId)) {
+			LOG.info("This is my OWN ID not adding it #########  ");
+		}else {
+			cssFriends.add((cssAdd.getName()));
+		}
+		
 		LOG.info("cssAdd.getName contains " +cssAdd.getName());
 		LOG.info("cssFriends contains " +cssFriends +" entries");
 	}
