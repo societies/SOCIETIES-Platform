@@ -77,6 +77,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.servicediscovery.ReturnValue";
 	public static final String GET_SERVICE     = "org.societies.android.platform.servicediscovery.GET_SERVICE";
 	public static final String GET_SERVICES    = "org.societies.android.platform.servicediscovery.GET_SERVICES";
+	public static final String GET_MY_SERVICES     = "org.societies.android.platform.servicediscovery.GET_MY_SERVICES";
 	public static final String SEARCH_SERVICES = "org.societies.android.platform.servicediscovery.SEARCH_SERVICES";
 	
     private static final String LOG_TAG = ServiceManagement.class.getName();
@@ -112,17 +113,38 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 	}
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceDiscovery >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)
-	 */
+	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
+	public AService[] getMyServices(String client) {
+		Log.d(LOG_TAG, "getMyServices called by client: " + client);
+		
+		//MESSAGE BEAN
+		ServiceDiscoveryMsgBean messageBean = new ServiceDiscoveryMsgBean();
+		messageBean.setMethod(MethodName.GET_LOCAL_SERVICES);
+
+		//COMMS STUFF
+		ICommCallback discoCallback = new ServiceLifecycleCallback(client, GET_MY_SERVICES); 
+		IIdentity toID = commMgr.getIdManager().getCloudNode();
+		Stanza stanza = new Stanza(toID);
+        try {
+        	commMgr.register(ELEMENT_NAMES, discoCallback);
+        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+			Log.d(LOG_TAG, "Sending stanza");
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "ERROR sending message: " + e.getMessage());
+        }
+        return null;
+	}
+
+	
+	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getServices(java.lang.String, org.societies.api.identity.IIdentity)*/
 	public AService[] getServices(String client, String identity) {
 		Log.d(LOG_TAG, "getServices called by client: " + client);
 		
-		INetworkNode node = commMgr.login("john", "societies.local", "1234");
-		if(node==null) 
-			Log.d(LOG_TAG, ">>>>>>>>Login failed");
-		else
-			Log.d(LOG_TAG, ">>>>>>>>Login success");
+		//INetworkNode node = commMgr.login("john", "societies.local", "1234");
+		//if(node==null) 
+		//	Log.d(LOG_TAG, ">>>>>>>>Login failed");
+		//else
+		//	Log.d(LOG_TAG, ">>>>>>>>Login success");
 		
 		//MESSAGE BEAN
 		ServiceDiscoveryMsgBean messageBean = new ServiceDiscoveryMsgBean();
@@ -237,6 +259,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 					//CONVERT TO PARCEL BEANS
 					int i=0;
 					AService serviceArray[] = AService.CREATOR.newArray(serviceList.size());
+					//Parcelable serviceArray[] = new Parcelable[serviceList.size()];
 					for(org.societies.api.schema.servicelifecycle.model.Service tmpService: serviceList) {
 						serviceArray[i] = (AService)tmpService;
 						i++;

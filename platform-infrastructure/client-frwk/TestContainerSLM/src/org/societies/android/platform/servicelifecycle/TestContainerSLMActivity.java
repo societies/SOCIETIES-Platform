@@ -48,6 +48,7 @@ public class TestContainerSLMActivity extends Activity {
         //REGISTER BROADCAST
         IntentFilter intentFilter = new IntentFilter() ;
         intentFilter.addAction(ServiceManagement.GET_SERVICES);
+        intentFilter.addAction(ServiceManagement.GET_MY_SERVICES);
         intentFilter.addAction(ServiceManagement.GET_SERVICE);
         intentFilter.addAction(ServiceManagement.SEARCH_SERVICES);
         intentFilter.addAction(CoreServiceMonitor.INSTALLED_APPLICATIONS);

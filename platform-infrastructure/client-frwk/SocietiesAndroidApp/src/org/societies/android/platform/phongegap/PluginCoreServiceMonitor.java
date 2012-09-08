@@ -158,6 +158,7 @@ public class PluginCoreServiceMonitor extends Plugin {
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_SERVICES);
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_TASKS);
         
+        intentFilter.addAction(ServiceManagement.GET_MY_SERVICES);
         intentFilter.addAction(ServiceManagement.GET_SERVICES);
         intentFilter.addAction(ServiceManagement.GET_SERVICE);
         intentFilter.addAction(ServiceManagement.SEARCH_SERVICES);
@@ -222,6 +223,18 @@ public class PluginCoreServiceMonitor extends Plugin {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, 9))) {
+				try {
+					this.coreServiceMonitor.getInstalledApplications(data.getString(0));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, 5))) {
+				try {
+					this.coreServiceMonitor.startActivity(data.getString(0), data.getString(1));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
 			}
 			//>>>>>>>>>  IServiceDiscovery METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 0))) {
@@ -239,6 +252,12 @@ public class PluginCoreServiceMonitor extends Plugin {
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 2))) {
 				try {
 					this.serviceDisco.searchService(data.getString(0), (AService) data.get(1), data.getString(2));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 3))) {
+				try {
+					this.serviceDisco.getMyServices(data.getString(0));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
