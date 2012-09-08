@@ -70,7 +70,7 @@ var Societies3PServices = {
 			alert("refresh3PServices - failure: " + data);
 		}
 		
-		window.plugins.ServiceManagementService.getInstalledApps(success, failure);
+		window.plugins.SocietiesCoreServiceMonitor.getInstalledApps(success, failure);
 	},
 
 	// Load the data for a specific category, based on
@@ -113,6 +113,7 @@ var Societies3PServices = {
 			//$page.page();
 
 			// Now call changePage() and tell it to switch to the page we just modified.
+			//options.
 			$.mobile.changePage( $page, options );
 		}
 	}
@@ -126,29 +127,15 @@ var Societies3PServices = {
  * @description Add Javascript functions to various HTML tags using JQuery
  * @returns null
  */
-
-/**
- * JQuery boilerplate to attach JS functions to relevant HTML elements
- * 
- * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pageinit
- * N.B. this event is fired once per page load
- * @returns null
- */
 $(document).bind('pageinit',function(){
-	console.log("jQuery pageinit action(s) for active my_apps");
 
-	//$(document).ready(function() {
-	//	SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);
-	//}); 
+	console.log("pageinit: Active Services jQuery calls");
 	
-	$('#List3PServices').off('click').on('click', function(){
+	//CANNOT CALL MY onload FUNCTIONS TILL PHONEGAP LOADS ITS debugdata.json - ADD DELAY
+	setTimeout(function() {
 		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
-	});
-	
-	setTimeout(function(){
-		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
-		Societies3PServices.refreshLocalApps();
-    }, 500);
+		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refreshLocalApps);
+    }, 200);
 	
 	//Listen for any attempts to call changePage().
 	$(document).bind( "pagebeforechange", function( e, data ) {
