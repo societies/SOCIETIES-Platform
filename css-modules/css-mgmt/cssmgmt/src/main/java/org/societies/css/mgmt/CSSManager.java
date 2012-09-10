@@ -1320,7 +1320,12 @@ public List<CssAdvertisementRecord> suggestedFriends( ) {
     for (CssAdvertisementRecord friend : cssFriends) {
     	LOG.info("[]][][][][][] CSS Friends iterator List contains " +friend);
         if (socialFriends.contains(friend.getName())) {
-        	commonFriends.add(friend);
+        	if (commonFriends.contains(friend)){
+        		LOG.info("This friend is already added to the list @@@@@@@@@@  " +friend);	
+        	}else {
+        		commonFriends.add(friend);
+        	}
+        	
         }
        // i++;
     }
