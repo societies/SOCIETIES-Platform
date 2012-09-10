@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 public class TestContainerSLMActivity extends Activity {
 
@@ -37,13 +39,13 @@ public class TestContainerSLMActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
+
         //CREATE INTENT FOR SERVICE AND BIND
-        //Intent intentServiceDisco = new Intent(this.getApplicationContext(), ServiceManagement.class);
-        //this.getApplicationContext().bindService(intentServiceDisco, serviceDiscoConnection, Context.BIND_AUTO_CREATE);
+        Intent intentServiceDisco = new Intent(this.getApplicationContext(), ServiceManagement.class);
+        this.getApplicationContext().bindService(intentServiceDisco, serviceDiscoConnection, Context.BIND_AUTO_CREATE);
         
-        Intent intentServiceMon = new Intent(this.getApplicationContext(), CoreServiceMonitor.class);
-        this.getApplicationContext().bindService(intentServiceMon, coreServiceMonitorConnection, Context.BIND_AUTO_CREATE);
+        //Intent intentServiceMon = new Intent(this.getApplicationContext(), CoreServiceMonitor.class);
+        //this.getApplicationContext().bindService(intentServiceMon, coreServiceMonitorConnection, Context.BIND_AUTO_CREATE);
         
         //REGISTER BROADCAST
         IntentFilter intentFilter = new IntentFilter() ;
@@ -78,8 +80,6 @@ public class TestContainerSLMActivity extends Activity {
 	            serviceDiscoConnected = true;
 	            Log.d(LOG_TAG, "Successfully connected to IServiceDiscovery service");
 	            
-	            //EXECUTE NATIVE SERVICE API
-	            serviceDisco.getServices("TestContainerSLMActivity", "john.societies.local");
         	} catch (Exception ex) {
         		Log.d(LOG_TAG, "Error binding to service: " + ex.getMessage());
         	}
@@ -116,6 +116,12 @@ public class TestContainerSLMActivity extends Activity {
         }
     };
     
+    public void btnSendMessage_onClick(View view) {
+    	Log.d(LOG_TAG, ">>>>>>>>btnSendMessage_onClick - serviceDiscoConnected: " + serviceDiscoConnected);
+		if (serviceDiscoConnected)
+			serviceDisco.getMyServices("org.societies.android.platform.servicelifecycle"); //"TestContainerSLMActivity");
+    }
+    
     private class TestSLM extends AsyncTask<Void, Void, Void> {
     	
     	private Context context;
@@ -125,6 +131,19 @@ public class TestContainerSLMActivity extends Activity {
     	}
     	
     	protected Void doInBackground(Void... args) {
+
+    		try {
+				Thread.currentThread();
+				Thread.sleep(5 * 1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		//EXECUTE NATIVE SERVICE API
+    		Log.d(LOG_TAG, ">>>>>>>>serviceDiscoConnected: " + serviceDiscoConnected);
+    		if (serviceDiscoConnected)
+    			serviceDisco.getMyServices("org.societies.android.platform.servicelifecycle"); //"TestContainerSLMActivity");
     		return null;
     	}
     }
@@ -135,7 +154,7 @@ public class TestContainerSLMActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, intent.getAction());
 			
-			if (intent.getAction().equals(ServiceManagement.GET_SERVICES)) {
+			if ((intent.getAction().equals(ServiceManagement.GET_SERVICES)) || (intent.getAction().equals(ServiceManagement.GET_MY_SERVICES))) {
 				//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
 				Parcelable parcels[] =  intent.getParcelableArrayExtra(ServiceManagement.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {
