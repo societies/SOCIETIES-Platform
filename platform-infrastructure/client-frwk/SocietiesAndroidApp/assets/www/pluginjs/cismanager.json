@@ -1,6 +1,7 @@
 {
 	"CISDesktopManagerService" : {
 		"exceptionThreshold" : 0,
+		
 		"createdCIS" : {
 
 						"cisName": "barcelona fc",
@@ -18,6 +19,60 @@
 	                        ],
 	                    "cisDescription": "soh barca",
 	                    "cisJid" : "barca.soc.com"
-	     }
+	     },
+	     
+	     "listOfCISs": [{
+	     				"cisName": "flamengo",
+	                    "cisType": "soccer",
+	                    "cisOwner": "zico@soc.com",
+	                    "cisCriteria": [
+	                    	{
+	                        "attribute": "religion",
+	                        "operation": "equals",
+	                        "value": "Protestant"},
+	                        {
+	                        "attribute": "location",
+	                        "operation": "equals",
+	                        "value": "Peru"}
+	                        ],
+	                    "cisDescription": "cis do flamengo",
+	                    "cisJid" : "fla.soc.com"
+					     },
+	     				{
+						"cisName": "vasco",
+	                    "cisType": "soccer",
+	                    "cisOwner": "dinamite@soc.com",
+	                    "cisCriteria": [
+	                    	{
+	                        "attribute": "religion",
+	                        "operation": "equals",
+	                        "value": "Protestant"},
+	                        {
+	                        "attribute": "location",
+	                        "operation": "equals",
+	                        "value": "Peru"}
+	                        ],
+	                    "cisDescription": "cis do Vasco",
+	                    "cisJid" : "vasco.soc.com"
+					     },
+					     {
+						"cisName": "fluminense fc",
+	                    "cisType": "soccer",
+	                    "cisOwner": "fred@soc.com",
+	                    "cisCriteria": [
+	                    	{
+	                        "attribute": "religion",
+	                        "operation": "equals",
+	                        "value": "Protestant"},
+	                        {
+	                        "attribute": "location",
+	                        "operation": "equals",
+	                        "value": "Peru"}
+	                        ],
+	                    "cisDescription": "cis do flu",
+	                    "cisJid" : "flu.soc.com"
+	     				}
+	     		]
+	     
 	}
 }

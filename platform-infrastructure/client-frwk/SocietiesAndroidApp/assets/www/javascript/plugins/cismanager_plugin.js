@@ -59,5 +59,28 @@ var	SocietiesLocalCISManager = {
 					'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
 					'createCIS',          //Telling the plugin, which action we want to perform
 					[cisRecord]);        //Passing a list of arguments to the plugin
+		},
+		
+		
+		/**
+		 * @methodOf Societies.LocalCISManagerService#
+		 * @description list CISs
+		 * @param {Object} successCallback The callback which will be called when result is successful
+		 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+		 * @returns CIS record array
+		 */
+		listCIS: function(successCallback, failureCallback) {
+			var clientPackage = "org.societies.android.platform.gui";
+
+
+			console.log("Call LocalCISManagerService - listCIS");
+
+
+			return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+					failureCallback,     //Callback which will be called when plugin action encounters an error
+					'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+					'listCIS',          //Telling the plugin, which action we want to perform
+					[]);        //Passing a list of arguments to the plugin
 		}
+		
 };
