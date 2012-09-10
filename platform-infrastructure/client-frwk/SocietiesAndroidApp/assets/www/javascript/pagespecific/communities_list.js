@@ -1,5 +1,3 @@
-
-
 /**
 Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
 
@@ -27,63 +25,59 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 
 /**
- * Societies Android app Create CIS function(s) namespace
+ * Societies Android app CIS list function(s) namespace
  * 
- * @namespace SocietiesCISManagerService
+ * @namespace SocietiesCISListService
  */
 
-var	SocietiesCISManagerService = {
+var	SocietiesCISListService = {
 			
 		/**
-		 * @methodOf SocietiesCISManagerService#
-		 * @description create a CIS
+		 * @methodOf SocietiesCISListService#
+		 * @description update the CIS data on communities_list.html 
 		 * @param {Object} successCallback The callback which will be called when result is successful
 		 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-		 * @returns CIS record
+		 * @returns none
 		 */
-	CreateCIS: function() {
-		console.log("create CIS");
-		//$.mobile.loadPage( "community_profile.html", { showLoadMsg: false } );//load it in the dom
-
-		function success(data) {
+		populateCISListpage: function(data) {
 			
-			console.log("create CIS where data has name = " + data.cisName);
-			$.mobile.changePage("community_profile.html", { transition: "slideup"} );
-			SocietiesCISProfileService.populateCISProfilepage(data);
+			//EMPTY TABLE
+			$('ul#CommunitiesListDiv li:last').remove();
+			//DISPLAY COMMUNTIES
+			for (i  = 0; i < data.length; i++) {
+				var tableEntry = '<li><a href="#category-item?pos=' + i + '"><img src="./images/community_profile_icon.png" class="profile_list" alt="logo" >' +
+				'<h2>' + data[i].cisName + '</h2>' + 
+				'<p>' + data[i].cisDescription + '</p>' + 
+				'</a></li>';
+				/*
+				$('ul#SocietiesServicesDiv').append(
+						$('<li>').append(
+								$('<a>').attr('href','#appdetails').append(
+										$('<img>').attr('src', '../images/printer_icon.png').append(data.serviceName) )));     
+				*/
+				jQuery('ul#CommunitiesListDiv').append(tableEntry);
+			}
+			$('#CommunitiesListDiv').listview('refresh');
 			
-		}
-		
-		function failure(data) {
-			alert("createCIS - failure: " + data);
-		}
-		window.plugins.SocietiesLocalCISManager.createCIS(success, failure);
 
-	},
 
-	/**
-	 * @methodOf SocietiesCISManagerService#
-	 * @description list CISs
-	 * @param {Object} successCallback The callback which will be called when result is successful
-	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-	 * @returns CIS records
-	 */
-	ListCIS: function() {
-	console.log("list CISs");
-	//$.mobile.loadPage( "community_profile.html", { showLoadMsg: false } );//load it in the dom
-	
-	function success(data) {
-		
-		console.log("List CISs where  = TODO");
-		$.mobile.changePage("communities_list.html", { transition: "slideup"} );
-		SocietiesCISListService.populateCISListpage(data);
-		
-	}
-	
-	function failure(data) {
-		alert("createCIS - failure: " + data);
-	}
-	window.plugins.SocietiesLocalCISManager.listCIS(success, failure);
-	
-	}
+		}
+
+
 
 }
+
+
+/**
+ * JQuery boilerplate to attach JS functions to relevant HTML elements
+ * 
+ * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pageinit
+ * N.B. this event is fired once per page load
+ * @returns null
+ */
+$(document).bind('pageinit',function(){
+
+	console.log("SocietiesCISProfileService pageinit action(s)");
+
+
+});

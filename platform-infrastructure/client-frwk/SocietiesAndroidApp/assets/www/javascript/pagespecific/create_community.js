@@ -1,5 +1,3 @@
-
-
 /**
 Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
 
@@ -26,64 +24,23 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+
 /**
- * Societies Android app Create CIS function(s) namespace
+ * JQuery boilerplate to attach JS functions to relevant HTML elements
  * 
- * @namespace SocietiesCISManagerService
+ * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pageinit
+ * N.B. this event is fired once per page load
+ * @returns null
  */
+$(document).bind('pageinit',function(){
 
-var	SocietiesCISManagerService = {
-			
-		/**
-		 * @methodOf SocietiesCISManagerService#
-		 * @description create a CIS
-		 * @param {Object} successCallback The callback which will be called when result is successful
-		 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-		 * @returns CIS record
-		 */
-	CreateCIS: function() {
-		console.log("create CIS");
-		//$.mobile.loadPage( "community_profile.html", { showLoadMsg: false } );//load it in the dom
-
-		function success(data) {
-			
-			console.log("create CIS where data has name = " + data.cisName);
-			$.mobile.changePage("community_profile.html", { transition: "slideup"} );
-			SocietiesCISProfileService.populateCISProfilepage(data);
-			
-		}
-		
-		function failure(data) {
-			alert("createCIS - failure: " + data);
-		}
-		window.plugins.SocietiesLocalCISManager.createCIS(success, failure);
-
-	},
-
-	/**
-	 * @methodOf SocietiesCISManagerService#
-	 * @description list CISs
-	 * @param {Object} successCallback The callback which will be called when result is successful
-	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-	 * @returns CIS records
-	 */
-	ListCIS: function() {
-	console.log("list CISs");
-	//$.mobile.loadPage( "community_profile.html", { showLoadMsg: false } );//load it in the dom
+	console.log("create Community pageinit action(s)");
 	
-	function success(data) {
-		
-		console.log("List CISs where  = TODO");
-		$.mobile.changePage("communities_list.html", { transition: "slideup"} );
-		SocietiesCISListService.populateCISListpage(data);
-		
-	}
+	 $('#createCISbutton').off('click').on('click', function() {
+		  SocietiesCISManagerService.CreateCIS();
+		 });
 	
-	function failure(data) {
-		alert("createCIS - failure: " + data);
-	}
-	window.plugins.SocietiesLocalCISManager.listCIS(success, failure);
-	
-	}
+	 });
 
-}
+
