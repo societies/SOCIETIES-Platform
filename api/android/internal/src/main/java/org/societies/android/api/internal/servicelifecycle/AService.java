@@ -107,4 +107,23 @@ public class AService extends Service implements Parcelable {
 			return new AService[size];
 		}
 	};
+	
+	public static AService convertService(Service service) {
+		AService aservice = new AService();
+		aservice.setAuthorSignature(service.getAuthorSignature());
+		aservice.setContextSource(service.getContextSource());
+		aservice.setPrivacyPolicy(service.getPrivacyPolicy());
+		aservice.setSecurityPolicy(service.getSecurityPolicy());
+		aservice.setServiceCategory(service.getServiceCategory());
+		aservice.setServiceDescription(service.getServiceDescription());
+		aservice.setServiceEndpoint(service.getServiceEndpoint());
+		aservice.setServiceIdentifier(AServiceResourceIdentifier.convertServiceResourceIdentifier(service.getServiceIdentifier()));
+		aservice.setServiceInstance(AServiceInstance.convertServiceInstance(service.getServiceInstance()));
+		aservice.setServiceLocation(service.getServiceLocation());
+		aservice.setServiceName(service.getServiceName());
+		aservice.setServiceStatus(service.getServiceStatus());
+		aservice.setServiceType(service.getServiceType());
+		
+		return aservice;
+	}
 }

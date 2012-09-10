@@ -73,4 +73,12 @@ public class AServiceResourceIdentifier extends ServiceResourceIdentifier implem
 			return new AServiceResourceIdentifier[size];
 		}
 	};
+	
+	public static AServiceResourceIdentifier convertServiceResourceIdentifier(ServiceResourceIdentifier sri) {
+		AServiceResourceIdentifier asri = new AServiceResourceIdentifier();
+		asri.setIdentifier(sri.getIdentifier());
+		asri.setServiceInstanceIdentifier(sri.getServiceInstanceIdentifier());
+		
+		return asri;
+	}
 }
