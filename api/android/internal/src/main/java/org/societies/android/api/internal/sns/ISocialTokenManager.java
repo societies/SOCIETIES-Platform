@@ -47,6 +47,7 @@ public interface ISocialTokenManager {
 	 * and the Extra SOCIAL_NETWORK_KEY with the value of the socialNetwork parameter, 
 	 * the Extra INTENT_RETURN_KEY with the token 
 	 * and the Extra EXTRA_EXPIRES with the expire time of the token. 
+	 * If, for some reason, cannot get the token the intent will return the last two extras as null.
 	 * @param client Package name of the application that will receive the intent with the asynchronous return value.
 	 * @param socialNetwork Social network to get the token.
 	 */
