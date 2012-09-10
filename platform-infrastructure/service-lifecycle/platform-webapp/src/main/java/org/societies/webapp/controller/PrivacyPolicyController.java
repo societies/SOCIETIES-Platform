@@ -32,6 +32,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -55,6 +56,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -62,15 +64,20 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.comm.xmpp.xc.impl.CommManagerHelper;
 import org.societies.webapp.models.PrivacyPolicyForm;
@@ -100,6 +107,63 @@ public class PrivacyPolicyController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		return new ModelAndView("privacy/privacy-policy/index", model);
 	}
+	
+	
+	@RequestMapping(value = "/privacy-policy-show.html", method = RequestMethod.GET)
+	public ModelAndView showAction(@RequestParam(value="cisOwnerId", required=false) String cisOwnerId,
+									@RequestParam(value="cisId", required=true) String cisId) {
+		LOG.debug("Show CIS privacy policy: "+cisId+" "+cisOwnerId);
+		StringBuffer infoMsg = new StringBuffer();
+		StringBuffer errorMsg = new StringBuffer();
+
+		// -- Retrieve the privacy policy
+		RequestorCis provider = null;
+		RequestPolicy privacyPolicy = null;
+		try {
+			IIdentity cisOwnerIdentity = commMngrRef.getIdManager().fromJid(cisOwnerId);
+			IIdentity cisIdentity = commMngrRef.getIdManager().fromJid(cisId);
+			provider = new RequestorCis(cisOwnerIdentity, cisIdentity);
+			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(provider);
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// -- Display the privacy policy
+		// - No privacy policy
+		if (null == privacyPolicy) {
+//			errorMsg.append("The CIS privacy policy of "+provider+" can not be retrieved. It doesn't exist on this node, or identifiers are incorrect.");
+			LOG.error("The CIS privacy policy of "+provider+" can not be retrieved. It doesn't exist on this node, or identifiers are incorrect.");
+			LOG.error("Let's create one");
+			// -- Create a privacy policy
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.READ));
+			actions.add(new Action(ActionConstants.WRITE, true));
+			List<Condition> conditions = new ArrayList<Condition>();
+			conditions.add(new Condition(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1"));
+			conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+			List<RequestItem> requests = new ArrayList<RequestItem>();
+			requests.add(new RequestItem(new Resource(DataIdentifierScheme.CIS, "cis-member-list"), actions, conditions));
+			privacyPolicy = new RequestPolicy(provider, requests);
+		}
+		else {
+			LOG.debug(privacyPolicy.toXMLString());
+		}
+		
+		LOG.error(errorMsg.toString());
+		LOG.info(infoMsg.toString());
+		
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("error", errorMsg.toString());
+		model.put("info", infoMsg.toString());
+		model.put("PrivacyPolicy", privacyPolicy);
+		return new ModelAndView("privacy/privacy-policy/show", model);
+	}
+	
+	
 
 	@RequestMapping(value = "/privacy-policy.html", method = RequestMethod.GET)
 	public ModelAndView updateAction() {

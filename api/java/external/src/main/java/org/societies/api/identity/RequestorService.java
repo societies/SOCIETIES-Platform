@@ -95,9 +95,8 @@ public class RequestorService extends Requestor implements Serializable{
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
-		result = prime
-				* result
+		int result = 1; //super.hashCode();
+		result = prime * result
 				+ ((requestorServiceId == null) ? 0 : requestorServiceId
 						.hashCode());
 		return result;

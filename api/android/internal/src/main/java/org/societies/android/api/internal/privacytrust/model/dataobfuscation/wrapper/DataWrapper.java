@@ -79,8 +79,9 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	
 
 	// --- GET/SET
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#getDataId()
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper#getDataId()
 	 */
 	@Override
 	public String getDataId() {
