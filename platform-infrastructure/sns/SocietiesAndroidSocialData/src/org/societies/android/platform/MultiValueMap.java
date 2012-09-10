@@ -58,5 +58,16 @@ public class MultiValueMap<K, V> {
 		else
 			return Collections.emptyList();
 	}
+	
+	public List<V> remove(K key) {
+		if(map.containsKey(key))
+			return map.remove(key);
+		else
+			return Collections.emptyList();
+	}
+	
+	public boolean containsKey(K key) {
+		return map.containsKey(key);
+	}
 
 }

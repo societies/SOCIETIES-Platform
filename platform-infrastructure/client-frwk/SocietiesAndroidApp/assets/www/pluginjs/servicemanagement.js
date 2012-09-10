@@ -29,14 +29,15 @@ window.plugins.ServiceManagementService = {
 		}
 	},
 	
-	getInstalledApps: function(successCallback, errorCallback){
+	getMyServices: function(successCallback, errorCallback){
 		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(phonegapdesktop.internal.getDebugValue('ServiceManagementService', 'getInstalledApps'));
+			successCallback(phonegapdesktop.internal.getDebugValue('ServiceManagementService', 'getServices'));
 		}
 	}
+	
 }
 
 var ServiceManagementServiceHelper = {

@@ -28,17 +28,19 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.internal.sns.AConnectorBean;
 import org.societies.android.api.internal.sns.ISocialData;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
+import org.societies.api.internal.schema.sns.socialdata.ConnectorsList;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.identity.IdentityManagerImpl;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
 import android.app.Service;
@@ -63,23 +65,9 @@ public class SocialData extends Service implements ISocialData {
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/internal/schema/sns/socialdata");
     private static final List<String> PACKAGES = Arrays.asList("org.societies.api.internal.schema.sns.socialdata");   
 
-	/**
-	 * CoreServiceMonitor intents
-	 * Used to create to create Intents to signal return values of a called method
-	 * If the method is locally bound it is possible to directly return a value but is discouraged
-	 * as called methods usually involve making asynchronous calls. 
-	 */
-	public static final String ADD_SOCIAL_CONNECTOR = "org.societies.android.platform.sns.ADD_SOCIAL_CONNECTOR";
-	public static final String REMOVE_SOCIAL_CONNECTOR = "org.societies.android.platform.sns.REMOVE_SOCIAL_CONNECTOR";
-	public static final String GET_SOCIAL_CONNECTORS = "org.societies.android.platform.sns.GET_SOCIAL_CONNECTORS";
-	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.sns.ReturnValue";
-	
 	private IBinder binder = null;
 	
-	private static final String SOCIALDATA_NODE_JID = "xcmanager.societies.local";
-	
 	private ClientCommunicationMgr commMgr;
-	private IIdentity toId;
 
 	@Override
 	public void onCreate () {
@@ -88,8 +76,7 @@ public class SocialData extends Service implements ISocialData {
 		try {
 			//INSTANTIATE COMMS MANAGER
 			commMgr = new ClientCommunicationMgr(this);
-			commMgr.register(ELEMENT_NAMES, nullCallback);
-			toId = IdentityManagerImpl.staticfromJid(SOCIALDATA_NODE_JID);			
+			commMgr.register(ELEMENT_NAMES, nullCallback);		
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception creating ClientCommunicationMgr instance.", e);
         }  
@@ -127,6 +114,7 @@ public class SocialData extends Service implements ISocialData {
 		SocialdataMessageBean messageBean = SocialDataCommsUtils.createAddConnectorMessageBean(socialNetwork, token, validity);
 
 		//COMMS STUFF
+		IIdentity toId = commMgr.getIdManager().getCloudNode();	
 		Stanza stanza = new Stanza(toId);
         try {
         	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, ADD_SOCIAL_CONNECTOR, client));
@@ -143,6 +131,7 @@ public class SocialData extends Service implements ISocialData {
 		SocialdataMessageBean messageBean = SocialDataCommsUtils.createRemoveConnectorMessageBean(connectorId);
 
 		//COMMS STUFF
+		IIdentity toId = commMgr.getIdManager().getCloudNode();	
 		Stanza stanza = new Stanza(toId);
         try {
         	commMgr.sendIQ(stanza, IQ.Type.SET, messageBean, createCallback(this, REMOVE_SOCIAL_CONNECTOR, client));
@@ -159,6 +148,7 @@ public class SocialData extends Service implements ISocialData {
 		SocialdataMessageBean messageBean = SocialDataCommsUtils.createGetConnectorsMessageBean();
 
 		//COMMS STUFF
+		IIdentity toId = commMgr.getIdManager().getCloudNode();	
 		Stanza stanza = new Stanza(toId);
         try {
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, createCallback(this, GET_SOCIAL_CONNECTORS, client));
@@ -182,6 +172,7 @@ public class SocialData extends Service implements ISocialData {
 
 			public void receiveResult(Stanza stanza, Object payload) {
 				Log.d(LOG_TAG, "receiveResult");
+				
 				if(payload instanceof SocialdataResultBean) {
 					
 					SocialdataResultBean resultBean = (SocialdataResultBean)payload;
@@ -191,15 +182,23 @@ public class SocialData extends Service implements ISocialData {
 					if(action.equals(ADD_SOCIAL_CONNECTOR)) {
 						intent.putExtra(INTENT_RETURN_KEY, resultBean.getId());
 					}
+					else if(action.equals(GET_SOCIAL_CONNECTORS)) {
+						intent.putExtra(INTENT_RETURN_KEY, convertConnectorsListToAConnectorBeanArray(resultBean.getConnectorsList()));
+					}
 					
 					intent.setPackage(client);
-					context.sendBroadcast(intent);
-					
+					context.sendBroadcast(intent);					
 				}
 			}
 
 			public void receiveError(Stanza stanza, XMPPError error) {
-				Log.d(LOG_TAG, "receiveError: "+error.getGenericText());
+				Log.d(LOG_TAG, "receiveError: "+error.getStanzaErrorString());
+				
+				Intent intent = new Intent(ACTION_XMPP_ERROR);
+				intent.putExtra(EXTRA_STANZA_ERROR, error.getStanzaErrorString());
+				
+				intent.setPackage(client);
+				context.sendBroadcast(intent);
 			}
 
 			public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
@@ -216,6 +215,17 @@ public class SocialData extends Service implements ISocialData {
 			}
 			
 		};
+	}
+	
+	private AConnectorBean[] convertConnectorsListToAConnectorBeanArray(ConnectorsList connectorsList) { 
+		List<ConnectorBean> beans = connectorsList.getConnectorBean();
+		AConnectorBean[] connectorBeans = new AConnectorBean[beans.size()];
+		
+		for(int i=0; i<connectorBeans.length; i++) {			
+			connectorBeans[i] = new AConnectorBean(beans.get(i));			
+		}
+		
+		return connectorBeans;
 	}
 	
 	private ICommCallback nullCallback = new ICommCallback() {

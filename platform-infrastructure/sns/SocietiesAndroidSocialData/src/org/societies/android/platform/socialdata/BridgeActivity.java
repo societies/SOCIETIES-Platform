@@ -81,17 +81,14 @@ public class BridgeActivity extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {	
-		String token = data.getStringExtra(Constants.ACCESS_TOKEN);
-		String expires = data.getStringExtra(Constants.TOKEN_EXPIRATION);
-		if (requestCode == Constants.FB_CODE){				
-			returnToken(SocialNetwork.Facebook, token, expires);			
+		if(resultCode == RESULT_CANCELED) {
+			returnEmptyToken(requestCode);
 		}
-		else if(requestCode == Constants.TW_CODE){
-			returnToken(SocialNetwork.twitter, token, expires);
+		else {			
+			String token = data.getStringExtra(Constants.ACCESS_TOKEN);
+			String expires = data.getStringExtra(Constants.TOKEN_EXPIRATION);
+			returnToken(socialNetwork(requestCode), token, expires);
 		}
-		else if(requestCode == Constants.FQ_CODE){
-			returnToken(SocialNetwork.Foursquare, token, expires);
-		}			
 	}	
 	
 	private void returnToken(final SocialNetwork socialNetwork, final String token, final String expires) {
@@ -122,6 +119,27 @@ public class BridgeActivity extends Activity {
 		
 		Intent intentService = new Intent(this.getApplicationContext(), SocialTokenManager.class);
         this.getApplicationContext().bindService(intentService, connection, Context.BIND_AUTO_CREATE);
+	}
+	
+	private void returnEmptyToken(int requestCode) {
+		returnToken(socialNetwork(requestCode), null, null);
+	}
+	
+	private SocialNetwork socialNetwork(int requestCode) {
+		if (requestCode == Constants.FB_CODE){				
+			return SocialNetwork.Facebook;			
+		}
+		else if(requestCode == Constants.TW_CODE){
+			return SocialNetwork.twitter;
+		}
+		else if(requestCode == Constants.FQ_CODE){
+			return SocialNetwork.Foursquare;
+		}	
+		else if(requestCode == Constants.LK_CODE) {
+			return SocialNetwork.linkedin;
+		}
+		
+		throw new IllegalArgumentException("No social network bound to requestCode: "+requestCode); 
 	}
 	
 	public static void startActivityForSN(Context context, SocialNetwork socialNetwork) {

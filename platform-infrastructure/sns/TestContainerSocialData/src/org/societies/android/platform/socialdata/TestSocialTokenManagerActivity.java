@@ -24,6 +24,8 @@ public class TestSocialTokenManagerActivity extends Activity {
 
 	private static final String LOG_TAG = TestSocialTokenManagerActivity.class.getName();
 	
+	private static final String PACKAGE_NAME = "org.societies.android.platform.socialdata";
+	
     private ISocialTokenManager socialTokenMgr;
     private boolean connected = false;
     private TextView text;  
@@ -96,7 +98,7 @@ public class TestSocialTokenManagerActivity extends Activity {
     }
 
     private void testGetToken() {
-    	socialTokenMgr.getToken("TestSocialTokenManagerActivity", SocialNetwork.Facebook);
+    	socialTokenMgr.getToken(PACKAGE_NAME, SocialNetwork.Facebook);
     }
     
     private class bReceiver extends BroadcastReceiver  {
@@ -111,7 +113,7 @@ public class TestSocialTokenManagerActivity extends Activity {
 				Log.d(LOG_TAG, "token="+token);
 				text.setText("token="+token);
 				Log.d(LOG_TAG, "expires="+expires);
-				text.setText("expires="+expires);
+				text.append("\nexpires="+expires);
 			}
 		}
 	};

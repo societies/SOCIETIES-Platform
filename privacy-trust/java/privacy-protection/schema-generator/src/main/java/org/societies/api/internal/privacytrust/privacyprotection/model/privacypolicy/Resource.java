@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
+import org.societies.api.schema.identity.DataIdentifierScheme;
+
 /**
  * the Resource class is used to represent  a piece of data type belonging to the user 
  * (i.e context data, preference data, profile data). It contains the id of the data and the type of data. 
@@ -33,6 +35,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 public class Resource {
 	private String dataIdUri;
 	private String dataType;
+	private DataIdentifierScheme scheme;
 	
 	/**
 	 * @return the dataIdUri
@@ -58,5 +61,20 @@ public class Resource {
 	public void setDataType(String dataType) {
 		this.dataType = dataType;
 	}
+	
+	/**
+	 * @return the dataType
+	 */
+	public DataIdentifierScheme getScheme() {
+		return scheme;
+	}
+	/**
+	 * @param dataType the dataType to set
+	 */
+	public void setScheme(DataIdentifierScheme scheme) {
+		this.scheme = scheme;
+	}
+	
+	
 }
 

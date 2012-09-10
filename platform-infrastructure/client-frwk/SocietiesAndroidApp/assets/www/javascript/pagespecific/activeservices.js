@@ -73,9 +73,9 @@ var SocietiesActiveServices = {
  */
 $(document).bind('pageinit',function(){
 
-	console.log("jQuery pageinit action(s)");
+	console.log("jQuery pageinit action(s) for activeservices");
 
-	$('#refreshServices').click(function() {
+	$('#refreshServices').off('click').on('click', function(){
 		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(SocietiesActiveServices.refreshActiveServices);
 	});
 

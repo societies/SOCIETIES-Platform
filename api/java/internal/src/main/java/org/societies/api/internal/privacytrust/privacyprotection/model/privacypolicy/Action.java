@@ -57,6 +57,11 @@ public class Action implements Serializable{
 		this.optional = isOptional;
 	}
 	
+	public Action(Action action){
+		this.action = action.getActionType();
+		this.optional = action.isOptional();
+	}
+	
 	public void setOptional(boolean isOptional){
 		this.optional = isOptional;
 	}

@@ -47,17 +47,6 @@ import android.util.Log;
 public class SocialTokenManager extends Service implements ISocialTokenManager {	
 
 	private static final String LOG_TAG = SocialTokenManager.class.getName();
-	
-	/**
-	 * Intents
-	 * Used to create to create Intents to signal return values of a called method
-	 * If the method is locally bound it is possible to directly return a value but is discouraged
-	 * as called methods usually involve making asynchronous calls. 
-	 */
-	public static final String GET_TOKEN = "org.societies.android.platform.socialdata.GET_TOKEN";
-	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.socialdata.ReturnValue";
-	public static final String SOCIAL_NETWORK_KEY = "org.societies.android.platform.socialdata.SocialNetwork";
-	public static final String EXTRA_EXPIRES = "org.societies.android.platform.socialdata.SocialTokenManager.extra.EXPIRES";
 
 	private IBinder binder = null;
 	private MultiValueMap<SocialNetwork, String> requests = new MultiValueMap<SocialNetwork, String>();
@@ -90,18 +79,23 @@ public class SocialTokenManager extends Service implements ISocialTokenManager {
 	
 	// Service API
 	
-	public void getToken(String client, SocialNetwork socialNetwork) {	
+	public synchronized void getToken(String client, SocialNetwork socialNetwork) {	
 		Dbc.require("client cannot be null", client != null && client.length() > 0);
 		Dbc.require("socialNetwork cannot be null", socialNetwork != null);		
 		
-		requests.put(socialNetwork, client);
-		
-		BridgeActivity.startActivityForSN(this, socialNetwork);		
+		if(requests.containsKey(socialNetwork)) {
+			requests.put(socialNetwork, client);
+		}
+		else {
+			requests.put(socialNetwork, client);
+			
+			BridgeActivity.startActivityForSN(this, socialNetwork);
+		}
 	}
 	
 	// To receive token from BridgeActivity
-	void returnToken(SocialNetwork socialNetwork, String token, String expires) {
-		List<String> clients = requests.get(socialNetwork);
+	synchronized void returnToken(SocialNetwork socialNetwork, String token, String expires) {
+		List<String> clients = requests.remove(socialNetwork);
 		
 		for(String client:clients) {
 			sendReturnValue(client, socialNetwork, token, expires);
