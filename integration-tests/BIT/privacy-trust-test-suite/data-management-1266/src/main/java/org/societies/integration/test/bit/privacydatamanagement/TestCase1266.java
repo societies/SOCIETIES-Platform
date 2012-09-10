@@ -33,22 +33,26 @@ package org.societies.integration.test.bit.privacydatamanagement;
  */
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.integration.test.IntegrationTestCase;
 
 public class TestCase1266 extends IntegrationTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1266.class.getSimpleName());
 
 	public static IPrivacyDataManager privacyDataManager;
+	public static IPrivacyPolicyManager privacyPolicyManager;
 	public static ICommManager commManager;
+	public static ICisManager cisManager;
 	
 	
 	public TestCase1266() {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
-		super(1266, new Class[]{PrivacyDataManagerTest.class});
+		super(1266, new Class[]{PrivacyDataManagerTest.class, CisDataAccessControlTest.class});
 		PrivacyDataManagerTest.testCaseNumber = this.testCaseNumber;
 	}
 	
@@ -58,9 +62,17 @@ public class TestCase1266 extends IntegrationTestCase {
 		this.privacyDataManager = privacyDataManager;
 		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] IPrivacyDataManager injected");
 	}
+	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+		this.privacyPolicyManager = privacyPolicyManager;
+		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] IPrivacyPolicyManager injected");
+	}
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICommManager injected");
+	}
+	public void setCisManager(ICisManager cisManager) {
+		this.cisManager = cisManager;
+		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICisManager injected");
 	}
 
 	public static boolean isDepencyInjectionDone() {
@@ -77,6 +89,14 @@ public class TestCase1266 extends IntegrationTestCase {
 		}
 		if (null == privacyDataManager) {
 			LOG.info("[Dependency Injection] Missing IPrivacyDataManager");
+			return false;
+		}
+		if (null == privacyPolicyManager) {
+			LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
+			return false;
+		}
+		if (null == cisManager) {
+			LOG.info("[Dependency Injection] Missing ICisManager");
 			return false;
 		}
 		return true;

@@ -74,9 +74,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId) {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
-		if (null == dataId.getOwnerId()) {
-			throw new PrivacyException("[Parameters] OwnerId is missing");
-		}
+//		if (null == dataId.getOwnerId()) {
+//			throw new PrivacyException("[Parameters] OwnerId is missing");
+//		}
 
 		Session session = sessionFactory.openSession();
 		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
@@ -126,9 +126,9 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == dataId) {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
-		if (null == dataId.getOwnerId()) {
-			throw new PrivacyException("[Parameters] OwnerId is missing");
-		}
+//		if (null == dataId.getOwnerId()) {
+//			throw new PrivacyException("[Parameters] OwnerId is missing");
+//		}
 		if (null == actions || actions.size() <= 0) {
 			throw new PrivacyException("[Parameters] Actions are missing");
 		}
