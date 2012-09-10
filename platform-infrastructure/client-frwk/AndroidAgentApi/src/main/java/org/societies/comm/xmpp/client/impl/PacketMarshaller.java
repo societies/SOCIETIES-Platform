@@ -27,6 +27,7 @@ import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
 import org.societies.impl.RawXmlProvider;
+import org.societies.maven.converters.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;
@@ -55,6 +56,7 @@ public class PacketMarshaller {
 		try {
 			Element exampleElementImpl = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("dummy");
 			registry.bind(exampleElementImpl.getClass(), ElementConverter.class);
+			registry.bind(java.net.URI.class,URIConverter.class);
 			registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
 			registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));
 			registry.bind(org.jabber.protocol.pubsub.Item.class, new PubsubItemConverter(s));
