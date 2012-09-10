@@ -176,7 +176,13 @@
 			<version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.societies.platform</groupId>
+            <artifactId>socialdata</artifactId>
+            <version>0.1</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 	<build>
 		<plugins>
 			<plugin>

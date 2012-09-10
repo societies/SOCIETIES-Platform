@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.societies.android.api.internal.examples.AndroidParcelable;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
+import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.android.api.utilities.RemoteServiceHandler;
 
 
@@ -309,6 +310,12 @@ public class CoreMonitor extends Service implements ICoreServiceMonitor {
 	public boolean stopActivity(String arg0, String arg1) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public InstalledAppInfo[] getInstalledApplications(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 		

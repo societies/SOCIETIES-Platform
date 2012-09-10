@@ -36,6 +36,7 @@
 	<h3>Privacy Policies</h3>
 	<ul>
 		<li><a href="privacy-policy.html">Add a new one</a></li>
+		<li><a href="privacy-policy-show.html?cisId=onecis.societies.local&cisOwnerId=olivier.societies.local">Show an existing privacy policy</a></li>
 	</ul>
 
 	<p>There is currently no privacy policy.</p>

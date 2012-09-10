@@ -4,30 +4,12 @@
 <title>Societies</title>
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
-<link href="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.css" rel="stylesheet" type="text/css"/>
-<link rel="stylesheet" type="text/css" href="includes/societies.css"/>
-<script src="jquery-mobile/jquery-1.7.2.js" type="text/javascript"></script>
-<script src="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.min.js" type="text/javascript"></script>
-<!--JQM SlideMenu-->
-<link rel="stylesheet" href="includes/jqm.css"/>
-<script src="js/jqm.slidemenu.js"></script>
 </head>
 <body>
-<div id="slidemenu">
-
-<h3>MENU</h3>
-	<ul>
-		<li><input id="slide-inbox"  type="button" value="Inbox"/></li>
-		<li><input id="slide-chat"  type="button" value="Chat"/></li>
-		<li><input id="slide-rssfeeds"  type="button" value="RSS Feeds"/></li>
-		<li><input id="slide-help"  type="button" value="Help"/></li>
-		<li><input id="slide-logout" type="button" value="Log Out"/></li>
-	</ul>
-</div>
 
 
 <!-- Start of first page: #friends -->
-<div data-role="page" id="friends">
+<div data-role="page" id="suggested-friends-list">
 	<!-- header -->
 	<div data-role="header" data-position="fixed">
 		<img class="logo" src="../images/societies_header.png" alt="logo" />
@@ -39,7 +21,7 @@
 		<br/><br/>
 		<ul data-role="listview" data-theme="d" data-divider-theme="b">
 			<li data-role="list-divider">Suggested Societies Friends</li>
-			<li><a href="suggested_friend_profile.html" rel="external">
+			<li><a href="suggested_friend_profile.html">
 			<img src="../images/top_friend.png" class="profile_list" alt="top friend" />
 			<h2>JOE BLOGGS</h2>
 			<p>
@@ -49,7 +31,7 @@
 				Location: 10
 			</p>
 			</a></li>
-			<li><a href="friend_profile.html" rel="external">
+			<li><a href="friend_profile.html">
 			<img src="images/profile_pic_sample4.jpg" class="profile_list" alt="profile picture" />
 			<h2>JOE BLOGGS</h2>
 			<p>

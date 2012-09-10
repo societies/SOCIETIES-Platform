@@ -70,7 +70,7 @@ public class PacketMarshaller {
 	public void register(List<String> elementNames, List<String> namespaces, List<String> packages) {
 //		Log.d(LOG_TAG, "register");
 		for (String element : elementNames) {
-			Log.d(LOG_TAG, "register element: " + element);
+//			Log.d(LOG_TAG, "register element: " + element);
 		}
 		
 		try {
@@ -155,12 +155,12 @@ public class PacketMarshaller {
 		
 		String namespace = element.lookupNamespaceURI(element.getPrefix());
 		String xml = MarshallUtils.nodeToString(element);
-		Log.d(PacketMarshaller.class.getName() + " ### ", xml);
+//		Log.d(PacketMarshaller.class.getName() + " ### ", xml);
 		
 		//GET CLASS FIRST
 		String packageStr = nsToPackage.get(namespace);  
 		String beanName = element.getLocalName().substring(0,1).toUpperCase() + element.getLocalName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-		Log.d(PacketMarshaller.class.getName(), "Trying to unmarshall: " + packageStr + "." + beanName);
+//		Log.d(PacketMarshaller.class.getName(), "Trying to unmarshall: " + packageStr + "." + beanName);
 		Class<?> c = Class.forName(packageStr + "." + beanName);
 		
 		Object payload = s.read(c, xml);
@@ -196,7 +196,7 @@ public class PacketMarshaller {
 	}
 	
 	private String marshallPayload(Object payload) {
-		Log.d(LOG_TAG, "marshallPayload payload: " + payload.getClass().getName());
+//		Log.d(LOG_TAG, "marshallPayload payload: " + payload.getClass().getName());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
 		try {
@@ -204,7 +204,7 @@ public class PacketMarshaller {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Log.d(PacketMarshaller.class.getName() + " ### ", os.toString());
+//		Log.d(PacketMarshaller.class.getName() + " ### ", os.toString());
 		return os.toString();
 	}
 	

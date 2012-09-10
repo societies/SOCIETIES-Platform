@@ -45,11 +45,11 @@ var SocietiesUtility = {
 		
 		console.log("Back button handling on page: " + $.mobile.activePage[0].id );
 		
-	    if ($.mobile.activePage[0].id === "main"){
+	    if ($.mobile.activePage[0].id === "index"){
 	        e.preventDefault();
 	        navigator.app.exitApp();
 	    }
-	    else if ($.mobile.activePage[0].id === "menu"){
+	    else if ($.mobile.activePage[0].id === "landing"){
 	        e.preventDefault();
 	        SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulCSSCloudLogout);
 	    } else {
@@ -124,31 +124,44 @@ var SocietiesUtility = {
 /**
  * JQuery boilerplate to attach JS functions to relevant HTML elements
  * 
- * @description Add Javascript functions to various HTML tags using JQuery
+ * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on document.ready
+ * N.B. this event is only fired once, i.e. on the first page's loading
  * @returns null
  */
 
 jQuery(function() {
-	console.log("jQuery calls");
+	console.log("jQuery document ready action(s)");
 
 	document.addEventListener("deviceready", SocietiesUtility.onDeviceReady, false);
-	
-	$('#connectXMPP').click(function() {
-		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#cloudnode").val(), jQuery("#identitydomain").val())) {
+
+});
+
+/**
+ * JQuery boilerplate to attach JS functions to relevant HTML elements
+ * 
+ * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pageinit
+ * N.B. this event is fired once per page load
+ * @returns null
+ */
+
+
+$(document).bind('pageinit',function(){
+
+	console.log("jQuery pageinit action(s) for mainpage");
+
+	$('#connectXMPP').off('click').on('click', function(){
+		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 	});
 
-	$('#username').focus(function() {
+	$('#username').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#username')
 	});
 
-	$('#password').focus(function() {
+	$('#password').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#password')
 	});
 
-	$('#cloudnode').focus(function() {
-		SocietiesLogin.clearElementValue('#cloudnode')
-	});
 
 });

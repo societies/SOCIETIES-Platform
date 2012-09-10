@@ -77,4 +77,66 @@ public class ActionUtils {
 		}
 		return actionBeans;
 	}
+	
+	public static boolean contains(Action actionToCheck, List<Action> actions) {
+		if (null == actions || actions.size() <= 0 || null == actionToCheck) {
+			return false;
+		}
+		for(Action action : actions) {
+			if (action.getActionType().equals(actionToCheck.getActionType())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean contains(List<Action> actionsToCheck, List<Action> actions) {
+		return contains(actionsToCheck, actions, null);
+	}
+	/**
+	 * 
+	 * @param actionsToCheck
+	 * @param actions
+	 * @param intersection Will be filled with the intersection of the two list. It will works only if actions contains actionsToCheck
+	 * @return
+	 */
+	public static boolean contains(List<Action> actionsToCheck, List<Action> actions, List<Action> intersection) {
+		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
+			return false;
+		}
+		for(Action actionToCheck : actionsToCheck) {
+			if (!contains(actionToCheck, actions)) {
+				return false;
+			}
+			if (null != intersection) {
+				intersection.add(actionToCheck);
+			}
+		}
+		return true;
+	}
+	
+	public static boolean containsOr(List<Action> actionsToCheck, List<Action> actions) {
+		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
+			return false;
+		}
+		for(Action actionToCheck : actionsToCheck) {
+			if (contains(actionToCheck, actions)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static List<Action> intersect(List<Action> actionsToCheck, List<Action> actions) {
+		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
+			return null;
+		}
+		List<Action> result = new ArrayList<Action>();
+		for(Action actionToCheck : actionsToCheck) {
+			if (contains(actionToCheck, actions)) {
+				result.add(actionToCheck);
+			}
+		}
+		return result;
+	}
 }

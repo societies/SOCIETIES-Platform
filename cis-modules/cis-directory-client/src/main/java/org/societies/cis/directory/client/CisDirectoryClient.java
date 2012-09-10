@@ -346,5 +346,36 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 		;
 
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.societies.api.cis.directory.ICisDirectoryRemote#
+	 * searchByID
+	 */
+	@Override
+	public void searchByID(String cisID, ICisDirectoryCallback cisDirCallback)  {
+		// We want to send all messages for CisDirectory to the domain authority Node
+		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
+		Stanza stanza = new Stanza(toIdentity);
+
+		// SETUP CLIENT RETURN STUFF
+		CisDirectoryClientCallback callback = new CisDirectoryClientCallback(stanza.getId(),
+				cisDirCallback);
+
+		// CREATE MESSAGE BEAN
+		CisDirectoryBean cisDirBean = new CisDirectoryBean();
+		cisDirBean.setFilter(cisID);
+
+		cisDirBean.setMethod(MethodType.SEARCH_BY_ID);
+		try {
+			commManager.sendIQGet(stanza, cisDirBean, callback);
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+				
+		
+	}
+	
 
 }

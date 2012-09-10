@@ -25,11 +25,13 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.platform.servicemonitor;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.android.api.internal.examples.AndroidParcelable;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
+import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.utilities.DBC.Dbc;
 
 
@@ -38,8 +40,14 @@ import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Parcelable;
+import android.util.Base64;
 import android.util.Log;
 
 /**
@@ -64,6 +72,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	public static final String ACTIVE_FILTERED_SERVICES = "org.societies.android.platform.servicemonitor.ACTIVE_FILTERED_SERVICES";
 	public static final String ACTIVE_TASKS = "org.societies.android.platform.servicemonitor.ACTIVE_TASKS";
 	public static final String ACTIVE_FILTERED_TASKS = "org.societies.android.platform.servicemonitor.ACTIVE_FILTERED_TASKS";
+	public static final String INSTALLED_APPLICATIONS = "org.societies.android.platform.servicemonitor.INSTALLED_APPLICATIONS";
 	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.servicemonitor.ReturnValue";
 
 
@@ -176,7 +185,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 			 * Intentionally restricting potential intent receiver to client 
 			 */
 			intent.setPackage(client);
-			Log.d(this.getClass().getName(), "Intent package name: " + client);
+			Log.d(LOG_TAG, "Intent package name: " + client);
 			this.sendBroadcast(intent);
 			
 		}
@@ -212,7 +221,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 			
 			intent.putExtra(INTENT_RETURN_KEY, arrayTasks);
 			intent.setPackage(client);
-			Log.d(this.getClass().getName(), "Intent package name: " + client);
+			Log.d(LOG_TAG, "Intent package name: " + client);
 			this.sendBroadcast(intent);
 			
 		}
@@ -260,6 +269,76 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 		return filteredTasks; 
 	}
 
+	/* @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#getInstalledApplications(java.lang.String)*/
+	public InstalledAppInfo[] getInstalledApplications(String client) {
+		Log.d(LOG_TAG, "Calling getInstalledApplications from client: " + client);
+		
+		List<InstalledAppInfo> apps = getInstalledApps(false, "org.societies."); /* false = no system packages */
+		Parcelable returnArray[] = new Parcelable[apps.size()];
+		for (int i=0; i<apps.size(); i++) {
+			InstalledAppInfo tmpApp = apps.get(i); 
+			returnArray[i] = tmpApp;
+			Log.d(LOG_TAG, tmpApp.toString());
+		}
+
+		//SETUP RETURN INTENT STUFF
+		if (client != null) {
+			Intent intent = new Intent(INSTALLED_APPLICATIONS);
+			intent.putExtra(INTENT_RETURN_KEY, returnArray);
+			intent.setPackage(client);
+			this.sendBroadcast(intent);
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param getSysPackages true if 
+	 * @return
+	 */
+	private List<InstalledAppInfo> getInstalledApps(boolean getSysPackages, String packageNameFilter) { 
+		List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
+		List<InstalledAppInfo> res = new ArrayList<InstalledAppInfo>();
+		
+		for(int i=0;i<packs.size();i++) {
+			PackageInfo p = packs.get(i);
+			if ((!getSysPackages) && (p.versionName == null)) {
+				continue ;
+			}
+			//FILTER PACKAGES
+			String pack = p.packageName;
+			if (!packageNameFilter.equals(""))
+				if (!pack.contains(packageNameFilter))
+					continue;
+			
+			//CONVERT ICON TO BASE64 STRING
+			Drawable icon = p.applicationInfo.loadIcon(getPackageManager());
+			Bitmap bitmap = ((BitmapDrawable)icon).getBitmap(); 
+			ByteArrayOutputStream stream = new ByteArrayOutputStream(); 
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream); 
+			byte[] bitmapdata = stream.toByteArray(); 
+			String base64String = Base64.encodeToString(bitmapdata, 0); 
+
+			//ADD PACKAGE INFO TO RETURNED ARRAY
+			InstalledAppInfo newInfo = new InstalledAppInfo();
+			newInfo.setApplicationName(p.applicationInfo.loadLabel(getPackageManager()).toString());
+			newInfo.setPackageName(p.packageName);
+			String desc = "";
+			try {
+				desc = p.applicationInfo.loadDescription(getPackageManager()).toString();
+			}
+			catch(Exception ex) {
+			}
+			newInfo.setApplicationDescription(desc);
+			newInfo.setVersionName(p.versionName);
+			newInfo.setVersionCode(p.versionCode);
+			newInfo.setIconAsB64string(base64String);
+			res.add(newInfo);
+		}
+		return res;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#getNodeDetails(java.lang.String, org.societies.android.api.internal.examples.AndroidParcelable)
 	 */
@@ -270,8 +349,10 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#startActivity(java.lang.String, java.lang.String)
 	 */
-	public boolean startActivity(String arg0, String arg1) {
-		return false;
+	public boolean startActivity(String arg0, String packageName) {
+		Intent LaunchApp = getPackageManager().getLaunchIntentForPackage(packageName);
+		startActivity( LaunchApp ); 
+		return true;
 	}
 
 	/* (non-Javadoc)

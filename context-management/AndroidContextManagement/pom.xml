@@ -5,15 +5,16 @@
    <parent>
         <groupId>org.societies</groupId>
         <artifactId>android-parent</artifactId>
-        <version>0.1</version>
-        <relativePath>../../../parent/android.xml</relativePath>
+        <version>RELEASE</version>
+        <!-- <version>0.1</version> -->
+        <!-- <relativePath>../../../parent/android.xml</relativePath> -->
 	<!-- modify if project root directory different to other projects-->
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
    <artifactId>context</artifactId>
-   <!-- version>${version.cm}</version> -->
-   <version>0.1</version>
+   <version>${version.cm}</version>
+<!--    <version>0.1</version> -->
    <name>AndroidContextManagement</name>
    <packaging>apk</packaging>
    
@@ -34,12 +35,19 @@
 		</developer>
 	</developers>	
 
-    <dependencies>
+    <dependencies>   
         <dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>android</artifactId>
-		</dependency>       
-		
+	    	<groupId>com.google.android</groupId>
+           	<artifactId>android</artifactId> 
+           	<exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+			<scope>provided</scope>
+		</dependency>
        <!--  <dependency>
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
@@ -48,48 +56,65 @@
 	    	<groupId>org.societies.api.external</groupId>
 	    	<artifactId>societies-api</artifactId>
 	    	<version>${release.version}</version>
+	    	<scope>provided</scope>
 		</dependency>
 		<dependency>
 		   <groupId>org.societies.api.internal</groupId>
 		   <artifactId>societies-api-internal</artifactId>
+		   <scope>provided</scope>
         </dependency>
         <dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
    			<groupId>org.societies.android.api.external</groupId>
    			<artifactId>societies-android-api</artifactId>
   			<version>${release.version}</version>
+  			<scope>provided</scope>
 		</dependency> 
+		<!-- <dependency>
+		    <groupId>org.societies</groupId>
+		    <artifactId>common-ext-libs</artifactId>
+		    <scope>provided</scope>
+		</dependency> -->
 		<dependency>
  			<groupId>org.slf4j</groupId>
   			<artifactId>slf4j-api</artifactId>
 			<version>1.6.2</version>
-		</dependency>		
+			<scope>provided</scope>
+		</dependency>
+
+
         
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
 		    <version>${version.comm}</version>
+		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
 			<version>${version.comm}</version>
-		</dependency>				
-		
-		<dependency>
+			<scope>provided</scope>
+		</dependency>
+
+
+
+		<!-- <dependency>
 			<groupId>org.asmack</groupId>
 	    	<artifactId>asmack</artifactId>
-		</dependency>
-		<dependency>
+	    	<scope>provided</scope>
+		</dependency> -->
+		<!--dependency>
 	    	<groupId>org.societies.android.jaxb</groupId>
 	    	<artifactId>jaxb-android-societies</artifactId>
 	    	<version>0.1</version>
-		</dependency>
-		<dependency>
+		</dependency-->
+		<!--dependency>
 	    	<groupId>xerces</groupId>
 	    	<artifactId>xercesImpl</artifactId>
 	    	<version>2.10.0</version>
@@ -99,10 +124,32 @@
 		    		<artifactId>xml-apis</artifactId>
 				</exclusion>
 	    	</exclusions>
-		</dependency>
+		</dependency-->
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.2</version>
+			<exclusions>
+				<!-- StAX is not available on Android -->
+				<exclusion>
+					<artifactId>stax</artifactId>
+			       	<groupId>stax</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>stax-api</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+			   	<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+			       	<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+			<scope>provided</scope>	
+		</dependency>        
     </dependencies>
 
-    <build>
+<!--    <build>
 	<finalName>${project.artifactId}</finalName>
 	<sourceDirectory>src</sourceDirectory>
         <plugins>
@@ -116,9 +163,9 @@
 			<platform>${test.android.apilevel}</platform>
                     <path>${android.home}</path>
 		    </sdk>
-		    <emulator>
+		    <emulator> -->
 		        <!-- the name of the avd device to use for starting the emulator -->
-		        <avd>${test.android.avd}</avd>
+<!--		        <avd>${test.android.avd}</avd>
 		    </emulator>
 		    <undeployBeforeDeploy>true</undeployBeforeDeploy>
 		    <unpackDependencies>false</unpackDependencies>
@@ -149,5 +196,17 @@
 		    </configuration>
 	    </plugin>
         </plugins>
+    </build> -->
+    
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
+    
 </project>

@@ -53,7 +53,7 @@ public class ClientCommunicationMgr {
 	public void register(final List<String> elementNames, final ICommCallback callback) {
 		Log.d(LOG_TAG, "register element names");
 		for (String element : elementNames) {
-			Log.d(LOG_TAG, "register element: " + element);
+//			Log.d(LOG_TAG, "register element: " + element);
 		}
 
 		final List<String> namespaces = callback.getXMLNamespaces();
@@ -74,7 +74,7 @@ public class ClientCommunicationMgr {
 	public void unregister(final List<String> elementNames, final ICommCallback callback) {
 		Log.d(LOG_TAG, "unregister");
 		for (String element : elementNames) {
-			Log.d(LOG_TAG, "unregister element: " + element);
+//			Log.d(LOG_TAG, "unregister element: " + element);
 		}
 		
 		final List<String> namespaces = callback.getXMLNamespaces();		
@@ -190,7 +190,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void sendMessage(final String xml) {
-		Log.d(LOG_TAG, "sendMessage message" + xml);
+//		Log.d(LOG_TAG, "sendMessage message" + xml);
 		ServiceConnection connection = new ServiceConnection() {
 
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
@@ -208,7 +208,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void sendIQ(final String xml, final ICommCallback callback) {
-		Log.d(LOG_TAG, "sendIQ message: " + xml);
+//		Log.d(LOG_TAG, "sendIQ message: " + xml);
 		ServiceConnection connection = new ServiceConnection() {
 
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
@@ -243,6 +243,7 @@ public class ClientCommunicationMgr {
 		} catch (Throwable e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
+		Log.d(LOG_TAG, "getIdentityJid: " + identityJid);
 		return identityJid;
 	}
 	
