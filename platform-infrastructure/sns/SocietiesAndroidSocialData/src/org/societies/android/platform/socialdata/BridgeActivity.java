@@ -135,6 +135,9 @@ public class BridgeActivity extends Activity {
 		else if(requestCode == Constants.FQ_CODE){
 			return SocialNetwork.Foursquare;
 		}	
+		else if(requestCode == Constants.LK_CODE) {
+			return SocialNetwork.linkedin;
+		}
 		
 		throw new IllegalArgumentException("No social network bound to requestCode: "+requestCode); 
 	}
