@@ -172,7 +172,8 @@ public class CommunicationAdapter extends Service implements ISocialAdapter{
     		String sortOrder){
     	String[] columnNames = {SocialContract.Community.NAME,
 				SocialContract.Community.OWNER_ID,
-				SocialContract.Community.CREATION_DATE};
+//				SocialContract.Community.CREATION_DATE
+				};
     	MatrixCursor cursor= new MatrixCursor(columnNames, 10);
     	String[] columnValues = {"XYZ", "babak@societies.org", "today"};
     	cursor.addRow(columnValues);

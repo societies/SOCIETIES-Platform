@@ -112,7 +112,7 @@ public final class SocialContract {
         public static final String _ID = "_id"; //Key local ID
         public static final String GLOBAL_ID = "global_id"; //Global ID for the community, e.g. JID
         public static final String OWNER_ID = "owner"; //Person who owns the community
-        public static final String DISPLAY_NAME = "display_name"; //Name of the community to be shown to the user
+      //  public static final String DISPLAY_NAME = "display_name"; //Name of the community to be shown to the user
     }
     /**
      * Class that stores metadata about CISs, both those I am
@@ -131,10 +131,10 @@ public final class SocialContract {
         public static final String TYPE = "type"; //The type of the community being stored. E.g. "disaster".
         										//The type will be defined and used by applications.
         public static final String NAME = "name"; //Name of the community
-        public static final String DISPLAY_NAME = "display_name"; //Name of the community to be shown to the user
+    //    public static final String DISPLAY_NAME = "display_name"; //Name of the community to be shown to the user
         public static final String OWNER_ID = "owner"; //Person who owns the community
-        public static final String CREATION_DATE = "creation_date";	
-        public static final String MEMBERSHIP_TYPE = "membership_type"; //TODO: need to decide types.
+    //    public static final String CREATION_DATE = "creation_date";	
+     //   public static final String MEMBERSHIP_TYPE = "membership_type"; //TODO: need to decide types.
         public static final String DIRTY = "dirty"; //Used to indicate whether this community's data is changed locally.
     }
 

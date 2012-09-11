@@ -163,10 +163,8 @@ public class PluginCISManager extends Plugin {
 				try{
 					JSONObject cis = data.getJSONObject(0);
 					ContentValues createCISValue = new ContentValues();
-					createCISValue.put(SocialContract.Community.GLOBAL_ID , cis.getString(CIS_JID));
 					createCISValue.put(SocialContract.Community.TYPE , cis.getString(CIS_TYPE));
 					createCISValue.put(SocialContract.Community.NAME , cis.getString(CIS_NAME));
-					createCISValue.put(SocialContract.Community.DISPLAY_NAME, cis.getString(CIS_NAME));
 					createCISValue.put(SocialContract.Community.OWNER_ID, cis.getString(CIS_NAME));
 					createCISValue.put(SocialContract.Community.DIRTY , "yes");
 
