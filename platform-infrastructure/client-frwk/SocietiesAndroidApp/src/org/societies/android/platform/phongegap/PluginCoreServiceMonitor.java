@@ -38,9 +38,10 @@ import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.servicemonitor.AndroidActiveServices;
 import org.societies.android.api.internal.servicemonitor.AndroidActiveTasks;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
+import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.ServiceManagement;
-import org.societies.android.platform.servicemonitor.CoreServiceMonitor.LocalBinder;
+import org.societies.android.platform.servicemonitor.ServiceManagement.LocalBinder;
 
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
@@ -111,7 +112,7 @@ public class PluginCoreServiceMonitor extends Plugin {
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to CoreServiceMonitor service");
         	//get a local binder
-            LocalBinder binder = (LocalBinder) service;
+        	org.societies.android.platform.servicemonitor.CoreServiceMonitor.LocalBinder binder = (org.societies.android.platform.servicemonitor.CoreServiceMonitor.LocalBinder) service;
             //obtain the service's API
             coreServiceMonitor = (ICoreServiceMonitor) binder.getService();
             connectedtoCoreMonitor = true;
@@ -262,7 +263,7 @@ public class PluginCoreServiceMonitor extends Plugin {
 					e.printStackTrace();
 				}
 			}
-			//>>>>>>>>>  IServiceDiscovery METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
+			//>>>>>>>>>  IServiceControl METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			//TODO
 			
             // Don't return any result now, since status results will be sent when events come in from broadcast receiver 
@@ -339,10 +340,55 @@ public class PluginCoreServiceMonitor extends Plugin {
 
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
+			} else if (intent.getAction().equals(CoreServiceMonitor.INSTALLED_APPLICATIONS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, 9);
+				
+				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					
+					//unmarshall intent extra
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(CoreServiceMonitor.INTENT_RETURN_KEY);
+					//CONVERT PARCELS BACK INTO InstalledAppInfo ARRAY 
+					InstalledAppInfo apps[] = new InstalledAppInfo[parcels.length];
+					for (int i = 0; i < parcels.length; i++) {
+						apps[i] = (InstalledAppInfo) parcels[i];
+					}
+					//CONVERT TO JSON AND RETURN
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertInstalledAppInfoToJSONArray(apps));
+					result.setKeepCallback(false);
+					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
+					
+					//remove callback ID for given method invocation
+					PluginCoreServiceMonitor.this.methodCallbacks.remove(mapKey);
+
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
 			} 
 			//>>>>>>>>>  IServiceDiscovery METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
-			else if (intent.getAction().equals(ServiceManagement.GET_SERVICES)) {
+			else if (intent.getAction().equals(ServiceManagement.GET_SERVICES)) { 
 				String mapKey = ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 0);
+				
+				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					
+					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(ServiceManagement.INTENT_RETURN_VALUE);
+					AService services[] = new AService[parcels.length];
+					for (int i = 0; i < parcels.length; i++) {
+						services[i] = (AService) parcels[i];
+					}
+					
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAServiceToJSONArray(services));
+					result.setKeepCallback(false);
+					PluginCoreServiceMonitor.this.success(result, methodCallbackId);
+					
+					//remove callback ID for given method invocation
+					PluginCoreServiceMonitor.this.methodCallbacks.remove(mapKey);
+
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			} else if (intent.getAction().equals(ServiceManagement.GET_MY_SERVICES)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 3);
 				
 				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
@@ -405,10 +451,29 @@ public class PluginCoreServiceMonitor extends Plugin {
 		return activeTasks;
 	}
  
-    /**
-     * Creates a JSONArray for a given AndroidActiveServices array
+	/**
+     * Creates a JSONArray for a given InstalledAppInfo array
      * 
-     * @param node
+     * @param array of InstalledAppInfo
+     * @return JSONArray 
+     */
+    private JSONArray convertInstalledAppInfoToJSONArray(InstalledAppInfo array[]) {
+    	JSONArray jObj = new JSONArray();
+		Gson gson = new Gson();
+		try {
+			jObj =  (JSONArray) new JSONTokener(gson.toJson(array)).nextValue();
+			
+			Log.d(LOG_TAG, jObj.toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        return jObj;
+    }
+    
+    /**
+     * Creates a JSONArray for a given AService array
+     * 
+     * @param array of AService
      * @return JSONArray 
      */
     private JSONArray convertAServiceToJSONArray(AService array[]) {
@@ -427,7 +492,7 @@ public class PluginCoreServiceMonitor extends Plugin {
     /**
      * Creates a JSONArray for a given AndroidActiveServices array
      * 
-     * @param node
+     * @param array of AndroidActiveServices
      * @return JSONArray 
      */
     private JSONArray convertAndroidActiveServices(AndroidActiveServices services []) {
@@ -446,7 +511,7 @@ public class PluginCoreServiceMonitor extends Plugin {
     /**
      * Creates a JSONArray for a given AndroidActiveTasks array
      * 
-     * @param node
+     * @param array of AndroidActiveTasks
      * @return JSONArray 
      */
     private JSONArray convertAndroidActiveTasks(AndroidActiveTasks tasks []) {

@@ -56,21 +56,12 @@
 			android:label="@string/app_name">
 		</activity>
 		
-         <service
-        	android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor"
-        	>
-        </service>
+		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagement" />
+        <service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
+        <service android:name="org.societies.android.platform.cssmanager.LocalCSSManagerService" />
+        <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
         
-         <service
-        	android:name="org.societies.android.platform.cssmanager.LocalCSSManagerService"
-        	>
-        </service>
-        
-        <service 
-            android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService"
-        ></service>
-        
-                    <!-- this needs to be copied manualy  -->
+          <!-- this needs to be copied manualy  -->
     <provider
         android:name="org.societies.android.platform.SocialProvider"
         android:authorities="@string/provider_authority"

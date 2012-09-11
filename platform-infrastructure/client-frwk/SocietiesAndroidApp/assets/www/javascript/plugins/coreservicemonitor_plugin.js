@@ -132,8 +132,6 @@ var SocietiesCoreServiceMonitor = {
 	 * @returns List of active apps
 	 */
 	getInstalledApps: function(successCallback, errorCallback){
-		var clientPackage = "org.societies.android.platform.gui";
-
 		console.log("Call CoreServiceMonitorService - getInstalledApps");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful

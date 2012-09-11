@@ -41,7 +41,7 @@ var Societies3PServices = {
 			alert("refresh3PServices - failure: " + data);
 		}
 		
-		window.plugins.ServiceManagementService.getServices(success, failure);
+		window.plugins.ServiceManagementService.getMyServices(success, failure);
 	},
 	
 	/**
