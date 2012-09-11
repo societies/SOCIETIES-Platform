@@ -49,6 +49,7 @@ public class TestContainerSocialDataActivity extends Activity {
         intentFilter.addAction(ISocialData.ADD_SOCIAL_CONNECTOR);        
         intentFilter.addAction(ISocialData.REMOVE_SOCIAL_CONNECTOR);
         intentFilter.addAction(ISocialData.GET_SOCIAL_CONNECTORS);
+        intentFilter.addAction(ISocialData.ACTION_XMPP_ERROR);
         this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
         
         //CREATE INTENT FOR SERVICE AND BIND
@@ -109,7 +110,7 @@ public class TestContainerSocialDataActivity extends Activity {
 					Thread.sleep(1000);
 				
 				removeConnector(addedConnectorId);
-				
+    			
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -158,6 +159,13 @@ public class TestContainerSocialDataActivity extends Activity {
 			else if(intent.getAction().equals(ISocialData.REMOVE_SOCIAL_CONNECTOR)) {
 				Log.d(LOG_TAG, "connector removed");
 				text.append("\nconnector removed");
+			}
+			else if(intent.getAction().equals(ISocialData.ACTION_XMPP_ERROR)) {
+				String stanzaError = intent.getStringExtra(ISocialData.EXTRA_STANZA_ERROR);
+				
+				String logMsg = "XMPPError: "+stanzaError;
+				Log.d(LOG_TAG, logMsg);
+				text.append("\n"+logMsg);
 			}
 			
 		}

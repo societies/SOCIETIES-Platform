@@ -78,4 +78,15 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 			return new AServiceInstance[size];
 		}
 	};
+	
+	public static AServiceInstance convertServiceInstance(ServiceInstance servIns) {
+		AServiceInstance aservIns = new AServiceInstance();
+		aservIns.setCssJid(servIns.getCssJid());
+		aservIns.setCssJid(servIns.getCssJid());
+		aservIns.setParentJid(servIns.getParentJid());
+		aservIns.setXMPPNode(servIns.getXMPPNode());
+		aservIns.setServiceImpl(AServiceImplementation.convertServiceImplementation(servIns.getServiceImpl()));
+		
+		return aservIns;
+	}
 }
