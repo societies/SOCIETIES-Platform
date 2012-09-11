@@ -76,7 +76,7 @@ public class AService extends Service implements Parcelable {
 	    dest.writeString(this.getServiceEndpoint());
 	    dest.writeParcelable(this.getServiceIdentifier(), flags);
 	    dest.writeParcelable(this.getServiceInstance(), flags);
-	    dest.writeString(this.getServiceLocation().toString());
+	    dest.writeString(this.getServiceLocation());
 	    dest.writeString(this.getServiceName());
 		dest.writeString(this.getServiceCategory());
 		dest.writeString(this.getServiceStatus().toString());
