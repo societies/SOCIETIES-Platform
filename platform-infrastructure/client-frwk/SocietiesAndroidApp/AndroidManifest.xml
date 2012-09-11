@@ -28,6 +28,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="org.societies.android.SocialProvider.WRITE"/>
+    <uses-permission android:name="org.societies.android.SocialProvider.READ"/>
     
     <application
         android:icon="@drawable/ic_launcher"
@@ -67,6 +69,17 @@
         <service 
             android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService"
         ></service>
+        
+                    <!-- this needs to be copied manualy  -->
+    <provider
+        android:name="org.societies.android.platform.SocialProvider"
+        android:authorities="@string/provider_authority"
+        android:exported="true"
+        android:syncable="true"
+        android:enabled="true"
+        android:readPermission="org.societies.android.SocialProvider.READ"
+        android:writePermission="org.societies.android.SocialProvider.WRITE">
+    </provider>
         
     </application>
 
