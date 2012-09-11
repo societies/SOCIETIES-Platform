@@ -69,6 +69,12 @@
 			<artifactId>com.springsource.org.apache.xml.security</artifactId>
 			<version>1.4.2</version>
 		</dependency-->
+
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+			<version>1.4.5</version>
+		</dependency>
 	
 		<dependency>
 			<groupId>org.societies</groupId>
@@ -168,6 +174,7 @@
 							javax.xml.xpath,
 							org.w3c.dom,
 							org.xml.sax,-->
+							!org.apache.xerces,
 							*;resolution:=optional
 						</Import-Package>
 					</instructions>
