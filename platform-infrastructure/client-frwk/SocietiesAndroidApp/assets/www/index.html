@@ -14,6 +14,9 @@
 	<link rel="stylesheet" type="text/css" href="css/custom/societies.css"/>
 	
 	<script type="text/javascript" src="javascript/jquery/jquery-1.7.1.js" ></script>
+	<!-- Must be loaded prior to JQueryMobile script -->
+	<script type="text/javascript" src="javascript/jquerymobile/jqmDefaults.js" ></script>
+	
 	<script type="text/javascript" src="javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
 	
 	<!--JQM SlideMenu-->
@@ -31,6 +34,7 @@
 
 	<!-- Functionality JS -->
 	<script type="text/javascript" src="javascript/pagespecific/mainpage.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/navigation.js"></script>
 	<script type="text/javascript" src="javascript/pagespecific/activeservices.js"></script>
 	<script type="text/javascript" src="javascript/pagespecific/activetasks.js"></script>
 	<script type="text/javascript" src="javascript/pagespecific/apppreferences.js"></script>
@@ -57,7 +61,7 @@
 	<div id="slidemenu">
 		<h3>MENU</h3>
 		<ul>
-			<li><input id="slide-inbox"  type="button" value="Inbox"/></li>
+			<li><input id="temp-active-services"  type="button" value="Active Services"/></li>
 			<li><input id="slide-chat"  type="button" value="Chat"/></li>
 			<li><input id="slide-rssfeeds"  type="button" value="RSS Feeds"/></li>
 			<li><input id="slide-help"  type="button" value="Help"/></li>

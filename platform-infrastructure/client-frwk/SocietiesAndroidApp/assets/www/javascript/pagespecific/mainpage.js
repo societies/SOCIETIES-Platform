@@ -155,6 +155,12 @@ $(document).bind('pageinit',function(){
 		}
 	});
 
+//	$('#slide-active-services').off('click').on('click', function(){
+//		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(SocietiesActiveServices.getActiveServices);
+////		$.mobile.changePage("#activeServices", {transition: "slideup"});
+//
+//	});
+
 	$('#username').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#username')
 	});
