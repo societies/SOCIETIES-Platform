@@ -48,6 +48,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
@@ -340,10 +341,12 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 						if(log.isDebugEnabled())
 							log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
-						//getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath());
+						INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
+						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
+						//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());
 						
 						if(log.isDebugEnabled())
-							log.debug("Adding privacy policy to the Policy Manager!");
+							log.debug("Adding privacy policy to the Privacy Manager!");
 						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
 						
 						int index = privacyLocation.indexOf('@');	

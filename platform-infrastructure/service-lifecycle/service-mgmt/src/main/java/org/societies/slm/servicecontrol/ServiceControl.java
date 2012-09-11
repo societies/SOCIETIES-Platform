@@ -438,7 +438,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 			RequestorService provider = new RequestorService(providerNode, serviceToInstall.getServiceIdentifier());
 			
-			/*
+			
 			ServiceNegotiationCallback negotiationCallback = new ServiceNegotiationCallback();
 			getPolicyNegotiation().startNegotiation(provider, negotiationCallback);
 			ServiceNegotiationResult negotiationResult = negotiationCallback.getResult();
@@ -459,7 +459,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			if(logger.isDebugEnabled())
 					logger.debug("Negotiation was successful! URI returned is: " + negotiationResult.getServiceUri());
-			*/
+			
 			// Now install the client!
 			if(serviceToInstall.getServiceType().equals(ServiceType.THIRD_PARTY_WEB)){
 				if(logger.isDebugEnabled()) logger.debug("This is a web-type service, no client to install!");
