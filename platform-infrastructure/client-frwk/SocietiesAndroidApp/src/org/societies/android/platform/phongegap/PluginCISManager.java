@@ -165,7 +165,7 @@ public class PluginCISManager extends Plugin {
 					ContentValues createCISValue = new ContentValues();
 					createCISValue.put(SocialContract.Community.TYPE , cis.getString(CIS_TYPE));
 					createCISValue.put(SocialContract.Community.NAME , cis.getString(CIS_NAME));
-					createCISValue.put(SocialContract.Community.OWNER_ID, cis.getString(CIS_NAME));
+					createCISValue.put(SocialContract.Community.OWNER_ID, cis.getString(CIS_OWNER));
 					createCISValue.put(SocialContract.Community.DIRTY , "yes");
 
 				
@@ -208,9 +208,47 @@ public class PluginCISManager extends Plugin {
 
 			Log.d(LOG_TAG, "list cis inside cis plugin");
 			
-			result = new PluginResult(PluginResult.Status.OK);
+			Uri COMUNITIES_URI = Uri.parse(COMUNITIES__STRING_URI);
+			Log.d(LOG_TAG, "before query insert");
+			
+			
+			
+			JSONArray returnData = new JSONArray();
+
+			try{
+				Cursor cursor = cr.query(SocialContract.Community.CONTENT_URI, null, null, null, null);
+				if (cursor != null && cursor.getCount() >0) {
+					// Determine the column index of the column named "word"
+					//int index = cursor.getColumnIndex(SocialContract.Community.DISPLAY_NAME);
+					
+					/*
+				     * Moves to the next row in the cursor. Before the first movement in the cursor, the
+				     * "row pointer" is -1, and if you try to retrieve data at that position you will get an
+				     * exception.
+				     */
+				    while (cursor.moveToNext()) {
+				    	JSONObject cis = new JSONObject();
+				        Log.d("LOG_TAG", "found community ");
+				    	cis.put(CIS_NAME, cursor.getString(cursor.getColumnIndex(SocialContract.Community.NAME)));
+				    	cis.put(CIS_OWNER, cursor.getString(cursor.getColumnIndex(SocialContract.Community.OWNER_ID)));
+				    	cis.put(CIS_TYPE, cursor.getString(cursor.getColumnIndex(SocialContract.Community.TYPE)));
+				        returnData.put(cis);
+				    }
+				} else {
+					Log.d(LOG_TAG, "empty CIS list query result");
+				}
+			}catch (Exception e) {
+				// TODO Auto-generated catch block
+				Log.d(LOG_TAG, "exception in the create");
+				e.printStackTrace();
+				result = new PluginResult(PluginResult.Status.ERROR);
+				result.setKeepCallback(false);
+			}
+
+			result = new PluginResult(PluginResult.Status.OK,returnData);
 			result.setKeepCallback(false);
 
+			
             return result;
 		} 
 
