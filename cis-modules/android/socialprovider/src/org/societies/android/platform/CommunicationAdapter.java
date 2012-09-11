@@ -65,7 +65,7 @@ import android.util.Log;
 public class CommunicationAdapter extends Service implements ISocialAdapter{
 
 	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("CommunityManager", "ListResponse");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("communityManager", "listResponse");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cis/manager",
 														    	  "http://societies.org/api/schema/activityfeed",	  		
 																  "http://societies.org/api/schema/cis/community");
