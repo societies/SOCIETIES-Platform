@@ -88,9 +88,9 @@ var SocietiesAppPrefs = {
  */
 $(document).bind('pageinit',function(){
 
-	console.log("jQuery pageinit action(s)");
+	console.log("jQuery pageinit action(s) for active apppreferences");
 
-	$('#getPref').click(function() {
+	$('#getPref').off('click').on('click', function(){
 		SocietiesAppPrefs.getAppPref();
 	});
 

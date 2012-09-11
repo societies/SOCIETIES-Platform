@@ -10,10 +10,15 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.HostedNode;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.comm.xmpp.pubsub.model.PubsubNodeDAO;
 
 // TODO collection node support
 public class PubsubNode extends HostedNode {
@@ -31,6 +36,10 @@ public class PubsubNode extends HostedNode {
 	private Map<String, String> publisherByItemId;
 	// itempublishoptions??? these suck!
 	
+	private Session s;
+	private IIdentityManager idm;
+	private PubsubNodeDAO dao;
+	
 	public PubsubNode(IIdentity owner, String nodeId) {
 		super(nodeId, null); // TODO collection nodes
 		this.owner = owner;
@@ -39,6 +48,77 @@ public class PubsubNode extends HostedNode {
 		itemIdByOrder = new Stack<String>();
 		itemsById = new HashMap<String, Object>();
 		publisherByItemId = new HashMap<String, String>();
+	}
+	
+	public PubsubNode(PubsubNodeDAO dao, Session s, IIdentityManager idm) {
+		super(dao.getNodeId(), null);
+//		this.sf = sf;
+		this.s = s;
+		this.idm = idm;
+		this.dao = dao;
+		
+		subscriptionsById = new HashMap<String, IIdentity>();
+		subscriptionsByUser = new HashMap<IIdentity, List<String>>();
+		itemIdByOrder = new Stack<String>();
+		itemsById = new HashMap<String, Object>();
+		publisherByItemId = new HashMap<String, String>();
+		
+		loadFromDAO();
+	}
+	
+	public PubsubNodeDAO enablePersistence(Session session, IIdentityManager idm) {
+		if (dao==null) {
+			this.s = session;
+			this.idm = idm;
+			
+			dao = new PubsubNodeDAO();
+			dao.setNodeId(getNode());
+			dao.setOwner(owner.getBareJid());
+			for (String subId : subscriptionsById.keySet()) {
+				String subJid = subscriptionsById.get(subId).getBareJid();
+				dao.getSubscriptionsById().put(subId, subJid);
+			}
+		}
+		return dao;
+	}
+	
+	private void loadFromDAO() {
+		subscriptionsById = new HashMap<String, IIdentity>();
+		subscriptionsByUser = new HashMap<IIdentity, List<String>>();
+		
+		try {
+			owner = idm.fromJid(dao.getOwner());
+			for (String subId : dao.getSubscriptionsById().keySet()) {
+				String subJid = dao.getSubscriptionsById().get(subId);
+//				System.out.println("restoring subscription: subId="+subId+";subJid="+subJid);
+				IIdentity subIdentity = idm.fromJid(subJid);
+				subscriptionsById.put(subId, subIdentity);
+				List<String> subIdList = subscriptionsByUser.get(subJid);
+				if (subIdList==null) {
+					subIdList = new ArrayList<String>();
+					subscriptionsByUser.put(subIdentity, subIdList);
+				}
+				subIdList.add(subId);
+			}
+		} catch (InvalidFormatException e) {
+			LOG.error("InvalidFormatException getting identities from database", e);
+		}
+	}
+	
+	private void writeToDAO(String subId) {
+		if (subscriptionsById.get(subId)!=null) {
+			String subJid = subscriptionsById.get(subId).getBareJid();
+			dao.getSubscriptionsById().put(subId, subJid);
+		}
+		else {
+			dao.getSubscriptionsById().remove(subId);
+		}
+		s.update(dao);
+		s.flush();
+	}
+	
+	public PubsubNodeDAO getDAO() {
+		return dao;
 	}
 
 	public String newSubscription(IIdentity subscriber) {
@@ -55,6 +135,8 @@ public class PubsubNode extends HostedNode {
 			subscriptionsByUser.put(subscriber, subIdList);
 		}
 		subIdList.add(subId);
+		
+		writeToDAO(subId);
 		return subId;
 	}
 	
@@ -69,7 +151,8 @@ public class PubsubNode extends HostedNode {
 	public void unsubscribe(String string) {
 		IIdentity subscriber = subscriptionsById.get(string);
 		subscriptionsById.remove(string);
-		subscriptionsByUser.remove(subscriber);
+		subscriptionsByUser.remove(subscriber); // removes all subscriptions... TODO handle subIds separately
+		writeToDAO(string);
 	}
 
 	public String publishItem(String itemId, Object itemObject, String publisher) {

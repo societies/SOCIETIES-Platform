@@ -59,9 +59,48 @@ var SocietiesActiveServices = {
 		}
 		
 		window.plugins.SocietiesCoreServiceMonitor.activeServices(success, failure);
-		
-	}
+	},
+	/**
+	 * @methodOf SocietiesActiveServices#
+	 * @description Refresh the Active Service page with currently active services
+	 * @returns null
+	 */
 
+	getActiveServices: function() {
+		console.log("Get Active Services");
+
+		function success(serviceData) {
+			SocietiesActiveServices.populateServicesHTML(serviceData);
+		}
+		
+		function failure(data) {
+			alert("getActiveServices - failure: " + data);
+		}
+		
+		window.plugins.SocietiesCoreServiceMonitor.activeServices(success, failure);
+	},
+
+	/**
+	 * @methodOf SocietiesActiveServices#
+	 * @description Populate Active Service page with currently active services
+	 * @returns null
+	 */
+	populateServicesHTML: function(data){
+		console.log("Populate Active Service page");
+		
+		
+		//Empty list
+		$('ul#activeServicesList li:last').remove();
+		//Populate services
+		for (i  = 0; i < data.length; i++) {
+			var tableEntry = '<li><span>' + data[i].className + '</span><span>' + SocietiesUtility.convertMilliseconds(data[i].activeSince)+ '</span></li>';
+			jQuery('ul#activeServicesList').append(tableEntry);
+		}
+
+		$.mobile.changePage($("#activeServices"), {transition: "slideup"});
+		$('ul#activeServicesList').listview();
+
+	}
 }
 
 /**
@@ -73,11 +112,71 @@ var SocietiesActiveServices = {
  */
 $(document).bind('pageinit',function(){
 
-	console.log("jQuery pageinit action(s)");
+	console.log("jQuery pageinit action(s) for activeservices");
 
-	$('#refreshServices').click(function() {
-		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(SocietiesActiveServices.refreshActiveServices);
+//	$('#refreshServices').off('click').on('click', function(){
+//		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(SocietiesActiveServices.refreshActiveServices);
+//	});
+	
+	$('#temp-active-services').off('click').on('click', function(){
+		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(SocietiesActiveServices.getActiveServices);
+
 	});
 
 });
+
+/**
+ * JQuery boilerplate to attach JS functions to relevant HTML elements
+ * 
+ * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pageinit
+ * N.B. this event is fired once per page load
+ * @returns null
+ */
+$(document).bind("pagechange", function(event, options) {
+	//$("div[data-role*='page'] [id='activeServices']")$(document).on('pagechange',function(){
+
+		console.log("jQuery pagechange action(s) for activeservices");
+		console.log("to page: " + options.toPage[0].id);
+//		if (options.toPage[0].id === "activeServices"){
+//			$('ul#activeServicesList').listview();
+//
+//		}
+});
+
+$(document).bind("pagebeforechange", function(event, options) {
+
+	console.log("jQuery pagechange action(s) for activeservices");
+});
+
+$(document).bind("pagebeforeload", function(event, options) {
+
+	console.log("jQuery pagebeforeload action(s) for activeservices");
+});
+
+$(document).bind("pageload", function(event, options) {
+
+	console.log("jQuery pageload action(s) for activeservices");
+});
+
+$(document).bind("pagebeforeshow", function(event, options) {
+
+	console.log("jQuery pagebeforeshow action(s) for activeservices");
+});
+
+$(document).bind("pageshow", function(event, options) {
+
+	console.log("jQuery pageshow action(s) for activeservices");
+});
+
+$(document).bind("pagebeforecreate", function(event, options) {
+
+	console.log("jQuery pagebeforecreate action(s) for activeservices");
+});
+
+$(document).bind("pagecreate", function(event, options) {
+
+	console.log("jQuery pagecreate action(s) for activeservices");
+});
+
+
 

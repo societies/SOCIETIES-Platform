@@ -17,6 +17,9 @@
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
+		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
+		<property name="cisManager" ref="cisManager" />
+		<property name="commManager" ref="commManager" />
 	</bean>
 
 	<bean name="privacyDataManagerInternal"

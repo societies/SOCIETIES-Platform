@@ -122,6 +122,25 @@ var SocietiesCoreServiceMonitor = {
 		'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 		'getServices',              //Telling the plugin, which action we want to perform
 		["org.societies.android.platform.gui"]); //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf getInstalledApps#
+	 * @description Get a list of active apps
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns List of active apps
+	 */
+	getInstalledApps: function(successCallback, errorCallback){
+		var clientPackage = "org.societies.android.platform.gui";
+
+		console.log("Call CoreServiceMonitorService - getInstalledApps");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
+		'getInstalledApps',              //Telling the plugin, which action we want to perform
+		["org.societies.android.platform.gui"]); //Passing a list of arguments to the plugin
 	}
 }
 

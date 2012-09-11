@@ -206,7 +206,7 @@ public class CisManagerController {
 				// -- Fill CisCreationForm for next step
 				CisCreationForm cisCreationForm = generateCisCreationForm(cisForm, cisCriteria);
 				cisCreationForm.setMode("SHARED");
-				
+
 
 				// Send page to generate the privacy policy
 				generateResourceLists();
@@ -434,7 +434,7 @@ public class CisManagerController {
 				else {
 					cisData = cisCreationForm;
 				}
-				
+
 				// Generate a real privacy policy
 				privacyPolicy = cisData.toRequestPolicy(commMngrRef.getIdManager());
 
@@ -500,7 +500,7 @@ public class CisManagerController {
 			resourceSchemeList[j] = schemes[j].value();
 		}
 	}
-	
+
 	public CisCreationForm generateCisCreationForm(CisManagerForm cisForm, Map<String, MembershipCriteria> cisCriteria) throws IllegalArgumentException, IllegalAccessException {
 		return generateCisCreationForm(cisForm, cisCriteria, "SHARED");
 	}
@@ -510,7 +510,7 @@ public class CisManagerController {
 		if (null != cisForm) {
 			cisCreationForm.fillCisConfiguration(cisForm);
 		}
-		
+
 		// -- Prepare condition list
 		List<PrivacyConditionForm> conditionsCisMemberList = new ArrayList<PrivacyConditionForm>();
 		List<PrivacyConditionForm> conditionsCisMembershipCriteria = new ArrayList<PrivacyConditionForm>();
@@ -519,24 +519,18 @@ public class CisManagerController {
 			LOG.info("SHARED mode");
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
-//			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1", false));
-			
-			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
-			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
-			
+			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1", false));
+
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
-//			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1", false));
+			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1", false));
 		}
 		else if ("PUBLIC".equals(mode)) {
 			LOG.info("PUBLIC mode");
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
-			
-			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
-			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
-			
+
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
@@ -545,13 +539,15 @@ public class CisManagerController {
 			LOG.info("PRIVATE mode");
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
-			
-			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
-			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
-			
+			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1", false));
+
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
+			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1", false));
 		}
+		conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
+		conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.MAY_BE_INFERRED, "1", false));
+		conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1", false));
 
 		// -- Infer first version of the privacy policy: using CIS member list
 		PrivacyPolicyResourceForm resourceCisMemberList = new PrivacyPolicyResourceForm();
@@ -560,20 +556,20 @@ public class CisManagerController {
 		resourceCisMemberList.addAction(new PrivacyActionForm(ActionConstants.READ));
 		resourceCisMemberList.setConditions(conditionsCisMemberList);
 		cisCreationForm.addResource(resourceCisMemberList);
-		// -- Infer first version of the privacy policy: using membership criteria
-		if (null != cisCriteria && cisCriteria.size() > 0) {
-			PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
-			resource.setResourceType(DataIdentifierScheme.CONTEXT+":///"+cisCreationForm.getAttribute());
-			resource.addAction(new PrivacyActionForm(ActionConstants.READ));
-			resource.setConditions(conditionsCisMembershipCriteria);
-			cisCreationForm.addResource(resource);
-		}
 		// -- Infer first version of the privacy policy: using Community Context Data
 		for(Field ctxType : CtxAttributeTypes.class.getDeclaredFields()) {
 			PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
 			resource.setResourceType(DataIdentifierScheme.CONTEXT+":///"+(String) ctxType.get(null));
 			resource.addAction(new PrivacyActionForm(ActionConstants.READ));
 			resource.setConditions(conditionsCisCommunityContext);
+			cisCreationForm.addResource(resource);
+		}
+		// -- Infer first version of the privacy policy: using membership criteria
+		if (null != cisCriteria && cisCriteria.size() > 0) {
+			PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
+			resource.setResourceType(DataIdentifierScheme.CONTEXT+":///"+cisCreationForm.getAttribute());
+			resource.addAction(new PrivacyActionForm(ActionConstants.READ));
+			resource.setConditions(conditionsCisMembershipCriteria);
 			cisCreationForm.addResource(resource);
 		}
 		return cisCreationForm;

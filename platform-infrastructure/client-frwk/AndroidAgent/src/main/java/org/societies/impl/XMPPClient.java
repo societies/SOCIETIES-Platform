@@ -60,12 +60,12 @@ public class XMPPClient implements XMPPAgent {
 	
 	public void register(String[] elementNames, String[] namespaces, final Callback callback) {
 		Log.d(LOG_TAG, "register");
-		for (String element : elementNames) {
-			Log.d(LOG_TAG, "register element name: " + element);
-		}
-		for (String namespace : namespaces) {
-			Log.d(LOG_TAG, "register namespace: " + namespace);
-		}
+//		for (String element : elementNames) {
+//			Log.d(LOG_TAG, "register element name: " + element);
+//		}
+//		for (String namespace : namespaces) {
+//			Log.d(LOG_TAG, "register namespace: " + namespace);
+//		}
 		
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
@@ -91,12 +91,12 @@ public class XMPPClient implements XMPPAgent {
 	
 	public void unregister(String[] elementNames, String[] namespaces) {
 		Log.d(LOG_TAG, "unregister");
-		for (String element : elementNames) {
-			Log.d(LOG_TAG, "unregister element name: " + element);
-		}
-		for (String namespace : namespaces) {
-			Log.d(LOG_TAG, "unregister namespace: " + namespace);
-		}
+//		for (String element : elementNames) {
+//			Log.d(LOG_TAG, "unregister element name: " + element);
+//		}
+//		for (String namespace : namespaces) {
+//			Log.d(LOG_TAG, "unregister namespace: " + namespace);
+//		}
 		
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
@@ -128,7 +128,7 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public void sendMessage(String messageXml) {
-		Log.d(LOG_TAG, "sendMessage xml: " + messageXml);
+//		Log.d(LOG_TAG, "sendMessage xml: " + messageXml);
 		try {
 			connect();	
 			
@@ -142,7 +142,7 @@ public class XMPPClient implements XMPPAgent {
 	}	
 
 	public void sendIQ(String xml, final Callback callback) {
-		Log.d(LOG_TAG, "sendIQ xml: " + xml);
+//		Log.d(LOG_TAG, "sendIQ xml: " + xml);
 		try {
 			connect(); 
 			
@@ -252,7 +252,7 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	private Packet createPacketFromXml(final String xml) {
-		Log.d(LOG_TAG, "createPacketFromXml xml: " + xml);
+//		Log.d(LOG_TAG, "createPacketFromXml xml: " + xml);
 		return new Packet() {
 			@Override
 			public String toXML() {
@@ -423,7 +423,7 @@ public class XMPPClient implements XMPPAgent {
 			connection.addPacketListener(new PacketListener() {
 	
 				public void processPacket(Packet packet) {
-					Log.d(LOG_TAG, "Packet received: " + packet.toXML());
+//					Log.d(LOG_TAG, "Packet received: " + packet.toXML());
 				}
 				
 			}, new PacketFilter() {
@@ -436,7 +436,7 @@ public class XMPPClient implements XMPPAgent {
 			connection.addPacketSendingListener(new PacketListener() {
 	
 				public void processPacket(Packet packet) {
-					Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
+//					Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
 				}
 				
 			}, new PacketFilter() {

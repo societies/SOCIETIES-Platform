@@ -4,27 +4,6 @@
 <title>Societies</title>
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
-	<link rel="stylesheet" type="text/css" href="../css/custom/custom-theme-societies.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/jquerymobile/jquery.mobile-1.1.0.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/custom/societies.css"/>
-	
-	<script type="text/javascript" src="../javascript/jquery/jquery-1.7.1.js" ></script>
-	<script type="text/javascript" src="../javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
-
-	<!--JQM SlideMenu-->
-	<link rel="stylesheet" href="../css/custom/jqm.css" />
-	<script src="../javascript/jquerymobile/jqm.slidemenu.js"></script>
-	
-	<!-- PHONEGAP  -->
-	<!-- <script type="text/javascript" src="../javascript/cordova/cordova-1.7.0.js"></script>  -->
-	<!-- <script type="text/javascript" src="../javascript/plugins/coreservicemonitor_plugin.js"></script>  -->
-	
-	<!-- PHONEGAP DESKTOP -->
-	<script type="text/javascript" src="../phonegap-desktop.js"></script>
-	<script type="text/javascript" src="../pluginjs/servicemanagement.js"></script>
-	
-	<!-- PAGE SPECIFIC FUNCTIONS -->
-	<script type="text/javascript" src="../javascript/pagespecific/my_apps.js"></script>
 </head>
 <body>
 <div id="slidemenu">
@@ -50,7 +29,14 @@
 		<input type="search" name="search" id="search-basic" value="Search Apps" data-theme="b"/>
 		<br/><br/>
 		<ul data-role="listview" data-theme="d" data-divider-theme="b" id="SocietiesServicesDiv">
-			<li data-role="list-divider">Your Installed Apps</li>
+			<li data-role="list-divider">My Application Servers</li>
+			<!-- //////////////////// LIST OF 3P SERVICES /////////////////// -->
+			<li id="searchMsg"><img src="../javascript/jquerymobile/images/ajax-loader.gif" /></li>
+			
+		</ul>
+		<br/>
+		<ul data-role="listview" data-theme="d" data-divider-theme="b" id="LocalServicesDiv">
+			<li data-role="list-divider">My Installed Clients</li>
 			<!-- //////////////////// LIST OF 3P SERVICES /////////////////// -->
 			<li id="searchMsg"><img src="../javascript/jquerymobile/images/ajax-loader.gif" /></li>
 			

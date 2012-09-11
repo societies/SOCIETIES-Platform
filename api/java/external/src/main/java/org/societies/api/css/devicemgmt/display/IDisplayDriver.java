@@ -40,8 +40,9 @@ public interface IDisplayDriver {
 	 * @param serviceID 	the serviceID of the service registering
 	 * @param serviceName	the user-friendly name of the service registering 
 	 * @param executableLocation	the location of the executable on a web server or the URL of the webpage
+	 * @param requiresKinect	indicates whether this executable needs access to a Kinect device
 	 */
-	public void registerDisplayableService(ServiceResourceIdentifier serviceID, String serviceName, URL executableLocation);
+	public void registerDisplayableService(ServiceResourceIdentifier serviceID, String serviceName, URL executableLocation, boolean requiresKinect);
 	
 	
 	/**

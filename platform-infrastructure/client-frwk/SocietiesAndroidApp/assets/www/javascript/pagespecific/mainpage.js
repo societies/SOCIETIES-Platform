@@ -45,11 +45,11 @@ var SocietiesUtility = {
 		
 		console.log("Back button handling on page: " + $.mobile.activePage[0].id );
 		
-	    if ($.mobile.activePage[0].id === "main"){
+	    if ($.mobile.activePage[0].id === "index"){
 	        e.preventDefault();
 	        navigator.app.exitApp();
 	    }
-	    else if ($.mobile.activePage[0].id === "menu"){
+	    else if ($.mobile.activePage[0].id === "landing"){
 	        e.preventDefault();
 	        SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogout.successfulCSSCloudLogout);
 	    } else {
@@ -133,7 +133,6 @@ jQuery(function() {
 	console.log("jQuery document ready action(s)");
 
 	document.addEventListener("deviceready", SocietiesUtility.onDeviceReady, false);
-	
 
 });
 
@@ -144,25 +143,31 @@ jQuery(function() {
  * N.B. this event is fired once per page load
  * @returns null
  */
+
+
 $(document).bind('pageinit',function(){
 
-	console.log("jQuery pageinit action(s)");
+	console.log("jQuery pageinit action(s) for mainpage");
 
-	$('#connectXMPP').click(function() {
-		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#cloudnode").val(), jQuery("#identitydomain").val())) {
+	$('#connectXMPP').off('click').on('click', function(){
+		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 	});
 
-	$('#username').focus(function() {
+//	$('#slide-active-services').off('click').on('click', function(){
+//		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(SocietiesActiveServices.getActiveServices);
+////		$.mobile.changePage("#activeServices", {transition: "slideup"});
+//
+//	});
+
+	$('#username').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#username')
 	});
 
-	$('#password').focus(function() {
+	$('#password').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#password')
 	});
 
-	$('#cloudnode').focus(function() {
-		SocietiesLogin.clearElementValue('#cloudnode')
-	});
+
 });

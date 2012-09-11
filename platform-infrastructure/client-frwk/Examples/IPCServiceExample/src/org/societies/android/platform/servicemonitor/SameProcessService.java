@@ -32,6 +32,7 @@ import java.util.List;
 import org.societies.android.api.internal.examples.AndroidParcelable;
 import org.societies.android.api.internal.examples.ICoreServiceExample;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
+import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.utilities.DBC.Dbc;
 
 import android.app.ActivityManager;
@@ -190,6 +191,12 @@ public class SameProcessService extends Service implements ICoreServiceExample, 
 
 	@Override
 	public AndroidParcelable getNodeDetails(String client, org.societies.android.api.internal.examples.AndroidParcelable arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public InstalledAppInfo[] getInstalledApplications(String arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}

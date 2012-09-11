@@ -24,7 +24,6 @@
  */
 package org.societies.css.devicemgmt.devicemanager.registry;
 
-import org.societies.api.internal.css.devicemgmt.IDeviceLister;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 /**

@@ -23,8 +23,11 @@ import org.simpleframework.xml.convert.RegistryStrategy;
 import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.StanzaError;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
 import org.societies.impl.RawXmlProvider;
+import org.societies.maven.converters.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;
@@ -53,6 +56,7 @@ public class PacketMarshaller {
 		try {
 			Element exampleElementImpl = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("dummy");
 			registry.bind(exampleElementImpl.getClass(), ElementConverter.class);
+			registry.bind(java.net.URI.class,URIConverter.class);
 			registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
 			registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));
 			registry.bind(org.jabber.protocol.pubsub.Item.class, new PubsubItemConverter(s));
@@ -70,7 +74,7 @@ public class PacketMarshaller {
 	public void register(List<String> elementNames, List<String> namespaces, List<String> packages) {
 //		Log.d(LOG_TAG, "register");
 		for (String element : elementNames) {
-			Log.d(LOG_TAG, "register element: " + element);
+//			Log.d(LOG_TAG, "register element: " + element);
 		}
 		
 		try {
@@ -155,12 +159,12 @@ public class PacketMarshaller {
 		
 		String namespace = element.lookupNamespaceURI(element.getPrefix());
 		String xml = MarshallUtils.nodeToString(element);
-		Log.d(PacketMarshaller.class.getName() + " ### ", xml);
+//		Log.d(PacketMarshaller.class.getName() + " ### ", xml);
 		
 		//GET CLASS FIRST
 		String packageStr = nsToPackage.get(namespace);  
 		String beanName = element.getLocalName().substring(0,1).toUpperCase() + element.getLocalName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-		Log.d(PacketMarshaller.class.getName(), "Trying to unmarshall: " + packageStr + "." + beanName);
+//		Log.d(PacketMarshaller.class.getName(), "Trying to unmarshall: " + packageStr + "." + beanName);
 		Class<?> c = Class.forName(packageStr + "." + beanName);
 		
 		Object payload = s.read(c, xml);
@@ -195,8 +199,19 @@ public class PacketMarshaller {
 		};
 	}
 	
+	public XMPPError unmarshallError(Packet packet) throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		Element element = (Element) factory.newDocumentBuilder().parse(new InputSource(new StringReader(packet.toXML()))).getDocumentElement().getFirstChild();
+		
+		Element errorElement = ((Element)element.getElementsByTagName("error").item(0));
+		String errorElementName = firstElement(errorElement.getChildNodes()).getTagName(); // TODO assumes the stanza error comes first
+	
+		StanzaError stanzaError = StanzaError.valueOf(errorElementName.replaceAll("-", "_"));
+		return new XMPPError(stanzaError, null); // TODO parse application error
+	}
+	
 	private String marshallPayload(Object payload) {
-		Log.d(LOG_TAG, "marshallPayload payload: " + payload.getClass().getName());
+//		Log.d(LOG_TAG, "marshallPayload payload: " + payload.getClass().getName());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
 		try {
@@ -204,7 +219,7 @@ public class PacketMarshaller {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Log.d(PacketMarshaller.class.getName() + " ### ", os.toString());
+//		Log.d(PacketMarshaller.class.getName() + " ### ", os.toString());
 		return os.toString();
 	}
 	
@@ -293,6 +308,13 @@ public class PacketMarshaller {
         iqPacket.setType(type);
 
         return iqPacket;    
+	}
+	
+	private Element firstElement(NodeList nodes) {
+		for(int i=0; i<nodes.getLength(); i++)
+			if(nodes.item(i) instanceof Element)
+				return (Element)nodes.item(i);
+		throw new IllegalArgumentException("There is no Element in the given node list.");
 	}
 	
 }

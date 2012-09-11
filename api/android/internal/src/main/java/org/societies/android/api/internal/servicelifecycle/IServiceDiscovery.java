@@ -25,6 +25,9 @@
 
 package org.societies.android.api.internal.servicelifecycle;
 
+import org.societies.android.api.servicelifecycle.AService;
+import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
+
 /**
  *  Each method requires a callback to receive the result
 
@@ -33,11 +36,18 @@ package org.societies.android.api.internal.servicelifecycle;
  */
 public interface IServiceDiscovery {
 
-	public String methodsArray[] = {"getServices(String client, String identity)", 
-							 "getService(String client, ServiceResourceIdentifier serviceId, String identity)",
-							 "searchService(String client, Service filter, String identity)" 
+	public String methodsArray[] = {"getServices(String client, String identity)",
+							 		"getService(String client, ServiceResourceIdentifier serviceId, String identity)",
+							 		"searchService(String client, Service filter, String identity)",
+							 		"getMyServices(String client)"
 							};
 	
+	/**
+	 * Gets list of 3rd party services available from this users cloud node
+	 * @param client component package calling this method
+	 */
+    public AService[] getMyServices(String client);
+    
 	/**
 	 * Gets list of 3rd party services available
 	 * @param client component package calling this method

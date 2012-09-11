@@ -26,6 +26,7 @@ package org.societies.orchestration.cpa.test;
 
 import org.hibernate.SessionFactory;
 import org.societies.activity.ActivityFeed;
+import org.societies.activity.PersistedActivityFeed;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.management.ICisOwned;
@@ -43,7 +44,7 @@ public class CISSimulator implements IActivityFeedCallback {
 	private int messagesperuserperday;
 	private int users;
 	@Autowired
-	private ActivityFeed actFeed;
+	private PersistedActivityFeed actFeed;
 	@Autowired
 	private SessionFactory sessionFactory;
 	private int maxActs = 2000;
@@ -74,7 +75,7 @@ public class CISSimulator implements IActivityFeedCallback {
 		return actFeed;
 	}
 
-	public void setActFeed(ActivityFeed actFeed) {
+	public void setActFeed(PersistedActivityFeed actFeed) {
 		this.actFeed = actFeed;
 	}
 
@@ -110,6 +111,7 @@ public class CISSimulator implements IActivityFeedCallback {
 	public ICisOwned simulate(long days){
 		ICISSimulated ret = new ICISSimulated();
 		ret.setFeed(actFeed);
+        actFeed.setId("simId");
 		for(String user : userToUserMap.keySet()){
 			try {
 				ret.addMember(user,"member");
@@ -156,7 +158,7 @@ public class CISSimulator implements IActivityFeedCallback {
 			}
 			timecounter += (24L*3600L*1000L);
 		}
-		System.out.println("ret.getFeed(): "+ret.getFeed()+ " ret.getFeed().count(): "+((ActivityFeed)ret.getFeed()).count());
+		System.out.println("rethash: "+ret.hashCode()+" ret.getFeed(): "+ret.getFeed()+ " ret.getFeed().count(): "+((ActivityFeed)ret.getFeed()).count());
 		return ret;
 	}
 	public Activity makeMessage(String user1, String user2, String message, String published){
@@ -173,13 +175,13 @@ public class CISSimulator implements IActivityFeedCallback {
 		
         ApplicationContextLoader loader = new ApplicationContextLoader();
         loader.load(sim, "SimTest-context.xml");
-		sim.getActFeed().setSession(sim.getSessionFactory().openSession());
+		sim.getActFeed().setSessionFactory(sim.getSessionFactory());
         sim.simulate(1);
         sim.maxActs = 2000;
         
         CPACreationPatterns cpa = new CPACreationPatterns();
         cpa.init();
-        cpa.analyze(sim.getActFeed().getActivities("0"+Long.toString(System.currentTimeMillis()+100000000L)));
+        cpa.analyze(sim.getActFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()+100000000L)));
         
 	}
 

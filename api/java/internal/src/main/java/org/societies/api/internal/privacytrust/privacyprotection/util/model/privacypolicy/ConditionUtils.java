@@ -27,6 +27,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.util.model.pri
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 
@@ -77,5 +78,53 @@ public class ConditionUtils {
 			conditionBeans.add(ConditionUtils.toConditionBean(condition));
 		}
 		return conditionBeans;
+	}
+	
+	public static boolean contains(ConditionConstants conditionToCheck, List<Condition> conditions) {
+		if (null == conditions || conditions.size() <= 0 || null == conditionToCheck) {
+			return false;
+		}
+		for(Condition condition : conditions) {
+			if (condition.getConditionName().equals(conditionToCheck)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean contains(Condition conditionToCheck, List<Condition> conditions) {
+		if (null == conditions || conditions.size() <= 0 || null == conditionToCheck) {
+			return false;
+		}
+		for(Condition condition : conditions) {
+			if (condition.getConditionName().equals(conditionToCheck.getConditionName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean contains(List<Condition> conditionsToCheck, List<Condition> conditions) {
+		if (null == conditions || conditions.size() <= 0 || null == conditionsToCheck || conditionsToCheck.size() <= 0 || conditionsToCheck.size() < conditionsToCheck.size()) {
+			return false;
+		}
+		for(Condition conditionToCheck : conditionsToCheck) {
+			if (!contains(conditionToCheck, conditions)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static boolean containsOr(List<Condition> conditionsToCheck, List<Condition> conditions) {
+		if (null == conditions || conditions.size() <= 0 || null == conditionsToCheck || conditionsToCheck.size() <= 0 || conditionsToCheck.size() < conditionsToCheck.size()) {
+			return false;
+		}
+		for(Condition conditionToCheck : conditionsToCheck) {
+			if (contains(conditionToCheck, conditions)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

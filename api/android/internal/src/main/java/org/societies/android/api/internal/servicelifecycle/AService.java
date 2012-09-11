@@ -25,7 +25,6 @@
 package org.societies.android.api.internal.servicelifecycle;
 
 import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
@@ -77,7 +76,7 @@ public class AService extends Service implements Parcelable {
 	    dest.writeString(this.getServiceEndpoint());
 	    dest.writeParcelable(this.getServiceIdentifier(), flags);
 	    dest.writeParcelable(this.getServiceInstance(), flags);
-	    dest.writeString(this.getServiceLocation().toString());
+	    dest.writeString(this.getServiceLocation());
 	    dest.writeString(this.getServiceName());
 		dest.writeString(this.getServiceCategory());
 		dest.writeString(this.getServiceStatus().toString());
@@ -92,7 +91,7 @@ public class AService extends Service implements Parcelable {
 	    this.setServiceEndpoint(in.readString());
 	    this.setServiceIdentifier((AServiceResourceIdentifier) in.readParcelable(this.getClass().getClassLoader()) );
 	    this.setServiceInstance((AServiceInstance) in.readParcelable(this.getClass().getClassLoader()) );
-	    this.setServiceLocation(ServiceLocation.fromValue(in.readString()));
+	    this.setServiceLocation(in.readString());
 	    this.setServiceName(in.readString());
 		this.setServiceCategory(in.readString());
 		this.setServiceStatus(ServiceStatus.fromValue(in.readString()));
@@ -108,4 +107,23 @@ public class AService extends Service implements Parcelable {
 			return new AService[size];
 		}
 	};
+	
+	public static AService convertService(Service service) {
+		AService aservice = new AService();
+		aservice.setAuthorSignature(service.getAuthorSignature());
+		aservice.setContextSource(service.getContextSource());
+		aservice.setPrivacyPolicy(service.getPrivacyPolicy());
+		aservice.setSecurityPolicy(service.getSecurityPolicy());
+		aservice.setServiceCategory(service.getServiceCategory());
+		aservice.setServiceDescription(service.getServiceDescription());
+		aservice.setServiceEndpoint(service.getServiceEndpoint());
+		aservice.setServiceIdentifier(AServiceResourceIdentifier.convertServiceResourceIdentifier(service.getServiceIdentifier()));
+		aservice.setServiceInstance(AServiceInstance.convertServiceInstance(service.getServiceInstance()));
+		aservice.setServiceLocation(service.getServiceLocation());
+		aservice.setServiceName(service.getServiceName());
+		aservice.setServiceStatus(service.getServiceStatus());
+		aservice.setServiceType(service.getServiceType());
+		
+		return aservice;
+	}
 }

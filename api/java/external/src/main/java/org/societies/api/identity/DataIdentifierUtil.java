@@ -42,7 +42,7 @@ public class DataIdentifierUtil {
 	public static String toUriString(DataIdentifier dataId)
 	{
 		StringBuilder str = new StringBuilder("");
-		str.append((dataId.getScheme() != null ? dataId.getScheme().name()+"://" : "/"));
+		str.append((dataId.getScheme() != null ? dataId.getScheme().value()+"://" : "/"));
 		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
 		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
 		return str.toString();

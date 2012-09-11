@@ -43,6 +43,35 @@ var Societies3PServices = {
 		
 		window.plugins.ServiceManagementService.getServices(success, failure);
 	},
+	
+	/**
+	 * @methodOf Societies3PServices#
+	 * @description Refresh the 3P Service page with currently active services
+	 * @returns null
+	 */
+	refreshLocalApps: function() {
+		console.log("Refreshing Local Apps");
+
+		function success(data) {			
+			//EMPTY TABLE
+			$('ul#LocalServicesDiv li:last').remove();
+			//DISPLAY SERVICES
+			for (i  = 0; i < data.length; i++) {
+				var tableEntry = '<li><a href="#localapp-item?pos=' + i + '"><img src="' + data[i].icon + '" class="profile_list" alt="logo" >' +
+				'<h2>' + data[i].applicationName + '</h2>' + 
+				'<p>' + data[i].packageName+ '</p>' + 
+				'</a></li>';
+				jQuery('ul#LocalServicesDiv').append(tableEntry);
+			}
+			$('#LocalServicesDiv').listview('refresh');
+		}
+		
+		function failure(data) {
+			alert("refresh3PServices - failure: " + data);
+		}
+		
+		window.plugins.SocietiesCoreServiceMonitor.getInstalledApps(success, failure);
+	},
 
 	// Load the data for a specific category, based on
 	// the URL passed in. Generate markup for the items in the
@@ -84,6 +113,7 @@ var Societies3PServices = {
 			//$page.page();
 
 			// Now call changePage() and tell it to switch to the page we just modified.
+			//options.
 			$.mobile.changePage( $page, options );
 		}
 	}
@@ -97,21 +127,15 @@ var Societies3PServices = {
  * @description Add Javascript functions to various HTML tags using JQuery
  * @returns null
  */
+$(document).bind('pageinit',function(){
 
-jQuery(function() {
-	console.log("Active Services jQuery calls");
-
-	//$(document).ready(function() {
-	//	SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);
-	//}); 
+	console.log("pageinit: Active Services jQuery calls");
 	
-	$('#List3PServices').click(function() {
+	//CANNOT CALL MY onload FUNCTIONS TILL PHONEGAP LOADS ITS debugdata.json - ADD DELAY
+	setTimeout(function() {
 		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
-	});
-	
-	setTimeout(function(){
-		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
-    }, 500);
+		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refreshLocalApps);
+    }, 200);
 	
 	//Listen for any attempts to call changePage().
 	$(document).bind( "pagebeforechange", function( e, data ) {
