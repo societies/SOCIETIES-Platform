@@ -23,49 +23,66 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.api.internal.servicelifecycle;
+package org.societies.android.api.servicelifecycle;
 
-import org.societies.android.api.servicelifecycle.AService;
-import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-/**
- *  Each method requires a callback to receive the result
+public class AServiceImplementation extends ServiceImplementation implements Parcelable {
 
- * @author aleckey
- *
- */
-public interface IServiceDiscovery {
+	private static final long serialVersionUID = -3863142958575222945L;
 
-	public String methodsArray[] = {"getServices(String client, String identity)",
-							 		"getService(String client, ServiceResourceIdentifier serviceId, String identity)",
-							 		"searchService(String client, Service filter, String identity)",
-							 		"getMyServices(String client)"
-							};
+	public AServiceImplementation() {
+		super();
+	}
 	
-	/**
-	 * Gets list of 3rd party services available from this users cloud node
-	 * @param client component package calling this method
-	 */
-    public AService[] getMyServices(String client);
-    
-	/**
-	 * Gets list of 3rd party services available
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public AService[] getServices(String client, String identity);
-    
-    /**
-	 * Gets details of a 3rd party service
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public AService getService(String client, AServiceResourceIdentifier serviceId, String identity);
-    
-    /**
-	 * Searches list of 3rd party services available based on a filter
-	 * @param client component package calling this method
-	 * @param identity The target node where search is to occur
-	 */
-    public AService[] searchService(String client, AService filter, String identity);	
+	/* (non-Javadoc)
+	 * @see android.os.Parcelable#describeContents()*/
+	public int describeContents() {
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int) */
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.getServiceNameSpace());
+		dest.writeString(this.getServiceProvider());
+		dest.writeString(this.getServiceVersion());
+		dest.writeString(this.getServiceClient().toString());
+	}
+	
+	private AServiceImplementation(Parcel in) {
+		super();
+		this.setServiceNameSpace(in.readString());
+		this.setServiceProvider(in.readString());
+		this.setServiceVersion(in.readString());
+		try {
+			this.setServiceClient(new URI(in.readString()));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static final Parcelable.Creator<AServiceImplementation> CREATOR = new Parcelable.Creator<AServiceImplementation>() {
+		public AServiceImplementation createFromParcel(Parcel in) {
+			return new AServiceImplementation(in);
+		}
+
+		public AServiceImplementation[] newArray(int size) {
+			return new AServiceImplementation[size];
+		}
+	};
+	
+	public static AServiceImplementation convertServiceImplementation(ServiceImplementation serviceImpl) {
+		AServiceImplementation aservImpl = new AServiceImplementation();
+		aservImpl.setServiceClient(serviceImpl.getServiceClient());
+		aservImpl.setServiceNameSpace(serviceImpl.getServiceNameSpace());
+		aservImpl.setServiceProvider(serviceImpl.getServiceProvider());
+		aservImpl.setServiceVersion(serviceImpl.getServiceVersion());
+		
+		return aservImpl;
+	}
 }
