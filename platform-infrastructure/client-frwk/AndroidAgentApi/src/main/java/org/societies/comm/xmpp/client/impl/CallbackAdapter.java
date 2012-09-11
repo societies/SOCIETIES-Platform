@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.StanzaError;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -14,6 +16,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.interfaces.Callback;
 import org.xml.sax.SAXException;
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 
 import android.content.Context;
@@ -39,7 +42,7 @@ public class CallbackAdapter implements Callback {
 	
 	@Override
 	public void receiveResult(String xml) {
-		Log.d(LOG_TAG, "receiveResult result: " + xml );
+//		Log.d(LOG_TAG, "receiveResult result: " + xml );
 
 		unbindService();
 		
@@ -54,19 +57,20 @@ public class CallbackAdapter implements Callback {
 	}
 	@Override
 	public void receiveError(String xml) {
-		Log.d(LOG_TAG, "receiveError error: " + xml );
+//		Log.d(LOG_TAG, "receiveError error: " + xml );
 		unbindService();
 		
 		try {
 			Packet packet = marshaller.unmarshallIq(xml);
-			callback.receiveError(stanzaFromPacket(packet), null); // TODO parse error
+			XMPPError error = marshaller.unmarshallError(packet);
+			callback.receiveError(stanzaFromPacket(packet), error);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 		} 
 	}
 	
 	public void receiveItems(String xml) {
-		Log.d(LOG_TAG, "receiveItems items: " + xml );
+//		Log.d(LOG_TAG, "receiveItems items: " + xml );
 		unbindService();
 		
 		try {
@@ -79,7 +83,7 @@ public class CallbackAdapter implements Callback {
 	}
 	
 	public void receiveMessage(String xml) {	
-		Log.d(LOG_TAG, "receiveMessage message: " + xml );
+//		Log.d(LOG_TAG, "receiveMessage message: " + xml );
 		
 		try {			
 			Packet packet = marshaller.unmarshallMessage(xml);			

@@ -18,9 +18,11 @@
 
 	<bean id="testCase1266"
 		class="org.societies.integration.test.bit.privacydatamanagement.TestCase1266"
-		depends-on="privacyDataManager, commManager" init-method="run">
+		depends-on="privacyDataManager, commManager, cisManager, privacyPolicyManager" init-method="run">
 		<property name="commManager" ref="commManager" />
 		<property name="privacyDataManager" ref="privacyDataManager" />
+		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
+		<property name="cisManager" ref="cisManager" />
 	</bean>
 
 </beans>

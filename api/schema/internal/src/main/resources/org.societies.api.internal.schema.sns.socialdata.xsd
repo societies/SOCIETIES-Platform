@@ -10,31 +10,44 @@
   <xs:complexType >
     <xs:sequence>
       <xs:element name="identity" 	type="xs:string" minOccurs="0"/>
-      <xs:element name="method" 	type="tns:socialDataMethod" minOccurs="0"/>
+      <xs:element name="method" 	type="tns:socialDataMethod"/>
       <xs:element name="snName" 	type="tns:socialnetwork" minOccurs="0"/>
       <xs:element name="token" 		type="xs:string" minOccurs="0"/>
+      <xs:element name="validity" 	type="xs:long" minOccurs="0"/>
       <xs:element name="params" 	type="xs:string" minOccurs="0"/>
+	  <xs:element name="id" 	    type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
  </xs:element>
 
  <xs:element name="SocialdataResultBean">
 	 <xs:complexType>
-	    <xs:sequence>
-	      <xs:element name="responseCode" type="xs:int"/>
-	      <xs:element name="result" type="xs:anyType" minOccurs="0"/>
-	    </xs:sequence>
+	     <xs:choice minOccurs='0'>
+	      <xs:element name="id" type="xs:string"/>
+	      <xs:element name="timestamp" type="xs:long"/>
+	      <xs:element ref='connectorsList'/>
+	      <xs:element name='available' type="xs:boolean"/>
+	     </xs:choice>
 	  </xs:complexType>
  </xs:element>
+ 
+  <xs:element name='connectorsList'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref='ConnectorBean' minOccurs='0' maxOccurs='unbounded'/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 
 
 <xs:element name="ConnectorBean">
   <xs:complexType>
     <xs:sequence>
       <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
       <xs:element name="identity" type="xs:string" minOccurs="0"/>
       <xs:element name="token" type="xs:string" minOccurs="0"/>
-      <xs:element name="expires" type="xs:int" minOccurs="0"/>
+      <xs:element name="expires" type="xs:long" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 </xs:element>
@@ -46,6 +59,7 @@
       <xs:enumeration value="addConnector"/>
       <xs:enumeration value="removeConnector"/>
       <xs:enumeration value="getConnectorList"/>
+      <xs:enumeration value="isConnectorAvailable"/>
       <xs:enumeration value="getProfiles"/>
       <xs:enumeration value="getFriends"/>
       <xs:enumeration value="getGroups"/>

@@ -4,32 +4,14 @@
 <title>Societies</title>
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
-	<link rel="stylesheet" type="text/css" href="../css/custom/custom-theme-societies.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/jquerymobile/jquery.mobile-1.1.0.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/custom/societies.css"/>
-	
-	<script type="text/javascript" src="../javascript/jquery/jquery-1.7.1.js" ></script>
-	<script type="text/javascript" src="../javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
 
-	<!--JQM SlideMenu-->
-	<link rel="stylesheet" href="../css/custom/jqm.css" />
-	<script src="../javascript/jquerymobile/jqm.slidemenu.js"></script>
+
 </head>
 <body>
-<div id="slidemenu">
 
-<h3>MENU</h3>
-	<ul>
-		<li><input id="slide-inbox"  type="button" value="Inbox"/></li>
-		<li><input id="slide-chat"  type="button" value="Chat"/></li>
-		<li><input id="slide-rssfeeds"  type="button" value="RSS Feeds"/></li>
-		<li><input id="slide-help"  type="button" value="Help"/></li>
-		<li><input id="slide-logout" type="button" value="Log Out"/></li>
-	</ul>
-</div>
 
 <!-- Start of first page: #friends -->
-<div data-role="page" id="friends">
+<div data-role="page" id="community-profile">
 	<div data-role="header" data-position="fixed">
 		<img class="logo" src="../images/societies_header.png" alt="logo" />
 		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
@@ -42,8 +24,36 @@
 			<div class="profile_pic">
 				<img src="../images/community_profile_img.png" alt="logo" />
 			</div>
-			<div class="profile_txt">
-				<h1>ICT</h1>
+			
+			<div class="community_profile_txt">
+
+				<div data-role="fieldcontain" >
+			    	<label for="comProfCisName">Name: </label>
+			    	<input type="text" id="comProfCisName" readOnly="true"/>
+				</div>
+	
+				<div data-role="fieldcontain">
+			    	<label for="comProfCisCategory">Category: </label>
+			    	<input type="text" id="comProfCisCategory" value="" />
+				</div>
+	
+				<div data-role="fieldcontain">
+			    	<label for="comProfCisJid">Jid: </label>
+			    	<input type="text" id="comProfCisJid"  disabled="true"/>
+				</div>
+				
+				<div data-role="fieldcontain">
+			    	<label for="comProfCisDesc">Description: </label>
+			    	<input type="text" id="comProfCisDesc"  disabled="true"/>
+				</div>
+				
+				<div data-role="fieldcontain">
+			    	<label for="comProfCisowner">Owner: </label>
+			    	<input type="text" id="comProfCisowner"  disabled="true"/>
+				</div>
+
+			
+<!--  				<h1>ICT</h1>
 				<p>
 					Category: ICT
 				</p>
@@ -52,13 +62,13 @@
 				</p>
 				<p>
 					Admin: Sara Weber
-				</p>
+				</p>-->
 			</div>
 			<p>
 				<a href="invite_member_friends_list.html" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Invite </a>
 			</p>
 			</li>
-			<li data-role="list-divider">Additional Info</li>
+<!-- 			<li data-role="list-divider">Additional Info</li>
 			<li>
 			<br/>
 			<p>
@@ -100,7 +110,7 @@
 			<p>
 				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 			</p>
-			</li>
+			</li>-->
 		</ul>
 	</div>
 	<!-- /content -->

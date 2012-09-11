@@ -39,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Items;
@@ -55,6 +58,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.xmpp.pubsub.PubsubService;
+import org.societies.comm.xmpp.pubsub.model.PubsubNodeDAO;
+import org.societies.comm.xmpp.pubsub.model.PubsubServiceDAO;
 
 // TODO
 public class PubsubServiceImpl implements PubsubService {
@@ -92,19 +97,71 @@ public class PubsubServiceImpl implements PubsubService {
 	
 	// Fields
 	private Map<String, PubsubNode> nodes;
-	private Map<String, String> redirectedNodes;
+	private Map<String, String> redirectedNodes; // TODO use!
 	private PubsubEventSender pes;
-	private List<IIdentity> admins;
+	private List<IIdentity> admins; // TODO use!
 	private ICommManager endpoint;
 	private IIdentityManager idm;
+//	private SessionFactory sf;
+	private Session s;
+	private PubsubServiceDAO dao;
 	
 	public PubsubServiceImpl(ICommManager endpoint) {
+		init(endpoint);
+	}
+
+	private void init(ICommManager endpoint) {
 		nodes = new HashMap<String, PubsubNode>();
 		redirectedNodes = new HashMap<String, String>();
 		pes = new PubsubEventSender(endpoint);
 		this.endpoint = endpoint;
 		admins = new ArrayList<IIdentity>();
 		idm = endpoint.getIdManager();
+	}
+
+	public PubsubServiceImpl(ICommManager endpoint, SessionFactory sf) {
+		init(endpoint);
+//		this.sf = sf;
+		s = sf.openSession();
+		String pssJid = endpoint.getIdManager().getThisNetworkNode().getJid();
+		List list = s.createCriteria(PubsubServiceDAO.class).add(Restrictions.like("pubsubServiceEndpoint", pssJid)).list();
+		
+		if (list.size()>0) {
+			dao = (PubsubServiceDAO) list.get(0);
+			loadFromDAO();
+		}
+		else {
+			dao = new PubsubServiceDAO();
+			dao.setPubsubServiceEndpoint(pssJid);
+			s.save(dao);
+			s.flush();
+		}
+	}
+
+	private void loadFromDAO() {
+		for (PubsubNodeDAO pnDao : dao.getNodes()) {
+			PubsubNode psn = new PubsubNode(pnDao, s, idm);
+			nodes.put(pnDao.getNodeId(),psn);
+			endpoint.addRootNode(psn);
+		}
+	}
+	
+	private void writeToDAO(PubsubNode node) {
+		if (s != null) {
+			if (nodes.containsValue(node)) {
+				// add
+				PubsubNodeDAO pnDao = node.enablePersistence(s, idm);
+				dao.getNodes().add(pnDao);
+				pnDao.setPubsubService(dao);
+				s.save(pnDao);
+				s.flush();
+			}
+			else {
+				// remove
+				s.delete(node.getDAO());
+				s.flush();
+			}
+		}
 	}
 
 	@Override
@@ -403,6 +460,7 @@ public class PubsubServiceImpl implements PubsubService {
 		PubsubNode newNode = new PubsubNode(owner, nodeId);
 		nodes.put(nodeId, newNode);
 		endpoint.addRootNode(newNode);
+		writeToDAO(newNode);
 		
 		// Build success response
 		Pubsub response = new Pubsub();
@@ -466,6 +524,7 @@ public class PubsubServiceImpl implements PubsubService {
 		// Remove Node
 		nodes.remove(nodeId);
 		endpoint.removeRootNode(node);
+		writeToDAO(node);
 		
 		// Example 156. Owner deletes a node with redirection
 		String redirectUri = null;

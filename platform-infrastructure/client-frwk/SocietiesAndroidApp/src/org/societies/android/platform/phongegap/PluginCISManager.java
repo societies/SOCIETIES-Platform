@@ -89,6 +89,7 @@ public class PluginCISManager extends Plugin {
 	 * Ancilliary functionality
 	 */
 	private static final String CREATE_CIS = "createCIS";
+	private static final String LIST_CIS = "listCIS";
 	
 	//Required to match method calls with callbackIds (used by PhoneGap)
 	private HashMap<String, String> methodCallbacks;
@@ -168,6 +169,16 @@ public class PluginCISManager extends Plugin {
 			result = new PluginResult(PluginResult.Status.OK);
 			result.setKeepCallback(false);
 			Log.d(LOG_TAG, "going to return");
+
+            return result;
+		} 
+
+		if (action.equals(LIST_CIS)) {
+
+			Log.d(LOG_TAG, "list cis inside cis plugin");
+			
+			result = new PluginResult(PluginResult.Status.OK);
+			result.setKeepCallback(false);
 
             return result;
 		} 

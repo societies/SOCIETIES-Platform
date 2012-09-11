@@ -41,7 +41,6 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
-import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
@@ -281,9 +280,11 @@ public class ServiceRegistryTest extends
 				result.setServiceEndpoint("serviceEndPoint");
 				result.setServiceName("serviceName" + i);
 				result.setPrivacyPolicy("pathtoprivacypolicy");
+				result.setSecurityPolicy("securityPolicystuff");
 				result.setServiceCategory("testservice");
 				result.setServiceType(ServiceType.THIRD_PARTY_SERVER);
-				result.setServiceLocation(ServiceLocation.LOCAL);
+				result.setServiceLocation("Local");
+				result.setContextSource("true");
 				result.setServiceStatus(ServiceStatus.STARTED);
 				si = new ServiceInstance();
 				si.setFullJid("fullJid"+i);

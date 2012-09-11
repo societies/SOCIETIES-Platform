@@ -4,30 +4,16 @@
 <title>Societies - New Account</title>
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
-	<link rel="stylesheet" type="text/css" href="../css/custom/custom-theme-societies.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/jquerymobile/jquery.mobile-1.1.0.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/custom/societies.css"/>
 
-	<script type="text/javascript" src="../javascript/cordova/cordova-1.7.0.js"></script>-->
-	<!-- Uncomment line below to enable PhoneGap desktop and comment out real PhoneGap/Cordova JS library-->
-	<!--<script type="text/javascript" src="../javascript/phonegapdesktop/phonegap-desktop.js"></script>-->
-	 
-
-	<script type="text/javascript" src="../javascript/jquery/jquery-1.7.1.js" ></script>
-	<script type="text/javascript" src="../javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
-
-    <script type="text/javascript" src="../javascript/pagespecific/cismanager.js"></script>
-    <script type="text/javascript" src="../javascript/plugins/cismanager_plugin.js"></script>
-	<!-- Uncomment lines below to enable PhoneGap desktop-->
-	<!--<script type="text/javascript"  charset="utf-8" src="../javascript/phonegapdesktop/pluginjs/cismanager.js"></script>-->
 	
 
 </head>
 <body>
 <!-- Page starts here -->
-<div data-role="page" id="one">
+<div data-role="page" id="community-create">
 	<div data-role="header" data-position="fixed">
-		<img class="logo" src="../images/societies_header.png" alt="societies logo"/>
+	    <img class="logo" src="../images/societies_header.png" alt="logo" />
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
 		<!-- /header -->
 	</div>
 	<div data-role="content" id="contentMain" name="contentMain">
@@ -35,22 +21,27 @@
 			<li data-role="list-divider">Create a New Community</li>
 		</ul>
 		<br/>
+		<a href="community_profile.html" data-prefetch />
 		<form id="createCISform">
 			<!-- <div id="fnameDiv" data-role="fieldcontain">
 				<label for="fname" id="fnameLabel" name="fnameLabel">Admin name*</label>
 				<input id="fname" name="fname_r" type="text"/>
 			</div>-->
 			<div id="lnameDiv" data-role="fieldcontain">
-				<label for="lname">Community name*</label>
-				<input id="cisNameOnCisCreate" name="lname_r" type="text"/>
+				<label for="cisNameOnCisCreate">Community name:</label>
+				<input id="cisNameOnCisCreate" type="text"/>
 			</div>
 			<div id="category-typeDiv" data-role="fieldcontain">
-				<label for="select-choice-0" class="select">Category:</label>
-				<select name="select-choice-0" id="cisCategoryOnCisCreate">
+				<label for="cisCategoryOnCisCreate" class="select">Category:</label>
+				<select id="cisCategoryOnCisCreate">
 					<option value="ICT">ICT</option>
 					<option value="education">Education</option>
 					<option value="sports">Sports</option>
 				</select>
+			</div>
+			<div id="ldescDiv" data-role="fieldcontain">
+				<label for="cisDescOnCisCreate">Description:</label>
+				<input id="cisDescOnCisCreate" type="text"/>
 			</div>
 			<!--<div id="community-typeDiv" data-role="fieldcontain">
 				<label for="select-choice-0" class="select">Comunity Type:</label>
@@ -65,10 +56,9 @@
 					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
 					<label for="checkbox-1">I agree</label>
 				</fieldset>
-			</div>
-			<div id="create_account" data-role="fieldcontain">
-				<a href=""><input id="createCISbutton" type="submit" value="Create Community" data-inline="true" data-theme="b" data-icon="check"/></a>
-			</div>
+				
+				<input id="createCISbutton" type="button" value="Create Community" data-inline="true" data-theme="b" data-icon="check"/>
+			
 		</form>
 		<br/>
 		<div class="terms">

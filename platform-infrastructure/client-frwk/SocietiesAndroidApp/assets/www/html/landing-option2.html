@@ -4,30 +4,11 @@
 <title>Societies</title>
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
-<link href="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.css" rel="stylesheet" type="text/css"/>
-<link rel="stylesheet" type="text/css" href="includes/custom-theme-societies.css"/>
-<link rel="stylesheet" type="text/css" href="includes/societies.css"/>
-<script src="jquery-mobile/jquery-1.7.2.js" type="text/javascript"></script>
-<script src="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.min.js" type="text/javascript"></script>
-<!--JQM SlideMenu-->
-<link rel="stylesheet" href="includes/jqm.css"/>
-<script src="js/jqm.slidemenu.js"></script>
 </head>
 <body>
-<div id="slidemenu">
-
-<h3>MENU</h3>
-	<ul>
-		<li><input id="slide-inbox"  type="button" value="Inbox"/></li>
-		<li><input id="slide-chat"  type="button" value="Chat"/></li>
-		<li><input id="slide-rssfeeds"  type="button" value="RSS Feeds"/></li>
-		<li><input id="slide-help"  type="button" value="Help"/></li>
-		<li><input id="slide-logout" type="button" value="Log Out"/></li>
-	</ul>
-</div>
 
 <!-- Start of first page: #one -->
-<div data-role="page" id="one">
+<div data-role="page" id="landing-option2">
 	<div data-role="header" data-position="fixed">
 		<img class="logo" src="../images/societies_header.png" alt="societies logo"/>
 		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
@@ -45,8 +26,8 @@
 			<img src="images/landing-image-option3.jpg" alt="slide">
 		</div>
 		<ul data-role="listview" data-inset="true" id="listview" data-theme="c">
-			<li><a href="friends_landing.html" rel="external">Friends</a></li>
-			<li><a href="communities_landing.html" rel="external">Communities</a></li>
+			<li><a href="friends_landing.html">Friends</a></li>
+			<li><a href="communities_landing.html">Communities</a></li>
 			<li><a href="your_installed_apps.html">Apps</a></li>
 		</ul>
 		<!--<p><a href="#popup" data-role="button" data-rel="dialog" data-transition="pop">Popup (Dialog Box)</a></p> -->

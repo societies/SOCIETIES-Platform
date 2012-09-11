@@ -213,6 +213,14 @@
 						<emulator>
 							<avd>${test.android.avd}</avd>
 						</emulator>
+					        <!-- THIS line fix the problem with MAC of OutOfMemory HEAP-->
+						<dex>
+						   <jvmArguments>
+					                 <argument>-Xms256m</argument>
+					                 <argument>-Xmx512m</argument>
+					          </jvmArguments>
+					        </dex>
+						<!-- END -->
 						<undeployBeforeDeploy>true</undeployBeforeDeploy>
 					</configuration>
 					<extensions>true</extensions>

@@ -38,6 +38,8 @@ package org.societies.comm.xmpp.pubsub.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.hibernate.SessionFactory;
 import org.jabber.protocol.pubsub.Options;
 import org.jabber.protocol.pubsub.Pubsub;
 import org.jabber.protocol.pubsub.owner.Configure;
@@ -56,7 +58,7 @@ import org.springframework.stereotype.Component;
 // TODO
 // no distinction between get and set... join and leave should be set and who should be get
 // 
-@Component
+
 public class PubsubServiceRouter implements IFeatureServer {
 	
 	private static Logger LOG = LoggerFactory
@@ -79,15 +81,25 @@ public class PubsubServiceRouter implements IFeatureServer {
 	private ICommManager endpoint;
 	private PubsubService impl;
 
-	@Autowired
 	public PubsubServiceRouter(ICommManager endpoint) {
+		init(endpoint, null);
+	}
+	
+	private void init(ICommManager endpoint, SessionFactory sf) {
 		this.endpoint = endpoint;
-		impl = new PubsubServiceImpl(endpoint);
+		if (sf==null)
+			impl = new PubsubServiceImpl(endpoint);
+		else
+			impl = new PubsubServiceImpl(endpoint,sf);
 		try {
 			endpoint.register(this); // TODO unregister??
 		} catch (CommunicationException e) {
 			LOG.error(e.getMessage());
 		}
+	}
+
+	public PubsubServiceRouter(ICommManager endpoint, SessionFactory sf) {
+		init(endpoint, sf);
 	}
 
 	@Override
