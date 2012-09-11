@@ -41,7 +41,6 @@ import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.identity.IdentityManagerImpl;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
 import android.app.Service;
@@ -193,7 +192,13 @@ public class SocialData extends Service implements ISocialData {
 			}
 
 			public void receiveError(Stanza stanza, XMPPError error) {
-				Log.d(LOG_TAG, "receiveError: "+error.getGenericText());
+				Log.d(LOG_TAG, "receiveError: "+error.getStanzaErrorString());
+				
+				Intent intent = new Intent(ACTION_XMPP_ERROR);
+				intent.putExtra(EXTRA_STANZA_ERROR, error.getStanzaErrorString());
+				
+				intent.setPackage(client);
+				context.sendBroadcast(intent);
 			}
 
 			public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {

@@ -41,6 +41,8 @@ public interface ISocialData {
 	public static final String REMOVE_SOCIAL_CONNECTOR = "org.societies.android.platform.sns.REMOVE_SOCIAL_CONNECTOR";
 	public static final String GET_SOCIAL_CONNECTORS = "org.societies.android.platform.sns.GET_SOCIAL_CONNECTORS";
 	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.sns.ReturnValue";
+	public static final String ACTION_XMPP_ERROR = "org.societies.android.platform.sns.action.XMPP_ERROR";
+	public static final String EXTRA_STANZA_ERROR = "org.societies.android.platform.sns.extra.STANZA_ERROR";
 		
 	/**
 	 * Create and add a new social connector.

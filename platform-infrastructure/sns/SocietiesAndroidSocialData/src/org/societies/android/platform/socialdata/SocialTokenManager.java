@@ -79,18 +79,23 @@ public class SocialTokenManager extends Service implements ISocialTokenManager {
 	
 	// Service API
 	
-	public void getToken(String client, SocialNetwork socialNetwork) {	
+	public synchronized void getToken(String client, SocialNetwork socialNetwork) {	
 		Dbc.require("client cannot be null", client != null && client.length() > 0);
 		Dbc.require("socialNetwork cannot be null", socialNetwork != null);		
 		
-		requests.put(socialNetwork, client);
-		
-		BridgeActivity.startActivityForSN(this, socialNetwork);		
+		if(requests.containsKey(socialNetwork)) {
+			requests.put(socialNetwork, client);
+		}
+		else {
+			requests.put(socialNetwork, client);
+			
+			BridgeActivity.startActivityForSN(this, socialNetwork);
+		}
 	}
 	
 	// To receive token from BridgeActivity
-	void returnToken(SocialNetwork socialNetwork, String token, String expires) {
-		List<String> clients = requests.get(socialNetwork);
+	synchronized void returnToken(SocialNetwork socialNetwork, String token, String expires) {
+		List<String> clients = requests.remove(socialNetwork);
 		
 		for(String client:clients) {
 			sendReturnValue(client, socialNetwork, token, expires);

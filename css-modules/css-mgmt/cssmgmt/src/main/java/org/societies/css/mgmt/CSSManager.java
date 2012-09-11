@@ -3,6 +3,7 @@ package org.societies.css.mgmt;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -33,6 +34,7 @@ import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.societies.api.internal.css.cssRegistry.ICssRegistry;
@@ -42,6 +44,15 @@ import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.utilities.DBC.Dbc;
 
 import org.societies.api.schema.servicelifecycle.model.Service;
+
+import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
+import org.societies.api.internal.sns.ISocialData;
+//import org.societies.platform.socialdata.SocialData;
+
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.Group;
+import org.apache.shindig.social.opensocial.model.Person;
 
 
 public class CSSManager implements ICSSLocalManager {
@@ -735,8 +746,18 @@ public class CSSManager implements ICSSLocalManager {
 		
 	}
 
+	@Autowired
+	private ISocialData socialdata;
 
 	//Spring injection
+	
+	public ISocialData getSocialData() {
+		return socialdata;
+	}
+	
+	public void setSocialData(ISocialData socialData) {
+		this.socialdata = socialData;
+	}
 	
 	/**
 	 * @return the cssRegistry
@@ -1196,5 +1217,124 @@ public void removeNode(CssRecord cssrecord, String nodeId ) {
 		//this.modifyCssRecord(cssrecord); 
 	
 	}
+
+@SuppressWarnings("unchecked")
+public List<CssAdvertisementRecord> suggestedFriends( ) {
+	
+	ISocialData socialData = null;
+	
+	List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
+	List<CssAdvertisementRecord> cssFriends = new ArrayList<CssAdvertisementRecord>();
+	List<Person> snFriends = new ArrayList<Person>();
+	List<String> socialFriends = new ArrayList<String>();
+	List<CssAdvertisementRecord> commonFriends = new ArrayList<CssAdvertisementRecord>();
+	String MyId = "";	
+	MyId = idManager.getThisNetworkNode().toString();
+	LOG.info("@#@#@#@#@#@# ==== MyId contains " +MyId);
+	
+	LOG.info("CSSManager getFriends method called ");
+	
+	LOG.info("Contacting CSS Directory to get list of CSSs");
+	
+	// first get all the cssdirectory records
+	CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+
+	getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
+	recordList = callback.getResultList();
+	
+	for (CssAdvertisementRecord cssAdd : recordList) {
+		LOG.info("@#@#@#@#@#@# ==== Comparing Id contains " +cssAdd.getId());
+		if (cssAdd.getId().equalsIgnoreCase(MyId)) {
+			LOG.info("This is my OWN ID not adding it #########  ");
+		}else {
+			cssFriends.add((cssAdd));
+		}
+		
+		LOG.info("cssAdd.getName contains " +cssAdd.getName());
+		LOG.info("cssFriends contains " +cssFriends +" entries");
+	}
+	
+	LOG.info("cssFriends contains " +cssFriends);
+	LOG.info("CSS Directory contains " +cssFriends.size() +" entries");
+	
+	LOG.info("Contacting SN Connector to get list");
+	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ getSocialData() returns " +getSocialData());
+	
+	// Generate the connector
+	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
+	socialdata.updateSocialData();
+	
+	while (it.hasNext()){
+	  ISocialConnector conn = it.next();
+  	  
+	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ SocialNetwork connector contains " +conn.getConnectorName());
+	
+	//socialdata.updateSocialData();
+	}
+	
+	snFriends = (List<Person>) socialdata.getSocialPeople();
+	LOG.info("snFriends size is :" +snFriends.size());
+    Iterator<Person> itt = snFriends.iterator();
+    int index =1;
+    while(itt.hasNext()){
+    	Person p =null;
+    	String name = "";
+    	try{
+        	p = (Person) itt.next();
+        	if (p.getName()!=null){
+    			if (p.getName().getFormatted()!=null){
+    				name = p.getName().getFormatted();
+    				LOG.info(index +" Friends:" +name);
+    				socialFriends.add(name);
+    			}
+    				
+    			else {
+    				if(p.getName().getFamilyName()!=null) name = p.getName().getFamilyName();
+    				if(p.getName().getGivenName()!=null){
+    					if (name.length()>0)  name+=" ";
+    					name +=p.getName().getGivenName();
+    					LOG.info(index +" Friends:" +name);
+    					socialFriends.add(name);
+    				}
+    					  
+    			
+    			}
+    				
+    		}
+    	}catch(Exception ex){name = "- NOT AVAILABLE -";}
+    	index++;
+    }
+	//}
+    
+    //compare the lists to create
+    
+    LOG.info("CSS Friends List contains " +cssFriends.size() +" entries");
+    LOG.info("Social Friends List contains " +socialFriends.size() +" entries");
+    LOG.info("common Friends List contains " +commonFriends.size() +" entries");
+    
+    //compare the two lists
+    LOG.info("Compare the two lists to generate a common Friends list");
+    int i = 1;
+   // for (int index =0; index < cssFriends.size(); index++)
+   // {
+    for (CssAdvertisementRecord friend : cssFriends) {
+    	LOG.info("[]][][][][][] CSS Friends iterator List contains " +friend);
+        if (socialFriends.contains(friend.getName())) {
+        	if (commonFriends.contains(friend)){
+        		LOG.info("This friend is already added to the list @@@@@@@@@@  " +friend);	
+        	}else {
+        		commonFriends.add(friend);
+        	}
+        	
+        }
+       // i++;
+    }
+    //}
+    LOG.info("common Friends List NOW contains " +commonFriends.size() +" entries");
+	return commonFriends;
+
+	}
+
 	
 }
+
