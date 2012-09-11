@@ -47,7 +47,7 @@ var	SocietiesCISListService = {
 			for (i  = 0; i < data.length; i++) {
 				var tableEntry = '<li><a href="#category-item?pos=' + i + '"><img src="./images/community_profile_icon.png" class="profile_list" alt="logo" >' +
 				'<h2>' + data[i].cisName + '</h2>' + 
-				'<p>' + data[i].cisDescription + '</p>' + 
+				'<p>' + data[i].cisType + '</p>' + 
 				'</a></li>';
 				/*
 				$('ul#SocietiesServicesDiv').append(
