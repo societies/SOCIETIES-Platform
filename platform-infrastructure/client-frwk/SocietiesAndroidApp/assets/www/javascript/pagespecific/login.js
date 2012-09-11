@@ -199,6 +199,8 @@ var SocietiesLogin = {
 			
 			console.log("Current page: " + $.mobile.activePage[0].id);
 			
+			
+			$.mobile.loadPage("html/active_services.html");
 			$.mobile.changePage("html/landing.html", { transition: "slideup"} );
 		}
 		

@@ -64,11 +64,13 @@ import android.util.Log;
 public class ServiceManagement extends Service implements IServiceDiscovery {// , IServiceControl {
 
 	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("ServiceDiscoveryMsgBean", "ServiceDiscoveryResultBean");
-    private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/servicelifecycle/servicediscovery");//,
-															  	  //"http://societies.org/api/schema/servicelifecycle/servicecontrol"); //"http://societies.org/api/schema/servicelifecycle/model"
-    private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.servicelifecycle.servicediscovery");//, 
-															   //"org.societies.api.schema.servicelifecycle.servicecontrol"); //"org.societies.api.schema.servicelifecycle.model",
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("serviceDiscoveryMsgBean", "serviceDiscoveryResultBean");
+    private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/servicelifecycle/servicediscovery",
+															  	  "http://societies.org/api/schema/servicelifecycle/servicecontrol",
+															  	  "http://societies.org/api/schema/servicelifecycle/model");
+    private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.servicelifecycle.servicediscovery", 
+															   "org.societies.api.schema.servicelifecycle.servicecontrol",
+															   "org.societies.api.schema.servicelifecycle.model");
     private ClientCommunicationMgr commMgr;
     
     //SERVICE LIFECYCLE INTENTS
@@ -88,7 +90,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 		try {
 			//INSTANTIATE COMMS MANAGER
 			commMgr = new ClientCommunicationMgr(this);
-			commMgr.register(ELEMENT_NAMES, nullCallback);
+			//commMgr.register(ELEMENT_NAMES, nullCallback);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }    
@@ -126,7 +128,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
 		Stanza stanza = new Stanza(toID);
         try {
-        	//commMgr.register(ELEMENT_NAMES, discoCallback);
+        	commMgr.register(ELEMENT_NAMES, discoCallback);
         	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
 			Log.d(LOG_TAG, "Sending stanza");
 		} catch (Exception e) {
@@ -254,10 +256,10 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 					List<org.societies.api.schema.servicelifecycle.model.Service> serviceList = discoResult.getServices();
 					//CONVERT TO PARCEL BEANS
 					int i=0;
-					AService serviceArray[] = AService.CREATOR.newArray(serviceList.size());
-					//Parcelable serviceArray[] = new Parcelable[serviceList.size()];
+					//AService serviceArray[] = AService.CREATOR.newArray(serviceList.size());
+					Parcelable serviceArray[] = new Parcelable[serviceList.size()];
 					for(org.societies.api.schema.servicelifecycle.model.Service tmpService: serviceList) {
-						serviceArray[i] = (AService)tmpService;
+						serviceArray[i] = AService.convertService(tmpService);
 						i++;
 					}
 					//NOTIFY CALLING CLIENT
