@@ -22,42 +22,27 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.devicemgmt.display;
+package org.societies.android.api.servicelifecycle;
 
-import java.io.Serializable;
+
 
 /**
- * This class is the payload object of the org.societies.api.osgi.event.EventTypes.DISPLAY_EVENT event 
- *
- * @author Eliza
+ * This interface may be used by a third-party service to obtain information on itself
  *
  */
-public class DisplayEvent implements Serializable{
-
-	private DisplayEventConstants status;
-
-	private final String IPAddress;
-	
-	public DisplayEvent(String IPAddress, DisplayEventConstants status){
-		this.IPAddress = IPAddress;
-		this.status = status;
-		
-	}
+public interface IServiceUtilities {
 	
 	/**
-	 * 
-	 * @return  org.societies.api.css.devicemgmt.display.DisplayEventConstants.DEVICE_AVAILABLE when the user gets near a public display and is granted access </br>
-	 * 			org.societies.api.css.devicemgmt.display.DisplayEventConstants.DEVICE_UNAVAILABLE when the user leaves an area and releases the resource.
-	 * 
+	 * List of methods available for this service. Used for Android Intents
 	 */
-	public DisplayEventConstants getDisplayStatus(){
-		return this.status;
-	}
-
+	public String methodsArray[] = { "getMyServiceId(String client)" };
+	
 	/**
-	 * @return the iPAddress of the screen that the user has just connected to. 
+	 * This method allows a third-party service to get its own ServiceResourceIdentifier by passing a reference to itself.
+	 * 
+	 * @param client Full packagename of the 3rd Party app
+	 * @return the Parcelable version of the service resource identifier of this service
 	 */
-	public String getIPAddress() {
-		return IPAddress;
-	}
+	public AServiceResourceIdentifier getMyServiceId(String client);
+	
 }

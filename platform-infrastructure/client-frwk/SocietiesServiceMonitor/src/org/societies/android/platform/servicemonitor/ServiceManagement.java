@@ -25,21 +25,23 @@
 package org.societies.android.platform.servicemonitor;
 
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.api.internal.servicelifecycle.AService;
-import org.societies.android.api.internal.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.android.api.servicelifecycle.AService;
+import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
+import org.societies.android.api.servicelifecycle.IServiceUtilities;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
@@ -50,9 +52,14 @@ import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.Parcelable;
+import android.util.Base64;
 import android.util.Log;
 
 /**
@@ -61,7 +68,7 @@ import android.util.Log;
  * @author aleckey
  *
  */
-public class ServiceManagement extends Service implements IServiceDiscovery {// , IServiceControl {
+public class ServiceManagement extends Service implements IServiceDiscovery, IServiceUtilities {// , IServiceControl {
 
 	//COMMS REQUIRED VARIABLES
 	private static final List<String> ELEMENT_NAMES = Arrays.asList("serviceDiscoveryMsgBean", "serviceDiscoveryResultBean");
@@ -79,6 +86,7 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 	public static final String GET_SERVICES    = "org.societies.android.platform.servicediscovery.GET_SERVICES";
 	public static final String GET_MY_SERVICES     = "org.societies.android.platform.servicediscovery.GET_MY_SERVICES";
 	public static final String SEARCH_SERVICES = "org.societies.android.platform.servicediscovery.SEARCH_SERVICES";
+	public static final String GET_MY_SERVICE_ID = "org.societies.android.platform.servicemanagement.GET_MY_SERVICE_ID";
 	
     private static final String LOG_TAG = ServiceManagement.class.getName();
     private IBinder binder = null;
@@ -86,11 +94,10 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
     @Override
 	public void onCreate () {
 		this.binder = new LocalBinder();
-		Log.d(LOG_TAG, "ServiceDiscovery service starting");
+		Log.d(LOG_TAG, "ServiceManagement service starting");
 		try {
 			//INSTANTIATE COMMS MANAGER
 			commMgr = new ClientCommunicationMgr(this);
-			//commMgr.register(ELEMENT_NAMES, nullCallback);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
         }    
@@ -166,18 +173,57 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
         return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.identity.IIdentity)*/
+	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#getService(java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.identity.IIdentity)*/
 	public AService getService(String client, AServiceResourceIdentifier sri, String identity) {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#searchService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, org.societies.api.identity.IIdentity) */
+	/* @see org.societies.android.api.internal.servicelifecycle.IServiceDiscovery#searchService(java.lang.String, org.societies.api.schema.servicelifecycle.model.Service, org.societies.api.identity.IIdentity) */
 	public AService[] searchService(String client, AService filter, String identity) {
 		return null;
 	}
 
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceUtilities >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	/* @see org.societies.android.api.servicelifecycle.IServiceUtilities#getMyServiceId(java.lang.String) */
+	public AServiceResourceIdentifier getMyServiceId(String client) {
+		Log.d(LOG_TAG, "Calling getMyServiceId from client: " + client);
+		
+		AServiceResourceIdentifier sri = new AServiceResourceIdentifier();
+		String appName = getCallingAppName(client);
+		String uri = "http://" + commMgr.getIdManager().getThisNetworkNode().getJid() + "/" + appName;
+		try {
+			sri.setIdentifier(new URI(uri));
+		} catch (URISyntaxException e) {
+			Log.d(LOG_TAG, "Exception parsing URI: " + uri);
+		}
+		sri.setServiceInstanceIdentifier(client);
+
+		//SETUP RETURN INTENT STUFF
+		if (client != null) {
+			Intent intent = new Intent(GET_MY_SERVICE_ID);
+			intent.putExtra(INTENT_RETURN_VALUE, (Parcelable)sri);
+			intent.setPackage(client);
+			this.sendBroadcast(intent);
+		}
+		return null;
+	}
+
+	private String getCallingAppName(String client) {
+		List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
+		String appName = client; //DEFAULT BACK TO PACKAGE
+		for(int i=0;i<packs.size();i++) {
+			PackageInfo p = packs.get(i);
+			if (p.versionName == null) { //A SYSTEM PACKAGE - IGNORE
+				continue ;
+			}
+			//FILTER PACKAGES
+			String pack = p.packageName;
+			if (pack.contains(client))
+				appName = p.applicationInfo.loadLabel(getPackageManager()).toString();
+		}
+		return appName;
+	}
+	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceControl >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	
 	public ServiceControlResult installService(String client, URL arg1, String identity) {
@@ -282,37 +328,4 @@ public class ServiceManagement extends Service implements IServiceDiscovery {// 
 			}
 		}
 	}//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> END COMMS CALLBACK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	
-	private ICommCallback nullCallback = new ICommCallback() {
-
-		public List<String> getXMLNamespaces() {
-			return NAME_SPACES;
-		}
-
-		public List<String> getJavaPackages() {
-			return PACKAGES;
-		}
-
-		public void receiveResult(Stanza stanza, Object payload) {
-			Log.d(LOG_TAG, "receiveResult");
-		}
-
-		public void receiveError(Stanza stanza, XMPPError error) {
-			Log.d(LOG_TAG, "receiveError: "+error.getGenericText());
-		}
-
-		public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-			Log.d(LOG_TAG, "receiveInfo");
-		}
-
-		public void receiveItems(Stanza stanza, String node,
-				List<String> items) {
-			Log.d(LOG_TAG, "receiveItems");
-		}
-
-		public void receiveMessage(Stanza stanza, Object payload) {
-			Log.d(LOG_TAG, "receiveMessage");
-		}		
-	};
-
 }

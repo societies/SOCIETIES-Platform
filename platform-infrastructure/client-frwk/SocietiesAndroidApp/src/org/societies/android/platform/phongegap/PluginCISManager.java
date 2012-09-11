@@ -71,6 +71,20 @@ import com.google.gson.Gson;
  *
  */
 public class PluginCISManager extends Plugin {
+
+	// json strings
+	static final String CIS_JID = "cisJid";
+	static final String CIS_TYPE = "cisType";
+	static final String CIS_OWNER = "cisOwner";
+	static final String CIS_NAME = "cisName";
+	static final String CIS_CRIT = "cisCriteria";
+	static final String ATTR = "attribute";
+	static final String OPER = "operation";
+	static final String VAL = "value";
+	static final String CIS_DESC = "cisDescription";
+	
+
+	
 	//Logging tag
 	private static final String LOG_TAG = PluginCISManager.class.getName();
 
@@ -129,7 +143,7 @@ public class PluginCISManager extends Plugin {
 	public PluginResult execute(String action, JSONArray data, String callbackId) {
 		Log.d(LOG_TAG, "execute: " + action + " for callback: " + callbackId);
 
-		
+		this.initialiseServiceBinding();
 		
 		PluginResult result = null;
 
@@ -137,38 +151,55 @@ public class PluginCISManager extends Plugin {
 
 			Log.d(LOG_TAG, "create cis inside cis plugin");
 			
-			/*Log.d(LOG_TAG, "run async");
-			RunAsync ru = new RunAsync(cr);
-			Log.d(LOG_TAG, "run");
-			this.ctx.runOnUiThread(ru);
-			Log.d(LOG_TAG, "runt");
-			AsynchronousQueryHandler qr = ru.getQr();
-			Log.d(LOG_TAG, "async handler");*/
-			
-			ContentValues createCISValue = new ContentValues();
-			createCISValue.put(SocialContract.Community.GLOBAL_ID , "flamengo.societies.org");
-			createCISValue.put(SocialContract.Community.TYPE , "futebol");
-			createCISValue.put(SocialContract.Community.NAME , "Flamengo");
-			createCISValue.put(SocialContract.Community.DISPLAY_NAME , "FLA");
-			createCISValue.put(SocialContract.Community.OWNER_ID, "babak@societies.org");
-			createCISValue.put(SocialContract.Community.CREATION_DATE , "Today");
-			createCISValue.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
-			createCISValue.put(SocialContract.Community.DIRTY , "yes");
-			
-			cr.query(RawContacts.CONTENT_URI, null, null, null, null);
-			
-			Uri COMUNITIES_URI = Uri.parse(COMUNITIES__STRING_URI);
-			Log.d(LOG_TAG, "before start insert");
-			cr.insert(COMUNITIES_URI, createCISValue);
-			Log.d(LOG_TAG, "inserted ok");
-			//qr.startInsert(1, callbackId, COMUNITIES_URI, createCISValue);
-			
+			if(data == null || data.isNull(0) ){
+				Log.d(LOG_TAG, "problem with json input to create CIS");
+				result = new PluginResult(PluginResult.Status.ERROR);
+				result.setKeepCallback(false);
 
-			//result = new PluginResult(PluginResult.Status.NO_RESULT);
-			//result.setKeepCallback(true);
-			result = new PluginResult(PluginResult.Status.OK);
-			result.setKeepCallback(false);
-			Log.d(LOG_TAG, "going to return");
+			}else{
+
+				
+				
+				try{
+					JSONObject cis = data.getJSONObject(0);
+					ContentValues createCISValue = new ContentValues();
+					createCISValue.put(SocialContract.Community.TYPE , cis.getString(CIS_TYPE));
+					createCISValue.put(SocialContract.Community.NAME , cis.getString(CIS_NAME));
+					createCISValue.put(SocialContract.Community.OWNER_ID, cis.getString(CIS_OWNER));
+					createCISValue.put(SocialContract.Community.DIRTY , "yes");
+
+				
+					/*Log.d(LOG_TAG, "run async");
+					RunAsync ru = new RunAsync(cr);
+					Log.d(LOG_TAG, "run");
+					this.ctx.runOnUiThread(ru);
+					Log.d(LOG_TAG, "runt");
+					AsynchronousQueryHandler qr = ru.getQr();
+					Log.d(LOG_TAG, "async handler");*/
+					
+					
+					Uri COMUNITIES_URI = Uri.parse(COMUNITIES__STRING_URI);
+					Log.d(LOG_TAG, "before start insert");
+					cr.insert(COMUNITIES_URI, createCISValue);
+					Log.d(LOG_TAG, "inserted ok");
+					//qr.startInsert(1, callbackId, COMUNITIES_URI, createCISValue);
+					
+	
+					//result = new PluginResult(PluginResult.Status.NO_RESULT);
+					//result.setKeepCallback(true);
+					result = new PluginResult(PluginResult.Status.OK,cis);
+					result.setKeepCallback(false);
+					Log.d(LOG_TAG, "going to return");
+				}catch (Exception e) {
+					// TODO Auto-generated catch block
+					Log.d(LOG_TAG, "exception in the create");
+					e.printStackTrace();
+					result = new PluginResult(PluginResult.Status.ERROR);
+					result.setKeepCallback(false);
+				}
+				
+			}
+			
 
             return result;
 		} 
@@ -177,9 +208,47 @@ public class PluginCISManager extends Plugin {
 
 			Log.d(LOG_TAG, "list cis inside cis plugin");
 			
-			result = new PluginResult(PluginResult.Status.OK);
+			Uri COMUNITIES_URI = Uri.parse(COMUNITIES__STRING_URI);
+			Log.d(LOG_TAG, "before query insert");
+			
+			
+			
+			JSONArray returnData = new JSONArray();
+
+			try{
+				Cursor cursor = cr.query(SocialContract.Community.CONTENT_URI, null, null, null, null);
+				if (cursor != null && cursor.getCount() >0) {
+					// Determine the column index of the column named "word"
+					//int index = cursor.getColumnIndex(SocialContract.Community.DISPLAY_NAME);
+					
+					/*
+				     * Moves to the next row in the cursor. Before the first movement in the cursor, the
+				     * "row pointer" is -1, and if you try to retrieve data at that position you will get an
+				     * exception.
+				     */
+				    while (cursor.moveToNext()) {
+				    	JSONObject cis = new JSONObject();
+				        Log.d("LOG_TAG", "found community ");
+				    	cis.put(CIS_NAME, cursor.getString(cursor.getColumnIndex(SocialContract.Community.NAME)));
+				    	cis.put(CIS_OWNER, cursor.getString(cursor.getColumnIndex(SocialContract.Community.OWNER_ID)));
+				    	cis.put(CIS_TYPE, cursor.getString(cursor.getColumnIndex(SocialContract.Community.TYPE)));
+				        returnData.put(cis);
+				    }
+				} else {
+					Log.d(LOG_TAG, "empty CIS list query result");
+				}
+			}catch (Exception e) {
+				// TODO Auto-generated catch block
+				Log.d(LOG_TAG, "exception in the create");
+				e.printStackTrace();
+				result = new PluginResult(PluginResult.Status.ERROR);
+				result.setKeepCallback(false);
+			}
+
+			result = new PluginResult(PluginResult.Status.OK,returnData);
 			result.setKeepCallback(false);
 
+			
             return result;
 		} 
 
