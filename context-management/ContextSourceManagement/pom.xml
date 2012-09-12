@@ -88,6 +88,7 @@
 		</dependency>
 	</dependencies>
 
+<!-- 
 	<build>
 		<plugins>
 			<plugin>
@@ -96,7 +97,7 @@
 			</plugin>
 
 
-<!-- 
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
