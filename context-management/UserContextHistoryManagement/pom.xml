@@ -8,10 +8,11 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		
 	</parent>
 
 	<!-- groupId is set in parent pom -->
+	<groupId>org.societies.context-management</groupId>
 	<artifactId>user-context-history-mgmt</artifactId>
 	<version>${version.cm}</version>
 
@@ -102,5 +103,5 @@
 
 	<name>User Context History Management</name>
 
-	<groupId>org.societies.context-management</groupId>
+	
 </project>
