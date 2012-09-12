@@ -175,7 +175,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 		// -- Retrieve the CIS Privacy Policy
 		RequestorCis requestorCis = new RequestorCis(cssId, cisId);
-		RequestPolicy privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
+		RequestPolicy privacyPolicy = null;
+		try {
+			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
+		}
+		catch(Exception e) {
+			LOG.error("Error: The privacy policy can not be retrieved for this CIS: "+requestorCis.toString(), e);
+			return permission;
+		}
 		// Can't retrieve the privacy policy
 		if (null == privacyPolicy) {
 			LOG.error("The privacy policy can not be retrieved for this CIS: "+requestorCis.toString());
