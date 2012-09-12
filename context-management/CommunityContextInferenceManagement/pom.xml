@@ -18,6 +18,7 @@
 			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-mgmt-api</artifactId>
@@ -50,7 +51,6 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
 	<!-- Build Settings -->
