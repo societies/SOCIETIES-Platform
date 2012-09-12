@@ -41,7 +41,7 @@ var ServiceManagementService = {
 	 */
 	connectService: function(successCallback, failureCallback) {
 
-		console.log("Call CoreServiceMonitorService - connectService");
+		console.log("Call ServiceManagementService - connectService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -103,7 +103,7 @@ var ServiceManagementService = {
 		'getMyServices',              //Telling the plugin, which action we want to perform
 		["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
 	}
-}
+};
 
 /**
  * Provides a Helper API to the Service Monitor service
@@ -131,4 +131,4 @@ var ServiceManagementServiceHelper = {
 		}
 	    window.plugins.ServiceManagementService.connectService(success, failure);
 	}
-}
+};

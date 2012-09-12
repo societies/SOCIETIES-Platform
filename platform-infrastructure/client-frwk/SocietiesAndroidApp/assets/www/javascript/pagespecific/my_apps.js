@@ -119,7 +119,7 @@ var Societies3PServices = {
 	}
 
 
-}
+};
 
 /**
  * JQuery boilerplate to attach JS functions to relevant HTML elements
@@ -135,7 +135,7 @@ $(document).bind('pageinit',function(){
 	setTimeout(function() {
 		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
 		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refreshLocalApps);
-    }, 200);
+    }, 5200);
 	
 	//Listen for any attempts to call changePage().
 	$(document).bind( "pagebeforechange", function( e, data ) {

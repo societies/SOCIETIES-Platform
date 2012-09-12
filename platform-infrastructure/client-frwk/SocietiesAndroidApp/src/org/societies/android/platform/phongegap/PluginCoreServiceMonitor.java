@@ -158,6 +158,8 @@ public class PluginCoreServiceMonitor extends Plugin {
         
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_SERVICES);
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_TASKS);
+        intentFilter.addAction(CoreServiceMonitor.INSTALLED_APPLICATIONS);
+        intentFilter.addAction(CoreServiceMonitor.START_ACTIVITY);
         
         intentFilter.addAction(ServiceManagement.GET_MY_SERVICES);
         intentFilter.addAction(ServiceManagement.GET_SERVICES);

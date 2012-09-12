@@ -73,6 +73,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	public static final String ACTIVE_TASKS = "org.societies.android.platform.servicemonitor.ACTIVE_TASKS";
 	public static final String ACTIVE_FILTERED_TASKS = "org.societies.android.platform.servicemonitor.ACTIVE_FILTERED_TASKS";
 	public static final String INSTALLED_APPLICATIONS = "org.societies.android.platform.servicemonitor.INSTALLED_APPLICATIONS";
+	public static final String START_ACTIVITY = "org.societies.android.platform.servicemonitor.START_ACTIVITY";
 	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.servicemonitor.ReturnValue";
 
 
