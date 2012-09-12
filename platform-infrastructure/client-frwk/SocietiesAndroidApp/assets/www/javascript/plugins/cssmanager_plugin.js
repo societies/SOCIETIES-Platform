@@ -141,7 +141,7 @@ var	SocietiesLocalCSSManager = {
 		                    "cssNodes": [],
 		                    "cssRegistration": null,
 		                    "cssHostingLocation" : null,
-		                    "domainServer" : jQuery("#domainServers").val(),
+		                    "domainServer" : jQuery("#domainServer").val(),
 		                    "cssUpTime": 0,
 		                    "emailID": null,
 		                    "entity": 0,
