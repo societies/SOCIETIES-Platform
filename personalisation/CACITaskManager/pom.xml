@@ -6,8 +6,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.personalisation</groupId>
@@ -42,14 +41,26 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.societies</groupId>
+		    <artifactId>common-ext-libs</artifactId>
+		    <scope>provided</scope>
 		</dependency>
 		
+		
+		<dependency>
+		    <groupId>org.springframework</groupId>   
+		    <artifactId>org.springframework.spring-library</artifactId>   
+		    <type>libd</type>   
+		    <version>${spring.version}</version>   
+		    <scope>provided</scope>
+  		</dependency>		
 		<!-- <dependency> <groupId>org.societies.context-management</groupId> <artifactId>css_contextBroker_impl</artifactId> 
 			<version>${version.cm}</version> </dependency> <dependency> <groupId>org.societies.context-management</groupId> 
 			<artifactId>UserCtxDBMgmt</artifactId> <version>${version.cm}</version> </dependency> -->
