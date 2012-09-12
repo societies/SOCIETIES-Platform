@@ -30,17 +30,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.context.api.community.estimation.estimationModel;
 import org.societies.context.community.estimation.impl.*;
-import org.societies.context.broker.impl.CtxBroker;
+//import org.societies.context.broker.impl.CtxBroker;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -111,9 +118,94 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	
 	
 	@Override
-	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier ctxId,
+	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier communityCtxId,
 			CtxAttributeIdentifier ctxAttributeIdentifier) {
 		// TODO Auto-generated method stub
+
+		//Check the type of the ctxAttributeIdentifier
+
+		CtxAttribute retrievedType = null;
+		try {
+			retrievedType = (CtxAttribute) ctxBroker.retrieve(ctxAttributeIdentifier).get();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (CtxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		//In case that attrType is integer, then the corresponding methods should be called
+		if (retrievedType.getValueType().INTEGER != null) 
+				{
+			ArrayList<Integer> inputValues = new ArrayList<Integer>();
+			
+			//get the community and a set with the community's context attributes
+			try {
+				CtxEntity retrievedCommunity = (CtxEntity) ctxBroker.retrieve(communityCtxId).get();
+				Set<CtxAttribute> communityAttributes = retrievedCommunity.getAttributes();
+			
+			//from all the retrieved attributes get the ones that are equal to the given ctxAttriuteID and get the values	
+				for (CtxAttribute ca:communityAttributes){
+					if(ca.getId().equals(ctxAttributeIdentifier)){
+						inputValues.add(ca.getIntegerValue());
+					}
+				}
+				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			//Call the cceNumMean method
+			double meanValue = cceNumMean(inputValues);
+			double medianValue = cceNumMedian(inputValues);
+			ArrayList<Integer> modeValue = cceNumMode(inputValues);
+			Integer[] numRange = cceNumRange(inputValues);
+				}
+
+		if (retrievedType.getValueType().STRING != null) 
+		{
+			ArrayList<String> inputValues = new ArrayList<String>();
+
+			//get the community and a set with the community's context attributes
+			try {
+				CtxEntity retrievedCommunity = (CtxEntity) ctxBroker.retrieve(communityCtxId).get();
+				Set<CtxAttribute> communityAttributes = retrievedCommunity.getAttributes();
+
+				//from all the retrieved attributes get the ones that are equal to the given ctxAttriuteID and get the values	
+				for (CtxAttribute ca:communityAttributes){
+					if(ca.getId().equals(ctxAttributeIdentifier)){
+						inputValues.add(ca.getStringValue());
+					}
+				}
+
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			//Call the cceNumMean method
+			ArrayList<String> modeValue = cceStringMode(inputValues);
+		}
+		
+		//TO DO 
+		//set the value to a new community attribute
 		return null;
 	}
 
@@ -227,19 +319,19 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		   }	
 
 	//@Override
-	public ArrayList<Point> cceGeomConvexHull(ArrayList<Point> points) {
+	public ArrayList<Point2D> cceGeomConvexHull(ArrayList<Point2D> points) {
 		/**
 		 * Returns the convex hull of a points' ArrayList. It recursively uses the singleSideHulSet method
 		 * @param an array list of points.
 		 * @return an ArrayList of points, representing the convex hull set of the input points
 		 */		
-		ArrayList<Point> convexHullSet = new ArrayList<Point>();
+		ArrayList<Point2D> convexHullSet = new ArrayList<Point2D>();
 		int minX= Integer.MAX_VALUE;
 		int maxX = Integer.MIN_VALUE;
 		int minPointIndex = -1;
 		int maxPointIndex = -1;
-		ArrayList<Point> leftPointsSet = new ArrayList<Point>();
-		ArrayList<Point> rightPointsSet = new ArrayList<Point>();
+		ArrayList<Point2D> leftPointsSet = new ArrayList<Point2D>();
+		ArrayList<Point2D> rightPointsSet = new ArrayList<Point2D>();
 
 		if (points.size()<3){
 			return points;
@@ -256,9 +348,9 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			}
 		}
 		
-		Point minP = points.get(minPointIndex);
-		Point maxP = points.get(maxPointIndex);	
-		Point p = new Point();
+		Point2D minP = points.get(minPointIndex);
+		Point2D maxP = points.get(maxPointIndex);	
+		Point2D p = new Point2D();
 		convexHullSet.add(minP);
 		convexHullSet.add(maxP);
 		points.remove(minP);
@@ -279,8 +371,8 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	}
 
 
-	private void singleSideHullSet(ArrayList<Point> pointsSet, Point minPoint,
-			Point maxPoint, ArrayList<Point> convexHullSet) {
+	private void singleSideHullSet(ArrayList<Point2D> pointsSet, Point2D minPoint,
+			Point2D maxPoint, ArrayList<Point2D> convexHullSet) {
 	/**
 	 * This method finds the points of the given pointsSet, that belong to convex hull and adds them to the given convexHull set. 
 	 * It constructs a segment with the points minPoint and maxPoint and calculates if the points belonging to the pointsSet and are at the left of the segment
@@ -290,29 +382,29 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	 * @param convexHullSet the set that contains the points belonging to the convex hull
 	 */
 		
-		Point fP = new Point();
-		Point rP = new Point();
+		Point2D fP = new Point();
+		Point2D rP = new Point();
 
 		int distance_max = Integer.MIN_VALUE;
 		int relativeDistance = 0;
 		int farthestPointIndex = -1;
 		int insertPosition = convexHullSet.indexOf(maxPoint);
 
-		ArrayList<Point> set1 = new ArrayList<Point>();
-		ArrayList<Point> set2 = new ArrayList<Point>();		
+		ArrayList<Point2D> set1 = new ArrayList<Point2D>();
+		ArrayList<Point2D> set2 = new ArrayList<Point2D>();		
 		
 		if (pointsSet.size()==0){
 			return ;
 		}
 		if (pointsSet.size()==1){
-			Point p = pointsSet.get(0);
+			Point2D p = pointsSet.get(0);
 			pointsSet.remove(p);
 			convexHullSet.add(insertPosition, p);
 			return;
 		}
 
 		for (int i=0; i<pointsSet.size(); i++){	
-			Point m =pointsSet.get(i);				
+			Point2D m =pointsSet.get(i);				
 			relativeDistance=(maxPoint.x-minPoint.x)*(minPoint.y-m.y)-(maxPoint.y-minPoint.y)*(minPoint.x-m.x);
 			if (relativeDistance < 0){
 				relativeDistance= -relativeDistance;
@@ -355,13 +447,13 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	}
 
 	//@Override
-	public Point[] cceGeomMinBB(ArrayList<Point> points) {
+	public Point2D[] cceGeomMinBB(ArrayList<Point2D> points) {
 		/**
 		 * Returns the minimum bounding box that contains all the given points
 		 * @param an array list of integers
 		 * @return an array of points representing the minimum bounding box of the input points
 		 */
-		Point[] minBB = new Point[2];
+		Point2D[] minBB = new Point2D[2];
 		int minX= Integer.MAX_VALUE;
 		int maxX = Integer.MIN_VALUE;
 		int minY= Integer.MAX_VALUE;
@@ -382,8 +474,8 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			}
 		}
 
-		Point topLeft = new Point(minX,maxY);
-		Point bottomRight = new Point(maxX,minY);
+		Point2D topLeft = new Point2D(minX,maxY);
+		Point2D bottomRight = new Point2D(maxX,minY);
 
 		minBB[0]=topLeft;
 		minBB[1]=bottomRight;
