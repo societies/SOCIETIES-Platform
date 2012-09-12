@@ -61,10 +61,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
+		   <groupId>org.societies</groupId>
+		   <artifactId>common-ext-libs</artifactId>
+		   <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
