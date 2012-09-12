@@ -39,7 +39,7 @@ var SocietiesNavigation = {
 		 */
 
 		homeAction: function() {
-			$.mobile.changePage($("#landing"));
+			$.mobile.changePage($("#landing"), {transition: "slideup"});
 		},
 		/**
 		 * @methodOf SocietiesNavigation#
@@ -48,7 +48,7 @@ var SocietiesNavigation = {
 		 */
 
 		profileAction: function() {
-			$.mobile.changePage($("#my-profile"));
+			$.mobile.changePage($("#my-profile"), {transition: "slideup"});
 		},
 		/**
 		 * @methodOf SocietiesNavigation#
@@ -57,7 +57,7 @@ var SocietiesNavigation = {
 		 */
 
 		settingsAction: function() {
-			$.mobile.changePage($("#settings"));
+			$.mobile.changePage($("#settings"), {transition: "slideup"});
 		},
 		/**
 		 * @methodOf SocietiesNavigation#
@@ -66,7 +66,8 @@ var SocietiesNavigation = {
 		 */
 
 		aboutAction: function() {
-			$.mobile.changePage($("#about"));
+			$.mobile.changePage($("#about"), {transition: "slideup"});
+
 		}
 }
 /**
@@ -76,24 +77,24 @@ var SocietiesNavigation = {
  * N.B. this event is fired once per page load
  * @returns null
  */
-$(document).bind('pageinit',function(){
+$(document).bind("pagechange", function(event, options) {
 
-	console.log("jQuery pageinit action(s) for navigation bar");
+	console.log("jQuery pagechange action(s) for navigation bar");
 
-	$('#home-button').off('click').on('click', function(){
+	$(".ui-page-active #home-button").off('click').on('click', function(){
 		SocietiesNavigation.homeAction();
 	});
 
-	$('#profile-button').off('click').on('click', function(){
-		SocietiesNavigation.homeAction();
+	$(".ui-page-active #profile-button").off('click').on('click', function(){
+		SocietiesNavigation.profileAction();
 	});
 
-	$('#settings-button').off('click').on('click', function(){
-		SocietiesNavigation.homeAction();
+	$(".ui-page-active #settings-button").off('click').on('click', function(){
+		SocietiesNavigation.settingsAction();
 	});
 
-	$('#about-button').off('click').on('click', function(){
-		SocietiesNavigation.homeAction();
+	$(".ui-page-active #about-button").off('click').on('click', function(){
+		SocietiesNavigation.aboutAction();
 	});
 
 });
