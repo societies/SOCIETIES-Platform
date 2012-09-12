@@ -58,9 +58,11 @@ var Societies3PServices = {
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
 				var tableEntry = '<li><a href="#localapp-item?pos=' + i + '"><img src="' + data[i].icon + '" class="profile_list" alt="logo" >' +
-				'<h2>' + data[i].applicationName + '</h2>' + 
-				'<p>' + data[i].packageName+ '</p>' + 
-				'</a></li>';
+									'<h2>' + data[i].applicationName + '</h2>' + 
+									'<p>' + data[i].packageName+ '</p></a>' + 
+									'<a href="launch_app.html?pos=' + i + '" data-rel="dialog" data-transition="slideup" >Launch</a>' + 
+									'</li>';
+				//'<a href="#" data-rel="dialog" data-transition="slideup" onClick="startActivity("' + data[i].packageName + '") >Launch</a>' +
 				jQuery('ul#LocalServicesDiv').append(tableEntry);
 			}
 			$('#LocalServicesDiv').listview('refresh');
@@ -70,7 +72,7 @@ var Societies3PServices = {
 			alert("refresh3PServices - failure: " + data);
 		}
 		
-		window.plugins.SocietiesCoreServiceMonitor.getInstalledApps(success, failure);
+		window.plugins.SocietiesCoreServiceMonitor.getInstalledApplications(success, failure);
 	},
 
 	// Load the data for a specific category, based on
