@@ -33,9 +33,8 @@
 			<artifactId>org.springframework.beans</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -44,7 +43,6 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
 	<!-- Build Settings -->
