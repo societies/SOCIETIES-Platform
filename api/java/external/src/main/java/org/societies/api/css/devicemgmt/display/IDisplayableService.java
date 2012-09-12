@@ -24,40 +24,15 @@
  */
 package org.societies.api.css.devicemgmt.display;
 
-import java.io.Serializable;
-
 /**
- * This class is the payload object of the org.societies.api.osgi.event.EventTypes.DISPLAY_EVENT event 
+ * Describe your class here...
  *
  * @author Eliza
  *
  */
-public class DisplayEvent implements Serializable{
+public interface IDisplayableService {
 
-	private DisplayEventConstants status;
-
-	private final String IPAddress;
+	public void serviceStarted(String IPAddress);
 	
-	public DisplayEvent(String IPAddress, DisplayEventConstants status){
-		this.IPAddress = IPAddress;
-		this.status = status;
-		
-	}
-	
-	/**
-	 * 
-	 * @return  org.societies.api.css.devicemgmt.display.DisplayEventConstants.DEVICE_AVAILABLE when the user gets near a public display and is granted access </br>
-	 * 			org.societies.api.css.devicemgmt.display.DisplayEventConstants.DEVICE_UNAVAILABLE when the user leaves an area and releases the resource.
-	 * 
-	 */
-	public DisplayEventConstants getDisplayStatus(){
-		return this.status;
-	}
-
-	/**
-	 * @return the iPAddress of the screen that the user has just connected to. 
-	 */
-	public String getIPAddress() {
-		return IPAddress;
-	}
+	public void serviceStopped(String IPAddress);
 }

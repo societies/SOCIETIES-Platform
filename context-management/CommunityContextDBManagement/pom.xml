@@ -59,8 +59,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>RELEASE</version>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>RELEASE</version>		
 	</parent>
 
 	<!-- Build Settings -->
