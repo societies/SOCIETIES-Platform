@@ -154,7 +154,7 @@ public class PrivacyAgreementManagerTest {
 
 	private RequestorCis getRequestorCis() throws InvalidFormatException{
 		IIdentity otherCssId = TestCase1244.commManager.getIdManager().fromJid("red@societies.local");
-		IIdentity cisId = TestCase1244.commManager.getIdManager().fromJid("onecis.societies.local");
+		IIdentity cisId = TestCase1244.commManager.getIdManager().fromJid("cis-one.societies.local");
 		return new RequestorCis(otherCssId, cisId);
 	}
 
@@ -179,7 +179,7 @@ public class PrivacyAgreementManagerTest {
 		actions.add(new Action(ActionConstants.READ));
 		RequestItem rItem = new RequestItem(locationResource, actions, conditions, false);
 		responseItems.add(new ResponseItem(rItem, Decision.PERMIT));
-		Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, "someResource");
+		Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, "someUnexistingResource");
 		List<Condition> extendedConditions = new ArrayList<Condition>();
 		extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
 		extendedConditions.add(new Condition(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "YES"));
