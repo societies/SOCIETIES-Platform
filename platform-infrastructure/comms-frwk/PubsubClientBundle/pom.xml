@@ -1,65 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-     
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
-	 </parent>
+	</parent>
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.societies.comm.xmpp.pubsub</groupId>
-    <artifactId>PubsubClientBundle</artifactId>
-    <packaging>bundle</packaging>
-    <name>Pubsub Client Bundle</name>
-    <version>${version.comm}</version>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.comm.xmpp.pubsub</groupId>
+	<artifactId>PubsubClientBundle</artifactId>
+	<packaging>bundle</packaging>
+	<name>Pubsub Client Bundle</name>
+	<version>${version.comm}</version>
 
-    <properties>
-        <slf4j.version>1.5.0</slf4j.version>
-        <spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
-        <spring.osgi.version>1.2.1</spring.osgi.version>
-        <equinox.ver>3.2.2</equinox.ver>
-    </properties>
+	<properties>
+		<slf4j.version>1.5.0</slf4j.version>
+		<spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
+		<spring.osgi.version>1.2.1</spring.osgi.version>
+		<equinox.ver>3.2.2</equinox.ver>
+	</properties>
 
-    <dependencies>
-    	<!-- Interface -->
-    	<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
+	<dependencies>
+
+
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+
+
+
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
 		</dependency>
+
+
+		<!-- Interface -->
+		
+
+	
+	
 		<dependency>
 			<groupId>dom4j</groupId>
 			<artifactId>dom4j</artifactId>
@@ -67,50 +66,49 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.simpleframework</groupId>
-		    <artifactId>simple-xml</artifactId>
-		    <version>2.6.4</version>
-		    <scope>provided</scope>
-		   <exclusions>
-			    <!-- StAX is not available on Android -->
-			    <exclusion>
-			        <artifactId>stax</artifactId>
-			        <groupId>stax</groupId>
-			    </exclusion>
-			    <exclusion>
-			        <artifactId>stax-api</artifactId>
-			        <groupId>stax</groupId>
-			    </exclusion>
-			    <!-- Provided by Android -->
-			    <exclusion>
-			        <artifactId>xpp3</artifactId>
-			        <groupId>xpp3</groupId>
-			    </exclusion>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.4</version>
+			<scope>provided</scope>
+			<exclusions>
+				<!-- StAX is not available on Android -->
+				<exclusion>
+					<artifactId>stax</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>stax-api</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
-    </dependencies>
-    <build>
+	</dependencies>
+	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-    				<instructions>
-    					<Import-Package>
-    						org.springframework.beans.factory.annotation*;version="0",
-    						org.springframework.stereotype*;version="0",
+					<instructions>
+						<Import-Package>
+							org.springframework.beans.factory.annotation*;version="0",
+							org.springframework.stereotype*;version="0",
 							*;resolution:=optional
-    					</Import-Package>
-    					<Export-Package>
-    						org.societies.comm.xmpp.event,
-    						org.societies.comm.xmpp.pubsub
-		           		</Export-Package>
-		           		<DynamicImport-Package>*</DynamicImport-Package>
-		           		<Embed-Dependency>*;scope=compile</Embed-Dependency>
+						</Import-Package>
+						<Export-Package>
+							org.societies.comm.xmpp.event,
+							org.societies.comm.xmpp.pubsub
+						</Export-Package>
+						<Embed-Dependency>*;scope=compile</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-		         	</instructions>
-	       		</configuration>
+					</instructions>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -127,7 +125,7 @@
 						</artifactItem>
 					</artifactItems>
 				</configuration>
-			</plugin>	
+			</plugin>
 		</plugins>
 	</build>
 </project>

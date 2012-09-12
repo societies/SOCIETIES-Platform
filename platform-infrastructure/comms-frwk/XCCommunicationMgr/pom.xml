@@ -1,129 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    
-    <parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
-	 </parent>
-    
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.societies.comm.xmpp</groupId>
-    <artifactId>XCCommunicationMgr</artifactId>
-    <packaging>bundle</packaging>
-    <name>XC Communication Manager</name>
-    <version>${version.comm}</version>
+	</parent>
 
-    <dependencies>
-    	<!-- Interface -->
-    	<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-    	<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-    	<!-- Commons -->
-    	<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${version.comm}</version>
-			<scope>compile</scope>
-		</dependency>
-		<!-- XMPP -->
-		<dependency>
-			<groupId>org.igniterealtime</groupId>
-			<artifactId>whack</artifactId>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.igniterealtime.smack</groupId>
-			<artifactId>smack</artifactId>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.igniterealtime.smack</groupId>
-			<artifactId>smackx</artifactId>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.simpleframework</groupId>
-		    <artifactId>simple-xml</artifactId>
-		    <version>2.6.4</version>
-		    <scope>provided</scope>
-		   <exclusions>
-			    <!-- StAX is not available on Android -->
-			    <exclusion>
-			        <artifactId>stax</artifactId>
-			        <groupId>stax</groupId>
-			    </exclusion>
-			    <exclusion>
-			        <artifactId>stax-api</artifactId>
-			        <groupId>stax</groupId>
-			    </exclusion>
-			    <!-- Provided by Android -->
-			    <exclusion>
-			        <artifactId>xpp3</artifactId>
-			        <groupId>xpp3</groupId>
-			    </exclusion>
-			</exclusions>
-		</dependency>
-		<!-- Virgo -->
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.comm.xmpp</groupId>
+	<artifactId>XCCommunicationMgr</artifactId>
+	<packaging>bundle</packaging>
+	<name>XC Communication Manager</name>
+	<version>${version.comm}</version>
+
+	<dependencies>
+
+
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
 		</dependency>
-    </dependencies>
-    
-    <build>        
-        <plugins>
-            <plugin>
+
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+
+	
+		<!-- Commons -->
+		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>${version.comm}</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- XMPP -->
+	
+		
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-    				<instructions>
-    					<Import-Package>
-    						org.osgi.framework,
-    						!org.jvnet.staxex,
-    						!org.jvnet.fastinfoset,
-    						!com.sun.xml.fastinfoset.*,
-    						org.slf4j*;version="1.5.8",
-    						*;resolution:=optional
-    					</Import-Package>
-    					<Export-Package>
-    						org.societies.comm.xmpp.*
-		           		</Export-Package>
-		           		<DynamicImport-Package>*</DynamicImport-Package>
-		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment> 
-		         	</instructions>
-	       		</configuration>
+					<instructions>
+						<Import-Package>
+						<!-- org.osgi.framework;resolution:=optional,
+							!org.jvnet.staxex
+							!org.jvnet.fastinfoset;resolution:=optional,
+							!com.sun.xml.fastinfoset.*,
+							-->
+							*;resolution:=optional
+						</Import-Package>
+						<Export-Package>
+							org.societies.comm.xmpp.*
+						</Export-Package>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
+					</instructions>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -141,6 +99,6 @@
 					</artifactItems>
 				</configuration>
 			</plugin>
-        </plugins>
-    </build>
+		</plugins>
+	</build>
 </project>

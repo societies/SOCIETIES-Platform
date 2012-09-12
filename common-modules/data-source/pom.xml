@@ -30,6 +30,7 @@
 	<artifactId>data-source</artifactId>
 	<description>common data source bundle</description>
 	<packaging>bundle</packaging>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>
@@ -46,7 +47,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
