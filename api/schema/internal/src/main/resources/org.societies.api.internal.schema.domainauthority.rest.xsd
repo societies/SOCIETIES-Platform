@@ -19,7 +19,7 @@
 				<xs:element name="serviceId" type="xs:anyURI" minOccurs="0" />
 				<xs:element name="providerIdentity" type="xs:string" minOccurs="0"/>
 				<xs:element name="signature" type="xs:string" minOccurs="0"/>
-				<xs:element name="files" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+				<!--xs:element name="files" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/-->
 				<!--xs:choice minOccurs="0" maxOccurs="unbounded">
 					<xs:element minOccurs="0" maxOccurs="unbounded" name="files" type="xs:string" />
 				</xs:choice-->
