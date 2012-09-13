@@ -12,7 +12,6 @@
 	<version>${release.version}</version>
 	<name>Common External Libraries</name>
 	<properties>
-		<slf4j.version>1.5.0</slf4j.version>
 		<spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
 		<spring.osgi.version>1.2.1</spring.osgi.version>
 		<equinox.ver>3.2.2</equinox.ver>
@@ -26,6 +25,10 @@
 			         <groupId>org.eclipse.jetty</groupId>
 			        <artifactId>jetty-server</artifactId>
 			    </exclusion>
+			   <exclusion>
+			         <groupId>org.slf4j</groupId>
+			        <artifactId>slf4j-api</artifactId>
+			   </exclusion> 
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -58,20 +61,7 @@
 			<version>4.1.0</version>
 		</dependency>
 		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<!-- databases -->
+			<!-- databases -->
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>com.springsource.org.hsqldb</artifactId>
@@ -150,8 +140,48 @@
 			<version>20070829</version>
 		</dependency>
 		
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>com.springsource.slf4j.api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>com.springsource.slf4j.log4j</artifactId>
+				<version>${slf4j.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>log4j</groupId>
+						<artifactId>log4j</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.log4j</groupId>
+						<artifactId>com.springsource.org.apache.log4j</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			
+			<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>com.springsource.org.dom4j</artifactId>
+			<version>1.6.1</version>
+		</dependency>
 		
-		
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.4</version>
+		</dependency>
+				<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>
 		
 	</dependencies>
 	<build>

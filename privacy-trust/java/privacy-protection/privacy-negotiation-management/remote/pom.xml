@@ -24,7 +24,6 @@
 	</developers>
 
 	<properties>
-		<slf4j.version>1.5.8</slf4j.version>
 		<spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
 		<spring.osgi.version>1.2.1</spring.osgi.version>
 		<equinox.ver>3.2.2</equinox.ver>

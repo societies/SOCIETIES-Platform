@@ -49,16 +49,6 @@
 			<scope>provided</scope>
 		</dependency>
 		
-	<dependency>
-			<groupId>org.eclipse.osgi</groupId>
-			<artifactId>org.eclipse.equinox.event</artifactId>
-			<version>1.2.100.v20110110</version>
-			<scope>provided</scope>
-		</dependency>
-		
-
-
-
 		<!-- <dependency> <groupId>org.springframework</groupId> <artifactId>org.springframework.context</artifactId> 
 			</dependency> <dependency> <groupId>org.springframework</groupId> <artifactId>org.springframework.beans</artifactId> 
 			</dependency> <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> 

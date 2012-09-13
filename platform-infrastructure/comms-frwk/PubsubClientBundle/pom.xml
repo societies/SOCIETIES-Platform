@@ -16,7 +16,6 @@
 	<version>${version.comm}</version>
 
 	<properties>
-		<slf4j.version>1.5.0</slf4j.version>
 		<spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
 		<spring.osgi.version>1.2.1</spring.osgi.version>
 		<equinox.ver>3.2.2</equinox.ver>
@@ -59,34 +58,7 @@
 
 	
 	
-		<dependency>
-			<groupId>dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>1.6.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.simpleframework</groupId>
-			<artifactId>simple-xml</artifactId>
-			<version>2.6.4</version>
-			<scope>provided</scope>
-			<exclusions>
-				<!-- StAX is not available on Android -->
-				<exclusion>
-					<artifactId>stax</artifactId>
-					<groupId>stax</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>stax-api</artifactId>
-					<groupId>stax</groupId>
-				</exclusion>
-				<!-- Provided by Android -->
-				<exclusion>
-					<artifactId>xpp3</artifactId>
-					<groupId>xpp3</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+	
 	</dependencies>
 	<build>
 		<plugins>
@@ -97,8 +69,6 @@
 				<configuration>
 					<instructions>
 						<Import-Package>
-							org.springframework.beans.factory.annotation*;version="0",
-							org.springframework.stereotype*;version="0",
 							*;resolution:=optional
 						</Import-Package>
 						<Export-Package>

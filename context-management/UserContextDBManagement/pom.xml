@@ -37,6 +37,13 @@
 
 
 
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-mgmt-api</artifactId>
+			<version>${version.cm}</version>
+			<scope>provided</scope>
+		</dependency>
+		
 
 		<dependency>
 			<groupId>junit</groupId>
