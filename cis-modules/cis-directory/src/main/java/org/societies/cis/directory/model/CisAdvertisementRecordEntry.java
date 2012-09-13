@@ -57,7 +57,7 @@ public class CisAdvertisementRecordEntry implements Serializable {
 
 	private String id;
 	private String name;
-	private String uri;
+	private String cssownwerid;
 	private String password;
 	private String type;
 	private Set<CriteriaRecordEntry> criteriaRecords;
@@ -90,19 +90,19 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	}
 
 	/**
-	 * @return the uri
+	 * @return the cssownwerid
 	 */
-	@Column(name = "uri")
-	public String getUri() {
-		return uri;
+	@Column(name = "cssownwerid")
+	public String getcssOwnwerId() {
+		return cssownwerid;
 	}
 
 	/**
-	 * @param uri
-	 *            the uri to set
+	 * @param cssownwerid
+	 *            the css ownwer id to set
 	 */
-	public void setUri(String uri) {
-		this.uri = uri;
+	public void setcssOwnwerId(String cssownwerid) {
+		this.cssownwerid = cssownwerid;
 	}
 	
 	
@@ -152,16 +152,16 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	/**
 	 * @param name
 	 * @param id
-	 * @param uri
+	 * @param cssownwerid
 	 * @param password
 	 * @param type
 	 * @param criteriaRecords
 	 */
-	public CisAdvertisementRecordEntry(String name, String id, String uri, String password, String type) {
+	public CisAdvertisementRecordEntry(String name, String id, String cssownwerid, String password, String type) {
 		this();
 		this.name = name;
 		this.id = id;
-		this.uri = uri;
+		this.cssownwerid = cssownwerid;
 		this.password = password;
 		this.type = type;
 	}
