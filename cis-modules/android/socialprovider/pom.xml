@@ -38,10 +38,10 @@
             <artifactId>societies-android-api</artifactId>
             <version>${release.version}</version>
 		</dependency>
-        	<dependency>
+       	<!-- <dependency>
 			<groupId>org.asmack</groupId>
 	        <artifactId>asmack</artifactId>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
