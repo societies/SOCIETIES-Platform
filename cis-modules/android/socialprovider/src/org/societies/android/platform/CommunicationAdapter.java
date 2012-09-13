@@ -65,7 +65,7 @@ import android.util.Log;
 public class CommunicationAdapter extends Service implements ISocialAdapter{
 
 	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("CommunityManager", "ListResponse");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("communityManager", "listResponse");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cis/manager",
 														    	  "http://societies.org/api/schema/activityfeed",	  		
 																  "http://societies.org/api/schema/cis/community");
@@ -172,7 +172,8 @@ public class CommunicationAdapter extends Service implements ISocialAdapter{
     		String sortOrder){
     	String[] columnNames = {SocialContract.Community.NAME,
 				SocialContract.Community.OWNER_ID,
-				SocialContract.Community.CREATION_DATE};
+//				SocialContract.Community.CREATION_DATE
+				};
     	MatrixCursor cursor= new MatrixCursor(columnNames, 10);
     	String[] columnValues = {"XYZ", "babak@societies.org", "today"};
     	cursor.addRow(columnValues);

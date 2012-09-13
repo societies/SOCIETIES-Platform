@@ -148,10 +148,10 @@ public class PluginCISManager extends Plugin {
 			createCISValue.put(SocialContract.Community.GLOBAL_ID , "flamengo.societies.org");
 			createCISValue.put(SocialContract.Community.TYPE , "futebol");
 			createCISValue.put(SocialContract.Community.NAME , "Flamengo");
-			createCISValue.put(SocialContract.Community.DISPLAY_NAME , "FLA");
+//			createCISValue.put(SocialContract.Community.DISPLAY_NAME , "FLA");
 			createCISValue.put(SocialContract.Community.OWNER_ID, "babak@societies.org");
-			createCISValue.put(SocialContract.Community.CREATION_DATE , "Today");
-			createCISValue.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
+//			createCISValue.put(SocialContract.Community.CREATION_DATE , "Today");
+//			createCISValue.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
 			createCISValue.put(SocialContract.Community.DIRTY , "yes");
 			
 			cr.query(RawContacts.CONTENT_URI, null, null, null, null);

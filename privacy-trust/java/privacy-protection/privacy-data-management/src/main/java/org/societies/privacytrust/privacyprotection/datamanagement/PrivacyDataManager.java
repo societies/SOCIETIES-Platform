@@ -41,6 +41,8 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -70,7 +72,9 @@ import org.springframework.scheduling.annotation.AsyncResult;
  */
 public class PrivacyDataManager implements IPrivacyDataManager {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class.getSimpleName());
-
+	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
+	private static long performanceObfuscationCount = 0;
+	
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	private IPrivacyPreferenceManager privacyPreferenceManager;
 	private IDataObfuscationManager dataObfuscationManager;
@@ -175,7 +179,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 		// -- Retrieve the CIS Privacy Policy
 		RequestorCis requestorCis = new RequestorCis(cssId, cisId);
-		RequestPolicy privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
+		RequestPolicy privacyPolicy = null;
+		try {
+			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
+		}
+		catch(Exception e) {
+			LOG.error("Error: The privacy policy can not be retrieved for this CIS: "+requestorCis.toString(), e);
+			return permission;
+		}
 		// Can't retrieve the privacy policy
 		if (null == privacyPolicy) {
 			LOG.error("The privacy policy can not be retrieved for this CIS: "+requestorCis.toString());
@@ -343,7 +354,24 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (null != dataObfuscationPreferences) {
 			obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
 		}
-		// If no obfuscation is required: return directly the wrapped data
+		// - Performance loggings
+		// Counter
+		IPerformanceMessage m = new PerformanceMessage();
+		m.setSourceComponent(this.getClass()+"");
+		m.setD82TestTableName("S73");
+		m.setTestContext("Privacyprotection.PrivacyDataManager.Obfuscation.Counter");
+		m.setOperationType("NumberOfObfuscationDone");
+		m.setPerformanceType(IPerformanceMessage.Quanitative);
+		m.setPerformanceNameValue((++performanceObfuscationCount)+"");
+		PERF_LOG.trace(m.toString());
+		// Average obfuscation
+		m.setD82TestTableName("S75");
+		m.setTestContext("Privacyprotection.PrivacyDataManager.Obfuscation.AverageObfuscationLevel");
+		m.setOperationType("LogEachObfuscationLevel");
+		m.setPerformanceType(IPerformanceMessage.Quanitative);
+		m.setPerformanceNameValue(obfuscationLevel+"");
+		PERF_LOG.trace(m.toString());
+		// - If no obfuscation is required: return directly the wrapped data
 		if (obfuscationLevel >= 1) {
 			return new AsyncResult<IDataWrapper>(dataWrapper);
 		}

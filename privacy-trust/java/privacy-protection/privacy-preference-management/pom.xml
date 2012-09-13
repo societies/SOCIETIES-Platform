@@ -32,7 +32,7 @@
 	<artifactId>privacypreferencemanagement</artifactId>
 	<name>Privacy Preference Management</name>
 	<packaging>jar</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>${version.pt}</version>
 	<developers>
 		<developer>
 			<name>Eliza Papadopoulou</name>
@@ -57,13 +57,11 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

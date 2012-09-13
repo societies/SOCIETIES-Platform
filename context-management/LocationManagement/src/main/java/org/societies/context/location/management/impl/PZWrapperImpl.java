@@ -125,7 +125,11 @@ public class PZWrapperImpl implements PZWrapper  {
 				
 				userLocation = toIUserLocation(jsonResponse);
 				
-				if (convertToGeo){
+				if (userLocation == null){
+					log.debug("Json object for '"+ENTITY_ID+"' isn't valid. Entity wasn't found \t Json = "+jsonResponse);
+					return userLocation;
+					
+				}else if (convertToGeo){
 					Point point = pix2GeoConvertor.convertPixToGeo(new Point(userLocation.getXCoordinate().getCoordinate(),
 														   				     userLocation.getYCoordinate().getCoordinate())
 																   );
@@ -157,10 +161,10 @@ public class PZWrapperImpl implements PZWrapper  {
 			}
 			
 			
-			double x = ((Double)jsonObject.get("x")).doubleValue();
+			double x = jsonObject.getDouble("x");
 			userLocation.setXCoordinate(new CoordinateImpl(x));
 			
-			double y = ((Double)jsonObject.get("y")).doubleValue();
+			double y = jsonObject.getDouble("y");
 			userLocation.setYCoordinate(new CoordinateImpl(y));
 			
 			//double z = ((Double)jsonObject.get("z")).doubleValue();
@@ -221,6 +225,8 @@ public class PZWrapperImpl implements PZWrapper  {
 			zonesArray = jsonObject.getJSONArray("zones");
 			if (jsonObject.get("x") == null ||  jsonObject.get("y") == null ||
 				zonesArray.length() == 0){
+					
+					log.debug("Json object for isn't valid, no valid location , JSON =  "+jsonObject.toString());	
 					return false;
 			}
 		

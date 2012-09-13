@@ -128,8 +128,7 @@ $(document).bind('pageinit',function(){
 /**
  * JQuery boilerplate to attach JS functions to relevant HTML elements
  * 
- * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pageinit
- * N.B. this event is fired once per page load
+ * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pagechange
  * @returns null
  */
 $(document).bind("pagechange", function(event, options) {

@@ -48,7 +48,7 @@ var SocietiesCSSRecord = {
 			alert("refreshCssProfile - failure: " + data);
 		}
 		
-		window.plugins.SocietiesLocalCSSManagerService.readProfile(success, failure);
+		window.plugins.SocietiesLocalCSSManager.readProfile(success, failure);
 		
 	},
 	/**
@@ -94,12 +94,12 @@ var SocietiesCSSRecord = {
  * N.B. this event is fired once per page load
  * @returns null
  */
-$(document).bind('pageinit',function(){
-
-	console.log("jQuery pageinit action(s) for refreshcssrecord");
-
-	$('#refreshCssRecord').off('click').on('click', function(){
-		SocietiesCSSRecord.refreshCssProfile();
-	});
-
-});
+//$(document).bind('pageinit',function(){
+//
+//	console.log("jQuery pageinit action(s) for refreshcssrecord");
+//
+//	$('#refreshCssRecord').off('click').on('click', function(){
+//		SocietiesCSSRecord.refreshCssProfile();
+//	});
+//
+//});

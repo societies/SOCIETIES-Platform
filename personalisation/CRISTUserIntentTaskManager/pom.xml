@@ -19,8 +19,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -28,13 +27,11 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -43,24 +40,21 @@
 			<version>${version.pm}</version>
 			<scope>provided</scope>
 		</dependency>
-		
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
+		    <groupId>org.societies</groupId>
+		    <artifactId>common-ext-libs</artifactId>
+		    <scope>provided</scope>
 		</dependency>
 		
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
-		</dependency>
 		
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.beans</artifactId>
-		</dependency>
-		
+		    <groupId>org.springframework</groupId>   
+		    <artifactId>org.springframework.spring-library</artifactId>   
+		    <type>libd</type>   
+		    <version>${spring.version}</version>   
+		    <scope>provided</scope>
+  		</dependency>
+	
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>CRISTUserIntentDiscovery</artifactId>

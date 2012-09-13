@@ -34,6 +34,8 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
+import org.societies.android.api.cis.SocialContract;
+
 /**
  * This adapter will implement a local cache of Social Data.
  * TODO: Currently it is used for testing purposes.
@@ -74,18 +76,19 @@ public class LocalDBAdapter implements ISocialAdapter {
 			SocialContract.Community.GLOBAL_ID + " text not null, " +
 			SocialContract.Community.TYPE + " text not null," +
 			SocialContract.Community.NAME + " text not null, " + 
-			SocialContract.Community.DISPLAY_NAME + " text not null, " + 
+//			SocialContract.Community.DISPLAY_NAME + " text not null, " + 
 			SocialContract.Community.OWNER_ID + " text not null, " +
-			SocialContract.Community.CREATION_DATE + " text not null, " +
-			SocialContract.Community.MEMBERSHIP_TYPE + " text not null, " +
+//			SocialContract.Community.CREATION_DATE + " text not null, " +
+//			SocialContract.Community.MEMBERSHIP_TYPE + " text not null, " +
 			SocialContract.Community.DIRTY + " text not null );";
 
 	private static final String MY_COMMUNITIES_TABLE_CREATE = "create table if not exists " + MY_COMMUNITIES_TABLE_NAME
 			+ " (" + 
 			SocialContract.MyCommunity._ID + " integer primary key autoincrement, " +
 			SocialContract.MyCommunity.GLOBAL_ID + " text not null, " +
-			SocialContract.MyCommunity.OWNER_ID + " text not null, " +
-			SocialContract.MyCommunity.DISPLAY_NAME + " text not null );";
+			SocialContract.MyCommunity.OWNER_ID + " text not null )" +
+//			SocialContract.MyCommunity.DISPLAY_NAME + " text not null )" +
+					";";
 
 	//TODO: Need the same for other DBs, e.g. people.
 
@@ -304,7 +307,7 @@ public class LocalDBAdapter implements ISocialAdapter {
 		ContentValues initialValues = new ContentValues();
 		initialValues.put(SocialContract.Me.GLOBAL_ID, "you@societies.org");
 		initialValues.put(SocialContract.Me.NAME, "Your Name Here");
-		initialValues.put(SocialContract.Me.DISPLAY_NAME, "Your Name");
+//		initialValues.put(SocialContract.Me.DISPLAY_NAME, "Your Name");
 		
 		return (int)db.insert(ME_TABLE_NAME, null, initialValues);
 	}

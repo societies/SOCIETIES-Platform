@@ -570,7 +570,7 @@ public class PrivacyPolicyManagerTest {
 
 	private RequestorCis getRequestorCis() throws InvalidFormatException{
 		IIdentity otherCssId = TestCase1244.commManager.getIdManager().fromJid("red@societies.local");
-		IIdentity cisId = TestCase1244.commManager.getIdManager().fromJid("onecis.societies.local");
+		IIdentity cisId = TestCase1244.commManager.getIdManager().fromJid("cis-one.societies.local");
 		return new RequestorCis(otherCssId, cisId);
 	}
 }

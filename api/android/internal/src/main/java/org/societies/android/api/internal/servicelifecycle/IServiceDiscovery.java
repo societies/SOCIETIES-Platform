@@ -25,6 +25,9 @@
 
 package org.societies.android.api.internal.servicelifecycle;
 
+import org.societies.android.api.servicelifecycle.AService;
+import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
+
 /**
  *  Each method requires a callback to receive the result
 
