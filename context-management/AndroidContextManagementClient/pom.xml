@@ -6,20 +6,14 @@
         <groupId>org.societies</groupId>
         <artifactId>android-parent</artifactId>
         <version>RELEASE</version>
-        <!-- <version>0.1</version> -->
-        <!-- <relativePath>../../../parent/android.xml</relativePath> -->
-	<!-- modify if project root directory different to other projects-->
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>context</artifactId>
+   <artifactId>contextclient</artifactId>
+   <name>AndroidContextManagementClient</name>
    <version>${version.cm}</version>
-<!--    <version>0.1</version> -->
-   <name>AndroidContextManagement</name>
    <packaging>apk</packaging>
-   
-   
-   
+  
 	<developers>
 	    <developer>
 			<id>pkosmides</id>
@@ -35,7 +29,7 @@
 		</developer>
 	</developers>	
 
-   <dependencies>
+    <dependencies>
 		<dependency>
 	    	<groupId>com.google.android</groupId>
 	        <artifactId>android</artifactId> 
@@ -66,6 +60,12 @@
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+   			<groupId>org.societies.android.platform.contextservice</groupId>
+   			<artifactId>ContextService</artifactId>
+    		<version>${version.cm}</version>
+   			<type>apklib</type>
 		</dependency>
     	<dependency>
     		<groupId>com.google.code.gson</groupId>

@@ -39,8 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.jivesoftware.smack.packet.IQ;
 //import org.societies.android.api.useragent.IAndroidUserAgent;
-import org.societies.android.api.context.broker.ICtxClientBroker;
-import org.societies.android.api.context.broker.ICtxLocalBinder;
+import org.societies.android.api.internal.context.broker.ICtxClientBroker;
+import org.societies.android.api.internal.context.broker.ICtxLocalBinder;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
