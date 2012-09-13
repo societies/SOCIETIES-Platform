@@ -1219,7 +1219,7 @@ public void removeNode(CssRecord cssrecord, String nodeId ) {
 	}
 
 @SuppressWarnings("unchecked")
-public List<CssAdvertisementRecord> suggestedFriends( ) {
+public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	
 	ISocialData socialData = null;
 	
@@ -1331,7 +1331,8 @@ public List<CssAdvertisementRecord> suggestedFriends( ) {
     }
     //}
     LOG.info("common Friends List NOW contains " +commonFriends.size() +" entries");
-	return commonFriends;
+	//return commonFriends;
+	return new AsyncResult<List<CssAdvertisementRecord>>(commonFriends);
 
 	}
 

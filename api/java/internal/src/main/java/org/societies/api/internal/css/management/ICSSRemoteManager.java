@@ -180,4 +180,7 @@ public interface ICSSRemoteManager {
 		/* Get a list of Friend Css's from cloud Css Manger */
 		void getCssFriends(ICSSManagerCallback callback);
 		
+		/* Get a list of suggested Friends from cloud Css Manger */
+		void suggestedFriends(ICSSManagerCallback callback);
+		
 }
