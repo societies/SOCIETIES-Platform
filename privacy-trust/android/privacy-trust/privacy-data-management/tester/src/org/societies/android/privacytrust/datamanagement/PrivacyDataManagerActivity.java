@@ -22,23 +22,26 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.datamanagement.service;
+package org.societies.android.privacytrust.datamanagement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.api.utilities.ServiceMethodTranslator;
+import org.societies.android.api.identity.DataIdentifierFactory;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.android.privacytrust.datamanagement.R;
-import org.societies.android.privacytrust.datamanagement.R.id;
-import org.societies.android.privacytrust.datamanagement.R.layout;
-import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService.LocalBinder;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.android.privacytrust.R;
+import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService;
+import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService.LocalBinder;
+import org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerExternalService;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -47,7 +50,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
@@ -89,8 +91,8 @@ public class PrivacyDataManagerActivity extends Activity {
 		txtLocation = (TextView) findViewById(R.id.txtLocation);
 		
 		// -- Create a link with services
-		Intent ipIntent = new Intent(this, PrivacyDataManagerLocalService.class);
-		Intent opIntent = new Intent(this, PrivacyDataManagerExternalService.class);
+		Intent ipIntent = new Intent(this.getApplicationContext(), PrivacyDataManagerLocalService.class);
+		Intent opIntent = new Intent(this.getApplicationContext(), PrivacyDataManagerExternalService.class);
 		bindService(ipIntent, inProcessServiceConnection, Context.BIND_AUTO_CREATE);
 		bindService(opIntent, outProcessServiceConnection, Context.BIND_AUTO_CREATE);
 		
@@ -151,16 +153,17 @@ public class PrivacyDataManagerActivity extends Activity {
 			try {
 				RequestorBean requestor = new RequestorBean();
 	    		requestor.setRequestorId("red@societies.local");
-	    		String ownerId = "me@societies.local";
-	    		String dataId = "me@societies.local/ENTITY/person/1/ATTRIBUTE/name/13";
+	    		DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"/me@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+	    		List<Action> actions = new ArrayList<Action>();
 	    		Action action = new Action();
 	    		action.setActionConstant(ActionConstants.READ);
-				ResponseItem permission = targetIPService.checkPermission(requestor, ownerId, dataId, action);
+	    		actions.add(action);
+				ResponseItem permission = targetIPService.checkPermission(requestor, dataId, actions);
 				StringBuffer sb = new StringBuffer();
 				sb.append("Permission retrieved: "+(null !=permission));
 				if (null != permission) {
 					sb.append("\nDecision: "+permission.getDecision().name());
-					sb.append("\nOn resource: "+permission.getRequestItem().getResource().getCtxUriIdentifier());
+					sb.append("\nOn resource: "+permission.getRequestItem().getResource().getDataIdUri());
 				}
 				txtLocation.setText(sb.toString());
 			} catch (PrivacyException e) {
@@ -259,7 +262,7 @@ public class PrivacyDataManagerActivity extends Activity {
 				sb.append("Permission retrieved: "+(null !=permission));
 				if (null != permission) {
 					sb.append("\nDecision: "+permission.getDecision().name());
-					sb.append("\nOn resource: "+permission.getRequestItem().getResource().getCtxUriIdentifier());
+					sb.append("\nOn resource: "+permission.getRequestItem().getResource().getDataIdUri());
 				}
 				txtLocation.setText(sb.toString());
 			}

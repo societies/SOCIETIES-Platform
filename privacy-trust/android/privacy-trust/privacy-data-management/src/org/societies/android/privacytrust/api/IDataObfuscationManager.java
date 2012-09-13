@@ -22,60 +22,50 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust;
-
-import java.util.List;
+package org.societies.android.privacytrust.api;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.DataIdentifier;;
+
 
 /**
- * Interface exposed to Societies components in order to manage access control over resources
+ * Internal interface to protect a data by obfuscating it
  * @author Olivier Maridat (Trialog)
- * @created 09-nov.-2011 16:45:26
+ * @created 09-nov.-2011 16:45:53
  */
-public interface IPrivacyDataManager {
-	public static final String CHECK_PERMISSION = "org.societies.android.api.internal.privacytrust.checkPermission";
-	public static final String CHECK_PERMISSION_RESULT = "org.societies.android.api.internal.privacytrust.checkPermissionResult";
-	public static final String OBFUSCATE_DATA = "org.societies.android.api.internal.privacytrust.obfuscateData";
-	public static final String OBFUSCATE_DATA_RESULT = "org.societies.android.api.internal.privacytrust.obfuscateDataResult";
-	public static final String HAS_OBFUSCATED_VERSION = "org.societies.android.api.internal.privacytrust.hasObfuscatedVersion";
-	public static final String HAS_OBFUSCATED_VERSION_RESULT = "org.societies.android.api.internal.privacytrust.hasObfuscatedVersionResult";
-
-	/**
-	 * Check permission to access/use/disclose a data
-
-	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
-	 * @param dataId ID of the requested data.
-	 * @param action Action requested over this data.
-	 * @return A ResponseItem with permission information in it
-	 * @throws PrivacyException
-	 */
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
-
+public interface IDataObfuscationManager {
 	/**
 	 * Protect a data following the user preferences by obfuscating it to a correct
 	 * obfuscation level. The data information are wrapped into a relevant data
 	 * wrapper in order to execute the relevant obfuscation operation into relevant
 	 * information.
-	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * Example of use:
+	 * - Context Broker, to obfuscate context data (e.g. obfuscate a
+	 * location)
+	 * - Content Manager, to obfuscate content data (e.g. blur faces in a
+	 * picture)
+	 * - Anyone who wants to obfuscate a data
 	 * @param dataWrapper Data wrapped in a relevant data wrapper. Use DataWrapperFactory to select the relevant DataWrapper
+	 * @param obfuscationLevel Obfuscation level, a real number between 0 and 1. With 0 there is no obfuscation
 	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to instantiate the obfuscator)
 	 * @throws PrivacyException
 	 */
-	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException;
+	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
 
 	/**
 	 * Check if there is an obfuscated version of the data and return its ID.
-	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * Example of use:
+	 * - Context Broker, before retrieving the data, it can try to find an already
+	 * obfuscated data and retrieve it instead of the real data. Not all obfuscated
+	 * data are stored to be reused, but it may be in some cases. (e.g. long
+	 * processing like blur faces in a picture)
+	 * - Content Manager, same usage
+	 * - Anyone who wants to obfuscate a data
 	 * @param dataWrapper Data ID wrapped in the relevant DataWrapper. Only the ID information is mandatory to retrieve an obfuscated version. Use DataWrapperFactory to select the relevant DataWrapper
+	 * @param obfuscationLevel Obfuscation level, a real number between 0 and 1. With 0 there is no obfuscation
 	 * @return ID of the obfuscated version of the data if the persistence is enabled and if the obfuscated data exists
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws PrivacyException
 	 */
-	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException;
+	public String hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
 }

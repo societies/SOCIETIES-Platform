@@ -22,60 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper;
+package org.societies.android.api.identity;
 
 import org.societies.api.schema.identity.DataIdentifier;
 
-import android.os.Parcelable;
-
 /**
- * This data wrapper is an abstraction between obfuscation manager
- * and data models. This is the way for wrapping data to obfuscate them,
- * and filling a type of data (needed to know how obfuscate them) 
- * This wrapper is linked to a specific data obfuscator
- * and know what kind of data is needed to launch the obfuscation. 
+ * Simple data identifier implementations that helps managing data identifiers
+ *
  * @author Olivier Maridat (Trialog)
- * @date 18 oct. 2011
+ *
  */
-public interface IDataWrapper<E extends Parcelable> extends Parcelable {
-	/**
-	 * @return Id of the data to be obfuscated
-	 */
-	public DataIdentifier getDataId();
-	/**
-	 * @param dataId Id of the data to be obfuscated
-	 */
-	public void setDataId(DataIdentifier dataId);
+public class SimpleDataIdentifier extends DataIdentifier {
+	@Override
+	public String getUri() {
+		uri = DataIdentifierUtil.toUriString(this);
+		return uri;
+	}
 	
-	/**
-	 * Data
-	 * @return The data to be obfuscated
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
 	 */
-	public E getData();
-	/**
-	 * Set the data to be obfuscated
-	 * @param data The data to be obfuscated
+	@Override
+	public String toString() {
+		return "SimpleDataIdentifier ["
+				+ (scheme != null ? "scheme=" + scheme + ", " : "")
+				+ (ownerId != null ? "ownerId=" + ownerId + ", " : "")
+				+ (type != null ? "type=" + type + ", " : "")
+				+ (uri != null ? "uri=" + uri : "") + "]";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public void setData(E data);
-	
-	/**
-	 * To know if obfuscated data will be stored with this obfuscator
-	 * 
-	 * @return True if this obfuscator has enabled persistence
-	 * @return Otherwise false
-	 */
-	public boolean isPersistenceEnabled();
-	/**
-	 * To enable storage of obfuscated data
-	 * @param persist True to persist the data, false otherwise
-	 */
-	public void setPersistenceEnabled(boolean persist);
-	
-	/**
-	 * To know if this wrapper is ready for obfuscation operation
-	 * 
-	 * @return True if this DataWrapper is ready for obfuscation
-	 * @return Otherwise false
-	 */
-	public boolean isReadyForObfuscation();
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+		if (obj == null) { return false; }
+		if (obj == this) { return true; }
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		// -- Verify obj type
+		SimpleDataIdentifier rhs = (SimpleDataIdentifier) obj;
+		return this.getScheme().equals(rhs.getScheme()) && this.getOwnerId().equals(rhs.getOwnerId()) && this.getType().equals(rhs.getType());
+	}
 }

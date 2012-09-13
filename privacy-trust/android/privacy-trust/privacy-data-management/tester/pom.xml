@@ -29,10 +29,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.android</groupId>
-	<artifactId>privacytrust</artifactId>
-	<name>Privacy Protection (Light Client)</name>
-	<packaging>apklib</packaging>
-	<version>${version.pt}</version>
+	<artifactId>privacytrusttester</artifactId>
+	<name>Privacy Protection Tester (Light Client)</name>
+	<packaging>apk</packaging>
+	<version>1.0</version>
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>
@@ -55,6 +55,16 @@
 	<dependencies>
 		<!-- Societies -->
 		<dependency>
+			<groupId>org.societies.comm.android</groupId>
+			<artifactId>AndroidAgent</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
@@ -66,11 +76,12 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Comm -->
+		<!-- Platform Lib -->
 		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>AndroidAgentApi</artifactId>
-			<version>${version.comm}</version>
+			<groupId>org.societies.android</groupId>
+			<artifactId>privacytrust</artifactId>
+			<version>${version.pt}</version>
+			<type>apklib</type>
 		</dependency>
 		<!-- Android -->
 		<dependency>
@@ -84,8 +95,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>com.phonegap</groupId> <artifactId>phonegap</artifactId> 
-			</dependency> -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.1</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
@@ -107,16 +122,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- <dependency> <groupId>com.phonegap</groupId> <artifactId>phonegap</artifactId> 
+			</dependency> -->
 	</dependencies>
 
 	<build>
-        <finalName>${project.artifactId}</finalName>
-        <sourceDirectory>src</sourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>

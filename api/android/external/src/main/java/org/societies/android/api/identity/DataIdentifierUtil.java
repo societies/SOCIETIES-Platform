@@ -22,60 +22,43 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper;
+package org.societies.android.api.identity;
 
 import org.societies.api.schema.identity.DataIdentifier;
-
-import android.os.Parcelable;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
- * This data wrapper is an abstraction between obfuscation manager
- * and data models. This is the way for wrapping data to obfuscate them,
- * and filling a type of data (needed to know how obfuscate them) 
- * This wrapper is linked to a specific data obfuscator
- * and know what kind of data is needed to launch the obfuscation. 
+ * Util method that helps manipulating DataIdentifier objects
+ *
  * @author Olivier Maridat (Trialog)
- * @date 18 oct. 2011
+ *
  */
-public interface IDataWrapper<E extends Parcelable> extends Parcelable {
+public class DataIdentifierUtil {
 	/**
-	 * @return Id of the data to be obfuscated
+	 * Generate a URI: sheme://ownerId/type
+	 * @param dataId
+	 * @return
 	 */
-	public DataIdentifier getDataId();
-	/**
-	 * @param dataId Id of the data to be obfuscated
-	 */
-	public void setDataId(DataIdentifier dataId);
+	public static String toUriString(DataIdentifier dataId)
+	{
+		StringBuilder str = new StringBuilder("");
+		str.append((dataId.getScheme() != null ? dataId.getScheme().value()+"://" : "/"));
+		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
+		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
+		return str.toString();
+	}
 	
-	/**
-	 * Data
-	 * @return The data to be obfuscated
-	 */
-	public E getData();
-	/**
-	 * Set the data to be obfuscated
-	 * @param data The data to be obfuscated
-	 */
-	public void setData(E data);
-	
-	/**
-	 * To know if obfuscated data will be stored with this obfuscator
-	 * 
-	 * @return True if this obfuscator has enabled persistence
-	 * @return Otherwise false
-	 */
-	public boolean isPersistenceEnabled();
-	/**
-	 * To enable storage of obfuscated data
-	 * @param persist True to persist the data, false otherwise
-	 */
-	public void setPersistenceEnabled(boolean persist);
-	
-	/**
-	 * To know if this wrapper is ready for obfuscation operation
-	 * 
-	 * @return True if this DataWrapper is ready for obfuscation
-	 * @return Otherwise false
-	 */
-	public boolean isReadyForObfuscation();
+	public static DataIdentifier fromUri(String dataIdUri)
+	{
+		String[] uri = dataIdUri.split("://");
+		DataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(DataIdentifierScheme.fromValue(uri[0]));
+		String path = uri[1];
+		int pos = 0, end = 0;
+		if ((end = path.indexOf('/', pos)) >= 0) {
+			dataId.setOwnerId(path.substring(pos, end));
+		}
+		dataId.setType(path.substring(end+1, path.length()));
+		return dataId;
+	}
 }
