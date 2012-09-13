@@ -80,10 +80,9 @@ public class PrivacyDataManagerRemote implements IPrivacyDataManager {
 
 
 	/*
-	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.String, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier)
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
-	@Override
 	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
 		if (null == requestor) {
@@ -206,20 +205,12 @@ public class PrivacyDataManagerRemote implements IPrivacyDataManager {
 	}
 
 	// -- Obfuscation
-
-	@Override
 	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		Log.i(TAG, "Remote obfuscation not available yet.");
 		return dataWrapper;
 	}
-
-	@Override
 	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		Log.i(TAG, "Remote obfuscation not available yet.");
 		return dataWrapper.getDataId();
 	}
-
-
-	// -- Private methods
-
 }

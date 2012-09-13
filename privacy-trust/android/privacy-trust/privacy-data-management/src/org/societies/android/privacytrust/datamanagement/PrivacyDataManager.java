@@ -73,7 +73,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	}
 
 
-	@Override
 	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
 		if (null == requestor) {
@@ -120,11 +119,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return permission;
 	}
 
-	/*
-	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
-	 */
-	@Override
 	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 		if (null == requestor) {
@@ -200,11 +194,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return obfuscatedDataWrapper;
 	}
 
-	/*
-	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
-	 */
-	@Override
 	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		// -- Verify parameters
 //		if (null == requestor) {

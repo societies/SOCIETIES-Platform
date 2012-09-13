@@ -42,10 +42,10 @@ import org.societies.api.schema.identity.RequestorBean;
 public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	private final static String TAG = PrivacyDataManagerInternal.class.getSimpleName();
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.RequestorBean, org.societies.api.identity.String, org.societies.api.context.model.String)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.privacytrust.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
-	@Override
 	public ResponseItem getPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		ResponseItem permission = null;
 //		Session session = sessionFactory.openSession();
@@ -87,10 +87,10 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		return permission;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.RequestorBean, org.societies.api.identity.String, org.societies.api.context.model.String, java.util.List, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.privacytrust.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List, org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Decision)
 	 */
-	@Override
 	public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException {
 		boolean result = false;
 //		Session session = sessionFactory.openSession();
@@ -141,19 +141,18 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.RequestorBean, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.privacytrust.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
 	 */
-	@Override
-	public boolean updatePermission(RequestorBean requestor, ResponseItem permission)
-			throws PrivacyException {
+	public boolean updatePermission(RequestorBean requestor, ResponseItem permission) throws PrivacyException {
 		return updatePermission(requestor, DataIdentifierFactory.fromUri(permission.getRequestItem().getResource().getDataIdUri()), permission.getRequestItem().getActions(), permission.getDecision());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermission(org.societies.api.identity.RequestorBean, org.societies.api.identity.String, org.societies.api.context.model.String)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.privacytrust.api.IPrivacyDataManagerInternal#deletePermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier)
 	 */
-	@Override
 	public boolean deletePermission(RequestorBean requestor, DataIdentifier dataId) throws PrivacyException {
 		boolean result = false;
 //		Session session = sessionFactory.openSession();

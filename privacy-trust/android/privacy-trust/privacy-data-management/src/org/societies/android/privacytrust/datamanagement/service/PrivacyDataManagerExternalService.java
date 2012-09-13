@@ -72,10 +72,10 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 	 * Service Method Implementation
 	 **** */
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, java.lang.String, java.lang.String, org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
-	@Override
 	public ResponseItem checkPermission(RequestorBean requestor,
 			DataIdentifier dataId, List<Action> actions)
 					throws PrivacyException {
@@ -89,11 +89,11 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 		return permission;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, java.lang.String, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
 	 */
 	@SuppressWarnings("rawtypes")
-	@Override
 	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		Log.d(TAG, "External call to service obfuscateData()");
 		IDataWrapper obfuscatedDataWrapper = privacyDataManager.obfuscateData(requestor, dataWrapper);
@@ -104,11 +104,11 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 		return obfuscatedDataWrapper;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.schema.identity.RequestorBean, java.lang.String, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.schema.identity.RequestorBean, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
 	 */
 	@SuppressWarnings("rawtypes")
-	@Override
 	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		Log.d(TAG, "External call to service hasObfuscatedVersion()");
 		DataIdentifier dataId = privacyDataManager.hasObfuscatedVersion(requestor, dataWrapper);
