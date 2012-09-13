@@ -115,10 +115,11 @@ public class CssSuggestedFriendsController {
 			if (method.equalsIgnoreCase("findFriends")) {
 				res="CSS Suggested Friends Result ";
 				
-				List<CssAdvertisementRecord> cssfriends = getCssLocalManager().suggestedFriends();
+				Future<List<CssAdvertisementRecord>> asynchcssfriends = getCssLocalManager().suggestedFriends();
+				
 				
 				model.put("result", res);
-				model.put("cssfriends", cssfriends);
+				model.put("cssfriends", asynchcssfriends.get());
 				
 			}else{
 				res="error unknown metod";
