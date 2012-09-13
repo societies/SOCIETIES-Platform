@@ -268,6 +268,12 @@ public final class SocialContract {
          * other service or null.
          */
         public static final String DEPENDENCY = "dependnecy";
+        
+        /**
+         * String that contains the intent to be used to launch the service
+         * using Androdi intent mechanism.
+         */
+        public static final String CONFIG = "config";
     }
     
     /**

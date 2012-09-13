@@ -24,7 +24,7 @@
  */
 package org.societies.android.platform.test;
 
-import org.societies.android.platform.SocialContract;
+import org.societies.android.api.cis.SocialContract;
 import org.societies.android.platform.SocialProvider;
 
 import android.content.ContentValues;
@@ -98,7 +98,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		ContentValues initialValues = new ContentValues();
 		initialValues.put(SocialContract.MyCommunity.GLOBAL_ID , "football.societies.org");
 		initialValues.put(SocialContract.MyCommunity.OWNER_ID , "babak@societies.org");
-		initialValues.put(SocialContract.MyCommunity.DISPLAY_NAME , "Football");
+		//initialValues.put(SocialContract.MyCommunity.DISPLAY_NAME , "Football");
 		
 		//2- Call insert in SocialProvider to initiate insertion
 		Uri newCommunityUri= resolver.insert(SocialContract.MyCommunity.CONTENT_URI , 
@@ -109,7 +109,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		String[] projection ={
 				SocialContract.MyCommunity.GLOBAL_ID,
 				SocialContract.MyCommunity.OWNER_ID,
-				SocialContract.MyCommunity.DISPLAY_NAME
+			//	SocialContract.MyCommunity.DISPLAY_NAME
 			};
 		//WHERE _id = ID of the newly created CIS:
 		String selection = SocialContract.MyCommunity._ID + " = " +
@@ -126,7 +126,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		ContentValues returnedValues = new ContentValues();
 		returnedValues.put(SocialContract.MyCommunity.GLOBAL_ID , cursor.getString(0));
 		returnedValues.put(SocialContract.MyCommunity.OWNER_ID , cursor.getString(1));
-		returnedValues.put(SocialContract.MyCommunity.DISPLAY_NAME , cursor.getString(2));
+		//returnedValues.put(SocialContract.MyCommunity.DISPLAY_NAME , cursor.getString(2));
 		assertEquals(returnedValues,initialValues);
 
 	}
