@@ -14,7 +14,7 @@
    <version>${release.version}</version> 
    <!-- still being discussed -->
    <name>SocialProvider</name>
-   <packaging>apklib</packaging>
+   <packaging>apk</packaging>
 
    <developers>
 	    <developer>
@@ -33,7 +33,12 @@
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
 		</dependency>
-    	<dependency>
+        <dependency>
+            <groupId>org.societies.android.api.external</groupId>
+            <artifactId>societies-android-api</artifactId>
+            <version>${release.version}</version>
+		</dependency>
+        	<dependency>
 			<groupId>org.asmack</groupId>
 	        <artifactId>asmack</artifactId>
 		</dependency>

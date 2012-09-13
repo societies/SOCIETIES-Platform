@@ -31,8 +31,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteException;
 import android.net.Uri;
+
+import org.societies.android.api.cis.SocialContract;
 
 /**
  * This is the Android-based SocialProvider. It provides a content provider interface
