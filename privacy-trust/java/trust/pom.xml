@@ -19,6 +19,12 @@
 		</dependency>
 
 
+	<dependency>
+		<groupId>org.societies</groupId>
+		<artifactId>hibernate_classes</artifactId>
+		<scope>provided</scope>
+	</dependency>
+
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>

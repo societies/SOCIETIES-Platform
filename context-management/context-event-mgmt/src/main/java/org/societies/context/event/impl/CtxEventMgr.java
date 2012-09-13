@@ -281,7 +281,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 			if (LOG.isDebugEnabled()) 
 				LOG.debug("Sending local context change event to topic '" + topics[i] + "'"
 						+ " with properties '" + props + "'");
-			this.eventAdmin.postEvent(new Event(topics[i], props));
+			this.eventAdmin.postEvent(new Event(topics[i], (Dictionary) props));
 		}
 	}
 	

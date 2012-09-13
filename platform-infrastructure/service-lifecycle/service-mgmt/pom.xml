@@ -72,6 +72,20 @@
 			<scope>provided</scope>
 		</dependency>
 
+<!-- Embedded this for now -->
+		<dependency>
+			<groupId>org.eclipse.osgi</groupId>
+			<artifactId>org.eclipse.osgi</artifactId>
+			<version>3.7.0.v20110613</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.osgi</groupId>
+			<artifactId>org.eclipse.equinox.event</artifactId>
+			<version>1.2.100.v20110110</version>
+			<scope>compile</scope>
+		</dependency>
+		
 
 		<dependency>
 			<groupId>org.societies</groupId>
@@ -124,6 +138,7 @@
 			<scope>provided</scope>
 		</dependency>
 	
+		
 	
 	</dependencies>
 	<build>
