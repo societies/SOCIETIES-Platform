@@ -444,7 +444,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//this.persist(cis);
 		//cis.setSessionFactory(sessionFactory);
 
-
+		// TODO Check what else is required in relation to the CIS Advertisement owner Css Id
+		
 		// advertising the CIS to global CIS directory
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
 		//cisAd.setMode(0);//TODO: update this
@@ -452,7 +453,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		cis.fillMembershipCritXMPPobj(m);
 		cisAd.setMembershipCrit(m);
 		cisAd.setName(cis.getName());
-		cisAd.setUri(cis.getCisId());
+		cisAd.setCssownerid(cis.getCisId());
 		cisAd.setType(cis.getCisType());
 		cisAd.setId(cis.getCisId()); // TODO: check if the id or uri needs the jid
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
