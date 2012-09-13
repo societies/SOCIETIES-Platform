@@ -41,20 +41,21 @@
 			<scope>provided</scope>
 		</dependency>
 
+
 		<dependency>
-		    <groupId>org.societies</groupId>
-		    <artifactId>common-ext-libs</artifactId>
-		    <scope>provided</scope>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+			<version>${spring.version}</version>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		
-		<dependency>
-		    <groupId>org.springframework</groupId>   
-		    <artifactId>org.springframework.spring-library</artifactId>   
-		    <type>libd</type>   
-		    <version>${spring.version}</version>   
-		    <scope>provided</scope>
-  		</dependency>
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>personalisation_api</artifactId>
@@ -62,6 +63,24 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.societies.comm.xmpp.pubsub</groupId>
+			<artifactId>PubsubClientBundle</artifactId>
+			<version>${version.comm}</version>
+			<scope>provided</scope>
+		</dependency>
+
+	<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
