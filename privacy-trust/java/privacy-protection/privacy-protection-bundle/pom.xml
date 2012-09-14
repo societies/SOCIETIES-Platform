@@ -97,26 +97,25 @@
 			<artifactId>api</artifactId>
 			<version>${version.pt}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>identityselection</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.pt}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>privacydatamanagement</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.pt}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>privacypolicymanagement</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.pt}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>privacypreferencemanagement</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.pt}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>

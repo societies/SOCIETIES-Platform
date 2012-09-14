@@ -55,7 +55,7 @@
 		<dependency>
 		    <groupId>org.societies.maven.converters</groupId>
 		    <artifactId>SimpleXMLConverters</artifactId>
-		    <version>0.1</version>
+		    <version>${release.version}</version>
 		    <scope>compile</scope>
 		</dependency>
 	</dependencies>
