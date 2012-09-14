@@ -266,8 +266,11 @@ public class Tester {
 			CtxEntityIdentifier cssOwnerEntityId = 
 					this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
 			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
-			//assertEquals("xcmanager.societies.local/ENTITY/person/0 ",cssOwnerEntityId.toString());
-
+			CtxEntity individualEntity = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, cssOwnerEntityId).get();
+			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
+			assertNotNull(individualEntity);
+			assertNotNull(cssOwnerEntityId);
+			
 		} catch (Exception e) {
 			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
