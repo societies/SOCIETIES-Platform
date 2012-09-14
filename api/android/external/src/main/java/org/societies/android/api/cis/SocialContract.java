@@ -214,7 +214,7 @@ public final class SocialContract {
          */
         public static final String _ID = "_id";
         /**
-         *  Global ID for the service. E.g. URL in an app store.
+         *  Global ID for the service. E.g. packagename+appname in Android.
          */
         public static final String GLOBAL_ID = "global_id";
         /**
@@ -274,6 +274,11 @@ public final class SocialContract {
          * using Androdi intent mechanism.
          */
         public static final String CONFIG = "config";
+        
+        /**
+         * A URL to the code to be downloaded or to a web service interface.
+         */
+        public static final String URL = "url";
     }
     
     /**
@@ -587,7 +592,7 @@ public final class SocialContract {
 	 * Class that provides information about the owner of 
 	 * the current device. This is mainly information that will
 	 * be extracted from CSS Manager Light. Note that you can have 
-	 * as many CSS IDs as you wish. 
+	 * as many CSS IDs as you wish.
 	 * 
 	 * @author Babak dot Farshchian at sintef dot no
 	 *
@@ -621,8 +626,38 @@ public final class SocialContract {
 	     *  Possible password to be used with user name
 	     */
 	    public static final String PASSWORD = "password";
+	    
+	    /**
+	     * Name of the service this ID was created at. E.g. it might be 
+	     * a Facebook ID or a SOCIETIES ID. 
+	     */
+	    public static final String ORIGINE = "origin";
 	}
 
+	
+	public static final class UriMatcherIndex{
+		public static final int ME = 1;
+		public static final int ME_SHARP = 2;
+		public static final int PEOPLE = 3;
+		public static final int PEOPLE_SHARP = 4;
+		public static final int COMMUNITIES = 5;
+		public static final int COMMUNITIES_SHARP = 6;
+		public static final int SERVICES = 7;
+		public static final int SERVICES_SHARP = 8;
+		public static final int RELATIONSHIP = 9;
+		public static final int RELATIONSHIP_SHARP = 10;
+		public static final int MEMBERSHIP = 11;
+		public static final int MEMBERSHIP_SHARP = 12;
+		public static final int SHARING = 13;
+		public static final int SHARING_SHARP = 14;
+		public static final int PEOPLE_ACTIVITY = 15;
+		public static final int PEOPLE_ACTIVITY_SHARP = 16;
+		public static final int COMMUNITY_ACTIVITIY = 17;
+		public static final int COMMUNITY_ACTIVITIY_SHARP = 18;
+		public static final int SERVICE_ACTIVITY = 19;
+		public static final int SERVICE_ACTIVITY_SHARP = 20;
+
+	}
 	/**
      * Class that defines a pointer (record) to a CIS that I own or am member of.
      * The CIS itself can be retrieved from Community using GLOBAL_ID that
