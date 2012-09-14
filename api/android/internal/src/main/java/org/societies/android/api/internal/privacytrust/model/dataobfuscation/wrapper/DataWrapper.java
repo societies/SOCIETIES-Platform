@@ -85,14 +85,12 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper#getDataId()
 	 */
-	@Override
 	public DataIdentifier getDataId() {
 		return dataId;
 	}
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#setDataId(java.lang.String)
 	 */
-	@Override
 	public void setDataId(DataIdentifier dataId) {
 		this.dataId = dataId;
 	}
@@ -100,14 +98,12 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#getData()
 	 */
-	@Override
 	public E getData() {
 		return data;
 	}
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#setData(java.lang.Object)
 	 */
-	@Override
 	public void setData(E data) {
 		this.data = data;
 	}
@@ -115,14 +111,12 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#isPersistenceEnabled()
 	 */
-	@Override
 	public boolean isPersistenceEnabled() {
 		return persistence;
 	}
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#setPersistenceEnabled(boolean)
 	 */
-	@Override
 	public void setPersistenceEnabled(boolean persist) {
 		persistence = persist;
 	}
@@ -130,7 +124,6 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#isReadyForObfuscation()
 	 */
-	@Override
 	public boolean isReadyForObfuscation() {
 		if (null != data) {
 			return true;
@@ -168,7 +161,6 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	/*
 	 * @see android.os.Parcelable#describeContents()
 	 */
-	@Override
 	public int describeContents() {
 		return 0;
 	}
@@ -177,7 +169,6 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	 * 
 	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
 	 */
-	@Override
 	public void writeToParcel(Parcel out, int flag) {
 		out.writeSerializable(dataId);
 		out.writeParcelable(data, flag);

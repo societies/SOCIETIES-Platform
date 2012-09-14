@@ -27,11 +27,14 @@ package org.societies.android.privacytrust.datamanagement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -83,7 +86,7 @@ public class PrivacyDataManagerRemote implements IPrivacyDataManager {
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, AAction[] actions) throws PrivacyException {
 		// -- Verify parameters
 		if (null == requestor) {
 			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");
@@ -96,18 +99,21 @@ public class PrivacyDataManagerRemote implements IPrivacyDataManager {
 
 		// Send remote call
 		RemoteTask task = new RemoteTask(context); 
-		task.execute(requestor, dataId, actions);
+		List<AAction> actionsList = Arrays.asList(actions);
+		task.execute(requestor, dataId, actionsList);
 
 		// Wait and retrieve the result
 		ResponseItem permission = null;
 		try {
-			permission = task.get();
+			permission = task.get(10000, TimeUnit.MILLISECONDS);
 		}
 		catch(InterruptedException e) {
 			Log.e(TAG, "Interruption: can't retrieve the result - "+e.getMessage(), e);
 		}
 		catch(ExecutionException e) {
 			Log.e(TAG, "Execution: can't retrieve the result - "+e.getMessage(), e);
+		} catch (TimeoutException e) {
+			Log.e(TAG, "Execution: can't retrieve the result due to timeout - "+e.getMessage(), e);
 		}
 		return permission;
 	}
@@ -123,11 +129,13 @@ public class PrivacyDataManagerRemote implements IPrivacyDataManager {
 		}
 
 		protected ResponseItem doInBackground(Object... args) {
+			Log.d(TAG, "Try to send "+MethodType.CHECK_PERMISSION.name());
 			clientCommManager = new ClientCommunicationMgr(context);
 
 			// -- Destination
 			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
 			Stanza stanza = new Stanza(cloudNode);
+			Log.d(TAG, "to "+cloudNode.getJid());
 
 			// -- Message
 			PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
@@ -141,7 +149,7 @@ public class PrivacyDataManagerRemote implements IPrivacyDataManager {
 				clientCommManager.register(ELEMENT_NAMES, callback);
 				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 				Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.CHECK_PERMISSION.name());
-				callback.wait();
+				callback.wait(10000);
 			} catch (Exception e) {
 				Log.e(TAG, e.getMessage());
 			}

@@ -62,6 +62,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
@@ -146,7 +147,12 @@ public class PrivacyPolicyController {
 			conditions.add(new Condition(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1"));
 			conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
 			List<RequestItem> requests = new ArrayList<RequestItem>();
-			requests.add(new RequestItem(new Resource(DataIdentifierScheme.CIS, "cis-member-list"), actions, conditions));
+			requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC), actions, conditions));
+			try {
+				requests.add(new RequestItem(new Resource(DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId+"/cis-member-list")), actions, conditions));
+			} catch (MalformedCtxIdentifierException e) {
+				LOG.error("Wrong data identifier");
+			}
 			privacyPolicy = new RequestPolicy(provider, requests);
 		}
 		else {

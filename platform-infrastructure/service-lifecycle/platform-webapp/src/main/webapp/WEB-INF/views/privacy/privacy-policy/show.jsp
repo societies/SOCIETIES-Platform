@@ -23,29 +23,21 @@
 	margin: 16px;
 }
 
-label {
-	display: block;
-	padding: 0;
-	margin: 2px 0;
-	text-align: left;
-	font-size: 1.2em;
-}
-
-label.inline {
-	display: inline;
-}
-
-input,select {
-	margin-bottom: 20px;
+.resource{
+	float: left;
+	width: 30%;
+	min-height: 250px;
 	padding: 5px;
+	margin: 10px 5px;
+	border: 1px solid black;
+	border-radius: 5px;
+}
+.resource:nth-child(3n+1){
+	clear: left;
 }
 
-.clear {display block;
-	
-}
-
-th {
-	text-align: center
+.clear {
+	display block;
 }
 </style>
 </head>
@@ -72,20 +64,20 @@ th {
 	<c:if test="${null != PrivacyPolicy || fn:length(PrivacyPolicy.requests) > 0}">
 		<c:forEach var="request" items="${PrivacyPolicy.requests}" varStatus="status">
 			<div class="resource" id="resource${status.index}">
-				<h3><c:out value="${request.resource.scheme}" /> > <c:out value="${request.resource.type}" /></h3>
+				<h5><c:out value="${request.resource.scheme}" /> > <c:out value="${request.resource.dataType}" /></h5>
 				<div class="description">
 					This CIS requests to 
 					<c:if test="${null != request.actions || fn:length(request.actions) > 0}">
-						<c:forEach var="action" items="${request.actions}" var="statusAction">
-							<c:out value="${action.actionConstant}" /><c:if test="${statusAction.count != fn:length(request.actions)}">, </c:if>
+						<c:forEach var="action" items="${request.actions}" varStatus="statusAction">
+							<span class="${action.actionType}">${action.actionType}</span><c:if test="${statusAction.count != fn:length(request.actions)}">, </c:if>
 						</c:forEach>
 					</c:if>
-					your "<c:out value="${request.resource.type}" />".
+					on "${request.resource.dataType}"
 					<br />
 					<c:if test="${null != request.conditions || fn:length(request.conditions) > 0}">
 						Following these conditions:
 						<ul>
-							<c:forEach var="condition" items="${request.conditions}" var="statusCondition">
+							<c:forEach var="condition" items="${request.conditions}" varStatus="statusCondition">
 								<li><c:out value="${condition.conditionName}" />: <c:out value="${condition.value}" /></li>
 							</c:forEach>
 						</ul>
