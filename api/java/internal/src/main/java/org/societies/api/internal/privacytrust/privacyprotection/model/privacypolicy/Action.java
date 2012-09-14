@@ -71,6 +71,9 @@ public class Action implements Serializable{
 	public ActionConstants getActionType(){
 		return this.action;
 	}
+	public ActionConstants getActionConstants(){
+		return this.action;
+	}
 	public TargetMatchConstants getType(){
 		return TargetMatchConstants.ACTION;
 	}

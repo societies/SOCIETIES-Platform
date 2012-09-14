@@ -22,123 +22,64 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.internal.privacytrust.model.dataobfuscation;
+package org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+
+import org.societies.android.api.internal.privacytrust.model.dataobfuscation.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-
 /**
  * Describe your class here...
  *
- * @author Olivier Maridat (Trialog)
+ * @author olivierm
  *
  */
-public class Name implements Parcelable {
-	private String firstName;
-	private String lastName;
-	
-	public Name() {
-		super();
-	}
-	/**
-	 * @param firstName
-	 * @param lastName
-	 */
-	public Name(String firstName, String lastName) {
-		super();
-		this.firstName = firstName;
-		this.lastName = lastName;
-	}
-	
-	
-	/**
-	 * @return the firstName
-	 */
-	public String getFirstName() {
-		return firstName;
-	}
-	/**
-	 * @param firstName the firstName to set
-	 */
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	/**
-	 * @return the lastName
-	 */
-	public String getLastName() {
-		return lastName;
-	}
-	/**
-	 * @param lastName the lastName to set
-	 */
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	
-	/*
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		// -- Verify reference equality
-		if (obj == this) {
-			return true;
-		}
+public class AAction extends Action implements Parcelable {
 
-		// -- Verify obj type
-		if (obj instanceof Name) {
-			Name other = (Name) obj;
-			return (this.getFirstName().equals(other.getFirstName())
-					&& this.getLastName().equals(other.getLastName()));
-		}
-		return false;
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * @param in
 	 */
-	@Override
-	public String toString() {
-		return "Name [firstName=" + firstName + ", lastName=" + lastName + "]";
-	}
-	
-	/* ************************
-	 * Parcelable Management
-	 * ************************ */
-	
-	public Name(Parcel in) {
+	public AAction(Parcel in) {
 		readFromParcel(in);
 	}
-	
-	/*
+
+	/**
+	 * 
+	 */
+	public AAction() {
+	}
+
+	/* (non-Javadoc)
 	 * @see android.os.Parcelable#describeContents()
 	 */
 	public int describeContents() {
 		return 0;
 	}
 
-	/*
-	 * 
+	/* (non-Javadoc)
 	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
 	 */
-	public void writeToParcel(Parcel out, int flag) {
-		out.writeString(firstName);
-		out.writeString(lastName);
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(actionConstant.value());
+		dest.writeInt(optional ? 1 : 0);
 	}
 	
 	private void readFromParcel(Parcel in) {
-		firstName = in.readString();
-		lastName = in.readString();
+		actionConstant = ActionConstants.fromValue(in.readString());
+		optional = 1 == in.readInt() ? true : false;
 	}
 	
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-		public Name createFromParcel(Parcel in) {
-			return new Name(in);
+		public AAction createFromParcel(Parcel in) {
+			return new AAction(in);
 		}
 
-		public Name[] newArray(int size) {
-			return new Name[size];
+		public AAction[] newArray(int size) {
+			return new AAction[size];
 		}
 	};
+
 }

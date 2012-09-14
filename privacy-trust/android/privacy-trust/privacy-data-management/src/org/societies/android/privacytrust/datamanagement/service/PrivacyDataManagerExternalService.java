@@ -32,6 +32,7 @@ import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
@@ -76,9 +77,7 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
-	public ResponseItem checkPermission(RequestorBean requestor,
-			DataIdentifier dataId, List<Action> actions)
-					throws PrivacyException {
+	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, AAction[] actions) throws PrivacyException {
 		Log.d(TAG, "External call to service checkPermission()");
 		ResponseItem permission = privacyDataManager.checkPermission(requestor, dataId, actions);
 		// -- Create intent to broadcast results to interested receivers

@@ -280,7 +280,6 @@ public class PostalLocation implements Parcelable {
 	/*
 	 * @see android.os.Parcelable#describeContents()
 	 */
-	@Override
 	public int describeContents() {
 		return 0;
 	}
@@ -289,7 +288,6 @@ public class PostalLocation implements Parcelable {
 	 * 
 	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
 	 */
-	@Override
 	public void writeToParcel(Parcel out, int flag) {
 		out.writeString(logicalName);
 		out.writeString(streetNumber);
