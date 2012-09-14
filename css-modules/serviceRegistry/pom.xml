@@ -81,7 +81,27 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-
+						<!-- 
+						See 
+							http://www.bradchen.com/node/10 
+						for reasons of importing hibernate packages 
+						
+						See 
+							https://hibernate.onjira.com/browse/HHH-3826
+						for NoClassDefFound Hibernate Proxy issue
+						
+						
+						See 
+							http://billhiggins.us/blog/2011/02/24/using-reflection-in-osgi/
+						for tricks to be able to deal with reflection in OSGi
+						- ->
+						<Dynamic-Import>
+							javassist.util.proxy,
+							org.hibernate.proxy.pojo.javassist,
+							org.hibernate.proxy.pojo,
+							org.hibernate.proxy
+						</Dynamic-Import>
+						-->						
 					</instructions>
 				</configuration>
 			</plugin>
