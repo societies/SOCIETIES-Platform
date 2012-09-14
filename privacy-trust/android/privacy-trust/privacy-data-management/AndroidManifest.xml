@@ -17,6 +17,8 @@
         </service>
         <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" >
         </service>
+        <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" >
+        </service>
     </application>
 
 </manifest>

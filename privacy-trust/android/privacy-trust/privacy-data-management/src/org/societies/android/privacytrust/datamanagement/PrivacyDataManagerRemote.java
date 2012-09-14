@@ -123,11 +123,13 @@ public class PrivacyDataManagerRemote implements IPrivacyDataManager {
 		}
 
 		protected ResponseItem doInBackground(Object... args) {
+			Log.d(TAG, "Try to send "+MethodType.CHECK_PERMISSION.name());
 			clientCommManager = new ClientCommunicationMgr(context);
 
 			// -- Destination
 			INetworkNode cloudNode = clientCommManager.getIdManager().getCloudNode();
 			Stanza stanza = new Stanza(cloudNode);
+			Log.d(TAG, "to "+cloudNode.getJid());
 
 			// -- Message
 			PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
@@ -141,7 +143,7 @@ public class PrivacyDataManagerRemote implements IPrivacyDataManager {
 				clientCommManager.register(ELEMENT_NAMES, callback);
 				clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 				Log.d(TAG, "Send stanza PrivacyDataManagerBean::"+MethodType.CHECK_PERMISSION.name());
-				callback.wait();
+				callback.wait(10000);
 			} catch (Exception e) {
 				Log.e(TAG, e.getMessage());
 			}

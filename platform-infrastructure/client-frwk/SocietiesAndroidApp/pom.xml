@@ -115,6 +115,13 @@
 		   <type>apklib</type>
 		</dependency-->
 		
+		<dependency>
+			<groupId>org.societies.android</groupId>
+			<artifactId>privacytrust</artifactId>
+			<version>${version.pt}</version>
+			<type>apklib</type>
+		</dependency>
+		
     	<dependency>
     		<groupId>com.google.code.gson</groupId>
         	<artifactId>gson</artifactId>

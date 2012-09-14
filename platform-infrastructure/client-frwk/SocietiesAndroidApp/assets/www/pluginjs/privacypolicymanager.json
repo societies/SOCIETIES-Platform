@@ -1,0 +1,32 @@
+{
+"PrivacyPolicyManagerService" : {
+		"exceptionThreshold" : 0,
+		"getPrivacyPolicy" : {
+								"requestor": "red@societies.local",
+								"requestItems": [
+									{
+										"actions":  [{"actionConstant": "READ", "optional": false}],
+										"conditions": [{"conditionConstant": "SHARE_WITH_3P_SERVICES", "value": "1", "optional": false}],
+										"resource": {"dataUri": "uri", "scheme": "context", "dataType": "locationSymbolic"},
+										"optional": false
+									}
+								]
+							},
+		"updatePrivacyPolicy" : {
+								"requestor": "red@societies.local",
+								"requestItems": [
+									{
+										"actions":  [{"actionConstant": "READ", "optional": false}],
+										"conditions": [{"conditionConstant": "SHARE_WITH_3P_SERVICES", "value": "1", "optional": false}],
+										"resource": {"dataUri": "uri", "scheme": "context", "dataType": "locationSymbolic"},
+										"optional": false
+									}
+								]
+							},
+		"deletePrivacyPolicy" : {"ack" : true},
+		"inferPrivacyPolicy" : {
+								"requestor": "",
+								"requestItems": []
+							}
+	}
+}

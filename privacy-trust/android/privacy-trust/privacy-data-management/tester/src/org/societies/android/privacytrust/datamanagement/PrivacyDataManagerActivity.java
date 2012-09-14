@@ -153,7 +153,7 @@ public class PrivacyDataManagerActivity extends Activity {
 			try {
 				RequestorBean requestor = new RequestorBean();
 	    		requestor.setRequestorId("red@societies.local");
-	    		DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"/me@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+	    		DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 	    		List<Action> actions = new ArrayList<Action>();
 	    		Action action = new Action();
 	    		action.setActionConstant(ActionConstants.READ);
@@ -201,14 +201,14 @@ public class PrivacyDataManagerActivity extends Activity {
     		Bundle outBundle = new Bundle();
     		RequestorBean requestor = new RequestorBean();
     		requestor.setRequestorId("red@societies.local");
-    		String ownerId = "me@societies.local";
-    		String dataId = "me@societies.local/ENTITY/person/1/ATTRIBUTE/name/13";
+    		DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+    		List<Action> actions = new ArrayList<Action>();
     		Action action = new Action();
     		action.setActionConstant(ActionConstants.READ);
+    		actions.add(action);
     		outBundle.putSerializable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), requestor);
-    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), ownerId);
-    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), dataId);
-    		outBundle.putSerializable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), action);
+    		outBundle.putSerializable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), dataId);
+//    		outBundle.putS(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), actions);
     		outMessage.setData(outBundle);
     		// Call the out process method
     		try {
