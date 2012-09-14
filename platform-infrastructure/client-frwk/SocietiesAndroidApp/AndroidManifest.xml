@@ -62,7 +62,7 @@
         <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
         
           <!-- this needs to be copied manualy  -->
-    <provider
+    <!--provider
         android:name="org.societies.android.platform.SocialProvider"
         android:authorities="@string/provider_authority"
         android:exported="true"
@@ -70,7 +70,7 @@
         android:enabled="true"
         android:readPermission="org.societies.android.SocialProvider.READ"
         android:writePermission="org.societies.android.SocialProvider.WRITE">
-    </provider>
+    </provider-->
         
     </application>
 

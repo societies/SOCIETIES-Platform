@@ -36,10 +36,14 @@ import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
 import org.societies.android.platform.content.CssRecordDAO;
+import org.societies.android.platform.cssmanager.AndroidNotifier;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
+import org.societies.android.platform.cssmanager.AndroidNotifier;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalBinder;
 import org.societies.utilities.DBC.Dbc;
 
+import android.app.Notification;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -456,6 +460,13 @@ public class PluginCSSManager extends Plugin {
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
+				//Create Android Notification
+				int notifierflags [] = new int [1];
+				notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+				AndroidNotifier notifier = new AndroidNotifier(PluginCSSManager.this.ctx.getContext(), Notification.DEFAULT_SOUND, notifierflags);
+
+				notifier.notifyMessage("Successful", intent.getAction(), org.societies.android.platform.gui.MainActivity.class);
+
 			} else if (intent.getAction().equals(LocalCSSManagerService.LOGOUT_CSS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5);
 				
