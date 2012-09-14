@@ -77,7 +77,7 @@ public class TestActivityCIS extends Activity {
     private ServiceConnection cisManagerConnection = new ServiceConnection() {
 
         public void onServiceConnected(ComponentName name, IBinder service) {
-        	Log.d(LOG_TAG, "Connecting to IServiceDiscovery service");
+        	Log.d(LOG_TAG, "Connecting to ICisManager service");
         	try {
 	        	//GET LOCAL BINDER
 	            LocalBinder binder = (LocalBinder) service;

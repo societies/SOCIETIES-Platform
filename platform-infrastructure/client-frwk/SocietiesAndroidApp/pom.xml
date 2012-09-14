@@ -23,31 +23,27 @@
 	  </developer>
    </developers>
 
-
-    <dependencies>
-    
-	<dependency>
+	<dependencies>    
+		<dependency>
 	    	<groupId>com.google.android</groupId>
-           	<artifactId>android</artifactId> 
-           	<exclusions>
-			<!-- Provided by Android -->
-			<exclusion>
-				<artifactId>xpp3</artifactId>
-				<groupId>xpp3</groupId>
-			</exclusion>
-		</exclusions>
-	</dependency>
+	        <artifactId>android</artifactId> 
+	        <exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
     	<dependency>
-                <groupId>com.phonegap</groupId>
-                <artifactId>cordova</artifactId>
+			<groupId>com.phonegap</groupId>
+			<artifactId>cordova</artifactId>
     	</dependency>
 		<dependency>
 			<groupId>org.societies.android.api.external</groupId>
 			<artifactId>societies-android-api</artifactId>
 			<version>${release.version}</version>
 		</dependency>
-	
-	
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
@@ -62,14 +58,10 @@
 			<groupId>org.asmack</groupId>
 	    	<artifactId>asmack</artifactId>
 		</dependency>
-	
-	
-	
-
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
-			<version>2.6.2</version>
+			<version>2.6.6</version>
 			<exclusions>
 				<!-- StAX is not available on Android -->
 				<exclusion>
@@ -79,16 +71,14 @@
 				<exclusion>
 			        <artifactId>stax-api</artifactId>
 			        <groupId>stax</groupId>
-			 </exclusion>
+			 	</exclusion>
 			    <!-- Provided by Android -->
-			 <exclusion>
+			 	<exclusion>
 			        <artifactId>xpp3</artifactId>
 			        <groupId>xpp3</groupId>
-			 </exclusion>
-		</exclusions>
-	</dependency>
-
-
+			 	</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
    			<groupId>org.societies.android.platform.servicemonitor</groupId>
    			<artifactId>SocietiesServiceMonitor</artifactId>
@@ -107,29 +97,30 @@
    			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>
-
+		<dependency>
+   			<groupId>org.societies.android.platform.cis</groupId>
+   			<artifactId>CommunityManagerService</artifactId>
+    		<version>${release.version}</version>
+   			<type>apklib</type>
+		</dependency>
 		<!--dependency>
 		   <groupId>org.societies.android.platform</groupId>
 		   <artifactId>socialprovider-light</artifactId>
 		   <version>${release.version}</version> 
 		   <type>apklib</type>
 		</dependency-->
-		
 		<dependency>
 			<groupId>org.societies.android</groupId>
 			<artifactId>privacytrust</artifactId>
 			<version>${version.pt}</version>
 			<type>apklib</type>
 		</dependency>
-		
     	<dependency>
     		<groupId>com.google.code.gson</groupId>
         	<artifactId>gson</artifactId>
 			<version>2.1</version>
         	<scope>compile</scope>
-		</dependency>
-
-        
+		</dependency>   
     </dependencies>
 
     <build>

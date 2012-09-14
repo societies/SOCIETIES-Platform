@@ -167,7 +167,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 			listCriteria.add(acrit);
 		}	
 		rules.setCriteria(listCriteria);
-		cisinfo.setMembershipCrit(rules);
+		//cisinfo.setMembershipCrit(rules); TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX 
 		//ADD TO BEAN
 		Create create = new Create();
 		create.setCommunity(cisinfo);
@@ -334,12 +334,13 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisSubscribed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#Join(java.lang.String, java.lang.String, java.util.List)*/
-	public JoinResponse Join(String client, String cisId, List<Qualification> qualifications) {
+	public JoinResponse Join(String client, String cisId) {
 		Log.d(LOG_TAG, "Join CIS called by client: " + client);
 
 		//CREATE JOIN INFO
 		org.societies.api.schema.cis.community.Join join = new org.societies.api.schema.cis.community.Join();
-		join.setQualification(qualifications);
+		List<Qualification> qualifications = new ArrayList<Qualification>();
+		//join.setQualification(qualifications); TODO: GET MEMBERSHIP CRITERIA AND QUERY CONTEXT FOR QUALIFICATIONS FOR JOINING
 		//CREATE MESSAGE BEAN
 		CommunityMethods messageBean = new CommunityMethods();
 		messageBean.setJoin(join);

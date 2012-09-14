@@ -46,7 +46,7 @@ import org.societies.api.schema.cis.community.Qualification;
  * Implemented by the CommunityManager APKLib service
  */
 public interface ICisSubscribed {
-	public String methodsArray[] = {"Join(String client, String cisId, List<Qualification> qualifications)",
+	public String methodsArray[] = {"Join(String client, String cisId)",
 	 		"Leave(String client, String cisId)",
 	 		"getMembers(String client, String cisId)",
 	 		"getCisInformation(String client, String cisId)",
@@ -63,7 +63,7 @@ public interface ICisSubscribed {
 	 * @param qualifications
 	 * @return
 	 */
-	public JoinResponse Join(String client, String cisId, List<Qualification> qualifications);
+	public JoinResponse Join(String client, String cisId);
 	
 	/**
 	 * Leave a Community
