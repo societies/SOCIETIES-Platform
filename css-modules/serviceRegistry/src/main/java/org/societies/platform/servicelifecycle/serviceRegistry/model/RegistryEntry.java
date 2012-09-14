@@ -297,8 +297,10 @@ public class RegistryEntry implements Serializable {
 					.getServiceProvider());
 			servImpl.setServiceVersion(this.serviceInstance.getServiceImpl()
 					.getServiceVersion());
-			servImpl.setServiceClient(new URI(this.serviceInstance.getServiceImpl()
-					.getServiceClient()));
+			if(this.serviceInstance.getServiceImpl().getServiceClient() != null)
+				servImpl.setServiceClient(new URI(this.serviceInstance.getServiceImpl().getServiceClient()));
+			else
+				servImpl.setServiceClient(null);
 			si.setServiceImpl(servImpl);
 			returnedService.setServiceInstance(si);
 			returnedService.setServiceLocation(tmpServiceLocation);
