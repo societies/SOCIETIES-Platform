@@ -32,65 +32,23 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
-
-import org.societies.android.api.cis.SocialContract;
 
 /**
  * This adapter will implement a local cache of Social Data.
  * TODO: Currently it is used for testing purposes.
  * All SQLite-related code is inside here.
  * 
- * @author Babak.Farshchian@sintef.no
+ * @author Babak dot Farshchian at sintef dot no
  *
  */
 public class LocalDBAdapter implements ISocialAdapter {
 	//For logging:
     private static final String TAG = "LocalDBAdapter";
 
-	//Constants for DB names and table names:
-	private static final String DB_NAME = "societies.db";
-	private static final String DB_PATH = "/data/data/org.societies.android.platform/databases/";
-	private static final String ME_TABLE_NAME = "me";
-	private static final String COMMUNITIES_TABLE_NAME = "communities";
-	private static final String MY_COMMUNITIES_TABLE_NAME = "mycommunities";
-	private static final String PEOPLE_TABLE_NAME = "people";
-	private static final String SERVICES_TABLE_NAME = "services";
-
-	private static final int DB_VERSION = 1;
 
 	private SQLiteDatabase db;
 	private Context context;
 
-	//SQL query for creating the Community table:
-	private static final String ME_TABLE_CREATE = "create table if not exists " + ME_TABLE_NAME
-			+ " (" + 
-			SocialContract.Me._ID + " integer primary key autoincrement, " +
-			SocialContract.Me.GLOBAL_ID + " text not null, " +
-			SocialContract.Me.NAME + " text not null," +
-			SocialContract.Me.DISPLAY_NAME + " text not null );";
-
-	private static final String COMMUNITIES_TABLE_CREATE = "create table if not exists " + COMMUNITIES_TABLE_NAME
-			+ " (" + 
-			SocialContract.Community._ID + " integer primary key autoincrement, " +
-			SocialContract.Community.GLOBAL_ID + " text not null, " +
-			SocialContract.Community.TYPE + " text not null," +
-			SocialContract.Community.NAME + " text not null, " + 
-//			SocialContract.Community.DISPLAY_NAME + " text not null, " + 
-			SocialContract.Community.OWNER_ID + " text not null, " +
-//			SocialContract.Community.CREATION_DATE + " text not null, " +
-//			SocialContract.Community.MEMBERSHIP_TYPE + " text not null, " +
-			SocialContract.Community.DIRTY + " text not null );";
-
-	private static final String MY_COMMUNITIES_TABLE_CREATE = "create table if not exists " + MY_COMMUNITIES_TABLE_NAME
-			+ " (" + 
-			SocialContract.MyCommunity._ID + " integer primary key autoincrement, " +
-			SocialContract.MyCommunity.GLOBAL_ID + " text not null, " +
-			SocialContract.MyCommunity.OWNER_ID + " text not null )" +
-//			SocialContract.MyCommunity.DISPLAY_NAME + " text not null )" +
-					";";
-
-	//TODO: Need the same for other DBs, e.g. people.
 
 	
 	/**
@@ -104,7 +62,6 @@ public class LocalDBAdapter implements ISocialAdapter {
 		//For logging:
 	    private static final String TAG = "SocialDBOpenHelper";
 
-		
 		/**
 		 * @param context
 		 * @param name
@@ -114,33 +71,56 @@ public class LocalDBAdapter implements ISocialAdapter {
 		public SocialDBOpenHelper(Context _context, String _name,
 				CursorFactory _factory, int _version) {
 		    	super(_context, _name, _factory, _version);
-			// TODO Auto-generated constructor stub
 		}
-
 		/* (non-Javadoc)
 		 * @see android.database.sqlite.SQLiteOpenHelper#onCreate(android.database.sqlite.SQLiteDatabase)
 		 */
 		@Override
 		public void onCreate(SQLiteDatabase _db) {
-			_db.execSQL(ME_TABLE_CREATE);
+			_db.execSQL(SQLiteContract.ME_TABLE_CREATE);
 			android.util.Log.d(TAG, ": Me table created");
-			_db.execSQL(MY_COMMUNITIES_TABLE_CREATE);
-			android.util.Log.d(TAG, ": My communities table created");
-			_db.execSQL(COMMUNITIES_TABLE_CREATE);
+			_db.execSQL(SQLiteContract.PEOPLE_TABLE_CREATE);
+			android.util.Log.d(TAG, ": People table created");
+			_db.execSQL(SQLiteContract.COMMUNITIES_TABLE_CREATE);
 			android.util.Log.d(TAG, ": Communities table created");
-			//TODO: Do the same for all other tables.
+			_db.execSQL(SQLiteContract.SERVICES_TABLE_CREATE);
+			android.util.Log.d(TAG, ": Services table created");
+			_db.execSQL(SQLiteContract.RELATIONSHIP_TABLE_CREATE);
+			android.util.Log.d(TAG, ": Relationship table created");
+			_db.execSQL(SQLiteContract.MEMBERSHIP_TABLE_CREATE);
+			android.util.Log.d(TAG, ": Membership table created");
+			_db.execSQL(SQLiteContract.SHARING_TABLE_CREATE);
+			android.util.Log.d(TAG, ": Sharing table created");
+			_db.execSQL(SQLiteContract.PEOPLE_ACTIVITIY_TABLE_CREATE);
+			android.util.Log.d(TAG, ": People activity table created");
+			_db.execSQL(SQLiteContract.COMMUNITIES_ACTIVITIY_TABLE_CREATE);
+			android.util.Log.d(TAG, ": Communities activity table created");
+			_db.execSQL(SQLiteContract.SERVICES_ACTIVITIY_TABLE_CREATE);
+			android.util.Log.d(TAG, ": Services activity table created");
 		}
 
-		/* (non-Javadoc)
+		/* 
+		 * This method currently deletes the old tables and their contents and
+		 * creates new tables. It should do a real upgrade in the future.
+		 * 
 		 * @see android.database.sqlite.SQLiteOpenHelper#onUpgrade(android.database.sqlite.SQLiteDatabase, int, int)
 		 */
 		@Override
 		public void onUpgrade(SQLiteDatabase _db, int _oldVersion, int _newVersion) {
+			
+			android.util.Log.d(TAG, ": Upgrading DB...");
+
 			// Drop the old table:
-			_db.execSQL("drop table if exists " + COMMUNITIES_TABLE_NAME);
-			_db.execSQL("drop table if exists " + ME_TABLE_NAME);
-			_db.execSQL("drop table if exists " + MY_COMMUNITIES_TABLE_NAME);
-			//TODO: Do the same for all other tables.
+			_db.execSQL("drop table if exists " + SQLiteContract.ME_TABLE_NAME);
+			_db.execSQL("drop table if exists " + SQLiteContract.PEOPLE_ACTIVITIY_TABLE_NAME);
+			_db.execSQL("drop table if exists " + SQLiteContract.COMMUNITIES_ACTIVITIY_TABLE_NAME);
+			_db.execSQL("drop table if exists " + SQLiteContract.SERVICES_ACTIVITIY_TABLE_NAME);
+			_db.execSQL("drop table if exists " + SQLiteContract.RELATIONSHIP_TABLE_NAME);
+			_db.execSQL("drop table if exists " + SQLiteContract.MEMBERSHIP_TABLE_NAME);
+			_db.execSQL("drop table if exists " + SQLiteContract.SHARING_TABLE_NAME);
+			_db.execSQL("drop table if exists " + SQLiteContract.PEOPLE_ACTIVITIY_TABLE_NAME);
+			_db.execSQL("drop table if exists " + SQLiteContract.COMMUNITIES_ACTIVITIY_TABLE_NAME);
+			_db.execSQL("drop table if exists " + SQLiteContract.SERVICES_ACTIVITIY_TABLE_NAME);
 			// Create a new table:
 			onCreate(_db);
 		}
@@ -150,194 +130,244 @@ public class LocalDBAdapter implements ISocialAdapter {
 
 	public LocalDBAdapter(Context _context){
 		context = _context;
-		dbHelper = new SocialDBOpenHelper(context, DB_NAME, null, DB_VERSION);
-//		try	{
-//			connect();
-//		} catch (SQLiteException ex){
-//			android.util.Log.e(TAG, ex.getMessage());
-//		}
+		dbHelper = new SocialDBOpenHelper(context, SQLiteContract.DB_NAME, null, SQLiteContract.DB_VERSION);
 	}
+	
 	/* (non-Javadoc)
-	 * @see org.societies.android.platform.ISocialAdapter#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
+	 * @see org.societies.android.platform.ISocialAdapter#insertPeople(android.content.ContentValues)
 	 */
-	
-	public Cursor query(Uri uri, String[] projection, String selection,
-			String[] selectionArgs, String sortOrder) {
-		// TODO Delete.
-		
-		return null;
-	}
-	
-	@Deprecated
-	protected Cursor queryMe(String[] projection) {
-		Cursor cursor;
-		connect();
-		cursor = db.query(ME_TABLE_NAME, projection, "_id=0", null, null, null, null);
-		//disconnect();
-		return cursor;
+	public long insertPeople(ContentValues _values) {
+		db = dbHelper.getWritableDatabase();
+		return db.insert(SQLiteContract.PEOPLE_TABLE_NAME, null, _values);	
 	}
 
-	protected Cursor queryMe(String[] projection, String selection,
-			String[] selectionArgs, String sortOrder) {
-		// TODO Auto-generated method stub
-		db = dbHelper.getReadableDatabase();
-		return db.query(ME_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+	public Cursor queryPeople(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder) {
+		db = dbHelper.getWritableDatabase();
+		return db.query(SQLiteContract.PEOPLE_ACTIVITIY_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
 	}
 
-	protected Cursor queryCommunities(String[] projection, String selection,
-			String[] selectionArgs, String sortOrder) {
-		// TODO Auto-generated method stub
-		db = dbHelper.getReadableDatabase();
-		return db.query(COMMUNITIES_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+	public int updatePeople(ContentValues values, String selection,
+			String[] selectionArgs) {
+		db = dbHelper.getWritableDatabase();
+		return db.update(SQLiteContract.PEOPLE_TABLE_NAME, values, selection, selectionArgs);
 	}
 
-	protected Cursor queryMyCommunities(String[] projection, String selection,
-			String[] selectionArgs, String sortOrder) {
-		// TODO Auto-generated method stub
-		db = dbHelper.getReadableDatabase();
-		return db.query(MY_COMMUNITIES_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+	public int deletePeople(String _selection, String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.delete(SQLiteContract.PEOPLE_TABLE_NAME, _selection, _selectionArgs);
 	}
-/* (non-Javadoc)
-	 * @see org.societies.android.platform.ISocialAdapter#insert(android.net.Uri, android.content.ContentValues)
-	 */
-	public Uri insert(Uri uri, ContentValues values) {
-		// TODO Make a case and call proper private method with values.
-		
-		Uri withAppendedPath = uri.withAppendedPath(uri, Long.toString(insertCommunities(values)));
-		return withAppendedPath;
+
+	public long insertCommunities(ContentValues _values) {
+		db = dbHelper.getWritableDatabase();
+		return db.insert(SQLiteContract.COMMUNITIES_TABLE_NAME, null, _values);
+	}
+
+	public Cursor queryCommunities(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder) {
+		db = dbHelper.getWritableDatabase();
+		return db.query(SQLiteContract.COMMUNITIES_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
+	}
+
+	public int updateCommunities(ContentValues _values, String _selection,
+			String[] _selectionArgs) {
+		db = dbHelper.getWritableDatabase();
+		return db.update(SQLiteContract.COMMUNITIES_TABLE_NAME, 
+				_values, _selection, _selectionArgs);
+	}
+
+	public int deleteCommunities(String _selection, String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.delete(SQLiteContract.COMMUNITIES_TABLE_NAME,
+				_selection, _selectionArgs);
+	}
+
+	public long insertServices(ContentValues _values) {
+		db = dbHelper.getWritableDatabase();
+		return db.insert(SQLiteContract.SERVICES_TABLE_NAME, null, _values);	
+	}
+
+	public Cursor queryServices(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder) {
+		db = dbHelper.getWritableDatabase();
+		return db.query(SQLiteContract.SERVICES_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
 	}
 	
-	/**
-	 * @param _values
-	 * @return
-	 */
-	protected long insertMe(ContentValues values) {
-		// TODO Auto-generated method stub
+	public int updateServices(ContentValues _values, String _selection,
+			String[] _selectionArgs) {
 		db = dbHelper.getWritableDatabase();
-		return db.insert(ME_TABLE_NAME, null, values);
-		//return uri.withAppendedPath(uri, Long.toString(rowNumber));
+		return db.update(SQLiteContract.SERVICES_TABLE_NAME, 
+				_values, _selection, _selectionArgs);
 	}
-	protected long insertCommunities(ContentValues values) {
-		// TODO Auto-generated method stub
+
+	public int deleteServices(String _selection, String[] _selectionArgs){
 		db = dbHelper.getWritableDatabase();
-		return db.insert(COMMUNITIES_TABLE_NAME, null, values);
-		//return uri.withAppendedPath(uri, Long.toString(rowNumber));
+		return db.delete(SQLiteContract.SERVICES_TABLE_NAME, _selection, _selectionArgs);
 	}
-	protected long insertMyCommunity(ContentValues values) {
+
+	public long insertRelationship(ContentValues _values) {
 		db = dbHelper.getWritableDatabase();
-		return db.insert(MY_COMMUNITIES_TABLE_NAME, null, values);
-		//return uri.withAppendedPath(uri, Long.toString(rowNumber));
+		return db.insert(SQLiteContract.RELATIONSHIP_TABLE_NAME, null, _values);	
 	}
-	protected long insertPerson(ContentValues values) {
-		// TODO Auto-generated method stub
+	
+	public Cursor queryRelationship(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder){
 		db = dbHelper.getWritableDatabase();
-		return db.insert(PEOPLE_TABLE_NAME, null, values);	
+		return db.query(SQLiteContract.RELATIONSHIP_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
 	}
-	protected long insertService(ContentValues values) {
-		// TODO Auto-generated method stub
+	public int updateRelationship(ContentValues _values, String _selection,
+			String[] _selectionArgs){
 		db = dbHelper.getWritableDatabase();
-		return db.insert(SERVICES_TABLE_NAME, null, values);	
+		return db.update(SQLiteContract.RELATIONSHIP_TABLE_NAME, 
+				_values, _selection, _selectionArgs);
 	}
+	public int deleteRelationship(String _selection, String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.delete(SQLiteContract.RELATIONSHIP_TABLE_NAME,
+				_selection, _selectionArgs);
+	}
+	public long insertMembership(ContentValues _values) {
+		db = dbHelper.getWritableDatabase();
+		return db.insert(SQLiteContract.MEMBERSHIP_TABLE_NAME, null, _values);	
+	}
+	public Cursor queryMembership(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder){
+		db = dbHelper.getWritableDatabase();
+		return db.query(SQLiteContract.MEMBERSHIP_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
+	}
+	public int updateMembership(ContentValues _values, String _selection,
+			String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.update(SQLiteContract.MEMBERSHIP_TABLE_NAME, 
+				_values, _selection, _selectionArgs);
+	}
+	public int deleteMembership(String _selection, String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.delete(SQLiteContract.MEMBERSHIP_TABLE_NAME,
+				_selection, _selectionArgs);
+	}
+	public long insertSharing(ContentValues values) {
+		db = dbHelper.getWritableDatabase();
+		return db.insert(SQLiteContract.SHARING_TABLE_NAME, null, values);	
+	}
+	public Cursor querySharing(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder){
+		db = dbHelper.getWritableDatabase();
+		return db.query(SQLiteContract.SHARING_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
+	}
+	public int updateSharing(ContentValues _values, String _selection,
+			String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.update(SQLiteContract.SHARING_TABLE_NAME, 
+				_values, _selection, _selectionArgs);
+	}
+	public int deleteSharing(String _selection, String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.delete(SQLiteContract.SHARING_TABLE_NAME,
+				_selection, _selectionArgs);
+	}
+	public long insertPeopleActivity(ContentValues _values) {
+		db = dbHelper.getWritableDatabase();
+		return db.insert(SQLiteContract.PEOPLE_ACTIVITIY_TABLE_NAME, null, _values);	
+	}
+	public Cursor queryPeopleActivity(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder){
+		db = dbHelper.getWritableDatabase();
+		return db.query(SQLiteContract.PEOPLE_ACTIVITIY_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
+	}
+	public int updatePeopleActivity(ContentValues _values, String _selection,
+			String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.update(SQLiteContract.PEOPLE_ACTIVITIY_TABLE_NAME, 
+				_values, _selection, _selectionArgs);
+	}
+	public int deletePeopleActivity(String _selection, String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.delete(SQLiteContract.PEOPLE_ACTIVITIY_TABLE_NAME,
+				_selection, _selectionArgs);
+	}
+	public long insertCommunityActivity(ContentValues _values) {
+		db = dbHelper.getWritableDatabase();
+		return db.insert(SQLiteContract.COMMUNITIES_ACTIVITIY_TABLE_NAME, null, _values);	
+	}
+	public Cursor queryCommunityActivity(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder){
+		db = dbHelper.getWritableDatabase();
+		return db.query(SQLiteContract.COMMUNITIES_ACTIVITIY_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
+	}
+	public int updateCommunityActivity(ContentValues _values, String _selection,
+			String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.update(SQLiteContract.COMMUNITIES_ACTIVITIY_TABLE_NAME, 
+				_values, _selection, _selectionArgs);
+	}
+	public int deleteCommunityActivity(String _selection, String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.delete(SQLiteContract.COMMUNITIES_ACTIVITIY_TABLE_NAME,
+				_selection, _selectionArgs);
+	}
+	public long insertServiceActivity(ContentValues _values) {
+		db = dbHelper.getWritableDatabase();
+		return db.insert(SQLiteContract.SERVICES_ACTIVITIY_TABLE_NAME, null, _values);	
+	}
+	public Cursor queryServiceActivity(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder){
+		db = dbHelper.getWritableDatabase();
+		return db.query(SQLiteContract.SERVICES_ACTIVITIY_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
+	}
+	public int updateServiceActivity(ContentValues _values, String _selection,
+			String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.update(SQLiteContract.SERVICES_ACTIVITIY_TABLE_NAME, 
+				_values, _selection, _selectionArgs);
+	}
+	public int deleteServiceActivity(String _selection, String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.delete(SQLiteContract.SERVICES_ACTIVITIY_TABLE_NAME,
+				_selection, _selectionArgs);
+	}
+	public long insertMe(ContentValues _values) {
+		db = dbHelper.getWritableDatabase();
+		return db.insert(SQLiteContract.ME_TABLE_NAME, null, _values);
+	}
+	public Cursor queryMe(String[] _projection, String _selection,
+			String[] _selectionArgs, String _sortOrder) {
+		db = dbHelper.getReadableDatabase();
+		return db.query(SQLiteContract.ME_TABLE_NAME, 
+				_projection, _selection, _selectionArgs, null, null, _sortOrder);
+	}
+	public int updateMe(ContentValues _values, String _selection,
+			String[] _selectionArgs) {
+		db = dbHelper.getWritableDatabase();
+		return db.update(SQLiteContract.ME_TABLE_NAME, _values, _selection, _selectionArgs);
+	}
+	public int deleteMe(String _selection, String[] _selectionArgs){
+		db = dbHelper.getWritableDatabase();
+		return db.delete(SQLiteContract.ME_TABLE_NAME, _selection, _selectionArgs);
+	}
+
 	/* (non-Javadoc)
-	 * @see org.societies.android.platform.ISocialAdapter#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
-	 */
-	public int update(Uri uri, ContentValues values, String selection,
-			String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Deprecated
-	protected int updateMe(ContentValues values) {
-		//Always update first row.
-		//TODO: Fix this.
-		db = dbHelper.getWritableDatabase();
-		return db.update(ME_TABLE_NAME, values, SocialContract.Me._ID + "=1", null);
-	}
-
-	protected int updateMe(ContentValues values, String selection,
-			String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		db = dbHelper.getWritableDatabase();
-		return db.update(ME_TABLE_NAME, values, selection, selectionArgs);
-	}
-	protected int updateMyCommunity(ContentValues values, String selection,
-			String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		db = dbHelper.getWritableDatabase();
-		return db.update(MY_COMMUNITIES_TABLE_NAME, values, selection, selectionArgs);
-	}
-
-	protected int updateCommunity(ContentValues values, String selection,
-			String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		db = dbHelper.getWritableDatabase();
-		return db.update(COMMUNITIES_TABLE_NAME, values, selection, selectionArgs);
-	}
-	protected int updatePerson(ContentValues values, String selection,
-			String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		db = dbHelper.getWritableDatabase();
-		return db.update(PEOPLE_TABLE_NAME, values, selection, selectionArgs);
-	}
-	protected int updateService(ContentValues values, String selection,
-			String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		db = dbHelper.getWritableDatabase();
-		return db.update(SERVICES_TABLE_NAME, values, selection, selectionArgs);
-	}
-	/* (non-Javadoc)
-	 * @see org.societies.android.platform.ISocialAdapter#delete(android.net.Uri, java.lang.String, java.lang.String[])
-	 */
-	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/**
-	 * Total delete. Delete table and create again. This gives
-	 * index 1 to Me.
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	protected int deleteMe(){
-		db.execSQL("drop table if exists " + ME_TABLE_NAME);
-		db.execSQL(ME_TABLE_CREATE);
-		ContentValues initialValues = new ContentValues();
-		initialValues.put(SocialContract.Me.GLOBAL_ID, "you@societies.org");
-		initialValues.put(SocialContract.Me.NAME, "Your Name Here");
-//		initialValues.put(SocialContract.Me.DISPLAY_NAME, "Your Name");
-		
-		return (int)db.insert(ME_TABLE_NAME, null, initialValues);
-	}
-	protected int deleteMe(String _selection, String[] _selectionArgs){
-		db = dbHelper.getWritableDatabase();
-		return db.delete(ME_TABLE_NAME, _selection, _selectionArgs);
-	}
-	protected int deleteMyCommunities(String _selection, String[] _selectionArgs){
-		db = dbHelper.getWritableDatabase();
-		return db.delete(MY_COMMUNITIES_TABLE_NAME, _selection, _selectionArgs);
-	}
-	protected int deleteCommunities(String _selection, String[] _selectionArgs){
-		db = dbHelper.getWritableDatabase();
-		return db.delete(COMMUNITIES_TABLE_NAME, _selection, _selectionArgs);
-	}
-	protected int deletePeople(String _selection, String[] _selectionArgs){
-		db = dbHelper.getWritableDatabase();
-		return db.delete(PEOPLE_TABLE_NAME, _selection, _selectionArgs);
-	}
-	protected int deleteServices(String _selection, String[] _selectionArgs){
-		db = dbHelper.getWritableDatabase();
-		return db.delete(SERVICES_TABLE_NAME, _selection, _selectionArgs);
-	}
-	
-/* (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#isOnline()
 	 */
 	public boolean isConnected() {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			db = dbHelper.getWritableDatabase();
+			db.close();
+			return true;
+		} catch (SQLiteException ex){
+			
+			android.util.Log.e(TAG, ex.getMessage());
+			return false;
+		}
 	}
 	
 	/* 
@@ -359,6 +389,18 @@ public class LocalDBAdapter implements ISocialAdapter {
 
 	}
 	/* 
+	 * This method calls connect() and discards username and password.
+	 * Local DB does not need username and password. 
+	 * 
+	 * (non-Javadoc)
+	 * @see org.societies.android.platform.ISocialAdapter#connect(java.lang.String, java.lang.String)
+	 */
+	public int connect(String username, String password) {
+		// TODO Auto-generated method stub
+		return connect();
+	}
+
+	/* 
 	 * Return 1 if db was oepn and is now closed.
 	 * Return 0 if the db was already closed.
 	 * (non-Javadoc)
@@ -372,24 +414,13 @@ public class LocalDBAdapter implements ISocialAdapter {
 		return 0;
 	}
 
-	/* 
-	 * This method calls connect() and discards username and password.
-	 * Local DB does not need username and password. 
-	 * 
-	 * (non-Javadoc)
-	 * @see org.societies.android.platform.ISocialAdapter#connect(java.lang.String, java.lang.String)
-	 */
-	public int connect(String username, String password) {
-		// TODO Auto-generated method stub
-		return connect();
-	}
 	public boolean firstRun(){
 		try{
-			db = SQLiteDatabase.openDatabase(DB_PATH+DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
+			db = SQLiteDatabase.openDatabase(SQLiteContract.DB_PATH+SQLiteContract.DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
 			db.close();
 			return false;}
 		catch (SQLiteException e){
-			android.util.Log.d(TAG, ": Checked that DB does not exist:"+e.getMessage());
+			android.util.Log.d(TAG, ": DB does not exist, i.e. first run:"+e.getMessage());
 			return true;
 		}
 	}

@@ -24,7 +24,7 @@
  */
 package org.societies.android.platform;
 
-import java.util.UUID;
+import org.societies.android.api.cis.SocialContract;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -32,8 +32,7 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
-
-import org.societies.android.api.cis.SocialContract;
+import android.text.TextUtils;
 
 /**
  * This is the Android-based SocialProvider. It provides a content provider interface
@@ -47,7 +46,7 @@ import org.societies.android.api.cis.SocialContract;
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class SocialProvider extends ContentProvider implements ISocialAdapterCallback {
+public class SocialProvider extends ContentProvider{
     
 	//For logging:
     private static final String TAG = "SocialProvider";
@@ -55,318 +54,744 @@ public class SocialProvider extends ContentProvider implements ISocialAdapterCal
     //will contain all the legal URIs:
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-    private boolean online = false; // True when we are online.
-    private LocalDBAdapter dbAdapter = null;
-	//Construct all the legal query URIs:
-	//TODO replace with constants or move to SocialContract.
+    private ISocialAdapter adapter = null;
+	//Construct all the legal query URIs. The URIs that are added here are the
+    //ones that are supported in calls to SocialProvider. For all others there
+    //will be some exception being thrown.
+
+    //The method addURI() maps an authority and path to an integer value.
+    //The method match() returns the integer value for a URI.
+    // Later on in methods called from a Content Resolver, a switch statement 
+    // chooses between the different legal queries.
     static{
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me", 0);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", 1);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", 2);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities", 3);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities/#", 4);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services", 5);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services/#", 6);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities", 7);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/communities/#", 8);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me", SocialContract.UriMatcherIndex.ME);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/#", SocialContract.UriMatcherIndex.ME_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", SocialContract.UriMatcherIndex.PEOPLE);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", SocialContract.UriMatcherIndex.PEOPLE_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities", SocialContract.UriMatcherIndex.COMMUNITIES);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities/#", SocialContract.UriMatcherIndex.COMMUNITIES_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services", SocialContract.UriMatcherIndex.SERVICES);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services/#", SocialContract.UriMatcherIndex.SERVICES_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "relationship", SocialContract.UriMatcherIndex.RELATIONSHIP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "relationship/#", SocialContract.UriMatcherIndex.RELATIONSHIP_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "membership", SocialContract.UriMatcherIndex.MEMBERSHIP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "membership/#", SocialContract.UriMatcherIndex.MEMBERSHIP_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "sharing", SocialContract.UriMatcherIndex.SHARING);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "sharing/#", SocialContract.UriMatcherIndex.SHARING_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/people/activity", SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/people/activity/#", SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/communities/activity", SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/communities/activity/#", SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/services/activity", SocialContract.UriMatcherIndex.SERVICE_ACTIVITY);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/services/activity/#", SocialContract.UriMatcherIndex.SERVICE_ACTIVITY_SHARP);
+
     	}
-    	/* 
-     * Here I should do the following:
-     * - Create a {@link CommunicationAdapter} and try to get connection with cloud CisManager (currently not here 
-     *   due to problems with communication manager.
-     * - Initiate local database using {@link SocialDatabaseAdapter}
+   	/* 
      * 
      * (non-Javadoc)
      * @see android.content.ContentProvider#onCreate()
      */
     @Override
     public boolean onCreate() {
+    	android.util.Log.d(TAG, ": in onCreate()");
     	Context context = getContext();
-    	dbAdapter = new LocalDBAdapter(context);
-    	
-    	//TODO: This code will be removed. Only for filling in test data:
-    	if (dbAdapter.firstRun()){
-    		initializeMe();
-    		populateMyCommunities();
-    		populateCommunities();
-    		//populateMyServices();
-    		//populateMyPeople();
+    	adapter = new LocalDBAdapter(context);
+    	android.util.Log.d(TAG, ": dbAdapter created.");
+    	//Outsourcing initial data set to a separate class:
+    	SocialDataSet dataSet = new SocialDataSet(adapter);
+    	if(dataSet.initialize()){
+    	android.util.Log.d(TAG, ": data set created.");
     	}
-    	
-    	return true;
-	
-	//TODO: Add Edgar's CommunicationAdapter initialization here.
-	
+     	return true;	
     }
     
-    public void shutdown(){
-    	if (dbAdapter.isConnected()){
-    	dbAdapter.disconnect();
-    	}
-    }
-
-    private void initializeMe(){
-    	//TODO: needs to be done more elegantly! now just add 
-    	//Delete everything so there is only one CSS with _id = 1.
-    	//dbAdapter.deleteMe();
-		ContentValues initialValues = new ContentValues();
-		initialValues.put(SocialContract.Me.GLOBAL_ID , "you@societies.org");
-		initialValues.put(SocialContract.Me.NAME , "Your Name Here");
-		initialValues.put(SocialContract.Me.DISPLAY_NAME , "Your Name");
-
-		//2- Call insert in SocialProvider to initiate insertion
-		dbAdapter.updateMe(initialValues, SocialContract.Me._ID+"=0", null);
-		//update(SocialContract.Me.CONTENT_URI, initialValues, null, null);
-		//android.util.Log.e(TAG + ": number deleted", u.getLastPathSegment());
-    	
-    }
-
-    
-    private void populateMyCommunities(){
-    	ContentValues initialValues = new ContentValues();
-		initialValues.put(SocialContract.MyCommunity.GLOBAL_ID , "community1.societies.org");
-		initialValues.put(SocialContract.MyCommunity.OWNER_ID, "babak@societies.org");
-		//initialValues.put(SocialContract.MyCommunity.DISPLAY_NAME , "Football");
-		dbAdapter.connect();
-		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
-		dbAdapter.disconnect();
-		initialValues.clear();
-		initialValues.put(SocialContract.MyCommunity.GLOBAL_ID , "community3.societies.org");
-		initialValues.put(SocialContract.MyCommunity.OWNER_ID, "babak@societies.org");
-		//initialValues.put(SocialContract.MyCommunity.DISPLAY_NAME , "Basketball");
-		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
-		dbAdapter.connect();
-		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
-		dbAdapter.disconnect();
-		initialValues.put(SocialContract.MyCommunity.GLOBAL_ID , "community4.societies.org");
-		initialValues.put(SocialContract.MyCommunity.OWNER_ID, "thomas@societies.org");
-		//initialValues.put(SocialContract.MyCommunity.DISPLAY_NAME , "Handball");
-		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
-		dbAdapter.connect();
-		insert(SocialContract.MyCommunity.CONTENT_URI, initialValues);
-		dbAdapter.disconnect();
-
-    }
-    private void populateCommunities(){
-		ContentValues initialValues = new ContentValues();
+    /* 
+	 * (non-Javadoc)
+	 * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
+	 */
+	
+	@Override
+	public Uri insert(Uri _uri, ContentValues _values) {
+	
+		//Switch on the name of the path used in the query:
+		Uri returnUri = null;
 		
-		initialValues.put(SocialContract.Community.GLOBAL_ID , "community1.societies.org");
-		initialValues.put(SocialContract.Community.TYPE , "sports");
-		initialValues.put(SocialContract.Community.NAME , "Community 1");
-		//initialValues.put(SocialContract.Community.DISPLAY_NAME , "Football");
-		initialValues.put(SocialContract.Community.OWNER_ID, "babak@societies.org");
-		//initialValues.put(SocialContract.Community.CREATION_DATE , "Today");
-		//initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
-		initialValues.put(SocialContract.Community.DIRTY , "yes");
-		dbAdapter.connect();
-		insert(SocialContract.Community.CONTENT_URI, initialValues);
-		dbAdapter.disconnect();
-		initialValues.clear();
+		switch (sUriMatcher.match(_uri)){
+		case SocialContract.UriMatcherIndex.ME:
+			
+			//TODO: For all these, need to check for missing values in _values and add them.
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertMe(_values)));
+			break;
+			
+		// Cannot insert in specific index in the table. SQLite decides index.
+		//case SocialContract.UriMatcherIndex.ME_SHARP:
+		//	break;
+			
+		case SocialContract.UriMatcherIndex.PEOPLE:
+			
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertPeople(_values)));
+			break;
+			
+	   	// Cannot insert in specific index in the table. SQLite decides index.
+		//case SocialContract.UriMatcherIndex.PEOPLE_SHARP:
+		//	break;
+			
+		case SocialContract.UriMatcherIndex.COMMUNITIES:
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertCommunities(_values)));
+			break;
+	
+		// Cannot insert in specific index in the table. SQLite decides index.
+		//case SocialContract.UriMatcherIndex.COMMUNITIES_SHARP:
+		//	break;
+			
+		case SocialContract.UriMatcherIndex.SERVICES:
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertServices(_values)));
+			break;
+			
+	   	// Cannot insert in specific index in the table. SQLite decides index.
+		//case SocialContract.UriMatcherIndex.SERVICES_SHARP:
+		//	break;
+			
+		case SocialContract.UriMatcherIndex.RELATIONSHIP:
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertRelationship(_values)));
+			break;
+			
+	   	// Cannot insert in specific index in the table. SQLite decides index.
+		//case SocialContract.UriMatcherIndex.RELATIONSHIP_SHARP:
+		//	break;
+			
+		case SocialContract.UriMatcherIndex.MEMBERSHIP:
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertMembership(_values)));
+			break;
+			
+	   	// Cannot insert in specific index in the table. SQLite decides index.	
+		//case SocialContract.UriMatcherIndex.MEMBERSHIP_SHARP:
+		//	break;
+			
+		case SocialContract.UriMatcherIndex.SHARING:
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertSharing(_values)));
+			break;
+			
+	   	// Cannot insert in specific index in the table. SQLite decides index.
+		//case SocialContract.UriMatcherIndex.SHARING_SHARP:
+		//	break;
+			
+		case SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY:
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertPeopleActivity(_values)));
+			break;
+			
+	   	// Cannot insert in specific index in the table. SQLite decides index.
+		//case SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY_SHARP:
+		//	break;
+			
+		case SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY:
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertCommunityActivity(_values)));
+			break;
+			
+	   	// Cannot insert in specific index in the table. SQLite decides index.
+		//case SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY_SHARP:
+		//	break;
+			
+		case SocialContract.UriMatcherIndex.SERVICE_ACTIVITY:
+			returnUri = Uri.withAppendedPath(_uri, Long.toString(adapter.insertServiceActivity(_values)));
+			break;
+			
+	   	// Cannot insert in specific index in the table. SQLite decides index.
+		//case SocialContract.UriMatcherIndex.SERVICE_ACTIVITY_SHARP:
+		//	break;
+			
+		default:
+	        throw new IllegalArgumentException("Unsupported URI sent to SocialProvider insert:" + _uri);    	
+			
+		}
+		
+		//Inform content resolvers about changes:
+		getContext().getContentResolver().notifyChange(returnUri, null);
+		
+		return returnUri;
+	}
 
-		initialValues.put(SocialContract.Community.GLOBAL_ID , "community2.societies.org");
-		initialValues.put(SocialContract.Community.TYPE , "sports");
-		initialValues.put(SocialContract.Community.NAME , "Community 2");
-		//initialValues.put(SocialContract.Community.DISPLAY_NAME , "Baseball");
-		initialValues.put(SocialContract.Community.OWNER_ID, "jacqueline@societies.org");
-		//initialValues.put(SocialContract.Community.CREATION_DATE , "Today");
-		//initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
-		initialValues.put(SocialContract.Community.DIRTY , "yes");
-		dbAdapter.connect();
-		insert(SocialContract.Community.CONTENT_URI, initialValues);
-		dbAdapter.disconnect();
-		initialValues.clear();
-
-		initialValues.put(SocialContract.Community.GLOBAL_ID , "community3.societies.org");
-		initialValues.put(SocialContract.Community.TYPE , "sports");
-		initialValues.put(SocialContract.Community.NAME , "Community 3");
-		//initialValues.put(SocialContract.Community.DISPLAY_NAME , "Basketball");
-		initialValues.put(SocialContract.Community.OWNER_ID, "babak@societies.org");
-		//initialValues.put(SocialContract.Community.CREATION_DATE , "Today");
-		//initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Open");
-		initialValues.put(SocialContract.Community.DIRTY , "yes");
-		dbAdapter.connect();
-		insert(SocialContract.Community.CONTENT_URI, initialValues);
-		dbAdapter.disconnect();
-		initialValues.clear();
-
-		initialValues.put(SocialContract.Community.GLOBAL_ID , "community4.societies.org");
-		initialValues.put(SocialContract.Community.TYPE , "sports");
-		initialValues.put(SocialContract.Community.NAME , "Community 4");
-		//initialValues.put(SocialContract.Community.DISPLAY_NAME , "Handball");
-		initialValues.put(SocialContract.Community.OWNER_ID, "thomas@societies.org");
-		//initialValues.put(SocialContract.Community.CREATION_DATE , "Today");
-		//initialValues.put(SocialContract.Community.MEMBERSHIP_TYPE, "Closed");
-		initialValues.put(SocialContract.Community.DIRTY , "yes");
-		dbAdapter.connect();
-		insert(SocialContract.Community.CONTENT_URI, initialValues);
-		dbAdapter.disconnect();
-    	
-    }
-    private void populateMyServices(){
-		ContentValues initialValues = new ContentValues();
-		initialValues.put(SocialContract.Service.GLOBAL_ID , "service1@babak@societies.org");
-		initialValues.put(SocialContract.Service.NAME , "Service 1");
-		initialValues.put(SocialContract.Service.DISPLAY_NAME , "Some service");
-		dbAdapter.insertService(initialValues);
-		initialValues.clear();
-		initialValues.put(SocialContract.Service.GLOBAL_ID , "service2@babak@societies.org");
-		initialValues.put(SocialContract.Service.NAME , "Service 2");
-		initialValues.put(SocialContract.Service.DISPLAY_NAME , "Some other service");
-		dbAdapter.insertService(initialValues);
-		initialValues.clear();
-		initialValues.put(SocialContract.Service.GLOBAL_ID , "service3@babak@societies.org");
-		initialValues.put(SocialContract.Service.NAME , "Service 3");
-		initialValues.put(SocialContract.Service.DISPLAY_NAME , "Another service");
-		dbAdapter.insertService(initialValues);
-
-		//2- Call insert in SocialProvider to initiate insertion
-    	
-    }
-    private void populateMyPeople(){
-		ContentValues initialValues = new ContentValues();
-		initialValues.put(SocialContract.Person.GLOBAL_ID , "jacqueline@societies.org");
-		initialValues.put(SocialContract.Person.NAME , "Jacqueline Floch");
-		initialValues.put(SocialContract.Person.DISPLAY_NAME , "Jacqueline F");
-		dbAdapter.insertPerson(initialValues);
-		initialValues.clear();
-		initialValues.put(SocialContract.Person.GLOBAL_ID , "thomas@societies.org");
-		initialValues.put(SocialContract.Person.NAME , "ThomasVilarinho");
-		initialValues.put(SocialContract.Person.DISPLAY_NAME , "Thomas V");
-		dbAdapter.insertPerson(initialValues);
-		initialValues.clear();
-		initialValues.put(SocialContract.Person.GLOBAL_ID , "bjorn-magnus@societies.org");
-		initialValues.put(SocialContract.Person.NAME , "Bjørn Magnus Mathisen");
-		initialValues.put(SocialContract.Person.DISPLAY_NAME , " Bjørn Magnus M");
-		dbAdapter.insertPerson(initialValues);
-		initialValues.clear();
-
-
-		//2- Call insert in SocialProvider to initiate insertion
-//		dbAdapter.insertMe(initialValues);
-    	
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
-     */
-    @Override
-    public int delete(Uri _uri, String _selection, String[] _selectionArgs) {
-	// TODO Auto-generated method stub
-    	switch (sUriMatcher.match(_uri)){
-    	case 0: //Me
-    		return dbAdapter.deleteMe();
-    	case 7: //Me/Communities
-    		return dbAdapter.deleteMyCommunities(_selection, _selectionArgs);
-    	default:
-            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
-            }
-   }
-
-    /* (non-Javadoc)
-     * @see android.content.ContentProvider#getType(android.net.Uri)
-     */
-    @Override
-    public String getType(Uri uri) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    /* 
-     * (non-Javadoc)
-     * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
-     */
-
-    @Override
-    public Uri insert(Uri _uri, ContentValues _values) {
-
-    	//Switch on the name of the path used in the query:
-    	Uri returnUri = null;
-    	switch (sUriMatcher.match(_uri)){
-//    	case 0: //Me
-//    		returnUri = Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMe(_values)));
-//    		break;
-    	case 3:
-    		String fakeJid = UUID.randomUUID().toString(); // TODO: get it through xmpp
-    		_values.put(SocialContract.Community.GLOBAL_ID, fakeJid);
-    		//_values.
-    		returnUri = Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertCommunities(_values)));
-    		break;
-    	case 7: //Me/Communities
-    		returnUri = Uri.withAppendedPath(_uri, Long.toString(dbAdapter.insertMyCommunity(_values)));
-    		break;
-    	default:
-            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
-    	}
-    	return returnUri;
-    }
-
-    /* 
-     * Return a cursor that contains the contents of a query
-     * 
-     * (non-Javadoc)
-     * @see android.content.ContentProvider#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
-     */
-    @Override
-    public Cursor query(Uri _uri, String[] _projection, String _selection,
+	/* 
+	 * Return a cursor that contains the contents of a query
+	 * 
+	 * (non-Javadoc)
+	 * @see android.content.ContentProvider#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
+	 */
+	@Override
+	public Cursor query(Uri _uri, String[] _projection, String _selection,
 	    String[] _selectionArgs, String _sortOrder) {
-    	//Switch on the name of the path used in the query:
-    	switch (sUriMatcher.match(_uri)){
-    	case 0: //Me
-    		return dbAdapter.queryMe(_projection, _selection, _selectionArgs, _sortOrder);
-    	case 3:
-    		return dbAdapter.queryCommunities(_projection, _selection, _selectionArgs, _sortOrder);
-    	case 7:
-    		return dbAdapter.queryMyCommunities(_projection, _selection, _selectionArgs, _sortOrder);		
-    	default:
-            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
-    	}
-    }
+		
+		String rowID = null;
+		
+		//Use a query builder to build the query in the switch:
+		//SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+		
+		//Switch on the name of the path used in the query:
+		switch (sUriMatcher.match(_uri)){
+	
+		case SocialContract.UriMatcherIndex.ME:
+			return adapter.queryMe(_projection, _selection, _selectionArgs, _sortOrder);
+		case SocialContract.UriMatcherIndex.ME_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.queryMe(_projection, SocialContract.Me._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.PEOPLE:
+			return adapter.queryPeople(_projection, _selection, _selectionArgs, _sortOrder);
+		case SocialContract.UriMatcherIndex.PEOPLE_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.queryMe(_projection, SocialContract.People._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.COMMUNITIES:
+			return adapter.queryCommunities(_projection, _selection, _selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.COMMUNITIES_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.queryCommunities(_projection, SocialContract.Communities._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.SERVICES:
+			return adapter.queryServices(_projection, _selection, _selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.SERVICES_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.queryServices(_projection, SocialContract.Services._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.RELATIONSHIP:
+			return adapter.queryRelationship(_projection, _selection, _selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.RELATIONSHIP_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.queryRelationship(_projection, SocialContract.Relationship._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.MEMBERSHIP:
+			return adapter.queryMembership(_projection, _selection, _selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.MEMBERSHIP_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.queryMembership(_projection, SocialContract.Membership._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
 
-    /* (non-Javadoc)
-     * @see android.content.ContentProvider#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
-     */
-    @Override
-    public int update(Uri _uri, ContentValues _values, String _selection,
-	    String[] _selectionArgs) {
-    	int returnValue;
-    	int caseValue = sUriMatcher.match(_uri); 
-    	switch (caseValue){
-    	case 0: //Me
-    		returnValue= dbAdapter.updateMe(_values, _selection, _selectionArgs);
-    		break;
-    	case 3:
-    		returnValue= dbAdapter.updateCommunity(_values, _selection, _selectionArgs);
-    		break;
-    	case 7:
-    		returnValue= dbAdapter.updateMyCommunity(_values, _selection, _selectionArgs);
-    		break;
-    	default:
-            throw new IllegalArgumentException("Unsupported URI " + _uri);    	
-    	}
-    	return returnValue;
-    }
-    
-    /**
-     * 
-     * 
-     * @author Babak.Farshchian@sintef.no
-     *
-     */
-    //TODO: probably delete this:
-    
-    public boolean isOnline(){
-	return online;
-    }
+		case SocialContract.UriMatcherIndex.SHARING:
+			return adapter.querySharing(_projection, _selection, _selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.SHARING_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.querySharing(_projection, SocialContract.Sharing._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
+
+		case SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY:
+			return adapter.queryPeopleActivity(_projection, _selection, _selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.queryPeopleActivity(_projection, SocialContract.PeopleActivity._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
+
+		case SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY:
+			return adapter.queryCommunityActivity(_projection, _selection, _selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.queryCommunityActivity(_projection, SocialContract.CommunityActivity._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
+
+		case SocialContract.UriMatcherIndex.SERVICE_ACTIVITY:
+			return adapter.queryServiceActivity(_projection, _selection, _selectionArgs, _sortOrder);
+			
+		case SocialContract.UriMatcherIndex.SERVICE_ACTIVITY_SHARP:
+			//I have to set selection to exact row ID:
+			rowID = _uri.getPathSegments().get(1);
+			return adapter.queryServiceActivity(_projection, SocialContract.ServiceActivity._ID+" = "+rowID,
+					_selectionArgs, _sortOrder);
+		default:
+	        throw new IllegalArgumentException("Unsupported URI in SocialProvider query method:" + _uri);   			
+		}
+	
+	
+	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.android.platform.ISocialAdapterCallback#receiveResult(java.lang.Object)
+	 * @see android.content.ContentProvider#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
 	 */
-	public void receiveResult(Object returnValue) {
-		// TODO Auto-generated method stub
-		
-	};
+	@Override
+	public int update(Uri _uri, ContentValues _values, String _selection,
+	    String[] _selectionArgs) {
+		int updateCount = 0;
+		String rowID = null;
+		String selection = null;
+		switch (sUriMatcher.match(_uri)){
+		case SocialContract.UriMatcherIndex.ME:
+			//Call the right method with original parameters:
+			updateCount = adapter.updateMe(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
 
+		case SocialContract.UriMatcherIndex.ME_SHARP:
+			//If this is a # query, add row ID to the selection:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.Me._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");
+			updateCount = adapter.updateMe(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.PEOPLE:
+			//Call the right method with original parameters:
+			updateCount = adapter.updatePeople(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.PEOPLE_SHARP:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.People._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");			
+			updateCount = adapter.updatePeople(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.COMMUNITIES:
+			//Call the right method with original parameters:
+			updateCount = adapter.updateCommunities(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.COMMUNITIES_SHARP:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.Communities._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");
+			updateCount = adapter.updateCommunities(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.SERVICES:
+			//Call the right method with original parameters:
+			updateCount = adapter.updateServices(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.SERVICES_SHARP:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.Services._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");
+			updateCount = adapter.updateServices(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.RELATIONSHIP:
+			//Call the right method with original parameters:
+			updateCount = adapter.updateRelationship(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.RELATIONSHIP_SHARP:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.Relationship._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");
+			updateCount = adapter.updateRelationship(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.MEMBERSHIP:
+			//Call the right method with original parameters:
+			updateCount = adapter.updateMembership(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.MEMBERSHIP_SHARP:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.Membership._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");
+			updateCount = adapter.updateMembership(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.SHARING:
+			//Call the right method with original parameters:
+			updateCount = adapter.updateSharing(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.SHARING_SHARP:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.Sharing._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");
+			updateCount = adapter.updateSharing(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY:
+			//Call the right method with original parameters:
+			updateCount = adapter.updatePeopleActivity(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY_SHARP:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.PeopleActivity._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");
+			updateCount = adapter.updatePeopleActivity(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY:
+			//Call the right method with original parameters:
+			updateCount = adapter.updateCommunityActivity(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY_SHARP:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.CommunityActivity._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");
+			updateCount = adapter.updateCommunityActivity(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.SERVICE_ACTIVITY:
+			//Call the right method with original parameters:
+			updateCount = adapter.updateServiceActivity(_values, _selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+			
+		case SocialContract.UriMatcherIndex.SERVICE_ACTIVITY_SHARP:
+			rowID = _uri.getPathSegments().get(1);
+			selection = SocialContract.ServiceActivity._ID+" = "+ rowID
+					+ (!TextUtils.isEmpty(_selection) ?
+							" AND (" + _selection + ")" : "");
+			updateCount = adapter.updateServiceActivity(_values, selection, _selectionArgs);
+			//Inform resolvers about change:
+			getContext().getContentResolver().notifyChange(_uri, null);
+			//Return number of rows updated:
+			return updateCount;
+		default:
+	        throw new IllegalArgumentException("Unsupported URI in SocialProvider update method:" + _uri);    				
+		}
+	}
+		
+		/* (non-Javadoc)
+	     * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
+	     */
+	    @Override
+	    public int delete(Uri _uri, String _selection, String[] _selectionArgs) {
+		// TODO Auto-generated method stub
+	    	String rowID = null;
+	    	String selection = null;
+	    	int deleteCount = 0;
+	    	
+	    	switch (sUriMatcher.match(_uri)){
+	    	case SocialContract.UriMatcherIndex.ME:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deleteMe(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.ME_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.Me._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deleteMe(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.PEOPLE:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deletePeople(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.PEOPLE_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.People._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deletePeople(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.COMMUNITIES:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deleteCommunities(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.COMMUNITIES_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.Communities._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deleteCommunities(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.SERVICES:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deleteServices(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.SERVICES_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.Services._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deleteServices(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.RELATIONSHIP:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deleteRelationship(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.RELATIONSHIP_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.Relationship._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deleteRelationship(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.MEMBERSHIP:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deleteMembership(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.MEMBERSHIP_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.Membership._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deleteMembership(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.SHARING:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deleteSharing(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.SHARING_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.Sharing._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deleteSharing(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deletePeopleActivity(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.PeopleActivity._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deletePeopleActivity(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deleteCommunityActivity(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.CommunityActivity._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deleteCommunityActivity(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.SERVICE_ACTIVITY:
+	    		//To return the number of deleted items, you must
+	    		//specify a where clause. To delete all rows and
+	    		//return a value pass in "1":
+	    		if (_selection == null)
+	    			_selection = "1";
+				deleteCount = adapter.deleteServiceActivity(_selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    		
+	    	case SocialContract.UriMatcherIndex.SERVICE_ACTIVITY_SHARP:
+				//If this is a # query, add row ID to the selection:
+				rowID = _uri.getPathSegments().get(1);
+				selection = SocialContract.ServiceActivity._ID+" = "+ rowID
+						+ (!TextUtils.isEmpty(_selection) ?
+								" AND (" + _selection + ")" : "");
+				deleteCount = adapter.deleteServiceActivity(selection, _selectionArgs);
+				//Inform resolvers about change:
+				getContext().getContentResolver().notifyChange(_uri, null);
+				//Return number of rows updated:
+				return deleteCount;
+	    	default:
+	            throw new IllegalArgumentException("Unsupported URI in SocialProvider delete method:" + _uri);
+	    	}
+	
+	   }
+		
+		/* (non-Javadoc)
+		 * @see android.content.ContentProvider#getType(android.net.Uri)
+		 */
+		@Override
+		public String getType(Uri uri) {
+		// TODO Auto-generated method stub
+		return null;
+		}
 }
 
 
