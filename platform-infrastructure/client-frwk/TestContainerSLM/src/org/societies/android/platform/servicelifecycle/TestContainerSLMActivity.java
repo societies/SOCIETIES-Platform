@@ -176,6 +176,7 @@ public class TestContainerSLMActivity extends Activity {
     		if (connectedtoCoreMonitor) {
 	            coreServiceMonitor.activeServices("org.societies.android.platform.servicelifecycle");
 	            coreServiceMonitor.getInstalledApplications("org.societies.android.platform.servicelifecycle");
+	            coreServiceMonitor.startActivity("org.societies.android.platform.servicelifecycle", "org.societies.AndroidAgentTester");
     		}
     		
     		//TEST SERVICE UTILITIES API
@@ -228,6 +229,11 @@ public class TestContainerSLMActivity extends Activity {
 					Log.d(LOG_TAG, ">>>>>ACTIVE SERVICES RESULTS:\nName: " + info.clientLabel);
 					Log.d(LOG_TAG, "Package: " + info.clientPackage);
 				}
+			}
+			
+			if (intent.getAction().equals(CoreServiceMonitor.START_ACTIVITY)) {
+				Parcelable parcel =  intent.getParcelableExtra(CoreServiceMonitor.INTENT_RETURN_KEY);
+				Log.d(LOG_TAG, ">>>>>START ACTIVITY: " + parcel.toString() );
 			}
 		}
 	};

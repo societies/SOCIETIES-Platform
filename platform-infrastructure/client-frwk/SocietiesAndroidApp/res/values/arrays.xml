@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <resources>
+        <string-array name="xmppValues">
+	        <item>societies.local</item>
+	        <item>societies.bespoke</item>
+	        <item>societies.alternative</item>
+        </string-array>
+        
+        <string-array name="xmppNames">
+	        <item>Default</item>
+	        <item>Bespoke</item>
+	        <item>Alternative</item>
+        </string-array>
+        
+    </resources>
+    

@@ -64,20 +64,20 @@ public interface ICisAdvertisementRecord {
 
 	
 	/**
-     * Description: Gets the Uri of the CIS from the advertisement record
+     * Description: Gets the CSS ID of the owner of the CIS from the advertisement record
      *
      * 
-     * @return String Uri
+     * @return String cssOwnerId
      */
-	public String getUri();
+	public String getCssOwnerId();
 	
 	
 	/**
-     * Description: Sets the Uri of the CIS from the advertisement record
+     * Description: Sets the CSS ID of the owner of the CIS from the advertisement record
      *
-     * @param String Uri
+     * @param String cssId
      */
-	public void setUri(String uri);
+	public void setCssOwnerId(String cssId);
 	
 	/**
      * Description: Gets the password of the CIS from the advertisement record

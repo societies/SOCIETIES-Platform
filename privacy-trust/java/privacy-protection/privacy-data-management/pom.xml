@@ -32,7 +32,7 @@
 	<artifactId>privacydatamanagement</artifactId>
 	<name>Privacy Data Management</name>
 	<packaging>jar</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>${version.pt}</version>
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>

@@ -133,7 +133,7 @@
 						<Embed-Transitive>false</Embed-Transitive>
 
 						<Export-Package>
-							org.societies.context-management.**
+							org.societies.context.**
 						</Export-Package>
 					</instructions>
 				</configuration>

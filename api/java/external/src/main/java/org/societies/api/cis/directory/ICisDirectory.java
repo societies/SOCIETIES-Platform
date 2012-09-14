@@ -56,7 +56,7 @@ public interface ICisDirectory {
 	ICisAdvertisementRecord[] searchByOwner(String ownerId);
 	
 	/**
-	 * Description: Search method to search by Uri for CIS Advertisements that return an array of CISAdvertisementRecords.
+	 * Description: Search method to search by  for CIS Advertisements that return an array of CISAdvertisementRecords.
 	 * 
 	 * @return Array ICisAdvertisementRecord[]
 	 */

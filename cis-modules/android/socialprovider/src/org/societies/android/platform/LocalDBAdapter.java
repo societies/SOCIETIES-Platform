@@ -34,6 +34,8 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
+import org.societies.android.api.cis.SocialContract;
+
 /**
  * This adapter will implement a local cache of Social Data.
  * TODO: Currently it is used for testing purposes.

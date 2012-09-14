@@ -2,38 +2,7 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
   
-   <PreferenceCategory android:title="Example Category">
-        <CheckBoxPreference
-                android:key="DeadorAlive"
-                android:title="Alive"
-                android:defaultValue="true"
-                android:summary="Is user alive ?" />
-   		<EditTextPreference 
-   		    	android:title="Float Preference" 
-   	    		android:key="AFloatPref" 
-   	    		android:numeric="decimal"
-   	    		android:defaultValue="89999.9098" 
-   	    		android:summary="A large float"/>
-   		<EditTextPreference 
-   		    	android:title="Integer Preference" 
-   	    		android:numeric="integer"
-   		    	android:key="anInt" 
-   		    	android:defaultValue="132" 
-   		    	android:summary="An Integer value"/>
-   		<EditTextPreference 
-   		    	android:title="A Long preference" 
-   	    		android:numeric="integer"
-   		    	android:key="aLong" 
-   		    	android:defaultValue="100002322" 
-   		    	android:summary="A Long value"/>
-   		<EditTextPreference 
-   		    	android:title="String Preference" 
-   		    	android:key="aString" 
-   		    	android:defaultValue="String Theory" 
-   		    	android:summary="A String value"/>
-        
-    </PreferenceCategory>
-   	<PreferenceCategory android:title="Domain Authority Information">
+   	<PreferenceCategory android:title="CSS Information">
     		<EditTextPreference 
    		    	android:title="Domain Authority URI" 
    		    	android:key="daURI" 
@@ -60,12 +29,14 @@
             	android:title="Node Type" 
             	android:summary="CSS Node Type - Android" 
             	android:defaultValue="0" 
-            	android:enabled="true"/>
-            <EditTextPreference 
-            	android:key="cloudNode" 
-            	android:enabled="true" 
-            	android:summary="CSS Cloud Node" 
-           		android:defaultValue="xcmanager" 
-            	android:title="Cloud Node"/>
+            	android:enabled="false"/>
+            <ListPreference 
+	           android:title="Identity Domain Servers"
+	           android:summary="Select an Identity server"
+	           android:key="listIdentityDomain"
+	           android:defaultValue="societies.local"
+               android:entries="@array/xmppNames"
+           	   android:entryValues="@array/xmppValues" />       
+ />
    	</PreferenceCategory>
 </PreferenceScreen>

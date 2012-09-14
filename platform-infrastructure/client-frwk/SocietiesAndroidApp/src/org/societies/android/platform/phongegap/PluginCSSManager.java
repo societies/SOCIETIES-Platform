@@ -253,9 +253,8 @@ public class PluginCSSManager extends Plugin {
 				try {
 					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
 					Log.d(LOG_TAG, "parameter 1 - identity: " + data.getJSONObject(1).getString("cssIdentity"));
-					Log.d(LOG_TAG, "parameter 1 - hosting location: " + data.getJSONObject(1).getString("cssHostingLocation"));
-					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
 					Log.d(LOG_TAG, "parameter 1 - password: " + data.getJSONObject(1).getString("password"));
+					Log.d(LOG_TAG, "parameter 1 - domain server: " + data.getJSONObject(1).getString("domainServer"));
 				} catch (JSONException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
