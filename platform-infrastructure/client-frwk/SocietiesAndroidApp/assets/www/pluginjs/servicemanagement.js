@@ -41,23 +41,23 @@ window.plugins.ServiceManagementService = {
 }
 
 var ServiceManagementServiceHelper = {
-		/**
-		 * @methodOf SocietiesCoreServiceMonitorHelper#
-		 * @description Connect to Service Monitor native service
-		 * @param {Object} function to be executed if connection successful
-		 * @returns null
-		 */
+	/**
+	 * @methodOf ServiceManagementServiceHelper#
+	 * @description Connect to Service Management native service
+	 * @param {Object} function to be executed if connection successful
+	 * @returns null
+	 */
 
-		connectToServiceManagement: function(actionFunction) {
-			console.log("Connect to ServiceManagementService");
-				
-			function success(data) {
-				actionFunction();
-			}
+	connectToServiceManagement: function(actionFunction) {
+		console.log("Connect to ServiceManagementService");
 			
-			function failure(data) {
-				alert("ServiceManagementService - failure: " + data);
-			}
-		    window.plugins.ServiceManagementService.connectService(success, failure);
+		function success(data) {
+			actionFunction();
 		}
+		
+		function failure(data) {
+			alert("ServiceManagementService - failure: " + data);
+		}
+	    window.plugins.ServiceManagementService.connectService(success, failure);
+	}
 }

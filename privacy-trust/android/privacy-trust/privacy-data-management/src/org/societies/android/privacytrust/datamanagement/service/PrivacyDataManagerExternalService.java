@@ -26,6 +26,7 @@ package org.societies.android.privacytrust.datamanagement.service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
@@ -34,6 +35,7 @@ import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wra
 import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 
 import android.app.Service;
@@ -62,7 +64,7 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 		// Creation of a binder for the service
 		this.inMessenger = new Messenger(new IncomingHandler());
 		// Creation of an instance of the Java implementation
-		privacyDataManager = new PrivacyDataManager();
+		privacyDataManager = new PrivacyDataManager(this);
 	}
 
 
@@ -70,15 +72,15 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 	 * Service Method Implementation
 	 **** */
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, java.lang.String, java.lang.String, org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
-	@Override
 	public ResponseItem checkPermission(RequestorBean requestor,
-			String ownerId, String dataId, Action action)
+			DataIdentifier dataId, List<Action> actions)
 					throws PrivacyException {
 		Log.d(TAG, "External call to service checkPermission()");
-		ResponseItem permission = privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
+		ResponseItem permission = privacyDataManager.checkPermission(requestor, dataId, actions);
 		// -- Create intent to broadcast results to interested receivers
 		Intent intent = new Intent(IPrivacyDataManager.CHECK_PERMISSION);
 		intent.putExtra(IPrivacyDataManager.CHECK_PERMISSION_RESULT, permission);
@@ -87,15 +89,14 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 		return permission;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, java.lang.String, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
 	 */
 	@SuppressWarnings("rawtypes")
-	@Override
-	public IDataWrapper obfuscateData(String requestor, String ownerId,
-			IDataWrapper dataWrapper) throws PrivacyException {
+	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		Log.d(TAG, "External call to service obfuscateData()");
-		IDataWrapper obfuscatedDataWrapper = privacyDataManager.obfuscateData(requestor, ownerId, dataWrapper);
+		IDataWrapper obfuscatedDataWrapper = privacyDataManager.obfuscateData(requestor, dataWrapper);
 		// -- Create intent to broadcast results to interested receivers
 		Intent intent = new Intent(IPrivacyDataManager.OBFUSCATE_DATA);
 		intent.putExtra(IPrivacyDataManager.OBFUSCATE_DATA_RESULT, obfuscatedDataWrapper);
@@ -103,15 +104,14 @@ public class PrivacyDataManagerExternalService extends Service implements IPriva
 		return obfuscatedDataWrapper;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.schema.identity.RequestorBean, java.lang.String, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.schema.identity.RequestorBean, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
 	 */
 	@SuppressWarnings("rawtypes")
-	@Override
-	public String hasObfuscatedVersion(String requestor, String ownerId,
-			IDataWrapper dataWrapper) throws PrivacyException {
+	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		Log.d(TAG, "External call to service hasObfuscatedVersion()");
-		String dataId = privacyDataManager.hasObfuscatedVersion(requestor, ownerId, dataWrapper);
+		DataIdentifier dataId = privacyDataManager.hasObfuscatedVersion(requestor, dataWrapper);
 		// -- Create intent to broadcast results to interested receivers
 		Intent intent = new Intent(IPrivacyDataManager.HAS_OBFUSCATED_VERSION);
 		intent.putExtra(IPrivacyDataManager.HAS_OBFUSCATED_VERSION_RESULT, dataId);

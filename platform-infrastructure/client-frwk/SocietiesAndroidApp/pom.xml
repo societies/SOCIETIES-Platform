@@ -108,12 +108,12 @@
    			<type>apklib</type>
 		</dependency>
 
-		<dependency>
+		<!--dependency>
 		   <groupId>org.societies.android.platform</groupId>
 		   <artifactId>socialprovider-light</artifactId>
 		   <version>${release.version}</version> 
 		   <type>apklib</type>
-		</dependency>
+		</dependency-->
 		
     	<dependency>
     		<groupId>com.google.code.gson</groupId>

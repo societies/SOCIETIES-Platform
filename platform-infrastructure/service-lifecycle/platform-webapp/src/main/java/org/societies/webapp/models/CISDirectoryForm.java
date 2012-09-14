@@ -30,7 +30,7 @@ public class CISDirectoryForm {
 	private String method; 
 	
 	private String name;
-	private String uri; 
+	private String cssownwerid; 
 	private String type;
 	private String id;
 	private String password;
@@ -59,11 +59,11 @@ public class CISDirectoryForm {
 		this.name = name;
 	}
 	
-	public String getUri() {
-		return uri;
+	public String getcssOwnwerId() {
+		return cssownwerid;
 	}
-	public void setUri(String uri) {
-		this.uri = uri;
+	public void setcssOwnwerId(String cssownwerid) {
+		this.cssownwerid = cssownwerid;
 	}
 	
 	public String getType() {

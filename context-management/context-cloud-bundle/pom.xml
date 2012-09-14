@@ -6,8 +6,8 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+<!-- 		<relativePath>../../parent/spring-osgi.xml</relativePath> -->
+		<version>RELEASE</version>
 	</parent>
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
@@ -133,7 +133,7 @@
 						<Embed-Transitive>false</Embed-Transitive>
 
 						<Export-Package>
-							org.societies.context-management.**
+							org.societies.context.**
 						</Export-Package>
 					</instructions>
 				</configuration>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello! Context GUI coming soon..</string>
+    <string name="community_hello">Hello! Community Context Management coming soon..</string>
+    <string name="user_hello">Hello! Running User Context Management..</string>
+    <string name="create_entity">Create Entity..</string>
+    <string name="app_name">Context Management</string>
+    
+    <!-- Buttons -->
+    <string name="userctx_name">User Context</string>
+    <string name="communityctx_name">Community Context</string>
+    <string name="createctx_entity">Create Entity</string>
+    <string name="createctx_attribute">Create Attribute</string>
+    <string name="createctx_association">Create Association</string>
+    <string name="lookup">Lookup</string>
+    <string name="lookup_entities">Lookup Entities</string>
+    <string name="update">Update</string>
+        
+</resources>

@@ -97,10 +97,10 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<IDataWrapper<L
 		geolocation = data.getData();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
-	@Override
 	public IDataWrapper<LocationCoordinates> obfuscateData(double obfuscationLevel)
 			throws PrivacyException {
 		// -- Init

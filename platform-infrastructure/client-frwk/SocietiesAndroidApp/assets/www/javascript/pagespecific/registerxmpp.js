@@ -77,13 +77,13 @@ var SocietiesXMPPRegistration = {
 			
 			console.log("Current page: " + $.mobile.activePage[0].id);
 			
-			$.mobile.changePage( ($("#main")), { transition: "slideup"} );
+			$.mobile.changePage( ($("#index")), { transition: "slideup"} );
 		}
 		
 		function failure(data) {
 			alert("xmppRegistration - failure: " + data);
 		}
-	    window.plugins.SocietiesLocalCSSManagerService.registerXMPPServer(success, failure);
+	    window.plugins.SocietiesLocalCSSManager.registerXMPPServer(success, failure);
 
 	},
 	/**
@@ -101,15 +101,34 @@ var SocietiesXMPPRegistration = {
 		}
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssIdentity", jQuery("#regUsername").val());
 		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "cssPassword", jQuery("#regUserpass").val());
-		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#domainServers").val());
+		window.plugins.SocietiesAppPreferences.putStringPrefValue(success, failure, "daURI", jQuery("#domainServer").val());
 		
 		//Update the login page with XMPP registered values
 		jQuery("#username").val(jQuery("#regUsername").val());
-		jQuery("#userpass").val(jQuery("#regUserpass").val());
-		jQuery("#identitydomain").val(jQuery("#domainServers").val());
+		jQuery("#password").val(jQuery("#regUserpass").val());
+		jQuery("#identitydomain").val(jQuery("#domainServer").val());
 
+	},
+	/**
+	 * @methodOf SocietiesXMPPRegistration#
+	 * @description Gets the XMPP Identity app preference value
+	 * @returns null
+	 */
+
+	getIdentityDomain: function () {
+		
+		function success(data) {
+			console.log("getIdentityDomain - successful: " + data.value);
+
+
+			jQuery("#domainServer").val(data.value);
+		}
+		
+		function failure(data) {
+			alert("getIdentityDomain - failure: " + data);
+		}
+		window.plugins.SocietiesAppPreferences.getStringPrefValue(success, failure, "listIdentityDomain");
 	}
-
 }
 
 /**
@@ -125,8 +144,30 @@ $(document).bind('pageinit',function(){
 
 	$('#registerXMPP').off('click').on('click', function(){
 		if (SocietiesXMPPRegistration.validateRegistrationCredentials(jQuery("#regUsername").val(), jQuery("#regUserpass").val(), jQuery("#repeatRegUserpass").val(), jQuery("#regSocietiesTerms").val())) {
-			SocietiesLocalCSSManagerService.connectToLocalCSSManager(SocietiesXMPPRegistration.xmppRegistration);
-	}
+			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesXMPPRegistration.xmppRegistration);
+		}
+	});
+	
+	$('#xmppRegistration').off('click').on('click', function(){
+		$.mobile.changePage("html/new_identity.html");
 	});
 
 });
+
+/**
+ * JQuery boilerplate to attach JS functions to relevant HTML elements
+ * 
+ * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pageinit
+ * N.B. this event is fired once per page load
+ * @returns null
+ */
+$(document).bind("pagechange", function(event, options) {
+	//$("div[data-role*='page'] [id='activeServices']")$(document).on('pagechange',function(){
+
+		console.log("jQuery pagechange action(s) for register XMPP domain");
+		console.log("to page: " + options.toPage[0].id);
+		if (options.toPage[0].id === "new-identity"){
+			SocietiesXMPPRegistration.getIdentityDomain();
+		}
+});
+

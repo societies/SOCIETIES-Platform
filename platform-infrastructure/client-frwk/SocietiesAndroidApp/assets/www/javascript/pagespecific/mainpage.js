@@ -87,8 +87,8 @@ var SocietiesUtility = {
 			console.log("Register CIS Manager plugin ");
 			cordova.addPlugin("SocietiesLocalCISManager", SocietiesLocalCISManager);
 			
-			
-
+			console.log("Register Service Management plugin ");
+			cordova.addPlugin("ServiceManagementService", ServiceManagementService);
 		});
 		
 		//handle the Android Back button 
@@ -97,6 +97,8 @@ var SocietiesUtility = {
 		document.addEventListener("backbutton", SocietiesUtility.backButtonHandler, false);
 
 		SocietiesLogin.displayConnectionInfo();
+		
+
 
 	},
 
@@ -154,12 +156,6 @@ $(document).bind('pageinit',function(){
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
 	});
-
-//	$('#slide-active-services').off('click').on('click', function(){
-//		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(SocietiesActiveServices.getActiveServices);
-////		$.mobile.changePage("#activeServices", {transition: "slideup"});
-//
-//	});
 
 	$('#username').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#username')

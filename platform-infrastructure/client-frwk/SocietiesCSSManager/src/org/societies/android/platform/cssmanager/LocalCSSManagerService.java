@@ -36,7 +36,6 @@ import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.cssmanager.AndroidCSSNode;
 import org.societies.android.api.internal.cssmanager.AndroidCSSRecord;
 import org.societies.android.api.internal.cssmanager.IAndroidCSSManager;
-import org.societies.android.platform.content.CssRecordDAO;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -56,7 +55,10 @@ import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
+import org.societies.android.platform.content.CssRecordDAO;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -74,6 +76,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	//Logging tag
 	private static final String LOG_TAG = LocalCSSManagerService.class.getName();
+	
+	//Notification Tags
+	private static final String NEW_CSS_NODE = "New CSS Node";
+	private static final String OLD_CSS_NODE = "Old CSS Node";
+	private static final String NODE_LOGIN = "Node Logged in";
 	
 	private static final String ANDROID_PROFILING_NAME = "SocietiesCSSManager";
 
@@ -761,6 +768,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
 		        
 				this.updateLocalPersistence(aRecord);
+				
 			}
 		}
 		
@@ -805,18 +813,27 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(); 
     	    	subPubSub.execute(this.pubsubClient);
 	        } catch (ClassNotFoundException e) {
-	                Log.e(LOG_TAG, "ClassNotFoundException loading "+Arrays.toString(classList.toArray()), e);
+	                Log.e(LOG_TAG, "ClassNotFoundException loading " + Arrays.toString(classList.toArray()), e);
 	        }
-
 	}
+	
 
-	private static Subscriber subscriber = new Subscriber() {
+	private Subscriber subscriber = new Subscriber() {
 		@Override
 		public void pubsubEvent(IIdentity identity, String node, String itemId,
 				Object payload) {
 			Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
 			if (payload instanceof CssEvent) {
-				Log.d(LOG_TAG, "Received event is :" + ((CssEvent) payload).getType());
+				CssEvent event = (CssEvent) payload;
+				Log.d(LOG_TAG, "Received event is :" + event.getType());
+				
+				//Create Android Notification
+				int flags [] = new int [1];
+				flags[0] = Notification.FLAG_AUTO_CANCEL;
+
+//				AndroidNotifier notifier = new AndroidNotifier(LocalCSSManagerService.this.getApplicationContext(), Notification.DEFAULT_SOUND, flags);
+//
+//				notifier.notifyEvent(event, event.getType());
 			}
 		}
     };
