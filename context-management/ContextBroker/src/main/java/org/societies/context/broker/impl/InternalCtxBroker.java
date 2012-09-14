@@ -1074,9 +1074,27 @@ public class InternalCtxBroker implements ICtxBroker {
 	
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
-			CtxEntityIdentifier community) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+			CtxEntityIdentifier communityId) throws CtxException {
+		
+		List<CtxEntityIdentifier> result = null; 
+		
+		if (communityId == null)
+			throw new NullPointerException("communityId can't be null");
+		
+		try {
+			final CommunityCtxEntity communityEntity = (CommunityCtxEntity) this.retrieve(communityId).get();
+			
+			Set<CtxEntityIdentifier> commMembersSet = communityEntity.getMembers();
+			result = new ArrayList<CtxEntityIdentifier>(commMembersSet);
+	
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new AsyncResult<List<CtxEntityIdentifier>>(result);
 	}
 
 	@Override
