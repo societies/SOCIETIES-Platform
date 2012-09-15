@@ -133,8 +133,8 @@ public class CtxBrokerServer implements IFeatureServer{
 
 			// get the identity based on Jid and the identity manager
 			//String xmppIdentityJid = cbPayload.getCreate().getRequester();
-		
-			String targetIdentityString = cbPayload.getCreateEntity().getTargetCss();
+			
+			String targetIdentityString = cbPayload.getCreateEntity().getTargetCss().toString();
 			// TODO RequestorBean reqBean = cbPayload.getCreate().getRequestor();
 			// TODo Requestor requestor = getRequestorFromBean( reqBean);
 			
@@ -145,7 +145,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				targetIdentity = this.identMgr.fromJid(targetIdentityString);
 
 				// TODO Future<CtxEntity> newEntityFuture = ctxbroker.createEntity(requestor,targetIdentity,cbPayload.getCreate().getType());
-				CtxEntity newCtxEntity = ctxbroker.createEntity(null, targetIdentity, cbPayload.getCreateEntity().getType()).get();
+				CtxEntity newCtxEntity = ctxbroker.createEntity(null, targetIdentity, cbPayload.getCreateEntity().getType().toString()).get();
 				
 				LOG.info("CREATE_ENTITY  brokerserver id :" +newCtxEntity.getId());
 				LOG.info("CREATE_ENTITY  brokerserver getLastModified :" +newCtxEntity.getLastModified());
@@ -177,7 +177,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				e.printStackTrace();
 			}
 			break;
-		
+			
 		case CREATE_ATTRIBUTE:
 		
 			//CtxEntityIdentifier ctxEntityScope = cbPayload.getCreateAttribute().getScope();
@@ -185,7 +185,7 @@ public class CtxBrokerServer implements IFeatureServer{
 			try {
 				String ctxEntityScopeBean =  cbPayload.getCreateAttribute().getScope().getString();
 				CtxEntityIdentifier ctxEntityScope = new CtxEntityIdentifier(ctxEntityScopeBean);
-				String type = cbPayload.getCreateAttribute().getType();
+				String type = cbPayload.getCreateAttribute().getType().toString();
 			
 				RequestorBean reqBean = cbPayload.getCreateAttribute().getRequestor();
 				Requestor requestor = getRequestorFromBean(reqBean);
@@ -216,7 +216,70 @@ public class CtxBrokerServer implements IFeatureServer{
 				e.printStackTrace();
 			}
 			break;
-			/*
+		
+		case LOOKUP:
+			
+			LOG.info("LOOKUP 1 :");
+			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+			
+			RequestorBean reqBean = cbPayload.getLookup().getRequestor();
+			Requestor requestor = getRequestorFromBean(reqBean);
+			
+			String targetCssString = cbPayload.getLookup().getTargetCss();
+			IIdentity targetCss;
+			try {
+				targetCss = this.identMgr.fromJid(targetCssString);
+				
+				LOG.info("LOOKUP 1 :" +beanResponse);
+				CtxModelType modelType = ctxBeanTranslator.CtxModelTypeFromCtxModelTypeBean(cbPayload.getLookup().getModelType());
+			
+				LOG.info("LOOKUP 2 modelType:" +modelType);
+				String type = cbPayload.getCreateAttribute().getType().toString();
+				
+				LOG.info("LOOKUP 3 type:" +type);
+				
+				List<CtxIdentifier> lookupResultsList = ctxbroker.lookup(requestor, targetCss, modelType, type).get();
+				
+				LOG.info("LOOKUP 4 final local results size:" +lookupResultsList.size());
+				//TODO how to convert a list to a bean??
+				// until then send only one identifier
+				if(	lookupResultsList.size()>0){
+					
+					
+					List<CtxIdentifierBean> identBeanList = new ArrayList<CtxIdentifierBean>(); 
+					for(CtxIdentifier identifier :lookupResultsList){
+						LOG.info("LOOKUP 5  identifier.toString():" +identifier.toString());
+						CtxIdentifierBean identityBean = ctxBeanTranslator.fromCtxIdentifier(identifier);
+						identBeanList.add(identityBean);
+					}
+					LOG.info("LOOKUP 6 identBeanList :" +identBeanList);
+					beanResponse.setCtxBrokerLookupBeanResult(identBeanList);
+					LOG.info("LOOKUP 7 beanResponse :" +beanResponse);
+				}
+				
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+			
+
+			//	Future<List<CtxIdentifier>> lookupObjectsFuture = ctxbroker.lookup(requestor, requesterIdentity,
+			//			CtxModelType.valueOf(cbPayload.getLookup().getModelType().toString()), 
+			//			cbPayload.getLookup().getType());
+				
+				/*
 		else if (cbPayload.getCreateAssoc()!=null) {
 
 

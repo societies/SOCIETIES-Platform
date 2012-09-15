@@ -107,7 +107,7 @@ public class ExternalCtxBrokerTest {
 		when(mockRequestor.toString()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockNetworkNode.toString()).thenReturn(NETWORK_NODE_STRING);
 
-		when(mockIdentityLocal.toString()).thenReturn(OWNER_IDENTITY_STRING);
+		//when(mockIdentityLocal.toString()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockIdentityLocal.getType()).thenReturn(IdentityType.CSS);
 	}
 
@@ -216,17 +216,20 @@ public class ExternalCtxBrokerTest {
 	public void testCreateAssociationByString() throws Exception {
 
 		Requestor requestor = new Requestor(mockIdentityLocal);
-
+		System.out.println("mockIdentityLocal ******************************");
 		CtxAssociation ctxAssocHasParam = 
 				this.ctxBroker.createAssociation(requestor, mockIdentityLocal, CtxAssociationTypes.HAS_PARAMETERS).get();
 		assertNotNull(ctxAssocHasParam);
 		assertNotNull(ctxAssocHasParam.getId());
 		assertEquals(mockIdentityLocal.toString(), ctxAssocHasParam.getOwnerId());
 		assertEquals(CtxAssociationTypes.HAS_PARAMETERS, ctxAssocHasParam.getType());
-
+		
+		System.out.println("1 mockIdentityLocal "+mockIdentityLocal);
+		
 		// mock checkPermission
 		doNothing().when(mockCtxAccessController).checkPermission(requestor, mockIdentityLocal, 
 				new CtxPermission(ctxAssocHasParam.getId(), CtxPermission.READ));
+		
 		final List<CtxIdentifier> assocIdentifierList =	this.ctxBroker.lookup(
 				requestor, mockIdentityLocal, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_PARAMETERS).get();
 		assertEquals(1, assocIdentifierList.size());

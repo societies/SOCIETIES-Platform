@@ -420,13 +420,27 @@ public class CtxBrokerExample 	{
 			final IndividualCtxEntity operator = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 			LOG.info("*** CSS owner context entity id: " + operator.getId());
 
-			Set<CtxAttribute> attributes = operator.getAttributes();
-			if(attributes.size()>0){
-				for(CtxAttribute ctxAttr : attributes){
-					LOG.info("CtxAttribute "+ctxAttr.getId());
+			CtxAttribute books = this.internalCtxBroker.createAttribute(operator.getId(), CtxAttributeTypes.BOOKS).get();
+			books.setStringValue("Miserables");
+			
+			this.internalCtxBroker.update(books);
+			
+			final IndividualCtxEntity operator2 = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
+			
+			Set<CtxAttribute> attributesBooks = operator2.getAttributes(CtxAttributeTypes.BOOKS);
+			if(attributesBooks.size()>0){
+				for(CtxAttribute ctxAttr : attributesBooks){
+					LOG.info("CtxAttribute books id:"+ctxAttr.getId() + "value"+ctxAttr.getStringValue() ) ;
 				}	
 			}
 
+			Set<CtxAttribute> attributesAll = operator2.getAttributes();
+			if(attributesAll.size()>0){
+				for(CtxAttribute ctxAttr : attributesAll){
+					LOG.info("ALL CtxAttribute  id:"+ctxAttr.getId()) ;
+				}	
+			}
+			
 		} catch (Exception e) {
 
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);

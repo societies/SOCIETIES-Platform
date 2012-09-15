@@ -143,13 +143,13 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			final IIdentity targetCss, final String type) throws CtxException {
 
 		CtxEntity entity = null;
-		// ctxBrokerClient service retrieved
-
+		
 		if (idMgr.isMine(targetCss)) {
 
 			Future<CtxEntity> localEntity = internalCtxBroker.createEntity(type);
 
 			return localEntity;
+		
 		} else {
 
 			final CreateEntityCallback callback = new CreateEntityCallback();
@@ -672,12 +672,26 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
-		final List<CtxIdentifier> ctxIdList = new ArrayList<CtxIdentifier>();
+		final List<CtxIdentifier> localCtxIdListResult = new ArrayList<CtxIdentifier>();
+		List<CtxIdentifier> remoteCtxIdListResult = new ArrayList<CtxIdentifier>();
+		
+		LOG.info("lookup method called requestor:"+ requestor.toString());
+		System.out.println("lookup method called target:"+ target.getJid());
+		//LOG.info("lookup method called target:"+ target.toString());
+		//LOG.info("lookup method called target:"+ target.getJid().toString());
+		LOG.info("lookup method called modelType:"+ modelType.toString());
+		LOG.info("lookup method called type:"+ type);
+		
+		
 		if (this.idMgr.isMine(target)) {
-
+			LOG.info("lookup local call 1");
 			List<CtxIdentifier> ctxIdListFromDb;
 			try {
 				ctxIdListFromDb = internalCtxBroker.lookup(modelType, type).get();
+			
+				if (ctxIdListFromDb != null) LOG.info("lookup local call 2 data before access control : " + ctxIdListFromDb);
+			
+			
 			} catch (Exception e) {
 				throw new CtxBrokerException("Platform context broker failed to lookup " 
 						+ modelType	+ " objects of type " + type + ": " 
@@ -689,21 +703,46 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 					try {
 						this.ctxAccessController.checkPermission(requestor, target,
 								new CtxPermission(ctxId, CtxPermission.READ));
-						ctxIdList.add(ctxId);
+						localCtxIdListResult.add(ctxId);
+						
+				
 					} catch (CtxAccessControlException cace) {
 						// do nothing
 					}
 				}
-				if (ctxIdList.isEmpty())
+				if (localCtxIdListResult.isEmpty())
 					throw new CtxAccessControlException("Could not lookup " 
 							+ modelType	+ " objects of type " + type 
 							+ ": Access denied");
+				
+				if (localCtxIdListResult!=null)	LOG.info("lookup local call 3: " + localCtxIdListResult);
+				
+				
+				return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
 			}
 		} else {
-			LOG.info("remote call");
+			LOG.info("lookup remote call 1 requestor" + requestor);
+			LOG.info("lookup remote call 1 target" + target);
+			
+			final LookupCallback callback = new LookupCallback();
+			ctxBrokerClient.lookupRemote(requestor, target, modelType, type, callback);
+			LOG.info("lookup remote call 2");
+			synchronized (callback) {
+				
+				try {
+					callback.wait();
+					remoteCtxIdListResult = callback.getResult();
+					LOG.info("lookup remote call 3" + callback.getResult());
+				} catch (InterruptedException e) {
+
+					throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
+				}
+			}
+			
+			
 		}
 
-		return new AsyncResult<List<CtxIdentifier>>(ctxIdList);
+		return new AsyncResult<List<CtxIdentifier>>(remoteCtxIdListResult);
 	}
 
 	@Override
@@ -946,7 +985,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			synchronized (this) {	            
 				notifyAll();	        
 			}
-			LOG.info("notify all done");
+			LOG.info("onCreatedEntity, notify all done");
 		}
 
 		private CtxEntity getResult() {
@@ -957,6 +996,12 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		public void onCreatedAttribute(CtxAttribute retObject) {
 			// TODO Auto-generated method stub
 
+		}
+
+		@Override
+		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 
@@ -995,12 +1040,51 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			synchronized (this) {	            
 				notifyAll();	        
 			}
-			LOG.info("notify all done");
+			LOG.info("onCreatedAttribute, notify all done");
 
 		}
+
+		@Override
+		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
+	
+	
+	
+	private class LookupCallback implements ICtxCallback {
 
+		
+		private List<CtxIdentifier> idList;
+		
+		@Override
+		public void onCreatedEntity(CtxEntity retObject) {
+		}
 
+		@Override
+		public void onCreatedAttribute(CtxAttribute retObject) {
+		}
+
+		@Override
+		public void receiveCtxResult(Object retObject, String type) {
+		}
+
+		@Override
+		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
+			
+			LOG.info("onLookupCallback retObject " +idList);
+			this.idList = ctxIdsList;
+			synchronized (this) {	            
+				notifyAll();	        
+			}
+			LOG.info("onLookupCallback, notify all done");
+		}
+	
+		private List<CtxIdentifier> getResult() {
+			return this.idList;
+		}
+	}
 
 	private void logRequest(final Requestor requestor, final IIdentity target) {
 

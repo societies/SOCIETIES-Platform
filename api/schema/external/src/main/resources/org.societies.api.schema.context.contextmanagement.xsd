@@ -13,15 +13,24 @@
 	<xs:element name="ctxBrokerRequestBean">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="method" type="brokerMethodBean" nillable="false" minOccurs="1"/>
-				<xs:element name="retrieve" type="ctxBrokerRetrieveBean" nillable="false" minOccurs="0"/>
-				<xs:element name="lookup" type="ctxBrokerLookupBean" nillable="false" minOccurs="0"/>
-				<xs:element name="createEntity" type="ctxBrokerCreateEntityBean" nillable="false" minOccurs="0"/>
-				<xs:element name="updateAttribute" type="ctxBrokerUpdateAttributeBean" nillable="false" minOccurs="0"/>
-				<xs:element name="createAssociation" type="ctxBrokerCreateAssociationBean" nillable="false" minOccurs="0"/>
-				<xs:element name="remove" type="ctxBrokerRemoveBean" nillable="false" minOccurs="0"/>
-				<xs:element name="update" type="ctxBrokerUpdateBean" nillable="false" minOccurs="0"/>
-				<xs:element name="createAttribute" type="ctxBrokerCreateAttributeBean" nillable="false" minOccurs="0"/>
+				<xs:element name="method" type="brokerMethodBean"
+					nillable="false" minOccurs="1" />
+				<xs:element name="retrieve" type="ctxBrokerRetrieveBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="lookup" type="ctxBrokerLookupBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="createEntity" type="ctxBrokerCreateEntityBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="updateAttribute" type="ctxBrokerUpdateAttributeBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="createAssociation" type="ctxBrokerCreateAssociationBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="remove" type="ctxBrokerRemoveBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="update" type="ctxBrokerUpdateBean"
+					nillable="false" minOccurs="0" />
+				<xs:element name="createAttribute" type="ctxBrokerCreateAttributeBean"
+					nillable="false" minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -29,9 +38,10 @@
 	<xs:element name="ctxBrokerResponseBean">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="method" type="brokerMethodBean" nillable="false" minOccurs="1"/>
+				<xs:element name="method" type="brokerMethodBean"
+					nillable="false" minOccurs="1" />
 				<xs:element name="ctxBrokerCreateEntityBeanResult" type="tns:ctxEntityBean"
-					nillable="false" minOccurs="0"/>
+					nillable="false" minOccurs="0" />
 				<xs:element name="ctxBrokerLookupBeanResult" type="tns:ctxIdentifierBean"
 					minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="ctxBrokerRetrieveBeanResult" type="tns:ctxIdentifierBean"
@@ -64,16 +74,17 @@
 		<xs:sequence>
 			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
+			<xs:element name="targetCss" type="xs:string" minOccurs="1" />
+			<xs:element name="type" type="xs:string" minOccurs="1" />
 			<xs:element name="modelType" type="tns:ctxModelTypeBean"
 				minOccurs="0" />
-			<xs:element name="type" type="xs:string" minOccurs="0" />
-		</xs:sequence>
+			</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="ctxBrokerCreateEntityBean">
 		<xs:sequence>
-<!-- 			<xs:element name="requestor" type="tnsid:requestorBean"
-				minOccurs="0" />  -->
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="0" />
 			<xs:element name="targetCss" type="xs:string" minOccurs="1" />
 			<xs:element name="type" type="xs:string" minOccurs="1" />
 		</xs:sequence>
@@ -126,16 +137,16 @@
 			<xs:element name="type" type="xs:string" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:simpleType name="brokerMethodBean">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="CREATE_ENTITY"/>
-			<xs:enumeration value="CREATE_ATTRIBUTE"/>
-			<xs:enumeration value="CREATE_ASSOCIATION"/>
-			<xs:enumeration value="RETRIEVE"/>
-			<xs:enumeration value="UPDATE"/>
-			<xs:enumeration value="REMOVE"/>
-			<xs:enumeration value="LOOKUP"/>
+			<xs:enumeration value="CREATE_ENTITY" />
+			<xs:enumeration value="CREATE_ATTRIBUTE" />
+			<xs:enumeration value="CREATE_ASSOCIATION" />
+			<xs:enumeration value="RETRIEVE" />
+			<xs:enumeration value="UPDATE" />
+			<xs:enumeration value="REMOVE" />
+			<xs:enumeration value="LOOKUP" />
 		</xs:restriction>
 	</xs:simpleType>
 
