@@ -631,7 +631,7 @@ public final class SocialContract {
 	     * Name of the service this ID was created at. E.g. it might be 
 	     * a Facebook ID or a SOCIETIES ID. 
 	     */
-	    public static final String ORIGINE = "origin";
+	    public static final String ORIGIN = "origin";
 	}
 
 	

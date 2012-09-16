@@ -93,14 +93,16 @@ public class SocialProvider extends ContentProvider{
      */
     @Override
     public boolean onCreate() {
-    	android.util.Log.d(TAG, ": in onCreate()");
+    	android.util.Log.d(TAG, ": In onCreate()");
     	Context context = getContext();
     	adapter = new LocalDBAdapter(context);
     	android.util.Log.d(TAG, ": dbAdapter created.");
     	//Outsourcing initial data set to a separate class:
-    	SocialDataSet dataSet = new SocialDataSet(adapter);
-    	if(dataSet.initialize()){
-    	android.util.Log.d(TAG, ": data set created.");
+    	//If this is the first time, populate the DB:
+    	if(adapter.firstRun()){
+    		SocialDataSet dataSet = new SocialDataSet(adapter);
+        	dataSet.populate();
+        	android.util.Log.d(TAG, ": Data set created.");
     	}
      	return true;	
     }

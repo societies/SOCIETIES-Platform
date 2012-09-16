@@ -31,7 +31,7 @@ public final class SQLiteContract {
 			SocialContract.Me.DISPLAY_NAME + " text not null," +
 			SocialContract.Me.USER_NAME + " text not null," +
 			SocialContract.Me.PASSWORD + " text not null," +
-			SocialContract.Me.ORIGINE + " text not null );";
+			SocialContract.Me.ORIGIN + " text not null );";
 
 	public static final String PEOPLE_TABLE_CREATE = "create table if not exists " + PEOPLE_TABLE_NAME
 			+ " (" + 
@@ -41,9 +41,9 @@ public final class SQLiteContract {
 			SocialContract.People.EMAIL + " text not null," +
 			SocialContract.People.ORIGIN + " text not null," +
 			SocialContract.People.DESCRIPTION + " text not null," +
-			SocialContract.People.CREATION_DATE + " text not null," +
-			SocialContract.People.LAST_MODIFIED_DATE + " text not null," +
-			SocialContract.People.SYNC_STATUS + " text not null );";
+			SocialContract.People.CREATION_DATE + " text," +
+			SocialContract.People.LAST_MODIFIED_DATE + " text," +
+			SocialContract.People.SYNC_STATUS + " text );";
 
 	public static final String COMMUNITIES_TABLE_CREATE = "create table if not exists " + COMMUNITIES_TABLE_NAME
 			+ " (" + 
@@ -54,9 +54,9 @@ public final class SQLiteContract {
 			SocialContract.Communities.OWNER_ID + " text not null," +
 			SocialContract.Communities.ORIGIN + " text not null," +
 			SocialContract.Communities.DESCRIPTION + " text not null," +
-			SocialContract.Communities.CREATION_DATE + " text not null," +
-			SocialContract.Communities.LAST_MODIFIED_DATE + " text not null," +
-			SocialContract.Communities.SYNC_STATUS + " text not null );";
+			SocialContract.Communities.CREATION_DATE + " text," +
+			SocialContract.Communities.LAST_MODIFIED_DATE + " text," +
+			SocialContract.Communities.SYNC_STATUS + " text );";
 
 	public static final String SERVICES_TABLE_CREATE = "create table if not exists " + SERVICES_TABLE_NAME
 			+ " (" + 
@@ -67,9 +67,9 @@ public final class SQLiteContract {
 			SocialContract.Services.OWNER_ID + " text not null," +
 			SocialContract.Services.ORIGIN + " text not null," +
 			SocialContract.Services.DESCRIPTION + " text not null," +
-			SocialContract.Services.CREATION_DATE + " text not null," +
-			SocialContract.Services.LAST_MODIFIED_DATE + " text not null," +
-			SocialContract.Services.SYNC_STATUS + " text not null," +
+			SocialContract.Services.CREATION_DATE + " text," +
+			SocialContract.Services.LAST_MODIFIED_DATE + " text," +
+			SocialContract.Services.SYNC_STATUS + " text," +
 			SocialContract.Services.AVAILABLE + " text not null," +
 			SocialContract.Services.DEPENDENCY + " text not null," +
 			SocialContract.Services.CONFIG + " text not null," +

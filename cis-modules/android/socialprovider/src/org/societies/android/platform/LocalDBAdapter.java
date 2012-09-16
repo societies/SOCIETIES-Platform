@@ -401,7 +401,7 @@ public class LocalDBAdapter implements ISocialAdapter {
 	}
 
 	/* 
-	 * Return 1 if db was oepn and is now closed.
+	 * Return 1 if db was open and is now closed.
 	 * Return 0 if the db was already closed.
 	 * (non-Javadoc)
 	 * @see org.societies.android.platform.ISocialAdapter#disconnect()
@@ -414,13 +414,19 @@ public class LocalDBAdapter implements ISocialAdapter {
 		return 0;
 	}
 
+	/* 
+	 * Tries to open the DB specified in {@link SQLiteContract}. If the DB exists
+	 * returns false. If the DB does not exist return true.
+	 * (non-Javadoc)
+	 * @see org.societies.android.platform.ISocialAdapter#firstRun()
+	 */
 	public boolean firstRun(){
 		try{
 			db = SQLiteDatabase.openDatabase(SQLiteContract.DB_PATH+SQLiteContract.DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
 			db.close();
 			return false;}
 		catch (SQLiteException e){
-			android.util.Log.d(TAG, ": DB does not exist, i.e. first run:"+e.getMessage());
+			android.util.Log.d(TAG, ": DB does not exist, i.e. first run: "+e.getMessage());
 			return true;
 		}
 	}
