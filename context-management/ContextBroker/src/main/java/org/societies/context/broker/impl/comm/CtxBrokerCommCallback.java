@@ -40,6 +40,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelBeanTranslator;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
@@ -47,12 +48,13 @@ import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
+import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.context.broker.impl.comm.ICtxCallback;
 
 public class CtxBrokerCommCallback implements ICommCallback {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerCommCallback.class);
-	
+
 	private final static List<String> NAMESPACES = Arrays.asList(
 			"http://societies.org/api/schema/identity",
 			"http://societies.org/api/schema/context/model",
@@ -61,152 +63,171 @@ public class CtxBrokerCommCallback implements ICommCallback {
 			"org.societies.api.schema.identity",
 			"org.societies.api.schema.context.model",
 			"org.societies.api.schema.context.contextmanagement");
-	
+
 	//MAP TO STORE ALL THE CLIENT CONNECTIONS
 	private final Map<String, ICtxCallback> ctxClients = new HashMap<String, ICtxCallback>();
-	
+
 	/*
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
 		if (msgBean.getClass().equals(CtxBrokerCreateEntityBean.class)) {
 			CtxBrokerCreateEntityBean entityBean = 
 					(CtxBrokerCreateEntityBean) msgBean;
-			
+
 			ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 			ctxCallbackClient.receiveCtxResult(entityBean);
 		}
 	}
-	*/
-	
+	 */
+
 	@Override
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
-		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
+
+		//CHECK WHICH END SERVICE IS SENDING THE MESSAGE
 		LOG.info("inside receiveResult 1");
 		if (msgBean.getClass().equals(CtxBrokerResponseBean.class)) {
-			
+
 			CtxBrokerResponseBean payload = (CtxBrokerResponseBean) msgBean;
 			try {
-			
-				LOG.info("inside receiveResult 2");
-				if (payload.getCtxBrokerCreateEntityBeanResult()!=null) {
+						
+				// CREATE ENTITY
+				if (payload.getCtxBrokerCreateEntityBeanResult() != null) {
 					CtxEntityBean bean = 
 							(CtxEntityBean) payload.getCtxBrokerCreateEntityBeanResult();
 					LOG.info("CreateEntity receiveResult 23");
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+					
 					CtxEntity result = CtxModelBeanTranslator.getInstance().fromCtxEntityBean(bean);
 					LOG.info("CreateEntity receiveResult 24 " +result);
+					
 					ctxCallbackClient.onCreatedEntity(result);
 					LOG.info("CreateEntity receiveResult 25  ctxCallbackClient " +ctxCallbackClient);
-				
+					// CREATE ATTRIBUTE				
 				} else if (payload.getCtxBrokerCreateAttributeBeanResult()!=null) {
 					LOG.info("inside receiveResult create Attribute");
 					CtxAttributeBean attrBean = 
 							(CtxAttributeBean) payload.getCtxBrokerCreateAttributeBeanResult();
-					
 					LOG.info("inside receiveResult create Attribute 1 " +attrBean.toString());
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
-					
+
 					CtxAttribute result = CtxModelBeanTranslator.getInstance().fromCtxAttributeBean(attrBean);
 					LOG.info("inside receiveResult create Attribute 2" +result.getId());
 					ctxCallbackClient.onCreatedAttribute(result);
-				
+
+					// CREATE ASSOCIATION
 				} else if (payload.getCtxBrokerCreateAssociationBeanResult()!=null){
 					CtxAssociationBean bean = 
 							(CtxAssociationBean) payload.getCtxBrokerCreateAssociationBeanResult();
 
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 					ctxCallbackClient.receiveCtxResult(bean, "association");
+
+					// REMOVE
 				} else if (payload.getCtxBrokerRemoveBeanResult()!=null){
 					CtxEntityIdentifierBean bean = 
 							(CtxEntityIdentifierBean) payload.getCtxBrokerRemoveBeanResult();
 
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 					ctxCallbackClient.receiveCtxResult(bean, "remove");
+
+					// RETRIEVE
 				} else if (payload.getCtxBrokerRetrieveBeanResult()!=null){
-					CtxIdentifierBean bean = 
-							(CtxIdentifierBean) payload.getCtxBrokerRetrieveBeanResult();
+					CtxModelObjectBean objectBean = 
+							(CtxModelObjectBean) payload.getCtxBrokerRetrieveBeanResult();
+					LOG.info("inside receiveResult retrieve object objectBean 1 " +objectBean.getId().toString());
 
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
-					ctxCallbackClient.receiveCtxResult(bean, "retrieve");
-				
-				} else if (payload.getCtxBrokerLookupBeanResult()!=null){
-				//CtxEntityBean bean = 	(CtxEntityBean) payload.getCtxBrokerCreateEntityBeanResult();
-					LOG.info("inside receiveResult LOOKUP method");
+					CtxModelObject ctxObj = CtxModelBeanTranslator.getInstance().fromCtxModelObjectBean(objectBean);
+					LOG.info("inside receiveResult retrieve object ctxObj 2  " +ctxObj.getId().toString());
+
+					ctxCallbackClient.onRetrieveCtx(ctxObj);
 					
-					List<CtxIdentifierBean> bean = new ArrayList<CtxIdentifierBean>();
-					bean = (ArrayList<CtxIdentifierBean>)payload.getCtxBrokerLookupBeanResult();
+					//UPDATE	
+				} else if (payload.getCtxBrokerUpdateBeanResult() != null){
+
+					LOG.info("inside receiveResult UPDATE method 1 ");
+					CtxModelObjectBean updatedModelObjBean = 
+							(CtxModelObjectBean) payload.getCtxBrokerUpdateBeanResult();
+					LOG.info("inside receiveResult UPDATE method 2 ");
+					CtxModelObject updatedModelObj = CtxModelBeanTranslator.getInstance().fromCtxModelObjectBean(updatedModelObjBean);
+					LOG.info("inside receiveResult UPDATE method 3 ");
+					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+
+					ctxCallbackClient.onUpdateCtx(updatedModelObj);
+					LOG.info("inside receiveResult UPDATE method 4 ");
+					
+					// LOOKUP
+				} else if (payload.getCtxBrokerLookupBeanResult() != null){
+					LOG.info("inside receiveResult LOOKUP method 1 ");
+					List<CtxIdentifierBean> beanList = new ArrayList<CtxIdentifierBean>();
+					beanList = (ArrayList<CtxIdentifierBean>)payload.getCtxBrokerLookupBeanResult();
+
+					LOG.info("inside receiveResult LOOKUP method 2 beanList"+ beanList.size());
 
 					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 					List<CtxIdentifier> resultListIdentifiers = new ArrayList<CtxIdentifier>();
-					// TODO how to handle lists with beans ?
-					//result = CtxModelBeanTranslator.getInstance().fromListCtxIdentifiersBean(bean);
+
+					for(CtxIdentifierBean identBean : beanList ){
+						CtxIdentifier ctxIdent = CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean(identBean);
+						LOG.info("inside receiveResult LOOKUP method 3"+ ctxIdent);
+						resultListIdentifiers.add(ctxIdent);
+					}					
+					LOG.info("inside receiveResult LOOKUP method 4"+ resultListIdentifiers);
 					ctxCallbackClient.onLookupCallback(resultListIdentifiers);
-					
-					
-				} else if (payload.getCtxBrokerUpdateBeanResult()!=null){
-					CtxEntityIdentifierBean bean = 
-							(CtxEntityIdentifierBean) payload.getCtxBrokerUpdateBeanResult();
-
-					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
-					ctxCallbackClient.receiveCtxResult(bean, "update");
-				} else if (payload.getCtxBrokerUpdateAttributeBeanResult()!=null){
-					CtxAttributeIdentifierBean bean = 
-							(CtxAttributeIdentifierBean) payload.getCtxBrokerUpdateAttributeBeanResult();
-
-					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
-					ctxCallbackClient.receiveCtxResult(bean, "update attribute");
-				} else 
+							
+									
+				}  else 
 					LOG.error("The payload is not appropriate for the CtxBrokerCommCallback receiveResult method!");
 			} catch (Exception e) {
 
 				LOG.error("Could not parse result bean " + msgBean);
 			}
 
-			
-			
+
+
 		}
 	}
 
 	@Override
 	public List<String> getXMLNamespaces() {
-		
+
 		return NAMESPACES;
 	}
 
 	@Override
 	public List<String> getJavaPackages() {
-		
+
 		return PACKAGES;
 	}
 
 	@Override
 	public void receiveError(Stanza stanza, XMPPError error) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void receiveItems(Stanza stanza, String node, List<String> items) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	void addRequestingClient(String id, ICtxCallback callback) {
 		this.ctxClients.put(id, callback);
 	}
-	
+
 	private ICtxCallback getRequestingClient(String requestID) {
 		ICtxCallback requestingClient = (ICtxCallback) ctxClients.get(requestID);
 		ctxClients.remove(requestID);

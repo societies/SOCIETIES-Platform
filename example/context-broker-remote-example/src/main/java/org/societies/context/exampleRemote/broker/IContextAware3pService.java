@@ -28,8 +28,8 @@ package org.societies.context.exampleRemote.broker;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.identity.IIdentity;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 
 /**
  * This is a 3p service Ifc that needs to access context through the societies platform ...
@@ -39,10 +39,14 @@ import org.societies.api.identity.IIdentity;
  */
 public interface IContextAware3pService {
 	
+	public CtxAttribute createRemoteCtxAttribute(CtxEntityIdentifier remoteCtxEntityId);
 	
-	public List<CtxAttribute> lookupRemoteCtxAttribute(IIdentity targetId, String ctxAttrType);
+	public CtxEntity createRemoteCtxEntity();
 	
-	public CtxAttribute retrieveRemoteCtxAttribute(IIdentity targetId,CtxAttributeIdentifier attrID);
+	public List<CtxAttribute> lookupRemoteCtxAttribute();
 	
+	public CtxAttribute retrieveRemoteCtxAttribute();
+	
+	public List<CtxAttribute> lookupRemoteLocalCtxAttribute();
 	
 }

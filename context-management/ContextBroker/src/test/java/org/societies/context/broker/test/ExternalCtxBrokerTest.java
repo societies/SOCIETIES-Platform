@@ -163,6 +163,7 @@ public class ExternalCtxBrokerTest {
 		assertNotNull(ctxEntity.getId());
 		assertEquals(mockIdentityLocal.toString(), ctxEntity.getOwnerId());
 		assertEquals(CtxEntityTypes.DEVICE, ctxEntity.getType());
+	
 	}
 
 	/**

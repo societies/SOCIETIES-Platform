@@ -44,15 +44,15 @@
 					nillable="false" minOccurs="0" />
 				<xs:element name="ctxBrokerLookupBeanResult" type="tns:ctxIdentifierBean"
 					minOccurs="0" maxOccurs="unbounded" />
-				<xs:element name="ctxBrokerRetrieveBeanResult" type="tns:ctxIdentifierBean"
+				<xs:element name="ctxBrokerRetrieveBeanResult" type="tns:ctxModelObjectBean"
 					nillable="false" minOccurs="0" />
 				<xs:element name="ctxBrokerUpdateAttributeBeanResult"
-					type="tns:ctxAttributeIdentifierBean" nillable="false" minOccurs="0" />
+					type="tns:ctxModelObjectBean" nillable="false" minOccurs="0" />
 				<xs:element name="ctxBrokerCreateAssociationBeanResult"
 					type="tns:ctxAssociationBean" minOccurs="0" />
 				<xs:element name="ctxBrokerRemoveBeanResult" type="tns:ctxEntityIdentifierBean"
 					minOccurs="0" />
-				<xs:element name="ctxBrokerUpdateBeanResult" type="tns:ctxEntityIdentifierBean"
+				<xs:element name="ctxBrokerUpdateBeanResult" type="tns:ctxModelObjectBean"
 					minOccurs="0" />
 				<xs:element name="ctxBrokerCreateAttributeBeanResult"
 					type="tns:ctxAttributeBean" minOccurs="0" />
@@ -123,7 +123,7 @@
 		<xs:sequence>
 			<xs:element name="requestor" type="tnsid:requestorBean"
 				minOccurs="0" />
-			<xs:element name="id" type="tns:ctxModelObjectBean"
+			<xs:element name="ctxModelOject" type="tns:ctxModelObjectBean"
 				minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>

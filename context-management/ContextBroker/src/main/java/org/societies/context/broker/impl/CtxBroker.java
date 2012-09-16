@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.broker.CtxAccessControlException;
@@ -44,6 +46,7 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -51,14 +54,21 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.societies.context.broker.api.security.CtxPermission;
 import org.societies.context.broker.api.security.ICtxAccessController;
 import org.societies.context.broker.impl.comm.CtxBrokerClient;
 import org.societies.context.broker.impl.comm.ICtxCallback;
+import org.societies.context.broker.impl.comm.callbacks.CreateAttributeCallback;
+import org.societies.context.broker.impl.comm.callbacks.CreateEntityCallback;
+import org.societies.context.broker.impl.comm.callbacks.LookupCallback;
+import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
+import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,17 +153,21 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			final IIdentity targetCss, final String type) throws CtxException {
 
 		CtxEntity entity = null;
-		
+
 		if (idMgr.isMine(targetCss)) {
 
 			Future<CtxEntity> localEntity = internalCtxBroker.createEntity(type);
 
 			return localEntity;
-		
+
 		} else {
 
 			final CreateEntityCallback callback = new CreateEntityCallback();
-			ctxBrokerClient.createRemoteEntity(requestor, targetCss, type, callback);
+			// change target to local identity for testing 
+			LOG.info("createEntity remote call: target id changed to local" + this.getLocalID());
+			ctxBrokerClient.createRemoteEntity(requestor, this.getLocalID(), type, callback);
+
+			//ctxBrokerClient.createRemoteEntity(requestor, targetCss, type, callback);
 
 			synchronized (callback) {
 
@@ -184,19 +198,26 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			throw new NullPointerException("type can't be null");
 
 		CtxAttribute ctxAttribute = null;
-		IIdentity targetCss;
+
+		IIdentity targetCss = null; 
+
+		LOG.info("createAttribute requestor" + requestor);
+		LOG.info("createAttribute scope" + scope.getOwnerId().toString());
 		try {
 			//TODO remove if after testing
-			if(scope.getOwnerId().equals("null")) {
-				targetCss = null;
+			if(scope.getOwnerId().equals("local")) {
+				targetCss = this.idMgr.fromJid("jane.societies.local");
 			} else	targetCss = this.idMgr.fromJid(scope.getOwnerId());
+			LOG.info("createAttribute targetCss" + targetCss);
+
+			//targetCss = this.idMgr.fromJid("jane.societies.local");
 
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
 
 		if (this.idMgr.isMine(targetCss)) {
-
+			LOG.info("createAttribute local: ");
 			try {
 				ctxAttribute = internalCtxBroker.createAttribute(scope, type).get();
 
@@ -209,7 +230,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		} else {
 			// remote call
 			final CreateAttributeCallback callback = new CreateAttributeCallback();
-			ctxBrokerClient.createRemoteAttribute(requestor, targetCss, scope, type, callback);
+
+			// testing code
+			// change target to local identity for testing 
+			LOG.info("createAttribute remote call: target id changed to local" + this.getLocalID());
+			ctxBrokerClient.createRemoteAttribute(requestor, this.getLocalID(), scope, type, callback);
+			LOG.info("createAttribute remote call performed ");
+			//real code
+			//ctxBrokerClient.createRemoteAttribute(requestor, targetCss, scope, type, callback);
 
 			synchronized (callback) {
 				try {
@@ -299,9 +327,10 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "':" + ife.getLocalizedMessage(), ife);
 		}
+
 		this.logRequest(requestor, target);
 
-		// target is a CIS
+		// target is a CIS code starts 
 		if (IdentityType.CIS.equals(target.getType())) {
 			LOG.info("target is a CIS " +target.getJid());
 			try {
@@ -315,14 +344,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			}
 			return new AsyncResult<CtxModelObject>(obj);
 
-			//target is a CSS
+			//target is a CSS code end 
 		} else if (IdentityType.CSS.equals(target.getType()) 
 				|| IdentityType.CSS_RICH.equals(target.getType())
 				|| IdentityType.CSS_LIGHT.equals(target.getType())){
 
 
 			if (this.idMgr.isMine(target)) {
-				// access control commented until bug is fixed
+
 				this.ctxAccessController.checkPermission(requestor, target,
 						new CtxPermission(identifier, CtxPermission.READ));
 				try {
@@ -333,8 +362,26 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 									+ identifier + ": " +  e.getLocalizedMessage(), e);
 				}
 				return new AsyncResult<CtxModelObject>(obj);
+
 			} else {
-				LOG.info("remote call");
+				LOG.info("retrieve CSS context object remote call");
+
+				final RetrieveCtxCallback callback = new RetrieveCtxCallback();
+				
+				ctxBrokerClient.retrieveRemote(requestor, identifier, callback); 
+				LOG.info("RetrieveCtx remote call performed ");
+
+				synchronized (callback) {
+					try {
+						LOG.info("RetrieveCtx remote call result received 1 ");
+						callback.wait();
+						obj = callback.getResult();
+						LOG.info("RetrieveCtx remote call result received 2 " +obj.getId().toString());
+					} catch (InterruptedException e) {
+
+						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
+					}
+				}//end of remote code											
 			}
 		}
 		return new AsyncResult<CtxModelObject>(obj);
@@ -558,9 +605,26 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 							"Platform context broker failed to update context model object with id "
 									+ object.getId() + ": " +  e.getLocalizedMessage(), e);
 				}
+				return new AsyncResult<CtxModelObject>(updatedObject);
 
 			} else {
-				LOG.info("remote call");
+				LOG.info("update method remote call");
+
+				final UpdateCtxCallback callback = new UpdateCtxCallback();
+				ctxBrokerClient.updateRemote(requestor, object, callback);
+				LOG.info("UpdateCtx remote call performed ");
+
+				synchronized (callback) {
+					try {
+						LOG.info("UpdateCtx remote call result received 1 ");
+						callback.wait();
+						updatedObject = callback.getResult();
+						LOG.info("UpdateCtx remote call result received 2 " +updatedObject.getId().toString());
+					} catch (InterruptedException e) {
+
+						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
+					}
+				}
 			}
 		}else if (IdentityType.CIS.equals(target.getType())){
 			try {
@@ -571,7 +635,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 								+ object.getId() + ": " +  e.getLocalizedMessage(), e);
 			}
 		}
-
 
 		return new AsyncResult<CtxModelObject>(updatedObject);
 	}
@@ -674,24 +737,24 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		final List<CtxIdentifier> localCtxIdListResult = new ArrayList<CtxIdentifier>();
 		List<CtxIdentifier> remoteCtxIdListResult = new ArrayList<CtxIdentifier>();
-		
+
 		LOG.info("lookup method called requestor:"+ requestor.toString());
 		System.out.println("lookup method called target:"+ target.getJid());
 		//LOG.info("lookup method called target:"+ target.toString());
 		//LOG.info("lookup method called target:"+ target.getJid().toString());
 		LOG.info("lookup method called modelType:"+ modelType.toString());
 		LOG.info("lookup method called type:"+ type);
-		
-		
+
+
 		if (this.idMgr.isMine(target)) {
 			LOG.info("lookup local call 1");
 			List<CtxIdentifier> ctxIdListFromDb;
 			try {
 				ctxIdListFromDb = internalCtxBroker.lookup(modelType, type).get();
-			
+
 				if (ctxIdListFromDb != null) LOG.info("lookup local call 2 data before access control : " + ctxIdListFromDb);
-			
-			
+
+
 			} catch (Exception e) {
 				throw new CtxBrokerException("Platform context broker failed to lookup " 
 						+ modelType	+ " objects of type " + type + ": " 
@@ -704,8 +767,8 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 						this.ctxAccessController.checkPermission(requestor, target,
 								new CtxPermission(ctxId, CtxPermission.READ));
 						localCtxIdListResult.add(ctxId);
-						
-				
+
+
 					} catch (CtxAccessControlException cace) {
 						// do nothing
 					}
@@ -714,21 +777,29 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 					throw new CtxAccessControlException("Could not lookup " 
 							+ modelType	+ " objects of type " + type 
 							+ ": Access denied");
-				
+
 				if (localCtxIdListResult!=null)	LOG.info("lookup local call 3: " + localCtxIdListResult);
-				
-				
+
+
 				return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
 			}
 		} else {
 			LOG.info("lookup remote call 1 requestor" + requestor);
 			LOG.info("lookup remote call 1 target" + target);
-			
+
 			final LookupCallback callback = new LookupCallback();
-			ctxBrokerClient.lookupRemote(requestor, target, modelType, type, callback);
+
+			// Testing code : change target to local identity 
+			LOG.info("lookup remote call: target id changed to local " + this.getLocalID());
+			ctxBrokerClient.lookupRemote(requestor,  this.getLocalID() , modelType, type, callback);
+			//	
+
+			//real code
+			//ctxBrokerClient.lookupRemote(requestor, target, modelType, type, callback);
+
 			LOG.info("lookup remote call 2");
 			synchronized (callback) {
-				
+
 				try {
 					callback.wait();
 					remoteCtxIdListResult = callback.getResult();
@@ -738,8 +809,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 					throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
 				}
 			}
-			
-			
 		}
 
 		return new AsyncResult<List<CtxIdentifier>>(remoteCtxIdListResult);
@@ -965,7 +1034,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	// remote communication callback 
 	//*********************************
 
-
+	/*
 	private class CreateEntityCallback implements ICtxCallback {
 
 		private CtxEntity result;
@@ -1001,11 +1070,23 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		@Override
 		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onRetrieveCtx(CtxModelObject ctxObj) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onUpdateCtx(CtxModelObject ctxObj) {
+			// TODO Auto-generated method stub
+
 		}
 	}
-
-
+	 */
+	/*
 	private class CreateAttributeCallback implements ICtxCallback {
 
 		private CtxAttribute result;
@@ -1019,14 +1100,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		@Override
 		public void onCreatedEntity(CtxEntity retObject) {
-			/*	
-			LOG.info("onCreatedEntity retObject " +retObject);
-			this.result = retObject;
-			synchronized (this) {	            
-				notifyAll();	        
-			}
-			LOG.info("notify all done");
-			 */
+
 		}
 
 		private CtxAttribute getResult() {
@@ -1047,17 +1121,29 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		@Override
 		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onRetrieveCtx(CtxModelObject ctxObj) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onUpdateCtx(CtxModelObject ctxObj) {
+			// TODO Auto-generated method stub
+
 		}
 	}
-	
-	
-	
+	 */
+
+	/*
 	private class LookupCallback implements ICtxCallback {
 
-		
+
 		private List<CtxIdentifier> idList;
-		
+
 		@Override
 		public void onCreatedEntity(CtxEntity retObject) {
 		}
@@ -1072,7 +1158,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		@Override
 		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
-			
+
 			LOG.info("onLookupCallback retObject " +idList);
 			this.idList = ctxIdsList;
 			synchronized (this) {	            
@@ -1080,12 +1166,77 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			}
 			LOG.info("onLookupCallback, notify all done");
 		}
-	
+
 		private List<CtxIdentifier> getResult() {
 			return this.idList;
 		}
-	}
 
+		@Override
+		public void onRetrieveCtx(CtxModelObject ctxObj) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onUpdateCtx(CtxModelObject ctxObj) {
+			// TODO Auto-generated method stub
+
+		}
+	}
+	 */
+	/*
+	private class RetrieveCtxCallback implements ICtxCallback{
+
+		CtxModelObject result;
+
+		@Override
+		public void onCreatedEntity(CtxEntity retObject) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onCreatedAttribute(CtxAttribute retObject) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onRetrieveCtx(CtxModelObject ctxObj) {
+
+			LOG.info("onRetrieveCtx retObject " +ctxObj);
+
+			this.result = ctxObj;
+			synchronized (this) {	            
+				notifyAll();	        
+			}
+			LOG.info("onRetrieveCtx, notify all done");
+
+		}
+
+		@Override
+		public void receiveCtxResult(Object retObject, String type) {
+			// TODO Auto-generated method stub
+
+		}
+
+		private CtxModelObject getResult() {
+			return this.result;
+		}
+
+		@Override
+		public void onUpdateCtx(CtxModelObject ctxObj) {
+			// TODO Auto-generated method stub
+
+		}
+	}
+	 */
 	private void logRequest(final Requestor requestor, final IIdentity target) {
 
 		try {
@@ -1095,4 +1246,21 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			// do nothing
 		}
 	}
+
+	/*
+	 * 
+	 */
+	private IIdentity getLocalID(){
+		INetworkNode cssNodeId = this.idMgr.getThisNetworkNode();
+		IIdentity localID = null;
+		try {
+			localID = this.idMgr.fromJid(cssNodeId.getBareJid());
+			//LOG.info("changed to local id " + localID);
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return localID;
+	}
+
 }

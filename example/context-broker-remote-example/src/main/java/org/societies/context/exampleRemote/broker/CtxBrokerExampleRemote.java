@@ -43,22 +43,13 @@ import org.societies.context.exampleRemote.broker.IContextAware3pService;
  */
 @Service
 public class CtxBrokerExampleRemote 	{
-
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerExampleRemote.class);
-
-
 	private ICtxBroker ctxBroker;
 	private ICommManager commMgrService;
-	
-
 	private IIdentity targetCSSiD; 
-	
-
 	private IContextAware3pService ca3pService;
 	
-	
-
 	@Autowired(required=true)
 	public CtxBrokerExampleRemote(ICtxBroker ctxBroker, ICommManager commMgr,IContextAware3pService ca3pService) throws InvalidFormatException {
 		
@@ -67,18 +58,9 @@ public class CtxBrokerExampleRemote 	{
 		LOG.info("*** CtxBrokerExampleRemote instantiation broker service: "+this.ctxBroker);
 						
 		this.commMgrService = commMgr;
-		LOG.info("*** commMgrService instantiated "+this.commMgrService);
-				
 
-		this.targetCSSiD =  commMgr.getIdManager().fromJid("jane.societies.local");
+		this.ca3pService.lookupRemoteLocalCtxAttribute();
 		
-		LOG.info( "targetCSSiD should be 'jane.societies.local' and it is:"+ this.targetCSSiD);
-		LOG.info( "targetCSSiD getType() is: "+ this.targetCSSiD.getType());
-		
-		// this johns system and will
-		// create attribute of type books in jane's cm db
-		this.ca3pService.lookupRemoteCtxAttribute(targetCSSiD, CtxAttributeTypes.BOOKS);
-		
+		//this.ca3pService.lookupRemoteCtxAttribute();		
 	}
-
 }

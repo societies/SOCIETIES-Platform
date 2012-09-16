@@ -60,6 +60,7 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
@@ -102,23 +103,25 @@ public class ContextAware3pService implements IContextAware3pService{
 	//private IIdentity userIdentity;
 	private IIdentity serviceIdentity;
 	private ServiceResourceIdentifier myServiceID;
-	IIdentity johnID;
-	
+
+
 
 	@Autowired(required=true)
 	public ContextAware3pService( ICtxBroker ctxBroker, ICommManager commsMgr){
-		
+
 		LOG.info("*** ContextAware3pRemoteService started");
 
 		//services
 		this.ctxBroker = ctxBroker;
 		this.commsMgr = commsMgr;
 		this.idMgr = commsMgr.getIdManager();
-		
+
 		LOG.info("ctxBroker: "+this.ctxBroker);
 		LOG.info("commsMgr : "+this.commsMgr );
 		LOG.info("idMgr : "+this.idMgr );
-	
+
+
+
 		//identities
 		/*
 		this.userIdentity = this.idMgr.getThisNetworkNode();
@@ -139,20 +142,20 @@ public class ContextAware3pService implements IContextAware3pService{
 			e.printStackTrace();
 		}
 		//requestorService = new RequestorService(serviceIdentity, myServiceID);
-		*/
-		simpleRequestor = new Requestor(johnID);
+		 */
+		//simpleRequestor = new Requestor(johnID);
 		//LOG.info("userIdentity : "+ userIdentity.getBareJid());
 		//LOG.info("requestor service : "+requestorService);
 	}
 
 
-	
-	
+
+
 	@Override
-	public CtxAttribute  retrieveRemoteCtxAttribute(IIdentity targetId, CtxAttributeIdentifier attrID){
-		
+	public CtxAttribute  retrieveRemoteCtxAttribute(){
+
 		CtxAttribute result = null;
-	/*	
+		/*	
 		try {
 			result = (CtxAttribute) this.ctxBroker.retrieve(requestorService, attrID).get();
 		} catch (CtxException e) {
@@ -165,41 +168,35 @@ public class ContextAware3pService implements IContextAware3pService{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		*/
+		 */
 		return result;
 	}
 
-	
+
 	@Override
-	public List<CtxAttribute> lookupRemoteCtxAttribute(IIdentity targetId, String ctxAttrType){
+	public List<CtxAttribute> lookupRemoteCtxAttribute(){
 		List<CtxAttribute> results = null; 
 		try {
 			//List<CtxIdentifier> attridList = this.ctxBroker.lookup(requestorService, targetId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BOOKS).get();
-			//List<CtxIdentifier> attridList = this.ctxBroker.lookup(requestorService, targetId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BOOKS).get();
+
+			//create identities
+			INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			IIdentity localID = this.commsMgr.getIdManager().fromJid(cssOwnerStr);	
+			simpleRequestor = new Requestor(localID);
 			LOG.info("simple requestor "+ simpleRequestor.getRequestorId().getJid());
+
+			IIdentity targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local"); 
 			LOG.info("targetId "+ targetId.getJid());
-			
-			CtxEntity remoteEntity = this.ctxBroker.createEntity(simpleRequestor, targetId, "service").get();
-			LOG.info("remote entity"+ remoteEntity);
-			
-			CtxAttribute remoteAttribute = this.ctxBroker.createAttribute(simpleRequestor, remoteEntity.getId(), "home").get();
-				
-			LOG.info("remoteAttribute"+ remoteAttribute);
-			
-			
+
+			// lookup attribute
 			List<CtxIdentifier> attridList = this.ctxBroker.lookup(simpleRequestor, targetId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BOOKS).get();
-			
 			LOG.info("remote lookup results size "+ attridList.size());
-		
+
 			for(CtxIdentifier id : attridList ){
-				
-				
 				LOG.info("remote lookup results id "+ id);
-				
 			}
-			
-		
-		
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -209,14 +206,147 @@ public class ContextAware3pService implements IContextAware3pService{
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return results;
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+	@Override
+	public List<CtxAttribute> lookupRemoteLocalCtxAttribute(){
+		
+		List<CtxAttribute> results = null; 
+		
+		try {
+			//List<CtxIdentifier> attridList = this.ctxBroker.lookup(requestorService, targetId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BOOKS).get();
+
+			//create identities
+			INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+			IIdentity localID = this.commsMgr.getIdManager().fromJid(cssNodeId.getBareJid());	
+			
+			simpleRequestor = new Requestor(localID);
+			LOG.info("simple requestor "+ simpleRequestor.getRequestorId().getJid());
+
+			//!!!!! to perform the test locally change code in context broker 
+			IIdentity targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
+			LOG.info("targetId "+ targetId.getJid());
+
+			// create remote entity
+			
+			CtxEntity remoteEntity = this.ctxBroker.createEntity(simpleRequestor, targetId, "human").get();
+			LOG.info("remote entity"+ remoteEntity.getId().toString());
+			CtxEntityIdentifier entID = remoteEntity.getId();
+			LOG.info("remote entity owner "+ entID.getOwnerId());
+			entID.setOwnerId("local");
+			LOG.info("remote entity owner changed to local: "+ entID.getOwnerId());
+			
+			// create remote attribute
+			CtxAttribute remoteAttribute = this.ctxBroker.createAttribute(simpleRequestor, entID, CtxAttributeTypes.BOOKS).get();
+			CtxIdentifier attrID = remoteAttribute.getId();
+			LOG.info("remoteAttribute"+ attrID.toString());
+			
+			
+			//retrieve remote attribute
+			LOG.info("retrieve remoteAttribute"+ attrID.toString());
+			attrID.setOwnerId("jane.societies.local");
+			LOG.info("remote attribute owner changed to local is jane : "+ attrID.getOwnerId());
+			
+			
+			CtxAttribute remoteAttributeRetrieved = (CtxAttribute) this.ctxBroker.retrieve(simpleRequestor, attrID).get();
+			LOG.info("retrieval result Attribute 1 "+ remoteAttributeRetrieved);
+			LOG.info("retrieval result Attribute 2 "+ remoteAttributeRetrieved.getId().toString());
+						
+			// update attribute
+			remoteAttributeRetrieved.getId().setOwnerId("jane.societies.local");
+			remoteAttributeRetrieved.setStringValue("TarasBoulba");
+			CtxAttribute remoteUpdatedAttr = (CtxAttribute) this.ctxBroker.update(simpleRequestor, remoteAttributeRetrieved).get();
+			LOG.info("update result Attribute valye should be:  'taras Boulba' and is :"+remoteUpdatedAttr.getId());
+			LOG.info("update result Attribute valye should be:  'taras Boulba' and is :"+remoteUpdatedAttr.getStringValue()); 
+			
+			// lookup attribute
+			//List<CtxIdentifier> attridList = this.ctxBroker.lookup(simpleRequestor, targetId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BOOKS).get();
+			//LOG.info("remote lookup results size "+ attridList.size());
+
+			//for(CtxIdentifier id : attridList ){
+		//		LOG.info("remote lookup results id "+ id);
+			//}
+
+		
+			
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return results;
+	}
+
+	@Override
+	public CtxAttribute createRemoteCtxAttribute(CtxEntityIdentifier remoteCtxEntityId) {
+
+		CtxAttribute remoteAttribute = null;
+				
+		// create remote attribute
+		try {
+			LOG.info("remoteCtxEntityId.setOwnerId "+remoteCtxEntityId.getOwnerId());
+			remoteCtxEntityId.setOwnerId("local");
+			LOG.info("remoteCtxEntityId.setOwnerId "+remoteCtxEntityId.getOwnerId());
+			remoteAttribute = this.ctxBroker.createAttribute(simpleRequestor, remoteCtxEntityId, CtxAttributeTypes.ADDRESS_HOME_COUNTRY).get();
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		LOG.info("remoteAttribute"+ remoteAttribute);
+
+		return remoteAttribute;
+	}
+
+
+
+
+	@Override
+	public CtxEntity createRemoteCtxEntity() {
+
+		IIdentity targetId;
+		CtxEntity remoteEntity = null;
+
+		try {
+			targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
+			LOG.info("targetId "+ targetId.getJid());
+			// create remote entity
+			remoteEntity = this.ctxBroker.createEntity(simpleRequestor, targetId, "human").get();
+			LOG.info("remote entity"+ remoteEntity);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+		return remoteEntity;
+	}
 }
