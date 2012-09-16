@@ -139,11 +139,11 @@ public class CtxBrokerClient implements ICommCallback {
 		
 		try {
 			//to be removed
-			toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
-			LOG.error(" toIdentity " + toIdentity);
+			//toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
+			//LOG.error(" toIdentity " + toIdentity);
 			
-			//toIdentity = targetCss;
-			//LOG.error("SKATA 2 toIdentity1 " + toIdentity);
+			toIdentity = targetCss;
+			LOG.info("toIdentity " + toIdentity);
 
 			//create the message to be sent
 			Stanza stanza = new Stanza(toIdentity);
@@ -151,24 +151,25 @@ public class CtxBrokerClient implements ICommCallback {
 			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 			cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
 			// use the create entity method : createCtxEntity(String type)
-
+			LOG.error("SKATA 1 " );
 			CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerCreateEntityBean();
-		
+			LOG.error("SKATA 2 " );
 			RequestorBean requestorBean = createRequestorBean(requestor);
+			LOG.error("SKATA 3 " );
 			ctxBrokerCreateEntityBean.setRequestor(requestorBean);
-
+			LOG.error("SKATA 4 " );
 			ctxBrokerCreateEntityBean.setTargetCss(toIdentity.getBareJid());
-
+			LOG.error("SKATA 5 " );
 			ctxBrokerCreateEntityBean.setType(type);
-
+			LOG.info("SKATA 6 before ");
 			cbPacket.setCreateEntity(ctxBrokerCreateEntityBean);
-			LOG.info("SKATA 3 before sendIQGet"+ctxBrokerCreateEntityBean);
+			LOG.info("SKATA 7 before sendIQGet"+ctxBrokerCreateEntityBean);
 
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-			LOG.info("SKATA 4 before addRequestingClient "+stanza.getId());
+			LOG.info("SKATA 8 before addRequestingClient "+stanza.getId());
 
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
-			LOG.info("SKATA 5 CreateEntity send  ");
+			LOG.info("SKATA 7 CreateEntity send  ");
 	
 		} catch (Exception e) {
 
@@ -289,10 +290,10 @@ public class CtxBrokerClient implements ICommCallback {
 		//comment after testing
 		try {
 			//real code
-			//toIdentity = this.commManager.getIdManager().fromJid(identifier.getOwnerId());
+			toIdentity = this.commManager.getIdManager().fromJid(identifier.getOwnerId());
 
 			//testing code
-			toIdentity = this.commManager.getIdManager().fromJid("john.societies.local");
+			//toIdentity = this.commManager.getIdManager().fromJid("john.societies.local");
 		} catch (InvalidFormatException e1) {
 			e1.printStackTrace();
 		}
@@ -331,9 +332,9 @@ public class CtxBrokerClient implements ICommCallback {
 		IIdentity toIdentity = null;
 		try {
 			//real code
-			//toIdentity = this.commManager.getIdManager().fromJid(object.getOwnerId());
+			toIdentity = this.commManager.getIdManager().fromJid(object.getOwnerId());
 			//testing code
-			toIdentity = this.commManager.getIdManager().fromJid("john.societies.local");
+			//toIdentity = this.commManager.getIdManager().fromJid("john.societies.local");
 		} catch (InvalidFormatException e1) {
 			e1.printStackTrace();
 		}

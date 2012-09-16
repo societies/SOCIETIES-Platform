@@ -163,14 +163,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		} else {
 
 			final CreateEntityCallback callback = new CreateEntityCallback();
-			// change target to local identity for testing 
-			LOG.info("createEntity remote call: target id changed to local" + this.getLocalID());
-			ctxBrokerClient.createRemoteEntity(requestor, this.getLocalID(), type, callback);
-
-			//ctxBrokerClient.createRemoteEntity(requestor, targetCss, type, callback);
-
+		 			
+			// change target to local identity for testing
+			//LOG.info("createEntity remote call: target id changed to local" + this.getLocalID());
+			//ctxBrokerClient.createRemoteEntity(requestor, this.getLocalID(), type, callback);
+		
+			ctxBrokerClient.createRemoteEntity(requestor, targetCss, type, callback);
+					
 			synchronized (callback) {
-
 				try {
 					callback.wait();
 					entity = callback.getResult();
@@ -179,7 +179,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 					throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
 				}
 			}
-			//end of remote code
+			//end of remote comm code
 		}
 		return new AsyncResult<CtxEntity>(entity);
 	}
@@ -204,13 +204,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		LOG.info("createAttribute requestor" + requestor);
 		LOG.info("createAttribute scope" + scope.getOwnerId().toString());
 		try {
-			//TODO remove if after testing
+			// change target to local identity for testing
 			if(scope.getOwnerId().equals("local")) {
-				targetCss = this.idMgr.fromJid("jane.societies.local");
+				targetCss = this.getLocalID();
 			} else	targetCss = this.idMgr.fromJid(scope.getOwnerId());
 			LOG.info("createAttribute targetCss" + targetCss);
-
-			//targetCss = this.idMgr.fromJid("jane.societies.local");
 
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
@@ -230,15 +228,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		} else {
 			// remote call
 			final CreateAttributeCallback callback = new CreateAttributeCallback();
-
-			// testing code
-			// change target to local identity for testing 
-			LOG.info("createAttribute remote call: target id changed to local" + this.getLocalID());
-			ctxBrokerClient.createRemoteAttribute(requestor, this.getLocalID(), scope, type, callback);
+			
+			LOG.info("createAttribute perform remote call");
+			ctxBrokerClient.createRemoteAttribute(requestor, targetCss, scope, type, callback);
 			LOG.info("createAttribute remote call performed ");
-			//real code
-			//ctxBrokerClient.createRemoteAttribute(requestor, targetCss, scope, type, callback);
-
+			
 			synchronized (callback) {
 				try {
 					//LOG.info("Attribute creation Callback wait");
@@ -327,7 +321,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			throw new CtxBrokerException("Could not create IIdentity from JID '"
 					+ identifier.getOwnerId() + "':" + ife.getLocalizedMessage(), ife);
 		}
-
 		this.logRequest(requestor, target);
 
 		// target is a CIS code starts 
@@ -364,10 +357,8 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 				return new AsyncResult<CtxModelObject>(obj);
 
 			} else {
-				LOG.info("retrieve CSS context object remote call");
-
 				final RetrieveCtxCallback callback = new RetrieveCtxCallback();
-				
+				LOG.info("retrieve CSS context object remote call");
 				ctxBrokerClient.retrieveRemote(requestor, identifier, callback); 
 				LOG.info("RetrieveCtx remote call performed ");
 
@@ -423,8 +414,8 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 								+ e.getLocalizedMessage(), e);
 			}
 		} else {
-
 			LOG.warn("remote call");
+			
 		}
 
 		return new AsyncResult<CtxEntityIdentifier>(individualEntityId);
@@ -608,9 +599,8 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 				return new AsyncResult<CtxModelObject>(updatedObject);
 
 			} else {
-				LOG.info("update method remote call");
-
 				final UpdateCtxCallback callback = new UpdateCtxCallback();
+				LOG.info("update method remote call");
 				ctxBrokerClient.updateRemote(requestor, object, callback);
 				LOG.info("UpdateCtx remote call performed ");
 
@@ -739,9 +729,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		List<CtxIdentifier> remoteCtxIdListResult = new ArrayList<CtxIdentifier>();
 
 		LOG.info("lookup method called requestor:"+ requestor.toString());
-		System.out.println("lookup method called target:"+ target.getJid());
-		//LOG.info("lookup method called target:"+ target.toString());
-		//LOG.info("lookup method called target:"+ target.getJid().toString());
+		LOG.info("lookup method called target:"+ target.getJid());
 		LOG.info("lookup method called modelType:"+ modelType.toString());
 		LOG.info("lookup method called type:"+ type);
 
@@ -791,12 +779,10 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 			// Testing code : change target to local identity 
 			LOG.info("lookup remote call: target id changed to local " + this.getLocalID());
-			ctxBrokerClient.lookupRemote(requestor,  this.getLocalID() , modelType, type, callback);
-			//	
-
+			//ctxBrokerClient.lookupRemote(requestor,  this.getLocalID() , modelType, type, callback);
+			
 			//real code
-			//ctxBrokerClient.lookupRemote(requestor, target, modelType, type, callback);
-
+			ctxBrokerClient.lookupRemote(requestor, target, modelType, type, callback);
 			LOG.info("lookup remote call 2");
 			synchronized (callback) {
 

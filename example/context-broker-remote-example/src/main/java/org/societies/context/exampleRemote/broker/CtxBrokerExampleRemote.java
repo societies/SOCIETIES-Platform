@@ -25,13 +25,18 @@
 package org.societies.context.exampleRemote.broker;
 
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,8 +64,30 @@ public class CtxBrokerExampleRemote 	{
 						
 		this.commMgrService = commMgr;
 
-		this.ca3pService.lookupRemoteLocalCtxAttribute();
+		CtxEntity remoteEntity = this.ca3pService.createRemoteCtxEntity("remoteEntityType");
+		LOG.info("*** remoteEntity id : "+ remoteEntity.getId());
+
+		CtxAttribute remoteAttribute = this.ca3pService.createRemoteCtxAttribute(remoteEntity.getId(), CtxAttributeTypes.ADDRESS_HOME_CITY);
+		LOG.info("*** remoteAttribute id : "+ remoteAttribute.getId());		
 		
-		//this.ca3pService.lookupRemoteCtxAttribute();		
+		remoteAttribute.setStringValue("CarnabyStreet12");
+		
+		CtxAttribute updatedAttr = (CtxAttribute) this.ca3pService.updateCtxModelObject(remoteAttribute);
+		LOG.info("*** updated remoteAttribute id : "+ updatedAttr.getId());	
+		LOG.info("*** updated remoteAttribute value : "+ updatedAttr.getStringValue());
+		
+		List<CtxIdentifier> lookupResults = this.ca3pService.lookupRemoteCtxAttribute(CtxAttributeTypes.ADDRESS_HOME_CITY);
+		
+		LOG.info("remote lookup results size "+ lookupResults.size());
+
+		for(CtxIdentifier id : lookupResults ){
+			LOG.info("remote lookup results id "+ id);
+			LOG.info("retrieve object based on id"+ id);
+			CtxAttribute ctxAttrRetrieved = this.ca3pService.retrieveCtxObject(id);
+			LOG.info("retrieved object id"+ ctxAttrRetrieved.getId());
+			LOG.info("retrieved object id"+ ctxAttrRetrieved.getStringValue());
+		}
+	
+		
 	}
 }
