@@ -87,8 +87,8 @@ var SocietiesUtility = {
 			console.log("Register CIS Manager plugin ");
 			cordova.addPlugin("SocietiesLocalCISManager", SocietiesLocalCISManager);
 			
-			
-
+			console.log("Register Service Management plugin ");
+			cordova.addPlugin("ServiceManagementService", ServiceManagementService);
 		});
 		
 		//handle the Android Back button 
@@ -97,6 +97,8 @@ var SocietiesUtility = {
 		document.addEventListener("backbutton", SocietiesUtility.backButtonHandler, false);
 
 		SocietiesLogin.displayConnectionInfo();
+		
+
 
 	},
 

@@ -39,7 +39,7 @@ import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.android.api.context.broker.ICtxClientBroker;
+import org.societies.android.api.internal.context.broker.ICtxClientBroker;
 import org.societies.android.platform.context.ContextManagement.CtxLocalBinder;
 
 import android.app.Activity;

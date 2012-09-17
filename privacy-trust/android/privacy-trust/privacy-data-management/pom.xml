@@ -28,11 +28,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.android.privacytrust</groupId>
-	<artifactId>privacydatamanagement</artifactId>
-	<name>Privacy Data Management (Light Client)</name>
-	<packaging>apk</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<groupId>org.societies.android</groupId>
+	<artifactId>privacytrust</artifactId>
+	<name>Privacy Protection (Light Client)</name>
+	<packaging>apklib</packaging>
+	<version>${version.pt}</version>
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>
@@ -49,8 +49,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>android-parent</artifactId>
-		<relativePath>../../../../parent/android.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -67,27 +66,60 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- Comm -->
 		<dependency>
-			<groupId>org.societies.android.privacytrust</groupId>
-			<artifactId>api</artifactId>
-			<version>${version.pt}</version>
-			<scope>provided</scope>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
 		</dependency>
 		<!-- Android -->
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
+			<exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.6</version>
+			<exclusions>
+				<!-- StAX is not available on Android -->
+				<exclusion>
+					<artifactId>stax</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>stax-api</artifactId>
+					<groupId>stax</groupId>
+				</exclusion>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.phonegap</groupId>
-			<artifactId>phonegap</artifactId>
+			<artifactId>cordova</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.1</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
 		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>test</testSourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>

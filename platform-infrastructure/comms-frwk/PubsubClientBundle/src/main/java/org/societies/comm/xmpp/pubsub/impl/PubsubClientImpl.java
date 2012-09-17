@@ -103,8 +103,16 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			//contentUnmarshaller = jc.createUnmarshaller();
 			//contentMarshaller = jc.createMarshaller();
 			endpoint.register(this);
+			
+			
+			// TEMPORARY Solution : Waiting for PS to load
+			Thread.sleep(10000);
+			
 		} catch (CommunicationException e) {
 			LOG.error(e.getMessage());
+		} catch (InterruptedException e) {
+			LOG.error(e.getMessage());	
+		
 		//} catch (JAXBException e) {
 		//	LOG.error(e.getMessage());
 		}

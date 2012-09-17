@@ -73,6 +73,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	public static final String ACTIVE_TASKS = "org.societies.android.platform.servicemonitor.ACTIVE_TASKS";
 	public static final String ACTIVE_FILTERED_TASKS = "org.societies.android.platform.servicemonitor.ACTIVE_FILTERED_TASKS";
 	public static final String INSTALLED_APPLICATIONS = "org.societies.android.platform.servicemonitor.INSTALLED_APPLICATIONS";
+	public static final String START_ACTIVITY = "org.societies.android.platform.servicemonitor.START_ACTIVITY";
 	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.servicemonitor.ReturnValue";
 
 
@@ -317,7 +318,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 			ByteArrayOutputStream stream = new ByteArrayOutputStream(); 
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream); 
 			byte[] bitmapdata = stream.toByteArray(); 
-			String base64String = Base64.encodeToString(bitmapdata, 0); 
+			String base64String = "data:image/png;base64," + Base64.encodeToString(bitmapdata, 0); 
 
 			//ADD PACKAGE INFO TO RETURNED ARRAY
 			InstalledAppInfo newInfo = new InstalledAppInfo();
@@ -349,9 +350,23 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	/* (non-Javadoc)
 	 * @see org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor#startActivity(java.lang.String, java.lang.String)
 	 */
-	public boolean startActivity(String arg0, String packageName) {
-		Intent LaunchApp = getPackageManager().getLaunchIntentForPackage(packageName);
-		startActivity( LaunchApp ); 
+	public boolean startActivity(String client, String packageName) {
+		Log.d(LOG_TAG, "Calling startActivity from client: " + client + " with activity: " + packageName);
+		boolean appLaunched = true;
+		try {
+			Intent LaunchApp = getPackageManager().getLaunchIntentForPackage(packageName);
+			startActivity( LaunchApp );
+		} catch (Exception ex) {
+			appLaunched = false;
+			Log.d(LOG_TAG, "Exception occurred trying to launch app:" + ex.getMessage());
+		}
+		//SETUP RETURN INTENT STUFF
+		if (client != null) {
+			Intent intent = new Intent(START_ACTIVITY);
+			intent.putExtra(INTENT_RETURN_KEY, appLaunched);
+			intent.setPackage(client);
+			this.sendBroadcast(intent);
+		}
 		return true;
 	}
 

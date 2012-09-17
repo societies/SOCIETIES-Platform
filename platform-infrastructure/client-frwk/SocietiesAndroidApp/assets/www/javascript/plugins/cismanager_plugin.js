@@ -51,7 +51,7 @@ var	SocietiesLocalCISManager = {
                     "cisJid" : null
                     };
 
-			console.log("Call LocalCISManagerService - createCIS with cisRecod = " + cisRecord);
+			console.log("Call LocalCISManagerService - createCIS with cisRecod = ");// + cisRecord.cisName);
 
 
 			return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful

@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper;
 
+import org.societies.api.schema.identity.DataIdentifier;
+
 import android.os.Parcelable;
 
 /**
@@ -39,11 +41,11 @@ public interface IDataWrapper<E extends Parcelable> extends Parcelable {
 	/**
 	 * @return Id of the data to be obfuscated
 	 */
-	public String getDataId();
+	public DataIdentifier getDataId();
 	/**
 	 * @param dataId Id of the data to be obfuscated
 	 */
-	public void setDataId(String dataId);
+	public void setDataId(DataIdentifier dataId);
 	
 	/**
 	 * Data

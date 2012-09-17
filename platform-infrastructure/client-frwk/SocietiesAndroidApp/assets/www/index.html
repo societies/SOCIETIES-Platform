@@ -8,13 +8,16 @@
 	<!-- Uncomment line below to enable PhoneGap desktop and comment out real PhoneGap/Cordova JS library-->
 	<script type="text/javascript" src="javascript/cordova/cordova-1.7.0.js"></script>
 
-	<!-- <script type="text/javascript" charset="utf-8" src="phonegap-desktop.js"></script> -->
+	<!--<script type="text/javascript" charset="utf-8" src="phonegap-desktop.js"></script> -->
 
 	<link rel="stylesheet" type="text/css" href="css/custom/custom-theme-societies.css"/>
 	<link rel="stylesheet" type="text/css" href="css/jquerymobile/jquery.mobile-1.1.0.css"/>
 	<link rel="stylesheet" type="text/css" href="css/custom/societies.css"/>
 	
 	<script type="text/javascript" src="javascript/jquery/jquery-1.7.1.js" ></script>
+	<!-- Must be loaded prior to JQueryMobile script -->
+	<script type="text/javascript" src="javascript/jquerymobile/jqmDefaults.js" ></script>
+	
 	<script type="text/javascript" src="javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
 	
 	<!--JQM SlideMenu-->
@@ -29,9 +32,11 @@
 	<script type="text/javascript" src="javascript/plugins/cssmanager_plugin.js"></script>
 	<script type="text/javascript" src="javascript/plugins/cismanager_plugin.js"></script>
 	<script type="text/javascript" src="javascript/plugins/devicestatus_plugin.js"></script>
+	<script type="text/javascript" src="javascript/plugins/servicemanagement_plugin.js"></script>
 
 	<!-- Functionality JS -->
 	<script type="text/javascript" src="javascript/pagespecific/mainpage.js"></script>
+	<script type="text/javascript" src="javascript/pagespecific/navigation.js"></script>
 	<script type="text/javascript" src="javascript/pagespecific/activeservices.js"></script>
 	<script type="text/javascript" src="javascript/pagespecific/activetasks.js"></script>
 	<script type="text/javascript" src="javascript/pagespecific/apppreferences.js"></script>
@@ -66,7 +71,7 @@
 	<div id="slidemenu">
 		<h3>MENU</h3>
 		<ul>
-			<li><input id="slide-inbox"  type="button" value="Inbox"/></li>
+			<li><input id="temp-active-services"  type="button" value="Active Services"/></li>
 			<li><input id="slide-chat"  type="button" value="Chat"/></li>
 			<li><input id="slide-rssfeeds"  type="button" value="RSS Feeds"/></li>
 			<li><input id="slide-help"  type="button" value="Help"/></li>
@@ -96,7 +101,8 @@
 				<!--a href="html/landing.html" id="connectXMPP" data-role="button" data-theme="h" data-inline="true" rel="external">LOGIN </a-->
 			</form>
 			<div class="sign_up">
-				Don't have a login? <a href="html/new_identity.html" data-ajax="false">Sign Up</a>
+				Don't have a login? <input id="xmppRegistration" type="button" value="Sign Up" data-inline="true" data-theme="h"/> 
+				<!--a href="html/new_identity.html">Sign Up</a-->
 			</div>
 		</div>
 	</div>

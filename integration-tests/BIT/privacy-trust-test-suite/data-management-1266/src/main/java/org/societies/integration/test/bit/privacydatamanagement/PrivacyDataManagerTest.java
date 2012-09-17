@@ -99,7 +99,7 @@ public class PrivacyDataManagerTest
 		// Data
 		myCssId = TestCase1266.commManager.getIdManager().getThisNetworkNode();
 		otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
-		cisId = new MockIdentity(IdentityType.CIS, "onecis", "societies.local");
+		cisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
 		requestorCis = getRequestorCis();
 		requestorService = getRequestorService();
 		// Data Id

@@ -94,7 +94,7 @@ public class SpecificTestCaseUpperTester {
 			// - Search the Calculator Service
 			for(Service service : services) {
 				// - Calculator found
-				if (service.getServiceLocation().value().equals(serviceBundleUrl)) {
+				if (service.getServiceLocation().equals(serviceBundleUrl)) {
 					// - Retrieve service id
 					calculatorServiceId = service.getServiceIdentifier();
 					// - Service is running: Stop the service
@@ -162,7 +162,7 @@ public class SpecificTestCaseUpperTester {
 			boolean found = false;
 			for(Service service : services) {
 				// - Calculator found
-				if (service.getServiceLocation().value().equals(serviceBundleUrl)) {
+				if (service.getServiceLocation().equals(serviceBundleUrl)) {
 					found = true;
 					// - Retrieve the service id
 					calculatorServiceId = service.getServiceIdentifier();
