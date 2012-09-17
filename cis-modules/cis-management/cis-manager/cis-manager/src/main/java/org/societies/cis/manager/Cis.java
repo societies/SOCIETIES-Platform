@@ -132,6 +132,14 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	IPrivacyPolicyManager privacyPolicyManager;
 	
+	
+	
+	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+		this.privacyPolicyManager = privacyPolicyManager;
+	}
+
+
+
 	@Transient
 	private IIdentity cisIdentity;
 	@Transient
@@ -1289,7 +1297,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		try {
 			cssOwnerId = this.CISendpoint.getIdManager().fromJid(this.getOwnerId());
 			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisIdentity);	
-			this.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
+			if(this.privacyPolicyManager != null)
+				this.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
 		} catch (InvalidFormatException e1) {
 			// TODO Auto-generated catch block
 			LOG.info("bad format in cis owner jid at delete method");
