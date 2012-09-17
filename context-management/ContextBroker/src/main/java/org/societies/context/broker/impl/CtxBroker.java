@@ -201,21 +201,21 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		IIdentity targetCss = null; 
 
-		LOG.info("createAttribute requestor" + requestor);
-		LOG.info("createAttribute scope" + scope.getOwnerId().toString());
+		//LOG.info("createAttribute requestor" + requestor);
+		//LOG.info("createAttribute scope" + scope.getOwnerId().toString());
 		try {
 			// change target to local identity for testing
 			if(scope.getOwnerId().equals("local")) {
 				targetCss = this.getLocalID();
 			} else	targetCss = this.idMgr.fromJid(scope.getOwnerId());
-			LOG.info("createAttribute targetCss" + targetCss);
+			//LOG.info("createAttribute targetCss" + targetCss);
 
 		} catch (InvalidFormatException ife) {
 			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
 		}
 
 		if (this.idMgr.isMine(targetCss)) {
-			LOG.info("createAttribute local: ");
+			//LOG.info("createAttribute local: ");
 			try {
 				ctxAttribute = internalCtxBroker.createAttribute(scope, type).get();
 
@@ -229,9 +229,9 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			// remote call
 			final CreateAttributeCallback callback = new CreateAttributeCallback();
 
-			LOG.info("createAttribute perform remote call");
+			LOG.info("createAttribute perform remote call targetCSS:"+targetCss +" type:"+type);
 			ctxBrokerClient.createRemoteAttribute(requestor, targetCss, scope, type, callback);
-			LOG.info("createAttribute remote call performed ");
+			//LOG.info("createAttribute remote call performed ");
 
 			synchronized (callback) {
 				try {
@@ -358,16 +358,16 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 			} else {
 				final RetrieveCtxCallback callback = new RetrieveCtxCallback();
-				LOG.info("retrieve CSS context object remote call");
+				LOG.info("retrieve CSS context object remote call identifier " +identifier.toString());
 				ctxBrokerClient.retrieveRemote(requestor, identifier, callback); 
-				LOG.info("RetrieveCtx remote call performed ");
+				///LOG.info("RetrieveCtx remote call performed ");
 
 				synchronized (callback) {
 					try {
-						LOG.info("RetrieveCtx remote call result received 1 ");
+						//LOG.info("RetrieveCtx remote call result received 1 ");
 						callback.wait();
 						obj = callback.getResult();
-						LOG.info("RetrieveCtx remote call result received 2 " +obj.getId().toString());
+						//LOG.info("RetrieveCtx remote call result received 2 " +obj.getId().toString());
 					} catch (InterruptedException e) {
 
 						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
@@ -600,16 +600,16 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 			} else {
 				final UpdateCtxCallback callback = new UpdateCtxCallback();
-				LOG.info("update method remote call");
+				LOG.info("update method remote call ctx object id:"+object.getId());
 				ctxBrokerClient.updateRemote(requestor, object, callback);
-				LOG.info("UpdateCtx remote call performed ");
+				//LOG.info("UpdateCtx remote call performed ");
 
 				synchronized (callback) {
 					try {
-						LOG.info("UpdateCtx remote call result received 1 ");
+						//LOG.info("UpdateCtx remote call result received 1 ");
 						callback.wait();
 						updatedObject = callback.getResult();
-						LOG.info("UpdateCtx remote call result received 2 " +updatedObject.getId().toString());
+						//LOG.info("UpdateCtx remote call result received 2 " +updatedObject.getId().toString());
 					} catch (InterruptedException e) {
 
 						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
@@ -728,19 +728,19 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		final List<CtxIdentifier> localCtxIdListResult = new ArrayList<CtxIdentifier>();
 		List<CtxIdentifier> remoteCtxIdListResult = new ArrayList<CtxIdentifier>();
 
-		LOG.info("lookup method called requestor:"+ requestor.toString());
-		LOG.info("lookup method called target:"+ target.getJid());
-		LOG.info("lookup method called modelType:"+ modelType.toString());
-		LOG.info("lookup method called type:"+ type);
+		//LOG.info("lookup method called requestor:"+ requestor.toString());
+		//LOG.info("lookup method called target:"+ target.getJid());
+		//LOG.info("lookup method called modelType:"+ modelType.toString());
+		//LOG.info("lookup method called type:"+ type);
 
 
 		if (this.idMgr.isMine(target)) {
-			LOG.info("lookup local call 1");
+			//LOG.info("lookup local call 1");
 			List<CtxIdentifier> ctxIdListFromDb;
 			try {
 				ctxIdListFromDb = internalCtxBroker.lookup(modelType, type).get();
 
-				if (ctxIdListFromDb != null) LOG.info("lookup local call 2 data before access control : " + ctxIdListFromDb);
+				//if (ctxIdListFromDb != null) LOG.info("lookup local call 2 data before access control : " + ctxIdListFromDb);
 
 
 			} catch (Exception e) {
@@ -772,24 +772,24 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 				return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
 			}
 		} else {
-			LOG.info("lookup remote call 1 requestor" + requestor);
-			LOG.info("lookup remote call 1 target" + target);
+			//LOG.info("lookup remote call 1 requestor" + requestor);
+			//LOG.info("lookup remote call 1 target" + target);
 
 			final LookupCallback callback = new LookupCallback();
 
 			// Testing code : change target to local identity 
-			LOG.info("lookup remote call: target id changed to local " + this.getLocalID());
+			//LOG.info("lookup remote call: target id changed to local " + this.getLocalID());
 			//ctxBrokerClient.lookupRemote(requestor,  this.getLocalID() , modelType, type, callback);
-
+			LOG.info("lookup remote call target id:" + target.toString());
 			//real code
 			ctxBrokerClient.lookupRemote(requestor, target, modelType, type, callback);
-			LOG.info("lookup remote call 2");
+			//LOG.info("lookup remote call 2");
 			synchronized (callback) {
 
 				try {
 					callback.wait();
 					remoteCtxIdListResult = callback.getResult();
-					LOG.info("lookup remote call 3" + callback.getResult());
+					//LOG.info("lookup remote call 3" + callback.getResult());
 				} catch (InterruptedException e) {
 
 					throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
@@ -993,215 +993,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		this.privacyLogAppender = privacyLogAppender;
 	}
 
-
-
-	//**********************************
-	// remote communication callback 
-	//*********************************
-
-	/*
-	private class CreateEntityCallback implements ICtxCallback {
-
-		private CtxEntity result;
-
-		@Override
-		public void receiveCtxResult(Object retObject, String type) {
-
-			LOG.error("SKATA should not happen");
-
-		}
-
-		@Override
-		public void onCreatedEntity(CtxEntity retObject) {
-
-			LOG.info("onCreatedEntity retObject " +retObject);
-			this.result = retObject;
-			synchronized (this) {	            
-				notifyAll();	        
-			}
-			LOG.info("onCreatedEntity, notify all done");
-		}
-
-		private CtxEntity getResult() {
-			return this.result;
-		}
-
-		@Override
-		public void onCreatedAttribute(CtxAttribute retObject) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onRetrieveCtx(CtxModelObject ctxObj) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onUpdateCtx(CtxModelObject ctxObj) {
-			// TODO Auto-generated method stub
-
-		}
-	}
-	 */
-	/*
-	private class CreateAttributeCallback implements ICtxCallback {
-
-		private CtxAttribute result;
-
-		@Override
-		public void receiveCtxResult(Object retObject, String type) {
-
-			LOG.error("SKATA should not happen");
-
-		}
-
-		@Override
-		public void onCreatedEntity(CtxEntity retObject) {
-
-		}
-
-		private CtxAttribute getResult() {
-			return this.result;
-		}
-
-		@Override
-		public void onCreatedAttribute(CtxAttribute retObject) {
-			LOG.info("onCreatedAttribute retObject " +retObject);
-			this.result = retObject;
-			synchronized (this) {	            
-				notifyAll();	        
-			}
-			LOG.info("onCreatedAttribute, notify all done");
-
-		}
-
-		@Override
-		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onRetrieveCtx(CtxModelObject ctxObj) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onUpdateCtx(CtxModelObject ctxObj) {
-			// TODO Auto-generated method stub
-
-		}
-	}
-	 */
-
-	/*
-	private class LookupCallback implements ICtxCallback {
-
-
-		private List<CtxIdentifier> idList;
-
-		@Override
-		public void onCreatedEntity(CtxEntity retObject) {
-		}
-
-		@Override
-		public void onCreatedAttribute(CtxAttribute retObject) {
-		}
-
-		@Override
-		public void receiveCtxResult(Object retObject, String type) {
-		}
-
-		@Override
-		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
-
-			LOG.info("onLookupCallback retObject " +idList);
-			this.idList = ctxIdsList;
-			synchronized (this) {	            
-				notifyAll();	        
-			}
-			LOG.info("onLookupCallback, notify all done");
-		}
-
-		private List<CtxIdentifier> getResult() {
-			return this.idList;
-		}
-
-		@Override
-		public void onRetrieveCtx(CtxModelObject ctxObj) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onUpdateCtx(CtxModelObject ctxObj) {
-			// TODO Auto-generated method stub
-
-		}
-	}
-	 */
-	/*
-	private class RetrieveCtxCallback implements ICtxCallback{
-
-		CtxModelObject result;
-
-		@Override
-		public void onCreatedEntity(CtxEntity retObject) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onCreatedAttribute(CtxAttribute retObject) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onRetrieveCtx(CtxModelObject ctxObj) {
-
-			LOG.info("onRetrieveCtx retObject " +ctxObj);
-
-			this.result = ctxObj;
-			synchronized (this) {	            
-				notifyAll();	        
-			}
-			LOG.info("onRetrieveCtx, notify all done");
-
-		}
-
-		@Override
-		public void receiveCtxResult(Object retObject, String type) {
-			// TODO Auto-generated method stub
-
-		}
-
-		private CtxModelObject getResult() {
-			return this.result;
-		}
-
-		@Override
-		public void onUpdateCtx(CtxModelObject ctxObj) {
-			// TODO Auto-generated method stub
-
-		}
-	}
-	 */
 	private void logRequest(final Requestor requestor, final IIdentity target) {
 
 		try {

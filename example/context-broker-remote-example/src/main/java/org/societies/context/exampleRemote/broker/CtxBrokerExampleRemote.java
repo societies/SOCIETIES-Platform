@@ -72,7 +72,7 @@ public class CtxBrokerExampleRemote 	{
 		CtxAttribute remoteAttribute = this.ca3pService.createRemoteCtxAttribute(remoteEntity.getId(), CtxAttributeTypes.ADDRESS_HOME_CITY);
 		LOG.info("*** remoteAttribute id : "+ remoteAttribute.getId());		
 		
-		this.ca3pService.registerForContextUpdates(remoteAttribute.getId(), new MyCtxChangeEventListener());
+		//this.ca3pService.registerForContextUpdates(remoteAttribute.getId(), new MyCtxChangeEventListener());
 
 		remoteAttribute.setStringValue("CarnabyStreet12");
 		
