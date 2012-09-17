@@ -1,4 +1,5 @@
-/* Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
@@ -22,28 +23,38 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.context.broker.impl.comm;
-
+package org.societies.context.exampleRemote.broker;
 
 import java.util.List;
 
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 
-
-public interface ICtxCallback {
-
-	public void onCreatedEntity(CtxEntity retObject);
-
-	public void onCreatedAttribute(CtxAttribute retObject);
+/**
+ * This is a 3p service Ifc that needs to access context through the societies platform ...
+ *
+ * @author nikosk
+ *
+ */
+public interface IContextAware3pService {
 	
-	public void onLookupCallback(List<CtxIdentifier> ctxIdsList);
+	public CtxAttribute createRemoteCtxAttribute(CtxEntityIdentifier remoteCtxEntityId, String type);
 	
-	public void onRetrieveCtx(CtxModelObject ctxObj);
+	public CtxEntity createRemoteCtxEntity(String type);
 	
-	public void onUpdateCtx(CtxModelObject ctxObj);
-		
-	public void receiveCtxResult(Object retObject, String type);
+	public List<CtxIdentifier> lookupRemoteCtxAttribute(String type);
+	
+	public CtxAttribute retrieveCtxObject(CtxIdentifier ctxID);
+	
+	public CtxModelObject updateCtxModelObject(CtxModelObject obj);
+	
+	public List<CtxAttribute> lookupRemoteLocalCtxAttribute();
+	
+	public void registerForContextUpdates(CtxIdentifier ctxID, CtxChangeEventListener listener);
+	
 }
