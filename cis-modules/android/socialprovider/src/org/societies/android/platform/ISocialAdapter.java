@@ -26,7 +26,6 @@ package org.societies.android.platform;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.net.Uri;
 
 /**
  * All adapters have to implement this interface. It follows a logic very
@@ -40,21 +39,87 @@ import android.net.Uri;
  *
  */
 public interface ISocialAdapter {
-    public Cursor query(Uri uri, 
-    		String[] projection, 
-    		String selection, 
-    		String[] selectionArgs, 
-    		String sortOrder);
-    public Uri insert (Uri uri, 
-    		ContentValues values);
-    public int update(Uri uri, 
-    		ContentValues values, 
-    		String selection, 
-    		String[] selectionArgs);
-    public int delete(Uri uri, 
-    		String selection, 
-    		String[] selectionArgs);
-    
+	
+	//CRUD for people:
+	public long insertPeople(ContentValues values);
+	public Cursor queryPeople(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder);
+	public int updatePeople(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deletePeople(String _selection, String[] _selectionArgs);
+	
+	//CRUD for communities:
+	public long insertCommunities(ContentValues values);
+	public Cursor queryCommunities(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder);
+	public int updateCommunities(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deleteCommunities(String _selection, String[] _selectionArgs);
+	
+	//CRUD for services:
+	public long insertServices(ContentValues values);
+	public Cursor queryServices(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder);
+	public int updateServices(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deleteServices(String _selection, String[] _selectionArgs);
+	
+	//CRUD for relationships:
+	public long insertRelationship(ContentValues values);
+	public Cursor queryRelationship(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder);
+	public int updateRelationship(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deleteRelationship(String _selection, String[] _selectionArgs);
+	
+	
+	//CRUD for membership:
+	public long insertMembership(ContentValues values);
+	public Cursor queryMembership(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder);
+	public int updateMembership(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deleteMembership(String _selection, String[] _selectionArgs);
+	//CRUD for sharing:
+	public long insertSharing(ContentValues values);
+	public Cursor querySharing(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder);
+	public int updateSharing(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deleteSharing(String _selection, String[] _selectionArgs);
+
+	//CRUD for people activities:
+	public long insertPeopleActivity(ContentValues values);
+	public Cursor queryPeopleActivity(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder);
+	public int updatePeopleActivity(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deletePeopleActivity(String _selection, String[] _selectionArgs);
+	
+	//CRUD for community activities:
+	public long insertCommunityActivity(ContentValues values);
+	public Cursor queryCommunityActivity(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder);
+	public int updateCommunityActivity(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deleteCommunityActivity(String _selection, String[] _selectionArgs);
+
+	//CRUD for service activities:
+	public long insertServiceActivity(ContentValues values);
+	public Cursor queryServiceActivity(String[] projection, String selection,
+			String[] selectionArgs, String sortOrder);
+	public int updateServiceActivity(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deleteServiceActivity(String _selection, String[] _selectionArgs);
+
+	//CRUD for me:
+	public long insertMe(ContentValues values);
+	public Cursor queryMe(String[] projection, String selection,
+	String[] selectionArgs, String sortOrder);
+	public int updateMe(ContentValues values, String selection,
+			String[] selectionArgs);
+	public int deleteMe(String _selection, String[] _selectionArgs);
+	 
     /**
      * A method that can be used to check whether this adapter is usable.
      * @return true if connection is on.
@@ -78,9 +143,10 @@ public interface ISocialAdapter {
     public int connect(String username, String password);
     public int disconnect();
     
-    /**
+    public boolean firstRun();
+	/**
 	 * Retrieves the list of CISs owned by CIS Manager
 	 * 
-	 * @return list of {@link ICisOwned} in the callback object*/
+	 * @return list of ICisOwned in the callback object*/
 	public void getListOfOwnedCis(ISocialAdapterCallback callback);
     }
