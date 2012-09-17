@@ -408,6 +408,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				else
 					deviceCommonInfo.setContextSource(false);
 				
+				logger.debug("About to install!");
+
 				String deviceId = getDeviceMngr().fireNewSharedDevice(deviceCommonInfo, deviceNodeId);
 				
 				if(deviceId == null){
@@ -520,6 +522,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 		} catch (Exception ex) {
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
+			ex.printStackTrace();
 			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
 		}
 		

@@ -115,7 +115,7 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 		}
 	}
 
-	protected class ServiceNegotiationResult{
+	public class ServiceNegotiationResult{
 		
 		boolean success;
 		URI serviceUri;
