@@ -27,6 +27,7 @@ package org.societies.cis.manager.tester;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -35,10 +36,13 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
@@ -52,6 +56,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
+import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.MembershipCrit;
@@ -70,7 +75,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CisMgmtTester {
 
 	//private IcisManagerClient cisClient;
-	//private ICisManager cisClient;
+	private ICisManager cisClient;
+
+
 	private ICommManager iCommMgr;
 	
 	private static Logger LOG = LoggerFactory
@@ -90,16 +97,38 @@ public class CisMgmtTester {
 		CisMgmtTester.busy = busy;
 	}
 
-	public CisMgmtTester(ICommManager iCommMgr, String targetCisId){
+	public CisMgmtTester(ICisManager cisClient, ICommManager iCommMgr, String targetCisId){
 
+		this.cisClient = cisClient;
 		this.iCommMgr = iCommMgr;
 		this.targetCisId = targetCisId;
 		IIdentity toIdentity;
-		try {
-			toIdentity =iCommMgr.getIdManager().fromJid(targetCisId);
-			Stanza stanza = new Stanza(toIdentity);
+		ICis targetCis = this.cisClient.getCis(targetCisId);
+		IActivityFeed ac = targetCis.getActivityFeed();
+		
+
+			GetActivitiesCallBack callb1 = new GetActivitiesCallBack();
+			Calendar now = Calendar.getInstance();
+			now.add(Calendar.DAY_OF_MONTH, -60);
+			String timeperiod = (now.getTimeInMillis() + " " + System.currentTimeMillis());
+			ac.getActivities(timeperiod, callb1);
+
+			GetActivitiesCallBack callb2 = new GetActivitiesCallBack();
+			ac.getActivities("", timeperiod, callb2);
 			
-			CommunityManager c = new CommunityManager();
+			JSONObject searchQuery = new JSONObject();
+			try {
+				searchQuery.append("filterBy", "actor");
+				searchQuery.append("filterOp", "equals");
+				searchQuery.append("filterValue", "xcmanager1.societies.local");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			
+			GetActivitiesCallBack callb3 = new GetActivitiesCallBack();
+			ac.getActivities(searchQuery.toString(), timeperiod, callb3);
+			
+			/*CommunityManager c = new CommunityManager();
 			Create cr = new Create();
 			c.setCreate(cr);
 			Community com = new Community();
@@ -118,19 +147,10 @@ public class CisMgmtTester {
 			crit.setValue1("married");
 			l.add(crit);
 			
-			com.setMembershipCrit(m);
+			com.setMembershipCrit(m);*/
 			
-			try {
-				LOG.info("Sending stanza");
-				this.iCommMgr.sendIQGet(stanza, c, new TestIcomCallBack());
-			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (InvalidFormatException e1) {
-			LOG.info("Problem with the input jid when trying to send");
-			e1.printStackTrace();
-		}	
+			
+	
 		
 		
 		
@@ -185,7 +205,7 @@ public class CisMgmtTester {
 		
 	}
 	
-	public class JoinCallBack implements ICisManagerCallback{
+/*	public class JoinCallBack implements ICisManagerCallback{
 		
 		ICisManager cisClient;
 		
@@ -206,7 +226,7 @@ public class CisMgmtTester {
 				ICis icis = cisClient.getCis(communityResultObject.getCommunityJid());
 				
 				
-				/*					IActivity iActivity = new org.societies.activity.model.Activity();
+								IActivity iActivity = new org.societies.activity.model.Activity();
 				iActivity.setActor("act");
 				iActivity.setObject("obj");
 				iActivity.setTarget("tgt");
@@ -235,7 +255,7 @@ public class CisMgmtTester {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-*/				
+			
 				
 				
 	
@@ -247,7 +267,7 @@ public class CisMgmtTester {
 		}
 			
 
-	}
+	}*/
 	
 	public class TestIcomCallBack implements ICommCallback{
 		
@@ -307,31 +327,34 @@ public class CisMgmtTester {
 
 	}
 	
-	public class GetActivitiesCallBack  implements ICisManagerCallback{
+	public class GetActivitiesCallBack  implements IActivityFeedCallback{
 		
 		
 	
 
-		public void receiveResult(Community communityResultObject) {
-			if(communityResultObject == null){
-				LOG.info("null return on GetListMembersCallBack");
+		@Override
+		public void receiveResult(Activityfeed activityFeedObject) {
+			if(activityFeedObject ==null || activityFeedObject.getGetActivitiesResponse() == null){
+				LOG.info("callback response was empty");
 				return;
 			}
-			else{
-				LOG.info("good return on GetActivitiesCallBack  Callback");
-				LOG.info("Result Status: GetListMembersCallBack from CIS " + communityResultObject.getCommunityJid());
-			/*	List<org.societies.api.schema.activity.Activity> l = communityResultObject.getGetActivitiesResponse().getActivity();
-
-				int[] memberCheck = {0,0,0};
+			if (activityFeedObject.getGetActivitiesResponse().getActivity() != null ){
+				if (activityFeedObject.getGetActivitiesResponse().getActivity().size() < 1){
+					LOG.info("empty list");
+				}else{
+					if(activityFeedObject.getGetActivitiesResponse().getActivity().get(0) == null)
+						LOG.info("null activity in non null list");
+					else
+						LOG.info("activity eq " + activityFeedObject.getGetActivitiesResponse().getActivity().get(0).getVerb());
+					return;
+				}
 				
-				Iterator<org.societies.api.schema.activity.Activity> it = l.iterator();
-				
-				while(it.hasNext()){
-					org.societies.api.schema.activity.Activity element = it.next();
-					LOG.info("actor " + element.getActor() + " target "  + element.getTarget() + " time "  + element.getPublished() );
-			     }*/
-				
+			}else{
+				LOG.info("no list object");
+				return;
 			}
+				
+			
 			
 		}
 
