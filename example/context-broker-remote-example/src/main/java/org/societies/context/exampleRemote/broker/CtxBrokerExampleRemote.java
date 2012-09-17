@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.context.broker.ICtxBroker;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -70,8 +72,11 @@ public class CtxBrokerExampleRemote 	{
 		CtxAttribute remoteAttribute = this.ca3pService.createRemoteCtxAttribute(remoteEntity.getId(), CtxAttributeTypes.ADDRESS_HOME_CITY);
 		LOG.info("*** remoteAttribute id : "+ remoteAttribute.getId());		
 		
+		this.ca3pService.registerForContextUpdates(remoteAttribute.getId(), new MyCtxChangeEventListener());
+
 		remoteAttribute.setStringValue("CarnabyStreet12");
 		
+		LOG.info("*** perform updated ");
 		CtxAttribute updatedAttr = (CtxAttribute) this.ca3pService.updateCtxModelObject(remoteAttribute);
 		LOG.info("*** updated remoteAttribute id : "+ updatedAttr.getId());	
 		LOG.info("*** updated remoteAttribute value : "+ updatedAttr.getStringValue());
@@ -90,4 +95,34 @@ public class CtxBrokerExampleRemote 	{
 	
 		
 	}
+	
+	private class MyCtxChangeEventListener implements CtxChangeEventListener {
+
+		@Override
+		public void onCreation(CtxChangeEvent event) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onUpdate(CtxChangeEvent event) {
+			LOG.info("*** updated event received : "+ event.toString());
+			
+		}
+
+		@Override
+		public void onModification(CtxChangeEvent event) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRemoval(CtxChangeEvent event) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
+	
 }

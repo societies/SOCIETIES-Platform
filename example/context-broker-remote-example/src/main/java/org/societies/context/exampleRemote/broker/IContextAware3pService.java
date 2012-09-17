@@ -27,6 +27,7 @@ package org.societies.context.exampleRemote.broker;
 
 import java.util.List;
 
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
@@ -53,5 +54,7 @@ public interface IContextAware3pService {
 	public CtxModelObject updateCtxModelObject(CtxModelObject obj);
 	
 	public List<CtxAttribute> lookupRemoteLocalCtxAttribute();
+	
+	public void registerForContextUpdates(CtxIdentifier ctxID, CtxChangeEventListener listener);
 	
 }

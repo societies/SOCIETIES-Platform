@@ -370,4 +370,18 @@ public class ContextAware3pService implements IContextAware3pService{
 		
 		return updatedObj;
 	}
+	
+	
+	@Override
+	public void registerForContextUpdates(CtxIdentifier ctxID, CtxChangeEventListener listener){
+		try {
+			LOG.info("register for changes for "+ctxID.toString());
+			this.ctxBroker.registerForChanges(simpleRequestor, listener, ctxID);
+			LOG.info("registered");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+	}
+
 }

@@ -163,13 +163,13 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		} else {
 
 			final CreateEntityCallback callback = new CreateEntityCallback();
-		 			
+
 			// change target to local identity for testing
 			//LOG.info("createEntity remote call: target id changed to local" + this.getLocalID());
 			//ctxBrokerClient.createRemoteEntity(requestor, this.getLocalID(), type, callback);
-		
+
 			ctxBrokerClient.createRemoteEntity(requestor, targetCss, type, callback);
-					
+
 			synchronized (callback) {
 				try {
 					callback.wait();
@@ -228,11 +228,11 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		} else {
 			// remote call
 			final CreateAttributeCallback callback = new CreateAttributeCallback();
-			
+
 			LOG.info("createAttribute perform remote call");
 			ctxBrokerClient.createRemoteAttribute(requestor, targetCss, scope, type, callback);
 			LOG.info("createAttribute remote call performed ");
-			
+
 			synchronized (callback) {
 				try {
 					//LOG.info("Attribute creation Callback wait");
@@ -415,7 +415,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			}
 		} else {
 			LOG.warn("remote call");
-			
+
 		}
 
 		return new AsyncResult<CtxEntityIdentifier>(individualEntityId);
@@ -780,7 +780,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			// Testing code : change target to local identity 
 			LOG.info("lookup remote call: target id changed to local " + this.getLocalID());
 			//ctxBrokerClient.lookupRemote(requestor,  this.getLocalID() , modelType, type, callback);
-			
+
 			//real code
 			ctxBrokerClient.lookupRemote(requestor, target, modelType, type, callback);
 			LOG.info("lookup remote call 2");
@@ -834,18 +834,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		if (ctxId == null)
 			throw new NullPointerException("ctxId can't be null");
 
-		IIdentity targetCss;
-		try {
-			targetCss = this.idMgr.fromJid(ctxId.getOwnerId());
-		} catch (InvalidFormatException ife) {
-			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
-		}
-		if (idMgr.isMine(targetCss)) {
-			internalCtxBroker.registerForChanges(listener, ctxId);
-		} else {
-			LOG.info("remote call");
-		}
-
+		internalCtxBroker.registerForChanges(listener, ctxId);
 	}
 
 	/*
@@ -894,17 +883,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
 
-		IIdentity targetCss;
-		try {
-			targetCss = this.idMgr.fromJid(scope.getOwnerId());
-		} catch (InvalidFormatException ife) {
-			throw new CtxBrokerException("Could not create IIdentity from JID", ife);
-		}
-		if (idMgr.isMine(targetCss)) {
-			internalCtxBroker.registerForChanges(listener, scope,attrType);
-		} else {
-			LOG.info("remote call");
-		}
+		internalCtxBroker.registerForChanges(listener, scope,attrType);
 	}
 
 	/*
