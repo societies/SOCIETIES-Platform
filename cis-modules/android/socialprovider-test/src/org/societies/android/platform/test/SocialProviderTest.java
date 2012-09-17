@@ -93,28 +93,28 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 	 * index number that is returned by resolver.insert.
 	 *  
 	 */
-	public void testInsertMyCommunity(){
+	public void testInsertCommunity(){
 		//1- Create local ContentValues to hold the community data.
 		ContentValues initialValues = new ContentValues();
-		initialValues.put(SocialContract.MyCommunity.GLOBAL_ID , "football.societies.org");
-		initialValues.put(SocialContract.MyCommunity.OWNER_ID , "babak@societies.org");
-		//initialValues.put(SocialContract.MyCommunity.DISPLAY_NAME , "Football");
+		initialValues.put(SocialContract.Communities.GLOBAL_ID , "football.societies.org");
+		initialValues.put(SocialContract.Communities.OWNER_ID , "babak@societies.org");
+		initialValues.put(SocialContract.Communities.TYPE , "sports");
 		
 		//2- Call insert in SocialProvider to initiate insertion
-		Uri newCommunityUri= resolver.insert(SocialContract.MyCommunity.CONTENT_URI , 
+		Uri newCommunityUri= resolver.insert(SocialContract.Communities.CONTENT_URI , 
 				initialValues);
 		
 		//3- Get the newly inserted CIS from SocialProvider.
 		//What to get:
 		String[] projection ={
-				SocialContract.MyCommunity.GLOBAL_ID,
-				SocialContract.MyCommunity.OWNER_ID,
-			//	SocialContract.MyCommunity.DISPLAY_NAME
+				SocialContract.Communities.GLOBAL_ID,
+				SocialContract.Communities.OWNER_ID,
+				SocialContract.Communities.TYPE
 			};
 		//WHERE _id = ID of the newly created CIS:
-		String selection = SocialContract.MyCommunity._ID + " = " +
+		String selection = SocialContract.Communities._ID + " = " +
 			newCommunityUri.getLastPathSegment();
-		Cursor cursor = resolver.query(SocialContract.MyCommunity.CONTENT_URI,
+		Cursor cursor = resolver.query(SocialContract.Communities.CONTENT_URI,
 				projection, selection, null, null);
 		
 		//4- Fail if the CIS was not returned.
@@ -124,9 +124,9 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		//5- Fail if the CIS data are not correct:
 		//Create new ContentValues object based on returned CIS:
 		ContentValues returnedValues = new ContentValues();
-		returnedValues.put(SocialContract.MyCommunity.GLOBAL_ID , cursor.getString(0));
-		returnedValues.put(SocialContract.MyCommunity.OWNER_ID , cursor.getString(1));
-		//returnedValues.put(SocialContract.MyCommunity.DISPLAY_NAME , cursor.getString(2));
+		returnedValues.put(SocialContract.Communities.GLOBAL_ID , cursor.getString(0));
+		returnedValues.put(SocialContract.Communities.OWNER_ID , cursor.getString(1));
+		returnedValues.put(SocialContract.Communities.TYPE , cursor.getString(2));
 		assertEquals(returnedValues,initialValues);
 
 	}
