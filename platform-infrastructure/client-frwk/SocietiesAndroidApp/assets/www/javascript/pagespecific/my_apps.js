@@ -117,6 +117,8 @@ var Societies3PServices = {
 			// Now call changePage() and tell it to switch to the page we just modified.
 			//options.
 			$.mobile.changePage( $page, options );
+			
+			$('#app_details').appendTo(".ui-page").trigger("create");
 		}
 	}
 
@@ -154,6 +156,7 @@ $(document).bind('pageinit',function(){
 	
 			if ( u.hash.search(re) !== -1 ) {
 	
+				$.mobile.loadPage("my_apps_details.html");
 				// We're being asked to display the items for a specific category.
 				// Call our internal method that builds the content for the category
 				// on the fly based on our in-memory category data structure.
