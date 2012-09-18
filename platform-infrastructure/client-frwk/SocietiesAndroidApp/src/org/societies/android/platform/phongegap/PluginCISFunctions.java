@@ -519,6 +519,58 @@ public class PluginCISFunctions extends Plugin {
 					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
+			} else if (intent.getAction().equals(CommunityManagement.GET_CIS_INFO)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 3);
+				
+				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					//UNMARSHALL THE COMMUNITY FROM Parcel
+					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					ACommunity cis = (ACommunity) parcel;
+					//RETURN JSON OBJECT
+					PluginResult result = new PluginResult(PluginResult.Status.OK, createCommunityJSON(cis));
+					result.setKeepCallback(false);
+					PluginCISFunctions.this.success(result, methodCallbackId);
+					//remove callback ID for given method invocation
+					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			} else if (intent.getAction().equals(CommunityManagement.GET_ACTIVITY_FEED)) { 
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 4);
+				
+				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					//UNMARSHALL THE ACTIVITIES FROM Parcels
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					AActivity activities[] = new AActivity[parcels.length];
+					for (int i = 0; i < parcels.length; i++) {
+						activities[i] = (AActivity) parcels[i];
+					}
+					//RETURN JSON ARRAY
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertAActiviesToJSONArray(activities));
+					result.setKeepCallback(false);
+					PluginCISFunctions.this.success(result, methodCallbackId);
+					//remove callback ID for given method invocation
+					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
+			} else if (intent.getAction().equals(CommunityManagement.ADD_ACTIVITY)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 5);
+				
+				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {					
+					//unmarshall intent
+					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					Boolean deleted = Boolean.parseBoolean(parcel.toString());
+					//RETURN A JSON OBJECT
+					PluginResult result = new PluginResult(PluginResult.Status.OK, deleted);
+					result.setKeepCallback(false);
+					PluginCISFunctions.this.success(result, methodCallbackId);
+					
+					//remove callback ID for given method invocation
+					PluginCISFunctions.this.methodCallbacks.remove(mapKey);
+					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
+				}
 			}
 			//>>>>>>>>>  ICisDirectory METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (intent.getAction().equals(CisDirectoryRemote.FIND_ALL_CIS)) { 
@@ -609,6 +661,21 @@ public class PluginCISFunctions extends Plugin {
 		Gson gson = new Gson();
 		try {
 			jObj =  (JSONArray) new JSONTokener(gson.toJson(communities)).nextValue();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        return jObj;
+	}
+	
+	/**
+	 * @param communities
+	 * @return
+	 */
+	private JSONArray convertAActiviesToJSONArray(AActivity[] array) {
+		JSONArray jObj = new JSONArray();
+		Gson gson = new Gson();
+		try {
+			jObj =  (JSONArray) new JSONTokener(gson.toJson(array)).nextValue();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
