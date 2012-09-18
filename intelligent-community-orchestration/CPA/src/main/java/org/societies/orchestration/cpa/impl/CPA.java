@@ -26,9 +26,8 @@
 package org.societies.orchestration.cpa.impl;
 
 import org.societies.api.activity.IActivity;
-import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.identity.IIdentity;
+import org.societies.orchestration.api.ICisDataCollector;
 import org.societies.orchestration.api.ICisProposal;
 import org.societies.orchestration.api.IDataCollectorSubscriber;
 
@@ -47,13 +46,12 @@ import java.util.List;
  * 
  */
 
-public class CPA implements IDataCollectorSubscriber
+public class CPA implements IDataCollectorSubscriber, Runnable
 {
-	public CPA(){}
 	private CPACreationPatterns cpaCreationPatterns;
-	
+    private ICisDataCollector collector;
 	private Date lastTemporaryCheck;
-	private List<ICisOwned> currentCises;
+    private String cisId;
 	/*
      * Constructor for EgocentricCommunityAnalyser
      * 
@@ -63,24 +61,22 @@ public class CPA implements IDataCollectorSubscriber
 	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
 	 *              that this object will operate on behalf of. (Currently can only be a user CSS)
 	 */
-	
-	public CPA(IIdentity linkedEntity, String linkType) {
-		lastTemporaryCheck = new Date();
-	}
+    public CPA(ICisDataCollector collector, String cisId){
+         this.collector = collector; this.cisId = cisId;
+        init();
+    }
+
+//    public CPA(IIdentity linkedEntity, String linkType) {
+//		lastTemporaryCheck = new Date();
+//	}
 	private void sendToCSM(List<ICisProposal> list){
 	}
 	private void process() {
-		
-		sendToCSM(cpaCreationPatterns.analyze(null));
+		sendToCSM(cpaCreationPatterns.analyze(newActivities));
+	}
+	
+	
 
-	}
-	
-	
-	public void loop() {
-		
-		new SleepThread().start();
-		
-	}
     private List<IActivity> newActivities;
     private List<CtxChangeEvent> newContext;
     @Override
@@ -91,6 +87,42 @@ public class CPA implements IDataCollectorSubscriber
         }else if(newData.get(0) instanceof CtxChangeEvent){
            List<CtxChangeEvent> tmpCtxList = (List<CtxChangeEvent>)newData;
            this.newContext.addAll(tmpCtxList);
+        }
+    }
+
+    public ICisDataCollector getCollector() {
+        return collector;
+    }
+
+    public void setCollector(ICisDataCollector collector) {
+        this.collector = collector;
+    }
+    public List<IActivity> safeCast(List<?> inp){
+        List<IActivity> ret = new ArrayList<IActivity>();
+        try{
+            List<IActivity> castTry = (List<IActivity>) inp;
+            ret.addAll(castTry);
+        } catch (ClassCastException e){
+
+        }
+        return ret;
+    }
+    @Override
+    public void run() {
+        newActivities.addAll(safeCast(this.collector.subscribe(this.cisId,this)));
+        while (true) {
+            try {
+                Date date = new Date();
+                if (date.getTime() >= (lastTemporaryCheck.getTime() + (1000 * 180))) {
+                    process();
+                    lastTemporaryCheck.setTime(date.getTime());
+                }
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                //TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -107,30 +139,7 @@ public class CPA implements IDataCollectorSubscriber
 //        }
 //    }
 
-    class SleepThread extends Thread {
-		
-		public void run() {
-			while (true) {
-				try {
-					Date date = new Date();
-					if (date.getTime() >= (lastTemporaryCheck.getTime() + (1000 * 180))) {
-						process();
-						lastTemporaryCheck.setTime(date.getTime());
-					}
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					//TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-		    }
-		}
-	}
-	
-    
-    public void initialiseCPA() {
-    	loop();
-    }
+
     
     public CPACreationPatterns getCPACreationPatterns() {
     	return cpaCreationPatterns;

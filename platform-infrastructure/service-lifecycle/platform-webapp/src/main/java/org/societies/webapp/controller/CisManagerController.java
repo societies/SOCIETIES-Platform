@@ -63,6 +63,7 @@ import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
@@ -248,7 +249,9 @@ public class CisManagerController {
 				//ICisRecord searchRecord = null;
 				//ICisRecord[] records = this.getCisManager().getCisList(searchRecord);
 				List<ICis> records = this.getCisManager().getCisList();
+				IIdentity currentNodeId = commMngrRef.getIdManager().getThisNetworkNode();
 				model.put("cisrecords", records);
+				model.put("currentNodeId", currentNodeId);
 
 			} else if (method.equalsIgnoreCase("JoinRemoteCIS")) {
 				model.put("methodcalled", "JoinRemoteCIS");
@@ -419,9 +422,15 @@ public class CisManagerController {
 				// -- CIS Configuration
 				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
 				MembershipCriteria m = new MembershipCriteria();
-				Rule r = new Rule(cisCreationForm.getOperator(), new ArrayList(Arrays.asList(cisCreationForm.getValue())));
-				m.setRule(r);
-				cisCriteria.put(cisCreationForm.getAttribute(), m);
+				try {
+					Rule r = new Rule(cisCreationForm.getOperator(), new ArrayList(Arrays.asList(cisCreationForm.getValue())));
+					m.setRule(r);
+					cisCriteria.put(cisCreationForm.getAttribute(), m);
+				}
+				catch(InvalidParameterException e){
+					resultMsg.append("Warning: Can't retrieve the membership criterii.");
+				}
+
 
 				// -- Generate Privacy Policy
 				CisCreationForm cisData;
@@ -471,11 +480,11 @@ public class CisManagerController {
 				resultMsg.append("Error during the CIS privacy policy (retrieve resource) saving: "+e.getMessage());
 				LOG.error("Error during the CIS privacy policy (retrieve resource) saving", e);
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				resultMsg.append("Error during the CIS privacy policy (illegal argument) saving: "+e.getMessage());
+				LOG.error("Error during the CIS privacy policy (illegal argument) saving", e);
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				resultMsg.append("Error during the CIS privacy policy (illegal access) saving: "+e.getMessage());
+				LOG.error("Error during the CIS privacy policy (illegal access) saving", e);
 			}
 		}
 

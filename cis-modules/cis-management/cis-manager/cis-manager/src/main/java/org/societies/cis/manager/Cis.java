@@ -126,11 +126,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private ICommManager CISendpoint;
 	@Transient
-	IServiceDiscoveryRemote iServDiscRemote;
+	IServiceDiscoveryRemote iServDiscRemote = null;
 	@Transient
-	IServiceControlRemote iServCtrlRemote;
+	IServiceControlRemote iServCtrlRemote = null;
 	@Transient
-	IPrivacyPolicyManager privacyPolicyManager;
+	IPrivacyPolicyManager privacyPolicyManager = null;
 	
 	
 	

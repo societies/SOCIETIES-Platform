@@ -68,11 +68,15 @@ public class DataIdentifierFactory {
 		DataIdentifier dataId = new SimpleDataIdentifier();
 		dataId.setScheme(scheme);
 		String path = uri[1];
-		int pos = 0, end = 0;
+		int pos = 0, end = 0, endType = 0;
 		if ((end = path.indexOf('/', pos)) >= 0) {
 			dataId.setOwnerId(path.substring(pos, end));
 		}
-		dataId.setType(path.substring(end+1, path.length()));
+		endType = path.length();
+		if (path.endsWith("/") && endType > 1) {
+			endType--;
+		}
+		dataId.setType(path.substring(end+1, endType));
 		return dataId;
 	}
 }

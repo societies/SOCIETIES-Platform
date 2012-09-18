@@ -613,7 +613,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		}
 
 		public void receiveResult(Stanza returnStanza, Object msgBean) {
-			Log.d(LOG_TAG, "Callback receiveResult");
+			Log.d(LOG_TAG, "CIS Callback receiveResult");
 			
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);

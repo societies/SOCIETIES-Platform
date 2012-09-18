@@ -7,6 +7,19 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Societies Service Discovery Result</title>
+<style>
+.privacy-policy-handler{
+	display: inline-block;
+	padding: 1px 4px;
+	border: 1px solid gray;
+	border-radius: 2px;
+	background-color: #D3D3D3;
+	color: black;
+	text-decoration: none;
+	font-family: arial;
+	font-size: 0.9em;
+}
+</style>
 </head>
 <body>
 	<!-- HEADER -->
@@ -61,6 +74,7 @@ function updateForm(serviceID, toDo) {
             <td>${service.authorSignature}</td>
             <td>${service.serviceStatus}</td>
             <td>
+            <a href="service-privacy-policy-show.html?serviceId=${service.getServiceIdentifier().getServiceInstanceIdentifier()}&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>
             <%
 			if (methodCalled.equals("GetServicesCis")) {
 			%>
