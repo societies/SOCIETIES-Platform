@@ -48,17 +48,22 @@ public class DataIdentifierUtil {
 		return str.toString();
 	}
 	
+	@Deprecated
 	public static DataIdentifier fromUri(String dataIdUri)
 	{
 		String[] uri = dataIdUri.split("://");
 		DataIdentifier dataId = new SimpleDataIdentifier();
 		dataId.setScheme(DataIdentifierScheme.fromValue(uri[0]));
 		String path = uri[1];
-		int pos = 0, end = 0;
+		int pos = 0, end = 0, endType = 0;
 		if ((end = path.indexOf('/', pos)) >= 0) {
 			dataId.setOwnerId(path.substring(pos, end));
 		}
-		dataId.setType(path.substring(end+1, path.length()));
+		endType = path.length();
+		if (path.endsWith("/") && endType > 1) {
+			endType--;
+		}
+		dataId.setType(path.substring(end+1, endType));
 		return dataId;
 	}
 }
