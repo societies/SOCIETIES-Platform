@@ -129,7 +129,7 @@ public class CisDirectoryController {
 				CisAdvertisementRecord record= new CisAdvertisementRecord();
 				
 					record.setName(cdForm.getName()); 
-					record.setCssownerid(cdForm.getcssOwnwerId());
+					record.setCssownerid(cdForm.getCssOwnwerId());
 					record.setType(cdForm.getType());
 					record.setId(cdForm.getId());
 					//record.setMode(cdForm.getMode());

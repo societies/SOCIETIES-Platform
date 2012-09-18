@@ -59,10 +59,10 @@ public class CISDirectoryForm {
 		this.name = name;
 	}
 	
-	public String getcssOwnwerId() {
+	public String getCssOwnwerId() {
 		return cssownwerid;
 	}
-	public void setcssOwnwerId(String cssownwerid) {
+	public void setCssOwnwerId(String cssownwerid) {
 		this.cssownwerid = cssownwerid;
 	}
 	

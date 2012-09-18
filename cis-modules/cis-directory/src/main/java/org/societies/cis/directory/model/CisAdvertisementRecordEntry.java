@@ -93,7 +93,7 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	 * @return the cssownwerid
 	 */
 	@Column(name = "cssownwerid")
-	public String getcssOwnwerId() {
+	public String getCssOwnwerId() {
 		return cssownwerid;
 	}
 
@@ -101,7 +101,7 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	 * @param cssownwerid
 	 *            the css ownwer id to set
 	 */
-	public void setcssOwnwerId(String cssownwerid) {
+	public void setCssOwnwerId(String cssownwerid) {
 		this.cssownwerid = cssownwerid;
 	}
 	

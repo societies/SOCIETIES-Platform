@@ -61,9 +61,9 @@
 				<td><form:errors path="name" cssClass="error" /></td>
 			</tr>
 			<tr>
-				<td>CIS Uri:</td>
-				<td><form:input path="uri" /></td>
-				<td><form:errors path="uri" cssClass="error" /></td>
+				<td>Owner CSS Id:</td>
+				<td><form:input path="cssownwerid" /></td>
+				<td><form:errors path="cssownwerid" cssClass="error" /></td>
 			</tr>
 			<tr>
 				<td>CIS Type:</td>
