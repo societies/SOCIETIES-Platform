@@ -33,14 +33,14 @@
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
 
-	<h3>Privacy Policies</h3>
+	<h3>Privacy Policy Management</h3>
+	<p>This page is for testing purpose. You can use it to add manually a Privacy Policy (embedded in CIS creation GUI), and show an example of CIS or 3P service privacy policy (embedded in CIS / 3P service list GUIs).</p>
 	<ul>
 		<li><a href="privacy-policy.html">Add a new one</a></li>
-		<li><a href="privacy-policy-show.html?cisId=onecis.societies.local&cisOwnerId=olivier.societies.local">Show an existing privacy policy</a></li>
+		<li><a href="cis-privacy-policy-show.html?cisId=onecis.societies.local&cisOwnerId=olivier.societies.local&test=true">Show an existing CIS privacy policy</a></li>
+		<li><a href="service-privacy-policy-show.html?serviceId=css://olivier.societies.local&serviceOwnerId=olivier.societies.local&test=true">Show an existing 3P service privacy policy</a></li>
 	</ul>
 
-	<p>There is currently no privacy policy.</p>
-	
 	<!-- .................END PLACE YOUR CONTENT HERE ................ -->
 	<!-- FOOTER -->
 	<jsp:include page="../../footer.jsp" />

@@ -63,6 +63,7 @@ import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
@@ -248,7 +249,9 @@ public class CisManagerController {
 				//ICisRecord searchRecord = null;
 				//ICisRecord[] records = this.getCisManager().getCisList(searchRecord);
 				List<ICis> records = this.getCisManager().getCisList();
+				IIdentity currentNodeId = commMngrRef.getIdManager().getThisNetworkNode();
 				model.put("cisrecords", records);
+				model.put("currentNodeId", currentNodeId);
 
 			} else if (method.equalsIgnoreCase("JoinRemoteCIS")) {
 				model.put("methodcalled", "JoinRemoteCIS");
