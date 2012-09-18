@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.validation.Valid;
 
@@ -59,6 +61,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
@@ -67,6 +71,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
@@ -79,7 +84,11 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.comm.xmpp.xc.impl.CommManagerHelper;
 import org.societies.webapp.models.PrivacyPolicyForm;
 
@@ -92,7 +101,7 @@ public class PrivacyPolicyController {
 	private static String[] resourceList;
 	private static String[] resourceHumanList;
 	private static String[] resourceSchemeList;
-	
+
 	/**
 	 * OSGI service get auto injected
 	 */
@@ -100,6 +109,10 @@ public class PrivacyPolicyController {
 	private IPrivacyPolicyManager privacyPolicyManager;
 	@Autowired(required=false)
 	private ICommManager commMngrRef;
+	@Autowired
+	private ICisManager cisManager;
+	@Autowired
+	private IServiceDiscovery serviceDiscovery;
 
 	@RequestMapping(value = "/privacy-policies.html", method = RequestMethod.GET)
 	public ModelAndView indexAction() {
@@ -108,11 +121,12 @@ public class PrivacyPolicyController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		return new ModelAndView("privacy/privacy-policy/index", model);
 	}
-	
-	
-	@RequestMapping(value = "/privacy-policy-show.html", method = RequestMethod.GET)
-	public ModelAndView showAction(@RequestParam(value="cisOwnerId", required=false) String cisOwnerId,
-									@RequestParam(value="cisId", required=true) String cisId) {
+
+
+	@RequestMapping(value = "/cis-privacy-policy-show.html", method = RequestMethod.GET)
+	public ModelAndView showCisAction(@RequestParam(value="cisOwnerId", required=false) String cisOwnerId,
+			@RequestParam(value="cisId", required=true) String cisId,
+			@RequestParam(value="test", required=false, defaultValue="false") boolean test) {
 		LOG.debug("Show CIS privacy policy: "+cisId+" "+cisOwnerId);
 		StringBuffer infoMsg = new StringBuffer();
 		StringBuffer errorMsg = new StringBuffer();
@@ -120,56 +134,152 @@ public class PrivacyPolicyController {
 		// -- Retrieve the privacy policy
 		RequestorCis provider = null;
 		RequestPolicy privacyPolicy = null;
+		ICis cis = null;
 		try {
 			IIdentity cisOwnerIdentity = commMngrRef.getIdManager().fromJid(cisOwnerId);
 			IIdentity cisIdentity = commMngrRef.getIdManager().fromJid(cisId);
 			provider = new RequestorCis(cisOwnerIdentity, cisIdentity);
 			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(provider);
+			cis = cisManager.getCis(cisId);
 		} catch (PrivacyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Can't retrieve the privacy policy of this CIS", e);
+			errorMsg.append("Can't retrieve the privacy policy of this CIS");
 		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Can't retrieve parameters of this CIS", e);
+			errorMsg.append("Can't retrieve parameters of this CIS");
 		}
-		
+
 		// -- Display the privacy policy
 		// - No privacy policy
 		if (null == privacyPolicy) {
-//			errorMsg.append("The CIS privacy policy of "+provider+" can not be retrieved. It doesn't exist on this node, or identifiers are incorrect.");
+			//			errorMsg.append("The CIS privacy policy of "+provider+" can not be retrieved. It doesn't exist on this node, or identifiers are incorrect.");
 			LOG.error("The CIS privacy policy of "+provider+" can not be retrieved. It doesn't exist on this node, or identifiers are incorrect.");
-			LOG.error("Let's create one");
-			// -- Create a privacy policy
-			List<Action> actions = new ArrayList<Action>();
-			actions.add(new Action(ActionConstants.READ));
-			actions.add(new Action(ActionConstants.WRITE, true));
-			List<Condition> conditions = new ArrayList<Condition>();
-			conditions.add(new Condition(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1"));
-			conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
-			List<RequestItem> requests = new ArrayList<RequestItem>();
-			requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC), actions, conditions));
-			try {
-				requests.add(new RequestItem(new Resource(DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId+"/cis-member-list")), actions, conditions));
-			} catch (MalformedCtxIdentifierException e) {
-				LOG.error("Wrong data identifier");
+			errorMsg.append("Can't retrieve the privacy policy of this CIS.");
+			if (test) {
+				LOG.error("Let's create one");
+				errorMsg.append("\nFor testing purpose: lets create one.");
+				// -- Create a privacy policy
+				List<RequestItem> requests = createTestPrivacyPolicy();
+				privacyPolicy = new RequestPolicy(provider, requests);
 			}
-			privacyPolicy = new RequestPolicy(provider, requests);
 		}
 		else {
 			LOG.debug(privacyPolicy.toXMLString());
 		}
-		
+
 		LOG.error(errorMsg.toString());
 		LOG.info(infoMsg.toString());
-		
+
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("error", errorMsg.toString());
 		model.put("info", infoMsg.toString());
 		model.put("PrivacyPolicy", privacyPolicy);
-		return new ModelAndView("privacy/privacy-policy/show", model);
+		model.put("Cis", cis);
+		model.put("Element", "CIS");
+		return new ModelAndView("privacy/privacy-policy/show-cis", model);
 	}
-	
-	
+
+	@RequestMapping(value = "/service-privacy-policy-show.html", method = RequestMethod.GET)
+	public ModelAndView showServiceAction(@RequestParam(value="serviceOwnerId", required=false) String serviceOwnerId,
+			@RequestParam(value="serviceId", required=true) String serviceId,
+			@RequestParam(value="test", required=false, defaultValue="false") boolean test) {
+		LOG.debug("Show 3P service privacy policy: "+serviceId+" "+serviceOwnerId);
+		StringBuffer infoMsg = new StringBuffer();
+		StringBuffer errorMsg = new StringBuffer();
+
+		// -- Retrieve the privacy policy
+		RequestorService provider = null;
+		RequestPolicy privacyPolicy = null;
+		Service service = new Service();
+		service.setServiceName(serviceId);
+		try {
+			IIdentity serviceOwnerIdentity = null;
+			// Current node
+			if (null == serviceOwnerId || "".equals(serviceOwnerId)) {
+				serviceOwnerIdentity = commMngrRef.getIdManager().getThisNetworkNode(); 
+			}
+			else {
+				serviceOwnerIdentity = commMngrRef.getIdManager().fromJid(serviceOwnerId);
+			}
+			ServiceResourceIdentifier serviceIdentity = new ServiceResourceIdentifier();
+			serviceIdentity.setServiceInstanceIdentifier(serviceId);
+			provider = new RequestorService(serviceOwnerIdentity, serviceIdentity);
+			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(provider);
+			Future<Service> serviceFuture = serviceDiscovery.getService(serviceIdentity);
+			service = serviceFuture.get();
+		} catch (PrivacyException e) {
+			LOG.error("Can't retrieve the privacy policy of this Service", e);
+			errorMsg.append("Can't retrieve the privacy policy of this Service\n");
+		} catch (InvalidFormatException e) {
+			LOG.error("Can't retrieve parameters of this Service", e);
+			errorMsg.append("Can't retrieve parameters of this Service\n");
+		} catch (ServiceDiscoveryException e) {
+			LOG.error("Can't retrieve this Service", e);
+			errorMsg.append("Can't retrieve this Service\n");
+		} catch (InterruptedException e) {
+			LOG.error("Can't retrieve this Service: interruption", e);
+			errorMsg.append("Can't retrieve this Service: interruption\n");
+		} catch (ExecutionException e) {
+			LOG.error("Can't retrieve this Service: execution", e);
+			errorMsg.append("Can't retrieve this Service: execution\n");
+		}
+
+		// -- Display the privacy policy
+		// - No privacy policy
+		if (null == privacyPolicy) {
+			//			errorMsg.append("The CIS privacy policy of "+provider+" can not be retrieved. It doesn't exist on this node, or identifiers are incorrect.");
+			LOG.error("The Service privacy policy of "+provider+" can not be retrieved. It doesn't exist on this node, or identifiers are incorrect.");
+			errorMsg.append("Can't retrieve the privacy policy of this Service.");
+			if (test) {
+				LOG.error("Let's create one");
+				errorMsg.append("\nFor testing purpose: lets create one.");
+				// -- Create a privacy policy
+				List<RequestItem> requests = createTestPrivacyPolicy();
+				privacyPolicy = new RequestPolicy(provider, requests);
+			}
+		}
+		else {
+			LOG.debug(privacyPolicy.toXMLString());
+		}
+
+		LOG.error(errorMsg.toString());
+		LOG.info(infoMsg.toString());
+
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("error", errorMsg.toString());
+		model.put("info", infoMsg.toString());
+		model.put("PrivacyPolicy", privacyPolicy);
+		model.put("Service", service);
+		model.put("Element", "service");
+		return new ModelAndView("privacy/privacy-policy/show-3p-service", model);
+	}
+
+
+
+	private List<RequestItem> createTestPrivacyPolicy() {
+		List<Action> actionsRw = new ArrayList<Action>();
+		actionsRw.add(new Action(ActionConstants.READ));
+		actionsRw.add(new Action(ActionConstants.WRITE, true));
+		List<Action> actionsR = new ArrayList<Action>();
+		actionsR.add(new Action(ActionConstants.READ));
+		List<Condition> conditionsMembersOnly = new ArrayList<Condition>();
+		conditionsMembersOnly.add(new Condition(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1"));
+		conditionsMembersOnly.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+		List<Condition> conditionsPublic = new ArrayList<Condition>();
+		conditionsPublic.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
+		conditionsPublic.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+		List<Condition> conditionsPrivate = new ArrayList<Condition>();
+		conditionsPrivate.add(new Condition(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1"));
+		conditionsPrivate.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+		conditionsPrivate.add(new Condition(ConditionConstants.MAY_BE_INFERRED, "1"));
+		List<RequestItem> requests = new ArrayList<RequestItem>();
+		requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC), actionsRw, conditionsMembersOnly));
+		requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.BIRTHDAY), actionsR, conditionsPublic));
+		requests.add(new RequestItem(new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LAST_ACTION), actionsR, conditionsPrivate));
+		requests.add(new RequestItem(new Resource(DataIdentifierScheme.CIS, "cis-member-list"), actionsRw, conditionsMembersOnly));
+		return requests;
+	}
+
 
 	@RequestMapping(value = "/privacy-policy.html", method = RequestMethod.GET)
 	public ModelAndView updateAction() {
@@ -219,7 +329,7 @@ public class PrivacyPolicyController {
 			try {
 				privacyPolicy = privacyPolicyFrom.toRequestPolicy(commMngrRef.getIdManager());
 				LOG.info(privacyPolicy.toXMLString());
-//				privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
+				//				privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
 				resultMsg.append("\nPrivacy policy successfully created.");
 				resultMsg.append("\n"+privacyPolicyFrom.toString());
 			} catch (InvalidFormatException e) {
@@ -266,7 +376,7 @@ public class PrivacyPolicyController {
 			resourceList[i] = DataIdentifierScheme.CONTEXT+":///"+((String)resourceTypeList[i].get(null));
 			resourceHumanList[i] = DataIdentifierScheme.CONTEXT+": "+((String)resourceTypeList[i].get(null));
 		}
-		
+
 		DataIdentifierScheme[] schemes = DataIdentifierScheme.values();
 		resourceSchemeList = new String[schemes.length];
 		for(int j=0; j<schemes.length; j++) {
@@ -297,5 +407,13 @@ public class PrivacyPolicyController {
 	public void setCommMngrRef(ICommManager commMngrRef) {
 		this.commMngrRef = commMngrRef;
 		LOG.info("[DepencyInjection] ICommManager injected");
+	}
+	public void setCisManager(ICisManager cisManager) {
+		this.cisManager = cisManager;
+		LOG.info("[DepencyInjection] ICisManager injected");
+	}
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		this.serviceDiscovery = serviceDiscovery;
+		LOG.info("[DepencyInjection] IServiceDiscovery injected");
 	}
 }
