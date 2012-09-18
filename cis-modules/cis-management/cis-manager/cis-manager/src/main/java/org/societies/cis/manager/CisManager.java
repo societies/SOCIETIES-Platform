@@ -140,13 +140,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	ICommManager iCommMgr;
 	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
-	ICisDirectoryRemote iCisDirRemote;
+	ICisDirectoryRemote iCisDirRemote = null;
 
-	IServiceDiscoveryRemote iServDiscRemote;
-	IServiceControlRemote iServCtrlRemote;
-	private IPrivacyPolicyManager privacyPolicyManager;
-	private IEventMgr eventMgr;
-	private ICtxBroker internalCtxBroker;
+	IServiceDiscoveryRemote iServDiscRemote = null;
+	IServiceControlRemote iServCtrlRemote = null;
+	private IPrivacyPolicyManager privacyPolicyManager = null;
+	private IEventMgr eventMgr = null;
+	private ICtxBroker internalCtxBroker = null;
 
 	//private INegotiation negotiator;
 
