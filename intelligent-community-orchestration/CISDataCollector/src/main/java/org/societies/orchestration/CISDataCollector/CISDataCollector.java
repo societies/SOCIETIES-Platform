@@ -47,7 +47,6 @@ import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.activityfeed.Activityfeed;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.ICtxEventMgr;
-import org.societies.orchestration.api.IDataCollector;
 import org.societies.orchestration.api.IDataCollectorSubscriber;
 
 import javax.xml.bind.JAXBException;
@@ -59,7 +58,7 @@ import java.util.List;
  * Community Intelligence Orchestration 
  * modified from CtxEventExample
  */
-public class CISDataCollector implements Subscriber, IActivityFeedCallback, IDataCollector {
+public class CISDataCollector implements Subscriber, IActivityFeedCallback {
 	
 	private ICtxEventMgr ctxEventMgr;
 	private IIdentity userId;
@@ -72,8 +71,16 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback, IDat
 	public CISDataCollector(IIdentity userEntity, ICtxEventMgr ctxEventMgr) {
 		this.userId = userEntity;
 		this.ctxEventMgr = ctxEventMgr;
-		initCtxEvent();
+        init();
 	}
+    public void init(){
+        subscribers = new ArrayList<IDataCollectorSubscriber>();
+        initCtxEvent();;
+    }
+    public CISDataCollector(ICisOwned cisId){
+        this.cis = cis;
+        init();
+    }
 	
 	private void initCtxEvent() {
 
@@ -171,7 +178,7 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback, IDat
      }
     }
 
-    @Override
+
     public List<?> subscribe(IDataCollectorSubscriber subscriber) {
         List<Object> ret = this.getAllHistory(); //TODO: what happens if we receive update while retrieving history, this may be become a common issue when history is large..
         this.subscribers.add(subscriber);
@@ -212,4 +219,5 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback, IDat
 			sendEvent(event);
 		}
 	}
+
 }

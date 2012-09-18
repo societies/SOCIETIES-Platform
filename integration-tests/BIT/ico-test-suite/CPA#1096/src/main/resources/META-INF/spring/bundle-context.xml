@@ -24,13 +24,13 @@
         class="org.societies.integration.test.bit.cpa.TestCase1096"
 		depends-on=""
         init-method="run">
-        <property name="commManager" ref="CommManagerBundle"/>
         <property name="cisManager" ref="cisManager"/>
+        <property name="commManager" ref="commManager"/>
     </bean>
     
-    <bean
+<!--    <bean
         id="NominalTestCase"
         class="org.societies.integration.test.bit.cpa.NominalTestCase">
-    </bean>
+    </bean>-->
 
 </beans>

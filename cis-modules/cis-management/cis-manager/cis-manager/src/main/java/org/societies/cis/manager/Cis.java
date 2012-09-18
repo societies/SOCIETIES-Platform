@@ -126,12 +126,20 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private ICommManager CISendpoint;
 	@Transient
-	IServiceDiscoveryRemote iServDiscRemote;
+	IServiceDiscoveryRemote iServDiscRemote = null;
 	@Transient
-	IServiceControlRemote iServCtrlRemote;
+	IServiceControlRemote iServCtrlRemote = null;
 	@Transient
-	IPrivacyPolicyManager privacyPolicyManager;
+	IPrivacyPolicyManager privacyPolicyManager = null;
 	
+	
+	
+	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+		this.privacyPolicyManager = privacyPolicyManager;
+	}
+
+
+
 	@Transient
 	private IIdentity cisIdentity;
 	@Transient
@@ -1090,6 +1098,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			// get Activities
 			if (c.getGetActivities() != null) {
+				LOG.info("get activities called");
 				org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
 				GetActivitiesResponse r = new GetActivitiesResponse();
 				String senderJid = stanza.getFrom().getBareJid();
@@ -1100,13 +1109,16 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-					if(c.getGetActivities().getQuery()!=null  &&  c.getGetActivities().getQuery().isEmpty())
+					if(c.getGetActivities().getQuery()==null  ||  c.getGetActivities().getQuery().isEmpty())
 						iActivityList = activityFeed.getActivities(c.getGetActivities().getTimePeriod());
 					else
 						iActivityList = activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod());										
 				//}
 				
+					LOG.info("loacl query worked activities called");
+					this.activityFeed.iactivToMarshActv(iActivityList, marshalledActivList);
 
+				/*	
 				Iterator<IActivity> it = iActivityList.iterator();
 				
 				while(it.hasNext()){
@@ -1118,7 +1130,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 					a.setVerb(a.getVerb());
 					marshalledActivList.add(a);
 			     }
-				
+				*/
+					LOG.info("finished the marshling");
 				r.setActivity(marshalledActivList);
 				result.setGetActivitiesResponse(r);		
 				return result;
@@ -1284,7 +1297,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		try {
 			cssOwnerId = this.CISendpoint.getIdManager().fromJid(this.getOwnerId());
 			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisIdentity);	
-			this.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
+			if(this.privacyPolicyManager != null)
+				this.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
 		} catch (InvalidFormatException e1) {
 			// TODO Auto-generated catch block
 			LOG.info("bad format in cis owner jid at delete method");

@@ -129,13 +129,13 @@ public class CisDataAccessControlTest
 
 		// - CIS creation
 		Future<ICisOwned> cisPublicFuture = TestCase1266.cisManager.createCis("Public Cis", "1", null, "My Public Cis", privacyPolicyPublic.toXMLString());
-		ICisOwned cisPublic = cisPublicFuture.get();
+		cisPublic = cisPublicFuture.get();
 		
 		Future<ICisOwned> cisMembersOnlyFuture = TestCase1266.cisManager.createCis("Members only Cis", "1", null, "My Members only Cis", privacyPolicyMembersOnly.toXMLString());
-		ICisOwned cisMembersOnly = cisMembersOnlyFuture.get();
+		cisMembersOnly = cisMembersOnlyFuture.get();
 		
 		Future<ICisOwned> cisPrivateFuture = TestCase1266.cisManager.createCis("Private Cis", "1", null, "My Private Cis", privacyPolicyPrivate.toXMLString());
-		ICisOwned cisPrivate = cisPrivateFuture.get();
+		cisPrivate = cisPrivateFuture.get();
 
 		// - Identities
 		myCssId = TestCase1266.commManager.getIdManager().getThisNetworkNode();
@@ -199,12 +199,12 @@ public class CisDataAccessControlTest
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
 		}
 
-		assertNotNull("No permission retrieved", permission1);
-		assertNotNull("No (real) permission retrieved", permission1.getDecision());
-		assertEquals("Bad permission retrieved",  Decision.PERMIT.name(), permission1.getDecision().name());
-		assertNotNull("No permission retrieved", permission2);
-		assertNotNull("No (real) permission retrieved", permission2.getDecision());
-		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission2.getDecision().name());
+		assertNotNull("First: No permission retrieved", permission1);
+		assertNotNull("First: No (real) permission retrieved", permission1.getDecision());
+		assertEquals("First: Bad permission retrieved",  Decision.PERMIT.name(), permission1.getDecision().name());
+		assertNotNull("Second: No permission retrieved", permission2);
+		assertNotNull("Second: No (real) permission retrieved", permission2.getDecision());
+		assertEquals("Second: Bad permission retrieved", Decision.PERMIT.name(), permission2.getDecision().name());
 		assertEquals("Two requests, not the same answer", permission1.toXMLString(), permission2.toXMLString());
 	}
 	
@@ -232,29 +232,29 @@ public class CisDataAccessControlTest
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
 		}
 
-		assertNotNull("No permission retrieved", permissionOther1);
-		assertNotNull("No (real) permission retrieved", permissionOther1.getDecision());
-		assertEquals("Bad permission retrieved",  Decision.DENY.name(), permissionOther1.getDecision().name());
-		assertNotNull("No permission retrieved", permissionOther2);
-		assertNotNull("No (real) permission retrieved", permissionOther2.getDecision());
-		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissionOther2.getDecision().name());
-		assertEquals("Two requests, not the same answer", permissionOther1.toXMLString(), permissionOther2.toXMLString());
+		assertNotNull("Other: No permission retrieved", permissionOther1);
+		assertNotNull("Other: No (real) permission retrieved", permissionOther1.getDecision());
+		assertEquals("Other: Bad permission retrieved",  Decision.DENY.name(), permissionOther1.getDecision().name());
+		assertNotNull("Other: No permission retrieved", permissionOther2);
+		assertNotNull("Other: No (real) permission retrieved", permissionOther2.getDecision());
+		assertEquals("Other: Bad permission retrieved", Decision.DENY.name(), permissionOther2.getDecision().name());
+		assertEquals("Other: Two requests, not the same answer", permissionOther1.toXMLString(), permissionOther2.toXMLString());
 		
-		assertNotNull("No permission retrieved", permissionMember1);
-		assertNotNull("No (real) permission retrieved", permissionMember1.getDecision());
-		assertEquals("Bad permission retrieved",  Decision.PERMIT.name(), permissionMember1.getDecision().name());
-		assertNotNull("No permission retrieved", permissionMember2);
-		assertNotNull("No (real) permission retrieved", permissionMember2.getDecision());
-		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissionMember2.getDecision().name());
-		assertEquals("Two requests, not the same answer", permissionMember1.toXMLString(), permissionMember2.toXMLString());
+		assertNotNull("Member: No permission retrieved", permissionMember1);
+		assertNotNull("Member: No (real) permission retrieved", permissionMember1.getDecision());
+		assertEquals("Member: Bad permission retrieved",  Decision.PERMIT.name(), permissionMember1.getDecision().name());
+		assertNotNull("Member: No permission retrieved", permissionMember2);
+		assertNotNull("Member: No (real) permission retrieved", permissionMember2.getDecision());
+		assertEquals("Member: Bad permission retrieved", Decision.PERMIT.name(), permissionMember2.getDecision().name());
+		assertEquals("Member: Two requests, not the same answer", permissionMember1.toXMLString(), permissionMember2.toXMLString());
 
-		assertNotNull("No permission retrieved", permissionMe1);
-		assertNotNull("No (real) permission retrieved", permissionMe1.getDecision());
-		assertEquals("Bad permission retrieved",  Decision.PERMIT.name(), permissionMe1.getDecision().name());
-		assertNotNull("No permission retrieved", permissionMe2);
-		assertNotNull("No (real) permission retrieved", permissionMe2.getDecision());
-		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissionMe2.getDecision().name());
-		assertEquals("Two requests, not the same answer", permissionMe1.toXMLString(), permissionMe2.toXMLString());
+		assertNotNull("Me: No permission retrieved", permissionMe1);
+		assertNotNull("Me: No (real) permission retrieved", permissionMe1.getDecision());
+		assertEquals("Me: Bad permission retrieved",  Decision.PERMIT.name(), permissionMe1.getDecision().name());
+		assertNotNull("Me: No permission retrieved", permissionMe2);
+		assertNotNull("Me: No (real) permission retrieved", permissionMe2.getDecision());
+		assertEquals("Me: Bad permission retrieved", Decision.PERMIT.name(), permissionMe2.getDecision().name());
+		assertEquals("Me: Two requests, not the same answer", permissionMe1.toXMLString(), permissionMe2.toXMLString());
 	}
 
 	@Test

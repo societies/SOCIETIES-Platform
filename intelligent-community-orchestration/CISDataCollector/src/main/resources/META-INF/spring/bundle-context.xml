@@ -16,7 +16,8 @@
        bundle. We've kept the osgi definitions in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-
+
+
    <context:annotation-config />
 
     <tx:annotation-driven />
@@ -74,22 +75,9 @@
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
-    <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" init-method="init"
-    destroy-method="UnRegisterCisManager">
-        <property name="sessionFactory" ref="sessionFactory" />
-        <property name="ccmFactory" ref="cisCommMgrFactory"/>
-        <property name="iCommMgr" ref="xcCommunication"/>
-        <property name="iCisDirRemote" ref="CisDirectoryRemote"/>
-        <property name="iServDiscRemote" ref="servDiscRemote"/>
-        <property name="iServCtrlRemote" ref="servCtrlRemote"/>
-        <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
-        <property name="eventMgr" ref="eventMgmtRef"/>
-        <property name="internalCtxBroker" ref="internalCtxBroker"/>
-       <!-- <property name="iServDiscLocal" ref="serviceDiscovery"/>
-        <property name="iServCtrlLocal" ref="serviceControl"/>-->
-                
-        
-        
+    <bean id="CISDataCollector" class="org.societies.orchestration.CISDataCollectorManager" depends-on="ICisManager" init-method="init"
+    destroy-method="destroy">
+        <property name="cisManager" ref="ICisManager"/>
     </bean>
     
    <!-- <bean id="CisClientService" 
