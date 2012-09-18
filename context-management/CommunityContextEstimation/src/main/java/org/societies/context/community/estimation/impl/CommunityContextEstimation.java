@@ -37,17 +37,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 /**
+ * The CommunityContextEstimation class contains the methods to be called in order to estimate the community context.
+ * It has four types of methods. These that contain the letters "Num" in their name and deal with numeric attributes,
+ * these that contain the letters "Geom" in their name and deal with geometric attributes (e.g. location),
+ * these containing the letters "Special" and deal with other attributes and these containing the letters "String" in 
+ * their name that deal with string attributes
+ *
  * @author yboul 07-Dec-2011 4:15:14 PM
  */
+
 @Service("communityCtxEstimation")
 public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
-	/**
-	 * The CommunityContextEstimation class contains the methods to be called in order to estimate the community context.
-	 * It has four types of methods. These that contain the letters "Num" in their name and deal with numeric attributes,
-	 * these that contain the letters "Geom" in their name and deal with geometric attributes (e.g. location),
-	 * these containing the letters "Special" and deal with other attributes and these containing the letters "String" in 
-	 * their name that deal with string attributes
-	 */
+	
 	
 
 	public CommunityContextEstimation() {
@@ -59,15 +60,13 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	private ICtxBroker ctxBroker = null;
 
 
-
+	/**
+	 * Returns the mean value of an integers' ArrayList 
+	 * @param an array list of integers
+	 * @return a double as the mean value of the input integers
+	 */
 	@Override
 	public double cceNumMean(ArrayList<Integer> inputValuesList) {
-		/**
-		 * Returns the mean value of an integers' ArrayList 
-		 * @param an array list of integers
-		 * @return a double as the mean value of the input integers
-		 * 
-		 */
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		int total = 0; 
 
@@ -78,13 +77,14 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		return res;
 	}
 
+	/**
+	 * Returns the median of an integers' ArrayList
+     *
+	 * @param an array list of integers
+	 * @return a double as the median value of the input integers
+	 */
 	@Override
 	public double cceNumMedian(ArrayList<Integer> inputValuesList) {
-		/**
-		 * Returns the median of an integers' ArrayList
-		 * @param an array list of integers
-		 * @return a double as the median value of the input integers
-		 */
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		Integer med,med1,med2=0;
 		Collections.sort(inputValuesList);
@@ -99,14 +99,14 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		}
 		return med;	
 	}
-
+	
+	/**
+	 * Returns the mode of an integer's ArrayList
+	 * @param an array list of integers
+	 * @return an ArrayList of integers representing the mode value of the input integers
+	 */
 	@Override
 	public ArrayList<Integer> cceNumMode(ArrayList<Integer> inputValuesList) {
-		/**
-		 * Returns the mode of an integer's ArrayList
-		 * @param an array list of integers
-		 * @return an ArrayList of integers representing the mode value of the input integers
-		 */
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		Hashtable <Integer, Integer> frequencyMap = new Hashtable<Integer, Integer>();
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
@@ -140,13 +140,13 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		return mode;
 	}
 
+	/**
+	 * Returns the range of an integers' ArrayList
+	 * @param an array list of integers
+	 * @return the range of the input integers as Integer[]
+	 */		
 	@Override
 	public Integer[] cceNumRange(ArrayList<Integer> inputValuesList) {
-		/**
-		 * Returns the range of an integers' ArrayList
-		 * @param an array list of integers
-		 * @return the range of the input integers as Integer[]
-		 */		
 			Integer[] r = new Integer[2];
 
 		      Integer min= Integer.MAX_VALUE;
@@ -167,13 +167,13 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		      return r;
 		   }	
 
+	/**
+	 * Returns the convex hull of a points' ArrayList. It recursively uses the singleSideHulSet method
+	 * @param an array list of points.
+	 * @return an ArrayList of points, representing the convex hull set of the input points
+	 */		
 	@Override
 	public ArrayList<Point> cceGeomConvexHull(ArrayList<Point> points) {
-		/**
-		 * Returns the convex hull of a points' ArrayList. It recursively uses the singleSideHulSet method
-		 * @param an array list of points.
-		 * @return an ArrayList of points, representing the convex hull set of the input points
-		 */		
 		ArrayList<Point> convexHullSet = new ArrayList<Point>();
 		int minX= Integer.MAX_VALUE;
 		int maxX = Integer.MIN_VALUE;
@@ -220,8 +220,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	}
 
 
-	private void singleSideHullSet(ArrayList<Point> pointsSet, Point minPoint,
-			Point maxPoint, ArrayList<Point> convexHullSet) {
 	/**
 	 * This method finds the points of the given pointsSet, that belong to convex hull and adds them to the given convexHull set. 
 	 * It constructs a segment with the points minPoint and maxPoint and calculates if the points belonging to the pointsSet and are at the left of the segment
@@ -230,6 +228,8 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	 * @param pointsSet a set of points that are lying at the left of the segment (minPoint,maxPoint)
 	 * @param convexHullSet the set that contains the points belonging to the convex hull
 	 */
+	private void singleSideHullSet(ArrayList<Point> pointsSet, Point minPoint,
+			Point maxPoint, ArrayList<Point> convexHullSet) {
 		
 		Point fP = new Point();
 		Point rP = new Point();
@@ -295,13 +295,13 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			
 	}
 
+	/**
+	 * Returns the minimum bounding box that contains all the given points
+	 * @param an array list of integers
+	 * @return an array of points representing the minimum bounding box of the input points
+	 */
 	@Override
 	public Point[] cceGeomMinBB(ArrayList<Point> points) {
-		/**
-		 * Returns the minimum bounding box that contains all the given points
-		 * @param an array list of integers
-		 * @return an array of points representing the minimum bounding box of the input points
-		 */
 		Point[] minBB = new Point[2];
 		int minX= Integer.MAX_VALUE;
 		int maxX = Integer.MIN_VALUE;
@@ -331,13 +331,13 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		return minBB;      
 	}
 	
+	/**
+	 * Returns the range of a strings' ArrayList
+	 * @param an array list of strings
+	 * @return an ArrayList of strings showing the mode of the input strings
+	 */	
 	@Override
 	public ArrayList<String> cceStringMode(ArrayList<String> inputValuesList) {
-		/**
-		 * Returns the range of a strings' ArrayList
-		 * @param an array list of strings
-		 * @return an ArrayList of strings showing the mode of the input strings
-		 */	
 		Hashtable <String, Integer> frequencyMap = new Hashtable<String, Integer>();
 		ArrayList<String> finalList = new ArrayList<String>();
 
@@ -387,7 +387,4 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		// TODO Auto-generated method stub
 		
 	}
-	
-
-
 }
