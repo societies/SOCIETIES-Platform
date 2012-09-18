@@ -9,20 +9,21 @@
 $(document).bind('pageinit',function(){
 	console.log("pageinit: Landing jQuery calls");
 
-	$("#friends_anchor").off('click').on('click', function(){
+	$("a#friends_anchor").off('click').on('click', function(){
 		$.mobile.changePage("friends_landing.html", { transition: "fade"} );
 	});
 	
-	$("#communities_anchor").off('click').on('click', function(){
+	$("a#communities_anchor").off('click').on('click', function(){
 		$.mobile.changePage("communities_landing.html", { transition: "fade"} );
 	});
 	
-	$("#myapps_anchor").off('click').on('click', function(e){
-		window.alert("clicked");
-		e.preventDefault(); 
-		$.mobile.loadPage("my_apps_details.html");
-		$.mobile.changePage("my_apps.html", { transition: "fade"} );
+	$("a#myapps_anchor").off('click').on('click', function(e){
+		//e.preventDefault(); 
 		
+		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
+		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refreshLocalApps);
+		//GOTO NEWLY POPULATED PAGE
+		$.mobile.changePage("my_apps.html", { transition: "fade"} );
 	});
 	
 });
