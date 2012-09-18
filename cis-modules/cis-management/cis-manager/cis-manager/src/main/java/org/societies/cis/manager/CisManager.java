@@ -369,7 +369,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			ret = cis.deleteCIS();
 			ret = ret && getOwnedCISs().remove(cis);
 			
-			if(ret == true){ // if it works we also send an internal event
+			if(ret == true && this.getEventMgr() != null){ // if it works we also send an internal event
 				InternalEvent event = new InternalEvent(EventTypes.CIS_DELETION, "deletion of CIS", this.cisManagerId.getBareJid(), c);
 				try {
 					this.getEventMgr().publishInternalEvent(event);
@@ -461,15 +461,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		LOG.info("advertisement sent");
 		
 		// sending internal event
-		Community c = new Community();
-		cis.fillCommmunityXMPPobj(c);
-		InternalEvent event = new InternalEvent(EventTypes.CIS_CREATION, "creation of CIS", this.cisManagerId.getBareJid(), c);
-		try {
-			this.getEventMgr().publishInternalEvent(event);
-		} catch (EMSException e) {
-			LOG.error("error trying to internally publish CREATE event");
-			e.printStackTrace();
-			
+		if(this.getEventMgr() != null){
+			Community c = new Community();
+			cis.fillCommmunityXMPPobj(c);
+			InternalEvent event = new InternalEvent(EventTypes.CIS_CREATION, "creation of CIS", this.cisManagerId.getBareJid(), c);
+			try {
+				this.getEventMgr().publishInternalEvent(event);
+			} catch (EMSException e) {
+				LOG.error("error trying to internally publish CREATE event");
+				e.printStackTrace();
+				
+			}
 		}
 		
 		if (getOwnedCISs().add(cis)){
@@ -492,15 +494,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			this.persist(csi);
 			
 			// internal eventing
-			Community c = new Community();
-			csi.fillCommmunityXMPPobj(c);
-			InternalEvent event = new InternalEvent(EventTypes.CIS_SUBS, "subscription of CIS", this.cisManagerId.getBareJid(), c);
-			try {
-				this.getEventMgr().publishInternalEvent(event);
-			} catch (EMSException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				LOG.error("error trying to internally publish SUBS CIS event");
+			if(this.getEventMgr() != null){
+				Community c = new Community();
+				csi.fillCommmunityXMPPobj(c);
+				InternalEvent event = new InternalEvent(EventTypes.CIS_SUBS, "subscription of CIS", this.cisManagerId.getBareJid(), c);
+				try {
+					this.getEventMgr().publishInternalEvent(event);
+				} catch (EMSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					LOG.error("error trying to internally publish SUBS CIS event");
+				}
 			}
 			
 			return true;
@@ -527,13 +531,15 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				this.deletePersisted(temp); // removing it from the database
 				
 				//send the local event
-				InternalEvent event = new InternalEvent(EventTypes.CIS_UNSUBS, "unsubscription of CIS", this.cisManagerId.getBareJid(), c);
-				try {
-					this.getEventMgr().publishInternalEvent(event);
-				} catch (EMSException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					LOG.error("error trying to internally publish UNSUBS CIS event");
+				if(this.getEventMgr() != null){
+					InternalEvent event = new InternalEvent(EventTypes.CIS_UNSUBS, "unsubscription of CIS", this.cisManagerId.getBareJid(), c);
+					try {
+						this.getEventMgr().publishInternalEvent(event);
+					} catch (EMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						LOG.error("error trying to internally publish UNSUBS CIS event");
+					}
 				}
 				
 				return true;
