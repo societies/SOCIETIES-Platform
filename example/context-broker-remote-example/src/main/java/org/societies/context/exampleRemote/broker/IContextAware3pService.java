@@ -22,43 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.identity;
 
-import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.DataIdentifierScheme;
+package org.societies.context.exampleRemote.broker;
+
+import java.util.List;
+
+import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 
 /**
- * Util method that helps manipulating DataIdentifier objects
+ * This is a 3p service Ifc that needs to access context through the societies platform ...
  *
- * @author Olivier Maridat (Trialog)
+ * @author nikosk
  *
  */
-public class DataTypeFactory {
-	/**
-	 * Create the relevant data type using a correct URI
-	 *
-	 * @param dataIdUri URI format sheme://ownerId/type
-	 * @return the relevant DataIdentifier type instance
-	 * @throws MalformedCtxIdentifierException 
-	 */
-	public static DataIdentifier fromUri(String dataIdUri) throws MalformedCtxIdentifierException
-	{
-		String[] uri = dataIdUri.split("://");
-		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
-
-		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setScheme(scheme);
-		String path = uri[1];
-		int pos = 0, end = 0, endType = 0;
-		if ((end = path.indexOf('/', pos)) >= 0) {
-			dataId.setOwnerId(path.substring(pos, end));
-		}
-		endType = path.length();
-		if (path.endsWith("/") && endType > 1) {
-			endType--;
-		}
-		dataId.setType(path.substring(end+1, endType));
-		return dataId;
-	}
+public interface IContextAware3pService {
+	
+	public CtxAttribute createRemoteCtxAttribute(CtxEntityIdentifier remoteCtxEntityId, String type);
+	
+	public CtxEntity createRemoteCtxEntity(String type);
+	
+	public List<CtxIdentifier> lookupRemoteCtxAttribute(String type);
+	
+	public CtxAttribute retrieveCtxObject(CtxIdentifier ctxID);
+	
+	public CtxModelObject updateCtxModelObject(CtxModelObject obj);
+	
+	public List<CtxAttribute> lookupRemoteLocalCtxAttribute();
+	
+	public void registerForContextUpdates(CtxIdentifier ctxID, CtxChangeEventListener listener);
+	
 }

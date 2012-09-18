@@ -28,7 +28,7 @@
 	width: 30%;
 	min-height: 250px;
 	padding: 5px;
-	margin: 10px 5px;
+	margin: 10px;
 	border: 1px solid black;
 	border-radius: 5px;
 }
