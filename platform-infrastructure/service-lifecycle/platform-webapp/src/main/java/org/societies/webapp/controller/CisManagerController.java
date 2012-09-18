@@ -419,9 +419,15 @@ public class CisManagerController {
 				// -- CIS Configuration
 				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
 				MembershipCriteria m = new MembershipCriteria();
-				Rule r = new Rule(cisCreationForm.getOperator(), new ArrayList(Arrays.asList(cisCreationForm.getValue())));
-				m.setRule(r);
-				cisCriteria.put(cisCreationForm.getAttribute(), m);
+				try {
+					Rule r = new Rule(cisCreationForm.getOperator(), new ArrayList(Arrays.asList(cisCreationForm.getValue())));
+					m.setRule(r);
+					cisCriteria.put(cisCreationForm.getAttribute(), m);
+				}
+				catch(InvalidParameterException e){
+					resultMsg.append("Warning: Can't retrieve the membership criterii.");
+				}
+
 
 				// -- Generate Privacy Policy
 				CisCreationForm cisData;
@@ -471,11 +477,11 @@ public class CisManagerController {
 				resultMsg.append("Error during the CIS privacy policy (retrieve resource) saving: "+e.getMessage());
 				LOG.error("Error during the CIS privacy policy (retrieve resource) saving", e);
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				resultMsg.append("Error during the CIS privacy policy (illegal argument) saving: "+e.getMessage());
+				LOG.error("Error during the CIS privacy policy (illegal argument) saving", e);
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				resultMsg.append("Error during the CIS privacy policy (illegal access) saving: "+e.getMessage());
+				LOG.error("Error during the CIS privacy policy (illegal access) saving", e);
 			}
 		}
 

@@ -382,7 +382,6 @@ public class PrivacyDataManagerTest {
 
 	/* --- Data Id --- */
 	@Test
-	@Rollback(true)
 	public void testFromUriString() {
 		String testTitle = new String("testFromUriString: multiple test of DataId parsing");
 		LOG.info("[TEST] "+testTitle);
@@ -410,6 +409,27 @@ public class PrivacyDataManagerTest {
 		assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierUtil.fromUri(dataId5));
 		assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierUtil.fromUri(dataId5).getOwnerId());
 		assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierUtil.fromUri(dataId5).getType());
+	}
+	
+	@Test
+	public void testSchemes() {
+		String testTitle = new String("testSchemes: multiple test on DataIdentifierScheme");
+		LOG.info("[TEST] "+testTitle);
+
+		String ownerId = "owner@domain.com";
+		String dataId1 = "context://"+ownerId+"/locationSymbolic/";
+		String dataId2 = "context://owner@domain.com/locationSymbolic";
+		String dataId3 = "context:///locationSymbolic/";
+		String dataId4 = "context:///locationSymbolic";
+		String dataId5 = "context:///";
+		DataIdentifierScheme schemeCtx1 = DataIdentifierScheme.CONTEXT;
+		DataIdentifierScheme schemeCtx2 = DataIdentifierScheme.CONTEXT;
+		DataIdentifierScheme schemeCis = DataIdentifierScheme.CIS;
+
+		assertEquals("Schemes should be equals", schemeCtx1, schemeCtx2);
+		assertEquals("Schemes name should be equals", schemeCtx1.name(), schemeCtx2.name());
+		assertTrue("Schemes should not be equals", !schemeCtx1.equals(schemeCis));
+		assertTrue("Schemes name should not be equals", !schemeCtx1.name().equals(schemeCis.name()));
 	}
 
 	// -- Dependency Injection
