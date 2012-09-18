@@ -247,6 +247,7 @@ public class NominalTestCaseLowerTester {
 		testNegotiationService();
 
 		InputStream is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_FILENAME);
+		assertNotNull(is);
 		Files.writeFile(is, SERVICE_CLIENT_FILENAME);
 		
 		// URL with valid signature

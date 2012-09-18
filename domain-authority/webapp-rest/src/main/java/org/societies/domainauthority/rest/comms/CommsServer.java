@@ -93,11 +93,11 @@ public class CommsServer implements IFeatureServer {
 	}
 
 	// Getters and setters for beans
-	public IClientJarServer getNegotiationProvider() {
+	public IClientJarServer getClientJarServer() {
 		return clientJarServer;
 	}
-	public void setNegotiationProvider(IClientJarServer negotiationProvider) {
-		this.clientJarServer = negotiationProvider;
+	public void setClientJarServer(IClientJarServer clientJarServer) {
+		this.clientJarServer = clientJarServer;
 		//LOG.debug("setNegotiationProvider()");
 		//LOG.debug("setNegotiationProvider({})", negotiationProvider);
 	}
