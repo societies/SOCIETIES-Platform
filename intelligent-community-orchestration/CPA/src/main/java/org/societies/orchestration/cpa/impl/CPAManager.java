@@ -25,12 +25,8 @@
 
 package org.societies.orchestration.cpa.impl;
 
-import org.societies.api.osgi.event.EMSException;
-import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.osgi.event.*;
 import org.societies.orchestration.api.ICisDataCollector;
-import org.societies.orchestration.api.INewCisListener;
 import org.societies.orchestration.api.impl.CommunitySuggestionImpl;
 
 import java.util.HashMap;
@@ -41,14 +37,14 @@ import java.util.HashMap;
  * Date: 16.09.12
  * Time: 13:51
  */
-public class CPAManager implements INewCisListener {
+public class CPAManager extends EventListener {
     private HashMap<String, CPA> cpaMap;
     private ICisDataCollector collector;
     private IEventMgr eventMgr;
     public CPAManager(){
         cpaMap=new HashMap<String, CPA>();
     }
-    @Override
+
     public void newCis(String cisId) {
         if(cpaMap.containsKey(cisId)) return;
         CPA newCPA = new CPA(collector,cisId);
@@ -57,11 +53,11 @@ public class CPAManager implements INewCisListener {
         cpaMap.put(cisId,newCPA);
     }
 
-    @Override
     public void removedCis(String cisId) {
         if(!cpaMap.containsKey(cisId)) return;
     }
     public void init(){
+        this.eventMgr.subscribeInternalEvent(this,new String[]{EventTypes.CIS_CREATION,EventTypes.CIS_CREATION},null);
     }
     public void destroy(){
 
@@ -80,7 +76,7 @@ public class CPAManager implements INewCisListener {
         try {
             getEventMgr().publishInternalEvent(event);
         } catch (EMSException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 
@@ -90,5 +86,22 @@ public class CPAManager implements INewCisListener {
 
     public void setEventMgr(IEventMgr eventMgr) {
         this.eventMgr = eventMgr;
+    }
+
+    @Override
+    public void handleInternalEvent(InternalEvent event) {
+        String bareJid = null;
+        if(event.geteventType() == EventTypes.CIS_CREATION){
+            bareJid = (String) event.geteventInfo();
+            this.newCis(bareJid);
+        }else if(event.geteventType() == EventTypes.CIS_DELETION){
+            bareJid = (String) event.geteventInfo();
+            this.removedCis(bareJid);
+        }
+    }
+
+    @Override
+    public void handleExternalEvent(CSSEvent event) {
+
     }
 }

@@ -16,8 +16,8 @@
 		<property name="ignoreResourceNotFound" value="false"></property>
 		<property name="locations">
 			<list>
-			 	<value>classpath:/derby_database.properties</value>
-				<!-- <value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value> -->
+<!--			 	<value>classpath:/derby_database.properties</value>-->
+                <value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
 			</list>
 		</property>	
 	</bean>

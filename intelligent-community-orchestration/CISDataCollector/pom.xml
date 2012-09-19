@@ -39,13 +39,14 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+            <scope>provided</scope>
         </dependency>
 
 
         <dependency>
             <groupId>org.societies.api.external</groupId>
             <artifactId>societies-api</artifactId>
-            <version>${release.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.societies.orchestration.api</groupId>
@@ -53,15 +54,22 @@
             <version>${version.ico}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.societies.context-management</groupId>
             <artifactId>context-mgmt-api</artifactId>
             <version>0.1-SNAPSHOT</version>
-        </dependency>
+            <scope>provided</scope>
+        </dependency>-->
         <dependency>
             <groupId>org.societies.api.external</groupId>
             <artifactId>societies-api</artifactId>
-            <version>0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>4.1.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -74,8 +82,9 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator></Bundle-Activator>
-                        <Embed-Dependency>scope=compile|runtime</Embed-Dependency>
-                        <Embed-Transitive>true</Embed-Transitive>
+                        <Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+                        <Embed-Transitive>false</Embed-Transitive>
+                        <Import-Package>*;resolution:=optional</Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

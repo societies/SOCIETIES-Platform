@@ -75,9 +75,10 @@
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
-    <bean id="CISDataCollector" class="org.societies.orchestration.CISDataCollectorManager" depends-on="ICisManager" init-method="init"
+    <bean id="CISDataCollector" class="org.societies.orchestration.collector.CISDataCollectorManager" depends-on="ICisManager" init-method="init"
     destroy-method="destroy">
         <property name="cisManager" ref="ICisManager"/>
+        <property name="eventMgr" ref="eventMgr"/>
     </bean>
     
    <!-- <bean id="CisClientService" 

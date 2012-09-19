@@ -25,7 +25,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.CISDataCollector;
+package org.societies.orchestration.collector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,17 +36,12 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.activityfeed.Activityfeed;
-import org.societies.context.api.event.CtxChangeEventTopic;
-import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.orchestration.api.IDataCollectorSubscriber;
 
 import javax.xml.bind.JAXBException;
@@ -60,7 +55,7 @@ import java.util.List;
  */
 public class CISDataCollector implements Subscriber, IActivityFeedCallback {
 	
-	private ICtxEventMgr ctxEventMgr;
+	/*private ICtxEventMgr ctxEventMgr;*/
 	private IIdentity userId;
     private ICommManager iCommMgr;
     private PubsubClient pubsubClient;
@@ -68,26 +63,25 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback {
     private ICisOwned cis;
     private static Logger LOG = LoggerFactory
             .getLogger(CISDataCollector.class);
-	public CISDataCollector(IIdentity userEntity, ICtxEventMgr ctxEventMgr) {
+	public CISDataCollector(IIdentity userEntity) {
 		this.userId = userEntity;
-		this.ctxEventMgr = ctxEventMgr;
         init();
 	}
     public void init(){
         subscribers = new ArrayList<IDataCollectorSubscriber>();
-        initCtxEvent();;
+/*        initCtxEvent();*/
     }
     public CISDataCollector(ICisOwned cisId){
         this.cis = cis;
         init();
     }
-	
+	/*
 	private void initCtxEvent() {
 
 		this.registerListenerByCtxId();
-	}
+	}*/
 
-	private void registerListenerByCtxId() {
+/*	private void registerListenerByCtxId() {
 
 		if (this.ctxEventMgr == null) {
 			return;
@@ -103,7 +97,7 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback {
 		} catch (CtxException ce) {
 			
 		}
-	}
+	}*/
 	
 	private void sendEvent(CtxChangeEvent event) {
 		

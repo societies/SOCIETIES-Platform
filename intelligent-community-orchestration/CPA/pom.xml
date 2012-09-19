@@ -33,7 +33,6 @@
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>common-ext-libs</artifactId>
-            <version>0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -60,13 +59,13 @@
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>activityfeed</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>${version.cis}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.societies.cis</groupId>
             <artifactId>cis-manager</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>${version.cis}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -141,14 +140,13 @@
         <dependency>
             <groupId>org.societies.api.internal</groupId>
             <artifactId>societies-api-internal</artifactId>
-            <version>${release.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.societies.api.external</groupId>
             <artifactId>societies-api</artifactId>
-            <version>${release.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -163,12 +161,13 @@
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-graph-impl</artifactId>
             <version>2.0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-algorithms</artifactId>
             <version>2.0.1</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <!-- 	<dependency> -->
@@ -182,8 +181,14 @@
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-visualization</artifactId>
             <version>2.0.1</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
 
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>4.1.0</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

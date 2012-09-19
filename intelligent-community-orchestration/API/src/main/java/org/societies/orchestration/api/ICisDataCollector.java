@@ -36,6 +36,4 @@ import java.util.List;
  */
 public interface ICisDataCollector {
     public List<?> subscribe(String cisId, IDataCollectorSubscriber subscriber);
-    public void newCis(String cisId);
-    public void notifyOnRemovalOfCIS(String cisId);
 }

@@ -23,10 +23,11 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.CISDataCollector;
+package org.societies.orchestration.collector;
 
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.osgi.event.*;
 import org.societies.orchestration.api.ICisDataCollector;
 import org.societies.orchestration.api.IDataCollectorSubscriber;
 
@@ -39,13 +40,16 @@ import java.util.List;
  * Date: 16.09.12
  * Time: 12:19
  */
-public class CISDataCollectorManager implements ICisDataCollector {
+public class CISDataCollectorManager extends EventListener implements ICisDataCollector {
     private ICisManager cisManager;
     private HashMap<String,CISDataCollector> collectors = new HashMap<String,CISDataCollector>();
+    private IEventMgr eventMgr;
+    private Object mtx = new Object();
     public void init(){
         List<ICisOwned> cisOwnedList = getCisManager().getListOfOwnedCis();
         for(ICisOwned cis : cisOwnedList)
             collectors.put(cis.getCisId(),new CISDataCollector(cis));
+        this.eventMgr.subscribeInternalEvent(this,new String[]{EventTypes.CIS_CREATION,EventTypes.CIS_CREATION},null);
     }
     public void destroy(){
 
@@ -53,26 +57,30 @@ public class CISDataCollectorManager implements ICisDataCollector {
 
     @Override
     public List<?> subscribe(String cisId, IDataCollectorSubscriber subscriber) {
-        if(collectors.containsKey(cisId)){
-            return collectors.get(cisId).subscribe(subscriber);
+        synchronized (mtx) {
+            if(collectors.containsKey(cisId)){
+                return collectors.get(cisId).subscribe(subscriber);
+            }
+            //the following code should rarely run.. (all CISes should be in the list given notification from CISManager)
+            ICisOwned cis = getCisManager().getOwnedCis(cisId);
+            if(cis==null) return null;
+            CISDataCollector newCollector = new CISDataCollector(cis);
+            collectors.put(cisId,newCollector);
+            return newCollector.subscribe(subscriber);
         }
-        //the following code should rarely run.. (all CISes should be in the list given notification from CISManager)
-        ICisOwned cis = getCisManager().getOwnedCis(cisId);
-        if(cis==null) return null;
-        CISDataCollector newCollector = new CISDataCollector(cis);
-        collectors.put(cisId,newCollector);
-        return newCollector.subscribe(subscriber);
+
     }
 
-    @Override
     public void newCis(String cisId) {
-        ICisOwned cis = getCisManager().getOwnedCis(cisId);
-        if(cis==null) return;
-        collectors.put(cisId,new CISDataCollector(cis));
+        synchronized (mtx){
+            if(collectors.containsKey(cisId)) return;
+            ICisOwned cis = getCisManager().getOwnedCis(cisId);
+            if(cis==null) return;
+            collectors.put(cisId,new CISDataCollector(cis));
+        }
     }
 
-    @Override
-    public void notifyOnRemovalOfCIS(String cisId) {
+    public void removalOfCIS(String cisId) {
         if(collectors.containsKey(cisId)){
             collectors.remove(cisId);
             //TODO: should this bit also notify the CPA of the removal, or should this be handled elsewhere?
@@ -85,5 +93,30 @@ public class CISDataCollectorManager implements ICisDataCollector {
 
     public void setCisManager(ICisManager cisManager) {
         this.cisManager = cisManager;
+    }
+
+    @Override
+    public void handleInternalEvent(InternalEvent event) {
+        String bareJid = null;
+        if(event.geteventType() == EventTypes.CIS_CREATION){
+            bareJid = (String) event.geteventInfo();
+            this.newCis(bareJid);
+        }else if(event.geteventType() == EventTypes.CIS_DELETION){
+            bareJid = (String) event.geteventInfo();
+            this.removalOfCIS(bareJid);
+        }
+    }
+
+    @Override
+    public void handleExternalEvent(CSSEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public IEventMgr getEventMgr() {
+        return eventMgr;
+    }
+
+    public void setEventMgr(IEventMgr eventMgr) {
+        this.eventMgr = eventMgr;
     }
 }
