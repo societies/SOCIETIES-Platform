@@ -1,5 +1,8 @@
 package org.societies.comm.xmpp.xc.impl;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +50,6 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		this.secretKey = secretKey;
 		this.daNode = daNode;
 		otherNodes = new HashSet<INetworkNode>();
-		
 	}
 	
 	@Override
@@ -89,7 +91,6 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 			probePresence();
 			log.info("Connected to '"+host+"' as '"+subDomain+"'!");
 		} catch (ComponentException e) {
-			System.out.println("Could not connect to '"+host+"' as '"+subDomain+"'. Check Openfire service: "+e.getMessage());
 			log.warn("Could not connect to '"+host+"' as '"+subDomain+"': "+e.getMessage());
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
@@ -104,14 +105,14 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		subscribe.setFrom(subDomain);
 		subscribe.setTo(bareJid);
 		subscribe.setType(org.xmpp.packet.Presence.Type.subscribe);
-		log.info("SENDING: "+subscribe.toXML());
+		log.info("Sending presence subscribe: "+subscribe.toXML());
 		this.send(subscribe);
 		
 		Presence probe = new Presence();
 		probe.setFrom(subDomain);
 		probe.setTo(bareJid);
 		probe.setType(org.xmpp.packet.Presence.Type.probe);
-		log.info("SENDING: "+probe.toXML());
+		log.info("Sending presence probe: "+probe.toXML());
 		this.send(probe);
 	}
 
@@ -152,9 +153,10 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	
 	@Override
 	protected IQ handleDiscoItems(IQ iq) {
+		log.info("IQ disco#items received: "+iq.toXML());
 		IQ response = helper.handleDiscoItems(iq);
 		response.setFrom(thisIdentity.getJid());
-		log.info("disco#items response: "+response.toXML());
+		log.info("Returning disco#items response: "+response.toXML());
 		return response;
 	}
 
@@ -163,7 +165,8 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		log.info("IQ Received: "+iq.toXML());
 		IQ response = helper.dispatchIQ(iq);
 		response.setFrom(thisIdentity.getJid());
-		log.info("sending iq response: "+response.toXML());
+		// TODO mitja
+		log.info("Sending IQ response: "+response.toXML());
 		return response;
 	}
 
@@ -174,23 +177,25 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 
 	@Override
 	protected void handleIQResult(IQ iq) {
-		log.debug("IQ Result received");
+		log.info("IQ Result received: "+iq.toXML());
 		helper.dispatchIQResult(iq);
 	}
 
 	@Override
 	protected void handleIQError(IQ iq) {
+		log.info("IQ Error received: "+iq.toXML());
 		helper.dispatchIQError(iq);
 	}
 
 	@Override
 	protected void handleMessage(Message message) {
+		log.info("Message received: "+message.toXML());
 		helper.dispatchMessage(message);
 	}
 	
 	@Override
 	protected void handlePresence(Presence presence) {
-		log.info("RECEIVED: "+presence.toXML());
+		log.info("Received presence: "+presence.toXML());
 		try {
 			IIdentity nodeIdentity = idm.fromJid(presence.getFrom().toString());
 			if (nodeIdentity instanceof INetworkNode) {
@@ -206,7 +211,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 			e.printStackTrace();
 		}
 		
-		log.info("otherNodes: "+Arrays.toString(otherNodes.toArray()));
+		log.info("OtherNodes: "+Arrays.toString(otherNodes.toArray()));
 	}
 
 	/*
@@ -222,41 +227,72 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	public void register(ICommCallback messageCallback) throws CommunicationException {
 		helper.register(messageCallback);
 	}
+	
+	private void checkConnectivity() throws CommunicationException {
+		if (idm!=null)
+			return;
+		
+		initWhackCommManager();
+		if (idm==null) {
+			boolean hostReachable = false;
+			try {
+				for (InetAddress addr : InetAddress.getAllByName(host)) {
+					hostReachable = addr.isReachable(4000);
+				}
+			} catch (UnknownHostException e) {
+				log.error("UnknownHostException while resolving XMPP Server host '"+host+"'",e);
+			} catch (IOException e) {
+				log.error("IOException while pinging XMPP Server host '"+host+"'",e);
+			}
+			if (hostReachable)
+				throw new CommunicationException("CommunicationManager could not connect to XMPP server at '"+host+"' for subDomain '"+subDomain+"' with secretKey '"+secretKey+"'");
+			else
+				throw new CommunicationException("CommunicationManager could not find an XMPP server at '"+host+"'");
+		}
+	}
 
 	@Override
 	public void sendMessage(Stanza stanza, String type, Object payload)
 			throws CommunicationException {
+		checkConnectivity();
 		stanza.setFrom(thisIdentity);
 		Type mType = Message.Type.valueOf(type);
 		Message m = helper.sendMessage(stanza, mType, payload);
-		System.out.println("sending message: "+m.toXML());
+		log.info("Sending message: "+m.toXML());
+		// TODO mitja
 		this.send(m);
 	}
 
 	@Override
 	public void sendMessage(Stanza stanza, Object payload)
 			throws CommunicationException {
+		checkConnectivity();
 		stanza.setFrom(thisIdentity);
 		Message m = helper.sendMessage(stanza, null, payload);
-		System.out.println("sending message: "+m.toXML());
+		log.info("Sending message: "+m.toXML());
+		// TODO mitja
 		this.send(m);
 	}
 
 	@Override
 	public void sendIQGet(Stanza stanza, Object payload, ICommCallback callback)
 			throws CommunicationException {
+		checkConnectivity();
 		stanza.setFrom(thisIdentity);
 		IQ iq = helper.sendIQ(stanza, IQ.Type.get, payload, callback);
-		System.out.println("sending iq get: "+iq.toXML());
+		log.info("Sending IQ: "+iq.toXML());
+		// TODO mitja
 		this.send(iq);
 	}
 
 	@Override
 	public void sendIQSet(Stanza stanza, Object payload, ICommCallback callback)
 			throws CommunicationException {
+		checkConnectivity();
 		stanza.setFrom(thisIdentity);
 		IQ iq = helper.sendIQ(stanza, IQ.Type.set, payload, callback);
-		System.out.println("sending iq set: "+iq.toXML());
+		log.info("Sending IQ: "+iq.toXML());
+		// TODO mitja
 		this.send(iq);
 	}
 
@@ -272,6 +308,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 
 	@Override
 	public String getInfo(IIdentity entity, String node, ICommCallback callback)  throws CommunicationException {
+		checkConnectivity();
 		IQ iq = helper.buildInfoIq(entity, node, callback);
 		iq.setFrom(thisIdentity.getJid());
 		this.send(iq);
@@ -280,6 +317,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 
 	@Override
 	public String getItems(IIdentity entity, String node, ICommCallback callback)  throws CommunicationException {
+		checkConnectivity();
 		IQ iq = helper.buildItemsIq(entity, node, callback);
 		iq.setFrom(thisIdentity.getJid());
 		this.send(iq);
