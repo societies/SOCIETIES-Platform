@@ -51,7 +51,7 @@ public class AServiceImplementation extends ServiceImplementation implements Par
 		dest.writeString(this.getServiceNameSpace());
 		dest.writeString(this.getServiceProvider());
 		dest.writeString(this.getServiceVersion());
-		dest.writeString(this.getServiceClient().toString());
+		dest.writeString(this.getServiceClient());
 	}
 	
 	private AServiceImplementation(Parcel in) {
@@ -59,11 +59,7 @@ public class AServiceImplementation extends ServiceImplementation implements Par
 		this.setServiceNameSpace(in.readString());
 		this.setServiceProvider(in.readString());
 		this.setServiceVersion(in.readString());
-		try {
-			this.setServiceClient(new URI(in.readString()));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
+		this.setServiceClient(in.readString());
 	}
 	
 	public static final Parcelable.Creator<AServiceImplementation> CREATOR = new Parcelable.Creator<AServiceImplementation>() {

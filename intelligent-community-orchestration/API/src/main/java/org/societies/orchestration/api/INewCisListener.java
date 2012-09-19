@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -23,17 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.orchestration.api;
-
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Bjørn Magnus Mathisen
- * Date: 09.08.12
- * Time: 15:27
+ * Date: 16.09.12
+ * Time: 13:47
  */
-public interface IDataCollector {
-    public List<?> subscribe(IDataCollectorSubscriber subscriber);
+public interface INewCisListener {
+    public void newCis(String cisId);
+    public void removedCis(String cisId);
 }

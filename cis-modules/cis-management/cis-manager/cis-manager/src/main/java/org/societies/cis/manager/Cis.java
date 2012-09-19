@@ -126,11 +126,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private ICommManager CISendpoint;
 	@Transient
-	IServiceDiscoveryRemote iServDiscRemote;
+	IServiceDiscoveryRemote iServDiscRemote = null;
 	@Transient
-	IServiceControlRemote iServCtrlRemote;
+	IServiceControlRemote iServCtrlRemote = null;
 	@Transient
-	IPrivacyPolicyManager privacyPolicyManager;
+	IPrivacyPolicyManager privacyPolicyManager = null;
 	
 	
 	
@@ -785,7 +785,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 			// JOIN
 			if (c.getJoin() != null) {
-				String jid = "";
+				//String jid = "";
 				LOG.info("join received");
 				String senderjid = stanza.getFrom().getBareJid();
 
@@ -795,7 +795,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				Participant p = new Participant();
 				JoinResponse j = new JoinResponse();
 				boolean addresult = false; 
-				p.setJid(jid);
+				p.setJid(senderjid);
 				this.fillCommmunityXMPPobj(com);
 				
 				j.setCommunity(com);

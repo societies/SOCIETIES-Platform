@@ -62,11 +62,11 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.comm.simplexml.XMLGregorianCalendarConverter;
 import org.societies.maven.converters.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;
+import org.societies.simple.converters.XMLGregorianCalendarConverter;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.JID;
@@ -326,7 +326,7 @@ public class CommManagerHelper {
 			StanzaError se = StanzaError.valueOf(errorElementStr.replaceAll("-", "_")); //TODO valueOf() parses the name, not value
 			XMPPError error = new XMPPError(se, null);
 			if (errorElement.elements().size()>1)
-				error = parseApplicationError(se, (Element)errorElement.elements());
+				error = parseApplicationError(se, errorElement.elements());
 			LOG.info("XMPPError:"+error.getStanzaErrorString());
 			callback.receiveError(TinderUtils.stanzaFromPacket(iq),error);
 		} catch (UnavailableException e) {
@@ -338,25 +338,34 @@ public class CommManagerHelper {
 		}
 	}
 
-	private XMPPError parseApplicationError(StanzaError error, Element errorElement) throws UnavailableException, ClassNotFoundException {
-		Element e = (Element) errorElement.elements().get(1); // TODO assume that has text OR application error (not both)
-		if (e.getNamespaceURI().equals(XMPPError.STANZA_ERROR_NAMESPACE_DECL) && e.getName().equals("text")) { // TODO this better
-			return new XMPPError(error, e.getText());
-		} else {
-			//GET CLASS TO BE SERIALISED
-			String packageStr = getPackage(e.getNamespaceURI());  
-			String beanName = e.getName().substring(0,1).toUpperCase() + e.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-			Class<?> c = Class.forName(packageStr + "." + beanName);
-			
-			Object appError;
-			try {
-				appError = s.read(c, e.asXML());
-			} catch (Exception e1) {
-				throw new UnavailableException(e1.getMessage());
+	private XMPPError parseApplicationError(StanzaError error, List list) throws UnavailableException, ClassNotFoundException {
+		Object appError = null;
+		String text = "";
+		
+		for (Object o: list) {
+			if (o instanceof Element) {
+				Element e = (Element) o;
+				if (e.getNamespaceURI().equals(XMPPError.STANZA_ERROR_NAMESPACE_DECL) && e.getName().equals("text")) { // TODO this better
+					text = e.getText();
+				} else {
+					//GET CLASS TO BE SERIALISED
+					String packageStr = getPackage(e.getNamespaceURI());  
+					String beanName = e.getName().substring(0,1).toUpperCase() + e.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+					Class<?> c = Class.forName(packageStr + "." + beanName);
+					
+					try {
+						appError = s.read(c, e.asXML());
+					} catch (Exception e1) {
+						throw new UnavailableException(e1.getMessage());
+					}
+				}
 			}
-			
-			return new XMPPError(error, "", appError);
 		}
+		
+		if (appError==null)
+			return new XMPPError(error, text);
+		else
+			return new XMPPError(error, text, appError);
 	}
 
 	public IQ dispatchIQ(IQ iq) {
@@ -575,9 +584,6 @@ public class CommManagerHelper {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			os.write(error.getStanzaErrorBytes(), 0, error.getStanzaErrorBytes().length);
 			if (error.getApplicationError()!=null) {
-				InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
-				inxsw.setXmlDeclaration(false);
-
 				s.write(error.getApplicationError(), os);
 			}
 			os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
@@ -587,12 +593,9 @@ public class CommManagerHelper {
 			errorResponse.getElement().add(dom4jError.getRootElement());
 			
 			return errorResponse;
-		} catch (XMLStreamException e) {
-			return buildErrorResponse(originalFrom, id, "XMLStreamException while building application error");
+
 		} catch (DocumentException e) {
 			return buildErrorResponse(originalFrom, id, "DocumentException while building application error");
-		} catch (UnavailableException e) {
-			return buildErrorResponse(originalFrom, id, "UnavailableException while building application error");
 		} catch (Exception e) {
 			return buildErrorResponse(originalFrom, id, "Serializing Exception while building application error");
 		}
@@ -610,11 +613,10 @@ public class CommManagerHelper {
 	}
 
 	private synchronized IQ buildResponseIQ(JID originalFrom, String id, Object responseBean)
-			throws DocumentException, UnavailableException, XMLStreamException {
+			throws DocumentException {
 		IQ responseIq = new IQ(Type.result, id);
 		responseIq.setTo(originalFrom);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
 		if (responseBean!=null) {
 			try {
 				s.write(responseBean, os);

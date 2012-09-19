@@ -26,6 +26,7 @@ package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -47,6 +48,7 @@ public class ServiceInstanceDAO {
 	private String cssJid;
 	private String parentJid;
 	private String XMPPNode;
+	private ServiceResourceIdentifierDAO parentIdentifier;
 	private ServiceImplementationDAO serviceImpl;
 	
 	/**
@@ -55,7 +57,7 @@ public class ServiceInstanceDAO {
 	 * @param xMPPNode
 	 * @param serviceImpl
 	 */
-	public ServiceInstanceDAO(String fullJid, String cssJid, String parentJid, String xMPPNode,
+	public ServiceInstanceDAO(String fullJid, String cssJid, String parentJid, String xMPPNode, ServiceResourceIdentifierDAO parentIdentifier,
 			ServiceImplementationDAO serviceImpl) {
 		super();
 		
@@ -63,6 +65,7 @@ public class ServiceInstanceDAO {
 		this.cssJid = cssJid;
 		this.parentJid = parentJid;
 		this.XMPPNode = xMPPNode;
+		this.parentIdentifier = parentIdentifier;
 		this.serviceImpl = serviceImpl;
 	}
 	
@@ -101,6 +104,13 @@ public class ServiceInstanceDAO {
 	}
 	public void setXMPPNode(String xMPPNode) {
 		XMPPNode = xMPPNode;
+	}
+	@Embedded
+	public ServiceResourceIdentifierDAO getParentIdentifier() {
+		return parentIdentifier;
+	}
+	public void setParentIdentifier(ServiceResourceIdentifierDAO parentIdentifier) {
+		this.parentIdentifier = parentIdentifier;
 	}
 	@OneToOne(cascade=CascadeType.ALL)
 	

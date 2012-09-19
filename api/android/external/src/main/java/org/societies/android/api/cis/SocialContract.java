@@ -43,7 +43,7 @@ public final class SocialContract {
 	/**
 	 * The base URI used when calling SocialProvider:
 	 */
-	private static final String AUTHORITY_STRING = "content://org.societies.android.SocialProvider";
+	private static final String AUTHORITY_STRING = "content://org.societies.android.SocialProvider/";
 	//The main authority, i.e. the base URI for all operations:
     public static final Uri AUTHORITY = 
             Uri.parse("content://org.societies.android.SocialProvider");
@@ -66,26 +66,26 @@ public final class SocialContract {
 	 *
 	 */
 	public static final class UriPathIndex{
-		public static final String ME = "/me";
-		public static final String ME_SHARP = "/me/#";
-		public static final String PEOPLE = "/people";
-		public static final String PEOPLE_SHARP = "/people/#";
-		public static final String COMMINITIES = "/communities";
-		public static final String COMMINITIES_SHARP = "/communities/#";
-		public static final String SERVICES = "/services";
-		public static final String SERVICES_SHARP = "/services/#";
-		public static final String RELATIONSHIP = "/relationship";
-		public static final String RELATIONSHIP_SHARP = "/relationship/#";
-		public static final String MEMBERSHIP = "/membership";
-		public static final String MEMBERSHIP_SHARP = "/membership/#";
-		public static final String SHARING = "/sharing";
-		public static final String SHARING_SHARP = "/sharing/#";
-		public static final String PEOPLE_ACTIVITIY = "/people/activity";
-		public static final String PEOPLE_ACTIVITIY_SHARP = "/people/activity/#";
-		public static final String COMMUNITY_ACTIVITIY = "/communities/activity";
-		public static final String COMMUNITY_ACTIVITIY_SHARP = "/communities/activity/#";
-		public static final String SERVICE_ACTIVITY = "/services/activity";
-		public static final String SERVICE_ACTIVITY_SHARP = "/services/activity/#";
+		public static final String ME = "me";
+		public static final String ME_SHARP = "me/#";
+		public static final String PEOPLE = "people";
+		public static final String PEOPLE_SHARP = "people/#";
+		public static final String COMMINITIES = "communities";
+		public static final String COMMINITIES_SHARP = "communities/#";
+		public static final String SERVICES = "services";
+		public static final String SERVICES_SHARP = "services/#";
+		public static final String RELATIONSHIP = "relationship";
+		public static final String RELATIONSHIP_SHARP = "relationship/#";
+		public static final String MEMBERSHIP = "membership";
+		public static final String MEMBERSHIP_SHARP = "membership/#";
+		public static final String SHARING = "sharing";
+		public static final String SHARING_SHARP = "sharing/#";
+		public static final String PEOPLE_ACTIVITIY = "people/activity";
+		public static final String PEOPLE_ACTIVITIY_SHARP = "people/activity/#";
+		public static final String COMMUNITY_ACTIVITIY = "communities/activity";
+		public static final String COMMUNITY_ACTIVITIY_SHARP = "communities/activity/#";
+		public static final String SERVICE_ACTIVITY = "services/activity";
+		public static final String SERVICE_ACTIVITY_SHARP = "services/activity/#";
 	
 	}
 
@@ -165,10 +165,9 @@ public final class SocialContract {
      * This includes both communities you are a member of and communities
      * that are listed in some directory.
      * 
-     * @author Babak dot Farshchian at sintef dot no
-     *
-     */
-    /**
+     * Note: CREATION_DATE, LAST_MODIFIED_DATE, and SYNC_STATUS are set by
+     * SocialProvider.
+     * 
      * @author Babak dot Farshchian at sintef dot no
      *
      */
@@ -176,10 +175,7 @@ public final class SocialContract {
         /**
          * Use this Uri when calling queries on the content 
          * provider with the intention of working with community
-         * data.
-         * 
-         * Note: CREATION_DATE, LAST_MODIFIED_DATE, and SYNC_STATUS are set by
-         * SocialProvider. 
+         * data. 
          */
         public static final Uri CONTENT_URI = 
                     Uri.parse(AUTHORITY_STRING+ UriPathIndex.COMMINITIES);
@@ -430,6 +426,10 @@ public final class SocialContract {
          * Global ID for the service.
          */
         public static final String GLOBAL_ID_SERVICE = "global_id_service";
+        /**
+         * Global ID for the sharing.
+         */
+        public static final String OWNER_GLOBAL_ID = "owner_global_id";
         /**
          * Global ID for the community.
          */
