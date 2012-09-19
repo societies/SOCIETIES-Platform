@@ -26,6 +26,7 @@ package org.societies.privacytrust.privacyprotection.assessment.log;
 
 import java.util.Date;
 
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -165,10 +166,20 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner) {
 		
-		LOG.debug("logContext()");
+		LOG.info("logContext()");
 		
 		String invokerClass = "";  // FIXME
 		IIdentity requestorId;
+		
+		StackTraceElement[] stack = (new Exception()).getStackTrace();
+		//StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		for (int k = 0; k < stack.length; k++) {
+			Log.info("STACK[" + k + "]: " + stack[k].getClassName());    // Full class name
+			Log.info("STACK[" + k + "]: " + stack[k].getFileName());     // Java file name without path
+			//Log.info("STACK: " + ste.getMethodName());   // Method name without class name or parameters
+			//Log.info("STACK: " + ste.toString());        // Full class name + method + file name + line number
+			//Log.info("STACK: " + ste.isNativeMethod());  // false for all classes of interest, true only for sun.reflect.NativeMethodAccessorImpl
+		}
 		
 		if (requestor == null) {
 			requestorId = null;
@@ -185,7 +196,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner, int dataSize) {
 		
-		LOG.debug("logContext({})", dataSize);
+		LOG.info("logContext({})", dataSize);
 		
 		String invokerClass = "";  // FIXME
 		IIdentity requestorId;
