@@ -30,13 +30,20 @@ public class CISDirectoryForm {
 	private String method; 
 	
 	private String name;
-	private String cssownwerid; 
+	private String cssownerid; 
 	private String type;
 	private String id;
 	private String password;
 	private int mode;
 
 	
+	private String cssid;
+	
+	private String attrib;
+	private String operator;
+	private String value1;
+	private String value2;
+	private int rank;
 	//name
 	//ID
 	//uri
@@ -60,10 +67,10 @@ public class CISDirectoryForm {
 	}
 	
 	public String getCssOwnwerId() {
-		return cssownwerid;
+		return cssownerid;
 	}
 	public void setCssOwnwerId(String cssownwerid) {
-		this.cssownwerid = cssownwerid;
+		this.cssownerid = cssownwerid;
 	}
 	
 	public String getType() {
@@ -96,6 +103,43 @@ public class CISDirectoryForm {
 	
 	public void setMode(int mode) {
 		this.mode = mode;
+	}
+	
+	//criteria stuff
+	
+	public String getAttrib() {
+		return attrib;
+	}
+	public void setAttrib(String attrib) {
+		this.attrib = attrib;
+	}
+	
+	public String getOperator() {
+		return operator;
+	}
+	public void setOperator(String operator) {
+		this.operator = operator;
+	}
+	
+	public String getvalue1() {
+		return value1;
+	}
+	public void setValue1(String value1) {
+		this.value1 = value1;
+	}
+	
+	public String getvalue2() {
+		return value2;
+	}
+	public void setValue2(String value2) {
+		this.value2 = value2;
+	}
+	
+	public int getRank() {
+		return rank;
+	}
+	public void setRank(int rank) {
+		this.rank = rank;
 	}
 
 }

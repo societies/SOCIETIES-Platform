@@ -62,8 +62,8 @@
 			</tr>
 			<tr>
 				<td>Owner CSS Id:</td>
-				<td><form:input path="cssownwerid" /></td>
-				<td><form:errors path="cssownwerid" cssClass="error" /></td>
+				<td><form:input path="cssownerid" /></td>
+				<td><form:errors path="cssownerid" cssClass="error" /></td>
 			</tr>
 			<tr>
 				<td>CIS Type:</td>
@@ -75,6 +75,32 @@
 				<td><form:input path="id" /></td>
 				<td><form:errors path="id" cssClass="error" /></td>
 			</tr>
+			<tr>
+				<td>Attribute:</td>
+				<td><form:input path="attrib" /></td>
+				<td><form:errors path="attrib" cssClass="error" /></td>
+			</tr>
+			<tr>
+				<td>Operator:</td>
+				<td><form:input path="operator" /></td>
+				<td><form:errors path="operator" cssClass="error" /></td>
+			</tr>
+			<tr>
+				<td>Value 1:</td>
+				<td><form:input path="value1" /></td>
+				<td><form:errors path="value1" cssClass="error" /></td>
+			</tr>
+			<tr>
+				<td>Value 2:</td>
+				<td><form:input path="value2" /></td>
+				<td><form:errors path="value2" cssClass="error" /></td>
+			</tr>
+			<tr>
+				<td>Rank:</td>
+				<td><form:input path="rank" /></td>
+				<td><form:errors path="rank" cssClass="error" /></td>
+			</tr>
+			
 			</table>
 	</form:form>
 	
