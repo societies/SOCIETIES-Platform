@@ -24,19 +24,9 @@
  */
 package org.societies.android.api.cis.management;
 
-import java.util.List;
-
 import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.activityfeed.AddActivity;
-import org.societies.api.schema.activityfeed.AddActivityResponse;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
-import org.societies.api.schema.activityfeed.DeleteActivity;
-import org.societies.api.schema.activityfeed.DeleteActivityResponse;
-import org.societies.api.schema.cis.community.Community;
-import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
-import org.societies.api.schema.cis.community.Qualification;
-
 
 /**
  * This interface represents CISs that are not owned by this CSS but that this
@@ -47,14 +37,14 @@ import org.societies.api.schema.cis.community.Qualification;
  */
 public interface ICisSubscribed {
 	public String methodsArray[] = {"Join(String client, String cisId)",
-	 		"Leave(String client, String cisId)",
-	 		"getMembers(String client, String cisId)",
-	 		"getCisInformation(String client, String cisId)",
-	 		"getActivityFeed(String client, String cisId)",
-	 		"addActivity(String client, String cisId, AActivity activity)",
-	 		"deleteActivity(String client, String cisId, AActivity activity)",
-	 		"cleanActivityFeed(String client, String cisId)"
-	};
+							 		"Leave(String client, String cisId)",
+							 		"getMembers(String client, String cisId)",
+							 		"getCisInformation(String client, String cisId)",
+							 		"getActivityFeed(String client, String cisId)",
+							 		"addActivity(String client, String cisId, AActivity activity)",
+							 		"deleteActivity(String client, String cisId, AActivity activity)",
+							 		"cleanActivityFeed(String client, String cisId)"
+								};
 	
 	/**
 	 * Join a community
@@ -63,7 +53,7 @@ public interface ICisSubscribed {
 	 * @param qualifications
 	 * @return
 	 */
-	public JoinResponse Join(String client, String cisId);
+	public AJoinResponse Join(String client, String cisId);
 	
 	/**
 	 * Leave a Community

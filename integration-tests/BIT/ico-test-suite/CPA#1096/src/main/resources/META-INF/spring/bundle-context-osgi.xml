@@ -13,7 +13,6 @@
                       	http://www.springframework.org/schema/osgi 
                       	http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
     <osgi:reference id="cisManager" interface="org.societies.api.cis.management.ICisManager"/>
-
+    <osgi:reference id="commManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 </beans>

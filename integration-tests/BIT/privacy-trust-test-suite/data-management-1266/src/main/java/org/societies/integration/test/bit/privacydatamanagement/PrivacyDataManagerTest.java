@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.eclipse.jetty.util.log.Log;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,7 +106,9 @@ public class PrivacyDataManagerTest
 		// Data Id
 		try {
 			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId+"/ENTITY/person/1/ATTRIBUTE/name/13");
-			cisDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId+"/cis-member-list");
+			cisDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId+"/cis-member-list/");
+			LOG.info("Data id: "+dataId.getUri()+" (scheme: "+dataId.getScheme()+", type: "+dataId.getType()+")");
+			LOG.info("Cis Data id: "+cisDataId.getUri()+" (scheme: "+cisDataId.getScheme()+", type: "+cisDataId.getType()+")");
 		}
 		catch (MalformedCtxIdentifierException e) {
 			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
@@ -137,9 +140,9 @@ public class PrivacyDataManagerTest
 		List<RequestItem> requestItemsPrivate = new ArrayList<RequestItem>();
 		requestItemsPrivate.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsPrivate));
 
-		privacyPolicy = new RequestPolicy(requestorCis, requestItems);
-		privacyPolicyMembersOnly = new RequestPolicy(requestorCis, requestItemsMembersOnly);
-		privacyPolicyPrivate = new RequestPolicy(requestorCis, requestItemsPrivate);
+		privacyPolicy = new RequestPolicy(new RequestorCis(myCssId, cisId), requestItems);
+		privacyPolicyMembersOnly = new RequestPolicy(new RequestorCis(myCssId, cisId), requestItemsMembersOnly);
+		privacyPolicyPrivate = new RequestPolicy(new RequestorCis(myCssId, cisId), requestItemsPrivate);
 	}
 
 	@After
@@ -269,7 +272,9 @@ public class PrivacyDataManagerTest
 		ResponseItem permissionMe = null;
 		try {
 			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicyPrivate);
+			Log.info("[#"+testCaseNumber+"] Requested by: "+requestorService);
 			permissionOther = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			Log.info("[#"+testCaseNumber+"] Requested by me: "+myCssId.getJid());
 			permissionMe = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
 			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicyPrivate.getRequestor());
 		} catch (PrivacyException e) {
@@ -316,21 +321,21 @@ public class PrivacyDataManagerTest
 		assertNotNull("No privacy policy added", privacyPolicyAdded);
 		assertEquals("Privacy policy added: not the good one", privacyPolicyPrivate.toXMLString(), privacyPolicyAdded.toXMLString());
 
-		assertNotNull("No permission retrieved", permissionOther1);
-		assertNotNull("No (real) permission retrieved", permissionOther1.getDecision());
-		assertEquals("Bad permission retrieved",  Decision.DENY.name(), permissionOther1.getDecision().name());
-		assertNotNull("No permission retrieved", permissionOther2);
-		assertNotNull("No (real) permission retrieved", permissionOther2.getDecision());
-		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissionOther2.getDecision().name());
-		assertEquals("Two requests, not the same answer", permissionOther1.toXMLString(), permissionOther2.toXMLString());
+		assertNotNull("Other: No permission retrieved", permissionOther1);
+		assertNotNull("Other: No (real) permission retrieved", permissionOther1.getDecision());
+		assertEquals("Other: Bad permission retrieved",  Decision.DENY.name(), permissionOther1.getDecision().name());
+		assertNotNull("Other: No permission retrieved", permissionOther2);
+		assertNotNull("Other: No (real) permission retrieved", permissionOther2.getDecision());
+		assertEquals("Other: Bad permission retrieved", Decision.DENY.name(), permissionOther2.getDecision().name());
+		assertEquals("Other: Two requests, not the same answer", permissionOther1.toXMLString(), permissionOther2.toXMLString());
 		
-		assertNotNull("No permission retrieved", permissionMe1);
-		assertNotNull("No (real) permission retrieved", permissionMe1.getDecision());
-		assertEquals("Bad permission retrieved",  Decision.PERMIT.name(), permissionMe1.getDecision().name());
-		assertNotNull("No permission retrieved", permissionMe2);
-		assertNotNull("No (real) permission retrieved", permissionMe2.getDecision());
-		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissionMe2.getDecision().name());
-		assertEquals("Two requests, not the same answer", permissionMe1.toXMLString(), permissionMe2.toXMLString());
+		assertNotNull("Me: No permission retrieved", permissionMe1);
+		assertNotNull("Me: No (real) permission retrieved", permissionMe1.getDecision());
+		assertEquals("Me: Bad permission retrieved",  Decision.PERMIT.name(), permissionMe1.getDecision().name());
+		assertNotNull("Me: No permission retrieved", permissionMe2);
+		assertNotNull("Me: No (real) permission retrieved", permissionMe2.getDecision());
+		assertEquals("Me: Bad permission retrieved", Decision.PERMIT.name(), permissionMe2.getDecision().name());
+		assertEquals("Me: Two requests, not the same answer", permissionMe1.toXMLString(), permissionMe2.toXMLString());
 
 		assertTrue("Privacy policy not deleted", privacyPolicyDeleted);
 	}

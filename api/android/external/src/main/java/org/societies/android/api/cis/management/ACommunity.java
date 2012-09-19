@@ -89,7 +89,8 @@ public class ACommunity extends Community implements Parcelable {
 		acommunity.setCommunityType(community.getCommunityType());
 		acommunity.setDescription(community.getDescription());
 		acommunity.setOwnerJid(community.getOwnerJid());
-		acommunity.setMembershipCrit(AMembershipCrit.convertMembershipCrit(community.getMembershipCrit()));
+		if(community.getMembershipCrit()!=null && community.getMembershipCrit().getCriteria() != null && community.getMembershipCrit().getCriteria().isEmpty()== false)
+			acommunity.setMembershipCrit(AMembershipCrit.convertMembershipCrit(community.getMembershipCrit()));
 		return acommunity;
 	}
 }

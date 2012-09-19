@@ -59,17 +59,14 @@ public class ServiceImplementationDAO {
 	 * @param serviceVersion
 	 */
 	public ServiceImplementationDAO( String serviceNameSpace,
-			String serviceProvider, String serviceVersion, URI serviceClient) {
+			String serviceProvider, String serviceVersion, String serviceClient) {
 		super();
 		
 		this.serviceNameSpace = serviceNameSpace;
 		this.serviceProvider = serviceProvider;
 		this.serviceVersion = serviceVersion;
+		this.serviceClient = serviceClient;
 		
-		if(serviceClient == null)
-			this.serviceClient = null;
-		else
-			this.serviceClient = serviceClient.toString();
 	}
 	/**
 	 * 

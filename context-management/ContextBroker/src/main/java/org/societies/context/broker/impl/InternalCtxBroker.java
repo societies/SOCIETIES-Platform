@@ -279,6 +279,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			} else {
 
 				cssOwnerEnt = this.userCtxDBMgr.createIndividualCtxEntity(ownerType); 
+			
 				final CtxAttribute cssIdAttr = this.userCtxDBMgr.createAttribute(
 						cssOwnerEnt.getId(), CtxAttributeTypes.ID); 
 

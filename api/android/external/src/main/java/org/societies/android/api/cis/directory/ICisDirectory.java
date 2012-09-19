@@ -28,35 +28,33 @@ package org.societies.android.api.cis.directory;
  * @author Babak.Farshchian@sintef.no
  *
  */
-@Deprecated
 public interface ICisDirectory {
-	/*
-	 * Various search methods that return an array of CISAdvertisementRecords.
-	 */
-	ICisAdvertisementRecord[] searchByName(String cisName);
-	ICisAdvertisementRecord[] searchByOwner(String ownerId);
-	ICisAdvertisementRecord[] searchByUri(String uri);
 	
-	Boolean RegisterCis (ICisAdvertisementRecord cis);
-	Boolean UnregisterCis (ICisAdvertisementRecord cis);
-	/*
-	 * This method is used to add CIS Directories that reside on other nodes.
-	 * 
-	 * @param directoryURI URI for the directory to be added.
-	 * @param cssId ID for the CSS where the new directory resides.
-	 * @param synchMode One of several modes for synchronizing with the new directory. E.g. pull or push.
-	 * 
-	 */
-	Integer AddPeerDirectory(String directoryURI, String cssId, Integer synchMode);
+	public String methodsArray[] = {"findAllCisAdvertisementRecords(String client)",
+							 		"findForAllCis(String client, String filter)",
+							 		"searchByID(String client, String cis_id)"
+									};
 	
-	/*
-	 * Ping method for checking whether this Directory is alive.
+	/**
+	 * Find all Cis Advertisement Records {@link org.societies.api.schema.cis.directory.CisAdvertisementRecord} in the CisDirectory.
+	 *
+	 * @param callback the callback class of the remote CisDirectory client
 	 */
-	Boolean ping();
-	/*
-	 * A method that will return the current URI for this Directory. This URI might be fetched
-	 * from XMPP name-space or be a web service.
-	 */
+	public ACisAdvertisementRecord[] findAllCisAdvertisementRecords(String client);
 	
-	public String getURI();
+	/**
+	 * Find all Cis Advertisement Records {@link org.societies.api.schema.cis.directory.CisAdvertisementRecord} that match the specified filter 
+	 *
+	 * @param cisFilter the filter to be applied to the CisDirectory database search
+	 * @param callback the callback class of the remote Cis Directory client
+	 */
+	public ACisAdvertisementRecord[] findForAllCis(String client, String filter);
+	
+	
+	/**
+	 * Search for a advertisement record based on CisID  in the CisDirectory
+	 *
+	 * @param cis_id ID of cis advertisment to return
+	 */
+	public ACisAdvertisementRecord searchByID(String client, String cis_id);
 }

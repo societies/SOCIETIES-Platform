@@ -334,7 +334,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisSubscribed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#Join(java.lang.String, java.lang.String, java.util.List)*/
-	public JoinResponse Join(String client, String cisId) {
+	public AJoinResponse Join(String client, String cisId) {
 		Log.d(LOG_TAG, "Join CIS called by client: " + client);
 
 		//CREATE JOIN INFO
@@ -613,7 +613,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		}
 
 		public void receiveResult(Stanza returnStanza, Object msgBean) {
-			Log.d(LOG_TAG, "Callback receiveResult");
+			Log.d(LOG_TAG, "CIS Callback receiveResult");
 			
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);

@@ -37,6 +37,7 @@
 		<property name="cisManager" ref="cisManagerRef" />
 		<property name="serviceControlRemote" ref="serviceControlRemoteRef" />				
 		<property name="policyNegotiation" ref="policyNegotiatorRef" />
+		<property name="deviceMngr" ref="deviceMngrRef" />
 	</bean>
 	
 	<bean id="serviceManagement" class="org.societies.slm.servicecontrol.ServiceMgmt" >
