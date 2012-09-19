@@ -56,6 +56,10 @@ var Societies3PServices = {
 		}
 		
 		window.plugins.SocietiesCoreServiceMonitor.getServices(success, failure);
+	},
+	
+	startStopService: function() {
+		return true;
 	}
 }
 
@@ -69,10 +73,6 @@ var Societies3PServices = {
 $(document).bind('pageinit',function(){
 
 	console.log("jQuery pageinit action(s) for servicemanagement");
-	
-	$(document).ready(function() {
-		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);;
-	}); 
 	
 	$('#List3PServices').off('click').on('click', function(){
 		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refresh3PServices);;

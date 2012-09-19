@@ -23,7 +23,7 @@ $(document).bind('pageinit',function(){
 		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
 		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refreshLocalApps);
 		//GOTO NEWLY POPULATED PAGE
-		$.mobile.changePage("my_apps.html", { transition: "fade"} );
+		$.mobile.changePage($("#my_apps"), { transition: "fade"} );
 	});
 	
 });
