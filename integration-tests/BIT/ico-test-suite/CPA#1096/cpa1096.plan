@@ -51,9 +51,9 @@
 	<artifact type="bundle" name="org.societies.cis.CisDirectoryClient"/>
     <artifact type="bundle" name="org.societies.cis.manager"/>
 
-<!--    <artifact type="bundle" name="org.societies.orchestration.cisdatacollector"/>
+    <artifact type="bundle" name="org.societies.orchestration.cisdatacollector"/>
 
-    <artifact type="bundle" name="org.societies.orchestration.cpa"/>   -->
+    <artifact type="bundle" name="org.societies.orchestration.cpa"/>
 
     <artifact type="bundle" name="org.societies.integration.test.bit.bit-1096-cpa"/>
 

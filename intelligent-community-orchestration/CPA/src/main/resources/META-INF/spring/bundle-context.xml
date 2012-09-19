@@ -72,7 +72,7 @@
        for integration testing outside of an OSGi environment -->
     <context:annotation-config />
     <tx:annotation-driven />
-   <bean id="CPA" class="org.societies.orchestration.cpa.impl.CPAManager" depends-on="ISuggestedCommunityAnalyser,CISDataCollector"
+   <bean id="CPA" class="org.societies.orchestration.cpa.impl.CPAManager" depends-on="cisDataCollector"
    init-method="init">
        <property name="collector" ref="cisDataCollector" />
        <property name="eventMgr" ref="eventMgr"/>

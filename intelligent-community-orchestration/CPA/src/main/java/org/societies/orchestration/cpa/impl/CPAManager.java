@@ -25,11 +25,14 @@
 
 package org.societies.orchestration.cpa.impl;
 
+import org.societies.api.internal.orchestration.ICPA;
+import org.societies.api.internal.orchestration.ISocialGraph;
 import org.societies.api.osgi.event.*;
 import org.societies.orchestration.api.ICisDataCollector;
 import org.societies.orchestration.api.impl.CommunitySuggestionImpl;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,7 +40,7 @@ import java.util.HashMap;
  * Date: 16.09.12
  * Time: 13:51
  */
-public class CPAManager extends EventListener {
+public class CPAManager extends EventListener implements ICPA {
     private HashMap<String, CPA> cpaMap;
     private ICisDataCollector collector;
     private IEventMgr eventMgr;
@@ -103,5 +106,21 @@ public class CPAManager extends EventListener {
     @Override
     public void handleExternalEvent(CSSEvent event) {
 
+    }
+
+    @Override
+    public List<String> getTrends(String cisId, int n) {
+        //TODO: handle cisId null
+        if(!cpaMap.containsKey(cisId))
+            return null;
+        return cpaMap.get(cisId).getTrends(n);
+    }
+
+    @Override
+    public ISocialGraph getGraph(String cisId) {
+        //TODO: handle cisId null
+        if(!cpaMap.containsKey(cisId))
+            return null;
+        return cpaMap.get(cisId).getCPACreationPatterns().getGraph();
     }
 }

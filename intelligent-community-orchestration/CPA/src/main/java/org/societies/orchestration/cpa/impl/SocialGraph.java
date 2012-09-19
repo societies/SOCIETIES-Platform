@@ -24,47 +24,46 @@
  */
 package org.societies.orchestration.cpa.impl;
 
+import edu.uci.ics.jung.graph.UndirectedSparseGraph;
+import org.societies.api.activity.IActivity;
+import org.societies.api.internal.orchestration.ISocialGraph;
+import org.societies.api.internal.orchestration.ISocialGraphEdge;
+import org.societies.api.internal.orchestration.ISocialGraphVertex;
+import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import org.societies.api.activity.IActivity;
-import org.societies.api.activity.IActivityFeedCallback;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
-
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.UndirectedSparseGraph;
-public class SocialGraph implements Collection<SocialGraphVertex> {
-	private ArrayList<SocialGraphEdge> edges;
-	private ArrayList<SocialGraphVertex> vertices;
+public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph {
+	private ArrayList<ISocialGraphEdge> edges;
+	private ArrayList<ISocialGraphVertex> vertices;
 	public SocialGraph(){
-		edges = new ArrayList<SocialGraphEdge>();
-		vertices = new ArrayList<SocialGraphVertex>();
+		edges = new ArrayList<ISocialGraphEdge>();
+		vertices = new ArrayList<ISocialGraphVertex>();
 	}
-	public ArrayList<SocialGraphEdge> getEdges() {
+	public List<ISocialGraphEdge> getEdges() {
 		return edges;
 	}
-	public void setEdges(ArrayList<SocialGraphEdge> edges) {
+	public void setEdges(ArrayList<ISocialGraphEdge> edges) {
 		this.edges = edges;
 	}
-	public ArrayList<SocialGraphVertex> getVertices() {
+	public List<ISocialGraphVertex> getVertices() {
 		return vertices;
 	}
-	public void setVertices(ArrayList<SocialGraphVertex> vertices) {
+	public void setVertices(ArrayList<ISocialGraphVertex> vertices) {
 		this.vertices = vertices;
 	}
 	public SocialGraphVertex hasVertex(String name){
-		for(SocialGraphVertex vertex : vertices)
+		for(ISocialGraphVertex vertex : vertices)
 			if(vertex.getName().equalsIgnoreCase(name))
-				return vertex;
+				return (SocialGraphVertex) vertex;
 		return null;
 	}
 	public SocialGraphEdge hasEdge(SocialGraphEdge iedge){
-		for(SocialGraphEdge edge : edges)
+		for(ISocialGraphEdge edge : edges)
 			if(edge.equals(iedge))
-				return edge;
+				return (SocialGraphEdge) edge;
 		return null;
 	}
 	@Override
@@ -72,11 +71,11 @@ public class SocialGraph implements Collection<SocialGraphVertex> {
 		return vertices.size();
 	}
 	@Override
-	public boolean add(SocialGraphVertex e) {
+	public boolean add(ISocialGraphVertex e) {
 		return vertices.add(e);
 	}
 	@Override
-	public boolean addAll(Collection<? extends SocialGraphVertex> c) {
+	public boolean addAll(Collection<? extends ISocialGraphVertex> c) {
 		return vertices.addAll(c);
 	}
 	@Override
@@ -97,8 +96,10 @@ public class SocialGraph implements Collection<SocialGraphVertex> {
 		return vertices.isEmpty();
 	}
 	@Override
-	public Iterator<SocialGraphVertex> iterator() {
-		return vertices.iterator();
+	public Iterator<ISocialGraphVertex> iterator() {
+/*        ArrayList<SocialGraphVertex> ret = new ArrayList<SocialGraphVertex>();
+        ret.addAll(this.getVertices());*/
+		return  vertices.iterator();
 	}
 	@Override
 	public boolean remove(Object o) {
@@ -122,11 +123,11 @@ public class SocialGraph implements Collection<SocialGraphVertex> {
 	}
 	public UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> toJung(){
 		UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> ret = new UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge>();
-		for(SocialGraphVertex vertex : this.vertices){
-			ret.addVertex(vertex);
+		for(ISocialGraphVertex vertex : this.vertices){
+			ret.addVertex((SocialGraphVertex) vertex);
 		}
-		for(SocialGraphEdge edge : this.edges){
-			ret.addEdge(edge, edge.getFrom(), edge.getTo());
+		for(ISocialGraphEdge edge : this.edges){
+			ret.addEdge((SocialGraphEdge) edge, (SocialGraphVertex)edge.getFrom(), (SocialGraphVertex)edge.getTo());
 		}
 		return ret;
 	}
@@ -150,17 +151,17 @@ public class SocialGraph implements Collection<SocialGraphVertex> {
 		System.out.println("actDiff size:"+actDiff.size()+" getVertices().size():"+getVertices().size());
 		int newEdges=0; int hasEdges=0;
 		SocialGraphEdge edge = null; SocialGraphEdge searchEdge = null;
-		for(SocialGraphVertex vertex1 : getVertices()){
-			for(SocialGraphVertex vertex2 : getVertices()){
-				edge = new SocialGraphEdge(vertex1,vertex2);
+		for(ISocialGraphVertex vertex1 : getVertices()){
+			for(ISocialGraphVertex vertex2 : getVertices()){
+				edge = new SocialGraphEdge((SocialGraphVertex)vertex1,(SocialGraphVertex)vertex2);
 				searchEdge = hasEdge(edge);
 				if(searchEdge == null){
 					newEdges++;
-					edge.setWeight(actComp.compare(vertex1,vertex2,actDiff));
+					edge.setWeight(actComp.compare((SocialGraphVertex)vertex1,(SocialGraphVertex)vertex2,actDiff));
 					getEdges().add(edge);
 				}else{
 					hasEdges++;
-					searchEdge.addToWeight(actComp.compare(vertex1,vertex2,actDiff));
+					searchEdge.addToWeight(actComp.compare((SocialGraphVertex)vertex1,(SocialGraphVertex)vertex2,actDiff));
 				}
 			}
 		}

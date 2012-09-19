@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.collector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.osgi.event.*;
@@ -41,6 +43,10 @@ import java.util.List;
  * Time: 12:19
  */
 public class CISDataCollectorManager extends EventListener implements ICisDataCollector {
+
+    private static Logger LOG = LoggerFactory
+            .getLogger(CISDataCollectorManager.class);
+
     private ICisManager cisManager;
     private HashMap<String,CISDataCollector> collectors = new HashMap<String,CISDataCollector>();
     private IEventMgr eventMgr;
@@ -72,6 +78,7 @@ public class CISDataCollectorManager extends EventListener implements ICisDataCo
     }
 
     public void newCis(String cisId) {
+        LOG.info("in newCIS in cis data collector");
         synchronized (mtx){
             if(collectors.containsKey(cisId)) return;
             ICisOwned cis = getCisManager().getOwnedCis(cisId);

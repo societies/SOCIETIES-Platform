@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.integration.test.IntegrationTestCase;
+import org.societies.orchestration.api.ICisDataCollector;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
 public class TestCase1096 extends IntegrationTestCase {
@@ -19,6 +20,8 @@ public class TestCase1096 extends IntegrationTestCase {
     public static ICisManager cisManager;
     public static ISuggestedCommunityAnalyser SCA;
     public static ICommManager commManager;
+    public static ICisDataCollector collector;
+    public static ICisDataCollector collector;
 	/**
 	 * Privacy Log Appender (injected)
 	 */
@@ -32,6 +35,14 @@ public class TestCase1096 extends IntegrationTestCase {
 		super(1096, new Class[] {NominalTestCase.class});
 		NominalTestCase.testCaseNumber = testCaseNumber;
 	}
+
+    public static ICisDataCollector getCollector() {
+        return collector;
+    }
+
+    public static void setCollector(ICisDataCollector collector) {
+        TestCase1096.collector = collector;
+    }
 
     public void setCommManager(ICommManager commManager) {
         this.commManager = commManager;

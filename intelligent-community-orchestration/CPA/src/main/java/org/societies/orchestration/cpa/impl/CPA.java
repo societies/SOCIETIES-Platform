@@ -151,6 +151,10 @@ public class CPA implements IDataCollectorSubscriber, Runnable
     public void init(){
         this.newActivities = new ArrayList<IActivity>();
     }
-    
+    public List<String> getTrends(int n){
+        ArrayList<String> ret = new ArrayList<String>();
+        //TODO: implement
+        return ret;
+    }
     
 }
