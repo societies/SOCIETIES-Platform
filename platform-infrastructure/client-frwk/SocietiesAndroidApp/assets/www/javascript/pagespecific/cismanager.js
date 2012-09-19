@@ -68,22 +68,19 @@ var	SocietiesCISManagerService = {
 	 * @returns CIS records
 	 */
 	ListCIS: function() {
-	console.log("list CISs");
-	//$.mobile.loadPage( "community_profile.html", { showLoadMsg: false } );//load it in the dom
-	
-	function success(data) {
+		console.log("list CISs");
+		//$.mobile.loadPage( "community_profile.html", { showLoadMsg: false } );//load it in the dom
 		
-		console.log("List CISs where  = TODO");
-		$.mobile.changePage("communities_list.html", { transition: "slideup"} );
-		SocietiesCISListService.populateCISListpage(data);
+		function success(data) {
+			console.log("List CISs where  = TODO");
+			$.mobile.changePage("communities_list.html", { transition: "slideup"} );
+			SocietiesCISListService.populateCISListpage(data);
+		}
 		
-	}
-	
-	function failure(data) {
-		alert("createCIS - failure: " + data);
-	}
-	window.plugins.SocietiesLocalCISManager.listCIS(success, failure);
-	
+		function failure(data) {
+			alert("createCIS - failure: " + data);
+		}
+		window.plugins.SocietiesLocalCISManager.listCIS(success, failure);
 	}
 
 }
