@@ -31,7 +31,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 
 var	SocietiesCISListService = {
-			
+		
+		mCommunitities: {}, //USED TO STORE ALL COMMUNITIES TO SAVE ROUND TRIPS
+		
 		/**
 		 * @methodOf SocietiesCISListService#
 		 * @description update the CIS data on communities_list.html 
@@ -43,28 +45,41 @@ var	SocietiesCISListService = {
 			
 			//EMPTY TABLE
 			$('ul#CommunitiesListDiv li:last').remove();
+			//EMPTY TABLE - NEED TO LEAVE THE HEADER
+			while( $('ul#SocietiesServicesDiv').children().length >1 )
+				$('ul#SocietiesServicesDiv li:last').remove();
+			
 			//DISPLAY COMMUNTIES
 			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#category-item?pos=' + i + '"><img src="./images/community_profile_icon.png" class="profile_list" alt="logo" >' +
+				//var tableEntry = '<li><a href="#category-item?pos=' + i + '"><img src="./images/community_profile_icon.png" class="profile_list" alt="logo" >' +
+				var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ')"><img src="../images/community_profile_icon.png" class="profile_list" alt="logo" >' +
 				'<h2>' + data[i].cisName + '</h2>' + 
 				'<p>' + data[i].cisType + '</p>' + 
 				'</a></li>';
-				/*
-				$('ul#SocietiesServicesDiv').append(
-						$('<li>').append(
-								$('<a>').attr('href','#appdetails').append(
-										$('<img>').attr('src', '../images/printer_icon.png').append(data.serviceName) )));     
-				*/
 				jQuery('ul#CommunitiesListDiv').append(tableEntry);
 			}
 			$('#CommunitiesListDiv').listview('refresh');
-			
-
-
+		},
+		
+		showCISDetails: function (cisPos) {
+			// GET SERVICE FROM ARRAY AT POSITION
+			var serviceObj = mServices[ servicePos ];
+			if ( serviceObj ) {
+				//VALID SERVICE OBJECT
+				var markup = "<h1>" + serviceObj.serviceName + "</h1>" + 
+							 "<p>" + serviceObj.serviceDescription + "</p>" +
+							 "<p>" + serviceObj.serviceInstance.serviceImpl.serviceProvider + "</p>" + 
+							 "<p>" + serviceObj.serviceStatus + "</p>";
+				//INJECT
+				$('#app_detail').html( markup );
+				try {//REFRESH FORMATTING
+					//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
+					$('ul#app_details').listview('refresh');
+				}
+				catch(err) {}
+				$.mobile.changePage("my_apps_details.html");
+			}
 		}
-
-
-
 }
 
 
