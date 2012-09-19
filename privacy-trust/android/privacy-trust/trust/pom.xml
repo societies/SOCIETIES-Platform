@@ -4,9 +4,8 @@
 
 	<parent>
 		<groupId>org.societies</groupId>
-        <artifactId>android-parent</artifactId>
-        <version>0.1</version>
-		<relativePath>../../../../parent/android.xml</relativePath>
+		<artifactId>android-parent</artifactId>
+		<version>RELEASE</version>
 	</parent>
 
 	<groupId>org.societies.android.privacytrust.trust</groupId>
@@ -28,8 +27,6 @@
 	</developers>	
 
 	<dependencies>
-
-
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
@@ -57,7 +54,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-android</artifactId>
 			<version>1.6.1-RC1</version>
-
 		</dependency>
 	</dependencies>
 
