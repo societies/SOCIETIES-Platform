@@ -28,19 +28,19 @@ public final class SQLiteContract {
 			SocialContract.Me._ID + " integer primary key autoincrement, " +
 			SocialContract.Me.GLOBAL_ID + " text not null, " +
 			SocialContract.Me.NAME + " text not null," +
-			SocialContract.Me.DISPLAY_NAME + " text not null," +
+			SocialContract.Me.DISPLAY_NAME + " text," +
 			SocialContract.Me.USER_NAME + " text not null," +
 			SocialContract.Me.PASSWORD + " text not null," +
-			SocialContract.Me.ORIGIN + " text not null );";
+			SocialContract.Me.ORIGIN + " text );";
 
 	public static final String PEOPLE_TABLE_CREATE = "create table if not exists " + PEOPLE_TABLE_NAME
 			+ " (" + 
 			SocialContract.People._ID + " integer primary key autoincrement, " +
 			SocialContract.People.GLOBAL_ID + " text not null, " +
 			SocialContract.People.NAME + " text not null," +
-			SocialContract.People.EMAIL + " text not null," +
-			SocialContract.People.ORIGIN + " text not null," +
-			SocialContract.People.DESCRIPTION + " text not null," +
+			SocialContract.People.EMAIL + " text," +
+			SocialContract.People.ORIGIN + " text," +
+			SocialContract.People.DESCRIPTION + " text," +
 			SocialContract.People.CREATION_DATE + " text," +
 			SocialContract.People.LAST_MODIFIED_DATE + " text," +
 			SocialContract.People.SYNC_STATUS + " text );";
@@ -52,8 +52,8 @@ public final class SQLiteContract {
 			SocialContract.Communities.TYPE + " text not null," +
 			SocialContract.Communities.NAME + " text not null," +
 			SocialContract.Communities.OWNER_ID + " text not null," +
-			SocialContract.Communities.ORIGIN + " text not null," +
-			SocialContract.Communities.DESCRIPTION + " text not null," +
+			SocialContract.Communities.ORIGIN + " text," +
+			SocialContract.Communities.DESCRIPTION + " text," +
 			SocialContract.Communities.CREATION_DATE + " text," +
 			SocialContract.Communities.LAST_MODIFIED_DATE + " text," +
 			SocialContract.Communities.SYNC_STATUS + " text );";
@@ -65,14 +65,14 @@ public final class SQLiteContract {
 			SocialContract.Services.TYPE + " text not null," +
 			SocialContract.Services.NAME + " text not null," +
 			SocialContract.Services.OWNER_ID + " text not null," +
-			SocialContract.Services.ORIGIN + " text not null," +
-			SocialContract.Services.DESCRIPTION + " text not null," +
+			SocialContract.Services.ORIGIN + " text," +
+			SocialContract.Services.DESCRIPTION + " text," +
 			SocialContract.Services.CREATION_DATE + " text," +
 			SocialContract.Services.LAST_MODIFIED_DATE + " text," +
 			SocialContract.Services.SYNC_STATUS + " text," +
 			SocialContract.Services.AVAILABLE + " text not null," +
-			SocialContract.Services.DEPENDENCY + " text not null," +
-			SocialContract.Services.CONFIG + " text not null," +
+			SocialContract.Services.DEPENDENCY + " text," +
+			SocialContract.Services.CONFIG + " text," +
 			SocialContract.Services.URL + " text not null );";
 
 	public static final String RELATIONSHIP_TABLE_CREATE = "create table if not exists " + RELATIONSHIP_TABLE_NAME
@@ -82,7 +82,7 @@ public final class SQLiteContract {
 			SocialContract.Relationship.GLOBAL_ID_P1 + " text not null," +
 			SocialContract.Relationship.GLOBAL_ID_P2 + " text not null," +
 			SocialContract.Relationship.TYPE + " text not null," +
-			SocialContract.Relationship.ORIGIN + " text not null );";
+			SocialContract.Relationship.ORIGIN + " text );";
 
 	public static final String MEMBERSHIP_TABLE_CREATE = "create table if not exists " + MEMBERSHIP_TABLE_NAME
 			+ " (" + 
@@ -91,55 +91,54 @@ public final class SQLiteContract {
 			SocialContract.Membership.GLOBAL_ID_MEMBER + " text not null," +
 			SocialContract.Membership.GLOBAL_ID_COMMUNITY + " text not null," +
 			SocialContract.Membership.TYPE + " text not null," +
-			SocialContract.Membership.ORIGIN + " text not null );";
+			SocialContract.Membership.ORIGIN + " text );";
 
 	public static final String SHARING_TABLE_CREATE = "create table if not exists " + SHARING_TABLE_NAME
 			+ " (" + 
 			SocialContract.Sharing._ID + " integer primary key autoincrement, " +
 			SocialContract.Sharing.GLOBAL_ID + " text not null, " +
+			SocialContract.Sharing.OWNER_GLOBAL_ID + "text not null, " +
 			SocialContract.Sharing.GLOBAL_ID_SERVICE + " text not null," +
 			SocialContract.Sharing.GLOBAL_ID_COMMUNITY + " text not null," +
 			SocialContract.Sharing.TYPE + " text not null," +
-			SocialContract.Sharing.ORIGIN + " text not null );";
+			SocialContract.Sharing.ORIGIN + " text );";
 
 	public static final String PEOPLE_ACTIVITIY_TABLE_CREATE = "create table if not exists " + PEOPLE_ACTIVITIY_TABLE_NAME
 			+ " (" + 
 			SocialContract.PeopleActivity._ID + " integer primary key autoincrement, " +
 			SocialContract.PeopleActivity.GLOBAL_ID + " text not null, " +
 			SocialContract.PeopleActivity.GLOBAL_ID_FEED_OWNER + " text not null," +
-			SocialContract.PeopleActivity.GLOBAL_ID_ACTOR + " text not null," +
-			SocialContract.PeopleActivity.GLOBAL_ID_OBJECT + " text not null," +
-			SocialContract.PeopleActivity.GLOBAL_ID_VERB + " text not null," +
-			SocialContract.PeopleActivity.GLOBAL_ID_TARGET + " text not null," +
-			SocialContract.PeopleActivity.ORIGIN + " text not null," +
-			SocialContract.PeopleActivity.CREATION_DATE + " text not null," +
-			SocialContract.PeopleActivity.SYNC_STATUS + " text not null );";
+			SocialContract.PeopleActivity.GLOBAL_ID_ACTOR + " text," +
+			SocialContract.PeopleActivity.GLOBAL_ID_OBJECT + " text," +
+			SocialContract.PeopleActivity.GLOBAL_ID_VERB + " text," +
+			SocialContract.PeopleActivity.GLOBAL_ID_TARGET + " text," +
+			SocialContract.PeopleActivity.ORIGIN + " text," +
+			SocialContract.PeopleActivity.CREATION_DATE + " text," +
+			SocialContract.PeopleActivity.SYNC_STATUS + " text);";
 
 	public static final String COMMUNITIES_ACTIVITIY_TABLE_CREATE = "create table if not exists " + COMMUNITIES_ACTIVITIY_TABLE_NAME
 			+ " (" + 
 			SocialContract.CommunityActivity._ID + " integer primary key autoincrement, " +
 			SocialContract.CommunityActivity.GLOBAL_ID + " text not null, " +
 			SocialContract.CommunityActivity.GLOBAL_ID_FEED_OWNER + " text not null," +
-			SocialContract.CommunityActivity.GLOBAL_ID_ACTOR + " text not null," +
-			SocialContract.CommunityActivity.GLOBAL_ID_OBJECT + " text not null," +
-			SocialContract.CommunityActivity.GLOBAL_ID_VERB + " text not null," +
-			SocialContract.CommunityActivity.GLOBAL_ID_TARGET + " text not null," +
-			SocialContract.CommunityActivity.ORIGIN + " text not null," +
-			SocialContract.CommunityActivity.CREATION_DATE + " text not null," +
-			SocialContract.CommunityActivity.SYNC_STATUS + " text not null );";
+			SocialContract.CommunityActivity.GLOBAL_ID_ACTOR + " text," +
+			SocialContract.CommunityActivity.GLOBAL_ID_OBJECT + " text," +
+			SocialContract.CommunityActivity.GLOBAL_ID_VERB + " text," +
+			SocialContract.CommunityActivity.GLOBAL_ID_TARGET + " text," +
+			SocialContract.CommunityActivity.ORIGIN + " text," +
+			SocialContract.CommunityActivity.CREATION_DATE + " text," +
+			SocialContract.CommunityActivity.SYNC_STATUS + " text );";
 
 	public static final String SERVICES_ACTIVITIY_TABLE_CREATE = "create table if not exists " + SERVICES_ACTIVITIY_TABLE_NAME
 			+ " (" + 
 			SocialContract.ServiceActivity._ID + " integer primary key autoincrement, " +
 			SocialContract.ServiceActivity.GLOBAL_ID + " text not null, " +
 			SocialContract.ServiceActivity.GLOBAL_ID_FEED_OWNER + " text not null," +
-			SocialContract.ServiceActivity.GLOBAL_ID_ACTOR + " text not null," +
-			SocialContract.ServiceActivity.GLOBAL_ID_OBJECT + " text not null," +
-			SocialContract.ServiceActivity.GLOBAL_ID_VERB + " text not null," +
-			SocialContract.ServiceActivity.GLOBAL_ID_TARGET + " text not null," +
-			SocialContract.ServiceActivity.ORIGIN + " text not null," +
-			SocialContract.ServiceActivity.CREATION_DATE + " text not null," +
-			SocialContract.ServiceActivity.SYNC_STATUS + " text not null );";
-
-
+			SocialContract.ServiceActivity.GLOBAL_ID_ACTOR + " text," +
+			SocialContract.ServiceActivity.GLOBAL_ID_OBJECT + " text," +
+			SocialContract.ServiceActivity.GLOBAL_ID_VERB + " text," +
+			SocialContract.ServiceActivity.GLOBAL_ID_TARGET + " text," +
+			SocialContract.ServiceActivity.ORIGIN + " text," +
+			SocialContract.ServiceActivity.CREATION_DATE + " text," +
+			SocialContract.ServiceActivity.SYNC_STATUS + " text );";
 }
