@@ -43,19 +43,18 @@ var	SocietiesCISListService = {
 		 */
 		populateCISListpage: function(data) {
 			
-			//EMPTY TABLE
-			$('ul#CommunitiesListDiv li:last').remove();
+			mCommunitities = data;
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
-			while( $('ul#SocietiesServicesDiv').children().length >1 )
-				$('ul#SocietiesServicesDiv li:last').remove();
+			while( $('ul#CommunitiesListDiv').children().length >1 )
+				$('ul#CommunitiesListDiv li:last').remove();
 			
 			//DISPLAY COMMUNTIES
 			for (i  = 0; i < data.length; i++) {
 				//var tableEntry = '<li><a href="#category-item?pos=' + i + '"><img src="./images/community_profile_icon.png" class="profile_list" alt="logo" >' +
 				var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ')"><img src="../images/community_profile_icon.png" class="profile_list" alt="logo" >' +
-				'<h2>' + data[i].cisName + '</h2>' + 
-				'<p>' + data[i].cisType + '</p>' + 
-				'</a></li>';
+								 '<h2>' + data[i].communityName + '</h2>' + 
+								 '<p>' + data[i].communityType + '</p>' + 
+								 '</a></li>';
 				jQuery('ul#CommunitiesListDiv').append(tableEntry);
 			}
 			$('#CommunitiesListDiv').listview('refresh');
@@ -63,21 +62,23 @@ var	SocietiesCISListService = {
 		
 		showCISDetails: function (cisPos) {
 			// GET SERVICE FROM ARRAY AT POSITION
-			var serviceObj = mServices[ servicePos ];
-			if ( serviceObj ) {
+			var communityObj = mCommunitities[ cisPos ];
+			if ( communityObj ) {
 				//VALID SERVICE OBJECT
-				var markup = "<h1>" + serviceObj.serviceName + "</h1>" + 
-							 "<p>" + serviceObj.serviceDescription + "</p>" +
-							 "<p>" + serviceObj.serviceInstance.serviceImpl.serviceProvider + "</p>" + 
-							 "<p>" + serviceObj.serviceStatus + "</p>";
+				var markup = "<h1>" + communityObj.communityName + "</h1>" + 
+							 "<p>Type: " + communityObj.communityType + "</p>" + 
+							 "<p>" + communityObj.description + "</p>" + 
+							 "<p>Owner: " + communityObj.ownerJid + "</p>";
 				//INJECT
-				$('#app_detail').html( markup );
+				$("#community_profile_info").html( markup );
+				
+				//var members = "";
 				try {//REFRESH FORMATTING
 					//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
-					$('ul#app_details').listview('refresh');
+					$('ul#community_details').listview('refresh');
 				}
 				catch(err) {}
-				$.mobile.changePage("my_apps_details.html");
+				$.mobile.changePage($("#community-details-page"), {transition: "fade"});
 			}
 		}
 }

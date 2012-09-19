@@ -276,7 +276,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 				throw new CtxEventMgrException("Could not send local context change event to topic '"
 						+ topics[i] + "': OSGi EventAdmin service is not available");
 		
-			final Map<String, Object> props = new HashMap<String, Object>();
+			final Dictionary<String, Object> props = new Hashtable<String, Object>();
 			props.put(EVENT_ID_PROPERTY_KEY, event.getId().toString());
 			if (LOG.isDebugEnabled()) 
 				LOG.debug("Sending local context change event to topic '" + topics[i] + "'"

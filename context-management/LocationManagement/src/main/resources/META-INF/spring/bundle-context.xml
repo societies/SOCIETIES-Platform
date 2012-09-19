@@ -10,15 +10,17 @@
 
 
   <!--  Mock PZ Wrapper -->
-  
+ 
    <bean id="PZWrapperBean" 
-       		 class="org.societies.context.location.management.impl.MockPZWrapperImpl" >
+       		 class="org.societies.context.location.management.impl.MockPZWrapperImpl"
+       		 init-method="init"
+       		 destroy-method="cleanup" >
    </bean>
    
    
    <!--  PZ Wrapper will be connected using REST to the location server   -->
-   <!--
-   <bean id="PZWrapperBean" 
+   <!-- 
+      <bean id="PZWrapperBean" 
        		 class="org.societies.context.location.management.impl.PZWrapperImpl" >
    </bean>
    -->

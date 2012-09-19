@@ -56,8 +56,9 @@
 			android:label="@string/app_name">
 		</activity>
 		
-		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagement" />
-        <service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
+		<service android:name="org.societies.android.platform.servicemonitor.ServiceDiscoveryLocal" />
+		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
+		<service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
         <service android:name="org.societies.android.platform.cssmanager.LocalCSSManagerService" />
         <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
         

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.maven.converters</groupId>
 	<artifactId>SimpleXMLConverters</artifactId>
-	<version>0.1</version>
+	<version>${release.version}</version>
 	<name>SimpleXML Converters</name>
 	<packaging>jar</packaging>
 
