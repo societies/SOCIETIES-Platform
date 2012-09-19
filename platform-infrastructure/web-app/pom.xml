@@ -30,7 +30,7 @@
 	<groupId>org.societies.wepapp</groupId>
 	<artifactId>societies-webapp</artifactId>
 	<packaging>war</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>${release.version}</version>
 	<name>societies-webapp</name>
 	<url>http://maven.apache.org</url>
 
@@ -119,7 +119,7 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>XCCommunicationMgr</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

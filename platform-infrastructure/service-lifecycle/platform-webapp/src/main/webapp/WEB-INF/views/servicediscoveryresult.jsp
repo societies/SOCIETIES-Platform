@@ -72,9 +72,11 @@ function updateForm(serviceID, toDo) {
         	<td>${service.serviceName}</td>
          	<td>${service.serviceDescription}</td>
             <td>${service.authorSignature}</td>
-            <td>${service.serviceStatus}</td>
+            <td>${service.serviceStatus}</td>      
             <td>
-            <a href="service-privacy-policy-show.html?serviceId=${service.getServiceIdentifier().getServiceInstanceIdentifier()}&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>
+            <xc:if test="${service.serviceType != 'DEVICE'}">
+			<a href="service-privacy-policy-show.html?serviceId=${service.getServiceIdentifier().getServiceInstanceIdentifier()}&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>
+            </xc:if>
             <%
 			if (methodCalled.equals("GetServicesCis")) {
 			%>
@@ -82,9 +84,14 @@ function updateForm(serviceID, toDo) {
 			<%
 			} else {
 			%>
+			 <xc:if test="${service.serviceType == 'DEVICE'}">
+				<a href="${pageContext.request.contextPath}/devicemgmt.html">Device Management</a>
+			</xc:if>
+			<xc:if test="${service.serviceType != 'DEVICE'}">
 				<input type="button" value="start" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'StartService')" >
 				<input type="button" value="stop" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'StopService')" >
 				<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" >
+			</xc:if>
 			<%
 			}
             %>

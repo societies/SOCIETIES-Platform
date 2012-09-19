@@ -18,7 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="org.societies.android.platform.servicemonitor.ServiceManagement" />
+        <service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesLocal" />
+        <service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote"        	
+            	android:process=":remote1"/>
+        <service android:name="org.societies.android.platform.servicemonitor.ServiceDiscoveryLocal" />
         <service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
     </application>
 

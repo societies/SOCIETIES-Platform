@@ -40,8 +40,7 @@ import org.societies.android.api.internal.servicemonitor.AndroidActiveTasks;
 import org.societies.android.api.internal.servicemonitor.ICoreServiceMonitor;
 import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
-import org.societies.android.platform.servicemonitor.ServiceManagement;
-import org.societies.android.platform.servicemonitor.ServiceManagement.LocalBinder;
+import org.societies.android.platform.servicemonitor.ServiceDiscoveryLocal;
 
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
@@ -112,7 +111,7 @@ public class PluginCoreServiceMonitor extends Plugin {
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to CoreServiceMonitor service");
         	//get a local binder
-        	org.societies.android.platform.servicemonitor.CoreServiceMonitor.LocalBinder binder = (org.societies.android.platform.servicemonitor.CoreServiceMonitor.LocalBinder) service;
+        	CoreServiceMonitor.LocalBinder binder = (CoreServiceMonitor.LocalBinder) service;
             //obtain the service's API
             coreServiceMonitor = (ICoreServiceMonitor) binder.getService();
             connectedtoCoreMonitor = true;
@@ -128,7 +127,7 @@ public class PluginCoreServiceMonitor extends Plugin {
         	Log.d(LOG_TAG, "Connecting to IServiceDiscovery service");
 
         	//GET LOCAL BINDER
-            LocalBinder binder = (LocalBinder) service;
+        	ServiceDiscoveryLocal.LocalBinder binder = (ServiceDiscoveryLocal.LocalBinder) service;
 
             //OBTAIN SERVICE DISCOVERY API
             serviceDisco = (IServiceDiscovery) binder.getService();
@@ -147,7 +146,7 @@ public class PluginCoreServiceMonitor extends Plugin {
     private void initialiseServiceBinding() {
     	//CREATE INTENT FOR EACH SERVICE
     	Intent intentServiceMon = new Intent(this.ctx.getContext(), CoreServiceMonitor.class);
-    	Intent intentServiceDisco = new Intent(this.ctx.getContext(), ServiceManagement.class);
+    	Intent intentServiceDisco = new Intent(this.ctx.getContext(), ServiceDiscoveryLocal.class);
     	
     	//BIND TO SERVICES
     	this.ctx.getContext().bindService(intentServiceMon, coreServiceMonitorConnection, Context.BIND_AUTO_CREATE);
@@ -161,10 +160,10 @@ public class PluginCoreServiceMonitor extends Plugin {
         intentFilter.addAction(CoreServiceMonitor.INSTALLED_APPLICATIONS);
         intentFilter.addAction(CoreServiceMonitor.START_ACTIVITY);
         
-        intentFilter.addAction(ServiceManagement.GET_MY_SERVICES);
-        intentFilter.addAction(ServiceManagement.GET_SERVICES);
-        intentFilter.addAction(ServiceManagement.GET_SERVICE);
-        intentFilter.addAction(ServiceManagement.SEARCH_SERVICES);
+        intentFilter.addAction(IServiceDiscovery.GET_MY_SERVICES);
+        intentFilter.addAction(IServiceDiscovery.GET_SERVICES);
+        intentFilter.addAction(IServiceDiscovery.GET_SERVICE);
+        intentFilter.addAction(IServiceDiscovery.SEARCH_SERVICES);
         
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     }
@@ -367,14 +366,14 @@ public class PluginCoreServiceMonitor extends Plugin {
 				}
 			} 
 			//>>>>>>>>>  IServiceDiscovery METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
-			else if (intent.getAction().equals(ServiceManagement.GET_SERVICES)) { 
+			else if (intent.getAction().equals(IServiceDiscovery.GET_SERVICES)) { 
 				String mapKey = ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 0);
 				
 				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(ServiceManagement.INTENT_RETURN_VALUE);
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
 					AService services[] = new AService[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
 						services[i] = (AService) parcels[i];
@@ -389,14 +388,14 @@ public class PluginCoreServiceMonitor extends Plugin {
 
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
-			} else if (intent.getAction().equals(ServiceManagement.GET_MY_SERVICES)) { 
+			} else if (intent.getAction().equals(IServiceDiscovery.GET_MY_SERVICES)) { 
 				String mapKey = ServiceMethodTranslator.getMethodName(IServiceDiscovery.methodsArray, 3);
 				
 				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
 					
 					//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(ServiceManagement.INTENT_RETURN_VALUE);
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
 					AService services[] = new AService[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
 						services[i] = (AService) parcels[i];

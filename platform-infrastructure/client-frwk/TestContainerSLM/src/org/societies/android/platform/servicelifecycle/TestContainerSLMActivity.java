@@ -6,9 +6,13 @@ import org.societies.android.api.internal.servicemonitor.InstalledAppInfo;
 import org.societies.android.api.servicelifecycle.AService;
 import org.societies.android.api.servicelifecycle.AServiceResourceIdentifier;
 import org.societies.android.api.servicelifecycle.IServiceUtilities;
+import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
-import org.societies.android.platform.servicemonitor.ServiceManagement;
-import org.societies.android.platform.servicemonitor.ServiceManagement.LocalBinder;
+import org.societies.android.platform.servicemonitor.ServiceDiscoveryLocal;
+import org.societies.android.platform.servicemonitor.ServiceUtilitiesLocal;
+import org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote;
+import org.societies.api.identity.INetworkNode;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -21,12 +25,20 @@ import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.os.Parcelable;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 public class TestContainerSLMActivity extends Activity {
+	
+	//Enter local user credentials and domain name
+	private static final String USER_NAME = "alan";
+	private static final String USER_PASS = "ala";
+	private static final String XMPP_DOMAIN = "societies.bespoke";
+	
 
     private IServiceDiscovery serviceDisco;
     private boolean serviceDiscoConnected = false;
@@ -36,7 +48,9 @@ public class TestContainerSLMActivity extends Activity {
     
     private IServiceUtilities serviceUtil;
     private boolean serviceUtilConnected = false;
-    
+    private boolean serviceUtilitiesRemote = false;
+	private Messenger remoteUtilitiesMessenger = null;
+
     private static final String LOG_TAG = TestContainerSLMActivity.class.getName();
 	
 	/** Called when the activity is first created. */
@@ -46,7 +60,7 @@ public class TestContainerSLMActivity extends Activity {
         setContentView(R.layout.main);
 
         //CREATE INTENT FOR SERVICE DISCO AND BIND
-        Intent intentServiceDisco = new Intent(this.getApplicationContext(), ServiceManagement.class);
+        Intent intentServiceDisco = new Intent(this.getApplicationContext(), ServiceDiscoveryLocal.class);
         this.getApplicationContext().bindService(intentServiceDisco, serviceDiscoConnection, Context.BIND_AUTO_CREATE);
         
         //CREATE INTENT FOR CORE SERVICE MONITOR AND BIND
@@ -54,16 +68,20 @@ public class TestContainerSLMActivity extends Activity {
         this.getApplicationContext().bindService(intentServiceMon, coreServiceMonitorConnection, Context.BIND_AUTO_CREATE);
         
         //CREATE INTENT FOR CORE SERVICE MONITOR AND BIND
-        Intent intentServiceUtil = new Intent(this.getApplicationContext(), ServiceManagement.class);
+        Intent intentServiceUtil = new Intent(this.getApplicationContext(), ServiceUtilitiesLocal.class);
         this.getApplicationContext().bindService(intentServiceUtil, serviceUtilConnection, Context.BIND_AUTO_CREATE);
+        
+        //Create intent for remote Service Utilities
+        Intent intentUtilitiesRemote = new Intent(this.getApplicationContext(), ServiceUtilitiesRemote.class);
+        this.getApplicationContext().bindService(intentUtilitiesRemote, remoteServiceUtilities, Context.BIND_AUTO_CREATE);
         
         //REGISTER BROADCAST
         IntentFilter intentFilter = new IntentFilter() ;
-        intentFilter.addAction(ServiceManagement.GET_SERVICES);
-        intentFilter.addAction(ServiceManagement.GET_MY_SERVICES);
-        intentFilter.addAction(ServiceManagement.GET_SERVICE);
-        intentFilter.addAction(ServiceManagement.SEARCH_SERVICES);
-        intentFilter.addAction(ServiceManagement.GET_MY_SERVICE_ID);
+        intentFilter.addAction(IServiceDiscovery.GET_SERVICES);
+        intentFilter.addAction(IServiceDiscovery.GET_MY_SERVICES);
+        intentFilter.addAction(IServiceDiscovery.GET_SERVICE);
+        intentFilter.addAction(IServiceDiscovery.SEARCH_SERVICES);
+        intentFilter.addAction(IServiceUtilities.GET_MY_SERVICE_ID);
         intentFilter.addAction(CoreServiceMonitor.INSTALLED_APPLICATIONS);
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_SERVICES);
         
@@ -83,7 +101,7 @@ public class TestContainerSLMActivity extends Activity {
         	Log.d(LOG_TAG, "Connecting to IServiceDiscovery service");
         	try {
 	        	//GET LOCAL BINDER
-	            LocalBinder binder = (LocalBinder) service;
+        		ServiceDiscoveryLocal.LocalBinder binder = (ServiceDiscoveryLocal.LocalBinder) service;
 	
 	            //OBTAIN SERVICE DISCOVERY API
 	            serviceDisco = (IServiceDiscovery) binder.getService();
@@ -130,7 +148,7 @@ public class TestContainerSLMActivity extends Activity {
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to serviceUtil service");
         	//get a local binder
-        	LocalBinder binder = (LocalBinder) service;
+        	ServiceUtilitiesLocal.LocalBinder binder = (ServiceUtilitiesLocal.LocalBinder) service;
             //obtain the service's API
         	serviceUtil = (IServiceUtilities) binder.getService();
         	serviceUtilConnected = true;
@@ -142,6 +160,22 @@ public class TestContainerSLMActivity extends Activity {
         	serviceUtilConnected = false;
         }
     };
+    
+	private ServiceConnection remoteServiceUtilities = new ServiceConnection() {
+		
+		public void onServiceDisconnected(ComponentName name) {
+			serviceUtilitiesRemote = false;
+        	Log.d(LOG_TAG, "Disconnecting from ServiceUtilitiesRemote");
+			
+		}
+		
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			serviceUtilitiesRemote = true;
+			remoteUtilitiesMessenger = new Messenger(service);
+	    	Log.d(LOG_TAG, "ServiceUtilitiesRemote connected");
+		}
+	};
+
     
     public void btnSendMessage_onClick(View view) {
     	Log.d(LOG_TAG, ">>>>>>>>btnSendMessage_onClick - serviceDiscoConnected: " + serviceDiscoConnected);
@@ -158,10 +192,12 @@ public class TestContainerSLMActivity extends Activity {
     	}
     	
     	protected Void doInBackground(Void... args) {
+    		
+    		loginXMPPServer(USER_NAME, USER_PASS, XMPP_DOMAIN);
 
     		try {//	WAIT TILL ALL THE SERVICES ARE CONNECTED
 				Thread.currentThread();
-				Thread.sleep(5 * 1000);
+				Thread.sleep(10 * 1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -184,6 +220,22 @@ public class TestContainerSLMActivity extends Activity {
     		if (serviceUtilConnected)
     			serviceUtil.getMyServiceId("org.societies.android.platform.servicelifecycle");    		
     		
+    		//Test Remote Service Utilities
+    		Log.d(LOG_TAG, ">>>>>>>>connected to ServiceUtilitiesRemote: " + serviceUtilitiesRemote);
+    		try {
+        		String targetMethod = IServiceUtilities.methodsArray[0];
+        		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IServiceUtilities.methodsArray, targetMethod), 0, 0);
+
+        		Bundle outBundle = new Bundle();
+        		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), "org.societies.android.platform.servicelifecycle");
+        		outMessage.setData(outBundle);
+
+    			remoteUtilitiesMessenger.send(outMessage);
+
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+ 
     		return null;
     	}
     }
@@ -194,9 +246,9 @@ public class TestContainerSLMActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, intent.getAction());
 			
-			if ((intent.getAction().equals(ServiceManagement.GET_SERVICES)) || (intent.getAction().equals(ServiceManagement.GET_MY_SERVICES))) {
+			if ((intent.getAction().equals(IServiceDiscovery.GET_SERVICES)) || (intent.getAction().equals(IServiceDiscovery.GET_MY_SERVICES))) {
 				//UNMARSHALL THE SERVICES FROM Parcels BACK TO Services
-				Parcelable parcels[] =  intent.getParcelableArrayExtra(ServiceManagement.INTENT_RETURN_VALUE);
+				Parcelable parcels[] =  intent.getParcelableArrayExtra(IServiceDiscovery.INTENT_RETURN_VALUE);
 				for (int i = 0; i < parcels.length; i++) {
 					AService aservice = (AService) parcels[i];
 					Log.d(LOG_TAG, ">>>>>GET MY SERVICES RESULTS:\nService Name: " + aservice.getServiceName());
@@ -204,9 +256,9 @@ public class TestContainerSLMActivity extends Activity {
 				}
 			}
 			
-			if (intent.getAction().equals(ServiceManagement.GET_MY_SERVICE_ID)) {
+			if (intent.getAction().equals(IServiceUtilities.GET_MY_SERVICE_ID)) {
 				//UNMARSHALL THE ID FROM THE RETURNED PARCEL
-				Parcelable parcel =  intent.getParcelableExtra(ServiceManagement.INTENT_RETURN_VALUE);
+				Parcelable parcel =  intent.getParcelableExtra(IServiceUtilities.INTENT_RETURN_VALUE);
 				AServiceResourceIdentifier sri =  (AServiceResourceIdentifier) parcel;
 				Log.d(LOG_TAG, ">>>>>GET MY SERVICE ID RESULTS:\nSRI.identifier: " + sri.getIdentifier().toString());
 				Log.d(LOG_TAG, "SRI.ServiceInstanceId: " + sri.getServiceInstanceIdentifier());
@@ -237,4 +289,20 @@ public class TestContainerSLMActivity extends Activity {
 			}
 		}
 	};
+	
+	/**
+	 * Login to Domain server
+	 * 
+	 * @param userName
+	 * @param userPassword
+	 * @param domain
+	 */
+	public void loginXMPPServer(String userName, String userPassword, String domain) {
+		Log.d(LOG_TAG, "loginXMPPServer user: " + userName + " pass: " + userPassword + " domain: " + domain);
+
+		ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
+		
+		INetworkNode networkNode = ccm.login(userName, domain, userPassword);
+	}
+
 }

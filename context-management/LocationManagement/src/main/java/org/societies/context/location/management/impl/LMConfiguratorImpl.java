@@ -61,7 +61,7 @@ public class LMConfiguratorImpl implements ILocationManagementConfigurator{
 		//this.deviceRegistry = deviceRegistry;
 		this.commManagerController = commMngrController;
 		
-		registerWithoutPubSub();
+		//registerWithoutPubSub();
 		/*
 		 * TODO Temp removal of pubSub eventing
 		 * register();

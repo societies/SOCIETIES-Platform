@@ -6,55 +6,42 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
-		<!-- <relativePath>../../../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version> -->
 	</parent>
 	<groupId>org.societies.useragent</groupId>
 	<artifactId>UACommsManager</artifactId>
 	<packaging>jar</packaging>
 	<version>${version.ua}</version>
-	
+
 	<developers>
-	    <developer>
-	      <name>Sarah Gallacher</name>
-	      <email>S.Gallacher@hw.ac.uk</email>
-	      <roles>
-	        <role>Developer</role>
-	      </roles>
-	    </developer>
+		<developer>
+			<name>Sarah Gallacher</name>
+			<email>S.Gallacher@hw.ac.uk</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
-    
-   <!--  <properties>
-        <slf4j.version>1.5.8</slf4j.version>
-        <spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
-        <spring.osgi.version>1.2.1</spring.osgi.version>
-        <equinox.ver>3.2.2</equinox.ver>
-    </properties> -->
-    
 	<dependencies>
-	 
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<!-- <version>${release.version}</version> -->
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<!-- <version>${release.version}</version> -->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
-			<version>${release.version}</version>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.societies</groupId>
-		    <artifactId>common-ext-libs</artifactId>
-		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.useragent</groupId>
@@ -62,64 +49,12 @@
 			<version>${version.ua}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Communication Manager  -->
+		<!-- Communication Manager -->
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
-		<!-- <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency> -->
 	</dependencies>
-
-	<!-- <build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Import-Package>
-    						org.springframework.beans.factory.annotation*;version="0",
-    						org.springframework.stereotype*;version="0",
-							*
-						</Import-Package>
-						<Export-Package>
-							org.societies.useragent.comms
-						</Export-Package>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-					</instructions>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<configuration>
-					<artifactItems>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${version.ua}</version>
-							<type>bundle</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-						</artifactItem>
-					</artifactItems>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build> -->
 </project>

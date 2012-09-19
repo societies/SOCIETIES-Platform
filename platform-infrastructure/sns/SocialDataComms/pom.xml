@@ -5,18 +5,38 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	<groupId>org.societies.platform.socialdata</groupId>
 	<artifactId>SocialDataComms</artifactId>
 	<packaging>jar</packaging>
 	<version>${release.version}</version>
-	
+
 	<dependencies>
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

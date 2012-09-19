@@ -333,7 +333,7 @@
 								<goal>copy</goal>
 							</goals>
 							<configuration>
-								<stripVersion>true</stripVersion>
+								<stripVersion>false</stripVersion>
 							</configuration>
 						</execution>
 						<!-- Used to analyze the dependencies of the project. Will print warnings 

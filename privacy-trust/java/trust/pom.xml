@@ -1,112 +1,61 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<!-- The Basics -->
 	<groupId>org.societies.privacytrust</groupId>
 	<artifactId>trust</artifactId>
 	<version>${version.pt}</version>
 	<packaging>bundle</packaging>
 	<dependencies>
+
+
+
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+
+
+	<dependency>
+		<groupId>org.societies</groupId>
+		<artifactId>hibernate_classes</artifactId>
+		<scope>provided</scope>
+	</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-  		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>hibernate_classes</artifactId>
-			<version>0.1</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-   			<groupId>org.societies</groupId>
-   			<artifactId>common-ext-libs</artifactId>
-   			<version>0.1</version>
-   			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.transaction</artifactId>
-			<scope>provided</scope>
-        </dependency>
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>com.springsource.javax.transaction</artifactId>
-			<version>1.1.0</version>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-        <dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.orm</artifactId>
-		</dependency>
-        <dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.jdbc</artifactId>
+
+	
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.asm</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.expression</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.aop</artifactId>
-		</dependency>
-		<dependency>
-    		<groupId>org.aopalliance</groupId>
-    		<artifactId>com.springsource.org.aopalliance</artifactId>
-    		<version>1.0.0</version>
-    		<scope>provided</scope>
-		</dependency>
-		<dependency>
-    		<groupId>org.slf4j</groupId>
-    		<artifactId>slf4j-simple</artifactId>
-    		<version>${slf4j.version}</version>
-    		<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.beans</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-			<version>4.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>org.springframework.osgi.core</artifactId>
-			<version>1.2.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-        	<groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.test</artifactId>
 			<version>3.0.5.RELEASE</version>
@@ -121,16 +70,21 @@
 			<groupId>org.apache.derby</groupId>
 			<artifactId>com.springsource.org.apache.derby</artifactId>
 			<version>10.5.1000001.764942</version>
-			<scope>test</scope> 
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>com.springsource.javax.transaction</artifactId>
+			<version>1.1.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
-	
+
 	<!-- Build Settings -->
 	<build>
 		<plugins>
@@ -145,8 +99,8 @@
 						</Export-Package>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package> 
-					</instructions> 
+						<Import-Package>*;resolution:=optional</Import-Package>
+					</instructions>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -173,13 +127,13 @@
 				<artifactId>maven-clean-plugin</artifactId>
 				<configuration>
 					<filesets>
-						<fileset> 
+						<fileset>
 							<!-- created after mvn test using the Derby DBMS -->
 							<directory>trustdb</directory>
 						</fileset>
 						<fileset>
 							<directory>.</directory>
-							<includes> 
+							<includes>
 								<!-- created after mvn test using the Derby DBMS -->
 								<include>derby.log</include>
 							</includes>
@@ -187,21 +141,21 @@
 					</filesets>
 				</configuration>
 			</plugin>
-		</plugins> 	
+		</plugins>
 	</build>
-	
+
 	<!-- More Project Information -->
 	<name>Trust Management and Evaluation</name>
 	<description>
     	Trust Management and Evaluation component
     </description>
-    <developers>
-    	<developer>
-    		<id>NicolasLiampotis</id>
+	<developers>
+		<developer>
+			<id>NicolasLiampotis</id>
 			<name>Nicolas Liampotis</name>
 			<email>nicolas.liampotis@cn.ntua.gr</email>
 			<organization>ICCS</organization>
-      		<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
 				<role>owner</role>
 				<role>developer</role>

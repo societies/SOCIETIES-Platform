@@ -50,7 +50,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>version-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	
 	<modules>

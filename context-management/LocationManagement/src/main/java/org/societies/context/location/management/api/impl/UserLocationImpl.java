@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.societies.context.location.management.api.ICoordinate;
+import org.societies.context.location.management.api.ITag;
 import org.societies.context.location.management.api.IUserLocation;
 import org.societies.context.location.management.api.IZone;
 
@@ -85,5 +86,36 @@ public class UserLocationImpl implements IUserLocation{
 	@Override
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	@Override
+	public String toString(){
+		String str = "";
+		
+		str += "x= "+this.getXCoordinate().getCoordinate() + "  y= "+this.getYCoordinate().getCoordinate() +" zones = [";
+		int count = 0;
+		for (IZone zone: this.getZones()){
+			str+= zone.getId().getId()+",name="+zone.getName()+",type="+zone.getType()+", Personal Tag="+zone.getPersonalTag().getTag();
+			str+= ", Tags=[";
+			
+			int count2=0;
+			for (ITag tag: zone.getTags()){
+				str+= tag.getTag();
+				
+				count2++;
+				if (count2 != zone.getTags().size()){
+					str+= ",";
+				}
+			}
+			str+= "]";
+			
+			count ++;
+			if (count != this.getZones().size()){
+				str+= " ;\t";
+			}
+		}
+		str+= "]";
+		
+		return str;
 	}
 }

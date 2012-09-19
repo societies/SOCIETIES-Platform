@@ -61,10 +61,11 @@ var Societies3PServices = {
 
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#localapp-item?pos=' + i + '"><img src="' + data[i].icon + '" class="profile_list" alt="logo" >' +
+				//var tableEntry = '<li><a href="#localapp-item?pos=' + i + '"><img src="' + data[i].icon + '" class="profile_list" alt="logo" >' +
+				var tableEntry = '<li><a href="#" data-rel="dialog" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">' +
 									'<h2>' + data[i].applicationName + '</h2>' + 
-									'<p>' + data[i].packageName+ '</p></a>' +  
-									'<a href="#" data-rel="dialog" data-transition="fade" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">Launch</a>' +
+									'<p>' + data[i].packageName + '</p></a>' +  
+									//'<a href="#" data-rel="dialog" data-transition="fade" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">Launch</a>' +
 									'</li>';
 				jQuery('ul#LocalServicesDiv').append(tableEntry);
 			}
@@ -79,9 +80,26 @@ var Societies3PServices = {
 	},
 	
 	startActivity: function (appName, packageName) {
+		function success(data) {			
+			window.alert("started");
+		}
+		
+		function failure(data) {
+			alert("failed");
+		}
+		
 		if(window.confirm("Launch " + appName + "?"))
-			//LaunchApp(packageName);
-			return null;
+			window.plugins.SocietiesCoreServiceMonitor.startActivity(packageName, success, failure);
+	},
+	
+	startStopService: function () {
+		Societies3PServices.startStopService();
+		$('#service_status').html( status );
+		//BUTTON TEXT
+		if (status == "started")
+			$('#start_stop').value="Stop";
+		else
+			$('#start_stop').value="Start";
 	},
 	
 	showDetails: function (servicePos) {
@@ -91,16 +109,24 @@ var Societies3PServices = {
 			//VALID SERVICE OBJECT
 			var markup = "<h1>" + serviceObj.serviceName + "</h1>" + 
 						 "<p>" + serviceObj.serviceDescription + "</p>" +
-						 "<p>" + serviceObj.serviceInstance.serviceImpl.serviceProvider + "</p>" + 
-						 "<p>" + serviceObj.serviceStatus + "</p>";
+						 "<p>" + serviceObj.serviceInstance.serviceImpl.serviceProvider + "</p><br />"; 
 			//INJECT
 			$('#app_detail').html( markup );
+			//SERVICE STATUS
+			var status = serviceObj.serviceStatus;
+			$('#service_status').html( status );
+			//BUTTON TEXT
+			if (status == "started")
+				$('#start_stop').value="Stop";
+			else
+				$('#start_stop').value="Start";
+						
 			try {//REFRESH FORMATTING
 				//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
 				$('ul#app_details').listview('refresh');
 			}
 			catch(err) {}
-			$.mobile.changePage("my_apps_details.html");
+			$.mobile.changePage($("#my_apps_details"), { transition: "fade"} );
 		}
 	}
 };
@@ -114,6 +140,11 @@ var Societies3PServices = {
 $(document).bind('pageinit',function(){
 
 	console.log("pageinit: Active Services jQuery calls");
+	
+	$("input#start_stop").off('click').on('click', function(e){
+		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
+	});
+	
 	
 	//Listen for any attempts to call changePage().
 	/*
