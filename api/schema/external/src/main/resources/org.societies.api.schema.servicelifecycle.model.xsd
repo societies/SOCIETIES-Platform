@@ -50,6 +50,7 @@
       <xs:element name="fullJid" type="xs:string" minOccurs="0"/>
       <xs:element name="cssJid" type="xs:string" minOccurs="0"/>
       <xs:element name="parentJid" type="xs:string" minOccurs="0"/>
+	  <xs:element name="parentIdentifier" type="tns:serviceResourceIdentifier" minOccurs="0"/>  
       <xs:element name="serviceImpl" type="tns:serviceImplementation" minOccurs="0"/>
       <xs:element name="XMPPNode" type="xs:string" minOccurs="0"/>
     </xs:sequence>
@@ -60,7 +61,7 @@
       <xs:element name="serviceNameSpace" type="xs:string" minOccurs="0"/>
       <xs:element name="serviceProvider" type="xs:string" minOccurs="0"/>
       <xs:element name="serviceVersion" type="xs:string" minOccurs="0"/>
-      <xs:element name="serviceClient" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="serviceClient" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 

@@ -61,7 +61,7 @@ public class SocialProvider extends ContentProvider{
 
     //The method addURI() maps an authority and path to an integer value.
     //The method match() returns the integer value for a URI.
-    // Later on in methods called from a Content Resolver, a switch statement 
+    // Later on in methods called from a ContentResolver, a switch statement 
     // chooses between the different legal queries.
     static{
     	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
@@ -137,8 +137,8 @@ public class SocialProvider extends ContentProvider{
 	
 		//Switch on the name of the path used in the query:
 		Uri returnUri = null;
-		
-		switch (sUriMatcher.match(_uri)){
+		int index = sUriMatcher.match(_uri);
+		switch (index){
 		case SocialContract.UriMatcherIndex.ME:
 			
 			//TODO: For all these, need to check for missing values in _values and add them.

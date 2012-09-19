@@ -29,7 +29,7 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Embeddable;
 @Embeddable
-public class ServiceResourceIdentiferDAO implements Serializable {
+public class ServiceResourceIdentifierDAO implements Serializable {
 	/**
 	 * 
 	 */
@@ -39,11 +39,11 @@ public class ServiceResourceIdentiferDAO implements Serializable {
 	@Basic
 	private String instanceId;
 
-	public ServiceResourceIdentiferDAO() {
+	public ServiceResourceIdentifierDAO() {
 		
 	}
 
-	public ServiceResourceIdentiferDAO(String identifier, String instanceIdentifier) {
+	public ServiceResourceIdentifierDAO(String identifier, String instanceIdentifier) {
 		super();
 		this.identifier = identifier;
 		this.instanceId=instanceIdentifier;
@@ -66,8 +66,8 @@ public class ServiceResourceIdentiferDAO implements Serializable {
 	}
 	
 	public boolean equals(Object object){
-		if (object instanceof ServiceResourceIdentiferDAO) {
-			ServiceResourceIdentiferDAO serviceIdentifier = (ServiceResourceIdentiferDAO)object;
+		if (object instanceof ServiceResourceIdentifierDAO) {
+			ServiceResourceIdentifierDAO serviceIdentifier = (ServiceResourceIdentifierDAO)object;
             return this.identifier.equals(serviceIdentifier.getIdentifier()) && this.instanceId.equals(serviceIdentifier.getInstanceId()) ;
         } else {
             return false;
