@@ -152,7 +152,6 @@ public class ExternalCtxBrokerExample 	{
 		ca3pService.retrieveIndividualEntityId();
 		ca3pService.createCtxEntityWithCtxAttributes();
 		
-		//access control is not working for entities yet
 		ca3pService.retrieveCtxAttributeBasedOnEntity();
 
 		ca3pService.lookupAndRetrieveCtxAttributes();

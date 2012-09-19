@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
 
 /**
  * The callback object for the Negotiation procedure
@@ -39,7 +40,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiationCallback
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public class ServiceNegotiationCallback implements INegotiationCallback {
+public class ServiceNegotiationCallback implements INegotiationCallback, INegotiationProviderSLMCallback {
 
 	static final Logger logger = LoggerFactory.getLogger(ServiceNegotiationCallback.class);
 
@@ -114,7 +115,7 @@ public class ServiceNegotiationCallback implements INegotiationCallback {
 		}
 	}
 
-	protected class ServiceNegotiationResult{
+	public class ServiceNegotiationResult{
 		
 		boolean success;
 		URI serviceUri;
@@ -152,5 +153,17 @@ public class ServiceNegotiationCallback implements INegotiationCallback {
 			return agreementKey;
 		}
 		
+	}
+
+	@Override
+	public void notifySuccess() {
+		if(logger.isDebugEnabled())
+			logger.debug("Registering Service on Policy Negotiator successfull.");
+	}
+
+
+	@Override
+	public void notifyError(String msg, Throwable e) {
+		logger.warn("Registering Service on Policy Negotiator error: " + msg);
 	}
 }

@@ -48,6 +48,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
@@ -240,19 +241,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			servImpl.setServiceNameSpace(serBndl.getSymbolicName());
 		
 		servImpl.setServiceProvider((String) event.getServiceReference().getProperty("ServiceProvider"));
-		try {
-			String serviceClient = (String) event.getServiceReference().getProperty("ServiceClient");
-			if(serviceClient != null){
-				if(log.isDebugEnabled()) log.debug("There's a service client!");
-				servImpl.setServiceClient(new URI(serviceClient));
-			} else
-			{
-				servImpl.setServiceClient(null);
-			}
-		} catch (URISyntaxException e1) {
-			log.warn("Problem with service client!");
-			e1.printStackTrace();
-		}
+		servImpl.setServiceClient((String) event.getServiceReference().getProperty("ServiceClient"));
 		
 		si.setServiceImpl(servImpl);
 		service.setServiceInstance(si);
@@ -289,6 +278,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifier(service, serBndl));
 		else
 			service.setServiceIdentifier(ServiceModelUtils.generateServiceResourceIdentifierForDevice(service, deviceId));
+		
+		si.setParentIdentifier(service.getServiceIdentifier());
+		service.setServiceInstance(si);
 		
 		List<Service> serviceList = new ArrayList<Service>();
 		switch (event.getType()) {
@@ -331,7 +323,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Adding the shared service to the policy provider!");
 						String slaXml = null;
-						URI clientJar = service.getServiceInstance().getServiceImpl().getServiceClient();
+						URI clientJar = new URI(service.getServiceInstance().getServiceImpl().getServiceClient());
 						URI clientHost;
 						if(clientJar.getPort()!= -1)
 							clientHost = new URI("http://" + clientJar.getHost() +":"+ clientJar.getPort());
@@ -340,10 +332,12 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 						if(log.isDebugEnabled())
 							log.debug("With the path: " + clientJar.getPath() + " on host " + clientHost);
-						//getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath());
+						INegotiationProviderSLMCallback callback = new ServiceNegotiationCallback();
+						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
+						//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());
 						
 						if(log.isDebugEnabled())
-							log.debug("Adding privacy policy to the Policy Manager!");
+							log.debug("Adding privacy policy to the Privacy Manager!");
 						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
 						
 						int index = privacyLocation.indexOf('@');	

@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.RequestorBean;
@@ -55,7 +56,7 @@ public interface IPrivacyDataManager {
 	 * @return A ResponseItem with permission information in it
 	 * @throws PrivacyException
 	 */
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, AAction[] actions) throws PrivacyException;
 
 	/**
 	 * Protect a data following the user preferences by obfuscating it to a correct

@@ -31,6 +31,7 @@ import org.societies.android.api.identity.DataIdentifierFactory;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ActionConstants;
@@ -54,6 +55,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
@@ -153,11 +155,11 @@ public class PrivacyDataManagerActivity extends Activity {
 			try {
 				RequestorBean requestor = new RequestorBean();
 	    		requestor.setRequestorId("red@societies.local");
-	    		DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"/me@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
-	    		List<Action> actions = new ArrayList<Action>();
-	    		Action action = new Action();
+	    		DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+	    		AAction[] actions = new AAction[1];
+	    		AAction action = new AAction();
 	    		action.setActionConstant(ActionConstants.READ);
-	    		actions.add(action);
+	    		actions[0] = action;
 				ResponseItem permission = targetIPService.checkPermission(requestor, dataId, actions);
 				StringBuffer sb = new StringBuffer();
 				sb.append("Permission retrieved: "+(null !=permission));
@@ -201,14 +203,14 @@ public class PrivacyDataManagerActivity extends Activity {
     		Bundle outBundle = new Bundle();
     		RequestorBean requestor = new RequestorBean();
     		requestor.setRequestorId("red@societies.local");
-    		String ownerId = "me@societies.local";
-    		String dataId = "me@societies.local/ENTITY/person/1/ATTRIBUTE/name/13";
-    		Action action = new Action();
+    		DataIdentifier dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://red@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+    		Parcelable[] actions = new AAction[1];
+    		AAction action = new AAction();
     		action.setActionConstant(ActionConstants.READ);
+    		actions[0] = action;
     		outBundle.putSerializable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), requestor);
-    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), ownerId);
-    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), dataId);
-    		outBundle.putSerializable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), action);
+    		outBundle.putSerializable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), dataId);
+    		outBundle.putParcelableArray(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), actions);
     		outMessage.setData(outBundle);
     		// Call the out process method
     		try {

@@ -28,25 +28,21 @@ import android.net.Uri;
 
 
 /**
- * Content provider contract file for CIS manager light.
+ * Provides constants for using SocialProvider. Please read 
+ * information about content providers in Android in order to 
+ * learn how to use this contract. Note that this contract is 
+ * currently the only documentation of {@link SocialProvider} on
+ * Android. All the functionality of CIS manager is currently being 
+ * provided using this contract.
  * 
- *
  * @author Babak dot Farshchian at sintef dot no
  *
  */
 public final class SocialContract {
 
-    /**
-     * Provides constants for managing CIS-related queries. Please read 
-     * information about content providers in Android in order to 
-     * learn how to use this contract. Note that this contract is 
-     * currently the only documentation of {@link SocialProvider} on
-     * Android. All the functionality of CIS manager is currently being 
-     * provided using this contract. 
-     * 
-     * @author Babak dot Farshchian at sintef dot no
-     *
-     */
+	/**
+	 * The base URI used when calling SocialProvider:
+	 */
 	private static final String AUTHORITY_STRING = "content://org.societies.android.SocialProvider";
 	//The main authority, i.e. the base URI for all operations:
     public static final Uri AUTHORITY = 
@@ -57,8 +53,45 @@ public final class SocialContract {
     
     
     /**
+	 * A utility class defining constants for the different 
+	 * paths in the content provider URIs.
+	 * 
+	 * When you are calling content provider methods, use AUTHORITY_STRING
+	 * plus one of the paths in this class so your code is protected
+	 * against errors in paths and URIs, e.g.:
+	 * 
+	 *  query(SocialContract.AUTHORITY_STRING+SocialContract.UriPathIndex.ME,...)
+	 * 
+	 * @author Babak dot Farshchian at sintef dot no
+	 *
+	 */
+	public static final class UriPathIndex{
+		public static final String ME = "/me";
+		public static final String ME_SHARP = "/me/#";
+		public static final String PEOPLE = "/people";
+		public static final String PEOPLE_SHARP = "/people/#";
+		public static final String COMMINITIES = "/communities";
+		public static final String COMMINITIES_SHARP = "/communities/#";
+		public static final String SERVICES = "/services";
+		public static final String SERVICES_SHARP = "/services/#";
+		public static final String RELATIONSHIP = "/relationship";
+		public static final String RELATIONSHIP_SHARP = "/relationship/#";
+		public static final String MEMBERSHIP = "/membership";
+		public static final String MEMBERSHIP_SHARP = "/membership/#";
+		public static final String SHARING = "/sharing";
+		public static final String SHARING_SHARP = "/sharing/#";
+		public static final String PEOPLE_ACTIVITIY = "/people/activity";
+		public static final String PEOPLE_ACTIVITIY_SHARP = "/people/activity/#";
+		public static final String COMMUNITY_ACTIVITIY = "/communities/activity";
+		public static final String COMMUNITY_ACTIVITIY_SHARP = "/communities/activity/#";
+		public static final String SERVICE_ACTIVITY = "/services/activity";
+		public static final String SERVICE_ACTIVITY_SHARP = "/services/activity/#";
+	
+	}
+
+	/**
      * This is the URI you will use for accessing information about people.
-     * Every CSS/person which is accessible from this {@linkSocialProvider}
+     * Every CSS/person which is accessible from this {@link SocialProvider}
      * has an entry in this table. You can search for people using 
      * GLOBAL_ID. You can find information about:
      * 
@@ -69,14 +102,17 @@ public final class SocialContract {
      * more information. Depending on where the information is fetched from.
      * 
      * The information stored about people will in future versions correspond
-     * to what you typically find in social sites such as Facebook. 
+     * to what you typically find in social sites such as Facebook.
+     * 
+     * Note: CREATION_DATE, LAST_MODIFIED_DATE, and SYNC_STATUS are set by
+     * SocialProvider. 
      * 
      * @author Babak dot Farshchian at sintef dot no
      *
      */
     public static final class People {
         public static final Uri CONTENT_URI = 
-                    Uri.parse(AUTHORITY_STRING+"/people");
+                    Uri.parse(AUTHORITY_STRING+ UriPathIndex.PEOPLE);
         /**
          *  Key local ID, used by content provider to denote the location of this
          *  person in the table. Row number.
@@ -141,9 +177,12 @@ public final class SocialContract {
          * Use this Uri when calling queries on the content 
          * provider with the intention of working with community
          * data.
+         * 
+         * Note: CREATION_DATE, LAST_MODIFIED_DATE, and SYNC_STATUS are set by
+         * SocialProvider. 
          */
         public static final Uri CONTENT_URI = 
-                    Uri.parse(AUTHORITY_STRING+"/communities");
+                    Uri.parse(AUTHORITY_STRING+ UriPathIndex.COMMINITIES);
         /**
          * Key local ID. Used by content provider as an index to the DB
          * table.
@@ -199,6 +238,9 @@ public final class SocialContract {
      * gives you information about services that are in the market
      * place, installed on your device, or that belong to you.
      * 
+     * Note: CREATION_DATE, LAST_MODIFIED_DATE, and SYNC_STATUS 
+     * are set by SocialProvider. 
+
      * @author Babak dot Farshchian at sintef dot no
      *
      */
@@ -207,14 +249,14 @@ public final class SocialContract {
          * Use this Uri to search in the content provider.
          */
         public static final Uri CONTENT_URI = 
-                Uri.parse(AUTHORITY_STRING+"/services");
+                Uri.parse(AUTHORITY_STRING+ UriPathIndex.SERVICES);
         /**
          * Key local ID used by content provider. Index to the
          *  table holding service info.
          */
         public static final String _ID = "_id";
         /**
-         *  Global ID for the service. E.g. URL in an app store.
+         *  Global ID for the service. E.g. packagename+appname in Android.
          */
         public static final String GLOBAL_ID = "global_id";
         /**
@@ -274,6 +316,11 @@ public final class SocialContract {
          * using Androdi intent mechanism.
          */
         public static final String CONFIG = "config";
+        
+        /**
+         * A URL to the code to be downloaded or to a web service interface.
+         */
+        public static final String URL = "url";
     }
     
     /**
@@ -286,7 +333,7 @@ public final class SocialContract {
      */
     public static final class Relationship {
         public static final Uri CONTENT_URI = 
-                Uri.parse(AUTHORITY_STRING +"/people/relationship");
+                Uri.parse(AUTHORITY_STRING + UriPathIndex.RELATIONSHIP);
 
         /**
          * Key local ID. Needed for using cursors in Android. Note that _id is
@@ -326,7 +373,7 @@ public final class SocialContract {
      */
     public static final class Membership {
         public static final Uri CONTENT_URI = 
-                Uri.parse(AUTHORITY_STRING +"/communities/membership");
+                Uri.parse(AUTHORITY_STRING + UriPathIndex.MEMBERSHIP);
 
         /**
          * Key local ID for this membership. Needed for using 
@@ -367,7 +414,7 @@ public final class SocialContract {
      */
     public static final class Sharing {
         public static final Uri CONTENT_URI = 
-                Uri.parse(AUTHORITY_STRING +"/services/sharing");
+                Uri.parse(AUTHORITY_STRING + UriPathIndex.SHARING);
 
         /**
          * Key local ID for this sharing. Needed for using 
@@ -413,11 +460,13 @@ public final class SocialContract {
      */
     public static final class PeopleActivity{
 	    public static final Uri CONTENT_URI = 
-	            Uri.parse(AUTHORITY_STRING +"/people/activity");
+	            Uri.parse(AUTHORITY_STRING + UriPathIndex.PEOPLE_ACTIVITIY);
         /**
          * Key local ID for the activity. Needed for using 
          * content providers in Android. Note that _id is
          * unique only locally on this device.
+         * 
+         * Note: CREATION_DATE, and SYNC_STATUS are set by SocialProvider.
          */
         public static final String _ID = "_id"; 
         /**
@@ -475,11 +524,13 @@ public final class SocialContract {
      */
     public static final class CommunityActivity{
 	    public static final Uri CONTENT_URI = 
-	            Uri.parse(AUTHORITY_STRING +"/communities/activity");
+	            Uri.parse(AUTHORITY_STRING + UriPathIndex.COMMUNITY_ACTIVITIY);
         /**
          * Key local ID for the activity. Needed for using 
          * content providers in Android. Note that _id is
          * unique only locally on this device.
+         * 
+         * Note: CREATION_DATE, and SYNC_STATUS are set by SocialProvider.
          */
         public static final String _ID = "_id"; 
         /**
@@ -534,11 +585,13 @@ public final class SocialContract {
      */
     public static final class ServiceActivity{
 	    public static final Uri CONTENT_URI = 
-	            Uri.parse(AUTHORITY_STRING +"/services/activity");
+	            Uri.parse(AUTHORITY_STRING + UriPathIndex.SERVICE_ACTIVITY);
         /**
          * Key local ID for the activity. Needed for using 
          * content providers in Android. Note that _id is
          * unique only locally on this device.
+         * 
+         * Note: CREATION_DATE, and SYNC_STATUS are set by SocialProvider.
          */
         public static final String _ID = "_id"; 
         /**
@@ -587,14 +640,14 @@ public final class SocialContract {
 	 * Class that provides information about the owner of 
 	 * the current device. This is mainly information that will
 	 * be extracted from CSS Manager Light. Note that you can have 
-	 * as many CSS IDs as you wish. 
+	 * as many CSS IDs as you wish.
 	 * 
 	 * @author Babak dot Farshchian at sintef dot no
 	 *
 	 */
 	public static final class Me {
 	    public static final Uri CONTENT_URI = 
-	            Uri.parse(AUTHORITY_STRING +"/me");
+	            Uri.parse(AUTHORITY_STRING + UriPathIndex.ME);
 	
 	    /**
 	     * Key local ID. Needed for using cursors in Android. Note that _id is
@@ -621,8 +674,45 @@ public final class SocialContract {
 	     *  Possible password to be used with user name
 	     */
 	    public static final String PASSWORD = "password";
+	    
+	    /**
+	     * Name of the service this ID was created at. E.g. it might be 
+	     * a Facebook ID or a SOCIETIES ID. 
+	     */
+	    public static final String ORIGIN = "origin";
 	}
 
+	
+	/**
+	 * A utility class defining constants for UriMatcher in the 
+	 * content provider and for using in case/switch sentences.
+	 * @author Babak dot Farshchian at sintef dot no
+	 *
+	 */
+	public static final class UriMatcherIndex{
+		public static final int ME = 1;
+		public static final int ME_SHARP = 2;
+		public static final int PEOPLE = 3;
+		public static final int PEOPLE_SHARP = 4;
+		public static final int COMMUNITIES = 5;
+		public static final int COMMUNITIES_SHARP = 6;
+		public static final int SERVICES = 7;
+		public static final int SERVICES_SHARP = 8;
+		public static final int RELATIONSHIP = 9;
+		public static final int RELATIONSHIP_SHARP = 10;
+		public static final int MEMBERSHIP = 11;
+		public static final int MEMBERSHIP_SHARP = 12;
+		public static final int SHARING = 13;
+		public static final int SHARING_SHARP = 14;
+		public static final int PEOPLE_ACTIVITY = 15;
+		public static final int PEOPLE_ACTIVITY_SHARP = 16;
+		public static final int COMMUNITY_ACTIVITIY = 17;
+		public static final int COMMUNITY_ACTIVITIY_SHARP = 18;
+		public static final int SERVICE_ACTIVITY = 19;
+		public static final int SERVICE_ACTIVITY_SHARP = 20;
+
+	}
+	
 	/**
      * Class that defines a pointer (record) to a CIS that I own or am member of.
      * The CIS itself can be retrieved from Community using GLOBAL_ID that

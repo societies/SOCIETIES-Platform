@@ -25,6 +25,7 @@
 package org.societies.android.privacytrust.datamanagement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
@@ -36,6 +37,7 @@ import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Sta
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.Temperature;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.android.privacytrust.api.IPrivacyDataManagerInternal;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.LocationCoordinatesObfuscator;
 import org.societies.android.privacytrust.dataobfuscation.obfuscator.NameObfuscator;
@@ -73,7 +75,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	}
 
 
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, AAction[] actions) throws PrivacyException {
 		// -- Verify parameters
 		if (null == requestor) {
 			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");
@@ -96,7 +98,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		requestItemNull.setOptional(false);
 
 		// -- Retrieve a stored permission
-		permission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
+		List actionsList = Arrays.asList(actions);
+		permission = privacyDataManagerInternal.getPermission(requestor, dataId, actionsList);
 
 		// -- Permission not available: remote call
 		if (null == permission) {

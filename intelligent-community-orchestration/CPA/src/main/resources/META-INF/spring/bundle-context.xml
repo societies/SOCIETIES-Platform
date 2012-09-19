@@ -72,15 +72,10 @@
        for integration testing outside of an OSGi environment -->
     <context:annotation-config />
     <tx:annotation-driven />
-   <bean id="CPA" class="org.societies.orchestration.cpa.impl.CPA" 
+   <bean id="CPA" class="org.societies.orchestration.cpa.impl.CPAManager" depends-on="ISuggestedCommunityAnalyser,CISDataCollector"
    init-method="init">
-   <!-- depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, IIdentity, ICommManager"  -->
-<!--    <property name="linkedCss" ref="IIdentity"></property> -->
-<!--    <property name="egocentricCreationManager" ref="EgocentricCommunityCreationManager"></property> -->
-<!--    <property name="egocentricConfigurationManager" ref="EgocentricCommunityConfigurationManager"></property> -->
-<!--    <property name="egocentricDeletionManager" ref="EgocentricCommunityDeletionManager"></property> -->
-<!--    <property name="commManager" ref="ICommManager"></property> -->
-<!--    <property name="deviceManager" ref="IDeviceManager"></property> -->
+       <property name="collector" ref="cisDataCollector" />
+       <property name="eventMgr" ref="eventMgr"/>
    </bean>
    
    <bean id="CPACreationPatterns" class="org.societies.orchestration.cpa.impl.CPACreationPatterns" 

@@ -43,6 +43,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
@@ -71,7 +72,7 @@ import android.util.Log;
 public class ServiceManagement extends Service implements IServiceDiscovery, IServiceUtilities {// , IServiceControl {
 
 	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("serviceDiscoveryMsgBean", "serviceDiscoveryResultBean");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("serviceDiscoveryMsgBean", "serviceDiscoveryResultBean", "serviceControlMsgBean", "ServiceControlResultBean");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/servicelifecycle/servicediscovery",
 															  	  "http://societies.org/api/schema/servicelifecycle/servicecontrol",
 															  	  "http://societies.org/api/schema/servicelifecycle/model");
@@ -87,7 +88,10 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 	public static final String GET_MY_SERVICES     = "org.societies.android.platform.servicediscovery.GET_MY_SERVICES";
 	public static final String SEARCH_SERVICES = "org.societies.android.platform.servicediscovery.SEARCH_SERVICES";
 	public static final String GET_MY_SERVICE_ID = "org.societies.android.platform.servicemanagement.GET_MY_SERVICE_ID";
-	
+	//SERVICE CONTROL INTENTS
+	public static final String START_VIRGO_SERVICE = "org.societies.android.platform.servicediscovery.START_VIRGO_SERVICE";
+	public static final String STOP_VIRGO_SERVICE = "org.societies.android.platform.servicediscovery.STOP_VIRGO_SERVICE";
+		
     private static final String LOG_TAG = ServiceManagement.class.getName();
     private IBinder binder = null;
     
@@ -225,7 +229,6 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 	}
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IServiceControl >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	
 	public ServiceControlResult installService(String client, URL arg1, String identity) {
 		return null;
 	}
@@ -235,11 +238,49 @@ public class ServiceManagement extends Service implements IServiceDiscovery, ISe
 	}
 
 	public ServiceControlResult startService(String client, AServiceResourceIdentifier sri, String identity) {
-		return null;
+		Log.d(LOG_TAG, "getMyServices called by client: " + client);
+		
+		//MESSAGE BEAN
+		ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
+		messageBean.setMethod(org.societies.api.schema.servicelifecycle.servicecontrol.MethodType.START_SERVICE);
+		messageBean.setServiceId(sri);
+
+		//COMMS STUFF
+		ICommCallback discoCallback = new ServiceLifecycleCallback(client, START_VIRGO_SERVICE); 
+		IIdentity toID = commMgr.getIdManager().getCloudNode();
+		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
+		Stanza stanza = new Stanza(toID);
+        try {
+        	commMgr.register(ELEMENT_NAMES, discoCallback);
+        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+			Log.d(LOG_TAG, "Sending stanza");
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+        }
+        return null;
 	}
 
 	public ServiceControlResult stopService(String client, AServiceResourceIdentifier sri, String identity) {
-		return null;
+		Log.d(LOG_TAG, "getMyServices called by client: " + client);
+		
+		//MESSAGE BEAN
+		ServiceControlMsgBean messageBean = new ServiceControlMsgBean();
+		messageBean.setMethod(org.societies.api.schema.servicelifecycle.servicecontrol.MethodType.STOP_SERVICE);
+		messageBean.setServiceId(sri);
+
+		//COMMS STUFF
+		ICommCallback discoCallback = new ServiceLifecycleCallback(client, STOP_VIRGO_SERVICE); 
+		IIdentity toID = commMgr.getIdManager().getCloudNode();
+		Log.e(LOG_TAG, ">>>>>>>>>>>>>>Cloud Node: " + toID.getJid());
+		Stanza stanza = new Stanza(toID);
+        try {
+        	commMgr.register(ELEMENT_NAMES, discoCallback);
+        	commMgr.sendIQ(stanza, IQ.Type.GET, messageBean, discoCallback);
+			Log.d(LOG_TAG, "Sending stanza");
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
+        }
+        return null;
 	}
 
 	public ServiceControlResult unshareService(String client, org.societies.api.schema.servicelifecycle.model.Service arg1, String identity) {

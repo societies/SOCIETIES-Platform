@@ -7,4 +7,5 @@
     <string name="title_activity_main">Preferences</string>
 	<string name="edit_message">Edit your message</string>
 	<string name="button_Send">Send</string>
+	<string name="display_message">Display message</string>
 </resources>

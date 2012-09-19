@@ -19,6 +19,7 @@
         </activity>
         <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerExternalService" />
         <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" />
+        <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
     </application>
 
 </manifest>

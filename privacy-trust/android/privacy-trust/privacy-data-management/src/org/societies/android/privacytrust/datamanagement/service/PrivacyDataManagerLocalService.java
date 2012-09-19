@@ -29,6 +29,7 @@ import java.util.List;
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
@@ -69,7 +70,7 @@ public class PrivacyDataManagerLocalService extends Service implements IPrivacyD
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions)
+	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, AAction[] actions)
 			throws PrivacyException {
 		Log.d(TAG, "Local call to service checkPermission()");
 		return privacyDataManager.checkPermission(requestor, dataId, actions);

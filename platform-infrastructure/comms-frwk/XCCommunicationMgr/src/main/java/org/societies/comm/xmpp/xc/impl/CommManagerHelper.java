@@ -326,7 +326,7 @@ public class CommManagerHelper {
 			StanzaError se = StanzaError.valueOf(errorElementStr.replaceAll("-", "_")); //TODO valueOf() parses the name, not value
 			XMPPError error = new XMPPError(se, null);
 			if (errorElement.elements().size()>1)
-				error = parseApplicationError(se, (Element)errorElement.elements());
+				error = parseApplicationError(se, errorElement.elements());
 			LOG.info("XMPPError:"+error.getStanzaErrorString());
 			callback.receiveError(TinderUtils.stanzaFromPacket(iq),error);
 		} catch (UnavailableException e) {
@@ -338,25 +338,34 @@ public class CommManagerHelper {
 		}
 	}
 
-	private XMPPError parseApplicationError(StanzaError error, Element errorElement) throws UnavailableException, ClassNotFoundException {
-		Element e = (Element) errorElement.elements().get(1); // TODO assume that has text OR application error (not both)
-		if (e.getNamespaceURI().equals(XMPPError.STANZA_ERROR_NAMESPACE_DECL) && e.getName().equals("text")) { // TODO this better
-			return new XMPPError(error, e.getText());
-		} else {
-			//GET CLASS TO BE SERIALISED
-			String packageStr = getPackage(e.getNamespaceURI());  
-			String beanName = e.getName().substring(0,1).toUpperCase() + e.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
-			Class<?> c = Class.forName(packageStr + "." + beanName);
-			
-			Object appError;
-			try {
-				appError = s.read(c, e.asXML());
-			} catch (Exception e1) {
-				throw new UnavailableException(e1.getMessage());
+	private XMPPError parseApplicationError(StanzaError error, List list) throws UnavailableException, ClassNotFoundException {
+		Object appError = null;
+		String text = "";
+		
+		for (Object o: list) {
+			if (o instanceof Element) {
+				Element e = (Element) o;
+				if (e.getNamespaceURI().equals(XMPPError.STANZA_ERROR_NAMESPACE_DECL) && e.getName().equals("text")) { // TODO this better
+					text = e.getText();
+				} else {
+					//GET CLASS TO BE SERIALISED
+					String packageStr = getPackage(e.getNamespaceURI());  
+					String beanName = e.getName().substring(0,1).toUpperCase() + e.getName().substring(1); //NEEDS TO BE "CalcBean", not "calcBean"
+					Class<?> c = Class.forName(packageStr + "." + beanName);
+					
+					try {
+						appError = s.read(c, e.asXML());
+					} catch (Exception e1) {
+						throw new UnavailableException(e1.getMessage());
+					}
+				}
 			}
-			
-			return new XMPPError(error, "", appError);
 		}
+		
+		if (appError==null)
+			return new XMPPError(error, text);
+		else
+			return new XMPPError(error, text, appError);
 	}
 
 	public IQ dispatchIQ(IQ iq) {
