@@ -487,8 +487,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("This is a client-based service, we need to install it");
 					
 				Future<ServiceControlResult> asyncResult = null;
-				//URL bundleLocation = negotiationResult.getServiceUri().toURL();
-				URL bundleLocation = new URL(serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient());
+				URL bundleLocation = negotiationResult.getServiceUri().toURL();
+				//URL bundleLocation = new URL(serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient());
 
 				asyncResult = installService(bundleLocation);
 				ServiceControlResult result = asyncResult.get();
