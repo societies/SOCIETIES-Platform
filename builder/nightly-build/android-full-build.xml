@@ -93,6 +93,7 @@
 
 		<!-- Privacy and Trust -->
 		<module>../../privacy-trust/android/privacy-trust/privacy-data-management/</module>
+		<module>../../privacy-trust/android/privacy-trust/trust</module>
 
 	</modules>
 </project>
