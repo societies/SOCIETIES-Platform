@@ -25,6 +25,7 @@
 package org.societies.android.platform.test;
 
 import org.societies.android.api.cis.SocialContract;
+import org.societies.android.api.cis.SocialContract.UriPathIndex;
 import org.societies.android.platform.SocialProvider;
 
 import android.content.ContentValues;
@@ -101,7 +102,7 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		initialValues.put(SocialContract.Communities.TYPE , "sports");
 		
 		//2- Call insert in SocialProvider to initiate insertion
-		Uri newCommunityUri= resolver.insert(SocialContract.Communities.CONTENT_URI , 
+		Uri newCommunityUri= resolver.insert(SocialContract.AUTHORITY_STRING+ UriPathIndex.COMMINITIES , 
 				initialValues);
 		
 		//3- Get the newly inserted CIS from SocialProvider.

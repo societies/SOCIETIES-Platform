@@ -28,12 +28,16 @@ import android.net.Uri;
 
 
 /**
- * Provides constants for using SocialProvider. Please read 
- * information about content providers in Android in order to 
- * learn how to use this contract. Note that this contract is 
- * currently the only documentation of {@link SocialProvider} on
- * Android. All the functionality of CIS manager is currently being 
- * provided using this contract.
+ * Provides utility constant values for using SocialProvider. 
+ * Please read information about content providers in Android 
+ * in order to learn how to use this contract. You can start by
+ * going into this page:
+ * http://developer.android.com/guide/topics/providers/content-providers.html 
+ * 
+ * Note that this contract is currently the only documentation
+ * of {@link SocialProvider} on Android. All the functionality 
+ * of CIS manager is currently being provided based on the information
+ * in this contract.
  * 
  * @author Babak dot Farshchian at sintef dot no
  *
@@ -41,13 +45,22 @@ import android.net.Uri;
 public final class SocialContract {
 
 	/**
-	 * The base URI used when calling SocialProvider:
+	 * The base URI used when calling SocialProvider. You can use AUTHORITY_STRING
+	 * with a field in UriPathIndex in order to build a URI for your
+	 * queries to SocialProvider, e.g.:
+	 *  query(SocialContract.AUTHORITY_STRING+ UriPathIndex.ME,....) 
 	 */
-	private static final String AUTHORITY_STRING = "content://org.societies.android.SocialProvider/";
-	//The main authority, i.e. the base URI for all operations:
+	public static final String AUTHORITY_STRING = "content://org.societies.android.SocialProvider/";
+	
+    /**
+     * The main authority, i.e. the base URI for all operations:
+     */
     public static final Uri AUTHORITY = 
             Uri.parse("content://org.societies.android.SocialProvider");
-    //Constants used to define read and write permissions for social data:
+    
+    /**
+     * Constants used to define read and write permissions for social data:
+     */
     public static final String PROVIDER_READ_PERMISSION = "org.societies.android.SocialProvider.READ";
     public static final String PROVIDER_WRITE_PERMISSION = "org.societies.android.SocialProvider.WRITE";
     
@@ -60,7 +73,7 @@ public final class SocialContract {
 	 * plus one of the paths in this class so your code is protected
 	 * against errors in paths and URIs, e.g.:
 	 * 
-	 *  query(SocialContract.AUTHORITY_STRING+SocialContract.UriPathIndex.ME,...)
+	 *  query(SocialContract.AUTHORITY_STRING+ UriPathIndex.ME,....)
 	 * 
 	 * @author Babak dot Farshchian at sintef dot no
 	 *
