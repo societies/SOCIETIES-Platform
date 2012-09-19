@@ -102,56 +102,7 @@ var Societies3PServices = {
 			catch(err) {}
 			$.mobile.changePage("my_apps_details.html");
 		}
-	},
-	
-	// Load the data for a specific category, based on
-	// the URL passed in. Generate markup for the items in the
-	// category, inject it into an embedded page, and then make
-	// that page the current active page.
-	//   #category-items?category=animals
-	//<div id="category-items" data-role="page">
-	//  <div data-role="header"><h1></h1></div>
-	//  <div data-role="content"></div>
-	//</div>
-	showCategory: function( urlObj, options ) {
-		var servicePos = urlObj.hash.replace( /.*pos=/, "" ),
-			// GET SERVICE FROM ARRAY AT POSITION
-			serviceObj = mServices[ servicePos ],
-			// GET PAGE IN DOM FROM URL (before the '?')
-			pageSelector = urlObj.hash.replace( /\?.*$/, "" );
-
-		if ( serviceObj ) {
-			// Get the page we are going to dump our content into.
-			var $page = $( pageSelector ),
-
-				// SERVICE DETAILS
-				markup = "<h1>" + serviceObj.serviceName + "</h1>" + 
-						 "<p>" + serviceObj.serviceDescription + "</p>" +
-						 "<p>" + serviceObj.serviceInstance.serviceImpl.serviceProvider + "</p>" + 
-						 "<p>" + serviceObj.serviceStatus + "</p>";
-			//INJECT
-			$('#app_detail').html( markup );
-			try {//REFRESH FORMATTING
-				//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
-				$('ul#app_details').listview('refresh');
-			}
-			catch(err) {}
-			// Pages are lazily enhanced. We call page() on the page
-			// element to make sure it is always enhanced before we
-			// attempt to enhance the listview markup we just injected.
-			// Subsequent calls to page() are ignored since a page/widget
-			// can only be enhanced once.
-			//$page.page();
-
-			// Now call changePage() and tell it to switch to the page we just modified.
-			//options.
-			$.mobile.changePage( $page, options );
-			
-			$('#app_details').appendTo(".ui-page").trigger("create");
-		}
 	}
-
-
 };
 
 /**

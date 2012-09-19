@@ -40,6 +40,14 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 		super.setServiceImpl(aserviceImpl);
 	}
 	
+	public AServiceResourceIdentifier getParentIdentifier() {
+		return (AServiceResourceIdentifier)super.getParentIdentifier();
+	}
+
+	public void setParentIdentifier(AServiceResourceIdentifier aParentId) {
+		super.setParentIdentifier(aParentId);
+	}
+	
 	public AServiceInstance() {
 		super();
 	}
@@ -58,6 +66,7 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 		dest.writeString(this.getParentJid());
 		dest.writeString(this.getXMPPNode());
 		dest.writeParcelable(this.getServiceImpl(), flags);
+		dest.writeParcelable(this.getParentIdentifier(), flags);
 	}
 	
 	private AServiceInstance(Parcel in) {
@@ -67,6 +76,7 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 		this.setParentJid(in.readString());
 		this.setXMPPNode(in.readString());
 		this.setServiceImpl( (AServiceImplementation)in.readParcelable(this.getClass().getClassLoader()) );
+		this.setParentIdentifier((AServiceResourceIdentifier) in.readParcelable(this.getClass().getClassLoader()) );
 	}
 
 	public static final Parcelable.Creator<AServiceInstance> CREATOR = new Parcelable.Creator<AServiceInstance>() {
@@ -86,6 +96,7 @@ public class AServiceInstance extends ServiceInstance implements Parcelable {
 		aservIns.setParentJid(servIns.getParentJid());
 		aservIns.setXMPPNode(servIns.getXMPPNode());
 		aservIns.setServiceImpl(AServiceImplementation.convertServiceImplementation(servIns.getServiceImpl()));
+		aservIns.setParentIdentifier(AServiceResourceIdentifier.convertServiceResourceIdentifier(servIns.getParentIdentifier())); 
 		
 		return aservIns;
 	}
