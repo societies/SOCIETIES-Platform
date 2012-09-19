@@ -334,7 +334,7 @@ public class MockPZWrapperImpl implements PZWrapper {
 		zone.setDescription(mockZone.getDescription());
 		zone.setName(mockZone.getName());
 		zone.setType(mockZone.getType());
-		
+		zone.setId(zoneId);
 		return zone;
 	}
 	

@@ -63,7 +63,7 @@ public class RegistryEntry implements Serializable {
 	// private String serviceIdentifier;
 	// private ServiceResourceIdentifier serviceIdentifier;
 
-	private ServiceResourceIdentiferDAO serviceIdentifier;
+	private ServiceResourceIdentifierDAO serviceIdentifier;
 
 	/**
 	 * the service endPoint.
@@ -117,7 +117,7 @@ public class RegistryEntry implements Serializable {
 
 		super();
 
-		this.serviceIdentifier = new ServiceResourceIdentiferDAO(
+		this.serviceIdentifier = new ServiceResourceIdentifierDAO(
 				serviceIdentifier.getIdentifier().toString(),
 				serviceIdentifier.getServiceInstanceIdentifier());
 
@@ -133,8 +133,11 @@ public class RegistryEntry implements Serializable {
 		this.serviceType = type.toString();
 		this.serviceLocation = location;
 		this.serviceStatus = serviceStatus.toString();
+
 		this.serviceInstance = new ServiceInstanceDAO(
 				serviceInstance.getFullJid(), serviceInstance.getCssJid(), serviceInstance.getParentJid(),serviceInstance.getXMPPNode(),
+				new ServiceResourceIdentifierDAO(serviceInstance.getParentIdentifier().getIdentifier().toString(),
+						serviceInstance.getParentIdentifier().getServiceInstanceIdentifier()),
 				new ServiceImplementationDAO(serviceInstance.getServiceImpl()
 						.getServiceNameSpace(), serviceInstance
 						.getServiceImpl().getServiceProvider(), serviceInstance
@@ -211,14 +214,14 @@ public class RegistryEntry implements Serializable {
 	
 	// @Column(name = "ServiceIdentifier")
 	// @Id
-	// @Target(value = ServiceResourceIdentiferDAO.class)
+	// @Target(value = ServiceResourceIdentifierDAO.class)
 	@EmbeddedId
-	public ServiceResourceIdentiferDAO getServiceIdentifier() {
+	public ServiceResourceIdentifierDAO getServiceIdentifier() {
 		return this.serviceIdentifier;
 	}
 
 	public void setServiceIdentifier(
-			ServiceResourceIdentiferDAO serviceIdentifier) {
+			ServiceResourceIdentifierDAO serviceIdentifier) {
 		this.serviceIdentifier = serviceIdentifier;
 	}
 
@@ -285,11 +288,18 @@ public class RegistryEntry implements Serializable {
 			returnedService.setContextSource(this.contextSource);
 			returnedService.setSecurityPolicy(this.securityPolicy);
 			returnedService.setServiceCategory(this.serviceCategory);
+			
 			ServiceInstance si = new ServiceInstance();
 			si.setFullJid(this.serviceInstance.getFullJid());
 			si.setCssJid(this.serviceInstance.getCssJid());
 			si.setParentJid(this.serviceInstance.getParentJid());
 			si.setXMPPNode(this.serviceInstance.getXMPPNode());
+			
+			ServiceResourceIdentifier parentIdentifier = new ServiceResourceIdentifier();
+			parentIdentifier.setIdentifier(new URI(this.serviceInstance.getParentIdentifier().getIdentifier()));
+			parentIdentifier.setServiceInstanceIdentifier(this.serviceInstance.getParentIdentifier().getInstanceId());
+			si.setParentIdentifier(parentIdentifier);
+			
 			ServiceImplementation servImpl = new ServiceImplementation();
 			servImpl.setServiceNameSpace(this.serviceInstance.getServiceImpl()
 					.getServiceNameSpace());
@@ -297,22 +307,22 @@ public class RegistryEntry implements Serializable {
 					.getServiceProvider());
 			servImpl.setServiceVersion(this.serviceInstance.getServiceImpl()
 					.getServiceVersion());
-			if(this.serviceInstance.getServiceImpl().getServiceClient() != null)
-				servImpl.setServiceClient(new URI(this.serviceInstance.getServiceImpl().getServiceClient()));
-			else
-				servImpl.setServiceClient(null);
-			si.setServiceImpl(servImpl);
+			servImpl.setServiceClient(this.serviceInstance.getServiceImpl().getServiceClient());
+	
+			si.setServiceImpl(servImpl);			
 			returnedService.setServiceInstance(si);
 			returnedService.setServiceLocation(tmpServiceLocation);
 			returnedService.setServiceName(serviceName);
 			returnedService.setServiceStatus(tmpServiceStatus);
 			returnedService.setServiceType(tmpServiceType);
+			
 			ServiceResourceIdentifier serviceResourceIdentifier = new ServiceResourceIdentifier();
 			serviceResourceIdentifier.setIdentifier(new URI(this
 					.getServiceIdentifier().getIdentifier()));
 			serviceResourceIdentifier.setServiceInstanceIdentifier(this
 					.getServiceIdentifier().getInstanceId());
 			returnedService.setServiceIdentifier(serviceResourceIdentifier);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -395,6 +405,10 @@ public class RegistryEntry implements Serializable {
 				this.getServiceInstance().setXMPPNode(
 						service.getServiceInstance().getXMPPNode());
 			}
+			if(service.getServiceInstance().getParentIdentifier() != null){
+				this.getServiceInstance().getParentIdentifier().setIdentifier(service.getServiceInstance().getParentIdentifier().getIdentifier().toString());
+				this.getServiceInstance().getParentIdentifier().setInstanceId(service.getServiceInstance().getParentIdentifier().getServiceInstanceIdentifier());
+			}
 			if (service.getServiceInstance().getServiceImpl() != null) {
 				if (service.getServiceInstance().getServiceImpl()
 						.getServiceNameSpace() != null) {
@@ -435,7 +449,7 @@ public class RegistryEntry implements Serializable {
 							.setServiceClient(
 									service.getServiceInstance()
 											.getServiceImpl()
-											.getServiceClient().toString());
+											.getServiceClient());
 				}
 
 			}

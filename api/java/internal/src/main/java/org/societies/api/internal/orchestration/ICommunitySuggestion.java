@@ -44,6 +44,6 @@ public interface ICommunitySuggestion {
 	public abstract ArrayList<String> getMembersList();
 
 	//
-	public abstract ArrayList<String> getconditionsList();
+	public abstract ArrayList<String> getConditionsList();
 
 }

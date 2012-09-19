@@ -106,15 +106,17 @@ public class PubsubNode extends HostedNode {
 	}
 	
 	private void writeToDAO(String subId) {
-		if (subscriptionsById.get(subId)!=null) {
-			String subJid = subscriptionsById.get(subId).getBareJid();
-			dao.getSubscriptionsById().put(subId, subJid);
+		if (s != null) {
+			if (subscriptionsById.get(subId)!=null) {
+				String subJid = subscriptionsById.get(subId).getBareJid();
+				dao.getSubscriptionsById().put(subId, subJid);
+			}
+			else {
+				dao.getSubscriptionsById().remove(subId);
+			}
+			s.update(dao);
+			s.flush();
 		}
-		else {
-			dao.getSubscriptionsById().remove(subId);
-		}
-		s.update(dao);
-		s.flush();
 	}
 	
 	public PubsubNodeDAO getDAO() {
