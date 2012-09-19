@@ -92,7 +92,7 @@
 		<!-- module>../user-agent/Android-user-agent</module -->
 
 		<!-- Privacy and Trust -->
-		<module>../../privacy-trust/android/privacy-trust</module>
+		<module>../../privacy-trust/android/privacy-trust/privacy-data-management/</module>
 
 	</modules>
 </project>
