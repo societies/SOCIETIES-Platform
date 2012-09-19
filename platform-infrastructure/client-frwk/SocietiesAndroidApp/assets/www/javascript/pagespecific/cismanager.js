@@ -73,8 +73,8 @@ var	SocietiesCISManagerService = {
 		
 		function success(data) {
 			console.log("List CISs where  = TODO");
-			$.mobile.changePage("communities_list.html", { transition: "slideup"} );
 			SocietiesCISListService.populateCISListpage(data);
+			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
 		}
 		
 		function failure(data) {
