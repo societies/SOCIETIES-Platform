@@ -43,7 +43,7 @@ window.plugins.SocietiesCoreServiceMonitor = {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(phonegapdesktop.internal.getDebugValue('CoreServiceMonitorService', 'getInstalledApps'));
+			successCallback(phonegapdesktop.internal.getDebugValue('CoreServiceMonitorService', 'getInstalledApplications'));
 		}
 	}
 	

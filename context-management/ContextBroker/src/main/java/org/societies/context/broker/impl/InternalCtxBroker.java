@@ -219,7 +219,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
 
 				attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
-			
+				LOG.info("Context CREATE ATTRIBUTE performed for context ID:"+attribute.getId()+" of type:"+attribute.getType());			
 				//TODO origin type should be set in db manager
 				if (attribute.getQuality().getOriginType() == null) {
 					attribute.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
@@ -229,7 +229,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			} else if (IdentityType.CIS.equals(scopeID.getType())){
 
 				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, type);
-
+				LOG.info("Community Context CREATE ATTRIBUTE performed for context ID:"+attribute.getId()+" of type:"+attribute.getType());
 			} 
 		} catch (InvalidFormatException ife) {
 
@@ -252,6 +252,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		final CtxEntity entity = 
 				this.userCtxDBMgr.createEntity(type);
 		
+		LOG.info("Context CREATE ENTITY performed for context ID:"+entity.getId()+" of type:"+entity.getType());
 		return new AsyncResult<CtxEntity>(entity);
 	}
 
@@ -310,7 +311,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new IllegalArgumentException("Inserted id is not of type CIS");
 
 		CommunityCtxEntity communityCtxEnt = communityCtxDBMgr.createCommunityEntity(cisId);
-
+		LOG.info("Community Context CREATE ENTITY performed for context ID:"+communityCtxEnt.getId()+" of type:"+communityCtxEnt.getType());
 		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
 	}
 
@@ -529,8 +530,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			inferenceOutcome = this.initiateInference((CtxAttribute) modelObjReturn);
 		} // TO DO integrate inference outcome with returned value
 		 */
-	//	LOG.info("retrieved  " + modelObjReturn.getId());
-
+		
+		LOG.info("Context RETRIEVE performed for context ID:"+modelObjReturn.getId());
 		return new AsyncResult<CtxModelObject>(modelObjReturn);
 	}	
 
@@ -830,7 +831,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		if (attributeId == null)
 			throw new NullPointerException("attributeId can't be null");
-
+		
 		// Will throw IllegalArgumentException if value type is not supported
 		final CtxAttributeValueType valueType = CtxBrokerUtils.findAttributeValueType(value);
 
@@ -859,7 +860,9 @@ public class InternalCtxBroker implements ICtxBroker {
 				} else throw new CtxBrokerException("unkown type of attribute value");
 			}
 			attributeReturn = (CtxAttribute) this.update(currentAttribute).get();
-
+			String valueString = CtxBrokerUtils.attributeValueAsString(value);
+			LOG.info("Context UPDATE performed for context ID:"+attributeReturn.getId()+" of type:"+attributeReturn.getType()+" with value:" + valueString);
+			
 		} catch (InterruptedException e) {
 			throw new CtxBrokerException("updateAttribute including value failed " + e.getLocalizedMessage());
 		} catch (ExecutionException e) {

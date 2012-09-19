@@ -62,11 +62,11 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.comm.simplexml.XMLGregorianCalendarConverter;
 import org.societies.maven.converters.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;
+import org.societies.simple.converters.XMLGregorianCalendarConverter;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.JID;
@@ -584,9 +584,6 @@ public class CommManagerHelper {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			os.write(error.getStanzaErrorBytes(), 0, error.getStanzaErrorBytes().length);
 			if (error.getApplicationError()!=null) {
-				InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
-				inxsw.setXmlDeclaration(false);
-
 				s.write(error.getApplicationError(), os);
 			}
 			os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
@@ -596,12 +593,9 @@ public class CommManagerHelper {
 			errorResponse.getElement().add(dom4jError.getRootElement());
 			
 			return errorResponse;
-		} catch (XMLStreamException e) {
-			return buildErrorResponse(originalFrom, id, "XMLStreamException while building application error");
+
 		} catch (DocumentException e) {
 			return buildErrorResponse(originalFrom, id, "DocumentException while building application error");
-		} catch (UnavailableException e) {
-			return buildErrorResponse(originalFrom, id, "UnavailableException while building application error");
 		} catch (Exception e) {
 			return buildErrorResponse(originalFrom, id, "Serializing Exception while building application error");
 		}
@@ -619,11 +613,10 @@ public class CommManagerHelper {
 	}
 
 	private synchronized IQ buildResponseIQ(JID originalFrom, String id, Object responseBean)
-			throws DocumentException, UnavailableException, XMLStreamException {
+			throws DocumentException {
 		IQ responseIq = new IQ(Type.result, id);
 		responseIq.setTo(originalFrom);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
 		if (responseBean!=null) {
 			try {
 				s.write(responseBean, os);
