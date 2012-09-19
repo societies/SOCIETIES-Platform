@@ -30,6 +30,7 @@
 	<artifactId>data-source</artifactId>
 	<description>common data source bundle</description>
 	<packaging>bundle</packaging>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>
@@ -61,7 +62,7 @@
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
-			<version>0.1</version>
+			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		

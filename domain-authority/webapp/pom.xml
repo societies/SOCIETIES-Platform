@@ -30,7 +30,7 @@
 	<groupId>org.societies.domain-authority</groupId>
 	<artifactId>DomainAuthorityWebApp</artifactId>
 	<packaging>war</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>${release.version}</version>
 	<name>domain-authority-webapp</name>
 	<url>http://maven.apache.org</url>
 
@@ -53,12 +53,29 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
+	
+	
+
+<dependency>
+	<groupId>org.springframework</groupId>
+	<artifactId>org.springframework.spring-library</artifactId>
+	<type>libd</type>
+	<scope>provided</scope>
+</dependency>
+
+<dependency>
+	<groupId>org.societies.api.internal</groupId>
+	<artifactId>societies-api-internal</artifactId>
+	<scope>provided</scope>
+</dependency>
+
+<dependency>
+	<groupId>org.societies.api.external</groupId>
+	<artifactId>societies-api</artifactId>
+	<scope>provided</scope>
+</dependency>
+
+		
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>org.aspectj-library</artifactId>
@@ -66,18 +83,7 @@
 			<version>1.6.2.RELEASE</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-			<version>4.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>4.1.0</version>
-			<scope>provided</scope>
-		</dependency>
+		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet</artifactId>
@@ -119,39 +125,14 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>XCCommunicationMgr</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-
-
-
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.societies.domain-authority</groupId>
 			<artifactId>DomainAuthorityRegistry</artifactId>
-			<version>0.1</version>
+			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>
 

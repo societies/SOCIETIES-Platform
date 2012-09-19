@@ -4,7 +4,7 @@
 	<groupId>org.societies.maven</groupId>
 	<artifactId>jaxb2simple-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>JAXB to SimpleXML Maven Plugin</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
