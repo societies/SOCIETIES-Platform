@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.jivesoftware.smack.packet.IQ;
@@ -31,6 +33,7 @@ import org.societies.maven.converters.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;
+import org.societies.simple.converters.XMLGregorianCalendarConverter;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -55,6 +58,8 @@ public class PacketMarshaller {
 		Strategy strategy = new RegistryStrategy(registry);
 		try {
 			Element exampleElementImpl = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("dummy");
+			XMLGregorianCalendar gregorianCalendarImpl = DatatypeFactory.newInstance().newXMLGregorianCalendar();
+			registry.bind(gregorianCalendarImpl.getClass(), XMLGregorianCalendarConverter.class);
 			registry.bind(exampleElementImpl.getClass(), ElementConverter.class);
 			registry.bind(java.net.URI.class,URIConverter.class);
 			registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
