@@ -12,11 +12,16 @@
         <activity
             android:name=".datamanagement.PrivacyDataManagerActivity"
             android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".policymanagement.PrivacyPolicyManagerActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerExternalService" />
         <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" />
         <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
