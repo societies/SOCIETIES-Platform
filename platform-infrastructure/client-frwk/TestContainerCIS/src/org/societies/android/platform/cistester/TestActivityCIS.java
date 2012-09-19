@@ -3,6 +3,7 @@ package org.societies.android.platform.cistester;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.android.api.cis.directory.ICisDirectory;
 import org.societies.android.api.cis.management.AActivity;
 import org.societies.android.api.cis.management.ACommunity;
@@ -14,7 +15,13 @@ import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.platform.cis.CisDirectoryRemote;
 import org.societies.android.platform.cis.CommunityManagement;
 import org.societies.android.platform.cis.CommunityManagement.LocalBinder;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.MembershipCrit;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.manager.ListCrit;
+import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.api.identity.INetworkNode;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -52,6 +59,8 @@ public class TestActivityCIS extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        
+     
         Log.d(LOG_TAG, "before intents");
         
         //CREATE INTENT FOR CIS MANAGER SERVICE AND BIND
@@ -171,6 +180,14 @@ public class TestActivityCIS extends Activity {
 		//
     }
     
+    public void loginXMPPServer(String userName, String userPassword, String domain) {
+    	  Log.d(LOG_TAG, "loginXMPPServer user: " + userName + " pass: " + userPassword + " domain: " + domain);
+
+    	  ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
+    	  
+    	  INetworkNode networkNode = ccm.login(userName, domain, userPassword);
+    	 }
+    
 
     private class TestCIS extends AsyncTask<Void, Void, Void> {
     	
@@ -182,6 +199,10 @@ public class TestActivityCIS extends Activity {
     	
     	protected Void doInBackground(Void... args) {
 
+    	    Log.d(LOG_TAG, "login called");
+    	    loginXMPPServer("xcmanager","xcmanager","societies.local");
+    	    
+    		
     		try {//	WAIT TILL ALL THE SERVICES ARE CONNECTED
 				Thread.currentThread();
 				Thread.sleep(5 * 1000);
@@ -213,19 +234,39 @@ public class TestActivityCIS extends Activity {
     
     private void continueTests(String cis_id, String cis_name) {
     	
+    	Log.d(LOG_TAG, "entered continue test");
+    	
     	//TEST: GET ADVERT RECORD
-    	serviceCISdir.searchByID(CLIENT_PACKAGE, cis_id);
+    	//serviceCISdir.searchByID(CLIENT_PACKAGE, cis_id);
+    	
+		// TODO: get a real advertisement
+		CisAdvertisementRecord ad = new CisAdvertisementRecord();
+		ad.setId(cis_id);
+		// in order to force the join to send qualifications, Ill add some criteria to the AdRecord
+		MembershipCrit membershipCrit = new MembershipCrit();
+		List<Criteria> criteria = new ArrayList<Criteria>();
+		Criteria c1 = new Criteria();c1.setAttrib(CtxAttributeTypes.ADDRESS_HOME_CITY);c1.setOperator("equals");c1.setValue1("something");
+		Criteria c2 = new Criteria();c2.setAttrib(CtxAttributeTypes.RELIGIOUS_VIEWS);c2.setOperator("equals");c2.setValue1("something");
+		criteria.add(c1);criteria.add(c2);membershipCrit.setCriteria(criteria);
+		ad.setMembershipCrit(membershipCrit);
+    	
     	
     	//TEST: JOIN
-    	serviceCISsubscribe.Join(CLIENT_PACKAGE, cis_id);
-    	serviceCISManager.subscribeToCommunity(CLIENT_PACKAGE, cis_name, cis_id);
-    	
+    	Log.d(LOG_TAG, "record conversion");
+		ACisAdvertisementRecord aAdrec = ACisAdvertisementRecord.convertCisAdvertRecord(ad);
+    	Log.d(LOG_TAG, "sending join");
+		serviceCISsubscribe.Join(CLIENT_PACKAGE, aAdrec);
+    	//serviceCISManager.subscribeToCommunity(CLIENT_PACKAGE, cis_name, cis_id);
+    	Log.d(LOG_TAG, "join sent");
+
     	//TEST: LIST CIS'S (OWNED + SUBSCRIBED)
     	serviceCISManager.getCisList(CLIENT_PACKAGE, ListCrit.ALL.toString());
-    			
+    	Log.d(LOG_TAG, "get cis list");
+
     	//TEST: GET MEMBERS OF CIS
 		serviceCISsubscribe.getMembers(CLIENT_PACKAGE, cis_id);
-		
+    	Log.d(LOG_TAG, "get member list");
+
 		//TEST: ADD ACTIVITY
 		AActivity activity = new AActivity();
 		activity.setActor("Alec"); activity.setVerb("went"); activity.setTarget("mad"); activity.setTarget("late");
@@ -246,6 +287,10 @@ public class TestActivityCIS extends Activity {
 				Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
 				ACommunity cis =  (ACommunity) parcel;
 				Log.d(LOG_TAG, ">>>>>CREATE COMMUNITY  RESULT:\nCIS ID: " + cis.getCommunityJid());
+				
+	
+				continueTests("cis-e86edc27-7362-449a-9987-45561bb5353a.societies.local", "man city");
+				
 			}
 			
 			if (intent.getAction().equals(CisDirectoryRemote.FIND_ALL_CIS)) {

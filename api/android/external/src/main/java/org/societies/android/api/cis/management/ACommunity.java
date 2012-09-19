@@ -60,7 +60,8 @@ public class ACommunity extends Community implements Parcelable {
 		dest.writeString(this.getCommunityName());
 		dest.writeString(this.getCommunityType());
 		dest.writeString(this.getOwnerJid());
-		dest.writeParcelable(this.getMembershipCrit(), flags);
+		if(this.getMembershipCrit() !=null)
+			dest.writeParcelable(this.getMembershipCrit(), flags);
 	}
 	
 	private ACommunity(Parcel in) {
@@ -69,7 +70,9 @@ public class ACommunity extends Community implements Parcelable {
 		this.setCommunityName(in.readString());
 		this.setCommunityType(in.readString());
 		this.setOwnerJid(in.readString());
-		this.setMembershipCrit((AMembershipCrit) in.readParcelable(this.getClass().getClassLoader()));
+		this.setDescription(in.readString());
+		if(in.dataAvail() >0)
+			this.setMembershipCrit((AMembershipCrit) in.readParcelable(this.getClass().getClassLoader()));
 	}
 
 	public static final Parcelable.Creator<ACommunity> CREATOR = new Parcelable.Creator<ACommunity>() {

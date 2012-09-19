@@ -74,13 +74,13 @@ public interface ICisManager {
 	 * @param name CIS Name
 	 * @param cisId CIS id
 	 */
-	public void subscribeToCommunity(String client, String name, String cisId);
+	//public void subscribeToCommunity(String client, String name, String cisId);
 
 	/**
 	 * Notify cloud we've unsubscribed from a CIS
 	 * @param cisId
 	 */
-	public void unsubscribeFromCommunity(String client, String cisId);
+	//public void unsubscribeFromCommunity(String client, String cisId);
 
 	/**
 	 * Remove a member from this CIS
