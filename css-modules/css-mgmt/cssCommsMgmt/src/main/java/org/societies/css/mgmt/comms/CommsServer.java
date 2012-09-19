@@ -39,6 +39,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
@@ -109,6 +110,9 @@ public class CommsServer implements IFeatureServer {
 			
 			Future<List<String>> asyncGetFriendsResult = null;
 			List<String> getFriendsResult = null;
+			
+			Future<List<CssAdvertisementRecord>> asyncSuggestedFriendsResult = null;
+			List<CssAdvertisementRecord> suggestedFriendsResult = null;
 		
 			LOG.debug("CSSManager remote invocation of method "
 					+ bean.getMethod().name());
@@ -159,6 +163,9 @@ public class CommsServer implements IFeatureServer {
 			case GET_CSS_FRIENDS:
 				asyncGetFriendsResult = this.cssManager.getCssFriends();
 				break;
+			case SUGGESTED_FRIENDS:
+				asyncSuggestedFriendsResult = this.cssManager.suggestedFriends();
+				break;
 			default:
 				break;
 			}
@@ -167,6 +174,9 @@ public class CommsServer implements IFeatureServer {
 				switch (bean.getMethod()) {
 				case GET_CSS_FRIENDS:
 					getFriendsResult = asyncGetFriendsResult.get();
+					break;
+				case SUGGESTED_FRIENDS:
+					suggestedFriendsResult = asyncSuggestedFriendsResult.get();
 					break;
 				default:
 					// Since everything else seems to use this!!

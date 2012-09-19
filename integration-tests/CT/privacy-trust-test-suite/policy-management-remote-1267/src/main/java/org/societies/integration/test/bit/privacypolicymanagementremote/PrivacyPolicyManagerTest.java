@@ -425,7 +425,7 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 
 	private RequestorCis getRequestorCis() throws InvalidFormatException{
 		IIdentity otherCssId = TestCase1267.commManager.getIdManager().fromJid("olivier@societies.local");
-		IIdentity cisId = TestCase1267.commManager.getIdManager().fromJid("onecis.societies.local");
+		IIdentity cisId = TestCase1267.commManager.getIdManager().fromJid("cis-one.societies.local");
 		return new RequestorCis(otherCssId, cisId);
 	}
 

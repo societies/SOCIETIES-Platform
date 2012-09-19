@@ -96,6 +96,15 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		}
 	}
 	
+	@SuppressWarnings("unused")
+	private void cleanup(){
+		try{
+			timer.cancel();
+		}catch (Exception e) {
+			log.error("Exception in bean'cleanup' method ; msg: "+e.getMessage()+" ; Cause: "+e.getCause(),e);
+		}
+	}
+	
 	@Override
 	public Set<String> getActiveEntitiesIdsInZone(IZoneId arg0) {
 		return pzWrapper.getActiveEntitiesIdsInZone(arg0);
@@ -173,6 +182,8 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 					if (userLocation != null){
 						log.info("update CSM node - "+networkNode.getJid()+" \t location: "+userLocation.toString());
 						locationInference.updateCSM(userLocation, networkNode);
+					}else{
+						log.info("update CSM node - entity '"+networkNode.getJid()+"' wasn't identified by the LM system - can't perform update");
 					}
 				}
 				
@@ -183,6 +194,10 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 				}*/
 				
 				log.info("--------------------- Update task finished");
+			}catch (IllegalStateException e) {
+				log.error("IllegalStateException; Probably because the bundle was unistalled - canceling timer task);  Msg: "
+						   +e.getMessage()+" \t; cause:  "+e.getCause(),e);
+				timer.cancel();
 			}catch (Exception e) {
 				log.error("Error in update task; Msg: "+e.getMessage()+" \t; cause:  "+e.getCause(),e);
 			}

@@ -49,10 +49,10 @@ public class NameObfuscator extends DataObfuscator<IDataWrapper<Name>> {
 	}
 
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
-	@Override
 	public IDataWrapper<Name> obfuscateData(double obfuscationLevel)
 			throws PrivacyException {
 		// -- Verify

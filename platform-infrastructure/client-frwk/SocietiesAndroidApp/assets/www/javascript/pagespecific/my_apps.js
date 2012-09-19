@@ -18,14 +18,16 @@ var Societies3PServices = {
 		function success(data) {
 			mServices = data;
 			
-			//EMPTY TABLE
-			$('ul#SocietiesServicesDiv li:last').remove();
+			//EMPTY TABLE - NEED TO LEAVE THE HEADER
+			while( $('ul#SocietiesServicesDiv').children().length >1 )
+				$('ul#SocietiesServicesDiv li:last').remove();
+
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#category-item?pos=' + i + '"><img src="../images/printer_icon.png" class="profile_list" alt="logo" >' +
-				'<h2>' + data[i].serviceName + '</h2>' + 
-				'<p>' + data[i].serviceDescription + '</p>' + 
-				'</a></li>';
+				var tableEntry = '<li><a href="#" onclick="Societies3PServices.showDetails(' + i + ')"><img src="../images/printer_icon.png" class="profile_list" alt="logo" >' +
+					'<h2>' + data[i].serviceName + '</h2>' + 
+					'<p>' + data[i].serviceDescription + '</p>' + 
+					'</a></li>';
 				/*
 				$('ul#SocietiesServicesDiv').append(
 						$('<li>').append(
@@ -53,14 +55,17 @@ var Societies3PServices = {
 		console.log("Refreshing Local Apps");
 
 		function success(data) {			
-			//EMPTY TABLE
-			$('ul#LocalServicesDiv li:last').remove();
+			//EMPTY TABLE - NEED TO LEAVE THE HEADER
+			while( $('ul#LocalServicesDiv').children().length >1 )
+				$('ul#LocalServicesDiv li:last').remove();
+
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
 				var tableEntry = '<li><a href="#localapp-item?pos=' + i + '"><img src="' + data[i].icon + '" class="profile_list" alt="logo" >' +
-				'<h2>' + data[i].applicationName + '</h2>' + 
-				'<p>' + data[i].packageName+ '</p>' + 
-				'</a></li>';
+									'<h2>' + data[i].applicationName + '</h2>' + 
+									'<p>' + data[i].packageName+ '</p></a>' +  
+									'<a href="#" data-rel="dialog" data-transition="fade" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">Launch</a>' +
+									'</li>';
 				jQuery('ul#LocalServicesDiv').append(tableEntry);
 			}
 			$('#LocalServicesDiv').listview('refresh');
@@ -70,9 +75,35 @@ var Societies3PServices = {
 			alert("refresh3PServices - failure: " + data);
 		}
 		
-		window.plugins.SocietiesCoreServiceMonitor.getInstalledApps(success, failure);
+		window.plugins.SocietiesCoreServiceMonitor.getInstalledApplications(success, failure);
 	},
-
+	
+	startActivity: function (appName, packageName) {
+		if(window.confirm("Launch " + appName + "?"))
+			//LaunchApp(packageName);
+			return null;
+	},
+	
+	showDetails: function (servicePos) {
+		// GET SERVICE FROM ARRAY AT POSITION
+		var serviceObj = mServices[ servicePos ];
+		if ( serviceObj ) {
+			//VALID SERVICE OBJECT
+			var markup = "<h1>" + serviceObj.serviceName + "</h1>" + 
+						 "<p>" + serviceObj.serviceDescription + "</p>" +
+						 "<p>" + serviceObj.serviceInstance.serviceImpl.serviceProvider + "</p>" + 
+						 "<p>" + serviceObj.serviceStatus + "</p>";
+			//INJECT
+			$('#app_detail').html( markup );
+			try {//REFRESH FORMATTING
+				//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
+				$('ul#app_details').listview('refresh');
+			}
+			catch(err) {}
+			$.mobile.changePage("my_apps_details.html");
+		}
+	},
+	
 	// Load the data for a specific category, based on
 	// the URL passed in. Generate markup for the items in the
 	// category, inject it into an embedded page, and then make
@@ -115,11 +146,13 @@ var Societies3PServices = {
 			// Now call changePage() and tell it to switch to the page we just modified.
 			//options.
 			$.mobile.changePage( $page, options );
+			
+			$('#app_details').appendTo(".ui-page").trigger("create");
 		}
 	}
 
 
-}
+};
 
 /**
  * JQuery boilerplate to attach JS functions to relevant HTML elements
@@ -131,13 +164,8 @@ $(document).bind('pageinit',function(){
 
 	console.log("pageinit: Active Services jQuery calls");
 	
-	//CANNOT CALL MY onload FUNCTIONS TILL PHONEGAP LOADS ITS debugdata.json - ADD DELAY
-	setTimeout(function() {
-		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
-		SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(Societies3PServices.refreshLocalApps);
-    }, 200);
-	
 	//Listen for any attempts to call changePage().
+	/*
 	$(document).bind( "pagebeforechange", function( e, data ) {
 	
 		// We only want to handle changePage() calls where the caller is
@@ -151,7 +179,6 @@ $(document).bind('pageinit',function(){
 				re = /^#category-item/;
 	
 			if ( u.hash.search(re) !== -1 ) {
-	
 				// We're being asked to display the items for a specific category.
 				// Call our internal method that builds the content for the category
 				// on the fly based on our in-memory category data structure.
@@ -163,5 +190,6 @@ $(document).bind('pageinit',function(){
 			}
 		}
 	});
+	*/
 	
 });

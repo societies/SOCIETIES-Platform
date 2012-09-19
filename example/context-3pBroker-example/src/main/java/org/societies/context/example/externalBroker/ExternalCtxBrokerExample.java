@@ -152,8 +152,7 @@ public class ExternalCtxBrokerExample 	{
 		ca3pService.retrieveIndividualEntityId();
 		ca3pService.createCtxEntityWithCtxAttributes();
 		
-		//access control is not working for entities yet
-		//ca3pService.retrieveCtxAttributeBasedOnEntity();
+		ca3pService.retrieveCtxAttributeBasedOnEntity();
 
 		ca3pService.lookupAndRetrieveCtxAttributes();
 
@@ -171,7 +170,7 @@ public class ExternalCtxBrokerExample 	{
 		CommunityCtxEntity communityEntity;
 		try {
 			communityEntity = internalCtxBroker.createCommunityEntity(this.cisID).get();
-			this.cssID1 =  this.commMgrService.getIdManager().fromJid("Aris@societies.local ");
+			this.cssID1 =  this.commMgrService.getIdManager().fromJid("Aris@societies.local");
 			this.indiEnt1 = this.internalCtxBroker.createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
 			CtxAttribute individualAttr1 = this.internalCtxBroker.createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.INTERESTS).get();
 			individualAttr1.setStringValue("reading,socialnetworking,cinema,sports");
@@ -233,13 +232,6 @@ public class ExternalCtxBrokerExample 	{
 
 
 	}
-
-	
-
-
-	
-	
-	
 
 	
 	

@@ -16,9 +16,9 @@ import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
 public class TestCase1096 extends IntegrationTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1096.class);
-    public static ICommManager commManager;
     public static ICisManager cisManager;
     public static ISuggestedCommunityAnalyser SCA;
+    public static ICommManager commManager;
 	/**
 	 * Privacy Log Appender (injected)
 	 */
@@ -33,11 +33,10 @@ public class TestCase1096 extends IntegrationTestCase {
 		NominalTestCase.testCaseNumber = testCaseNumber;
 	}
 
-
     public void setCommManager(ICommManager commManager) {
-        LOG.debug("[#"+testCaseNumber+"] setCommManager()");
         this.commManager = commManager;
     }
+
 
     public  void setCisManager(ICisManager cisManager) {
         LOG.debug("[#"+testCaseNumber+"] setCisManager()");

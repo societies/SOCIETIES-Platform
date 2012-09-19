@@ -67,6 +67,7 @@ public class RequestPolicy implements Serializable{
 	public void setRequestor(Requestor subject){
 		this.requestor = subject;
 	}
+	
 	public String toXMLString(){
 		StringBuilder str = new StringBuilder("<RequestPolicy>");
 		if (this.hasRequestor()){

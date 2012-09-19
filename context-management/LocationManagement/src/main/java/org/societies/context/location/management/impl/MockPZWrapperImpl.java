@@ -150,7 +150,7 @@ public class MockPZWrapperImpl implements PZWrapper {
 			return result;
 		}
 		
-		private Set<String> tags;
+		private Set<String> tags = new HashSet<String>();
 		private String personalTag;
 	}
 	
@@ -287,7 +287,7 @@ public class MockPZWrapperImpl implements PZWrapper {
 		location.setY(generateRand());
 		location.setZ(generateRand());
 		
-		int zoneID = (int) Math.ceil( (Math.random()*100)%6); 
+		int zoneID = (int) Math.ceil( (Math.random()*100)%5); 
 		Zone zone = mockActiveZones.get(Integer.valueOf(zoneID));
 		ExZone exZone = new ExZone(zone);
 		exZone.setPersonalTag("Personal Tag: "+zoneID);
@@ -334,7 +334,7 @@ public class MockPZWrapperImpl implements PZWrapper {
 		zone.setDescription(mockZone.getDescription());
 		zone.setName(mockZone.getName());
 		zone.setType(mockZone.getType());
-		
+		zone.setId(zoneId);
 		return zone;
 	}
 	
@@ -344,9 +344,9 @@ public class MockPZWrapperImpl implements PZWrapper {
 	private HashMap<String, Location> mockEntitiesLocations;
 	private static final int DailyPlanet = 0;
 	private static final int Earth = 1;
-	private static final int LuthorCorp = 4;
-	private static final int Metropolis = 5;
-	private static final int Smallville = 6;
+	private static final int LuthorCorp = 2;
+	private static final int Metropolis = 3;
+	private static final int Smallville = 4;
 	private static final String LanaLang = "11:11:11:11:11:11";
 	private static final String LoisLane = "22:22:22:22:22:22";
 	private static final String LexLuthor = "ff:ff:ff:ff:ff:ff";

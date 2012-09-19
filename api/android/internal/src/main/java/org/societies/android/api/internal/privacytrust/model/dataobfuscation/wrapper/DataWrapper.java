@@ -24,6 +24,8 @@
  */
 package org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper;
 
+import org.societies.api.schema.identity.DataIdentifier;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -44,7 +46,7 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	/**
 	 * ID of the data, useful for persistence
 	 */
-	private String dataId;
+	private DataIdentifier dataId;
 	/**
 	 * Data to obfuscate
 	 */
@@ -71,7 +73,7 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	 * and the unique ID of the data to obfuscate will be used to retrieve obfuscated version of the data.  
 	 * @param dataId A unique ID of the data to obfuscate is needed to enable persistence
 	 */
-	public DataWrapper(String dataId, E data) {
+	public DataWrapper(DataIdentifier dataId, E data) {
 		this(data);
 		this.dataId = dataId;
 		setPersistenceEnabled(true);
@@ -83,29 +85,25 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper#getDataId()
 	 */
-	@Override
-	public String getDataId() {
+	public DataIdentifier getDataId() {
 		return dataId;
 	}
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#setDataId(java.lang.String)
 	 */
-	@Override
-	public void setDataId(String dataId) {
+	public void setDataId(DataIdentifier dataId) {
 		this.dataId = dataId;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#getData()
 	 */
-	@Override
 	public E getData() {
 		return data;
 	}
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#setData(java.lang.Object)
 	 */
-	@Override
 	public void setData(E data) {
 		this.data = data;
 	}
@@ -113,14 +111,12 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#isPersistenceEnabled()
 	 */
-	@Override
 	public boolean isPersistenceEnabled() {
 		return persistence;
 	}
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#setPersistenceEnabled(boolean)
 	 */
-	@Override
 	public void setPersistenceEnabled(boolean persist) {
 		persistence = persist;
 	}
@@ -128,7 +124,6 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper#isReadyForObfuscation()
 	 */
-	@Override
 	public boolean isReadyForObfuscation() {
 		if (null != data) {
 			return true;
@@ -166,7 +161,6 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	/*
 	 * @see android.os.Parcelable#describeContents()
 	 */
-	@Override
 	public int describeContents() {
 		return 0;
 	}
@@ -175,14 +169,13 @@ public class DataWrapper<E extends Parcelable> implements IDataWrapper<E> {
 	 * 
 	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
 	 */
-	@Override
 	public void writeToParcel(Parcel out, int flag) {
-		out.writeString(dataId);
+		out.writeSerializable(dataId);
 		out.writeParcelable(data, flag);
 	}
 	
 	private void readFromParcel(Parcel in) {
-		dataId = in.readString();
+		dataId = (DataIdentifier) in.readSerializable();
 		data = (E) in.readParcelable(this.getClass().getClassLoader());
 	}
 	

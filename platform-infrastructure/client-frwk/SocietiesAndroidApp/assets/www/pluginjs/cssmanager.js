@@ -57,6 +57,22 @@ window.plugins.SocietiesLocalCSSManager = {
 		else {
 			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'logoutXMPPServer'));
 		}
+	},
+	readProfile: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'readProfile'));
+		}
+	},
+	modifyAndroidCSSRecord: function(successCallback, errorCallback, data){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'modifyAndroidCSSRecord'));
+		}
 	}
 }
 

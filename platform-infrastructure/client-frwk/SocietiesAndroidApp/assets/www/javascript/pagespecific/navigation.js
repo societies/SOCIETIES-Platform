@@ -87,6 +87,7 @@ $(document).bind("pagechange", function(event, options) {
 
 	$(".ui-page-active #profile-button").off('click').on('click', function(){
 		SocietiesNavigation.profileAction();
+		
 	});
 
 	$(".ui-page-active #settings-button").off('click').on('click', function(){
@@ -96,5 +97,10 @@ $(document).bind("pagechange", function(event, options) {
 	$(".ui-page-active #about-button").off('click').on('click', function(){
 		SocietiesNavigation.aboutAction();
 	});
+	
+	if (options.toPage[0].id === "my-profile"){
+		SocietiesCSSRecord.refreshCssProfile();
+	}
+
 
 });

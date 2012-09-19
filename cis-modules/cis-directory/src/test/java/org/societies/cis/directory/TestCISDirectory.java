@@ -65,7 +65,7 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 		
 		cisAdvert1.setName("record1");
 		cisAdvert1.setId("pubs.societies.org");
-		cisAdvert1.setUri("/home/advert1");
+		cisAdvert1.setCssownerid("/home/advert1");
 		memberCrit1.setCriteria(criteria1);
 		cisAdvert1.setMembershipCrit(memberCrit1);
 		
@@ -97,7 +97,7 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 		cisAdvert2 = CisAdvertisementRecord.class.newInstance();
 		cisAdvert2.setName("record2");
 		cisAdvert2.setId("olympics.societies.org");
-		cisAdvert2.setUri("/home/advert2");
+		cisAdvert2.setCssownerid("/home/advert2");
 		memberCrit2.setCriteria(criteria2);
 		cisAdvert2.setMembershipCrit(memberCrit2);
 		
@@ -107,7 +107,7 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 		cisAdvert2new = CisAdvertisementRecord.class.newInstance();
 		cisAdvert2new.setName("record2new");
 		cisAdvert2new.setId("leona2@societies.org");
-		cisAdvert2new.setUri("/home/advert2");
+		cisAdvert2new.setCssownerid("/home/advert2");
 		assertTrue(null != cisAdvert2new);
 	}
 
@@ -123,7 +123,7 @@ public class TestCISDirectory extends AbstractTransactionalJUnit4SpringContextTe
 			System.out.println("+++++++++++++++++++++++ ADDING CIS_ADVERT1...");
 			System.out.println("Name is  = " + cisAdvert1.getName());
 			System.out.println("ID is  = " + cisAdvert1.getId());
-			System.out.println("Uri is  = " + cisAdvert1.getUri());
+			System.out.println("Owner ID is  = " + cisAdvert1.getCssownerid());
 			System.out.println("Criteria count = " + cisAdvert1.getMembershipCrit().getCriteria().size());
 			
 			cisDir.addCisAdvertisementRecord(cisAdvert1);

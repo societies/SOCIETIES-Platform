@@ -140,13 +140,13 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	ICommManager iCommMgr;
 	List<CisSubscribedImp> subscribedCISs;
 	private SessionFactory sessionFactory;
-	ICisDirectoryRemote iCisDirRemote;
+	ICisDirectoryRemote iCisDirRemote = null;
 
-	IServiceDiscoveryRemote iServDiscRemote;
-	IServiceControlRemote iServCtrlRemote;
-	private IPrivacyPolicyManager privacyPolicyManager;
-	private IEventMgr eventMgr;
-	private ICtxBroker internalCtxBroker;
+	IServiceDiscoveryRemote iServDiscRemote = null;
+	IServiceControlRemote iServCtrlRemote = null;
+	private IPrivacyPolicyManager privacyPolicyManager = null;
+	private IEventMgr eventMgr = null;
+	private ICtxBroker internalCtxBroker = null;
 
 	//private INegotiation negotiator;
 
@@ -369,7 +369,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			ret = cis.deleteCIS();
 			ret = ret && getOwnedCISs().remove(cis);
 			
-			if(ret == true){ // if it works we also send an internal event
+			if(ret == true && this.getEventMgr() != null){ // if it works we also send an internal event
 				InternalEvent event = new InternalEvent(EventTypes.CIS_DELETION, "deletion of CIS", this.cisManagerId.getBareJid(), c);
 				try {
 					this.getEventMgr().publishInternalEvent(event);
@@ -418,7 +418,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			IIdentity cssOwnerId = this.cisManagerId;
 			IIdentity cisId = iCommMgr.getIdManager().fromJid(cis.getCisId());
 			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisId);
-			privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
+			if(privacyPolicyManager != null)
+				privacyPolicyManager.updatePrivacyPolicy(privacyPolicy, requestorCis);			
 		} catch (InvalidFormatException e) {
 			LOG.error("CIS or CSS jid came in bad format");
 			e.printStackTrace();
@@ -444,7 +445,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		//this.persist(cis);
 		//cis.setSessionFactory(sessionFactory);
 
-
+		// TODO Check what else is required in relation to the CIS Advertisement owner Css Id
+		
 		// advertising the CIS to global CIS directory
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
 		//cisAd.setMode(0);//TODO: update this
@@ -452,22 +454,24 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		cis.fillMembershipCritXMPPobj(m);
 		cisAd.setMembershipCrit(m);
 		cisAd.setName(cis.getName());
-		cisAd.setUri(cis.getCisId());
+		cisAd.setCssownerid(cis.getCisId());
 		cisAd.setType(cis.getCisType());
 		cisAd.setId(cis.getCisId()); // TODO: check if the id or uri needs the jid
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
 		LOG.info("advertisement sent");
 		
 		// sending internal event
-		Community c = new Community();
-		cis.fillCommmunityXMPPobj(c);
-		InternalEvent event = new InternalEvent(EventTypes.CIS_CREATION, "creation of CIS", this.cisManagerId.getBareJid(), c);
-		try {
-			this.getEventMgr().publishInternalEvent(event);
-		} catch (EMSException e) {
-			LOG.error("error trying to internally publish CREATE event");
-			e.printStackTrace();
-			
+		if(this.getEventMgr() != null){
+			Community c = new Community();
+			cis.fillCommmunityXMPPobj(c);
+			InternalEvent event = new InternalEvent(EventTypes.CIS_CREATION, "creation of CIS", this.cisManagerId.getBareJid(), c);
+			try {
+				this.getEventMgr().publishInternalEvent(event);
+			} catch (EMSException e) {
+				LOG.error("error trying to internally publish CREATE event");
+				e.printStackTrace();
+				
+			}
 		}
 		
 		if (getOwnedCISs().add(cis)){
@@ -490,15 +494,17 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			this.persist(csi);
 			
 			// internal eventing
-			Community c = new Community();
-			csi.fillCommmunityXMPPobj(c);
-			InternalEvent event = new InternalEvent(EventTypes.CIS_SUBS, "subscription of CIS", this.cisManagerId.getBareJid(), c);
-			try {
-				this.getEventMgr().publishInternalEvent(event);
-			} catch (EMSException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				LOG.error("error trying to internally publish SUBS CIS event");
+			if(this.getEventMgr() != null){
+				Community c = new Community();
+				csi.fillCommmunityXMPPobj(c);
+				InternalEvent event = new InternalEvent(EventTypes.CIS_SUBS, "subscription of CIS", this.cisManagerId.getBareJid(), c);
+				try {
+					this.getEventMgr().publishInternalEvent(event);
+				} catch (EMSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					LOG.error("error trying to internally publish SUBS CIS event");
+				}
 			}
 			
 			return true;
@@ -525,13 +531,15 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				this.deletePersisted(temp); // removing it from the database
 				
 				//send the local event
-				InternalEvent event = new InternalEvent(EventTypes.CIS_UNSUBS, "unsubscription of CIS", this.cisManagerId.getBareJid(), c);
-				try {
-					this.getEventMgr().publishInternalEvent(event);
-				} catch (EMSException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					LOG.error("error trying to internally publish UNSUBS CIS event");
+				if(this.getEventMgr() != null){
+					InternalEvent event = new InternalEvent(EventTypes.CIS_UNSUBS, "unsubscription of CIS", this.cisManagerId.getBareJid(), c);
+					try {
+						this.getEventMgr().publishInternalEvent(event);
+					} catch (EMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						LOG.error("error trying to internally publish UNSUBS CIS event");
+					}
 				}
 				
 				return true;
@@ -1063,61 +1071,63 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		List<Qualification> lq = new ArrayList<Qualification>();
 
-		// Internal check of qualifications
-		if(adv.getMembershipCrit()!=null && adv.getMembershipCrit().getCriteria() !=null 
-				&& adv.getMembershipCrit().getCriteria().size()>0){
-			// if there is some memb criteria on the CIS we need to send our qualifications
-			CtxEntityIdentifier memberCssEntityId;
-			try {
-				memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
-			} catch (Exception e) {
-				LOG.debug("exception retrieving 1st data from internal CTX broker");
-				e.printStackTrace();
-				return;
-			}
+		if(internalCtxBroker !=null){ // check if it has been wired
 			
-			List<Criteria> l = adv.getMembershipCrit().getCriteria();
-			for (Criteria temp : l) { // for each criteria
-				List<CtxIdentifier> ctxIds;
+			// Internal check of qualifications
+			if(adv.getMembershipCrit()!=null && adv.getMembershipCrit().getCriteria() !=null 
+					&& adv.getMembershipCrit().getCriteria().size()>0){
+				// if there is some memb criteria on the CIS we need to send our qualifications
+				CtxEntityIdentifier memberCssEntityId;
 				try {
-					ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE,temp.getAttrib()).get();
+					memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
 				} catch (Exception e) {
-					LOG.debug("exception retrieving 2nd data from internal CTX broker");
+					LOG.debug("exception retrieving 1st data from internal CTX broker");
 					e.printStackTrace();
 					return;
 				}
-				if (ctxIds!=null && !ctxIds.isEmpty()) {
-					  LOG.debug("qualification found ");
-					  CtxIdentifier ctxId = ctxIds.get(0);
-					  // retrieve the attribute
-					  CtxAttribute attribute;
+				
+				List<Criteria> l = adv.getMembershipCrit().getCriteria();
+				for (Criteria temp : l) { // for each criteria
+					List<CtxIdentifier> ctxIds;
 					try {
-						attribute = (CtxAttribute) this.internalCtxBroker.retrieve(ctxId).get();
-						LOG.debug("qualification is " + attribute.getType());
+						ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE,temp.getAttrib()).get();
 					} catch (Exception e) {
-						LOG.debug("exception retrieving 3rd data from internal CTX broker");
+						LOG.debug("exception retrieving 2nd data from internal CTX broker");
 						e.printStackTrace();
 						return;
 					}
-					  if (attribute != null){
-						  // TODO: at the moment we are not checking the criteria here, but just building
-						  // the qualification because it was wanted by privace that just the attribute is
-						  // revealed on Advertisement
-						  Qualification q = new Qualification();
-						  q.setAttrib(temp.getAttrib());
-						  q.setValue(attribute.getStringValue());
-						  lq.add(q);
-						  LOG.debug("qualification value " + attribute.getStringValue());
-					  }
-						  
+					if (ctxIds!=null && !ctxIds.isEmpty()) {
+						  LOG.debug("qualification found ");
+						  CtxIdentifier ctxId = ctxIds.get(0);
+						  // retrieve the attribute
+						  CtxAttribute attribute;
+						try {
+							attribute = (CtxAttribute) this.internalCtxBroker.retrieve(ctxId).get();
+							LOG.debug("qualification is " + attribute.getType());
+						} catch (Exception e) {
+							LOG.debug("exception retrieving 3rd data from internal CTX broker");
+							e.printStackTrace();
+							return;
+						}
+						  if (attribute != null){
+							  // TODO: at the moment we are not checking the criteria here, but just building
+							  // the qualification because it was wanted by privace that just the attribute is
+							  // revealed on Advertisement
+							  Qualification q = new Qualification();
+							  q.setAttrib(temp.getAttrib());
+							  q.setValue(attribute.getStringValue());
+							  lq.add(q);
+							  LOG.debug("qualification value " + attribute.getStringValue());
+						  }
+							  
+					}
+	
+					
+					
 				}
-
-				
 				
 			}
-			
-		}
-		
+		}//end of if(internalCtxBroker !=null){
 		
 		// End of qualification retrieaval
 		if (lq.size()>0)
@@ -1129,43 +1139,47 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	// TODO just for test purposes, delete later
 	// set the user as a protestant from Paris =D
 	private void addHardCodedQualifications(){
-		LOG.info("going to add hard coded qualifications");
-		CtxEntityIdentifier memberCssEntityId;
-		try {
-			memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
+		
+		if(internalCtxBroker !=null){ // check if it has been wired
 			
-			// first social status
-            LOG.info("memberCssEntityId:"+memberCssEntityId.hashCode());
-            LOG.info("this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS): "+this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS));
-			List<CtxIdentifier> ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS).get();			
-
-			if(ctxIds!= null && ctxIds.isEmpty() == false){
-				CtxAttribute ctAtb1 = ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds.get(0)).get());
-				LOG.info("Already existing status equals to " + ctAtb1.getStringValue() );
-			}else{
-				LOG.info("non existing social status, gonna create");
-				CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.RELIGIOUS_VIEWS).get();
-				ctAtb1.setStringValue("protestant");
-				ctAtb1.setValueType(CtxAttributeValueType.STRING);
-				this.internalCtxBroker.update(ctAtb1);
+			LOG.info("going to add hard coded qualifications");
+			CtxEntityIdentifier memberCssEntityId;
+			try {
+				memberCssEntityId = this.internalCtxBroker.retrieveIndividualEntity(this.getICommMgr().getIdManager().getThisNetworkNode()).get().getId();
+				
+				// first social status
+	            LOG.info("memberCssEntityId:"+memberCssEntityId.hashCode());
+	            LOG.info("this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS): "+this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS));
+				List<CtxIdentifier> ctxIds = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.RELIGIOUS_VIEWS).get();			
+	
+				if(ctxIds!= null && ctxIds.isEmpty() == false){
+					CtxAttribute ctAtb1 = ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds.get(0)).get());
+					LOG.info("Already existing status equals to " + ctAtb1.getStringValue() );
+				}else{
+					LOG.info("non existing social status, gonna create");
+					CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.RELIGIOUS_VIEWS).get();
+					ctAtb1.setStringValue("protestant");
+					ctAtb1.setValueType(CtxAttributeValueType.STRING);
+					this.internalCtxBroker.update(ctAtb1);
+				}
+	
+				List<CtxIdentifier> ctxIds2 = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
+				if(ctxIds2!= null && ctxIds2.isEmpty() == false){
+					LOG.info("Already existing status equals to " + ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds2.get(0)).get()).getStringValue() );
+				}else{
+					LOG.info("non existing city, gonna create");
+					CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
+					ctAtb1.setStringValue("Paris");
+					ctAtb1.setValueType(CtxAttributeValueType.STRING);
+					this.internalCtxBroker.update(ctAtb1);
+				}
+	
+				
+			} catch (Exception e) {
+				LOG.debug("exception retrieving 1st data from internal CTX broker");
+				e.printStackTrace();
+				return;
 			}
-
-			List<CtxIdentifier> ctxIds2 = this.internalCtxBroker.lookup(memberCssEntityId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
-			if(ctxIds2!= null && ctxIds2.isEmpty() == false){
-				LOG.info("Already existing status equals to " + ((CtxAttribute) this.internalCtxBroker.retrieve(ctxIds2.get(0)).get()).getStringValue() );
-			}else{
-				LOG.info("non existing city, gonna create");
-				CtxAttribute ctAtb1 = this.internalCtxBroker.createAttribute(memberCssEntityId, CtxAttributeTypes.ADDRESS_HOME_CITY).get();
-				ctAtb1.setStringValue("Paris");
-				ctAtb1.setValueType(CtxAttributeValueType.STRING);
-				this.internalCtxBroker.update(ctAtb1);
-			}
-
-			
-		} catch (Exception e) {
-			LOG.debug("exception retrieving 1st data from internal CTX broker");
-			e.printStackTrace();
-			return;
 		}
 		
 	}
@@ -1279,6 +1293,14 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	 */
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
+		if(this.getListOfOwnedCis() != null && this.getListOfOwnedCis().size()>0){
+			LOG.info("[Dependency Injection] IPrivacyPolicyManager injected in CISs");
+			for (int i=0; i< this.getListOfOwnedCis().size(); i++) {
+				Cis c = (Cis)this.getListOfOwnedCis().get(i);
+				c.setPrivacyPolicyManager(privacyPolicyManager);
+			}
+		}
+		
 		LOG.info("[Dependency Injection] IPrivacyPolicyManager injected");
 	}
 	
@@ -1295,19 +1317,20 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
 			return false;
 		}
-		if (null == internalCtxBroker) {
-			LOG.info("[Dependency Injection] Missing Context Broker");
-			return false;
-		}
-		if (null == eventMgr) {
-			LOG.info("[Dependency Injection] Missing Event Manager");
-			return false;
-		}
+
 		//TODO: add service ones
 		
 		if (level >= 1) {
 			if (null == privacyPolicyManager) {
 				LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
+				return false;
+			}
+			if (null == internalCtxBroker) {
+				LOG.info("[Dependency Injection] Missing Context Broker");
+				return false;
+			}
+			if (null == eventMgr) {
+				LOG.info("[Dependency Injection] Missing Event Manager");
 				return false;
 			}
 		}

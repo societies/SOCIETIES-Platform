@@ -201,10 +201,14 @@ var SocietiesLogin = {
 			
 			//pre-fetch pre-populated pages
 			$.mobile.loadPage("html/active_services.html");
+			$.mobile.loadPage("html/myProfile.html");
+			
 			//pre-fetch main navigation pages
 			$.mobile.loadPage("html/myProfile.html");
 			$.mobile.loadPage("html/settings.html");
 			$.mobile.loadPage("html/about.html");
+			$.mobile.loadPage("html/my_apps.html");
+			$.mobile.loadPage("html/my_apps_details.html");
 			
 			$.mobile.changePage("html/landing.html", { transition: "slideup"} );
 		}

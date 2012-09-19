@@ -48,10 +48,10 @@ public class StatusObfuscator extends DataObfuscator<IDataWrapper<Status>> {
 	}
 
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
-	@Override
 	public IDataWrapper<Status> obfuscateData(double obfuscationLevel)
 			throws PrivacyException {
 		return dataWrapper;

@@ -88,11 +88,11 @@ public class NominalTestCase {
     public void testCreateCises() {
         for(int i = 0 ; i < this.numCIS ; i++){
             String cisId;
-            String testTitle = "testCreateCisWithoutPrivacyPolicyCreation: create a CIS without create of its privacy policy";
+            String testTitle = "testCreateCisWithoutPrivacyPolicyCreation: ";
             LOG.info("[#"+testCaseNumber+"] "+testTitle);
 
             // Create CIS
-            LOG.info("############## CSS Id:"+cssId+" ("+cssPassword+")");
+            LOG.info("############## CREATED CIS with Id:"+cssId+" ("+cssPassword+")");
             Future<ICisOwned> futureCis = TestCase1096.cisManager.createCis(cisName, cisType, cisMembershipCriteria, cisDescription);
             ICisOwned newCis = null;
             assertNotNull("Future new CIS is null", futureCis);
@@ -122,6 +122,8 @@ public class NominalTestCase {
             assertNotNull("New CIS is not stored", cisRetrieved);
             assertEquals("New CIS and retrived CIS should be the same but are not", newCis, cisRetrieved);
         }
+        LOG.info("cisIds.size(): "+cisIds.size());
+        assert(cisIds.size()==this.numCIS);
     }
 
 }

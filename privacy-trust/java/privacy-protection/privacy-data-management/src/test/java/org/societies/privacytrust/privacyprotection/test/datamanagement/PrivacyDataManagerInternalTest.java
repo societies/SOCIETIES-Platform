@@ -42,6 +42,7 @@ import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -55,6 +56,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.util.commonmock.MockIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.ExpectedException;
 import org.springframework.test.annotation.Rollback;
@@ -85,21 +87,21 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 
 	@Before
 	public void setUp() throws Exception {
+		// Requestor
+		IIdentity myCssId = new MockIdentity(IdentityType.CSS, "mycss","societies.local");
+		IIdentity requestorId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
+		IIdentity requestorCisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
+		requestor = new Requestor(requestorId);
+		requestorCis = new RequestorCis(requestorId, requestorCisId);
+
 		// Data Id
 		try {
-			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/name/13");
 		}
 		catch (MalformedCtxIdentifierException e) {
 			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
 			fail("setUp(): DataId creation error "+e.getMessage());
 		} 
-		// Requestor
-		IIdentity requestorId = Mockito.mock(IIdentity.class);
-		Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-		IIdentity requestorCisId = Mockito.mock(IIdentity.class);
-		Mockito.when(requestorCisId.getJid()).thenReturn("cis.societies.local");
-		requestor = new Requestor(requestorId);
-		requestorCis = new RequestorCis(requestorId, requestorCisId);
 	}
 
 	@After
