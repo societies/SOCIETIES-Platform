@@ -53,34 +53,50 @@
 	</parent>
 
 	<dependencies>
-		<!-- Societies -->
+
+
+
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+
+
 		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>api</artifactId>
-			<version>${version.pt}</version>
-		</dependency>
-		<!-- Tools -->
+
+
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- <dependency> <groupId>org.apache.commons</groupId> <artifactId>commons-lang3</artifactId> 
-			<version>3.1</version> <scope>provided</scope> </dependency> -->
-		<!-- <dependency> <groupId>commons-collections</groupId> <artifactId>commons-collections</artifactId> 
-			<version>3.1</version> </dependency> -->
+
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Societies -->
+
+		<dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>api</artifactId>
+			<version>${version.pt}</version>
+		</dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -124,48 +140,15 @@
 			<version>1.0</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- Logging -->
-		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> 
-			<version>${slf4j.version}</version> <scope>provided</scope> </dependency> -->
-		<!-- Spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
-		<!-- Persistence -->
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>hibernate_classes</artifactId>
-			<scope>provided</scope>
-		</dependency>
+		
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>com.springsource.javax.transaction</artifactId>
 			<version>1.1.0</version>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
+		
 
-
-		<!-- <dependency> <groupId>org.apache.derby</groupId> <artifactId>com.springsource.org.apache.derby</artifactId> 
-			<version>10.5.1000001.764942</version> <scope>test</scope> </dependency> 
-			<dependency> <groupId>org.springframework</groupId> <artifactId>org.springframework.transaction</artifactId> 
-			</dependency> <dependency> <groupId>javax.transaction</groupId> <artifactId>com.springsource.javax.transaction</artifactId> 
-			<version>1.1.0</version> <scope>provided</scope> </dependency> <dependency> 
-			<groupId>org.springframework</groupId> <artifactId>org.springframework.orm</artifactId> 
-			</dependency> <dependency> <groupId>org.springframework</groupId> <artifactId>org.springframework.jdbc</artifactId> 
-			</dependency> <dependency> <groupId>org.springframework</groupId> <artifactId>org.springframework.asm</artifactId> 
-			</dependency> <dependency> <groupId>org.springframework</groupId> <artifactId>org.springframework.expression</artifactId> 
-			</dependency> <dependency> <groupId>org.springframework</groupId> <artifactId>org.springframework.aop</artifactId> 
-			</dependency> <dependency> <groupId>org.aopalliance</groupId> <artifactId>com.springsource.org.aopalliance</artifactId> 
-			<version>1.0.0</version> <scope>provided</scope> </dependency> <dependency> 
-			<groupId>org.hibernate</groupId> <artifactId>com.springsource.org.hibernate</artifactId> 
-			<version>3.3.2.GA</version> <scope>provided</scope> </dependency> <dependency> 
-			<groupId>org.hibernate</groupId> <artifactId>com.springsource.org.hibernate.annotations</artifactId> 
-			<version>3.4.0.GA-A</version> <scope>provided</scope> </dependency> <dependency> 
-			<groupId>org.hibernate</groupId> <artifactId>com.springsource.org.hibernate.annotations.common</artifactId> 
-			<version>3.3.0.ga</version> <scope>provided</scope> </dependency> -->
 	</dependencies>
 
 	<build>

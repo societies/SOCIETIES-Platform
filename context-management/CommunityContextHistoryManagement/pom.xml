@@ -8,7 +8,6 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
 	<!-- groupId is set in parent pom -->
@@ -17,7 +16,7 @@
 	<packaging>bundle</packaging>
 
 	<developers>
-	    <developer>
+		<developer>
 			<id>nikoskal</id>
 			<name>Nikos Kalatzis</name>
 			<email>nikosk@cn.ntua.gr</email>
@@ -29,7 +28,7 @@
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
-	    <developer>
+		<developer>
 			<id>pkosmides</id>
 			<name>Pavlos Kosmides</name>
 			<email>pkosmidi@central.ntua.gr</email>
@@ -44,6 +43,18 @@
 
 	<!-- List dependencies here -->
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -62,7 +73,7 @@
 		</dependency>
 	</dependencies>
 
-	
+
 
 
 	<build>

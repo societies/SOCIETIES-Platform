@@ -17,17 +17,22 @@
     <version>${version.comm}</version>
 
     <dependencies>
+    
+    	<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
     	<!-- Interface -->
     	<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
     	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
     	<!-- Commons -->
@@ -113,6 +118,8 @@
     						!org.jvnet.fastinfoset,
     						!com.sun.xml.fastinfoset.*,
     						org.slf4j*;version="1.5.8",
+    						<!-- indirect runtime dependency which is not imported in code -->
+    						org.simpleframework.xml.stream,
     						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>

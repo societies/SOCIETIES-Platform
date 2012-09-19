@@ -52,28 +52,42 @@
 	</parent>
 
 	<dependencies>
-		<!-- Societies -->
+
+
+
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>api</artifactId>
-			<version>${version.pt}</version>
-		</dependency>
-		<!-- Common external libraries -->
+
+
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+	
+		<dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>api</artifactId>
+			<version>${version.pt}</version>
+		</dependency>
+	
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -87,13 +101,7 @@
 			<version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- Spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
+	
 	</dependencies>
 
 	<build>

@@ -5,9 +5,8 @@
    <parent>
         <groupId>org.societies</groupId>
         <artifactId>spring-osgi-parent</artifactId>
-        <version>0.1</version>
-        <relativePath>../../parent/spring-osgi.xml</relativePath>
-   </parent>
+        <version>RELEASE</version>
+    </parent>
 
   <groupId>org.societies.utilities</groupId>
   <artifactId>DBC</artifactId>

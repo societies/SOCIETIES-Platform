@@ -33,40 +33,29 @@
 	<dependencies>
 		<!-- Societies -->
 		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.societies.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
 		</dependency>
-		<!-- Tools -->
-		<!-- Needed for OSGI (Internal) Event -->
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-			<version>4.1.0</version>
-			<scope>provided</scope>
-		</dependency>
+	
 		<!-- Needed for Societies-specific annotations -->
 		<dependency>
 			<groupId>org.societies.utilities</groupId>
 			<artifactId>societies-annotations</artifactId>
 			<version>${release.version}</version>
+			 <scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.simpleframework</groupId>
-			<artifactId>simple-xml</artifactId>
-			<version>2.6.4</version>
-			<scope>compile</scope>
-		</dependency>
+
 		<dependency>
 		    <groupId>org.societies.maven.converters</groupId>
 		    <artifactId>SimpleXMLConverters</artifactId>
-		    <version>0.1</version>
+		    <version>${release.version}</version>
 		    <scope>compile</scope>
 		</dependency>
 	</dependencies>
@@ -81,17 +70,13 @@
 						<!-- the API will export all interfaces packages for the rest of modules. 
 							The exclusion of internal package can be avoided as the plugin excludes automatically 
 							'internal' and 'impl' package names org.societies.api.** -->
-						<_exportcontents>
-							!org.societies.api.internal,
-							!org.osgi.*,
-							*
-						</_exportcontents>
+						<_exportcontents>*</_exportcontents>
 						<Import-Package>
     						<!--!javax.microedition.io,-->*
     					</Import-Package>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<!-- ;scope=compile|runtime -->
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 					</instructions>
 				</configuration>
 			</plugin>

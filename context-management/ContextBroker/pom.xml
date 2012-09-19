@@ -6,24 +6,16 @@
 	<groupId>org.societies.context-management</groupId>
 	<artifactId>context-broker</artifactId>
 	<version>${version.cm}</version>
-	
+
 	<dependencies>
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.context-management</groupId>
-			<artifactId>context-mgmt-api</artifactId>
-			<version>${version.cm}</version>
-			<scope>provided</scope>
-		</dependency>
+
+
 
 		<dependency>
 			<groupId>org.societies</groupId>
@@ -32,62 +24,59 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<version>${spring.version}</version>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>org.springframework.osgi.core</artifactId>
-			<version>1.2.1</version>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
-			<!-- <dependency> <groupId>org.springframework</groupId> <artifactId>org.springframework.context</artifactId> 
-				</dependency> <dependency> <groupId>org.springframework</groupId> <artifactId>org.springframework.beans</artifactId> 
-				</dependency> <dependency> <groupId>org.springframework.osgi</groupId> <artifactId>org.springframework.osgi.core</artifactId> 
-				<version>1.2.1</version> <scope>provided</scope> </dependency> <dependency> 
-				<groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> <version>${slf4j.version}</version> 
-				<scope>provided</scope> </dependency> -->
 
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<scope>test</scope>
-			</dependency>
 	
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-all</artifactId>
-				<version>1.9.0</version>
-				<scope>test</scope>
-			</dependency>
-	
-			<dependency>
-				<groupId>org.societies.context-management</groupId>
-				<artifactId>user-context-db-mgmt</artifactId>
-				<version>${version.cm}</version>
-				<scope>test</scope>
-			</dependency>
-	
-			<dependency>
-				<groupId>org.societies.context-management</groupId>
-				<artifactId>community-context-db-mgmt</artifactId>
-				<version>${version.cm}</version>
-				<scope>test</scope>
-			</dependency>
-	
-			<dependency>
-				<groupId>org.societies.context-management</groupId>
-				<artifactId>user-context-history-mgmt</artifactId>
-				<version>${version.cm}</version>
-				<scope>test</scope>
-			</dependency>
-	
-	
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-mgmt-api</artifactId>
+			<version>${version.cm}</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-db-mgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>community-context-db-mgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-history-mgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<parent>

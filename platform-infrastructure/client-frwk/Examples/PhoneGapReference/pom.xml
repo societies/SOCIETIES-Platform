@@ -5,13 +5,13 @@
    <parent>
         <groupId>org.societies</groupId>
         <artifactId>android-parent</artifactId>
-        <version>0.1</version>
-        <relativePath>../../../parent/android.xml</relativePath>
+        <version>RELEASE</version>
    </parent>
 
    <groupId>org.societies.cft</groupId>
    <artifactId>PhoneGapReference</artifactId>
    <name>Reference</name>
+   <version>${release.version}</version>
    <packaging>apk</packaging>
 
 
