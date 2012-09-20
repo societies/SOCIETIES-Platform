@@ -29,9 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.internal.orchestration.ICisDataCollector;
+import org.societies.api.internal.orchestration.IDataCollectorSubscriber;
 import org.societies.api.osgi.event.*;
-import org.societies.orchestration.api.ICisDataCollector;
-import org.societies.orchestration.api.IDataCollectorSubscriber;
 
 import java.util.HashMap;
 import java.util.List;

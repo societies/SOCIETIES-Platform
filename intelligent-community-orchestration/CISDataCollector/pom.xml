@@ -6,6 +6,7 @@
     <artifactId>cisdatacollector</artifactId>
     <packaging>bundle</packaging>
     <version>${version.ico}</version>
+    <name>CISDataCollector</name>
     <description>CIS data collector</description>
     <developers>
         <developer>
@@ -30,39 +31,20 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20090211</version>
-        </dependency>
         <!-- spring -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
             <scope>provided</scope>
         </dependency>
-
-
         <dependency>
             <groupId>org.societies.api.external</groupId>
             <artifactId>societies-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.societies.orchestration.api</groupId>
-            <artifactId>intelligent-community-orchestration-api</artifactId>
-            <version>${version.ico}</version>
-            <scope>provided</scope>
-        </dependency>
-<!--        <dependency>
-            <groupId>org.societies.context-management</groupId>
-            <artifactId>context-mgmt-api</artifactId>
-            <version>0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>-->
-        <dependency>
-            <groupId>org.societies.api.external</groupId>
-            <artifactId>societies-api</artifactId>
+            <groupId>org.societies.api.internal</groupId>
+            <artifactId>societies-api-internal</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

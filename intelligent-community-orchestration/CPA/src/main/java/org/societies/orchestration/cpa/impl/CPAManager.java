@@ -26,9 +26,9 @@
 package org.societies.orchestration.cpa.impl;
 
 import org.societies.api.internal.orchestration.ICPA;
+import org.societies.api.internal.orchestration.ICisDataCollector;
 import org.societies.api.internal.orchestration.ISocialGraph;
 import org.societies.api.osgi.event.*;
-import org.societies.orchestration.api.ICisDataCollector;
 import org.societies.orchestration.api.impl.CommunitySuggestionImpl;
 
 import java.util.HashMap;

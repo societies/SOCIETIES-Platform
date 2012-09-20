@@ -27,9 +27,8 @@ package org.societies.orchestration.cpa.impl;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.orchestration.api.ICisDataCollector;
-import org.societies.orchestration.api.ICisProposal;
-import org.societies.orchestration.api.IDataCollectorSubscriber;
+import org.societies.api.internal.orchestration.ICisDataCollector;
+import org.societies.api.internal.orchestration.IDataCollectorSubscriber;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,10 +68,8 @@ public class CPA implements IDataCollectorSubscriber, Runnable
 //    public CPA(IIdentity linkedEntity, String linkType) {
 //		lastTemporaryCheck = new Date();
 //	}
-	private void sendToCSM(List<ICisProposal> list){
-	}
 	private void process() {
-		sendToCSM(cpaCreationPatterns.analyze(newActivities));
+		cpaCreationPatterns.analyze(newActivities);
 	}
 	
 	

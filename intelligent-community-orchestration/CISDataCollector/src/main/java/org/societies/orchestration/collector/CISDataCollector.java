@@ -40,9 +40,9 @@ import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.orchestration.IDataCollectorSubscriber;
 import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.activityfeed.Activityfeed;
-import org.societies.orchestration.api.IDataCollectorSubscriber;
 
 import javax.xml.bind.JAXBException;
 import java.util.ArrayList;

@@ -51,4 +51,7 @@ public class CommunitySuggestionImpl implements ICommunitySuggestion, Serializab
     public void setConditionsList(ArrayList<String> conditionsList) {
         this.conditionsList = conditionsList;
     }
+    public void addMember(String member){
+        membersList.add(member);
+    }
 }

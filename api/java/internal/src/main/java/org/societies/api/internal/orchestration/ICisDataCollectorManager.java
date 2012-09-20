@@ -1,4 +1,4 @@
-package org.societies.orchestration.api;
+package org.societies.api.internal.orchestration;
 
 import java.util.concurrent.Future;
 
