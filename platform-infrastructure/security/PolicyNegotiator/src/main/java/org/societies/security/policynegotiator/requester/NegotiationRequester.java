@@ -50,6 +50,7 @@ public class NegotiationRequester implements INegotiation {
 	private IPersonalisationManager personalizationMgr;
 	private IPrivacyPolicyNegotiationManager privacyPolicyNegotiationMgr;
 	private boolean isPrivacyPolicyNegotiationMgrAvailable = false;
+	private boolean privacyPolicyNegotiationIncluded;
 	private IEventMgr eventMgr;
 	
 //	@Autowired
@@ -112,6 +113,13 @@ public class NegotiationRequester implements INegotiation {
 		this.privacyPolicyNegotiationMgr = privacyPolicyNegotiationMgr;
 		this.isPrivacyPolicyNegotiationMgrAvailable = true;
 	}
+	public boolean isPrivacyPolicyNegotiationIncluded() {
+		return privacyPolicyNegotiationIncluded;
+	}
+	public void setPrivacyPolicyNegotiationIncluded(boolean privacyPolicyNegotiationIncluded) {
+		LOG.info("Setting privacyPolicyNegotiationIncluded to {}", privacyPolicyNegotiationIncluded);
+		this.privacyPolicyNegotiationIncluded = privacyPolicyNegotiationIncluded;
+	}
 	public IEventMgr getEventMgr() {
 		return eventMgr;
 	}
@@ -131,13 +139,15 @@ public class NegotiationRequester implements INegotiation {
 		
 		if (provider instanceof RequestorService) {
 			RequestorService providerService = (RequestorService) provider;
-			LOG.info("startNegotiation([{}; {}])", providerService.getRequestorId(),
+			LOG.info("startNegotiation([{}; {}], " + includePrivacyPolicyNegotiation + ")",
+					providerService.getRequestorId(),
 					providerService.getRequestorServiceId());
 			serviceOrCisId = providerService.getRequestorServiceId().getIdentifier().toString();
 		}
 		else if (provider instanceof RequestorCis) {
 			RequestorCis providerCis = (RequestorCis) provider;
-			LOG.info("startNegotiation([{}; {}])", providerCis.getRequestorId(),
+			LOG.info("startNegotiation([{}; {}], " + includePrivacyPolicyNegotiation + ")",
+					providerCis.getRequestorId(),
 					providerCis.getCisRequestorId());
 			serviceOrCisId = providerCis.getCisRequestorId().getJid();
 		}
@@ -155,6 +165,6 @@ public class NegotiationRequester implements INegotiation {
 
 	@Override
 	public void startNegotiation(Requestor provider, INegotiationCallback callback) {
-		startNegotiation(provider, true, callback);
+		startNegotiation(provider, privacyPolicyNegotiationIncluded, callback);
 	}
 }
