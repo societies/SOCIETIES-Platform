@@ -212,6 +212,7 @@ var SocietiesLogin = {
 			
 			$.mobile.loadPage("html/communities_list.html");
 			$.mobile.loadPage("html/community_profile.html");
+			$.mobile.loadPage("html/communities_result.html");
 			
 			$.mobile.changePage("html/landing.html", { transition: "slideup"} );
 		}
