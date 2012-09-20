@@ -24,6 +24,7 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -72,9 +73,10 @@ public class NominalTestCaseLowerTester {
 	 * Select the relevant service example: the Calculator
 	 * @throws NegotiationException 
 	 * @throws URISyntaxException 
+	 * @throws InterruptedException 
 	 */
 	@BeforeClass
-	public static void initialization() throws URISyntaxException, NegotiationException {
+	public static void initialization() throws URISyntaxException, NegotiationException, InterruptedException {
 		
 		LOG.info("[#1001] Initialization");
 		LOG.info("[#1001] Prerequisite: The CSS is created");
@@ -89,7 +91,12 @@ public class NominalTestCaseLowerTester {
 		LOG.info("Adding service {}", SERVICE_ID);
 		ServiceResourceIdentifier id = new ServiceResourceIdentifier();
 		id.setIdentifier(new URI(SERVICE_ID));
-		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), SERVICE_CLIENT_FILENAME);
+
+		NegotiationProviderSLMCallback callback = new NegotiationProviderSLMCallback();
+		negotiationProviderServiceMgmt.addService(id, null, new URI(SERVER_HOSTNAME), SERVICE_CLIENT_FILENAME, callback);
+		Thread.sleep(TIME_TO_WAIT_IN_MS);
+		assertTrue(callback.isInvoked());
+		assertTrue(callback.isSuccessful());
 	}
 
 	/**
@@ -240,6 +247,7 @@ public class NominalTestCaseLowerTester {
 		testNegotiationService();
 
 		InputStream is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_FILENAME);
+		assertNotNull(is);
 		Files.writeFile(is, SERVICE_CLIENT_FILENAME);
 		
 		// URL with valid signature

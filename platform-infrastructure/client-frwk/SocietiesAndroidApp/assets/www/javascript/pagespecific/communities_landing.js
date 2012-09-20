@@ -32,15 +32,35 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * N.B. this event is fired once per page load
  * @returns null
  */
+
 $(document).bind('pageinit',function(){
 
 	console.log("communities landing pageinit action(s)");
 	
-	 $('#listCommunities').off('click').on('click', function() {
-		  SocietiesCISManagerService.ListCIS();
-		 });
+	$('a#createCommunity').off('click').on('click', function() {
+		$.mobile.changePage($("#community-create"), { transition: "fade"} );
+	});
 	
-	 });
+	$('a#listCommunities').off('click').on('click', function() {
+		SocietiesCISManagerService.ListCIS();
+	});
+	
+	$('a#suggestedCommunities').off('click').on('click', function() {
+		window.alert("Coming soon...");
+	});
+	
+	$('#btnSearchCommunities').off('click').on('click', function() {
+		var search = $("#search-communities").val();
+		if (search != "Search Communities" && search != "") 
+			SocietiesCISManagerService.searchCisDirectory(search);
+		else
+			SocietiesCISManagerService.getAllCisDirAds();
+	});
+	
+	$('#search-communities').off('focus').on('focus', function(){
+		SocietiesLogin.clearElementValue('#search-communities')
+	});
+});
 
 
 

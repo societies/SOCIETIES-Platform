@@ -63,6 +63,8 @@
 		<module>../../platform-infrastructure/comms-frwk/XCCommunicationMgr</module>
 		<module>../../platform-infrastructure/comms-frwk/PubsubServiceBundle</module>
 		<module>../../platform-infrastructure/comms-frwk/PubsubClientBundle</module>
+		<module>../../platform-infrastructure/comms-frwk/CloudCommsBundle</module>
+		<module>../../platform-infrastructure/comms-frwk/RichCommsBundle</module>
 		<module>../../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
 		
 		<!-- Common External Libraries: 3 bundles -->
@@ -70,6 +72,5 @@
 		<module>../../common-modules/common-ext-libs</module>
 		<module>../../common-modules/common-data-source</module>
 		-->
-		<module>../../platform-infrastructure/comms-frwk/CommonLibraries</module>
 	</modules>
 </project>

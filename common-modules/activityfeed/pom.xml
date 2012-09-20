@@ -97,14 +97,6 @@
             <version>0.1</version>
             <scope>provided</scope>
         </dependency>
-        
-
-		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-			<artifactId>PubsubClientBundle</artifactId>
-			<version>${version.comm}</version>
-			<scope>provided</scope>
-		</dependency>
 		
 		<dependency>
 			<groupId>junit</groupId>

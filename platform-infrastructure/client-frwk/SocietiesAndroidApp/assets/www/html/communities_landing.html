@@ -17,40 +17,36 @@
 	</div>
 	<!-- /header -->
 	<div data-role="content">
-		
-		<input type="search" name="search" id="search-basic" value="Search Communities" data-theme="b"/>
-		<br/><br/>
+		<p align="right">
+		<input type="search" name="search" id="search-communities" value="Search Communities" data-theme="b"/>
+		<input id="btnSearchCommunities" type="button" value="Search" data-inline="true" data-theme="b" />
+		</p>
 		
 		<ul data-role="listview" id="listview" data-theme="c" data-divider-theme="b" data-count-theme="b">
-			<li data-theme="d">
-			<a href="#" id="listCommunities" >
-			<h2>Your Communities</h2>
-			<p>A list of your communities <span class="ui-li-count">15</span></p>
-			<p>
-			</p>
-			</a></li>
-			<li><a href="manage_communities.html">
-			<h2>Manage your Communities</h2>
-			<p>Edit profile details and settings <span class="ui-li-count">5</span></p>
-			<p>
-			</p>
-			</a></li>
-			<li><a href="create_community.html">
-			<h2>Create a new Community</h2>
-			<p>
-				Setup a new Community
-			</p>
-			<p>
-			</p>
-			</a></li>
-			<li><a href="your_suggested_communities_list.html">
-			<h2>Suggested Communities</h2>
-			<p>
-				Some communities we think you might <br/>be interested in joining <span class="ui-li-count">4</span>
-			</p>
-			<p>
-			</p>
-			</a></li>
+			<li><a href="#" id="createCommunity">
+				<h2>Create a new Community</h2>
+				<p>Setup a new Community</p>
+				<p>
+				</p>
+				</a></li>
+			<li><a href="#" id="listCommunities" >
+				<h2>My Communities</h2>
+				<p>A list of your communities <span class="ui-li-count">15</span></p>
+				<p>
+				</p>
+				</a></li>
+			<li><a href="#" id="suggestedCommunities">
+				<h2>Suggested Communities</h2>
+				<p>Some communities we think you might <br/>be interested in joining <span class="ui-li-count">4</span></p>
+				<p>
+				</p>
+				</a></li>
+			<!-- <li><a href="manage_communities.html">
+				<h2>Manage your Communities</h2>
+				<p>Edit profile details and settings <span class="ui-li-count">5</span></p>
+				<p>
+				</p>
+				</a></li> -->
 		</ul>
 		<br/><br/>
 		<a href="communities_list.html" data-prefetch />
