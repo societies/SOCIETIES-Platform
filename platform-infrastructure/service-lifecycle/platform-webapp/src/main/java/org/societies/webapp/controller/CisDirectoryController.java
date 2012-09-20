@@ -135,7 +135,7 @@ public class CisDirectoryController {
 				
 				
 					record.setName(cdForm.getName()); 
-					record.setCssownerid(cdForm.getCssOwnwerId());
+					record.setCssownerid(cdForm.getCssownerid());
 					record.setType(cdForm.getType());
 					record.setId(cdForm.getId());
 					//record.setMode(cdForm.getMode());

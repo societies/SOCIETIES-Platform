@@ -66,11 +66,11 @@ public class CISDirectoryForm {
 		this.name = name;
 	}
 	
-	public String getCssOwnwerId() {
+	public String getCssownerid() {
 		return cssownerid;
 	}
-	public void setCssOwnwerId(String cssownwerid) {
-		this.cssownerid = cssownwerid;
+	public void setCssownerid(String cssownerid) {
+		this.cssownerid = cssownerid;
 	}
 	
 	public String getType() {
