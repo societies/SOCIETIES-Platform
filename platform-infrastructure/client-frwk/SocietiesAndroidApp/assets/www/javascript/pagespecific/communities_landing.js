@@ -37,8 +37,16 @@ $(document).bind('pageinit',function(){
 
 	console.log("communities landing pageinit action(s)");
 	
-	$('#listCommunities').off('click').on('click', function() {
+	$('a#createCommunity').off('click').on('click', function() {
+		$.mobile.changePage($("#community-create"), { transition: "fade"} );
+	});
+	
+	$('a#listCommunities').off('click').on('click', function() {
 		SocietiesCISManagerService.ListCIS();
+	});
+	
+	$('a#suggestedCommunities').off('click').on('click', function() {
+		window.alert("Coming soon...");
 	});
 	
 	$('#btnSearchCommunities').off('click').on('click', function() {

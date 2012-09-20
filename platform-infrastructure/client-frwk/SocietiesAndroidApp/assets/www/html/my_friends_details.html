@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+
+<body>
+
+<div data-role="page" id="friend-profile">
+	<!-- /header -->
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="../images/societies_header.png" alt="logo"/>
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
+		<!-- /header -->
+	</div>
+	<div data-role="content">
+		<ul data-role="listview" data-theme="c" data-divider-theme="b" id="friendInfoUL">
+			<li data-role="list-divider">General Information</li>
+			<li>
+				<div class="profile_pic">
+					<img src="../images/profile_pic_sample.jpg" alt="profile_pic"/>
+				</div>
+				<div class="profile_txt" id="friend_profile_info">
+					<h1>Sarah Weber</h1>
+					<p>ICT, Education, E-Learning</p>
+					<p>Location: Dublin, Ireland</p>
+					</p>
+				</div>
+				<p><a href="remove_friend_dialog.html" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Remove Friend</a></p>
+				</li>
+			<li data-role="list-divider" >Additional Info</li>
+			<li id="friend_additional_info">
+				<br/>
+				<p>Java Programmer</p>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a nulla nunc. Cras elit nulla, varius vitae blandit sed, hendrerit vel nibh. Curabitur commodo vulputate dolor, sit amet lacinia felis ullamcorper ut.</p>
+				</li>
+			<li data-role="list-divider">SN Connectors - Latest Updates<span class="ui-li-count">2</span></li>
+			<li>
+				<h3>Facebook</h3>
+				<p>Sara updated her status to:</p>
+				<p>"Really enjoying the Societies Conference today!"</p>
+				<p class="ui-li-aside">
+					2:24PM
+				</p>
+				</li>
+			<li>
+				<h3>Twitter</h3>
+				<p>Joe Bloggs presentation on ICT in Education is very interesting and informative!</p>
+				<p class="ui-li-aside">
+					4:24PM
+				</p>
+				</li>
+			<li data-role="list-divider">Shared Apps</li>
+			<li>
+				<h3>HP Colour Printer</h3>
+				<p>HP SmartPrint Z200a</p>
+				<p class="ui-li-aside">
+					<a href="installed.html" data-role="button" data-theme="h" data-inline="true" data-rel="dialog">Install App</a>
+				</p>
+				<br/>
+				</li>
+			<li data-role="list-divider">Preferences</li>
+			<li>
+				<h3>Location:</h3>
+				<p>
+					Dublin, Ireland - 53°20' 52" N 6°1' 3" W
+				</p>
+				<h3>Interests: </h3>
+				<p>
+					 Sport, ICT, Research
+				</p>
+				<h3>Job Title:</h3>
+				<p>
+					ICT Researcher
+				</p>
+				</li>
+		</ul>
+	</div>
+	<!-- /content -->
+	<br/><br/>
+	<!-- footer -->
+   <div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home">
+				<input id="home-button" type="image" alt="home" src="../images/icons/home_logo.png"  data-role="none"/>
+			</li>
+			<li class="btn-profile">
+				<input id="profile-button" type="image" alt="profile" src="../images/icons/my_profile.png"  data-role="none"/>	
+			</li>
+			<li class="btn-settings">
+				<input id="settings-button" type="image" alt="settings" src="../images/icons/settings.png"  data-role="none"/>	
+			</li>
+			<li class="btn-about">
+				<input id="about-button" type="image" alt="about" src="../images/icons/about.png"  data-role="none"/>	
+			</li>
+		</ul><!-- /global navbar -->
+	</div>
+	<!-- end footer -->
+</div>
+</body>
+</html>
