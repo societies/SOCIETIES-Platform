@@ -70,6 +70,5 @@
 		<module>../../common-modules/common-ext-libs</module>
 		<module>../../common-modules/common-data-source</module>
 		-->
-		<module>../../platform-infrastructure/comms-frwk/CommonLibraries</module>
 	</modules>
 </project>
