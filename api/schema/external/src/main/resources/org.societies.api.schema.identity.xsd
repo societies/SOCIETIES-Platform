@@ -48,6 +48,7 @@
       <xs:enumeration value="device"/>
       <xs:enumeration value="cis"/>
       <xs:enumeration value="activity"/>
+      <xs:enumeration value="css"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>
