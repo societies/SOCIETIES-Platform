@@ -81,6 +81,12 @@
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
+				<dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>api</artifactId>
+			<version>${version.pt}</version>
+		</dependency>
 
 
 		<!-- Communication Manager -->
