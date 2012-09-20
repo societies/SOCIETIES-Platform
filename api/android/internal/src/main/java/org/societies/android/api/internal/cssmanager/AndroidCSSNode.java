@@ -86,11 +86,10 @@ public class AndroidCSSNode extends CssNode implements Parcelable {
 	/**
 	 * Parcelable implementation
 	 */
-	@Override
 	public int describeContents() {
 		return 0;
 	}
-	@Override
+
 	public void writeToParcel(Parcel out, int flags) {
 			out.writeString(getIdentity());
 			out.writeInt(getType());
@@ -99,12 +98,10 @@ public class AndroidCSSNode extends CssNode implements Parcelable {
 	
 	public static final Parcelable.Creator<AndroidCSSNode> CREATOR = new Parcelable.Creator<AndroidCSSNode>() {
 
-		@Override
 		public AndroidCSSNode createFromParcel(Parcel in) {
 			return new AndroidCSSNode(in);
 		}
 
-		@Override
 		public AndroidCSSNode[] newArray(int size) {
 			return new AndroidCSSNode[size];
 		}
