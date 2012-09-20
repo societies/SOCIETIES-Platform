@@ -23,31 +23,36 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.feedback;
+package org.societies.useragent.feedback.guis;
 
-import java.util.List;
-import java.util.concurrent.Future;
+public class UFControl {
+	
+	public enum ufControlType {
+	    SUNDAY, MONDAY, TUESDAY, WEDNESDAY,
+	    THURSDAY, FRIDAY, SATURDAY 
+	}
+	
+	String label;
+	ufControlType type;
+	String id;
+	
+	public String getLabel() {
+		return label;
+	}
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	public ufControlType getType() {
+		return type;
+	}
+	public void setType(ufControlType type) {
+		this.type = type;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.FeedbackRequest;
-
-/**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
- */
-public interface IUserFeedback
-{
-	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
-	
-	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
-	
-	public void showNotification(String notificationText);
-	
-	public Future<FeedbackRequest> getNextRequest();
-	
-	public void submitExplicitResponse(String id);
-	
-	public void submitImplicitResponse(String id);
 }

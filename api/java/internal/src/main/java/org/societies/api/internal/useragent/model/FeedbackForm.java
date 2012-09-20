@@ -23,31 +23,8 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.feedback;
+package org.societies.api.internal.useragent.model;
 
-import java.util.List;
-import java.util.concurrent.Future;
+public class FeedbackForm {
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.FeedbackRequest;
-
-/**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
- */
-public interface IUserFeedback
-{
-	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
-	
-	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
-	
-	public void showNotification(String notificationText);
-	
-	public Future<FeedbackRequest> getNextRequest();
-	
-	public void submitExplicitResponse(String id);
-	
-	public void submitImplicitResponse(String id);
 }

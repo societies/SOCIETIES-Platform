@@ -41,6 +41,7 @@ import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.FeedbackRequest;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
@@ -57,11 +58,14 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	ICtxBroker ctxBroker;
 	ICommManager commsMgr;
 	IUserAgentRemoteMgr uaRemote;
+	RequestManager requestMgr;
 	String myDeviceID;
 	static String UNDEFINED = "undefined";
 	
 	public void initialiseUserFeedback(){
 		LOG.debug("User Feedback initialised!!");
+		
+		requestMgr = new RequestManager();
 		
 		//get current device ID
 		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
@@ -194,7 +198,30 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		}
 		
 		return new AsyncResult<Boolean>(result);
-	}	
+	}
+	
+	@Override
+	public void showNotification(String arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public Future<FeedbackRequest> getNextRequest() {
+		//requestManager.get
+		return null;
+	}
+
+	@Override
+	public void submitExplicitResponse(String arg0) {
+		
+	}
+
+	@Override
+	public void submitImplicitResponse(String arg0) {
+		
+	}
+	
 	
 	
 	
