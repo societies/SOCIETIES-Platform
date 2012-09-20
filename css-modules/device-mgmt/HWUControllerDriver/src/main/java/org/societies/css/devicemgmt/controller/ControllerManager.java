@@ -27,10 +27,14 @@ package org.societies.css.devicemgmt.controller;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.css.devicemgmt.controller.gui.PressureMatMonitorGUI;
 import org.societies.css.devicemgmt.controller.model.Controller;
+import org.societies.css.devicemgmt.controller.model.IPluggableResource;
+import org.societies.css.devicemgmt.controller.model.PressureMat;
 import org.societies.css.devicemgmt.controller.xml.XMLReader;
 import org.springframework.osgi.context.BundleContextAware;
 
@@ -48,18 +52,29 @@ public class ControllerManager implements BundleContextAware{
 	private ICtxBroker ctxBroker;
 
 	private ArrayList<Controller> controllers;
+	private ArrayList<PressureMatMonitorGUI> guis;
 	private ContextDataManager ctxDataManager;
 	
 	public void initialiseControllerManager(){
 		URL fileURL = bundleContext.getBundle().getResource("config/controllerConfig.xml");
 		File file = new File(fileURL.getFile());
-		ctxDataManager = new ContextDataManager(ctxBroker);
+		
 		XMLReader reader = new XMLReader(ctxDataManager);
 		controllers = reader.getConfiguration(file);
 		for (Controller ctrl : controllers){
 			SocketClient socketClient = new SocketClient(ctrl.getIpAddress(), ctxDataManager);
 			socketClient.start();
+			
+			List<PressureMat> mats = new ArrayList<PressureMat>();
+			for (IPluggableResource pR : ctrl.getPluggableResources()){
+				if (pR instanceof PressureMat){
+					mats.add((PressureMat) pR);
+				}
+			}
+			PressureMatMonitorGUI gui = new PressureMatMonitorGUI(ctrl.getControllerId(), mats);
+			this.guis.add(gui);
 		}
+		ctxDataManager = new ContextDataManager(ctxBroker, guis);
 	}
 
 	@Override
