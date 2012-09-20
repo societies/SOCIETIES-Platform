@@ -25,17 +25,19 @@
 
 package org.societies.api.internal.useragent.model;
 
+import java.util.UUID;
+
 public class FeedbackRequest {
 	
-	String id;
+	UUID id;
 	FeedbackForm form;
 	
-	public FeedbackRequest(String id, FeedbackForm form){
+	public FeedbackRequest(UUID id, FeedbackForm form){
 		this.id = id;
 		this.form = form;
 	}
 
-	public String getID() {
+	public UUID getID() {
 		return id;
 	}
 	

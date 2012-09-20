@@ -25,7 +25,9 @@
 
 package org.societies.useragent.feedback;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -41,6 +43,7 @@ import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.FeedbackRequest;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
@@ -53,33 +56,198 @@ import org.societies.useragent.feedback.guis.TimedGUI;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
-	
+
 	Logger LOG = LoggerFactory.getLogger(UserFeedback.class);
 	ICtxBroker ctxBroker;
 	ICommManager commsMgr;
 	IUserAgentRemoteMgr uaRemote;
 	RequestManager requestMgr;
 	String myDeviceID;
+	HashMap<UUID, List<String>> expResults;
+	HashMap<UUID, Boolean> impResults;
 	static String UNDEFINED = "undefined";
-	
+
 	public void initialiseUserFeedback(){
 		LOG.debug("User Feedback initialised!!");
-		
+
 		requestMgr = new RequestManager();
-		
+		expResults = new HashMap<UUID, List<String>>();
+		impResults = new HashMap<UUID, Boolean>();
+
 		//get current device ID
 		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
 	}
-	
+
 	@Override
+	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content){
+		List<String> result = null;
+		//create feedback form
+		FeedbackForm fbForm = generateExpFeedbackForm(type, content);
+		//create new request object with unique ID
+		UUID requestID = UUID.randomUUID();
+		FeedbackRequest fbRequest = new FeedbackRequest(requestID, fbForm);
+		//add new request to queue
+		requestMgr.addRequest(fbRequest);
+
+		//add request ID and result type to results hashmap
+		expResults.put(requestID, null);
+
+		//wait until result is available
+		while((List<String>)this.expResults.get(requestID) == null){
+			try{
+				synchronized(expResults){
+					this.expResults.wait();
+				}
+			}catch(InterruptedException e){
+				e.printStackTrace();
+			}
+		}
+
+		//set result and remove id from hashmap
+		result = this.expResults.get(requestID);
+		this.expResults.remove(requestID);
+
+		return new AsyncResult<List<String>>(result);
+	}
+
+	@Override
+	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
+		Boolean result = false;
+		//create feedback form
+		FeedbackForm fbForm = generateImpFeedbackForm(type, content);
+		//create new request object with unique ID
+		UUID requestID = UUID.randomUUID();
+		FeedbackRequest fbRequest = new FeedbackRequest(requestID, fbForm);
+		//add new request to queue
+		requestMgr.addRequest(fbRequest);
+
+		//add request ID and result type to results hashmap
+		impResults.put(requestID, null);
+
+		//wait until result is available
+		while((Boolean)this.impResults.get(requestID) == null){
+			try{
+				synchronized(impResults){
+					this.impResults.wait();
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+
+		//set result and remove id from hashmap
+		result = this.impResults.get(requestID);
+		this.impResults.remove(requestID);
+
+		return new AsyncResult<Boolean>(result);
+	}
+
+	@Override
+	public void showNotification(String notificationTxt) {
+		//create feedback form
+		FeedbackForm fbForm = generateNotificationForm(notificationTxt);
+		//create request object with unique id
+		FeedbackRequest fbRequest = new FeedbackRequest(UUID.randomUUID(), fbForm);
+		//add new request to queue
+		requestMgr.addRequest(fbRequest);
+	}
+
+
+	/*
+	 * The following methods are called by the UserFeedbackController as part of the platform web-app
+	 * 
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.useragent.feedback.IUserFeedback#getNextRequest()
+	 */
+	@Override
+	public Future<FeedbackRequest> getNextRequest() {
+		FeedbackRequest nextRequest = requestMgr.getNextRequest();
+		return new AsyncResult<FeedbackRequest>(nextRequest);
+	}
+
+	public void submitResponse(UUID requestId, Object result){
+		if(result instanceof Boolean){
+			Boolean impResult = (Boolean)result;
+			//set result value in hashmap
+			synchronized(impResults){
+				this.impResults.put(requestId, impResult);
+				this.impResults.notifyAll();
+			}
+		}else{
+			List<String> expResult = (List<String>)result;
+		}
+
+		//remove request from queue
+		if(requestMgr.removeRequest(requestId)){
+			LOG.error("Could not find specified request in queue");
+		}
+	}
+
+	@Override
+	public void submitExplicitResponse(UUID requestId, List<String> result) {
+		//set result value in hashmap
+		synchronized(expResults){
+			this.expResults.put(requestId, result);
+			this.expResults.notifyAll();
+		}
+		//remove request from queue
+		if(requestMgr.removeRequest(requestId)){
+			LOG.error("Could not find specified request in queue");
+		}
+	}
+
+	@Override
+	public void submitImplicitResponse(UUID requestId, Boolean result) {
+		//set result value in hashmap
+		synchronized(impResults){
+			this.impResults.put(requestId, result);
+			this.impResults.notifyAll();
+		}
+		//remove request from queue
+		if(requestMgr.removeRequest(requestId)){
+			LOG.error("Could not find specified request in queue");
+		}
+	}
+
+
+	/*
+	 * Helper methods
+	 */
+	private FeedbackForm generateExpFeedbackForm(int type, ExpProposalContent content){
+		FeedbackForm newFbForm = new FeedbackForm();
+		if(type == ExpProposalType.RADIOLIST){
+
+		}else if(type == ExpProposalType.CHECKBOXLIST){
+
+		}else if(type == ExpProposalType.ACKNACK){
+
+		}
+		return newFbForm;
+	}
+
+	private FeedbackForm generateImpFeedbackForm(int type, ImpProposalContent content){
+		FeedbackForm newFbForm = new FeedbackForm();
+		if(type == ImpProposalType.TIMED_ABORT){
+
+		}
+		return newFbForm;
+	}
+
+	private FeedbackForm generateNotificationForm(String notificationTxt){
+		FeedbackForm newFbForm = new FeedbackForm();
+
+		return newFbForm;
+	}
+
+	/*@Override
 	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content) {
 		List<String> result = null;
-		
+
 		//check current UID
 		String uid = getCurrentUID();
 		if(uid.equals(UNDEFINED)){//don't know what current UID is
 			LOG.error("UID is not defined - sending request to all interactable devices in CSS");
-			
+
 		}else if(uid.equals(myDeviceID)){  //local device is current UID
 			//show GUIs on local device
 			LOG.debug("Returning explicit feedback");
@@ -97,7 +265,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 				LOG.debug("ACK/NACK GUI");
 				result = AckNackGUI.displayGUI(proposalText, options);
 			}
-			
+
 		}else{  //remote device is current UID
 			//show GUIs on remote UID
 			try {
@@ -108,22 +276,22 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 				e.printStackTrace();
 			}
 		}
-		
-		return new AsyncResult<List<String>>(result);
-	}
 
-	@Override
+		return new AsyncResult<List<String>>(result);
+	}*/
+
+	/*@Override
 	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
 		Boolean result = null;
-		
+
 		//check for current UID
 		String uid = getCurrentUID();
 		if(uid.equals(UNDEFINED)){  //don't know what current UID is
-			
+
 		}else if(uid.equals(myDeviceID)){  //local device is current UID
 			//show GUIs on local device
 			LOG.debug("Returning implicit feedback");
-			
+
 			String proposalText = content.getProposalText();
 			int timeout = content.getTimeout();
 			if(type == ImpProposalType.TIMED_ABORT){
@@ -141,10 +309,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 				e.printStackTrace();
 			}
 		}
-		
+
 		return new AsyncResult<Boolean>(result);
-	}	
-	
+	}	*/
+
 	/*
 	 *Called by UACommsServer to request explicit feedback for remote User Agent
 	 * 
@@ -155,7 +323,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	public Future<List<String>> getExplicitFBforRemote(int type, ExpProposalContent content) {
 		LOG.debug("Request for explicit feedback received from remote User Agent");
 		List<String> result = null;
-		
+
 		//show GUIs on local device
 		LOG.debug("Returning explicit feedback to UACommsServer");
 		String proposalText = content.getProposalText();
@@ -172,7 +340,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 			LOG.debug("ACK/NACK GUI");
 			result = AckNackGUI.displayGUI(proposalText, options);
 		}
-		
+
 		return new AsyncResult<List<String>>(result);
 	}
 
@@ -186,7 +354,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	public Future<Boolean> getImplicitFBforRemote(int type, ImpProposalContent content) {
 		LOG.debug("Request for implicit feedback received from remote User Agent");
 		Boolean result = null;
-		
+
 		//show GUIs on local device
 		LOG.debug("Returning implicit feedback to UACommsServer");
 		String proposalText = content.getProposalText();
@@ -196,35 +364,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 			TimedGUI gui = new TimedGUI();
 			result = gui.displayGUI(proposalText, timeout);
 		}
-		
+
 		return new AsyncResult<Boolean>(result);
 	}
-	
-	@Override
-	public void showNotification(String arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public Future<FeedbackRequest> getNextRequest() {
-		//requestManager.get
-		return null;
-	}
 
-	@Override
-	public void submitExplicitResponse(String arg0) {
-		
-	}
 
-	@Override
-	public void submitImplicitResponse(String arg0) {
-		
-	}
-	
-	
-	
-	
+
+
 	private String getCurrentUID(){
 		String uid = "";
 		try {
@@ -244,15 +390,15 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		}
 		return uid;
 	}
-	
+
 	public void setCtxBroker(ICtxBroker ctxBroker){
 		this.ctxBroker = ctxBroker;
 	}
-	
+
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
 	}
-	
+
 	public void setUaRemote(IUserAgentRemoteMgr uaRemote){
 		this.uaRemote = uaRemote;
 	}

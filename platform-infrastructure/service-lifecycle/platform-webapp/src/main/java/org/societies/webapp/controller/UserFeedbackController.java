@@ -23,37 +23,20 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.feedback;
+package org.societies.webapp.controller;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.UUID;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 
-import org.societies.api.internal.useragent.model.FeedbackRequest;
-
-public class RequestManager {
+public class UserFeedbackController {
 	
-	Queue<FeedbackRequest> requestQueue;
-
-	public RequestManager(){
-		requestQueue = new LinkedList<FeedbackRequest>();
+	IUserFeedback userFeedback;
+	
+	public /*UFControl[]*/void getForm(){
+		//retrieve form content and format from UF service
+		
 	}
 	
-	public FeedbackRequest getNextRequest(){
-		return requestQueue.element();
-	}
-	
-	public void addRequest(FeedbackRequest newRequest){
-		requestQueue.add(newRequest);
-	}
-	
-	public boolean removeRequest(UUID requestID){
-		for(FeedbackRequest nextRequest: requestQueue){
-			if(nextRequest.getID().compareTo(requestID) == 0){  //the same
-				requestQueue.remove(nextRequest);
-				return true;
-			}
-		}
-		return false;
+	public void setUserFeedback(IUserFeedback userFeedback){
+		this.userFeedback = userFeedback;
 	}
 }
