@@ -25,6 +25,7 @@
 package org.societies.domainauthority.rest.comms;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -92,11 +93,11 @@ public class CommsServer implements IFeatureServer {
 	}
 
 	// Getters and setters for beans
-	public IClientJarServer getNegotiationProvider() {
+	public IClientJarServer getClientJarServer() {
 		return clientJarServer;
 	}
-	public void setNegotiationProvider(IClientJarServer negotiationProvider) {
-		this.clientJarServer = negotiationProvider;
+	public void setClientJarServer(IClientJarServer clientJarServer) {
+		this.clientJarServer = clientJarServer;
 		//LOG.debug("setNegotiationProvider()");
 		//LOG.debug("setNegotiationProvider({})", negotiationProvider);
 	}
@@ -142,7 +143,14 @@ public class CommsServer implements IFeatureServer {
 			
 			// Method parameters
 			ClientJarBean clientJarBean = (ClientJarBean) messageBean;
-			List<String> files = clientJarBean.getFiles();
+			//List<String> files = clientJarBean.getFiles();
+			// Workaround to avoid org.simpleframework.xml.transform.TransformException:
+			// Transform of class java.util.ArrayList not supported
+			List<String> files = new ArrayList<String>();
+			addFileName(files, clientJarBean.getFile1());
+			addFileName(files, clientJarBean.getFile2());
+			addFileName(files, clientJarBean.getFile3());
+			
 			URI serviceId = clientJarBean.getServiceId();
 			String providerIdentity = clientJarBean.getProviderIdentity();
 			String signature = clientJarBean.getSignature();
@@ -179,6 +187,17 @@ public class CommsServer implements IFeatureServer {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Workaround to avoid org.simpleframework.xml.transform.TransformException:
+	 * Transform of class java.util.ArrayList not supported
+	 * 
+	 */
+	private void addFileName(List<String> files, String file) {
+		if (file != null) {
+			files.add(file);
+		}
 	}
 	
 	private ClientJarBeanResult failure() {

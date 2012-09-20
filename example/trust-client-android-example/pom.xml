@@ -4,14 +4,14 @@
 
 	<parent>
 		<groupId>org.societies</groupId>
-        <artifactId>android-parent</artifactId>
-        <version>0.1</version>
-		<relativePath>../../parent/android.xml</relativePath>
+		<artifactId>android-parent</artifactId>
+		<version>RELEASE</version>
 	</parent>
 
 	<groupId>org.societies.android.privacytrust.trust.example</groupId>
 	<artifactId>trust-client-android-example</artifactId>
 	<name>Trust Management and Evaluation Client Android App</name>
+	<version>${version.pt}</version>
 	<packaging>apk</packaging>
 	<developers>
 		<developer>
@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>org.societies.android.privacytrust.trust</groupId>
 			<artifactId>trust-droid</artifactId>
-			<version>${release.version}</version>
+			<version>${version.pt}</version>
 			<type>apklib</type>
 		</dependency>
 		<dependency>
