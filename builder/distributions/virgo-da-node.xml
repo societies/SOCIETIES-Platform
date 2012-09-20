@@ -39,6 +39,9 @@
 	<!-- All Spring-OSGi Java projects to be included in this distribution -->
 	<modules>
 		
+		<!-- CommsFwrk for DA -->
+		<module>../../platform-infrastructure/comms-frwk/DACommsBundle</module>
+		
 		<!-- Domain Authority Modules: 3 bundles (to be merged) -->
 		<module>../../domain-authority/group-manager</module>
 		<module>../../css-modules/css-directory</module>
