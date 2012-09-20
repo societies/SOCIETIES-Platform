@@ -58,11 +58,14 @@ public class PacketMarshaller {
 		Strategy strategy = new RegistryStrategy(registry);
 		try {
 			Element exampleElementImpl = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("dummy");
-			XMLGregorianCalendar gregorianCalendarImpl = DatatypeFactory.newInstance().newXMLGregorianCalendar();
-			registry.bind(gregorianCalendarImpl.getClass(), XMLGregorianCalendarConverter.class);
-			Log.i(LOG_TAG, "Registered class '"+gregorianCalendarImpl.getClass()+"' as XMLGregorianCalendarImpl");
 			registry.bind(exampleElementImpl.getClass(), ElementConverter.class);
 			Log.i(LOG_TAG, "Registered class '"+exampleElementImpl.getClass()+"' as ElementImpl");
+			
+			// http://stackoverflow.com/questions/7918466/cant-use-xmlgregoriancalendar-in-android-even-if-it-is-documented
+//			XMLGregorianCalendar gregorianCalendarImpl = DatatypeFactory.newInstance().newXMLGregorianCalendar();
+//			registry.bind(gregorianCalendarImpl.getClass(), XMLGregorianCalendarConverter.class);
+//			Log.i(LOG_TAG, "Registered class '"+gregorianCalendarImpl.getClass()+"' as XMLGregorianCalendarImpl");
+			
 			registry.bind(java.net.URI.class,URIConverter.class);
 			registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
 			registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));
