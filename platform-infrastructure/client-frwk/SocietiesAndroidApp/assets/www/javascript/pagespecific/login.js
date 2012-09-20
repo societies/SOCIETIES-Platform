@@ -218,8 +218,9 @@ var SocietiesLogin = {
 			//CSS FRIEND SET OF PAGES
 			$.mobile.loadPage("html/friends_landing.html");
 			$.mobile.loadPage("html/my_friends_list.html");
+			$.mobile.loadPage("html/my_friends_details.html");
 			
-			$.mobile.changePage("html/landing.html", { transition: "slideup"} );
+			$.mobile.changePage("html/landing.html", { transition: "fade"} );
 		}
 		
 		function failure(data) {

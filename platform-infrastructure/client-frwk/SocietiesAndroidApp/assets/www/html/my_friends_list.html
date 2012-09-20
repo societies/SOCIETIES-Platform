@@ -17,16 +17,13 @@
 	</div>
 	<!-- /header -->
 	<div data-role="content">
-		<input type="search" name="search" id="search-basic" value="Search Friends" data-theme="b"/>
-		<br/><br/>
-		<ul data-role="listview" data-theme="d" data-divider-theme="b">
-			<li data-role="list-divider">Your Societies Friends</li>
-			<li><a href="friend_profile.html">
-				<img src="../images/profile_pic_sample.jpg" class="profile_list" alt="profile picture" />
-				<h2>Sara Weber</h2>
-				<p>Communities: 10</p>
-				<p>Location: 10</p>
-				</a></li>
+		<!-- <input type="search" name="search" id="search-basic" value="Search Friends" data-theme="b"/>-->
+		<br/>
+		<ul data-role="listview" data-theme="d" data-divider-theme="b" id="FriendsListDiv" data-filter="true" data-filter-placeholder="Filter Friends..." >
+			<li data-role="list-divider">My Societies Friends</li>
+			<!-- //////////////////// LIST OF 3P SERVICES /////////////////// -->
+			<li id="searchMsg"><img src="../javascript/jquerymobile/images/ajax-loader.gif" /></li>
+			
 		</ul>
 		<br/><br/>
 		<div class="terms">
