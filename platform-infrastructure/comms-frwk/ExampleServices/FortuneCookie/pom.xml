@@ -5,8 +5,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	
 	<!-- change the artifactid to your project artifactid -->
@@ -36,7 +35,7 @@
 		<dependency>
 			<groupId>org.societies.example</groupId>
 			<artifactId>internalAPI</artifactId>
-			<version>0.1</version>	
+			<version>${release.version}</version>	
 			<scope>provided</scope>			
 		</dependency>
 		<dependency>

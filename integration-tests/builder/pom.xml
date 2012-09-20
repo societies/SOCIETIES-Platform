@@ -29,6 +29,8 @@
 	<modules>
 		<!-- Tools -->
 		<module>../util</module>
+		<module>../../utilities/maven/Jaxb2SimpleXMLplugin</module>
+		<module>../../utilities/maven/SimpleXMLConverters</module>
 		<module>../../platform-infrastructure/comms-frwk/ExampleServices/api/java/internal</module> <!-- to be removed when third party services example will be available -->
 		<module>../../platform-infrastructure/comms-frwk/ExampleServices/api/java/schema</module> <!-- to be removed when third party services example will be available -->
 		<module>../../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module> <!-- to be removed when third party services example will be available -->
