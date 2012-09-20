@@ -77,8 +77,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	 * 
 	 * @see {@link #setCommMgr(ICommManager)}
 	 */
-	@Autowired(required = true)
-	private ICommManager commMgr = null;
+	private ICommManager commMgr;
 
 	public ICommManager getCommManager() {
 		return commMgr;
@@ -94,14 +93,13 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	 * @see {@link #setCtxBroker(ICtxBroker)}
 	 */
 	@Autowired(required = true)
-	private ICtxBroker ctxBroker = null;
+	private ICtxBroker ctxBroker;
 
 	/**
 	 * The Device Manager service reference
 	 * 
 	 * @see {@link #setDeviceManager(IDeviceManager)}
 	 */
-	@Autowired(required = true)
 	private IDeviceManager deviceManager;
 
 	/**
@@ -114,7 +112,6 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		this.deviceManager = deviceManager;
 	}
 
-	@Autowired(required = true)
 	private IEventMgr eventManager;
 
 	public IEventMgr getEventManager() {
@@ -128,7 +125,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		this.eventManager = eventManager;
 	}
 
-	private IIdentityManager idManager = null;
+	private IIdentityManager idManager;
 
 	private NewDeviceListener newDeviceListener;
 	private final String sensor = "CONTEXT_SOURCE";
@@ -144,18 +141,27 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		this.ctxBroker = ctxBroker;
 	}
 
+	@Autowired(required=true)
+	public ContextSourceManagement(ICommManager commManager, 
+			IDeviceManager deviceManager, IEventMgr eventManager) {
+		
+		this.idManager = commManager.getIdManager();
+	}
+	
+	/**
+	 * Empty constructor used for testing
+	 */
 	public ContextSourceManagement() {
 //		activate();
 	}
 
-	@PostConstruct
+	//@PostConstruct
 	public void activate() {
 		this.newDeviceListener = new NewDeviceListener(deviceManager,
 				eventManager, this);
 		idManager = commMgr.getIdManager();
 		// newDeviceListener.run();
 		
-
 		try {
 			List<CtxEntityIdentifier> shadowEntitiesFuture = ctxBroker
 					.lookupEntities(sensor, "CtxSourceId", null, null).get();
@@ -171,7 +177,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		LOG.info("{}", "CSM started");
 	}
 
-	@PreDestroy
+	//@PreDestroy
 	public void deactivate() {
 		this.newDeviceListener.stop();
 		LOG.info("CSM + DeviceListener stopped");
