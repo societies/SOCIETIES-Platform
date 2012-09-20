@@ -89,15 +89,24 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	
 	private void logStack() {
 
-		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-		LOG.debug("stackTrace length = {}", stackTrace.length);
-		if (stackTrace != null) {
-			for (StackTraceElement st : stackTrace) {
-				LOG.debug(" ");
-				LOG.debug("  ClassName : {}", st.getClassName());
-				LOG.debug("  FileName  : {}", st.getFileName());
-				LOG.debug("  MethodName: {}", st.getMethodName());
-			}
+		//StackTraceElement[] stack = (new Exception()).getStackTrace();
+		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		for (int k = 0; k < stack.length; k++) {
+			
+			// Full class name
+			Log.info("STACK[" + k + "]: " + stack[k].getClassName());
+			
+			// Java file name without path
+			Log.info("STACK[" + k + "]: " + stack[k].getFileName());
+			
+			// Method name without class name or parameters
+			Log.info("STACK[" + k + "]: " + stack[k].getMethodName());
+			
+			// Full class name + method + file name + line number
+			Log.info("STACK[" + k + "]: " + stack[k].toString());
+			
+			// false for all classes of interest, true only for sun.reflect.NativeMethodAccessorImpl
+			Log.info("STACK[" + k + "]: " + stack[k].isNativeMethod());
 		}
 	}
 
@@ -140,6 +149,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logCommsFw()");
 
+		logStack();
+		
 		String dataType;
 		String invokerClass = "";  // FIXME
 		
@@ -167,19 +178,10 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public void logContext(Requestor requestor, IIdentity owner) {
 		
 		LOG.info("logContext()");
-		
+		logStack();
+
 		String invokerClass = "";  // FIXME
 		IIdentity requestorId;
-		
-		StackTraceElement[] stack = (new Exception()).getStackTrace();
-		//StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-		for (int k = 0; k < stack.length; k++) {
-			Log.info("STACK[" + k + "]: " + stack[k].getClassName());    // Full class name
-			Log.info("STACK[" + k + "]: " + stack[k].getFileName());     // Java file name without path
-			//Log.info("STACK: " + ste.getMethodName());   // Method name without class name or parameters
-			//Log.info("STACK: " + ste.toString());        // Full class name + method + file name + line number
-			//Log.info("STACK: " + ste.isNativeMethod());  // false for all classes of interest, true only for sun.reflect.NativeMethodAccessorImpl
-		}
 		
 		if (requestor == null) {
 			requestorId = null;
@@ -197,7 +199,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public void logContext(Requestor requestor, IIdentity owner, int dataSize) {
 		
 		LOG.info("logContext({})", dataSize);
-		
+		logStack();
+
 		String invokerClass = "";  // FIXME
 		IIdentity requestorId;
 		
