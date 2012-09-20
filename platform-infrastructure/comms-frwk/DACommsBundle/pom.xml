@@ -61,7 +61,6 @@
     						!org.jvnet.fastinfoset,
     						!com.sun.xml.fastinfoset.*,
     						org.slf4j*;version="1.5.8",
-    						org.simpleframework.xml.stream,
     						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
@@ -71,6 +70,7 @@
 		           		why do i need to import explicitly org.simpleframework.xml.stream?
 		           		!com.sun.org.apache.xerces.internal.jaxp.datatype,
 		           		org.xmpp.component;version="0.1.0",
+		           		org.simpleframework.xml.stream,
 		           		-->
 		           		<DynamicImport-Package>*</DynamicImport-Package>
 		           		<Embed-Dependency>
