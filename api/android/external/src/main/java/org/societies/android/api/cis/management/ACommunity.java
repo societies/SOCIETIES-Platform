@@ -60,6 +60,7 @@ public class ACommunity extends Community implements Parcelable {
 		dest.writeString(this.getCommunityName());
 		dest.writeString(this.getCommunityType());
 		dest.writeString(this.getOwnerJid());
+		dest.writeString(this.getDescription());
 		if(this.getMembershipCrit() !=null)
 			dest.writeParcelable(this.getMembershipCrit(), flags);
 	}

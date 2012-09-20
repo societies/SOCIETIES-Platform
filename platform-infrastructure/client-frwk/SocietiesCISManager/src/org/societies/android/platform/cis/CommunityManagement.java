@@ -165,10 +165,10 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		MembershipCrit rules = new MembershipCrit();
 		List<Criteria> listCriteria = new ArrayList<Criteria>();
 		for(ACriteria acrit: criteria) {
-			listCriteria.add(acrit);
+			listCriteria.add( ACriteria.convertACriteria(acrit));
 		}	
 		rules.setCriteria(listCriteria);
-		//cisinfo.setMembershipCrit(rules); TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX 
+		cisinfo.setMembershipCrit(rules); //TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX 
 		//ADD TO BEAN
 		Create create = new Create();
 		create.setCommunity(cisinfo);

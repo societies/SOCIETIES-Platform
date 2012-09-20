@@ -218,11 +218,11 @@ public class TestActivityCIS extends Activity {
     		//TEST: CREATE CIS
 			List<ACriteria> rules = new ArrayList<ACriteria>();
 			ACriteria crit1 = new ACriteria();
-			ACriteria crit2 = new ACriteria();
-			crit1.setAttrib("Location"); crit1.setOperator("="); crit1.setRank(1); crit1.setValue1("Dublin");
-			crit2.setAttrib("Age"); crit2.setOperator(">"); crit2.setRank(2); crit2.setValue1("18");
+			//ACriteria crit2 = new ACriteria();
+			crit1.setAttrib("Location"); crit1.setOperator("equals"); crit1.setRank(1); crit1.setValue1("Paris");
+			//crit2.setAttrib("Age"); crit2.setOperator(">"); crit2.setRank(2); crit2.setValue1("18");
 			rules.add(crit1);
-			rules.add(crit2);
+			//rules.add(crit2);
 			serviceCISManager.createCis(CLIENT_PACKAGE, "Tester CIS", "Test Type", "Test Description", rules, "privacy policy stuff");
     		
 			//TEST: GET ALL CIS ADVERTISEMENTS FROM DIRECTORY
