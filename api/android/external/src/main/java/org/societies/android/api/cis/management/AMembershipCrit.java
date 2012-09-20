@@ -89,8 +89,11 @@ public class AMembershipCrit extends MembershipCrit implements Parcelable {
 	public static AMembershipCrit convertMembershipCrit(MembershipCrit memberCrit) {
 		AMembershipCrit amemberCrit = new AMembershipCrit();
 		List<ACriteria> returnList = new ArrayList<ACriteria>();
-		for (Criteria crit: memberCrit.getCriteria()) {
-			returnList.add(ACriteria.convertCriteria(crit));
+
+		if (null != memberCrit && null != memberCrit.getCriteria()) {
+			for (Criteria crit: memberCrit.getCriteria()) {
+				returnList.add(ACriteria.convertCriteria(crit));
+			}
 		}
 		amemberCrit.setACriteria(returnList);
 		
