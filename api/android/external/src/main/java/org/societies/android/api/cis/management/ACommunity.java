@@ -59,6 +59,7 @@ public class ACommunity extends Community implements Parcelable {
 		dest.writeString(this.getCommunityJid());
 		dest.writeString(this.getCommunityName());
 		dest.writeString(this.getCommunityType());
+		dest.writeString(this.getDescription());
 		dest.writeString(this.getOwnerJid());
 		dest.writeParcelable(this.getMembershipCrit(), flags);
 	}
@@ -68,6 +69,7 @@ public class ACommunity extends Community implements Parcelable {
 		this.setCommunityJid(in.readString());
 		this.setCommunityName(in.readString());
 		this.setCommunityType(in.readString());
+		this.setDescription(in.readString());
 		this.setOwnerJid(in.readString());
 		this.setMembershipCrit((AMembershipCrit) in.readParcelable(this.getClass().getClassLoader()));
 	}
@@ -89,7 +91,8 @@ public class ACommunity extends Community implements Parcelable {
 		acommunity.setCommunityType(community.getCommunityType());
 		acommunity.setDescription(community.getDescription());
 		acommunity.setOwnerJid(community.getOwnerJid());
-		acommunity.setMembershipCrit(AMembershipCrit.convertMembershipCrit(community.getMembershipCrit()));
+		if(community.getMembershipCrit()!=null && community.getMembershipCrit().getCriteria() != null && community.getMembershipCrit().getCriteria().isEmpty()== false)
+			acommunity.setMembershipCrit(AMembershipCrit.convertMembershipCrit(community.getMembershipCrit()));
 		return acommunity;
 	}
 }

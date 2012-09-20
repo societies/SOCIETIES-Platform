@@ -207,6 +207,11 @@ var SocietiesLogin = {
 			$.mobile.loadPage("html/myProfile.html");
 			$.mobile.loadPage("html/settings.html");
 			$.mobile.loadPage("html/about.html");
+			$.mobile.loadPage("html/my_apps.html");
+			$.mobile.loadPage("html/my_apps_details.html");
+			
+			$.mobile.loadPage("html/communities_list.html");
+			$.mobile.loadPage("html/community_profile.html");
 			
 			$.mobile.changePage("html/landing.html", { transition: "slideup"} );
 		}

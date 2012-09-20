@@ -69,4 +69,22 @@ public interface IServices {
 	 */
 	public IIdentity getServer(ServiceResourceIdentifier serviceId);
 	
+	/**
+	 * This method is used by a third-party client service to get the serviceId of its parent/server
+	 * 
+	 * @param serviceId
+	 * @return the serviceId of the parent
+	 */
+	public ServiceResourceIdentifier getServerServiceIdentifier(ServiceResourceIdentifier serviceId);
+
+	/**
+	 *  This method compares to ServiceResourceIdentifiers to determine if they are equal. It is, effectively, an "equals" method
+	 *  as the ServiceResourceIdentifier does not have one, since it is a bean.
+	 *  
+	 * @param serviceId
+	 * @param otherServiceId
+	 * @return true if they are equal, false otherwise.
+	 */
+	public boolean compare(ServiceResourceIdentifier serviceId, ServiceResourceIdentifier otherServiceId);
+
 }

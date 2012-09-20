@@ -52,6 +52,8 @@ public class TestActivityCIS extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        Log.d(LOG_TAG, "before intents");
+        
         //CREATE INTENT FOR CIS MANAGER SERVICE AND BIND
         Intent intentCisManager = new Intent(this.getApplicationContext(), CommunityManagement.class);
         this.getApplicationContext().bindService(intentCisManager, cisManagerConnection, Context.BIND_AUTO_CREATE);
@@ -63,6 +65,9 @@ public class TestActivityCIS extends Activity {
         //CREATE INTENT FOR CIS DIRECTORY AND BIND
         Intent intentCisDir = new Intent(this.getApplicationContext(), CisDirectoryRemote.class);
         this.getApplicationContext().bindService(intentCisDir, cisDirConnection, Context.BIND_AUTO_CREATE);
+        
+        Log.d(LOG_TAG, "before registering broadcasts");
+
         
         //REGISTER BROADCAST
         //CIS Manager
@@ -79,11 +84,14 @@ public class TestActivityCIS extends Activity {
         intentFilter.addAction(CisDirectoryRemote.FIND_ALL_CIS);
         intentFilter.addAction(CisDirectoryRemote.FILTER_CIS);
         intentFilter.addAction(CisDirectoryRemote.FIND_CIS_ID);
-        
+
+        Log.d(LOG_TAG, "gonna register receiver");
         this.getApplicationContext().registerReceiver(new bReceiver(), intentFilter);
         
         //TEST THE SLM COMPONENT
+        Log.d(LOG_TAG, "gonna create test");
         TestCIS task = new TestCIS(this);
+        Log.d(LOG_TAG, "gonna execute test");
         task.execute();
     }
     
@@ -197,7 +205,7 @@ public class TestActivityCIS extends Activity {
 			serviceCISManager.createCis(CLIENT_PACKAGE, "Tester CIS", "Test Type", "Test Description", rules, "privacy policy stuff");
     		
 			//TEST: GET ALL CIS ADVERTISEMENTS FROM DIRECTORY
-			serviceCISdir.findAllCisAdvertisementRecords(CLIENT_PACKAGE);
+			//serviceCISdir.findAllCisAdvertisementRecords(CLIENT_PACKAGE);
 			
 			return null;
     	}

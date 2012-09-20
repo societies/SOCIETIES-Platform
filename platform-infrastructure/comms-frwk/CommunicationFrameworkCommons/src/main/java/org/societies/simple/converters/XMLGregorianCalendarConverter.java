@@ -1,4 +1,4 @@
-package org.societies.comm.simplexml;
+package org.societies.simple.converters;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;

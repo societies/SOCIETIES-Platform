@@ -22,63 +22,44 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.platform.servicelifecycle.serviceRegistry.model;
+package org.societies.android.platform.servicemonitor;
 
-import java.io.Serializable;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
-import javax.persistence.Basic;
-import javax.persistence.Embeddable;
-@Embeddable
-public class ServiceResourceIdentiferDAO implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7982137477351378779L;
-	@Basic
-	private String identifier;
-	@Basic
-	private String instanceId;
+/**
+ * This wrapper class acts as a local wrapper for the Service Management Android service.
+ * It uses the base service implementation {@link ServiceUtilitiesBase} provide the service functionality
+ */
 
-	public ServiceResourceIdentiferDAO() {
-		
+public class ServiceDiscoveryLocal extends Service {
+	
+    private static final String LOG_TAG = ServiceDiscoveryLocal.class.getName();
+    private IBinder binder = null;
+    
+    @Override
+	public void onCreate () {
+		this.binder = new LocalBinder();
+		Log.d(LOG_TAG, "ServiceDiscoveryLocal service starting");
 	}
 
-	public ServiceResourceIdentiferDAO(String identifier, String instanceIdentifier) {
-		super();
-		this.identifier = identifier;
-		this.instanceId=instanceIdentifier;
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "ServiceDiscoveryLocal service terminating");
 	}
 
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
-
-	public String getInstanceId() {
-		return instanceId;
-	}
-
-	public void setInstanceId(String instanceId) {
-		this.instanceId = instanceId;
+	/**Create Binder object for local service invocation */
+	public class LocalBinder extends Binder {
+		public ServiceDiscoveryBase getService() {
+			return new ServiceDiscoveryBase(ServiceDiscoveryLocal.this.getApplicationContext());
+		}
 	}
 	
-	public boolean equals(Object object){
-		if (object instanceof ServiceResourceIdentiferDAO) {
-			ServiceResourceIdentiferDAO serviceIdentifier = (ServiceResourceIdentiferDAO)object;
-            return this.identifier.equals(serviceIdentifier.getIdentifier()) && this.instanceId.equals(serviceIdentifier.getInstanceId()) ;
-        } else {
-            return false;
-        }
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return this.binder;
 	}
-	
-	public int hashCode() {
-		StringBuilder builder = new StringBuilder();
-	    builder.append(this.identifier);
-	    builder.append(this.instanceId);
-	    return builder.toString().hashCode();
-
-    }
 }

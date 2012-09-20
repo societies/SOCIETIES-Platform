@@ -9,6 +9,19 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Societies CIS Results</title>
+<style>
+.privacy-policy-handler{
+display: inline-block;
+padding: 1px 4px;
+border: 1px solid gray;
+border-radius: 2px;
+background-color: #D3D3D3;
+color: black;
+text-decoration: none;
+font-family: arial;
+font-size: 0.9em;
+}
+</style>
 </head>
 <body>
 	<!-- HEADER -->
@@ -61,6 +74,7 @@ function updateForm(cisId, toDo, where) {
 	        <tr>
 	        	<td>${record.getName()}&nbsp;</td>
 	        	<td>${record.getCisId()}&nbsp;</td>
+	        	<td><a href="cis-privacy-policy-show.html?cisId=${record.getCisId()}&cisOwnerId=${currentNodeId.jid}" class="privacy-policy-handler">Privacy Policy</a></td>
 	        	<td><input type="button" value="Members" onclick="updateForm('${record.getCisId()}', 'GetMemberList', 'cismanager.html')" ></td>
 	        	<td><input type="button" value="Services" onclick="updateForm('${record.getCisId()}', 'GetServicesCis', 'servicediscovery.html')" ></td>
 	        </tr>

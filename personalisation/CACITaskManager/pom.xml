@@ -32,73 +32,39 @@
 	<!-- List dependencies here -->
 	<dependencies>
 
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>personalisation_api</artifactId>
 			<version>${version.pm}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-		    <groupId>org.societies</groupId>
-		    <artifactId>common-ext-libs</artifactId>
-		    <scope>provided</scope>
-		</dependency>
-		
-		
-		<dependency>
-		    <groupId>org.springframework</groupId>   
-		    <artifactId>org.springframework.spring-library</artifactId>   
-		    <type>libd</type>   
-		    <version>${spring.version}</version>   
-		    <scope>provided</scope>
-  		</dependency>		
-		<!-- <dependency> <groupId>org.societies.context-management</groupId> <artifactId>css_contextBroker_impl</artifactId> 
-			<version>${version.cm}</version> </dependency> <dependency> <groupId>org.societies.context-management</groupId> 
-			<artifactId>UserCtxDBMgmt</artifactId> <version>${version.cm}</version> </dependency> -->
-
-<!-- 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.core</artifactId>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.beans</artifactId>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency> -->
 	</dependencies>
 
 
@@ -111,16 +77,18 @@
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
 
+
+
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<!-- <Import-Package>org.springframework.beans.factory.annotation;version="0",org.springframework.stereotype;version="0"</Import-Package> -->
-						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<_nouses>true</_nouses>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

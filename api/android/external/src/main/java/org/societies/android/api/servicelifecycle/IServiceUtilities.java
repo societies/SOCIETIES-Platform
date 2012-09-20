@@ -32,6 +32,10 @@ package org.societies.android.api.servicelifecycle;
  */
 public interface IServiceUtilities {
 	
+    //SERVICE LIFECYCLE INTENTS
+	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.servicediscovery.ReturnValue";
+	public static final String GET_MY_SERVICE_ID = "org.societies.android.platform.servicemanagement.GET_MY_SERVICE_ID";
+
 	/**
 	 * List of methods available for this service. Used for Android Intents
 	 */

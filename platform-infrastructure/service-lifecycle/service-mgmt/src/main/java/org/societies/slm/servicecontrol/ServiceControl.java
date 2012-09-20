@@ -434,7 +434,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.debug("Trying to do policy negotiation!");
 			
 			IIdentity providerNode = getCommMngr().getIdManager().fromJid(serviceToInstall.getServiceInstance().getFullJid());
-
+			INetworkNode myNode = getCommMngr().getIdManager().getThisNetworkNode();
+			
 			if(logger.isDebugEnabled())
 				logger.debug("Got the provider IIdentity, now creating the Requestor");
 		
@@ -467,21 +468,27 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("This is a web-type service, no client to install!");
 				//serviceToInstall.setServiceEndpoint(negotiationResult.getServiceUri().toString());				
 
+				ServiceInstance si = serviceToInstall.getServiceInstance();
+				si.setParentIdentifier(serviceToInstall.getServiceIdentifier());
+				si.setParentJid(serviceToInstall.getServiceInstance().getFullJid());
+				si.setFullJid(myNode.getJid());
+				si.setCssJid(myNode.getBareJid());
+				serviceToInstall.setServiceInstance(si);
+				
 				List<Service> addServices = new ArrayList<Service>();
 				addServices.add(serviceToInstall);
 				getServiceReg().registerServiceList(addServices);
 
 				logger.info("Installed web-type third-party service.");
 				returnResult.setMessage(ResultMessage.SUCCESS);
-				
 			
 			} else{
 									
 				if(logger.isDebugEnabled()) logger.debug("This is a client-based service, we need to install it");
 					
 				Future<ServiceControlResult> asyncResult = null;
-				//URL bundleLocation = negotiationResult.getServiceUri().toURL();
-				URL bundleLocation = serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient().toURL();
+				URL bundleLocation = negotiationResult.getServiceUri().toURL();
+				//URL bundleLocation = new URL(serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient());
 
 				asyncResult = installService(bundleLocation);
 				ServiceControlResult result = asyncResult.get();
@@ -501,6 +508,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						
 					ServiceInstance newServiceInstance = newService.getServiceInstance();
 					newServiceInstance.setParentJid(serviceToInstall.getServiceInstance().getFullJid());
+					newServiceInstance.setParentIdentifier(serviceToInstall.getServiceIdentifier());
 					newService.setServiceInstance(newServiceInstance);
 					getServiceReg().updateRegisteredService(newService);
 						

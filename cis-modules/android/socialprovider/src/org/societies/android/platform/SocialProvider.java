@@ -61,29 +61,49 @@ public class SocialProvider extends ContentProvider{
 
     //The method addURI() maps an authority and path to an integer value.
     //The method match() returns the integer value for a URI.
-    // Later on in methods called from a Content Resolver, a switch statement 
+    // Later on in methods called from a ContentResolver, a switch statement 
     // chooses between the different legal queries.
     static{
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me", SocialContract.UriMatcherIndex.ME);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "me/#", SocialContract.UriMatcherIndex.ME_SHARP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", SocialContract.UriMatcherIndex.PEOPLE);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", SocialContract.UriMatcherIndex.PEOPLE_SHARP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities", SocialContract.UriMatcherIndex.COMMUNITIES);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities/#", SocialContract.UriMatcherIndex.COMMUNITIES_SHARP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services", SocialContract.UriMatcherIndex.SERVICES);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services/#", SocialContract.UriMatcherIndex.SERVICES_SHARP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "relationship", SocialContract.UriMatcherIndex.RELATIONSHIP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "relationship/#", SocialContract.UriMatcherIndex.RELATIONSHIP_SHARP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "membership", SocialContract.UriMatcherIndex.MEMBERSHIP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "membership/#", SocialContract.UriMatcherIndex.MEMBERSHIP_SHARP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "sharing", SocialContract.UriMatcherIndex.SHARING);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "sharing/#", SocialContract.UriMatcherIndex.SHARING_SHARP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/people/activity", SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/people/activity/#", SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY_SHARP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/communities/activity", SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/communities/activity/#", SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY_SHARP);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/services/activity", SocialContract.UriMatcherIndex.SERVICE_ACTIVITY);
-    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "/services/activity/#", SocialContract.UriMatcherIndex.SERVICE_ACTIVITY_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.ME, SocialContract.UriMatcherIndex.ME);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), 
+    			SocialContract.UriPathIndex.ME_SHARP, SocialContract.UriMatcherIndex.ME_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), 
+    			SocialContract.UriPathIndex.PEOPLE, SocialContract.UriMatcherIndex.PEOPLE);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.PEOPLE_SHARP, SocialContract.UriMatcherIndex.PEOPLE_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.COMMINITIES, SocialContract.UriMatcherIndex.COMMUNITIES);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.COMMINITIES_SHARP, SocialContract.UriMatcherIndex.COMMUNITIES_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.SERVICES, SocialContract.UriMatcherIndex.SERVICES);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.SERVICES_SHARP, SocialContract.UriMatcherIndex.SERVICES_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.RELATIONSHIP, SocialContract.UriMatcherIndex.RELATIONSHIP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.RELATIONSHIP_SHARP, SocialContract.UriMatcherIndex.RELATIONSHIP_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.MEMBERSHIP, SocialContract.UriMatcherIndex.MEMBERSHIP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.MEMBERSHIP_SHARP, SocialContract.UriMatcherIndex.MEMBERSHIP_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.SHARING, SocialContract.UriMatcherIndex.SHARING);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.SHARING_SHARP, SocialContract.UriMatcherIndex.SHARING_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.PEOPLE_ACTIVITIY, SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.PEOPLE_ACTIVITIY_SHARP, SocialContract.UriMatcherIndex.PEOPLE_ACTIVITY_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.COMMUNITY_ACTIVITIY, SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.COMMUNITY_ACTIVITIY_SHARP, SocialContract.UriMatcherIndex.COMMUNITY_ACTIVITIY_SHARP);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.SERVICE_ACTIVITY, SocialContract.UriMatcherIndex.SERVICE_ACTIVITY);
+    	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(),
+    			SocialContract.UriPathIndex.SERVICE_ACTIVITY_SHARP, SocialContract.UriMatcherIndex.SERVICE_ACTIVITY_SHARP);
 
     	}
    	/* 
@@ -117,8 +137,8 @@ public class SocialProvider extends ContentProvider{
 	
 		//Switch on the name of the path used in the query:
 		Uri returnUri = null;
-		
-		switch (sUriMatcher.match(_uri)){
+		int index = sUriMatcher.match(_uri);
+		switch (index){
 		case SocialContract.UriMatcherIndex.ME:
 			
 			//TODO: For all these, need to check for missing values in _values and add them.
