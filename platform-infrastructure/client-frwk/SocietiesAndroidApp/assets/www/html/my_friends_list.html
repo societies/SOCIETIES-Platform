@@ -8,8 +8,8 @@
 <body>
 
 
-<!-- Start of first page: #friends -->
-<div data-role="page" id="community-list">
+
+<div data-role="page" id="my-friends-list">
 	<!-- header -->
 	<div data-role="header" data-position="fixed">
 		<img class="logo" src="../images/societies_header.png" alt="logo" />
@@ -17,12 +17,16 @@
 	</div>
 	<!-- /header -->
 	<div data-role="content">
-		<!--  <input type="search" name="search" id="search-basic" value="Search Communities" data-theme="b"/> -->		
+		<input type="search" name="search" id="search-basic" value="Search Friends" data-theme="b"/>
 		<br/><br/>
-		<ul data-role="listview" data-theme="d" data-divider-theme="b" id="CommunitiesListDiv" data-filter="true" data-filter-placeholder="Filter communities..." >
-			<li data-role="list-divider">Your Communities</li>
-			<!-- //////////////////// LIST OF COMMUNITIES /////////////////// -->
-			<li id="searchMsg"><img src="../javascript/jquerymobile/images/ajax-loader.gif" /></li>
+		<ul data-role="listview" data-theme="d" data-divider-theme="b">
+			<li data-role="list-divider">Your Societies Friends</li>
+			<li><a href="friend_profile.html">
+				<img src="../images/profile_pic_sample.jpg" class="profile_list" alt="profile picture" />
+				<h2>Sara Weber</h2>
+				<p>Communities: 10</p>
+				<p>Location: 10</p>
+				</a></li>
 		</ul>
 		<br/><br/>
 		<div class="terms">
