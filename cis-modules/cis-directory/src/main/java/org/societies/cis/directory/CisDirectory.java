@@ -83,7 +83,7 @@ public class CisDirectory implements ICisDirectory {
 		log.info("addCisAdvertisementRecord called.");
 		System.out.println("+++++++++++++++++++++++ Name is  = " + cisAdRec.getName());
 		System.out.println("+++++++++++++++++++++++ ID is  = " + cisAdRec.getId());
-		System.out.println("+++++++++++++++++++++++ Uri is  = " + cisAdRec.getCssownerid());
+		System.out.println("+++++++++++++++++++++++ Owner Id is  = " + cisAdRec.getCssownerid());
 		
 		Session session = sessionFactory.openSession();
 		CisAdvertisementRecordEntry advertEntry = null;
@@ -158,7 +158,7 @@ public class CisDirectory implements ICisDirectory {
 				record = new CisAdvertisementRecord();
 				record.setName(entry.getName());
 				record.setId(entry.getId());
-				record.setCssownerid(entry.getcssOwnwerId());
+				record.setCssownerid(entry.getCssOwnerId());
 				record.setPassword(entry.getpassword());
 				record.setType(entry.gettype());
 				//MEMBERSHIP CRITERIA
@@ -207,7 +207,7 @@ public class CisDirectory implements ICisDirectory {
 				if (record.getName().equals(filter)) {
 					record.setName(entry.getName());
 					record.setId(entry.getId());
-					record.setCssownerid(entry.getcssOwnwerId());
+					record.setCssownerid(entry.getCssOwnerId());
 					record.setPassword(entry.getpassword());
 					record.setType(entry.gettype()); 
 					//MEMBERSHIP CRITERIA
@@ -357,7 +357,7 @@ public class CisDirectory implements ICisDirectory {
 					record = new CisAdvertisementRecord();
 					record.setName(entry.getName());
 					record.setId(entry.getId());
-					record.setCssownerid(entry.getcssOwnwerId());
+					record.setCssownerid(entry.getCssOwnerId());
 					record.setPassword(entry.getpassword());
 					record.setType(entry.gettype()); 
 					//MEMBERSHIP CRITERIA

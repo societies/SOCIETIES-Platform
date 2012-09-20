@@ -36,6 +36,7 @@ import javax.validation.Valid;
 
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.cis.community.*;
 import org.societies.cis.directory.client.CisDirectoryRemoteClient;
 import org.societies.webapp.models.CISDirectoryForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.societies.api.schema.cis.community.MembershipCrit;
+//import org.societies.cis.directory.model.CriteriaRecordEntry;
 
 @Controller
 public class CisDirectoryController {
@@ -127,13 +130,28 @@ public class CisDirectoryController {
 				res="CIS Advertisement added Successfully ";
 				
 				CisAdvertisementRecord record= new CisAdvertisementRecord();
+				Criteria critEntry = new Criteria();
+				MembershipCrit crit = new MembershipCrit();
+				
 				
 					record.setName(cdForm.getName()); 
-					record.setCssownerid(cdForm.getcssOwnwerId());
+					record.setCssownerid(cdForm.getCssownerid());
 					record.setType(cdForm.getType());
 					record.setId(cdForm.getId());
 					//record.setMode(cdForm.getMode());
 					record.setPassword(cdForm.getPassword());
+					
+					critEntry.setAttrib(cdForm.getAttrib());
+					critEntry.setOperator(cdForm.getOperator());
+					critEntry.setValue1(cdForm.getvalue1());
+					critEntry.setValue2(cdForm.getvalue2());
+					critEntry.setRank(cdForm.getRank());
+					
+					//crit = (MembershipCrit) record.getMembershipCrit().getCriteria();
+					//record.setMembershipCrit(crit);
+					crit.getCriteria().add(critEntry);
+					record.setMembershipCrit(crit); 
+					
 					
 				getCisDirectoryRemote().addCisAdvertisementRecord(record);
 				model.put("message", "CisAdvertisement added");
@@ -143,6 +161,7 @@ public class CisDirectoryController {
 				CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
 				getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
 				adverts = callback.getResultList();
+				critEntry.getAttrib();
 				
 				model.put("result", res);
 				model.put("adverts", adverts);
