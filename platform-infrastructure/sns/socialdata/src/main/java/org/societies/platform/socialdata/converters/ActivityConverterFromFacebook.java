@@ -290,6 +290,8 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 
 			Iterator<String> keys = jstags.keys();
 			while(keys.hasNext()){
+				//this is the new line you have to find
+				
 
 				JSONArray jUserArray = jstags.getJSONArray(keys.next());
 				for (int i=0; i < jUserArray.length();i++){

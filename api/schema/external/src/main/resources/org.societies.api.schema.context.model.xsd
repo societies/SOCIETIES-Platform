@@ -176,4 +176,14 @@
       <xs:enumeration value="INHERITED"/>
     </xs:restriction>
   </xs:simpleType>
+  
+   <xs:complexType name="ctxUIElement">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="model" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  
 </xs:schema>

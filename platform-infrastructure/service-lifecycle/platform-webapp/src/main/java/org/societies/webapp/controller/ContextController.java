@@ -24,17 +24,31 @@ package org.societies.webapp.controller;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.broker.ICtxBroker;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationTypes;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.schema.context.model.CtxModelObjectBean;
+import org.societies.api.schema.context.model.CtxUIElement;
 import org.societies.webapp.models.ContextForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -55,6 +69,12 @@ public class ContextController {
 	private static final String ASSOCITATION_TYPES 	 = "associationTypes";
 	private static final String ENTITY_TYPES		 = "entityTypes";
 	
+	private static final String ACTION_LOOKUP			= "lookup";
+	private static final String ACTION_RETREIVE			= "retreive";
+	private static final String ACTION_EDIT				= "edit";
+	private static final String ACTION_DELETE			= "delete";
+	
+	
 	
 	@Autowired
 	private ICtxBroker internalCtxBroker;
@@ -67,15 +87,6 @@ public class ContextController {
 	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
 		this.internalCtxBroker = internalCtxBroker;
 	}
-
-
-
-
-	private static final String ACTION_ADD_ENTITY	= "add_entity";
-	private static final String ACTION_QUERY_ENTITY	= "query_entity";
-	private static final String ACTION_LOOKUP_ENIT	= "query_entity";
-	
-	
 	
 	
 	private Map<String, String> getTypesList(Class name) {
@@ -102,17 +113,17 @@ public class ContextController {
 			
 			ContextForm ctxForm = new ContextForm();
 			model.put("ctxForm", ctxForm);
+			model.put("model", getTypesList(CtxModelType.class));
 			model.put(ATTRIBUTE_TYPES, getTypesList(CtxAttributeTypes.class));
 			model.put(ENTITY_TYPES, getTypesList(CtxEntityTypes.class));
-			model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));
+			model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));	
+			model.put("results", lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON));
 			
-		
 			
-			//List<CtxIdentifier> list = internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSONs).get();
-//			try {
-				
 			
+//			try {	
 //			
+//			List<CtxIdentifier> list = internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON).get();
 //			// Entities
 //			CtxIdentifier id = list.iterator().next();
 //			CtxEntity model = (CtxEntity) internalCtxBroker.retrieve(id).get();
@@ -132,9 +143,9 @@ public class ContextController {
 //				CtxEntity newEntity = internalCtxBroker.createEntity(CtxEntityTypes.PERSON).get();
 //				//newEntity.getId();
 //			}
-//			
-//			
-//		
+			
+			
+		
 //		} 
 //		catch (CtxException e) {
 //			// TODO Auto-generated catch block
@@ -146,7 +157,7 @@ public class ContextController {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-		
+//		
 		
 	
 		//model.put("message", "Select a Social Newtork");
@@ -193,6 +204,67 @@ public class ContextController {
 		return new ModelAndView("context", model);
 	}
 	
+	private List<CtxUIElement> lookup(CtxModelType model, String type){
+		
+		List<CtxUIElement> results = new ArrayList<CtxUIElement>();
+		try {
+			List<CtxIdentifier> list = internalCtxBroker.lookup(model, type).get();
+			// Entities
+			
+			
+			for (CtxIdentifier id: list){
+				CtxModelObject elm =  internalCtxBroker.retrieve(id).get();
+				
+				CtxUIElement ctxBean = new CtxUIElement();
+				ctxBean.setId(elm.getId().toString());
+				ctxBean.setType(elm.getType());
+				
+				if (elm.getModelType().equals(CtxModelType.ENTITY)){
+					ctxBean.setModel(CtxModelType.ENTITY.toString());
+					CtxEntity entity = (CtxEntity) elm;
+					ctxBean.setValue("");
+				}
+				else if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
+					ctxBean.setModel(CtxModelType.ATTRIBUTE.toString());
+					CtxAttribute attr = (CtxAttribute) elm;
+					ctxBean.setValue(attr.getStringValue());
+				}
+				else if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
+					ctxBean.setModel(CtxModelType.ASSOCIATION.toString());
+					CtxAssociation assoc = (CtxAssociation) elm;
+					ctxBean.setValue("");
+				}
+				results.add(ctxBean);					
+				
+			
+				
+			}
+			
+		}
+		catch(Exception ex){
+			logger.error("Unable to make lookup:"+ex);
+			ex.printStackTrace();
+		}
+		
+		return results;
+	}
+			
+			
+			
+//		    Set<CtxAttribute> setAttr = model.getAttributes();
+//			Iterator it = setAttr.iterator();
+//			while (it.hasNext()){
+//				// TODO: print something...
+//				CtxAttribute attr = (CtxAttribute)it.next();
+//				System.out.println("type:" +attr.getType() + " : " + attr.getStringValue());
+//				// TODO: get the type of attribute to use attr.getValueType()
+//				attr.setStringValue("the new value");
+//			    internalCtxBroker.update(attr);
+//			}
+		
+		
+	
+	
 	
 	
 
@@ -205,15 +277,18 @@ public class ContextController {
 			return new ModelAndView("context", model);
 		}
 
-//		if (getSocialData() == null) {
-//			model.put("errormsg", "Social Data reference not avaiable");
-//			return new ModelAndView("error", model);
-//		}
+
 
 		
-		String method = ctxForm.getMethod();
+		String method 	= ctxForm.getMethod();
 		String res		 = "This method is not handled yet";
 		String content	 = " --- ";
+		
+		
+		if (ACTION_LOOKUP.equalsIgnoreCase(method)){
+			model.put("results", lookup(ctxForm.getLookupModel(), ctxForm.getLookupType().toString()));
+			logger.info("Made lookup: "+ ctxForm.getLookupModel());
+		}
 		
 //		
 //			if (ADD.equalsIgnoreCase(method)) {
@@ -422,14 +497,14 @@ public class ContextController {
 //			}
 
 		
-			model.put("result_title", 	res);
-			model.put("result_content", content);
+			
+			
 			
 		
 		
 		
 		
-		return new ModelAndView("contextresult", model);
+		return new ModelAndView("context", model);
 		
 
 	}

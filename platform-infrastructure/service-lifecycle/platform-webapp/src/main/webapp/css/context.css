@@ -10,7 +10,7 @@
 	margin: 16px;
 }
 
-table#context{
+table{
     width : 100%;
 	border: solid #ffffff 1px;
 	text-align: center;
@@ -30,21 +30,43 @@ th{
 	
 }
 
+
 td > input{
 	width :40%;
 }
 
+
+
+table#context-title{
+ 	color :#5E5A80;
+}
+
+table#context-title input{
+ 	width:100%;
+}
+
+table#context-title select{
+ 	width:100%;
+ 	
+}
+
+
+
+tr{
+	 background-color: #657383;
+}
+
 tr.entity{
-	 background-color: green;
+	 background-color: #4C7D7E;
 	 color: blue;
 }
 
 tr.attribute{
-	 background-color: blue;
+	 background-color: #5E5A80;
 	 color: #aa22aa;
 }
 
 tr.relationship{
-	 background-color: yellow;
+	 background-color: #736F6E;
 }
 
