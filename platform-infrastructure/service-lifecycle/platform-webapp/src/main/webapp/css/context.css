@@ -10,7 +10,7 @@
 	margin: 16px;
 }
 
-table{
+table#context{
     width : 100%;
 	border: solid #ffffff 1px;
 	text-align: center;

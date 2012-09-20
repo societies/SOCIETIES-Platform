@@ -23,22 +23,18 @@ package org.societies.webapp.controller;
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import javax.validation.Valid;
 
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelType;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.broker.ICtxBroker;
+import org.societies.api.context.model.CtxAssociationTypes;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.webapp.models.ContextForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,6 +47,15 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ContextController {
 
+	
+	private static final Logger logger = LoggerFactory.getLogger(ContextController.class);
+	
+	
+	private static final String ATTRIBUTE_TYPES 	 = "attributeTypes";
+	private static final String ASSOCITATION_TYPES 	 = "associationTypes";
+	private static final String ENTITY_TYPES		 = "entityTypes";
+	
+	
 	@Autowired
 	private ICtxBroker internalCtxBroker;
 	
@@ -73,15 +78,41 @@ public class ContextController {
 	
 	
 	
+	private Map<String, String> getTypesList(Class name) {
+		 Field[] 	fields = name.getDeclaredFields();
+		 String[] 	names = new String[fields.length];
+		 Map results = new HashMap<String, String>();
+		 for (int i=0; i<names.length; i++){
+			 results.put(fields[i].getName(), fields[i].getName());
+			 logger.info("add fields "+fields[i].getName());
+		 }
+		 return results;
+	}
 	
 	
 
 	@RequestMapping(value = "/context.html", method = RequestMethod.GET)
 	public ModelAndView ContextForm() {
 
-//		try {
-//			List<CtxIdentifier> list = internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON).get();
-//		
+		
+			
+			//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
+			Map<String, Object> model = new HashMap<String, Object>();
+			
+			
+			ContextForm ctxForm = new ContextForm();
+			model.put("ctxForm", ctxForm);
+			model.put(ATTRIBUTE_TYPES, getTypesList(CtxAttributeTypes.class));
+			model.put(ENTITY_TYPES, getTypesList(CtxEntityTypes.class));
+			model.put(ASSOCITATION_TYPES, getTypesList(CtxAssociationTypes.class));
+			
+		
+			
+			//List<CtxIdentifier> list = internalCtxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSONs).get();
+//			try {
+				
+			
+//			
 //			// Entities
 //			CtxIdentifier id = list.iterator().next();
 //			CtxEntity model = (CtxEntity) internalCtxBroker.retrieve(id).get();
@@ -117,8 +148,7 @@ public class ContextController {
 //		}
 		
 		
-		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
-		Map<String, Object> model = new HashMap<String, Object>();
+	
 		//model.put("message", "Select a Social Newtork");
 		
 //		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE

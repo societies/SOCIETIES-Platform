@@ -5,16 +5,23 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.socialdata.SocialData;
 import org.societies.platform.socialdata.converters.ActivityConverterFromFacebook;
+import org.societies.platform.socialdata.converters.PersonConverterFromFacebook;
 
 
 
 
 public class JsonToSocialDataService {
 
+	
+	 private static  Logger logger = LoggerFactory.getLogger(JsonToSocialDataService.class);
+	 
 	 /**
 	   * The DB
 	   */
@@ -43,7 +50,7 @@ public class JsonToSocialDataService {
 		  
 		  SocialData sd= new SocialData();
 		  //System.out.println("Convert JSON to SocialDATA");
-		  String access_token = "AAAFs43XOj3IBAPaMRQGAkZCzcyYDBxe2b551hPWSYxflFHh0YB81ysCKtkH5Q3VjZCGASZCU019WSjXpseyeogM05AHS9CiuZBWu1aZByRwZDZD";
+		  String access_token = "";
 		  HashMap<String, String> pars = new HashMap<String, String>();
 		  pars.put(ISocialConnector.AUTH_TOKEN, access_token);
 		  
@@ -51,25 +58,33 @@ public class JsonToSocialDataService {
 		  
 		 
 		  
-		  try {
-			
-			String data = c.getUserActivities();
-			
-			int index=0;
-			ActivityConverterFromFacebook parser = new ActivityConverterFromFacebook();
-			
-			List<ActivityEntry> p= parser.load(data);
-//			System.out.println("Size of:"+p.size());
-			Iterator<ActivityEntry> it = p.iterator();
-			while (it.hasNext()){
-				ActivityEntry entry = it.next();
-				System.out.println(entry.getPublished() + "-- "+entry.getActor().getDisplayName() + " made a  "+entry.getVerb() + " ? " + entry.getContent());
-				index++;
-			}
-		
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		  try {
+//			
+//			String data = c.getUserActivities();
+//			
+//			int index=0;
+//			ActivityConverterFromFacebook parser = new ActivityConverterFromFacebook();
+//			
+//			List<ActivityEntry> p= parser.load(data);
+////			System.out.println("Size of:"+p.size());
+//			Iterator<ActivityEntry> it = p.iterator();
+//			while (it.hasNext()){
+//				ActivityEntry entry = it.next();
+//				System.out.println(entry.getPublished() + "-- "+entry.getActor().getDisplayName() + " made a  "+entry.getVerb() + " ? " + entry.getContent());
+//				index++;
+//			}
+//		
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+		  
+		  
+		  String data = c.getUserProfile();
+		  logger.info("profile Data:"+data);
+		  System.out.println("data:"+data);
+		  PersonConverterFromFacebook parser = new PersonConverterFromFacebook();
+		  Person p = parser.load(data);
+		  
 		  
 	  }
 	  

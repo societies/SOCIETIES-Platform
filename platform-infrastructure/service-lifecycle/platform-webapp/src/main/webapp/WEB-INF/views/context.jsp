@@ -72,6 +72,27 @@
 					   <option value="b">ATTRIBUTE</option>
 					   <option value="c">RELATIONSHIP</option>
 					</select>
+					
+					EntityTypes: <form:select path="entityTypes" >
+					   <form:option value="NONE" label="--- Select ---" />
+					   <form:options items="${entityTypes}" />
+					</form:select>
+				    <form:errors path="entityTypes" cssClass="error" />
+				    <br>
+				    Attribute Types:
+				    <form:select path="attributeTypes" >
+					   <form:option value="NONE" label="--- Select ---" />
+					   <form:options items="${attributeTypes}" />
+					</form:select>
+					<form:errors path="attributeTypes" cssClass="error" />
+				    
+				    Association Types:
+				    <form:select path="associationTypes" >
+					   <form:option value="NONE" label="--- Select ---" />
+					   <form:options items="${associationTypes}" />
+					</form:select>
+				    <form:errors path="associationTypes" cssClass="error" />
+				    
 			
 			<br>
 			<input type="button" value=" Create " id="add"/>

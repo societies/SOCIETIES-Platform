@@ -17,12 +17,17 @@ import org.apache.shindig.social.opensocial.model.MediaLink;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialData;
+import org.societies.platform.socialdata.SocialData;
 import org.societies.platform.socialdata.model.ActionLink;
 
 public class ActivityConverterFromFacebook implements ActivityConverter {
 
-	
+	private Logger logger = LoggerFactory.getLogger(ActivityConverterFromFacebook.class);
+	 
+	 
 	class fb_user{
 		public String name;
 		public String type; 
@@ -84,7 +89,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	@Override
 	public List<ActivityEntry> load(String data) {
 		
-		//System.out.println("Parsing DATA:\n"+data);
+		
 		
 		activities = new ArrayList<ActivityEntry>();
 		JSONArray elements;
@@ -275,44 +280,60 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		Pattern p4 = Pattern.compile(".* likes .*.");
 		Matcher m4 = p4.matcher(story);
 		if (m4.find()){
-			String story_tags = elm.getString("story_tags");
-			JSONObject jstags = new JSONObject(story_tags);
+			
+
 			List<fb_user> users = new ArrayList<fb_user>();
+			String story_tags = elm.getString("story_tags");
+			logger.debug("Add story tag:"+story_tags);
+
+			JSONObject jstags 	= new JSONObject(story_tags);
+
 			Iterator<String> keys = jstags.keys();
 			while(keys.hasNext()){
+
 				JSONArray jUserArray = jstags.getJSONArray(keys.next());
 				for (int i=0; i < jUserArray.length();i++){
 					JSONObject jUser = jUserArray.getJSONObject(i);
-					if (!entry.getActor().getDisplayName().equalsIgnoreCase(jUser.getString("name")))
-						users.add(new fb_user(jUser.getString("name"), jUser.getString("type")));
+					if (!entry.getActor().getDisplayName().equalsIgnoreCase(jUser.getString("name"))){
+						String type = "";
+						if (jUser.has("type")) type= jUser.getString("type");
+						users.add(new fb_user(jUser.getString("name"), type));
+					}
 				}			
 			}
+
+
+			
 			
 			entry.setVerb(ISocialData.LIKE);
-			fb_user user = users.get(0);
-			ActivityObject object = new ActivityObjectImpl();
-			object.setDisplayName(user.name);
-			object.setObjectType(genType(user.type));
-			entry.setObject(object);
 			
-			if (users.size()>1){
-				for(int i=1; i<users.size(); i++){
-					fb_user user1 = users.get(i);
+			if (users.size()>0){
+				fb_user user = users.get(0);
+				
+				ActivityObject object = new ActivityObjectImpl();
+				object.setDisplayName(user.name);
+				object.setObjectType(genType(user.type));
+				entry.setObject(object);
+				logger.info("Add User:"+ user.name + " type:"+user.type);
+				if (users.size()>1){
 					
-					ActivityEntry activity = new ActivityEntryImpl();
-					activity.setActor(entry.getActor());
-					activity.setVerb(ISocialData.LIKE);
-					activity.setContent(entry.getContent());
-					
-					ActivityObject object1 = new ActivityObjectImpl();
-					object1.setDisplayName(user1.name);
-					object1.setObjectType(genType(user1.type));
-					activity.setObject(object1);
-					activity.setPublished(entry.getPublished());
-					activities.add(activity);					
+					for(int i=1; i<users.size(); i++){
+						fb_user user1 = users.get(i);
+
+						ActivityEntry activity = new ActivityEntryImpl();
+						activity.setActor(entry.getActor());
+						activity.setVerb(ISocialData.LIKE);
+						activity.setContent(entry.getContent());
+
+						ActivityObject object1 = new ActivityObjectImpl();
+						object1.setDisplayName(user1.name);
+						object1.setObjectType(genType(user1.type));
+						activity.setObject(object1);
+						activity.setPublished(entry.getPublished());
+						activities.add(activity);					
+					}
 				}
-			}
-			
+			}else logger.info("NO  User:");
 	    	return;
 		}
 		

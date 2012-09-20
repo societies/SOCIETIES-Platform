@@ -391,6 +391,7 @@ public class SocialData implements ISocialData{
 					if (booksString.length()>0) booksString+=",";
 					booksString += book;
 				}
+			
 				
 				
 				
