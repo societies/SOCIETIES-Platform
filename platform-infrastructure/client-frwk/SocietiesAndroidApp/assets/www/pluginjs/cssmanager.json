@@ -153,6 +153,28 @@
 	                    "socialURI": "frank@fondlebook.com",
 	                    "status": 0
 						},
+		"modifyAndroidCSSRecord" : {
+						"archiveCSSNodes": [],
+	                    "cssIdentity": "android@anotherchosendomain.org",
+	                    "cssInactivation": null,
+	                    "cssNodes": [],
+	                    "cssRegistration": null,
+	                    "cssHostingLocation" : null,
+	                    "domainServer" : "anotherchosendomain.org",
+	                    "cssUpTime": 0,
+	                    "emailID": "changed_frank@hotmail.com",
+	                    "entity": 1,
+	                    "foreName": "changed_frank",
+	                    "homeLocation": "changed_Dublin",
+	                    "identityName": "changed_The Frankster",
+	                    "imID": "changed_im@imo",
+	                    "name": "changed_The Gangster",
+	                    "password": null,
+	                    "presence": 0,
+	                    "sex": 1,
+	                    "socialURI": "changed_frank@fondlebook.com",
+	                    "status": 0
+						},
 		"getMyFriends": ["alec.societies.local", "alan.societies.local", "thomas.societies.local"]
 	}
 }

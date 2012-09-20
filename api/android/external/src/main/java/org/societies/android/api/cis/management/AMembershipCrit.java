@@ -48,7 +48,7 @@ public class AMembershipCrit extends MembershipCrit implements Parcelable {
 	public List<ACriteria> getACriteria() {
 		List<ACriteria> returnList = new ArrayList<ACriteria>();
 		for (Criteria crit: super.getCriteria()) {
-			returnList.add((ACriteria) crit);
+			returnList.add( ACriteria.convertCriteria(crit));
 		}		
 		return returnList;
 	}
@@ -56,7 +56,7 @@ public class AMembershipCrit extends MembershipCrit implements Parcelable {
 	public void setACriteria(List<ACriteria> listing) {
 		super.getCriteria().clear();
 		for (ACriteria acrit: listing) {
-			super.getCriteria().add(acrit);
+			super.getCriteria().add(ACriteria.convertACriteria(acrit));
 		}
 	}
 	
@@ -73,6 +73,7 @@ public class AMembershipCrit extends MembershipCrit implements Parcelable {
 	private AMembershipCrit(Parcel in) {
 		super();
 		this.setACriteria(in.readArrayList(this.getClass().getClassLoader()));
+		//this.setACriteria(in.createTypedArrayList(ACriteria.CREATOR));
 	}
 
 	public static final Parcelable.Creator<AMembershipCrit> CREATOR = new Parcelable.Creator<AMembershipCrit>() {
@@ -88,8 +89,11 @@ public class AMembershipCrit extends MembershipCrit implements Parcelable {
 	public static AMembershipCrit convertMembershipCrit(MembershipCrit memberCrit) {
 		AMembershipCrit amemberCrit = new AMembershipCrit();
 		List<ACriteria> returnList = new ArrayList<ACriteria>();
-		for (Criteria crit: memberCrit.getCriteria()) {
-			returnList.add((ACriteria) crit);
+
+		if (null != memberCrit && null != memberCrit.getCriteria()) {
+			for (Criteria crit: memberCrit.getCriteria()) {
+				returnList.add(ACriteria.convertCriteria(crit));
+			}
 		}
 		amemberCrit.setACriteria(returnList);
 		

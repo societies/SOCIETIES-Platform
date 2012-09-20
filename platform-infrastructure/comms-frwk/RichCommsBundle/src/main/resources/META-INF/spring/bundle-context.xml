@@ -27,6 +27,7 @@
 	    <constructor-arg value="${subDomain}"/>
 	    <constructor-arg value="${secretKey}"/>
 	    <constructor-arg value="${daNode}"/>
+		<!--property name="privacyLog" ref="privacyLog"/-->
     </bean>
     
     <bean id="cisCommMgrFactory" 

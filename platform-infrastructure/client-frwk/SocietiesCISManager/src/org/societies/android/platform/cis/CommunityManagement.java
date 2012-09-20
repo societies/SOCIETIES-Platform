@@ -30,6 +30,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.android.api.cis.management.AActivity;
 import org.societies.android.api.cis.management.ACommunity;
 import org.societies.android.api.cis.management.ACriteria;
@@ -164,10 +165,10 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		MembershipCrit rules = new MembershipCrit();
 		List<Criteria> listCriteria = new ArrayList<Criteria>();
 		for(ACriteria acrit: criteria) {
-			listCriteria.add(acrit);
+			listCriteria.add( ACriteria.convertACriteria(acrit));
 		}	
 		rules.setCriteria(listCriteria);
-		//cisinfo.setMembershipCrit(rules); TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX 
+		cisinfo.setMembershipCrit(rules); //TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX 
 		//ADD TO BEAN
 		Create create = new Create();
 		create.setCommunity(cisinfo);
@@ -275,7 +276,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 	}
 
 	/* @see org.societies.android.api.cis.management.ICisManager#subscribeToCommunity(java.lang.String, java.lang.String, java.lang.String)*/
-	public void subscribeToCommunity(String client, String name, String cisId) {
+/*	public void subscribeToCommunity(String client, String name, String cisId) {
 		Log.d(LOG_TAG, "subscribeToCommunity called by client: " + client);
 		
 		//COMMUNIY INFO
@@ -303,10 +304,10 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
         }
-	}
+	}*/
 
 	/* @see org.societies.android.api.cis.management.ICisManager#unsubscribeFromCommunity(java.lang.String, java.lang.String)*/
-	public void unsubscribeFromCommunity(String client, String cisId) {
+	/*public void unsubscribeFromCommunity(String client, String cisId) {
 		Log.d(LOG_TAG, "unsubscribeFromCommunity called by client: " + client);
 		
 		//DELETE NOTIFICATION
@@ -330,29 +331,28 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "ERROR sending message: " + e.getMessage());
         }
-	}
+	}*/
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ICisSubscribed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	/* @see org.societies.android.api.cis.management.ICisSubscribed#Join(java.lang.String, java.lang.String, java.util.List)*/
-	public AJoinResponse Join(String client, String cisId) {
+	public AJoinResponse Join(String client, ACisAdvertisementRecord targetCis) {
 		Log.d(LOG_TAG, "Join CIS called by client: " + client);
 
+		
 		//CREATE JOIN INFO
-		org.societies.api.schema.cis.community.Join join = new org.societies.api.schema.cis.community.Join();
-		List<Qualification> qualifications = new ArrayList<Qualification>();
+		org.societies.api.schema.cis.manager.AskCisManagerForJoin join = new org.societies.api.schema.cis.manager.AskCisManagerForJoin();
+		join.setCisAdv(  targetCis);
+		//org.societies.api.schema.cis.community.Join join = new org.societies.api.schema.cis.community.Join();
+		//List<Qualification> qualifications = new ArrayList<Qualification>();
 		//join.setQualification(qualifications); TODO: GET MEMBERSHIP CRITERIA AND QUERY CONTEXT FOR QUALIFICATIONS FOR JOINING
 		//CREATE MESSAGE BEAN
-		CommunityMethods messageBean = new CommunityMethods();
-		messageBean.setJoin(join);
+		CommunityManager messageBean = new CommunityManager();
+		messageBean.setAskCisManagerForJoin(join);
 
 		//COMMS STUFF
 		ICommCallback cisCallback = new CommunityCallback(client, JOIN_CIS); 
-		IIdentity toID = null;
-		try { 
-			toID = commMgr.getIdManager().fromJid(cisId);
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}		
+		IIdentity toID = null; 
+		toID = commMgr.getIdManager().getCloudNode();	
 		Stanza stanza = new Stanza(toID);
         try {
         	commMgr.register(ELEMENT_NAMES, cisCallback);
