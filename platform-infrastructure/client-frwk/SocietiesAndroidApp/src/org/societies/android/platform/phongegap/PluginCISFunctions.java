@@ -42,6 +42,7 @@ import org.societies.android.api.cis.management.AJoinResponse;
 import org.societies.android.api.cis.management.AParticipant;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
+import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.android.api.servicelifecycle.AService;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.cis.CisDirectoryRemote;
@@ -178,8 +179,8 @@ public class PluginCISFunctions extends Plugin {
         intentFilter.addAction(CommunityManagement.CREATE_CIS);
         intentFilter.addAction(CommunityManagement.DELETE_CIS);
         intentFilter.addAction(CommunityManagement.GET_CIS_LIST);
-        intentFilter.addAction(CommunityManagement.SUBSCRIBE_TO_CIS);
-        intentFilter.addAction(CommunityManagement.UNSUBSCRIBE_FROM_CIS);
+//        intentFilter.addAction(CommunityManagement.SUBSCRIBE_TO_CIS);
+//        intentFilter.addAction(CommunityManagement.UNSUBSCRIBE_FROM_CIS);
         intentFilter.addAction(CommunityManagement.REMOVE_MEMBER);
         //CIS SUBSCRIBED
         intentFilter.addAction(CommunityManagement.JOIN_CIS);
@@ -262,7 +263,7 @@ public class PluginCISFunctions extends Plugin {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 3))) {
+			} /*else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 3))) {
 				try { //SUBSCRIBE TO CIS
 					this.serviceCISManager.subscribeToCommunity(data.getString(0), data.getString(1), data.getString(1));
 				} catch (JSONException e) {
@@ -274,7 +275,7 @@ public class PluginCISFunctions extends Plugin {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 5))) {
+			}*/ else if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 3))) {
 				try { //REMOVE PARTICIPANT FROM CIS
 					this.serviceCISManager.removeMember(data.getString(0), data.getString(1), data.getString(2));
 				} catch (JSONException e) {
@@ -284,7 +285,8 @@ public class PluginCISFunctions extends Plugin {
 			//>>>>>>>>>  ICisSubscribed METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 0))) {
 				try { //JOIN A CIS
-					this.serviceCISsubscribe.Join(data.getString(0), data.getString(1));
+					// TODO check that the conversion method used for the 2nd parameter is NOT IMPLEMENTED
+					this.serviceCISsubscribe.Join(data.getString(0),  CreateACISAdvRecFromJSON(data.getJSONObject(1)));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -376,6 +378,20 @@ public class PluginCISFunctions extends Plugin {
 		
 		return act;
 	}
+	
+	/**
+	 * Creates an ACisAdvertisementRecord from a JSON object
+	 * @param jObj
+	 * @return
+	 * @throws JSONException
+	 */
+	private ACisAdvertisementRecord CreateACISAdvRecFromJSON(JSONObject jObj) throws JSONException {
+		ACisAdvertisementRecord a = new ACisAdvertisementRecord();
+		// TODO: add real code here!!
+		
+		return a;
+	}
+	
 	/** Convert a JSON Array of ACriteria objects to a List<ACriteria>
 	 * @param jArray
 	 * @return
