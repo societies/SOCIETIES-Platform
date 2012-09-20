@@ -128,6 +128,15 @@ public class TestCommsMgmt {
 				}
 			});
 			
+			this.remoteCSSManager.suggestedFriends(new ICSSManagerCallback()  {
+				
+				public void receiveResult(CssInterfaceResult result) {
+					LOG.info("Received result from remote call");
+					LOG.info("Result Status: " + result.isResultStatus());
+					
+				}
+			});
+			
 		}
 	}
 
