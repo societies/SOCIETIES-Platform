@@ -24,6 +24,7 @@
  */
 package org.societies.android.api.cis.management;
 
+import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.api.schema.activity.Activity;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
@@ -49,11 +50,11 @@ public interface ICisSubscribed {
 	/**
 	 * Join a community
 	 * @param client
-	 * @param cisId
+	 * @param targetCis
 	 * @param qualifications
 	 * @return
 	 */
-	public AJoinResponse Join(String client, String cisId);
+	public AJoinResponse Join(String client, ACisAdvertisementRecord targetCis);
 	
 	/**
 	 * Leave a Community

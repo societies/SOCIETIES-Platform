@@ -75,10 +75,8 @@ public class ACommunity extends Community implements Parcelable {
 		this.setCommunityType(in.readString());
 		this.setDescription(in.readString());
 		this.setOwnerJid(in.readString());
-		in.m
-		if (in.dataAvail() > 0) {
+		if(in.dataAvail() >0)
 			this.setMembershipCrit((AMembershipCrit) in.readParcelable(this.getClass().getClassLoader()));
-		}
 	}
 
 	public static final Parcelable.Creator<ACommunity> CREATOR = new Parcelable.Creator<ACommunity>() {
