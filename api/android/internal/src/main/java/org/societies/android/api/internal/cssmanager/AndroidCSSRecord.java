@@ -254,6 +254,7 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		setCssRegistration(in.readString());
 		setCssInactivation(in.readString());
 		setCssUpTime(in.readInt());
+		setSocialURI(in.readString());
 		
 		setArchiveCSSNodes(convertParcels(in.readParcelableArray(AndroidCSSNode.class.getClassLoader())));
 		setPresence(in.readInt());
@@ -285,6 +286,7 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		out.writeString(getCssRegistration());
 		out.writeString(getCssInactivation());
 		out.writeInt(getCssUpTime());
+		out.writeString(getSocialURI());
 		
 		out.writeParcelableArray(getArchivedCSSNodes(), 0);
 		out.writeInt(getPresence());

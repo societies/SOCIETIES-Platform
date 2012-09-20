@@ -34,8 +34,8 @@ public interface ICisManager {
 	public String methodsArray[] = {"createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy)",
 							 		"deleteCis(String client, String cisId)",
 							 		"Community[] getCisList(String client, String query)",
-							 		"subscribeToCommunity(String client, String name, String cisId)",
-							 		"unsubscribeFromCommunity(String client, String cisId)",
+		//					 		"subscribeToCommunity(String client, String name, String cisId)",
+		//					 		"unsubscribeFromCommunity(String client, String cisId)",
 							 		"removeMember(String client, String cisId, String memberJid)"
 	};
 	
@@ -74,13 +74,13 @@ public interface ICisManager {
 	 * @param name CIS Name
 	 * @param cisId CIS id
 	 */
-	public void subscribeToCommunity(String client, String name, String cisId);
+	//public void subscribeToCommunity(String client, String name, String cisId);
 
 	/**
 	 * Notify cloud we've unsubscribed from a CIS
 	 * @param cisId
 	 */
-	public void unsubscribeFromCommunity(String client, String cisId);
+	//public void unsubscribeFromCommunity(String client, String cisId);
 
 	/**
 	 * Remove a member from this CIS

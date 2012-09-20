@@ -101,6 +101,7 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.Join;
+import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.Leave;
 import org.societies.api.schema.cis.community.Qualification;
 //import org.societies.api.schema.cis.community.Leave;
@@ -641,14 +642,24 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 							
 						}
 					}
-					
-					ICisOwned icis = localCreateCis( cisName, cisType, cisDescription,h,pPolicy);
+					// real create
+					Cis icis = (Cis) localCreateCis( cisName, cisType, cisDescription,h,pPolicy);
 		
-						
-					create.getCommunity().setCommunityJid(icis.getCisId());
-					LOG.info("CIS with self assigned ID Created!!");
+					// sending the response back
+					if(icis !=null){
+						CommunityManager response = new CommunityManager();
+						Create cr = new Create();
+						response.setCreate(cr);
 
-					return c;  
+						Community comm = new Community();
+						icis.fillCommmunityXMPPobj(comm);
+						cr.setCommunity(comm);
+						cr.setResult(true);
+						return response;
+					}else{
+						create.setResult(false);
+						return c;
+					}
 				}
 				else{
 					create.setResult(false);
@@ -723,6 +734,42 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				return c;
 			}
 			// END OF DELETE
+			
+			
+			// client Request for join
+			if (c.getAskCisManagerForJoin() != null) {
+				CommunityManager response = new CommunityManager();
+				JoinResponse j = new JoinResponse();
+				response.setJoinResponse(j);
+				LOG.info("android request for join received in CIS manager");
+				String senderjid = stanza.getFrom().getBareJid();
+				LOG.info("sender JID = " + senderjid); 
+				CisAdvertisementRecord ad = c.getAskCisManagerForJoin().getCisAdv();
+				
+				if(ad == null){
+					j.setResult(false);
+					return response;
+				}
+				else{
+					JoinCallBack jCallback = new JoinCallBack(j);
+					this.joinRemoteCIS(ad, jCallback);
+				
+
+					// TODO: REMOVE THIS SLEEP
+					while(j.getCommunity()== null){// wait for callback
+						try {
+							Thread.sleep(5 * 1000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+
+					return response;
+				}
+			}
+			// END OF DELETE
 				
 
 			if (c.getConfigure() != null) {
@@ -737,6 +784,28 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
+public class JoinCallBack implements ICisManagerCallback{
+		
+	JoinResponse resp;
+	
+	public JoinCallBack(JoinResponse resp){
+		this.resp = resp;
+	}
+
+	@Override
+	public void receiveResult(CommunityMethods communityResultObject) {
+		if(communityResultObject == null || communityResultObject.getJoinResponse() == null){
+			LOG.info("null return on JoinCallBack");
+			resp.setResult(false);
+		}
+		else{
+			LOG.info("Result Status: joined CIS " + communityResultObject.getJoinResponse().isResult());
+			resp = communityResultObject.getJoinResponse();
+		}
+	}
+}
+	
+	
 
 	@Override
 	public List<String> getXMLNamespaces() {

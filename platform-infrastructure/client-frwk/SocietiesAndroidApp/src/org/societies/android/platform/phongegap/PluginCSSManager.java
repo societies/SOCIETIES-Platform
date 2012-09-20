@@ -115,6 +115,7 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(LocalCSSManagerService.REGISTER_XMPP_SERVER);
         intentFilter.addAction(LocalCSSManagerService.LOGIN_XMPP_SERVER);
         intentFilter.addAction(LocalCSSManagerService.LOGOUT_XMPP_SERVER);
+        intentFilter.addAction(LocalCSSManagerService.MODIFY_ANDROID_CSS_RECORD);
         
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     	
@@ -280,6 +281,22 @@ public class PluginCSSManager extends Plugin {
 
 				try {
 					this.localCSSManager.logoutXMPPServer(data.getString(0));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 11))) {
+				try {
+					Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+					Log.d(LOG_TAG, "parameter 2 - forename: " + data.getJSONObject(1).getString("foreName"));
+					Log.d(LOG_TAG, "parameter 3 - name: " + data.getJSONObject(1).getString("name"));
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				try {
+					this.localCSSManager.modifyAndroidCSSRecord(data.getString(0), createCSSRecord(data.getJSONObject(1)));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -460,6 +477,7 @@ public class PluginCSSManager extends Plugin {
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
+				
 				//Create Android Notification
 				int notifierflags [] = new int [1];
 				notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
@@ -497,7 +515,14 @@ public class PluginCSSManager extends Plugin {
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
-			}
+			} else if (intent.getAction().equals(LocalCSSManagerService.MODIFY_ANDROID_CSS_RECORD)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 11);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} 
 		}
 	};
     /**

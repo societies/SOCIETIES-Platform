@@ -36,8 +36,12 @@
 	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"
 				xmlns:tns="http://societies.org/api/schema/cis/manager" 
 	xmlns="http://societies.org/api/schema/cis/manager"
-	xmlns:ins="http://societies.org/api/schema/cis/community">
+	xmlns:ins="http://societies.org/api/schema/cis/community"
+	xmlns:ads="http://societies.org/api/schema/cis/directory">
 
+<xs:import namespace="http://societies.org/api/schema/cis/directory" 
+           schemaLocation="org.societies.api.schema.cis.directory.xsd"/>
+           
 <xs:import namespace="http://societies.org/api/schema/cis/community" 
            schemaLocation="org.societies.api.schema.cis.community.xsd"/>
 
@@ -76,6 +80,8 @@
 			  <xs:element ref='list'/>
 			  <xs:element ref='listResponse'/>
 			  <xs:element ref='searchCis'/>
+			  <xs:element ref='askCisManagerForJoin'/>
+			  <xs:element ref='ins:joinResponse'/>
 			  <xs:element ref='configure'/>
 			  <xs:element ref='notification'/>
 	      </xs:choice>
@@ -83,6 +89,14 @@
 	</xs:element>
 	
 
+
+   <xs:element name='askCisManagerForJoin'>
+	    <xs:complexType>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element name="cisAdv" type="ads:cisAdvertisementRecord"/>
+			</xs:sequence>
+	    </xs:complexType>
+	</xs:element>
 
 	
 	<xs:element name='create'>

@@ -229,7 +229,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		
 		AndroidCSSRecord record = null;
 		
-		if (null == this.cssRecordDAO.readCSSrecord()) {
+		if (null == this.readLocalCSSRecord()) {
 			record = this.synchProfile(client, record);
 		} else {
 			if (client != null) {
@@ -355,6 +355,30 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	@Override
 	public AndroidCSSRecord modifyAndroidCSSRecord(String client, AndroidCSSRecord record) {
 		Log.d(LOG_TAG, "modifyAndroidCSSRecord called with client: " + client);
+		
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
+		Dbc.require("CSS record cannot be null", record != null);
+		
+		
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		CssRecord localCssrecord = convertAndroidCSSRecord(record);
+		
+		
+		messageBean.setProfile(localCssrecord);
+		messageBean.setMethod(MethodType.MODIFY_CSS_RECORD);
+
+		Stanza stanza = new Stanza(toXCManager);
+		
+		ICommCallback callback = new CSSManagerCallback(client, MODIFY_ANDROID_CSS_RECORD);
+
+		try {
+    		ccm.register(ELEMENT_NAMES, callback);
+			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(LOG_TAG, "Send stanza");
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        } 
+
 		return null;
 	}
 
@@ -777,7 +801,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		 * @param record
 		 */
 		private void updateLocalPersistence(AndroidCSSRecord record) {
-			if (this.returnIntent.equals(LOGIN_CSS) || this.returnIntent.equals(SYNCH_PROFILE)) {
+			if (this.returnIntent.equals(LOGIN_CSS) || 
+					this.returnIntent.equals(SYNCH_PROFILE) || 
+					this.returnIntent.equals(MODIFY_ANDROID_CSS_RECORD)) {
 				LocalCSSManagerService.this.updateLocalCSSrecord(record);
 			}
 			

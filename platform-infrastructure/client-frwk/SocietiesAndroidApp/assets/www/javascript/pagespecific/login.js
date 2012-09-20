@@ -203,18 +203,24 @@ var SocietiesLogin = {
 			$.mobile.loadPage("html/active_services.html");
 			$.mobile.loadPage("html/myProfile.html");
 			
-			//pre-fetch main navigation pages
+			//MAIN NAVIGATION PAGES
 			$.mobile.loadPage("html/myProfile.html");
 			$.mobile.loadPage("html/settings.html");
 			$.mobile.loadPage("html/about.html");
+			//APPS SET OF PAGES
 			$.mobile.loadPage("html/my_apps.html");
 			$.mobile.loadPage("html/my_apps_details.html");
-			
+			//COMMUNITY SET OF PAGES
 			$.mobile.loadPage("html/communities_list.html");
 			$.mobile.loadPage("html/community_profile.html");
 			$.mobile.loadPage("html/communities_result.html");
+			$.mobile.loadPage("html/create_community.html");
+			//CSS FRIEND SET OF PAGES
+			$.mobile.loadPage("html/friends_landing.html");
+			$.mobile.loadPage("html/my_friends_list.html");
+			$.mobile.loadPage("html/my_friends_details.html");
 			
-			$.mobile.changePage("html/landing.html", { transition: "slideup"} );
+			$.mobile.changePage("html/landing.html", { transition: "fade"} );
 		}
 		
 		function failure(data) {

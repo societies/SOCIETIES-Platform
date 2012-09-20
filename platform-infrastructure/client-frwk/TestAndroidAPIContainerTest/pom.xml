@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+        <groupId>org.societies</groupId>
+        <artifactId>android-parent</artifactId>
+        <version>RELEASE</version>
+   </parent>
+
+   <groupId>org.societies.android.test</groupId>
+   <artifactId>TestAndroidAPIContainer</artifactId>
+   <name>TestAPIContainer</name>
+   <version>${release.version}</version>
+   <packaging>apk</packaging>
+
+   <developers>
+      <developer>
+		 <name>WP4 Client Framework Team</name>
+		<!-- Name of component author-->
+		 <email>http://www.ict-societies.eu</email>
+		<!-- Component author e-mail-->
+	  </developer>
+   </developers>
+
+
+    <dependencies>
+	<dependency>
+                <groupId>com.google.android</groupId>
+                <artifactId>android</artifactId>
+                <exclusions>
+                <!-- Provided by Android -->
+                  <exclusion>
+                      <artifactId>xpp3</artifactId>
+                      <groupId>xpp3</groupId>
+                 </exclusion>
+                </exclusions>
+	</dependency>
+		
+       	<dependency>
+      		<groupId>com.google.android</groupId>
+      		<artifactId>android-test</artifactId>
+    	</dependency>
+	<dependency>
+	   	<groupId>org.societies.android.test</groupId>
+   		<artifactId>AndroidAPIContainer</artifactId>
+   		<version>${release.version}</version>
+ 	</dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
