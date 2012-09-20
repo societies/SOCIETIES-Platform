@@ -69,17 +69,18 @@ import org.springframework.util.Assert;
  * these containing the letters "Special" and deal with other attributes and these containing the letters "String" in 
  * their name that deal with string attributes
  */
-@Service("communityCtxEstimation")
+@Service
 public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CommunityContextEstimation.class);
-
-	private ICtxBroker internalCtxBroker = null;
 	
-	@Autowired(required=true)
-	public CommunityContextEstimation(ICtxBroker internalCtxBroker) {
-		LOG.info(this.getClass() + "internalCtxBroker instantiated "+ this.internalCtxBroker);
+	@Autowired(required=false)
+	private ICtxBroker internalCtxBroker;
+	
+	
+	public CommunityContextEstimation() {
+		LOG.info(this.getClass() + "CommunityContextEstimation instantiated ");
 
 	}
 	
