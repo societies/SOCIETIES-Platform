@@ -49,20 +49,6 @@
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
-
-		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-			<artifactId>PubsubClientBundle</artifactId>
-			<version>${version.comm}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${version.comm}</version>
-			<scope>compile</scope>
-		</dependency>
 	
 	</dependencies>
 

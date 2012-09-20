@@ -80,8 +80,6 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	private Map<String,Object> responses;
 	private Map<Subscription,List<Subscriber>> subscribers;
 	private IIdentityManager idm;
-	//private Marshaller contentMarshaller;
-	//private Unmarshaller contentUnmarshaller;
 	
 	private final Map<String, String> nsToPackage = new HashMap<String, String>();
 	private String packagesContextPath;
@@ -99,20 +97,10 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			else
 				throw new CommunicationException("Injected endpoint is not connected!");
 			packagesContextPath = "";
-			//JAXBContext jc = JAXBContext.newInstance();
-			//contentUnmarshaller = jc.createUnmarshaller();
-			//contentMarshaller = jc.createMarshaller();
 			endpoint.register(this);
 			
-			
-			// Waiting for PS to load
-			Thread.sleep(10000);
 		} catch (CommunicationException e) {
 			LOG.error(e.getMessage());
-		} catch (InterruptedException e) {
-			LOG.error(e.getMessage());	
-		//} catch (JAXBException e) {
-		//	LOG.error(e.getMessage());
 		}
 	}
 	

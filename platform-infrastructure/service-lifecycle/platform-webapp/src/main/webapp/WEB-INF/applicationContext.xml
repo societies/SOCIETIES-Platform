@@ -45,5 +45,5 @@
 <osgi:reference id="PrivacyAssessment" interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment" cardinality="0..1"/>
 <osgi:reference id="privacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" cardinality="0..1"/>
 <osgi:reference id="privacyPolicyManagerRemote" interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote" cardinality="0..1"/>
-
+<osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" cardinality="0..1" />
 </beans>

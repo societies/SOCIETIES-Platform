@@ -60,7 +60,9 @@ public class PacketMarshaller {
 			Element exampleElementImpl = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("dummy");
 			XMLGregorianCalendar gregorianCalendarImpl = DatatypeFactory.newInstance().newXMLGregorianCalendar();
 			registry.bind(gregorianCalendarImpl.getClass(), XMLGregorianCalendarConverter.class);
+			Log.i(LOG_TAG, "Registered class '"+gregorianCalendarImpl.getClass()+"' as XMLGregorianCalendarImpl");
 			registry.bind(exampleElementImpl.getClass(), ElementConverter.class);
+			Log.i(LOG_TAG, "Registered class '"+exampleElementImpl.getClass()+"' as ElementImpl");
 			registry.bind(java.net.URI.class,URIConverter.class);
 			registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
 			registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));
@@ -70,7 +72,7 @@ public class PacketMarshaller {
 		} catch (ParserConfigurationException e) {
 			Log.e(LOG_TAG, "ParserConfigurationException trying to get runtime ElementImpl");
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Exception trying to register runtime ElementImpl in SimpleXML");
+			Log.e(LOG_TAG, "Exception trying to register runtime ElementImpl or XMLGregorianCalendarImpl in SimpleXML",e);
 		}
 		
 		s = new Persister(strategy);

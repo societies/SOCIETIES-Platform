@@ -23,31 +23,36 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.feedback;
+package org.societies.useragent.feedback;
 
-import java.util.List;
-import java.util.concurrent.Future;
+import java.util.LinkedList;
+import java.util.Queue;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.FeedbackRequest;
 
-/**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
- */
-public interface IUserFeedback
-{
-	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
+public class RequestManager {
 	
-	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
+	Queue<FeedbackRequest> requestQueue;
+
+	public RequestManager(){
+		requestQueue = new LinkedList<FeedbackRequest>();
+	}
 	
-	public void showNotification(String notificationText);
+	public FeedbackRequest getNextRequest(){
+		FeedbackRequest topOfList = requestQueue.element();
+		return null;
+	}
 	
-	public Future<FeedbackRequest> getNextRequest();
+	public void addRequest(FeedbackRequest newRequest){
+		requestQueue.add(newRequest);
+	}
 	
-	public void submitExplicitResponse(String id);
-	
-	public void submitImplicitResponse(String id);
+	public void removeRequest(String requestID){
+		for(FeedbackRequest nextRequest: requestQueue){
+			if(nextRequest.getID().equals(requestID)){
+				requestQueue.remove(nextRequest);
+				break;
+			}
+		}
+	}
 }

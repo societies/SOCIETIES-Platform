@@ -17,14 +17,23 @@
    for integration testing outside of an OSGi environment -->
 
 	<context:annotation-config />
-
-
-
+	<context:property-placeholder properties-ref="componentConfig"/>
 	
-
-  
-	<bean id="pubsubService" class="org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter">
-		<constructor-arg ref="xcCommunication"/>
+	<bean id="xcCommunication" 
+		 class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr"
+		 init-method="loginFromConfig"
+		 destroy-method="UnRegisterCommManager">
+	    <constructor-arg value="${host}"/>
+	    <constructor-arg value="${subDomain}"/>
+	    <constructor-arg value="${secretKey}"/>
+	    <constructor-arg value="${daNode}"/>
+    </bean>
+    
+    <bean id="cisCommMgrFactory" 
+    	class="org.societies.comm.xmpp.xc.impl.CISCommunicationMgrFactoryImpl"
+    	destroy-method="destroyAllConnections">
+    	<constructor-arg ref="xcCommunication"/>
+        <constructor-arg value="${secretKey}"/>
     </bean>
 	
 </beans>
