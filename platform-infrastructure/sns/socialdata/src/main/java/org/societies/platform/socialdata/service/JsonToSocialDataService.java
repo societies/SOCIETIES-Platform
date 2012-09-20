@@ -43,7 +43,7 @@ public class JsonToSocialDataService {
 		  
 		  SocialData sd= new SocialData();
 		  //System.out.println("Convert JSON to SocialDATA");
-		  String access_token = "AAAFs43XOj3IBAGbtrA2I7cibWs8YD1ODGr7JiqXl0ZCJ4DBkeXKeSsth9r2EbRGj6jh1eBIhUAkIZBNs1nKOJU1Ys81xKxUqZAC13DwBAZDZD";
+		  String access_token = "AAAFs43XOj3IBAPaMRQGAkZCzcyYDBxe2b551hPWSYxflFHh0YB81ysCKtkH5Q3VjZCGASZCU019WSjXpseyeogM05AHS9CiuZBWu1aZByRwZDZD";
 		  HashMap<String, String> pars = new HashMap<String, String>();
 		  pars.put(ISocialConnector.AUTH_TOKEN, access_token);
 		  

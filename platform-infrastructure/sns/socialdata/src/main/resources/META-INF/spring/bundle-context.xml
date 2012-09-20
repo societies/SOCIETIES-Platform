@@ -9,9 +9,14 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment
     -->
-    <bean id="iSocialData" class="org.societies.platform.socialdata.SocialData"/>
-           
+    <bean id="iSocialData" 
+    	  class="org.societies.platform.socialdata.SocialData"
+    	  init-method="initSocialData">
     
+   		 <property name="internalCtxBroker" ref="internalCtxBroker"/>
+		 <property name="commsMgr" 			ref="commsMgr"/>
+           
+    </bean>
     
 
 </beans>

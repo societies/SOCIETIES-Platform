@@ -20,6 +20,10 @@
 	   <tr><td><b>Social Network Data</b></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/socialdata.html">SocialData</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
+	  
+	   <tr><td><b>My Contexta</b></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/context.html">Context Management</a></td></tr>
+	  <tr><td>&nbsp;</td></tr>
 
 	  <tr><td><b>Privacy and Trust</b></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacy-assessment.html">Privacy Assessment</a></td></tr>

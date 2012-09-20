@@ -1,0 +1,50 @@
+.error {
+	color: #ff0000;
+}
+ 
+.errorblock {
+	color: #000;
+	background-color: #ffEEEE;
+	border: 3px solid #ff0000;
+	padding: 8px;
+	margin: 16px;
+}
+
+table{
+    width : 100%;
+	border: solid #ffffff 1px;
+	text-align: center;
+	background-color: grey;
+	
+}
+
+
+.big {
+	width:40%;
+	}
+
+
+
+th{
+	color: white;
+	
+}
+
+td > input{
+	width :40%;
+}
+
+tr.entity{
+	 background-color: green;
+	 color: blue;
+}
+
+tr.attribute{
+	 background-color: blue;
+	 color: #aa22aa;
+}
+
+tr.relationship{
+	 background-color: yellow;
+}
+

@@ -1,11 +1,12 @@
 package org.societies.api.internal.sns;
 
+import java.io.Serializable;
 import java.util.Map;
 
 
 
 
-public interface ISocialConnector {
+public interface ISocialConnector extends Serializable {
 	
 	public final static String FACEBOOK_CONN 		= "facebook";
 	public final static String TWITTER_CONN  		= "twitter";
