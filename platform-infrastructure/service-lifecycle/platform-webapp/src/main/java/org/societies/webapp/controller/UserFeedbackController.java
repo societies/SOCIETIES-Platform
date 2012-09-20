@@ -26,14 +26,22 @@
 package org.societies.webapp.controller;
 
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.FeedbackRequest;
 
 public class UserFeedbackController {
 	
 	IUserFeedback userFeedback;
 	
-	public /*UFControl[]*/void getForm(){
-		//retrieve form content and format from UF service
-		
+	public String getForm(){
+		String jsonString = "";
+		//retrieve next request from UF service
+		FeedbackRequest topRequest = userFeedback.getNextRequest();
+		return jsonString;
+	}
+	
+	public void submitResponse(String id, String type, String results){
+		//convert results string to string array
+		userFeedback.
 	}
 	
 	public void setUserFeedback(IUserFeedback userFeedback){

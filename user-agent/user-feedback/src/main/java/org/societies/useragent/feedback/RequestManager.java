@@ -27,7 +27,6 @@ package org.societies.useragent.feedback;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.UUID;
 
 import org.societies.api.internal.useragent.model.FeedbackRequest;
 
@@ -47,9 +46,9 @@ public class RequestManager {
 		requestQueue.add(newRequest);
 	}
 	
-	public boolean removeRequest(UUID requestID){
+	public boolean removeRequest(String requestID){
 		for(FeedbackRequest nextRequest: requestQueue){
-			if(nextRequest.getID().compareTo(requestID) == 0){  //the same
+			if(nextRequest.getID().equals(requestID)){ 
 				requestQueue.remove(nextRequest);
 				return true;
 			}

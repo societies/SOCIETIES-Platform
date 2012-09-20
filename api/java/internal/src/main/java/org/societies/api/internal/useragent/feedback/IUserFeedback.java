@@ -46,9 +46,9 @@ public interface IUserFeedback
 	
 	public void showNotification(String notificationText);
 	
-	public Future<FeedbackRequest> getNextRequest();
+	public FeedbackRequest getNextRequest();
 	
-	public void submitExplicitResponse(UUID id, List<String> result);
+	public void submitExplicitResponse(String id, List<String> result);
 	
-	public void submitImplicitResponse(UUID id, Boolean result);
+	public void submitImplicitResponse(String id, Boolean result);
 }

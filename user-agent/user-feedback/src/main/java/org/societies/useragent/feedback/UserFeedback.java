@@ -63,16 +63,16 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	IUserAgentRemoteMgr uaRemote;
 	RequestManager requestMgr;
 	String myDeviceID;
-	HashMap<UUID, List<String>> expResults;
-	HashMap<UUID, Boolean> impResults;
+	HashMap<String, List<String>> expResults;
+	HashMap<String, Boolean> impResults;
 	static String UNDEFINED = "undefined";
 
 	public void initialiseUserFeedback(){
 		LOG.debug("User Feedback initialised!!");
 
 		requestMgr = new RequestManager();
-		expResults = new HashMap<UUID, List<String>>();
-		impResults = new HashMap<UUID, Boolean>();
+		expResults = new HashMap<String, List<String>>();
+		impResults = new HashMap<String, Boolean>();
 
 		//get current device ID
 		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
@@ -84,7 +84,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		//create feedback form
 		FeedbackForm fbForm = generateExpFeedbackForm(type, content);
 		//create new request object with unique ID
-		UUID requestID = UUID.randomUUID();
+		String requestID = UUID.randomUUID().toString();
 		FeedbackRequest fbRequest = new FeedbackRequest(requestID, fbForm);
 		//add new request to queue
 		requestMgr.addRequest(fbRequest);
@@ -116,7 +116,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		//create feedback form
 		FeedbackForm fbForm = generateImpFeedbackForm(type, content);
 		//create new request object with unique ID
-		UUID requestID = UUID.randomUUID();
+		String requestID = UUID.randomUUID().toString();
 		FeedbackRequest fbRequest = new FeedbackRequest(requestID, fbForm);
 		//add new request to queue
 		requestMgr.addRequest(fbRequest);
@@ -147,7 +147,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		//create feedback form
 		FeedbackForm fbForm = generateNotificationForm(notificationTxt);
 		//create request object with unique id
-		FeedbackRequest fbRequest = new FeedbackRequest(UUID.randomUUID(), fbForm);
+		String requestID = UUID.randomUUID().toString();
+		FeedbackRequest fbRequest = new FeedbackRequest(requestID, fbForm);
 		//add new request to queue
 		requestMgr.addRequest(fbRequest);
 	}
@@ -160,12 +161,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	 * @see org.societies.api.internal.useragent.feedback.IUserFeedback#getNextRequest()
 	 */
 	@Override
-	public Future<FeedbackRequest> getNextRequest() {
-		FeedbackRequest nextRequest = requestMgr.getNextRequest();
-		return new AsyncResult<FeedbackRequest>(nextRequest);
+	public FeedbackRequest getNextRequest() {
+		return requestMgr.getNextRequest();
 	}
 
-	public void submitResponse(UUID requestId, Object result){
+	public void submitResponse(String requestId, Object result){
 		if(result instanceof Boolean){
 			Boolean impResult = (Boolean)result;
 			//set result value in hashmap
@@ -184,7 +184,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	}
 
 	@Override
-	public void submitExplicitResponse(UUID requestId, List<String> result) {
+	public void submitExplicitResponse(String requestId, List<String> result) {
 		//set result value in hashmap
 		synchronized(expResults){
 			this.expResults.put(requestId, result);
@@ -197,7 +197,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	}
 
 	@Override
-	public void submitImplicitResponse(UUID requestId, Boolean result) {
+	public void submitImplicitResponse(String requestId, Boolean result) {
 		//set result value in hashmap
 		synchronized(impResults){
 			this.impResults.put(requestId, result);
