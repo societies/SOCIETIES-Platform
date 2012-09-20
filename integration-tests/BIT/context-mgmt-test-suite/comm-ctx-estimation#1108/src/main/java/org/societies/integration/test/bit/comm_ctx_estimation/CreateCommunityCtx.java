@@ -1,5 +1,8 @@
 package org.societies.integration.test.bit.comm_ctx_estimation;
 
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.concurrent.ExecutionException;
 
@@ -22,6 +25,10 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+
+
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.attributes.Rule;
 
 
 public class CreateCommunityCtx {
@@ -163,9 +170,6 @@ public class CreateCommunityCtx {
 			e.printStackTrace();
 		}
 	}
-
-
-	
 	
 	// helper classes
 	
@@ -181,9 +185,37 @@ public class CreateCommunityCtx {
 			final String cssOwnerStr = this.cssNodeId.getBareJid();
 			cssOwnerId = Test1108.getCommManager().getIdManager().fromJid(cssOwnerStr);
 		
-			Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
+			//Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
+		
 			
-			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
+			MembershipCriteria m = new MembershipCriteria();
+			try{
+				Rule r = new Rule("equals",new ArrayList<String>(Arrays.asList("married")));
+				m.setRule(r);
+				cisCriteria.put(CtxAttributeTypes.STATUS, m);
+				r = new Rule("equals",new ArrayList<String>(Arrays.asList("Brazil")));
+				m.setRule(r);
+				cisCriteria.put(CtxAttributeTypes.ADDRESS_HOME_COUNTRY, m);
+			}catch(InvalidParameterException e){
+				// TODO: treat expection
+				e.printStackTrace();
+			}
+			
+			LOG.info("*** trying to create cis : ");
+			cisOwned = Test1108.getCisManager().createCis("CIS_NAME", "password.societies.local" , cisCriteria,"stringArg3").get();
+			
+			LOG.info("*** cis created: "+cisOwned.getCisId());
+			
+			//LOG.info("*** cis list: "+cisManager.getCisList());
+			//			cisManager.createCis(arg0, arg1, arg2, arg3)
+			
+			 //CisOwned ciss =  (cisManager.createCis(cssOwnerStr, "password.societies.local","cisNAme", null , TEST_CIS_MODE)).get();
+			
+			
+			//.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+			
+			//cisOwned = cisManager.getOwnedCis(arg0);
 			LOG.info("*** cisOwned " +cisOwned);
 			String cisIDString  = cisOwned.getCisId();
 			LOG.info("*** cisOwned.getCisId() " +cisIDString);

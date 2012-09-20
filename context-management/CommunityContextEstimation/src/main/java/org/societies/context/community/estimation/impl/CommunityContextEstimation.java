@@ -133,6 +133,10 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		//Check the type of the ctxAttributeIdentifier
 
+		LOG.info("inside estimateCommunityCtx communityCtxId:"+ communityCtxId);
+		LOG.info("inside estimateCommunityCtx ctxAttributeIdentifier:"+ ctxAttributeIdentifier);
+		
+		
 		CtxAttribute retrievedType = null;
 		try {
 			retrievedType = (CtxAttribute) internalCtxBroker.retrieve(ctxAttributeIdentifier).get();
