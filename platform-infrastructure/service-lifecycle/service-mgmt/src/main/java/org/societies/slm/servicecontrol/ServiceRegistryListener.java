@@ -476,7 +476,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			
 			if(log.isDebugEnabled())
 					log.debug("Removing the shared service from the policy provider!");
-			//getNegotiationProvider().removeService(serviceToRemove.getServiceIdentifier());
+			getNegotiationProvider().removeService(serviceToRemove.getServiceIdentifier());
 			
 			
 			if(log.isDebugEnabled())

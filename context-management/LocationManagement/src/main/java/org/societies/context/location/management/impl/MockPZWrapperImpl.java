@@ -31,16 +31,31 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.societies.context.location.management.api.*;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.context.location.management.PZWrapper;
+import org.societies.context.location.management.PzPropertiesReader;
+import org.societies.context.location.management.api.ITag;
+import org.societies.context.location.management.api.IUserLocation;
+import org.societies.context.location.management.api.IZone;
+import org.societies.context.location.management.api.IZoneId;
 import org.societies.context.location.management.api.impl.CoordinateImpl;
 import org.societies.context.location.management.api.impl.TagImpl;
 import org.societies.context.location.management.api.impl.UserLocationImpl;
 import org.societies.context.location.management.api.impl.ZoneIdImpl;
 import org.societies.context.location.management.api.impl.ZoneImpl;
-import org.societies.context.location.management.PZWrapper;
 
 
 public class MockPZWrapperImpl implements PZWrapper {
+	/** The logging facility. */
+	private static final Logger log = LoggerFactory.getLogger(MockPZWrapperImpl.class);
+	
+	private final Timer timer = new Timer();
+	
+	
 	
 	public MockPZWrapperImpl() {
 		fillMockActiveZones();
@@ -48,6 +63,41 @@ public class MockPZWrapperImpl implements PZWrapper {
 		fillMockEntitiesLocations();
 	}
 	
+	
+	@SuppressWarnings("unused")
+	private void init(){
+		int generateNewLocationsCycle = PzPropertiesReader.instance().getPzMockGenerateLocationsCycle();
+		try{
+			timer.schedule(new CleanTimerTask(), generateNewLocationsCycle, generateNewLocationsCycle);
+		}catch (Exception e) {
+			log.error("couldn't create timer task in MockPZWrapperImpl",e);
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	private void cleanup(){
+		try{
+			if (timer != null){
+				timer.cancel();
+			}
+		}catch (Exception e) {
+			log.error("couldn't stop timer task in MockPZWrapperImpl",e);
+		}
+	}
+	
+	private class CleanTimerTask extends TimerTask{
+
+		@Override
+		public void run() {
+			try{
+				synchronized (this) {
+					mockEntitiesLocations.clear();
+				}
+			}catch (Exception e) {
+				log.error("failed to clear mockEntitiesLocations object",e);
+			}
+		}
+	}
 	public static class Zone {
 		public int getZoneId() {
 			return zoneId;
@@ -168,6 +218,7 @@ public class MockPZWrapperImpl implements PZWrapper {
 		}
 		public void setX(double x) {
 			this.x = x;
+			
 		}
 
 		public Double getY() {
@@ -219,7 +270,7 @@ public class MockPZWrapperImpl implements PZWrapper {
 	/* http://ta-proj02:9082/QueriesGatewayREST/RT/allActiveZones */
 	/**************************************************************/
 	public Collection<IZone> getActiveZones() {
-		Collection<MockPZWrapperImpl.Zone> mockZones;
+		Collection<MockPZWrapperImpl.ExZone> mockZones;
 		synchronized (this) {
 			mockZones = mockActiveZones.values();	
 		}
@@ -264,9 +315,6 @@ public class MockPZWrapperImpl implements PZWrapper {
 			}
 		}
 		
-		location.setX(location.getX()+1);
-		location.setY(location.getY()+1);
-		
 		IUserLocation userLocation = new UserLocationImpl();
 		List<IZone> zones = convert(location.getZones());
 		userLocation.setZones(zones);
@@ -287,10 +335,11 @@ public class MockPZWrapperImpl implements PZWrapper {
 		location.setY(generateRand());
 		location.setZ(generateRand());
 		
-		int zoneID = (int) Math.ceil( (Math.random()*100)%5); 
-		Zone zone = mockActiveZones.get(Integer.valueOf(zoneID));
+		int zoneID = (int) Math.ceil( (Math.random()*100)%4); 
+		ExZone zone = mockActiveZones.get(Integer.valueOf(zoneID));
 		ExZone exZone = new ExZone(zone);
-		exZone.setPersonalTag("Personal Tag: "+zoneID);
+		exZone.setPersonalTag("Personal Tag"+zoneID);
+		exZone.getTags().addAll(zone.getTags());
 		location.getZones().add(exZone);
 		return location;
 	}
@@ -339,7 +388,7 @@ public class MockPZWrapperImpl implements PZWrapper {
 	}
 	
 	// Mock Data
-	private HashMap<Integer, Zone> mockActiveZones;
+	private HashMap<Integer, ExZone> mockActiveZones;
 	private HashMap<Integer, Set<String>> mockActiveEntitiesIdsInZones;
 	private HashMap<String, Location> mockEntitiesLocations;
 	private static final int DailyPlanet = 0;
@@ -352,41 +401,46 @@ public class MockPZWrapperImpl implements PZWrapper {
 	private static final String LexLuthor = "ff:ff:ff:ff:ff:ff";
 	
 	private void fillMockActiveZones() {
-		mockActiveZones = new HashMap<Integer, Zone>();
+		mockActiveZones = new HashMap<Integer, ExZone>();
 		
-		Zone zone = new Zone();
+		ExZone zone = new ExZone();
 		zone.setZoneId(DailyPlanet);
 		zone.setType("building");
 		zone.setName("Daily Planet");
 		zone.setDescription("");
+		zone.getTags().add("Office Planet");
 		mockActiveZones.put(zone.getZoneId(), zone);
 		
-		zone = new Zone();
+		zone = new ExZone();
 		zone.setZoneId(Earth);
 		zone.setType("planet");
 		zone.setName("Earth");
 		zone.setDescription("Planet Earth");
+		zone.getTags().add("earth Zone");
 		mockActiveZones.put(zone.getZoneId(), zone);
 		
-		zone = new Zone();
+		zone = new ExZone();
 		zone.setZoneId(LuthorCorp);
 		zone.setType("building");
 		zone.setName("Luthor Corp");
 		zone.setDescription("");
+		zone.getTags().add("office Luthor");
 		mockActiveZones.put(zone.getZoneId(), zone);
 		
-		zone = new Zone();
+		zone = new ExZone();
 		zone.setZoneId(Metropolis);
 		zone.setType("city");
 		zone.setName("Metropolis");
 		zone.setDescription("");
+		zone.getTags().add("office Metropolis");
 		mockActiveZones.put(zone.getZoneId(), zone);
 		
-		zone = new Zone();
+		zone = new ExZone();
 		zone.setZoneId(Smallville);
 		zone.setType("city");
 		zone.setName("Smallville");
 		zone.setDescription("");
+		zone.getTags().add("office Smallville");
 		mockActiveZones.put(zone.getZoneId(), zone);
 	}
 	

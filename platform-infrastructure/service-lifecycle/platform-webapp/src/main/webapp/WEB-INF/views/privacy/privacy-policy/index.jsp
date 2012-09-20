@@ -40,11 +40,59 @@
 		<li><a href="cis-privacy-policy-show.html?cisId=onecis.societies.local&cisOwnerId=olivier.societies.local&test=true">Show an existing CIS privacy policy</a></li>
 		<li><a href="service-privacy-policy-show.html?serviceId=css://olivier.societies.local&serviceOwnerId=olivier.societies.local&test=true">Show an existing 3P service privacy policy</a></li>
 	</ul>
+	
+	<h3>Search a CIS Privacy Policy</h3>
+	<c:if test="${null != ResultMsg}">
+	<p>
+		<pre>${ResultMsg}</pre>
+	</p>
+	</c:if>
+	<form:form method="POST" action="privacy-policies.html" commandName="privacyPolicyCriteria" class="searchPrivacyPolicy">
+		<fieldset>
+		<legend>Criteria</legend>
+			<form:errors path="*" cssClass="errorblock" element="div" />
+			
+			<form:label path="cisLocation">CIS location</form:label>
+			<form:select path="cisLocation" class="cisLocation">
+				<option value="local">One of my CIS</option>
+				<option value="remote">Other CIS, remotely</option>
+			</form:select>
+			<form:errors path="cisLocation" cssClass="error" />
+			<span class="remoteCis">			
+				<form:label path="ownerId">select the CIS owner JID</form:label>
+				<form:input path="ownerId" placeholder="e.g. myfriend.societies.local" />
+				<form:errors path="ownerId" cssClass="error" />
+			</span>
+
+			<form:label path="cisId">CIS JID</form:label>
+			<form:input path="cisId" placeholder="e.g. cis-lion.societies.local" />
+			<form:errors path="cisId" cssClass="error" />
+			
+			<input type="submit" value="Submit" />
+			<span class="globalError error"></span>
+		</fieldset>
+	</form:form>
 
 	<!-- .................END PLACE YOUR CONTENT HERE ................ -->
 	<!-- FOOTER -->
 	<jsp:include page="../../footer.jsp" />
 	<!-- END FOOTER -->
+	
+	<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		$('.remoteCis').hide();
+		// CIS location changed
+		$('.cisLocation').change(function(){
+			if (0 == $(this).prop('selectedIndex')) {
+				$('.remoteCis').hide();
+			}
+			else {
+				$('.remoteCis').show('slow');
+			}
+		});
+	});
+	</script>
 </body>
 </html>
 

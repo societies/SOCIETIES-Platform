@@ -51,11 +51,11 @@
 					<url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
 					<releases>
 						<enabled>true</enabled>
-						<updatePolicy>daily</updatePolicy>
+						<updatePolicy>always</updatePolicy>
 					</releases>
 					<snapshots>
 						<enabled>true</enabled>
-						<updatePolicy>daily</updatePolicy>
+						<updatePolicy>always</updatePolicy>
 					</snapshots>
 				</repository>
 			</repositories>

@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.societies</groupId>
@@ -9,34 +9,37 @@
 	</parent>
 
 
-  <groupId>org.societies.css.mgmt</groupId>
-  <artifactId>cssmgmt</artifactId>
-  <version>${release.version}</version>
-  <packaging>bundle</packaging>
- 
-   <developers>
-      <developer>
-		 <name>WP4 CSS/CIS Team</name>
-		<!-- Name of component author-->
-		 <email>http://www.ict-societies.eu</email>
-		<!-- Component author e-mail-->
-	  </developer>
-   </developers>
+	<groupId>org.societies.css.mgmt</groupId>
+	<artifactId>cssmgmt</artifactId>
+	<version>${release.version}</version>
+	<packaging>bundle</packaging>
+
+	<developers>
+		<developer>
+			<name>WP4 CSS/CIS Team</name>
+			<!-- Name of component author -->
+			<email>http://www.ict-societies.eu</email>
+			<!-- Component author e-mail -->
+		</developer>
+	</developers>
 
 	<dependencies>
-	    <dependency>
-           <groupId>junit</groupId>
-           <artifactId>junit</artifactId>
-           <scope>test</scope>
-        </dependency>
-	
-	    <dependency>
-  		<groupId>org.societies.utilities</groupId>
-  		<artifactId>DBC</artifactId>
-  		<version>${release.version}</version>
-            	<scope>compile</scope>
-        </dependency>
-	
+
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
@@ -49,70 +52,49 @@
 			<scope>provided</scope>
 		</dependency>
 
-        	<dependency>
-            		<groupId>org.societies.comm.xmpp.pubsub</groupId>
-            		<artifactId>PubsubClientBundle</artifactId>
-            		<version>${version.comm}</version>
-            		<scope>provided</scope>
-        	</dependency>
-        
-        	<dependency>
-            		<groupId>org.societies.comm.xmpp</groupId>
-            		<artifactId>CommunicationFrameworkCommons</artifactId>
-            		<version>${version.comm}</version>
-            		<scope>provided</scope>
-        	</dependency>
-        
 
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 
-		
+
+
+
 		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>common-ext-libs</artifactId>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>DBC</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.platform</groupId>
+			<artifactId>socialdata</artifactId>
+			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
-		<dependency>
-            <groupId>org.apache.shindig</groupId>
-            <artifactId>shindig-social-api</artifactId>
-            <version>3.0.0-beta4</version>
-            <scope>provided</scope>
- 		</dependency>
-
- 		<dependency>
-            <groupId>org.societies.platform</groupId>
-            <artifactId>socialdata</artifactId>
-            <version>${release.version}</version>
-            <scope>provided</scope>
- 		</dependency>
-		
 
 	</dependencies>
 
 	<build>
 		<plugins>
+
+
 			<plugin>
-    				<groupId>org.apache.felix</groupId>
-    				<artifactId>maven-bundle-plugin</artifactId>
-    				<extensions>true</extensions>
-    				<configuration>
-        				<instructions>
-            					<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
-            					<Bundle-Name>${pom.artifactId}</Bundle-Name>
-            					<Bundle-Version>${pom.version}</Bundle-Version>
-             			
-                        			<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
-                        			<Embed-Transitive>false</Embed-Transitive>
-            					<Import-Package>*;resolution:=optional</Import-Package>
-        				</instructions>
-    				</configuration>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
+					</instructions>
+				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>

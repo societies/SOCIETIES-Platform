@@ -32,23 +32,20 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.stream.XMLStreamException;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.AnnotationStrategy;
-import org.simpleframework.xml.convert.Registry;
-import org.simpleframework.xml.convert.RegistryStrategy;
-import org.simpleframework.xml.core.Persister;
-import org.simpleframework.xml.strategy.Strategy;
-import org.simpleframework.xml.strategy.TreeStrategy;
+
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.Registry;
+import org.simpleframework.xml.convert.RegistryStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.HostedNode;
@@ -56,17 +53,17 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.comm.simplexml.XMLGregorianCalendarConverter;
 import org.societies.maven.converters.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;
+import org.societies.simple.converters.XMLGregorianCalendarConverter;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.JID;
@@ -268,7 +265,7 @@ public class CommManagerHelper {
 	}
 
 	public void dispatchIQResult(IQ iq) {
-		LOG.info("result got with id "+iq.getID());
+//		LOG.info("result got with id "+iq.getID());
 		Element element = getElementAny(iq);
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
@@ -290,8 +287,8 @@ public class CommManagerHelper {
 				callback.receiveItems(TinderUtils.stanzaFromPacket(iq), nodeMap.getKey(), nodeMap.getValue());
 				return;
 			}
-			LOG.info("not disco... callback is "+callback);
-			LOG.info("ns="+ns+" nsToPackage.keySet()="+Arrays.toString(nsToPackage.keySet().toArray()));
+//			LOG.info("not disco... callback is "+callback);
+//			LOG.info("ns="+ns+" nsToPackage.keySet()="+Arrays.toString(nsToPackage.keySet().toArray()));
 
 			//GET CLASS TO BE SERIALISED
 			String packageStr = getPackage(ns);
@@ -305,36 +302,36 @@ public class CommManagerHelper {
 			
 			callback.receiveResult(TinderUtils.stanzaFromPacket(iq), bean);
 		} catch (UnavailableException e) {
-			LOG.info(e.getMessage());
+			LOG.error("Unable to find package for namespace",e);
 		} catch (InvalidFormatException e) {
-			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
+			LOG.error("Unable to convert Tinder Packet into Stanza", e);
 		} catch (ClassNotFoundException e) {
-			LOG.warn("Unable to create class", e);
+			LOG.error("Unable to create class", e);
 		} catch (Exception e) {
-			LOG.warn("Unable to serialise Simple element", e);
+			LOG.error("Unable to serialise Simple element", e);
 		}
 	}
 
 	public void dispatchIQError(IQ iq) {
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
-			LOG.warn("dispatchIQError: XMPP ERROR!");
+//			LOG.warn("dispatchIQError: XMPP ERROR!");
 			Element errorElement = (Element)iq.getElement().elements().get(0); //GIVES US "error" ELEMENT
-			LOG.info("errorElement.getName()="+errorElement.getName()+";errorElement.elements().size()="+errorElement.elements().size());
+//			LOG.info("errorElement.getName()="+errorElement.getName()+";errorElement.elements().size()="+errorElement.elements().size());
 			String errorElementStr = ((Element)errorElement.elements().get(0)).getName(); // TODO assumes the stanza error comes first
-			LOG.info("errorElement.elements().get(0)).getName()=" + errorElementStr);
+//			LOG.info("errorElement.elements().get(0)).getName()=" + errorElementStr);
 			StanzaError se = StanzaError.valueOf(errorElementStr.replaceAll("-", "_")); //TODO valueOf() parses the name, not value
 			XMPPError error = new XMPPError(se, null);
 			if (errorElement.elements().size()>1)
 				error = parseApplicationError(se, errorElement.elements());
-			LOG.info("XMPPError:"+error.getStanzaErrorString());
+//			LOG.info("XMPPError:"+error.getStanzaErrorString());
 			callback.receiveError(TinderUtils.stanzaFromPacket(iq),error);
 		} catch (UnavailableException e) {
-			LOG.info(e.getMessage());
+			LOG.error("Unable to find package for namespace",e);
 		} catch (InvalidFormatException e) {
-			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
+			LOG.error("Unable to convert Tinder Packet into Stanza", e);
 		} catch (ClassNotFoundException e) {
-			LOG.warn("Unable to find class during Simple serialisation prep", e);
+			LOG.error("Unable to find class during Simple serialisation prep", e);
 		}
 	}
 
@@ -372,7 +369,7 @@ public class CommManagerHelper {
 		Element element = getElementAny(iq);
 		String namespace = element.getNamespace().getURI();
 		JID originalFrom = iq.getFrom();
-		LOG.info("iq.getFrom().toString()="+iq.getFrom().toString());
+//		LOG.info("iq.getFrom().toString()="+iq.getFrom().toString());
 		String id = iq.getID();
 
 		try {
@@ -394,17 +391,17 @@ public class CommManagerHelper {
 		} catch (XMPPError e) {
 			return buildApplicationErrorResponse(originalFrom, id, e);
 		} catch (UnavailableException e) {
-			LOG.info(e.getMessage());
+			LOG.warn("Unable to find package or feature server for namespace",e);
 			return buildErrorResponse(originalFrom, id, e.getMessage());
 		} catch (DocumentException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.info(message);
+			LOG.warn(message);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (InvalidFormatException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
-			LOG.info(message);
+			LOG.warn(message);
 			return buildErrorResponse(originalFrom, id, message);
 		} catch (ClassNotFoundException e) {
 			String message = e.getClass().getName() + ": Unable to create class for serialisation - " + e.getMessage();
@@ -436,15 +433,15 @@ public class CommManagerHelper {
 				fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
 			}
 		} catch (UnavailableException e) {
-			LOG.info(e.getMessage());
+			LOG.error("Unable to find package or feature server for namespace",e);
 		} catch (InvalidFormatException e) {
-			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
+			LOG.error("Unable to convert Tinder Packet into Stanza", e);
 		} catch (ClassNotFoundException e) {
 			String m = e.getClass().getName() + "Error finding class:" + e.getMessage();
-			LOG.info(m);
+			LOG.error(m);
 		} catch (Exception e) {
 			String m = e.getClass().getName() + "Error de-serializing the message:" + e.getMessage();
-			LOG.info(m);
+			LOG.error(m);
 		}
 	}
 
@@ -502,8 +499,10 @@ public class CommManagerHelper {
 //			iqCommCallbacks.put(ns, messageCallback);
 //		}
 		String mainNs = messageCallback.getXMLNamespaces().get(0);
-		if (mainNs.indexOf("#")>-1)
-			nsCommCallbacks.put(messageCallback.getXMLNamespaces().get(0), messageCallback);
+		if (mainNs.indexOf("#")>-1) {
+			LOG.info("registering Callback for namespace " + mainNs);
+			nsCommCallbacks.put(mainNs, messageCallback);
+		}
 	}
 	
 	private void jaxbMapping(List<String> namespaces, List<String> packages) throws CommunicationException {
@@ -535,6 +534,7 @@ public class CommManagerHelper {
 			for (int i=0; i<packages.size(); i++) {
 				String packageStr = packages.get(i);
 				String nsStr = namespaces.get(i); 
+				LOG.info("registering namespace-package mapping: "+nsStr+" <-> "+packageStr);
 				nsToPackage.put(nsStr, packageStr);
 			}	
 		}

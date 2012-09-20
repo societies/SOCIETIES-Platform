@@ -1,70 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    
-  <modelVersion>4.0.0</modelVersion>
-   <parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
-<!-- 		<relativePath>../../../parent/spring-osgi.xml</relativePath> -->
 	</parent>
-  <groupId>org.societies.css.devicemgmt</groupId>
-  <artifactId>DeviceCommsMgr</artifactId>
-  <packaging>bundle</packaging>
-  <name>Device Communication Manager</name>
-  <version>${release.version}</version>
- 	
- 	<developers>
+	<groupId>org.societies.css.devicemgmt</groupId>
+	<artifactId>DeviceCommsMgr</artifactId>
+	<packaging>bundle</packaging>
+	<name>Device Communication Manager</name>
+	<version>${release.version}</version>
+
+	<developers>
 		<developer>
 			<name>Guy Feigenblat</name>
 			<organization>IBM</organization>
 			<organizationUrl>http://www.ibm.com/</organizationUrl>
 		</developer>
 	</developers>
-	
+
 	<dependencies>
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-			<artifactId>PubsubClientBundle</artifactId>
-			<version>${version.comm}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${version.comm}</version>
-			<scope>compile</scope>
-		</dependency>
+
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-   			<groupId>org.slf4j</groupId>
-    		<artifactId>slf4j-simple</artifactId>
-    		<version>${slf4j.version}</version>
-    		<scope>provided</scope>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
 		</dependency>
-		
-	</dependencies>
+
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	
-		<build>
+	</dependencies>
+
+	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -72,13 +60,12 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 						<Export-Package>
-    						org.societies.css.devicemgmt.DeviceCommsMgr.*
-		           		</Export-Package>
-		           		<DynamicImport-Package>*</DynamicImport-Package>
+							org.societies.css.devicemgmt.DeviceCommsMgr.*
+						</Export-Package>
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

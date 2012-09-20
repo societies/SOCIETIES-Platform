@@ -69,18 +69,58 @@ var	SocietiesCISManagerService = {
 	 */
 	ListCIS: function() {
 		console.log("list CISs");
-		//$.mobile.loadPage( "community_profile.html", { showLoadMsg: false } );//load it in the dom
 		
 		function success(data) {
 			console.log("List CISs where  = TODO");
-			$.mobile.changePage("communities_list.html", { transition: "slideup"} );
 			SocietiesCISListService.populateCISListpage(data);
+			$.mobile.changePage( $("#community-list"), { transition: "fade"} );
 		}
 		
 		function failure(data) {
 			alert("createCIS - failure: " + data);
 		}
 		window.plugins.SocietiesLocalCISManager.listCIS(success, failure);
+	}, 
+	
+	searchCisDirectory: function(searchTerm) {
+		console.log("Search CIS Dir for " + searchTerm);
+		
+		function success(data) {
+			SocietiesCisDirService.populateCISListpage(data);
+			$.mobile.changePage( $("#community-results"), { transition: "fade"} );
+		}
+		
+		function failure(data) {
+			alert("searchCisDirectory - failure: " + data);
+		}
+		window.plugins.SocietiesLocalCISManager.findForAllCis(searchTerm, success, failure);
+	},
+	
+	getAllCisDirAds: function() {
+		console.log("getAllCisDirAds");
+		
+		function success(data) {
+			SocietiesCisDirService.populateCISListpage(data);
+			$.mobile.changePage( $("#community-results"), { transition: "fade"} );
+		}
+		
+		function failure(data) {
+			alert("searchCisDirectory - failure: " + data);
+		}
+		window.plugins.SocietiesLocalCISManager.findAllCisAdvertisementRecords(success, failure);
+	},
+	
+	getJoinResponse: function(cis_id) {
+		console.log("getAllCisDirAds");
+		
+		function success(data) {
+			SocietiesCisDirService.showJoinResponse(data);
+			$.mobile.changePage($("#community-details-page"), {transition: "fade"});
+		}
+		
+		function failure(data) {
+			alert("getJoinResponse - failure: " + data);
+		}
+		window.plugins.SocietiesLocalCISManager.joinCis(cis_id, success, failure);
 	}
-
 }

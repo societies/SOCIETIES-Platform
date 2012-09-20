@@ -130,7 +130,7 @@ public class CommsClient implements IClientJarServerRemote {
 		payload.setServiceId(serviceId);
 		payload.setProviderIdentity(provider.getJid());
 		payload.setSignature(signature);
-		payload.setFiles(files);
+		//payload.setFiles(files);  // ArrayList causes org.simpleframework.xml.transform.TransformException
 		if (files != null && files.size() > 0) {
 			payload.setFile1(files.get(0));
 			if (files.size() > 1) {

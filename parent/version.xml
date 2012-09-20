@@ -14,28 +14,28 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		This is the master version number!
 		 <Public release>.<wp7 bugfix release>
 	-->
-	<release.version>0.1</release.version>
+	<release.version>0.3</release.version>
 
 	<!-- master properties for component blocks -->
 	<release.groupId>org.societies</release.groupId>
 	<!-- EPapadopoulou: added version.pm property -->
-	<version.pm>${release.version}-SNAPSHOT</version.pm>
-	<version.spm>${release.version}-SNAPSHOT</version.spm>
+	<version.pm>${release.version}</version.pm>
+	<version.spm>${release.version}</version.spm>
 	<!-- SGallacher: added version.cm property (Context Management) -->
-	<version.cm>${release.version}-SNAPSHOT</version.cm>
+	<version.cm>${release.version}</version.cm>
 	<!-- SGallacher: added version.ua property (User Agent) -->
-	<version.ua>${release.version}-SNAPSHOT</version.ua>
+	<version.ua>${release.version}</version.ua>
 	<!-- FRBlackmun: added version.ico property (Intelligent Community Orchestration) -->
-	<version.ico>${release.version}-SNAPSHOT</version.ico>
+	<version.ico>${release.version}</version.ico>
 	<!-- aleckey: added version.comm property (Communication Framework) -->
-	<version.comm>${release.version}-SNAPSHOT</version.comm>
+	<version.comm>${release.version}</version.comm>
 	<!-- EPapadopoulou: added version.pt property -->
-	<version.pt>${release.version}-SNAPSHOT</version.pt>
+	<version.pt>${release.version}</version.pt>
 	<!-- tcarlyle: added version.css and version.cis property (CSS and CIS) -->
-	<version.cis>${release.version}-SNAPSHOT</version.cis>
-	<version.css>${release.version}-SNAPSHOT</version.css>
+	<version.cis>${release.version}</version.cis>
+	<version.css>${release.version}</version.css>
 	<!-- RafikSM: added version.dm property -->
-	<version.dm>${release.version}-SNAPSHOT</version.dm>	
+	<version.dm>${release.version}</version.dm>	
 	
 	
     </properties>

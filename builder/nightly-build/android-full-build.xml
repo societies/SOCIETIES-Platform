@@ -45,8 +45,8 @@
 		<module>../../utilities/DBC</module>
 
 		<!-- Android Communication components -->
-		<module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidApi</module>
-		<module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidImpl</module>
+		<!--module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidApi</module>
+		<module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidImpl</module-->
 		<module>../../platform-infrastructure/client-frwk/AndroidIPC</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgentApi</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
@@ -75,7 +75,7 @@
 		<module>../../platform-infrastructure/client-frwk/SocietiesCSSManager</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesDeviceStatus</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesContentProvider</module>
-		<module>../../platform-infrastructure/client-frwk/MasterGUI</module>
+		<!--module>../../platform-infrastructure/client-frwk/MasterGUI</module-->
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidApp</module>
 		<!-- CIS manager light modules -->
 		<!-- <module>../cis-modules/android/client-lib-android</module> -->
@@ -92,7 +92,8 @@
 		<!-- module>../user-agent/Android-user-agent</module -->
 
 		<!-- Privacy and Trust -->
-		<module>../../privacy-trust/android/privacy-trust</module>
+		<module>../../privacy-trust/android/privacy-trust/privacy-data-management/</module>
+		<module>../../privacy-trust/android/privacy-trust/trust</module>
 
 	</modules>
 </project>

@@ -25,73 +25,36 @@
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
 	</parent>
-	
+
 	<properties>
-  	  <powermock.version>1.4.12</powermock.version>
+		<powermock.version>1.4.12</powermock.version>
 	</properties>
 
 	<dependencies>
 
-	<!-- add your dependencies here -->	
-	
-	<dependency>
+		<!-- add your dependencies here -->
+
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
-      <dependency>
-      <groupId>org.societies</groupId>
-      <artifactId>common-ext-libs</artifactId>
-      <scope>provided</scope>
-	  </dependency>
-	  
-      		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>com.springsource.javax.transaction</artifactId>
-			<version>1.1.0</version>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
 			<scope>provided</scope>
 		</dependency>
-	
-      <dependency>
-      <groupId>org.societies</groupId>
-      <artifactId>hibernate_classes</artifactId>
-      <scope>provided</scope>
-	  </dependency>
-      
-		 <dependency>
-           <groupId>junit</groupId>
-           <artifactId>junit</artifactId>
-           <scope>test</scope>
-        </dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.test</artifactId>
-			<version>3.0.5.RELEASE</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-		  	<groupId>org.mockito</groupId>
-  			<artifactId>mockito-all</artifactId>
-  			<version>1.9.0</version>
-  			<scope>test</scope>
-		</dependency>
-	   <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-module-junit4</artifactId>
-	      <version>${powermock.version}</version>
-	      <scope>test</scope>
-	   </dependency>
-	   <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-api-mockito</artifactId>
-	      <version>${powermock.version}</version>
-	      <scope>test</scope>
-	   </dependency>
 
-    	<dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
@@ -101,49 +64,65 @@
 			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
+
+
 		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${version.comm}</version>
-			<scope>provided</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-			<artifactId>PubsubClientBundle</artifactId>
-			<version>${version.comm}</version>
-			<scope>provided</scope>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.test</artifactId>
+			<version>3.0.5.RELEASE</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>activityfeed</artifactId>
-			<version>${version.cis}</version>
-			<scope>provided</scope>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>${powermock.version}</version>
+			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>${powermock.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
 			<version>${version.comm}</version>
 			<scope>test</scope>
 		</dependency>
-	
-	<!-- dependency for internal eventing-->	
-	<dependency>
-    <groupId>org.osgi</groupId>
-    <artifactId>org.osgi.compendium</artifactId>
-    <version>4.1.0</version>
-    <scope>provided</scope>
-  </dependency>
-       
+		
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>activityfeed</artifactId>
+			<version>${version.cis}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>com.springsource.javax.transaction</artifactId>
+			<version>1.1.0</version>
+			<scope>test</scope>
+		</dependency>
+		
+	</dependencies>
 
 
-    </dependencies>
-	
-	
-	
+
 
 	<build>
 		<plugins>
@@ -153,27 +132,9 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<!-- <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-						<Bundle-Name>${project.name}</Bundle-Name>
-						<Bundle-Version>${project.version}</Bundle-Version>
-						<Embed-Dependency>
-							activityfeed;scope=compile|runtime,
-						</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Export-Package></Export-Package> -->
-						<Bundle-Activator></Bundle-Activator>
-						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<!-- 							org.societies.activity.*, -->
-<!-- 							org.societies.activity.model.*, -->
-<!-- 							org.societies.activity, -->
-<!-- 							org.societies.activity.model, -->
-						<Import-Package>
-							*;resolution:=optional</Import-Package>
-						<Export-Package>
-<!-- 							org.societies.api.schema.cis.community, -->
-<!-- 							org.societies.api.schema.cis.manager -->
-						</Export-Package> 
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -185,13 +146,13 @@
 				<artifactId>maven-clean-plugin</artifactId>
 				<configuration>
 					<filesets>
-						<fileset> 
+						<fileset>
 							<!-- created after mvn test using the Derby DBMS -->
 							<directory>cismanagertestdb</directory>
 						</fileset>
 						<fileset>
 							<directory>.</directory>
-							<includes> 
+							<includes>
 								<!-- created after mvn test using the Derby DBMS -->
 								<include>derby.log</include>
 							</includes>
