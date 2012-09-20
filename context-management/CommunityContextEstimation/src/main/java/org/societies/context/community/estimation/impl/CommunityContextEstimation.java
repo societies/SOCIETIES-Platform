@@ -33,6 +33,8 @@ import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
@@ -48,6 +50,7 @@ import org.societies.context.api.community.estimation.estimationModel;
 
 import org.societies.context.community.estimation.impl.*;
 
+
 import org.societies.api.internal.context.broker.ICtxBroker;
 
 
@@ -58,27 +61,28 @@ import org.springframework.util.Assert;
 /**
  * @author yboul 07-Dec-2011 4:15:14 PM
  */
-@Service("communityCtxEstimation")
-/*
+
+/**
  * The CommunityContextEstimation class contains the methods to be called in order to estimate the community context.
  * It has four types of methods. These that contain the letters "Num" in their name and deal with numeric attributes,
  * these that contain the letters "Geom" in their name and deal with geometric attributes (e.g. location),
  * these containing the letters "Special" and deal with other attributes and these containing the letters "String" in 
  * their name that deal with string attributes
  */
+@Service("communityCtxEstimation")
 public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	
-	
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(CommunityContextEstimation.class);
 
-	public CommunityContextEstimation() {
-		// TODO Auto-generated constructor stub
+	private ICtxBroker internalCtxBroker = null;
+	
+	@Autowired(required=true)
+	public CommunityContextEstimation(ICtxBroker internalCtxBroker) {
+		LOG.info(this.getClass() + "internalCtxBroker instantiated "+ this.internalCtxBroker);
 
 	}
 	
-	@Autowired(required = true)
-	private ICtxBroker ctxBroker = null;
-
-		
 	
 	@Override
 	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier ctxId,
@@ -130,7 +134,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		CtxAttribute retrievedType = null;
 		try {
-			retrievedType = (CtxAttribute) ctxBroker.retrieve(ctxAttributeIdentifier).get();
+			retrievedType = (CtxAttribute) internalCtxBroker.retrieve(ctxAttributeIdentifier).get();
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -149,7 +153,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			
 			//get the community and a set with the community's context attributes
 			try {
-				CtxEntity retrievedCommunity = (CtxEntity) ctxBroker.retrieve(communityCtxId).get();
+				CtxEntity retrievedCommunity = (CtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
 				Set<CtxAttribute> communityAttributes = retrievedCommunity.getAttributes();
 			
 			//from all the retrieved attributes get the ones that are equal to the given ctxAttriuteID and get the values	
@@ -183,7 +187,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 			//get the community and a set with the community's context attributes
 			try {
-				CtxEntity retrievedCommunity = (CtxEntity) ctxBroker.retrieve(communityCtxId).get();
+				CtxEntity retrievedCommunity = (CtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
 				Set<CtxAttribute> communityAttributes = retrievedCommunity.getAttributes();
 
 				//from all the retrieved attributes get the ones that are equal to the given ctxAttriuteID and get the values	
@@ -233,14 +237,14 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		double res = total/inputValuesList.size();
 		return res;
 	}
-
+	
+	/*
+	 * Returns the median of an integers' ArrayList
+	 * @param an array list of integers
+	 * @return a double as the median value of the input integers
+	 */
 	//@Override
 	public double cceNumMedian(ArrayList<Integer> inputValuesList) {
-		/**
-		 * Returns the median of an integers' ArrayList
-		 * @param an array list of integers
-		 * @return a double as the median value of the input integers
-		 */
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		Integer med,med1,med2=0;
 		Collections.sort(inputValuesList);

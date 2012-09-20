@@ -40,6 +40,13 @@
 		</osgi:interfaces>
 	</osgi:service>
 
+	<osgi:service ref="communityCtxEstimation">
+	<osgi:interfaces>
+			<value>org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr</value>
+		</osgi:interfaces>
+	</osgi:service>
+	
+	
 	<!-- ctx event mgr -->
 	<osgi:service ref="ctxEventMgr">
 		<osgi:interfaces>

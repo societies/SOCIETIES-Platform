@@ -44,9 +44,9 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 //import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.context.broker.impl.InternalCtxBroker;
+//import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.community.estimation.impl.CommunityContextEstimation;
-import org.societies.context.user.db.impl.UserCtxDBMgr;
+//import org.societies.context.user.db.impl.UserCtxDBMgr;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,7 +55,7 @@ public class CommunityContextEstimationTest{
 
 	//private ICtxBroker internalCtxBroker;
 
-	InternalCtxBroker iB;
+	//InternalCtxBroker iB;
 	CtxEntityIdentifier pId1 = null;
 	CtxEntityIdentifier pId2 = null;
 	CtxEntityIdentifier pId3 = null;
@@ -81,7 +81,7 @@ public class CommunityContextEstimationTest{
 	@Before
 	public void setUp() throws Exception {
 		//ICtxBroker internalCtxBroker;
-		iB = new InternalCtxBroker();	
+		//iB = new InternalCtxBroker();	
 	//	iB.setUserCtxDBMgr(new UserCtxDBMgr());
 	
 	}

@@ -704,7 +704,8 @@ public class InternalCtxBroker implements ICtxBroker {
 					||ctxModelObj instanceof CtxAssociation){
 
 				returnModelObject = this.userCtxDBMgr.update(ctxModelObj);
-
+				
+				
 				storeHoc(ctxModelObj);
 
 			}  else throw new CtxBrokerException("CSS model object not regognized as valid");
@@ -861,7 +862,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			}
 			attributeReturn = (CtxAttribute) this.update(currentAttribute).get();
 			String valueString = CtxBrokerUtils.attributeValueAsString(value);
-			LOG.info("Context UPDATE performed for context ID:"+attributeReturn.getId()+" of type:"+attributeReturn.getType()+" with value:" + valueString);
+			//LOG.info("Context UPDATE performed for context ID:"+attributeReturn.getId()+" of type:"+attributeReturn.getType()+" with value:" + valueString);
 			
 		} catch (InterruptedException e) {
 			throw new CtxBrokerException("updateAttribute including value failed " + e.getLocalizedMessage());
