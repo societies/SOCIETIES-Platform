@@ -101,8 +101,10 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		initialValues.put(SocialContract.Communities.TYPE , "sports");
 		
 		//2- Call insert in SocialProvider to initiate insertion
-		Uri newCommunityUri= resolver.insert(SocialContract.Communities.CONTENT_URI , 
-				initialValues);
+		Uri newCommunityUri= 
+				resolver.insert(Uri.parse(SocialContract.AUTHORITY_STRING+
+						SocialContract.UriPathIndex.COMMINITIES), 
+						initialValues);
 		
 		//3- Get the newly inserted CIS from SocialProvider.
 		//What to get:

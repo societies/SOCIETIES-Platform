@@ -28,12 +28,16 @@ import android.net.Uri;
 
 
 /**
- * Provides constants for using SocialProvider. Please read 
- * information about content providers in Android in order to 
- * learn how to use this contract. Note that this contract is 
- * currently the only documentation of {@link SocialProvider} on
- * Android. All the functionality of CIS manager is currently being 
- * provided using this contract.
+ * Provides utility constant values for using SocialProvider. 
+ * Please read information about content providers in Android 
+ * in order to learn how to use this contract. You can start by
+ * going into this page:
+ * http://developer.android.com/guide/topics/providers/content-providers.html 
+ * 
+ * Note that this contract is currently the only documentation
+ * of {@link SocialProvider} on Android. All the functionality 
+ * of CIS manager is currently being provided based on the information
+ * in this contract.
  * 
  * @author Babak dot Farshchian at sintef dot no
  *
@@ -41,26 +45,37 @@ import android.net.Uri;
 public final class SocialContract {
 
 	/**
-	 * The base URI used when calling SocialProvider:
+	 * The base URI used when calling SocialProvider. You can use AUTHORITY_STRING
+	 * with a field in UriPathIndex in order to build a URI for your
+	 * queries to SocialProvider, e.g.:
+	 *  query(Uri.parse(SocialContract.AUTHORITY_STRING+ 
+	 *  	SocialContract.UriPathIndex.ME),....)
 	 */
-	private static final String AUTHORITY_STRING = "content://org.societies.android.SocialProvider/";
-	//The main authority, i.e. the base URI for all operations:
+	public static final String AUTHORITY_STRING = "content://org.societies.android.SocialProvider/";
+	
+    /**
+     * The main authority, i.e. the base URI for all operations:
+     */
     public static final Uri AUTHORITY = 
             Uri.parse("content://org.societies.android.SocialProvider");
-    //Constants used to define read and write permissions for social data:
+    
+    /**
+     * Constants used to define read and write permissions for social data:
+     */
     public static final String PROVIDER_READ_PERMISSION = "org.societies.android.SocialProvider.READ";
     public static final String PROVIDER_WRITE_PERMISSION = "org.societies.android.SocialProvider.WRITE";
     
     
     /**
 	 * A utility class defining constants for the different 
-	 * paths in the content provider URIs.
+	 * paths that are supported by the SocialProvider.
 	 * 
 	 * When you are calling content provider methods, use AUTHORITY_STRING
 	 * plus one of the paths in this class so your code is protected
 	 * against errors in paths and URIs, e.g.:
 	 * 
-	 *  query(SocialContract.AUTHORITY_STRING+SocialContract.UriPathIndex.ME,...)
+	 *  query(Uri.parse(SocialContract.AUTHORITY_STRING+ 
+	 *  	SocialContract.UriPathIndex.ME),....)
 	 * 
 	 * @author Babak dot Farshchian at sintef dot no
 	 *
@@ -90,59 +105,113 @@ public final class SocialContract {
 	}
 
 	/**
-     * This is the URI you will use for accessing information about people.
-     * Every CSS/person which is accessible from this {@link SocialProvider}
-     * has an entry in this table. You can search for people using 
-     * GLOBAL_ID. You can find information about:
-     * 
-     * - People you don't have a relationship to: Here you will get info
-     * that you typically find in a CSS directory/yellow pages.
-     * 
-     * - People you have a relationship with: Here you might be able to get 
-     * more information. Depending on where the information is fetched from.
-     * 
-     * The information stored about people will in future versions correspond
-     * to what you typically find in social sites such as Facebook.
-     * 
-     * Note: CREATION_DATE, LAST_MODIFIED_DATE, and SYNC_STATUS are set by
-     * SocialProvider. 
-     * 
-     * @author Babak dot Farshchian at sintef dot no
-     *
-     */
+	 * 
+	 * <h3>Class overview</h3> 
+	 * Constants and helpers for operating on people.<br />
+	 * <br />
+	 * This is the URI you will use for accessing information about people.
+	 * Every CSS/person which is accessible from {@link SocialProvider} has an
+	 * entry in this table. You can search for people using GLOBAL_ID, name etc.
+	 * You can find information about both of the following:
+	 * <ul>
+	 * <li>People you have a relationship to.</li>
+	 * <li>People you don't have a relationship to.</li>
+	 * </ul>
+	 * Of course for people to whom you have a relationship (e.g. friends)
+	 * might be represented with more information than those you do 
+	 * not have a relationship to. But the method of accessing this 
+	 * information is the same for all people.
+	 * 
+	 * <h3>Insert</h3> 
+	 * Applications cannot insert people.<br />
+	 * <br />
+	 * Insert will be supported for SyncAdapters only. SyncAdapters have to
+	 * set the following parameters in the query in order to insert successfully:
+	 * <ul>
+	 * <li>{@link GLOBAL_ID}
+	 * <li>{@link NAME}
+	 * <li>{@link DESCRIPTION} (Optional)
+	 * <li>{@link EMAIL} (Optional)
+	 * <li>{@link ORIGIN}
+	 * <li>{@link CREATION_DATE}
+	 * <li>{@link SYNC_STATUS}
+	 * </ul>
+	 * 
+	 * The following parameters can also be set:
+	 * <ul>
+	 * </ul>
+	 * 
+	 * <h3>Update</h3> 
+	 * Applications can update:
+	 * <ul>
+	 * <li>{@link NAME}
+	 * <li>{@link EMAIL}
+	 * <li>{@link DESCRIPTION}
+	 * </ul>
+	 * 
+	 * SyncAdapters can update:
+	 * <ul>
+	 * <li>{@link NAME}
+	 * <li>{@link DESCRIPTION}
+	 * <li>{@link EMAIL}
+	 * <li>{@link ORIGIN}
+	 * <li>{@link CREATION_DATE}
+	 * <li>{@link SYNC_STATUS}
+	 * </ul>
+	 * 
+	 * <h3>Delete</h3>
+	 * Applications cannot delete people.<br />
+	 * <br />
+	 * SyncAdapters can delete people by either appending _ID to the
+	 * end of the query URI or using a standard selection.
+	 * 
+	 * <h3>Query</h3>
+	 * Applications can query for people using standard query URI or using _ID as
+	 * the last part of the URI.
+	 * 
+	 * 
+	 * @author Babak dot Farshchian at sintef dot no
+	 */
     public static final class People {
         public static final Uri CONTENT_URI = 
                     Uri.parse(AUTHORITY_STRING+ UriPathIndex.PEOPLE);
         /**
          *  Key local ID, used by content provider to denote the location of this
          *  person in the table. Row number.
+         *  
+         *  Read-only
          */
         public static final String _ID = "_id";
         /**
-         * ID which globally identifies this person. Can be JID, email address 
-         * etc. Note that if a person exists in more than one cloud directory
-         * this GLOBAL_ID will be used to map info about the person.
+         * ID which globally identifies this person. 
+         * 
+         * Mandatory.
+         * Read-only.
+         * 
          */
         public static final String GLOBAL_ID = "global_id";
         /**
-         * Name of the person. 
+         * Name of the person. Mandatory.
          */
         public static final String NAME = "name";
         /**
-         * Email address of the person.
+		 * A description of the user. This is set locally.
+		 * Should not be synchronized.
+		 */
+		public static final String DESCRIPTION = "description";
+		/**
+         * Email address of the person. Optional.
          */
         public static final String EMAIL = "email";
         /**
-         * Set by user or Sync adapter, telling the user where this person is
-         * found. Can for instance be Facebook (if this is a Facebook contact)
-         * or SOCIETIES etc.
-         */
-        public static final String ORIGIN = "origin";
-        /**
-         * A description of the user.
-         */
-        public static final String DESCRIPTION = "description";
-        /**
+		 * Set by Sync adapter, telling the user where this person is 
+		 * synchronized from.
+		 * 
+		 * Can for instance be Facebook (if this is a Facebook contact)
+		 * or SOCIETIES etc.
+		 */
+		public static final String ORIGIN = "origin";
+		/**
          * The date this record was created by its origin.
          */
         public static final String CREATION_DATE = "creation_date";
@@ -161,12 +230,85 @@ public final class SocialContract {
     }
     
     /**
-     * This class allows you to see information about all communities (CISs).
-     * This includes both communities you are a member of and communities
-     * that are listed in some directory.
-     * 
-     * Note: CREATION_DATE, LAST_MODIFIED_DATE, and SYNC_STATUS are set by
-     * SocialProvider.
+	 * <h3>Class overview</h3> 
+	 * Constants and helpers for operating on communities.<br />
+	 * <br />
+	 * This is the URI you will use for accessing information about communities.
+	 * Every community which is accessible from {@link SocialProvider} has an
+	 * entry in this table. You can search for communities using GLOBAL_ID, name etc.
+	 * You can find information about both of the following:
+	 * <ul>
+	 * <li>Communities you are a member of or own.</li>
+	 * <li>All other communities that are registered in directories.</li>
+	 * </ul>
+	 * 
+	 * You might have different levels of information for the different
+	 * types of communities.
+	 * 
+	 * <h3>Insert</h3> 
+	 * Applications can insert communities that will be confirmed
+	 * by SyncAdapters. While confirmation pending, {@link SYNCH_STATUS}
+	 * will show "pending". Applications will have to provide the following
+	 * parameters in when inserting:
+	 * <ul>
+	 * <li>{@link NAME}
+	 * <li>{@link OWNER_ID}
+	 * <li>{@link TYPE}
+	 * <li>{@link DESCRIPTION} (optional)
+	 * <li>{@link ORIGIN}
+	 * </ul>
+	 * 
+	 * When an application inserts a community, SYNC_STATUS will be
+	 * set to "pending" by {@link SocialProvider}. This has to be changed
+	 * by a SyncAdapter upon next successful synchronization.
+	 * 
+	 * SyncAdapters can also insert communities. SyncAdapters have to
+	 * set the following parameters in the query in order to insert successfully:
+	 * <ul>
+	 * <li>{@link GLOBAL_ID}
+	 * <li>{@link NAME}
+	 * <li>{@link OWNER_ID}
+	 * <li>{@link TYPE}
+	 * <li>{@link DESCRIPTION} (optional)
+	 * <li>{@link ORIGIN}
+	 * <li>{@link CREATION_DATE}
+	 * <li>{@link SYNC_STATUS}
+	 * </ul>
+	 * 
+	 * SYNC_STATUS has to be set to "updated". 
+	 * 
+	 * <h3>Update</h3> 
+	 * Applications can update:
+	 * <ul>
+	 * <li>{@link NAME}
+	 * <li>{@link TYPE}
+	 * <li>{@link DESCRIPTION}
+	 * </ul>
+	 * 
+	 * SyncAdapters can update:
+	 * <ul>
+	 * <li>{@link NAME}
+	 * <li>{@link OWNER_ID}
+	 * <li>{@link TYPE}
+	 * <li>{@link DESCRIPTION}
+	 * <li>{@link ORIGIN}
+	 * <li>{@link CREATION_DATE}
+	 * <li>{@link SYNC_STATUS}
+	 * </ul>
+	 * 
+	 * SYNC_STATUS has to be set to "updated".
+	 * 
+	 * <h3>Delete</h3>
+	 * Applications can delete people. Only communities that belong to
+	 * the logged-in user can be deleted. A community can be deleted either
+	 * by appending _ID to the end of the URI or via a standard query.<br />
+	 * <br />
+	 * SyncAdapters can delete people by either appending _ID to the
+	 * end of the query URI or using a standard selection.
+	 * 
+	 * <h3>Query</h3>
+	 * Applications and SyncAdapters can query for communities using standard
+	 * query URI or using _ID as the last part of the URI.
      * 
      * @author Babak dot Farshchian at sintef dot no
      *
@@ -189,28 +331,28 @@ public final class SocialContract {
          */
         public static final String GLOBAL_ID = "global_id";
         /**
+		 *  Name of the community. Is user-given.
+		 */
+		public static final String NAME = "name";
+		/**
+		 * Global ID of the person who owns this community.
+		 */
+		public static final String OWNER_ID = "owner_id";
+		/**
          *  The type of the community being stored. E.g. "disaster".
          *  The type will be defined and used by applications.
          */
         public static final String TYPE = "type";
         /**
-         *  Name of the community. Is user-given.
-         */
-        public static final String NAME = "name";
-        /**
-         * Global ID of the person who owns this community.
-         */
-        public static final String OWNER_ID = "owner_id";
-        /**
+		 * A user-provided description of the community.
+		 */
+		public static final String DESCRIPTION = "description";
+		/**
          * Set by user or Sync adapter, telling the user where this community
          * is originating from. Can for instance be Facebook (if this is a 
          * Facebook group) or SOCIETIES etc.
          */
         public static final String ORIGIN = "origin";
-        /**
-         * A user-provided description of the community.
-         */
-        public static final String DESCRIPTION = "description";
         /**
          * The date this record was created by its origin.
          */
@@ -229,17 +371,107 @@ public final class SocialContract {
         
     }
     
-    /**
-     * Use this class when searching for services, any services. It
-     * gives you information about services that are in the market
-     * place, installed on your device, or that belong to you.
+   /**
+	 * <h3>Class overview</h3> 
+	 * Constants and helpers for operating on services.<br />
+	 * <br />
+	 * This is the URI you will use for accessing information about services.
+	 * Every service which is accessible from {@link SocialProvider} has an
+	 * entry in this table. You can search for services using GLOBAL_ID, name etc.
+	 * You can find information about both of the following:
+	 * <ul>
+	 * <li>Services you own.</li>
+	 * <li>Other services, e.g. in a service market place.</li>
+	 * </ul>
+	 * 
+	 * You might have different levels of information for the different
+	 * types of services.
+	 * 
+	 * <h3>Insert</h3> 
+	 * Applications can insert services. Applications will have to provide the following
+	 * parameters in when inserting services:
+	 * <ul>
+	 * <li>{@link NAME}
+	 * <li>{@link OWNER_ID}
+	 * <li>{@link TYPE}
+	 * <li>{@link DESCRIPTION} (optional)
+	 * <li>{@link APP_TYPE}
+	 * <li>{@link ORIGIN}
+	 * <li>{@link AVAILABLE}
+	 * <li>{@link DEPENDENCY} (Optional)
+	 * <li>{@link CONFIG} (Optional)
+	 * <li>{@link URL} (Optional)
+	 * </ul>
+	 * 
+	 * When an application inserts a service, SYNC_STATUS will be
+	 * set to "pending" by {@link SocialProvider}. This has to be changed
+	 * by a SyncAdapter upon next successful synchronization.
+	 * 
+	 * SyncAdapters can also insert services. SyncAdapters have to
+	 * set the following parameters in the query in order to insert successfully:
+	 * <ul>
+	 * <li>{@link GLOBAL_ID}
+	 * <li>{@link NAME}
+	 * <li>{@link OWNER_ID}
+	 * <li>{@link TYPE}
+	 * <li>{@link DESCRIPTION} (optional)
+	 * <li>{@link APP_TYPE}
+	 * <li>{@link ORIGIN}
+	 * <li>{@link AVAILABLE}
+	 * <li>{@link DEPENDENCY} (Optional)
+	 * <li>{@link CONFIG} (Optional)
+	 * <li>{@link URL} (Optional)
+	 * <li>{@link CREATION_DATE}
+	 * <li>{@link SYNC_STATUS}
+	 * </ul>
+	 * 
+	 * SYNC_STATUS has to be set to "updated". 
+	 * 
+	 * <h3>Update</h3> 
+	 * Applications can update:
+	 * <ul>
+	 * <li>{@link NAME}
+	 * <li>{@link OWNER_ID}
+	 * <li>{@link DESCRIPTION}
+	 * <li>{@link ORIGIN}
+	 * <li>{@link AVAILABLE}
+	 * <li>{@link DEPENDENCY}
+	 * <li>{@link CONFIG}
+	 * <li>{@link URL}
+	 * </ul>
+	 * 
+	 * SyncAdapters can update:
+	 * <ul>
+	 * <li>{@link NAME}
+	 * <li>{@link OWNER_ID}
+	 * <li>{@link DESCRIPTION}
+	 * <li>{@link ORIGIN}
+	 * <li>{@link AVAILABLE}
+	 * <li>{@link DEPENDENCY}
+	 * <li>{@link CONFIG}
+	 * <li>{@link URL}
+	 * <li>{@link CREATION_DATE}
+	 * <li>{@link SYNC_STATUS}
+	 * </ul>
+	 * 
+	 * SYNC_STATUS has to be set to "updated".
+	 * 
+	 * <h3>Delete</h3>
+	 * Applications can delete services. Only services that belong to
+	 * the logged-in user can be deleted. A service can be deleted either
+	 * by appending _ID to the end of the URI or via a standard query.<br />
+	 * <br />
+	 * SyncAdapters can delete services by either appending _ID to the
+	 * end of the query URI or using a standard selection.
+	 * 
+	 * <h3>Query</h3>
+	 * Applications and SyncAdapters can query for services using standard
+	 * query URI or using _ID as the last part of the URI.
      * 
-     * Note: CREATION_DATE, LAST_MODIFIED_DATE, and SYNC_STATUS 
-     * are set by SocialProvider. 
-
      * @author Babak dot Farshchian at sintef dot no
      *
      */
+    
     public static final class Services {
         /**
          * Use this Uri to search in the content provider.
@@ -256,26 +488,65 @@ public final class SocialContract {
          */
         public static final String GLOBAL_ID = "global_id";
         /**
-         *  The type of the service being stored.
+		 *  User/provided name of the service, e.g. "iDisaster" or "iJacket".
+		 */
+		public static final String NAME = "name";
+		/**
+		 * Global ID of the person who owns this service. This can be your own
+		 * Global ID if you own the service, or someone else's global ID if 
+		 * you find a service e.g. on a market place.
+		 */
+		public static final String OWNER_ID = "owner_id";
+		/**
+         *  The type of the service being stored. This is a user-provided
+         *  name, which can be the name given by the client application.
+         *  E.g. iDisaster and other crisis management applications can
+         *  assign TYPE to be "disaster".
          */
         public static final String TYPE = "type";
         /**
-         *  User/provided name of the service
+		 * A user-provided description of the service.
+		 */
+		public static final String DESCRIPTION = "description";
+		/**
+         *  This is a parameter that can be used to define the technical
+         *  type of the service. It can for instance be set to "android_application"
+         *  or "virgo_service" etc.
          */
-        public static final String NAME = "name";
-        /**
-         * Global ID of the person who owns this service.
-         */
-        public static final String OWNER_ID = "owner_id";
+        public static final String APP_TYPE = "type";
         /**
          * Where this service comes from, e.g. Android Market.
          */
         public static final String ORIGIN = "origin";
         /**
-         * A user-provided description of the service.
-         */
-        public static final String DESCRIPTION = "description";
-        /**
+		 * Tells whether this service is available on this device.
+		 * E.g. if the service is available through an app installed on an 
+		 * Android device then this parameter is set to "1". If this is a 
+		 * cloud service accessible through e.g. a REST API this parameter
+		 *  is set to "1". If this is an app that is not yet installed or it 
+		 *  is a cloud service that is not available through a URI it is
+		 *  set to "0".
+		 * 
+		 * Value needs to be set and kept updated by clients.
+		 */
+		public static final String AVAILABLE = "available";
+		/**
+		 * A field telling whether this service depends on another 
+		 * service to function. The value is the global ID of the
+		 * other service or null.
+		 */
+		public static final String DEPENDENCY = "dependency";
+		/**
+		 * String that contains the intent to be used to launch the service
+		 * using Androdi intent mechanism.
+		 */
+		public static final String CONFIG = "config";
+		/**
+		 * A URL to the code to be downloaded or to a web service interface.
+		 * This can for instance be a link to an Android App.
+		 */
+		public static final String URL = "url";
+		/**
          * The date this record was created by its origin.
          */
         public static final String CREATION_DATE = "creation_date";
@@ -290,33 +561,6 @@ public final class SocialContract {
          * services. Its value can be "dirty", "clean", "new", "deleted".
          */
         public static final String SYNC_STATUS = "sync_status";
-        /**
-         * Boolean telling whether this service is available on this device.
-         * E.g. if the service is available through an app on an Android device
-         * then this boolean tells whether the app is installed on this
-         * device. Or if this is a cloud service accessible through
-         * a REST API this boolean might tell if the API is accessible.
-         * 
-         * Value needs to be set and kept updated by clients.
-         */
-        public static final String AVAILABLE = "available";
-        /**
-         * A field telling whether this service depends on another 
-         * service to function. The value is the global ID of the
-         * other service or null.
-         */
-        public static final String DEPENDENCY = "dependnecy";
-        
-        /**
-         * String that contains the intent to be used to launch the service
-         * using Androdi intent mechanism.
-         */
-        public static final String CONFIG = "config";
-        
-        /**
-         * A URL to the code to be downloaded or to a web service interface.
-         */
-        public static final String URL = "url";
     }
     
     /**
