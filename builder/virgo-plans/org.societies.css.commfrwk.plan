@@ -8,10 +8,11 @@
 		
 	<!--  
 	<artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
-	-->
 	<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
 	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
+    -->
+    <artifact type="bundle" name="org.societies.comm.CloudCommsBundle"/>
 	<artifact type="bundle" name="org.societies.comm.event.mgmt" />
 
 </plan>

@@ -24,7 +24,6 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>RELEASE</version>
 	</parent>
 
