@@ -85,6 +85,67 @@
 	                    "description": "cis do flu",
 	                    "communityJid" : "flu.soc.com"
 	     				}
-	     		]
+	     		],
+		"CISDirResults": [
+     				{
+     				"id" : "student.hw.local",
+     				"cssownerid": "sarah.hw.local",
+     				"name": "Students Union",
+                    "type": "university",
+                    "membershipCrit": {
+	                    "criteria": [
+	                    	{
+	                        "attribute": "age",
+	                        "operation": "<",
+	                        "value": "25"},
+	                        {
+	                        "attribute": "location",
+	                        "operation": "equals",
+	                        "value": "Edinburgh"}
+	                        ]
+	                	}
+				    },
+     				{
+					"id" : "developers.societies.local",
+     				"cssownerid": "john.societies.local",
+     				"name": "Societies Developers Helpdesk",
+                    "type": "Development",
+                    "membershipCrit": {
+	                    "criteria": [
+	                    	{
+	                        "attribute": "age",
+	                        "operation": ">",
+	                        "value": "25"},
+	                        {
+	                        "attribute": "location",
+	                        "operation": "equals",
+	                        "value": "Edinburgh"}
+	                        ]
+	                	}
+				    }
+     			],
+     			
+		"JoinResponse": {
+     				"result": "true",
+     				"community": {
+	     				"communityName": "Societies Developers Helpdesk",
+	                    "communityType": "Development",
+	                    "ownerJid": "john.societies.local",
+	                    "membershipCrit": {
+		                    "criteria": [
+		                    	{
+		                        "attribute": "religion",
+		                        "operation": "equals",
+		                        "value": "Protestant"},
+		                        {
+		                        "attribute": "location",
+		                        "operation": "equals",
+		                        "value": "Peru"}
+		                        ]
+		                	},
+	                    "description": "Where to go if you want help developing Societies services",
+	                    "communityJid" : "developers.societies.local"
+					     }
+					}
 	}
 }

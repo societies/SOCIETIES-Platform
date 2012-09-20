@@ -38,13 +38,6 @@
      <h1>My Context Data</h1>
     
 
-    <form:form method="POST" action="context.html" commandName="ctxForm" name="cxt">
-	     
-		     Method: <form:input id="method"  path="method" value="" />
-			 <form:input id="id"  style="visibility:hidden" path="id" value=""/>
-		    
-		     <a href="#">Lookup </a>
-    </form:form>
     
   
 

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	 </parent>
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.societies.comm</groupId>
+    <artifactId>RichCommsBundle</artifactId>
+    <packaging>bundle</packaging>
+    <name>Rich Node Communications Bundle</name>
+    <version>${version.comm}</version>
+
+    <dependencies>
+    	<!-- Embedded Dependency -->
+   		<dependency>
+			<groupId>org.igniterealtime</groupId>
+			<artifactId>whack</artifactId>
+			<type>jar</type>
+			<scope>compile</scope>
+				<exclusions>
+					<!-- slf4j already provided -->
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
+		</dependency>
+    	 
+    	<!-- Communication Components -->
+    	<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>${version.comm}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>XCCommunicationMgr</artifactId>
+			<version>${version.comm}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp.pubsub</groupId>
+			<artifactId>PubsubClient</artifactId>
+			<version>${version.comm}</version>
+			<scope>compile</scope>
+		</dependency>
+    </dependencies>
+    
+    <build>        
+        <plugins>
+            <plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+    				<instructions>
+    					<Import-Package>
+    						org.osgi.framework,
+    						!org.jvnet.staxex,
+    						!org.jvnet.fastinfoset,
+    						!com.sun.xml.fastinfoset.*,
+    						org.slf4j*;version="1.5.8",
+    						org.simpleframework.xml.stream,
+    						*;resolution:=optional
+    					</Import-Package>
+    					<Export-Package>
+    						org.societies.comm.xmpp,
+    						org.societies.comm.xmpp.pubsub,
+    						org.societies.comm.xmpp.pubsub.impl
+		           		</Export-Package>
+		           		<!-- Is impl export needed for anything but tests? 
+		           		why do i need to import explicitly org.simpleframework.xml.stream?
+		           		!com.sun.org.apache.xerces.internal.jaxp.datatype,
+		           		org.xmpp.component;version="0.1.0",
+		           		-->
+		           		<DynamicImport-Package>*</DynamicImport-Package>
+		           		<Embed-Dependency>
+			           		*;scope=compile|runtime
+		           		</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment> 
+		         	</instructions>
+	       		</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${version.comm}</version>
+							<type>bundle</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
+        </plugins>
+    </build>
+</project>

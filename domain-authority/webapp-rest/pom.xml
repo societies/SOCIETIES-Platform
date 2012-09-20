@@ -448,11 +448,11 @@
 									<version>2.5.0</version>
 									<type>jar</type>
 								</artifactItem>
-								<artifactItem>
+								<!--artifactItem>
 									<groupId>javax.servlet</groupId>
 									<artifactId>com.springsource.javax.servlet</artifactId>
 									<version>2.5.0</version>
-								</artifactItem>
+								</artifactItem-->
 
 							</artifactItems>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
