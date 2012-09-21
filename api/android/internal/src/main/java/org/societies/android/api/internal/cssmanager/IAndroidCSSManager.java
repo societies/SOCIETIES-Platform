@@ -63,9 +63,7 @@ public interface IAndroidCSSManager {
 			"getCssFriends(String client)", 					//TODO
 			"getSuggestedFriends(String client)",				//TODO
 			"readProfileRemote(String client, String cssId)",	//TODO
-			"sendFriendRequest(String client, String cssId)",	//TODO
-			"findForAllCss(String client, String searchTerm)",	//TODO
-			"findAllCssAdvertisementRecords(String client)"		//TODO
+			"sendFriendRequest(String client, String cssId)"	//TODO
 			};
 	/**
 	 * Register with chosen Domain Server
