@@ -95,7 +95,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			if (db.has(TURNONS))		person.setTurnOns(jarrayToList(db.getString(TURNONS)));
 			if (db.has(MUSIC))		    person.setMusic(jarrayToList(db.getString(MUSIC)));
 			if (db.has(INTERESTS))	    person.setInterests(jarrayToList(db.getString(INTERESTS)));
-										
+			if (db.has(BOOKS))	    	person.setBooks(jarrayToList(db.getString(BOOKS)));
 			
 		}
 		catch (JSONException e) {

@@ -307,26 +307,24 @@ public class SocialData implements ISocialData{
 
 	@Override
 	public void updateSocialData() {
-
+		
+				
 		Iterator<ISocialConnector>it = connectors.values().iterator();
 		socialActivities = new HashMap<String, Object>();  // reset old Activities
 		
 		while (it.hasNext()){
 			ISocialConnector connector = it.next();
-		    
+
 			getActivities(connector);
 			updateProfile(connector);
 			updateGroups(connector);
 			updateFriends(connector);
 			/// UPDATE ALL DATA
-	
+
 		}
 		
-		
-		
 		lastUpate = new Date().getTime();
-		
-		
+
 	}
 	
 	
@@ -381,20 +379,15 @@ public class SocialData implements ISocialData{
 	private void updateProfile(ISocialConnector connector) {
 			PersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
 			Person profile = parser.load(connector.getUserProfile());
+			
+			// store SNS data to context
+			ContextUpdater ctxUpdater = new ContextUpdater(this.internalCtxBroker,this.cssOwnerId);
+			ctxUpdater.updateCtxProfile(profile);
+			//end of context related code
+			
 			if (socialProfiles.containsKey(profile.getId())){
 				socialProfiles.remove(profile.getId());
 				// Send notification of UPDATE?
-				
-				
-				String booksString = "";
-				for(String book : profile.getBooks()){
-					if (booksString.length()>0) booksString+=",";
-					booksString += book;
-				}
-			
-				
-				
-				
 			}	
 			else {
 				// Send Notitication of NEW PROFILE?
