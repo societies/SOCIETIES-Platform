@@ -6,10 +6,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.societies.api.context.source.ICtxSourceMgr;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.osgi.event.CSSEvent;
@@ -18,6 +21,7 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 
+@Service
 public class NewDeviceListener extends EventListener implements ServiceTrackerCustomizer, BundleContextAware{
 	private static Logger LOG = LoggerFactory.getLogger(ContextSourceManagement.class);
 	private BundleContext bundleContext;
@@ -26,7 +30,7 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 	private IDeviceManager deviceManager;
 	private IEventMgr eventManager;
 	
-	private ContextSourceManagement csm;
+	private ICtxSourceMgr csm;
 	private boolean RUNNING_MODE = true;
 
 	private String filterOption = "(&" + 
@@ -52,24 +56,22 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 	
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Setting bundle context " + bundleContext);
+		this.bundleContext = bundleContext;
+		this.registerDevicesAndUpdates();
 	}	
 	
-
-	
-	
-	
-	public NewDeviceListener(IDeviceManager deviceManager, IEventMgr eventManager, ContextSourceManagement contextSourceManagement) {
+	@Autowired(required=true)
+	public NewDeviceListener(IDeviceManager deviceManager, 
+			IEventMgr eventManager, ICtxSourceMgr contextSourceManagement) {
 		this.deviceManager = deviceManager;
 		this.eventManager = eventManager;
 		this.csm = contextSourceManagement;
 
-		LOG.info("NewDeviceListener: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device manager consumer constructor");
-		
-		registerDevicesAndUpdates();
-
-		if (LOG.isDebugEnabled()) LOG.debug(this+" created");
+		LOG.info(this.getClass() + " instantiated");
+		//registerDevicesAndUpdates();
 	}
 
 	
@@ -121,7 +123,8 @@ public class NewDeviceListener extends EventListener implements ServiceTrackerCu
 		String sourceName;
 		for (String eventName : iDevice.getEventNameList()){
 			sourceName = iDevice.getDeviceName() + "#" + eventName;
-			csm.registerFull(null, sourceName, eventName, iDevice.getDeviceId());
+			// !! DANGEROUS CODE !!
+			((ContextSourceManagement) csm).registerFull(null, sourceName, eventName, iDevice.getDeviceId());
 		}
 
 		return iDevice;

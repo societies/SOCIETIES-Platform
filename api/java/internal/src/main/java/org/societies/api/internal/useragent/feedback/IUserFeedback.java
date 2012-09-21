@@ -26,6 +26,7 @@
 package org.societies.api.internal.useragent.feedback;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Future;
 
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -45,9 +46,9 @@ public interface IUserFeedback
 	
 	public void showNotification(String notificationText);
 	
-	public Future<FeedbackRequest> getNextRequest();
+	public FeedbackRequest getNextRequest();
 	
-	public void submitExplicitResponse(String id);
+	public void submitExplicitResponse(String id, List<String> result);
 	
-	public void submitImplicitResponse(String id);
+	public void submitImplicitResponse(String id, Boolean result);
 }

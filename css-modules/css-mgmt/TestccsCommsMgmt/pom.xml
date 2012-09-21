@@ -6,7 +6,7 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<relativePath>../../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	
 	<groupId>org.societies.css.mgmt.testcomms</groupId>
