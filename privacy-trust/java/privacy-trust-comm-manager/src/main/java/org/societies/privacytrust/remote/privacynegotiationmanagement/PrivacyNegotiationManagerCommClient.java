@@ -55,6 +55,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgentRemote;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 /**
@@ -63,7 +64,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author aleckey
  *
  */
-public class PrivacyNegotiationManagerCommClient implements INegotiationAgent, ICommCallback{
+public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRemote, ICommCallback{
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
 					  		"http://societies.org/api/schema/servicelifecycle/model"));
