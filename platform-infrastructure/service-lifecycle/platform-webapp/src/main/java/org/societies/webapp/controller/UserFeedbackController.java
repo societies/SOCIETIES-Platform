@@ -45,7 +45,7 @@ public class UserFeedbackController {
 		String id = topRequest.getID();
 		FeedbackForm form = topRequest.getForm();
 		String type = form.getType();
-		String[] data = form.getControls();
+		String[] data = form.getData();
 		String jsonString = gsonMgr.toJson(topRequest);
 		
 		return jsonString;
