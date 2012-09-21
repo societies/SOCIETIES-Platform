@@ -44,7 +44,6 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.FeedbackForm;
-import org.societies.api.internal.useragent.model.FeedbackRequest;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
@@ -67,6 +66,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	HashMap<String, Boolean> impResults;
 	static String UNDEFINED = "undefined";
 
+	//GUI types
+	private static final String RADIO = "radio";
+	private static final String CHECK = "check";
+	private static final String ACK = "ack";
+	private static final String ABORT = "abort";
+	private static final String NOTIFICATION = "notification";
+
 	public void initialiseUserFeedback(){
 		LOG.debug("User Feedback initialised!!");
 
@@ -84,16 +90,14 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		//create feedback form
 		FeedbackForm fbForm = generateExpFeedbackForm(type, content);
 		//create new request object with unique ID
-		String requestID = UUID.randomUUID().toString();
-		FeedbackRequest fbRequest = new FeedbackRequest(requestID, fbForm);
 		//add new request to queue
-		requestMgr.addRequest(fbRequest);
+		requestMgr.addRequest(fbForm);
 
 		//add request ID and result type to results hashmap
-		expResults.put(requestID, null);
+		expResults.put(fbForm.getID(), null);
 
 		//wait until result is available
-		while((List<String>)this.expResults.get(requestID) == null){
+		while((List<String>)this.expResults.get(fbForm.getID()) == null){
 			try{
 				synchronized(expResults){
 					this.expResults.wait();
@@ -102,10 +106,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 				e.printStackTrace();
 			}
 		}
-
 		//set result and remove id from hashmap
-		result = this.expResults.get(requestID);
-		this.expResults.remove(requestID);
+		result = this.expResults.get(fbForm.getID());
+		this.expResults.remove(fbForm.getID());
 
 		return new AsyncResult<List<String>>(result);
 	}
@@ -115,17 +118,14 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 		Boolean result = false;
 		//create feedback form
 		FeedbackForm fbForm = generateImpFeedbackForm(type, content);
-		//create new request object with unique ID
-		String requestID = UUID.randomUUID().toString();
-		FeedbackRequest fbRequest = new FeedbackRequest(requestID, fbForm);
 		//add new request to queue
-		requestMgr.addRequest(fbRequest);
+		requestMgr.addRequest(fbForm);
 
 		//add request ID and result type to results hashmap
-		impResults.put(requestID, null);
+		impResults.put(fbForm.getID(), null);
 
 		//wait until result is available
-		while((Boolean)this.impResults.get(requestID) == null){
+		while((Boolean)this.impResults.get(fbForm.getID()) == null){
 			try{
 				synchronized(impResults){
 					this.impResults.wait();
@@ -134,10 +134,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 				e.printStackTrace();
 			}
 		}
-
 		//set result and remove id from hashmap
-		result = this.impResults.get(requestID);
-		this.impResults.remove(requestID);
+		result = this.impResults.get(fbForm.getID());
+		this.impResults.remove(fbForm.getID());
 
 		return new AsyncResult<Boolean>(result);
 	}
@@ -146,11 +145,25 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	public void showNotification(String notificationTxt) {
 		//create feedback form
 		FeedbackForm fbForm = generateNotificationForm(notificationTxt);
-		//create request object with unique id
-		String requestID = UUID.randomUUID().toString();
-		FeedbackRequest fbRequest = new FeedbackRequest(requestID, fbForm);
 		//add new request to queue
-		requestMgr.addRequest(fbRequest);
+		requestMgr.addRequest(fbForm);
+
+		//add request ID and result type to results hashmap
+		impResults.put(fbForm.getID(), null);
+
+		//wait until result is available
+		while((Boolean)this.impResults.get(fbForm.getID()) == null){
+			try{
+				synchronized(impResults){
+					this.impResults.wait();
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+
+			}
+		}
+		//remove id from hashmap
+		this.impResults.remove(fbForm.getID());		
 	}
 
 
@@ -161,26 +174,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	 * @see org.societies.api.internal.useragent.feedback.IUserFeedback#getNextRequest()
 	 */
 	@Override
-	public FeedbackRequest getNextRequest() {
+	public FeedbackForm getNextRequest() {
 		return requestMgr.getNextRequest();
-	}
-
-	public void submitResponse(String requestId, Object result){
-		if(result instanceof Boolean){
-			Boolean impResult = (Boolean)result;
-			//set result value in hashmap
-			synchronized(impResults){
-				this.impResults.put(requestId, impResult);
-				this.impResults.notifyAll();
-			}
-		}else{
-			List<String> expResult = (List<String>)result;
-		}
-
-		//remove request from queue
-		if(requestMgr.removeRequest(requestId)){
-			LOG.error("Could not find specified request in queue");
-		}
 	}
 
 	@Override
@@ -215,27 +210,54 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 	 */
 	private FeedbackForm generateExpFeedbackForm(int type, ExpProposalContent content){
 		FeedbackForm newFbForm = new FeedbackForm();
+		//add unique id
+		newFbForm.setID(UUID.randomUUID().toString());
+		//add text to show to user
+		newFbForm.setText(content.getProposalText());
+		//add data
+		newFbForm.setData(content.getOptions());
+		//add type
 		if(type == ExpProposalType.RADIOLIST){
-
+			newFbForm.setType(RADIO);
 		}else if(type == ExpProposalType.CHECKBOXLIST){
-
+			newFbForm.setType(CHECK);
 		}else if(type == ExpProposalType.ACKNACK){
-
+			newFbForm.setType(ACK);
+		}else{
+			LOG.error("Could not understand this type of explicit GUI: "+type);
 		}
 		return newFbForm;
 	}
 
 	private FeedbackForm generateImpFeedbackForm(int type, ImpProposalContent content){
 		FeedbackForm newFbForm = new FeedbackForm();
+		//add unique id
+		newFbForm.setID(UUID.randomUUID().toString());
+		//add text to show user
+		newFbForm.setText(content.getProposalText());
+		//add data
+		String[] data = {new Integer(content.getTimeout()).toString()};
+		newFbForm.setData(data);
+		//add type
 		if(type == ImpProposalType.TIMED_ABORT){
-
+			newFbForm.setType(ABORT);
+		}else{
+			LOG.error("Could not understand this type of implicit GUI: "+type);
 		}
 		return newFbForm;
 	}
 
 	private FeedbackForm generateNotificationForm(String notificationTxt){
 		FeedbackForm newFbForm = new FeedbackForm();
-
+		//add id
+		newFbForm.setID(UUID.randomUUID().toString());
+		//add text to show user
+		newFbForm.setText(notificationTxt);
+		//add data
+		String[] data = {"5000"};
+		newFbForm.setData(data);
+		//add type
+		newFbForm.setType(NOTIFICATION);
 		return newFbForm;
 	}
 

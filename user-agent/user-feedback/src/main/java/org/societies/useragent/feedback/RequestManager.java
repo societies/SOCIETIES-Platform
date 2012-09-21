@@ -28,26 +28,26 @@ package org.societies.useragent.feedback;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.societies.api.internal.useragent.model.FeedbackRequest;
+import org.societies.api.internal.useragent.model.FeedbackForm;
 
 public class RequestManager {
 	
-	Queue<FeedbackRequest> requestQueue;
+	Queue<FeedbackForm> requestQueue;
 
 	public RequestManager(){
-		requestQueue = new LinkedList<FeedbackRequest>();
+		requestQueue = new LinkedList<FeedbackForm>();
 	}
 	
-	public FeedbackRequest getNextRequest(){
+	public FeedbackForm getNextRequest(){
 		return requestQueue.element();
 	}
 	
-	public void addRequest(FeedbackRequest newRequest){
+	public void addRequest(FeedbackForm newRequest){
 		requestQueue.add(newRequest);
 	}
 	
 	public boolean removeRequest(String requestID){
-		for(FeedbackRequest nextRequest: requestQueue){
+		for(FeedbackForm nextRequest: requestQueue){
 			if(nextRequest.getID().equals(requestID)){ 
 				requestQueue.remove(nextRequest);
 				return true;
