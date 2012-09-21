@@ -341,7 +341,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		
 		//CREATE JOIN INFO
 		org.societies.api.schema.cis.manager.AskCisManagerForJoin join = new org.societies.api.schema.cis.manager.AskCisManagerForJoin();
-		join.setCisAdv(  targetCis);
+		join.setCisAdv(  ACisAdvertisementRecord.convertACisAdvertRecord(targetCis));
 		//org.societies.api.schema.cis.community.Join join = new org.societies.api.schema.cis.community.Join();
 		//List<Qualification> qualifications = new ArrayList<Qualification>();
 		//join.setQualification(qualifications); TODO: GET MEMBERSHIP CRITERIA AND QUERY CONTEXT FOR QUALIFICATIONS FOR JOINING
