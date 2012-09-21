@@ -32,6 +32,7 @@ import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.internal.orchestration.ICisDataCollector;
 import org.societies.api.internal.orchestration.IDataCollectorSubscriber;
 import org.societies.api.osgi.event.*;
+import org.societies.api.schema.cis.community.Community;
 
 import java.util.HashMap;
 import java.util.List;
@@ -105,11 +106,18 @@ public class CISDataCollectorManager extends EventListener implements ICisDataCo
     @Override
     public void handleInternalEvent(InternalEvent event) {
         String bareJid = null;
+        org.societies.api.schema.cis.community.Community community = null;
         if(event.geteventType() == EventTypes.CIS_CREATION){
-            bareJid = (String) event.geteventInfo();
+            if(!event.geteventInfo().getClass().equals(org.societies.api.schema.cis.community.Community.class))
+                return;
+            community = (Community) event.geteventInfo();
+            bareJid = community.getCommunityJid();
             this.newCis(bareJid);
         }else if(event.geteventType() == EventTypes.CIS_DELETION){
-            bareJid = (String) event.geteventInfo();
+            if(!event.geteventInfo().getClass().equals(org.societies.api.schema.cis.community.Community.class))
+                return;
+            community = (Community) event.geteventInfo();
+            bareJid = community.getCommunityJid();
             this.removalOfCIS(bareJid);
         }
     }

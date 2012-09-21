@@ -29,6 +29,7 @@ import org.societies.api.internal.orchestration.ICPA;
 import org.societies.api.internal.orchestration.ICisDataCollector;
 import org.societies.api.internal.orchestration.ISocialGraph;
 import org.societies.api.osgi.event.*;
+import org.societies.api.schema.cis.community.Community;
 import org.societies.orchestration.api.impl.CommunitySuggestionImpl;
 
 import java.util.HashMap;
@@ -93,12 +94,19 @@ public class CPAManager extends EventListener implements ICPA {
 
     @Override
     public void handleInternalEvent(InternalEvent event) {
+        org.societies.api.schema.cis.community.Community community = null;
         String bareJid = null;
         if(event.geteventType() == EventTypes.CIS_CREATION){
-            bareJid = (String) event.geteventInfo();
+            if(!event.geteventInfo().getClass().equals(org.societies.api.schema.cis.community.Community.class))
+                return;
+            community = (Community) event.geteventInfo();
+            bareJid = community.getCommunityJid();
             this.newCis(bareJid);
         }else if(event.geteventType() == EventTypes.CIS_DELETION){
-            bareJid = (String) event.geteventInfo();
+            if(!event.geteventInfo().getClass().equals(org.societies.api.schema.cis.community.Community.class))
+                return;
+            community = (Community) event.geteventInfo();
+            bareJid = community.getCommunityJid();
             this.removedCis(bareJid);
         }
     }

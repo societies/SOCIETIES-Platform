@@ -72,7 +72,7 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback {
 /*        initCtxEvent();*/
     }
     public CISDataCollector(ICisOwned cisId){
-        this.cis = cis;
+        this.cis = cisId;
         init();
     }
 	/*
@@ -143,7 +143,7 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback {
             LOG.info("something weird came on the pubsub");
         }
     }
-    Object syncObj;
+    final Object syncObj = new Object();
     public List<Object> getHistory(String timePeriod){
         ArrayList<Object> ret = new ArrayList<Object>();
         cis.getActivityFeed().getActivities(timePeriod,this);
@@ -167,9 +167,9 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback {
     @Override
     public void receiveResult(Activityfeed activityFeedObject) {
         incomingActHist =  activityFeedObject.getGetActivitiesResponse().getActivity();
-     synchronized (syncObj){
-         syncObj.notify();
-     }
+        synchronized (syncObj){
+            syncObj.notify();
+        }
     }
 
 

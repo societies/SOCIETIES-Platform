@@ -61,7 +61,7 @@ public class CPA implements IDataCollectorSubscriber, Runnable
 	 *              that this object will operate on behalf of. (Currently can only be a user CSS)
 	 */
     public CPA(ICisDataCollector collector, String cisId){
-         this.collector = collector; this.cisId = cisId;
+        this.collector = collector; this.cisId = cisId;
         init();
     }
 
