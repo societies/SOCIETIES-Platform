@@ -137,9 +137,9 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	
 	private void setInteractable(){
 		LOG.debug("Setting interactable variable in UAM for this device with ID: "+myDeviceID);
-		interactable = false;
+		interactable = true;
 		
-		try {
+		/*try {
 			CssInterfaceResult cssInterface = cssMgr.getCssRecord().get();
 			CssRecord record = cssInterface.getProfile();
 			if(record != null){
@@ -153,9 +153,9 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 							LOG.debug("Found this device in CSS record");
 							found = true;
 							
-							/*
+							
 							 * Temporary use of String
-							 */
+							 
 							String tmp = nextNode.getInteractable();
 							if(tmp.equalsIgnoreCase("true")){
 								LOG.debug("This device is interactable");
@@ -167,9 +167,9 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 								LOG.error("Interactable variable is not defined for this node, assuming default: not interactable");
 								interactable = false;
 							}
-							/*
+							
 							 * end
-							 */
+							 
 							
 							break;
 						}
@@ -190,7 +190,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public void setCtxBroker(ICtxBroker broker){

@@ -23,26 +23,41 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.model;
+package org.societies.webapp.controller;
 
-public class FeedbackForm {
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.FeedbackForm;
+import org.societies.api.internal.useragent.model.FeedbackRequest;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.google.gson.Gson;
+
+public class UserFeedbackController {
+	
+	IUserFeedback userFeedback;
+	Gson gsonMgr = new Gson();
+	
+	@RequestMapping(value = "/get_form.html", method = RequestMethod.GET)
+	public String getForm(){
+		//retrieve next request from UF service
+		FeedbackRequest topRequest = userFeedback.getNextRequest();
+		String id = topRequest.getID();
+		FeedbackForm form = topRequest.getForm();
+		String type = form.getType();
+		String[] data = form.getData();
+		String jsonString = gsonMgr.toJson(topRequest);
 		
-	String type;
-	String[] data;
-	
-	public String getType() {
-		return type;
+		return jsonString;
 	}
 	
-	public void setType(String type) {
-		this.type = type;
+	@RequestMapping(value = "/get_form.html", method = RequestMethod.POST)
+	public void submitResponse(String id, String type, String results){
+		//convert results string to string array
+		//userFeedback.
 	}
 	
-	public String[] getData() {
-		return data;
-	}
-	
-	public void setData(String[] data) {
-		this.data = data;
+	public void setUserFeedback(IUserFeedback userFeedback){
+		this.userFeedback = userFeedback;
 	}
 }

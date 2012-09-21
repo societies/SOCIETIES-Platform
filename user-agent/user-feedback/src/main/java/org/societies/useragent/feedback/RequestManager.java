@@ -39,20 +39,20 @@ public class RequestManager {
 	}
 	
 	public FeedbackRequest getNextRequest(){
-		FeedbackRequest topOfList = requestQueue.element();
-		return null;
+		return requestQueue.element();
 	}
 	
 	public void addRequest(FeedbackRequest newRequest){
 		requestQueue.add(newRequest);
 	}
 	
-	public void removeRequest(String requestID){
+	public boolean removeRequest(String requestID){
 		for(FeedbackRequest nextRequest: requestQueue){
-			if(nextRequest.getID().equals(requestID)){
+			if(nextRequest.getID().equals(requestID)){ 
 				requestQueue.remove(nextRequest);
-				break;
+				return true;
 			}
 		}
+		return false;
 	}
 }
