@@ -28,7 +28,7 @@ package org.societies.api.internal.useragent.model;
 public class FeedbackForm {
 		
 	String type;
-	String[] controls;
+	String[] data;
 	
 	public String getType() {
 		return type;
@@ -38,11 +38,11 @@ public class FeedbackForm {
 		this.type = type;
 	}
 	
-	public String[] getControls() {
-		return controls;
+	public String[] getData() {
+		return data;
 	}
 	
-	public void setControls(String[] controls) {
-		this.controls = controls;
+	public void setData(String[] data) {
+		this.data = data;
 	}
 }

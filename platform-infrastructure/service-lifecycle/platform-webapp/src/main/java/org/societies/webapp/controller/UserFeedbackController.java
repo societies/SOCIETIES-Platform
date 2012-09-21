@@ -26,22 +26,35 @@
 package org.societies.webapp.controller;
 
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.FeedbackRequest;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.google.gson.Gson;
 
 public class UserFeedbackController {
 	
 	IUserFeedback userFeedback;
+	Gson gsonMgr = new Gson();
 	
+	@RequestMapping(value = "/get_form.html", method = RequestMethod.GET)
 	public String getForm(){
-		String jsonString = "";
 		//retrieve next request from UF service
 		FeedbackRequest topRequest = userFeedback.getNextRequest();
+		String id = topRequest.getID();
+		FeedbackForm form = topRequest.getForm();
+		String type = form.getType();
+		String[] data = form.getControls();
+		String jsonString = gsonMgr.toJson(topRequest);
+		
 		return jsonString;
 	}
 	
+	@RequestMapping(value = "/get_form.html", method = RequestMethod.POST)
 	public void submitResponse(String id, String type, String results){
 		//convert results string to string array
-		userFeedback.
+		//userFeedback.
 	}
 	
 	public void setUserFeedback(IUserFeedback userFeedback){
