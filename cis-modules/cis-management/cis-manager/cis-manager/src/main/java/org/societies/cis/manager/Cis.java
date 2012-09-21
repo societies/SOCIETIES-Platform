@@ -535,6 +535,43 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.membersCss = membersCss;
 	}
 	
+	// notifies cloud node
+	private void nofityAddedUser(String jid, String role){
+		
+		Stanza sta;
+		LOG.info("new member added, going to notify the user");
+		IIdentity targetCssIdentity = null;
+		try {
+			targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
+		} catch (InvalidFormatException e) {
+			LOG.info("could not send addd notification");
+			e.printStackTrace();
+		}		
+		
+		CommunityManager cMan = new CommunityManager();
+		Notification n = new Notification();
+		SubscribedTo s = new SubscribedTo();
+		Community com = new Community();
+		this.fillCommmunityXMPPobj(com);
+		s.setRole(role.toString());
+		s.setCommunity(com);
+		n.setSubscribedTo(s);
+		cMan.setNotification(n);
+		
+		LOG.info("finished building notification");
+
+		sta = new Stanza(targetCssIdentity);
+		try {
+			CISendpoint.sendMessage(sta, cMan);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			LOG.info("problem sending notification to cis");
+			e.printStackTrace();
+		}
+				
+		LOG.info("notification sent to the new user");
+	}
+	
 
 	@Override
 	public Future<Boolean> addMember(String jid, String role){
@@ -551,41 +588,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 		ret = this.insertMember(jid, typedRole);
 
 		
-		Stanza sta;
-		LOG.info("new member added, going to notify the user");
-		IIdentity targetCssIdentity = null;
-		try {
-			targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
-		} catch (InvalidFormatException e) {
-			LOG.info("could not send addd notification");
-			e.printStackTrace();
-		}		
+
 		// 1) Notifying the added user
 
-		
-		CommunityManager cMan = new CommunityManager();
-		Notification n = new Notification();
-		SubscribedTo s = new SubscribedTo();
-		Community com = new Community();
-		this.fillCommmunityXMPPobj(com);
-		s.setRole(role.toString());
-		s.setCommunity(com);
-		n.setSubscribedTo(s);
-		cMan.setNotification(n);
-		
-		LOG.info("finished building notification");
-
-
-		sta = new Stanza(targetCssIdentity);
-		try {
-			CISendpoint.sendMessage(sta, cMan);
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			LOG.info("problem sending notification to cis");
-			e.printStackTrace();
-		}
-				
-		LOG.info("notification sent to the new user");		
+		this.nofityAddedUser( jid,  role);	
 
 		
 		return new AsyncResult<Boolean>(new Boolean(ret));
@@ -798,13 +804,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 				p.setJid(senderjid);
 				this.fillCommmunityXMPPobj(com);
 				
-				j.setCommunity(com);
-				result.setJoinResponse(j);
-
-				
-				// TEMPORARELY DISABLING THE QUALIFICATION CHECKS
-				// TODO: uncomment this
-				
+				j.setCommunity(com); // THE COMMUNITY MUST BE SET IN THE RESPONSE. THE CALLBACKS ARE COUNTING ON THIS!!
+				result.setJoinResponse(j);				
 				
 				// checking the criteria
 				if(this.cisCriteria.size()>0){

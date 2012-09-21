@@ -85,4 +85,15 @@ public class ACriteria extends Criteria implements Parcelable {
 		
 		return acriteria;
 	}
+	
+	public static Criteria convertACriteria(ACriteria acriteria) {
+		Criteria criteria = new Criteria();
+		criteria.setAttrib(acriteria.getAttrib());
+		criteria.setOperator(acriteria.getOperator());
+		criteria.setValue1(acriteria.getValue1());
+		criteria.setValue2(acriteria.getValue2());
+		criteria.setRank(acriteria.getRank());
+		
+		return criteria;
+	}
 }

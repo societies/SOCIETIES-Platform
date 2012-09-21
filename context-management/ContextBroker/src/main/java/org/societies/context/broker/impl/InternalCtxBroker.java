@@ -141,7 +141,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @see {@link #setUserCtxInferenceMgr(IUserCtxInferenceMgr)}
 	 */
-	@Autowired(required=true)
+	@Autowired(required=false)
 	private IUserCtxInferenceMgr userCtxInferenceMgr;
 
 	/**
@@ -149,7 +149,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @see {@link #setCommunityCtxInferenceMgr(ICommunityCtxInferenceMgr)}
 	 */
-	@Autowired(required=true)
+	@Autowired(required=false)
 	private ICommunityCtxInferenceMgr communityCtxInferenceMgr;
 	
 	/**
