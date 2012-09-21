@@ -7,7 +7,34 @@
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
 
-    <artifact type="plan" name="org.societies.combined-node"/>
+	<artifact type="configuration" name="xc"/>
+
+	<!--
+	<artifact type="plan" name="org.societies.apis"/>
+	-->
+
+	<artifact type="plan" name="org.societies.css.commfrwk"/>
+
+	<artifact type="plan" name="org.societies.common.modules"/>
+
+	<artifact type="plan" name="org.societies.security"/>
+
+	<artifact type="plan" name="org.societies.privacy.and.trust"/>
+
+	<artifact type="plan" name="org.societies.css.devicemgmt"/>
+
+	<artifact type="plan" name="org.societies.context.management"/>
+
+	<artifact type="plan" name="org.societies.css.management"/>
+
+	<artifact type="plan" name="org.societies.cis.management"/>
+
+	<artifact type="plan" name="org.societies.service-lifecycle"/>
+
+	<artifact type="plan" name="org.societies.sns"/>
+		<artifact type="plan" name="org.societies.personalisation"/>
+
+    	<artifact type="plan" name="org.societies.webapp"/>
 
     <artifact type="bundle" name="org.societies.orchestration.cisdatacollector"/>
 
