@@ -25,39 +25,95 @@
 
 package org.societies.webapp.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.FeedbackForm;
-import org.societies.api.internal.useragent.model.FeedbackRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.google.gson.Gson;
 
 public class UserFeedbackController {
+
+	/**
+	 * OSGI service get auto injected
+	 */
+	@Autowired
+	private IUserFeedback userFeedback;
 	
-	IUserFeedback userFeedback;
+	Logger LOG = LoggerFactory.getLogger(UserFeedbackController.class);
+	
+	//GUI types
+	private static final String RADIO = "radio";
+	private static final String CHECK = "check";
+	private static final String ACK = "ack";
+	private static final String ABORT = "abort";
+	private static final String NOTIFICATION = "notification";
+	
 	Gson gsonMgr = new Gson();
 	
-	@RequestMapping(value = "/get_form.html", method = RequestMethod.GET)
-	public String getForm(){
-		//retrieve next request from UF service
-		FeedbackRequest topRequest = userFeedback.getNextRequest();
-		String id = topRequest.getID();
-		FeedbackForm form = topRequest.getForm();
-		String type = form.getType();
-		String[] data = form.getData();
-		String jsonString = gsonMgr.toJson(topRequest);
-		
-		return jsonString;
-	}
-	
-	@RequestMapping(value = "/get_form.html", method = RequestMethod.POST)
-	public void submitResponse(String id, String type, String results){
-		//convert results string to string array
-		//userFeedback.
+	public IUserFeedback getUserFeedback(){
+		return userFeedback;
 	}
 	
 	public void setUserFeedback(IUserFeedback userFeedback){
 		this.userFeedback = userFeedback;
+	}
+	
+
+	@RequestMapping(value = "/get_form.html", method = RequestMethod.GET)
+	public String getForm(){
+		//retrieve next request from UF service
+		//FeedbackRequest topRequest = userFeedback.getNextRequest();
+		FeedbackForm form = userFeedback.getNextRequest();
+		String jsonString = gsonMgr.toJson(form);
+		return jsonString;
+	}
+
+	@RequestMapping(value = "/get_form.html", method = RequestMethod.POST)
+	public void submitResponse(String jsonString){
+		//convert json string back to Java types
+		FeedbackForm responseForm = gsonMgr.fromJson(jsonString, FeedbackForm.class);
+
+		//respond back to UF service
+		String type = responseForm.getType();
+		if(type.equalsIgnoreCase(RADIO)){
+			String[] data = responseForm.getData();
+			List<String> result = new ArrayList<String>();
+			for(int i = 0; i<data.length; i++){
+				result.add(data[i]);
+			}
+			userFeedback.submitExplicitResponse(responseForm.getID(), result);
+		}else if(type.equalsIgnoreCase(CHECK)){
+			String[] data = responseForm.getData();
+			List<String> result = new ArrayList<String>();
+			for(int i = 0; i<data.length; i++){
+				result.add(data[i]);
+			}
+			userFeedback.submitExplicitResponse(responseForm.getID(), result);
+		}else if(type.equalsIgnoreCase(ACK)){
+			String[] data = responseForm.getData();
+			List<String> result = new ArrayList<String>();
+			for(int i = 0; i<data.length; i++){
+				result.add(data[i]);
+			}
+			userFeedback.submitExplicitResponse(responseForm.getID(), result);
+		}else if(type.equalsIgnoreCase(ABORT)){
+			String[] data = responseForm.getData();
+			if(data[0].equalsIgnoreCase("true")){
+				userFeedback.submitImplicitResponse(responseForm.getID(), true);
+			}else{
+				userFeedback.submitImplicitResponse(responseForm.getID(), false);
+			}
+		}else if(type.equalsIgnoreCase(NOTIFICATION)){
+			userFeedback.submitImplicitResponse(responseForm.getID(), true);
+		}else{
+			LOG.error("Did not recognise response form type from AJAX");
+		}
 	}
 }

@@ -26,12 +26,11 @@
 package org.societies.api.internal.useragent.feedback;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.Future;
 
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.FeedbackRequest;
+import org.societies.api.internal.useragent.model.FeedbackForm;
 
 /**
  * 
@@ -46,7 +45,7 @@ public interface IUserFeedback
 	
 	public void showNotification(String notificationText);
 	
-	public FeedbackRequest getNextRequest();
+	public FeedbackForm getNextRequest();
 	
 	public void submitExplicitResponse(String id, List<String> result);
 	
