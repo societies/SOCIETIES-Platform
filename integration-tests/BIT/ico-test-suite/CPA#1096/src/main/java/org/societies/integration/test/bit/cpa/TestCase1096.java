@@ -36,7 +36,7 @@ public class TestCase1096 extends IntegrationTestCase {
 	}
 
 
-    public void setCisCollector(ICisDataCollector cisDataCollector) {
+    public void setCisDataCollector(ICisDataCollector cisDataCollector) {
         LOG.debug("[TEST CASE #"+testCaseNumber+"] setCollector()");
         TestCase1096.cisDataCollector = cisDataCollector;
     }
@@ -55,6 +55,9 @@ public class TestCase1096 extends IntegrationTestCase {
     public  void setCisManager(ICisManager cisManager) {
         LOG.debug("[TEST CASE #"+testCaseNumber+"] setCisManager()");
         this.cisManager = cisManager;
+    }
+    public void destroy(){
+
     }
 
 	
