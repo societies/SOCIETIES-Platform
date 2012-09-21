@@ -21,6 +21,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICommManagerController;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.identity.IdentityManagerImpl;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.component.ComponentException;
@@ -41,6 +42,8 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	private IIdentity thisIdentity;
 	private IIdentityManager idm;
 	private Set<INetworkNode> otherNodes;
+	private IPrivacyLogAppender privacyLog;
+	private boolean privacyLogEnabled = false;
 
 	public XCCommunicationMgr(String host, String subDomain,
 			String secretKey, String daNode) {
@@ -259,7 +262,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		Type mType = Message.Type.valueOf(type);
 		Message m = helper.sendMessage(stanza, mType, payload);
 		log.info("Sending message: "+m.toXML());
-		// TODO mitja
+		privacyLog(stanza, payload);
 		this.send(m);
 	}
 
@@ -270,7 +273,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		stanza.setFrom(thisIdentity);
 		Message m = helper.sendMessage(stanza, null, payload);
 		log.info("Sending message: "+m.toXML());
-		// TODO mitja
+		privacyLog(stanza, payload);
 		this.send(m);
 	}
 
@@ -281,7 +284,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		stanza.setFrom(thisIdentity);
 		IQ iq = helper.sendIQ(stanza, IQ.Type.get, payload, callback);
 		log.info("Sending IQ: "+iq.toXML());
-		// TODO mitja
+		privacyLog(stanza, payload);
 		this.send(iq);
 	}
 
@@ -292,7 +295,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		stanza.setFrom(thisIdentity);
 		IQ iq = helper.sendIQ(stanza, IQ.Type.set, payload, callback);
 		log.info("Sending IQ: "+iq.toXML());
-		// TODO mitja
+		privacyLog(stanza, payload);
 		this.send(iq);
 	}
 
@@ -355,5 +358,20 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 			return true;
 		else
 			return false;
+	}
+
+	public IPrivacyLogAppender getPrivacyLog() {
+		return privacyLog;
+	}
+
+	public void setPrivacyLog(IPrivacyLogAppender privacyLog) {
+		this.privacyLog = privacyLog;
+		privacyLogEnabled = true;
+	}
+	
+	private void privacyLog(Stanza stanza, Object payload) {
+		if (privacyLogEnabled) {
+			privacyLog.logCommsFw(stanza.getFrom(), stanza.getTo(), payload);
+		}
 	}
 }

@@ -28,24 +28,21 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.privacytrust.privacyprotection</groupId>
-	<artifactId>assessment</artifactId>
-	<name>Privacy Assessment</name>
-	<description>A posteriori privacy assessment engine and logger. Logs access to personal data (via Context Broker) and data transmission (via Comms Manager). Performs correlation of data access and data transmission events and estimates data transmission of private data in the past.</description>
+	<groupId>org.societies.example</groupId>
+	<artifactId>gsontest</artifactId>
+	<name>Test GSON</name>
 	<packaging>jar</packaging>
-	<version>${version.pt}</version>
+	<version>1.0</version>
 	<developers>
 		<developer>
-			<id>mvardjan</id>
-			<name>Mitja Vardjan</name>
-			<email>mitja.vardjan@setcce.si</email>
-			<organization>SETCCE</organization>
-			<organizationUrl>http://www.setcce.si</organizationUrl>
-			<roles>
-				<role>owner</role>
-				<role>developer</role>
-			</roles>
+			<name>Olivier Maridat</name>
+			<email>olivier.maridat@trialog.com</email>
+			<organization>Trialog</organization>
 			<timezone>+1</timezone>
+			<roles>
+				<role>Owner</role>
+				<role>Developer</role>
+			</roles>
 		</developer>
 	</developers>
 
@@ -56,72 +53,30 @@
 	</parent>
 
 	<dependencies>
-	
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>common-ext-libs</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>api</artifactId>
-			<version>${version.pt}</version>
-		</dependency>
-		
-		<!--dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>XCCommunicationMgr</artifactId>
-			<version>${version.comm}</version>
-		</dependency-->
-		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${version.comm}</version>
-			<scope>provided</scope>
-		</dependency>
-		
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.0</version>
+			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.9.0</version>
+	    	<groupId>com.google.code.gson</groupId>
+	    	<artifactId>gson</artifactId>
+	    	<version>2.2.2</version>
+	    	<scope>test</scope>
+	    </dependency>
+	    <dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
 			<scope>test</scope>
 		</dependency>
-	
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 </project>

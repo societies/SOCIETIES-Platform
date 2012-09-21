@@ -50,17 +50,15 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CommunityCtxInferenceMgr.class);
 
+	@Autowired(required=true)
 	private ICtxBroker internalCtxBroker;
-	ICommManager commMgr;
 
 	@Autowired(required=true)
-	CommunityCtxInferenceMgr(ICtxBroker internalCtxBroker, ICommManager commMgr){
+	private ICommManager commMgr;
 
-		this.internalCtxBroker = internalCtxBroker;
-		LOG.info(this.getClass() + "internalCtxBroker instantiated "+ this.internalCtxBroker);
+	CommunityCtxInferenceMgr(){
 
-		this.commMgr = commMgr;
-		LOG.info(this.getClass() + "commMgr instantiated " +this.commMgr);
+		LOG.info(this.getClass() + " instantiated");
 	}
 
 	@Override
