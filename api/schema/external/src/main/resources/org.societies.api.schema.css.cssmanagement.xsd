@@ -92,14 +92,12 @@
 			<xs:sequence>
 				<xs:element name="result" type="tns:cssInterfaceResult"
 					minOccurs="0" />
-				<xs:element name="resultCssAdvertisementRecord" type="tnd:cssAdvertisementRecord"
+				<xs:element name="resultAdvertList" type="tnd:cssAdvertisementRecord"
 					minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="resultServicelist" type="tnl:service"
 					minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="resultCssRequestList" type="tns:cssRequest"
 					minOccurs="0" maxOccurs="unbounded" />
-				<xs:element name="resultCssFriendList" type="xs:string"
-					minOccurs="0" maxOccurs="unbounded" />	
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

@@ -1048,17 +1048,26 @@ public class CSSManager implements ICSSLocalManager {
 	}
 	
 		@Override
-	public Future<List<String>> getCssFriends() {
+	public Future<List<CssAdvertisementRecord>> getCssFriends() {
 		List<String> friendList = new ArrayList<String>();
+		List<CssAdvertisementRecord> friendAdList = new ArrayList<CssAdvertisementRecord>();
 		
 		try {
 				friendList = cssRegistry.getCssFriends();
+				
+				
+				// first get all the cssdirectory records
+				CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+
+				getCssDirectoryRemote().searchByID(friendList, callback);
+				friendAdList = callback.getResultList();
+				
 			} catch (CssRegistrationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-		return new AsyncResult<List<String>>(friendList);
+		return new AsyncResult<List<CssAdvertisementRecord>>(friendAdList);
 		
 	}
 	

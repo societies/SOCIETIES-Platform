@@ -108,11 +108,10 @@ public class CommsServer implements IFeatureServer {
 			Future<CssInterfaceResult> asyncResult = null;
 			CssInterfaceResult result = null;
 			
-			Future<List<String>> asyncGetFriendsResult = null;
-			List<String> getFriendsResult = null;
 			
-			Future<List<CssAdvertisementRecord>> asyncSuggestedFriendsResult = null;
-			List<CssAdvertisementRecord> suggestedFriendsResult = null;
+			
+			Future<List<CssAdvertisementRecord>> asyncFriendsAdsResult = null;
+			List<CssAdvertisementRecord> friendsAdRecordResult = null;
 		
 			LOG.debug("CSSManager remote invocation of method "
 					+ bean.getMethod().name());
@@ -161,10 +160,10 @@ public class CommsServer implements IFeatureServer {
 				asyncResult = this.cssManager.registerCSSNode((CssRecord) bean.getProfile());
 				break;
 			case GET_CSS_FRIENDS:
-				asyncGetFriendsResult = this.cssManager.getCssFriends();
+				asyncFriendsAdsResult = this.cssManager.getCssFriends();
 				break;
 			case SUGGESTED_FRIENDS:
-				asyncSuggestedFriendsResult = this.cssManager.suggestedFriends();
+				asyncFriendsAdsResult = this.cssManager.suggestedFriends();
 				break;
 			default:
 				break;
@@ -173,10 +172,8 @@ public class CommsServer implements IFeatureServer {
 			try {
 				switch (bean.getMethod()) {
 				case GET_CSS_FRIENDS:
-					getFriendsResult = asyncGetFriendsResult.get();
-					break;
 				case SUGGESTED_FRIENDS:
-					suggestedFriendsResult = asyncSuggestedFriendsResult.get();
+					friendsAdsResult = asyncFriendsAdsResult.get();
 					break;
 				default:
 					// Since everything else seems to use this!!
@@ -194,7 +191,7 @@ public class CommsServer implements IFeatureServer {
 
 			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
-			resultBean.setResultCssFriendList(getFriendsResult);
+			resultBean.setResultAdvertList(friendsAdsResult);
 
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;

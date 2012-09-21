@@ -306,7 +306,7 @@ public class CssManagerController {
 					.findAllCssFriendRequests();
 			Future<List<CssRequest>> cssRequests = getCssLocalManager()
 					.findAllCssRequests();
-			Future<List<String>> asynchCssFriends = getCssLocalManager().getCssFriends();
+			Future<List<CssAdvertisementRecord>> asynchCssFriends = getCssLocalManager().getCssFriends();
 						
 			Future<List<Service>> asynchServices = null;
 			List<Service> friendServices =  new ArrayList<Service>();
