@@ -198,6 +198,7 @@ public class CommsServer implements IFeatureServer {
 			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
 			resultBean.setResultCssFriendList(getFriendsResult);
+			resultBean.setResultCssAdvertisementRecord(suggestedFriendsResult);
 
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;

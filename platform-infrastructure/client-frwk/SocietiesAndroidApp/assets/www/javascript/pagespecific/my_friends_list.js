@@ -47,21 +47,7 @@ var CSSFriendsServices = {
 	showFriendDetails: function (css_id) {
 		
 		function success(data) {
-			//CSS Record OBJECT
-			var markup = "<h1>" + data.foreName + " " + data.name + "</h1>" + 
-						 "<p>" + data.homeLocation + "</p>" +
-						 "<p>" + data.cssIdentity + "</p><br />"; 
-			//INJECT
-			$('div#friend_profile_info').html( markup );
-			//ADDITIONAL INFO
-			var addInfo = "<br/>" + "<p>Email: " + data.emailID + "</p>";
-			$('li#friend_additional_info').html( addInfo );
-					
-			try {//REFRESH FORMATTING
-				//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
-				$('ul#friendInfoUL').listview('refresh');
-			}
-			catch(err) {}
+			showFriendDetailPage(data);
 			$.mobile.changePage($("#friend-profile"), { transition: "fade"} );
 		}
 		
@@ -70,6 +56,99 @@ var CSSFriendsServices = {
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.readRemoteCSSProfile(css_id, success, failure);
+	},
+	
+	showFriendDetailPage: function(data) {
+		//CSS Record OBJECT
+		var markup = "<h1>" + data.foreName + " " + data.name + "</h1>" + 
+					 "<p>" + data.homeLocation + "</p>" +
+					 "<p>" + data.cssIdentity + "</p><br />"; 
+		//INJECT
+		$('div#friend_profile_info').html( markup );
+		//ADDITIONAL INFO
+		var addInfo = "<br/>" + "<p>Email: " + data.emailID + "</p>";
+		$('li#friend_additional_info').html( addInfo );
+				
+		try {//REFRESH FORMATTING
+			//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
+			$('ul#friendInfoUL').listview('refresh');
+		}
+		catch(err) {}
+	},
+	
+	refreshSuggestedFriendsList: function() {
+		console.log("Refreshing Suggested friends");
+
+		function success(data) {			
+			CSSFriendsServices.displayCSSAdvertRecords(data);
+		}
+		
+		function failure(data) {
+			alert("refresh3PServices - failure: " + data);
+		}
+		
+		window.plugins.SocietiesLocalCSSManager.getSuggestedFriends(success, failure);
+	},
+	
+	displayCSSAdvertRecords: function(data) {
+		//EMPTY TABLE - NEED TO LEAVE THE HEADER
+		while( $('ul#SuggestedFriendsListUL').children().length >1 )
+			$('ul#SuggestedFriendsListUL li:last').remove();
+
+		//DISPLAY SUGGESTIONS
+		for (i  = 0; i < data.length; i++) {
+			var tableEntry = '<li><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\')">' +
+				'<h2>' + data[i].name + '</h2>' + 
+				'<p>' + data[i].id + '</p>' +
+				'</a></li>';
+			jQuery('ul#SuggestedFriendsListUL').append(tableEntry);
+		}
+		$('ul#SuggestedFriendsListUL').listview('refresh');
+	},
+	
+	sendFriendRequest: function(name, css_id) {
+		
+		function success(data) {
+			CSSFriendsServices.showFriendDetailPage(data);
+			$.mobile.changePage($("#friend-profile"), {transition: "fade"});
+		}
+		
+		function failure(data) {
+			alert("getJoinResponse - failure: " + data);
+		}
+		
+		//SEND REQUEST
+		if (window.confirm("Send friend request to " + name + "?")) {
+			window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
+		}
+	},
+	
+	searchCssDirectory: function(searchTerm) {
+		console.log("Search CIS Dir for " + searchTerm);
+		
+		function success(data) {
+			CSSFriendsServices.displayCSSAdvertRecords(data);
+			$.mobile.changePage($("#suggested-friends-list"), { transition: "fade"} );
+		}
+		
+		function failure(data) {
+			alert("searchCisDirectory - failure: " + data);
+		}
+		window.plugins.SocietiesLocalCSSManager.findForAllCss(searchTerm, success, failure);
+	},
+	
+	returnAllCssDirAdverts: function() {
+		console.log("returnAllCssDirAdverts");
+		
+		function success(data) {
+			CSSFriendsServices.displayCSSAdvertRecords(data);
+			$.mobile.changePage($("#suggested-friends-list"), { transition: "fade"} );
+		}
+		
+		function failure(data) {
+			alert("searchCisDirectory - failure: " + data);
+		}
+		window.plugins.SocietiesLocalCSSManager.findAllCssAdvertisementRecords(success, failure);
 	}
 };
 
@@ -89,8 +168,18 @@ $(document).bind('pageinit',function(){
 	});
 	
 	$("a#SuggestFriendsLink").off('click').on('click', function(e){
-		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(CSSFriendsServices.refresh3PServices);
+		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(CSSFriendsServices.refreshSuggestedFriendsList);
+		$.mobile.changePage($("#suggested-friends-list"), { transition: "fade"} );
 	});
 	
+	$('input#btnSearchFriends').off('click').on('click', function() {
+		var search = $("#search-friends").val();
+		if (search != "Search Friends" && search != "") 
+			CSSFriendsServices.searchCssDirectory(search);
+		else {
+			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(CSSFriendsServices.returnAllCssDirAdverts);
+			$.mobile.changePage($("#suggested-friends-list"), { transition: "fade"} );
+		}
+	});
 	
 });
