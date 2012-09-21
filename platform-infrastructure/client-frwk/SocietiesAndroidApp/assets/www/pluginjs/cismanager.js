@@ -1,7 +1,22 @@
 phonegapdesktop.internal.parseConfigFile('pluginjs/cismanager.json');
 
-
 window.plugins.SocietiesLocalCISManager = {
+	connectService: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CisManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CisManagerService', 'connectService'));
+		}
+	},
+	disconnectService: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CisManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CisManagerService', 'disconnectService'));
+		}
+	},
 	createCIS: function(successCallback, failureCallback) {
 		console.log("create CIS desktop invoked");
 		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {

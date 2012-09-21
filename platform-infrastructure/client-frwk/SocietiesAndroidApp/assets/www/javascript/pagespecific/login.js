@@ -219,6 +219,7 @@ var SocietiesLogin = {
 			$.mobile.loadPage("html/friends_landing.html");
 			$.mobile.loadPage("html/my_friends_list.html");
 			$.mobile.loadPage("html/my_friends_details.html");
+			$.mobile.loadPage("html/suggested_societies_friends_list.html");
 			
 			$.mobile.changePage("html/landing.html", { transition: "fade"} );
 		}
