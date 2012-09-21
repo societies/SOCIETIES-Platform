@@ -27,6 +27,8 @@
  */
 package org.societies.webapp.models;
 
+import org.societies.api.context.model.CtxModelType;
+
 /**
  * 
  * @author Luca Lamorte
@@ -36,6 +38,27 @@ package org.societies.webapp.models;
 public class ContextForm {
 
 	private String method;
+	private CtxModelType lookupModel;
+	private CtxModelType lookupType;
+
+
+
+
+	public CtxModelType getLookupModel() {
+		return lookupModel;
+	}
+
+	public void setLookupModel(CtxModelType lookupModel) {
+		this.lookupModel = lookupModel;
+	}
+
+	public CtxModelType getLookupType() {
+		return lookupType;
+	}
+
+	public void setLookupType(CtxModelType lookupType) {
+		this.lookupType = lookupType;
+	}
 
 
 	public String getMethod() {

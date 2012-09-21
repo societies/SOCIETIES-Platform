@@ -18,13 +18,18 @@
 <script type="text/javascript" src="js/context/jquery.cookie.js"></script>
 <script type="text/javascript" src="js/context/jquery.hotkeys.js"></script>
 <script type="text/javascript" src="js/context/jquery.jstree.js"></script>
-<script type="text/javascript" src="context/context.js"></script>
-<script src="js/context/jquery.livesearch.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="js/context/context.js"></script>
+<script type="text/javascript" src="js/context/jquery.livesearch.js"></script>
 
 
 
 </head>
 
+<script>
+	var ctxAttributeType = ${entityTypes};
+	
+	
+</script>
 
 
 
@@ -50,126 +55,87 @@
     
 
 
-
-
-	
-	<h3>My Context   </h3>
-		
-		<fieldset>
+	<fieldset>
 			
-			<label class="form-label-left" id="label_3" for="input_3"> Filter Context:  </label>
-			<input type="text" size=50 name="lookup"/>
-			<span id="count"></span>
-			<br>
+			<label> Lookup:</label>
 			
-			<label class="form-label-left" id="label_3" for="input_3"> Lookup:  </label>
-			<input type="text" size=50 name="type"/>
-			<label class="form-label-left" id="label_3" for="input_3"> Type:  </label>
-			         <select path="type" >
-					   <option value="NONE">--- Select ---</option>
-					   <option value="a">ALL</option>
-					   <option value="a">ENTITY</option>
-					   <option value="b">ATTRIBUTE</option>
-					   <option value="c">RELATIONSHIP</option>
-					</select>
+			        <form:select path="model" id="model">
+					   <form:option value="NONE" label="--- Select Model Type---" />
+					   <form:options items="${model}" />
+					</form:select>
+				    <form:errors path="ctx-type" cssClass="error" />
 					
-					EntityTypes: <form:select path="entityTypes" >
-					   <form:option value="NONE" label="--- Select ---" />
+		
+			        <form:select path="entityTypes" id="entity-sel">
+					   <form:option value="NONE" label="--- Select Entity Type---" />
 					   <form:options items="${entityTypes}" />
 					</form:select>
 				    <form:errors path="entityTypes" cssClass="error" />
-				    <br>
-				    Attribute Types:
-				    <form:select path="attributeTypes" >
-					   <form:option value="NONE" label="--- Select ---" />
+				    
+				    <form:select path="attributeTypes" id="attribute-sel">
+					   <form:option value="NONE" label="--- Select Attribute Type ---" />
 					   <form:options items="${attributeTypes}" />
 					</form:select>
 					<form:errors path="attributeTypes" cssClass="error" />
-				    
-				    Association Types:
-				    <form:select path="associationTypes" >
-					   <form:option value="NONE" label="--- Select ---" />
+					
+					  
+				    <form:select path="associationTypes" id="association-sel" >
+					   <form:option value="NONE" label="--- Select Association Type---" />
 					   <form:options items="${associationTypes}" />
 					</form:select>
 				    <form:errors path="associationTypes" cssClass="error" />
-				    
 			
-			<br>
-			<input type="button" value=" Create " id="add"/>
-					<label class="form-label-left" id="label_3" for="input_3"> Type:  </label>
-			         <select path="type" >
-					   <option value="NONE">--- Select ---</option>
-					   <option value="a">ALL</option>
-					   <option value="a">ENTITY</option>
-					   <option value="b">ATTRIBUTE</option>
-					   <option value="c">RELATIONSHIP</option>
-					</select>
-		</fieldset>
+			<input type="button" value=" Send Lookup" id="lookup"/>
+		   </fieldset>
 		
 		 
 		<br>
 		
+	
 		
-			<table>
+			<table id="context-title">
 			<tr>
 			   <th class="big"> Context Identifier </th>
 			   <th> Type</th>
 			   <th> Value   </th>
 			   <th> Actions </th>
-			</TR>
-			</table>
-			
-			<table id="context">
-			
-			
-			<tr class="entity">
-			   <td class="big"> AAAAA   </td>
-			   <td> BBBBBB  </td>
-			   <td> CCCCCCC </td>
-			   <td> <input type="button" value=" Create " id="add"/>
-					<input type="button" value=" Delete " id="delete"/>
-
+			</tr>
+			<tr>
+				<td><input type="text" size=50 name="lookup"/></td>
+				<td>
+					<input type="text" size=50 name="lookup"/>
+				<td>
+					<input type="text" size=50 name="lookup"/>
+				
 				</td>
-			</TR>
-			
-			<tr class="entity">
-			   <td class="big"> AAAAA   </td>
-			   <td> BBBBBB  </td>
-			   <td> CCCCCCC </td>
-			   <td> <input type="button" value=" Edit " id="edit"/>
-					<input type="button" value=" Delete " id="delete"/>
-
-				</td>
-			</TR>
-			<tr class="relationship">
-			   <td class="big"> AAAAA   </td>
-			   <td>  </td>
-			   <td> CCCCCCC </td>
-			   <td> <input type="button" value=" Edit " id="edit"/>
-					<input type="button" value=" Delete " id="delete"/>
-
+				<td>
+					<input type="text" size=50 name="lookup"/>
 				</td>
 			</tr>
 			
-			<tr class="relationship">
-			   <td class="big"><a href="context://myFooIIdentity@societies.local/ENTITY/person/0">context://myFooIIdentity@societies.local/ENTITY/person/0</a>   </td>
-			   <td> Person  </td>
-			   <td> ------ </td>
-			   <td> <input type="button" value=" Edit " id="add"/>
-					<input type="button" value=" Delete " id="delete"/>
-
-				</td>
-			</TR>
+			<tr>
+				<td><span id="count"></span></td>
+ 				<td>   </td>
+ 				<td>   </td>
+ 				<td>   </td>
+			<tr>
+			</table>
 			
-			<tr class="entity">
-			   <td class="big"> AAAAA   </td>
-			   <td> BBBBBB  </td>
-			   <td> CCCCCCC </td>
-			   <td> <input type="button" value=" Create " id="add"/>
-					<input type="button" value=" Delete " id="delete"/>
-
-				</td>
-			</TR>
+			<br>
+			
+			<table id="context">
+			
+			<xc:forEach var="elm" items="${results}">
+        	<tr class="${elm.model}">
+        	<td id="ctx-id"><a href="lookup('${elm.id}','{elm.type}');">{elm.id}</a></td>
+         	<td>${elm.type}</td>
+            <td>${service.value}</td>
+            <td>
+            	<input type="button" value=" Create " id="add"/>
+				<input type="button" value=" Delete " id="delete"/>
+			</td>
+        	</tr>
+   		 	</xc:forEach>
 			
 			
 			
@@ -177,9 +143,11 @@
 			</table>
 					
 		
-    
-    
-   
+    <form:form method="POST" action="context.html" commandName="ctxForm" name="ctx">
+    	<form:input id="lookupModel"  style="visibility:hidden" path="lookupModel" value=""/>
+    	<form:input id="lookupType"   style="visibility:hidden" path="lookupType" value=""/>
+    	<form:input id="method"  style="visibility:hidden" path="method" value=""/>
+    </form:form>
 
 
 </div>
