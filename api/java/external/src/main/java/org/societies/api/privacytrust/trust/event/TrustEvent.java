@@ -22,33 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.evidence;
+package org.societies.api.privacytrust.trust.event;
+
+import java.util.EventObject;
 
 /**
- * Describe your class here...
+ * This abstract class is used to represent an event emitted by the Trust
+ * Management & Evaluation system.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 0.0.7
  */
-public enum TrustEvidenceType {
+public abstract class TrustEvent extends EventObject {
 
-	/**
-	 * The enum constant for trust ratings.
-	 */
-	RATED,
+	private static final long serialVersionUID = 7234801758138292681L;
 	
 	/**
+	 * Constructs a <code>TrustEvent</code> with the specified source.
 	 * 
+	 * @param source
+	 *            the object upon which this event occurred.
 	 */
-	JOINED_COMMUNITY,
-	
-	/**
-	 * 
-	 */
-	LEFT_COMMUNITY,
-	
-	/**
-	 * 
-	 */
-	USED_SERVICE,
+	public TrustEvent(Object source) {
+		
+		super(source);
+	}
 }

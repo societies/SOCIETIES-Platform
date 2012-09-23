@@ -22,29 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.event;
+package org.societies.api.privacytrust.trust.event;
 
-import java.util.EventObject;
+import java.util.EventListener;
 
 /**
- * This abstract class is used to represent an event emitted by the Trust
- * Management & Evaluation system.
+ * A listener for receiving {@link TrustEvent TrustEvents}. Extensions of this
+ * interface (e.g. {@link TrustUpdateEventListener}) define methods for handling
+ * concrete implementations of the <code>TrustEvent</code> class.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.7
  */
-public abstract class TrustEvent extends EventObject {
+public interface ITrustEventListener extends EventListener {
 
-	private static final long serialVersionUID = 7234801758138292681L;
-	
-	/**
-	 * Constructs a <code>TrustEvent</code> with the specified source.
-	 * 
-	 * @param source
-	 *            the object upon which this event occurred.
-	 */
-	public TrustEvent(Object source) {
-		
-		super(source);
-	}
 }

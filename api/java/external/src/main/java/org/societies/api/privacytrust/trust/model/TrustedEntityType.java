@@ -22,18 +22,48 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.event;
-
-import java.util.EventListener;
+package org.societies.api.privacytrust.trust.model;
 
 /**
- * A listener for receiving {@link TrustEvent TrustEvents}. Extensions of this
- * interface (e.g. {@link TrustUpdateEventListener}) define methods for handling
- * concrete implementations of the <code>TrustEvent</code> class.
+ * The constants of this enumerated type specify the type of a trusted entity.
+ * More specifically, trusted entities can be of one of the following types:
+ * <ul>
+ * <li>{@link #CSS}: Denotes a trusted individual</li>
+ * <li>{@link #CIS}: Denotes a trusted community</li>
+ * <li>{@link #SVC}: Denotes a trusted service</li>
+ * <li>{@link #DVP}: Denotes a trusted service developer</li>
+ * <li>{@link #LGC}: Denotes a trusted legacy entity, i.e. non-SOCIETIES
+ * entity</li>
+ * </ul>
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 0.0.3
  */
-public interface ITrustEventListener extends EventListener {
+public enum TrustedEntityType {
 
+	/**
+	 * The enum constant for trusted individuals
+	 */
+	CSS,
+	
+	/**
+	 * The enum constant for trusted communities
+	 */
+	CIS,
+	
+	/**
+	 * The enum constant for trusted services
+	 */
+	SVC,
+	
+	/**
+	 * The enum constant for trusted service developers
+	 */
+	DVP,
+	
+	/**
+	 * The enum constant for trusted legacy entities, i.e. non-SOCIETIES
+	 * entities
+	 */
+	LGC,
 }

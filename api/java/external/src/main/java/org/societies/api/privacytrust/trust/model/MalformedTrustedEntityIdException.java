@@ -22,23 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.event;
+package org.societies.api.privacytrust.trust.model;
+
+import org.societies.api.privacytrust.trust.TrustException;
 
 /**
- * An interface that must be implemented by a component that wants to be notified
- * when a trust value is updated.  
+ * Thrown to indicate a malformed {@link TrustedEntityId}.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.2
+ * @since 0.0.5
  */
-public interface ITrustUpdateEventListener extends ITrustEventListener {
-	
+public class MalformedTrustedEntityIdException extends TrustException {
+
+	private static final long serialVersionUID = -1528636958746998120L;
+
 	/**
-	 * Notifies registered listeners that a trust value is updated.
-	 * 
-	 * @param evt
-	 *            the <code>TrustUpdateEvent</code> object describing the
-	 *            event source, as well as, the old and new trust value.
-	 */
-	public void onUpdate(TrustUpdateEvent evt);
+     * Constructs a <code>MalformedTrustedEntityIdException</code> with no detail message.
+     */
+    public MalformedTrustedEntityIdException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>MalformedTrustedEntityIdException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public MalformedTrustedEntityIdException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>MalformedTrustedEntityIdException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public MalformedTrustedEntityIdException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>MalformedTrustedEntityIdException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public MalformedTrustedEntityIdException(Throwable cause) {
+    	
+        super(cause);
+    }
 }

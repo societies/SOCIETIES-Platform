@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.trust.api.event;
 
-import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustException;
 
 /**
  * Thrown to indicate Trust Event Manager exceptions.

@@ -34,8 +34,8 @@ import javax.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
-import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
 /**
