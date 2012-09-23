@@ -647,7 +647,6 @@ public class CssRegistry implements ICssRegistry {
 
 		Session session = sessionFactory.openSession();
 		CssRequest registryEntry = new CssRequest();
-		CssFriendEntry filterRegistryEntry = new CssFriendEntry();
 		registryEntry.setCssIdentity(cssFriendId);
 		registryEntry.setRequestStatus(CssRequestStatusType.NOTREQUESTED); // default
 																			// value

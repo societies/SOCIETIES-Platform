@@ -352,7 +352,7 @@ public class CssDirectoryClient implements ICssDirectoryRemote, ICommCallback {
 		CssDirectoryBean cssDirBean = new CssDirectoryBean();
 		cssDirBean.setCssIdList(cssIdList);
 		
-		cssDirBean.setMethod(MethodType.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
+		cssDirBean.setMethod(MethodType.SEARCH_BY_ID);
 		try {
 			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
 			// "callback.RecieveMessage()"

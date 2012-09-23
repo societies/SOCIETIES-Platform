@@ -241,14 +241,10 @@ public class CssDirectory implements ICssDirectory {
 		Transaction t = session.beginTransaction();
 		try {
 
-			tmpEntry = new CssAdvertisementRecordEntry(oldCssValues.getName(),
-					oldCssValues.getId(), oldCssValues.getUri());
-			session.delete(tmpEntry);
-
-			tmpEntry.setName(updatedCssValues.getName());
-			tmpEntry.setId(updatedCssValues.getId());
-			tmpEntry.setUri(updatedCssValues.getUri());
-			session.save(tmpEntry);
+			tmpEntry = new CssAdvertisementRecordEntry(updatedCssValues.getName(),
+					updatedCssValues.getId(), updatedCssValues.getUri());
+			
+			session.saveOrUpdate(tmpEntry);
 
 			t.commit();
 			log.debug("Css Advertisement Record updated.");

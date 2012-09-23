@@ -232,6 +232,9 @@ public class CommsServer implements IFeatureServer {
 					} 
 					case SEARCH_BY_ID :
 					{
+						resultList = null;
+						returnList = null;
+						
 						returnList = this.getCssDirectory().searchByID(messageBean.getCssIdList());
 						resultList =  returnList.get();
 						
