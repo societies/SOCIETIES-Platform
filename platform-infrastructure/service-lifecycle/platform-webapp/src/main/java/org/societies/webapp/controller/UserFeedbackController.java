@@ -69,16 +69,28 @@ public class UserFeedbackController {
 	@RequestMapping(value = "/get_form.html", method = RequestMethod.GET)
 	public String getForm(){
 		//retrieve next request from UF service
-		//FeedbackRequest topRequest = userFeedback.getNextRequest();
+		String returnString = "";
 		FeedbackForm form = userFeedback.getNextRequest();
-		String jsonString = gsonMgr.toJson(form);
-		return jsonString;
+		if(form != null){
+			returnString = gsonMgr.toJson(form);
+		}else{
+			returnString = "NO_REQUESTS";
+		}
+		
+		return returnString;
 	}
 
 	@RequestMapping(value = "/get_form.html", method = RequestMethod.POST)
-	public void submitResponse(String jsonString){
+	public String submitResponse(String jsonString){
+		
 		//convert json string back to Java types
-		FeedbackForm responseForm = gsonMgr.fromJson(jsonString, FeedbackForm.class);
+		FeedbackForm responseForm; 
+		try{
+			responseForm = gsonMgr.fromJson(jsonString, FeedbackForm.class);
+		}catch(Exception e){
+			LOG.error("Submitted response - incorrect format");
+			return gsonMgr.toJson(new Boolean(false));
+		}
 
 		//respond back to UF service
 		String type = responseForm.getType();
@@ -114,6 +126,9 @@ public class UserFeedbackController {
 			userFeedback.submitImplicitResponse(responseForm.getID(), true);
 		}else{
 			LOG.error("Did not recognise response form type from AJAX");
+			return gsonMgr.toJson(new Boolean(false));
 		}
+		
+		return gsonMgr.toJson(new Boolean(true));
 	}
 }
