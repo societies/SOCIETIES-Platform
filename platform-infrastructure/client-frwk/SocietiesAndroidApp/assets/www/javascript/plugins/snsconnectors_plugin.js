@@ -45,7 +45,7 @@ var SocialConnectorsService = {
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
-		'PluginSnsConnectors',  //Telling PhoneGap that we want to run specified plugin
+		'PluginSNConnector',  //Telling PhoneGap that we want to run specified plugin
 		'connectService',              //Telling the plugin, which action we want to perform
 		[]);        //Passing a list of arguments to the plugin
 	},
@@ -63,7 +63,7 @@ var SocialConnectorsService = {
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
-		'PluginSnsConnectors',  //Telling PhoneGap that we want to run specified plugin
+		'PluginSNConnector',  //Telling PhoneGap that we want to run specified plugin
 		'disconnectService',              //Telling the plugin, which action we want to perform
 		[]);        //Passing a list of arguments to the plugin
 	},
@@ -80,7 +80,7 @@ var SocialConnectorsService = {
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
-		'PluginSnsConnectors',  //Telling PhoneGap that we want to run specified plugin
+		'PluginSNConnector',  //Telling PhoneGap that we want to run specified plugin
 		'getSocialConnectors',              //Telling the plugin, which action we want to perform
 		["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
 	},
@@ -97,7 +97,7 @@ var SocialConnectorsService = {
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
-		'PluginSnsConnectors',  //Telling PhoneGap that we want to run specified plugin
+		'PluginSNConnector',  //Telling PhoneGap that we want to run specified plugin
 		'getToken',              //Telling the plugin, which action we want to perform
 		["org.societies.android.platform.gui", socialNetwork]);        //Passing a list of arguments to the plugin
 	},
@@ -114,7 +114,7 @@ var SocialConnectorsService = {
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
-		'PluginSnsConnectors',  //Telling PhoneGap that we want to run specified plugin
+		'PluginSNConnector',  //Telling PhoneGap that we want to run specified plugin
 		'removeSocialConnector',              //Telling the plugin, which action we want to perform
 		["org.societies.android.platform.gui", connectorId]);        //Passing a list of arguments to the plugin
 	}
