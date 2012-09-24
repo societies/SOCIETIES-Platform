@@ -1,0 +1,30 @@
+{ 
+	"SocialConnectorsService" : 
+		{
+		"exceptionThreshold" : 0,
+		"allArray" : true,
+		"connectService" : "connected",
+		"disconnectService" : "disconnected",
+		"getSocialConnectors" : [ 
+						{
+	                    "id": "xyz123",
+    					"identity": "john@facebook.com",
+    					"name": "facebook",
+    					"token": "xyz123" 
+						},
+						{
+	                    "id": "xyz123",
+    					"identity": "john@twitter.com",
+    					"name": "twitter",
+    					"token": "xyz123" 
+						},
+						{
+	                    "id": "xyz123",
+    					"identity": "john@foursquare.com",
+    					"name": "foursquare",
+    					"token": "xyz123" 
+						} ],
+		"addSocialConnector": "xyz123",
+		"removeSocialConnector": "true"
+		}
+}
