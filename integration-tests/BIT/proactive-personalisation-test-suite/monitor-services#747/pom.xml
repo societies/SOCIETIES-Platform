@@ -90,7 +90,7 @@
 							<version>${version.ua}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
