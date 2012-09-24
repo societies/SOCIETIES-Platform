@@ -54,7 +54,7 @@ public class CtxBrokerExampleRemote 	{
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerExampleRemote.class);
 	private ICtxBroker ctxBroker;
 	private ICommManager commMgrService;
-	private IIdentity targetCSSiD; 
+//	private IIdentity targetCSSiD; 
 	private IContextAware3pService ca3pService;
 	
 	@Autowired(required=true)
@@ -66,6 +66,11 @@ public class CtxBrokerExampleRemote 	{
 						
 		this.commMgrService = commMgr;
 
+		
+		LOG.info("remote retrieve of indi entity ");
+		this.ca3pService.retrieveRemoteIndiEntity();
+		
+		
 		CtxEntity remoteEntity = this.ca3pService.createRemoteCtxEntity("remoteEntityType");
 		LOG.info("*** remoteEntity id : "+ remoteEntity.getId());
 
@@ -93,6 +98,8 @@ public class CtxBrokerExampleRemote 	{
 			LOG.info("retrieved object id"+ ctxAttrRetrieved.getStringValue());
 		}
 	
+		
+		
 		
 	}
 	

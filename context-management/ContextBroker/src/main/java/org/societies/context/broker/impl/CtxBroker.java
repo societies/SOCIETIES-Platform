@@ -58,6 +58,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.schema.context.contextmanagement.RetrieveIndividualEntityIdBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.societies.context.broker.api.security.CtxPermission;
@@ -68,6 +69,7 @@ import org.societies.context.broker.impl.comm.callbacks.CreateAttributeCallback;
 import org.societies.context.broker.impl.comm.callbacks.CreateEntityCallback;
 import org.societies.context.broker.impl.comm.callbacks.LookupCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
+import org.societies.context.broker.impl.comm.callbacks.RetrieveIndividualEntCallback;
 import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
 
 import org.slf4j.Logger;
@@ -86,7 +88,7 @@ import org.springframework.stereotype.Service;
 public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CtxBroker.class);
 
 	/** ICtxAccessController service reference. */
 	@Autowired(required=true)
@@ -364,7 +366,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 				synchronized (callback) {
 					try {
-						//LOG.info("RetrieveCtx remote call result received 1 ");
+						LOG.info("RetrieveCtx remote call result received 1 ");
 						callback.wait();
 						obj = callback.getResult();
 						//LOG.info("RetrieveCtx remote call result received 2 " +obj.getId().toString());
@@ -372,8 +374,8 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
 					}
-				}//end of remote code											
-			}
+				}											
+			}//end of remote code
 		}
 		return new AsyncResult<CtxModelObject>(obj);
 	}
@@ -414,8 +416,22 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 								+ e.getLocalizedMessage(), e);
 			}
 		} else {
-			LOG.warn("remote call");
+			LOG.info("RetrieveIndividualEntCallback remote call");
+			RetrieveIndividualEntCallback callback = new RetrieveIndividualEntCallback();
+			
+			ctxBrokerClient.retrieveRemoteIndividualEntId(requestor, cssId, callback);
+			synchronized (callback) {
+				try {
+					LOG.info("RetrieveCtx remote call result received 1 ");
+					callback.wait();
+					individualEntityId = callback.getResult();
+					LOG.info("RetrieveIndividualEntCallback remote call result received 2 " +individualEntityId.toString());
+				} catch (InterruptedException e) {
 
+					throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
+				}
+			}
+			
 		}
 
 		return new AsyncResult<CtxEntityIdentifier>(individualEntityId);
