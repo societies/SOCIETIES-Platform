@@ -1,10 +1,13 @@
-var userfeedbackBoxId = '#ufbNotifications';
+/* **************************
+ * 		Parameters
+ ****************************/
+var userfeedbackBoxId = '#ufeedbackNotifications';
 var url = {getForm: 'get-form.html', sendAnswer: 'send-answer.html' };
 var formType = {RADIOLIST: 0, CHECKBOXLIST: 1, ACKNACK: 2};
 
 
 $(document).ready(function(){
-	$('.ufbRefreshHandler').click(function() {
+	$('.ufeedbackRefreshHandler').click(function() {
 		retrieveNotification();
 	});
 	
@@ -27,7 +30,7 @@ function retrieveNotification() {
 		beforeSend: function (xhr) {
 			console.log("Before send");
 		},
-		success: function(formInfo) {
+		success: function(formInfo, textStatus, xhr) {
 			console.log("Success");
 			console.log(formInfo);
 			// Generate the relevant form

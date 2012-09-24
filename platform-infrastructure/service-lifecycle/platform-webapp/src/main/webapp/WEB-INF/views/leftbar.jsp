@@ -1,8 +1,8 @@
 <!-- PAGE TABLE -->
 <tr><td align="left" valign="top" width="15%" background="${pageContext.request.contextPath}/images/societies-background.png">
 	<div id="userfeedback">
-		<p class="ufbRefreshHandler">Refresh notification</p>
-		<div id="ufbNotifications">
+		<p class="ufeedbackRefreshHandler">Refresh notification</p>
+		<div id="ufeedbackNotifications">
 		</div>
 	</div>
 	<table border="0" >

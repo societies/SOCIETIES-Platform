@@ -1,0 +1,16 @@
+body{
+	text-align: center;
+}
+#userfeedback{
+	margin: 20px auto;
+	padding: 5px;
+	border: 1px solid black;
+	border-radius: 5px;
+	text-align: left;
+}
+.ufeedbackHandler{
+	margin: 0 auto;
+	font-size: 1.2em;
+	text-align: center;
+	cursor: pointer;
+}
