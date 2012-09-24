@@ -159,6 +159,9 @@ public class CommsServer implements IFeatureServer {
 			case REGISTER_CSS_NODE:
 				asyncResult = this.cssManager.registerCSSNode((CssRecord) bean.getProfile());
 				break;
+			case MODIFY_CSS_RECORD:
+				asyncResult = this.cssManager.modifyCssRecord((CssRecord) bean.getProfile());
+				break;	
 			case GET_CSS_FRIENDS:
 				asyncFriendsAdsResult = this.cssManager.getCssFriends();
 				break;
