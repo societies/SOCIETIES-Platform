@@ -15,8 +15,7 @@
     
 	<osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" cardinality="1..1" />
 	<osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="1..1" />
-	<osgi:reference id="userCtxInferenceMgr" interface="org.societies.context.api.user.inference.IUserCtxInferenceMgr" cardinality="1..1" />
 	<osgi:reference id="cisManager" interface="org.societies.api.cis.management.ICisManager" cardinality="1..1" />
-	
+	<osgi:reference id="pubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient" cardinality="1..1" />
 	
 </beans>

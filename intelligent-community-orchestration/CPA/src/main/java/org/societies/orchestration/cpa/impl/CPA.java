@@ -27,9 +27,8 @@ package org.societies.orchestration.cpa.impl;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.orchestration.api.ICisDataCollector;
-import org.societies.orchestration.api.ICisProposal;
-import org.societies.orchestration.api.IDataCollectorSubscriber;
+import org.societies.api.internal.orchestration.ICisDataCollector;
+import org.societies.api.internal.orchestration.IDataCollectorSubscriber;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,17 +61,15 @@ public class CPA implements IDataCollectorSubscriber, Runnable
 	 *              that this object will operate on behalf of. (Currently can only be a user CSS)
 	 */
     public CPA(ICisDataCollector collector, String cisId){
-         this.collector = collector; this.cisId = cisId;
+        this.collector = collector; this.cisId = cisId;
         init();
     }
 
 //    public CPA(IIdentity linkedEntity, String linkType) {
 //		lastTemporaryCheck = new Date();
 //	}
-	private void sendToCSM(List<ICisProposal> list){
-	}
 	private void process() {
-		sendToCSM(cpaCreationPatterns.analyze(newActivities));
+		cpaCreationPatterns.analyze(newActivities);
 	}
 	
 	
@@ -151,6 +148,10 @@ public class CPA implements IDataCollectorSubscriber, Runnable
     public void init(){
         this.newActivities = new ArrayList<IActivity>();
     }
-    
+    public List<String> getTrends(int n){
+        ArrayList<String> ret = new ArrayList<String>();
+        //TODO: implement
+        return ret;
+    }
     
 }

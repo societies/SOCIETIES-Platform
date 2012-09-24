@@ -40,20 +40,20 @@
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses" >
             <list>
-                <value>org.societies.cis.manager.Cis</value>
+<!--                <value>org.societies.cis.manager.Cis</value>
                 <value>org.societies.cis.manager.CisRecord</value>
                 <value>org.societies.cis.manager.CisParticipant</value>
                 <value>org.societies.cis.manager.CisSubscribedImp</value>
                 <value>org.societies.activity.model.Activity</value>
-                <value>org.societies.activity.ActivityFeed</value>
+                <value>org.societies.activity.ActivityFeed</value>-->
             </list>
         </property>
 
         <property name="annotatedPackages" >
 
             <list>
-                <value>org.societies.cis.manager</value>
-                <value>org.societies.cis.activity</value>
+<!--                <value>org.societies.cis.manager</value>
+                <value>org.societies.cis.activity</value>-->
             </list>
         </property>
 
@@ -75,9 +75,10 @@
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
-    <bean id="CISDataCollector" class="org.societies.orchestration.CISDataCollectorManager" depends-on="ICisManager" init-method="init"
+    <bean id="cisDataCollector" class="org.societies.orchestration.collector.CISDataCollectorManager" depends-on="ICisManager" init-method="init"
     destroy-method="destroy">
         <property name="cisManager" ref="ICisManager"/>
+        <property name="eventMgr" ref="eventMgr"/>
     </bean>
     
    <!-- <bean id="CisClientService" 

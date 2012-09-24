@@ -58,7 +58,13 @@ public interface IAndroidCSSManager {
 			"modifyAndroidCSSRecord(String client, AndroidCSSRecord profile)",
 			"changeCSSNodeStatus(String client, AndroidCSSRecord profile)",
 			"synchProfile(String client, AndroidCSSRecord profile)",
-			"setPresenceStatus(String client, AndroidCSSRecord profile)"};
+			"setPresenceStatus(String client, AndroidCSSRecord profile)",
+			"readCSSRecord(String client)",						//TODO
+			"getCssFriends(String client)", 					//TODO
+			"getSuggestedFriends(String client)",				//TODO
+			"readProfileRemote(String client, String cssId)",	//TODO
+			"sendFriendRequest(String client, String cssId)"	//TODO
+			};
 	/**
 	 * Register with chosen Domain Server
 	 * 

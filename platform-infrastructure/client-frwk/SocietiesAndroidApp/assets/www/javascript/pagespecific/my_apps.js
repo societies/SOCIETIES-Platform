@@ -80,16 +80,16 @@ var Societies3PServices = {
 	},
 	
 	startActivity: function (appName, packageName) {
-		function success(data) {			
-			window.alert("started");
+		function success(data) {
+			window.plugins.SocietiesCoreServiceMonitor.startActivity(packageName, failure);
 		}
 		
 		function failure(data) {
-			alert("failed");
+			window.alert("Failed to start application!");
 		}
 		
 		if(window.confirm("Launch " + appName + "?"))
-			window.plugins.SocietiesCoreServiceMonitor.startActivity(packageName, success, failure);
+			SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(success);
 	},
 	
 	startStopService: function () {

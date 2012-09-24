@@ -24,7 +24,10 @@
  */
 package org.societies.orchestration.cpa.impl;
 
-public class SocialGraphEdge {
+import org.societies.api.internal.orchestration.ISocialGraphEdge;
+import org.societies.api.internal.orchestration.ISocialGraphVertex;
+
+public class SocialGraphEdge implements ISocialGraphEdge {
 	private double weight;
 	private SocialGraphVertex from;
 	private SocialGraphVertex to;
@@ -45,13 +48,13 @@ public class SocialGraphEdge {
 	public void setWeight(double weight) {
 		this.weight = weight;
 	}
-	public SocialGraphVertex getFrom() {
+	public ISocialGraphVertex getFrom() {
 		return from;
 	}
 	public void setFrom(SocialGraphVertex from) {
 		this.from = from;
 	}
-	public SocialGraphVertex getTo() {
+	public ISocialGraphVertex getTo() {
 		return to;
 	}
 	public void setTo(SocialGraphVertex to) {
