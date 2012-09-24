@@ -39,31 +39,22 @@
 			</div>
 		</form>
 		<br/>
-		<ul data-role="listview" data-theme="d" data-divider-theme="b">
+		<ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="listSNSconnectors" >
 			<li data-role="list-divider">Social Network Connectors</li>
+			<!--  ADD LIST OF CONNECTORS HERE -->
 		</ul>
-		<br/>
+		<br/><br/>
 		<form id="form1">
-			<div data-role="fieldcontain">
-				<fieldset data-role="controlgroup">
-					<legend>Facebook:</legend>
-					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
-					<label for="checkbox-1">Connect</label>
-				</fieldset>
-			</div>
-			<div data-role="fieldcontain">
-				<fieldset data-role="controlgroup">
-					<legend>Twitter:</legend>
-					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
-					<label for="checkbox-1">Connect</label>
-				</fieldset>
-			</div>
-			<div data-role="fieldcontain">
-				<fieldset data-role="controlgroup">
-					<legend>Foursquare:</legend>
-					<input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom"/>
-					<label for="checkbox-1">Connect</label>
-				</fieldset>
+			<div data-role="controlgroup" > <!-- data-type="horizontal">  -->
+				<label for="connectorType" class="select">Add Connector:</label>
+				<select id="connectorType" onChange="SocialNetworksConnectors.addConnector()">
+					<option id="0">Select a connection</option>
+					<option id="Facebook">facebook</option>
+					<option id="twitter">twitter</option>
+					<option id="Foursquare">foursquare</option>
+					<option id="linkedin">linkedin</option>
+					<option id="googleplus">googleplus</option>
+				</select> 
 			</div>
 		</form>
 		<br/>

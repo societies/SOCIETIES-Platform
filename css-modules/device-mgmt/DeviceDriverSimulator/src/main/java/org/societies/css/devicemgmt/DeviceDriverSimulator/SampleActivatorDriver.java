@@ -225,21 +225,21 @@ public class SampleActivatorDriver implements BundleContextAware{
 			ls = null;
 		}
 		else {
-			System.out.println("no ls");
+			LOG.info("no ls");
 		}
 		if (ls2!=null){
 			deviceManager.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", physicalDeviceId2);
 			ls2 = null;
 		}
 		else {
-			System.out.println("no ls2");
+			LOG.info("no ls2");
 		}
 		if (ls3!=null){
 			deviceManager.fireDeviceDisconnected("org.societies.DeviceDriverSimulator", physicalDeviceId3);
 			ls3 = null;
 		}
 		else {
-			System.out.println("no ls3");
+			LOG.info("no ls3");
 		}
 		
 		/* Screen */
@@ -248,7 +248,7 @@ public class SampleActivatorDriver implements BundleContextAware{
 			screen = null;
 		}
 		else {
-			System.out.println("no screen");
+			LOG.info("no screen");
 		}
 	}
 }

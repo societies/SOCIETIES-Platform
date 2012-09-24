@@ -25,8 +25,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-			<artifactId>PubsubClientBundle</artifactId>
+			<groupId>org.societies.comm</groupId>
+			<artifactId>CloudCommsBundle</artifactId>
 			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -112,7 +112,7 @@
 							<version>${release.version}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

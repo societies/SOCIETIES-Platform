@@ -102,12 +102,12 @@
     		<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>
-		<!--dependency>
+		<dependency>
 		   <groupId>org.societies.android.platform</groupId>
-		   <artifactId>socialprovider-light</artifactId>
+		   <artifactId>SocietiesAndroidSocialData</artifactId>
 		   <version>${release.version}</version> 
 		   <type>apklib</type>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>org.societies.android</groupId>
 			<artifactId>privacytrust</artifactId>
