@@ -111,7 +111,7 @@ public class CommsServer implements IFeatureServer {
 			
 			
 			Future<List<CssAdvertisementRecord>> asyncFriendsAdsResult = null;
-			List<CssAdvertisementRecord> friendsAdRecordResult = null;
+			List<CssAdvertisementRecord> friendsAdsResult = null;
 		
 			LOG.debug("CSSManager remote invocation of method "
 					+ bean.getMethod().name());
