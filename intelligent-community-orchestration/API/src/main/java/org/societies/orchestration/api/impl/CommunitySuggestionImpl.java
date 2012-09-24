@@ -16,6 +16,10 @@ public class CommunitySuggestionImpl implements ICommunitySuggestion, Serializab
     private String name;
     private ArrayList<String> membersList;
     private ArrayList<String> conditionsList;
+    public CommunitySuggestionImpl(){
+        membersList = new ArrayList<String>();
+        conditionsList = new ArrayList<String>();
+    }
     @Override
     public String getSuggestionType() {
         return suggestionType;
