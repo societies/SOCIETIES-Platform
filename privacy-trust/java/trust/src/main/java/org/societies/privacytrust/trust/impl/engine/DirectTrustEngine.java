@@ -75,7 +75,6 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
     }
 	
 	/** The Trust Evidence Repository service reference. */
-	@SuppressWarnings("unused")
 	@Autowired
 	private ITrustEvidenceRepository trustEvidenceRepo;
 	
