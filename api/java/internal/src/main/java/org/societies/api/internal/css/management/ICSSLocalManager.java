@@ -222,7 +222,7 @@ public interface ICSSLocalManager {
  /**
   * Returns a list of Css id's of people who we have accepted/have accepted friend requests
   */
- public Future<List<String>> getCssFriends();
+ public Future<List<CssAdvertisementRecord>> getCssFriends();
  
  public Future<List<CssAdvertisementRecord>> suggestedFriends();
  

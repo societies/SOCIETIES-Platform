@@ -25,6 +25,8 @@
 
 package org.societies.api.css.directory;
 
+import java.util.List;
+
 import org.societies.api.css.directory.ICssDirectoryCallback;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
@@ -77,6 +79,18 @@ public interface ICssDirectoryRemote {
 	 * @param callback the callback class of the remote Css Directory client
 	 */
 	public void findForAllCss(CssAdvertisementRecord cssFilter, ICssDirectoryCallback callback);
+	
+	
+	/**
+	 * Description : Queries by css id's
+	 * 
+	 * @param cssidList
+	 *            list of id's to return ad rec  
+	 *  @param callback the callback class of the remote Css Directory client
+	 */
+	public void searchByID(
+			List<String> cssIdList, ICssDirectoryCallback callback);
+	
 	
 }
 

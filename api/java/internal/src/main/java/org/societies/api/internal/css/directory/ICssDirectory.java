@@ -77,5 +77,13 @@ public interface ICssDirectory {
 	 * @return a CSS object if available or null
 	 */
 	Object findCss(Object searchinfo);
+	
+	/**
+	 * Descripption : Search for specigified CSS in the directory
+	 * @param cisIdList searching object or criteria
+	 * @return collection of CSS advert object
+	 */
+	Collection<Object> searchById(Collection<Object> cisIdList);
+	
 
 }

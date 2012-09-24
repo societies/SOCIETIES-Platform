@@ -306,7 +306,7 @@ public class CssManagerController {
 					.findAllCssFriendRequests();
 			Future<List<CssRequest>> cssRequests = getCssLocalManager()
 					.findAllCssRequests();
-			Future<List<String>> asynchCssFriends = getCssLocalManager().getCssFriends();
+			Future<List<CssAdvertisementRecord>> asynchCssFriends = getCssLocalManager().getCssFriends();
 						
 			Future<List<Service>> asynchServices = null;
 			List<Service> friendServices =  new ArrayList<Service>();
@@ -362,6 +362,8 @@ public class CssManagerController {
 								}
 								
 								friendServiceCount = 1;
+								//don't fall over if friend container not available!
+								if (friendServices != null) {
 								for ( int j = 0; (j < friendServices.size()) && (j < 5); j++)
 								{
 									switch (friendServiceCount) {
@@ -387,6 +389,7 @@ public class CssManagerController {
 										break;
 									}	
 									friendServiceCount++;
+								}
 								}
 							}
 							
@@ -416,6 +419,8 @@ public class CssManagerController {
 								}
 								
 								friendServiceCount = 1;
+								//don't fall over if friend container not available!
+								if (friendServices != null) {
 								for ( int j = 0; (j < friendServices.size()) && (j < 5); j++)
 								{
 									switch (friendServiceCount) {
@@ -442,6 +447,7 @@ public class CssManagerController {
 									}	
 
 									friendServiceCount++;
+								}
 								}
 							
 							}
@@ -471,6 +477,8 @@ public class CssManagerController {
 								}
 								
 								friendServiceCount = 1;
+								//don't fall over if friend container not available!
+								if (friendServices != null) {
 								for ( int j = 0; (j < friendServices.size()) && (j < 5); j++)
 								{
 									switch (friendServiceCount) {
@@ -497,6 +505,7 @@ public class CssManagerController {
 									}	
 
 									friendServiceCount++;
+								}
 								}
 								
 							}
