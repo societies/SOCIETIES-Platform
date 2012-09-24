@@ -1,7 +1,8 @@
 {
 	"CISDesktopManagerService" : {
 		"exceptionThreshold" : 0,
-		
+		"connectService" : "connected",
+		"disconnectService" : "disconnected",
 		"createdCIS" : {
 						"cisName": "barcelona fc",
 	                    "cisType": "soccer",

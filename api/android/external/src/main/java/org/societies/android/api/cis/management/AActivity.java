@@ -85,4 +85,17 @@ public class AActivity extends Activity implements Parcelable {
 		
 		return aact;
 	}
+	
+	public static Activity convertAActivity(Activity aactivity) {
+		Activity act = new Activity();
+		act.setActor(aactivity.getActor());
+		act.setObject(aactivity.getObject());
+		act.setPublished(aactivity.getPublished());
+		act.setTarget(aactivity.getTarget());
+		act.setVerb(aactivity.getVerb());
+		
+		return act;
+	}
+
+	
 }

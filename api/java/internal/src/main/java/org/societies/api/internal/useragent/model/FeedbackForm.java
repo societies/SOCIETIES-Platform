@@ -26,5 +26,41 @@
 package org.societies.api.internal.useragent.model;
 
 public class FeedbackForm {
-
+		
+	String id;
+	String type;
+	String text;
+	String[] data;
+	
+	public String getID(){
+		return id;
+	}
+	
+	public void setID(String id){
+		this.id = id;
+	}
+	
+	public String getType() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public String getText(){
+		return text;
+	}
+	
+	public void setText(String text){
+		this.text = text;
+	}
+	
+	public String[] getData() {
+		return data;
+	}
+	
+	public void setData(String[] data) {
+		this.data = data;
+	}
 }

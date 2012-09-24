@@ -50,8 +50,7 @@ var	SocietiesCISListService = {
 			
 			//DISPLAY COMMUNTIES
 			for (i  = 0; i < data.length; i++) {
-				//var tableEntry = '<li><a href="#category-item?pos=' + i + '"><img src="./images/community_profile_icon.png" class="profile_list" alt="logo" >' +
-				var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ')"><img src="../images/community_profile_icon.png" class="profile_list" alt="logo" >' +
+				var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ')"><img src="images/community_profile_icon.png" class="profile_list" alt="logo" >' +
 								 '<h2>' + data[i].communityName + '</h2>' + 
 								 '<p>' + data[i].communityType + '</p>' + 
 								 '</a></li>';
@@ -83,17 +82,3 @@ var	SocietiesCISListService = {
 		}
 }
 
-
-/**
- * JQuery boilerplate to attach JS functions to relevant HTML elements
- * 
- * @description Add Javascript functions and/or event handlers to various HTML tags using JQuery on pageinit
- * N.B. this event is fired once per page load
- * @returns null
- */
-$(document).bind('pageinit',function(){
-
-	console.log("SocietiesCISProfileService pageinit action(s)");
-
-
-});
