@@ -33,10 +33,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * This class is used to uniquely identify an {@link ITrustedEntity}. Trusted
- * Entity Identifiers (TEIDs) are formatted as Uniform Name Numbers (URNs). A
- * URN is composed of the Namespace Identifier (NID) and the Namespace Specific
- * String (NSS). More specifically, using EBNF notation, a URN has the form:
+ * This class is used to uniquely identify trusted CSSs, CISs or services. 
+ * Trusted Entity Identifiers (TEIDs) are formatted as Uniform Name Numbers
+ * (URNs). A URN is composed of the Namespace Identifier (NID) and the 
+ * Namespace Specific String (NSS). More specifically, using EBNF notation, a
+ * URN has the form:
  * 
  * <pre>
  * urn = "urn:" , nid , ":" , nss ;
@@ -202,7 +203,12 @@ public class TrustedEntityId implements Serializable {
      * urn:teid:trustorId:entityType:trusteeId
      * </pre>
      * 
+     * The returned String representation can be used to re-create the
+     * <code>TrustedEntityId</code> instance through the
+     * {@link #TrustedEntityId(String)} constructor.
+     * 
      * @return a String representation of this identifier.
+     * @see #TrustedEntityId(String)
 	 */
 	@Override
 	public String toString() {
