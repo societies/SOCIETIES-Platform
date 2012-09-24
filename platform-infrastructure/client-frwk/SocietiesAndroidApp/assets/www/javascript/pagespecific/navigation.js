@@ -32,43 +32,47 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 
 var SocietiesNavigation = {
-		/**
-		 * @methodOf SocietiesNavigation#
-		 * @description home page navigation actions
-		 * @returns null
-		 */
+	/**
+	 * @methodOf SocietiesNavigation#
+	 * @description home page navigation actions
+	 * @returns null
+	 */
 
-		homeAction: function() {
-			$.mobile.changePage($("#landing"), {transition: "slideup"});
-		},
-		/**
-		 * @methodOf SocietiesNavigation#
-		 * @description profile page navigation actions
-		 * @returns null
-		 */
+	homeAction: function() {
+		$.mobile.changePage($("#landing"), {transition: "slideup"});
+	},
+	/**
+	 * @methodOf SocietiesNavigation#
+	 * @description profile page navigation actions
+	 * @returns null
+	 */
 
-		profileAction: function() {
-			$.mobile.changePage($("#my-profile"), {transition: "slideup"});
-		},
-		/**
-		 * @methodOf SocietiesNavigation#
-		 * @description settings page navigation actions
-		 * @returns null
-		 */
+	profileAction: function() {
+		$.mobile.changePage($("#my-profile"), {transition: "slideup"});
+	},
+	/**
+	 * @methodOf SocietiesNavigation#
+	 * @description settings page navigation actions
+	 * @returns null
+	 */
 
-		settingsAction: function() {
-			$.mobile.changePage($("#settings"), {transition: "slideup"});
-		},
-		/**
-		 * @methodOf SocietiesNavigation#
-		 * @description about page navigation actions
-		 * @returns null
-		 */
+	settingsAction: function() {
+		//ADD LIST OF PRE-POPULATED CONENT FOR SETTINGS PAGE HERE
+		SocialConnectorsServiceHelper.connectToSNConnectorService(SocialNetworksConnectors.refreshConnectors);
+		
+		//CHANGE TO THE SETTINGS PAGE
+		$.mobile.changePage($("#settings"), {transition: "slideup"});
+	},
+	/**
+	 * @methodOf SocietiesNavigation#
+	 * @description about page navigation actions
+	 * @returns null
+	 */
 
-		aboutAction: function() {
-			$.mobile.changePage($("#about"), {transition: "slideup"});
+	aboutAction: function() {
+		$.mobile.changePage($("#about"), {transition: "slideup"});
 
-		}
+	}
 }
 /**
  * JQuery boilerplate to attach JS functions to relevant HTML elements
@@ -101,6 +105,4 @@ $(document).bind("pagechange", function(event, options) {
 	if (options.toPage[0].id === "my-profile"){
 		SocietiesCSSRecord.refreshCssProfile();
 	}
-
-
 });
