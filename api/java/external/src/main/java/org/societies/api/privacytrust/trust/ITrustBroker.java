@@ -65,7 +65,7 @@ public interface ITrustBroker {
 	 *         identifier is <code>null</code>
 	 */
 	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId entityId) throws TrustException;
+			final TrustedEntityId teid) throws TrustException;
 	
 	/**
 	 * Unregisters the specified listener from trust value update events associated

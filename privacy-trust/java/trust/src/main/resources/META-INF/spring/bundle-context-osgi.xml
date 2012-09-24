@@ -13,12 +13,17 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 
+	<!-- External provided services -->
+	<osgi:service ref="externalTrustBroker" interface="org.societies.api.privacytrust.trust.ITrustBroker" />
+	
+	<!-- Internal provided services -->
 	<osgi:service ref="trustEventMgr" interface="org.societies.privacytrust.trust.api.event.ITrustEventMgr" />
 	<osgi:service ref="trustBroker" interface="org.societies.api.internal.privacytrust.trust.ITrustBroker" />
 	<osgi:service ref="trustRepository" interface="org.societies.privacytrust.trust.api.repo.ITrustRepository" />
 	<osgi:service ref="trustEvidenceRepository" interface="org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository" />
 	<osgi:service ref="trustEvidenceCollector" interface="org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector" />
 	
+	<!-- Internal required services -->
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
 	<osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr" />
 	<osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1">
