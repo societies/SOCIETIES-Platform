@@ -30,7 +30,7 @@ package org.societies.api.css.directory;
  * @author aleckey
  *
  */
-public interface ICssDirectory {
+public interface IAndroidCssDirectory {
 
 	String methodsArray [] = {"findForAllCss(String client, String searchTerm)",
 							  "findAllCssAdvertisementRecords(String client)"

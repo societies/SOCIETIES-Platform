@@ -16,6 +16,10 @@ public class CommunitySuggestionImpl implements ICommunitySuggestion, Serializab
     private String name;
     private ArrayList<String> membersList;
     private ArrayList<String> conditionsList;
+    public CommunitySuggestionImpl(){
+        membersList = new ArrayList<String>();
+        conditionsList = new ArrayList<String>();
+    }
     @Override
     public String getSuggestionType() {
         return suggestionType;
@@ -50,5 +54,8 @@ public class CommunitySuggestionImpl implements ICommunitySuggestion, Serializab
 
     public void setConditionsList(ArrayList<String> conditionsList) {
         this.conditionsList = conditionsList;
+    }
+    public void addMember(String member){
+        membersList.add(member);
     }
 }

@@ -26,7 +26,7 @@
 
 			<!-- CSS Organisation Type-->
 				<label for="cssrecordorgtype">CSS Entity Type:</label>
-				<select name="cssRecordOrgType" id="cssrecordorgtype" data-role="slider" disabled="true">
+				<select name="cssRecordOrgType" id="cssrecordorgtype" data-role="slider">
 					<option value="0">Individual</option>
 					<option value="1">Entity</option>
 				</select>
@@ -35,20 +35,20 @@
 			<!-- CSS Owner Forename (optional)-->
 			<div data-role="fieldcontain">
 		    	<label for="cssrecordforename">Forename: </label>
-		    	<input type="text" name="cssRecordForeName" id="cssrecordforename" value="" disabled="true"/>
+		    	<input type="text" name="cssRecordForeName" id="cssrecordforename" value="" />
 			</div>
 
 			<!-- CSS Owner Name 
 				Can be an individual, organisation or some other entity -->
 			<div data-role="fieldcontain">
 		    	<label for="cssrecordname">Name: </label>
-		    	<input type="text" name="cssRecordName" id="cssrecordname" value="" disabled="true"/>
+		    	<input type="text" name="cssRecordName" id="cssrecordname" value=""/>
 			</div>
 
-			<!-- CSS Identity-->
+			<!-- CSS Name -->
 			<div data-role="fieldcontain" >
-		    	<label for="cssrecordidentity">Identity: </label>
-		    	<input type="text" name="cssRecordIdentity" id="cssrecordidentity" value="" disabled="true"/>
+		    	<label for="cssrecordidentity">CSS Name: </label>
+		    	<input type="text" name="cssRecordIdentity" id="cssrecordidentity" value=""/>
 			</div>
 
 			<div data-role="collapsible-set">
@@ -59,18 +59,18 @@
 					<!-- CSS e-mail Details-->
 					<div data-role="fieldcontain" >
 				    	<label for="cssrecordemaildetails">e-Mail: </label>
-				    	<input type="text" name="cssRecordEmailDetails" id="cssrecordemaildetails" value="" disabled="true"/>
+				    	<input type="text" name="cssRecordEmailDetails" id="cssrecordemaildetails" value=""/>
 					</div>
 					
 					<!-- CSS IM Details-->
 					<div data-role="fieldcontain" >
 				    	<label for="cssrecordimdetails">IM: </label>
-				    	<input type="text" name="cssRecordImDetails" id="cssrecordimdetails" value="" disabled="true"/>
+				    	<input type="text" name="cssRecordImDetails" id="cssrecordimdetails" value=""/>
 					</div>
 					<!-- CSS SNS Details-->
 					<div data-role="fieldcontain" >
 				    	<label for="cssrecordsnsdetails">Social: </label>
-				    	<input type="text" name="cssRecordSNSDetails" id="cssrecordsnsdetails" value="" disabled="true"/>
+				    	<input type="text" name="cssRecordSNSDetails" id="cssrecordsnsdetails" value=""/>
 					</div>
 				</div>
 				
@@ -80,7 +80,7 @@
 					<div data-role="fieldcontain" >
 						<!-- Sex -->
 						<label for="cssrecordsextype">Sex:</label>
-						<select name="cssRecordSexType" id="cssrecordsextype" data-role="slider"  disabled="true">
+						<select name="cssRecordSexType" id="cssrecordsextype" data-role="slider">
 							<option value="0">Male</option>
 							<option value="1">Female</option>
 						</select>
@@ -89,7 +89,7 @@
 					<!-- CSS Location -->
 					<div data-role="fieldcontain" >
 				    	<label for="cssrecorduserlocation">Home Location: </label>
-				    	<input type="text" name="cssRecordUserLocation" id="cssrecorduserlocation" value="" disabled="true"/>
+				    	<input type="text" name="cssRecordUserLocation" id="cssrecorduserlocation" value=""/>
 					</div>
 					
 				</div>
@@ -115,6 +115,10 @@
 					
 				</div>
 			</div>
+			<div class="sign_up">
+				<input id="updateProfile" type="button" value="Update Profile" data-inline="true" data-theme="h"/> 
+			</div>
+			
 		</form>
 			
 		<br/>

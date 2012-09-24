@@ -164,6 +164,4 @@ $(document).bind('pageinit',function(){
 	$('#password').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#password')
 	});
-
-
 });

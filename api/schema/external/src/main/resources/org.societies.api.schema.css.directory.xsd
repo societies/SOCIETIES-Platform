@@ -12,6 +12,8 @@
 					minOccurs="0" />
 				<xs:element name="cssB" type="tns:cssAdvertisementRecord"
 					minOccurs="0" />
+				<xs:element name="cssIdList" type="xs:string"
+					minOccurs="0" maxOccurs="unbounded" />	
 				<xs:element name="method" type="tns:methodType"
 					minOccurs="0" />
 			</xs:sequence>
@@ -42,6 +44,7 @@
 			<xs:enumeration value="updateCssAdvertisementRecord" />
 			<xs:enumeration value="findAllCssAdvertisementRecords" />
 			<xs:enumeration value="findForAllCss" />
+			<xs:enumeration value="searchByID" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

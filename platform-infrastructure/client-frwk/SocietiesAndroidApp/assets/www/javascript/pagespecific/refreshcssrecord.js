@@ -66,7 +66,7 @@ var SocietiesCSSRecord = {
 		jQuery("#cssrecordimdetails").val(data.imID);
 		jQuery("#cssrecorduserlocation").val(data.homeLocation);
 		jQuery("#cssrecordsnsdetails").val(data.socialURI);
-		jQuery("#cssrecordidentity").val(data.cssIdentity);
+		jQuery("#cssrecordidentity").val(data.identityName);
 		jQuery("#cssrecordorgtype").val(data.entity);
 		jQuery("#cssrecordsextype").val(data.sex);
 		
@@ -82,9 +82,39 @@ var SocietiesCSSRecord = {
 
 			jQuery('#cssNodesTable').append(tableEntry);
 		}
-
+	},
+	
+	/**
+	 * @methodOf SocietiesCSSRecord#
+	 * @description Update the user's profile information
+	 * @returns null
+	 */
+	modifyCSSProfile: function(){
+		console.log("calling modifyCSSProfile");
+		
+		var modifiedData = {
+				"emailID": jQuery("#cssrecordemaildetails").val(),
+				"entity": jQuery("#cssrecordidentity").val(),
+				"foreName": jQuery("#cssrecordforename").val(),
+				"identityName": jQuery("#cssrecordidentity").val(),
+				"imID": jQuery("#cssrecordimdetails").val(),
+				"name": jQuery("#cssrecordname").val(),
+				"sex": jQuery("#cssrecordsextype").val(),
+				"socialURI": jQuery("#cssrecordsnsdetails").val(),
+				"entity": jQuery("#cssrecordorgtype").val()
+		};
+		
+		
+		function success(data) {
+			SocietiesCSSRecord.populateCSSRecordpage(data);
+		}
+		
+		function failure(data) {
+			alert("modifyCSSProfile - failure: " + data);
+		}
+		
+		window.plugins.SocietiesLocalCSSManager.modifyAndroidCSSRecord(success, failure, modifiedData);
 	}
-
 }
 
 /**
@@ -94,12 +124,12 @@ var SocietiesCSSRecord = {
  * N.B. this event is fired once per page load
  * @returns null
  */
-//$(document).bind('pageinit',function(){
-//
-//	console.log("jQuery pageinit action(s) for refreshcssrecord");
-//
-//	$('#refreshCssRecord').off('click').on('click', function(){
-//		SocietiesCSSRecord.refreshCssProfile();
-//	});
-//
-//});
+$(document).bind('pageinit',function(){
+
+	console.log("jQuery pageinit action(s) for refreshcssrecord");
+
+	$('#updateProfile').off('click').on('click', function(){
+		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesCSSRecord.modifyCSSProfile);
+	});
+
+});

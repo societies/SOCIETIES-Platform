@@ -18,8 +18,8 @@
 
   	<osgi:reference id="ICisManager" interface="org.societies.api.cis.management.ICisManager"/>
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource"/>
-    <osgi:service ref="CISDataCollector" interface="org.societies.orchestration.api.ICisDataCollector"/>
-
+    <osgi:service ref="cisDataCollector" interface="org.societies.api.internal.orchestration.ICisDataCollector"/>
+    <osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr"/>
 
 	<!--<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr" />-->
 	<!--<osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />-->
