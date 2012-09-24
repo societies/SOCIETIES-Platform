@@ -22,10 +22,12 @@
     <bean
         id="TestCase1096"
         class="org.societies.integration.test.bit.cpa.TestCase1096"
-		depends-on=""
-        init-method="run">
+		depends-on="cpa,cisManager,commManager,cisDataCollector"
+        init-method="run" destroy-method="destroy">
         <property name="cisManager" ref="cisManager"/>
         <property name="commManager" ref="commManager"/>
+        <property name="cpa" ref="cpa"/>
+        <property name="cisDataCollector" ref="cisDataCollector"/>
     </bean>
     
 <!--    <bean

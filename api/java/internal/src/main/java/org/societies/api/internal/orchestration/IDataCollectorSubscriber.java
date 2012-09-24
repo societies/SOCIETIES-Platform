@@ -22,15 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.api;
+
+package org.societies.api.internal.orchestration;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Bjørn Magnus Mathisen
- * Date: 16.09.12
- * Time: 13:47
+ * Date: 09.08.12
+ * Time: 15:43
  */
-public interface INewCisListener {
-    public void newCis(String cisId);
-    public void removedCis(String cisId);
+public interface IDataCollectorSubscriber {
+    public void receiveNewData(List<?> newdata);
 }

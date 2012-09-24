@@ -26,15 +26,10 @@
 package org.societies.orchestration.cpa.impl;
 
 import org.societies.api.activity.IActivity;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisParticipant;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.orchestration.api.ICis;
-import org.societies.orchestration.api.ICisProposal;
+import org.societies.api.internal.orchestration.ICommunitySuggestion;
+import org.societies.orchestration.api.impl.CommunitySuggestionImpl;
 import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
 import org.societies.orchestration.cpa.impl.comparison.SimpleCounter;
-
-import edu.uci.ics.jung.algorithms.cluster.EdgeBetweennessClusterer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +67,8 @@ public class CPACreationPatterns
 		}
 	}
 	private ActorComparator actComp = null;
-	public List<ICisProposal> analyze(List<IActivity> actDiff){
-		ArrayList<ICisProposal> ret = new ArrayList<ICisProposal>();
+	public List<ICommunitySuggestion> analyze(List<IActivity> actDiff){
+		ArrayList<ICommunitySuggestion> ret = new ArrayList<ICommunitySuggestion>();
 		// = new ArrayList<IActivity>();
 		String lastTimeStr = Long.toString(lastTime);
 		String nowStr = Long.toString(System.currentTimeMillis());
@@ -87,16 +82,12 @@ public class CPACreationPatterns
 		//TADA, the social graph should be created, phew
 		//Now for the analysis..
 		clusterSets = analyser.cluster(graph);
-		try{
 		for(Set<SocialGraphVertex> set : clusterSets){
-			ICisProposal prop = new ICisProposal();
+            CommunitySuggestionImpl prop = new CommunitySuggestionImpl();
 			for(SocialGraphVertex member : set){
-				prop.addMember(member.getName(), "role");//TODO: role?
+				prop.addMember(member.getName());//TODO: role?
 			}
 			ret.add(prop);
-		}
-		}catch(CommunicationException ce){
-			
 		}
 		return ret;
 		

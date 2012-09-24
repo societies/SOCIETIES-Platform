@@ -11,47 +11,51 @@
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
 	xmlns:tx="http://www.springframework.org/schema/tx">
 
-    	<bean id="CPAPropConfig"
+	<context:annotation-config />
+
+	<tx:annotation-driven />
+
+	<bean id="CISDirectoryPropConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="false"></property>
 		<property name="locations">
 			<list>
-			 	<value>classpath:/derby_database.properties</value>
-				<!-- <value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value> -->
+			 	<value>classpath:META-INF/spring/derby_database.properties</value>
 			</list>
 		</property>	
 	</bean>
-    
+
 	 <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		init-method="createDataSource" destroy-method="close">
 		<property name="driverClassName" value="${jdbc.driverClassName}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-		<property name="initialSize" value="2" />
-		<property name="maxActive" value="5" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="100" />
 	</bean>  
-	
-	 <bean id="sessionFactory"
+
+	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 
 		<property name="annotatedClasses">
 			<list>
+				<value>org.societies.css.directory.model.CssAdvertisementRecordEntry</value>
 			</list>
 		</property>
 
 		<property name="annotatedPackages">
 			<list>
+				
+				<value>org.societies.css.directory.model
+				</value>
 			</list>
 		</property>
 
 		<property name="hibernateProperties">
 			<props>
-				<!-- <prop key="hibernate.dialect">${hibernate.dialect}</prop>
-				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-				<prop key="hibernate.jdbc.batch_size">0</prop> 
-				-->
+				<prop key="hibernate.show_ddl">true</prop>
 				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">false</prop>
 				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
@@ -59,30 +63,16 @@
 			</props>
 		</property>
 	</bean>
+
+	<!-- enable the configuration of transactional behavior based on annotations -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-	 
-  <!-- regular spring configuration file defining the beans for this
-       bundle. We've kept the osgi definitions in a separate 
-       configuration file so that this file can easily be used
-       for integration testing outside of an OSGi environment -->
-    <context:annotation-config />
-    <tx:annotation-driven />
-<!--   <bean id="CPA" class="org.societies.orchestration.cpa.impl.CPA"
-   init-method="init">
-    <property name="linkedCss" ref="IIdentity"></property>
-    <property name="egocentricCreationManager" ref="EgocentricCommunityCreationManager"></property>
-    <property name="egocentricConfigurationManager" ref="EgocentricCommunityConfigurationManager"></property>
-    <property name="egocentricDeletionManager" ref="EgocentricCommunityDeletionManager"></property>
-    <property name="commManager" ref="ICommManager"></property>
-    <property name="deviceManager" ref="IDeviceManager"></property>
-   </bean>-->
-   
-   <bean id="CPACreationPatterns" class="org.societies.orchestration.cpa.impl.CPACreationPatterns" 
-   depends-on="" init-method="init">
+
+	<bean id="cssDirectory" class="org.societies.css.directory.CssDirectory">
+		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 </beans>

@@ -24,11 +24,15 @@
  */
 package org.societies.orchestration.cpa.impl;
 
-import java.util.ArrayList;
+import org.societies.api.internal.orchestration.ISocialGraphEdge;
+import org.societies.api.internal.orchestration.ISocialGraphVertex;
 
-public class SocialGraphVertex {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SocialGraphVertex implements ISocialGraphVertex {
 	private String name;
-	private ArrayList<SocialGraphEdge> edges;
+	private ArrayList<ISocialGraphEdge> edges;
 	public SocialGraphVertex(){
 		
 	}
@@ -41,10 +45,10 @@ public class SocialGraphVertex {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public ArrayList<SocialGraphEdge> getEdges() {
+	public List<ISocialGraphEdge> getEdges() {
 		return edges;
 	}
-	public void setEdges(ArrayList<SocialGraphEdge> edges) {
+	public void setEdges(ArrayList<ISocialGraphEdge> edges) {
 		this.edges = edges;
 	}
 	public String toString(){

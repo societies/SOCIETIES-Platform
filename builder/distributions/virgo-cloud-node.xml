@@ -86,6 +86,9 @@
 		<!-- User Agent: 3 bundles (can these be merged?)-->
 		<module>../../user-agent</module>
 
+		<!-- Intelligent Community Orchestration: 2 bundles (can these be merged?)-->
+		<module>../../intelligent-community-orchestration</module>
+
 		<!-- Personalisation: 2 bundles (merge?) -->
 		<module>../../personalisation</module>
 		<module>../../personalisation/Personalisation-GroupManager</module>

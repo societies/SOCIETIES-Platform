@@ -6,6 +6,7 @@
     <artifactId>cpa</artifactId>
     <packaging>bundle</packaging>
     <version>${version.ico}</version>
+    <name>CPA</name>
     <description>Collaboration Pattern Analyzer (CPA)</description>
     <developers>
         <developer>
@@ -33,7 +34,6 @@
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>common-ext-libs</artifactId>
-            <version>0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -41,7 +41,17 @@
             <artifactId>json</artifactId>
             <version>20090211</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.societies</groupId>
+            <artifactId>hibernate_classes</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>com.springsource.javax.transaction</artifactId>
+            <version>1.1.0</version>
+            <scope>test</scope>
+        </dependency>
         <!-- spring -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -52,6 +62,12 @@
         </dependency>
         <!-- databases -->
         <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>com.springsource.org.apache.derby</artifactId>
+            <version>10.5.1000001.764942</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
@@ -60,13 +76,13 @@
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>activityfeed</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>${version.cis}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.societies.cis</groupId>
             <artifactId>cis-manager</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>${version.cis}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -75,36 +91,7 @@
             <version>3.0.5.RELEASE</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>com.springsource.javax.persistence</artifactId>
-            <version>2.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>com.springsource.javax.transaction</artifactId>
-            <version>1.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>com.springsource.org.hibernate</artifactId>
-            <version>3.3.2.GA</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>com.springsource.org.hibernate.annotations</artifactId>
-            <version>3.4.0.GA-A</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>com.springsource.org.hibernate.annotations.common</artifactId>
-            <version>3.3.0.ga</version>
-            <scope>provided</scope>
-        </dependency>
+
         <!-- logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -117,6 +104,19 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung-graph-impl</artifactId>
+            <version>2.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung-algorithms</artifactId>
+            <version>2.0.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- apache commons -->
@@ -141,35 +141,23 @@
         <dependency>
             <groupId>org.societies.api.internal</groupId>
             <artifactId>societies-api-internal</artifactId>
-            <version>${release.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.orchestration.api</groupId>
+            <artifactId>intelligent-community-orchestration-api</artifactId>
+            <scope>provided</scope>
+            <version>${version.ico}</version>
         </dependency>
 
         <dependency>
             <groupId>org.societies.api.external</groupId>
             <artifactId>societies-api</artifactId>
-            <version>${release.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies.orchestration.api</groupId>
-            <artifactId>intelligent-community-orchestration-api</artifactId>
-            <version>${version.ico}</version>
             <scope>provided</scope>
         </dependency>
 
         <!--  graph stuff -->
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-graph-impl</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-algorithms</artifactId>
-            <version>2.0.1</version>
-            <scope>compile</scope>
-        </dependency>
+
 
         <!-- 	<dependency> -->
         <!-- 		<groupId>net.sf.jung</groupId> -->
@@ -182,8 +170,14 @@
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-visualization</artifactId>
             <version>2.0.1</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
 
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>4.1.0</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

@@ -6,50 +6,12 @@
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-	<!-- Common -->
-		<artifact type="configuration" name="xc"/>
 
-	<artifact type="bundle" name="org.societies.api.external.societies-api"/>
-	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal"/>
-    <artifact type="bundle" name="org.societies.data-source"/>
+	<artifact type="plan" name="org.societies.combined-node"/>
 
+    <artifact type="bundle" name="org.societies.orchestration.cisdatacollector"/>
 
-    <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-
-    <!-- Comms (needed by Context) -->
-	<artifact type="bundle"
-		name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle" />
-	<artifact type="bundle"
-		name="org.societies.comm.xmpp.pubsub.PubsubClientBundle" />
-	<artifact type="bundle" name="org.societies.comm.event.mgmt" />
-
-
-    <!-- Device Management (needed by Context) -->
-	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager" />
-
-	<!-- Context (needed by Privacy & Trust) -->
-	<artifact type="bundle" name="org.societies.context-management.context-mgmt-cloud-bundle"/>
-
-	<!-- Privacy & Trust -->
-	<artifact type="bundle" name="org.societies.privacytrust.trust" />
-	<artifact type="bundle" name="org.societies.privacytrust.privacyprotection" />
-
-    <!-- Security Negotiation
-    <artifact type="bundle" name="org.societies.privacytrust.privacytrustcommmanagement"/>
-    <artifact type="bundle" name="org.societies.security.secur-services"/>
-	<artifact type="bundle" name="org.societies.security.secur-commsmgr"/>
-	<artifact type="bundle" name="org.societies.security.policy-negotiator"/>-->
-
-	<!-- from services -->
-
-    <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
-    <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
-    <artifact type="bundle" name="org.societies.slm.SLMCommsManager"/>
-
-
-	<!-- from cis manager -->
-	<artifact type="bundle" name="org.societies.cis.CisDirectoryClient"/>
-    <artifact type="bundle" name="org.societies.cis.manager"/>
+    <artifact type="bundle" name="org.societies.orchestration.cpa"/>
 
     <artifact type="bundle" name="org.societies.integration.test.bit.bit-1096-cpa"/>
 

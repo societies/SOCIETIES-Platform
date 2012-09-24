@@ -14,7 +14,7 @@ testing of the bundle outside of an OSGi container -->
 
     <!--         <osgi:service ref="CPA"> -->
     <!--         <osgi:interfaces> -->
-    <osgi:reference id="cisDataCollector" interface="org.societies.orchestration.api.ICisDataCollector" />
-    <osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr">
-    </osgi:reference>
+    <osgi:reference id="cisDataCollector" interface="org.societies.api.internal.orchestration.ICisDataCollector" />
+    <osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr"/>
+    <osgi:service ref="cpa" interface="org.societies.api.internal.orchestration.ICPA"/>
 </beans>

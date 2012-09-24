@@ -33,6 +33,7 @@ import java.util.concurrent.Future;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -240,14 +241,10 @@ public class CssDirectory implements ICssDirectory {
 		Transaction t = session.beginTransaction();
 		try {
 
-			tmpEntry = new CssAdvertisementRecordEntry(oldCssValues.getName(),
-					oldCssValues.getId(), oldCssValues.getUri());
-			session.delete(tmpEntry);
-
-			tmpEntry.setName(updatedCssValues.getName());
-			tmpEntry.setId(updatedCssValues.getId());
-			tmpEntry.setUri(updatedCssValues.getUri());
-			session.save(tmpEntry);
+			tmpEntry = new CssAdvertisementRecordEntry(updatedCssValues.getName(),
+					updatedCssValues.getId(), updatedCssValues.getUri());
+			
+			session.saveOrUpdate(tmpEntry);
 
 			t.commit();
 			log.debug("Css Advertisement Record updated.");
@@ -263,4 +260,47 @@ public class CssDirectory implements ICssDirectory {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.css.directory.ICssDirectory#findAllCssAdvertisementRecords
+	 * ()
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Async
+	public Future<List<CssAdvertisementRecord>> searchByID(List<String> cssIds) {
+		Session session = sessionFactory.openSession();
+		List<CssAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CssAdvertisementRecordEntry>();
+		List<CssAdvertisementRecord> returnList = new ArrayList<CssAdvertisementRecord>();
+		CssAdvertisementRecord record = null;
+
+		try {
+
+
+			tmpAdvertList = session.createCriteria(CssAdvertisementRecordEntry.class).
+					add(Restrictions.in("id",cssIds)).list();
+			
+			for (CssAdvertisementRecordEntry entry : tmpAdvertList) {
+				record = new CssAdvertisementRecord();
+				record.setName(entry.getName());
+				record.setId(entry.getId());
+				record.setUri(entry.getUri());
+
+				returnList.add(record);
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return new AsyncResult<List<CssAdvertisementRecord>>(returnList);
+
+	}
+	
 }
