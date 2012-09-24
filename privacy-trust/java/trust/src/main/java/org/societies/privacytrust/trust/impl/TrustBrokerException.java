@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl;
 
-import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustException;
 
 /**
  * Thrown to indicate that the Trust Broker could not handle a request.

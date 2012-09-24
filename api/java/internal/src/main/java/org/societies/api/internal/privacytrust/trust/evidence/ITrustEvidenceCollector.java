@@ -28,8 +28,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.trust.TrustException;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**

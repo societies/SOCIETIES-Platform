@@ -22,10 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.remote;
+package org.societies.api.privacytrust.trust;
 
-//import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
-import org.societies.api.privacytrust.trust.TrustException;
+import java.util.concurrent.Future;
+
+import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
@@ -33,28 +34,24 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
  * communities and services.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 0.4
  */
-public interface ITrustBrokerRemote {
+public interface ITrustBroker {
 
 	/**
 	 * Retrieves the trust value of the specified entity.
 	 * 
 	 * @param teid
 	 *            the identifier of the entity whose trust value to retrieve.
-	 * @param callback
-	 *            the callback to receive the trust value.
 	 * @return the trust value of the specified entity.
-	 * @throws TrustException 
-	 *             if the trust value of the specified entity cannot be
-	 *             retrieved
-	 * @throws NullPointerException 
-	 *             if any of the specified parameters is <code>null</code>
+	 * @throws TrustException if the trust value of the specified entity
+	 *         cannot be retrieved
+	 * @throws NullPointerException if the specified entity identifier is
+	 *         <code>null</code>
 	 */
-	public void retrieveTrust(final TrustedEntityId teid, 
-			final ITrustBrokerRemoteCallback callback) throws TrustException;
+	public Future<Double> retrieveTrust(final TrustedEntityId teid) throws TrustException;
 	
-	/* TODO
+	/**
 	 * Registers the specified listener for trust value update events associated
 	 * with the identified entity.
 	 * 
@@ -66,9 +63,9 @@ public interface ITrustBrokerRemote {
 	 * @throws TrustException if the specified listener cannot be registered
 	 * @throws NullPointerException if any of the specified listener or entity
 	 *         identifier is <code>null</code>
-	 *
+	 */
 	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
-			final TrustedEntityId entityId) throws TrustException;
+			final TrustedEntityId teid) throws TrustException;
 	
 	/**
 	 * Unregisters the specified listener from trust value update events associated
@@ -82,8 +79,7 @@ public interface ITrustBrokerRemote {
 	 * @throws TrustException if the specified listener cannot be unregistered
 	 * @throws NullPointerException if any of the specified listener or entity
 	 *         identifier is <code>null</code>
-	 *
+	 */
 	public void unregisterTrustUpdateEventListener(final ITrustUpdateEventListener listener,
 			final TrustedEntityId teid) throws TrustException;
-	 */
 }

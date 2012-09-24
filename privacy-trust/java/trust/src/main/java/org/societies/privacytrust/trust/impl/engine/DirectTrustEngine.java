@@ -32,10 +32,10 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.trust.TrustException;
-import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.engine.IDirectTrustEngine;
 import org.societies.privacytrust.trust.api.engine.TrustEngineException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
@@ -75,7 +75,6 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
     }
 	
 	/** The Trust Evidence Repository service reference. */
-	@SuppressWarnings("unused")
 	@Autowired
 	private ITrustEvidenceRepository trustEvidenceRepo;
 	

@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.trust.api.evidence.repo;
 
-import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustException;
 
 /**
  * Thrown to indicate problems in the Trust Evidence Repository.

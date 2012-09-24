@@ -24,7 +24,6 @@
  */
 package org.societies.android.privacytrust.trust.evidence;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -92,7 +91,7 @@ public class TrustEvidenceCollector extends Service
 	        "org.societies.api.internal.schema.privacytrust.trust.model");
 	
 	// TODO Don't hardcode!
-	private String cloudNodeJid = "xcmanager.societies.local";
+	private String cloudNodeJid = "jane.societies.local";
 	
 	private IIdentity cloudNodeId;
 	
