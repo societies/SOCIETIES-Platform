@@ -105,7 +105,6 @@ background-color: red;
 	<!-- .................END PLACE YOUR CONTENT HERE ................ -->
 	<!-- FOOTER -->
 	<jsp:include page="../../footer.jsp" />
-	<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/js/privacypolicy/show.js"></script>
 </body>
 </html>
