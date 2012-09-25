@@ -1,0 +1,73 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.integration.test</groupId>
+	<artifactId>builder</artifactId>
+	<name>Societies Integration Tests Builder</name>
+	<packaging>pom</packaging>
+	<version>1.0-SNAPSHOT</version>
+
+	<developers>
+		<developer>
+			<name>Olivier Maridat</name>
+			<email>olivier.maridat@trialog.com</email>
+			<organization>Trialog</organization>
+			<timezone>+1</timezone>
+			<roles>
+				<role>Owner</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<modules>
+		<!-- Tools -->
+		<module>../util</module>
+<!--		<module>../../utilities/maven/Jaxb2SimpleXMLplugin</module> -->
+<!--		<module>../../utilities/maven/SimpleXMLConverters</module> -->
+		<module>../../platform-infrastructure/comms-frwk/ExampleServices/api/java/internal</module> <!-- to be removed when third party services example will be available -->
+		<module>../../platform-infrastructure/comms-frwk/ExampleServices/api/java/schema</module> <!-- to be removed when third party services example will be available -->
+		<module>../../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module> <!-- to be removed when third party services example will be available -->
+		<module>../../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module> <!-- to be removed when third party services example will be available -->
+		
+		<!-- BIT Tests -->
+		<module>../BIT/css-services-test-suite/use-service-759</module>
+		<module>../BIT/css-services-test-suite/install-service-713</module>
+		<module>../BIT/css-services-test-suite/start-stop-714</module>
+		<module>../BIT/privacy-trust-test-suite/assessment</module>
+		<module>../BIT/privacy-trust-test-suite/data-management-1266</module>
+		<module>../BIT/privacy-trust-test-suite/policy-management-1244</module>
+		<module>../BIT/privacy-trust-test-suite/negotiation-management-1264</module>
+		<!-- <module>../BIT/cis-services-test-suite/cis-share-service-962</module> -->
+		<module>../BIT/cis-services-test-suite/cis-list-services-964</module>
+		<module>../BIT/cis-test-suite/cis-management/create_cis#958</module>
+		<module>../BIT/comm-frwk-test-suite/eventing/pubsub-#772</module>
+		<module>../BIT/comm-frwk-test-suite/messaging/AsyncMessaging-774</module>
+		<module>../BIT/comm-frwk-test-suite/messaging/remote_api_calls#771</module>
+		<module>../BIT/security-test-suite/policy-negotiate</module>
+		<!-- <module>../BIT/context-mgmt-test-suite/comm-ctx-estimation#1108</module> -->
+		<module>../BIT/context-mgmt-test-suite/communication-ctx-frwk#1064</module>
+		<module>../BIT/context-mgmt-test-suite/ctx-3pBroker#1337</module>
+		<module>../BIT/context-mgmt-test-suite/ctx-identity#1083</module>
+		<module>../BIT/context-mgmt-test-suite/ctx-src-registration#1028</module>
+		<module>../BIT/css-test-suite/CreateCSSCloduNode-#755</module>
+		<module>../BIT/css-test-suite/CSS-Devices/use-devices/get_data_from_device#899</module>
+		<module>../BIT/css-test-suite/RetrieveContextAs3PService#861</module>
+		<!-- <module>../BIT/ico-test-suite/CPA#1096</module> -->
+		<module>../BIT/proactive-personalisation-test-suite/Ctx-Personalisation#751</module>
+		<module>../BIT/proactive-personalisation-test-suite/monitor-services#747</module>
+		<module>../BIT/proactive-personalisation-test-suite/trigger-caui-prediction#1109</module>
+		<module>../BIT/proactive-personalisation-test-suite/trigger-user-intent-learning#749</module>
+		<module>../BIT/proactive-personalisation-test-suite/trigger-user-preference-learning#748</module>
+
+		<!-- CT Tests -->
+		<module>../CT/privacy-trust-test-suite</module>
+	</modules>
+
+</project>
