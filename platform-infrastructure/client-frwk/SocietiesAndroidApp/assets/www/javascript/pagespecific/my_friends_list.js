@@ -20,9 +20,9 @@ var CSSFriendsServices = {
 
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#" onclick="CSSFriendsServices.showFriendDetails(\'' + data[i] + '\')">' +
-					'<h2>' + data[i] + '</h2>' + 
-					'<p>' + data[i] + '</p>' +
+				var tableEntry = '<li><a href="#" onclick="CSSFriendsServices.showFriendDetails(\'' + data[i].id + '\')">' +
+					'<h2>' + data[i].name + '</h2>' + 
+					'<p>' + data[i].id + '</p>' +
 					'</a></li>';
 				/*
 				<li><a href="friend_profile.html">
@@ -47,7 +47,7 @@ var CSSFriendsServices = {
 	showFriendDetails: function (css_id) {
 		
 		function success(data) {
-			showFriendDetailPage(data);
+			CSSFriendsServices.showFriendDetailPage(data);
 			$.mobile.changePage($("#friend-profile"), { transition: "fade"} );
 		}
 		
