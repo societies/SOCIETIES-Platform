@@ -409,10 +409,15 @@ public class CSSManager implements ICSSLocalManager {
 			cssRecord.setIdentityName(profile.getIdentityName());
 			
 			// internal eventing
+			LOG.info(" :) :) :) :) Generating CSS_Record_Event to notify Record has changed");
 			if(this.getEventMgr() != null){
 				InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record modified", this.idManager.getThisNetworkNode().toString(), cssRecord);
 				try {
+					LOG.info(":) :) :) :) Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
 					this.getEventMgr().publishInternalEvent(event);
+					CssRecord rec = (CssRecord) event.geteventInfo();
+					String email = rec.getEmailID();
+					LOG.info(" :) :) :) :) Email retrieved from event Payload : " +email);
 				} catch (EMSException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
