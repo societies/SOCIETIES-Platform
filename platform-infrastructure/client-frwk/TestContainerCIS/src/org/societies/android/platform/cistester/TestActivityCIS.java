@@ -48,6 +48,9 @@ public class TestActivityCIS extends Activity {
     private ICisSubscribed serviceCISsubscribe;
     private boolean serviceCISsubscribeConnected = false;
     
+    private final String hardCodedTargetJid = "cis-6ba87dc4-ea63-46ef-a614-bac4e8ca1a9b.societies.local";
+    private final String hardCodedTargetName = "brasilia";
+    
     private ICisDirectory serviceCISdir;
     private boolean serviceCISdirConnected = false;
     
@@ -294,7 +297,7 @@ public class TestActivityCIS extends Activity {
 					Log.d(LOG_TAG, ">>>>>CREATE COMMUNITY  RESULT:\nCIS ID: " + cis.getCommunityJid());
 				}
 	
-				continueTests("cis-e86edc27-7362-449a-9987-45561bb5353a.societies.local", "man city");
+				continueTests(hardCodedTargetJid, hardCodedTargetName);
 				
 			}
 			

@@ -64,6 +64,9 @@
         <service android:name="org.societies.android.platform.socialdata.SocialTokenManager" />
         <service android:name="org.societies.android.platform.socialdata.SocialData" />
         
+        <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
+        <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
+        
           <!-- this needs to be copied manualy  -->
     <!--provider
         android:name="org.societies.android.platform.SocialProvider"
