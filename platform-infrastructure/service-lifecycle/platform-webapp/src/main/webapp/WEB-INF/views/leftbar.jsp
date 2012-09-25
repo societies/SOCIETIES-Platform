@@ -21,7 +21,7 @@
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/socialdata.html">SocialData</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	  
-	   <tr><td><b>My Contexta</b></td></tr>
+	  <tr><td><b>My Context</b></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/context.html">Context Management</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 

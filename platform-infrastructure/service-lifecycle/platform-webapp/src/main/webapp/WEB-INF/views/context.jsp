@@ -1,6 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="xc"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -9,27 +10,19 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>My Context</title>
 
-    
-<link href="css/context.css" rel="stylesheet" type="text/css" media="screen" />
+
+<link href="css/context/context.css" rel="stylesheet" type="text/css"
+	media="screen" />
+<link href="css/context/ctx-table-style.css" rel="stylesheet"
+	type="text/css" media="screen" />
 
 <script type="text/javascript" src="js/context/jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="js/context/jquery.slidertron-1.0.js"></script>
-<script type="text/javascript" src="js/context/jquery.js"></script>
-<script type="text/javascript" src="js/context/jquery.cookie.js"></script>
-<script type="text/javascript" src="js/context/jquery.hotkeys.js"></script>
-<script type="text/javascript" src="js/context/jquery.jstree.js"></script>
 <script type="text/javascript" src="js/context/context.js"></script>
-<script type="text/javascript" src="js/context/jquery.livesearch.js"></script>
-
 
 
 </head>
 
-<script>
-	var ctxAttributeType = ${entityTypes};
-	
-	
-</script>
+
 
 
 
@@ -45,125 +38,157 @@
 	<!-- LEFTBAR -->
 	<jsp:include page="leftbar.jsp" />
 	<!-- END LEFTBAR -->
-    <!-- .................PLACE YOUR CONTENT HERE ................ -->
-
-     
-	
-	
-     <div id="container">
-     <h1>My Context Data</h1>
-    
+	<!-- .................PLACE YOUR CONTENT HERE ................ -->
 
 
-	<fieldset>
+	<div id="container">
+
+		<div class="query">
+			<h1>My Context Data</h1>
+
+
+
+
+
+			<label> Action: </label>
 			
-			<label> Lookup:</label>
+			 <select id="method">
+				<option value="NONE" label="--- Select Operation ---" />
+				<option value="lookup" label="Lookup" />
+				<option value="retrieve" label="Retrieve" />
+				<option value="create" label="Create" />
+			</select> 
 			
-			        <form:select path="model" id="model">
-					   <form:option value="NONE" label="--- Select Model Type---" />
-					   <form:options items="${model}" />
-					</form:select>
-				    <form:errors path="ctx-type" cssClass="error" />
-					
-		
-			        <form:select path="entityTypes" id="entity-sel">
-					   <form:option value="NONE" label="--- Select Entity Type---" />
-					   <form:options items="${entityTypes}" />
-					</form:select>
-				    <form:errors path="entityTypes" cssClass="error" />
-				    
-				    <form:select path="attributeTypes" id="attribute-sel">
-					   <form:option value="NONE" label="--- Select Attribute Type ---" />
-					   <form:options items="${attributeTypes}" />
-					</form:select>
-					<form:errors path="attributeTypes" cssClass="error" />
-					
-					  
-				    <form:select path="associationTypes" id="association-sel" >
-					   <form:option value="NONE" label="--- Select Association Type---" />
-					   <form:options items="${associationTypes}" />
-					</form:select>
-				    <form:errors path="associationTypes" cssClass="error" />
-			
-			<input type="button" value=" Send Lookup" id="lookup"/>
-		   </fieldset>
-		
-		 
-		<br>
-		
-	
-		
-			<table id="context-title">
-			<tr>
-			   <th class="big"> Context Identifier </th>
-			   <th> Type</th>
-			   <th> Value   </th>
-			   <th> Actions </th>
-			</tr>
-			<tr>
-				<td><input type="text" size=50 name="lookup"/></td>
-				<td>
-					<input type="text" size=50 name="lookup"/>
-				<td>
-					<input type="text" size=50 name="lookup"/>
+			<select id="lookup" style="display: none">
+				<option value="NONE" label="--- Select Model Type---" />
+				<option value="attribute">attribute</option>
+				<option value="entity">entity</option>
+				<option value="association">association</option>
+
+				<xc:forEach var="type" items="${models}">
+					<option value="${type}" label="${type}" />
+				</xc:forEach>
+				<select>
+
+					<select id="create" style="display: none">
+						<option value="NONE" label="--- Select Model Type---" />
+						<options items="${models}" />
+						<option value="attribute" label="Attribute" />
+						<option value="entity" label="entity" />
+						<option value="association" label="association" />
+				</select>
+
+
+
+
+					<select context="type" id="entity" style="display: none">
+						<option value="NONE" label="--- Select Entity Type---" />
+						<xc:forEach var="type" items="${entityTypes}">
+							<option value="${type}" label="${type}" />
+						</xc:forEach>
+				</select>
+
+					<select context="type" id="attribute" style="display: none">
+						<option value="NONE" label="--- Select Attribute Type --- " />
+
+						<xc:forEach var="type" items="${attributeTypes}">
+							<option value="${type}"> ${type} </option>
+						</xc:forEach>
+				</select>
+
+
+					<select context="type" id="association" style="display: none">
+						<option value="NONE" label="--- Select Association Type---" />
+						<xc:forEach var="type" items="${associationTypes}">
+							<option value="${type}" label="${type}" />
+						</xc:forEach>
+				</select>
 				
-				</td>
-				<td>
-					<input type="text" size=50 name="lookup"/>
-				</td>
-			</tr>
-			
-			<tr>
-				<td><span id="count"></span></td>
- 				<td>   </td>
- 				<td>   </td>
- 				<td>   </td>
-			<tr>
-			</table>
-			
-			<br>
-			
-			<table id="context">
-			
-			<xc:forEach var="elm" items="${results}">
-        	<tr class="${elm.model}">
-        	<td id="ctx-id"><a href="lookup('${elm.id}','{elm.type}');">{elm.id}</a></td>
-         	<td>${elm.type}</td>
-            <td>${service.value}</td>
-            <td>
-            	<input type="button" value=" Create " id="add"/>
-				<input type="button" value=" Delete " id="delete"/>
-			</td>
-        	</tr>
-   		 	</xc:forEach>
-			
-			
-			
-			
-			</table>
-					
-		
-    <form:form method="POST" action="context.html" commandName="ctxForm" name="ctx">
-    	<form:input id="lookupModel"  style="visibility:hidden" path="lookupModel" value=""/>
-    	<form:input id="lookupType"   style="visibility:hidden" path="lookupType" value=""/>
-    	<form:input id="method"  style="visibility:hidden" path="method" value=""/>
-    </form:form>
+				<input style="display:none" size="50"	id="retrieve" />
 
 
-</div>
-     
-     
-	
-	     
-		
-		
-		 	
-		 	
-		 	
+					<form:form method="POST" action="context.html" 		    commandName="ctxForm" name="ctx">
+						<form:input name="lookupType" style="display:none"  path="lookupType" />
+						<form:input name="lookupModel" style="display:none" path="lookupModel" />
+						<form:input name="method" style="display:none"      path="method" />
+						<form:input name="retrieve" style="display:none"    path="id" />
+						<form:input name="value" style="display:none" 		path="value" />
+					</form:form>
 
-	
 
-<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+					<input type="button" value=" Exectute " id="executeQuery" style="display: none" />
+		</div>
+
+
+		<!--  RESULT SECTION -->
+
+		<!-- Table markup-->
+		<table id="newspaper-a">
+
+			<!-- Table header -->
+
+			<thead>
+				<tr>
+					<th scope="col" id="ctx-id">ID</th>
+					<th scope="col" id="ctx-model">Model</th>
+					<th scope="col" id="ctx-type">Type</th>
+					<th scope="col" id="ctx-value">Value</th>
+					<th scope="col" id="ctx-action">Actions</th>
+
+
+				</tr>
+			</thead>
+
+			<!-- Table footer -->
+
+			<tfoot>
+				<!--tr>
+	              <td>valore1</td>
+	              <td>valore1</td>
+	              <td>valore1</td>
+	              <td>valore1</td>
+	        </tr-->
+			</tfoot>
+
+			<!-- Table body -->
+			<tbody>
+				<xc:forEach var="elmement" items="${results}">
+					<tr id="${elmement.id}">
+						<td><a href="#" onclick="exeQuery(${element.id});">${elmement.id}</a></td>
+						<td>${elmement.model}</td>
+						<td>${elmement.type}</td>
+						<td>${elmement.value}</td>
+						<td>
+							<button onclick="edit(${elmement.id})">Edit</button>
+							<button onclick="del(${elmement.id})">Delete</button>
+						</td>
+
+					</tr>
+				</xc:forEach>
+			</tbody>
+
+		</table>
+
+
+
+
+
+
+
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+	<!-- .................END PLACE YOUR CONTENT HERE ................ -->
 	<!-- FOOTER -->
 	<jsp:include page="footer.jsp" />
 	<!-- END FOOTER -->
