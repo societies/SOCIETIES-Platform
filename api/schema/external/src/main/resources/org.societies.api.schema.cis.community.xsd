@@ -326,6 +326,7 @@
 			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
 				<xs:element ref='participant'/>
 			</xs:sequence>
+			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name='addMember'>

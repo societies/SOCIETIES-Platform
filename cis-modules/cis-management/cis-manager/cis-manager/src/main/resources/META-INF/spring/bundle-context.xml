@@ -83,6 +83,7 @@
         <property name="iServDiscRemote" ref="servDiscRemote"/>
         <property name="iServCtrlRemote" ref="servCtrlRemote"/>
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
+        <property name="privacyDataManager" ref="PrivacyDataManager"/>
         <property name="eventMgr" ref="eventMgmtRef"/>
         <property name="internalCtxBroker" ref="internalCtxBroker"/>
        <property name="negotiator" ref="NegotiationRequester"/>

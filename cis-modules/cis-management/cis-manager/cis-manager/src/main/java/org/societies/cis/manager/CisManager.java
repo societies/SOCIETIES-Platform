@@ -79,6 +79,7 @@ import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
@@ -156,12 +157,19 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private ICtxBroker internalCtxBroker = null;
 
 	private INegotiation negotiator;
+	private IPrivacyDataManager privacyDataManager;
 
 	//Autowiring gets and sets
+	
+	
 	
 	public INegotiation getNegotiator() {
 		return negotiator;
 	}
+	public IPrivacyDataManager getPrivacyDataManager() {
+		return privacyDataManager;
+	}
+
 	public void setNegotiator(INegotiation negotiator) {
 		this.negotiator = negotiator;
 	}
@@ -250,6 +258,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		while(it.hasNext()){
 			 Cis element = it.next();
 			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager);
+			 element.setPrivacyDataManager(privacyDataManager);
 			 element.setiServCtrlRemote(this.iServCtrlRemote);
 			 element.setiServDiscRemote(this.iServDiscRemote);
 	     }
@@ -429,6 +438,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
 		this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
 		,description,cisCriteria);
+		cis.setPrivacyDataManager(privacyDataManager); // TODO: possibly move this to the constructor of the cis
 		if(cis == null)
 			return cis;
 
@@ -1418,6 +1428,21 @@ public class JoinCallBack implements ICisManagerCallback{
 	}
 	
 	
+	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+		
+		if(this.getListOfOwnedCis() != null && this.getListOfOwnedCis().size()>0){
+			LOG.info("[Dependency Injection] IPrivacyDataManager injected in CISs");
+			for (int i=0; i< this.getListOfOwnedCis().size(); i++) {
+				Cis c = (Cis)this.getListOfOwnedCis().get(i);
+				c.setPrivacyDataManager(privacyDataManager);
+			}
+		}
+		
+		LOG.info("[Dependency Injection] IPrivacyDataManager injected");
+	}
+	
+	
 	private boolean isDepencyInjectionDone() {
 		return isDepencyInjectionDone(0);
 	}
@@ -1455,6 +1480,10 @@ public class JoinCallBack implements ICisManagerCallback{
 			}
 			if (null == privacyPolicyManager) {
 				LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
+				return false;
+			}
+			if (null == privacyDataManager) {
+				LOG.info("[Dependency Injection] Missing IPrivacyDataManager");
 				return false;
 			}
 

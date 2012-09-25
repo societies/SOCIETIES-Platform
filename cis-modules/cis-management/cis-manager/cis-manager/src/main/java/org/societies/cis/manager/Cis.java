@@ -46,20 +46,30 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.schema.activityfeed.*;
 import org.societies.api.schema.cis.community.*;
 import org.societies.api.schema.cis.manager.*;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -135,9 +145,19 @@ public class Cis implements IFeatureServer, ICisOwned {
 	IServiceControlRemote iServCtrlRemote = null;
 	@Transient
 	IPrivacyPolicyManager privacyPolicyManager = null;
+	@Transient
+	IPrivacyDataManager privacyDataManager = null;
 	
 	
 	
+	public IPrivacyDataManager getPrivacyDataManager() {
+		return privacyDataManager;
+	}
+
+	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+	}
+
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
 	}
@@ -882,9 +902,38 @@ public class Cis implements IFeatureServer, ICisOwned {
 				LOG.info("get who received");
 				CommunityMethods result = new CommunityMethods();
 				WhoResponse who = new WhoResponse();
+				result.setWhoResponse(who);
+				who.setResult(false);
 				this.getMembersCss();
 		
-				// TODO: add privacy call
+				if(null == c.getWhoRequest().getRequestor()){
+					LOG.info("requestor missing on who request");
+					return result;
+				}
+
+				//privacy call
+				if(null != this.privacyDataManager){
+					Requestor r;
+					ResponseItem resp = null;
+					try {
+						r = RequestorUtils.toRequestor(c.getWhoRequest().getRequestor(),this.CISendpoint.getIdManager());
+						DataIdentifier d = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS + "://" + this.getCisId() + "/cis-member-list");
+						resp = this.privacyDataManager.checkPermission(r, d, new Action(ActionConstants.READ));
+					} catch (InvalidFormatException e) {
+						e.printStackTrace();
+					} catch (MalformedCtxIdentifierException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (PrivacyException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					if(null == resp || resp.getDecision().equals(Decision.PERMIT) == false){
+						LOG.info("no permission");
+						return result;
+					}
+				}
 				
 				Set<CisParticipant> s = this.getMembersCss();
 				Iterator<CisParticipant> it = s.iterator();
@@ -896,8 +945,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 					p.setRole( ParticipantRole.fromValue(element.getMtype().toString())   );
 					who.getParticipant().add(p);
 			     }
+				who.setResult(true);
 				
-				result.setWhoResponse(who);
+
 				return result;
 				// END OF WHO
 			}
@@ -1221,10 +1271,29 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		WhoResponse w = new WhoResponse();
 		c.setWhoResponse(w);
-		//RequestorBean reqB = Util.createRequestorBean(req);
-		//w.setRequestor(reqB);
+		w.setResult(false);
 		
-		//TODO: add a privacy call?
+		//privacy call
+		if(null != this.privacyDataManager){
+			ResponseItem resp = null;
+			try {
+				DataIdentifier d = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS + "://" + this.getCisId() + "/cis-member-list");
+				resp = this.privacyDataManager.checkPermission(req, d, new Action(ActionConstants.READ));
+			} catch (MalformedCtxIdentifierException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(null == resp || resp.getDecision().equals(Decision.PERMIT) == false){
+				LOG.info("no permission");
+				callback.receiveResult(c);
+				return;
+			}
+		}
+		// end of privacy call
 		
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();

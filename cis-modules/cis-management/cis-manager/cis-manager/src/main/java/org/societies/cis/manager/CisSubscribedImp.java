@@ -228,7 +228,6 @@ public class CisSubscribedImp implements ICis {
 		RequestorBean reqB = Util.createRequestorBean(req);
 		w.setRequestor(reqB);
 		
-		//TODO: add a privacy call?
 		this.sendXmpp(c, callback);		
 
 	}
