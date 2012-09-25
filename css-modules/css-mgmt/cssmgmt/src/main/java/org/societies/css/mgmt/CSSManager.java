@@ -208,6 +208,19 @@ public class CSSManager implements ICSSLocalManager {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				// internal eventing
+				LOG.info(" :) :) :) :) Generating CSS_Record_Event to notify Record has been created");
+				if(this.getEventMgr() != null){
+					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record Created", this.idManager.getThisNetworkNode().toString(), cssProfile);
+					try {
+						LOG.info(":) :) :) :) Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
+						this.getEventMgr().publishInternalEvent(event);
+					} catch (EMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						LOG.error("error trying to internally publish SUBS CIS event");
+					}
+				}
 			} else {
 				// if CssRecord already persisted remove all nodes and add cloud node
 				
