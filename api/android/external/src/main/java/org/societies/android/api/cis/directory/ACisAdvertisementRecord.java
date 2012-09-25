@@ -113,7 +113,7 @@ public class ACisAdvertisementRecord extends CisAdvertisementRecord implements P
 		if(arecord.getMembershipCrit()!=null && arecord.getMembershipCrit().getCriteria() != null && arecord.getMembershipCrit().getCriteria().isEmpty()== false)
 			record.setMembershipCrit(AMembershipCrit.convertAMembershipCrit(arecord.getMembershipCrit()));
 		
-		return arecord;
+		return record;
 	}
 
 }
