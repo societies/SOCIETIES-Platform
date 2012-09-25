@@ -33,7 +33,7 @@ import java.util.List;
 public interface ICisManager {
 	public String methodsArray[] = {"createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy)",
 							 		"deleteCis(String client, String cisId)",
-							 		"Community[] getCisList(String client, String query)",
+							 		"getCisList(String client, String query)",
 		//					 		"subscribeToCommunity(String client, String name, String cisId)",
 		//					 		"unsubscribeFromCommunity(String client, String cisId)",
 							 		"removeMember(String client, String cisId, String memberJid)"
