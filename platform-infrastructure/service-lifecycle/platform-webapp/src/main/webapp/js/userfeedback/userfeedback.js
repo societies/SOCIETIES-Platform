@@ -1,101 +1,397 @@
-/* **************************
- * 		Parameters
- ****************************/
-var userfeedbackBoxId = '#ufeedbackNotifications';
-var url = {getForm: 'get-form.html', sendAnswer: 'send-answer.html' };
-var formType = {RADIOLIST: 0, CHECKBOXLIST: 1, ACKNACK: 2};
+var userFeedback = (function () {
+	/* ************************
+	 * 		Parameters
+	 **************************/
+	var lastNotificationId = 0;
+	var boxId = '#ufeedbackNotifications';
+	var handlerId = '.ufeedbackRefreshHandler';
+	var url = {getForm: 'get_form.html', sendAnswer: 'get_form.html' };
+	var formType = {RADIOLIST: "radio", CHECKBOXLIST: "check", ACKNACK: "ack", ABORT: "abort", NOTIFICATION: "notification"};
+	var toastTime = 5000; // 5s
+
+	var oneSecond = 1000; // 1s
+	var timeoutTimer = $.timer(function(){}, oneSecond, false);
+	var poolingNormalTime = 5000; // 5s
+	var poolingBusyTime = 15000; // 15s
+	var poolingTimer = $.timer(retrieveNotification, poolingNormalTime, false);
 
 
-$(document).ready(function(){
-	$('.ufeedbackRefreshHandler').click(function() {
-		retrieveNotification();
-	});
-	
-	$('.sendFeedback').live('click', function() {
-		// -- Retrieve data
-		var notificationDom = $(this).parent();
+	var loader = $('<img>').addClass('ufeedbackLoader')
+	.attr('src', 'societies/img/loader.gif')
+	.attr('alt', 'Loading')
+	.hide();
+	var result = $('<span>').addClass('ufeedbackResult')
+	.hide();
+
+
+	/* ************************
+	 * 		Functions
+	 **************************/
+	/* Retrieve/Display form  */
+	function retrieveNotification() {
+		$.ajax({
+			url: url.getForm,
+			beforeSend: function (xhr, settings) {
+				console.log("Before retrieve notification");
+				// Hide old toast result
+				result.hide();
+				// Display loader
+				loader.show();
+				// Reduce pooling time interval
+				poolingTimerBusy();
+			},
+			dataFilter: function(data, dataType) {
+				//var data = jQuery.parseJSON(data);
+				console.log("Response received ("+dataType+"): ", data);
+				return data;
+			},
+			success: function(data, textStatus, xhr) {
+				console.log("Success: notification retrieved", textStatus);
+				// -- No form to display
+				if ("NO_REQUESTS" == data) {
+					// Pooling timer normal internal
+					poolingTimerNormal();
+					return;
+				}
+				// -- Form already displayed: don't do anything
+				if (lastNotificationId == data.id) {
+					return;
+				}
+				// -- Manage data form
+				lastNotificationId = data.id;
+				// - Timeout and timer
+				// Stop timeout count
+				timeoutTimer.stop();
+				// Pooling timer normal internall
+				if (formType.NOTIFICATION == data.type) {
+					poolingTimerNormal();
+				}
+				// - Generate and display form
+				// Generate the relevant form
+				var form = renderForm(data);
+				// Display the notification
+				displayForm(form);
+			},
+			error: function(xhr, textStatus, e) {
+				console.log("Error: ", textStatus, e);
+				// Pooling timer normal internal
+				poolingTimerNormal();
+			},
+			complete: function(xhr, textStatus) {
+				console.log("Complete", textStatus);
+				// Remove loader
+				loader.hide('slow');
+			}
+		});
+	}
+
+	function poolingTimerBusy() {
+		poolingTimer.set({time: poolingBusyTime});
+		if (poolingTimer.isActive) {
+			poolingTimer.reset();
+		}
+	}
+	function poolingTimerNormal() {
+		poolingTimer.set({time: poolingNormalTime});
+		if (poolingTimer.isActive) {
+			poolingTimer.reset();
+		}
+	}
+
+	function displayForm(form) {
+		// Clean the previous notification
+		$(boxId).html('');
+		// Display
+		$(boxId).append(form).slideDown('slow');
+	}
+
+	function renderForm(formInfo) {
+		// - Generate generic form
+		var res = $('<div>').addClass('ufeedbackNotification');
+		$('<span>').addClass('notificationText')
+		.addClass(formInfo.type)
+		.html(formInfo.text)
+		.appendTo(res);
+		$('<input>').addClass('notificationId')
+		.attr('type', 'hidden')
+		.attr('value', formInfo.id)
+		.appendTo(res);
+		$('<input>').addClass('notificationType')
+		.attr('type', 'hidden')
+		.attr('value', formInfo.type)
+		.appendTo(res);
+
+		// - Add specific information
+		if (null != formInfo && formType.ACKNACK == formInfo.type) {
+			res = renderFormAcknack(res, formInfo);
+		}
+		else if (null != formInfo && formType.RADIOLIST == formInfo.type) {
+			res = renderFormRadioList(res, formInfo);
+		}
+		else if (null != formInfo && formType.CHECKBOXLIST == formInfo.type) {
+			res = renderFormCheckoxList(res, formInfo);
+		}
+		else if (null != formInfo && formType.ABORT == formInfo.type) {
+			res = renderFormAbort(res, formInfo);
+		}
+		else if (null != formInfo && formType.NOTIFICATION == formInfo.type) {
+			res = renderFormNotification(res, formInfo);
+		}
+		else {
+			res = $('<div>').addClass('nothing').html('Nothing');
+		}
+		return res;
+	}
+
+	function renderFormAcknack(res, formInfo) {
+		for(var i=0; i< formInfo.data.length; i++) {
+			$('<input>').addClass('sendFeedback')
+			.attr('type', 'button')
+			.attr('name', 'data'+i)
+			.attr('value', formInfo.data[i])
+			.appendTo(res);
+		}
+		return res;
+	}
+
+	function renderFormRadioList(res, formInfo) {
+		for(var i=0; i< formInfo.data.length; i++) {
+			$('<input>').attr('type', 'radio')
+			.attr('name', 'data')
+			.attr('id', 'data'+i)
+			.attr('value', formInfo.data[i])
+			.appendTo(res);
+			$('<label>').attr('for', 'data'+i)
+			.html(formInfo.data[i])
+			.appendTo(res);
+		}
+		$('<input>').addClass('sendFeedback')
+		.attr('type', 'button')
+		.attr('value', 'Send')
+		.appendTo(res);
+		return res;
+	}
+
+	function renderFormCheckoxList(res, formInfo) {
+		for(var i=0; i< formInfo.data.length; i++) {
+			$('<input>').attr('type', 'checkbox')
+			.attr('name', 'data'+i)
+			.attr('id', 'data'+i)
+			.attr('value', formInfo.data[i])
+			.appendTo(res);
+			$('<label>').attr('for', 'data'+i)
+			.html(formInfo.data[i])
+			.appendTo(res);
+		}
+		$('<input>').addClass('sendFeedback')
+		.attr('type', 'button')
+		.attr('value', 'Send')
+		.appendTo(res);
+		return res;
+	}
+
+	function renderFormAbort(res, formInfo) {
+		// Add form
+		var timeout = displayTimeout(formInfo.data[0]);
+		var continueButton = $('<input>').addClass('sendFeedback')
+		.addClass('timeout')
+		.attr('type', 'button')
+		.attr('name', 'continue')
+		.attr('value', "Continue ("+timeout+"s)");
+		continueButton.appendTo(res);
+		var abortButton = $('<input>').addClass('sendFeedback')
+		.attr('type', 'button')
+		.attr('name', 'abort')
+		.attr('value', "Abort");
+		abortButton.appendTo(res);
+
+		// Manage timeout
+		timeoutTimer.set(function() {
+			$('.timeout').attr('value', "Continue ("+(--timeout)+"s)");
+			if (timeout <= 0) {
+				this.stop();
+				var answer = retrieveAnswer(continueButton, true);
+				console.log("Send timeout answer: ", answer);
+				sendAnswer(answer);
+				return;
+			}
+		});
+		timeoutTimer.play();
+		return res;
+	}
+
+	function renderFormNotification(res, formInfo) {
+		// Add form
+		var timeout = displayTimeout(formInfo.data[0]);
+		$('<input>').addClass('closeFeedback')
+		.addClass('timeout')
+		.attr('type', 'button')
+		.attr('value', "Close ("+timeout+"s)")
+		.appendTo(res);
+
+		// Manage timeout
+		timeoutTimer.set(function() {
+			$('.timeout').attr('value', "Close ("+(--timeout)+"s)");
+			if (timeout <= 0) {
+				this.stop();
+				closeNotification();
+				return;
+			}
+		});
+		timeoutTimer.play();
+		return res;
+	}
+
+	function displayTimeout(seconds) {
+		return Math.ceil(parseInt(seconds)/1000);
+	}
+
+	/*       Send answer     */
+	function sendAnswer(data) {
+		$.ajax({
+			url: url.sendAnswer,
+			type: "POST",
+			data: data,
+			beforeSend: function (xhr) {
+				console.log("Before send answer");
+				// Hide old toast result
+				result.hide();
+				// Display loader
+				loader.show();
+				// Stop timeout count
+				timeoutTimer.stop();
+				// Pooling timer normal internal
+				poolingTimerNormal();
+			},
+			success: function(formInfo) {
+				console.log("Success");
+				console.log(formInfo);
+				// Clean the previous notification
+				closeNotification();
+				// Display result
+				result.addClass(formInfo.ack ? 'ok' : 'error')
+				.html(formInfo.ack ? 'Ok!' : 'Oups, error!')
+				.fadeIn('slow')
+				.delay(toastTime).fadeOut('slow');
+			},
+			error: function(e) {
+				console.log("Error", e);
+			},
+			complete: function(jqXHR, textStatus) {
+				console.log("Complete", textStatus);
+				// Remove loader
+				loader.hide('slow');
+			}
+		});
+	}
+
+	function retrieveAnswer(clickedElement, timeout) {
+		var notificationDom = clickedElement.parent();
 		var notification = {
 				id: notificationDom.find('.notificationId').val(),
 				type: notificationDom.find('.notificationType').val(),
 				data: []
+		};
+		// Ack nack
+		if (userFeedback.formType.ACKNACK == notification.type) {
+			notification.data[0] = clickedElement.val();
 		}
-		console.log(notification);
-		sendAnswer(notification);
+		else if (userFeedback.formType.RADIOLIST == notification.type) {
+			notification.data[0] = notificationDom.find(':checked').val();
+		}
+		else if (userFeedback.formType.CHECKBOXLIST == notification.type) {
+			notificationDom.find(':checked').each(function(i, element) {
+				notification.data[i] = $(element).val();
+			});
+		}
+		else if (userFeedback.formType.ABORT == notification.type) {
+			notification.data[0] = ('continue' == clickedElement.attr('name') ? true : false);
+		}
+		return notification;
+	}
+
+	function closeNotification() {
+		lastNotificationId = 0;
+		$(boxId).slideUp('slow');
+		result.removeClass(['ok', 'error']);
+
+	}
+
+	// Public
+	return {
+		boxId: boxId,
+		handlerId: handlerId,
+		url: url,
+		formType: formType,
+		toastTime: toastTime,
+		loader: loader,
+		result: result,
+		timeoutTimer: timeoutTimer,
+		poolingNormalTime: poolingNormalTime,
+		poolingBusyTime: poolingBusyTime,
+		poolingTimer: poolingTimer,
+
+		retrieveNotification: retrieveNotification,
+		sendAnswer: sendAnswer,
+		retrieveAnswer: retrieveAnswer,
+		closeNotification: closeNotification,
+	};
+
+}());
+
+
+/* ************************
+ * 		Controller
+ **************************/
+$(document).ready(function(){
+	// -- Prepare UI
+	userFeedback.loader.insertBefore(userFeedback.boxId);
+	userFeedback.result.insertBefore(userFeedback.boxId);
+
+	// -- Init pooling
+	userFeedback.poolingTimer.play();
+
+	// -- Handler: retrieve notification
+	$(userFeedback.handlerId).click(function() {
+		// -- Send request to check if there is notifications to display
+		// STUB
+		userFeedback.url.getForm = 'test-request.php?simulate=0&type='+$(this).html();
+		userFeedback.retrieveNotification();
+		// STUB
+		userFeedback.url.getForm = 'test-request.php';
+	});
+
+	// -- Handler: send an answer to a notification
+	$('.sendFeedback').live('click', function() {
+		// -- Retrieve data
+		var answer = userFeedback.retrieveAnswer($(this));
+		// -- Send answer
+		console.log("Send answer: ", answer);
+		userFeedback.sendAnswer(answer);
+	});
+
+	// -- Handler: close notification
+	$('.closeFeedback').live('click', function() {
+		// -- Stop timeout count
+		userFeedback.timeoutTimer.stop();
+		// -- Hide notification
+		userFeedback.closeNotification();
+	});
+
+	// -- Handlers: manage pooling
+	$('.ufeedbackPoolingRefresh').click(function() {
+		// -- Send request to check if there is notifications to display
+		userFeedback.retrieveNotification();
+		return false;
+	});
+	$('.ufeedbackPoolingStartStop').click(function() {
+		userFeedback.poolingTimer.toggle();
+		if ('Start' == $(this).html()) {
+			$(this).html('Stop').removeClass('start').addClass('stop');
+		}
+		else {
+			$(this).html('Start').removeClass('stop').addClass('start');
+		}
+		return false;
 	});
 });
-
-function retrieveNotification() {
-	$.ajax({
-		url: url.getForm,
-		beforeSend: function (xhr) {
-			console.log("Before send");
-		},
-		success: function(formInfo, textStatus, xhr) {
-			console.log("Success");
-			console.log(formInfo);
-			// Generate the relevant form
-			var form = renderForm(formInfo);
-			// Clean the previous notification
-			$(userfeedbackBoxId).html('');
-			// Display the notification
-			form.appendTo(userfeedbackBoxId);
-		},
-		error: function(e) {
-			console.log("Error");
-			console.log(e);
-		},
-		complete: function(jqXHR, textStatus) {
-			console.log("Complete");
-		}
-	});
-}
-
-function sendAnswer(data) {
-	$.ajax({
-		url: url.sendAnswer,
-		data: data,
-		beforeSend: function (xhr) {
-			console.log("Before send");
-		},
-		success: function(formInfo) {
-			console.log("Success");
-			console.log(formInfo);
-			// Clean the previous notification
-			$(userfeedbackBoxId).html('');
-		},
-		error: function(e) {
-			console.log("Error");
-			console.log(e);
-		},
-		complete: function(jqXHR, textStatus) {
-			console.log("Complete");
-		}
-	});
-}
-
-function renderForm(formInfo) {
-	if (formType.ACKNACK == formInfo.type && null != formInfo) {
-		return renderFormAcknack(formInfo);
-	}
-	if (formType.RADIOLIST == formInfo.type && null != formInfo) {
-		return renderFormRadioList(formInfo);
-	}
-	if (formType.CHECKBOXLIST == formInfo.type && null != formInfo) {
-		return renderFormCheckoxList(formInfo);
-	}
-	return $('<div>').addClass('nothing').html('nothing');
-}
-
-function renderFormAcknack(formInfo) {
-	var res = $('<div>').addClass('acknack').html('Acknack form');
-	return res;
-}
-
-function renderFormRadioList(formInfo) {
-	var res = $('<div>').addClass('radiolist').html('Radiolist form');
-	return res;
-}
-function renderFormCheckoxList(formInfo) {
-	var res = $('<div>').addClass('checkboxlist').html('Checkboxlist form');
-	return res;
-}
