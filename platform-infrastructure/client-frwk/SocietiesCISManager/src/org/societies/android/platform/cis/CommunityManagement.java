@@ -101,6 +101,8 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
     
     //SERVICE LIFECYCLE INTENTS
 	public static final String INTENT_RETURN_VALUE = "org.societies.android.platform.community.ReturnValue";
+	public static final String INTENT_RETURN_BOOLEAN = "org.societies.android.platform.community.ReturnBoolean"; // extra from True/False methods
+
 	//CIS MANAGER INTENTS
 	public static final String CREATE_CIS     = "org.societies.android.platform.community.CREATE_CIS";
 	public static final String DELETE_CIS    = "org.societies.android.platform.community.DELETE_CIS";
@@ -341,7 +343,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		
 		//CREATE JOIN INFO
 		org.societies.api.schema.cis.manager.AskCisManagerForJoin join = new org.societies.api.schema.cis.manager.AskCisManagerForJoin();
-		join.setCisAdv(  targetCis);
+		join.setCisAdv(  ACisAdvertisementRecord.convertACisAdvertRecord(targetCis));
 		//org.societies.api.schema.cis.community.Join join = new org.societies.api.schema.cis.community.Join();
 		//List<Qualification> qualifications = new ArrayList<Qualification>();
 		//join.setQualification(qualifications); TODO: GET MEMBERSHIP CRITERIA AND QUERY CONTEXT FOR QUALIFICATIONS FOR JOINING
@@ -399,7 +401,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 
 		//GETFEED OBJECT
 		AddActivity addAct = new AddActivity();
-		addAct.setActivity(activity);
+		addAct.setActivity(AActivity.convertAActivity(activity));
 		//CREATE MESSAGE BEAN
 		org.societies.api.schema.activityfeed.Activityfeed messageBean = new org.societies.api.schema.activityfeed.Activityfeed();
 		messageBean.setAddActivity(addAct);
@@ -628,16 +630,20 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 					//CREATE COMMUNITY RESULT
 					if (communityResult.getCreate() != null) {
 						Log.d(LOG_TAG, "Create CIS Result!");
-						Community cis = communityResult.getCreate().getCommunity();
-						//CONVERT TO PARCEL BEAN
-						Parcelable pCis  = ACommunity.convertCommunity(cis);
-						//NOTIFY CALLING CLIENT
-						intent.putExtra(INTENT_RETURN_VALUE, pCis); 
+						if(communityResult.getCreate().isResult() == true){
+							Community cis = communityResult.getCreate().getCommunity();
+							//CONVERT TO PARCEL BEAN
+							Parcelable pCis  = ACommunity.convertCommunity(cis);
+							//NOTIFY CALLING CLIENT
+							intent.putExtra(INTENT_RETURN_VALUE, pCis); 
+						}
+						intent.putExtra(INTENT_RETURN_BOOLEAN,communityResult.getCreate().isResult());
+						
 					}
 					
 					//LIST COMMUNITIES RESULT
-					else if (communityResult.getDelete() != null) {
-						Log.d(LOG_TAG, "Delete CIS Result!");
+					else if (communityResult.getListResponse() != null) {
+						Log.d(LOG_TAG, "List CIS Result!");
 						List<Community> listReturned = communityResult.getListResponse().getCommunity();
 						//CONVERT TO PARCEL BEANS
 						Parcelable returnArray[] = new Parcelable[listReturned.size()];
@@ -649,6 +655,25 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(INTENT_RETURN_VALUE, returnArray);
 					}
+					
+					//ASK FOR JOIN COMMUNITIES RESULT
+					else if (communityResult.getJoinResponse() != null) {
+						Log.d(LOG_TAG, "JOIN CIS Response!");
+						if(communityResult.getJoinResponse().isResult()){
+							Log.d(LOG_TAG, "JOIN response is true");
+							Community joinedCIS = communityResult.getJoinResponse().getCommunity(); 
+							Parcelable pCis  = ACommunity.convertCommunity(joinedCIS);
+							//NOTIFY CALLING CLIENT
+							intent.putExtra(INTENT_RETURN_VALUE, pCis); 
+						}else{
+							Log.d(LOG_TAG, "JOIN response is false");
+							intent.putExtra(INTENT_RETURN_BOOLEAN, false);
+						}
+					
+						
+					}
+
+					
 				} 
 				// --------- CIS SUBSCRIBED BEAN---------
 				else if(msgBean instanceof CommunityMethods) {

@@ -26,6 +26,7 @@ package org.societies.android.api.cis.directory;
 
 import org.societies.android.api.cis.management.AMembershipCrit;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.cis.community.MembershipCrit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -41,11 +42,11 @@ public class ACisAdvertisementRecord extends CisAdvertisementRecord implements P
 	private static final long serialVersionUID = -7971431315356401469L;
 
 	public AMembershipCrit getMembershipCrit() {
-		return (AMembershipCrit)this.getMembershipCrit();
+		return AMembershipCrit.convertMembershipCrit( this.membershipCrit);
 	}
 	
 	public void setMembershipCrit(AMembershipCrit amembershipCrit) {
-		super.setMembershipCrit(amembershipCrit);
+		this.membershipCrit = (MembershipCrit) amembershipCrit;
 	}
 	
 	public ACisAdvertisementRecord() {
@@ -64,7 +65,9 @@ public class ACisAdvertisementRecord extends CisAdvertisementRecord implements P
 		dest.writeString(this.getName());
 		dest.writeString(this.getPassword());
 		dest.writeString(this.getType());
-		dest.writeParcelable(this.getMembershipCrit(), flags);
+		if (null != this.getMembershipCrit() && null != this.getMembershipCrit().getACriteria() && this.getMembershipCrit().getACriteria().size() > 0){
+			dest.writeParcelable(this.getMembershipCrit(), flags);
+		}
 	}
 	
 	private ACisAdvertisementRecord(Parcel in) {
@@ -73,7 +76,8 @@ public class ACisAdvertisementRecord extends CisAdvertisementRecord implements P
 		this.setName(in.readString());
 		this.setPassword(in.readString());
 		this.setType(in.readString());
-		this.setMembershipCrit((AMembershipCrit) in.readParcelable(this.getClass().getClassLoader()));
+		if(in.dataAvail() >0)
+			this.setMembershipCrit((AMembershipCrit) in.readParcelable(this.getClass().getClassLoader()));
 	}
 
 	public static final Parcelable.Creator<ACisAdvertisementRecord> CREATOR = new Parcelable.Creator<ACisAdvertisementRecord>() {
@@ -93,8 +97,23 @@ public class ACisAdvertisementRecord extends CisAdvertisementRecord implements P
 		arecord.setName(record.getName());
 		arecord.setPassword(record.getPassword());
 		arecord.setType(record.getType());
-		arecord.setMembershipCrit(AMembershipCrit.convertMembershipCrit(record.getMembershipCrit()));
+		if(record.getMembershipCrit()!=null && record.getMembershipCrit().getCriteria() != null && record.getMembershipCrit().getCriteria().isEmpty()== false)
+			arecord.setMembershipCrit(AMembershipCrit.convertMembershipCrit(record.getMembershipCrit()));
 		
 		return arecord;
 	}
+	
+	public static CisAdvertisementRecord convertACisAdvertRecord(ACisAdvertisementRecord arecord) {
+		CisAdvertisementRecord record = new CisAdvertisementRecord();
+		record.setCssownerid(arecord.getCssownerid());
+		record.setId(arecord.getId());
+		record.setName(arecord.getName());
+		record.setPassword(arecord.getPassword());
+		record.setType(arecord.getType());
+		if(arecord.getMembershipCrit()!=null && arecord.getMembershipCrit().getCriteria() != null && arecord.getMembershipCrit().getCriteria().isEmpty()== false)
+			record.setMembershipCrit(AMembershipCrit.convertAMembershipCrit(arecord.getMembershipCrit()));
+		
+		return record;
+	}
+
 }

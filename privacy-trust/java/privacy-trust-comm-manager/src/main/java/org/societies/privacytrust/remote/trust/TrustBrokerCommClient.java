@@ -31,14 +31,14 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.privacytrust.trust.TrustException;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemote;
 import org.societies.api.internal.privacytrust.trust.remote.ITrustBrokerRemoteCallback;
 import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
 import org.societies.api.internal.schema.privacytrust.trust.broker.MethodName;
 import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.remote.PrivacyTrustCommClientCallback;
 
 /**

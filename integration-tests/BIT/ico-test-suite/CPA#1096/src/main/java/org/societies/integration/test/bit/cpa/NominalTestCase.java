@@ -122,6 +122,10 @@ public class NominalTestCase {
             assertNotNull("New CIS is not stored", cisRetrieved);
             assertEquals("New CIS and retrived CIS should be the same but are not", newCis, cisRetrieved);
         }
+        LOG.info("Starting simulation and injection of fake activities..");
+
+
+
         LOG.info("cisIds.size(): "+cisIds.size());
         assert(cisIds.size()==this.numCIS);
     }

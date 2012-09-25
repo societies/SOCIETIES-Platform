@@ -28,31 +28,40 @@ package org.societies.useragent.feedback;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.societies.api.internal.useragent.model.FeedbackRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.useragent.model.FeedbackForm;
 
 public class RequestManager {
 	
-	Queue<FeedbackRequest> requestQueue;
+	Logger LOG = LoggerFactory.getLogger(RequestManager.class);
+	Queue<FeedbackForm> requestQueue;
 
 	public RequestManager(){
-		requestQueue = new LinkedList<FeedbackRequest>();
+		requestQueue = new LinkedList<FeedbackForm>();
 	}
 	
-	public FeedbackRequest getNextRequest(){
-		FeedbackRequest topOfList = requestQueue.element();
-		return null;
+	public FeedbackForm getNextRequest(){
+		FeedbackForm nextForm = null;
+		try{
+			nextForm = requestQueue.element();
+		}catch(Exception e){
+			LOG.debug("The feedback request queue is empty");
+		}
+		return nextForm;
 	}
 	
-	public void addRequest(FeedbackRequest newRequest){
+	public void addRequest(FeedbackForm newRequest){
 		requestQueue.add(newRequest);
 	}
 	
-	public void removeRequest(String requestID){
-		for(FeedbackRequest nextRequest: requestQueue){
-			if(nextRequest.getID().equals(requestID)){
+	public boolean removeRequest(String requestID){
+		for(FeedbackForm nextRequest: requestQueue){
+			if(nextRequest.getID().equals(requestID)){ 
 				requestQueue.remove(nextRequest);
-				break;
+				return true;
 			}
 		}
+		return false;
 	}
 }

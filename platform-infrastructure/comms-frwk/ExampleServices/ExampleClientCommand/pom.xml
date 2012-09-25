@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 	<groupId>org.societies.comm.examples</groupId>
 	<artifactId>ClientCommand</artifactId>

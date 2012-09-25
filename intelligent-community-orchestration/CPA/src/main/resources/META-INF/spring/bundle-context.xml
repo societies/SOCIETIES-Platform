@@ -16,8 +16,8 @@
 		<property name="ignoreResourceNotFound" value="false"></property>
 		<property name="locations">
 			<list>
-			 	<value>classpath:/derby_database.properties</value>
-				<!-- <value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value> -->
+<!--			 	<value>classpath:/derby_database.properties</value>-->
+                <value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
 			</list>
 		</property>	
 	</bean>
@@ -72,7 +72,7 @@
        for integration testing outside of an OSGi environment -->
     <context:annotation-config />
     <tx:annotation-driven />
-   <bean id="CPA" class="org.societies.orchestration.cpa.impl.CPAManager" depends-on="ISuggestedCommunityAnalyser,CISDataCollector"
+   <bean id="cpa" class="org.societies.orchestration.cpa.impl.CPAManager" depends-on="cisDataCollector"
    init-method="init">
        <property name="collector" ref="cisDataCollector" />
        <property name="eventMgr" ref="eventMgr"/>

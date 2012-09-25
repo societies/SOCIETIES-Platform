@@ -1,7 +1,22 @@
 phonegapdesktop.internal.parseConfigFile('pluginjs/cismanager.json');
 
-
 window.plugins.SocietiesLocalCISManager = {
+	connectService: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CISDesktopManagerService', 'connectService'));
+		}
+	},
+	disconnectService: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CISDesktopManagerService', 'disconnectService'));
+		}
+	},
 	createCIS: function(successCallback, failureCallback) {
 		console.log("create CIS desktop invoked");
 		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {
@@ -52,3 +67,49 @@ window.plugins.SocietiesLocalCISManager = {
 		}
 	}
 }
+
+/**
+ * Provides a Helper API to the CIS Manager
+ * 
+ * @namespace SocietiesLocalCISManagerHelper
+ */
+var	SocietiesCISManagerHelper = {
+	/**
+	 * @methodOf SocietiesLocalCISManagerHelper#
+	 * @description Disconnect from CSSManager native service
+	 * @returns null
+	 */
+	disconnectFromLocalCISManager: function() {
+		console.log("Disconnect from LocalCISManager");
+		
+		function success(data) {
+			$.mobile.changePage( ($("#index")), { transition: "fade"} );
+			console.log(data);
+		}
+		
+		function failure(data) {
+			alert("disconnectFromLocalCSSManager - failure: " + data);
+		}
+	    window.plugins.SocietiesLocalCISManager.disconnectService(success, failure);
+	},
+	
+	/**
+	 * @methodOf SocietiesLocalCISManagerHelper#
+	 * @description Connect to CISManager native service
+	 * @param {Object} function to be executed if connection successful
+	 * @returns null
+	 */
+
+	connectToLocalCISManager: function(actionFunction) {
+		console.log("Connect to LocalCISManager");
+			
+		function success(data) {
+			actionFunction();
+		}
+		
+		function failure(data) {
+			alert("connectToLocalCSSManager - failure: " + data);
+		}
+	    window.plugins.SocietiesLocalCISManager.connectService(success, failure);
+	}
+};

@@ -89,6 +89,9 @@ var SocietiesUtility = {
 			
 			console.log("Register Service Management plugin ");
 			cordova.addPlugin("ServiceManagementService", ServiceManagementService);
+			
+			console.log("Register SNS plugin ");
+			cordova.addPlugin("SocialConnectorsService", SocialConnectorsService);
 		});
 		
 		//handle the Android Back button 
@@ -164,6 +167,4 @@ $(document).bind('pageinit',function(){
 	$('#password').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#password')
 	});
-
-
 });

@@ -42,7 +42,7 @@ $(document).bind('pageinit',function(){
 	});
 	
 	$('a#listCommunities').off('click').on('click', function() {
-		SocietiesCISManagerService.ListCIS();
+		SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.ListCIS);
 	});
 	
 	$('a#suggestedCommunities').off('click').on('click', function() {
@@ -51,18 +51,17 @@ $(document).bind('pageinit',function(){
 	
 	$('#btnSearchCommunities').off('click').on('click', function() {
 		var search = $("#search-communities").val();
-		if (search != "Search Communities" && search != "") 
-			SocietiesCISManagerService.searchCisDirectory(search);
+		if (search != "Search Communities" && search != "") { 
+			SocietiesCISManagerHelper.connectToLocalCISManager(function() {
+											SocietiesCISManagerService.searchCisDirectory(search);
+											} 
+									);
+		}
 		else
-			SocietiesCISManagerService.getAllCisDirAds();
+			SocietiesCISManagerHelper.connectToLocalCISManager(SocietiesCISManagerService.getAllCisDirAds);
 	});
 	
 	$('#search-communities').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#search-communities')
 	});
 });
-
-
-
-
-

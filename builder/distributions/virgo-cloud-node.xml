@@ -77,6 +77,8 @@
 		<module>../../platform-infrastructure/sns/FoursquareConnector</module>
 		<module>../../platform-infrastructure/sns/TwitterConnector</module>
 		<module>../../platform-infrastructure/sns/socialdata</module>
+		<module>../../platform-infrastructure/sns/SocialDataComms</module>
+		<module>../../platform-infrastructure/sns/SocialDataCommsMgr</module>
 		
 		<!-- Context Management: 9 bundles (can some be merged?) -->
 		<module>../../context-management</module>
@@ -85,6 +87,9 @@
 
 		<!-- User Agent: 3 bundles (can these be merged?)-->
 		<module>../../user-agent</module>
+
+		<!-- Intelligent Community Orchestration: 2 bundles (can these be merged?)-->
+		<module>../../intelligent-community-orchestration</module>
 
 		<!-- Personalisation: 2 bundles (merge?) -->
 		<module>../../personalisation</module>

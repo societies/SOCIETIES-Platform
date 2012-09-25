@@ -92,6 +92,12 @@ public class CtxAttributeTypes {
 	
     /**
      * 
+     * @since 0.4
+     */
+    public static final String AFFILIATION = "affiliation";
+    
+    /**
+     * 
      * @since 0.0.8
      */
     public static final String BIRTHDAY = "birthday";
@@ -265,7 +271,5 @@ public class CtxAttributeTypes {
      * To be moved in internal API
      */
     @Deprecated
-    public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";
-
-    
+    public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";   
 }

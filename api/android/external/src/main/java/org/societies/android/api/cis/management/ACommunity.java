@@ -45,7 +45,7 @@ public class ACommunity extends Community implements Parcelable {
 	}
 	
 	public void setMembershipCrit(AMembershipCrit amembershipCrit) {
-		this.membershipCrit = (MembershipCrit) amembershipCrit;
+		super.setMembershipCrit(amembershipCrit);
 	}
 	
 	public ACommunity() {

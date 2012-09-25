@@ -24,7 +24,7 @@ var Societies3PServices = {
 
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#" onclick="Societies3PServices.showDetails(' + i + ')"><img src="../images/printer_icon.png" class="profile_list" alt="logo" >' +
+				var tableEntry = '<li><a href="#" onclick="Societies3PServices.showDetails(' + i + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
 					'<h2>' + data[i].serviceName + '</h2>' + 
 					'<p>' + data[i].serviceDescription + '</p>' + 
 					'</a></li>';
@@ -61,8 +61,8 @@ var Societies3PServices = {
 
 			//DISPLAY SERVICES
 			for (i  = 0; i < data.length; i++) {
-				//var tableEntry = '<li><a href="#localapp-item?pos=' + i + '"><img src="' + data[i].icon + '" class="profile_list" alt="logo" >' +
 				var tableEntry = '<li><a href="#" data-rel="dialog" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">' +
+									'<img src="' + data[i].icon + '" class="profile_list" alt="logo" >' + 
 									'<h2>' + data[i].applicationName + '</h2>' + 
 									'<p>' + data[i].packageName + '</p></a>' +  
 									//'<a href="#" data-rel="dialog" data-transition="fade" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">Launch</a>' +
@@ -80,16 +80,16 @@ var Societies3PServices = {
 	},
 	
 	startActivity: function (appName, packageName) {
-		function success(data) {			
-			window.alert("started");
+		function success(data) {
+			window.plugins.SocietiesCoreServiceMonitor.startActivity(packageName, failure);
 		}
 		
 		function failure(data) {
-			alert("failed");
+			window.alert("Failed to start application!");
 		}
 		
 		if(window.confirm("Launch " + appName + "?"))
-			window.plugins.SocietiesCoreServiceMonitor.startActivity(packageName, success, failure);
+			SocietiesCoreServiceMonitorHelper.connectToCoreServiceMonitor(success);
 	},
 	
 	startStopService: function () {
@@ -139,39 +139,8 @@ var Societies3PServices = {
  */
 $(document).bind('pageinit',function(){
 
-	console.log("pageinit: Active Services jQuery calls");
-	
 	$("input#start_stop").off('click').on('click', function(e){
 		ServiceManagementServiceHelper.connectToServiceManagement(Societies3PServices.refresh3PServices);
 	});
-	
-	
-	//Listen for any attempts to call changePage().
-	/*
-	$(document).bind( "pagebeforechange", function( e, data ) {
-	
-		// We only want to handle changePage() calls where the caller is
-		// asking us to load a page by URL.
-		if ( typeof data.toPage === "string" ) {
-	
-			// We are being asked to load a page by URL, but we only
-			// want to handle URLs that request the data for a specific
-			// category.
-			var u = $.mobile.path.parseUrl( data.toPage ),
-				re = /^#category-item/;
-	
-			if ( u.hash.search(re) !== -1 ) {
-				// We're being asked to display the items for a specific category.
-				// Call our internal method that builds the content for the category
-				// on the fly based on our in-memory category data structure.
-				Societies3PServices.showCategory( u, data.options );
-	
-				// Make sure to tell changePage() we've handled this call so it doesn't
-				// have to do anything.
-				e.preventDefault();
-			}
-		}
-	});
-	*/
 	
 });

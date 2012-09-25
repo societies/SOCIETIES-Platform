@@ -11,14 +11,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.orchestration.ICPA;
+import org.societies.api.internal.orchestration.ICisDataCollector;
 import org.societies.integration.test.IntegrationTestCase;
-import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
 public class TestCase1096 extends IntegrationTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1096.class);
     public static ICisManager cisManager;
-    public static ISuggestedCommunityAnalyser SCA;
     public static ICommManager commManager;
+    public static ICPA cpa;
+    public static ICisDataCollector cisDataCollector;
 	/**
 	 * Privacy Log Appender (injected)
 	 */
@@ -33,14 +35,29 @@ public class TestCase1096 extends IntegrationTestCase {
 		NominalTestCase.testCaseNumber = testCaseNumber;
 	}
 
+
+    public void setCisDataCollector(ICisDataCollector cisDataCollector) {
+        LOG.debug("[TEST CASE #"+testCaseNumber+"] setCollector()");
+        TestCase1096.cisDataCollector = cisDataCollector;
+    }
+
+    public void setCpa(ICPA cpa) {
+        LOG.debug("[TEST CASE #"+testCaseNumber+"] setCpa()");
+        TestCase1096.cpa = cpa;
+    }
+
     public void setCommManager(ICommManager commManager) {
+        LOG.debug("[TEST CASE #"+testCaseNumber+"] setCommManager()");
         this.commManager = commManager;
     }
 
 
     public  void setCisManager(ICisManager cisManager) {
-        LOG.debug("[#"+testCaseNumber+"] setCisManager()");
+        LOG.debug("[TEST CASE #"+testCaseNumber+"] setCisManager()");
         this.cisManager = cisManager;
+    }
+    public void destroy(){
+
     }
 
 	

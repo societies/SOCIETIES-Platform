@@ -30,57 +30,119 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @namespace SocietiesLocalCISManager
  */
 var	SocietiesLocalCISManager = {
-		/**
-		 * @methodOf Societies.LocalCISManagerService#
-		 * @description create a CIS
-		 * @param {Object} successCallback The callback which will be called when result is successful
-		 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-		 * @returns CIS record
-		 */
-		createCIS: function(successCallback, failureCallback) {
-			var clientPackage = "org.societies.android.platform.gui";
-			
-			var cisRecord = {
-                    "cisName": jQuery("#cisNameOnCisCreate").val(),
-                    "cisType": jQuery("#cisCategoryOnCisCreate").val(),
-                    "cisCriteria": [{
-                        "attribute": "location",
-                        "operation": "equals",
-                        "value": "Paris"}],
-                    "cisDescription": jQuery("#cisDescOnCisCreate").val(),
-                    "cisJid" : null
-                    };
+	/**
+	 * @methodOf SocietiesLocalCISManager#
+	 * @description Connects the GUI to native service implementation
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns null
+	 */
+	connectService: function(successCallback, failureCallback) {
+		console.log("Call LocalCISManagerService - connectService");
 
-			console.log("Call LocalCISManagerService - createCIS with cisRecod = ");// + cisRecord.cisName);
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+		'connectService',          //Telling the plugin, which action we want to perform
+		[]);        //Passing a list of arguments to the plugin
+	},
 
+	/**
+	 * @methodOf SocietiesLocalCISManager#
+	 * @description Disconnects the GUI to native service implementation
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns null
+	 */
+	disconnectService: function(successCallback, failureCallback) {
+		console.log("Call LocalCISManagerService - disconnectService");
 
-			return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-					failureCallback,     //Callback which will be called when plugin action encounters an error
-					'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
-					'createCIS',          //Telling the plugin, which action we want to perform
-					[cisRecord]);        //Passing a list of arguments to the plugin
-		},
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+		'disconnectService',          //Telling the plugin, which action we want to perform
+		[]);        //Passing a list of arguments to the plugin
+	},
+
+	/**
+	 * @methodOf Societies.LocalCISManagerService#
+	 * @description create a CIS
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns CIS record
+	 */
+	createCIS: function(successCallback, failureCallback) {
+		var clientPackage = "org.societies.android.platform.gui";
 		
+		var cisRecord = {
+                "cisName": jQuery("#cisNameOnCisCreate").val(),
+                "cisType": jQuery("#cisCategoryOnCisCreate").val(),
+                "cisCriteria": [{
+                    "attribute": "location",
+                    "operation": "equals",
+                    "value": "Paris"}],
+                "cisDescription": jQuery("#cisDescOnCisCreate").val(),
+                "cisJid" : null
+                };
+
+		console.log("Call LocalCISManagerService - createCIS with cisRecod = ");// + cisRecord.cisName);
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+				'createCIS',          //Telling the plugin, which action we want to perform
+				[cisRecord]);        //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf Societies.LocalCISManagerService#
+	 * @description list CISs
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 * @returns CIS record array
+	 */
+	listCIS: function(successCallback, failureCallback) {
+		console.log("Call LocalCISManagerService - listCIS");
+		var client = "org.societies.android.platform.gui";
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+				'listCIS',          //Telling the plugin, which action we want to perform
+				[client]);        //Passing a list of arguments to the plugin
+	},
+	
+	findForAllCis: function(searchTerm, successCallback, failureCallback) {
+		console.log("findForAllCis invoked");
+		var client = "org.societies.android.platform.gui";
 		
-		/**
-		 * @methodOf Societies.LocalCISManagerService#
-		 * @description list CISs
-		 * @param {Object} successCallback The callback which will be called when result is successful
-		 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
-		 * @returns CIS record array
-		 */
-		listCIS: function(successCallback, failureCallback) {
-			var clientPackage = "org.societies.android.platform.gui";
-
-
-			console.log("Call LocalCISManagerService - listCIS");
-
-
-			return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
-					failureCallback,     //Callback which will be called when plugin action encounters an error
-					'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
-					'listCIS',          //Telling the plugin, which action we want to perform
-					[]);        //Passing a list of arguments to the plugin
-		}
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+				'findForAllCis',          //Telling the plugin, which action we want to perform
+				[client, searchTerm]);        //Passing a list of arguments to the plugin
+	},
+	
+	findAllCisAdvertisementRecords: function(successCallback, failureCallback) {
+		console.log("findAllCisAdvertisementRecords desktop invoked");
+		var client = "org.societies.android.platform.gui";
 		
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+				'findAllCisAdvertisementRecords',          //Telling the plugin, which action we want to perform
+				[client]);        //Passing a list of arguments to the plugin
+	},
+	
+	joinCis: function(cis_id, successCallback, failureCallback) {
+		console.log("joinCis desktop invoked");
+		var client = "org.societies.android.platform.gui";
+		
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+				failureCallback,     //Callback which will be called when plugin action encounters an error
+				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+				'joinCis',          //Telling the plugin, which action we want to perform
+				[client, cis_id]);        //Passing a list of arguments to the plugin
+	}
+	
 };

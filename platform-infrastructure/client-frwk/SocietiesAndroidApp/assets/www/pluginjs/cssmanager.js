@@ -90,6 +90,38 @@ window.plugins.SocietiesLocalCSSManager = {
 			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'readProfile'));
 		}
 	},
+	getSuggestedFriends: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'listAdvertisementRecords'));
+		}
+	},
+	sendFriendRequest: function(css_id, successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'readProfile'));
+		}
+	},
+	findForAllCss: function(searchTerm, successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'listAdvertisementRecords'));
+		}
+	},
+	findAllCssAdvertisementRecords: function(successCallback, errorCallback){
+		if (phonegapdesktop.internal.randomException("CssManagerService")) {
+			errorCallback('A random error was generated');
+		}
+		else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'listAdvertisementRecords'));
+		}
+	}
 }
 
 /**

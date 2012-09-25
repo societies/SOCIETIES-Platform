@@ -61,7 +61,6 @@
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
-			<version>2.6.6</version>
 			<exclusions>
 				<!-- StAX is not available on Android -->
 				<exclusion>
@@ -103,12 +102,12 @@
     		<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>
-		<!--dependency>
+		<dependency>
 		   <groupId>org.societies.android.platform</groupId>
-		   <artifactId>socialprovider-light</artifactId>
+		   <artifactId>SocietiesAndroidSocialData</artifactId>
 		   <version>${release.version}</version> 
 		   <type>apklib</type>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>org.societies.android</groupId>
 			<artifactId>privacytrust</artifactId>
@@ -118,7 +117,6 @@
     	<dependency>
     		<groupId>com.google.code.gson</groupId>
         	<artifactId>gson</artifactId>
-			<version>2.1</version>
         	<scope>compile</scope>
 		</dependency>   
     </dependencies>

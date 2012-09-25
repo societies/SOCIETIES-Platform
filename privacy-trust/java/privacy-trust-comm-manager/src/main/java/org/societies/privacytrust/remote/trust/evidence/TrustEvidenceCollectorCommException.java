@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.remote.trust.evidence;
 
-import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustException;
 
 /**
  * Thrown to indicate that the Trust Evidence Collector could not handle a

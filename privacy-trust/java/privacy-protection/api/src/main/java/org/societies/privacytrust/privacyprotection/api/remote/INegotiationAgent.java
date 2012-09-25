@@ -32,6 +32,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 
 
 /**
+ * This interface is for use during the communication. It is not to be implemented or consumed (defined in a bean)
  * @author Eliza
  * @version 1.0
  * @created 11-Nov-2011 18:55:01

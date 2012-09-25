@@ -52,6 +52,7 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInter
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
+import org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgentRemote;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.NegotiationClient;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.provider.PolicyRetriever;
 
@@ -78,7 +79,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	private IPrivacyAgreementManagerInternal privacyAgreementManagerInternal;
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
-	private INegotiationAgent negotiationAgent;
+	private INegotiationAgentRemote negotiationAgent;
 	
 	private IIdentitySelection identitySelection;
 	
@@ -177,13 +178,13 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	/**
 	 * @return the negotiationAgent
 	 */
-	public INegotiationAgent getNegotiationAgent() {
+	public INegotiationAgentRemote getNegotiationAgent() {
 		return negotiationAgent;
 	}
 	/**
 	 * @param negotiationAgent the negotiationAgent to set
 	 */
-	public void setNegotiationAgent(INegotiationAgent negotiationAgent) {
+	public void setNegotiationAgent(INegotiationAgentRemote negotiationAgent) {
 		this.negotiationAgent = negotiationAgent;
 	}
 	/**

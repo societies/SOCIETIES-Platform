@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.xml.bind.JAXBException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
@@ -42,7 +44,13 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.schema.activity.Activity;
+import org.societies.api.activity.IActivityFeed;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -77,7 +85,7 @@ import org.societies.api.cis.management.ICisOwned;
  * This class provides examples for using the internal Context Broker in OSGi. 
  */
 @Service
-public class CtxBrokerExample 	{
+public class CtxBrokerExample implements Subscriber{
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerExample.class);
@@ -85,7 +93,10 @@ public class CtxBrokerExample 	{
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
 	private ICommManager commMgrService;
-	
+	private ICisManager cisManager;
+	//private IActivityFeed activityFeed;
+	private PubsubClient pubsubClient;
+
 	private IIdentity cisID;
 	private IIdentity cssOwnerId;
 	private IIdentity cssID1; 
@@ -101,35 +112,6 @@ public class CtxBrokerExample 	{
 
 	private INetworkNode cssNodeId;
 
-	private String privacyPolicyWithoutRequestor  = "<RequestPolicy>" +
-			"<Target>" +
-			"<Resource>" +
-			"<Attribute AttributeId=\"contextType\" DataType=\"http://www.w3.org/2001/XMLSchema#string\">" +
-			"<AttributeValue>fdsfsf</AttributeValue>" +
-			"</Attribute>" +
-			"</Resource>" +
-			"<Action>" +
-			"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">" +
-			"<AttributeValue>WRITE</AttributeValue>" +
-			"</Attribute>" +
-			"<optional>false</optional>" +
-			"</Action>" +
-			"<Condition>" +
-			"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
-			"<AttributeValue DataType=\"SHARE_WITH_3RD_PARTIES\">dfsdf</AttributeValue>" +
-			"</Attribute>" +
-			"<optional>true</optional>" +
-			"</Condition>" +
-			"<Condition>" +
-			"<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">" +
-			"<AttributeValue DataType=\"DATA_RETENTION_IN_MINUTES\">412</AttributeValue>" +
-			"</Attribute>" +
-			"<optional>true</optional>" +
-			"</Condition>" +
-			"<optional>false</optional>" +
-			"</Target>" +
-			"</RequestPolicy>";
-
 	String cssPassword = "password.societies.local";
 
 
@@ -138,16 +120,22 @@ public class CtxBrokerExample 	{
 	private CtxIdentifier ctxAttributeBinaryIdentifier = null;
 
 	@Autowired(required=true)
-	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr, ICisManager cisManager) throws InvalidFormatException {
+	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr, ICisManager cisManager,PubsubClient pubsubClient) throws InvalidFormatException {
 
 		LOG.info("*** CtxBrokerExample instantiated "+this.internalCtxBroker);
-		
+
 		this.internalCtxBroker = internalCtxBroker;
 		LOG.info("*** CtxBroker service "+this.internalCtxBroker);
-		
+
 		this.commMgrService = commMgr;
 		LOG.info("*** commMgrService instantiated "+this.commMgrService);
-		
+
+		this.cisManager = cisManager;
+		LOG.info("*** cisManager instantiated "+this.cisManager);
+
+		this.pubsubClient = pubsubClient;
+		LOG.info("*** pubsubClient instantiated "+this.cisManager);
+
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
 
@@ -194,6 +182,34 @@ public class CtxBrokerExample 	{
 		LOG.info("*** cisManager this.cisID " +this.cisID.toString());
 		LOG.info("*** cisManager this.cisID type " +this.cisID.getType());
 
+
+		// subscribe with activity feed		
+		List<String> packageList = new ArrayList<String>();
+		packageList.add("org.societies.api.schema.activity"); 
+
+		try {
+			this.pubsubClient.addJaxbPackages(packageList);
+
+		} catch (JAXBException e) {
+			LOG.warn("Jaxb exception when trying to add packages to pubsub");
+			e.printStackTrace();
+		}
+
+		try {
+			LOG.info("*** subscribe with cisManager");
+			this.pubsubClient.subscriberSubscribe(this.commMgrService.getIdManager().fromJid(cssOwnerStr), cisOwned.getCisId() , this);
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 		LOG.info("*** Starting  individual context examples...");
 		this.retrieveIndividualEntity();
 		this.retrieveCssNode();
@@ -204,6 +220,7 @@ public class CtxBrokerExample 	{
 		this.simpleCtxHistoryTest();
 		this.tuplesCtxHistoryTest();
 		//this.triggerInferenceTest();
+		this.cisManagerEventsTest();
 
 		LOG.info("*** Starting community context examples...");
 		// community context tests
@@ -216,24 +233,32 @@ public class CtxBrokerExample 	{
 	}
 
 
+	private void cisManagerEventsTest(){
+		//cisManager.joinRemoteCIS(adv, callback)
+		//this.cisManager.
+
+
+	}
+
+
 	private void lookupCommunityEntAttributes(){
-		
+
 		CtxEntityIdentifier ctxCommunityEntityIdentifier;
 		try {
 			ctxCommunityEntityIdentifier = this.internalCtxBroker.retrieveCommunityEntityId(this.cisID).get();
 			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
-			
+
 			List<CtxIdentifier> communityAttrIDList = this.internalCtxBroker.lookup(ctxCommunityEntityIdentifier, CtxModelType.ATTRIBUTE, "ctxCommunityAttribute").get();
 			LOG.info("communityAttrIDList"+ communityAttrIDList);		
-			
+
 			if(communityAttrIDList.size()>0 ){
 				CtxIdentifier communityAttrID = communityAttrIDList.get(0);
 				LOG.info("communityAttrIDList"+ communityAttrID);
 				CtxAttribute communityAttr = (CtxAttribute) this.internalCtxBroker.retrieve(communityAttrID).get();
 				LOG.info("communityAttr value:"+communityAttr.getStringValue());
-			
+
 			}
-			
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -244,26 +269,26 @@ public class CtxBrokerExample 	{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-			
+
 	}
-	
-	
+
+
 	private void retrieveCommunityEntityBasedOnCisID(){
 		try {
 			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.internalCtxBroker.retrieveCommunityEntityId(this.cisID).get();
 			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
-			
+
 			CtxEntity communityEntity = (CtxEntity) this.internalCtxBroker.retrieve(ctxCommunityEntityIdentifier).get();
-			
+
 			final IIdentity communityEntityId = this.commMgrService.getIdManager().fromJid(communityEntity.getOwnerId());
-			
+
 			if (IdentityType.CIS.equals(communityEntityId.getType())){
 				LOG.info("entity retrieved is a community entity with jid "+ communityEntityId.toString());
-			
+
 				//TODO add communityEntity.getAttributes(); code
-			
+
 			}
-	
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -291,8 +316,8 @@ public class CtxBrokerExample 	{
 
 			LOG.info(" BEFORE UPDATE communityEnt.getID():  " +this.communityEntity.getId());
 			LOG.info(" BEFORE UPDATE communityEnt.getMembers():  " +this.communityEntity.getMembers());
-	
-			
+
+
 			//	create and add bonds
 			CtxAttributeBond attributeLocationBond = new CtxAttributeBond(CtxAttributeTypes.LOCATION_SYMBOLIC, CtxBondOriginType.MANUALLY_SET);
 			attributeLocationBond.setMinValue("Athens_Greece");
@@ -308,7 +333,7 @@ public class CtxBrokerExample 	{
 			this.communityEntity.addBond(attributeLocationBond);
 			this.communityEntity.addBond(attributeAgeBond);
 
-						
+
 			this.internalCtxBroker.update(this.communityEntity).get();
 
 			CommunityCtxEntity communityEnt = (CommunityCtxEntity) this.internalCtxBroker.retrieve(this.communityEntity.getId()).get();
@@ -422,11 +447,11 @@ public class CtxBrokerExample 	{
 
 			CtxAttribute books = this.internalCtxBroker.createAttribute(operator.getId(), CtxAttributeTypes.BOOKS).get();
 			books.setStringValue("Miserables");
-			
+
 			this.internalCtxBroker.update(books);
-			
+
 			final IndividualCtxEntity operator2 = this.internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
-			
+
 			Set<CtxAttribute> attributesBooks = operator2.getAttributes(CtxAttributeTypes.BOOKS);
 			if(attributesBooks.size()>0){
 				for(CtxAttribute ctxAttr : attributesBooks){
@@ -440,7 +465,7 @@ public class CtxBrokerExample 	{
 					LOG.info("ALL CtxAttribute  id:"+ctxAttr.getId()) ;
 				}	
 			}
-			
+
 		} catch (Exception e) {
 
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
@@ -878,5 +903,14 @@ public class CtxBrokerExample 	{
 		}
 	}
 
+	@Override
+	public void pubsubEvent(IIdentity pubsubService, String node,
+			String itemId, Object item) {
+
+		if(item.getClass().equals(org.societies.api.schema.activity.Activity.class)){
+			Activity a = (Activity)item;
+			LOG.info("*************************** pubsubevent with acitvity " + a.getActor() + " " +a.getVerb());
+		}
+	}
 
 }

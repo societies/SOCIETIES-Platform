@@ -75,12 +75,13 @@ var	SocietiesLocalCSSManager = {
 
 	readProfile: function(successCallback, failureCallback) {
 		console.log("Call LocalCSSManagerService - readProfile");
+		var client = "org.societies.android.platform.gui";
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
 		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
 		'readCSSRecord',          //Telling the plugin, which action we want to perform
-		[]);        //Passing a list of arguments to the plugin
+		[client]);        //Passing a list of arguments to the plugin
 	},
 	
 	/**
@@ -257,7 +258,6 @@ var	SocietiesLocalCSSManager = {
 	 * @param {Object} successCallback The callback which will be called when result is successful
 	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
 	 */
-
 	logoutXMPPServer: function(successCallback, failureCallback) {
 		var client = "org.societies.android.platform.gui";
 		console.log("Call LocalCSSManagerService - logoutXMPPServer");
@@ -267,7 +267,151 @@ var	SocietiesLocalCSSManager = {
 		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
 		'logoutXMPPServer',          //Telling the plugin, which action we want to perform
 		[client]);        //Passing a list of arguments to the plugin
+	},
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Modify the CSS record user profile details
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 */
+
+	modifyAndroidCSSRecord: function(successCallback, failureCallback, data) {
+		var client = "org.societies.android.platform.gui";
+		console.log("Call LocalCSSManagerService - modifyAndroidCSSRecord");
+
+		var cssRecord = {
+	  			"archiveCSSNodes": [],
+                "cssIdentity": null,
+                "cssInactivation": null,
+                "cssNodes": [],
+                "cssRegistration": null,
+                "cssHostingLocation" : null,
+                "domainServer" : null,
+                "cssUpTime": 0,
+                "emailID": data.emailID,
+                "entity": data.entity,
+                "foreName": data.foreName,
+                "homeLocation": null,
+                "identityName": data.identityName,
+                "imID": data.imID,
+                "name": data.name,
+                "password": null,
+                "presence": 0,
+                "sex": data.sex,
+                "socialURI": data.socialURI,
+                "status": 0
+	            }
+
+                return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+                failureCallback,     //Callback which will be called when plugin action encounters an error
+                'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+                'modifyAndroidCSSRecord',          //Telling the plugin, which action we want to perform
+                [client, cssRecord]);        //Passing a list of arguments to the plugin
+
+	},	
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Retrieves list of current friends
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 */
+	getMyFriendsList: function(successCallback, failureCallback) {
+		var client = "org.societies.android.platform.gui";
+		console.log("Call LocalCSSManagerService - getMyFriendsList");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'getCssFriends',          //Telling the plugin, which action we want to perform
+		[client]);        //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Reads CSS Record on other CSS's cloud
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 */
+	readRemoteCSSProfile: function(css_id, successCallback, failureCallback) {
+		var client = "org.societies.android.platform.gui";
+		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'readCssRecordRemote',          //Telling the plugin, which action we want to perform
+		[client, css_id]);        //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Retrieves list of friend suggestions
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 */
+	getSuggestedFriends: function(successCallback, failureCallback) {
+		var client = "org.societies.android.platform.gui";
+		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'getSuggestedFriends',          //Telling the plugin, which action we want to perform
+		[client]);        //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Retrieves list of friend suggestions
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 */
+	sendFriendRequest: function(css_id, successCallback, failureCallback) {
+		var client = "org.societies.android.platform.gui";
+		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'sendFriendRequest', //Telling the plugin, which action we want to perform
+		[client, css_id]);   //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Retrieves list of friend suggestions
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 */
+	findForAllCss: function(searchTerm, successCallback, failureCallback) {
+		var client = "org.societies.android.platform.gui";
+		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'findForAllCss', //Telling the plugin, which action we want to perform
+		[client, searchTerm]);   //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Retrieves list of friend suggestions
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 */
+	findAllCssAdvertisementRecords: function(successCallback, failureCallback) {
+		var client = "org.societies.android.platform.gui";
+		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'findAllCssAdvertisementRecords', //Telling the plugin, which action we want to perform
+		[client]);   //Passing a list of arguments to the plugin
 	}
+	
+	
 };
 
 /**
