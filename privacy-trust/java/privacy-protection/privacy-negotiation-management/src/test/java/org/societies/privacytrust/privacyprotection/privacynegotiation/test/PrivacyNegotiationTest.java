@@ -154,7 +154,7 @@ public class PrivacyNegotiationTest {
 		this.negotiationMgr.setPrefMgr(prefMgr);
 		this.negotiationMgr.setPrivacyDataManagerInternal(privacyDataManager);
 		this.negotiationMgr.setPrivacyAgreementManagerInternal(policyAgreementMgr );
-		this.negotiationMgr.setNegotiationAgent(negAgent);
+		this.negotiationMgr.setNegotiationAgentRemote(negAgent);
 		this.negotiationMgr.setPrivacyPreferenceManager(privacyPreferenceManager);
 		this.negotiationMgr.setPrivacyPolicyManager(privacyPolicyManager);
 		this.setupMockito();

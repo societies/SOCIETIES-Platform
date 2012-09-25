@@ -24,7 +24,6 @@
  */
 package org.societies.privacytrust.privacyprotection.api.remote;
 
-//TODO : temporary mock package import to solve missing package in API folder
 
 import java.util.concurrent.Future;
 
@@ -33,7 +32,6 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 /**
  * @author Eliza
  * @version 1.0

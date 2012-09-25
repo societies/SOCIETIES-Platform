@@ -112,8 +112,7 @@
 		<property name="commsMgr" ref="commManager" />
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
 		<property name="privacyAgreementManagerInternal" ref="privacyAgreementManagerInternal" />
-		<!-- <property name="negotiationAgentRemote" ref="negotiationAgentRemote"></property> -->
-		<property name="negotiationAgent" ref="negotiationAgentRemote" />
+		<property name="negotiationAgentRemote" ref="negotiationAgentRemote" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 		<property name="identitySelection" ref="identitySelection" />
 		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
