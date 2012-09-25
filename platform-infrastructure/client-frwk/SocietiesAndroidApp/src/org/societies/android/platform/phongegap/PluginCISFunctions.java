@@ -43,12 +43,10 @@ import org.societies.android.api.cis.management.AParticipant;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
-import org.societies.android.api.servicelifecycle.AService;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.cis.CisDirectoryRemote;
 import org.societies.android.platform.cis.CommunityManagement;
 import org.societies.android.platform.cis.CommunityManagement.LocalBinder;
-import org.societies.android.platform.servicemonitor.ServiceManagement;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -157,7 +155,7 @@ public class PluginCISFunctions extends Plugin {
         
         public void onServiceDisconnected(ComponentName name) {
         	Log.d(LOG_TAG, "Disconnecting from ICisDirectory service");
-        	serviceCISsubscribeConnected = false;
+        	serviceCISdirConnected = false;
         }
     };
     
@@ -168,10 +166,12 @@ public class PluginCISFunctions extends Plugin {
     	//CREATE INTENT FOR EACH SERVICE
     	Intent intentCisManager = new Intent(this.ctx.getContext(), CommunityManagement.class);
     	Intent intentCisSubscribe = new Intent(this.ctx.getContext(), CommunityManagement.class);
+    	Intent intentCisDir = new Intent(this.ctx.getContext(), CisDirectoryRemote.class);
     	
     	//BIND TO SERVICES
     	this.ctx.getContext().bindService(intentCisManager, cisManagerConnection, Context.BIND_AUTO_CREATE);
     	this.ctx.getContext().bindService(intentCisSubscribe, cisSubscribeConnection, Context.BIND_AUTO_CREATE);
+    	this.ctx.getContext().bindService(intentCisDir, cisDirConnection, Context.BIND_AUTO_CREATE);
     	
     	//REGISTER BROADCAST
     	//CIS MANAGER
@@ -467,8 +467,9 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					
 					//unmarshall intent
-					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
-					Boolean deleted = Boolean.parseBoolean(parcel.toString());
+					//Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					//Boolean deleted = Boolean.parseBoolean(parcel.toString());
+					Boolean deleted = intent.getBooleanExtra(CommunityManagement.INTENT_RETURN_VALUE, true);
 					//RETURN A JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, deleted);
 					result.setKeepCallback(false);
@@ -576,8 +577,9 @@ public class PluginCISFunctions extends Plugin {
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					
 					//unmarshall intent
-					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
-					Boolean deleted = Boolean.parseBoolean(parcel.toString());
+					//Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					//Boolean deleted = Boolean.parseBoolean(parcel.toString());
+					boolean deleted = intent.getBooleanExtra(CommunityManagement.INTENT_RETURN_VALUE, true);
 					//RETURN A JSON OBJECT
 					PluginResult result = new PluginResult(PluginResult.Status.OK, deleted);
 					result.setKeepCallback(false);
@@ -744,15 +746,21 @@ public class PluginCISFunctions extends Plugin {
      */
     private boolean validRemoteCall(String action) {
     	boolean retValue = false;
-    	//CHECK IServiceDisovery METHODS
+    	//CHECK ICisManager METHODS
     	for (int i = 0; i < ICisManager.methodsArray.length; i++) {
         	if (action.equals(ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, i))) {
         		return true;
         	}
     	}
-    	//CHECK ICoreServiceMonitor METHODS
+    	//CHECK ICisSubscribed METHODS
     	for (int i = 0; i < ICisSubscribed.methodsArray.length; i++) {
         	if (action.equals(ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, i))) {
+        		return true;
+        	}
+    	}
+    	//CHECK ICisDirectory METHODS
+    	for (int i = 0; i < ICisDirectory.methodsArray.length; i++) {
+        	if (action.equals(ServiceMethodTranslator.getMethodName(ICisDirectory.methodsArray, i))) {
         		return true;
         	}
     	}

@@ -257,9 +257,11 @@ public class PluginSNConnector extends Plugin {
 				
 				String methodCallbackId = PluginSNConnector.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
-					//unmarshall intent extra
-					Parcelable parcel =  intent.getParcelableExtra(ISocialTokenManager.EXTRA_EXPIRES);
-					PluginResult result = new PluginResult(PluginResult.Status.OK, parcel.toString());
+					//UNMARSHALL RETURN VALUES
+					String token = intent.getStringExtra(SocialTokenManager.INTENT_RETURN_KEY);
+					String expires = intent.getStringExtra(SocialTokenManager.EXTRA_EXPIRES);
+					
+					PluginResult result = new PluginResult(PluginResult.Status.OK, expires);
 					result.setKeepCallback(false);
 					PluginSNConnector.this.success(result, methodCallbackId);
 					

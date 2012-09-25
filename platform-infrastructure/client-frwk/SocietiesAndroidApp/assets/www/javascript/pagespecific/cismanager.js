@@ -72,7 +72,7 @@ var	SocietiesCISManagerService = {
 		}
 		
 		function failure(data) {
-			alert("createCIS - failure: " + data);
+			alert("ListCIS - failure: " + data);
 		}
 		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
 				window.plugins.SocietiesLocalCISManager.listCIS(success, failure); } );
