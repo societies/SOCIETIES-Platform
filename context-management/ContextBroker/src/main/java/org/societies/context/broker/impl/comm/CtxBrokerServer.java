@@ -370,6 +370,9 @@ public class CtxBrokerServer implements IFeatureServer{
 			
 				CtxIdentifierBean ctxIdentBean = ctxBeanTranslator4.fromCtxIdentifier(entID);
 				LOG.info("identifier converted to bean :  "+ctxIdentBean.toString() );
+	
+				//check if id or object are returned
+				
 				
 				beanResponse.setRetrieveIndividualEntityIdBeanResult(ctxIdentBean);
 				

@@ -67,8 +67,8 @@ public class CtxBrokerExampleRemote 	{
 		this.commMgrService = commMgr;
 
 		
-		LOG.info("remote retrieve of indi entity ");
-		this.ca3pService.retrieveRemoteIndiEntity();
+		//LOG.info("remote retrieve of indi entity ");
+		//this.ca3pService.retrieveRemoteIndiEntity();
 		
 		
 		CtxEntity remoteEntity = this.ca3pService.createRemoteCtxEntity("remoteEntityType");

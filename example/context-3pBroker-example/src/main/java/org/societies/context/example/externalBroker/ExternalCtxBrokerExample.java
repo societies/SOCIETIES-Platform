@@ -229,10 +229,7 @@ public class ExternalCtxBrokerExample 	{
 			e.printStackTrace();
 		}
 
-
-
 	}
 
-	
 	
 }
