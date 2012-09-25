@@ -3,9 +3,9 @@
 	<div id="userfeedback">
 		<h1>
 			Notification box
-			<a href="#" class="ufeedbackPoolingRefresh" title="Check now if there is new notification">Refresh</a>
-			<a class="ufeedbackPoolingStartStop stop" title="Start / Stop notifications">Stop</a>
 		</h1>
+		<a href="#" class="ufeedbackPoolingRefresh" title="Check now if there is new notification">Refresh</a>
+		<a class="ufeedbackPoolingStartStop stop" title="Start / Stop notification pooling">Stop</a>
 		<div id="ufeedbackNotifications"></div>
 	</div>
 	<table border="0" >
