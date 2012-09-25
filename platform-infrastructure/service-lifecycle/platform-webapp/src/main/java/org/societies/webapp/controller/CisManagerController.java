@@ -192,16 +192,19 @@ public class CisManagerController {
 				res = "Creating CIS...";
 
 				// -- Retrieve CIS Configuration
-				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
-				MembershipCriteria m = new MembershipCriteria();
-				try{
-					Rule r = new Rule(cisForm.getOperator(),new ArrayList(Arrays.asList(cisForm.getValue())));
-					m.setRule(r);
-					cisCriteria.put(cisForm.getAttribute(), m);
-					LOG.info("Membership criteria rule #1: "+ cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue());
-				}
-				catch(InvalidParameterException e){
-					throw new Exception(" excepation of invalid param " + cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue());
+				Hashtable<String, MembershipCriteria> cisCriteria = null;
+				if(cisForm.getValue().isEmpty() == false){
+					cisCriteria = new Hashtable<String, MembershipCriteria> (); 
+					MembershipCriteria m = new MembershipCriteria();
+					try{
+						Rule r = new Rule(cisForm.getOperator(),new ArrayList(Arrays.asList(cisForm.getValue())));
+						m.setRule(r);
+						cisCriteria.put(cisForm.getAttribute(), m);
+						LOG.info("Membership criteria rule #1: "+ cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue());
+					}
+					catch(InvalidParameterException e){
+						throw new Exception(" excepation of invalid param " + cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue());
+					}
 				}
 
 				// -- Fill CisCreationForm for next step
@@ -420,17 +423,19 @@ public class CisManagerController {
 		else {
 			try {
 				// -- CIS Configuration
-				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
-				MembershipCriteria m = new MembershipCriteria();
-				try {
-					Rule r = new Rule(cisCreationForm.getOperator(), new ArrayList(Arrays.asList(cisCreationForm.getValue())));
-					m.setRule(r);
-					cisCriteria.put(cisCreationForm.getAttribute(), m);
+				Hashtable<String, MembershipCriteria> cisCriteria = null;
+				if (cisCreationForm.getValue().isEmpty() == false){ 
+					cisCriteria = new Hashtable<String, MembershipCriteria> (); 
+					MembershipCriteria m = new MembershipCriteria();
+					try {
+						Rule r = new Rule(cisCreationForm.getOperator(), new ArrayList(Arrays.asList(cisCreationForm.getValue())));
+						m.setRule(r);
+						cisCriteria.put(cisCreationForm.getAttribute(), m);
+					}
+					catch(InvalidParameterException e){
+						resultMsg.append("Warning: Can't retrieve the membership criterii.");
+					}
 				}
-				catch(InvalidParameterException e){
-					resultMsg.append("Warning: Can't retrieve the membership criterii.");
-				}
-
 
 				// -- Generate Privacy Policy
 				CisCreationForm cisData;

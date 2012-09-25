@@ -115,10 +115,13 @@ import org.societies.api.schema.cis.community.Participant;
 
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
+import org.societies.api.schema.cis.manager.AskCisManagerForJoinResponse;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.ListCrit;
 import org.societies.api.schema.cis.manager.ListResponse;
+import org.societies.api.schema.cis.manager.Notification;
+import org.societies.api.schema.cis.manager.SubscribedTo;
 
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
@@ -290,7 +293,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		LOG.info("listener registered");
 		
 		// testing to add hard coded context atributtes
-		this.addHardCodedQualifications();
+		//this.addHardCodedQualifications();
 		//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
 		startup();
 		LOG.info("CISManager started up with "+this.ownedCISs.size()
@@ -739,33 +742,33 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// client Request for join
 			if (c.getAskCisManagerForJoin() != null) {
 				CommunityManager response = new CommunityManager();
-				JoinResponse j = new JoinResponse();
-				response.setJoinResponse(j);
+				AskCisManagerForJoinResponse ar = new AskCisManagerForJoinResponse();
+				response.setAskCisManagerForJoinResponse(ar);
 				LOG.info("android request for join received in CIS manager");
 				String senderjid = stanza.getFrom().getBareJid();
 				LOG.info("sender JID = " + senderjid); 
 				CisAdvertisementRecord ad = c.getAskCisManagerForJoin().getCisAdv();
 				
 				if(ad == null){
-					j.setResult(false);
+					ar.setStatus("error");
 					return response;
 				}
 				else{
-					JoinCallBack jCallback = new JoinCallBack(j);
-					this.joinRemoteCIS(ad, jCallback);
+					JoinCallBack jCallback = new JoinCallBack(stanza.getFrom(),this.iCommMgr,ad.getId());
+					this.joinRemoteCIS(ad, jCallback);// the real return will come in the callback
 				
 
 					// TODO: REMOVE THIS SLEEP
-					while(j.getCommunity()== null){// wait for callback
+					/*while(j.getCommunity()== null){// wait for callback
 						try {
 							Thread.sleep(5 * 1000);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					}
+					}*/
 					
-
+					ar.setStatus("pending");
 					return response;
 				}
 			}
@@ -783,26 +786,55 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	}
 
-
+// internal callback for the getAskCisManagerForJoin
 public class JoinCallBack implements ICisManagerCallback{
 		
-	JoinResponse resp;
+	IIdentity returnAddress;
+	ICommManager icom;
+	String targetCommunityJid;
 	
-	public JoinCallBack(JoinResponse resp){
-		this.resp = resp;
+	public JoinCallBack(IIdentity returnAddress, ICommManager icom, String targetCommunityJid){
+		this.returnAddress = returnAddress;
+		this.icom = icom;
+		this.targetCommunityJid = targetCommunityJid;
 	}
 
 	@Override
 	public void receiveResult(CommunityMethods communityResultObject) {
+		JoinResponse resp;
 		if(communityResultObject == null || communityResultObject.getJoinResponse() == null){
 			LOG.info("null return on JoinCallBack");
+			resp = new JoinResponse();
 			resp.setResult(false);
+			Community c = new Community();
+			c.setCommunityJid(targetCommunityJid);
+			resp.setCommunity(c);
 		}
 		else{
 			LOG.info("Result Status: joined CIS " + communityResultObject.getJoinResponse().isResult());
 			resp = communityResultObject.getJoinResponse();
 		}
+		
+		sendXMPPmessage(resp);
+		
 	}
+	
+	public void sendXMPPmessage(Object payload){
+
+		
+		LOG.info("finished building join response XMPP message to android");
+
+		Stanza sta = new Stanza(returnAddress);
+		try {
+			icom.sendMessage(sta, payload);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+				
+		LOG.info("notification sent to android");
+	}
+	
 }
 	
 	

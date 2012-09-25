@@ -610,8 +610,28 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 			Log.d(LOG_TAG, "Callback receiveItems");
 		}
 
-		public void receiveMessage(Stanza arg0, Object arg1) {
+		public void receiveMessage(Stanza stanza, Object msgBean) {
 			Log.d(LOG_TAG, "Callback receiveMessage");	
+			
+			Intent intent = new Intent(returnIntent);
+			
+			if (msgBean==null) Log.d(LOG_TAG, ">>>>msgBean is null");
+			// --------- JOIN RESPONSE ---------
+			if (msgBean instanceof JoinResponse) {
+				JoinResponse j = (JoinResponse) msgBean;
+				if(j.isResult()){
+					Log.d(LOG_TAG, "JOIN response is true");
+					Community joinedCIS = j.getCommunity(); 
+					Parcelable pCis  = ACommunity.convertCommunity(joinedCIS);
+					//NOTIFY CALLING CLIENT
+					intent.putExtra(INTENT_RETURN_VALUE, pCis); 
+					intent.putExtra(INTENT_RETURN_BOOLEAN, true);
+				}else{
+					Log.d(LOG_TAG, "JOIN response is false");
+					intent.putExtra(INTENT_RETURN_BOOLEAN, false);
+				}
+			}
+
 		}
 
 		public void receiveResult(Stanza returnStanza, Object msgBean) {
@@ -657,19 +677,8 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 					}
 					
 					//ASK FOR JOIN COMMUNITIES RESULT
-					else if (communityResult.getJoinResponse() != null) {
-						Log.d(LOG_TAG, "JOIN CIS Response!");
-						if(communityResult.getJoinResponse().isResult()){
-							Log.d(LOG_TAG, "JOIN response is true");
-							Community joinedCIS = communityResult.getJoinResponse().getCommunity(); 
-							Parcelable pCis  = ACommunity.convertCommunity(joinedCIS);
-							//NOTIFY CALLING CLIENT
-							intent.putExtra(INTENT_RETURN_VALUE, pCis); 
-						}else{
-							Log.d(LOG_TAG, "JOIN response is false");
-							intent.putExtra(INTENT_RETURN_BOOLEAN, false);
-						}
-					
+					else if (communityResult.getAskCisManagerForJoinResponse() != null) {
+						Log.d(LOG_TAG, "Ask CIS JOIN Response = " + communityResult.getAskCisManagerForJoinResponse().getStatus());
 						
 					}
 
