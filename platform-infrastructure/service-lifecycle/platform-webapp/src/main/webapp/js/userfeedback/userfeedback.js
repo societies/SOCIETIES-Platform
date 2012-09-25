@@ -155,15 +155,17 @@ var userFeedback = (function () {
 	}
 
 	function renderFormRadioList(res, formInfo) {
+		var ul = $('<ul class="list radiolist">').appendTo(res);
 		for(var i=0; i< formInfo.data.length; i++) {
+			var li = $('<li>').appendTo(ul);
 			$('<input>').attr('type', 'radio')
 			.attr('name', 'data')
 			.attr('id', 'data'+i)
 			.attr('value', formInfo.data[i])
-			.appendTo(res);
+			.appendTo(li);
 			$('<label>').attr('for', 'data'+i)
 			.html(formInfo.data[i])
-			.appendTo(res);
+			.appendTo(li);
 		}
 		$('<input>').addClass('sendFeedback')
 		.attr('type', 'button')
@@ -173,15 +175,17 @@ var userFeedback = (function () {
 	}
 
 	function renderFormCheckoxList(res, formInfo) {
+		var ul = $('<ul class="list checkboxlist">').appendTo(res);
 		for(var i=0; i< formInfo.data.length; i++) {
+			var li = $('<li>').appendTo(ul);
 			$('<input>').attr('type', 'checkbox')
 			.attr('name', 'data'+i)
 			.attr('id', 'data'+i)
 			.attr('value', formInfo.data[i])
-			.appendTo(res);
+			.appendTo(li);
 			$('<label>').attr('for', 'data'+i)
 			.html(formInfo.data[i])
-			.appendTo(res);
+			.appendTo(li);
 		}
 		$('<input>').addClass('sendFeedback')
 		.attr('type', 'button')
