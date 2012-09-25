@@ -56,6 +56,10 @@ import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 
 public class CSSManager implements ICSSLocalManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
@@ -93,6 +97,8 @@ public class CSSManager implements ICSSLocalManager {
     private Random randomGenerator;
     
 	private boolean pubsubInitialised = false;
+	
+	private IEventMgr eventMgr = null;
 	
 	public void cssManagerInit() {
 		LOG.debug("CSS Manager initialised");
@@ -370,6 +376,18 @@ public class CSSManager implements ICSSLocalManager {
 			cssRecord.setSex(profile.getSex());
 			cssRecord.setHomeLocation(profile.getHomeLocation());
 			cssRecord.setIdentityName(profile.getIdentityName());
+			
+			// internal eventing
+			if(this.getEventMgr() != null){
+				InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record modified", this.idManager.getThisNetworkNode().toString(), cssRecord);
+				try {
+					this.getEventMgr().publishInternalEvent(event);
+				} catch (EMSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					LOG.error("error trying to internally publish SUBS CIS event");
+				}
+			}
 
 			try {
 				this.cssRegistry.updateCssRecord(cssRecord);
@@ -775,6 +793,14 @@ public class CSSManager implements ICSSLocalManager {
 	 */
 	public void setCssManagerRemote(ICSSRemoteManager cssManagerRemote) {
 		this.cssManagerRemote = cssManagerRemote;
+	}
+	
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
 	}
 
 
