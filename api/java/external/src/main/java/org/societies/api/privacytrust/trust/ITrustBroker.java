@@ -28,6 +28,8 @@ import java.util.concurrent.Future;
 
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * This interface provides access to the trust values associated with individuals,
@@ -36,6 +38,7 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.4
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ITrustBroker {
 
 	/**
