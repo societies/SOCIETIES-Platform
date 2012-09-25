@@ -26,7 +26,7 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyConditionConstants;
 
 /**

@@ -28,10 +28,13 @@ package org.societies.useragent.feedback;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.useragent.model.FeedbackForm;
 
 public class RequestManager {
 	
+	Logger LOG = LoggerFactory.getLogger(RequestManager.class);
 	Queue<FeedbackForm> requestQueue;
 
 	public RequestManager(){
@@ -39,7 +42,13 @@ public class RequestManager {
 	}
 	
 	public FeedbackForm getNextRequest(){
-		return requestQueue.element();
+		FeedbackForm nextForm = null;
+		try{
+			nextForm = requestQueue.element();
+		}catch(Exception e){
+			LOG.debug("The feedback request queue is empty");
+		}
+		return nextForm;
 	}
 	
 	public void addRequest(FeedbackForm newRequest){

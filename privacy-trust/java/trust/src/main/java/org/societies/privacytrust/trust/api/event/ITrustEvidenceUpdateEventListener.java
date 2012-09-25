@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.trust.api.event;
 
-import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
+import org.societies.api.privacytrust.trust.event.ITrustEventListener;
 
 /**
  * An interface that must be implemented by a component that wants to be
