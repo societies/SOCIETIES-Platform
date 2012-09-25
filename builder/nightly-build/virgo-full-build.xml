@@ -58,5 +58,7 @@
 		<module>../../intelligent-community-orchestration/CPA</module>
 		-->
 		
+		<!-- Integration tests -->
+		<module>../../integration-tests/builder/virgo-integration/virgo-integration-tests.xml</module>		
 	</modules>
 </project>
