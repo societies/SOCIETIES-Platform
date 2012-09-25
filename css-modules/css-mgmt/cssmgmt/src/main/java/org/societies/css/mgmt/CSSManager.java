@@ -415,9 +415,6 @@ public class CSSManager implements ICSSLocalManager {
 				try {
 					LOG.info(":) :) :) :) Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
 					this.getEventMgr().publishInternalEvent(event);
-					CssRecord rec = (CssRecord) event.geteventInfo();
-					String email = rec.getEmailID();
-					LOG.info(" :) :) :) :) Email retrieved from event Payload : " +email);
 				} catch (EMSException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
