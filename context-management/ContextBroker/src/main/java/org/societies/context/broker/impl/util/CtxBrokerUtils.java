@@ -128,7 +128,7 @@ public class CtxBrokerUtils {
 		if (value instanceof String ) {
 			if (attribute.getStringValue()!=null) {
 				String valueStr = attribute.getStringValue();
-				if(valueStr.equals(value.toString())) return true;             			
+				if(valueStr.equalsIgnoreCase(value.toString())) return true;             			
 			}
 		} else if (value instanceof Integer) {
 			if(attribute.getIntegerValue()!=null) {
