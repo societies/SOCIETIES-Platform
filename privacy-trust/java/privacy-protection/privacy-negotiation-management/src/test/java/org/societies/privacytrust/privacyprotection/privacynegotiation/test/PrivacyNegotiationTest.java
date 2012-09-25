@@ -89,6 +89,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
+import org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgentRemote;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.AgreementFinaliser;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -109,7 +110,7 @@ public class PrivacyNegotiationTest {
 	private PrivacyPolicyNegotiationManager negotiationMgr;
 	private IPrivacyDataManagerInternal privacyDataManager = Mockito.mock(IPrivacyDataManagerInternal.class);
 	private IPrivacyAgreementManagerInternal policyAgreementMgr = Mockito.mock(IPrivacyAgreementManagerInternal.class);
-	private INegotiationAgent negAgent = Mockito.mock(INegotiationAgent.class);
+	private INegotiationAgentRemote negAgent = Mockito.mock(INegotiationAgentRemote.class);
 	private IIdentitySelection ids = Mockito.mock(IIdentitySelection.class);
 	private IPrivacyPolicyManager privacyPolicyManager = Mockito.mock(IPrivacyPolicyManager.class);
 	private RequestorService requestorService;

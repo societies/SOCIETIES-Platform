@@ -825,7 +825,9 @@ div.TabView div.Pages div.Page div.Pad {
 						</tr>
 						<xc:forEach var="cssFriend" items="${cssFriends}">
         				<tr>
-        					<td>${cssFriend}</td>
+        					<td>${cssFriend.id}</td>
+        					<td>${cssFriend.name}</td>
+        					<td>${cssFriend.uri}</td>
         				</tr>	
         				</xc:forEach>
 						</table>
@@ -837,6 +839,7 @@ div.TabView div.Pages div.Page div.Pad {
 				</div>
 			</div>
 
+					
 
 		</div>
 	</div>

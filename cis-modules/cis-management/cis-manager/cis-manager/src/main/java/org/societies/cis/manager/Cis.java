@@ -130,12 +130,20 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Transient
 	private ICommManager CISendpoint;
 	@Transient
-	IServiceDiscoveryRemote iServDiscRemote;
+	IServiceDiscoveryRemote iServDiscRemote = null;
 	@Transient
-	IServiceControlRemote iServCtrlRemote;
+	IServiceControlRemote iServCtrlRemote = null;
 	@Transient
-	IPrivacyPolicyManager privacyPolicyManager;
+	IPrivacyPolicyManager privacyPolicyManager = null;
 	
+	
+	
+	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
+		this.privacyPolicyManager = privacyPolicyManager;
+	}
+
+
+
 	@Transient
 	private IIdentity cisIdentity;
 	@Transient
@@ -531,6 +539,43 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.membersCss = membersCss;
 	}
 	
+	// notifies cloud node
+	private void nofityAddedUser(String jid, String role){
+		
+		Stanza sta;
+		LOG.info("new member added, going to notify the user");
+		IIdentity targetCssIdentity = null;
+		try {
+			targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
+		} catch (InvalidFormatException e) {
+			LOG.info("could not send addd notification");
+			e.printStackTrace();
+		}		
+		
+		CommunityManager cMan = new CommunityManager();
+		Notification n = new Notification();
+		SubscribedTo s = new SubscribedTo();
+		Community com = new Community();
+		this.fillCommmunityXMPPobj(com);
+		s.setRole(role.toString());
+		s.setCommunity(com);
+		n.setSubscribedTo(s);
+		cMan.setNotification(n);
+		
+		LOG.info("finished building notification");
+
+		sta = new Stanza(targetCssIdentity);
+		try {
+			CISendpoint.sendMessage(sta, cMan);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			LOG.info("problem sending notification to cis");
+			e.printStackTrace();
+		}
+				
+		LOG.info("notification sent to the new user");
+	}
+	
 
 	@Override
 	public Future<Boolean> addMember(String jid, String role){
@@ -547,41 +592,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 		ret = this.insertMember(jid, typedRole);
 
 		
-		Stanza sta;
-		LOG.info("new member added, going to notify the user");
-		IIdentity targetCssIdentity = null;
-		try {
-			targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);
-		} catch (InvalidFormatException e) {
-			LOG.info("could not send addd notification");
-			e.printStackTrace();
-		}		
+
 		// 1) Notifying the added user
 
-		
-		CommunityManager cMan = new CommunityManager();
-		Notification n = new Notification();
-		SubscribedTo s = new SubscribedTo();
-		Community com = new Community();
-		this.fillCommmunityXMPPobj(com);
-		s.setRole(role.toString());
-		s.setCommunity(com);
-		n.setSubscribedTo(s);
-		cMan.setNotification(n);
-		
-		LOG.info("finished building notification");
-
-
-		sta = new Stanza(targetCssIdentity);
-		try {
-			CISendpoint.sendMessage(sta, cMan);
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			LOG.info("problem sending notification to cis");
-			e.printStackTrace();
-		}
-				
-		LOG.info("notification sent to the new user");		
+		this.nofityAddedUser( jid,  role);	
 
 		
 		return new AsyncResult<Boolean>(new Boolean(ret));
@@ -781,7 +795,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 			// JOIN
 			if (c.getJoin() != null) {
-				String jid = "";
+				//String jid = "";
 				LOG.info("join received");
 				String senderjid = stanza.getFrom().getBareJid();
 
@@ -791,16 +805,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 				Participant p = new Participant();
 				JoinResponse j = new JoinResponse();
 				boolean addresult = false; 
-				p.setJid(jid);
+				p.setJid(senderjid);
 				this.fillCommmunityXMPPobj(com);
 				
-				j.setCommunity(com);
-				result.setJoinResponse(j);
-
-				
-				// TEMPORARELY DISABLING THE QUALIFICATION CHECKS
-				// TODO: uncomment this
-				
+				j.setCommunity(com); // THE COMMUNITY MUST BE SET IN THE RESPONSE. THE CALLBACKS ARE COUNTING ON THIS!!
+				result.setJoinResponse(j);				
 				
 				// checking the criteria
 				if(this.cisCriteria.size()>0){
@@ -1095,6 +1104,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			
 			// get Activities
 			if (c.getGetActivities() != null) {
+				LOG.info("get activities called");
 				org.societies.api.schema.activityfeed.Activityfeed result = new org.societies.api.schema.activityfeed.Activityfeed();
 				GetActivitiesResponse r = new GetActivitiesResponse();
 				String senderJid = stanza.getFrom().getBareJid();
@@ -1105,13 +1115,16 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-					if(c.getGetActivities().getQuery()!=null  &&  c.getGetActivities().getQuery().isEmpty())
+					if(c.getGetActivities().getQuery()==null  ||  c.getGetActivities().getQuery().isEmpty())
 						iActivityList = activityFeed.getActivities(c.getGetActivities().getTimePeriod());
 					else
 						iActivityList = activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod());										
 				//}
 				
+					LOG.info("loacl query worked activities called");
+					this.activityFeed.iactivToMarshActv(iActivityList, marshalledActivList);
 
+				/*	
 				Iterator<IActivity> it = iActivityList.iterator();
 				
 				while(it.hasNext()){
@@ -1123,7 +1136,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 					a.setVerb(a.getVerb());
 					marshalledActivList.add(a);
 			     }
-				
+				*/
+					LOG.info("finished the marshling");
 				r.setActivity(marshalledActivList);
 				result.setGetActivitiesResponse(r);		
 				return result;
@@ -1287,7 +1301,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 		try {
 			cssOwnerId = this.CISendpoint.getIdManager().fromJid(this.getOwnerId());
 			RequestorCis requestorCis = new RequestorCis(cssOwnerId, cisIdentity);	
-			this.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
+			if(this.privacyPolicyManager != null)
+				this.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
 		} catch (InvalidFormatException e1) {
 			// TODO Auto-generated catch block
 			LOG.info("bad format in cis owner jid at delete method");

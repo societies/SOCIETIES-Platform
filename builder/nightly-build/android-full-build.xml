@@ -45,8 +45,8 @@
 		<module>../../utilities/DBC</module>
 
 		<!-- Android Communication components -->
-		<module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidApi</module>
-		<module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidImpl</module>
+		<!--module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidApi</module>
+		<module>../../platform-infrastructure/client-frwk/Examples/JaxbAndroidImpl</module-->
 		<module>../../platform-infrastructure/client-frwk/AndroidIPC</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidAgentApi</module>
 		<module>../../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
@@ -59,22 +59,25 @@
 		<module>../../api/android/internal</module>
 
 		<!-- Client Framework Examples -->
-		<module>../../platform-infrastructure/client-frwk/Examples/PhoneGapReference
-		</module>
-		<module>../../platform-infrastructure/client-frwk/Examples/IPCServiceExample
-		</module>
+		<module>../../platform-infrastructure/client-frwk/Examples/PhoneGapReference</module>
+		<module>../../platform-infrastructure/client-frwk/Examples/IPCServiceExample</module>
 		<!--module>../../platform-infrastructure/client-frwk/devicestatusgui</module -->
 
 		<!-- CIS -->
-		<module>../../cis-modules/android/socialprovider</module>
+		<!-- <module>../../cis-modules/android/socialprovider</module> -->
 
 		<!-- Client Framework -->
-
 		<module>../../platform-infrastructure/client-frwk/SocietiesServiceMonitor</module>
+		<module>../../platform-infrastructure/client-frwk/SocietiesCISManager</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesCSSManager</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesDeviceStatus</module>
 		<module>../../platform-infrastructure/client-frwk/SocietiesContentProvider</module>
-		<module>../../platform-infrastructure/client-frwk/MasterGUI</module>
+		<!--module>../../platform-infrastructure/client-frwk/MasterGUI</module-->
+		<!-- SN Connector -->
+		<module>../../platform-infrastructure/sns/AndroidSNApp</module>
+		<module>../../platform-infrastructure/sns/SocialDataComms</module>
+		<module>../../platform-infrastructure/sns/SocietiesAndroidSocialData</module>
+		
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidApp</module>
 		<!-- CIS manager light modules -->
 		<!-- <module>../cis-modules/android/client-lib-android</module> -->
@@ -91,7 +94,8 @@
 		<!-- module>../user-agent/Android-user-agent</module -->
 
 		<!-- Privacy and Trust -->
-		<!-- <module>../../privacy-trust/android/privacy-trust</module>-->
+		<module>../../privacy-trust/android/privacy-trust/privacy-data-management/</module>
+		<module>../../privacy-trust/android/privacy-trust/trust</module>
 
 	</modules>
 </project>

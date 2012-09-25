@@ -4,42 +4,48 @@
 
 	<!-- The Basics -->
 	<groupId>org.societies.context</groupId>
-  	<artifactId>location.management</artifactId>
+	<artifactId>location.management</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>RELEASE</version>
 	</parent>
-	
+
 	<dependencies>
 		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-			<artifactId>PubsubClientBundle</artifactId>
-			<version>${version.comm}</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${version.comm}</version>
-			<scope>compile</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-mgmt-api</artifactId>
@@ -52,69 +58,10 @@
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<!-- <dependency>
-   			<groupId>org.societies</groupId>
-   			<artifactId>common-ext-libs</artifactId>
-   			<scope>provided</scope>
-		</dependency> -->
-	
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-		</dependency>
-		
-		 <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>1.6</version>
-            </dependency>
-		 <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>1.1.1</version>
-         </dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>4.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.2</version>
-		</dependency>
-            
-		<dependency>
-    		<groupId>org.json</groupId>
-    		<artifactId>com.springsource.org.json</artifactId>
-    		<version>1.0.0</version>
-		</dependency>
-	
-		
+
+
 	</dependencies>
-	
+
 
 	<!-- Build Settings -->
 	<build>
@@ -130,12 +77,8 @@
 				<configuration>
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<_nouses>true</_nouses>
-						<DynamicImport-Package>*</DynamicImport-Package>
-						<Import-Package>
-						 org.societies.context.source.impl.*
-						</Import-Package>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -157,7 +100,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<!-- Project Information -->
 	<name>Location Management</name>
 	<developers>

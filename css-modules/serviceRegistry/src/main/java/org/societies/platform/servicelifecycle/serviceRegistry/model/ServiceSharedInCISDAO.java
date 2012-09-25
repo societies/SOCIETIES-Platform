@@ -28,13 +28,9 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.NaturalId;
 
 /**
  * Describe your class here...
@@ -47,8 +43,13 @@ import org.hibernate.annotations.NaturalId;
 @Table(name = "ServiceSharedInCIS")
 public class ServiceSharedInCISDAO implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8413535805119618405L;
+	
 	private String CISId;
-	private ServiceResourceIdentiferDAO serviceResourceIdentifier;
+	private ServiceResourceIdentifierDAO serviceResourceIdentifier;
 	private String id;
 	
 	/**
@@ -56,7 +57,7 @@ public class ServiceSharedInCISDAO implements Serializable{
 	 * @param serviceResourceIdentifier
 	 */
 	public ServiceSharedInCISDAO(String cISId,
-			ServiceResourceIdentiferDAO serviceResourceIdentifier) {
+			ServiceResourceIdentifierDAO serviceResourceIdentifier) {
 		super();
 		CISId = cISId;
 		this.serviceResourceIdentifier = serviceResourceIdentifier;
@@ -74,11 +75,11 @@ public class ServiceSharedInCISDAO implements Serializable{
 		CISId = cISId;
 	}
 	@Embedded
-	public ServiceResourceIdentiferDAO getServiceResourceIdentifier() {
+	public ServiceResourceIdentifierDAO getServiceResourceIdentifier() {
 		return serviceResourceIdentifier;
 	}
 	public void setServiceResourceIdentifier(
-			ServiceResourceIdentiferDAO serviceResourceIdentifier) {
+			ServiceResourceIdentifierDAO serviceResourceIdentifier) {
 		this.serviceResourceIdentifier = serviceResourceIdentifier;
 	}
 	@Id

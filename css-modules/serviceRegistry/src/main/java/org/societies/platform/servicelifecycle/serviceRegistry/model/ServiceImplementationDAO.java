@@ -24,6 +24,8 @@
  */
 package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
+import java.net.URI;
+
 import javax.annotation.Generated;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -64,6 +66,7 @@ public class ServiceImplementationDAO {
 		this.serviceProvider = serviceProvider;
 		this.serviceVersion = serviceVersion;
 		this.serviceClient = serviceClient;
+		
 	}
 	/**
 	 * 

@@ -11,7 +11,8 @@
 	<artifact type="configuration" name="xc"/>
 
     	<!-- Communication framework -->
-    	<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
+    	<!--artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/-->
+    	<artifact type="bundle" name="org.societies.comm.DACommsBundle"/>
     	
     	<!-- Data source bundle -->
 		<artifact type="bundle" name="org.societies.data-source"/>

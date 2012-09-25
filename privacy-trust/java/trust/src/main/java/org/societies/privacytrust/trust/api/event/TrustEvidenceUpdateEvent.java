@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.trust.api.event;
 
-import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
+import org.societies.api.privacytrust.trust.event.TrustEvent;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
 /**

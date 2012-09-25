@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, PrivacyProtectionTester!</string>
+    <string name="app_name">PrivacyProtectionTester</string>
+    
+    <string name="title_connectivity">Connectivity Status</string>
+    <string name="title_battery">Battery Status</string>
+    <string name="title_location">Location Status</string>
+    <string name="txt_nothing">Nothing yet.</string>
+    <string name="txt_sameprocess">Refresh using same process approach</string>
+    <string name="txt_differentprocess">Refresh using different process approach</string>
+    <string name="txt_reset">Reset</string>
+</resources>

@@ -25,13 +25,11 @@
 package org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -39,29 +37,18 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityTypes;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationClient;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
@@ -69,7 +56,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
@@ -82,6 +68,7 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManage
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentityOption;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
+import org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgentRemote;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.data.DataHelper;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.ClientResponseChecker;
@@ -100,7 +87,7 @@ import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGen
 public class NegotiationClient implements INegotiationClient {
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	private final INegotiationAgent negotiationAgent;
+	private final INegotiationAgentRemote negotiationAgent;
 	private RequestPolicy requestPolicy;
 	private ICtxBroker ctxBroker;
 	private IEventMgr eventMgr;
@@ -115,7 +102,7 @@ public class NegotiationClient implements INegotiationClient {
 	private IIdentityManager idm;
 	private IIdentity userIdentity;
 	
-	public NegotiationClient(INegotiationAgent negotiationAgent, PrivacyPolicyNegotiationManager privacyPolicyNegotiationManager){
+	public NegotiationClient(INegotiationAgentRemote negotiationAgent, PrivacyPolicyNegotiationManager privacyPolicyNegotiationManager){
 		this.negotiationAgent = negotiationAgent;
 		this.policyMgr = privacyPolicyNegotiationManager;
 		this.privacyPolicyManager = privacyPolicyNegotiationManager.getPrivacyPolicyManager();

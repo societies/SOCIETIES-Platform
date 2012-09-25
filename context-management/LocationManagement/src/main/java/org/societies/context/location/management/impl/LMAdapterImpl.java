@@ -24,12 +24,13 @@
  */
 package org.societies.context.location.management.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -51,7 +52,6 @@ import org.societies.context.location.management.api.ILocationManagementAdapter;
 import org.societies.context.location.management.api.IUserLocation;
 import org.societies.context.location.management.api.IZone;
 import org.societies.context.location.management.api.IZoneId;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -76,6 +76,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 	@Autowired
 	private PZWrapper pzWrapper; 
 	
+	HashSet<String> registeredDevices = new HashSet<String>();
 	
 	@SuppressWarnings("unused")
 	private void init(){
@@ -96,6 +97,15 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		}
 	}
 	
+	@SuppressWarnings("unused")
+	private void cleanup(){
+		try{
+			timer.cancel();
+		}catch (Exception e) {
+			log.error("Exception in bean'cleanup' method ; msg: "+e.getMessage()+" ; Cause: "+e.getCause(),e);
+		}
+	}
+	
 	@Override
 	public Set<String> getActiveEntitiesIdsInZone(IZoneId arg0) {
 		return pzWrapper.getActiveEntitiesIdsInZone(arg0);
@@ -113,28 +123,34 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 		
 	}
 	
-	private void getCSSnodesFromCssManager(){
+	private Collection<INetworkNode> getCSSnodesFromCssManager(){
 		Future<CssInterfaceResult> futureCssRecord = cssLocalManager.getCssRecord();
 		CssInterfaceResult cssInterfaceResult= null;
 		List<CssNode> cssNodes;
+		
+		List<INetworkNode> networkNodes = new ArrayList<INetworkNode>();
 		
 		try {
 			cssInterfaceResult = (CssInterfaceResult)futureCssRecord.get();
 			CssRecord cssRecord = cssInterfaceResult.getProfile();
 			cssNodes = cssRecord.getCssNodes();
 			for (CssNode cssNode: cssNodes){
-				System.out.println(cssNode.getIdentity());
+				try {
+					INetworkNode networkNode = commManager.getIdManager().fromFullJid(cssNode.getIdentity());
+					networkNodes.add(networkNode);
+					
+				} catch (InvalidFormatException e) {
+					log.error("Couldn't convert '"+cssNode.getIdentity()+"' to INetworkNode");
+				}
 			}
-			
-			
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			log.error("Error from cssLocalManager ",e);
 		}
 		
+		//TODO: TEMP !!! adding this network node
+		networkNodes.add(commManager.getIdManager().getThisNetworkNode());
+		
+		return networkNodes;
 	}
 	
 	
@@ -166,26 +182,32 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 			IUserLocation userLocation=null;
 			try{
 				
-				Collection<INetworkNode> registeredEntities =  locationInference.getAllRegisteredEntites();
+				Collection<INetworkNode> registeredEntities =  getCSSnodesFromCssManager();	//locationInference.getAllRegisteredEntites();
+				for (INetworkNode networkNode : registeredEntities){
+					String jid = networkNode.getJid();
+					if (!registeredDevices.contains(jid)){
+						registerCSSdevice(jid, "", "00:00:00:00:00");
+						registeredDevices.add(jid);
+					}
+				}
 				
 				for (INetworkNode networkNode : registeredEntities){
 					userLocation = getEntityFullLocation(networkNode.getJid());
 					if (userLocation != null){
 						log.info("update CSM node - "+networkNode.getJid()+" \t location: "+userLocation.toString());
 						locationInference.updateCSM(userLocation, networkNode);
+					}else{
+						log.info("update CSM node - entity '"+networkNode.getJid()+"' wasn't identified by the LM system - can't perform update");
 					}
 				}
-				
-				/**** For testing *****/
-				/*userLocation = getEntityFullLocation("guy-phone");
-				if (userLocation != null){
-					locationInference.updateCSM(userLocation, commManager.getIdManager().getThisNetworkNode());
-				}*/
-				
-				log.info("--------------------- Update task finished");
+			}catch (IllegalStateException e) {
+				log.error("IllegalStateException; Probably because the bundle was unistalled - canceling timer task);  Msg: "
+						   +e.getMessage()+" \t; cause:  "+e.getCause(),e);
+				timer.cancel();
 			}catch (Exception e) {
 				log.error("Error in update task; Msg: "+e.getMessage()+" \t; cause:  "+e.getCause(),e);
 			}
+			log.info("--------------------- Update task finished");
 		}
 		
 	}

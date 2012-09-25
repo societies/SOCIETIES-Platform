@@ -52,7 +52,7 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>	
 		<!-- Test -->
@@ -152,7 +152,7 @@
 							<version>${project.version}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

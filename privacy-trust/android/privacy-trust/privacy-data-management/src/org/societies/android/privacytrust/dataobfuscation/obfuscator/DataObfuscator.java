@@ -67,37 +67,38 @@ public abstract class DataObfuscator<E extends IDataWrapper> implements IDataObf
 	}
 
 	
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getObfuscationType()
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#getObfuscationLevelType()
 	 */
-	@Override
 	public ObfuscationLevelType getObfuscationLevelType() {
 		return obfuscationLevelType;
 	}
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getDataWrapper()
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#getDataWrapper()
 	 */
 	public IDataWrapper getDataWrapper() {
 		return dataWrapper;
 	}
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getDataType()
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#getDataType()
 	 */
-	@Override
 	public Type getDataType() {
 		return dataType;
 	}
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#getStepNumber()
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#getStepNumber()
 	 */
-	@Override
 	public int getStepNumber() {
 		return stepNumber;
 	}
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator#isAvailable()
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#isAvailable()
 	 */
-	@Override
 	public boolean isAvailable() {
 		return available;
 	}

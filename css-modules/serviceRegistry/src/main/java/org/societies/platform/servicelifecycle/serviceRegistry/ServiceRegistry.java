@@ -51,9 +51,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
-import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO;
-import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceInstanceDAO;
-import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceResourceIdentiferDAO;
+import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifierDAO;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceSharedInCISDAO;
 
 public class ServiceRegistry implements IServiceRegistry {
@@ -79,9 +77,11 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceDescription(),
 						service.getAuthorSignature(),
 						service.getPrivacyPolicy(),
+						service.getSecurityPolicy(),
 						service.getServiceCategory(),
 						service.getServiceType(),
 						service.getServiceLocation(),
+						service.getContextSource(),
 						service.getServiceInstance(),
 						service.getServiceStatus());
 
@@ -118,9 +118,11 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceDescription(),
 						service.getAuthorSignature(), 
 						service.getPrivacyPolicy(),
+						service.getSecurityPolicy(),
 						service.getServiceCategory(),
 						service.getServiceType(),
 						service.getServiceLocation(),
+						service.getContextSource(),
 						service.getServiceInstance(),
 						service.getServiceStatus());
 				// tmpRegistryEntry = (RegistryEntry)
@@ -235,12 +237,16 @@ public class ServiceRegistry implements IServiceRegistry {
 			c.add(Restrictions.like("authorSignature", filter.getAuthorSignature()));
 		if (filter.getPrivacyPolicy() != null)
 			c.add(Restrictions.like("privacyPolicy", filter.getPrivacyPolicy()));
+		if (filter.getSecurityPolicy() != null)
+			c.add(Restrictions.like("securityPolicy", filter.getSecurityPolicy()));
 		if (filter.getServiceCategory() != null)
-			c.add(Restrictions.like("serviceCategory", filter.getPrivacyPolicy()));
+			c.add(Restrictions.like("serviceCategory", filter.getServiceCategory()));
 		if (filter.getServiceEndpoint() != null)
 			c.add(Restrictions.like("serviceEndPoint", filter.getServiceEndpoint()));
+		if (filter.getContextSource() != null)
+			c.add(Restrictions.like("contextSource", filter.getContextSource()));
 		if (filter.getServiceLocation() != null)
-			c.add(Restrictions.like("serviceLocation", filter.getServiceLocation().toString()));
+			c.add(Restrictions.like("serviceLocation", filter.getServiceLocation()));
 		if (filter.getServiceStatus() != null) 
 			c.add(Restrictions.like("serviceStatus", filter.getServiceStatus().toString()));
 		if (filter.getServiceType() != null) 
@@ -273,6 +279,18 @@ public class ServiceRegistry implements IServiceRegistry {
 			if (servInst.getXMPPNode() != null) {
 				c.add(Restrictions.like("servInst.XMPPNode", servInst.getXMPPNode()));
 			}
+			
+			ServiceResourceIdentifier pi = servInst.getParentIdentifier();
+			if (pi != null) {
+				c.createAlias("servInst.parentIdentifier", "parentId");
+				if (pi.getIdentifier() != null) {
+					c.add(Restrictions.like("parentId.identifier", pi.getIdentifier().toString()));
+				}
+				if (pi.getServiceInstanceIdentifier() != null) {
+					c.add(Restrictions.like("parentId.instanceId", pi.getServiceInstanceIdentifier()));
+				}			
+			}
+			
 			ServiceImplementation si = servInst.getServiceImpl();
 			if ( si != null) {
 				c.createAlias("servInst.serviceImpl", "servImpl");
@@ -322,10 +340,10 @@ public class ServiceRegistry implements IServiceRegistry {
 		try {
 			if (session.get(
 					RegistryEntry.class,
-					new ServiceResourceIdentiferDAO(serviceIdentifier.getIdentifier().toString(), serviceIdentifier.getServiceInstanceIdentifier())
+					new ServiceResourceIdentifierDAO(serviceIdentifier.getIdentifier().toString(), serviceIdentifier.getServiceInstanceIdentifier())
 				) != null) {
 								ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
-										CISID, new ServiceResourceIdentiferDAO(
+										CISID, new ServiceResourceIdentifierDAO(
 												serviceIdentifier.getIdentifier().toString(),
 												serviceIdentifier
 														.getServiceInstanceIdentifier()));
@@ -364,7 +382,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		Transaction t = session.beginTransaction();
 		try {
 			ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
-					CISID, new ServiceResourceIdentiferDAO(serviceIdentifier
+					CISID, new ServiceResourceIdentifierDAO(serviceIdentifier
 							.getIdentifier().toString(),
 							serviceIdentifier.getServiceInstanceIdentifier()));
 			Object obj = session.load(ServiceSharedInCISDAO.class,
@@ -398,7 +416,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		try {
 			tmpRegistryEntry = (RegistryEntry) session.get(
 					RegistryEntry.class,
-					new ServiceResourceIdentiferDAO(serviceIdentifier
+					new ServiceResourceIdentifierDAO(serviceIdentifier
 							.getIdentifier().toString(), serviceIdentifier
 							.getServiceInstanceIdentifier()));
 			if (tmpRegistryEntry != null) {
@@ -424,7 +442,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		Transaction t = session.beginTransaction();
 		try {
 			RegistryEntry tmpRegistryEntry = (RegistryEntry) session.get(
-					RegistryEntry.class, new ServiceResourceIdentiferDAO(
+					RegistryEntry.class, new ServiceResourceIdentifierDAO(
 							serviceIdentifier.getIdentifier().toString(),
 							serviceIdentifier.getServiceInstanceIdentifier()));
 			tmpRegistryEntry.setServiceStatus(serviceStatus.toString());
@@ -540,7 +558,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		Session session = sessionFactory.openSession();
 		Transaction t = null;
 		try {
-		 RegistryEntry retrievedRegistryEntry= (RegistryEntry)session.get(RegistryEntry.class, new ServiceResourceIdentiferDAO(service.getServiceIdentifier().getIdentifier().toString(),service.getServiceIdentifier().getServiceInstanceIdentifier()));
+		 RegistryEntry retrievedRegistryEntry= (RegistryEntry)session.get(RegistryEntry.class, new ServiceResourceIdentifierDAO(service.getServiceIdentifier().getIdentifier().toString(),service.getServiceIdentifier().getServiceInstanceIdentifier()));
 	     if(retrievedRegistryEntry!=null){
 	     retrievedRegistryEntry.updateRegistryEntry(service);
 	     t=session.beginTransaction();

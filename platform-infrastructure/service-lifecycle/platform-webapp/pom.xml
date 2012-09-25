@@ -30,8 +30,8 @@
 	<groupId>org.societies.wepapp</groupId>
 	<artifactId>societies-webapp</artifactId>
 	<packaging>war</packaging>
-	<version>1.0-SNAPSHOT</version>
-	<name>societies-webapp</name>
+	<version>${release.version}</version>
+	<name>Platform Test Webapp</name>
 	<url>http://maven.apache.org</url>
 
 	<developers>
@@ -119,7 +119,7 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>XCCommunicationMgr</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -132,14 +132,18 @@
 			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.societies.platform</groupId>
 			<artifactId>socialdata</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+	    	<groupId>com.google.code.gson</groupId>
+	    	<artifactId>gson</artifactId>
+	    	<version>2.2.2</version>
+	    	<scope>provided</scope>
+	    </dependency>
 		<dependency>
 			<groupId>org.apache.shindig</groupId>
 			<artifactId>shindig-social-api</artifactId>
@@ -239,7 +243,7 @@
 						<supportedProjectType>war</supportedProjectType>
 					</supportedProjectTypes>
 					<instructions>
-						<Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Export-Package>!*</Export-Package>
 						<Import-Package>
 							org.simpleframework.xml;resolution:=optional,
@@ -250,18 +254,18 @@
 							javax.servlet.resources;
 							version="[2.4.0, 4.0.0)",
 							<!-- spring DM -->
-							org.springframework.beans.factory.config,
-							org.springframework.osgi.web.context.support,
-							org.springframework.web.context.request,
-							org.springframework.web.context.support,
-							org.springframework.web.context,
-							org.springframework.stereotype,
-							org.springframework.web.bind.annotation,
-							org.springframework.web.servlet,
+							org.springframework.beans.factory.config;resolution:=optional,
+							org.springframework.osgi.web.context.support;resolution:=optional,
+							org.springframework.web.context.request;resolution:=optional,
+							org.springframework.web.context.support;resolution:=optional,
+							org.springframework.web.context;resolution:=optional,
+							org.springframework.stereotype;resolution:=optional,
+							org.springframework.web.bind.annotation;resolution:=optional,
+							org.springframework.web.servlet;resolution:=optional,
 							org.eclipse.virgo.web.dm;version="[3.0.0, 4.0.0)",
-							org.springframework.beans.factory.annotation,
-							org.springframework.context.config,
-							org.springframework.web.util,
+							org.springframework.beans.factory.annotation;resolution:=optional,
+							org.springframework.context.config;resolution:=optional,
+							org.springframework.web.util;resolution:=optional,
 							<!-- servlet -->
 							org.springframework.web.servlet.config;version="[3.0.0, 4.0.0)",
 							org.springframework.web.servlet.view;version="[3.0.0, 4.0.0)",
@@ -296,18 +300,18 @@
 							org.apache.taglibs.standard.tag.rt.xml; version="[1.2.0,2)",
 							org.apache.taglibs.standard.tei; version="[1.2.0,2)",
 							org.apache.taglibs.standard.tlv; version="[1.2.0,2)",
-							org.osgi.framework,
-							org.jfree.chart,
-							org.jfree.chart.axis,
-							org.jfree.chart.entity,
-							org.jfree.chart.labels,
-							org.jfree.chart.plot,
-							org.jfree.chart.renderer.category,
-							org.jfree.chart.urls,
-							org.jfree.data.category,
-							org.jfree.data.general,
+							org.osgi.framework;resolution:=optional,
+							org.jfree.chart;resolution:=optional,
+							org.jfree.chart.axis;resolution:=optional,
+							org.jfree.chart.entity;resolution:=optional,
+							org.jfree.chart.labels;resolution:=optional,
+							org.jfree.chart.plot;resolution:=optional,
+							org.jfree.chart.renderer.category;resolution:=optional,
+							org.jfree.chart.urls;resolution:=optional,
+							org.jfree.data.category;resolution:=optional,
+							org.jfree.data.general;resolution:=optional,
 							<!-- Form validation -->
-							javax.validation,
+							javax.validation;resolution:=optional,
 							*;resolution:=optional
 						</Import-Package>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>

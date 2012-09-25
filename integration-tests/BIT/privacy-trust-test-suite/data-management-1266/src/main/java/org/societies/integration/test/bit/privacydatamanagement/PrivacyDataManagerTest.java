@@ -19,6 +19,7 @@
  */
 package org.societies.integration.test.bit.privacydatamanagement;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.eclipse.jetty.util.log.Log;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +40,9 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -47,12 +51,18 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.util.commonmock.MockIdentity;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -64,9 +74,19 @@ public class PrivacyDataManagerTest
 	public static Integer testCaseNumber = 0;
 
 	private DataIdentifier dataId;
-	private IIdentity ownerId;
+	private DataIdentifier cisDataId;
+	private IIdentity myCssId;
+	private IIdentity otherCssId;
+	private IIdentity cisId;
 	private RequestorCis requestorCis;
 	private RequestorService requestorService;
+	private List<Action> actionsRead;
+	private List<Condition> conditionsPublic;
+	private List<Condition> conditionsMembersOnly;
+	private List<Condition> conditionsPrivate;
+	private RequestPolicy privacyPolicy;
+	private RequestPolicy privacyPolicyMembersOnly;
+	private RequestPolicy privacyPolicyPrivate;
 
 
 	@Before
@@ -78,17 +98,51 @@ public class PrivacyDataManagerTest
 			throw new PrivacyException("[#"+testCaseNumber+"] [Dependency Injection] PrivacyDataManagerTest not ready");
 		}
 		// Data
-		ownerId = TestCase1266.commManager.getIdManager().getThisNetworkNode();
+		myCssId = TestCase1266.commManager.getIdManager().getThisNetworkNode();
+		otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
+		cisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
 		requestorCis = getRequestorCis();
 		requestorService = getRequestorService();
 		// Data Id
 		try {
-			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId+"/ENTITY/person/1/ATTRIBUTE/name/13");
+			cisDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId+"/cis-member-list/");
+			LOG.info("Data id: "+dataId.getUri()+" (scheme: "+dataId.getScheme()+", type: "+dataId.getType()+")");
+			LOG.info("Cis Data id: "+cisDataId.getUri()+" (scheme: "+cisDataId.getScheme()+", type: "+cisDataId.getType()+")");
 		}
 		catch (MalformedCtxIdentifierException e) {
 			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
 			fail("setUp(): DataId creation error "+e.getMessage());
-		} 
+		}
+
+		// - Actions
+		actionsRead = new ArrayList<Action>();
+		actionsRead.add(new Action(ActionConstants.READ));
+
+		// - Conditions
+		conditionsPublic = new ArrayList<Condition>();
+		conditionsPublic.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
+		conditionsPublic.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+
+		conditionsMembersOnly = new ArrayList<Condition>();
+		conditionsMembersOnly.add(new Condition(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "1"));
+		conditionsMembersOnly.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+
+		conditionsPrivate = new ArrayList<Condition>();
+		conditionsPrivate.add(new Condition(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1"));
+		conditionsPrivate.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+
+		// - Privacy Policy
+		List<RequestItem> requestItems = new ArrayList<RequestItem>();
+		requestItems.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsPublic));
+		List<RequestItem> requestItemsMembersOnly = new ArrayList<RequestItem>();
+		requestItemsMembersOnly.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsMembersOnly));
+		List<RequestItem> requestItemsPrivate = new ArrayList<RequestItem>();
+		requestItemsPrivate.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsPrivate));
+
+		privacyPolicy = new RequestPolicy(new RequestorCis(myCssId, cisId), requestItems);
+		privacyPolicyMembersOnly = new RequestPolicy(new RequestorCis(myCssId, cisId), requestItemsMembersOnly);
+		privacyPolicyPrivate = new RequestPolicy(new RequestorCis(myCssId, cisId), requestItemsPrivate);
 	}
 
 	@After
@@ -97,19 +151,17 @@ public class PrivacyDataManagerTest
 		LOG.info("[#"+testCaseNumber+"] "+getClass().getSimpleName()+"::tearDown");
 	}
 
+	/* --- CHECK PERMISSION CSS --- */
 
 	@Test
-	public void CheckPermissionFirstTime()
+	public void testCheckPermissionFirstTime()
 	{
 		String testTitle = new String("CheckPermission: retrieve a privacy for the first time");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		boolean dataUpdated = false;
+
 		ResponseItem permission = null;
 		try {
-			Action read = new Action(ActionConstants.READ);
-			List<Action> actions = new ArrayList<Action>();
-			actions.add(read);
-			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actions);
+			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
@@ -123,21 +175,16 @@ public class PrivacyDataManagerTest
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, IIdentity, IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)}.
 	 */
 	@Test
-	public void CheckPermissionPreviouslyAdded()
+	public void testCheckPermissionPreviouslyAdded()
 	{
 		String testTitle = new String("CheckPermission: retrieve a privacy two times");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
 
-		boolean dataUpdated = false;
 		ResponseItem permission1 = null;
 		ResponseItem permission2 = null;
 		try {
-			Action read = new Action(ActionConstants.READ);
-			List<Action> actions = new ArrayList<Action>();
-			actions.add(read);
-			Decision decision = Decision.PERMIT;
-			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actions);
-			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actions);
+			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
+			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
 			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
@@ -148,11 +195,156 @@ public class PrivacyDataManagerTest
 		assertNotNull("No permission retrieved", permission2);
 		assertNotNull("No (real) permission retrieved", permission2.getDecision());
 		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission2.getDecision().name());
-		assertEquals("Two requests, not the same answer", permission1, permission2);
+		assertEquals("Two requests, not the same answer", permission1.toXMLString(), permission2.toXMLString());
+	}
+
+	/* --- CHECK PERMISSION CIS --- */
+
+	@Test
+	public void testCheckPermissionPublicCis()
+	{
+		String testTitle = new String("CheckPermission public Cis: retrieve a privacy for the first time");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		RequestPolicy privacyPolicyAdded = null;
+		boolean privacyPolicyDeleted = false;
+		ResponseItem permission = null;
+		try {
+			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
+			permission = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicy.getRequestor());
+		} catch (PrivacyException e) {
+			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
+			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
+		}
+		assertNotNull("No privacy policy added", privacyPolicyAdded);
+		assertEquals("Privacy policy added: not the good one", privacyPolicy.toXMLString(), privacyPolicyAdded.toXMLString());
+
+		assertNotNull("No permission retrieved", permission);
+		assertNotNull("No (real) permission retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
+
+		assertTrue("Privacy policy not deleted", privacyPolicyDeleted);
 	}
 
 	@Test
-	public void ObfuscateData()
+	public void testCheckPermissionPublicCisPreviouslyAdded()
+	{
+		String testTitle = new String("CheckPermission public Cis: retrieve a privacy two times");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		RequestPolicy privacyPolicyAdded = null;
+		boolean privacyPolicyDeleted = false;
+		ResponseItem permission1 = null;
+		ResponseItem permission2 = null;
+		try {
+			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
+			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicy.getRequestor());
+		} catch (PrivacyException e) {
+			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
+			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
+		}
+		assertNotNull("No privacy policy added", privacyPolicyAdded);
+		assertEquals("Privacy policy added: not the good one", privacyPolicy.toXMLString(), privacyPolicyAdded.toXMLString());
+
+		assertNotNull("No permission retrieved", permission1);
+		assertNotNull("No (real) permission retrieved", permission1.getDecision());
+		assertEquals("Bad permission retrieved",  Decision.PERMIT.name(), permission1.getDecision().name());
+		assertNotNull("No permission retrieved", permission2);
+		assertNotNull("No (real) permission retrieved", permission2.getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission2.getDecision().name());
+		assertEquals("Two requests, not the same answer", permission1.toXMLString(), permission2.toXMLString());
+
+		assertTrue("Privacy policy not deleted", privacyPolicyDeleted);
+	}
+
+	@Test
+	public void testCheckPermissionPrivateCis()
+	{
+		String testTitle = new String("CheckPermission Private Cis: retrieve a privacy for the first time");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		RequestPolicy privacyPolicyAdded = null;
+		boolean privacyPolicyDeleted = false;
+		ResponseItem permissionOther = null;
+		ResponseItem permissionMe = null;
+		try {
+			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicyPrivate);
+			Log.info("[#"+testCaseNumber+"] Requested by: "+requestorService);
+			permissionOther = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			Log.info("[#"+testCaseNumber+"] Requested by me: "+myCssId.getJid());
+			permissionMe = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
+			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicyPrivate.getRequestor());
+		} catch (PrivacyException e) {
+			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
+			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
+		}
+		assertNotNull("No privacy policy added", privacyPolicyAdded);
+		assertEquals("Privacy policy added: not the good one", privacyPolicyPrivate.toXMLString(), privacyPolicyAdded.toXMLString());
+
+		assertNotNull("No permission retrieved", permissionOther);
+		assertNotNull("No (real) permission retrieved", permissionOther.getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissionOther.getDecision().name());
+		
+		assertNotNull("No permission retrieved", permissionMe);
+		assertNotNull("No (real) permission retrieved", permissionMe.getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissionMe.getDecision().name());
+
+		assertTrue("Privacy policy not deleted", privacyPolicyDeleted);
+	}
+
+	@Test
+	public void testCheckPermissionPrivateCisPreviouslyAdded()
+	{
+		String testTitle = new String("CheckPermission Private Cis: retrieve a privacy two times");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		RequestPolicy privacyPolicyAdded = null;
+		boolean privacyPolicyDeleted = false;
+		ResponseItem permissionOther1 = null;
+		ResponseItem permissionMe1 = null;
+		ResponseItem permissionOther2 = null;
+		ResponseItem permissionMe2 = null;
+		try {
+			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicyPrivate);
+			permissionOther1 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			permissionMe1 = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
+			permissionOther2 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			permissionMe2 = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
+			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicyPrivate.getRequestor());
+		} catch (PrivacyException e) {
+			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
+			fail("PrivacyException ("+e.getMessage()+") "+testTitle);
+		}
+		assertNotNull("No privacy policy added", privacyPolicyAdded);
+		assertEquals("Privacy policy added: not the good one", privacyPolicyPrivate.toXMLString(), privacyPolicyAdded.toXMLString());
+
+		assertNotNull("Other: No permission retrieved", permissionOther1);
+		assertNotNull("Other: No (real) permission retrieved", permissionOther1.getDecision());
+		assertEquals("Other: Bad permission retrieved",  Decision.DENY.name(), permissionOther1.getDecision().name());
+		assertNotNull("Other: No permission retrieved", permissionOther2);
+		assertNotNull("Other: No (real) permission retrieved", permissionOther2.getDecision());
+		assertEquals("Other: Bad permission retrieved", Decision.DENY.name(), permissionOther2.getDecision().name());
+		assertEquals("Other: Two requests, not the same answer", permissionOther1.toXMLString(), permissionOther2.toXMLString());
+		
+		assertNotNull("Me: No permission retrieved", permissionMe1);
+		assertNotNull("Me: No (real) permission retrieved", permissionMe1.getDecision());
+		assertEquals("Me: Bad permission retrieved",  Decision.PERMIT.name(), permissionMe1.getDecision().name());
+		assertNotNull("Me: No permission retrieved", permissionMe2);
+		assertNotNull("Me: No (real) permission retrieved", permissionMe2.getDecision());
+		assertEquals("Me: Bad permission retrieved", Decision.PERMIT.name(), permissionMe2.getDecision().name());
+		assertEquals("Me: Two requests, not the same answer", permissionMe1.toXMLString(), permissionMe2.toXMLString());
+
+		assertTrue("Privacy policy not deleted", privacyPolicyDeleted);
+	}
+
+
+	/* --- OBFUSCATION --- */
+
+	@Test
+	public void testObfuscateData()
 	{
 		String testTitle = new String("ObfuscateData");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
@@ -206,16 +398,13 @@ public class PrivacyDataManagerTest
 	 ******************************/
 
 	private RequestorService getRequestorService() throws InvalidFormatException, URISyntaxException{
-		IIdentity requestorId = TestCase1266.commManager.getIdManager().fromJid("red@societies.local");
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		serviceId.setServiceInstanceIdentifier("css://red@societies.local/HelloEarth");
-		serviceId.setIdentifier(new URI("css://red@societies.local/HelloEarth"));
-		return new RequestorService(requestorId, serviceId);
+		serviceId.setServiceInstanceIdentifier("css://"+otherCssId+"/HelloEarth");
+		serviceId.setIdentifier(new URI("css://"+otherCssId+"/HelloEarth"));
+		return new RequestorService(otherCssId, serviceId);
 	}
 
 	private RequestorCis getRequestorCis() throws InvalidFormatException{
-		IIdentity otherCssId = TestCase1266.commManager.getIdManager().fromJid("red@societies.local");
-		IIdentity cisId = TestCase1266.commManager.getIdManager().fromJid("onecis.societies.local");
 		return new RequestorCis(otherCssId, cisId);
 	}
 }

@@ -4,33 +4,12 @@
 <title>Societies</title>
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
-	<link rel="stylesheet" type="text/css" href="../css/custom/custom-theme-societies.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/jquerymobile/jquery.mobile-1.1.0.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/custom/societies.css"/>
-	
-	<script type="text/javascript" src="../javascript/jquery/jquery-1.7.1.js" ></script>
-	<script type="text/javascript" src="../javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
-
-	<!--JQM SlideMenu-->
-	<link rel="stylesheet" href="../css/custom/jqm.css" />
-	<script src="../javascript/jquerymobile/jqm.slidemenu.js"></script>
 </head>
 <body>
-<div id="slidemenu">
-
-<h3>MENU</h3>
-	<ul>
-		<li><input id="slide-inbox"  type="button" value="Inbox"/></li>
-		<li><input id="slide-chat"  type="button" value="Chat"/></li>
-		<li><input id="slide-rssfeeds"  type="button" value="RSS Feeds"/></li>
-		<li><input id="slide-help"  type="button" value="Help"/></li>
-		<li><input id="slide-logout" type="button" value="Log Out"/></li>
-	</ul>
-</div>
 
 
 
-<div data-role="page" id="friends">
+<div data-role="page" id="your-suggested-friends">
 	<!-- header -->
 	<div data-role="header" data-position="fixed">
 		<img class="logo" src="../images/societies_header.png" alt="logo" />
@@ -42,7 +21,7 @@
 		<br/><br/>
 		<ul data-role="listview" data-theme="d" data-divider-theme="b">
 			<li data-role="list-divider">Your Societies Friends</li>
-			<li><a href="friend_profile.html" rel="external">
+			<li><a href="friend_profile.html">
 			<img src="../images/profile_pic_sample.jpg" class="profile_list" alt="profile picture" />
 			<h2>Sara Weber</h2>
 			<p>
@@ -52,7 +31,7 @@
 				Location: 10
 			</p>
 			</a></li>
-			<li><a href="friend_profile.html" rel="external">
+			<li><a href="friend_profile.html">
 			<img src="../images/profile_pic_sample2.jpg" class="profile_list" alt="profile picture"/>
 			<h2>JOE BLOGGS</h2>
 			<p>
@@ -62,7 +41,7 @@
 				Location: 10
 			</p>
 			</a></li>
-			<li><a href="friend_profile.html" rel="external">
+			<li><a href="friend_profile.html">
 			<img src="../images/profile_pic_sample3.jpg" class="profile_list" alt="profile picture"/>
 			<h2>JOE BLOGGS</h2>
 			<p>
@@ -72,7 +51,7 @@
 				Location: 10
 			</p>
 			</a></li>
-			<li><a href="friend_profile.html" rel="external">
+			<li><a href="friend_profile.html">
 			<img src="../images/profile_pic_sample4.jpg" class="profile_list" alt="profile picture"/>
 			<h2>JOE BLOGGS</h2>
 			<p>
@@ -91,25 +70,21 @@
 	<!-- /content -->
 	<br/><br/>
 	<!-- footer -->
-	<div class="footer_fixed" data-role="footer" data-position="fixed">
+   <div class="footer_fixed" data-role="footer" data-position="fixed">
 		<ul class="nav">
-			<li class="btn-home"><a href="landing.html">
-			<span class="ico"><img src="../images/icons/home_logo.png" alt="home"/></span>
-			</a>
+			<li class="btn-home">
+				<input id="home-button" type="image" alt="home" src="../images/icons/home_logo.png"  data-role="none"/>
 			</li>
-			<li class="btn-profile"><a href="myProfile.html">
-			<span class="ico"><img src="../images/icons/my_profile.png" alt="profile"/></span>
-			</a>
+			<li class="btn-profile">
+				<input id="profile-button" type="image" alt="profile" src="../images/icons/my_profile.png"  data-role="none"/>	
 			</li>
-			<li class="btn-settings"><a href="settings.html">
-			<span class="ico"><img src="../images/icons/settings.png" alt="settings"/></span>
-			</a>
+			<li class="btn-settings">
+				<input id="settings-button" type="image" alt="settings" src="../images/icons/settings.png"  data-role="none"/>	
 			</li>
-			<li class="btn-about"><a href="about.html">
-			<span class="ico"><img src="../images/icons/about.png" alt="about"/></span>
-			</a>
+			<li class="btn-about">
+				<input id="about-button" type="image" alt="about" src="../images/icons/about.png"  data-role="none"/>	
 			</li>
-		</ul>
+		</ul><!-- /global navbar -->
 	</div>
 	<!-- end footer -->
 </div>

@@ -184,10 +184,6 @@ public class PrivacyPolicyManagerTest {
 		}
 		
 		
-		//Modified by rafik
-		//before:
-		//assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
-		//After:
 		assertNull("Expected null privacy policy, but it is not.", privacyPolicy);
 	}
 
@@ -245,15 +241,10 @@ public class PrivacyPolicyManagerTest {
 			fail("Error");
 		}
 		
-		LOG.info("$$$$$$ Rafik 1");
 		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
-		LOG.info("$$$$$$ Rafik 2");
 		assertEquals("Privacy policy not updated", cisPolicy, privacyPolicy2);
-		LOG.info("$$$$$$ Rafik 3");
 		assertEquals("Difference between same privacy policies", privacyPolicy1, privacyPolicy2);
-		LOG.info("$$$$$$ Rafik 4");
 		assertTrue("Privacy policy not deleted.", deleteResult);
-		LOG.info("$$$$$$ Rafik 5");
 	}
 
 	/**
@@ -531,7 +522,7 @@ public class PrivacyPolicyManagerTest {
 		//before:
 		//assertEquals(expected, actual);
 		//After:
-		assertEquals(expected.toXMLString(), actual.toXMLString());
+		assertEquals("Privacy policy inferred not equals to the exepcted empty one", expected.toXMLString(), actual.toXMLString());
 	}
 
 
@@ -579,7 +570,7 @@ public class PrivacyPolicyManagerTest {
 
 	private RequestorCis getRequestorCis() throws InvalidFormatException{
 		IIdentity otherCssId = TestCase1244.commManager.getIdManager().fromJid("red@societies.local");
-		IIdentity cisId = TestCase1244.commManager.getIdManager().fromJid("onecis.societies.local");
+		IIdentity cisId = TestCase1244.commManager.getIdManager().fromJid("cis-one.societies.local");
 		return new RequestorCis(otherCssId, cisId);
 	}
 }

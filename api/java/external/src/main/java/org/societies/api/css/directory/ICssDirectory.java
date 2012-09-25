@@ -87,5 +87,16 @@ public interface ICssDirectory {
 	 */
 	Future<List<CssAdvertisementRecord>> findForAllCss(
 			CssAdvertisementRecord cssFilter);
+	
+	/**
+	 * Description : Queries by css id's
+	 * 
+	 * @param cssidList
+	 *            list of id's to return ad rec  
+	 * @return list of CssAdvertisementRecords
+	 */
+	Future<List<CssAdvertisementRecord>> searchByID(
+			List<String> cssIdList);
+	
 
 }

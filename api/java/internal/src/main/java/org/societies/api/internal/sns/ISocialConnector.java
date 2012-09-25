@@ -2,9 +2,6 @@ package org.societies.api.internal.sns;
 
 import java.util.Map;
 
-
-
-
 public interface ISocialConnector {
 	
 	public final static String FACEBOOK_CONN 		= "facebook";
@@ -16,7 +13,20 @@ public interface ISocialConnector {
 	public enum SocialNetwork{
 		Facebook,
 		Foursquare,
-		twitter
+		twitter,
+		linkedin,
+		googleplus;
+		
+		private final String value = "";
+		
+		public static SocialNetwork fromValue(String v) {
+	        for (SocialNetwork c: SocialNetwork.values()) {
+	            if (c.value.equals(v)) {
+	                return c;
+	            }
+	        }
+	        throw new IllegalArgumentException(v);
+	    }
 	}
 	
 	

@@ -11,6 +11,9 @@ import org.junit.Test;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.schema.cssmanagement.CssNode;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 //import com.google.gson.Gson;
 //import com.google.gson.GsonBuilder;
 
@@ -74,13 +77,29 @@ public class TestAndroidCSSNode {
 		
 	}
 //	@Test
+	/**
+	 * Cannot run this test as it must be run within an Android context. This is not possible with the Android library as it is a stub library.
+	 */
 //	public void testParcelable() {
-//		AndroidCSSNode cssNode = new AndroidCSSNode(TEST_IDENTITY_1, CSSNode.nodeStatus.Hibernating.ordinal(), CSSNode.nodeType.Rich.ordinal());
+//		AndroidCSSNode cssNode = new AndroidCSSNode();
+//		assertNotNull(cssNode);
 //		
-//		Parcel parcelOut = new Parcel();
+//		cssNode.setIdentity(TEST_IDENTITY_1);
+//		cssNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+//		cssNode.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
+//
+//		AndroidCSSNode aCSSNode = AndroidCSSNode.convertCssNode(cssNode);
 //		
-//		cssNode.writeToParcel(out, flags)
+//		assertEquals(0, aCSSNode.describeContents());
 //		
+//        Parcel parcel = Parcel.obtain();
+//        aCSSNode.writeToParcel(parcel, 0);
+//        //done writing, now reset parcel for reading
+//        parcel.setDataPosition(0);
+//        //finish round trip
+//        AndroidCSSNode createFromParcel = AndroidCSSNode.CREATOR.createFromParcel(parcel);
+//       
+//        assertEquals(aCSSNode, createFromParcel);		
 //	}
 	
 //	@Test

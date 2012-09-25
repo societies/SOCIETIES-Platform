@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -39,6 +41,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.css.devicemgmt.controller.gui.PressureMatMonitorGUI;
 import org.societies.css.devicemgmt.controller.model.Controller;
 import org.societies.css.devicemgmt.controller.model.IPluggableResource;
 import org.societies.css.devicemgmt.controller.model.PressureMat;
@@ -55,10 +58,13 @@ public class ContextDataManager {
 
 	private List<Controller> controllers;
 	
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
-	public ContextDataManager(ICtxBroker ctxBroker){
+	private List<PressureMatMonitorGUI> guis;
+	public ContextDataManager(ICtxBroker ctxBroker, List<PressureMatMonitorGUI> guis){
 		this.ctxBroker = ctxBroker;
 		this.controllers = new ArrayList<Controller>();
+		this.guis = guis;
 
 		
 	}
@@ -66,16 +72,19 @@ public class ContextDataManager {
 	
 	
 	public void updateContext(String controllerId, String resourceId, Object value){
+		this.updateGUI(controllerId, resourceId, value);
+		this.logging.debug("Updating context");
 		for (Controller controller : controllers){
 			if (controller.getControllerId().equalsIgnoreCase(controllerId)){
+				this.logging.debug("Found controller with id: "+controllerId);
 				for (IPluggableResource resource : controller.getPluggableResources()){
 					if (resource.getPortId().equalsIgnoreCase(resourceId)){
-						
+						this.logging.debug("Found pressureMat with id: "+resourceId);
 						try {
 							CtxAttribute ctxAttr = (CtxAttribute) ctxBroker.retrieve(resource.getCtxId()).get();
 							if (resource.getValueType().equals(CtxAttributeValueType.INTEGER)){
-								int intValue = Integer.parseInt((String) value);
-								ctxAttr.setIntegerValue(intValue);
+								//int intValue = Integer.parseInt((String) value);
+								ctxAttr.setIntegerValue((Integer) value);
 								
 							}
 							else if (resource.getValueType().equals(CtxAttributeValueType.STRING)){
@@ -89,6 +98,7 @@ public class ContextDataManager {
 							}
 							
 							ctxBroker.update(ctxAttr);
+							this.logging.debug("Updated ctxAttribute: "+ctxAttr.getId());
 							//ctxBroker.updateAttribute(resource.getCtxId(), value);
 							return;
 						} catch (CtxException e) {
@@ -107,8 +117,23 @@ public class ContextDataManager {
 					}
 				}
 			}
-		}
+		}
+
 	}
+	
+	
+	
+	private void updateGUI(String controllerId, String resourceId, Object value) {
+		for (PressureMatMonitorGUI gui : this.guis){
+			if (gui.getControllerID().equalsIgnoreCase(controllerId)){
+				gui.updatePressureMatInfo(resourceId, value.toString());
+			}
+		}
+		
+	}
+
+
+
 	public CtxEntityIdentifier createControllerEntity(String contextType){
 
 		 try {

@@ -53,7 +53,7 @@ public class ClientCommunicationMgr {
 	public void register(final List<String> elementNames, final ICommCallback callback) {
 		Log.d(LOG_TAG, "register element names");
 		for (String element : elementNames) {
-			Log.d(LOG_TAG, "register element: " + element);
+//			Log.d(LOG_TAG, "register element: " + element);
 		}
 
 		final List<String> namespaces = callback.getXMLNamespaces();
@@ -74,7 +74,7 @@ public class ClientCommunicationMgr {
 	public void unregister(final List<String> elementNames, final ICommCallback callback) {
 		Log.d(LOG_TAG, "unregister");
 		for (String element : elementNames) {
-			Log.d(LOG_TAG, "unregister element: " + element);
+//			Log.d(LOG_TAG, "unregister element: " + element);
 		}
 		
 		final List<String> namespaces = callback.getXMLNamespaces();		
@@ -114,6 +114,7 @@ public class ClientCommunicationMgr {
 	
 	public void sendMessage(Stanza stanza, Message.Type type, Object payload)
 			throws CommunicationException {
+		stanza.setFrom(getIdManager().getThisNetworkNode());
 		Log.d(LOG_TAG, "sendMessage type: " + type.name());
 		
 		if (payload == null) {
@@ -132,6 +133,7 @@ public class ClientCommunicationMgr {
 	
 	public void sendMessage(Stanza stanza, Object payload)
 			throws CommunicationException {
+		stanza.setFrom(getIdManager().getThisNetworkNode());
 		Log.d(LOG_TAG, "sendMessage stanza from : " + stanza.getFrom() + " to: " + stanza.getTo());
 		
 		sendMessage(stanza, null, payload);
@@ -139,6 +141,7 @@ public class ClientCommunicationMgr {
 	
 	public void sendIQ(Stanza stanza, IQ.Type type, Object payload,
 			ICommCallback callback) throws CommunicationException {
+		stanza.setFrom(getIdManager().getThisNetworkNode());
 		Log.d(LOG_TAG, "sendIQ IQtype: " + type.toString() + " from: " + stanza.getFrom() + " to: " + stanza.getTo());
 		try {
 			String xml = marshaller.marshallIQ(stanza, type, payload);
@@ -190,7 +193,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void sendMessage(final String xml) {
-		Log.d(LOG_TAG, "sendMessage message" + xml);
+//		Log.d(LOG_TAG, "sendMessage message" + xml);
 		ServiceConnection connection = new ServiceConnection() {
 
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
@@ -208,7 +211,7 @@ public class ClientCommunicationMgr {
 	}
 	
 	private void sendIQ(final String xml, final ICommCallback callback) {
-		Log.d(LOG_TAG, "sendIQ message: " + xml);
+//		Log.d(LOG_TAG, "sendIQ message: " + xml);
 		ServiceConnection connection = new ServiceConnection() {
 
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
@@ -243,6 +246,7 @@ public class ClientCommunicationMgr {
 		} catch (Throwable e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
+		Log.d(LOG_TAG, "getIdentityJid: " + identityJid);
 		return identityJid;
 	}
 	

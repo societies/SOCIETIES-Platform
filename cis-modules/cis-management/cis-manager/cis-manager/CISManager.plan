@@ -13,13 +13,9 @@
     <artifact type="bundle" name="org.societies.data-source"/>
     	
 	
-    <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
 
+ 	<artifact type="bundle" name="org.societies.comm.CloudCommsBundle"/>
     <!-- Comms (needed by Context) -->
-	<artifact type="bundle"
-		name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle" />
-	<artifact type="bundle"
-		name="org.societies.comm.xmpp.pubsub.PubsubClientBundle" />
 	<artifact type="bundle" name="org.societies.comm.event.mgmt" />	
     
         
@@ -28,17 +24,11 @@
 
 	<!-- Context (needed by Privacy & Trust) -->
 	<artifact type="bundle" name="org.societies.context-management.context-mgmt-cloud-bundle"/>
-	
-		
+
 	<!-- Privacy & Trust -->
 	<artifact type="bundle" name="org.societies.privacytrust.trust" />
 	<artifact type="bundle" name="org.societies.privacytrust.privacyprotection" />
     
-    <!-- Security Negotiation -->
-    <artifact type="bundle" name="org.societies.privacytrust.privacytrustcommmanagement"/>
-    <artifact type="bundle" name="org.societies.security.secur-services"/>
-	<artifact type="bundle" name="org.societies.security.secur-commsmgr"/>
-	<artifact type="bundle" name="org.societies.security.policy-negotiator"/>
     
 	<!-- from services -->     
 

@@ -1,6 +1,10 @@
 <!-- PAGE TABLE -->
 <tr><td align="left" valign="top" width="15%" background="${pageContext.request.contextPath}/images/societies-background.png">
-
+	<div id="userfeedback">
+		<p class="ufeedbackRefreshHandler">Refresh notification</p>
+		<div id="ufeedbackNotifications">
+		</div>
+	</div>
 	<table border="0" >
 	  <tr><td align="left"><a href="default.html"><img src="${pageContext.request.contextPath}/images/societies_xsmall.png" alt="Home" border="0"/></a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
@@ -8,6 +12,7 @@
 	  <tr><td><b>CSS Management</b></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cssmanager.html">CSS Management</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/cssnodemgmt.html">CSS Node Mgmt</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/suggestedfriends.html">CSS Friends</a></td></tr>
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/devicemgmt.html">Device Management</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 

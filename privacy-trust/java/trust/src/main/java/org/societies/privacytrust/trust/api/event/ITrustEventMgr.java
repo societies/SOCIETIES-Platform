@@ -24,9 +24,9 @@
  */
 package org.societies.privacytrust.trust.api.event;
 
-import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
-import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.event.ITrustEventListener;
+import org.societies.api.privacytrust.trust.event.TrustEvent;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
  * The Trust Event Manager is responsible for the subscription and publishing

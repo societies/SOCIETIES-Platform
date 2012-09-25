@@ -39,9 +39,15 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.DataIdentifierFactory;
+import org.societies.api.identity.DataIdentifierUtil;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
@@ -56,6 +62,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager;
+import org.societies.util.commonmock.MockIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -78,6 +86,7 @@ public class PrivacyDataManagerTest {
 
 	// -- Mocked data
 	private DataIdentifier dataId;
+	private DataIdentifier cisDataId;
 	private Requestor requestor;
 	private Requestor requestorCis;
 
@@ -88,21 +97,40 @@ public class PrivacyDataManagerTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		// Requestor
+		IIdentity myCssId = new MockIdentity(IdentityType.CSS, "mycss","societies.local");
+		IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
+		IIdentity cisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
+		requestor = new Requestor(otherCssId);
+		requestorCis = new RequestorCis(otherCssId, cisId);
+
 		// Data Id
 		try {
-			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/name/13");
+			cisDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId.getJid()+"/cis-member-list");
 		}
 		catch (MalformedCtxIdentifierException e) {
 			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
 			fail("setUp(): DataId creation error "+e.getMessage());
 		} 
-		// Requestor
-		IIdentity requestorId = Mockito.mock(IIdentity.class);
-		Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-		IIdentity requestorCisId = Mockito.mock(IIdentity.class);
-		Mockito.when(requestorCisId.getJid()).thenReturn("cis.societies.local");
-		requestor = new Requestor(requestorId);
-		requestorCis = new RequestorCis(requestorId, requestorCisId);
+
+		// Comm Manager
+		ICommManager commManager = Mockito.mock(ICommManager.class);
+		IIdentityManager idManager = Mockito.mock(IIdentityManager.class);
+		INetworkNode myCssNetworkNode = Mockito.mock(INetworkNode.class);
+		Mockito.when(myCssNetworkNode.getJid()).thenReturn(myCssId.getJid());
+		Mockito.when(idManager.getThisNetworkNode()).thenReturn(myCssNetworkNode);
+		Mockito.when(idManager.fromJid(myCssId.getJid())).thenReturn(myCssId);
+		Mockito.when(idManager.fromJid(otherCssId.getJid())).thenReturn(otherCssId);
+		Mockito.when(idManager.fromJid(cisId.getJid())).thenReturn(cisId);
+		Mockito.when(commManager.getIdManager()).thenReturn(idManager);
+
+		// CIS Manager
+		ICisManager cisManager = Mockito.mock(ICisManager.class);
+
+		// Privacy Policy Manager
+		((PrivacyDataManager) privacyDataManager).setCommManager(commManager);
+		((PrivacyDataManager) privacyDataManager).setCisManager(cisManager);
 	}
 
 	/**
@@ -113,7 +141,7 @@ public class PrivacyDataManagerTest {
 	}
 
 
-	/* --- CHECK PERMISSION --- */
+	/* --- CHECK PERMISSION CSS --- */
 
 	@Test
 	@Rollback(true)
@@ -139,7 +167,7 @@ public class PrivacyDataManagerTest {
 		assertNotNull("No permission decision retrieved", permission.getDecision());
 		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
 	}
-	
+
 	@Test
 	@Rollback(true)
 	public void CheckPermissionPreviouslyAddedRequestorCis() {
@@ -164,7 +192,7 @@ public class PrivacyDataManagerTest {
 		assertNotNull("No permission decision retrieved", permission.getDecision());
 		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
 	}
-	
+
 	@Test
 	@Rollback(true)
 	public void CheckPermissionPreviouslyAddedRequestorCisError() {
@@ -244,6 +272,56 @@ public class PrivacyDataManagerTest {
 		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
 	}
 
+	/* --- CHECK PERMISSION CIS --- */
+
+	@Test
+	@Rollback(true)
+	public void testCheckPermissionCisPreviouslyAdded() {
+		String testTitle = new String("CheckPermissionCis: previously added permission");
+		LOG.info("[TEST] "+testTitle);
+		boolean dataUpdated = false;
+		ResponseItem permission = null;
+		try {
+			Action action = new Action(ActionConstants.READ);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(action);
+			Decision decision = Decision.PERMIT;
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, cisDataId, actions, decision);
+			permission = privacyDataManager.checkPermission(requestor, cisDataId, actions);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		}
+		assertTrue("Data permission not updated", dataUpdated);
+		assertNotNull("No permission retrieved", permission);
+		LOG.info("Permission retrieved: "+permission.toString());
+		assertNotNull("No permission decision retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
+	}
+
+	@Test
+	@Rollback(true)
+	public void testCheckPermissionCisPreviouslyDeleted() {
+		String testTitle = new String("CheckPermissionCis: permission previously deleted, it is sure that it doesn't exist");
+		LOG.info("[TEST] "+testTitle);
+		boolean dataDeleted = false;
+		ResponseItem permission = null;
+		try {
+			Action action = new Action(ActionConstants.READ);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(action);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestor, cisDataId);
+			permission = privacyDataManager.checkPermission(requestor, cisDataId, actions);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		}
+		assertTrue("Data permission not deleted", dataDeleted);
+		assertNotNull("No permission retrieved", permission);
+		LOG.info("Permission retrieved: "+permission.toString());
+		assertNotNull("No permission decision retrieved", permission.getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
+	}
 
 	/* --- OBFUSCATION --- */
 
@@ -301,6 +379,58 @@ public class PrivacyDataManagerTest {
 		assertNull(actual);
 	}
 
+
+	/* --- Data Id --- */
+	@Test
+	public void testFromUriString() {
+		String testTitle = new String("testFromUriString: multiple test of DataId parsing");
+		LOG.info("[TEST] "+testTitle);
+
+		String ownerId = "owner@domain.com";
+		String dataId1 = "context://"+ownerId+"/locationSymbolic/";
+		String dataId2 = "context://owner@domain.com/locationSymbolic";
+		String dataId3 = "context:///locationSymbolic/";
+		String dataId4 = "context:///locationSymbolic";
+		String dataId5 = "context:///";
+
+		assertNotNull("Data id from "+dataId1+" should not be null", DataIdentifierUtil.fromUri(dataId1));
+		assertEquals("Owner id from "+dataId1+" not retrieved", ownerId, DataIdentifierUtil.fromUri(dataId1).getOwnerId());
+
+		assertNotNull("Data id from "+dataId2+" should not be null", DataIdentifierUtil.fromUri(dataId2));
+		assertEquals("Owner id from "+dataId2+" not retrieved", ownerId, DataIdentifierUtil.fromUri(dataId2).getOwnerId());
+
+		assertNotNull("Data id from "+dataId3+" should not be null", DataIdentifierUtil.fromUri(dataId3));
+		assertEquals("Owner id from "+dataId3+" not retrieved", "", DataIdentifierUtil.fromUri(dataId3).getOwnerId());
+
+		assertNotNull("Data id from "+dataId4+" should not be null", DataIdentifierUtil.fromUri(dataId4));
+		assertEquals("Owner id from "+dataId4+" not retrieved", "", DataIdentifierUtil.fromUri(dataId4).getOwnerId());
+		assertEquals("Data type from "+dataId4+" not retrieved", "locationSymbolic", DataIdentifierUtil.fromUri(dataId4).getType());
+
+		assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierUtil.fromUri(dataId5));
+		assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierUtil.fromUri(dataId5).getOwnerId());
+		assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierUtil.fromUri(dataId5).getType());
+	}
+	
+	@Test
+	public void testSchemes() {
+		String testTitle = new String("testSchemes: multiple test on DataIdentifierScheme");
+		LOG.info("[TEST] "+testTitle);
+
+		String ownerId = "owner@domain.com";
+		String dataId1 = "context://"+ownerId+"/locationSymbolic/";
+		String dataId2 = "context://owner@domain.com/locationSymbolic";
+		String dataId3 = "context:///locationSymbolic/";
+		String dataId4 = "context:///locationSymbolic";
+		String dataId5 = "context:///";
+		DataIdentifierScheme schemeCtx1 = DataIdentifierScheme.CONTEXT;
+		DataIdentifierScheme schemeCtx2 = DataIdentifierScheme.CONTEXT;
+		DataIdentifierScheme schemeCis = DataIdentifierScheme.CIS;
+
+		assertEquals("Schemes should be equals", schemeCtx1, schemeCtx2);
+		assertEquals("Schemes name should be equals", schemeCtx1.name(), schemeCtx2.name());
+		assertTrue("Schemes should not be equals", !schemeCtx1.equals(schemeCis));
+		assertTrue("Schemes name should not be equals", !schemeCtx1.name().equals(schemeCis.name()));
+	}
 
 	// -- Dependency Injection
 	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {

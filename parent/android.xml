@@ -111,6 +111,11 @@
 				<version>2.1</version>
 				<scope>compile</scope>
 			</dependency>
+	              	<dependency>
+        	                <groupId>org.simpleframework</groupId>
+                	        <artifactId>simple-xml</artifactId>
+                        	<version>2.6.6</version>
+                	</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -213,6 +218,14 @@
 						<emulator>
 							<avd>${test.android.avd}</avd>
 						</emulator>
+					        <!-- THIS line fix the problem with MAC of OutOfMemory HEAP-->
+						<dex>
+						   <jvmArguments>
+					                 <argument>-Xms256m</argument>
+					                 <argument>-Xmx512m</argument>
+					          </jvmArguments>
+					        </dex>
+						<!-- END -->
 						<undeployBeforeDeploy>true</undeployBeforeDeploy>
 					</configuration>
 					<extensions>true</extensions>

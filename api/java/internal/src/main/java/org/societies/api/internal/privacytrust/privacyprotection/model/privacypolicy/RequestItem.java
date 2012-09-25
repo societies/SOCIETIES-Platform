@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 
 /**
  * The RequestItem class is used to represent a request to access a specific piece of personal data. 
@@ -92,6 +93,28 @@ public class RequestItem implements Serializable{
 	public void setActions(List<Action> actions){
 		this.actions = actions;
 	}
+	
+	public String getStatus() {
+		for(Condition condition : conditions) {
+			if (condition.getConditionName().equals(ConditionConstants.SHARE_WITH_3RD_PARTIES)) {
+				return "Public";
+			}
+			if (condition.getConditionName().equals(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY)) {
+				return "Members only";
+			}
+		}
+		return "Private";
+	}
+	
+	public String getInferenceStatus() {
+		for(Condition condition : conditions) {
+			if (condition.getConditionName().equals(ConditionConstants.MAY_BE_INFERRED)) {
+				return "May be inferred";
+			}
+		}
+		return null;
+	}
+	
 	public String toXMLString(){
 		StringBuilder str = new StringBuilder("\n<Target>");
 		str.append(this.resource.toXMLString());

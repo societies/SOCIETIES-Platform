@@ -87,6 +87,15 @@ public class TestCommsMgmt {
 	        for (String s: listTopics) {
 	        	LOG.info("Node: " + s);
 	        }
+	        
+	        this.remoteCSSManager.suggestedFriends(new ICSSManagerCallback()  {
+				
+				public void receiveResult(CssInterfaceResult result) {
+					LOG.info("Received result from remote call");
+					//LOG.info("Result Status: " + result.isResultStatus());
+					
+				}
+			});
 
 		
 		} catch (XMPPError e) {
@@ -127,6 +136,8 @@ public class TestCommsMgmt {
 					
 				}
 			});
+			
+			
 			
 		}
 	}

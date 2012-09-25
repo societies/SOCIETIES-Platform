@@ -227,6 +227,7 @@ public class CssManagerController {
 				 cssAdvert.setUri(" ");
 				 getCssLocalManager().addAdvertisementRecord(cssAdvert);
 				
+				
 				model.put("message", "created Css Record");
 			} else {
 				if (((CssInterfaceResult) loginResult.get()).isResultStatus() == false) {
@@ -297,6 +298,7 @@ public class CssManagerController {
 			
 		
 			
+			
 				// Update all data
 			Future<List<CssAdvertisementRecordDetailed>> cssadverts = getCssLocalManager()
 					.getCssAdvertisementRecordsFull();
@@ -304,7 +306,7 @@ public class CssManagerController {
 					.findAllCssFriendRequests();
 			Future<List<CssRequest>> cssRequests = getCssLocalManager()
 					.findAllCssRequests();
-			Future<List<String>> asynchCssFriends = getCssLocalManager().getCssFriends();
+			Future<List<CssAdvertisementRecord>> asynchCssFriends = getCssLocalManager().getCssFriends();
 						
 			Future<List<Service>> asynchServices = null;
 			List<Service> friendServices =  new ArrayList<Service>();
@@ -351,12 +353,17 @@ public class CssManagerController {
 								try {
 									asynchServices = this.getSDService().getServices(cssAdDetails.getResultCssAdvertisementRecord().getId());
 									friendServices = asynchServices.get();
+									System.out.println("~~~~~~~~~~~~~~~ asynchServices is : " +asynchServices);
+									System.out.println("~~~~~~~~~~~~~~~ getId() is : " +cssAdDetails.getResultCssAdvertisementRecord().getId());
+									System.out.println("~~~~~~~~~~~~~~~ friendServices size is : " +friendServices);
 								} catch (ServiceDiscoveryException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 								
 								friendServiceCount = 1;
+								//don't fall over if friend container not available!
+								if (friendServices != null) {
 								for ( int j = 0; (j < friendServices.size()) && (j < 5); j++)
 								{
 									switch (friendServiceCount) {
@@ -382,6 +389,7 @@ public class CssManagerController {
 										break;
 									}	
 									friendServiceCount++;
+								}
 								}
 							}
 							
@@ -411,6 +419,8 @@ public class CssManagerController {
 								}
 								
 								friendServiceCount = 1;
+								//don't fall over if friend container not available!
+								if (friendServices != null) {
 								for ( int j = 0; (j < friendServices.size()) && (j < 5); j++)
 								{
 									switch (friendServiceCount) {
@@ -437,6 +447,7 @@ public class CssManagerController {
 									}	
 
 									friendServiceCount++;
+								}
 								}
 							
 							}
@@ -466,6 +477,8 @@ public class CssManagerController {
 								}
 								
 								friendServiceCount = 1;
+								//don't fall over if friend container not available!
+								if (friendServices != null) {
 								for ( int j = 0; (j < friendServices.size()) && (j < 5); j++)
 								{
 									switch (friendServiceCount) {
@@ -492,6 +505,7 @@ public class CssManagerController {
 									}	
 
 									friendServiceCount++;
+								}
 								}
 								
 							}

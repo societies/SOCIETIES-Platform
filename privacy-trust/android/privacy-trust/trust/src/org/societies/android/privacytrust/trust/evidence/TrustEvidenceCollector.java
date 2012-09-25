@@ -24,7 +24,6 @@
  */
 package org.societies.android.privacytrust.trust.evidence;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -47,10 +46,10 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.privacytrust.trust.TrustException;
-import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.internal.privacytrust.trust.remote.TrustModelBeanTranslator;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddIndirectEvidenceRequestBean;
@@ -92,7 +91,7 @@ public class TrustEvidenceCollector extends Service
 	        "org.societies.api.internal.schema.privacytrust.trust.model");
 	
 	// TODO Don't hardcode!
-	private String cloudNodeJid = "xcmanager.societies.local";
+	private String cloudNodeJid = "jane.societies.local";
 	
 	private IIdentity cloudNodeId;
 	

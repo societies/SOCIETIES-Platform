@@ -74,15 +74,10 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	@Autowired 
 	protected SessionFactory sessionFactory;
     protected static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
-    protected Session session;
-	public Session getSession() {
-		return session;
-	}
+    //protected Session session;
+
 	public int count(){
 		return list.size();
-	}
-	public void setSession(Session session) {
-		this.session = session;
 	}
 	//timeperiod: "millisecondssinceepoch millisecondssinceepoch+n" 
 	//where n has to be equal to or greater than 0
@@ -186,7 +181,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 
 
 	public void addActivity(IActivity activity) {
-
+        Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		Activity newact = new Activity(activity);
 		newact.setOwnerId(this.id);
@@ -201,7 +196,8 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			LOG.warn("Saving activity failed, rolling back");
 			e.printStackTrace();
 		}finally{
-
+            if(session!=null)
+                session.close();
 		}		
 	}
 
@@ -210,7 +206,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		int ret = 0;
 		String forever = "0 "+Long.toString(System.currentTimeMillis());
 		List<IActivity> toBeDeleted = getActivities(criteria,forever);
-		//Session session = sessionFactory.openSession();
+		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try{
 			for(IActivity act : toBeDeleted){
@@ -220,7 +216,10 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		}catch(Exception e){
 			t.rollback();
 			LOG.warn("deleting activities failed, rolling back");
-		}
+		} finally {
+            if(session!=null)
+                session.close();
+        }
 		return ret;
 	}
 
@@ -234,10 +233,10 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	
 	synchronized public void startUp(SessionFactory sessionFactory, String id){
         this.id = id;
-        Session session = sessionFactory.openSession();
+        //Session session = sessionFactory.openSession();
         list = new HashSet<Activity>();
         LOG.info("starting loading activities from db with ownerId: "+ id );
-        //Session session = sessionFactory.openSession();
+        Session session = sessionFactory.openSession();
         try{
             list.addAll(session.createCriteria(Activity.class).add(Property.forName("ownerId").eq(id)).list());
             if(list.size() == 0){
@@ -299,11 +298,19 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 	}
 
 	public boolean deleteActivity(IActivity activity) {
+        Session session = sessionFactory.openSession();
 		if(!list.contains(activity))
 			return false;
 		boolean ret = list.remove(activity);
 		Transaction t = session.beginTransaction();
-		session.delete(activity);
+        try {
+            session.delete(activity);
+        } catch (Exception e){
+
+        } finally {
+            if(session!=null)
+                session.close();
+        }
 		return ret;
 	}
 	@Override
@@ -319,6 +326,7 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		}
 		List<ActivityEntry> castedList = (List<ActivityEntry>) activityEntries;
 		Activity newAct = null;
+        Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		ParsePosition pp = new ParsePosition(0);
@@ -343,6 +351,8 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			e.printStackTrace();
 
 		}finally{
+            if(session!=null)
+                session.close();
 		}
 
 		return ret;
@@ -358,11 +368,19 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 		return a.getContent();
 	}
 	public void clear(){
-		for(Activity act : list){
-			Transaction t = session.beginTransaction();
-			session.delete(act);
-			t.commit();
-		}
+        Session session = sessionFactory.openSession();
+        try{
+            for(Activity act : list){
+                Transaction t = session.beginTransaction();
+                session.delete(act);
+                t.commit();
+            }
+        } catch (Exception e){
+
+        } finally {
+            if(session!=null)
+                session.close();
+        }
 		list.clear();
 	}
 
@@ -386,9 +404,10 @@ public class ActivityFeed implements IActivityFeed, Subscriber {
 			IActivity element = it.next();
 			org.societies.api.schema.activity.Activity a = new org.societies.api.schema.activity.Activity();
 			a.setActor(element.getActor());
-			a.setObject(a.getObject());
-			a.setPublished(a.getPublished());
-			a.setVerb(a.getVerb());
+			a.setObject(element.getObject());
+			a.setPublished(element.getPublished());
+			a.setVerb(element.getVerb());
+            a.setTarget(element.getTarget());
 			marshalledActivList.add(a);
 	     }
 	}

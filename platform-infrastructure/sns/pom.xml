@@ -31,14 +31,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>version-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<!-- Setup the identity of this builder -->
 	<groupId>org.societies</groupId>
 	<artifactId>sns</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1</version>
+	<version>RELEASE</version>
 	<name>Social Network Services</name>
 
 	<!-- All Spring-OSGi Java projects to be included in nightly builds -->
@@ -46,12 +46,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<!-- API -->
 		<module>../../api/java/internal</module>
 		
-		<!-- Communications Infrastructure -->
+		<!-- SNS Connectors -->
 		<module>TwitterConnector</module>
 		<module>FoursquareConnector</module>
 		<module>FacebookConn</module>
 		<module>LinkedinConn</module>
 		<module>GooglePlusConnector</module>
 		<module>socialdata</module>
+		
+		<!-- Communications Infrastructure -->
+		<module>SocialDataComms</module>
+		<module>SocialDataCommsMgr</module>
 	</modules>
 </project>

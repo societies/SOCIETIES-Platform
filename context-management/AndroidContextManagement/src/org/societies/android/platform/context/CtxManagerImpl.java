@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.societies.android.api.context.broker.ICtxClientBroker;
+import org.societies.android.api.internal.context.broker.ICtxClientBroker;
 
 /// allaksa se kanoniko api
 import org.societies.api.context.CtxException;
@@ -33,8 +33,8 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.useragent.monitoring.MethodType;
-import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
+//import org.societies.api.schema.useragent.monitoring.MethodType;
+//import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 

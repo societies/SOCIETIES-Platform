@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Societies</title>
+<meta charset="UTF-8">
+<meta name="description" content="Societies"/>
+</head>
+<body>
+
+
+<!-- Start of first page: #friends -->
+<div data-role="page" id="community-results">
+	<!-- header -->
+	<div data-role="header" data-position="fixed">
+		<img class="logo" src="../images/societies_header.png" alt="logo" />
+		<a href="#" data-slidemenu="#slidemenu" data-slideopen="false" data-corners="false" data-iconpos="notext">Menu</a>
+	</div>
+	<!-- /header -->
+	<div data-role="content">
+		<!-- <input type="search" name="search" id="search-basic" value="Search Communities" data-theme="b"/>  -->
+		<br/><br/>
+		<ul data-role="listview" data-theme="d" data-divider-theme="b" id="CommunitiesFoundDiv" data-filter="true" data-filter-placeholder="Filter results..." >
+			<li data-role="list-divider">Found Communities</li>
+			<!-- //////////////////// LIST OF COMMUNITIES /////////////////// -->
+			<li id="searchMsg"><img src="../javascript/jquerymobile/images/ajax-loader.gif" /></li>
+		</ul>
+		<br/><br/>
+		<div class="terms">
+			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
+		</div>
+	</div>
+	<!-- /content -->
+	<br/><br/>
+	<!-- footer -->
+   <div class="footer_fixed" data-role="footer" data-position="fixed">
+		<ul class="nav">
+			<li class="btn-home">
+				<input id="home-button" type="image" alt="home" src="images/icons/home_logo.png"  data-role="none"/>
+			</li>
+			<li class="btn-profile">
+				<input id="profile-button" type="image" alt="profile" src="images/icons/my_profile.png"  data-role="none"/>	
+			</li>
+			<li class="btn-settings">
+				<input id="settings-button" type="image" alt="settings" src="images/icons/settings.png"  data-role="none"/>	
+			</li>
+			<li class="btn-about">
+				<input id="about-button" type="image" alt="about" src="images/icons/about.png"  data-role="none"/>	
+			</li>
+		</ul><!-- /global navbar -->
+	</div>
+	<!-- end footer -->
+</div>
+</body>
+</html>

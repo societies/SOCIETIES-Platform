@@ -42,10 +42,10 @@
 
 	<!-- Privacy Policy Negotiation Management Configuration -->
 	
-	<!-- <osgi:service ref="PrivacyNegotiationManagerCommClient"
-		interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote" /> -->
+	<osgi:service ref="PrivacyNegotiationManagerCommClient"
+		interface="org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgentRemote" /> 
 		
-	<osgi:reference id="privacyNegotiationAgent"
+	<osgi:reference id="privacyNegotiationAgentLocalService"
 		interface="org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent" cardinality="0..1" />
 
 

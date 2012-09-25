@@ -1,7 +1,8 @@
-{
+{ 
 	"ServiceManagementService" : 
 		{
 		"exceptionThreshold" : 0,
+		"allArray" : true,
 		"connectService" : "connected",
 		"disconnectService" : "disconnected",
 		"getServices" : [ {
@@ -9,42 +10,42 @@
     					"privacyPolicy": "privacy policy info: you're on your own!",
     					"serviceDescription": "Performs basic calculator services, Add/Subtract",
     					"serviceEndpoint": "http://societies.local/calculator",
-    					"serviceIdentifier": { //ServiceResourceIdentifier
+    					"serviceIdentifier": { 
     								"identifier": "http://societies.local/calculator",
     								"serviceInstanceIdentifier": "myInstance"
     								}, 
-    					"serviceInstance": { //ServiceInstance
+    					"serviceInstance": { 
     								"fullJid": "john@societies.local",
     								"cssJid":  "john.societies.local",
 									"parentJid": "john.societies.local",
-									"serviceImpl": { //ServiceImplementation 
+									"serviceImpl": {  
 											"serviceNameSpace": "http://societies.org/calculator",
 											"serviceProvider": "Honest John's calculators",
 											"serviceVersion": "1.0",
 											"serviceClient": "http://societies.org/calculator"
 											},
 									"xmppNode" : "Cloud node"
-    								},  
-    					"serviceLocation": "Local", //ServiceLocation
+    								},
+    					"serviceLocation": "Local",
     					"serviceName": "Calculator",
     					"serviceCategory": "Maths Tools",
-    					"serviceStatus": "STARTED", //ServiceStatus 
-    					"serviceType": "ThirdPartyServer", //ServiceType
+    					"serviceStatus": "STARTED",  
+    					"serviceType": "ThirdPartyServer" 
 						},
 						{
 	                    "authorSignature": "Jane Smith",
     					"privacyPolicy": "privacy policy info: you're on your own!",
     					"serviceDescription": "Provides a fortune telling service",
     					"serviceEndpoint": "http://societies.local/fortune",
-    					"serviceIdentifier": { //ServiceResourceIdentifier
+    					"serviceIdentifier": { 
     								"identifier": "http://societies.local/fortune",
     								"serviceInstanceIdentifier": "myInstance"
     								}, 
-    					"serviceInstance": { //ServiceInstance
+    					"serviceInstance": { 
     								"fullJid": "jane@societies.local",
     								"cssJid":  "jane.societies.local",
 									"parentJid": "jane.societies.local",
-									"serviceImpl": { //ServiceImplementation 
+									"serviceImpl": {  
 											"serviceNameSpace": "http://societies.org/fortune",
 											"serviceProvider": "Know your future",
 											"serviceVersion": "0.5",
@@ -52,26 +53,26 @@
 											},
 									"xmppNode" : "Cloud node"
     								},  
-    					"serviceLocation": "Local", //ServiceLocation
+    					"serviceLocation": "Local", 
     					"serviceName": "FortuneCookie",
     					"serviceCategory": "Future Casting",
-    					"serviceStatus": "STARTED", //ServiceStatus 
-    					"serviceType": "ThirdPartyServer", //ServiceType
+    					"serviceStatus": "STARTED",  
+    					"serviceType": "ThirdPartyServer" 
 						},
 						{
 	                    "authorSignature": "Bob Hope",
     					"privacyPolicy": "privacy policy info: you're on your own!",
     					"serviceDescription": "Performs Complex services cheap",
     					"serviceEndpoint": "http://societies.local/complex",
-    					"serviceIdentifier": { //ServiceResourceIdentifier
+    					"serviceIdentifier": { 
     								"identifier": "http://societies.local/complex",
     								"serviceInstanceIdentifier": "myInstance"
     								}, 
-    					"serviceInstance": { //ServiceInstance
+    					"serviceInstance": { 
     								"fullJid": "bob@societies.local",
     								"cssJid":  "bob.societies.local",
 									"parentJid": "bob.societies.local",
-									"serviceImpl": { //ServiceImplementation 
+									"serviceImpl": {  
 											"serviceNameSpace": "http://societies.org/fortune",
 											"serviceProvider": "Complexity Solutions",
 											"serviceVersion": "2.1",
@@ -79,11 +80,11 @@
 											},
 									"xmppNode" : "Cloud node"
     								},  
-    					"serviceLocation": "Local", //ServiceLocation
+    					"serviceLocation": "Local", 
     					"serviceName": "Complex Service",
     					"serviceCategory": "Complexity Tools",
-    					"serviceStatus": "STARTED", //ServiceStatus 
-    					"serviceType": "ThirdPartyServer", //ServiceType
+    					"serviceStatus": "STARTED",  
+    					"serviceType": "ThirdPartyServer" 
 						} ]
 		}
 }

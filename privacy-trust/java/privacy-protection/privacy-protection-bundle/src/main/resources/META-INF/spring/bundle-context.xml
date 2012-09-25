@@ -17,6 +17,9 @@
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
+		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
+		<property name="cisManager" ref="cisManager" />
+		<property name="commManager" ref="commManager" />
 	</bean>
 
 	<bean name="privacyDataManagerInternal"
@@ -24,7 +27,7 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-	<!-- Persistance Configuration -->
+	<!-- Persistence Configuration -->
 	<context:annotation-config />
 
 	<tx:annotation-driven />
@@ -110,7 +113,7 @@
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
 		<property name="privacyAgreementManagerInternal" ref="privacyAgreementManagerInternal" />
 		<!-- <property name="negotiationAgentRemote" ref="negotiationAgentRemote"></property> -->
-		<property name="negotiationAgent" ref="negotiationAgent" />
+		<property name="negotiationAgent" ref="negotiationAgentRemote" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 		<property name="identitySelection" ref="identitySelection" />
 		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>

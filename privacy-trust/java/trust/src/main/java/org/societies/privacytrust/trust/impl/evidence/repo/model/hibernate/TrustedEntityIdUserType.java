@@ -34,9 +34,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.type.Type;
 import org.hibernate.usertype.CompositeUserType;
-import org.societies.api.internal.privacytrust.trust.model.MalformedTrustedEntityIdException;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 
 /**
  * This class is used to serialize instances of {@link TrustedEntityId} to and from JDBC.

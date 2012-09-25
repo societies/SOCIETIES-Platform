@@ -68,7 +68,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 
 
 	public void init() {
-		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker,commManager.getIdManager());
+		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker, commManager.getIdManager());
 	}
 
 
@@ -92,7 +92,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		RequestPolicy privacyPolicy = policyRegistryManager.getPolicy(requestor);
 		return privacyPolicy;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFromLocation(java.lang.String)
@@ -101,7 +101,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	public String getPrivacyPolicyFromLocation(String location) throws PrivacyException {
 		return getPrivacyPolicyFromLocation(location, null);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFromLocation(java.lang.String, java.util.Map)
@@ -142,9 +142,6 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		// -- Verify
 		if (null == privacyPolicy) {
 			throw new PrivacyException("The privacy policy to update is empty.");
-		}
-		if (null == policyRegistryManager) {
-			throw new PrivacyException("The privacy policy registry is not ready");
 		}
 		if (null == privacyPolicy.getRequestor() || null == privacyPolicy.getRequestor().getRequestorId()) {
 			throw new PrivacyException("Not enought information to update a privacy policy. Requestor needed.");
@@ -297,17 +294,24 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return isDepencyInjectionDone(0);
 	}
 	private boolean isDepencyInjectionDone(int level) {
-		if (null == ctxBroker) {
-			LOG.info("[Dependency Injection] Missing ICtxBorker");
-			return false;
+		if (level == 0) {
+
+			if (null == policyRegistryManager) {
+				LOG.error("[Manual Dependency Injection] Missing PolicyRegistryManager");
+				return false;
+			}
 		}
 		if (level == 0 || level == 1) {
+			if (null == ctxBroker) {
+				LOG.error("[Dependency Injection] Missing ICtxBorker");
+				return false;
+			}
 			if (null == commManager) {
-				LOG.info("[Dependency Injection] Missing ICommManager");
+				LOG.error("[Dependency Injection] Missing ICommManager");
 				return false;
 			}
 			if (null == commManager.getIdManager()) {
-				LOG.info("[Dependency Injection] Missing IIdentityManager");
+				LOG.error("[Dependency Injection] Missing IIdentityManager");
 				return false;
 			}
 		}

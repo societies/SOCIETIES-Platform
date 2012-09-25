@@ -24,7 +24,6 @@
  */
 package org.societies.slm.servicecontrol;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,13 +44,14 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
-//import org.societies.api.internal.security.policynegotiator.INegotiation;
-//import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
+import org.societies.api.internal.css.devicemgmt.IDeviceManager;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+import org.societies.api.internal.security.policynegotiator.INegotiation;
+import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
-import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
@@ -60,7 +60,7 @@ import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
-//import org.societies.slm.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
+import org.societies.slm.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -79,16 +79,30 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
 	private IServiceControlRemote serviceControlRemote;
-	//private INegotiation policyNegotiation;
+	private INegotiation policyNegotiation;
 	private ICisManager cisManager;
-
+	private IDeviceManager deviceMngr;
+	
 	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	private static HashMap<Long,BlockingQueue<Service>> uninstallServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	
 	private final long TIMEOUT = 5;
 
+	
+	public IDeviceManager getDeviceMngr(){
+		return deviceMngr;
+	}
+	
+	public void setDeviceMngr(IDeviceManager deviceMngr){
+		this.deviceMngr = deviceMngr;
+	}
+	
 	public ICisManager getCisManager(){
 		return cisManager;
+	}
+	
+	public void setCisManager(ICisManager cisManager){
+		this.cisManager = cisManager;
 	}
 	
 	public IServiceRegistry getServiceReg() {
@@ -103,15 +117,11 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		this.commMngr = commMngr;
 	}
 	
-	public void setCisManager(ICisManager cisManager){
-		this.cisManager = cisManager;
-	}
-	
 	public ICommManager getCommMngr() {
 		return commMngr;
 	}
 
-	/*
+	
 	public void setPolicyNegotiation(INegotiation policyNegotiation){
 		this.policyNegotiation = policyNegotiation;
 	}
@@ -119,7 +129,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public INegotiation getPolicyNegotiation(){
 		return policyNegotiation;
 	}
-	*/
+	
 	public void setServiceControlRemote(IServiceControlRemote serviceControlRemote){
 		this.serviceControlRemote = serviceControlRemote;
 	}
@@ -206,6 +216,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("Service represented by " + serviceId + " does not exist in SOCIETIES Registry");
 				
 				returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);
+				return new AsyncResult<ServiceControlResult>(returnResult);
+			}
+			
+			//Next, we need to determine if we should continue
+			if(service.getServiceType().equals(ServiceType.DEVICE)){
+				if(logger.isDebugEnabled()) logger.debug("It's a device, so shouldn't proceed.");
+				returnResult.setMessage(ResultMessage.SERVICE_TYPE_NOT_SUPPORTED);
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
@@ -312,6 +329,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);
 				return new AsyncResult<ServiceControlResult>(returnResult);			}
 			
+			//Next, we need to determine if we should continue
+			if(service.getServiceType().equals(ServiceType.DEVICE)){
+				if(logger.isDebugEnabled()) logger.debug("It's a device, so shouldn't proceed.");
+				returnResult.setMessage(ResultMessage.SERVICE_TYPE_NOT_SUPPORTED);
+				return new AsyncResult<ServiceControlResult>(returnResult);
+			}
+			
 			// Next step, we obtain the bundle that corresponds to this service			
 			Bundle serviceBundle = getBundleFromService(service);
 			
@@ -362,26 +386,64 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			if(logger.isDebugEnabled()) 
 				logger.debug("Service Management: installService method, trying to install a remote service!");
 		
+			if(serviceToInstall.getServiceType().equals(ServiceType.DEVICE)){
+				
+				if(logger.isDebugEnabled()) 
+					logger.debug("This is a device, calling Device Manager");
+				
+				IIdentity deviceNodeId = getCommMngr().getIdManager().fromFullJid(serviceToInstall.getServiceInstance().getFullJid());
+				DeviceCommonInfo deviceCommonInfo = new DeviceCommonInfo();
+				deviceCommonInfo.setDeviceDescription(serviceToInstall.getServiceDescription());
+				deviceCommonInfo.setDeviceID(serviceToInstall.getServiceIdentifier().getServiceInstanceIdentifier());
+				deviceCommonInfo.setDeviceLocation(serviceToInstall.getServiceLocation());
+				deviceCommonInfo.setDeviceName(serviceToInstall.getServiceName());
+				deviceCommonInfo.setDeviceType(serviceToInstall.getServiceCategory());
+				deviceCommonInfo.setDevicePhysicalAddress(null);
+				deviceCommonInfo.setDeviceFamilyIdentity(null);
+				deviceCommonInfo.setDeviceProvider(serviceToInstall.getServiceInstance().getServiceImpl().getServiceProvider());
+				deviceCommonInfo.setDeviceConnectionType(null);
+				
+				if(serviceToInstall.getContextSource().equals("isContextSource"))
+					deviceCommonInfo.setContextSource(true);
+				else
+					deviceCommonInfo.setContextSource(false);
+				
+				logger.debug("About to install!");
+
+				String deviceId = getDeviceMngr().fireNewSharedDevice(deviceCommonInfo, deviceNodeId);
+				
+				if(deviceId == null){
+					if(logger.isDebugEnabled()) 
+						logger.debug("Problem installing device!");
+					returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
+					return new AsyncResult<ServiceControlResult>(returnResult);	
+
+				} else{
+					if(logger.isDebugEnabled()) 
+						logger.debug("Device installed with id: " + deviceId);
+					returnResult.setServiceId(ServiceModelUtils.generateServiceResourceIdentifierForDevice(serviceToInstall, deviceId));
+					returnResult.setMessage(ResultMessage.SUCCESS);
+					return new AsyncResult<ServiceControlResult>(returnResult);	
+				}
+				
+			}
+			
 			// First up, we need to do the negotiation check
 			
 			if(logger.isDebugEnabled())
 				logger.debug("Trying to do policy negotiation!");
 			
 			IIdentity providerNode = getCommMngr().getIdManager().fromJid(serviceToInstall.getServiceInstance().getFullJid());
-
+			INetworkNode myNode = getCommMngr().getIdManager().getThisNetworkNode();
+			
 			if(logger.isDebugEnabled())
 				logger.debug("Got the provider IIdentity, now creating the Requestor");
 		
 			RequestorService provider = new RequestorService(providerNode, serviceToInstall.getServiceIdentifier());
-		
-			boolean includePrivacyPolicyNegotiation = false;
 			
-			if(logger.isDebugEnabled())
-				logger.debug("For now, PrivacyPolicyNegotiation is: " + includePrivacyPolicyNegotiation);
 			
-			/*
 			ServiceNegotiationCallback negotiationCallback = new ServiceNegotiationCallback();
-			getPolicyNegotiation().startNegotiation(provider, includePrivacyPolicyNegotiation, negotiationCallback);
+			getPolicyNegotiation().startNegotiation(provider, negotiationCallback);
 			ServiceNegotiationResult negotiationResult = negotiationCallback.getResult();
 		
 			if(negotiationResult == null){
@@ -400,17 +462,18 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			if(logger.isDebugEnabled())
 					logger.debug("Negotiation was successful! URI returned is: " + negotiationResult.getServiceUri());
-			*/
+			
 			// Now install the client!
 			if(serviceToInstall.getServiceType().equals(ServiceType.THIRD_PARTY_WEB)){
 				if(logger.isDebugEnabled()) logger.debug("This is a web-type service, no client to install!");
-				serviceToInstall.setServiceLocation(ServiceLocation.REMOTE);
-				//serviceToInstall.setServiceEndpoint(negotiationResult.getServiceUri().toString());
-				//mmannion: Note this is just temporary fix to get around bug#1314
-				// ServiceEndpoint might not be current for remote servers
-				// but since it's only temporary ......
-				serviceToInstall.setServiceEndpoint(getCommMngr().getIdManager().getThisNetworkNode().getJid()  + "/" +  serviceToInstall.getServiceName().replaceAll(" ", ""));
-				
+				//serviceToInstall.setServiceEndpoint(negotiationResult.getServiceUri().toString());				
+
+				ServiceInstance si = serviceToInstall.getServiceInstance();
+				si.setParentIdentifier(serviceToInstall.getServiceIdentifier());
+				si.setParentJid(serviceToInstall.getServiceInstance().getFullJid());
+				si.setFullJid(myNode.getJid());
+				si.setCssJid(myNode.getBareJid());
+				serviceToInstall.setServiceInstance(si);
 				
 				List<Service> addServices = new ArrayList<Service>();
 				addServices.add(serviceToInstall);
@@ -418,14 +481,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 				logger.info("Installed web-type third-party service.");
 				returnResult.setMessage(ResultMessage.SUCCESS);
-				
 			
 			} else{
+									
 				if(logger.isDebugEnabled()) logger.debug("This is a client-based service, we need to install it");
-				
+					
 				Future<ServiceControlResult> asyncResult = null;
-				//URL bundleLocation = negotiationResult.getServiceUri().toURL();
-				URL bundleLocation = serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient().toURL();
+				URL bundleLocation = negotiationResult.getServiceUri().toURL();
+				//URL bundleLocation = new URL(serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient());
 
 				asyncResult = installService(bundleLocation);
 				ServiceControlResult result = asyncResult.get();
@@ -433,21 +496,22 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(result == null){
 					if(logger.isDebugEnabled())
 						logger.debug("Error with installation! ");
-					
+						
 					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 				} 
-				
-				if(result.getMessage() == ResultMessage.SUCCESS){
 					
+				if(result.getMessage() == ResultMessage.SUCCESS){
+						
 					// We get the service from the registry
 					Service newService = getServiceReg().retrieveService(result.getServiceId());
-					
+						
 					ServiceInstance newServiceInstance = newService.getServiceInstance();
 					newServiceInstance.setParentJid(serviceToInstall.getServiceInstance().getFullJid());
+					newServiceInstance.setParentIdentifier(serviceToInstall.getServiceIdentifier());
 					newService.setServiceInstance(newServiceInstance);
 					getServiceReg().updateRegisteredService(newService);
-					
+						
 					//
 					logger.info("Installed shared third-party service client!");
 					returnResult.setServiceId(result.getServiceId());
@@ -457,6 +521,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Installation of client was not successful");
 					returnResult.setMessage(result.getMessage());
 				}
+	
 			}
 			
 
@@ -465,6 +530,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 		} catch (Exception ex) {
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
+			ex.printStackTrace();
 			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
 		}
 		
@@ -753,8 +819,37 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
-			// Next step, we check if there's actually something to uninstall!
+			if(service.getServiceType().equals(ServiceType.DEVICE) && !nodeJid.equals(localNodeJid)){
+				if(logger.isDebugEnabled()) logger.debug("It's a remote device...");
+				getDeviceMngr().fireDisconnectedSharedDevice(service.getServiceIdentifier().getServiceInstanceIdentifier());
+
+				returnResult.setMessage(ResultMessage.SUCCESS);
+				return new AsyncResult<ServiceControlResult>(returnResult);
+			}
 			
+			//Next, we need to determine if we should continue
+			if(service.getServiceType().equals(ServiceType.DEVICE) || service.getServiceType().equals(ServiceType.THIRD_PARTY_ANDROID)){
+				if(logger.isDebugEnabled()) logger.debug("It's a device, so shouldn't proceed.");
+				returnResult.setMessage(ResultMessage.SERVICE_TYPE_NOT_SUPPORTED);
+				return new AsyncResult<ServiceControlResult>(returnResult);
+			}
+			
+			//Next, we need to determine if we should continue
+			if(service.getServiceType().equals(ServiceType.THIRD_PARTY_WEB) && !nodeJid.equals(localNodeJid)){
+				if(logger.isDebugEnabled())
+					logger.debug("It's a web-app, we need to remove it");
+				
+				List<Service> servicesToRemove = new ArrayList<Service>();
+				servicesToRemove.add(service);
+				
+				if(logger.isDebugEnabled()) logger.debug("Removing service: " + service.getServiceName() + " from SOCIETIES Registry");
+
+				getServiceReg().unregisterServiceList(servicesToRemove);
+				logger.info("Service " + service.getServiceName() + " has been uninstalled");
+				
+				returnResult.setMessage(ResultMessage.SUCCESS);
+				return new AsyncResult<ServiceControlResult>(returnResult);
+			}
 			
 			// Next step, we obtain the bundle that corresponds to this service			
 			Bundle serviceBundle = getBundleFromService(service);
@@ -778,6 +873,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				uninstallServiceMap.put(bundleId, idList);
 			}
 				*/
+			
 			if(logger.isDebugEnabled()) logger.debug("Attempting to uninstall bundle: " + serviceBundle.getSymbolicName());
 			
 			serviceBundle.uninstall();
@@ -1053,7 +1149,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Removing service from sharing");
 					getServiceReg().removeServiceSharingInCIS(service.getServiceIdentifier(), node.getJid());
 					
-					//Checking if the service is ours, if so then add it to the negotiation provider
+					
+					//Checking if the service is ours, if not then we remove it from the repository
 					if(!ServiceModelUtils.isServiceOurs(service,getCommMngr())){
 						if(logger.isDebugEnabled())
 							logger.debug("Service isn't ours, removing it from the service repository!");
@@ -1061,6 +1158,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						List<Service> servicesList = new ArrayList<Service>();
 						servicesList.add(service);
 						getServiceReg().unregisterServiceList(servicesList);
+						
+						//And if it's a device...
+						if(service.getServiceType().equals(ServiceType.DEVICE)){
+							if(logger.isDebugEnabled())
+								logger.debug("Service is a device, alerting device management");
+							
+							getDeviceMngr().fireDisconnectedSharedDevice(service.getServiceIdentifier().getServiceInstanceIdentifier());
+						}
 					}
 		
 					returnResult.setMessage(ResultMessage.SUCCESS);
@@ -1090,7 +1195,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						
 						if(result.getMessage() == ResultMessage.SUCCESS){
 
-							// Don't think this makes sense or is needed... should you be able to remove a service that isn't your from a remote CIS?!
+							// Don't think this makes sense or is needed... should you be able to remove a service that isn't yours from a remote CIS?!
 							if(!ServiceModelUtils.isServiceOurs(ourService, getCommMngr())){
 								if(logger.isDebugEnabled())
 									logger.debug("Service isn't ours, removing it from the service repository!");

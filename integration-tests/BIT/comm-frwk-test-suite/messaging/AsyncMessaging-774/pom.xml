@@ -1,14 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.societies</groupId>
-		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
-	</parent>
 	<artifactId>integration.test.bit.asyncmessage_774</artifactId>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
+	
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
 	
 	<dependencies>
 		<dependency>
@@ -57,7 +58,7 @@
 		<dependency>
 		    <groupId>org.societies.maven.converters</groupId>
 		    <artifactId>SimpleXMLConverters</artifactId>
-		    <version>0.1</version>
+		    <version>${release.version}</version>
 		    <scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -86,7 +87,7 @@
 			<plugin>
 				<groupId>org.societies.maven</groupId>
 				<artifactId>jaxb2simple-maven-plugin</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<version>1.0</version>
 				<executions>
 					<execution>
 						<phase>process-sources</phase>
@@ -127,7 +128,7 @@
 							<version>${release.version}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

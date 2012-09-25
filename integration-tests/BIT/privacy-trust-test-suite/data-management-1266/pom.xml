@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -56,7 +56,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.1</version>
+			<version>4.1</version><!--$NO-MVN-MAN-VER$-->
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.util</groupId>
+			<artifactId>commonmock</artifactId>
+			<version>1.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<!-- Tools -->
@@ -87,8 +93,7 @@
 						<Bundle-Name>${project.artifactId}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Embed-Dependency>
-							junit;scope=compile|runtime,
-							integrationtestutil;scope=compile|runtime,
+							*;scope=compile|runtime,
 						</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 					</instructions>
@@ -125,7 +130,7 @@
 							<version>${project.version}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

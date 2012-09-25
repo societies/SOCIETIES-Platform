@@ -81,13 +81,22 @@ public class PersonalisationManagerAndroid extends Service implements IPersonali
 						"org.societies.api.schema.servicelifecycle.model"));
 
 	//currently hard coded but should be injected
-	private static final String DESTINATION = "xcmanager.societies.local";
+	private static final String DESTINATION = "university.societies.local.macs.hw.ac.uk";
 
 	private IIdentity toXCManager = null;
 	private ClientCommunicationMgr ccm;
 
 	private IBinder binder = null;
 
+	/**
+	 * Create Binder object for local service invocation
+	 */
+	public class LocalBinder extends Binder {
+		public IPersonalisationManagerAndroid getService() {
+			return PersonalisationManagerAndroid.this;
+		}
+	}
+	
 	
 	Hashtable<String,IAction> results = new Hashtable<String, IAction>();
 	@Override

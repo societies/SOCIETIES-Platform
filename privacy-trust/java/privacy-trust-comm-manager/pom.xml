@@ -53,24 +53,48 @@
 	</parent>
 
 	<dependencies>
-		<!--  Societies -->
+
+
+
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Communication Manager  -->
+
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+				<dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>api</artifactId>
+			<version>${version.pt}</version>
+		</dependency>
+
+
+		<!-- Communication Manager -->
+		<!-- The version has to be updated accordingly -->
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- Test -->
@@ -92,25 +116,12 @@
 			<version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- Logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!-- Spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
+		<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
@@ -119,18 +130,14 @@
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.name}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<Embed-Dependency>
-						</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>
-    						org.springframework.beans.factory.annotation*;version="0",
-    						org.springframework.stereotype*;version="0",
-							*
-						</Import-Package>
-						<Export-Package></Export-Package>
+
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
@@ -145,7 +152,7 @@
 							<artifactId>${project.artifactId}</artifactId>
 							<version>${project.version}</version>
 							<type>jar</type>
-							<!--type>bundle</type-->
+							<!--type>bundle</type -->
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>

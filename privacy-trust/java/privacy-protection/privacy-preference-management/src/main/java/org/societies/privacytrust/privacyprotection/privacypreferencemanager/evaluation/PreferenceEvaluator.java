@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
-import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;

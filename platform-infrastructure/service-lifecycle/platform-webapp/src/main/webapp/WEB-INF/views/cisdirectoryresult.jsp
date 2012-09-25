@@ -33,19 +33,17 @@
 <input type="hidden" name="method" id="method" value="JoinRemoteCIS">
 
 <Table border="1">
-<tr><td><B>CIS Name</B></td><td><B>Uri</B></td><td><B>Action</B></td><!-- <td><B>ID</B></td><td><B>Password</B></td><td><B>Mode</B></td> -->
+<tr><td><B>CIS Name</B></td><td><B>CSS Owner ID</B></td><td><B>CIS Type</B></td><td><B>CIS ID</B></td><td><B>Action</B></td>
 </tr> 
 
 	<xc:forEach var="advert" items="${adverts}">
         <tr>
         	<td>${advert.name}</td>
-         	<td>${advert.uri}</td>
-         	<td><input type="button" value="join" onclick="updateForm('${advert.uri}')" ></td>
-         	<!-- 
+        	<td>${advert.cssownerid}</td>
             <td>${advert.type}</td>
             <td>${advert.id}</td> 
-            <td>${advert.password}</td>
-             -->           
+            <td><input type="button" value="join" onclick="updateForm('${advert.id}')" ></td> 
+           
         </tr>
     </xc:forEach>
     	

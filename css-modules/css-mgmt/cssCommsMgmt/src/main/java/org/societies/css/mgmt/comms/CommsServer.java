@@ -39,6 +39,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
@@ -107,8 +108,10 @@ public class CommsServer implements IFeatureServer {
 			Future<CssInterfaceResult> asyncResult = null;
 			CssInterfaceResult result = null;
 			
-			Future<List<String>> asyncGetFriendsResult = null;
-			List<String> getFriendsResult = null;
+			
+			
+			Future<List<CssAdvertisementRecord>> asyncFriendsAdsResult = null;
+			List<CssAdvertisementRecord> friendsAdsResult = null;
 		
 			LOG.debug("CSSManager remote invocation of method "
 					+ bean.getMethod().name());
@@ -156,8 +159,14 @@ public class CommsServer implements IFeatureServer {
 			case REGISTER_CSS_NODE:
 				asyncResult = this.cssManager.registerCSSNode((CssRecord) bean.getProfile());
 				break;
+			case MODIFY_CSS_RECORD:
+				asyncResult = this.cssManager.modifyCssRecord((CssRecord) bean.getProfile());
+				break;	
 			case GET_CSS_FRIENDS:
-				asyncGetFriendsResult = this.cssManager.getCssFriends();
+				asyncFriendsAdsResult = this.cssManager.getCssFriends();
+				break;
+			case SUGGESTED_FRIENDS:
+				asyncFriendsAdsResult = this.cssManager.suggestedFriends();
 				break;
 			default:
 				break;
@@ -166,7 +175,8 @@ public class CommsServer implements IFeatureServer {
 			try {
 				switch (bean.getMethod()) {
 				case GET_CSS_FRIENDS:
-					getFriendsResult = asyncGetFriendsResult.get();
+				case SUGGESTED_FRIENDS:
+					friendsAdsResult = asyncFriendsAdsResult.get();
 					break;
 				default:
 					// Since everything else seems to use this!!
@@ -184,7 +194,7 @@ public class CommsServer implements IFeatureServer {
 
 			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
-			resultBean.setResultCssFriendList(getFriendsResult);
+			resultBean.setResultAdvertList(friendsAdsResult);
 
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;

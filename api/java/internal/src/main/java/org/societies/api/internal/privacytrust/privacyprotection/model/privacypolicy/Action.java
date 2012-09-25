@@ -57,6 +57,11 @@ public class Action implements Serializable{
 		this.optional = isOptional;
 	}
 	
+	public Action(Action action){
+		this.action = action.getActionType();
+		this.optional = action.isOptional();
+	}
+	
 	public void setOptional(boolean isOptional){
 		this.optional = isOptional;
 	}
@@ -64,6 +69,9 @@ public class Action implements Serializable{
 		return this.optional;
 	}
 	public ActionConstants getActionType(){
+		return this.action;
+	}
+	public ActionConstants getActionConstants(){
 		return this.action;
 	}
 	public TargetMatchConstants getType(){

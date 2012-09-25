@@ -4,30 +4,12 @@
 <title>Societies</title>
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
-<link href="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.css" rel="stylesheet" type="text/css"/>
-<link rel="stylesheet" type="text/css" href="includes/societies.css"/>
-<script src="jquery-mobile/jquery-1.7.2.js" type="text/javascript"></script>
-<script src="jquery-mobile/jquery.mobile-1.1.0/jquery.mobile-1.1.0.min.js" type="text/javascript"></script>
-<!--JQM SlideMenu-->
-<link rel="stylesheet" href="includes/jqm.css"/>
-<script src="js/jqm.slidemenu.js"></script>
 </head>
 <body>
-<div id="slidemenu">
-
-<h3>MENU</h3>
-	<ul>
-		<li><input id="slide-inbox"  type="button" value="Inbox"/></li>
-		<li><input id="slide-chat"  type="button" value="Chat"/></li>
-		<li><input id="slide-rssfeeds"  type="button" value="RSS Feeds"/></li>
-		<li><input id="slide-help"  type="button" value="Help"/></li>
-		<li><input id="slide-logout" type="button" value="Log Out"/></li>
-	</ul>
-</div>
 
 
 <!-- Start of first page: #friends -->
-<div data-role="page" id="friends">
+<div data-role="page" id="my-profile">
 	<!-- header -->
 	<div data-role="header" data-position="fixed">
 		<img class="logo" src="../images/societies_header.png" alt="logo" />
@@ -40,48 +22,105 @@
 		</ul>
 		<br/>
 		<form id="form1">
-			<div id="fnameDiv" data-role="fieldcontain">
-				<label for="fname" id="fnameLabel" name="fnameLabel">First name*</label>
-				<input id="fname" name="fname_r" type="text"/>
+			<div data-role="fieldcontain" >
+
+			<!-- CSS Organisation Type-->
+				<label for="cssrecordorgtype">CSS Entity Type:</label>
+				<select name="cssRecordOrgType" id="cssrecordorgtype" data-role="slider">
+					<option value="0">Individual</option>
+					<option value="1">Entity</option>
+				</select>
 			</div>
-			<div id="lnameDiv" data-role="fieldcontain">
-				<label for="lname">Last name*</label>
-				<input id="lname" name="lname_r" type="text"/>
+
+			<!-- CSS Owner Forename (optional)-->
+			<div data-role="fieldcontain">
+		    	<label for="cssrecordforename">Forename: </label>
+		    	<input type="text" name="cssRecordForeName" id="cssrecordforename" value="" />
 			</div>
-			<div id="locationDiv" data-role="fieldcontain">
-				<label for="location">Location</label>
-				<input id="location" name="location_r" type="text"/>
+
+			<!-- CSS Owner Name 
+				Can be an individual, organisation or some other entity -->
+			<div data-role="fieldcontain">
+		    	<label for="cssrecordname">Name: </label>
+		    	<input type="text" name="cssRecordName" id="cssrecordname" value=""/>
 			</div>
-			<div id="emailDiv" data-role="fieldcontain">
-				<label for="location">Email</label>
-				<input id="location" name="email_r" type="text"/>
+
+			<!-- CSS Name -->
+			<div data-role="fieldcontain" >
+		    	<label for="cssrecordidentity">CSS Name: </label>
+		    	<input type="text" name="cssRecordIdentity" id="cssrecordidentity" value=""/>
 			</div>
-			<br/>
-			<div id="create_account" data-role="fieldcontain">
-			</div>
-		</form>
-		<ul data-role="listview" data-theme="d" data-divider-theme="b">
-			<li data-role="list-divider">Account Settings</li>
-		</ul>
-		<br/>
-		<form id="form1">
-			<div id="usernameDiv" data-role="fieldcontain">
-				<label for="username" id="usernameLabel" name="fnameLabel">Current Password</label>
-				<input id="username" name="username_r" type="text"/>
-			</div>
-			<div id="passwordDiv" data-role="fieldcontain">
-				<label for="password" id="passwordLabel" name="fnameLabel">New Password</label>
-				<input id="password" name="password_r" type="text"/>
-			</div>
-			<div id="passwordDiv" data-role="fieldcontain">
-				<label for="password" id="passwordLabel" name="fnameLabel">Re-type New Password</label>
-				<input id="password" name="password_r" type="text"/>
-			</div>
-			<div id="create_account" data-role="fieldcontain">
+
+			<div data-role="collapsible-set">
 			
-			<input type="submit" value="Update" data-inline="true" data-theme="b"/>
-		</div>
-        </form>
+				<div data-role="collapsible">
+					<h3>Contact Details</h3>
+					
+					<!-- CSS e-mail Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecordemaildetails">e-Mail: </label>
+				    	<input type="text" name="cssRecordEmailDetails" id="cssrecordemaildetails" value=""/>
+					</div>
+					
+					<!-- CSS IM Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecordimdetails">IM: </label>
+				    	<input type="text" name="cssRecordImDetails" id="cssrecordimdetails" value=""/>
+					</div>
+					<!-- CSS SNS Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecordsnsdetails">Social: </label>
+				    	<input type="text" name="cssRecordSNSDetails" id="cssrecordsnsdetails" value=""/>
+					</div>
+				</div>
+				
+				<div data-role="collapsible">
+					<h3>Personal Details</h3>
+					
+					<div data-role="fieldcontain" >
+						<!-- Sex -->
+						<label for="cssrecordsextype">Sex:</label>
+						<select name="cssRecordSexType" id="cssrecordsextype" data-role="slider">
+							<option value="0">Male</option>
+							<option value="1">Female</option>
+						</select>
+					</div>
+					
+					<!-- CSS Location -->
+					<div data-role="fieldcontain" >
+				    	<label for="cssrecorduserlocation">Home Location: </label>
+				    	<input type="text" name="cssRecordUserLocation" id="cssrecorduserlocation" value=""/>
+					</div>
+					
+				</div>
+				<div data-role="collapsible">
+					<h3>Current CSS Nodes</h3>
+					
+					<table id="cssNodesTable" border="1">
+					<thead>
+						<tr>
+							<th>Identity</th>
+							<th>Status</th>
+							<th>Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!--tr>
+							<td>row 2, cell 1</td>
+							<td>row 2, cell 2</td>
+							<td>row 2, cell 3</td>
+						</tr-->
+					</tbody>
+					</table>
+					
+				</div>
+			</div>
+			<div class="sign_up">
+				<input id="updateProfile" type="button" value="Update Profile" data-inline="true" data-theme="h"/> 
+			</div>
+			
+		</form>
+			
 		<br/>
 		<div class="terms">
 			<a href="#">Terms of Use</a> - <a href="#">Disclaimer</a> - <a href="#">Privacy</a>
@@ -90,25 +129,21 @@
 	<!-- /content -->
 	<br/><br/>
 		<!-- footer -->
-	<div class="footer_fixed" data-role="footer" data-position="fixed">
+   <div class="footer_fixed" data-role="footer" data-position="fixed">
 		<ul class="nav">
-			<li class="btn-home"><a href="landing.html">
-			<span class="ico"><img src="../images/icons/home_logo.png" alt="home"/></span>
-			</a>
+			<li class="btn-home">
+				<input id="home-button" type="image" alt="home" src="../images/icons/home_logo.png"  data-role="none"/>
 			</li>
-			<li class="btn-profile"><a href="myProfile.html">
-			<span class="ico"><img src="../images/icons/my_profile.png" alt="profile"/></span>
-			</a>
+			<li class="btn-profile">
+				<input id="profile-button" type="image" alt="profile" src="../images/icons/my_profile.png"  data-role="none"/>	
 			</li>
-			<li class="btn-settings"><a href="settings.html">
-			<span class="ico"><img src="../images/icons/settings.png" alt="settings"/></span>
-			</a>
+			<li class="btn-settings">
+				<input id="settings-button" type="image" alt="settings" src="../images/icons/settings.png"  data-role="none"/>	
 			</li>
-			<li class="btn-about"><a href="about.html">
-			<span class="ico"><img src="../images/icons/about.png" alt="about"/></span>
-			</a>
+			<li class="btn-about">
+				<input id="about-button" type="image" alt="about" src="../images/icons/about.png"  data-role="none"/>	
 			</li>
-		</ul>
+		</ul><!-- /global navbar -->
 	</div>
 	<!-- end footer -->
 </div>

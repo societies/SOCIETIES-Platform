@@ -9,9 +9,21 @@
 	<packaging>bundle</packaging>
 	<dependencies>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -24,8 +36,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>RELEASE</version>
 	</parent>
 
 	<!-- Build Settings -->
@@ -38,11 +49,12 @@
 				<configuration>
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<_nouses>true</_nouses>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
@@ -80,7 +92,7 @@
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
-	    <developer>
+		<developer>
 			<id>nikoskal</id>
 			<name>Nikos Kalatzis</name>
 			<email>nikosk@cn.ntua.gr</email>
@@ -91,5 +103,5 @@
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
-	</developers>	
+	</developers>
 </project>

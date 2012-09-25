@@ -5,16 +5,11 @@
 <meta charset="UTF-8">
 <meta name="description" content="Societies"/>
 
-	<link rel="stylesheet" type="text/css" href="../css/jquerymobile/jquery.mobile-1.1.0.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/custom/societies.css"/>
-	
-	<script type="text/javascript" src="../javascript/jquery/jquery-1.7.1.js" ></script>
-	<script type="text/javascript" src="../javascript/jquerymobile/jquery.mobile-1.1.0.js"></script>
 
 </head>
 <body>
 <!-- Page starts here -->
-<div data-role="page" id="one">
+<div data-role="page" id="new-identity">
 	<div data-role="header" data-position="fixed">
 		<img class="logo" src="../images/societies_header.png" alt="societies logo"/>
 		<!-- /header -->
@@ -41,13 +36,14 @@
 		    	<input type="password" name="repeatRegUserPass" id="repeatRegUserpass" value="" />
 			</div>
 			
-			<div>
-				<label for="domainServers">Societies Domain Servers</label>
+			<div id="xmppServer" data-role="fieldcontain">
+				<label for="domainServer">Societies Domain Servers</label>
+				<input type="text" name="domainServer" id="domainServer" value="" />
 				
-				<select name="domainServersList" id="domainServers">
+				<!--select name="domainServersList" id="domainServers">
 		  			<option value="societies.local" selected="selected">societies.local</option>
 		  			<option value="societies.alternative">societies.alternative</option>
-				</select> 
+				</select--> 
 			</div>
 			
 			<div data-role="collapsible">
@@ -77,8 +73,8 @@
 			</div>
 
 
-			<div id="create_identity" data-role="fieldcontain">
-				<a href="thank_you.html"><input id="registerXMPP" type="submit" value="Create Identity" data-inline="true" data-theme="b"/></a>
+			<div id="create_identity" data-role="fieldcontain" class="sign_up">
+				<!--a href="thank_you.html"--><input id="registerXMPP" type="button" value="Create Identity" data-inline="true" data-theme="h"/>
 			</div>
 		</form>
 		<br/>

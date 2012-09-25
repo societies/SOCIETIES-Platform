@@ -141,7 +141,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @see {@link #setUserCtxInferenceMgr(IUserCtxInferenceMgr)}
 	 */
-	@Autowired(required=true)
+	@Autowired(required=false)
 	private IUserCtxInferenceMgr userCtxInferenceMgr;
 
 	/**
@@ -149,7 +149,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @see {@link #setCommunityCtxInferenceMgr(ICommunityCtxInferenceMgr)}
 	 */
-	@Autowired(required=true)
+	@Autowired(required=false)
 	private ICommunityCtxInferenceMgr communityCtxInferenceMgr;
 	
 	/**
@@ -219,7 +219,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
 
 				attribute =	this.userCtxDBMgr.createAttribute(scope, type);	
-			
+				LOG.info("Context CREATE ATTRIBUTE performed for context ID:"+attribute.getId()+" of type:"+attribute.getType());			
 				//TODO origin type should be set in db manager
 				if (attribute.getQuality().getOriginType() == null) {
 					attribute.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
@@ -229,7 +229,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			} else if (IdentityType.CIS.equals(scopeID.getType())){
 
 				attribute =	this.communityCtxDBMgr.createCommunityAttribute(scope, type);
-
+				LOG.info("Community Context CREATE ATTRIBUTE performed for context ID:"+attribute.getId()+" of type:"+attribute.getType());
 			} 
 		} catch (InvalidFormatException ife) {
 
@@ -252,6 +252,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		final CtxEntity entity = 
 				this.userCtxDBMgr.createEntity(type);
 		
+		LOG.info("Context CREATE ENTITY performed for context ID:"+entity.getId()+" of type:"+entity.getType());
 		return new AsyncResult<CtxEntity>(entity);
 	}
 
@@ -279,6 +280,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			} else {
 
 				cssOwnerEnt = this.userCtxDBMgr.createIndividualCtxEntity(ownerType); 
+			
 				final CtxAttribute cssIdAttr = this.userCtxDBMgr.createAttribute(
 						cssOwnerEnt.getId(), CtxAttributeTypes.ID); 
 
@@ -309,7 +311,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new IllegalArgumentException("Inserted id is not of type CIS");
 
 		CommunityCtxEntity communityCtxEnt = communityCtxDBMgr.createCommunityEntity(cisId);
-
+		LOG.info("Community Context CREATE ENTITY performed for context ID:"+communityCtxEnt.getId()+" of type:"+communityCtxEnt.getType());
 		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
 	}
 
@@ -528,8 +530,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			inferenceOutcome = this.initiateInference((CtxAttribute) modelObjReturn);
 		} // TO DO integrate inference outcome with returned value
 		 */
-	//	LOG.info("retrieved  " + modelObjReturn.getId());
-
+		
+		LOG.info("Context RETRIEVE performed for context ID:"+modelObjReturn.getId());
 		return new AsyncResult<CtxModelObject>(modelObjReturn);
 	}	
 
@@ -829,7 +831,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		if (attributeId == null)
 			throw new NullPointerException("attributeId can't be null");
-
+		
 		// Will throw IllegalArgumentException if value type is not supported
 		final CtxAttributeValueType valueType = CtxBrokerUtils.findAttributeValueType(value);
 
@@ -858,7 +860,9 @@ public class InternalCtxBroker implements ICtxBroker {
 				} else throw new CtxBrokerException("unkown type of attribute value");
 			}
 			attributeReturn = (CtxAttribute) this.update(currentAttribute).get();
-
+			String valueString = CtxBrokerUtils.attributeValueAsString(value);
+			LOG.info("Context UPDATE performed for context ID:"+attributeReturn.getId()+" of type:"+attributeReturn.getType()+" with value:" + valueString);
+			
 		} catch (InterruptedException e) {
 			throw new CtxBrokerException("updateAttribute including value failed " + e.getLocalizedMessage());
 		} catch (ExecutionException e) {
@@ -1074,9 +1078,27 @@ public class InternalCtxBroker implements ICtxBroker {
 	
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
-			CtxEntityIdentifier community) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+			CtxEntityIdentifier communityId) throws CtxException {
+		
+		List<CtxEntityIdentifier> result = null; 
+		
+		if (communityId == null)
+			throw new NullPointerException("communityId can't be null");
+		
+		try {
+			final CommunityCtxEntity communityEntity = (CommunityCtxEntity) this.retrieve(communityId).get();
+			
+			Set<CtxEntityIdentifier> commMembersSet = communityEntity.getMembers();
+			result = new ArrayList<CtxEntityIdentifier>(commMembersSet);
+	
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new AsyncResult<List<CtxEntityIdentifier>>(result);
 	}
 
 	@Override

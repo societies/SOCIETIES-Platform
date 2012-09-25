@@ -94,7 +94,7 @@ public class RequestorCis extends Requestor implements Serializable {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
+		int result = 1; //super.hashCode();
 		result = prime * result
 				+ ((cisRequestorId == null) ? 0 : cisRequestorId.hashCode());
 		return result;

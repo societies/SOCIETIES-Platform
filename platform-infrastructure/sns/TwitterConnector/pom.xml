@@ -12,21 +12,13 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
 
-	<!-- <parent> <groupId>org.societies</groupId> <artifactId>version-parent</artifactId> 
-		<version>0.1</version> <relativePath>../../../parent/version.xml</relativePath> 
-		</parent> -->
 
 	<dependencies>
-		<!-- add your dependencies here -->
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
+
+
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -34,47 +26,27 @@
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.shindig</groupId>
-			<artifactId>shindig-social-api</artifactId>
-			<version>3.0.0-beta4</version>
-		</dependency>
 
-		<!-- <dependency> <groupId>org.societies.api.external</groupId> <artifactId>societies-api</artifactId> 
-			<version>${release.version}</version> <scope>provided</scope> </dependency> -->
 
 		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.5</version>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.scribe</groupId>
-			<artifactId>scribe</artifactId>
-			<version>1.3.0</version>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
-		
-<!--  
-		
 		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1</version>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1</version>
-		</dependency>
--->
-        <dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20070829</version>
-		</dependency>
+
+
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -92,22 +64,17 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-
-						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> 
-				<configuration> <artifactItems> <artifactItem> <groupId>${project.groupId}</groupId> 
-				<artifactId>${project.artifactId}</artifactId> <version>${release.version}</version> 
-				<type>bundle</type> <overWrite>true</overWrite> <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory> 
-				</artifactItem> </artifactItems> </configuration> </plugin> -->
 		</plugins>
 	</build>
 

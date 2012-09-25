@@ -27,8 +27,8 @@ package org.societies.privacytrust.trust.api.evidence.repo;
 import java.util.Date;
 import java.util.Set;
 
-import org.societies.api.internal.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;

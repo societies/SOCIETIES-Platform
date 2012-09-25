@@ -76,9 +76,7 @@ public class CtxAttributeTypes {
      * 
      * @since 0.0.8
      */
-    public static final String ADDRESS_WORK_COUNTRY = 
-
-"addressWorkCountry";
+    public static final String ADDRESS_WORK_COUNTRY = "addressWorkCountry";
 	
 	/**
      * 
@@ -92,6 +90,12 @@ public class CtxAttributeTypes {
      */
     public static final String ADDRESS_WORK_STREET_NUMBER = "addressWorkStreetNumber";
 	
+    /**
+     * 
+     * @since 0.4
+     */
+    public static final String AFFILIATION = "affiliation";
+    
     /**
      * 
      * @since 0.0.8
@@ -119,6 +123,11 @@ public class CtxAttributeTypes {
     /**
      * @since 0.0.8
      */
+    public static final String EMAIL = "email";
+    
+    /**
+     * @since 0.0.8
+     */
     public static final String FAVOURITE_QUOTES = "favoriteQuotes";
         
 	/**
@@ -131,6 +140,12 @@ public class CtxAttributeTypes {
      */
     public static final String INTERESTS = "interests";
 
+    /**
+     * @since 0.0.8
+     */
+    public static final String LANGUAGES = "languages";
+
+    
     /**
      * @since 0.0.8
      */
@@ -201,6 +216,12 @@ public class CtxAttributeTypes {
     /**
      * @since 0.0.8
      */
+    public static final String OCCUPATION = "occupation";
+    
+    
+    /**
+     * @since 0.0.8
+     */
     public static final String PARAMETER_NAME = "parameterName";
     
     /**
@@ -226,6 +247,12 @@ public class CtxAttributeTypes {
     /**
      * @since 0.0.8
      */
+    public static final String SKILLS = "skills";
+    
+    
+    /**
+     * @since 0.0.8
+     */
     public static final String TEMPERATURE = "temperature";
    
     /**
@@ -244,7 +271,5 @@ public class CtxAttributeTypes {
      * To be moved in internal API
      */
     @Deprecated
-    public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";
-
-    
+    public static final String PRIVACY_POLICY_AGREEMENT = "privacy-policy-agreement-of_";   
 }

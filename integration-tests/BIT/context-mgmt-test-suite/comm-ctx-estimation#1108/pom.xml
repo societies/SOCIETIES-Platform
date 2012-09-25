@@ -24,10 +24,8 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>RELEASE</version>
 	</parent>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -129,7 +127,7 @@
 							<version>${project.version}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

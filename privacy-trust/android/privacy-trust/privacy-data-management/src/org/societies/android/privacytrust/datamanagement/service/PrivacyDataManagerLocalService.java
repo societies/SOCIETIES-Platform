@@ -24,12 +24,16 @@
  */
 package org.societies.android.privacytrust.datamanagement.service;
 
+import java.util.List;
+
 import org.societies.android.api.internal.privacytrust.IPrivacyDataManager;
 import org.societies.android.api.internal.privacytrust.model.PrivacyException;
 import org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.android.api.internal.privacytrust.privacyprotection.model.privacypolicy.AAction;
 import org.societies.android.privacytrust.datamanagement.PrivacyDataManager;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 
 import android.app.Service;
@@ -54,7 +58,7 @@ public class PrivacyDataManagerLocalService extends Service implements IPrivacyD
 		// Creation of a binder for the service
 		binder = new LocalBinder();
 		// Creation of an instance of the Java implementation
-		privacyDataManager = new PrivacyDataManager();
+		privacyDataManager = new PrivacyDataManager(this);
 	}
 	
 	
@@ -62,37 +66,34 @@ public class PrivacyDataManagerLocalService extends Service implements IPrivacyD
 	 * Service Method Implementation
 	 **** */
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, java.lang.String, java.lang.String, org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Action)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
-	@Override
-	public ResponseItem checkPermission(RequestorBean requestor,
-			String ownerId, String dataId, Action action)
+	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, AAction[] actions)
 			throws PrivacyException {
 		Log.d(TAG, "Local call to service checkPermission()");
-		return privacyDataManager.checkPermission(requestor, ownerId, dataId, action);
+		return privacyDataManager.checkPermission(requestor, dataId, actions);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, java.lang.String, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
 	 */
 	@SuppressWarnings("rawtypes")
-	@Override
-	public IDataWrapper obfuscateData(String requestor, String ownerId,
-			IDataWrapper dataWrapper) throws PrivacyException {
+	public IDataWrapper obfuscateData(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		Log.d(TAG, "Local call to service obfuscateData()");
-		return privacyDataManager.obfuscateData(requestor, ownerId, dataWrapper);
+		return privacyDataManager.obfuscateData(requestor, dataWrapper);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.schema.identity.RequestorBean, java.lang.String, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.android.api.internal.privacytrust.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.schema.identity.RequestorBean, org.societies.android.api.internal.privacytrust.model.dataobfuscation.wrapper.IDataWrapper)
 	 */
 	@SuppressWarnings("rawtypes")
-	@Override
-	public String hasObfuscatedVersion(String requestor, String ownerId,
-			IDataWrapper dataWrapper) throws PrivacyException {
+	public DataIdentifier hasObfuscatedVersion(RequestorBean requestor, IDataWrapper dataWrapper) throws PrivacyException {
 		Log.d(TAG, "Local call to service hasObfuscatedVersion()");
-		return privacyDataManager.hasObfuscatedVersion(requestor, ownerId, dataWrapper);
+		return privacyDataManager.hasObfuscatedVersion(requestor, dataWrapper);
 	}
 	
 

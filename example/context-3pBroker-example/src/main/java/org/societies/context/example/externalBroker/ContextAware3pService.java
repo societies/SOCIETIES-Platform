@@ -56,6 +56,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -216,10 +217,10 @@ public class ContextAware3pService implements IContextAware3pService{
 			deviceTempAttr = (CtxAttribute) this.ctxBroker.update(requestorService, deviceTempAttr).get();
 
 			// at this point the ctxEntity of type CtxEntityTypes.DEVICE is assigned with CtxAttributes of type : LOCATION, WEIGHT, TEMPERATURE
-			LOG.info("*** created entity deviceCtxEnt  "+deviceCtxEnt.getId().toString());
-			LOG.info("*** with attributes Location: "+ctxAttributeDeviceLocation.getId());
-			LOG.info("*** with attributes Temperature: "+deviceTempAttr.getId());
-			LOG.info("*** with attributes Weight: "+ctxAttrWeight.getId());
+			LOG.info("*** created entity deviceCtxEnt  "+deviceCtxEnt.getId().toString()+ " and type: "+deviceCtxEnt.getType()+" should be DEVICE");
+			LOG.info("*** with attributes Location: "+ctxAttributeDeviceLocation.getId()+ "and value:"+ctxAttributeDeviceLocation.getStringValue() + "should be 'HOME'");
+			LOG.info("*** with attributes Temperature: "+deviceTempAttr.getId()+ "and value: "+deviceTempAttr.getDoubleValue() + "should be '25' ");
+			LOG.info("*** with attributes Weight: "+ctxAttrWeight.getId()+"and valueType: "+ctxAttrWeight.getValueType() + "should be blob ");
 
 		} catch (Exception e) {
 			LOG.error("*** 3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
@@ -282,11 +283,16 @@ public class ContextAware3pService implements IContextAware3pService{
 			}
 
 			List<CtxIdentifier> idsAttributesList2 = this.ctxBroker.lookup(requestorService, userIdentity, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			LOG.info("location attributes size : "+idsAttributesList2.size() );
 			if( idsAttributesList2.size()>0 ){
-				CtxAttributeIdentifier attributeId2 = (CtxAttributeIdentifier) idsAttributesList2.get(0);			
-				CtxAttribute ctxAttributeLocation = (CtxAttribute) this.ctxBroker.retrieve(requestorService, attributeId2).get();
-				String value = ctxAttributeLocation.getStringValue();
-				LOG.info("lookupAndRetrieveCtxAttributes : Retrieved ctxAttribute id " +ctxAttributeLocation.getId()+ "and value: "+ value +" (must be equal to 'home' ");
+				for(int i=0; i<idsAttributesList2.size(); i++){
+					CtxAttributeIdentifier attributeId2 = (CtxAttributeIdentifier) idsAttributesList2.get(i);			
+					CtxAttribute ctxAttributeLocation = (CtxAttribute) this.ctxBroker.retrieve(requestorService, attributeId2).get();
+					String value = ctxAttributeLocation.getStringValue();
+					LOG.info("lookupAndRetrieveCtxAttributes attr number:"+i +" ) Retrieved ctxAttribute id " +ctxAttributeLocation.getId()+ "and value: "+ value +" (must be equal to 'home' ");	
+				}
+				
+			
 			}
 
 		} catch (InterruptedException e) {
@@ -430,6 +436,21 @@ public class ContextAware3pService implements IContextAware3pService{
 			ctxCommunityEntityIdentifier = this.ctxBroker.retrieveCommunityEntityId(requestorService, cisID).get();
 			LOG.info("communityEntityIdentifier retrieved: " +ctxCommunityEntityIdentifier.toString()+ " based on cisID: "+ cisID);
 
+			CommunityCtxEntity commEntity = (CommunityCtxEntity) this.ctxBroker.retrieve(requestorService, ctxCommunityEntityIdentifier).get();
+			if(commEntity != null ){
+				Set<CtxEntityIdentifier> commEntityIds =  commEntity.getMembers();
+				LOG.info("commEnt member size: "+commEntityIds.size());
+				for(CtxEntityIdentifier commMemberID :commEntityIds ){
+					LOG.info("commEnt member Id:"+commMemberID.toString() );
+					
+					IndividualCtxEntity indiEnt = (IndividualCtxEntity) this.ctxBroker.retrieve(requestorService, commMemberID).get();
+					LOG.info("commEnt member object :"+indiEnt.getId().toString() );
+				}
+				
+			}
+			
+			
+			
 			List<CtxIdentifier> communityAttrIDList = this.ctxBroker.lookup(requestorService, ctxCommunityEntityIdentifier, CtxModelType.ATTRIBUTE, CtxAttributeTypes.INTERESTS).get();
 			LOG.info("lookup results communityAttrIDList: "+ communityAttrIDList);		
 
