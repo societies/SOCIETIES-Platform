@@ -1365,5 +1365,45 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		
 		return date.toString();
 	}
+
+	@Override
+	public Future<List<CssAdvertisementRecord>> getFriendRequests() {
+		List<CssRequest> pendingfriendList = new ArrayList<CssRequest>();
+		List<CssAdvertisementRecord> friendReqList = new ArrayList<CssAdvertisementRecord>();
+		List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
+		List<String> pendingList = new ArrayList<String>();	
+		
+		
+		try {
+			pendingfriendList = cssRegistry.getCssFriendRequests();
+			
+			for (CssRequest cssrequest : pendingfriendList) {
+		    	LOG.info("[]][][][][][] CSS FriendRequest iterator List contains " +pendingfriendList);
+		    	LOG.info("[]][][][][][] cssrequest status is: " +cssrequest.getRequestStatus());
+		        if (cssrequest.getRequestStatus().value().equalsIgnoreCase("pending")) {
+		        	//cssrequest.getCssIdentity();
+		        	pendingList.add(cssrequest.getCssIdentity());
+		        	LOG.info("[]][][][][][] pendingList size is now: " +pendingfriendList.size());
+		        	LOG.info("[]][][][][][] pendingList entry is: " +cssrequest.getCssIdentity());
+		        		
+		        	}
+		        	
+		        }	
+				
+				
+			// first get all the cssdirectory records
+			CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+
+			getCssDirectoryRemote().searchByID(pendingList, callback);
+			friendReqList = callback.getResultList();
+
+				
+			} catch (CssRegistrationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		return new AsyncResult<List<CssAdvertisementRecord>>(friendReqList);
+	}
 }
 
