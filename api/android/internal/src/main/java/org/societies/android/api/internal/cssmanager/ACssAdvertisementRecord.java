@@ -22,77 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.cssRegistry;
+package org.societies.android.api.internal.cssmanager;
 
-import java.util.List;
-
-import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
-import org.societies.api.schema.cssmanagement.CssInterfaceResult;
-import org.societies.api.schema.cssmanagement.CssRecord;
-import org.societies.api.schema.cssmanagement.CssRequest;
-
-
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
- * @author Maria Mannion - Intel
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
-public interface ICssRegistry {
+public class ACssAdvertisementRecord extends CssAdvertisementRecord implements Parcelable {
 
-	/**
-	 * Description: This method provides the interface to add a new Css.
-	 * 				
-	 * @param cssDetails
-	 * @throws CssRegistrationException
-	 */
-	public CssInterfaceResult registerCss (CssRecord cssDetails) throws CssRegistrationException;
+	private static final long serialVersionUID = -2512188831294429422L;
+
+	public ACssAdvertisementRecord() {
+		super();
+	}
 	
-	/**
-	 * Description: This method permits you to unregister a css
-	 * @param cssDetails
-	 * @throws CssRegistrationException
-	 */
-	public void unregisterCss (CssRecord cssDetails) throws CssRegistrationException;
+	/* @see android.os.Parcelable#describeContents()*/
+	public int describeContents() {
+		return 0;
+	}
 
-	/**
-	 * Description: This method permits you to update the css Record
-	 * @param cssDetails
-	 * @throws CssRegistrationException
-	 */
-	public void updateCssRecord(CssRecord cssDetails) throws CssRegistrationException; 
+	/* @see android.os.Parcelable#writeToParcel(android.os.Parcel, int) */
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.getId());
+		dest.writeString(this.getName());
+		dest.writeString(this.getUri());
+	}
+
+	private ACssAdvertisementRecord(Parcel in) {
+		super();
+		this.setId(in.readString());
+		this.setName(in.readString());
+		this.setUri(in.readString());
+	}
+	
+	public static final Parcelable.Creator<ACssAdvertisementRecord> CREATOR = new Parcelable.Creator<ACssAdvertisementRecord>() {
+		public ACssAdvertisementRecord createFromParcel(Parcel in) {
+			return new ACssAdvertisementRecord(in);
+		}
+
+		public ACssAdvertisementRecord[] newArray(int size) {
+			return new ACssAdvertisementRecord[size];
+		}
+	};
+	
+	public static ACssAdvertisementRecord convertCssAdvertisementRecord(CssAdvertisementRecord record) {
+		ACssAdvertisementRecord arecord=new ACssAdvertisementRecord();
+		arecord.setId(record.getId());
+		arecord.setName(record.getName());
+		arecord.setUri(record.getUri());
 		
-
-	/**
-	 * Description: Returns the css record details
-	 * @param none
-	 * @throws CssRegistrationException
-	 */
-	public CssRecord getCssRecord() throws CssRegistrationException; 
-
-	/**
-	 * Description: Test if a CssRecord exists
-	 * 
-	 * @return boolean true id record exists
-	 * @throws CssRegistrationException
-	 */
-	public boolean cssRecordExists() throws CssRegistrationException;
-	
-	
-	List<CssRequest>  getCssFriendRequests()
-			throws CssRegistrationException;
-	
-	void updateCssFriendRequestRecord(CssRequest cssRequest)
-			throws CssRegistrationException ;
-	
-	List<CssRequest>  getCssRequests()
-			throws CssRegistrationException;
-	
-	void updateCssRequestRecord(CssRequest cssRequest)
-			throws CssRegistrationException;
-	
-	CssRequest  getCssFriendRequest(String friendId)
-			throws CssRegistrationException;
-	
-	List<String>  getCssFriends()
-			throws CssRegistrationException;
-			
+		return arecord;
+	}
 }

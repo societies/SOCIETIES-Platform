@@ -73,6 +73,8 @@ public class AServiceImplementation extends ServiceImplementation implements Par
 	};
 	
 	public static AServiceImplementation convertServiceImplementation(ServiceImplementation serviceImpl) {
+		if(serviceImpl == null) return new AServiceImplementation();
+
 		AServiceImplementation aservImpl = new AServiceImplementation();
 		aservImpl.setServiceClient(serviceImpl.getServiceClient());
 		aservImpl.setServiceNameSpace(serviceImpl.getServiceNameSpace());

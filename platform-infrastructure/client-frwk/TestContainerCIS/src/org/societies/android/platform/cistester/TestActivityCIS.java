@@ -283,11 +283,16 @@ public class TestActivityCIS extends Activity {
 			Log.d(LOG_TAG, intent.getAction());
 			
 			if (intent.getAction().equals(CommunityManagement.CREATE_CIS)) {
-				//UNMARSHALL THE COMMUNITY FROM Parcel BACK TO COMMUNITY
-				Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
-				ACommunity cis =  (ACommunity) parcel;
-				Log.d(LOG_TAG, ">>>>>CREATE COMMUNITY  RESULT:\nCIS ID: " + cis.getCommunityJid());
-				
+				boolean result = intent.getBooleanExtra(CommunityManagement.INTENT_RETURN_BOOLEAN,false);
+				Log.d(LOG_TAG, ">>>>>CIS Creation RESULT:\n>>>>>: " + result);
+				if(true == result){
+	
+					
+					//UNMARSHALL THE COMMUNITY FROM Parcel BACK TO COMMUNITY
+					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					ACommunity cis =  (ACommunity) parcel;
+					Log.d(LOG_TAG, ">>>>>CREATE COMMUNITY  RESULT:\nCIS ID: " + cis.getCommunityJid());
+				}
 	
 				continueTests("cis-e86edc27-7362-449a-9987-45561bb5353a.societies.local", "man city");
 				
@@ -313,11 +318,15 @@ public class TestActivityCIS extends Activity {
 			}
 			
 			if (intent.getAction().equals(CommunityManagement.JOIN_CIS)) {
-				//UNMARSHALL THE community FROM Parcel
-				Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
-				AJoinResponse resp = (AJoinResponse) parcel;
-				Log.d(LOG_TAG, ">>>>>CIS JOIN RESULT:\n>>>>>Allowed to join: " + resp.isResult());
-				Log.d(LOG_TAG, ">>>>>Community Joined: " + resp.getCommunity().getCommunityName() + "\n" + resp.getCommunity().getDescription());
+				//UNMARSHALL THE result
+				boolean result = intent.getBooleanExtra(CommunityManagement.INTENT_RETURN_BOOLEAN,false);
+				Log.d(LOG_TAG, ">>>>>CIS JOIN RESULT:\n>>>>>Allowed to join: " + result);
+				if(true == result){
+					//UNMARSHALL THE community FROM Parcel
+					Parcelable parcel =  intent.getParcelableExtra(CommunityManagement.INTENT_RETURN_VALUE);
+					ACommunity resp = (ACommunity) parcel;
+					Log.d(LOG_TAG, ">>>>>Community Joined: " + resp.getCommunityName() + "\n" + resp.getDescription());
+				}
 			}
 			
 			if (intent.getAction().equals(CommunityManagement.GET_MEMBERS)) {
