@@ -81,9 +81,6 @@ var SocietiesUtility = {
 			console.log("Register Preferences plugin ");
 			cordova.addPlugin("SocietiesAppPreferences", SocietiesAppPreferences);
 			
-			console.log("Register Preferences plugin ");
-			cordova.addPlugin("SocietiesAppPreferences", SocietiesAppPreferences);
-			
 			console.log("Register CIS Manager plugin ");
 			cordova.addPlugin("SocietiesLocalCISManager", SocietiesLocalCISManager);
 			
