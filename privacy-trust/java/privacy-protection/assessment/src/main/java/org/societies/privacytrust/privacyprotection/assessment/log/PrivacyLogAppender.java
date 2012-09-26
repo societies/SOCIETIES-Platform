@@ -149,7 +149,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logCommsFw()");
 
-		logStack();
+		//logStack();
 		
 		String dataType;
 		String invokerClass = "";  // FIXME
@@ -178,7 +178,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public void logContext(Requestor requestor, IIdentity owner) {
 		
 		LOG.info("logContext()");
-		logStack();
+		
+		//logStack();
 
 		String invokerClass = "";  // FIXME
 		IIdentity requestorId;
@@ -199,7 +200,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public void logContext(Requestor requestor, IIdentity owner, int dataSize) {
 		
 		LOG.info("logContext({})", dataSize);
-		logStack();
+		
+		//logStack();
 
 		String invokerClass = "";  // FIXME
 		IIdentity requestorId;
