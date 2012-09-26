@@ -226,5 +226,7 @@ public interface ICSSLocalManager {
  
  public Future<List<CssAdvertisementRecord>> suggestedFriends();
  
+ public Future<List<CssAdvertisementRecord>> getFriendRequests();
+ 
  
 }

@@ -656,4 +656,53 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e.printStackTrace();
 		}
 	}
+	
+	/* Get a list of suggested Friend from cloud Css Manger */
+	public void getFriendRequests(ICSSManagerCallback callback)
+	{
+		
+		LOG.debug("Remote call on getFriendRequests");
+
+		Stanza stanza = new Stanza(commManager.getIdManager().getCloudNode());
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+		messageBean.setMethod(MethodType.FIND_ALL_CSS_FRIEND_REQUESTS);
+		CommsClientCallback commsCallback = new CommsClientCallback(
+				stanza.getId(), callback);
+
+		try {
+			this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void acceptCssFriendRequest(CssRequest request) {
+		// TODO Auto-generated method stub
+		LOG.debug("Remote call on AcceptCssFriendRequest");
+
+		try {
+
+			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(
+					request.getCssIdentity()));
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+			request.setOrigin(CssRequestOrigin.REMOTE);
+			
+			messageBean.setMethod(MethodType.ACCEPT_CSS_FRIEND_REQUEST);
+			messageBean.setRequestStatus(request.getRequestStatus());
+
+			try {
+				this.commManager.sendMessage(stanza, messageBean);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+	}
 }

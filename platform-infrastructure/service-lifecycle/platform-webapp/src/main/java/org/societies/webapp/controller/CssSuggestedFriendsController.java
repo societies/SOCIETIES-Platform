@@ -16,6 +16,7 @@ import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
+import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.cis.directory.client.CisDirectoryRemoteClient;
 //import org.societies.webapp.models.CISDirectoryForm;
 import org.societies.webapp.models.SuggestedFriendsForm;
@@ -83,7 +84,7 @@ public class CssSuggestedFriendsController {
 		Map<String, String> methods = new LinkedHashMap<String, String>();
 		
 		methods.put("findFriends", "Find Friends");
-		methods.put("sendfriendreq", "Send Friend Request");
+		methods.put("pendingfriendreq", "Find Pending Friend Request");
 		model.put("methods", methods);
 		
 		model.put("suggestedfriendsresult", "CSS Suggested Friends Result :");
@@ -121,6 +122,17 @@ public class CssSuggestedFriendsController {
 				model.put("result", res);
 				model.put("cssfriends", asynchcssfriends.get());
 				
+			}else if (method.equalsIgnoreCase("pendingfriendreq")) {
+				
+				
+				res="All Pending Friend Requests";
+				
+				Future<List<CssAdvertisementRecord>> asynchfriendrequests = cssLocalManager.getFriendRequests(); 
+				
+				model.put("result", res);
+				model.put("cssfriends", asynchfriendrequests.get());
+					
+			
 			}else{
 				res="error unknown metod";
 			}

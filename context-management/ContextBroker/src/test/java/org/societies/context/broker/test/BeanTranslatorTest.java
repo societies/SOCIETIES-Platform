@@ -69,7 +69,8 @@ public class BeanTranslatorTest {
 
 		when(cssMockIdentity.toString()).thenReturn(OWNER_IDENTITY_STRING);
 		when(cssMockIdentity.getType()).thenReturn(IdentityType.CSS);
-
+		when(mockIdentityMgr.isMine(cssMockIdentity)).thenReturn(true);
+		
 		when(cisMockIdentity.getType()).thenReturn(IdentityType.CIS);
 		when(cisMockIdentity.toString()).thenReturn(CIS_IDENTITY_STRING);
 

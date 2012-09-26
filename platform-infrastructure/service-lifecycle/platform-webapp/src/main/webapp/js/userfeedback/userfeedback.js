@@ -1,3 +1,17 @@
+if ( ! window.console ) {
+    (function() {
+      var names = ["log", "debug", "info", "warn", "error",
+          "assert", "dir", "dirxml", "group", "groupEnd", "time",
+          "timeEnd", "count", "trace", "profile", "profileEnd"],
+          i, l = names.length;
+      window.console = {};
+      for ( i = 0; i < l; i++ ) {
+        window.console[ names[i] ] = function() {};
+      }
+    }());
+}
+
+
 var userFeedback = (function () {
 	/* ************************
 	 * 		Parameters
@@ -17,7 +31,7 @@ var userFeedback = (function () {
 
 
 	var loader = $('<img>').addClass('ufeedbackLoader')
-	.attr('src', 'societies/img/loader.gif')
+	.attr('src', '/societies/images/loading.gif')
 	.attr('alt', 'Loading')
 	.hide();
 	var result = $('<span>').addClass('ufeedbackResult')
@@ -155,15 +169,17 @@ var userFeedback = (function () {
 	}
 
 	function renderFormRadioList(res, formInfo) {
+		var ul = $('<ul class="list radiolist">').appendTo(res);
 		for(var i=0; i< formInfo.data.length; i++) {
+			var li = $('<li>').appendTo(ul);
 			$('<input>').attr('type', 'radio')
 			.attr('name', 'data')
 			.attr('id', 'data'+i)
 			.attr('value', formInfo.data[i])
-			.appendTo(res);
+			.appendTo(li);
 			$('<label>').attr('for', 'data'+i)
 			.html(formInfo.data[i])
-			.appendTo(res);
+			.appendTo(li);
 		}
 		$('<input>').addClass('sendFeedback')
 		.attr('type', 'button')
@@ -173,15 +189,17 @@ var userFeedback = (function () {
 	}
 
 	function renderFormCheckoxList(res, formInfo) {
+		var ul = $('<ul class="list checkboxlist">').appendTo(res);
 		for(var i=0; i< formInfo.data.length; i++) {
+			var li = $('<li>').appendTo(ul);
 			$('<input>').attr('type', 'checkbox')
 			.attr('name', 'data'+i)
 			.attr('id', 'data'+i)
 			.attr('value', formInfo.data[i])
-			.appendTo(res);
+			.appendTo(li);
 			$('<label>').attr('for', 'data'+i)
 			.html(formInfo.data[i])
-			.appendTo(res);
+			.appendTo(li);
 		}
 		$('<input>').addClass('sendFeedback')
 		.attr('type', 'button')
@@ -354,11 +372,7 @@ $(document).ready(function(){
 	// -- Handler: retrieve notification
 	$(userFeedback.handlerId).click(function() {
 		// -- Send request to check if there is notifications to display
-		// STUB
-		userFeedback.url.getForm = 'test-request.php?simulate=0&type='+$(this).html();
 		userFeedback.retrieveNotification();
-		// STUB
-		userFeedback.url.getForm = 'test-request.php';
 	});
 
 	// -- Handler: send an answer to a notification

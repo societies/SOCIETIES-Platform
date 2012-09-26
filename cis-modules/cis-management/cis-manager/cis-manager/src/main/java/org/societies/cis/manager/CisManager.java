@@ -115,10 +115,14 @@ import org.societies.api.schema.cis.community.Participant;
 
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
+import org.societies.api.schema.cis.manager.AskCisManagerForJoinResponse;
+import org.societies.api.schema.cis.manager.AskCisManagerForLeaveResponse;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.ListCrit;
 import org.societies.api.schema.cis.manager.ListResponse;
+import org.societies.api.schema.cis.manager.Notification;
+import org.societies.api.schema.cis.manager.SubscribedTo;
 
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
@@ -290,7 +294,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		LOG.info("listener registered");
 		
 		// testing to add hard coded context atributtes
-		this.addHardCodedQualifications();
+		//this.addHardCodedQualifications();
 		//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
 		startup();
 		LOG.info("CISManager started up with "+this.ownedCISs.size()
@@ -739,39 +743,51 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// client Request for join
 			if (c.getAskCisManagerForJoin() != null) {
 				CommunityManager response = new CommunityManager();
-				JoinResponse j = new JoinResponse();
-				response.setJoinResponse(j);
+				AskCisManagerForJoinResponse ar = new AskCisManagerForJoinResponse();
+				response.setAskCisManagerForJoinResponse(ar);
 				LOG.info("android request for join received in CIS manager");
 				String senderjid = stanza.getFrom().getBareJid();
 				LOG.info("sender JID = " + senderjid); 
 				CisAdvertisementRecord ad = c.getAskCisManagerForJoin().getCisAdv();
 				
 				if(ad == null){
-					j.setResult(false);
+					ar.setStatus("error");
 					return response;
 				}
 				else{
-					JoinCallBack jCallback = new JoinCallBack(j);
-					this.joinRemoteCIS(ad, jCallback);
-				
-
-					// TODO: REMOVE THIS SLEEP
-					while(j.getCommunity()== null){// wait for callback
-						try {
-							Thread.sleep(5 * 1000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
+					JoinCallBackToAndroid jCallback = new JoinCallBackToAndroid(stanza.getFrom(),this.iCommMgr,ad.getId());
+					this.joinRemoteCIS(ad, jCallback);// the real return will come in the callback
 					
-
+					ar.setStatus("pending");
 					return response;
 				}
 			}
-			// END OF DELETE
+			// END OF client Request for join
 				
 
+			// client Request for leave
+			if (c.getAskCisManagerForLeave() != null) {
+				CommunityManager response = new CommunityManager();
+				AskCisManagerForLeaveResponse lr = new AskCisManagerForLeaveResponse();
+				response.setAskCisManagerForLeaveResponse(lr);
+				LOG.info("android request for leave received in CIS manager");
+				String senderjid = stanza.getFrom().getBareJid();
+				LOG.info("sender JID = " + senderjid); 
+				
+				if(null == c.getAskCisManagerForLeave().getTargetCisJid() || c.getAskCisManagerForLeave().getTargetCisJid().isEmpty()){
+					lr.setStatus("error");
+					return response;
+				}
+				else{
+					LeaveCallBackToAndroid jCallback = new LeaveCallBackToAndroid(stanza.getFrom(),this.iCommMgr,c.getAskCisManagerForLeave().getTargetCisJid());
+					this.leaveRemoteCIS(c.getAskCisManagerForLeave().getTargetCisJid(), jCallback);
+					
+					lr.setStatus("pending");
+					return response;
+				}
+			}
+			// END OF client Request for leave			
+			
 			if (c.getConfigure() != null) {
 				LOG.info("configure received");
 				return c;
@@ -784,26 +800,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
-public class JoinCallBack implements ICisManagerCallback{
-		
-	JoinResponse resp;
-	
-	public JoinCallBack(JoinResponse resp){
-		this.resp = resp;
-	}
-
-	@Override
-	public void receiveResult(CommunityMethods communityResultObject) {
-		if(communityResultObject == null || communityResultObject.getJoinResponse() == null){
-			LOG.info("null return on JoinCallBack");
-			resp.setResult(false);
-		}
-		else{
-			LOG.info("Result Status: joined CIS " + communityResultObject.getJoinResponse().isResult());
-			resp = communityResultObject.getJoinResponse();
-		}
-	}
-}
 	
 	
 
