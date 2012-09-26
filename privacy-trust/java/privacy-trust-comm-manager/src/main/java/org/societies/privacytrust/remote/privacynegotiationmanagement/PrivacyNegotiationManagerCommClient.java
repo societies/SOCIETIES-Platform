@@ -200,6 +200,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 		Stanza stanza = new Stanza(toIdentity);
 		NegotiationAgentBean bean = new NegotiationAgentBean();
 		bean.setAgreementEnvelope(Util.toByteArray(envelope));
+		bean.setRequestor(this.createRequestorBean(envelope.getAgreement().getRequestor()));
 		bean.setMethod(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT);
 		try {
 			this.commManager.sendIQGet(stanza, bean, this);
