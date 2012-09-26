@@ -88,19 +88,13 @@
 			<version>${version.pt}</version>
 		</dependency>
 		
-		<!--dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>XCCommunicationMgr</artifactId>
-			<version>${version.comm}</version>
-		</dependency-->
+		<!-- Test -->
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
 			<version>${version.comm}</version>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
-		
-		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
