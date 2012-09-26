@@ -171,6 +171,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 	public void setNegotiator(INegotiation negotiator) {
+		LOG.info("negotiator set");
 		this.negotiator = negotiator;
 	}
 	public IPrivacyPolicyManager getPrivacyPolicyManager() {
@@ -484,7 +485,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		cis.fillMembershipCritXMPPobj(m);
 		cisAd.setMembershipCrit(m);
 		cisAd.setName(cis.getName());
-		cisAd.setCssownerid(cis.getCisId());
+		cisAd.setCssownerid(cis.getOwnerId());
 		cisAd.setType(cis.getCisType());
 		cisAd.setId(cis.getCisId()); // TODO: check if the id or uri needs the jid
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
@@ -1309,7 +1310,7 @@ public class JoinCallBack implements ICisManagerCallback{
 		
 		this.getQualificationsForJoin(adv,j);
 		
-		
+		LOG.info("going to start the negotiation");
 		// TODO: HARDCODED!! CANT BE COMMITED THIS WAY
 		try {
 			negotiator.startNegotiation(new RequestorCis(this.iCommMgr.getIdManager().fromJid("xcmanager.societies.local") ,this.iCommMgr.getIdManager().fromJid(adv.getId())), new INegCallBack());
