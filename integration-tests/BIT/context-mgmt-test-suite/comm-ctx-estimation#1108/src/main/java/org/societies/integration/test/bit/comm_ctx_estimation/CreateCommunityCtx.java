@@ -77,9 +77,9 @@ public class CreateCommunityCtx {
 		LOG.info("Context broker service: "+ Test1108.getCtxBroker());
 		LOG.info("comm manager service"+ Test1108.getCommManager());
 		LOG.info("cisManager service"+ Test1108.getCisManager());
-		
+
 		CommunityCtxEntity communityEntity = null;
-		
+
 		try {
 			IIdentity cisID = createCISid();
 			LOG.info("Cis id "+cisID);
@@ -88,43 +88,43 @@ public class CreateCommunityCtx {
 
 			this.cssID1 =  Test1108.getCommManager().getIdManager().fromJid("boo@societies.local ");
 			this.indiEnt1 = Test1108.getCtxBroker().createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
-			
+
 			CtxAttribute individualAttr1 = Test1108.getCtxBroker().createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.INTERESTS).get();
 			individualAttr1.setStringValue("reading,socialnetworking,cinema,sports");
 			individualAttr1.setValueType(CtxAttributeValueType.STRING);
-						
+
 			CtxAttribute individualAttr2 = Test1108.getCtxBroker().createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.TEMPERATURE).get();
 			individualAttr2.setValueType(CtxAttributeValueType.INTEGER);
 			individualAttr2.setIntegerValue(25);
-						
+
 			Test1108.getCtxBroker().update(individualAttr1);
 			Test1108.getCtxBroker().update(individualAttr2);
 
 			this.cssID2 =  Test1108.getCommManager().getIdManager().fromJid("coo@societies.local ");
 			this.indiEnt2 = Test1108.getCtxBroker().createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
-			
+
 			CtxAttribute individualAttr3 = Test1108.getCtxBroker().createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.INTERESTS).get();
 			individualAttr3.setStringValue("cooking,horseRiding,restaurants,cinema");
 			individualAttr3.setValueType(CtxAttributeValueType.STRING);
-			
+
 			CtxAttribute individualAttr4 = Test1108.getCtxBroker().createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.TEMPERATURE).get();
 			individualAttr4.setIntegerValue(27);
 			individualAttr4.setValueType(CtxAttributeValueType.INTEGER);
-			
+
 			Test1108.getCtxBroker().update(individualAttr3);
 			Test1108.getCtxBroker().update(individualAttr4);
 
 			this.cssID3 =  Test1108.getCommManager().getIdManager().fromJid("doo@societies.local ");
 			this.indiEnt3 = Test1108.getCtxBroker().createIndividualEntity(this.cssID3, CtxEntityTypes.PERSON).get();
-			
+
 			CtxAttribute individualAttr5 = Test1108.getCtxBroker().createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.INTERESTS).get();
 			individualAttr5.setStringValue("cooking,horseRiding,socialnetworking,restaurants,cinema");
 			individualAttr5.setValueType(CtxAttributeValueType.STRING);
-			
+
 			CtxAttribute individualAttr6 = Test1108.getCtxBroker().createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.TEMPERATURE).get();
 			individualAttr6.setIntegerValue(27);
 			individualAttr6.setValueType(CtxAttributeValueType.INTEGER);
-			
+
 			Test1108.getCtxBroker().update(individualAttr5);
 			Test1108.getCtxBroker().update(individualAttr6);
 
@@ -134,21 +134,21 @@ public class CreateCommunityCtx {
 
 			Test1108.getCtxBroker().update(communityEntity);
 
-			 CtxAttribute ctxAttr = Test1108.getCtxBroker().createAttribute(communityEntity.getId(), CtxAttributeTypes.INTERESTS).get();
-			 CtxAttribute ctxAttr1 = Test1108.getCtxBroker().createAttribute(communityEntity.getId(), CtxAttributeTypes.TEMPERATURE).get();
-		
-			 this.communityAttrTemperatureId = ctxAttr.getId();
-			 this.communityCtxEntityID = communityEntity.getId();
-			 this.communityAttrInterestsId = ctxAttr1.getId();
-			 
-			 //this.communityAttrTemperatureId = ctxAttr1.getId();
-			 
+			CtxAttribute ctxAttr = Test1108.getCtxBroker().createAttribute(communityEntity.getId(), CtxAttributeTypes.TEMPERATURE).get();
+			CtxAttribute ctxAttr1 = Test1108.getCtxBroker().createAttribute(communityEntity.getId(), CtxAttributeTypes.INTERESTS).get();
+
+			this.communityAttrTemperatureId = ctxAttr.getId();
+			this.communityCtxEntityID = communityEntity.getId();
+			this.communityAttrInterestsId = ctxAttr1.getId();
+
+			//this.communityAttrTemperatureId = ctxAttr1.getId();
+
 			// LOG.info("TestRetrieveCommunityEntities "+ctxAttr.getId() );
-			 LOG.info("TestRetrieveCommunityEntities   this.communityAttrAgeId "+ this.communityAttrTemperatureId );
-			 LOG.info("TestRetrieveCommunityEntities   this.communityInterests "+ this.communityAttrInterestsId);
-			 
-			 
-			 retrieveCommunityEntities();
+			LOG.info("TestRetrieveCommunityEntities   this.communityAttrTemperatureId "+ this.communityAttrTemperatureId );
+			LOG.info("TestRetrieveCommunityEntities   this.communityInterestsId "+ this.communityAttrInterestsId);
+
+
+			retrieveCommunityEntities();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -175,21 +175,21 @@ public class CreateCommunityCtx {
 			// at this point communityAttrInterests is created and assigned to communityEntity but has a null value 
 			LOG.info("communityAttrInterestsId " + this.communityAttrInterestsId);
 			LOG.info("communityAttrInterestsId getOwnerId " + this.communityAttrInterestsId.getOwnerId());
-			CtxAttribute communityAttr1 = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, false).get();
-
-			LOG.info(" communityAttr  "+communityAttr1.getId()); 
-			LOG.info(" communityAttr  value "+ communityAttr1.getStringValue()+ " should be null");
+			CtxAttribute communityTempr = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrTemperatureId, false).get();
+			CtxAttribute communityInter = (CtxAttribute) Test1108.getCtxBroker().retrieveAttribute(this.communityAttrInterestsId, false).get();
+			LOG.info(" communityAttr  "+communityTempr.getId()); 
+			LOG.info(" communityAttr  value "+ communityInter.getStringValue()+ " should be null");
 	
-			LOG.info(" A T T R I B U T E S T E M P E R A T U R E");
+			LOG.info(" The estimation for the community Temperature begins, ");
 			estimatedCommunityAttribute = Test1108.getCtxBroker().estimateCommunityContext(this.communityCtxEntityID, this.communityAttrTemperatureId);
 			LOG.info(" estimatedCommunityAttribute getString ID:  "+estimatedCommunityAttribute.getId()+" should not be null ");
 			LOG.info(" estimatedCommunityAttribute getString value:  "+estimatedCommunityAttribute.getDoubleValue() +" should not be null ");
 			
-			LOG.info(" A T T R I B U T E S    I N T E R E S T S");
+			LOG.info(" The estimation for the community Interests begins, ");
 			estimatedCommunityAttribute = Test1108.getCtxBroker().estimateCommunityContext(this.communityCtxEntityID, this.communityAttrInterestsId);
 			LOG.info(" estimatedCommunityAttribute getString ID:  "+estimatedCommunityAttribute.getId()+" should not be null ");
-			LOG.info(" estimatedCommunityAttribute getString value:  "+estimatedCommunityAttribute.getDoubleValue() +" should not be null ");
-		
+			LOG.info(" estimatedCommunityAttribute getString value:  "+estimatedCommunityAttribute.getStringValue() +" should not be null ");
+			
 			// TODO second version of the test
 			//retrieving attribute with flag true should initiate the inference process.
 			//inference process will assign a community context value to community attribute

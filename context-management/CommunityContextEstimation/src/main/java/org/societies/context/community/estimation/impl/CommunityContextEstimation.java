@@ -27,14 +27,12 @@ package org.societies.context.community.estimation.impl;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
@@ -43,22 +41,11 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.context.api.community.estimation.estimationModel;
-
-import org.societies.context.community.estimation.impl.*;
-
-
-import org.societies.api.internal.context.broker.ICtxBroker;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -76,27 +63,22 @@ import org.springframework.util.Assert;
  */
 @Service
 public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
-	
+
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CommunityContextEstimation.class);
-	
+
 	@Autowired(required=false)
 	private ICtxBroker internalCtxBroker;
 
-
-	
-	
 	public CommunityContextEstimation() {
 		LOG.info(this.getClass() + "CommunityContextEstimation instantiated ");
-
 	}
-	
-	
+
 	@Override
 	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier ctxId,
 			CtxAttributeIdentifier ctxAttributeIdentifier, estimationModel model) {
 		// TODO Auto-generated method stub
-		
+
 		switch (model) {
 		case mean:
 
@@ -131,26 +113,17 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		return null;
 	}
-	
+
 
 	@Override
 	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier communityCtxId, CtxAttributeIdentifier ctxAttributeIdentifier) {
-		// TODO Auto-generated method stub
-
-		//Check the type of the ctxAttributeIdentifier
-
-		LOG.info("inside estimateCommunityCtx communityCtxId:"+ communityCtxId);
-		LOG.info("inside estimateCommunityCtx ctxAttributeIdentifier:"+ ctxAttributeIdentifier);
 
 		CtxAttribute retrievedType = null;
 		CtxAttribute result = null;
 		ArrayList<String> finalArrayStringList = new ArrayList<String>();
-		
+
 		try {
 			retrievedType = (CtxAttribute) internalCtxBroker.retrieve(ctxAttributeIdentifier).get();
-			LOG.info("retrievedTypeValueType: "+ retrievedType.getValueType()); //EMPTY
-			LOG.info("retrievedTypeIntegerValue: "+ retrievedType.getIntegerValue()); //null
-			LOG.info("retrievedTypeType: "+ retrievedType.getType()); //interests
 
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
@@ -163,36 +136,25 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			e1.printStackTrace();
 		}
 
-		LOG.info("Before checking the TEMPERATURE, :"+retrievedType.getType());
-		//if(retrievedType.getType().toString().equals("TEMPERATURE"));
-		//if(retrievedType.getType().toString().equals("TEMPERATUREdsfhgfhfhfghfghhhhhhh"));
 		if(retrievedType.getType().toString().equals("temperature"))
 		{
-			LOG.info("the comparisson suceeded with TEMPERATURE");
 			ArrayList<Integer> inputValues = new ArrayList<Integer>();
-			//get the community and a set with the community's context attributes
-			// TODO code optimization
 
-			//CommunityCtxEntity retrievedCommunity;
+			// TODO code optimization
 
 			try {
 				CommunityCtxEntity retrievedCommunity;
 				try {
 					retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
-					LOG.info("CommunityCtxEntity retrievedCommunity "+retrievedCommunity);
 					Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
-					LOG.info("THE size is "+communityMembers.size());							
+						
 					for(CtxEntityIdentifier comMemb:communityMembers){
-
-						IndividualCtxEntity objMembers = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-
-						LOG.info("objMemebers.getType "+ objMembers.getType()); //person
-
-						Set<CtxAttribute> list = objMembers.getAttributes("TEMPERATURE");	
+						IndividualCtxEntity individualMember = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+						Set<CtxAttribute> list = individualMember.getAttributes("TEMPERATURE");	
+						
 						for (CtxAttribute ca:list){
 							inputValues.add(ca.getIntegerValue());
 						}
-						LOG.info("THE size of input value list "+inputValues.size());
 					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -206,23 +168,16 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			//Call the cceNumMean method
+
 			double meanValue = cceNumMean(inputValues);
-			LOG.info("THE MEAN VALUE IS :"+ meanValue);
-			
-			//double medianValue = cceNumMedian(inputValues);
-			//ArrayList<Integer> modeValue = cceNumMode(inputValues);
-			//Integer[] numRange = cceNumRange(inputValues);
 
 			try {
 				CtxAttribute meanV = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.TEMPERATURE).get();
-				meanV.setDoubleValue(meanValue);//(ctxAttributeIdentifier.getType()+" mean Value");
+				meanV.setDoubleValue(meanValue);
 				meanV.setValueType(CtxAttributeValueType.DOUBLE);
 				meanV = (CtxAttribute) this.internalCtxBroker.update(meanV).get();
 				result =meanV;
 				result.getDoubleValue();
-				LOG.info("mean V for update "+ meanV.getDoubleValue());
 
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
@@ -234,84 +189,64 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-
 		}
-		//the if statement ends here		
 
-		LOG.info("Before checking the INTERESTS, :"+retrievedType.getType());
 		if (retrievedType.getType().toString().equals("interests")) 
 		{
-			LOG.info("the comparisson suceeded with INTERESTS");
 			ArrayList<String> stringInputValues = new ArrayList<String>();
 			ArrayList<String> individualsStrings = new ArrayList<String>();
 
-			CommunityCtxEntity retrievedCommunity;
+
 
 			try {
-				retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
-				LOG.info("CommunityCtxEntity retrievedCommunity INTERESTS "+retrievedCommunity);
+				CommunityCtxEntity retrievedCommunity;
+				try {
+					retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
 
-				Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
-				LOG.info("THE community's size is "+communityMembers.size());
+					Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
 
-				for(CtxEntityIdentifier comMemb:communityMembers){
+					for(CtxEntityIdentifier comMemb:communityMembers){
 
-					IndividualCtxEntity objMemebers = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-					LOG.info("objMemebers.getType "+ objMemebers.getType());//person
+						IndividualCtxEntity individualMemeber = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+						Set<CtxAttribute> setAttributesInterests = individualMemeber.getAttributes("INTERESTS");
 
-					Set<CtxAttribute> setAttributesInterests = objMemebers.getAttributes("INTERESTS");
-					LOG.info("THE size of List list of CtxAttributes is "+setAttributesInterests.size());	//1 ??????????????????
-
-					for (CtxAttribute ca:setAttributesInterests){
-						stringInputValues.add(ca.getStringValue());
-						LOG.info("THE interests are "+ ca.getStringValue());
+						for (CtxAttribute ca:setAttributesInterests){
+							stringInputValues.add(ca.getStringValue());
+						}
 					}
-				}
-				
-				individualsStrings.addAll(stringInputValues);
-				LOG.info("1. individualsStrings size is :"+ individualsStrings.size());	
-				
-				for (int i=0; i<individualsStrings.size(); i++){
-					LOG.info(i +"2. the value of the individualStrings array is :"+ individualsStrings.get(i));
-				}
 
-				LOG.info("The value of individuals strings are :"+individualsStrings); //reading,socialnetworking,cinema,sports, cooking,horseRiding,restaurants,cinema, cooking,horseRiding,socialnetworking,restaurants,cinema
-				LOG.info("THE size of individuals strings are :"+individualsStrings.size()); //3
+					individualsStrings.addAll(stringInputValues);
 
-				
-				for (String s:individualsStrings){
-					String[] helper = s.split(",");
-					for (String s1:helper){
-						finalArrayStringList.add(s1);
+					for (String s:individualsStrings){
+						String[] helper = s.split(",");
+						for (String s1:helper){
+							finalArrayStringList.add(s1);
+						}
 					}
-				}
-				
-				LOG.info("finalArrayStringLists size is :" + finalArrayStringList.size());
-				LOG.info("finalArrayStringLists values are :" + finalArrayStringList);
-				
 
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (CtxException e) {
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			catch (CtxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 			ArrayList<String> modeStringValue= cceStringMode(finalArrayStringList); //[cinema]
-		
+
 			try {
 				CtxAttribute interestsMode = (CtxAttribute) this.internalCtxBroker.createAttribute(communityCtxId, CtxAttributeTypes.INTERESTS).get();
-				interestsMode.setStringValue(modeStringValue.get(0).toString());//(interestsMode.getStringValue());//(ctxAttributeIdentifier.getType()+" mean Value");
+				interestsMode.setStringValue(modeStringValue.get(0).toString());
 				interestsMode.setValueType(CtxAttributeValueType.STRING);
 				interestsMode = (CtxAttribute) this.internalCtxBroker.update(interestsMode).get();
 				result =interestsMode;
 				result.getStringValue();
-				LOG.info("mode String value for update "+ modeStringValue +"or "+modeStringValue.get(0).toString());
-
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -323,17 +258,12 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				e.printStackTrace();
 			}
 
-			//Call the cceNumMean method
+		}
 
-			//	}
-
-			//TO DO 
-			//set the value to a new community attribute
-
-			//result.getDoubleValue();
-
-	}
-		
+		//Methods that can also be called
+		//double medianValue = cceNumMedian(inputValues);
+		//ArrayList<Integer> modeValue = cceNumMode(inputValues);
+		//Integer[] numRange = cceNumRange(inputValues);	
 		
 //		
 //		LOG.info("Before checking the LOCATION, :"+retrievedType.getType());
@@ -438,18 +368,17 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		int total = 0; 
+		//double res = 0.0;
 
-		LOG.info("inside the cceNumMean "+inputValuesList.size());
 		for (int i=0; i<inputValuesList.size(); i++) {
 			total = total + inputValuesList.get(i);
-			LOG.info("total " + total);
 		}		
-		
-		double res = total/inputValuesList.size();
-		//double res =roundTwoDecimals(total/inputValuesList.size());
-		 DecimalFormat twoDForm = new DecimalFormat("#.##");
-		  res=  Double.valueOf(twoDForm.format(res));				
-		LOG.info("res " + res);
+
+		double res = (double)total/(double)inputValuesList.size();
+//		double res =roundTwoDecimals(total/inputValuesList.size());
+//		DecimalFormat twoDForm = new DecimalFormat("#.##");
+//		double resF = Double.valueOf(twoDForm.format(res)).doubleValue();				
+
 		return res;
 	}
 	
@@ -463,7 +392,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		Integer med,med1,med2=0;
 		Collections.sort(inputValuesList);
-		
+
 		if (inputValuesList.size()%2 == 1 ){
 			med = inputValuesList.get((inputValuesList.size()-1)/2);	
 		}
@@ -482,7 +411,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	 * @return an ArrayList of integers representing the mode value of the input integers
 	 */
 	public ArrayList<Integer> cceNumMode(ArrayList<Integer> inputValuesList) {
-		
+
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		Hashtable <Integer, Integer> frequencyMap = new Hashtable<Integer, Integer>();
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
@@ -523,26 +452,24 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	 * @return the range of the input integers as Integer[]
 	 */
 	public Integer[] cceNumRange(ArrayList<Integer> inputValuesList) {
-				
-			Integer[] r = new Integer[2];
 
-		      Integer min= Integer.MAX_VALUE;
-		      Integer max = Integer.MIN_VALUE;
+		Integer[] r = new Integer[2];
 
-		      for (int i=0; i<inputValuesList.size(); ++i){
-		         if (inputValuesList.get(i) < min){
-		            min=inputValuesList.get(i);
-		         }
-		         if (inputValuesList.get(i) > max){
-		            max=inputValuesList.get(i);
-		         }
-		      }
+		Integer min= Integer.MAX_VALUE;
+		Integer max = Integer.MIN_VALUE;
 
-		      r[0]=min;
-		      r[1]=max;
-
-		      return r;
-		   }	
+		for (int i=0; i<inputValuesList.size(); ++i){
+			if (inputValuesList.get(i) < min){
+				min=inputValuesList.get(i);
+			}
+			if (inputValuesList.get(i) > max){
+				max=inputValuesList.get(i);
+			}
+		}
+		r[0]=min;
+		r[1]=max;
+		return r;
+	}	
 
 	//@Override
 	/*
@@ -639,10 +566,8 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 			if (relativeDistance > distance_max){			
 				distance_max =relativeDistance;
-				farthestPointIndex=i;
-				
-			}
-			
+				farthestPointIndex=i;			
+			}		
 		}
 		
 		fP=pointsSet.get(farthestPointIndex);
@@ -725,31 +650,21 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		ArrayList<String> mode = new ArrayList<String>();
 		int max=0;
-		LOG.info("The size of the input values list in string mode methos is :"+inputValuesList.size()); //13
 		for (int i=0; i<inputValuesList.size(); i++){
 			if (finalList.contains(inputValuesList.get(i))){
-				LOG.info(i+"   iiiiii FIRST IF   :" + inputValuesList.get(i));
 				int elementCount = Integer.parseInt(frequencyMap.get(inputValuesList.get(i)).toString());
 				elementCount++;
-				frequencyMap.put(inputValuesList.get(i), elementCount);
-				LOG.info("inputValueList is :"+ inputValuesList);
+				frequencyMap.put(inputValuesList.get(i), elementCount);				
 				if (elementCount>max){
 					max=elementCount;
 				}
-				}
-				else
-				{
-					finalList.add(inputValuesList.get(i));
-					LOG.info(i+"iiiiii SECOND IF this is the log for the final list :"+ inputValuesList.get(i));
-					frequencyMap.put(inputValuesList.get(i), 1);
-					LOG.info("frequencyMap :"+frequencyMap.get(inputValuesList.get(i)));
-				}	
-			//}
+			}
+			else
+			{
+				finalList.add(inputValuesList.get(i));
+				frequencyMap.put(inputValuesList.get(i), 1);
+			}	
 		}
-		for (int i=0; i<frequencyMap.size(); i++){
-			LOG.info("frequencymap  is :" + frequencyMap.get(i)); //null!!!!! 7 times
-		}
-
 
 		Enumeration<String> e = frequencyMap.keys();
 
@@ -759,7 +674,7 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				mode.add(curString.toString());
 			}
 		}
-		LOG.info("the mode of the string is :"+mode);
+
 		return mode;
 	}
 
@@ -781,8 +696,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		// TODO Auto-generated method stub
 		
 	}
-
-
 
 
 }
