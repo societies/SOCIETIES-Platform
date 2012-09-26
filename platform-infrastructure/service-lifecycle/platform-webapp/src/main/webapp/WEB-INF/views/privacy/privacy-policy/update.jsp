@@ -249,7 +249,6 @@ th {
 	<!-- FOOTER -->
 	<jsp:include page="../../footer.jsp" />
 	<!-- END FOOTER -->
-	<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 	<script type="text/javascript">
 	var actionList = [<c:forEach var="action" items="${ActionList}">"${action}", </c:forEach>];
 	var conditionList = [<c:forEach var="condition" items="${ConditionList}">"${condition}", </c:forEach>];

@@ -88,7 +88,7 @@ var	SocietiesCISManagerHelper = {
 		}
 		
 		function failure(data) {
-			alert("disconnectFromLocalCSSManager - failure: " + data);
+			alert("disconnectFromLocalCISManager - failure: " + data);
 		}
 	    window.plugins.SocietiesLocalCISManager.disconnectService(success, failure);
 	},

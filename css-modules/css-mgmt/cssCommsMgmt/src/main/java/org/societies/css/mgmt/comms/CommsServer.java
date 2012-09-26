@@ -168,6 +168,9 @@ public class CommsServer implements IFeatureServer {
 			case SUGGESTED_FRIENDS:
 				asyncFriendsAdsResult = this.cssManager.suggestedFriends();
 				break;
+			case GET_FRIEND_REQUESTS:
+				asyncFriendsAdsResult = this.cssManager.getFriendRequests(); 
+				break;
 			default:
 				break;
 			}
@@ -176,6 +179,7 @@ public class CommsServer implements IFeatureServer {
 				switch (bean.getMethod()) {
 				case GET_CSS_FRIENDS:
 				case SUGGESTED_FRIENDS:
+				case GET_FRIEND_REQUESTS:
 					friendsAdsResult = asyncFriendsAdsResult.get();
 					break;
 				default:

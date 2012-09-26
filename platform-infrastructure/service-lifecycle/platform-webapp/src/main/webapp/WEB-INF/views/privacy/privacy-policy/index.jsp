@@ -78,7 +78,6 @@
 	<jsp:include page="../../footer.jsp" />
 	<!-- END FOOTER -->
 	
-	<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function(){
 		$('.remoteCis').hide();

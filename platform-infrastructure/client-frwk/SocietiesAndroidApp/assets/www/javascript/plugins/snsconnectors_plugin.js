@@ -41,7 +41,7 @@ var SocialConnectorsService = {
 	 */
 	connectService: function(successCallback, failureCallback) {
 
-		console.log("Call ServiceManagementService - connectService");
+		console.log("Call SocialConnectorsService - connectService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -59,7 +59,7 @@ var SocialConnectorsService = {
 	 */
 	disconnectService: function(successCallback, failureCallback) {
 
-		console.log("Call CoreServiceMonitorService - disconnectService");
+		console.log("Call SocialConnectorsService - disconnectService");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -134,7 +134,7 @@ var SocialConnectorsServiceHelper = {
 	 * @returns null
 	 */
 
-	connectToServiceManagement: function(actionFunction) {
+	connectToSNConnectorService: function(actionFunction) {
 		console.log("SocialConnectorsServiceHelper.connectToSNSconnectors()");
 			
 		function success(data) {

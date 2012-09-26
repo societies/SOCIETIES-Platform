@@ -81,9 +81,6 @@ var SocietiesUtility = {
 			console.log("Register Preferences plugin ");
 			cordova.addPlugin("SocietiesAppPreferences", SocietiesAppPreferences);
 			
-			console.log("Register Preferences plugin ");
-			cordova.addPlugin("SocietiesAppPreferences", SocietiesAppPreferences);
-			
 			console.log("Register CIS Manager plugin ");
 			cordova.addPlugin("SocietiesLocalCISManager", SocietiesLocalCISManager);
 			
@@ -155,9 +152,14 @@ $(document).bind('pageinit',function(){
 	console.log("jQuery pageinit action(s) for mainpage");
 
 	$('#connectXMPP').off('click').on('click', function(){
+		$('#connectXMPP').val("logging in...");
+		$("#connectXMPP").attr("disabled",true);
 		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
 		}
+		$('#connectXMPP').val("LOGIN");
+		$("#connectXMPP").removeAttr("disabled");
+
 	});
 
 	$('#username').off('focus').on('focus', function(){
@@ -167,4 +169,13 @@ $(document).bind('pageinit',function(){
 	$('#password').off('focus').on('focus', function(){
 		SocietiesLogin.clearElementValue('#password')
 	});
+	
+	$("form#login").submit(function() {
+		if (SocietiesLogin.validateLoginCredentials(jQuery("#username").val(), jQuery("#password").val(), jQuery("#identitydomain").val())) {
+			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
+		}
+		
+		return false;
+	});
+	
 });

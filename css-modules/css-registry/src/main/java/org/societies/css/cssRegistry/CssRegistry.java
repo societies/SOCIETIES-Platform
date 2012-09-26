@@ -678,4 +678,33 @@ public class CssRegistry implements ICssRegistry {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean cssRecordExists() throws CssRegistrationException {
+		log.debug("CSSRegistry cssRecordExists");
+
+		boolean retValue = false;
+		
+		Session session = sessionFactory.openSession();
+		
+		try {
+
+			List<CssRegistryEntry> tmpRegistryEntryList = session
+					.createCriteria(CssRegistryEntry.class).list();
+			
+			if (tmpRegistryEntryList.size() > 0) {
+				retValue = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new CssRegistrationException(e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return retValue;
+	}
+
 }
