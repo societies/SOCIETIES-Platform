@@ -24,6 +24,9 @@
  */
 package org.societies.api.css.directory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -41,6 +44,36 @@ public class ACssAdvertisementRecord extends CssAdvertisementRecord implements P
 	public ACssAdvertisementRecord() {
 		super();
 	}
+	/**
+	 * Convert a CssAdvertisementRecord to a ACssAdvertisementRecord
+	 * @param record
+	 * @return ACssAdvertisementRecord
+	 */
+	public static ACssAdvertisementRecord ConvertCssAdvertisementRecord(CssAdvertisementRecord record) {
+		ACssAdvertisementRecord arecord = new ACssAdvertisementRecord();
+		arecord.setId(record.getId());
+		arecord.setName(record.getName());
+		arecord.setUri(record.getUri());
+		
+		return arecord;
+	}
+
+	/**
+	 * Convert a List of CssAdvertisementRecords to an array of ACssAdvertisementRecords
+	 * @param schemaList
+	 * @return ACssAdvertisementRecord array
+	 */
+	public static ACssAdvertisementRecord [] getArray(List<CssAdvertisementRecord> schemaList) {
+		
+		ACssAdvertisementRecord androidArray [] = new ACssAdvertisementRecord [schemaList.size()];
+		
+		for (int i = 0; i < schemaList.size(); i++) {
+			androidArray[0] = (ConvertCssAdvertisementRecord(schemaList.get(i)));
+		}
+		return androidArray;
+	}
+	
+	//Parcelable interface implementation
 	
 	/* @see android.os.Parcelable#describeContents()*/
 	public int describeContents() {
@@ -71,12 +104,4 @@ public class ACssAdvertisementRecord extends CssAdvertisementRecord implements P
 		}
 	};
 	
-	public static ACssAdvertisementRecord ConvertCssAdvertisementRecord(CssAdvertisementRecord record) {
-		ACssAdvertisementRecord arecord = new ACssAdvertisementRecord();
-		arecord.setId(record.getId());
-		arecord.setName(record.getName());
-		arecord.setUri(record.getUri());
-		
-		return arecord;
-	}
 }
