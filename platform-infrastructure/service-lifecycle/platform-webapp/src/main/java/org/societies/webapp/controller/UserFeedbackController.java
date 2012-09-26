@@ -80,8 +80,7 @@ public class UserFeedbackController {
 		if(form != null){
 			returnString = gsonMgr.toJson(form);
 		}else{
-			form = new FeedbackForm();
-			form.setType("NO_REQUESTS");
+			returnString = gsonMgr.toJson(new FeedbackForm().generateEmptyFeedbackForm());
 		}
 		
 		Map<String, Object> model = new HashMap<String, Object>();

@@ -241,18 +241,20 @@ var userFeedback = (function () {
 	function renderFormNotification(res, formInfo) {
 		// Add form
 		var timeout = displayTimeout(formInfo.data[0]);
-		$('<input>').addClass('closeFeedback')
+		var button = $('<input>').addClass('sendFeedback')
 		.addClass('timeout')
 		.attr('type', 'button')
-		.attr('value', "Close ("+timeout+"s)")
-		.appendTo(res);
+		.attr('value', "Close ("+timeout+"s)");
+		button.appendTo(res);
 
 		// Manage timeout
 		timeoutTimer.set(function() {
 			$('.timeout').attr('value', "Close ("+(--timeout)+"s)");
 			if (timeout <= 0) {
 				this.stop();
-				closeNotification();
+				var answer = retrieveAnswer(button, true);
+				console.log("Send timeout answer: ", answer);
+				sendAnswer(answer);
 				return;
 			}
 		});
@@ -324,6 +326,9 @@ var userFeedback = (function () {
 		}
 		else if (userFeedback.formType.ABORT == notification.type) {
 			notification.data[0] = ('continue' == clickedElement.attr('name') ? true : false);
+		}
+		else if (userFeedback.formType.NOTIFICATION == notification.type) {
+			notification.data[0] = (true);
 		}
 		return notification;
 	}
