@@ -267,7 +267,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 				this.logging.debug("Returning getPolicy result");
 				NegotiationGetPolicyBeanResult result = policyResults.get(id);
 				
-				RequestPolicy policy = (RequestPolicy) SerialisationHelper.deserialise(result.getRequestPolicy(), this.getClass().getClassLoader());
+				RequestPolicy policy = (RequestPolicy) SerialisationHelper.deserialise(result.getRequestPolicy(), this.idMgr.getClass().getClassLoader());
 				//RequestPolicy policy = (RequestPolicy) Util.convertToObject(result.getRequestPolicy(), this.getClass());
 				this.policyResults.remove(id);
 				return new AsyncResult<RequestPolicy>(policy);
@@ -367,7 +367,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 				this.logging.debug("Returning negotiate result");
 				NegotiationMainBeanResult result = this.mainResults.get(id);
 				
-				ResponsePolicy resp = (ResponsePolicy) SerialisationHelper.deserialise(result.getResponsePolicy(), this.getClass().getClassLoader());
+				ResponsePolicy resp = (ResponsePolicy) SerialisationHelper.deserialise(result.getResponsePolicy(), this.idMgr.getClass().getClassLoader());
 				
 				//ResponsePolicy resp = (ResponsePolicy) Util.convertToObject(result.getResponsePolicy(), this.getClass());
 				this.mainResults.remove(id);
