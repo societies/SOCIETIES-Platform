@@ -245,6 +245,14 @@ public class CommsServer implements IFeatureServer {
 			//	request.setRequestStatus(bean.ge);
 				this.cssManager.updateCssRequest(request);
 			break;
+			case ACCEPT_CSS_FRIEND_REQUEST:
+
+				request.setCssIdentity(stanza.getFrom().getJid());
+				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
+			//	request.setRequestStatus(bean.ge);
+				this.cssManager.updateCssRequest(request);
+			break;
 			
 			
 				
