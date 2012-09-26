@@ -168,6 +168,9 @@ public class CommsServer implements IFeatureServer {
 			case SUGGESTED_FRIENDS:
 				asyncFriendsAdsResult = this.cssManager.suggestedFriends();
 				break;
+			case GET_FRIEND_REQUESTS:
+				asyncFriendsAdsResult = this.cssManager.getFriendRequests(); 
+				break;
 			default:
 				break;
 			}
@@ -179,6 +182,7 @@ public class CommsServer implements IFeatureServer {
 					LOG.debug("Number of actual friends: " + friendsAdsResult.size());
 					break;
 				case SUGGESTED_FRIENDS:
+				case GET_FRIEND_REQUESTS:
 					friendsAdsResult = asyncFriendsAdsResult.get();
 					LOG.debug("Number of suggested friends: " + friendsAdsResult.size());
 					break;

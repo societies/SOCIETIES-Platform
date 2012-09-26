@@ -34,6 +34,9 @@ package org.societies.api.osgi.event;
 
 public class EventTypes {
 
+	/** Used to notify peers that the CSS Record has been modified */
+	public static final String CSS_RECORD_EVENT = "org/societies/css/record";
+	
 	/** User to notify peers of a css event */
 	public static final String CSS_ADV_EVENT = "org/societies/css/advert";	
 	

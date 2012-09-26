@@ -81,13 +81,34 @@
 			  <xs:element ref='listResponse'/>
 			  <xs:element ref='searchCis'/>
 			  <xs:element ref='askCisManagerForJoin'/>
-			  <xs:element ref='ins:joinResponse'/>
+			  <xs:element ref='askCisManagerForJoinResponse'/>
+			  <xs:element ref='askCisManagerForLeave'/>
+			  <xs:element ref='askCisManagerForLeaveResponse'/>
+			 <!--  <xs:element ref='ins:joinResponse'/>  -->
 			  <xs:element ref='configure'/>
 			  <xs:element ref='notification'/>
 	      </xs:choice>
 	    </xs:complexType>
 	</xs:element>
 	
+
+    <xs:element name='askCisManagerForJoinResponse'>
+    <xs:complexType>
+          <xs:attribute name='status' type='xs:string'/> <!-- normally will be equal to pending -->
+    </xs:complexType>
+  </xs:element>
+
+    <xs:element name='askCisManagerForLeaveResponse'>
+    <xs:complexType>
+          <xs:attribute name='status' type='xs:string'/> <!-- normally will be equal to pending -->
+    </xs:complexType>
+  </xs:element>
+
+    <xs:element name='askCisManagerForLeave'>
+    <xs:complexType>
+          <xs:attribute name='targetCisJid' type='xs:string' use='required'/> <!-- normally will be equal to pending -->
+    </xs:complexType>
+  </xs:element>
 
 
    <xs:element name='askCisManagerForJoin'>

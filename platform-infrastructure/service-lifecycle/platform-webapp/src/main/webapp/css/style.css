@@ -45,9 +45,19 @@ body{
 	width: 16px;
 	height: 16px;
 }
-.stop{
+#userfeedback .stop{
 	background-image: url(../images/pause_16x16.png);
 }
-.start{
+#userfeedback .start{
 	background-image: url(../images/play_16x16.png);
+}
+
+#userfeedback .notificationText{
+	display: block;
+	margin: 4px auto;
+}
+#userfeedback ul.list{
+	margin: 4px auto;
+	padding: 0;
+	list-style: none;
 }

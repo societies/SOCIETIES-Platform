@@ -183,4 +183,7 @@ public interface ICSSRemoteManager {
 		/* Get a list of suggested Friends from cloud Css Manger */
 		void suggestedFriends(ICSSManagerCallback callback);
 		
+		/* Get a list of Pending CSS Friend Requests */
+		void getFriendRequests(ICSSManagerCallback callback);
+		
 }

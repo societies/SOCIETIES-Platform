@@ -70,11 +70,11 @@ var SocialNetworksConnectors = {
 		}
 		
 		function failure(data) {
-			window.alert("Failed to add connector!");
+			window.alert("Failed to add connector: " + data);
 		}
 		
 		var connectorType = $('select#connectorType').attr('value');
-		if (connectorType != "0") { "Select a Connector"
+		if (connectorType != "0") { //"Select a Connector"
 			SocialConnectorsServiceHelper.connectToSNConnectorService(function() {
 										window.plugins.SocialConnectorsService.getToken(connectorType, success, failure) }
 										);
