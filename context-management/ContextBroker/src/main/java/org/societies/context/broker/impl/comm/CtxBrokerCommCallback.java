@@ -38,6 +38,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.CtxModelObject;
@@ -164,7 +165,21 @@ public class CtxBrokerCommCallback implements ICommCallback {
 		//			LOG.info("inside receiveResult LOOKUP method 4"+ resultListIdentifiers);
 					ctxCallbackClient.onLookupCallback(resultListIdentifiers);
 							
-									
+				} else if(payload.getRetrieveIndividualEntityIdBeanResult() != null){
+					
+					LOG.info("inside receiveResult RetrieveIndividualEntityId method 1 ");
+					CtxIdentifierBean indiEntIdBean = payload.getRetrieveIndividualEntityIdBeanResult();
+					LOG.info("inside receiveResult RetrieveIndividualEntityId method 2 ");
+					ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+					LOG.info("inside receiveResult RetrieveIndividualEntityId method 3 ");
+					CtxIdentifier ctxId = CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean(indiEntIdBean);
+					LOG.info("inside receiveResult RetrieveIndividualEntityId method 4 ");
+					if(ctxId instanceof CtxEntityIdentifier){
+						CtxEntityIdentifier ctxEntityId = 	(CtxEntityIdentifier) ctxId;
+						ctxCallbackClient.onRetrieveIndiEnt(ctxEntityId);
+					} else LOG.error ("Returned ctxIdentifier is not a CtxEntityIdentifier");
+										
+					
 				}  else 
 					LOG.error("The payload is not appropriate for the CtxBrokerCommCallback receiveResult method!");
 			} catch (Exception e) {
