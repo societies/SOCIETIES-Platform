@@ -62,7 +62,7 @@ var userFeedback = (function () {
 			success: function(data, textStatus, xhr) {
 				console.log("Success: notification retrieved", textStatus);
 				// -- No form to display
-				if (formType.EMPTY == data) {
+				if (formType.EMPTY == data.type) {
 					// Pooling timer normal internal
 					poolingTimerNormal();
 					return;
@@ -287,8 +287,8 @@ var userFeedback = (function () {
 				// Clean the previous notification
 				closeNotification();
 				// Display result
-				result.addClass("true" == formInfo ? 'ok' : 'error')
-				.html("true" == formInfo ? 'Ok!' : 'Oups, error!')
+				result.addClass(formInfo.ack ? 'ok' : 'error')
+				.html(formInfo.ack ? 'Ok!' : 'Oups, error!')
 				.fadeIn('slow')
 				.delay(toastTime).fadeOut('slow');
 			},

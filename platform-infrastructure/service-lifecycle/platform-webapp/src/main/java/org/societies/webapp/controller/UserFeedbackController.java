@@ -80,7 +80,8 @@ public class UserFeedbackController {
 		if(form != null){
 			returnString = gsonMgr.toJson(form);
 		}else{
-			returnString = "NO_REQUESTS";
+			form = new FeedbackForm();
+			form.setType("NO_REQUESTS");
 		}
 		
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -99,7 +100,7 @@ public class UserFeedbackController {
 			responseForm = gsonMgr.fromJson(jsonString, FeedbackForm.class);
 		}catch(Exception e){
 			LOG.error("Submitted response - incorrect format");
-			String returnString = gsonMgr.toJson(new Boolean(false));
+			String returnString = gsonMgr.toJson((new FeedbackForm().generateFaillureFeedbackResultForm()));
 			model.put("data", returnString);
 			return new ModelAndView("data", model);
 		}
@@ -138,12 +139,12 @@ public class UserFeedbackController {
 			userFeedback.submitImplicitResponse(responseForm.getID(), true);
 		}else{
 			LOG.error("Did not recognise response form type from AJAX");
-			String returnString = gsonMgr.toJson(new Boolean(false));
+			String returnString = gsonMgr.toJson((new FeedbackForm().generateFaillureFeedbackResultForm()));
 			model.put("data", returnString);
 			return new ModelAndView("data", model);
 		}
 		
-		String returnString = gsonMgr.toJson(new Boolean(true));
+		String returnString = gsonMgr.toJson((new FeedbackForm().generateSuccessFeedbackResultForm()));
 		model.put("data", returnString);
 		return new ModelAndView("data", model);
 	}
