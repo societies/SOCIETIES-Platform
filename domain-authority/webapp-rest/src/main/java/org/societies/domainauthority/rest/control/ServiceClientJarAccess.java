@@ -50,7 +50,6 @@ public class ServiceClientJarAccess implements IClientJarServer {
 
 	private static HashMap<URI, Service> services = new HashMap<URI, Service>();
 
-	private ICommManager commMgr;
 	private static ISignatureMgr sigMgr;
 	private static boolean accessControlEnabled;
 
@@ -64,14 +63,6 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		LOG.debug("init()");
 	}
 
-	// Getters and setters for beans
-	public ICommManager getCommMgr() {
-		return commMgr;
-	}
-	public void setCommMgr(ICommManager commMgr) {
-		LOG.info("setCommMgr()");
-		this.commMgr = commMgr;
-	}
 	public ISignatureMgr getSigMgr() {
 		return sigMgr;
 	}

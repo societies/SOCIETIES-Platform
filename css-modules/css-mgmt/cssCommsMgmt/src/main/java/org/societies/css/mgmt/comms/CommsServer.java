@@ -267,7 +267,7 @@ public class CommsServer implements IFeatureServer {
 				
 				//SAVE receivedIDcloud TO DATABASE INSTEAD
 				request.setCssIdentity(receivedIDcloud);
-				LOG.info(" <<<<<<<<<<>>>>>>>>>>>>> UPDATE_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				LOG.info(" <<<<<<<<<<>>>>>>>>>>>>> UPDATE_CSS_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
 				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);
@@ -282,12 +282,12 @@ public class CommsServer implements IFeatureServer {
 				
 				//SAVE receivedIDcloud TO DATABASE INSTEAD
 				request.setCssIdentity(receivedIDcloud);
-				LOG.info(" <<<<<<<<<<>>>>>>>>>>>>> UPDATE_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
+				LOG.info(" <<<<<<<<<<>>>>>>>>>>>>> ACCEPT_CSS_FRIEND_REQUEST COMMSServer StanzagetJid " +stanza.getFrom().getJid());
 				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);
 			//	request.setRequestStatus(bean.ge);
-				this.cssManager.updateCssRequest(request);
+				this.cssManager.acceptCssFriendRequest(request);
 			break;
 			
 			

@@ -75,6 +75,7 @@
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
     <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" init-method="init"
+        depends-on="NegotiationRequester"
     destroy-method="UnRegisterCisManager">
         <property name="sessionFactory" ref="sessionFactory" />
         <property name="ccmFactory" ref="cisCommMgrFactory"/>
@@ -83,10 +84,11 @@
         <property name="iServDiscRemote" ref="servDiscRemote"/>
         <property name="iServCtrlRemote" ref="servCtrlRemote"/>
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager"/>
+        <property name="privacyDataManager" ref="PrivacyDataManager"/>
         <property name="eventMgr" ref="eventMgmtRef"/>
         <property name="internalCtxBroker" ref="internalCtxBroker"/>
-        <!-- <property name="negotiator" ref="NegotiationRequester"/>
-       <property name="iServDiscLocal" ref="serviceDiscovery"/>
+       <property name="negotiator" ref="NegotiationRequester"/>
+        <!-- <property name="iServDiscLocal" ref="serviceDiscovery"/>
         <property name="iServCtrlLocal" ref="serviceControl"/>-->
                 
         

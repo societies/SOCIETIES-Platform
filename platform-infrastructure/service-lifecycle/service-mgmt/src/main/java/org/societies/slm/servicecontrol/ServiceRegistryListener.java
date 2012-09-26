@@ -336,10 +336,11 @@ public class ServiceRegistryListener implements BundleContextAware,
 						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
 						//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());
 						
-						if(log.isDebugEnabled())
-							log.debug("Adding privacy policy to the Privacy Manager!");
 						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
 						
+						if(log.isDebugEnabled())
+							log.debug("Adding privacy policy to the Privacy Manager... from: " + privacyLocation);
+
 						int index = privacyLocation.indexOf('@');	
 						String privacyPath = privacyLocation.substring(index+1);
 						
@@ -347,7 +348,6 @@ public class ServiceRegistryListener implements BundleContextAware,
 						
 						if(log.isDebugEnabled())
 							log.debug("Tried to get privacy policy from: " + privacyLocation);
-						
 						
 						RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
 						RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);

@@ -228,5 +228,7 @@ public interface ICSSLocalManager {
  
  public Future<List<CssAdvertisementRecord>> getFriendRequests();
  
+ public void acceptCssFriendRequest(CssRequest request);
+ 
  
 }

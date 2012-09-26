@@ -93,6 +93,7 @@
 			<groupId>org.objectweb.asm</groupId>
 			<artifactId>com.springsource.org.objectweb.asm</artifactId>
 			<version>3.2.0</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -116,6 +117,7 @@
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>org.springframework.osgi.web</artifactId>
 			<version>1.2.1</version>
+			<scope>provided</scope>
 		</dependency>
 		<!--dependency>
 			<groupId>org.springframework</groupId>
@@ -155,6 +157,7 @@
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
 			<version>${jersey-version}</version>
+			<scope>provided</scope>
 			<!--exclusions>
 				<exclusion>
 					<groupId>cglib</groupId>
@@ -178,12 +181,20 @@
 				</exclusion>
 			</exclusions-->
 		</dependency>
-		<dependency>
+<!-- 	<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-json</artifactId>
 			<version>${jersey-version}</version>
+			<scope>provided</scope>
+			  <exclusions>
+			    <exclusion>
+			        <artifactId>stax-api</artifactId>
+			        <groupId>stax</groupId>
+			    </exclusion>
+			</exclusions>
+		
 		</dependency>
-		<dependency>
+-->		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
@@ -263,28 +274,30 @@
 					</supportedProjectTypes>
 					<instructions>
 						<Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-						<Export-Package>org.societies.domainauthority.rest.*</Export-Package>
+				<!-- 	<Export-Package>org.societies.domainauthority.rest.*</Export-Package> -->
 						<Import-Package>
 							<!--
 							javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
 							-->
-							javax.servlet;version="[3.0.0, 4.0.0)",
+						 <!-- javax.servlet;version="[3.0.0, 4.0.0)",
 							javax.servlet.resources;
-							version="[2.4.0, 4.0.0)",
+							version="[2.4.0, 4.0.0)",  -->
+							javax.servlet;version="[3.0.0, 4.0.0)";resolution:=optional,
+							javax.servlet.http;version="[3.0.0, 4.0.0)";resolution:=optional, 
 							<!-- spring DM -->
-							org.springframework.beans.factory.config,
-							org.springframework.osgi.web.context.support,
+							org.springframework.beans.factory.config;resolution:=optional,
+							org.springframework.osgi.web.context.support;resolution:=optional,
 							<!--
 							org.springframework.web.context.request,
 							org.springframework.web.context.support,
 							-->
-							org.springframework.web.context,
-							org.springframework.stereotype,
-							org.springframework.web.bind.annotation,
+							org.springframework.web.context;resolution:=optional,
+							org.springframework.stereotype;resolution:=optional,
+							org.springframework.web.bind.annotation;resolution:=optional,
 							<!--org.springframework.web.servlet,-->
 							org.eclipse.virgo.web.dm;version="[3.0.0, 4.0.0)",
-							org.springframework.beans.factory.annotation,
-							org.springframework.context.config,
+							org.springframework.beans.factory.annotation;resolution:=optional,
+							org.springframework.context.config;resolution:=optional,
 							<!--
 							org.springframework.web.util,
 							-->
@@ -326,12 +339,12 @@
 							org.apache.taglibs.standard.tei; version="[1.2.0,2)",
 							org.apache.taglibs.standard.tlv; version="[1.2.0,2)",
 							-->
-							org.osgi.framework,
+							org.osgi.framework;resolution:=optional,
 
-							com.sun.jersey.spi.container.servlet,
-							javax.ws.rs,
-							org.objectweb.asm,
-							javax.annotation;version="0",
+							com.sun.jersey.spi.container.servlet;resolution:=optional,
+							javax.ws.rs;resolution:=optional,
+							org.objectweb.asm;resolution:=optional,
+							javax.annotation;resolution:=optional, 
 							*;resolution:=optional
 						</Import-Package>
 						<_nouses>true</_nouses>
@@ -375,43 +388,20 @@
 							<goal>copy</goal>
 						</goals>
 						<configuration>
-							<artifactItems>
-								<artifactItem>
+						
+						 <artifactItems>
+						<!--		<artifactItem>
 									<groupId>javax.validation</groupId>
 									<artifactId>com.springsource.javax.validation</artifactId>
 									<version>1.0.0.GA</version>
 									<type>jar</type>
-								</artifactItem>
+								</artifactItem> 
 								<artifactItem>
 									<groupId>org.springframework.osgi</groupId>
 									<artifactId>org.springframework.osgi.web</artifactId>
 									<version>1.2.1</version>
 									<type>jar</type>
-								</artifactItem>
-								<!--artifactItem>
-									<groupId>org.apache.wink</groupId>
-									<artifactId>wink-server</artifactId>
-									<version>1.2.0-incubating</version>
-									<type>jar</type>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.apache.wink</groupId>
-									<artifactId>wink-common</artifactId>
-									<version>1.2.0-incubating</version>
-									<type>jar</type>
-								</artifactItem>
-								<artifactItem>
-									<groupId>javax.mail</groupId>
-									<artifactId>mail</artifactId>
-									<version>1.4.1</version>
-									<type>jar</type>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.jsoup</groupId>
-									<artifactId>jsoup</artifactId>
-									<version>1.6.0</version>
-									<type>jar</type>
-								</artifactItem-->
+								</artifactItem> -->
 								<artifactItem>
 									<groupId>com.sun.jersey</groupId>
 									<artifactId>jersey-core</artifactId>
@@ -435,19 +425,13 @@
 									<artifactId>jsr311-api</artifactId>
 									<version>1.1.1</version>
 									<type>jar</type>
-								</artifactItem>
-								<!--artifactItem>
-									<groupId>commons-lang</groupId>
-									<artifactId>commons-lang</artifactId>
-									<version>2.3</version>
-									<type>jar</type>
-								</artifactItem-->
-								<artifactItem>
+								</artifactItem> 
+						<!-- 	<artifactItem>
 									<groupId>org.apache.commons</groupId>
 									<artifactId>com.springsource.org.apache.commons.lang</artifactId>
 									<version>2.5.0</version>
 									<type>jar</type>
-								</artifactItem>
+								</artifactItem> -->
 								<!--artifactItem>
 									<groupId>javax.servlet</groupId>
 									<artifactId>com.springsource.javax.servlet</artifactId>

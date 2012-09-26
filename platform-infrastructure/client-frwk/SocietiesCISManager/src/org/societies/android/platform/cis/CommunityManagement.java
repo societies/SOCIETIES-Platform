@@ -547,10 +547,10 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		Log.d(LOG_TAG, "getMembers called by client: " + client);
 
 		//CREATE LIST INFO
-		org.societies.api.schema.cis.community.Who listing = new org.societies.api.schema.cis.community.Who();
+		org.societies.api.schema.cis.community.WhoRequest listing = new org.societies.api.schema.cis.community.WhoRequest();
 		//CREATE MESSAGE BEAN
 		CommunityMethods messageBean = new CommunityMethods();
-		messageBean.setWho(listing);
+		messageBean.setWhoRequest(listing);
 
 		//COMMS STUFF
 		ICommCallback cisCallback = new CommunityCallback(client, GET_MEMBERS); 
@@ -698,8 +698,8 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 					}
 					
 					//GET MEMBERS RESULT
-					else if (communityResponse.getWho() != null) {
-						List<Participant> listReturned = communityResponse.getWho().getParticipant();
+					else if (communityResponse.getWhoResponse() != null) {
+						List<Participant> listReturned = communityResponse.getWhoResponse().getParticipant();
 						//CONVERT TO PARCEL BEANS
 						Parcelable returnArray[] = new Parcelable[listReturned.size()];
 						for (int i=0; i<listReturned.size(); i++) {
