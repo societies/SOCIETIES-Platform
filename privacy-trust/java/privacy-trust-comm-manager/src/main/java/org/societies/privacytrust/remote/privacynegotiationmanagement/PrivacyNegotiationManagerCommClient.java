@@ -96,7 +96,11 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 		this.commManager = commManager;
 	}
 
-	public PrivacyNegotiationManagerCommClient() {	}
+	public PrivacyNegotiationManagerCommClient() {	
+		ackResults = new Hashtable<String, NegotiationACKBeanResult>();
+		policyResults = new Hashtable<String, NegotiationGetPolicyBeanResult>();
+		mainResults = new Hashtable<String, NegotiationMainBeanResult>();
+	}
 
 	public void initBean() {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
@@ -142,17 +146,25 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 			this.logging.debug("Received : NegotiationACKBeanResult");
 			String id = getId(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT, ((NegotiationACKBeanResult) bean).getRequestor().getRequestorId());
 			this.ackResults.put(id, (NegotiationACKBeanResult) bean);
-			this.ackResults.notifyAll();
+			synchronized(this.ackResults){
+				this.ackResults.notifyAll();
+			}
 		}else if (bean instanceof NegotiationGetPolicyBeanResult){
 			this.logging.debug("Received : NegotiationGetPolicyBeanResult");
 			String id = getId(NegAgentMethodType.GET_POLICY, ((NegotiationGetPolicyBeanResult) bean).getRequestor().getRequestorId());
 			this.policyResults.put(id, (NegotiationGetPolicyBeanResult) bean);
-			this.policyResults.notifyAll();
+			synchronized (this.policyResults) {
+				this.policyResults.notifyAll();
+			}
+			
 		}else if (bean instanceof NegotiationMainBeanResult){
 			this.logging.debug("Received : NegotiationMainBeanResult");
 			String id = getId(NegAgentMethodType.NEGOTIATE, ((NegotiationMainBeanResult) bean).getRequestor().getRequestorId());
 			this.mainResults.put(id, (NegotiationMainBeanResult) bean);
-			this.mainResults.notifyAll();
+			synchronized (this.mainResults) {
+				this.mainResults.notifyAll();
+			}
+			
 		}else{
 			this.logging.debug("Received unknown bean");
 			this.logging.debug("Bean is of type: "+bean.getClass().getName());
