@@ -153,6 +153,10 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 			String id = getId(NegAgentMethodType.NEGOTIATE, ((NegotiationACKBeanResult) bean).getRequestor().getRequestorId());
 			this.mainResults.put(id, (NegotiationMainBeanResult) bean);
 			this.mainResults.notifyAll();
+		}else{
+			this.logging.debug("Received unknown bean");
+			this.logging.debug("Bean is of type: "+bean.getClass().getName());
+			
 		}
 
 	}

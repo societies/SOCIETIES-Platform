@@ -48,6 +48,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegAgentMethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationACKBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationGetPolicyBeanResult;
@@ -92,7 +93,9 @@ public class PrivacyNegotiationManagerCommServer {
 	
 
 	public Object getQuery(Stanza stanza, NegotiationAgentBean bean){
-		if (bean.getMethod().equals("acknowledgeAgreement")){
+		this.LOG.debug("Received Query");
+		if (bean.getMethod().equals(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT)){
+			
 			byte[] agreementEnvelopeArray = bean.getAgreementEnvelope();
 			Object obj = Util.convertToObject(agreementEnvelopeArray, this.getClass());
 			if (obj!=null){
@@ -111,10 +114,13 @@ public class PrivacyNegotiationManagerCommServer {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					return false;
+					NegotiationACKBeanResult resultBean = new NegotiationACKBeanResult();
+					resultBean.setAcknowledgement(false);
+					resultBean.setRequestor(bean.getRequestor());
+					return resultBean;
 				}
 			}
-		}else if (bean.getMethod().equals("getPolicy")){
+		}else if (bean.getMethod().equals(NegAgentMethodType.GET_POLICY)){
 			try{
 				
 			RequestPolicy policy =  this.negAgent.getPolicy(this.getRequestorFromBean(bean.getRequestor())).get();
@@ -132,7 +138,7 @@ public class PrivacyNegotiationManagerCommServer {
 			}
 			return new NegotiationGetPolicyBeanResult();
 		
-		}else if (bean.getMethod().equals("negotiate")){
+		}else if (bean.getMethod().equals(NegAgentMethodType.NEGOTIATE)){
 			try{
 			byte[] responseArray = bean.getResponsePolicy();
 			Object obj = Util.convertToObject(responseArray,this.getClass());
