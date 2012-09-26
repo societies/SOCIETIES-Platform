@@ -1312,6 +1312,7 @@ public class JoinCallBack implements ICisManagerCallback{
 		
 		// -- Security and privacy negotiation
 		try {
+			LOG.info("Joining CIS: "+adv.getCssownerid()+" or "+adv.getId());
 			negotiator.startNegotiation(new RequestorCis(this.iCommMgr.getIdManager().fromJid(adv.getCssownerid()) ,this.iCommMgr.getIdManager().fromJid(adv.getId())), new INegCallBack());
 		}
 		catch (InvalidFormatException e) {
