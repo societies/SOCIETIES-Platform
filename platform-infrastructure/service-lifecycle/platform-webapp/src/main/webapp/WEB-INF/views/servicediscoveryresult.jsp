@@ -38,7 +38,7 @@ String[] methodCalledArr = (String[]) model.get("method");
 String methodCalled = methodCalledArr[0];
 
 String node = "";
-if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")) {
+if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
 	String[] nodeArr = (String[]) model.get("node");
 	node = nodeArr[0];
 }
@@ -74,13 +74,11 @@ function updateForm(serviceID, toDo) {
             <td>${service.authorSignature}</td>
             <td>${service.serviceStatus}</td>      
             <td>
-            <xc:if test="${service.serviceType != 'DEVICE'}">
-			<a href="service-privacy-policy-show.html?serviceId=${service.getServiceIdentifier().getServiceInstanceIdentifier()}&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>
-            </xc:if>
             <%
-			if (methodCalled.equals("GetServicesCis")) {
+			if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
 			%>
 				<input type="button" value="share" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'ShareService')" >
+				<input type="button" value="unshare" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UnshareService')" >
 			<%
 			} else {
 			%>
@@ -88,6 +86,7 @@ function updateForm(serviceID, toDo) {
 				<a href="${pageContext.request.contextPath}/devicemgmt.html">Device Management</a>
 			</xc:if>
 			<xc:if test="${service.serviceType != 'DEVICE'}">
+				<a href="service-privacy-policy-show.html?serviceId=${service.getServiceIdentifier().getServiceInstanceIdentifier()}&serviceOwnerId=${node}" class="privacy-policy-handler">Privacy Policy</a>
 				<input type="button" value="start" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'StartService')" >
 				<input type="button" value="stop" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'StopService')" >
 				<input type="button" value="uninstall" onclick="updateForm('${service.getServiceIdentifier().getServiceInstanceIdentifier()}' + '_' + '${service.getServiceIdentifier().getIdentifier().toString()}', 'UninstallService')" >
@@ -102,7 +101,7 @@ function updateForm(serviceID, toDo) {
 	</table>
 <%
 //DISPLAY LIST OF SERVICES FROM CIS
-if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService")) {
+if (methodCalled.equals("GetServicesCis") || methodCalled.equals("ShareService") || methodCalled.equals("UnshareService")) {
 %>
 	<p>&nbsp;</p>
     <p><b>Community Services: <%= node %></b></p>	
