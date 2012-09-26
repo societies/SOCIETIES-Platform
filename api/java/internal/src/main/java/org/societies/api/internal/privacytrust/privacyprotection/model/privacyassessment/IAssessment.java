@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.societies.api.identity.IIdentity;
 
@@ -100,4 +101,9 @@ public interface IAssessment {
 	 * @return number of all recorded data access events
 	 */
 	public long getNumDataAccessEvents();
+	
+	/**
+	 * @return All recorded data access events
+	 */
+	public List<DataAccessLogEntry> getDataAccessEvents();
 }

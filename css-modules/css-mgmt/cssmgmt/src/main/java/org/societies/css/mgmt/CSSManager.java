@@ -1371,7 +1371,8 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		
 		
 		try {
-			pendingfriendList = cssRegistry.getCssFriendRequests();
+			//pendingfriendList = cssRegistry.getCssFriendRequests();
+			pendingfriendList = cssRegistry.getCssRequests();
 			
 			for (CssRequest cssrequest : pendingfriendList) {
 		    	LOG.info("[]][][][][][] CSS FriendRequest iterator List contains " +pendingfriendList);
@@ -1401,5 +1402,31 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 
 		return new AsyncResult<List<CssAdvertisementRecord>>(friendReqList);
 	}
+	
+	public void acceptCssFriendRequest(CssRequest request) {
+		
+		//TODO: This is called either locally or remotle
+		//Locally, we can cancel pending request, or leave css's
+		// remotely, it will be an accepted of the request we sent
+			try {
+				cssRegistry.updateCssFriendRequestRecord(request);
+			} catch (CssRegistrationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+			// If this was initiated locally then inform remote css
+			// We only want to sent messages to remote Css's for this function if we initiated the call locally
+			if (request.getOrigin() == CssRequestOrigin.LOCAL)
+			{
+				
+				// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+				// otherwise send message to remote css
+		
+					//called updateCssFriendRequest on remote
+					request.setOrigin(CssRequestOrigin.REMOTE);
+					cssManagerRemote.acceptCssFriendRequest(request); 
+			}
+		}
 }
 

@@ -22,43 +22,8 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.CSSDataCollector.main.java;
+package org.societies.context.api.community.estimation;
 
-/**
- * Describe your class here...
- *
- * @author John
- *
- */
-import java.io.Serializable;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.event.CtxChangeEvent;
-
-public class CssDCEvent implements Serializable{
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private IIdentity userId;
-    private CtxChangeEvent evt;
-    
-    private CssDCEvent(){
-        
-    }
-    public CssDCEvent(IIdentity userId, CtxChangeEvent evt){
-        this.userId = userId;
-        this.evt = evt;
-        
-    }
-	public IIdentity getUserId() {
-		return userId;
-	}
-	public CtxChangeEvent getEvt() {
-		return evt;
-	}
-
-
-
+public enum estimationModel {
+	mean, median, mode, range, convexHull, minBB, stringMode;	
 }

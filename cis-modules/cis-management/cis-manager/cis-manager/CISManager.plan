@@ -17,6 +17,8 @@
  	<artifact type="bundle" name="org.societies.comm.CloudCommsBundle"/>
     <!-- Comms (needed by Context) -->
 	<artifact type="bundle" name="org.societies.comm.event.mgmt" />	
+	
+	<artifact type="plan" name="org.societies.security"/>
     
         
     <!-- Device Management (needed by Context) -->

@@ -91,7 +91,14 @@
 		</osgi:interfaces>
 	</osgi:service>
 
+	
+	<osgi:service ref="communityContextEstimation">
+		<osgi:interfaces>
+			<value>org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr</value>
+		</osgi:interfaces>
+	</osgi:service>
 
+	
 	<!-- importing external services -->
 
 	<!-- context broker -->

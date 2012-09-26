@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
@@ -194,7 +195,14 @@ public interface ICisManager {
 	
 	// END of API implementing client functionality
 
-		
+	/**
+	 * Get list of members from a CIS in which you are not necessarely a member
+	 * 
+	 * @param {@link IIdentity } Cis to retrieve the member list from
+	 * @param {@link Requestor} requestor object identifying if the user is 
+	 * @param callback callback function
+	 */
+    public void getListOfMembers(Requestor req, IIdentity targetcis, ICisManagerCallback callback);	
 	
 	// API which is not yet properly defined
 	

@@ -28,8 +28,12 @@
 		<artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityRegistry"/>
 		
 		<!--Domain Authoity WebApps -->
+		<artifact type="bundle" name="org.societies.security.secur-services"/>
 		<artifact type="bundle" name="DomainAuthorityRest"/>
 		<artifact type="bundle" name="DomainAuthorityWebApp"/>
+
+		<!--ICO -->
+    		<artifact type="bundle" name="org.societies.orchestration.csm"/>
     
     
     

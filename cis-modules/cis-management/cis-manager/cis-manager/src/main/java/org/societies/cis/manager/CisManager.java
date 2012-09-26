@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Set;
 
 import java.util.Iterator;
 import java.util.List;
@@ -78,8 +79,10 @@ import org.societies.api.identity.RequestorCis;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
@@ -103,7 +106,10 @@ import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.Leave;
+import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.Qualification;
+import org.societies.api.schema.cis.community.WhoRequest;
+import org.societies.api.schema.cis.community.WhoResponse;
 //import org.societies.api.schema.cis.community.Leave;
 import org.societies.api.schema.cis.community.MembershipCrit;
 
@@ -126,6 +132,7 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 
 import org.societies.api.schema.cis.manager.Delete;
 import org.societies.api.schema.cis.manager.DeleteMemberNotification;
+import org.societies.api.schema.identity.RequestorBean;
 
 
 // this is the class which manages all the CIS from a CSS
@@ -153,10 +160,27 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private IEventMgr eventMgr = null;
 	private ICtxBroker internalCtxBroker = null;
 
-	//private INegotiation negotiator;
+	private INegotiation negotiator;
+	private IPrivacyDataManager privacyDataManager;
 
 	//Autowiring gets and sets
 	
+	
+	
+	public INegotiation getNegotiator() {
+		return negotiator;
+	}
+	public IPrivacyDataManager getPrivacyDataManager() {
+		return privacyDataManager;
+	}
+
+	public void setNegotiator(INegotiation negotiator) {
+		LOG.info("negotiator set");
+		this.negotiator = negotiator;
+	}
+	public IPrivacyPolicyManager getPrivacyPolicyManager() {
+		return privacyPolicyManager;
+	}
 	public ICtxBroker getInternalCtxBroker() {
 		return internalCtxBroker;
 	}
@@ -239,6 +263,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		while(it.hasNext()){
 			 Cis element = it.next();
 			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager);
+			 element.setPrivacyDataManager(privacyDataManager);
 			 element.setiServCtrlRemote(this.iServCtrlRemote);
 			 element.setiServDiscRemote(this.iServDiscRemote);
 	     }
@@ -277,6 +302,10 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	}
 	public void init(){
+		
+		this.isDepencyInjectionDone(); // TODO: move this to other parts of the code and
+		// throw exceptions
+		
 		while (iCommMgr.getIdManager() ==null)
 			;//just wait untill the XCommanager is ready
 		
@@ -414,6 +443,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
 		this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
 		,description,cisCriteria);
+		cis.setPrivacyDataManager(privacyDataManager); // TODO: possibly move this to the constructor of the cis
 		if(cis == null)
 			return cis;
 
@@ -624,7 +654,15 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 				// TODO: maybe check if the attributes in the criteria are valid attributes (something from CtxAttributeTypes)
 				if(cisType != null && cisName != null){
-					String pPolicy = "<RequestPolicy></RequestPolicy>";						
+					String pPolicy;
+					if(create.getCommunity().getPrivacyPolicy() != null && 
+							create.getCommunity().getPrivacyPolicy().isEmpty() == false){
+						pPolicy = create.getCommunity().getPrivacyPolicy();
+					}else{
+						LOG.info("create came with an empty policy");
+						pPolicy = "<RequestPolicy></RequestPolicy>";	
+					};
+											
 					Hashtable<String, MembershipCriteria> h = null;
 					
 					MembershipCrit m = create.getCommunity().getMembershipCrit();
@@ -800,6 +838,28 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
+public class JoinCallBack implements ICisManagerCallback{
+		
+	JoinResponse resp;
+	
+	public JoinCallBack(JoinResponse resp){
+		this.resp = resp;
+	}
+
+	@Override
+	public void receiveResult(CommunityMethods communityResultObject) {
+		if(communityResultObject == null || communityResultObject.getJoinResponse() == null){
+			LOG.info("null return on JoinCallBack");
+			resp.setResult(false);
+		}
+		else{
+			LOG.info("Result Status: joined CIS " + communityResultObject.getJoinResponse().isResult());
+			resp = communityResultObject.getJoinResponse();
+		}
+	}
+}
+	
+	
 	
 	
 
@@ -874,19 +934,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				return;
 			}
 		}
-		if (payload.getClass().equals(CommunityMethods.class)) {
 
-			CommunityMethods c = (CommunityMethods) payload;
-
-			// treating new member notifications
-			if (c.getWho() != null) {
-				LOG.info("new member joined a CIS notification received");
-				// TODO: do something? or maybe remove those notifications
-				return;
-			}
-			
-
-		}
 		
 		
 	}
@@ -1251,51 +1299,81 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	
 	// client methods
+	@Override
+	public void getListOfMembers(Requestor req, IIdentity targetcis,
+			ICisManagerCallback callback) {
+		// TODO Auto-generated method stub
+		
+		LOG.debug("local get member list WITH CALLBACK called");
+
+		
+		CommunityMethods c = new CommunityMethods();
+		
+		WhoRequest w = new WhoRequest();
+		c.setWhoRequest(w);
+		RequestorBean reqB = Util.createRequestorBean(req);
+		w.setRequestor(reqB);
+		
+		//TODO: add a privacy call?
+		this.sendXmpp(c, targetcis.getBareJid(), callback);		
+		
+	}
+	
 	
 	@Override
 	public void joinRemoteCIS(CisAdvertisementRecord adv, ICisManagerCallback callback) {
 		
 		LOG.debug("client call to join a RemoteCIS");
 		Join j = new Join();
+		boolean error = false;
 		
+		// TODO: maybe to already a check here
 		this.getQualificationsForJoin(adv,j);
 		
-		// TODO: check with privacy
-		
-//		negotiator.startNegotiation(new Requestor(this.cisManagerId), new INegCallBack());
-		
-		// sending join
 
-		IIdentity toIdentity;
+		LOG.info("going to start the negotiation");
+
 		try {
-			toIdentity = this.iCommMgr.getIdManager().fromJid(adv.getId());
-			Stanza stanza = new Stanza(toIdentity);
-			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
-					stanza.getId(), callback, this);
-
-			CommunityMethods c = new CommunityMethods();
-
-			c.setJoin(j);
-
-			try {
-				LOG.info("Sending stanza with join");
-				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
-			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (InvalidFormatException e1) {
-			LOG.info("Problem with the input jid when trying to send the join");
-			e1.printStackTrace();
+			negotiator.startNegotiation(new RequestorCis(this.iCommMgr.getIdManager().fromJid(adv.getCssownerid()) ,this.iCommMgr.getIdManager().fromJid(adv.getId())),
+					new INegCallBack(this,j,adv.getId(),callback));
 		}
+		catch (InvalidFormatException e) {
+			LOG.error("[Negotiation] Error during the instantiation of IIdentitys from "+adv.getCssownerid()+" or "+adv.getId(), e);
+			error = true;
+		}
+		catch (Exception e) {
+			LOG.error("[Negotiation] Error during negotiation", e);
+			error = true;
+		}
+		if(true == error){
+			CommunityMethods result = new CommunityMethods();		
+			Community com = new Community();
+			com.setCommunityJid(adv.getId());
+			JoinResponse jr = new JoinResponse();
+			jr.setResult(false);
+			jr.setCommunity(com);
+			result.setJoinResponse(jr);			
+			callback.receiveResult(result);
+			return;
+		}
+		
+		LOG.debug("negotiator has been called, Ill proceed with the join");
+		
 	}
 	
-/*	class INegCallBack implements INegotiationCallback{
+	class INegCallBack implements INegotiationCallback{
 		
-		//ICisManagerCallback IcisCallback;
+		CisManager cisMgm = null;
+		Join j = null;
+		String targetJid = null;
+		ICisManagerCallback callback = null;
+
 		
-		public INegCallBack (){
-			//IcisCallback = IcisCallback;
+		public INegCallBack (CisManager cisMgm, Join j, String targetJid, ICisManagerCallback callback){
+			this.cisMgm = cisMgm;
+			this.j = j;
+			this.targetJid = targetJid;
+			this.callback = callback;
 		}
 		
 		@Override
@@ -1305,40 +1383,68 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		@Override
 		public void onNegotiationComplete(String agreementKey, URI jar) {
-			if(agreementKey!=null && !agreementKey.isEmpty())
-				LOG.debug("privacy negotiation success");
+			if(agreementKey!=null && !agreementKey.isEmpty()){
+				// -- Sending join
+				IIdentity toIdentity;
+				try {
+					toIdentity = cisMgm.iCommMgr.getIdManager().fromJid(targetJid);
+					Stanza stanza = new Stanza(toIdentity);
+					CisManagerClientCallback commsCallback = new CisManagerClientCallback(
+							stanza.getId(), callback, cisMgm);
+
+					CommunityMethods c = new CommunityMethods();
+
+					c.setJoin(j);
+
+					try {
+						LOG.info("Sending stanza with join");
+						cisMgm.iCommMgr.sendIQGet(stanza, c, commsCallback);
+					} catch (CommunicationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} catch (InvalidFormatException e1) {
+					LOG.info("Problem with the input jid when trying to send the join");
+					e1.printStackTrace();
+				}
+			}
+				
 		}
 	}
-	*/
+	
 
 	@Override
 	public void leaveRemoteCIS(String cisId, ICisManagerCallback callback){
 		LOG.debug("client call to leave a RemoteCIS");
 
 
+		CommunityMethods c = new CommunityMethods();
+		c.setLeave(new Leave());
+		this.sendXmpp(c, cisId, callback);
+		
+	}
+
+	
+	private void sendXmpp(CommunityMethods c, String targetJid, ICisManagerCallback callback){
 		IIdentity toIdentity;
 		try {
-			toIdentity = this.iCommMgr.getIdManager().fromJid(cisId);
+			toIdentity = this.iCommMgr.getIdManager().fromJid(targetJid);
 			Stanza stanza = new Stanza(toIdentity);
 			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
 					stanza.getId(), callback, this);
 
-			CommunityMethods c = new CommunityMethods();
-
-			c.setLeave(new Leave());
 			try {
-				LOG.info("Sending stanza with leave");
+				LOG.info("Sending stanza");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} catch (InvalidFormatException e1) {
-			LOG.info("Problem with the input jid when trying to send the join");
+			LOG.info("Problem with the input jid when trying to send");
 			e1.printStackTrace();
-		}
+		}	
 	}
-
 	
 	public void UnRegisterCisManager(){
 		// unregister all its CISs
@@ -1370,6 +1476,21 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 	
 	
+	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+		
+		if(this.getListOfOwnedCis() != null && this.getListOfOwnedCis().size()>0){
+			LOG.info("[Dependency Injection] IPrivacyDataManager injected in CISs");
+			for (int i=0; i< this.getListOfOwnedCis().size(); i++) {
+				Cis c = (Cis)this.getListOfOwnedCis().get(i);
+				c.setPrivacyDataManager(privacyDataManager);
+			}
+		}
+		
+		LOG.info("[Dependency Injection] IPrivacyDataManager injected");
+	}
+	
+	
 	private boolean isDepencyInjectionDone() {
 		return isDepencyInjectionDone(0);
 	}
@@ -1382,14 +1503,43 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
 			return false;
 		}
+		if (null == ccmFactory) {
+			LOG.info("[Dependency Injection] Missing ICISCommunicationMgrFactory");
+			return false;
+		}
+		if (null == sessionFactory) {
+			LOG.info("[Dependency Injection] Missing SessionFactory");
+			return false;
+		}
 
-		//TODO: add service ones
 		
 		if (level >= 1) {
+			if (null == iCisDirRemote) {
+				LOG.info("[Dependency Injection] Missing ICisDirectoryRemote");
+				return false;
+			}
+			if (null == iServDiscRemote) {
+				LOG.info("[Dependency Injection] Missing IServiceDiscoveryRemote");
+				return false;
+			}
+			if (null == iServCtrlRemote) {
+				LOG.info("[Dependency Injection] Missing IServiceControlRemote");
+				return false;
+			}
 			if (null == privacyPolicyManager) {
 				LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
 				return false;
 			}
+			if (null == privacyDataManager) {
+				LOG.info("[Dependency Injection] Missing IPrivacyDataManager");
+				return false;
+			}
+
+			if (null == negotiator) {
+				LOG.info("[Dependency Injection] Missing INegotiation");
+				return false;
+			}
+
 			if (null == internalCtxBroker) {
 				LOG.info("[Dependency Injection] Missing Context Broker");
 				return false;
@@ -1401,6 +1551,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}
 		return true;
 	}
+
 
 
 }

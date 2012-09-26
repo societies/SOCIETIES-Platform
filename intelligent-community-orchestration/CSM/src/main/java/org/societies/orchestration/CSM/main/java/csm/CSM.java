@@ -24,10 +24,11 @@
  */
 package org.societies.orchestration.CSM.main.java.csm;
 
-import local.test.dummy.interfaces.ICisDirectory;
+//import local.test.dummy.interfaces.ICisDirectory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.directory.ICisDirectory;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.osgi.event.CSSEvent;

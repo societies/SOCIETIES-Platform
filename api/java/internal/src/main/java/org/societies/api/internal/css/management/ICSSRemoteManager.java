@@ -186,4 +186,7 @@ public interface ICSSRemoteManager {
 		/* Get a list of Pending CSS Friend Requests */
 		void getFriendRequests(ICSSManagerCallback callback);
 		
+		/* accept/reject a CSS Friend Requests */
+		void acceptCssFriendRequest(CssRequest request );
+		
 }

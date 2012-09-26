@@ -129,7 +129,7 @@ public class NominalTestCaseUpperTester {
 			String cisName ="TestCIS";
 			String cssPassword = "testPassword";
 			String cssId = TestCase739.getCommManager().getIdManager().getThisNetworkNode().getJid();
-			Future<ICisOwned> asyncCis = TestCase739.getCisManager().createCis(cssId, cssPassword, cisName, cisType, mode);
+			Future<ICisOwned> asyncCis = TestCase739.getCisManager().createCis(cisName, cisType, null, cssPassword);
 			myCis = asyncCis.get();
 			
 			assertNotNull("[#739] CIS is null! Failed creating!",myCis);
@@ -166,7 +166,7 @@ public class NominalTestCaseUpperTester {
 				return;
 			}
 			
-			boolean result = TestCase739.getCisManager().deleteCis(TestCase739.getCommManager().getIdManager().getThisNetworkNode().getJid(), "testPassword", myCis.getCisId());
+			boolean result = TestCase739.getCisManager().deleteCis(myCis.getCisId());
 		
 			if(!result){
 				LOG.error("[#739] Teardown delete CIS: Couldn't delete!");

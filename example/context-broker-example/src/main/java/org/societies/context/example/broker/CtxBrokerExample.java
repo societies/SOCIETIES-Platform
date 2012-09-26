@@ -44,8 +44,9 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.schema.activity.Activity;
-import org.societies.api.activity.IActivityFeed;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -111,7 +112,10 @@ public class CtxBrokerExample implements Subscriber{
 	private ICisOwned cisOwned  = null;
 
 	private INetworkNode cssNodeId;
-
+	
+	
+	private ICSSLocalManager cssManager;
+	
 	String cssPassword = "password.societies.local";
 
 
@@ -120,7 +124,7 @@ public class CtxBrokerExample implements Subscriber{
 	private CtxIdentifier ctxAttributeBinaryIdentifier = null;
 
 	@Autowired(required=true)
-	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr, ICisManager cisManager,PubsubClient pubsubClient) throws InvalidFormatException {
+	public CtxBrokerExample(ICtxBroker internalCtxBroker, ICommManager commMgr, ICisManager cisManager,PubsubClient pubsubClient, ICSSLocalManager cssManager) throws InvalidFormatException {
 
 		LOG.info("*** CtxBrokerExample instantiated "+this.internalCtxBroker);
 
@@ -136,9 +140,12 @@ public class CtxBrokerExample implements Subscriber{
 		this.pubsubClient = pubsubClient;
 		LOG.info("*** pubsubClient instantiated "+this.cisManager);
 
+		this.cssManager = cssManager;
+		LOG.info("*** cssManager instantiated "+this.cssManager);
+		
 		this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
 		LOG.info("*** cssNodeId = " + this.cssNodeId);
-
+		
 		final String cssOwnerStr = this.cssNodeId.getBareJid();
 		LOG.info( "cssOwnerStr "+ cssOwnerStr);
 		this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
@@ -259,6 +266,8 @@ public class CtxBrokerExample implements Subscriber{
 
 			}
 
+			
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -466,6 +475,13 @@ public class CtxBrokerExample implements Subscriber{
 				}	
 			}
 
+			//CssRecord cssRecord = this.cssManager..getCssRecord().get();
+			//cssRecord
+			
+			
+			LOG.info("*** cssManager instantiated "+this.cssManager);
+			
+			
 		} catch (Exception e) {
 
 			LOG.error("*** CM sucks: " + e.getLocalizedMessage(), e);
