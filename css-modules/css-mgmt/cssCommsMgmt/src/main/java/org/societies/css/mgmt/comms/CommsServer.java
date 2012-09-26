@@ -175,8 +175,12 @@ public class CommsServer implements IFeatureServer {
 			try {
 				switch (bean.getMethod()) {
 				case GET_CSS_FRIENDS:
+					friendsAdsResult = asyncFriendsAdsResult.get();
+					LOG.debug("Number of actual friends: " + friendsAdsResult.size());
+					break;
 				case SUGGESTED_FRIENDS:
 					friendsAdsResult = asyncFriendsAdsResult.get();
+					LOG.debug("Number of suggested friends: " + friendsAdsResult.size());
 					break;
 				default:
 					// Since everything else seems to use this!!
