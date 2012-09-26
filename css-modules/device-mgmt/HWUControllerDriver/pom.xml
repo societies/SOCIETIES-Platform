@@ -6,7 +6,7 @@
 	<groupId>org.societies.css.devicemgmt</groupId>
 	<artifactId>HWUController</artifactId>
 	<packaging>bundle</packaging>
-	<version>RELEASE</version>
+	<version>${version.dm}</version>
 
 	<developers>
 		<developer>

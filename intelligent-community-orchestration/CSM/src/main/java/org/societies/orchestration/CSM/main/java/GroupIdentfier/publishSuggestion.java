@@ -24,11 +24,11 @@
  */
 package org.societies.orchestration.CSM.main.java.GroupIdentfier;
 
-import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.orchestration.CSM.main.java.csm.CommunitySuggestion;
 
 /**
  * Describe your class here...
@@ -40,7 +40,7 @@ public class publishSuggestion {
 	
 	private IEventMgr eventMgr;
 
-	public void sendSuggestion(IcoRecommendtionEvent ire){
+	public void sendSuggestion(CommunitySuggestion ire){
 		//send local event
 		InternalEvent event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, "newaction", "org/societies/orchestration/ICO", ire);
 		try {

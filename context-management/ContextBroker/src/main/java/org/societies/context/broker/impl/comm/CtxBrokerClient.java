@@ -69,6 +69,7 @@ import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRetrieveBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerUpdateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerUpdateBean;
+import org.societies.api.schema.context.contextmanagement.RetrieveIndividualEntityIdBean;
 import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
@@ -131,46 +132,46 @@ public class CtxBrokerClient implements ICommCallback {
 
 	//createEntity(final Requestor requestor,final IIdentity targetCss, final String type)
 	public void createRemoteEntity(Requestor requestor,IIdentity targetCss, String type, ICtxCallback callback) throws CtxException{
-		
+
 		INetworkNode cssNodeId = this.commManager.getIdManager().getThisNetworkNode();
 		final String cssOwnerStr = cssNodeId.getBareJid();
-			
+
 		IIdentity toIdentity;
-		
+
 		try {
 			//to be removed
 			//toIdentity = this.commManager.getIdManager().fromJid(cssOwnerStr);
 			//LOG.error(" toIdentity " + toIdentity);
-			
+
 			toIdentity = targetCss;
 			LOG.info("toIdentity " + toIdentity);
 
 			//create the message to be sent
 			Stanza stanza = new Stanza(toIdentity);
-	//		LOG.error("SKATA stanza " + stanza.getTo());
+			//		LOG.error("SKATA stanza " + stanza.getTo());
 			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 			cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
 			// use the create entity method : createCtxEntity(String type)
-		//	LOG.error("SKATA 1 " );
+			//	LOG.error("SKATA 1 " );
 			CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerCreateEntityBean();
 			//LOG.error("SKATA 2 " );
 			RequestorBean requestorBean = createRequestorBean(requestor);
-//			LOG.error("SKATA 3 " );
+			//			LOG.error("SKATA 3 " );
 			ctxBrokerCreateEntityBean.setRequestor(requestorBean);
-	//		LOG.error("SKATA 4 " );
+			//		LOG.error("SKATA 4 " );
 			ctxBrokerCreateEntityBean.setTargetCss(toIdentity.getBareJid());
-		//	LOG.error("SKATA 5 " );
+			//	LOG.error("SKATA 5 " );
 			ctxBrokerCreateEntityBean.setType(type);
-		//LOG.info("SKATA 6 before ");
+			//LOG.info("SKATA 6 before ");
 			cbPacket.setCreateEntity(ctxBrokerCreateEntityBean);
-		//	LOG.info("SKATA 7 before sendIQGet"+ctxBrokerCreateEntityBean);
+			//	LOG.info("SKATA 7 before sendIQGet"+ctxBrokerCreateEntityBean);
 
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-		//	LOG.info("SKATA 8 before addRequestingClient "+stanza.getId());
+			//	LOG.info("SKATA 8 before addRequestingClient "+stanza.getId());
 
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
-		//	LOG.info("SKATA 7 CreateEntity send  ");
-	
+			//	LOG.info("SKATA 7 CreateEntity send  ");
+
 		} catch (Exception e) {
 
 			throw new CtxBrokerException("Could not create remote entity: "
@@ -267,21 +268,53 @@ public class CtxBrokerClient implements ICommCallback {
 			ctxBrokerLookupBean.setType(type);
 			//LOG.info("1 CtxBrokerLookupBean type "+type);
 
-		//	LOG.info("CtxBrokerLookupBean ready "+cbPacket.getLookup());
+			//	LOG.info("CtxBrokerLookupBean ready "+cbPacket.getLookup());
 			cbPacket.setLookup(ctxBrokerLookupBean);
 
 			//LOG.info("3 CtxBrokerLookupBean before sendIQGet");
 
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-		//	LOG.info("4 CtxBrokerLookupBean before sendIQGet stanza.getId() "+stanza.getId());
+			//	LOG.info("4 CtxBrokerLookupBean before sendIQGet stanza.getId() "+stanza.getId());
 
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
-	//		LOG.info("5  IQGet send");
+			//		LOG.info("5  IQGet send");
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}
+
+	public void retrieveRemoteIndividualEntId(Requestor requestor, IIdentity targetCss, ICtxCallback callback){
+
+		IIdentity toIdentity = null;
+
+		try {
+			toIdentity = targetCss;
+			Stanza stanza = new Stanza(toIdentity);
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+			cbPacket.setMethod(BrokerMethodBean.RETRIEVE_INDIVIDUAL_ENTITY_ID);
+
+			RetrieveIndividualEntityIdBean retrieveIndEntBean = new RetrieveIndividualEntityIdBean();
+
+			//1.requestor
+			RequestorBean requestorBean = createRequestorBean(requestor);
+			retrieveIndEntBean.setRequestor(requestorBean);
+
+			//2. target id
+			retrieveIndEntBean.setTargetCss(toIdentity.getJid());
+
+			cbPacket.setRetrieveIndividualEntityId(retrieveIndEntBean);
+			//	LOG.info("ctxBrokerRetrieveBean ready "+cbPacket.getRetrieve());
+
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 
 	public void retrieveRemote(Requestor requestor, CtxIdentifier identifier, ICtxCallback callback){
 
@@ -316,7 +349,7 @@ public class CtxBrokerClient implements ICommCallback {
 			ctxBrokerRetrieveBean.setRequestor(requestorBean);
 
 			cbPacket.setRetrieve(ctxBrokerRetrieveBean);
-		//	LOG.info("ctxBrokerRetrieveBean ready "+cbPacket.getRetrieve());
+			//	LOG.info("ctxBrokerRetrieveBean ready "+cbPacket.getRetrieve());
 
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 
@@ -328,7 +361,7 @@ public class CtxBrokerClient implements ICommCallback {
 	}
 
 	public void updateRemote(Requestor requestor, CtxModelObject object, ICtxCallback callback){
-		
+
 		IIdentity toIdentity = null;
 		try {
 			//real code
@@ -344,23 +377,23 @@ public class CtxBrokerClient implements ICommCallback {
 			Stanza stanza = new Stanza(toIdentity);
 			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 			cbPacket.setMethod(BrokerMethodBean.UPDATE);
-			
+
 			CtxBrokerUpdateBean ctxBrokerUpdateBean = new CtxBrokerUpdateBean();
-			
+
 			RequestorBean requestorBean = createRequestorBean(requestor);
 			ctxBrokerUpdateBean.setRequestor(requestorBean);
 
 			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 			CtxModelObjectBean objectBean = ctxBeanTranslator.fromCtxModelObject(object);
-			
-	//		LOG.info("updateRemote 1 ctxBrokerUpdateBean  "+objectBean.getId());
+
+			//		LOG.info("updateRemote 1 ctxBrokerUpdateBean  "+objectBean.getId());
 			ctxBrokerUpdateBean.setCtxModelOject(objectBean);
 
-		//	LOG.info("updateRemote 2 ctxBrokerUpdateBean  "+objectBean.getId());
+			//	LOG.info("updateRemote 2 ctxBrokerUpdateBean  "+objectBean.getId());
 			cbPacket.setUpdate(ctxBrokerUpdateBean);
-			
-	//		LOG.info("updateRemote 3 ctxBrokerUpdateBean  "+cbPacket.getUpdate());
-			
+
+			//		LOG.info("updateRemote 3 ctxBrokerUpdateBean  "+cbPacket.getUpdate());
+
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
@@ -486,7 +519,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
 		this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
-		
+
 		//send the message
 		try {
 			this.commManager.sendIQGet(stanza, ctxBrokerUpdateAttributeBean, this);

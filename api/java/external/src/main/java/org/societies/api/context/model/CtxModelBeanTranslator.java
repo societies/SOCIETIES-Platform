@@ -33,6 +33,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.eclipse.jetty.util.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
@@ -51,7 +54,10 @@ public final class CtxModelBeanTranslator {
 	private static CtxModelBeanTranslator instance = new CtxModelBeanTranslator();
 
 	private CtxModelBeanTranslator() {}
-
+	
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(CtxModelBeanTranslator.class);
+	
 	public static synchronized CtxModelBeanTranslator getInstance() {
 
 		return instance;
@@ -105,7 +111,11 @@ public final class CtxModelBeanTranslator {
 		if (identifier.getModelType().equals(CtxModelType.ENTITY)) {
 
 			ctxIdBean = new CtxEntityIdentifierBean(); 
+			
+			LOG.info("translator ctxIdBean 1 "+identifier.toString());
+			
 			ctxIdBean.setString(identifier.toString());
+		
 		}
 		else if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)) {
 
@@ -117,7 +127,8 @@ public final class CtxModelBeanTranslator {
 			ctxIdBean = new CtxAssociationIdentifierBean(); 
 			ctxIdBean.setString(identifier.toString());
 		}
-
+		LOG.info("translator ctxIdBean  2 "+ctxIdBean.getString());
+		
 		return ctxIdBean;
 	}
 

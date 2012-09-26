@@ -148,6 +148,45 @@ public class ServiceModelUtils {
 	}
 	
 	/**
+	 * This method is used to obtain the Service that is exposed by given Bundle
+	 * 
+	 * @param The ServiceInstance of this service
+	 * @param A reference to IServiceDiscovery
+	 * @return The Service object 
+	 */
+	public static Service getServiceFromServiceInstance(String serviceInstance, IServiceDiscovery serviceDiscovery) {
+			
+		// Preparing the search filter
+		Service filter = generateEmptyFilter();
+		filter.getServiceIdentifier().setServiceInstanceIdentifier(serviceInstance);
+		//filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
+		
+		List<Service> listServices = null;
+		
+		try {
+			Future<List<Service>> asyncListServices = serviceDiscovery.searchServices(filter);
+			listServices = asyncListServices.get();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if(listServices == null || listServices.isEmpty())
+			return null; 
+		
+		Service result = null;
+
+		for(Service service: listServices){
+			
+			if(service.getServiceIdentifier().getServiceInstanceIdentifier().equals(serviceInstance)){
+				result = service;
+				break;
+			}
+		}
+		
+		return result;
+	}	
+	
+	/**
 	 * This method returns the Jid of the node where the service exists
 	 * 
 	 * @param serviceId

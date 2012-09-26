@@ -23,7 +23,6 @@
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.societies.orchestration.CSSDataCollector.test;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,16 +36,18 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
-import org.societies.context.api.event.CtxEventScope;
-import org.societies.context.api.event.ICtxEventMgr;
-import org.societies.context.broker.api.security.ICtxAccessController;
-import org.societies.context.broker.impl.CtxBroker;
-import org.societies.context.broker.impl.InternalCtxBroker;
-import org.societies.context.user.db.impl.UserCtxDBMgr;
-import org.societies.context.userHistory.impl.UserContextHistoryManagement;
+import org.societies.api.internal.context.broker.ICtxBroker;
+//import org.societies.orchestration.CSSDataCollector.main.java.CSSDataCollector;
+//import org.societies.api.internal.context.broker.ICtxBroker;
+//import org.societies.context.api.event.CtxEventScope;
+//import org.societies.context.api.event.ICtxEventMgr;
+//import org.societies.context.broker.api.security.ICtxAccessController;
+//import org.societies.context.broker.impl.CtxBroker;
+//import org.societies.context.broker.impl.InternalCtxBroker;
+//import org.societies.context.user.db.impl.UserCtxDBMgr;
+//import org.societies.context.userHistory.impl.UserContextHistoryManagement;
 
 
-import org.societies.orchestration.CSSDataCollector.main.java.CSSDataCollector;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,17 +63,17 @@ import static org.mockito.Mockito.when;
 public class CSSDataCollectorTest {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CSSDataCollectorTest.class);
-	private CSSDataCollector cdc;
-	private ICtxEventMgr ctxEventMgr = mock(ICtxEventMgr.class);;
+	//private CSSDataCollector cdc;
+	//private ICtxEventMgr ctxEventMgr = mock(ICtxEventMgr.class);;
 	private static ICommManager mockCommMgr = mock(ICommManager.class);
 	private static IIdentityManager mockIdManager = mock(IIdentityManager.class);
 	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);
 	private static IIdentity mockIIdentity = mock(IIdentity.class);
 	//
-	private CtxBroker ctxBroker;
+	private ICtxBroker ctxBroker;
 	private static IIdentityManager mockIdentityMgr = mock(IIdentityManager.class);
 	private static IIdentity mockIdentityLocal = mock(IIdentity.class);
-	private static ICtxAccessController mockCtxAccessController = mock(ICtxAccessController.class);
+	//private static ICtxAccessController mockCtxAccessController = mock(ICtxAccessController.class);
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -87,20 +88,20 @@ public class CSSDataCollectorTest {
 	@Test
 	public void testsetup() throws CtxException{
 		LOG.info("Starting test set up");
-		InternalCtxBroker internalCtxBroker = new InternalCtxBroker();
+		ICtxBroker internalCtxBroker;// = new InternalCtxBroker();
 
-		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
-		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
-		internalCtxBroker.setIdentityMgr(mockIdentityMgr);
-		internalCtxBroker.createIndividualEntity(mockIdentityLocal, CtxEntityTypes.PERSON); // TODO remove?
-		internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
+		//internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
+		//internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
+		//internalCtxBroker.setIdentityMgr(mockIdentityMgr);
+		//internalCtxBroker.createIndividualEntity(mockIdentityLocal, CtxEntityTypes.PERSON); // TODO remove?
+		//internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
 
-		ctxBroker = new CtxBroker(internalCtxBroker);
-		ctxBroker.setIdentityMgr(mockIdentityMgr);
-		ctxBroker.setCtxAccessController(mockCtxAccessController);
+		//ctxBroker = new CtxBroker(internalCtxBroker);
+		//ctxBroker.setIdentityMgr(mockIdentityMgr);
+		//ctxBroker.setCtxAccessController(mockCtxAccessController);
 		
-		cdc = new CSSDataCollector(ctxEventMgr, mockCommMgr);
-		cdc.registerForContextChanges();
+		//cdc = new CSSDataCollector(ctxEventMgr, mockCommMgr);
+		//cdc.registerForContextChanges();
 		
 	}
 	
@@ -108,9 +109,9 @@ public class CSSDataCollectorTest {
 	public void testRegister(){
 
 		LOG.info("Starting Register tests");
-		cdc = new CSSDataCollector(ctxEventMgr, mockCommMgr);
-		cdc.setCtxBroker(ctxBroker);
-		cdc.registerForContextChanges();
+		//cdc = new CSSDataCollector(mockCommMgr);
+		//cdc.setCtxBroker(ctxBroker);
+		//cdc.registerForContextChanges();
 	}
 	
 	//@Test
@@ -131,7 +132,3 @@ public class CSSDataCollectorTest {
 		//cdc = new CSSDataCollector(ctxEventMgr, mockCommMgr);
 	//}
 }
-
-
-
-

@@ -39,9 +39,9 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
-import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
@@ -52,7 +52,6 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInter
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
-import org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgentRemote;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.NegotiationClient;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.provider.PolicyRetriever;
 
@@ -79,7 +78,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	private IPrivacyAgreementManagerInternal privacyAgreementManagerInternal;
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
-	private INegotiationAgentRemote negotiationAgent;
+	private INegotiationAgentRemote negotiationAgentRemote;
 	
 	private IIdentitySelection identitySelection;
 	
@@ -175,17 +174,21 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	public void setPrivacyDataManagerInternal(IPrivacyDataManagerInternal privacyDataManagerInternal) {
 		this.privacyDataManagerInternal = privacyDataManagerInternal;
 	}
+
+
 	/**
-	 * @return the negotiationAgent
+	 * @return the negotiationAgentRemote
 	 */
-	public INegotiationAgentRemote getNegotiationAgent() {
-		return negotiationAgent;
+	public INegotiationAgentRemote getNegotiationAgentRemote() {
+		return negotiationAgentRemote;
 	}
 	/**
-	 * @param negotiationAgent the negotiationAgent to set
+	 * @param negotiationAgentRemote the negotiationAgentRemote to set
 	 */
-	public void setNegotiationAgent(INegotiationAgentRemote negotiationAgent) {
-		this.negotiationAgent = negotiationAgent;
+	public void setNegotiationAgentRemote(INegotiationAgentRemote negotiationAgentRemote) {
+		this.negotiationAgentRemote = negotiationAgentRemote;
+		
+		this.logging.debug("Set Remote Negotiation Agent : "+this.negotiationAgentRemote.getClass().getName());
 	}
 	/**
 	 * @return the identitySelection
@@ -285,7 +288,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			this.negClients.remove(requestor);
 		}
 		this.logging.debug("Starting new negotiation with cis: "+requestor.toString());
-		NegotiationClient negClient = new NegotiationClient(this.negotiationAgent, this);
+		NegotiationClient negClient = new NegotiationClient(this.negotiationAgentRemote, this);
 		negClient.startNegotiation(requestor);
 		this.negClients.put(requestor, negClient);
 	}
@@ -305,7 +308,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			this.negClients.remove(requestor);
 		}
 		this.logging.debug("Starting new negotiation with service: "+requestor.toString());
-		NegotiationClient negClient = new NegotiationClient(this.negotiationAgent, this);
+		NegotiationClient negClient = new NegotiationClient(this.getNegotiationAgentRemote(), this);
 		negClient.startNegotiation(requestor);
 		this.negClients.put(requestor, negClient);		
 	}

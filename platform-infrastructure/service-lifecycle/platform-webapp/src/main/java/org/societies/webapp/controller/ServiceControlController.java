@@ -38,6 +38,7 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
@@ -69,6 +70,20 @@ public class ServiceControlController {
 
 	public void setSCService(IServiceControl scService) {
 		this.scService = scService;
+	}
+
+	/**
+	 * OSGI service get auto injected
+	 */
+	@Autowired
+	private ICommManager commManager;
+	
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
 	}
 
 	/**
@@ -280,6 +295,28 @@ public class ServiceControlController {
 				res="Started service: " + serviceId;
 				returnPage = "servicediscoveryresult";
 				
+			} else if (method.equalsIgnoreCase("UnshareService")){
+				
+				if(logger.isDebugEnabled()) logger.debug("UnshareService:" + serviceId);
+
+				//GENERATE SERVICE OBJECT
+				Future<Service> asyncService = this.getSDService().getService(serviceId);
+				Service serviceToShare = asyncService.get();
+				//SHARE SERVICE
+				asynchResult = this.getSCService().unshareService(serviceToShare, node);
+				scresult = asynchResult.get();
+				
+				if(logger.isDebugEnabled()) logger.debug("Result of operation was " + scresult.getMessage());
+				
+				//GET REMOTE SERVICES
+				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
+				List<Service> cisServices = asynchServices.get();
+				model.put("cisservices", cisServices);
+				model.put("myNode", getCommManager().getIdManager().getThisNetworkNode());
+
+				res = "Success";//scresult.getMessage().toString();
+				returnPage = "servicediscoveryresult";
+	
 			} else if (method.equalsIgnoreCase("StopService")){
 				
 				if(logger.isDebugEnabled()) logger.debug("StopService:" + serviceId);
@@ -326,6 +363,7 @@ public class ServiceControlController {
 				Future<List<Service>> asynchServices = this.getSDService().getServices(node);
 				List<Service> cisServices = asynchServices.get();
 				model.put("cisservices", cisServices);
+				model.put("myNode", getCommManager().getIdManager().getThisNetworkNode());
 
 				res = "Success";//scresult.getMessage().toString();
 				returnPage = "servicediscoveryresult";
@@ -337,6 +375,7 @@ public class ServiceControlController {
 				//GENERATE SERVICE OBJECT
 				Future<Service> asyncService = this.getSDService().getService(serviceId);
 				Service serviceToInstall = asyncService.get();
+
 				//SHARE SERVICE
 				asynchResult = this.getSCService().installService(serviceToInstall);
 				scresult = asynchResult.get();

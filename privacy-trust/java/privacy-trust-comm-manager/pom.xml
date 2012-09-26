@@ -86,17 +86,18 @@
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>api</artifactId>
 			<version>${version.pt}</version>
+			<scope>provided</scope>
 		</dependency>
 
 
 		<!-- Communication Manager -->
 		<!-- The version has to be updated accordingly -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
 			<version>${version.comm}</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>  -->
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>

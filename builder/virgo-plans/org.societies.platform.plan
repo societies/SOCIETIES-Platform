@@ -38,4 +38,6 @@
 	
 	<artifact type="plan" name="org.societies.webapp"/>
 
+	<artifact type="plan" name="org.societies.orchestration"/>
+
 </plan>
