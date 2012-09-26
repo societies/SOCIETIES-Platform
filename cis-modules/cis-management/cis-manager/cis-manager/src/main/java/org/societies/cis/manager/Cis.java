@@ -869,6 +869,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				} 
 				
 				LeaveResponse l = new LeaveResponse();
+				l.setCommunityJid(this.getCisId());
 				l.setResult(b);
 				result.setLeaveResponse(l);
 				return result;
