@@ -906,31 +906,30 @@ public class Cis implements IFeatureServer, ICisOwned {
 				who.setResult(false);
 				this.getMembersCss();
 		
-				if(null == c.getWhoRequest().getRequestor()){
-					LOG.info("requestor missing on who request");
-					return result;
-				}
-
-				//privacy call
-				if(null != this.privacyDataManager){
-					Requestor r;
+				// -- Access control
+				/* TODO
+				 * At the moment, if the requestor is not available, the access control is not done.
+				 */
+				if(null != this.privacyDataManager && null != c.getWhoRequest().getRequestor()){
+					Requestor requestor = null;
 					ResponseItem resp = null;
+					DataIdentifier dataId = null;
 					try {
-						r = RequestorUtils.toRequestor(c.getWhoRequest().getRequestor(),this.CISendpoint.getIdManager());
-						DataIdentifier d = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS + "://" + this.getCisId() + "/cis-member-list");
-						resp = this.privacyDataManager.checkPermission(r, d, new Action(ActionConstants.READ));
-					} catch (InvalidFormatException e) {
-						e.printStackTrace();
+						requestor = RequestorUtils.toRequestor(c.getWhoRequest().getRequestor(),this.CISendpoint.getIdManager());
+						dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS + "://" + this.getCisId() + "/cis-member-list");
+						resp = this.privacyDataManager.checkPermission(requestor, dataId, new Action(ActionConstants.READ));
 					} catch (MalformedCtxIdentifierException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.error("The identifier of the requested data is malformed", e);
 					} catch (PrivacyException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.error("Error during access control of this data", e);
+					} catch (InvalidFormatException e) {
+						LOG.error("The requestor of this data is not identifiable", e);
 					}
-					
-					if(null == resp || resp.getDecision().equals(Decision.PERMIT) == false){
-						LOG.info("no permission");
+					// No permission
+					if(null == resp || !Decision.PERMIT.equals(resp.getDecision())){
+						LOG.info("This requestor: "+requestor);
+						LOG.info("doesn't have the permission to retrieve this data: "+dataId);
+						who.setParticipant(null);
 						return result;
 					}
 				}
@@ -1263,37 +1262,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 	
 	@Override
-	public void getListOfMembers(Requestor req, ICisManagerCallback callback){
-		LOG.debug("local get member list WITH CALLBACK called");
-
-		
+	public void getListOfMembers(ICisManagerCallback callback){
+		LOG.debug("getListOfMembers: callback");
 		CommunityMethods c = new CommunityMethods();
-		
 		WhoResponse w = new WhoResponse();
 		c.setWhoResponse(w);
 		w.setResult(false);
-		
-		//privacy call
-		if(null != this.privacyDataManager){
-			ResponseItem resp = null;
-			try {
-				DataIdentifier d = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS + "://" + this.getCisId() + "/cis-member-list");
-				resp = this.privacyDataManager.checkPermission(req, d, new Action(ActionConstants.READ));
-			} catch (MalformedCtxIdentifierException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (PrivacyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			if(null == resp || resp.getDecision().equals(Decision.PERMIT) == false){
-				LOG.info("no permission");
-				callback.receiveResult(c);
-				return;
-			}
-		}
-		// end of privacy call
 		
 		Set<CisParticipant> s = this.getMembersCss();
 		Iterator<CisParticipant> it = s.iterator();
@@ -1310,6 +1284,36 @@ public class Cis implements IFeatureServer, ICisOwned {
 		w.setParticipant(l);
 		
 		callback.receiveResult(c);	
+		
+	}
+	public void getListOfMembers(Requestor requestor, ICisManagerCallback callback){
+		LOG.debug("local get member list WITH CALLBACK called");
+
+		CommunityMethods c = new CommunityMethods();
+		
+		// -- Access control
+		if(null != this.privacyDataManager){
+			ResponseItem resp = null;
+			DataIdentifier dataId = null;
+			try {
+				dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS + "://" + this.getCisId() + "/cis-member-list");
+				resp = this.privacyDataManager.checkPermission(requestor, dataId, new Action(ActionConstants.READ));
+			} catch (MalformedCtxIdentifierException e) {
+				LOG.error("The identifier of the requested data is malformed", e);
+			} catch (PrivacyException e) {
+				LOG.error("Error during access control of this data", e);
+			}
+			// No permission
+			if(null == resp || !Decision.PERMIT.equals(resp.getDecision())){
+				LOG.info("This requestor: "+requestor);
+				LOG.info("doesn't have the permission to retrieve this data: "+dataId);
+				callback.receiveResult(c);
+				return;
+			}
+		}
+		
+		// -- Retrieve the list of members
+		getListOfMembers(callback);
 	}
 	
 	@Override

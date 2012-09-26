@@ -217,8 +217,16 @@ public class CisSubscribedImp implements ICis {
 	
 	
 	@Override
-	public void getListOfMembers(Requestor req, ICisManagerCallback callback){
+	public void getListOfMembers(ICisManagerCallback callback){
+		LOG.info("client call to get list of members from a RemoteCIS");
+
+		CommunityMethods c = new CommunityMethods();
 		
+		WhoRequest w = new WhoRequest();
+		
+		this.sendXmpp(c, callback);		
+	}
+	public void getListOfMembers(Requestor req, ICisManagerCallback callback){
 		LOG.info("client call to get list of members from a RemoteCIS");
 
 		CommunityMethods c = new CommunityMethods();
@@ -228,8 +236,7 @@ public class CisSubscribedImp implements ICis {
 		RequestorBean reqB = Util.createRequestorBean(req);
 		w.setRequestor(reqB);
 		
-		this.sendXmpp(c, callback);		
-
+		this.sendXmpp(c, callback);	
 	}
 
 	

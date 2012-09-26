@@ -102,6 +102,16 @@ public interface ICis {
     public void getInfo(ICisManagerCallback callback);
     
 
+    /**
+     * Get list of members from a CIS.
+     * The callback must be able to retrieve a community object
+     * defined at org.societies.api.schema.cis.community 
+     * which will have a Who with a list of Participant objects
+     * 
+     * @param callback callback function
+     */
+    @Deprecated
+    public void getListOfMembers(ICisManagerCallback callback);
 	/**
 	 * Get list of members from a CIS.
 	 * The callback must be able to retrieve a community object

@@ -19,6 +19,8 @@ import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.schema.cis.community.Community;
 
+import org.societies.api.identity.Requestor;
+
 public class ICISSimulated implements ICisOwned {
 	private ArrayList<String> members;
 	public ArrayList<String> getMembers() {
@@ -65,7 +67,7 @@ public class ICISSimulated implements ICisOwned {
 	}
 
 	@Override
-	public void getListOfMembers(ICisManagerCallback callback) {
+	public void getListOfMembers(Requestor requestor, ICisManagerCallback callback) {
 		// TODO Auto-generated method stub
 
 	}
