@@ -42,7 +42,7 @@ var	SocietiesLocalCISManager = {
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
-		'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+		'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 		'connectService',          //Telling the plugin, which action we want to perform
 		[]);        //Passing a list of arguments to the plugin
 	},
@@ -59,7 +59,7 @@ var	SocietiesLocalCISManager = {
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
-		'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+		'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 		'disconnectService',          //Telling the plugin, which action we want to perform
 		[]);        //Passing a list of arguments to the plugin
 	},
@@ -89,7 +89,7 @@ var	SocietiesLocalCISManager = {
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 				failureCallback,     //Callback which will be called when plugin action encounters an error
-				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 				'createCIS',          //Telling the plugin, which action we want to perform
 				[cisRecord]);        //Passing a list of arguments to the plugin
 	},
@@ -107,9 +107,9 @@ var	SocietiesLocalCISManager = {
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 				failureCallback,     //Callback which will be called when plugin action encounters an error
-				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
-				'listCIS',          //Telling the plugin, which action we want to perform
-				[client]);        //Passing a list of arguments to the plugin
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
+				'getCisList',          //Telling the plugin, which action we want to perform
+				[client, "all"]);        //Passing a list of arguments to the plugin
 	},
 	
 	findForAllCis: function(searchTerm, successCallback, failureCallback) {
@@ -118,7 +118,7 @@ var	SocietiesLocalCISManager = {
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 				failureCallback,     //Callback which will be called when plugin action encounters an error
-				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 				'findForAllCis',          //Telling the plugin, which action we want to perform
 				[client, searchTerm]);        //Passing a list of arguments to the plugin
 	},
@@ -129,7 +129,7 @@ var	SocietiesLocalCISManager = {
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 				failureCallback,     //Callback which will be called when plugin action encounters an error
-				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 				'findAllCisAdvertisementRecords',          //Telling the plugin, which action we want to perform
 				[client]);        //Passing a list of arguments to the plugin
 	},
@@ -140,9 +140,55 @@ var	SocietiesLocalCISManager = {
 		
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 				failureCallback,     //Callback which will be called when plugin action encounters an error
-				'PluginCISManager',  //Telling PhoneGap that we want to run specified plugin
+				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 				'joinCis',          //Telling the plugin, which action we want to perform
 				[client, cis_id]);        //Passing a list of arguments to the plugin
 	}
 	
+};
+
+/**
+ * Provides a Helper API to the CIS Manager
+ * 
+ * @namespace SocietiesLocalCISManagerHelper
+ */
+var	SocietiesCISManagerHelper = {
+	/**
+	 * @methodOf SocietiesLocalCISManagerHelper#
+	 * @description Disconnect from CSSManager native service
+	 * @returns null
+	 */
+	disconnectFromLocalCISManager: function() {
+		console.log("Disconnect from LocalCISManager");
+		
+		function success(data) {
+			$.mobile.changePage( ($("#index")), { transition: "fade"} );
+			console.log(data);
+		}
+		
+		function failure(data) {
+			alert("disconnectFromLocalCISManager - failure: " + data);
+		}
+	    window.plugins.SocietiesLocalCISManager.disconnectService(success, failure);
+	},
+	
+	/**
+	 * @methodOf SocietiesLocalCISManagerHelper#
+	 * @description Connect to CISManager native service
+	 * @param {Object} function to be executed if connection successful
+	 * @returns null
+	 */
+
+	connectToLocalCISManager: function(actionFunction) {
+		console.log("Connect to LocalCISManager");
+			
+		function success(data) {
+			actionFunction();
+		}
+		
+		function failure(data) {
+			alert("connectToLocalCISManager - failure: " + data);
+		}
+	    window.plugins.SocietiesLocalCISManager.connectService(success, failure);
+	}
 };

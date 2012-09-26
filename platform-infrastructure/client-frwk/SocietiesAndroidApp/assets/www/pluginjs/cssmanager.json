@@ -175,10 +175,18 @@
 	                    "socialURI": "changed_frank@fondlebook.com",
 	                    "status": 0
 						},
-		"getMyFriends": ["alec.societies.local", 
-						 "alan.societies.local", 
-						 "thomas.societies.local"
-						],
+		"getMyFriends": [{"id": "john.societies.local",
+						  "name": "John Dough",
+						  "uri": "john.societies.local"
+						 },
+						 {"id": "jane.societies.local",
+						  "name": "Jane Smith",
+						  "uri": "jane.societies.local"
+						 },
+						 {"id": "tom.societies.local",
+						  "name": "Tom Cruise",
+						  "uri": "tom.societies.local"
+						 }],
 		"listAdvertisementRecords": [{
 						"name" : "John Dough",
 						"id": "john.societies.local" },

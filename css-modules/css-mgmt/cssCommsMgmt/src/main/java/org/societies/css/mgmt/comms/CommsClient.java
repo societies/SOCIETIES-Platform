@@ -656,4 +656,25 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e.printStackTrace();
 		}
 	}
+	
+	/* Get a list of suggested Friend from cloud Css Manger */
+	public void getFriendRequests(ICSSManagerCallback callback)
+	{
+		
+		LOG.debug("Remote call on getFriendRequests");
+
+		Stanza stanza = new Stanza(commManager.getIdManager().getCloudNode());
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+		messageBean.setMethod(MethodType.FIND_ALL_CSS_FRIEND_REQUESTS);
+		CommsClientCallback commsCallback = new CommsClientCallback(
+				stanza.getId(), callback);
+
+		try {
+			this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

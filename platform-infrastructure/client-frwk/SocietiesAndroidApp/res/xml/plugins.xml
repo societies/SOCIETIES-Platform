@@ -40,6 +40,8 @@
     <plugin name="PluginCoreServiceMonitor" value="org.societies.android.platform.phongegap.PluginCoreServiceMonitor"/>
     <plugin name="PluginCSSManager" value="org.societies.android.platform.phongegap.PluginCSSManager"/>
     <plugin name="PluginPreferences" value="org.societies.android.platform.phongegap.PreferencesPlugin"/>
-    <plugin name="PluginCISManager" value="org.societies.android.platform.phongegap.PluginCISManager"/>
+    <!-- <plugin name="PluginCISManager" value="org.societies.android.platform.phongegap.PluginCISManager"/> -->
+    <plugin name="PluginCISFunctions" value="org.societies.android.platform.phongegap.PluginCISFunctions"/>
+    <plugin name="PluginSNConnector" value="org.societies.android.platform.phongegap.PluginSNConnector"/>
 
 </plugins>
