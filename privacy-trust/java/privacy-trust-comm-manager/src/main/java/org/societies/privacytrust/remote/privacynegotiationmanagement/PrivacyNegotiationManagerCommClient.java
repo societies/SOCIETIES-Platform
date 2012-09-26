@@ -137,15 +137,19 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 
 	@Override
 	public void receiveResult(Stanza stanza, Object bean) {
+		this.logging.debug("Received resultBean");
 		if (bean instanceof NegotiationACKBeanResult){
+			this.logging.debug("Received : NegotiationACKBeanResult");
 			String id = getId(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT, ((NegotiationACKBeanResult) bean).getRequestor().getRequestorId());
 			this.ackResults.put(id, (NegotiationACKBeanResult) bean);
 			this.ackResults.notifyAll();
 		}else if (bean instanceof NegotiationGetPolicyBeanResult){
+			this.logging.debug("Received : NegotiationGetPolicyBeanResult");
 			String id = getId(NegAgentMethodType.GET_POLICY, ((NegotiationACKBeanResult) bean).getRequestor().getRequestorId());
 			this.policyResults.put(id, (NegotiationGetPolicyBeanResult) bean);
 			this.policyResults.notifyAll();
 		}else if (bean instanceof NegotiationMainBeanResult){
+			this.logging.debug("Received : NegotiationMainBeanResult");
 			String id = getId(NegAgentMethodType.NEGOTIATE, ((NegotiationACKBeanResult) bean).getRequestor().getRequestorId());
 			this.mainResults.put(id, (NegotiationMainBeanResult) bean);
 			this.mainResults.notifyAll();
@@ -180,6 +184,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 		bean.setMethod(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT);
 		try {
 			this.commManager.sendIQGet(stanza, bean, this);
+			this.logging.debug("Sending "+NegAgentMethodType.ACKNOWLEDGE_AGREEMENT+" IQGET");
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -195,6 +200,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 
 					this.ackResults.wait();
 				} 
+				this.logging.debug("Returning acknowledgement result ");
 				NegotiationACKBeanResult resultBean = this.ackResults.get(id);
 				this.ackResults.remove(id);
 				return new AsyncResult<Boolean>(resultBean.isAcknowledgement());
@@ -225,6 +231,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 
 		try{
 			this.commManager.sendIQGet(stanza, bean, this);
+			this.logging.debug("Sending "+NegAgentMethodType.GET_POLICY+" IQGET");
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -238,6 +245,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 					this.policyResults.wait();
 					
 				}
+				this.logging.debug("Returning getPolicy result");
 				NegotiationGetPolicyBeanResult result = policyResults.get(id);
 				RequestPolicy policy = (RequestPolicy) Util.convertToObject(result.getRequestPolicy(), this.getClass());
 				this.policyResults.remove(id);
@@ -316,6 +324,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 		bean.setResponsePolicy(Util.toByteArray(policy));
 		try{
 			this.commManager.sendIQGet(stanza, bean, this);
+			this.logging.debug("Sending "+NegAgentMethodType.NEGOTIATE+" IQGET");
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -328,6 +337,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 				synchronized(this.mainResults){
 					this.mainResults.wait();
 				}
+				this.logging.debug("Returning negotiate result");
 				NegotiationMainBeanResult result = this.mainResults.get(id);
 				
 				ResponsePolicy resp = (ResponsePolicy) Util.convertToObject(result.getResponsePolicy(), this.getClass());
