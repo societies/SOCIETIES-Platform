@@ -16,12 +16,19 @@ import org.apache.shindig.social.opensocial.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.api.internal.sns.ISocialData;
@@ -36,163 +43,183 @@ import org.societies.platform.socialdata.converters.GroupConverter;
 import org.societies.platform.socialdata.converters.GroupConveterFactory;
 import org.societies.platform.socialdata.converters.PersonConverter;
 import org.societies.platform.socialdata.converters.PersonConverterFactory;
-import org.springframework.stereotype.Service;
 
 import com.restfb.json.JsonObject;
 
 
-@Service
+
 public class SocialData implements ISocialData{
 
+    /**
+     * Get the Context Broker to store some data
+     */
+	private ICtxBroker    internalCtxBroker;
 
-	private static final Logger logger = LoggerFactory.getLogger(SocialData.class);
-	
-	private INetworkNode 	cssNodeId;
-	private IIdentity 		cssOwnerId;
-	
-	// css user is modeled as individualCtxEntity
-	private IndividualCtxEntity individualCtxEntity;
-	
-	/*
-	 * Platform services  
-	*/
-	private ICtxBroker internalCtxBroker;
-	private ICommManager commsMgr;
-	private IIdentityManager identityMgr;
-	
-	//this class provides the functionality for storing sns data to context
-	private ContextUpdater ctxUpdater;
-	
 	public ICtxBroker getInternalCtxBroker() {
 		logger.info(this.getClass().getName()+": Return ctxBroker");
 		return internalCtxBroker;
+
 	}
+
 
 	public void setInternalCtxBroker(ICtxBroker ctxBroker) {
 		this.internalCtxBroker = ctxBroker;
 		logger.info(this.getClass().getName()+": Got ctxBroker");
 	}
 
+	private HashMap<String, String> connectorsInCtxBroker = new HashMap<String, String>();
+
+
+	/**
+	 * Set the Comm Manager to get the User Identity
+	 */
+	private ICommManager  			commsMgr;
+	private IIdentityManager 		identityMgr;
 
 	public ICommManager getCommsMgr() {
 		logger.info(this.getClass().getName()+": Return commsMgr");
 		return commsMgr;
 	}
 
-	
+
 	public void setCommsMgr(ICommManager commsMgr) {
 		logger.info(this.getClass().getName()+": Got commsMgr");
 		this.commsMgr 		= commsMgr;
 		this.identityMgr	= this.commsMgr.getIdManager();
+
+
 	}
 
-	
+	private INetworkNode 	cssNodeId;
+	private IIdentity 		cssOwnerId;
+
+
+
 	HashMap<String, ISocialConnector> connectors = new HashMap<String, ISocialConnector>();
+    
+    Map<String, Object> 			socialFriends;
+    Map<String, Object>				socialGroups;
+    Map<String, Object>				socialProfiles;
+    Map<String, Object>	 			socialActivities;
+    
+    
+    private static final Logger logger = LoggerFactory.getLogger(SocialData.class);
 
-	Map<String, Object> 			socialFriends;
-	Map<String, Object>				socialGroups;
-	Map<String, Object>				socialProfiles;
-	Map<String, Object>	 			socialActivities;
-
-
-
-	long lastUpate ;
-
-
+    long lastUpate ;
+    
+    private IndividualCtxEntity individualCtxEntity;
+   
+    
+    @SuppressWarnings("unchecked")
 	public SocialData(){
+    	
+    }
+    
+    /** 
+     * FOR TEST
+     * @param identity
+     */
+    public SocialData(IIdentityManager idManager, ICtxBroker internalCtxBroker){
+    	
+    	socialFriends 			= new HashMap<String, Object>();
+    	socialGroups			= new HashMap<String, Object>();
+    	socialProfiles			= new HashMap<String, Object>();
+    	socialActivities		= new HashMap<String, Object>();
+    	
+    	this.identityMgr = idManager;
+    	this.internalCtxBroker = internalCtxBroker;
+    	
+    	try  {
 
-		socialFriends 			= new HashMap<String, Object>();
-		socialGroups			= new HashMap<String, Object>();
-		socialProfiles			= new HashMap<String, Object>();
-		socialActivities		= new HashMap<String, Object>();
+    		this.cssNodeId	 	= identityMgr.getThisNetworkNode();
+    		this.cssOwnerId 	= identityMgr.fromJid(this.cssNodeId.getBareJid());
+    		
+    		
+    		logger.info("CssNodeId:"+this.cssNodeId + " -  CssOwnerId:"+this.cssOwnerId);
+    	} 
+    	catch (InvalidFormatException e) {
 
-		lastUpate				= new Date().getTime();
-		
-		logger.info("SocialData Bundle is started");
-		
-	}
+    		e.printStackTrace();
+    	}
 
-	
+    	
+    }
+    
+    private void initSocialData(){
+    
+    	socialFriends 			= new HashMap<String, Object>();
+    	socialGroups			= new HashMap<String, Object>();
+    	socialProfiles			= new HashMap<String, Object>();
+    	socialActivities		= new HashMap<String, Object>();
+    	
+    	lastUpate				= new Date().getTime();
+    	logger.info("SocialData Bundle is started");
 
-	 private void initSocialData(){
-		
-		 /*
-		 	socialFriends 			= new HashMap<String, Object>();
-			socialGroups			= new HashMap<String, Object>();
-			socialProfiles			= new HashMap<String, Object>();
-			socialActivities		= new HashMap<String, Object>();
+    	try  {
 
-			lastUpate				= new Date().getTime();
-	    	*/
-	    	
+    		this.cssNodeId	 	= identityMgr.getThisNetworkNode();
+    		this.cssOwnerId 	= identityMgr.fromJid(this.cssNodeId.getBareJid());
+    		
+    		
+    		logger.info("CssNodeId:"+this.cssNodeId + " -  CssOwnerId:"+this.cssOwnerId);
+    	} 
+    	catch (InvalidFormatException e) {
 
-	    	try  {
+    		e.printStackTrace();
+    	}
+
+    	
+    	// Save data into the context
+		try {
+			logger.info(internalCtxBroker.toString());
+
+
+			individualCtxEntity  = internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
+			logger.info("Indivudual Context Entity: " + individualCtxEntity.getId().toString());
+
+			CtxAttribute connector = null;
+			// Restore the connected connector
+			Set<CtxAttribute> connectors= individualCtxEntity.getAttributes(CtxAttributeTypes.SOCIAL_NETWORK_CONNECTOR);
+			if (connectors != null ){
+				List<CtxAttribute> connectorList = new ArrayList<CtxAttribute>(connectors);
+				for(CtxAttribute conn : connectorList){
+					ISocialConnector connectoBlob;
+					try {
+						connectoBlob = (ISocialConnector) SerialisationHelper.deserialise(connector.getBinaryValue(), this.getClass().getClassLoader());
+						this.addSocialConnector(connectoBlob);
+						connectorsInCtxBroker.put(connectoBlob.getID(), conn.getId().toString());
+						logger.info("Restore Connector: "+connectoBlob.getID());
+					} 
+					catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+			}else logger.warn("No SocialNetworkConnector stored in the Broker!");
+
+		}
+		catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+    }
+    
     
 
-	    		this.cssNodeId	 	= identityMgr.getThisNetworkNode();
-	    		this.cssOwnerId 	= identityMgr.fromJid(this.cssNodeId.getBareJid());
-	 	    		
-	    		logger.info("CssNodeId:"+this.cssNodeId + " -  CssOwnerId:"+this.cssOwnerId);
-	    	} 
-	    	catch (InvalidFormatException e) {
-	    		e.printStackTrace();
-	    	}
-	    
-	    	// store SNS data to context
-			this.ctxUpdater = new ContextUpdater(this.internalCtxBroker,this.cssOwnerId);
-	    	
-	    	
-	    	logger.info("SocialData Bundle is started");
-	    	/*
-	    	// Save data into the context
-			try {
-				logger.info(internalCtxBroker.toString());
-				
-				
-				individualCtxEntity  = internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
-				logger.info("Indivudual Context Entity: " + individualCtxEntity.getId().toString());
-				
-				CtxAttribute connector = null;
-				// Restore the connected connector
-				Set<CtxAttribute> connectors= individualCtxEntity.getAttributes(CtxAttributeTypes.SOCIAL_NETWORK_CONNECTOR);
-				if (connectors != null ){
-					List<CtxAttribute> connectorList = new ArrayList<CtxAttribute>(connectors);
-					for(CtxAttribute conn : connectorList){
-						ISocialConnector connectoBlob;
-						try {
-							connectoBlob = (ISocialConnector) SerialisationHelper.deserialise(connector.getBinaryValue(), this.getClass().getClassLoader());
-							this.addSocialConnector(connectoBlob);
-							connectorsInCtxBroker.put(connectoBlob.getID(), conn.getId().toString());
-							logger.info("Restore Connector: "+connectoBlob.getID());
-						} 
-						catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-					}
-				}else logger.warn("No SocialNetworkConnector stored in the Broker!");
-				
-			}
-			catch (CtxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			*/
-	 }
-	
 	@Override
 	public void addSocialConnector(ISocialConnector socialConnector) throws Exception {
 		if (connectors.containsKey(socialConnector.getID())){
@@ -203,11 +230,11 @@ public class SocialData implements ISocialData{
 		connectors.put(socialConnector.getID(), socialConnector);
 		log("Add connector "+socialConnector.getID());
 		log("CssOwenerId: "+this.cssOwnerId);
-		
+
 		// Store into the context broker
 		individualCtxEntity  = internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 		CtxAttribute connectorAttr = internalCtxBroker.createAttribute(individualCtxEntity.getId(), CtxAttributeTypes.SOCIAL_NETWORK_CONNECTOR).get();		
-		
+
 		byte[] blobBytes;
 		try {
 			blobBytes = SerialisationHelper.serialise(socialConnector);
@@ -220,8 +247,8 @@ public class SocialData implements ISocialData{
 			e.printStackTrace();
 			logger.error("Unable to store the connector to the CtxBroker");
 		}
-		
-		
+
+
 	}
 
 
@@ -259,11 +286,11 @@ public class SocialData implements ISocialData{
 	@Override
 	public List<Object> getSocialActivity() {
 		List activities = new ArrayList();
-		Iterator it = socialActivities.values().iterator();
-		while (it.hasNext()){
-			Collection acts = (Collection)it.next();
-			activities.addAll(acts);
-		}
+	    Iterator it = socialActivities.values().iterator();
+	    while (it.hasNext()){
+	    	Collection acts = (Collection)it.next();
+	    	activities.addAll(acts);
+	    }
 		return activities;
 	}
 
@@ -280,13 +307,14 @@ public class SocialData implements ISocialData{
 
 	@Override
 	public void updateSocialData() {
-		
+
+
 		Iterator<ISocialConnector>it = connectors.values().iterator();
-		
 		socialActivities = new HashMap<String, Object>();  // reset old Activities
+
 		while (it.hasNext()){
 			ISocialConnector connector = it.next();
-			
+
 			getActivities(connector);
 			updateProfile(connector);
 			updateGroups(connector);
@@ -295,10 +323,7 @@ public class SocialData implements ISocialData{
 
 		}
 
-
-
 		lastUpate = new Date().getTime();
-
 
 	}
 
@@ -352,29 +377,22 @@ public class SocialData implements ISocialData{
 
 
 	private void updateProfile(ISocialConnector connector) {
-		
-		PersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
-		Person profile = parser.load(connector.getUserProfile());
+			PersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
+			Person profile = parser.load(connector.getUserProfile());
 
-		
-		if (socialProfiles.containsKey(profile.getId())){
-			socialProfiles.remove(profile.getId());
-			// Send notification of UPDATE?
-		}	
-		else {
-			// Send Notitication of NEW PROFILE?
-		}
-		socialProfiles.put(profile.getId(), profile);
-		
-		// store SNS data to context
-		try{
-			if(this.ctxUpdater != null ) this.ctxUpdater.updateCtxProfile(profile);	
-		
-		} catch (Exception e) {
-			logger.info("context DB not updated");
-		}
-		
-				
+			// store SNS data to context
+			ContextUpdater ctxUpdater = new ContextUpdater(this.internalCtxBroker,this.cssOwnerId);
+			ctxUpdater.updateCtxProfile(profile);
+			//end of context related code
+
+			if (socialProfiles.containsKey(profile.getId())){
+				socialProfiles.remove(profile.getId());
+				// Send notification of UPDATE?
+			}	
+			else {
+				// Send Notitication of NEW PROFILE?
+			}
+			socialProfiles.put(profile.getId(), profile);
 	}
 
 
@@ -382,11 +400,11 @@ public class SocialData implements ISocialData{
 	public long getLastUpdate() {
 		return lastUpate;
 	}
-
-
-	private void log(String out){
-		logger.info("SocialData - " +out);
-	}
+    
+    
+    private void log(String out){
+    	logger.info("SocialData - " +out);
+    }
 
 	@Override
 	public boolean isAvailable(ISocialConnector connector) {
@@ -417,20 +435,20 @@ public class SocialData implements ISocialData{
 
 		logger.info("Create a new connector with "+snName + " name");
 		switch(snName){
-		case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
+				case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
 
-		case twitter:    
-			// Just for now that we don't have a way to use our persona token
-			//return (ISocialConnector) new TwitterConnectorImpl();
-			return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), "test");
+				case twitter:    
+					// Just for now that we don't have a way to use our persona token
+						//return (ISocialConnector) new TwitterConnectorImpl();
+					return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), "test");
 
-		case Foursquare: 
+				case Foursquare: 
 
-			// Just for now ...
-			// return (ISocialConnector) new FoursquareConnectorImpl();
-			return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
+						// Just for now ...
+					   // return (ISocialConnector) new FoursquareConnectorImpl();
+					   return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
 
-		default : return null;
+				default : return null;
 		}
 
 	}
@@ -483,33 +501,33 @@ public class SocialData implements ISocialData{
 		JsonObject result= new JsonObject(type);
 		if (type.equals(ISocialData.CHECKIN)){
 
-			//			Example:
-			//			String value="{ \"checkin\": {"+
-			//			        "\"lat\": \"45.473272\","+
-			//			        "\"lon\": \"9.187519\","+
-			//			        "\"message\": \"Milano City\","+
-			//			        "\"place\": 1234}"+
-			//			        "}";
+//			Example:
+//			String value="{ \"checkin\": {"+
+//			        "\"lat\": \"45.473272\","+
+//			        "\"lon\": \"9.187519\","+
+//			        "\"message\": \"Milano City\","+
+//			        "\"place\": 1234}"+
+//			        "}";
 
 			if (map.containsKey(ISocialData.POST_DESCR))
-				result.put(ISocialData.POST_DESCR, map.get(ISocialData.POST_DESCR).toString());
+			result.put(ISocialData.POST_DESCR, map.get(ISocialData.POST_DESCR).toString());
 			result.put(ISocialData.POST_LAT, map.get(ISocialData.POST_LAT).toString());
 			result.put(ISocialData.POST_LON, map.get(ISocialData.POST_LON).toString());
 			if (map.containsKey(ISocialData.POST_MESSAGE))
-				result.put(ISocialData.POST_MESSAGE, map.get(ISocialData.POST_MESSAGE).toString());
+			result.put(ISocialData.POST_MESSAGE, map.get(ISocialData.POST_MESSAGE).toString());
 			if (map.containsKey(ISocialData.POST_PLACE))
-				result.put(ISocialData.POST_PLACE, map.get(ISocialData.POST_PLACE).toString());
+			result.put(ISocialData.POST_PLACE, map.get(ISocialData.POST_PLACE).toString());
 		}
 		else{
 
-			//			Example:
-			//			String value="{ \"event\": {"+
-			//			        "\"name\": \"Party\","+
-			//			        "\"from\": \"2013-08-12 10:45\","+
-			//			        "\"to\": \"2013-08-12 18:45\","+
-			//			        "\"location\": \"HOME\","+
-			//			        "\"description\": \"My Birthday Party\"}"+
-			//			        "}";
+//			Example:
+//			String value="{ \"event\": {"+
+//			        "\"name\": \"Party\","+
+//			        "\"from\": \"2013-08-12 10:45\","+
+//			        "\"to\": \"2013-08-12 18:45\","+
+//			        "\"location\": \"HOME\","+
+//			        "\"description\": \"My Birthday Party\"}"+
+//			        "}";
 
 			if (map.containsKey(ISocialData.POST_NAME))
 				result.put(ISocialData.POST_NAME, map.get(ISocialData.POST_NAME).toString());
@@ -526,7 +544,7 @@ public class SocialData implements ISocialData{
 		return result.toString(1);
 	}
 
-
+ 
 
 
 }
