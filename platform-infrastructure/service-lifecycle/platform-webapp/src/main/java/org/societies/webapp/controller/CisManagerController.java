@@ -259,6 +259,7 @@ public class CisManagerController {
 				// TODO: get a real advertisement
 				CisAdvertisementRecord ad = new CisAdvertisementRecord();
 				ad.setId(cisForm.getCisJid());
+				ad.setCssownerid(cisForm.getCssId());
 				// in order to force the join to send qualifications, Ill add some criteria to the AdRecord
 				MembershipCrit membershipCrit = new MembershipCrit();
 				List<Criteria> criteria = new ArrayList<Criteria>();

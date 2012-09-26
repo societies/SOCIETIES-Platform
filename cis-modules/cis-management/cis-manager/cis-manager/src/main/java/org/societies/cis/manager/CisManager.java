@@ -1307,54 +1307,55 @@ public class JoinCallBack implements ICisManagerCallback{
 		
 		LOG.debug("client call to join a RemoteCIS");
 		Join j = new Join();
+		boolean error = false;
 		
+		// TODO: maybe to already a check here
 		this.getQualificationsForJoin(adv,j);
 		
 
 		LOG.info("going to start the negotiation");
 
 		try {
-			negotiator.startNegotiation(new RequestorCis(this.iCommMgr.getIdManager().fromJid(adv.getCssownerid()) ,this.iCommMgr.getIdManager().fromJid(adv.getId())), new INegCallBack());
+			negotiator.startNegotiation(new RequestorCis(this.iCommMgr.getIdManager().fromJid(adv.getCssownerid()) ,this.iCommMgr.getIdManager().fromJid(adv.getId())),
+					new INegCallBack(this,j,adv.getId(),callback));
 		}
 		catch (InvalidFormatException e) {
 			LOG.error("[Negotiation] Error during the instantiation of IIdentitys from "+adv.getCssownerid()+" or "+adv.getId(), e);
+			error = true;
 		}
 		catch (Exception e) {
 			LOG.error("[Negotiation] Error during negotiation", e);
+			error = true;
 		}
+		if(true == error){
+			CommunityMethods result = new CommunityMethods();		
+			Community com = new Community();
+			com.setCommunityJid(adv.getId());
+			JoinResponse jr = new JoinResponse();
+			jr.setResult(false);
+			jr.setCommunity(com);
+			result.setJoinResponse(jr);			
+			callback.receiveResult(result);
+			return;
+		}
+		
 		LOG.debug("negotiator has been called, Ill proceed with the join");
 		
-		// -- Sending join
-		IIdentity toIdentity;
-		try {
-			toIdentity = this.iCommMgr.getIdManager().fromJid(adv.getId());
-			Stanza stanza = new Stanza(toIdentity);
-			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
-					stanza.getId(), callback, this);
-
-			CommunityMethods c = new CommunityMethods();
-
-			c.setJoin(j);
-
-			try {
-				LOG.info("Sending stanza with join");
-				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
-			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (InvalidFormatException e1) {
-			LOG.info("Problem with the input jid when trying to send the join");
-			e1.printStackTrace();
-		}
 	}
 	
 	class INegCallBack implements INegotiationCallback{
 		
-		//ICisManagerCallback IcisCallback;
+		CisManager cisMgm = null;
+		Join j = null;
+		String targetJid = null;
+		ICisManagerCallback callback = null;
+
 		
-		public INegCallBack (){
-			//IcisCallback = IcisCallback;
+		public INegCallBack (CisManager cisMgm, Join j, String targetJid, ICisManagerCallback callback){
+			this.cisMgm = cisMgm;
+			this.j = j;
+			this.targetJid = targetJid;
+			this.callback = callback;
 		}
 		
 		@Override
@@ -1364,8 +1365,32 @@ public class JoinCallBack implements ICisManagerCallback{
 
 		@Override
 		public void onNegotiationComplete(String agreementKey, URI jar) {
-			if(agreementKey!=null && !agreementKey.isEmpty())
-				LOG.debug("privacy negotiation success");
+			if(agreementKey!=null && !agreementKey.isEmpty()){
+				// -- Sending join
+				IIdentity toIdentity;
+				try {
+					toIdentity = cisMgm.iCommMgr.getIdManager().fromJid(targetJid);
+					Stanza stanza = new Stanza(toIdentity);
+					CisManagerClientCallback commsCallback = new CisManagerClientCallback(
+							stanza.getId(), callback, cisMgm);
+
+					CommunityMethods c = new CommunityMethods();
+
+					c.setJoin(j);
+
+					try {
+						LOG.info("Sending stanza with join");
+						cisMgm.iCommMgr.sendIQGet(stanza, c, commsCallback);
+					} catch (CommunicationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} catch (InvalidFormatException e1) {
+					LOG.info("Problem with the input jid when trying to send the join");
+					e1.printStackTrace();
+				}
+			}
+				
 		}
 	}
 	
