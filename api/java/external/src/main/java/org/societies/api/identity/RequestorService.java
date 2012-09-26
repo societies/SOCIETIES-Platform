@@ -98,7 +98,7 @@ public class RequestorService extends Requestor implements Serializable{
 		int result = 1; //super.hashCode();
 		result = prime * result
 				+ ((requestorServiceId == null) ? 0 : requestorServiceId
-						.hashCode());
+						.getServiceInstanceIdentifier().hashCode());
 		return result;
 	}
 
