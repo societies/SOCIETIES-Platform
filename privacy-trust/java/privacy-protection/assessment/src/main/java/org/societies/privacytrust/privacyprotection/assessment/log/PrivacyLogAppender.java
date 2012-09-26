@@ -93,7 +93,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 		StackParser stackParser = new StackParser(stack);
 		String invoker = stackParser.getInvokerOfInvoker();
-		LOG.debug("Context / Comms: {}", stackParser.getInvoker());  // TODO: remove this call
+		//LOG.debug("Context / Comms: {}", stackParser.getInvoker());  // Costly call, use for debugging only!
 		LOG.debug("Invoked by {}", invoker);
 		return invoker;
 	}

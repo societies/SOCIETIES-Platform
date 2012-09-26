@@ -87,20 +87,33 @@ public class StackParser {
 		return getNextInvoker();
 	}
 	
-	public String[] getAllInvokers() {
-		k = 0;
+	public List<String> getAllInvokers() {
+
 		List<String> invokers = new ArrayList<String>();
 		String next;
 
+		k = 0;
 		while ((next = getNextInvoker()) != null) {
 			invokers.add(next);
 		}
-		return (String[]) invokers.toArray();
+		return invokers;
+	}
+	
+	public List<String> getInvokers(int howMany) {
+
+		List<String> invokers = new ArrayList<String>();
+		String next;
+
+		k = 0;
+		while ((next = getNextInvoker()) != null && invokers.size() < howMany) {
+			invokers.add(next);
+		}
+		return invokers;
 	}
 
 	public String getNextInvoker() {
 		
-		LOG.debug("getNextInvoker()");
+		//LOG.debug("getNextInvoker()");
 		
 		for (; k < stack.length; k++) {
 			
