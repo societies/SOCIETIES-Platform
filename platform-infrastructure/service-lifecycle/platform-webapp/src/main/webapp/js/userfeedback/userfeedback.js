@@ -20,7 +20,7 @@ var userFeedback = (function () {
 	var boxId = '#ufeedbackNotifications';
 	var handlerId = '.ufeedbackRefreshHandler';
 	var url = {getForm: 'get_form.html', sendAnswer: 'get_form.html' };
-	var formType = {RADIOLIST: "radio", CHECKBOXLIST: "check", ACKNACK: "ack", ABORT: "abort", NOTIFICATION: "notification"};
+	var formType = {RADIOLIST: "radio", CHECKBOXLIST: "check", ACKNACK: "ack", ABORT: "abort", NOTIFICATION: "notification", EMPTY: "NO_REQUESTS"};
 	var toastTime = 5000; // 5s
 
 	var oneSecond = 1000; // 1s
@@ -62,7 +62,7 @@ var userFeedback = (function () {
 			success: function(data, textStatus, xhr) {
 				console.log("Success: notification retrieved", textStatus);
 				// -- No form to display
-				if ("NO_REQUESTS" == data) {
+				if (formType.EMPTY == data) {
 					// Pooling timer normal internal
 					poolingTimerNormal();
 					return;
@@ -76,7 +76,7 @@ var userFeedback = (function () {
 				// - Timeout and timer
 				// Stop timeout count
 				timeoutTimer.stop();
-				// Pooling timer normal internall
+				// Pooling timer normal interval
 				if (formType.NOTIFICATION == data.type) {
 					poolingTimerNormal();
 				}
@@ -152,7 +152,7 @@ var userFeedback = (function () {
 			res = renderFormNotification(res, formInfo);
 		}
 		else {
-			res = $('<div>').addClass('nothing').html('Nothing');
+			return "";
 		}
 		return res;
 	}
@@ -269,7 +269,7 @@ var userFeedback = (function () {
 		$.ajax({
 			url: url.sendAnswer,
 			type: "POST",
-			data: data,
+			data: {data: JSON.stringify(data)},
 			beforeSend: function (xhr) {
 				console.log("Before send answer");
 				// Hide old toast result
@@ -287,8 +287,8 @@ var userFeedback = (function () {
 				// Clean the previous notification
 				closeNotification();
 				// Display result
-				result.addClass(formInfo.ack ? 'ok' : 'error')
-				.html(formInfo.ack ? 'Ok!' : 'Oups, error!')
+				result.addClass("true" == formInfo ? 'ok' : 'error')
+				.html("true" == formInfo ? 'Ok!' : 'Oups, error!')
 				.fadeIn('slow')
 				.delay(toastTime).fadeOut('slow');
 			},
