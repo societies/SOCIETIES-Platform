@@ -158,7 +158,7 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 	@Override
 	public void notifySuccess() {
 		if(logger.isDebugEnabled())
-			logger.debug("Registering Service on Policy Negotiator successfull.");
+			logger.debug("Registering Service on Policy Negotiator successful.");
 	}
 
 
