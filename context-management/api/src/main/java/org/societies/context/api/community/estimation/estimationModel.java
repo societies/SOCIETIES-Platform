@@ -22,69 +22,8 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.comm_ctx_estimation;
+package org.societies.context.api.community.estimation;
 
-
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.integration.test.IntegrationTestCase;
-
-/**
- * 
- *
- * @author Yiorgos
- *
- */
-public class Test1108 extends IntegrationTestCase{
-
-	
-	public static ICtxBroker ctxBroker;
-	public static ICommManager commManager;
-	public static ICisManager cisManager;
-	
-	
-	public Test1108(){
-		super(1108, new Class[]{CreateCommunityCtx.class});
-	}
-
-	/**
-	 * @return the ctxBroker
-	 */
-	public static ICtxBroker getCtxBroker() {
-		return ctxBroker;
-	}
-
-	/**
-	 * @param ctxBroker the ctxBroker to set
-	 */
-	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		Test1108.ctxBroker = ctxBroker;
-
-	}
-	
-	/**
-	 * @return the commMgr
-	 */
-	public static ICommManager  getCommManager() {
-		return commManager ;
-	}
-
-	/**
-	 * @param commMgr the commMgr to set
-	 */
-	public  void setCommManager(ICommManager commMgr) {
-		Test1108.commManager = commMgr;
-	}	
-
-
-	public static ICisManager getCisManager() {
-		return cisManager;
-	}
-
-	public void setCisManager(ICisManager cisManager) {
-		
-		Test1108.cisManager = cisManager;
-	}
-
+public enum estimationModel {
+	mean, median, mode, range, convexHull, minBB, stringMode;	
 }
