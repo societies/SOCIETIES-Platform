@@ -145,12 +145,12 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 			this.ackResults.notifyAll();
 		}else if (bean instanceof NegotiationGetPolicyBeanResult){
 			this.logging.debug("Received : NegotiationGetPolicyBeanResult");
-			String id = getId(NegAgentMethodType.GET_POLICY, ((NegotiationACKBeanResult) bean).getRequestor().getRequestorId());
+			String id = getId(NegAgentMethodType.GET_POLICY, ((NegotiationGetPolicyBeanResult) bean).getRequestor().getRequestorId());
 			this.policyResults.put(id, (NegotiationGetPolicyBeanResult) bean);
 			this.policyResults.notifyAll();
 		}else if (bean instanceof NegotiationMainBeanResult){
 			this.logging.debug("Received : NegotiationMainBeanResult");
-			String id = getId(NegAgentMethodType.NEGOTIATE, ((NegotiationACKBeanResult) bean).getRequestor().getRequestorId());
+			String id = getId(NegAgentMethodType.NEGOTIATE, ((NegotiationMainBeanResult) bean).getRequestor().getRequestorId());
 			this.mainResults.put(id, (NegotiationMainBeanResult) bean);
 			this.mainResults.notifyAll();
 		}else{
