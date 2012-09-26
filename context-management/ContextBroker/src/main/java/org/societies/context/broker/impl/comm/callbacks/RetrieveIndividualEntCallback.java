@@ -11,56 +11,67 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.context.broker.impl.comm.ICtxCallback;
 
-public class LookupCallback implements ICtxCallback {
+public class RetrieveIndividualEntCallback implements ICtxCallback{
 
+	
 	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(LookupCallback.class);
-
-	private List<CtxIdentifier> idList;
-
+	private static final Logger LOG = LoggerFactory.getLogger(RetrieveCtxCallback.class);
+	
+	CtxEntityIdentifier entityId;
+	
+	
+	
 	@Override
 	public void onCreatedEntity(CtxEntity retObject) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void onCreatedAttribute(CtxAttribute retObject) {
-	}
-
-	@Override
-	public void receiveCtxResult(Object retObject, String type) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
-
-		LOG.info("onLookupCallback retObject " +idList);
-		this.idList = ctxIdsList;
-		synchronized (this) {	            
-			notifyAll();	        
-		}
-		LOG.info("onLookupCallback, notify all done");
+		// TODO Auto-generated method stub
+		
 	}
-
 
 	@Override
 	public void onRetrieveCtx(CtxModelObject ctxObj) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void onUpdateCtx(CtxModelObject ctxObj) {
 		// TODO Auto-generated method stub
-
+		
 	}
-	
-	public List<CtxIdentifier> getResult() {
-		return this.idList;
+
+	@Override
+	public void receiveCtxResult(Object retObject, String type) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
-		// TODO Auto-generated method stub
+		
+		LOG.info("onRetrieveIndiEnt ctxId " +ctxId);
+		this.entityId = ctxId;
+		synchronized (this) {	            
+			notifyAll();	        
+		}
+		LOG.info("onRetrieveIndiEnt, notify all done");
 		
 	}
+
+	
+	public CtxEntityIdentifier getResult() {
+		return this.entityId;
+	}
+	
 }

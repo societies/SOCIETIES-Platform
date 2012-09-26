@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 
@@ -46,4 +47,6 @@ public interface ICtxCallback {
 	public void onUpdateCtx(CtxModelObject ctxObj);
 		
 	public void receiveCtxResult(Object retObject, String type);
+	
+	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId);
 }

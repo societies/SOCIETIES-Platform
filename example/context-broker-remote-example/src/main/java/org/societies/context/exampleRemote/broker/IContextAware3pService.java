@@ -57,4 +57,6 @@ public interface IContextAware3pService {
 	
 	public void registerForContextUpdates(CtxIdentifier ctxID, CtxChangeEventListener listener);
 	
+	public void retrieveRemoteIndiEntity();
+	
 }

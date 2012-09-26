@@ -384,4 +384,37 @@ public class ContextAware3pService implements IContextAware3pService{
 		}	
 	}
 
+	@Override
+	public void retrieveRemoteIndiEntity() {
+		LOG.info("retrieve remote Individual Entity id  1");
+		
+		IIdentity targetId;
+		try {
+			targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
+			LOG.info("retrieve remote Individual Entity id 2   "+targetId.getBareJid());
+			
+			CtxEntityIdentifier remoteEntityID = this.ctxBroker.retrieveIndividualEntityId(simpleRequestor, targetId).get();
+			LOG.info("retrieve remote Individual Entity id 3   "+remoteEntityID.toString());
+			
+			IndividualCtxEntity entity = (IndividualCtxEntity) this.ctxBroker.retrieve(simpleRequestor, remoteEntityID).get();	
+			LOG.info("retrieve remote Individual Entity  4   "+entity.getAttributes().size());
+			
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
+	
 }

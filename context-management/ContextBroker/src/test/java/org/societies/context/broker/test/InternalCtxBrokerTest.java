@@ -70,6 +70,7 @@ import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
+import org.societies.context.broker.api.security.ICtxAccessController;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.broker.test.util.MockBlobClass;
 import org.societies.context.community.db.impl.CommunityCtxDBMgr;
@@ -98,6 +99,8 @@ public class InternalCtxBrokerTest {
 	private static IIdentity cisMockIdentity = mock(IIdentity.class);
 	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);
 
+	private static ICtxAccessController mockCtxAccessController = mock(ICtxAccessController.class);
+
 	private static IUserCtxInferenceMgr mockUserCtxInferenceMgr = mock(IUserCtxInferenceMgr.class);
 	/**
 	 * @throws java.lang.Exception
@@ -112,7 +115,8 @@ public class InternalCtxBrokerTest {
 		when(mockNetworkNode.getBareJid()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockIdentityMgr.fromJid(OWNER_IDENTITY_STRING)).thenReturn(cssMockIdentity);
 		when(mockNetworkNode.toString()).thenReturn(NETWORK_NODE_STRING);
-
+		when(mockIdentityMgr.isMine(cssMockIdentity)).thenReturn(true);
+		
 		when(cssMockIdentity.toString()).thenReturn(OWNER_IDENTITY_STRING);
 		when(cssMockIdentity.getType()).thenReturn(IdentityType.CSS);
 
@@ -149,7 +153,8 @@ public class InternalCtxBrokerTest {
 		internalCtxBroker.createIndividualEntity(cssMockIdentity, CtxEntityTypes.PERSON); // TODO remove?
 		internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
 		
-		//this.commMgr.getIdManager().fromJid(ctxModelObj.getOwnerId());
+		internalCtxBroker.setCtxAccessController(mockCtxAccessController);
+
 		
 		//internalCtxBroker.setUserCtxInferenceMgr(mockUserCtxInferenceMgr);
 		
@@ -391,6 +396,7 @@ public class InternalCtxBrokerTest {
 	}
 
 	@Test
+	@Ignore
 	public void testStoreRetrieveServiceParameters2() {
 
 
@@ -492,8 +498,8 @@ public class InternalCtxBrokerTest {
 			CtxEntity serviceParamEntityResult = null;
 			//returns all services assigned to user
 			Set<CtxAssociationIdentifier> operatorServicesAssocs = operator.getAssociations(CtxAssociationTypes.USES_SERVICES);
-			System.out.println("************ ");
-			System.out.println("************ operatorServicesAssocs "+operatorServicesAssocs.size());
+			//System.out.println("************ ");
+			//System.out.println("************ operatorServicesAssocs "+operatorServicesAssocs.size());
 			
 			CtxAssociation assocUseServices = null;
 
