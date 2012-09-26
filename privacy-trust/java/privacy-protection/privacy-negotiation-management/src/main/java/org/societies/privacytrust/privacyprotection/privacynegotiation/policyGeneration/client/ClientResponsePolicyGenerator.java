@@ -56,6 +56,10 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
@@ -74,12 +78,13 @@ public class ClientResponsePolicyGenerator {
 	private ICtxBroker ctxBroker;
 	private final PrivacyPolicyNegotiationManager policyMgr;
 	private CtxEntityIdentifier personEntityID;
-	
+	private IUserFeedback userFeedback;
 	public ClientResponsePolicyGenerator(PrivacyPolicyNegotiationManager policyMgr){
 		this.policyMgr = policyMgr;
 		this.privPrefMgr = policyMgr.getPrivacyPreferenceManager();
 		this.ctxBroker = policyMgr.getCtxBroker();
 		this.locator = new PPNPOutcomeLocator(policyMgr);
+		this.userFeedback = policyMgr.getUserFeedback();
 	}
 	
 	/*
@@ -162,6 +167,7 @@ public class ClientResponsePolicyGenerator {
 			if (outcome.getEffect().equals(PrivacyOutcomeConstants.BLOCK)){
 				if(item.isOptional()){
 					myResponse.addResponseItem(new ResponseItem(item, Decision.DENY));
+					((RequestorService) requestor).getRequestorServiceId().getServiceInstanceIdentifier()
 					isExactMatch = false;
 				}else{
 					int n = JOptionPane.showConfirmDialog(null, "Preference for item: "+item.getResource().getDataType()
@@ -396,7 +402,10 @@ public class ClientResponsePolicyGenerator {
 		}else if (requestor instanceof RequestorService){
 			question = "Service: "+((RequestorService) requestor).getRequestorServiceId()+" requests access to a non-existing attribute: "+type+"\nCreate the attribute and set its value or abort service?";
 		}
-		int n = JOptionPane.showConfirmDialog(null, question, "Non-Existing Attribute", JOptionPane.YES_NO_OPTION);
+		String permit = "Allow access";
+		String deny = "Deny access";
+		List<String> response = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(question, new String[]{permit,deny})).get();
+		//int n = JOptionPane.showConfirmDialog(null, question, "Non-Existing Attribute", JOptionPane.YES_NO_OPTION);
 		if (n==JOptionPane.YES_OPTION){
 			try {
 				CtxEntityIdentifier personEntityIdentifier = this.getPersonEntity(); 
