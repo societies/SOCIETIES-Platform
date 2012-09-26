@@ -257,9 +257,10 @@ public class CisManagerController {
 				model.put("methodcalled", "JoinRemoteCIS");
 
 				// TODO: get a real advertisement
+				LOG.info("[CisManagerController] "+cisForm);
 				CisAdvertisementRecord ad = new CisAdvertisementRecord();
 				ad.setId(cisForm.getCisJid());
-				ad.setCssownerid(cisForm.getCssId());
+				ad.setCssownerid((null != cisForm.getCssId() && !"".equals(cisForm.getCssId())) ? cisForm.getCssId() : "university.societies.local");
 				// in order to force the join to send qualifications, Ill add some criteria to the AdRecord
 				MembershipCrit membershipCrit = new MembershipCrit();
 				List<Criteria> criteria = new ArrayList<Criteria>();
