@@ -212,6 +212,7 @@
 	<xs:element name='leaveResponse'>
 		<xs:complexType>
 			<xs:attribute name='result' type='xs:boolean'/>
+			<xs:attribute name='communityJid' type='xs:string'/>
 		</xs:complexType>
 	</xs:element>
 
