@@ -52,6 +52,7 @@ public class ServiceClientJarAccess implements IClientJarServer {
 
 	private ICommManager commMgr;
 	private static ISignatureMgr sigMgr;
+	private static boolean accessControlEnabled;
 
 	public ServiceClientJarAccess() {
 		
@@ -77,6 +78,13 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	public void setSigMgr(ISignatureMgr sigMgr) {
 		LOG.info("setSigMgr()");
 		ServiceClientJarAccess.sigMgr = sigMgr;
+	}
+	public boolean isAccessControlEnabled() {
+		return accessControlEnabled;
+	}
+	public void setAccessControlEnabled(boolean accessControlEnabled) {
+		LOG.debug("setAccessControlEnabled({})", accessControlEnabled);
+		ServiceClientJarAccess.accessControlEnabled = accessControlEnabled;
 	}
 	
 //	@Override
@@ -117,7 +125,7 @@ public class ServiceClientJarAccess implements IClientJarServer {
 //		
 //		return new AsyncResult<UrlBean>(result);
 //	}
-	
+
 	@Override
 	public Future<UrlBean> shareFiles(URI serviceId, IIdentity provider, String signature, List<String> files) {
 		
@@ -181,6 +189,10 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	public static boolean isAuthorized(String filePath, String signature) {
 		
 		LOG.debug("isAuthorized({}, {})", filePath, signature);
+		
+		if (!accessControlEnabled) {
+			return true;
+		}
 
 		for (Service s : services.values()) {
 			for (String file : s.getFiles()) {

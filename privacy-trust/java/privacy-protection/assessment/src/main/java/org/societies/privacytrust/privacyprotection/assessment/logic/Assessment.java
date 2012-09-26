@@ -25,6 +25,7 @@
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
@@ -166,5 +168,13 @@ public class Assessment implements IAssessment {
 		LOG.info("getNumDataAccessEvents()");
 		
 		return privacyLog.getDataAccess().size();
+	}
+	
+	@Override
+	public List<DataAccessLogEntry> getDataAccessEvents() {
+		
+		LOG.info("getDataAccessEvents()");
+		
+		return privacyLog.getDataAccess();
 	}
 }

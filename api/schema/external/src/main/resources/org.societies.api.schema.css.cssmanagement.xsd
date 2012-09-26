@@ -133,6 +133,7 @@
 			<xs:enumeration value="sendCssFriendRequest" />
 			<xs:enumeration value="getCssFriends" />
 			<xs:enumeration value="suggestedFriends" />
+			<xs:enumeration value="getFriendRequests" />
 
 		</xs:restriction>
 	</xs:simpleType>

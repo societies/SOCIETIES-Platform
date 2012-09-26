@@ -48,14 +48,10 @@ import org.societies.utilities.DBC.Dbc;
 import org.societies.api.schema.servicelifecycle.model.Service;
 
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
 import org.societies.api.internal.sns.ISocialData;
 //import org.societies.platform.socialdata.SocialData;
 
-import org.apache.shindig.social.opensocial.model.ActivityEntry;
-import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
-import org.eclipse.jetty.util.log.Log;
 
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
@@ -1364,6 +1360,46 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		date.append(Integer.toString(today.get(Calendar.DAY_OF_MONTH)));
 		
 		return date.toString();
+	}
+
+	@Override
+	public Future<List<CssAdvertisementRecord>> getFriendRequests() {
+		List<CssRequest> pendingfriendList = new ArrayList<CssRequest>();
+		List<CssAdvertisementRecord> friendReqList = new ArrayList<CssAdvertisementRecord>();
+		List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
+		List<String> pendingList = new ArrayList<String>();	
+		
+		
+		try {
+			pendingfriendList = cssRegistry.getCssFriendRequests();
+			
+			for (CssRequest cssrequest : pendingfriendList) {
+		    	LOG.info("[]][][][][][] CSS FriendRequest iterator List contains " +pendingfriendList);
+		    	LOG.info("[]][][][][][] cssrequest status is: " +cssrequest.getRequestStatus());
+		        if (cssrequest.getRequestStatus().value().equalsIgnoreCase("pending")) {
+		        	//cssrequest.getCssIdentity();
+		        	pendingList.add(cssrequest.getCssIdentity());
+		        	LOG.info("[]][][][][][] pendingList size is now: " +pendingfriendList.size());
+		        	LOG.info("[]][][][][][] pendingList entry is: " +cssrequest.getCssIdentity());
+		        		
+		        	}
+		        	
+		        }	
+				
+				
+			// first get all the cssdirectory records
+			CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+
+			getCssDirectoryRemote().searchByID(pendingList, callback);
+			friendReqList = callback.getResultList();
+
+				
+			} catch (CssRegistrationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		return new AsyncResult<List<CssAdvertisementRecord>>(friendReqList);
 	}
 }
 

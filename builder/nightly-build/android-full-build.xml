@@ -80,6 +80,7 @@
 		
 		<module>../../platform-infrastructure/client-frwk/SocietiesAndroidApp</module>
 		<!-- CIS manager light modules -->
+		<module>../../platform-infrastructure/client-frwk/TestContainerCIS</module>
 		<!-- <module>../cis-modules/android/client-lib-android</module> -->
 		<!-- <module>../cis-modules/android/cis-management</module> -->
 		<!-- CIS manager light test modules. Give error due to missing emulator. 

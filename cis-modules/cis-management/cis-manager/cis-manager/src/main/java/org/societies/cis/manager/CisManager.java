@@ -116,6 +116,7 @@ import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 import org.societies.api.schema.cis.manager.AskCisManagerForJoinResponse;
+import org.societies.api.schema.cis.manager.AskCisManagerForLeaveResponse;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.ListCrit;
@@ -754,27 +755,39 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 					return response;
 				}
 				else{
-					JoinCallBack jCallback = new JoinCallBack(stanza.getFrom(),this.iCommMgr,ad.getId());
+					JoinCallBackToAndroid jCallback = new JoinCallBackToAndroid(stanza.getFrom(),this.iCommMgr,ad.getId());
 					this.joinRemoteCIS(ad, jCallback);// the real return will come in the callback
-				
-
-					// TODO: REMOVE THIS SLEEP
-					/*while(j.getCommunity()== null){// wait for callback
-						try {
-							Thread.sleep(5 * 1000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}*/
 					
 					ar.setStatus("pending");
 					return response;
 				}
 			}
-			// END OF DELETE
+			// END OF client Request for join
 				
 
+			// client Request for leave
+			if (c.getAskCisManagerForLeave() != null) {
+				CommunityManager response = new CommunityManager();
+				AskCisManagerForLeaveResponse lr = new AskCisManagerForLeaveResponse();
+				response.setAskCisManagerForLeaveResponse(lr);
+				LOG.info("android request for leave received in CIS manager");
+				String senderjid = stanza.getFrom().getBareJid();
+				LOG.info("sender JID = " + senderjid); 
+				
+				if(null == c.getAskCisManagerForLeave().getTargetCisJid() || c.getAskCisManagerForLeave().getTargetCisJid().isEmpty()){
+					lr.setStatus("error");
+					return response;
+				}
+				else{
+					LeaveCallBackToAndroid jCallback = new LeaveCallBackToAndroid(stanza.getFrom(),this.iCommMgr,c.getAskCisManagerForLeave().getTargetCisJid());
+					this.leaveRemoteCIS(c.getAskCisManagerForLeave().getTargetCisJid(), jCallback);
+					
+					lr.setStatus("pending");
+					return response;
+				}
+			}
+			// END OF client Request for leave			
+			
 			if (c.getConfigure() != null) {
 				LOG.info("configure received");
 				return c;
@@ -786,56 +799,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	}
 
-// internal callback for the getAskCisManagerForJoin
-public class JoinCallBack implements ICisManagerCallback{
-		
-	IIdentity returnAddress;
-	ICommManager icom;
-	String targetCommunityJid;
-	
-	public JoinCallBack(IIdentity returnAddress, ICommManager icom, String targetCommunityJid){
-		this.returnAddress = returnAddress;
-		this.icom = icom;
-		this.targetCommunityJid = targetCommunityJid;
-	}
 
-	@Override
-	public void receiveResult(CommunityMethods communityResultObject) {
-		JoinResponse resp;
-		if(communityResultObject == null || communityResultObject.getJoinResponse() == null){
-			LOG.info("null return on JoinCallBack");
-			resp = new JoinResponse();
-			resp.setResult(false);
-			Community c = new Community();
-			c.setCommunityJid(targetCommunityJid);
-			resp.setCommunity(c);
-		}
-		else{
-			LOG.info("Result Status: joined CIS " + communityResultObject.getJoinResponse().isResult());
-			resp = communityResultObject.getJoinResponse();
-		}
-		
-		sendXMPPmessage(resp);
-		
-	}
-	
-	public void sendXMPPmessage(Object payload){
-
-		
-		LOG.info("finished building join response XMPP message to android");
-
-		Stanza sta = new Stanza(returnAddress);
-		try {
-			icom.sendMessage(sta, payload);
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-				
-		LOG.info("notification sent to android");
-	}
-	
-}
 	
 	
 
