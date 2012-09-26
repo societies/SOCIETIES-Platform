@@ -604,11 +604,11 @@ public class CisManagerController {
 					}
 
 				}
-				if(communityResultObject.getWho() != null){
-					LOG.debug("### " + communityResultObject.getWho().getParticipant().size());
+				if(communityResultObject.getWhoResponse() != null){
+					LOG.debug("### " + communityResultObject.getWhoResponse().getParticipant().size());
 
 					m_session.setAttribute("community", remoteCommunity);
-					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWho().getParticipant();					
+					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWhoResponse().getParticipant();					
 					m_session.setAttribute("remoteMemberRecords", l);
 				}
 
