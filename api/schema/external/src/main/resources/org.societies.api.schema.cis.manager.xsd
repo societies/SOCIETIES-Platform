@@ -119,14 +119,6 @@
 	    </xs:complexType>
 	</xs:element>
 
-   <xs:element name='askCisManagerForJoin'>
-	    <xs:complexType>
-			<xs:sequence minOccurs='1' maxOccurs='1'>
-				<xs:element name="cisAdv" type="ads:cisAdvertisementRecord"/>
-			</xs:sequence>
-	    </xs:complexType>
-	</xs:element>
-
 	
 	<xs:element name='create'>
 	<xs:complexType>
