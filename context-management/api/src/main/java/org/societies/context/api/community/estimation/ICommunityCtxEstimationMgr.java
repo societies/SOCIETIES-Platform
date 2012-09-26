@@ -27,31 +27,24 @@ package org.societies.context.api.community.estimation;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+
 /**
  * @author yboul
  * @created 12-Nov-2011 7:15:14 PM
  */
 public interface ICommunityCtxEstimationMgr {
-		
-	public double cceNumMean(ArrayList<Integer> inputValuesList);
 	
-	public double cceNumMedian(ArrayList<Integer> inputValuesList);
-	
-	public ArrayList<Integer> cceNumMode(ArrayList<Integer> inputValuesList);
-	
-	public Integer[] cceNumRange(ArrayList<Integer> inputValuesList);
-	
-	public ArrayList<Point> cceGeomConvexHull(ArrayList<Point> points);
-	
-	public Point[] cceGeomMinBB(ArrayList<Point> points);
-	
-	public ArrayList<String> cceStringMode(ArrayList<String> inputValuesList);
-	
-	public void cceSpecial1();
-	
-	public void cceSpecial2();
-	
-	public void cceSpecial3();
-	
+	/**
+	 * 
+	 */
+	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier ctxId, CtxAttributeIdentifier ctxAttributeIdentifier, estimationModel model);
 
+	/**
+	 * 
+	 */
+	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier ctxId, CtxAttributeIdentifier ctxAttributeIdentifier);	
+	
 }

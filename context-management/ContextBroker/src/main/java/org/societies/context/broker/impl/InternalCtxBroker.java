@@ -1476,7 +1476,8 @@ public class InternalCtxBroker implements ICtxBroker {
 	public CtxAttribute estimateCommunityContext(CtxEntityIdentifier communityCtxEntityID,	CtxAttributeIdentifier ctxAttrId) {
 
 		CtxAttribute returnCtxAttr = this.communityCtxInferenceMgr.estimateCommunityContext(communityCtxEntityID, ctxAttrId);
-		// TODO at this point check if inference (estimation) outcome is acceptable and if yes persist ctxAttribute 
+
+		// TODO at this point check if inference (estimation) outcome is acceptable and if yes persist ctxAttribute
 
 		if(returnCtxAttr != null)
 			try {
@@ -1922,12 +1923,12 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (IdentityType.CSS.equals(target.getType()) 
 				|| IdentityType.CSS_RICH.equals(target.getType())
 				|| IdentityType.CSS_LIGHT.equals(target.getType())) {
-			
+
 			//local call
 			if (idMgr.isMine(target)) {
-				
+
 				if(!requestor.equals(this.getLocalRequestor())){
-					
+
 					LOG.info("Update method, enforcing access control for requestor: "+requestor);
 					this.ctxAccessController.checkPermission(requestor, target,	
 							new CtxPermission(ctxModelObj.getId(), CtxPermission.WRITE));
