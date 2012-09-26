@@ -24,8 +24,6 @@
  */
 package org.societies.orchestration.CSSDataCollector.main.java;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -34,17 +32,7 @@ import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.osgi.event.CSSEvent;
-import org.societies.api.osgi.event.EventListener;
-import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.context.api.event.ICtxEventMgr;
-import org.societies.context.broker.impl.CtxBroker;
-
 
 /**
  * CSS Data Collector
@@ -60,42 +48,41 @@ public class CSSDataCollector {
 	private IIdentityManager idMgr;
 	private Logger LOG = LoggerFactory.getLogger(CSSDataCollector.class);
 	private String myDeviceID;
-	
-	private ICtxEventMgr ctxEventMgr;
-	private ServiceResourceIdentifier myServiceID;
+
+	//private ServiceResourceIdentifier myServiceID;
 	private RequestorService requestorService;
 	private IIdentity userIdentity;
 	private IIdentity serviceIdentity;
 	private CssDCEventPublish cssDcEventPub;
+	
+	private String cdcLog;
 
-	public CSSDataCollector(ICtxEventMgr ctxEventMgr, ICommManager commMgr)  
+	public CSSDataCollector(ICommManager commMgr)  
 	{
 		LOG.debug("Starting data collector");
 		this.commsMgr = commMgr;
 		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();
 		myCssID = commsMgr.getIdManager().getThisNetworkNode();
-		myServiceID = new ServiceResourceIdentifier();
 		idMgr = commsMgr.getIdManager();
 		cssDcEventPub = new CssDCEventPublish();
 		//identities
-		try {
-			this.userIdentity = this.idMgr.getThisNetworkNode();
-			this.serviceIdentity = this.idMgr.fromJid(userIdentity.getJid());
-		} catch (InvalidFormatException e) {
+		//try {
+		//	this.userIdentity = this.idMgr.getThisNetworkNode();
+		//	this.serviceIdentity = this.idMgr.fromJid(userIdentity.getJid());
+		//} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		myServiceID.setServiceInstanceIdentifier("css://" + myDeviceID + "/ContextAware3pService");
-		
-		try {
-			myServiceID.setIdentifier(new URI("css://" + myDeviceID + "/ContextAware3pService"));
-		} catch (URISyntaxException e) {
+		//	e.printStackTrace();
+		//}
+		//myCssID.setServiceInstanceIdentifier("css://" + myDeviceID + "/ContextAware3pService");
+		//try {
+		//	myServiceID.setIdentifier(new URI("css://" + myDeviceID + "/ContextAware3pService"));
+		//} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		requestorService = new RequestorService(serviceIdentity, myServiceID);
+		//	e.printStackTrace();
+		//}
+		//requestorService = new RequestorService(serviceIdentity, myServiceID);
 		//initCtxEvent();
-
+		registerForContextChanges();
 	}
 	
 	public void registerForContextChanges() {
@@ -123,8 +110,8 @@ public class CSSDataCollector {
 		 */
 		@Override
 		public void onCreation(CtxChangeEvent arg0) {
-			cssDcEventPub.manageEvent(arg0,myCssID);
-			
+			cssDcEventPub.manageEvent(arg0,myCssID, "Create");
+			setcdcLog("Create")
 		}
 
 		/* (non-Javadoc)
@@ -132,7 +119,7 @@ public class CSSDataCollector {
 		 */
 		@Override
 		public void onModification(CtxChangeEvent arg0) {
-			cssDcEventPub.manageEvent(arg0,myCssID);
+			cssDcEventPub.manageEvent(arg0,myCssID, "Mod");
 			
 		}
 
@@ -141,7 +128,7 @@ public class CSSDataCollector {
 		 */
 		@Override
 		public void onRemoval(CtxChangeEvent arg0) {
-			cssDcEventPub.manageEvent(arg0,myCssID);
+			cssDcEventPub.manageEvent(arg0,myCssID, "Removal");
 			
 		}
 
@@ -150,22 +137,25 @@ public class CSSDataCollector {
 		 */
 		@Override
 		public void onUpdate(CtxChangeEvent arg0) {
-			cssDcEventPub.manageEvent(arg0,myCssID);
+			cssDcEventPub.manageEvent(arg0,myCssID, "Update");
 		}
 
 	}
 	
-    
-
-    
-    public ICtxBroker getCtxBroker() {
+	public ICtxBroker getCtxBroker() {
 		return ctxBroker;
-	}
-    public void setCtxBroker(CtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
+		}
+	
+	public void setCtxBroker(org.societies.api.internal.context.broker.ICtxBroker ctxBroker2) {
+		this.ctxBroker = (ICtxBroker) ctxBroker2;
 	}
 
-
+	public String getcdcLog(){
+		return cdcLog;
+	}
+	public void setcdcLog(String cd){
+		this.cdcLog = cd;
+	}
 
     
 }

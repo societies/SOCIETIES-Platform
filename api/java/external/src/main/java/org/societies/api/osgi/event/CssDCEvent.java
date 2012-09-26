@@ -24,58 +24,42 @@
  */
 package org.societies.orchestration.CSSDataCollector.main.java;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.osgi.event.EventListener;
-import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
-import org.societies.orchestration.CSSDataCollector.main.java.CssDCEvent;
-
 /**
  * Describe your class here...
  *
  * @author John
  *
  */
+import java.io.Serializable;
 
-public class CssDCEventPublish extends EventListener{
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.identity.IIdentity;
 
-	private IEventMgr eventMgr;
-	private IIdentity myCssID;
-	private Logger LOG = LoggerFactory.getLogger(CssDCEventPublish.class);
-	
-    public void manageEvent(CtxChangeEvent arg0, IIdentity myCssID){
-    	LOG.info("publishing event to :   " + myCssID);
-    	//send local event
-    	CssDCEvent payload = new CssDCEvent(myCssID, arg0);
-    	InternalEvent event = new InternalEvent(EventTypes.CSSDC_EVENT, "newaction", "org/societies/orchestration/CSSDC", payload);
+public class CssDCEvent implements Serializable{
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private IIdentity userId;
+    private CtxChangeEvent evt;
+    private String eventType;
     
-    	try {
-    		getEventMgr().publishInternalEvent(event);
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
+    public CssDCEvent(IIdentity userId, CtxChangeEvent evt, String evtT){
+        this.userId = userId;
+        this.evt = evt;
+        this.eventType = evtT;
+        
     }
-    	
-    /* (non-Javadoc)
-     * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
-     */
-    public void handleExternalEvent(CssDCEvent arg0) {
-    	LOG.info("CssDCEventPublish handleExternalEvent error ");   		
-    }
-
-    /* (non-Javadoc)
-     * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
-     */
-    @Override
-    public void handleInternalEvent(InternalEvent arg0) {
-    	LOG.info("CssDCEventPublish handleInternalEvent error ");
-    }
-    
-    public IEventMgr getEventMgr() {
-		return eventMgr;
+	public IIdentity getUserId() {
+		return userId;
 	}
+	public CtxChangeEvent getEvt() {
+		return evt;
+	}
+
+	public String getEvtT(){
+		return eventType;
+	}
+
 }

@@ -54,5 +54,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>UserContextInferenceManagement</module>
 		<module>CommunityContextInferenceManagement</module>
 		<module>css-context-monitor</module>
+		<module>ContextSimilarityEvaluation</module>
 	</modules>
 </project>

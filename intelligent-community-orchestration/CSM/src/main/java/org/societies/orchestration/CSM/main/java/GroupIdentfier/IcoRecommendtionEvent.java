@@ -24,9 +24,11 @@
  */
 package org.societies.orchestration.CSM.main.java.GroupIdentfier;
 
+import java.io.Serializable;
+
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.orchestration.ICommunitySuggestion;
-import org.societies.api.personalisation.model.IAction;
+
 
 /**
  * Describe your class here...
@@ -34,9 +36,13 @@ import org.societies.api.personalisation.model.IAction;
  * @author John
  *
  */
-public class IcoRecommendtionEvent {
+public class IcoRecommendtionEvent implements Serializable {
 
-    private IIdentity userId;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private IIdentity userId;
     private ICommunitySuggestion cs;
     
     public IcoRecommendtionEvent(IIdentity userId,ICommunitySuggestion cs){
