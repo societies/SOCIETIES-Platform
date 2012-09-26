@@ -6,13 +6,13 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.when;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
@@ -22,58 +22,124 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
+import org.mockito.Mockito;
+import org.mockito.internal.verification.MockAwareVerificationMode;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialConnector.SocialNetwork;
-import org.societies.api.internal.sns.ISocialData;
-import org.societies.platform.socialdata.ContextUpdater;
+
 import org.societies.platform.socialdata.SocialData;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 
 public class SocialDataTest {
 
-
-	private static String access_token = "";
+	
+    private static String 			access_token = "";
 	private static ISocialConnector fbConnector=null;
-	private static ISocialData		socialData =null;
-	private static final Logger logger   = Logger.getLogger(SocialDataTest.class.getSimpleName());
+	private static SocialData		 socialData =null;
+	private static final Logger		 logger   = Logger.getLogger(SocialDataTest.class.getSimpleName());
+	
+	
+	private static final String OWNER_IDENTITY_STRING = "myFooIIdentity@societies.local";
+	private static final String NETWORK_NODE_STRING = "myFooIIdentity@societies.local/node";
+	private static final String CIS_IDENTITY_STRING = "FooCISIIdentity@societies.local";
+	//myFooIIdentity@societies.local
+	private static final List<String> INF_TYPES_LIST = new ArrayList<String>(); 
+	
+	
+	private static CtxEntityIdentifier mockCtxEntityId = mock (CtxEntityIdentifier.class);
+	private static IndividualCtxEntity mockCtxEntity   = mock (IndividualCtxEntity.class);
+	private static CtxAttributeIdentifier mockCtxAttributeId = mock(CtxAttributeIdentifier.class);
+	
 
+	private static IIdentityManager mockIdentityMgr = mock(IIdentityManager.class);
+	private static IIdentity 		cssMockIdentity = mock(IIdentity.class);
+	private static ICtxBroker		mockCtxBroker	= mock(ICtxBroker.class);
+	
+	private static INetworkNode mockNetworkNode = mock(INetworkNode.class);
+	
+	
+	
 	private static ISocialConnector mockedSocialConnector; 
-
+	private static ICtxBroker broker = Mockito.mock(ICtxBroker.class);
+	
+	
 	@BeforeClass
-	public static void setUp() throws Exception {
+	public static void  setUp() throws Exception {
+		
+		
+		when(mockIdentityMgr.getThisNetworkNode()).thenReturn(mockNetworkNode);
+		when(mockNetworkNode.getBareJid()).thenReturn(OWNER_IDENTITY_STRING);
+		when(mockIdentityMgr.fromJid(OWNER_IDENTITY_STRING)).thenReturn(cssMockIdentity);
+		when(mockNetworkNode.toString()).thenReturn(NETWORK_NODE_STRING);
+
+		when(cssMockIdentity.toString()).thenReturn(OWNER_IDENTITY_STRING);
+		when(cssMockIdentity.getType()).thenReturn(IdentityType.CSS);
+
+		when(mockCtxBroker.retrieveIndividualEntity(cssMockIdentity)).thenReturn(new AsyncResult( new IndividualCtxEntity(mockCtxEntityId)));
+		when(mockCtxBroker.createAttribute(mockCtxEntityId, CtxAttributeTypes.SOCIAL_NETWORK_CONNECTOR)).thenReturn(new AsyncResult( new CtxAttribute(mockCtxAttributeId)));
+
+		//IIdentity scopeID = this.idMgr.fromJid(communityCtxEnt.getOwnerId());
+		
+		
+		
+		
+		
+	    
+		
+		
+		  mockedSocialConnector = mock(ISocialConnector.class);
+		  stub(mockedSocialConnector.getConnectorName()).toReturn("facebook");
+		  stub(mockedSocialConnector.getID()).toReturn("facebook_0001");
+		  stub(mockedSocialConnector.getUserFriends()).toReturn(readFileAsString("mocks/friends.txt"));
+		  stub(mockedSocialConnector.getUserActivities()).toReturn(readFileAsString("mocks/activities.txt"));
+		  stub(mockedSocialConnector.getUserGroups()).toReturn(readFileAsString("mocks/groups.txt"));
+		  stub(mockedSocialConnector.getUserProfile()).toReturn(readFileAsString("mocks/profile.txt"));
 
 
-
-
-		mockedSocialConnector = mock(ISocialConnector.class);
-		stub(mockedSocialConnector.getConnectorName()).toReturn("facebook");
-		stub(mockedSocialConnector.getID()).toReturn("facebook_0001");
-		stub(mockedSocialConnector.getUserFriends()).toReturn(readFileAsString("mocks/friends.txt"));
-		stub(mockedSocialConnector.getUserActivities()).toReturn(readFileAsString("mocks/activities.txt"));
-		stub(mockedSocialConnector.getUserGroups()).toReturn(readFileAsString("mocks/groups.txt"));
-		stub(mockedSocialConnector.getUserProfile()).toReturn(readFileAsString("mocks/profile.txt"));
-
-
-
-		// fbConnector = new FacebookConnectorImpl(access_token, null);
-		socialData  = new SocialData();
-
-		assertNotNull("Social Data is null", socialData);
-		assertNotNull("Moked FB Connector is null", mockedSocialConnector);
-
-
-
-		logger.info("Created new FB Connector with id:" + mockedSocialConnector.getID());
-		logger.info("Created SocialData Container"+socialData.getLastUpdate());
-
-		try {
-			socialData.addSocialConnector(mockedSocialConnector);
-
-			//			HashMap<String, String> map = new HashMap<String, String>();
-			//			map.put(ISocialConnector.AUTH_TOKEN, "");
-			//			ISocialConnector tw_con = socialData.createConnector(SocialNetwork.twitter, map);
-			//			socialData.addSocialConnector(tw_con);
+		  
+		  
+		 // fbConnector = new FacebookConnectorImpl(access_token, null);
+		  logger.info("Start loading socialdata bundle");
+		  socialData  = new SocialData(mockIdentityMgr, mockCtxBroker);
+		
+		//  when(broker.retrieveIndividualEntity(cssMockIdentity)).thenReturn(new AsyncResult(new IndividualCtxEntity(ctxEntityId)));
+		
+//		  ctxEntityId 	= new CtxEntityIdentifier(cssMockIdentity.getJid(), "Person", new Long(1));
+//		  ctxEntity 	= new IndividualCtxEntity(ctxEntityId);	
+//		  
+		
+		  
+		  assertNotNull("Social Data is null", socialData);
+		  assertNotNull("Moked FB Connector is null", mockedSocialConnector);
+		 
+		  
+		  
+		  logger.info("Created new FB Connector with id:" + mockedSocialConnector.getID());
+		  logger.info("Created SocialData Container"+socialData.getLastUpdate());
+		  
+		  
+		  try {
+			
+			//socialData.addSocialConnector(mockedSocialConnector);
+			
+			
+			
+//			HashMap<String, String> map = new HashMap<String, String>();
+//			map.put(ISocialConnector.AUTH_TOKEN, "");
+//			ISocialConnector tw_con = socialData.createConnector(SocialNetwork.twitter, map);
+//			socialData.addSocialConnector(tw_con);
+			
 
 			logger.info("Add Social Connector");
 		} catch (Exception e) {

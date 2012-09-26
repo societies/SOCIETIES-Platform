@@ -1,5 +1,6 @@
 package org.societies.platform.socialdata;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -7,6 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
@@ -124,6 +127,7 @@ public class SocialData implements ISocialData{
 	    	
 
 	    	try  {
+    
 
 	    		this.cssNodeId	 	= identityMgr.getThisNetworkNode();
 	    		this.cssOwnerId 	= identityMgr.fromJid(this.cssNodeId.getBareJid());
@@ -197,8 +201,27 @@ public class SocialData implements ISocialData{
 
 
 		connectors.put(socialConnector.getID(), socialConnector);
-
 		log("Add connector "+socialConnector.getID());
+		log("CssOwenerId: "+this.cssOwnerId);
+		
+		// Store into the context broker
+		individualCtxEntity  = internalCtxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
+		CtxAttribute connectorAttr = internalCtxBroker.createAttribute(individualCtxEntity.getId(), CtxAttributeTypes.SOCIAL_NETWORK_CONNECTOR).get();		
+		
+		byte[] blobBytes;
+		try {
+			blobBytes = SerialisationHelper.serialise(socialConnector);
+			connectorAttr.setBinaryValue(blobBytes);
+			internalCtxBroker.update(connectorAttr);
+			logger.info("Stored Connector "+socialConnector.getID() + "in the context broker");
+			connectorsInCtxBroker.put(socialConnector.getID(), connectorAttr.getId().toString());
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			logger.error("Unable to store the connector to the CtxBroker");
+		}
+		
+		
 	}
 
 
@@ -208,6 +231,9 @@ public class SocialData implements ISocialData{
 
 		if (connectors.containsKey(connectorId)){
 			connectors.remove(connectorId);
+			String ctxBrokerObjId = connectorsInCtxBroker.get(connectorId);
+			internalCtxBroker.remove(CtxIdentifierFactory.getInstance().fromString(ctxBrokerObjId));
+			logger.info("Connector also removed from CtxBroker");
 		}
 		else throw new Exception("This connector not found");
 
