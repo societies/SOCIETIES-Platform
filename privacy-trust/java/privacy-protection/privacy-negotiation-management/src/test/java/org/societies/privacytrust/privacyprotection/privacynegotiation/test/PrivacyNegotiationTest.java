@@ -28,14 +28,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Key;
-import java.util.AbstractSet;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import javax.swing.JOptionPane;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +39,6 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -57,7 +51,6 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
-import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
@@ -76,6 +69,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -89,7 +83,6 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
-import org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgentRemote;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.AgreementFinaliser;
 import org.springframework.scheduling.annotation.AsyncResult;

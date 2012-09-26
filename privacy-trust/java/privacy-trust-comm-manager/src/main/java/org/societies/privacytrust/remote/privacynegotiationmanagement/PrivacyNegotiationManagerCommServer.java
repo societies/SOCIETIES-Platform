@@ -48,7 +48,10 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationACKBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationGetPolicyBeanResult;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationMainBeanResult;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
@@ -97,7 +100,10 @@ public class PrivacyNegotiationManagerCommServer {
 					Boolean b;
 					try {
 						b = this.negAgent.acknowledgeAgreement((IAgreementEnvelope) obj).get();
-						return b;
+						NegotiationACKBeanResult resultBean = new NegotiationACKBeanResult();
+						resultBean.setAcknowledgement(b);
+						resultBean.setRequestor(bean.getRequestor());
+						return resultBean;
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -113,7 +119,10 @@ public class PrivacyNegotiationManagerCommServer {
 				
 			RequestPolicy policy =  this.negAgent.getPolicy(this.getRequestorFromBean(bean.getRequestor())).get();
 			if (policy!=null){
-				return Util.toByteArray(policy);
+				NegotiationGetPolicyBeanResult resultBean = new NegotiationGetPolicyBeanResult();
+				resultBean.setRequestor(bean.getRequestor());
+				resultBean.setRequestPolicy(Util.toByteArray(policy));
+				return resultBean;
 			}
 			} catch (InterruptedException e){
 				
@@ -121,17 +130,8 @@ public class PrivacyNegotiationManagerCommServer {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return null;
-		}else if (bean.getMethod().equals("getProviderIdentity")){
-			try {
-				return this.getNegAgent().getProviderIdentity().get().getJid();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			return new NegotiationGetPolicyBeanResult();
+		
 		}else if (bean.getMethod().equals("negotiate")){
 			try{
 			byte[] responseArray = bean.getResponsePolicy();
@@ -140,7 +140,10 @@ public class PrivacyNegotiationManagerCommServer {
 				if (obj instanceof ResponsePolicy){
 					ResponsePolicy policy = (this.negAgent.negotiate(this.getRequestorFromBean(bean.getRequestor()), (ResponsePolicy) obj)).get();
 					if (policy!=null){
-						return Util.toByteArray(policy);
+						NegotiationMainBeanResult resultBean = new NegotiationMainBeanResult();
+						resultBean.setRequestor(bean.getRequestor());
+						resultBean.setResponsePolicy(Util.toByteArray(policy));
+						return resultBean;
 					}
 				}
 			}

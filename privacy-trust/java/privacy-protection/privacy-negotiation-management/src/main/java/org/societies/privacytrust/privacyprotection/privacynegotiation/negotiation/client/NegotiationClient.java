@@ -56,6 +56,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
@@ -68,7 +69,6 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManage
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentityOption;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
-import org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgentRemote;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.data.DataHelper;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.ClientResponseChecker;
