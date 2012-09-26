@@ -91,7 +91,8 @@ public class ExternalCtxBrokerTest {
 	private static IIdentity cisMockIdentity = mock(IIdentity.class);
 
 	private static ICtxAccessController mockCtxAccessController = mock(ICtxAccessController.class);
-
+	
+	//Requestor mockRequestor = mock(Requestor.class);
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -109,6 +110,7 @@ public class ExternalCtxBrokerTest {
 		when(mockNetworkNode.toString()).thenReturn(NETWORK_NODE_STRING);
 
 		when(mockIdentityMgr.isMine(mockIdentityLocal)).thenReturn(true);
+	
 		
 		//when(mockIdentityLocal.toString()).thenReturn(OWNER_IDENTITY_STRING);
 		when(mockIdentityLocal.getType()).thenReturn(IdentityType.CSS);
@@ -139,6 +141,9 @@ public class ExternalCtxBrokerTest {
 		ctxBroker = new CtxBroker(internalCtxBroker);
 		ctxBroker.setIdentityMgr(mockIdentityMgr);
 		//ctxBroker.setCtxAccessController(mockCtxAccessController);
+		
+	//	when(internalCtxBroker.getLocalRequestor()).thenReturn(mockRequestor);
+		
 	}
 
 	/**
@@ -221,7 +226,7 @@ public class ExternalCtxBrokerTest {
 	public void testCreateAssociationByString() throws Exception {
 
 		Requestor requestor = new Requestor(mockIdentityLocal);
-		System.out.println("mockIdentityLocal ******************************");
+		//System.out.println("mockIdentityLocal ******************************");
 		CtxAssociation ctxAssocHasParam = 
 				this.ctxBroker.createAssociation(requestor, mockIdentityLocal, CtxAssociationTypes.HAS_PARAMETERS).get();
 		assertNotNull(ctxAssocHasParam);
@@ -232,10 +237,16 @@ public class ExternalCtxBrokerTest {
 		System.out.println("1 mockIdentityLocal "+mockIdentityLocal);
 
 		// mock checkPermission
+		//doNothing().when()
+		//when(getLocalRequestor()).thenReturn(new Requestor(mockIdentityLocal));
+		//doNothing().when()
+		
 		doNothing().when(mockCtxAccessController).checkPermission(requestor, mockIdentityLocal, 
 				new CtxPermission(ctxAssocHasParam.getId(), CtxPermission.READ));
 		
-				
+		//doNothing().when(internalCtxBroker).getLocalRequestor()
+		
+		
 		final List<CtxIdentifier> assocIdentifierList =	this.ctxBroker.lookup(
 				requestor, mockIdentityLocal, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_PARAMETERS).get();
 

@@ -132,6 +132,8 @@ public class ExternalCtxBrokerExample 	{
 		LOG.info("*** requestor = " + this.requestor);
 
 		Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
+		
+		
 		try {
 			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
 		} catch (InterruptedException e) {
@@ -157,7 +159,7 @@ public class ExternalCtxBrokerExample 	{
 		ca3pService.lookupAndRetrieveCtxAttributes();
 
 
-		LOG.info("*** Starting community context examples...");
+		//LOG.info("*** Starting community context examples...");
 		// creation of communities is only allowed by platform services
 		//this.createCommunityCtxEnt();
 		
