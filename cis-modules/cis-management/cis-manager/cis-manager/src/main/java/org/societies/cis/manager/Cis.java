@@ -481,7 +481,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		// TODO: broadcast its creation to other nodes?
 		
 		//session = sessionFactory.openSession();
-		System.out.println("activityFeed: "+activityFeed);
+		LOG.info("activityFeed: "+activityFeed);
 		activityFeed.startUp(sessionFactory,this.getCisId()); // this must be called just after the CisRecord has been set
 		this.sessionFactory = sessionFactory;
         //activityFeed.setSessionFactory(this.sessionFactory);

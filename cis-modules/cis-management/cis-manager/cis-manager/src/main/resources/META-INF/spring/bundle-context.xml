@@ -75,6 +75,7 @@
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
     <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" init-method="init"
+        depends-on="NegotiationRequester"
     destroy-method="UnRegisterCisManager">
         <property name="sessionFactory" ref="sessionFactory" />
         <property name="ccmFactory" ref="cisCommMgrFactory"/>

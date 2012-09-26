@@ -1310,16 +1310,19 @@ public class JoinCallBack implements ICisManagerCallback{
 		this.getQualificationsForJoin(adv,j);
 		
 		
-		// TODO: HARDCODED!! CANT BE COMMITED THIS WAY
+		// -- Security and privacy negotiation
 		try {
-			negotiator.startNegotiation(new RequestorCis(this.iCommMgr.getIdManager().fromJid("xcmanager.societies.local") ,this.iCommMgr.getIdManager().fromJid(adv.getId())), new INegCallBack());
-		} catch (InvalidFormatException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
+			negotiator.startNegotiation(new RequestorCis(this.iCommMgr.getIdManager().fromJid(adv.getCssownerid()) ,this.iCommMgr.getIdManager().fromJid(adv.getId())), new INegCallBack());
+		}
+		catch (InvalidFormatException e) {
+			LOG.error("[Negotiation] Error during the instantiation of IIdentitys from "+adv.getCssownerid()+" or "+adv.getId(), e);
+		}
+		catch (Exception e) {
+			LOG.error("[Negotiation] Error during negotiation", e);
 		}
 		LOG.debug("negotiator has been called, Ill proceed with the join");
-		// sending join
-
+		
+		// -- Sending join
 		IIdentity toIdentity;
 		try {
 			toIdentity = this.iCommMgr.getIdManager().fromJid(adv.getId());
