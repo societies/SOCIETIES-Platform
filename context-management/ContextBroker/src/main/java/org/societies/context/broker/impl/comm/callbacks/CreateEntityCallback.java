@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.context.broker.impl.comm.ICtxCallback;
@@ -61,5 +62,11 @@ public class CreateEntityCallback implements ICtxCallback {
 	
 	public CtxEntity getResult() {
 		return this.result;
+	}
+
+	@Override
+	public void onRetrieveIndiEnt(CtxEntityIdentifier ctxId) {
+		// TODO Auto-generated method stub
+		
 	}
 }

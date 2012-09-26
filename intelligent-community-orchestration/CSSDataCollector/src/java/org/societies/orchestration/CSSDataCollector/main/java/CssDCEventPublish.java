@@ -24,41 +24,64 @@
  */
 package org.societies.orchestration.CSSDataCollector.main.java;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.osgi.event.*;
+
 /**
  * Describe your class here...
  *
  * @author John
  *
  */
-import java.io.Serializable;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.event.CtxChangeEvent;
+public class CssDCEventPublish implements Subscriber{
 
-public class CssDCEvent implements Serializable{
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private IIdentity userId;
-    private CtxChangeEvent evt;
+	private IEventMgr eventMgr;
+	private IIdentity myCssID;
+	private Logger LOG = LoggerFactory.getLogger(CssDCEventPublish.class);
+	
+    public void manageEvent(CtxChangeEvent arg0, IIdentity myCssID, String evtType){
+    	LOG.info("publishing event to :   " + myCssID);
+    	//send local event
+    	CssDCEvent payload = new CssDCEvent(myCssID, arg0, evtType);
+    	InternalEvent event = new InternalEvent(EventTypes.CSSDC_EVENT, "newaction", "org/societies/orchestration/CSSDC", payload);
     
-    private CssDCEvent(){
-        
+    	try {
+    		getEventMgr().publishInternalEvent(event);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
     }
-    public CssDCEvent(IIdentity userId, CtxChangeEvent evt){
-        this.userId = userId;
-        this.evt = evt;
-        
+    	
+    /* (non-Javadoc)
+     * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
+     */
+    public void handleExternalEvent(CssDCEvent arg0) {
+    	LOG.info("CssDCEventPublish handleExternalEvent error ");   		
     }
-	public IIdentity getUserId() {
-		return userId;
+
+    /* (non-Javadoc)
+     * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
+     */
+    public void handleInternalEvent(InternalEvent arg0) {
+    	LOG.info("CssDCEventPublish handleInternalEvent error ");
+    }
+    
+    public IEventMgr getEventMgr() {
+		return eventMgr;
 	}
-	public CtxChangeEvent getEvt() {
-		return evt;
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.comm.xmpp.pubsub.Subscriber#pubsubEvent(org.societies.api.identity.IIdentity, java.lang.String, java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void pubsubEvent(IIdentity arg0, String arg1, String arg2,
+			Object arg3) {
+		// TODO Auto-generated method stub
+		
 	}
-
-
-
 }

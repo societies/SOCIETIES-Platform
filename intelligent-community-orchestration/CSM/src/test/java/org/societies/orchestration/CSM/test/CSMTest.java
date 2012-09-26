@@ -49,7 +49,7 @@ public class CSMTest {
 	
 	@Test
 	public void testSetup(){
-		csm = new CSM();
+		//csm = new CSM();
 		//csm.setUP();
 	}
 	//

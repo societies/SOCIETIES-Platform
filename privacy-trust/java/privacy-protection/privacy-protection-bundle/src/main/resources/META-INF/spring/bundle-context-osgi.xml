@@ -69,6 +69,6 @@
 		cardinality="0..1" />
 	
 	<osgi:reference id="negotiationAgentRemote"
-	    interface="org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgentRemote"
+	    interface="org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote"
 	    cardinality="0..1"/>
 </beans>

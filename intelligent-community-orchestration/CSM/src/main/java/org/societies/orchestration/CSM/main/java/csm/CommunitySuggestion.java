@@ -24,11 +24,12 @@
  */
 package org.societies.orchestration.CSM.main.java.csm;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.societies.api.internal.orchestration.ICommunitySuggestion;
 
-public class CommunitySuggestion implements ICommunitySuggestion {
+public class CommunitySuggestion implements ICommunitySuggestion, Serializable {
 
 	private String suggestionType;
 	private ArrayList<String> membersList;
@@ -84,6 +85,14 @@ public class CommunitySuggestion implements ICommunitySuggestion {
 	 */
 	public ArrayList<String> getconditionsList(){
 		return this.conditionsList;
+	}
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.orchestration.ICommunitySuggestion#getConditionsList()
+	 */
+	@Override
+	public ArrayList<String> getConditionsList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

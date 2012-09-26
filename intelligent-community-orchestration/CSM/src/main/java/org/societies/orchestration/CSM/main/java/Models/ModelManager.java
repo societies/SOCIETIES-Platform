@@ -39,6 +39,7 @@ import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisDirectory;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
+import org.societies.api.identity.IIdentity;
 
 //***
 //	for unit testing only 
@@ -70,7 +71,7 @@ public class ModelManager {
 	//
 	private Map<String, ArrayList<String>> attModel;
 	private HashMap<String, HashMap> modelAttRange;
-	private Map<Integer, ArrayList<String>> userSubscribed;
+	private Map<IIdentity, ArrayList<String>> userSubscribed;
 	
 	public ModelManager()  {
 		// 
@@ -130,7 +131,7 @@ public class ModelManager {
 		// TODO figure out later if needed phase 2
 	}
 	
-	public void updateSubscribed(Integer user, String model){
+	public void updateSubscribed(IIdentity user, String model){
 		LOG.debug("ModelManager : update Subscribed ");
 		ArrayList<String> tmpList = new ArrayList<String>();
 		tmpList.add(model);
@@ -138,7 +139,7 @@ public class ModelManager {
 
 	}
 	
-	public ArrayList<String> getSubscribed(Integer user){
+	public ArrayList<String> getSubscribed(IIdentity user){
 		LOG.debug("ModelManager : get Subscribed ");
 		if (userSubscribed.containsKey(user)){
 			return userSubscribed.get(user);
@@ -146,7 +147,7 @@ public class ModelManager {
 		return null;
 	}
 
-	public HashMap<String, String> getUnSubscribed(Integer user){
+	public HashMap<String, String> getUnSubscribed(IIdentity user){
 		LOG.debug("ModelManager : get UN Subscribed ");
 		HashMap<String, String> tmpList = models.getModelNames();
 		if (userSubscribed.containsKey(user)){

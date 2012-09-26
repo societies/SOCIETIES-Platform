@@ -28,19 +28,47 @@
 	</xs:element>
 
 
-	<xs:element name="negotiationBeanResult">
+	<xs:element name="negotiationACKBeanResult">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="acknowledgement" type="xs:boolean"
 					minOccurs="0" />
-				<xs:element name="identity" type="xs:string" minOccurs="0" />
+				<xs:element name="requestor" type="ns1:requestorBean" 
+					minOccurs="0"/>					
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="negotiationGetPolicyBeanResult">
+		<xs:complexType>
+			<xs:sequence>
 				<xs:element name="requestPolicy" type="xs:base64Binary"
 					minOccurs="0" />
+				<xs:element name="requestor" type="ns1:requestorBean" 
+					minOccurs="0"/>					
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="negotiationMainBeanResult">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="requestor" type="ns1:requestorBean" 
+					minOccurs="0"/>
 				<xs:element name="responsePolicy" type="xs:base64Binary"
 					minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+
+	<xs:element name="negotiationGetProviderIdBeanResult">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="identity" type="xs:string" minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
 
 	<xs:simpleType name="negAgentMethodType">
 		<xs:restriction base="xs:string">

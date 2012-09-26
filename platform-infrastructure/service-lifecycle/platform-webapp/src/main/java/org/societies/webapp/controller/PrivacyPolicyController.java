@@ -58,6 +58,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -222,8 +223,8 @@ public class PrivacyPolicyController {
 		// -- Retrieve the privacy policy
 		RequestorService provider = null;
 		RequestPolicy privacyPolicy = null;
-		Service service = new Service();
-		service.setServiceName(serviceId);
+		Service service = ServiceModelUtils.getServiceFromServiceInstance(serviceId, serviceDiscovery);
+		//service.setServiceName(serviceId);
 		try {
 			IIdentity serviceOwnerIdentity = null;
 			// Current node
@@ -233,8 +234,7 @@ public class PrivacyPolicyController {
 			else {
 				serviceOwnerIdentity = commMngrRef.getIdManager().fromJid(serviceOwnerId);
 			}
-			ServiceResourceIdentifier serviceIdentity = new ServiceResourceIdentifier();
-			serviceIdentity.setServiceInstanceIdentifier(serviceId);
+			ServiceResourceIdentifier serviceIdentity = service.getServiceIdentifier();
 			provider = new RequestorService(serviceOwnerIdentity, serviceIdentity);
 			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(provider);
 			Future<Service> serviceFuture = serviceDiscovery.getService(serviceIdentity);

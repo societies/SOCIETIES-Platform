@@ -32,27 +32,31 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.osgi.event.EventListener;
+
 import org.societies.orchestration.CSM.main.java.Models.ModelManager;
 import org.societies.orchestration.CSM.main.java.csm.CSM;
 import org.societies.orchestration.CSM.main.java.csm.CommunitySuggestion;
+import org.societies.orchestration.CSSDataCollector.main.java.CssDCEvent;
 
-import org.societies.api.osgi.event.CSSEvent;
-import org.societies.api.osgi.event.CSSEventConstants;
-import org.societies.api.osgi.event.EventListener;
-import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.osgi.event.*;
+//import org.societies.api.osgi.event.CSSEventConstants;
+//import org.societies.api.osgi.event.EventListener;
+//import org.societies.api.osgi.event.EventTypes;
+//import org.societies.api.osgi.event.IEventMgr;
+//import org.societies.api.osgi.event.InternalEvent;
 
-public class GroupManager extends EventListener
+public class GroupManager  extends EventListener implements Subscriber {
+
 	private Logger LOG = LoggerFactory.getLogger(CSM.class);
-	//
-	private Map<String, ArrayList<String>> ownerModels;
+
+	private HashMap<String, ArrayList<String>> ownerModels;
 	
-	private Map<String, String> attMap; 			// inner index
-	private Map<String, ArrayList<Integer>> ownAttMap;
-	private ArrayList<Integer> ownerRelationship;   // mapping 
+	private HashMap<String, String> attMap; 			// inner index
+	private HashMap<String, ArrayList<Integer>> ownAttMap;
+	private ArrayList<Integer> ownerRelationship;   // mapping
+
 	private ModelManager modelMang;
 	private IEventMgr eventMgr;
 	private publishSuggestion ps;
@@ -60,14 +64,13 @@ public class GroupManager extends EventListener
 	public GroupManager(ModelManager modelMang)
     {
     	LOG.info("GroupManager : set up ");
-    	this.ownerModels = new HashMap<String, ArrayList<String>>();    
-
-    	//		
+    	
+    	ownerModels = new HashMap<String, ArrayList<String>>();    
     	this.modelMang = modelMang;
     	ownAttMap = new HashMap<String, ArrayList<Integer>>();
       	attMap = new HashMap<String, String>(); 
-      	registerForEvents();
-    	//ownerRelationship  = new ArrayList<Integer>();
+      	this.registerForEvents();
+
     }	
 	
 	public void addUser(IIdentity user){
@@ -82,7 +85,7 @@ public class GroupManager extends EventListener
     	
     }
     
-    public void groupUpdateUpdate(){
+    private void groupUpdateUpdate(){
     	LOG.info("GroupManager : Group Update");
     	
     	// join
@@ -91,7 +94,7 @@ public class GroupManager extends EventListener
 
     }
     
-    private void updateGrouping(Integer id, String att, String val)
+    private void updateGrouping(IIdentity id, String att, String val)
     {
     	LOG.info("GroupManager : Update Grouping ");
     	// 
@@ -101,7 +104,7 @@ public class GroupManager extends EventListener
     	existModelCheck(id, att, val);
     }
     
-    private void existModelCheck(Integer id, String att, String value){
+    private void existModelCheck(IIdentity id, String att, String value){
     	LOG.info("GroupManager : exist Model Check ");
     	//
     	ArrayList<String> models = modelMang.getSubscribed(id);
@@ -128,19 +131,7 @@ public class GroupManager extends EventListener
 		LOG.info("GroupManager : registered for events ");
 
 	}
-	
-	@Override
-	public void handleExternalEvent(CSSEvent arg0) {
-		LOG.info("External event ??");
-
-	}
-	
-	@Override
-	public void handleInternalEvent(InternalEvent event) {
-		LOG.info("Received Internal  event ");
-	}
-	
-    /**************************************************************
+	/**************************************************************
 	*
 	***************************************************************/
     
@@ -178,7 +169,7 @@ public class GroupManager extends EventListener
     	}
     }
     
-    private void updateOwnerValue(Integer id, String att, String val)
+    private void updateOwnerValue(IIdentity id, String att, String val)
     {
     	LOG.info("GroupManager : update Owner Value ");
     	//
@@ -190,10 +181,10 @@ public class GroupManager extends EventListener
     
     private void sendMsg(CommunitySuggestion cs){
     	LOG.info("GroupManager : send Msg ");
-    	ps.sendSuggestion(suggestion);
+	    	ps.sendSuggestion(cs);
     }
     
-    private void deleteGrouping(Integer id){
+    private void deleteGrouping(IIdentity id){
     	LOG.info("GroupManager : delete Grouping ");
     	// assume just user
     	ArrayList<String> models = modelMang.getSubscribed(id);
@@ -201,7 +192,7 @@ public class GroupManager extends EventListener
     	// remove from various internal lists
     }
     
-    private void newModelCheck(Integer id, String att, String value){
+    private void newModelCheck(IIdentity id, String att, String value){
     	LOG.info("GroupManager : new Model Check ");
     	HashMap<String, String> models = modelMang.getUnSubscribed(id);
     	
@@ -226,6 +217,46 @@ public class GroupManager extends EventListener
 	 */
 	public void setEventMgr(IEventMgr eventMgr) {
 		this.eventMgr = eventMgr;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.comm.xmpp.pubsub.Subscriber#pubsubEvent(org.societies.api.identity.IIdentity, java.lang.String, java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public void pubsubEvent(IIdentity arg0, String arg1, String arg2,
+			Object arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
+	 */
+	@Override
+	public void handleInternalEvent(InternalEvent arg0) {
+		LOG.info("recieved an internal event");
+		CssDCEvent cde = (CssDCEvent) arg0.geteventInfo();
+		//String evtType = cde.getEvtT;
+		IIdentity user = cde.getUserId(); 
+		//if (evtType.equals("Create")){
+			
+		//}
+		//else if ( (evtType.equals("Mod")) || (evtType.equals("Update") )){
+			
+		//}
+		//else if (evtType.equals("Removal")){
+			
+		//}
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
+	 */
+	@Override
+	public void handleExternalEvent(CSSEvent arg0) {
+		LOG.info("recieved an external event");
+		
 	}
     
 }
