@@ -145,6 +145,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 	IServiceControlRemote iServCtrlRemote = null;
 	@Transient
 	IPrivacyPolicyManager privacyPolicyManager = null;
+<<<<<<< HEAD
+	
+	
+	
+=======
 	@Transient
 	IPrivacyDataManager privacyDataManager = null;
 	
@@ -158,6 +163,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		this.privacyDataManager = privacyDataManager;
 	}
 
+>>>>>>> thomas-privacy
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
 	}
@@ -1265,9 +1271,6 @@ public class Cis implements IFeatureServer, ICisOwned {
 	@Override
 	public void getListOfMembers(ICisManagerCallback callback){
 		LOG.debug("getListOfMembers: callback");
-		LOG.debug("local get member list WITH CALLBACK called");
-
-		
 		CommunityMethods c = new CommunityMethods();
 		WhoResponse w = new WhoResponse();
 		c.setWhoResponse(w);

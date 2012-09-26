@@ -489,7 +489,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		cis.fillMembershipCritXMPPobj(m);
 		cisAd.setMembershipCrit(m);
 		cisAd.setName(cis.getName());
+<<<<<<< HEAD
 		cisAd.setCssownerid(cis.getCisId());
+=======
+		cisAd.setCssownerid(cis.getOwnerId());
+>>>>>>> thomas-privacy
 		cisAd.setType(cis.getCisType());
 		cisAd.setId(cis.getCisId()); // TODO: check if the id or uri needs the jid
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
@@ -781,14 +785,20 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			// client Request for join
 			if (c.getAskCisManagerForJoin() != null) {
 				CommunityManager response = new CommunityManager();
+<<<<<<< HEAD
 				AskCisManagerForJoinResponse ar = new AskCisManagerForJoinResponse();
 				response.setAskCisManagerForJoinResponse(ar);
+=======
+				JoinResponse j = new JoinResponse();
+				response.setJoinResponse(j);
+>>>>>>> thomas-privacy
 				LOG.info("android request for join received in CIS manager");
 				String senderjid = stanza.getFrom().getBareJid();
 				LOG.info("sender JID = " + senderjid); 
 				CisAdvertisementRecord ad = c.getAskCisManagerForJoin().getCisAdv();
 				
 				if(ad == null){
+<<<<<<< HEAD
 					ar.setStatus("error");
 					return response;
 				}
@@ -801,6 +811,31 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				}
 			}
 			// END OF client Request for join
+=======
+					j.setResult(false);
+					return response;
+				}
+				else{
+					JoinCallBack jCallback = new JoinCallBack(j);
+					this.joinRemoteCIS(ad, jCallback);
+				
+
+					// TODO: REMOVE THIS SLEEP
+					while(j.getCommunity()== null){// wait for callback
+						try {
+							Thread.sleep(5 * 1000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+
+					return response;
+				}
+			}
+			// END OF DELETE
+>>>>>>> thomas-privacy
 				
 
 			// client Request for leave
@@ -838,6 +873,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	}
 
 
+<<<<<<< HEAD
+=======
 public class JoinCallBack implements ICisManagerCallback{
 		
 	JoinResponse resp;
@@ -858,8 +895,7 @@ public class JoinCallBack implements ICisManagerCallback{
 		}
 	}
 }
-	
-	
+>>>>>>> thomas-privacy
 	
 	
 
@@ -1503,6 +1539,10 @@ public class JoinCallBack implements ICisManagerCallback{
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
 			return false;
 		}
+<<<<<<< HEAD
+
+		//TODO: add service ones
+=======
 		if (null == ccmFactory) {
 			LOG.info("[Dependency Injection] Missing ICISCommunicationMgrFactory");
 			return false;
@@ -1512,6 +1552,7 @@ public class JoinCallBack implements ICisManagerCallback{
 			return false;
 		}
 
+>>>>>>> thomas-privacy
 		
 		if (level >= 1) {
 			if (null == iCisDirRemote) {
@@ -1530,6 +1571,8 @@ public class JoinCallBack implements ICisManagerCallback{
 				LOG.info("[Dependency Injection] Missing IPrivacyPolicyManager");
 				return false;
 			}
+<<<<<<< HEAD
+=======
 			if (null == privacyDataManager) {
 				LOG.info("[Dependency Injection] Missing IPrivacyDataManager");
 				return false;
@@ -1540,6 +1583,7 @@ public class JoinCallBack implements ICisManagerCallback{
 				return false;
 			}
 
+>>>>>>> thomas-privacy
 			if (null == internalCtxBroker) {
 				LOG.info("[Dependency Injection] Missing Context Broker");
 				return false;

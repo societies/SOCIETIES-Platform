@@ -82,6 +82,15 @@
         <property name="clientJarServer" ref="clientJar"/>
 	</bean>
 
+	<bean id="DomainAuthorityRestCommsServer"
+		class="org.societies.domainauthority.rest.comms.CommsServer"
+		depends-on="CommManager"
+		init-method="init"
+  		>
+  		<property name="commMgr" ref="CommManager"/>
+        <property name="clientJarServer" ref="clientJar"/>
+	</bean>
+
 	<osgi:service ref="clientJar" interface="org.societies.api.internal.domainauthority.IClientJarServer" />
 	
 </beans>

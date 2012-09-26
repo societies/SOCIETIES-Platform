@@ -22,13 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.CSM.main.java.GroupIdentfier;
+package org.societies.orchestration.CSSDataCollector.main.java;
 
-import org.societies.api.osgi.event.EMSException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
-import org.societies.orchestration.CSM.main.java.csm.CommunitySuggestion;
+import org.societies.orchestration.CSSDataCollector.main.java.CssDCEvent;
 
 /**
  * Describe your class here...
@@ -36,19 +40,42 @@ import org.societies.orchestration.CSM.main.java.csm.CommunitySuggestion;
  * @author John
  *
  */
-public class publishSuggestion {
-	
-	private IEventMgr eventMgr;
 
-	public void sendSuggestion(CommunitySuggestion ire){
-		//send local event
-		InternalEvent event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, "newaction", "org/societies/orchestration/ICO", ire);
-		try {
-			eventMgr.publishInternalEvent(event);
-		} catch (EMSException e) {
-			e.printStackTrace();
-		}
+public class CssDCEventPublish extends EventListener{
+
+	private IEventMgr eventMgr;
+	private IIdentity myCssID;
+	private Logger LOG = LoggerFactory.getLogger(CssDCEventPublish.class);
+	
+    public void manageEvent(CtxChangeEvent arg0, IIdentity myCssID){
+    	LOG.info("publishing event to :   " + myCssID);
+    	//send local event
+    	CssDCEvent payload = new CssDCEvent(myCssID, arg0);
+    	InternalEvent event = new InternalEvent(EventTypes.CSSDC_EVENT, "newaction", "org/societies/orchestration/CSSDC", payload);
+    
+    	try {
+    		getEventMgr().publishInternalEvent(event);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    	
+    /* (non-Javadoc)
+     * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
+     */
+    public void handleExternalEvent(CssDCEvent arg0) {
+    	LOG.info("CssDCEventPublish handleExternalEvent error ");   		
+    }
+
+    /* (non-Javadoc)
+     * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
+     */
+    @Override
+    public void handleInternalEvent(InternalEvent arg0) {
+    	LOG.info("CssDCEventPublish handleInternalEvent error ");
+    }
+    
+    public IEventMgr getEventMgr() {
+		return eventMgr;
 	}
-	
-	
 }

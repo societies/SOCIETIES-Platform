@@ -26,7 +26,6 @@
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
 	</parent>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -128,7 +127,7 @@
 							<version>${project.version}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}/testing</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

@@ -22,33 +22,45 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.CSM.main.java.GroupIdentfier;
 
-import org.societies.api.osgi.event.EMSException;
-import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
-import org.societies.orchestration.CSM.main.java.csm.CommunitySuggestion;
+package org.societies.api.internal.useragent.model;
 
-/**
- * Describe your class here...
- *
- * @author John
- *
- */
-public class publishSuggestion {
+public class FeedbackForm {
+		
+	String id;
+	String type;
+	String text;
+	String[] data;
 	
-	private IEventMgr eventMgr;
-
-	public void sendSuggestion(CommunitySuggestion ire){
-		//send local event
-		InternalEvent event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, "newaction", "org/societies/orchestration/ICO", ire);
-		try {
-			eventMgr.publishInternalEvent(event);
-		} catch (EMSException e) {
-			e.printStackTrace();
-		}
+	public String getID(){
+		return id;
 	}
 	
+	public void setID(String id){
+		this.id = id;
+	}
 	
+	public String getType() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public String getText(){
+		return text;
+	}
+	
+	public void setText(String text){
+		this.text = text;
+	}
+	
+	public String[] getData() {
+		return data;
+	}
+	
+	public void setData(String[] data) {
+		this.data = data;
+	}
 }

@@ -425,6 +425,7 @@ public class CisManagerController {
 		else {
 			try {
 				// -- CIS Configuration
+<<<<<<< HEAD
 				Hashtable<String, MembershipCriteria> cisCriteria = null;
 				if (cisCreationForm.getValue().isEmpty() == false){ 
 					cisCriteria = new Hashtable<String, MembershipCriteria> (); 
@@ -438,6 +439,19 @@ public class CisManagerController {
 						resultMsg.append("Warning: Can't retrieve the membership criterii.");
 					}
 				}
+=======
+				Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> (); 
+				MembershipCriteria m = new MembershipCriteria();
+				try {
+					Rule r = new Rule(cisCreationForm.getOperator(), new ArrayList(Arrays.asList(cisCreationForm.getValue())));
+					m.setRule(r);
+					cisCriteria.put(cisCreationForm.getAttribute(), m);
+				}
+				catch(InvalidParameterException e){
+					resultMsg.append("Warning: Can't retrieve the membership criterii.");
+				}
+
+>>>>>>> thomas-privacy
 
 				// -- Generate Privacy Policy
 				CisCreationForm cisData;
@@ -547,7 +561,6 @@ public class CisManagerController {
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
 
-
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
@@ -573,28 +586,12 @@ public class CisManagerController {
 		resourceCisMemberList.addAction(new PrivacyActionForm(ActionConstants.READ));
 		resourceCisMemberList.setConditions(conditionsCisMemberList);
 		cisCreationForm.addResource(resourceCisMemberList);
-		// -- Infer first version of the privacy policy: using membership criteria
-		if (null != cisCriteria && cisCriteria.size() > 0) {
-			PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
-			resource.setResourceType(DataIdentifierScheme.CONTEXT+":///"+cisCreationForm.getAttribute());
-			resource.addAction(new PrivacyActionForm(ActionConstants.READ));
-			resource.setConditions(conditionsCisMembershipCriteria);
-			cisCreationForm.addResource(resource);
-		}
 		// -- Infer first version of the privacy policy: using Community Context Data
 		for(Field ctxType : CtxAttributeTypes.class.getDeclaredFields()) {
 			PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
 			resource.setResourceType(DataIdentifierScheme.CONTEXT+":///"+(String) ctxType.get(null));
 			resource.addAction(new PrivacyActionForm(ActionConstants.READ));
 			resource.setConditions(conditionsCisCommunityContext);
-			cisCreationForm.addResource(resource);
-		}
-		// -- Infer first version of the privacy policy: using membership criteria
-		if (null != cisCriteria && cisCriteria.size() > 0) {
-			PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
-			resource.setResourceType(DataIdentifierScheme.CONTEXT+":///"+cisCreationForm.getAttribute());
-			resource.addAction(new PrivacyActionForm(ActionConstants.READ));
-			resource.setConditions(conditionsCisMembershipCriteria);
 			cisCreationForm.addResource(resource);
 		}
 		// -- Infer first version of the privacy policy: using membership criteria
