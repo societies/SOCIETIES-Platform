@@ -122,7 +122,7 @@ var	SocietiesLocalCISManager = {
 				[client]);        //Passing a list of arguments to the plugin
 	},
 	
-	joinCis: function(cis_id, successCallback, failureCallback) {
+	joinCis: function(cisAdvert, successCallback, failureCallback) {
 		console.log("joinCis desktop invoked");
 		var client = "org.societies.android.platform.gui";
 		
@@ -130,7 +130,7 @@ var	SocietiesLocalCISManager = {
 				failureCallback,     //Callback which will be called when plugin action encounters an error
 				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
 				'joinCis',          //Telling the plugin, which action we want to perform
-				[client, cis_id]);        //Passing a list of arguments to the plugin
+				[client, cisAdvert]);        //Passing a list of arguments to the plugin
 	}
 	
 };

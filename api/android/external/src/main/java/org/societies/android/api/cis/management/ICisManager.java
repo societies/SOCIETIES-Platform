@@ -26,6 +26,9 @@ package org.societies.android.api.cis.management;
 
 import java.util.List;
 
+import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
+import org.societies.api.schema.cis.community.LeaveResponse;
+
 /**
  * @author Babak.Farshchian@sintef.no
  * Implemented by the CommunityManager APKLib service
@@ -34,9 +37,9 @@ public interface ICisManager {
 	public String methodsArray[] = {"createCis(String client, String cisName, String cisType, String description, List<ACriteria> criteria, String privacyPolicy)",
 							 		"deleteCis(String client, String cisId)",
 							 		"getCisList(String client, String query)",
-		//					 		"subscribeToCommunity(String client, String name, String cisId)",
-		//					 		"unsubscribeFromCommunity(String client, String cisId)",
-							 		"removeMember(String client, String cisId, String memberJid)"
+							 		"removeMember(String client, String cisId, String memberJid)",
+							 		"Join(String client, String cisId)",
+							 		"Leave(String client, String cisId)"
 	};
 	
 	/**
@@ -69,23 +72,27 @@ public interface ICisManager {
 	 */
 	public ACommunity[] getCisList(String client, String query);
 	
-	/**Notify cloud that we've joined a new CIS
-	 *  
-	 * @param name CIS Name
-	 * @param cisId CIS id
-	 */
-	//public void subscribeToCommunity(String client, String name, String cisId);
-
-	/**
-	 * Notify cloud we've unsubscribed from a CIS
-	 * @param cisId
-	 */
-	//public void unsubscribeFromCommunity(String client, String cisId);
-
 	/**
 	 * Remove a member from this CIS
 	 * @param cisId
 	 * @param memberJid
 	 */
 	public void removeMember(String client, String cisId, String memberJid);
+	
+	/**
+	 * Join a community
+	 * @param client
+	 * @param targetCis
+	 * @param qualifications
+	 * @return
+	 */
+	public String Join(String client, ACisAdvertisementRecord targetCis);
+	
+	/**
+	 * Leave a Community
+	 * @param client
+	 * @param cisId
+	 * @return
+	 */
+	public String Leave(String client, String cisId);
 }

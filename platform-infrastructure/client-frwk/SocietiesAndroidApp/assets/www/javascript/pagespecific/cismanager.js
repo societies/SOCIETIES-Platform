@@ -116,7 +116,7 @@ var	SocietiesCISManagerService = {
 				window.plugins.SocietiesLocalCISManager.findAllCisAdvertisementRecords(success, failure); } );
 	},
 	
-	getJoinResponse: function(cis_id) {
+	getJoinResponse: function(cisAdvert) {
 		console.log("getAllCisDirAds");
 		
 		function success(data) {
@@ -128,6 +128,6 @@ var	SocietiesCISManagerService = {
 			alert("getJoinResponse - failure: " + data);
 		}
 		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
-					window.plugins.SocietiesLocalCISManager.joinCis(cis_id, success, failure); } );
+					window.plugins.SocietiesLocalCISManager.joinCis(cisAdvert, success, failure); } );
 	}
 }
