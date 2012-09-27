@@ -129,7 +129,7 @@ var	SocietiesLocalCISManager = {
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 				failureCallback,     //Callback which will be called when plugin action encounters an error
 				'PluginCISFunctions',  //Telling PhoneGap that we want to run specified plugin
-				'joinCis',          //Telling the plugin, which action we want to perform
+				'Join',          //Telling the plugin, which action we want to perform
 				[client, cisAdvert]);        //Passing a list of arguments to the plugin
 	}
 	

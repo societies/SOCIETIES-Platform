@@ -39,7 +39,6 @@ import org.societies.android.api.cis.management.AActivity;
 import org.societies.android.api.cis.management.ACommunity;
 import org.societies.android.api.cis.management.ACriteria;
 import org.societies.android.api.cis.management.AJoinResponse;
-import org.societies.android.api.cis.management.AMembershipCrit;
 import org.societies.android.api.cis.management.AParticipant;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
@@ -377,10 +376,9 @@ public class PluginCISFunctions extends Plugin {
 		advert.setCssownerid(jObj.getString("cssownerid"));
 		advert.setName(jObj.getString("name"));
 		advert.setType(jObj.getString("type"));
-		advert.setPassword(jObj.getString("password"));
-		AMembershipCrit crit = new AMembershipCrit();
-		crit.setACriteria(CreateCriteriaList(jObj.getJSONArray("criteria")));
-		advert.setMembershipCrit(crit);
+		//advert.setPassword(jObj.getString("password"));
+		//crit.setACriteria(CreateCriteriaList(jObj.getJSONArray("criteria")));
+		//advert.setMembershipCrit(crit);
 		
 		return advert;
 	}
