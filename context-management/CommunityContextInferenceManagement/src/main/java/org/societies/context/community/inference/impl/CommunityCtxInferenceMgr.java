@@ -39,6 +39,7 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,15 +51,27 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CommunityCtxInferenceMgr.class);
 
-	@Autowired(required=true)
+	@Autowired(required=false)
 	private ICtxBroker internalCtxBroker;
-
-	@Autowired(required=true)
+	
+	@Autowired(required=false)
+	private ICommunityCtxEstimationMgr communityContextEstimation;
+	
+	@Autowired(required=false)
 	private ICommManager commMgr;
-
+	
 	CommunityCtxInferenceMgr(){
+	
+		LOG.info(this.getClass() + "instantiated ");
+		
+		//this.internalCtxBroker = internalCtxBroker;
+		//LOG.info(this.getClass() + "internalCtxBroker instantiated "+ this.internalCtxBroker);
 
-		LOG.info(this.getClass() + " instantiated");
+		//this.commMgr = commMgr;
+		//LOG.info(this.getClass() + "commMgr instantiated " +this.commMgr);
+	
+		//this.communityCtxEstimation = communityCtxEstimation; 
+		//LOG.info(this.getClass() + "communityCtxEstimation instantiated " +this.communityCtxEstimation);
 	}
 
 	@Override
@@ -71,10 +84,8 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 			ctxAttrReturn = this.internalCtxBroker.retrieveAttribute(communityAttrId, false).get();
 			LOG.info("communityEntIdentifier "+communityEntIdentifier.toString());
 			LOG.info("communityAttrId "+communityAttrId.toString());
-
-			// at this point call community context estimation component and retrieve the community value
-			ctxAttrReturn.setStringValue("communityEstimatedValue");
-
+			ctxAttrReturn = this.communityContextEstimation.estimateCommunityCtx(communityEntIdentifier, communityAttrId);
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

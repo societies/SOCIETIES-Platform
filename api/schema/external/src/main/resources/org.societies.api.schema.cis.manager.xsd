@@ -150,7 +150,7 @@
   	<xs:simpleType name="listCrit">
  		 <xs:restriction base="xs:string">
 		      <xs:enumeration value="owned"/>
-		      <xs:enumeration value=" subscribed"/>
+		      <xs:enumeration value="subscribed"/>
 		      <xs:enumeration value="all"/>
 		 </xs:restriction>
 	</xs:simpleType>

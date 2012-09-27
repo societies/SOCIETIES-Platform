@@ -46,6 +46,8 @@ import org.societies.webapp.models.CisManagerForm;
 import org.societies.webapp.models.PrivacyActionForm;
 import org.societies.webapp.models.PrivacyConditionForm;
 import org.societies.webapp.models.PrivacyPolicyResourceForm;
+import org.societies.webapp.models.privacy.CisCtxAttributeHumanTypes;
+import org.societies.webapp.models.privacy.CisCtxAttributeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -193,7 +195,7 @@ public class CisManagerController {
 
 				// -- Retrieve CIS Configuration
 				Hashtable<String, MembershipCriteria> cisCriteria = null;
-				if(cisForm.getValue().isEmpty() == false){
+				if(null !=cisForm && null != cisForm.getValue() && false == cisForm.getValue().isEmpty()){
 					cisCriteria = new Hashtable<String, MembershipCriteria> (); 
 					MembershipCriteria m = new MembershipCriteria();
 					try{
@@ -210,13 +212,15 @@ public class CisManagerController {
 				// -- Fill CisCreationForm for next step
 				CisCreationForm cisCreationForm = generateCisCreationForm(cisForm, cisCriteria);
 				cisCreationForm.setMode("SHARED");
+				LOG.info("Proposed CIS Privacy Policy");
+				LOG.info(cisCreationForm.toString());
 
 
 				// Send page to generate the privacy policy
 				generateResourceLists();
 				model.put("res", res);
 				model.put("cisCreationForm", cisCreationForm);
-				model.put("ActionList", ActionConstants.values());
+				model.put("ActionList", new String[]{"READ", "WRITE", "CREATE", "DELETE"});//ActionConstants.values());
 				model.put("ConditionList", ConditionConstants.values());
 				model.put("ResourceList", resourceList);
 				model.put("ResourceHumanList", resourceHumanList);
@@ -260,8 +264,10 @@ public class CisManagerController {
 				model.put("methodcalled", "JoinRemoteCIS");
 
 				// TODO: get a real advertisement
+				LOG.info("[CisManagerController] "+cisForm);
 				CisAdvertisementRecord ad = new CisAdvertisementRecord();
 				ad.setId(cisForm.getCisJid());
+				ad.setCssownerid((null != cisForm.getCssId() && !"".equals(cisForm.getCssId())) ? cisForm.getCssId() : "university.societies.local");
 				// in order to force the join to send qualifications, Ill add some criteria to the AdRecord
 				MembershipCrit membershipCrit = new MembershipCrit();
 				List<Criteria> criteria = new ArrayList<Criteria>();
@@ -393,6 +399,7 @@ public class CisManagerController {
 			model.put("cisrecords", records);
 
 		} catch (Exception ex) {
+			LOG.error("Error when managing CIS", ex);
 			res += "Oops!!!! <br/>" + ex.getMessage();//.getMessage();
 		}
 
@@ -424,7 +431,7 @@ public class CisManagerController {
 			try {
 				// -- CIS Configuration
 				Hashtable<String, MembershipCriteria> cisCriteria = null;
-				if (cisCreationForm.getValue().isEmpty() == false){ 
+				if (null !=cisCreationForm && null != cisCreationForm.getValue() && false == cisCreationForm.getValue().isEmpty()){ 
 					cisCriteria = new Hashtable<String, MembershipCriteria> (); 
 					MembershipCriteria m = new MembershipCriteria();
 					try {
@@ -500,12 +507,13 @@ public class CisManagerController {
 	}
 
 	public static void generateResourceLists() throws IllegalArgumentException, IllegalAccessException {
-		Field[] resourceTypeList = CtxAttributeTypes.class.getDeclaredFields();
-		resourceList = new String[resourceTypeList.length];
-		resourceHumanList = new String[resourceTypeList.length];
-		for(int i=0; i<resourceTypeList.length; i++) {
-			resourceList[i] = DataIdentifierScheme.CONTEXT+":///"+((String)resourceTypeList[i].get(null));
-			resourceHumanList[i] = DataIdentifierScheme.CONTEXT+": "+((String)resourceTypeList[i].get(null));
+		Field[] resourceTypeArray = CisCtxAttributeTypes.class.getDeclaredFields();
+		Field[] resourceHumanTypeArray = CisCtxAttributeHumanTypes.class.getDeclaredFields();
+		resourceList = new String[resourceTypeArray.length];
+		resourceHumanList = new String[resourceTypeArray.length];
+		for(int i=0; i<resourceTypeArray.length; i++) {
+			resourceList[i] = DataIdentifierScheme.CONTEXT+":///"+((String)resourceTypeArray[i].get(null));
+			resourceHumanList[i] = DataIdentifierScheme.CONTEXT+": "+((String)resourceHumanTypeArray[i].get(null));
 		}
 
 		DataIdentifierScheme[] schemes = DataIdentifierScheme.values();
@@ -519,6 +527,7 @@ public class CisManagerController {
 		return generateCisCreationForm(cisForm, cisCriteria, "SHARED");
 	}
 	public CisCreationForm generateCisCreationForm(CisManagerForm cisForm, Map<String, MembershipCriteria> cisCriteria, String mode) throws IllegalArgumentException, IllegalAccessException {
+		generateResourceLists();
 		// -- Fill CisCreationForm for next step
 		CisCreationForm cisCreationForm = new CisCreationForm();
 		if (null != cisForm) {
@@ -545,6 +554,7 @@ public class CisManagerController {
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
 
+
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1", false));
@@ -553,11 +563,11 @@ public class CisManagerController {
 			LOG.info("PRIVATE mode");
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
-			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1", false));
+			conditionsCisMemberList.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1", false));
 
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.STORE_IN_SECURE_STORAGE, "1", false));
-			conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1", false));
+			conditionsCisCommunityContext.add(new PrivacyConditionForm(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "1", false));
 		}
 		conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.RIGHT_TO_OPTOUT, "1", false));
 		conditionsCisMembershipCriteria.add(new PrivacyConditionForm(ConditionConstants.MAY_BE_INFERRED, "1", false));
@@ -568,22 +578,25 @@ public class CisManagerController {
 		resourceCisMemberList.setResourceSchemeCustom(DataIdentifierScheme.CIS.value());
 		resourceCisMemberList.setResourceTypeCustom("cis-member-list");
 		resourceCisMemberList.addAction(new PrivacyActionForm(ActionConstants.READ));
+		resourceCisMemberList.addAction(new PrivacyActionForm(ActionConstants.CREATE));
 		resourceCisMemberList.setConditions(conditionsCisMemberList);
 		cisCreationForm.addResource(resourceCisMemberList);
-		// -- Infer first version of the privacy policy: using Community Context Data
-		for(Field ctxType : CtxAttributeTypes.class.getDeclaredFields()) {
-			PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
-			resource.setResourceType(DataIdentifierScheme.CONTEXT+":///"+(String) ctxType.get(null));
-			resource.addAction(new PrivacyActionForm(ActionConstants.READ));
-			resource.setConditions(conditionsCisCommunityContext);
-			cisCreationForm.addResource(resource);
-		}
 		// -- Infer first version of the privacy policy: using membership criteria
 		if (null != cisCriteria && cisCriteria.size() > 0) {
 			PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
 			resource.setResourceType(DataIdentifierScheme.CONTEXT+":///"+cisCreationForm.getAttribute());
 			resource.addAction(new PrivacyActionForm(ActionConstants.READ));
+			resource.addAction(new PrivacyActionForm(ActionConstants.CREATE));
 			resource.setConditions(conditionsCisMembershipCriteria);
+			cisCreationForm.addResource(resource);
+		}
+		// -- Infer first version of the privacy policy: using Community Context Data
+		for(int i=0; i<resourceList.length; i++) {
+			PrivacyPolicyResourceForm resource = new PrivacyPolicyResourceForm();
+			resource.setResourceType(resourceList[i]);
+			resource.addAction(new PrivacyActionForm(ActionConstants.READ));
+			resource.addAction(new PrivacyActionForm(ActionConstants.CREATE));
+			resource.setConditions(conditionsCisCommunityContext);
 			cisCreationForm.addResource(resource);
 		}
 		return cisCreationForm;
@@ -609,11 +622,11 @@ public class CisManagerController {
 					}
 
 				}
-				if(communityResultObject.getWho() != null){
-					LOG.debug("### " + communityResultObject.getWho().getParticipant().size());
+				if(communityResultObject.getWhoResponse() != null){
+					LOG.debug("### " + communityResultObject.getWhoResponse().getParticipant().size());
 
 					m_session.setAttribute("community", remoteCommunity);
-					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWho().getParticipant();					
+					List<org.societies.api.schema.cis.community.Participant> l = communityResultObject.getWhoResponse().getParticipant();					
 					m_session.setAttribute("remoteMemberRecords", l);
 				}
 

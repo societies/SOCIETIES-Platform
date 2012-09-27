@@ -31,6 +31,7 @@
 	
 	xmlns:insact="http://societies.org/api/schema/activityfeed"
 	xmlns:ins="http://societies.org/api/schema/activity"
+	xmlns:ids="http://societies.org/api/schema/identity"
 	>
 
 <xs:import namespace="http://societies.org/api/schema/activityfeed" 
@@ -38,6 +39,9 @@
 
 <xs:import namespace="http://societies.org/api/schema/activity" 
            schemaLocation="org.societies.api.schema.activity.xsd"/>
+           
+<xs:import namespace="http://societies.org/api/schema/identity" 
+           schemaLocation="org.societies.api.schema.identity.xsd"/>
      
      <xs:element name='communityMethods'>
  	 <xs:complexType>
@@ -48,7 +52,8 @@
 				<xs:element ref='join'/>
 				<xs:element ref='leave'/>
 				<xs:element ref='invite'/>
-				<xs:element ref='who'/>
+				<xs:element ref='whoRequest'/>
+				<xs:element ref='whoResponse'/>
 				<xs:element ref='addMember'/>
 				<xs:element ref='subscription'/>
 				<xs:element ref='deleteMember'/>
@@ -79,13 +84,15 @@
  	 <xs:complexType>
 	 	 <xs:sequence>
 			<xs:element ref='membershipCrit' minOccurs='0' maxOccurs='1'/>
+			<xs:element name='privacyPolicy' type='xs:string' minOccurs='0' maxOccurs='0'/>
 		</xs:sequence>
 	
 		  <xs:attribute name='owner-jid' type='xs:string'/> 
           <xs:attribute name='community-jid' type='xs:string'/>  
           <xs:attribute name='community-type' type='xs:string'/>
           <xs:attribute name='community-name' type='xs:string'/> 
-          <xs:attribute name='description' type='xs:string'/> 
+          <xs:attribute name='description' type='xs:string'/>
+          <xs:attribute name='privacyPolicy' type='xs:string'/>
 	 </xs:complexType>
 	</xs:element>
 	
@@ -308,11 +315,19 @@
 			</xs:simpleContent>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name='who'>
+		<xs:element name='whoRequest'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='1'>
+			   <xs:element name="requestor" type='ids:requestorBean'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name='whoResponse'>
 		<xs:complexType>
 			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
 				<xs:element ref='participant'/>
 			</xs:sequence>
+			<xs:attribute name='result' type='xs:boolean'/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name='addMember'>

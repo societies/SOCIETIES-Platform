@@ -181,4 +181,23 @@ public class CisManagerForm {
 	public void setCisJid(String cisJid) {
 		this.cisJid = cisJid;
 	}
+
+	@Override
+	public String toString() {
+		return "CisManagerForm ["
+				+ (method != null ? "method=" + method + ", " : "")
+				+ (cssId != null ? "cssId=" + cssId + ", " : "")
+				+ (cisPassword != null ? "cisPassword=" + cisPassword + ", "
+						: "")
+				+ (cisName != null ? "cisName=" + cisName + ", " : "")
+				+ (cisType != null ? "cisType=" + cisType + ", " : "")
+				+ (cisMode != null ? "cisMode=" + cisMode + ", " : "")
+				+ (cisJid != null ? "cisJid=" + cisJid + ", " : "")
+				+ (role != null ? "role=" + role + ", " : "")
+				+ (attribute != null ? "attribute=" + attribute + ", " : "")
+				+ (operator != null ? "operator=" + operator + ", " : "")
+				+ (value != null ? "value=" + value : "") + "]";
+	}
+	
+	
 }
