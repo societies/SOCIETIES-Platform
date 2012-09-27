@@ -4,21 +4,23 @@
 		"connectService" : "connected",
 		"disconnectService" : "disconnected",
 		"createdCIS" : {
-						"cisName": "barcelona fc",
-	                    "cisType": "soccer",
-	                    "cisOwner": "thomas@soc.com",
-	                    "cisCriteria": [
-	                    	{
-	                        "attribute": "religion",
-	                        "operation": "equals",
-	                        "value": "Protestant"},
-	                        {
-	                        "attribute": "location",
-	                        "operation": "equals",
-	                        "value": "Peru"}
-	                        ],
-	                    "cisDescription": "soh barca",
-	                    "cisJid" : "barca.soc.com"
+						"communityName": "barcelona fc",
+	                    "communityType": "soccer",
+	                    "ownerJid": "thomas@soc.com",
+	                    "membershipCrit": {
+			                    "criteria": [
+		                    	{
+		                        "attribute": "religion",
+		                        "operation": "equals",
+		                        "value": "Protestant"},
+		                        {
+		                        "attribute": "location",
+		                        "operation": "equals",
+		                        "value": "Peru"}
+		                        ]
+		                	},
+	                    "description": "soh barca",
+	                    "communityJid" : "barca.soc.com"
 	     			},
 	     "getMembers" : [{"jid": "alec@societies.local", 
 	     				  "role": "owner"

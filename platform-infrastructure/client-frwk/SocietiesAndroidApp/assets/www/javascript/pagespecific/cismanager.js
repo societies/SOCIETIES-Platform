@@ -44,7 +44,6 @@ var	SocietiesCISManagerService = {
 
 		function success(data) {
 			console.log("create CIS where data has name = " + data.cisName);
-			$.mobile.changePage("community_profile.html", { transition: "slideup"} );
 			SocietiesCISProfileService.populateCISProfilepage(data);
 		}
 		
@@ -52,7 +51,16 @@ var	SocietiesCISManagerService = {
 			alert("createCIS - failure: " + data);
 		}
 		
-		window.plugins.SocietiesLocalCISManager.createCIS(success, failure);
+		var cisName = jQuery("#cisNameOnCisCreate").val(),
+            cisType = jQuery("#cisCategoryOnCisCreate").val(),
+            cisCriteria = [{
+                    "attribute": "age",
+                    "operation": "greater than",
+                    "value": "18"}],
+             cisDescription = jQuery("#cisDescOnCisCreate").val(),
+             privacyPolicy = "<policy />";
+
+		window.plugins.SocietiesLocalCISManager.createCIS(success, failure, cisName, cisDescription, cisType, cisCriteria, privacyPolicy);
 	},
 
 	/**

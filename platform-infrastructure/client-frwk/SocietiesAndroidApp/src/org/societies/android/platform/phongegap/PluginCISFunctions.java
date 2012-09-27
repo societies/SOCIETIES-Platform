@@ -598,12 +598,12 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(CisDirectoryRemote.INTENT_RETURN_VALUE);
-					ACommunity communities[] = new ACommunity[parcels.length];
+					ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
-						communities[i] = (ACommunity) parcels[i];
+						adverts[i] = (ACisAdvertisementRecord) parcels[i];
 					}
 					//RETURN JSON ARRAY
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertACommunitiesToJSONArray(communities));
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertACisAdvertisementRecordToJSONArray(adverts));
 					result.setKeepCallback(false);
 					PluginCISFunctions.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation
@@ -617,12 +617,12 @@ public class PluginCISFunctions extends Plugin {
 				if (methodCallbackId != null) {
 					//UNMARSHALL THE COMMUNITIES FROM Parcels
 					Parcelable parcels[] =  intent.getParcelableArrayExtra(CisDirectoryRemote.INTENT_RETURN_VALUE);
-					ACommunity communities[] = new ACommunity[parcels.length];
+					ACisAdvertisementRecord adverts[] = new ACisAdvertisementRecord[parcels.length];
 					for (int i = 0; i < parcels.length; i++) {
-						communities[i] = (ACommunity) parcels[i];
+						adverts[i] = (ACisAdvertisementRecord) parcels[i];
 					}
 					//RETURN JSON ARRAY
-					PluginResult result = new PluginResult(PluginResult.Status.OK, convertACommunitiesToJSONArray(communities));
+					PluginResult result = new PluginResult(PluginResult.Status.OK, convertACisAdvertisementRecordToJSONArray(adverts));
 					result.setKeepCallback(false);
 					PluginCISFunctions.this.success(result, methodCallbackId);
 					//remove callback ID for given method invocation
@@ -669,6 +669,22 @@ public class PluginCISFunctions extends Plugin {
 		}
         return jObj;
 	}
+	
+	/**
+	 * @param communities
+	 * @return
+	 */
+	private JSONArray convertACisAdvertisementRecordToJSONArray(ACisAdvertisementRecord[] adverts) {
+		JSONArray jObj = new JSONArray();
+		Gson gson = new Gson();
+		try {
+			jObj =  (JSONArray) new JSONTokener(gson.toJson(adverts)).nextValue();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        return jObj;
+	}
+	
 	
 	/**
 	 * @param communities
