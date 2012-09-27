@@ -52,6 +52,11 @@ public class DigSig {
 
 	public String sign(String textToSign, PrivateKey privateKey) throws DigsigException {
 
+		if (textToSign == null || privateKey == null) {
+			LOG.warn("verify({}, ...): All parameters must be non-null", textToSign);
+			return null;
+		}
+		
 		byte[] dataToSign = str2bytes(textToSign);
 
 		return sign(dataToSign, privateKey);
@@ -65,6 +70,11 @@ public class DigSig {
 		byte[] signature;
 		String signatureStr;
 
+		if (dataToSign == null || privateKey == null) {
+			LOG.warn("verify({}, ...): All parameters must be non-null", dataToSign);
+			return null;
+		}
+		
 		try {
 			sig = Signature.getInstance(ALGORITHM);
 			sig.initSign(privateKey);
@@ -103,11 +113,6 @@ public class DigSig {
 		Signature sig;
 		boolean valid;
 
-		if (data == null || signature == null || publicKey == null) {
-			LOG.warn("All parameters must be non-null");
-			return false;
-		}
-		
 		try {
 			sig = Signature.getInstance(ALGORITHM);
 			sig.initVerify(publicKey);
@@ -131,6 +136,11 @@ public class DigSig {
 
 		byte[] signatureBytes;
 
+		if (data == null || signature == null || publicKey == null) {
+			LOG.warn("verify({}, {}, ...): All parameters must be non-null", data, signature);
+			return false;
+		}
+		
 		signatureBytes = hexstr2bytes(signature);
 
 		return verify(data, signatureBytes, publicKey);
@@ -139,6 +149,11 @@ public class DigSig {
 	public boolean verify(String data, String signature, PublicKey publicKey) {
 
 		byte[] dataBytes;
+
+		if (data == null || signature == null || publicKey == null) {
+			LOG.warn("verify({}, {}, ...): All parameters must be non-null", data, signature);
+			return false;
+		}
 
 		dataBytes = str2bytes(data);
 		
