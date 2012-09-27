@@ -50,6 +50,39 @@ public class TestACommunity extends AndroidTestCase{
 		
 	}
 	
+	public void testParcelableWithEmptyCrit() throws Exception {
+		ACommunity aCommunity = new ACommunity();
+		aCommunity.setCommunityName("name");
+		aCommunity.setDescription("desc");
+		aCommunity.setCommunityType("type");
+		aCommunity.setCommunityJid("jid");
+		aCommunity.setOwnerJid("ownerJid");
+		AMembershipCrit amembershipCrit = new AMembershipCrit();
+		List<ACriteria> l = new ArrayList<ACriteria>();
+		amembershipCrit.setACriteria(l);
+		aCommunity.setMembershipCrit(amembershipCrit);
+
+		
+        Parcel parcel = Parcel.obtain();
+        aCommunity.writeToParcel(parcel, 0);
+        //done writing, now reset parcel for reading
+        parcel.setDataPosition(0);
+        //finish round trip
+        ACommunity createFromParcel = ACommunity.CREATOR.createFromParcel(parcel);
+       
+        assertEquals(aCommunity.getCommunityName(), createFromParcel.getCommunityName());
+        assertEquals(aCommunity.getDescription(), createFromParcel.getDescription());
+        assertEquals(aCommunity.getCommunityType(), createFromParcel.getCommunityType());
+        assertEquals(aCommunity.getCommunityJid(), createFromParcel.getCommunityJid());
+        assertEquals(aCommunity.getOwnerJid(), createFromParcel.getOwnerJid());
+
+        assertEquals(aCommunity.getMembershipCrit().getACriteria().size(), createFromParcel.getMembershipCrit().getACriteria().size());
+        assertEquals(0, createFromParcel.getMembershipCrit().getACriteria().size());
+
+		
+	}
+	
+	
 	public void testParcelableWithCrit() throws Exception {
 		ACommunity aCommunity = new ACommunity();
 		aCommunity.setCommunityName("name");
