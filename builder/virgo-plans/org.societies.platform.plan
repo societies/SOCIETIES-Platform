@@ -8,10 +8,6 @@
 	
 	<artifact type="configuration" name="xc"/>
 	
-	<!-- 		
-	<artifact type="plan" name="org.societies.apis"/>
-	-->
-	
 	<artifact type="plan" name="org.societies.css.commfrwk"/>
 	
 	<artifact type="plan" name="org.societies.common.modules"/>
@@ -37,7 +33,5 @@
 	<artifact type="plan" name="org.societies.personalisation"/>
 	
 	<artifact type="plan" name="org.societies.webapp"/>
-
-	<artifact type="plan" name="org.societies.orchestration"/>
 
 </plan>
