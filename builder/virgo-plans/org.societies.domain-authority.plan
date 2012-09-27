@@ -32,10 +32,4 @@
 		<artifact type="bundle" name="DomainAuthorityRest"/>
 		<artifact type="bundle" name="DomainAuthorityWebApp"/>
 
-		<!--ICO -->
-    		<artifact type="bundle" name="org.societies.orchestration.csm"/>
-    
-    
-    
-	
 </plan>
