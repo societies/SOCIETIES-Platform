@@ -39,7 +39,9 @@ public class NominalTestCaseLowerTester {
 	private static Logger LOG = LoggerFactory.getLogger(NominalTestCaseLowerTester.class);
 
 	private static final long TIME_TO_WAIT_IN_MS = 3000;
-	private static final String SERVICE_CLIENT_FILENAME = "Calculator.jar";
+	private static final String SERVICE_CLIENT_BASENAME = "Calculator.jar";
+	// External requirement: service client jar filename may start with "/"
+	private static final String SERVICE_CLIENT_FILENAME = "/3p-service/" + SERVICE_CLIENT_BASENAME;
 	private static final String SERVER_HOSTNAME = "http://localhost:8080";
 	private static final String SERVICE_ID = "http://localhost/societies/services/service-1";
 	
@@ -240,15 +242,19 @@ public class NominalTestCaseLowerTester {
 
 		String urlStr;
 		int httpCode;
+		String fileName = SERVICE_CLIENT_FILENAME;
 		
 		LOG.info("[#1001] testServiceClientDownload()");
 		LOG.info("[#1001] *** Domain Authority Rest server is required for this test! ***");
 
 		testNegotiationService();
 
-		InputStream is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_FILENAME);
+		if (fileName.startsWith("/")) {
+			fileName = fileName.replaceFirst("/", "");
+		}
+		InputStream is = getClass().getClassLoader().getResourceAsStream(SERVICE_CLIENT_BASENAME);
 		assertNotNull(is);
-		Files.writeFile(is, SERVICE_CLIENT_FILENAME);
+		Files.writeFile(is, fileName);
 		
 		// URL with valid signature
 		urlStr = serviceClient.toString();
