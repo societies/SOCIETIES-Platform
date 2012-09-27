@@ -180,6 +180,9 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 		host = s.getClientJarHost().toString();
 		filePath = s.getClientJarFilePath();
+		if (filePath.startsWith("/")) {
+			filePath = filePath.replaceFirst("/", "");
+		}
 		try {
 			sig = signatureMgr.sign(filePath, groupMgr.getIdMgr().getThisNetworkNode());
 		} catch (DigsigException e) {
