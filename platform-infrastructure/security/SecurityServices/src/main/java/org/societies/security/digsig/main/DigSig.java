@@ -103,6 +103,11 @@ public class DigSig {
 		Signature sig;
 		boolean valid;
 
+		if (data == null || signature == null || publicKey == null) {
+			LOG.warn("All parameters must be non-null");
+			return false;
+		}
+		
 		try {
 			sig = Signature.getInstance(ALGORITHM);
 			sig.initVerify(publicKey);
