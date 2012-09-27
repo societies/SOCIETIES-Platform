@@ -26,13 +26,13 @@ package org.societies.webapp.controller;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
-import java.awt.List;
 import java.awt.Paint;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.webapp.models.PrivacyAssessmentForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,11 +100,13 @@ public class PrivacyAssessmentController {
 			public static final String RECEIVER_IDS = "Receiver identities";
 			public static final String SENDER_IDS = "Sender identities";
 			public static final String SENDER_CLASSES = "Sender classes";
+			public static final String DATA_ACCESS_CLASSES = "Data access classes";
 
 			// Keys
 			public static final String RECEIVER_IDS_KEY = "receiverIds";
 			public static final String SENDER_IDS_KEY = "senderIds";
 			public static final String SENDER_CLASSES_KEY = "senderClasses";
+			public static final String DATA_ACCESS_CLASSES_KEY = "dataAccessClasses";
 		}
 		
 		/**
@@ -159,6 +162,7 @@ public class PrivacyAssessmentController {
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.RECEIVER_IDS_KEY, Presentation.SubjectTypes.RECEIVER_IDS);
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.SENDER_IDS_KEY, Presentation.SubjectTypes.SENDER_IDS);
 		assessmentSubjectTypes.put(Presentation.SubjectTypes.SENDER_CLASSES_KEY, Presentation.SubjectTypes.SENDER_CLASSES);
+		assessmentSubjectTypes.put(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY, Presentation.SubjectTypes.DATA_ACCESS_CLASSES);
 		model.put("assessmentSubjectTypes", assessmentSubjectTypes);
 
 		Map<String, String> presentationFormats = new LinkedHashMap<String, String>();
@@ -200,21 +204,48 @@ public class PrivacyAssessmentController {
 		
 		if (presentationFormat.equalsIgnoreCase(Presentation.Format.CHART)) {
 			
+			String chartFileName = "chart-1.png";
+			String chart2Filename = "chart-2.png";
+			double[][] data;
+			
 			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
 				assValues = assResult.values();
+				data = new double[][] {  // TODO
+						{210, 300, 320, 265, 299},
+						{200, 304, 201, 201, 340}
+						};
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
 				// FIXME
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
 				assResult = assessment.getAssessmentAllIds();
 				assValues = assResult.values();
+				data = new double[][] {  // TODO
+						{210, 300, 320, 265, 299},
+						{200, 304, 201, 201, 340}
+						};
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_CLASSES_KEY)) {
 				HashMap<String, AssessmentResultClassName> assResult;
 				assResult = assessment.getAssessmentAllClasses();
 				assValues = assResult.values();
+				data = new double[][] {  // TODO
+						{210, 300, 320, 265, 299},
+						{200, 304, 201, 201, 340}
+						};
+
+			}
+			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
+				List<DataAccessLogEntry> assResult;
+				assResult = assessment.getDataAccessEvents();
+				for (DataAccessLogEntry logEntry : assResult) {
+					logEntry.getRequestorClass();
+				}
+				data = new double[][] {
+						{210, 300, 320, 265, 299}
+						};
 			}
 			else {
 				LOG.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
@@ -222,22 +253,15 @@ public class PrivacyAssessmentController {
 			}
 			//model.put("assessmentResults", assValues);
 			
-			double[][] data = new double[][] {
-					{210, 300, 320, 265, 299},
-					{200, 304, 201, 201, 340}
-					};
-
 			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
 			form1.setAssessmentSubject("Subject 1");
-			String chart1 = "chart-1.png";
-			createBarchart(null, "Class", "Packets per month", data, chart1);
-			form1.setChart(chart1);
+			createBarchart(null, "Class", "Packets per month", data, chartFileName);
+			form1.setChart(chartFileName);
 			charts.add(form1);
 			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
 			form2.setAssessmentSubject("Subject 2");
-			String chart2 = "chart-2.png";
-			createBarchart(null, "Identity", "Correlation with data access by same identity", data, chart2);
-			form2.setChart(chart2);
+			createBarchart(null, "Identity", "Correlation with data access by same identity", data, chart2Filename);
+			form2.setChart(chart2Filename);
 			charts.add(form2);
 			model.put("assessmentResults", charts);
 
