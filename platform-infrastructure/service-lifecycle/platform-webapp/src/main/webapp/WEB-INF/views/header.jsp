@@ -1,4 +1,5 @@
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" title="Userfeedback" />
+<!--  Temporary removal, for dev purposes -->
+<!-- <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" title="Userfeedback" /> -->
 
 <!-- PAGE -->
 <table border="0" width="100%">

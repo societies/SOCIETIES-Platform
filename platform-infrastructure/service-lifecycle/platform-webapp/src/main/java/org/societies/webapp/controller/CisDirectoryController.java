@@ -35,10 +35,13 @@ import java.util.concurrent.Future;
 import javax.validation.Valid;
 
 import org.societies.api.cis.directory.ICisDirectoryRemote;
+import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.community.*;
 import org.societies.cis.directory.client.CisDirectoryRemoteClient;
+import org.societies.css.mgmt.CssDirectoryRemoteClient;
 import org.societies.webapp.models.CISDirectoryForm;
+import org.societies.webapp.models.CisDirectoryCombinedDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -47,6 +50,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.societies.api.schema.cis.community.MembershipCrit;
 //import org.societies.cis.directory.model.CriteriaRecordEntry;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 @Controller
 public class CisDirectoryController {
@@ -56,7 +60,9 @@ public class CisDirectoryController {
 	 */
 	@Autowired
 	private ICisDirectoryRemote cisDirectoryRemote;
-
+	
+	@Autowired
+	private ICssDirectoryRemote cssDirectoryRemote;
 	
 	
 	public ICisDirectoryRemote getCisDirectoryRemote() {
@@ -66,9 +72,17 @@ public class CisDirectoryController {
 	public void setCisDirectoryRemote(ICisDirectoryRemote cisDirectoryRemote) {
 		this.cisDirectoryRemote = cisDirectoryRemote;
 	}
+	
+	public ICssDirectoryRemote getCssDirectoryRemote() {
+		return cssDirectoryRemote;
+	}
 
-	@RequestMapping(value = "/cisdirectory.html", method = RequestMethod.GET)
-	public ModelAndView CISDirectory() {
+	public void setCssDirectoryRemote(ICssDirectoryRemote cssDirectoryRemote) {
+		this.cssDirectoryRemote = cssDirectoryRemote;
+	}
+
+	@RequestMapping(value = "/oldcisdirectory.html", method = RequestMethod.GET)
+	public ModelAndView CISDirectoryold() {
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -89,8 +103,8 @@ public class CisDirectoryController {
 	}
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/cisdirectory.html", method = RequestMethod.POST)
-	public ModelAndView CISDirectory(@Valid CISDirectoryForm cdForm,
+	@RequestMapping(value = "/oldcisdirectory.html", method = RequestMethod.POST)
+	public ModelAndView oldCISDirectory(@Valid CISDirectoryForm cdForm,
 			BindingResult result, Map model) {
 
 		if (result.hasErrors()) {
@@ -184,4 +198,83 @@ public class CisDirectoryController {
 		return new ModelAndView("cisdirectoryresult", model);
 	}
 
+	@RequestMapping(value = "/cisdirectory.html", method = RequestMethod.GET)
+	public ModelAndView CISDirectory() {
+
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		if (getCisDirectoryRemote() == null) {
+			model.put("errormsg", "CIS Directory reference not avaiable");
+			return new ModelAndView("error", model);
+		}
+		
+		if (getCssDirectoryRemote() == null) {
+			model.put("errormsg", "CSS Directory reference not avaiable");
+			return new ModelAndView("error", model);
+		}
+
+	
+		CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
+
+		getCisDirectoryRemote().findAllCisAdvertisementRecords(callback);
+		List<CisAdvertisementRecord> adverts = callback.getResultList();
+		List<CssAdvertisementRecord> cssDetails = null;
+		List<String> cssIds = new ArrayList<String>();
+		
+		// now we have two lists, we have to 
+		List<CisDirectoryCombinedDetails> cssNiceDetails =  new ArrayList<CisDirectoryCombinedDetails>(); 
+					
+					
+		if ((adverts != null) && (adverts.size() > 0))
+		{
+			for ( int i = 0; i < adverts.size(); i++)
+			{
+				cssIds.add(new String(adverts.get(i).getCssownerid()));
+			}
+			// Make a call to the Css Directory
+			
+			// first get all the cssdirectory records
+			CssDirectoryRemoteClient cssDirCallback = new CssDirectoryRemoteClient();
+
+			getCssDirectoryRemote().searchByID(cssIds, cssDirCallback);
+			cssDetails = cssDirCallback.getResultList();
+						
+			
+			// now we have two lists, we have to 
+			for ( int i = 0; i < adverts.size(); i++)
+			{
+				CisDirectoryCombinedDetails niceDets = new  CisDirectoryCombinedDetails();
+				niceDets.setAdrecord(adverts.get(i));
+				
+				if ((cssDetails != null) && (cssDetails.size() > 0))
+				{
+				
+					// list is returned in order we sent, so only have to check as far as 'i'
+					for ( int j = 0; ((j <= i) && (j < cssDetails.size())); j++)
+					{
+						if (adverts.get(i).getCssownerid().contains(cssDetails.get(j).getId()))
+						{
+							niceDets.setCssownername(cssDetails.get(j).getName());
+							// found it, stop searching
+							j = cssDetails.size();
+						}
+						
+					}
+					// If we didn't find it, then just use the cssowneer id
+					if (niceDets.getCssownername().isEmpty())
+					{
+						niceDets.setCssownername(adverts.get(i).getCssownerid());
+					}
+						
+					
+				}
+				cssNiceDetails.add(niceDets);
+			}
+		}
+		
+		model.put("cssNiceDetails", cssNiceDetails);
+		
+		return new ModelAndView("cisdirpilotresult", model);
+	}
+	
 }
