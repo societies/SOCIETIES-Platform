@@ -332,7 +332,8 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 
 		//CREATE JOIN INFO
 		AskCisManagerForJoin join = new AskCisManagerForJoin();
-		join.setCisAdv( ACisAdvertisementRecord.convertACisAdvertRecord(targetCis));
+		//join.setCisAdv( ACisAdvertisementRecord.convertACisAdvertRecord(targetCis));
+		join.setCisAdv( targetCis);
 		//CREATE MESSAGE BEAN
 		CommunityManager messageBean = new CommunityManager();
 		messageBean.setAskCisManagerForJoin(join);
