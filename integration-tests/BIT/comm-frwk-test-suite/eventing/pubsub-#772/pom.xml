@@ -30,6 +30,7 @@
 			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
@@ -48,6 +49,7 @@
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+		-->
 		<dependency>
 		    <groupId>org.societies.integration.test.util</groupId>
 		    <artifactId>integrationtestutil</artifactId>
@@ -76,7 +78,9 @@
 	</dependencies>
 
 	<build>
-		<plugins><!-- USED TO BUILD THE TEST CLASS THAT IS PUT ON PUBSUB NODE -->
+		<plugins>
+			<!-- USED TO BUILD THE TEST CLASS THAT IS PUT ON PUBSUB NODE -->
+			<!--
 		    <plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
@@ -109,9 +113,10 @@
 					</execution>
 				</executions>
 				<configuration>
-			 	 <!-- <folderInputDirectory>${project.build.directory}/generated-sources/</folderInputDirectory> -->
+			 		<folderInputDirectory>${project.build.directory}/generated-sources/</folderInputDirectory>
 				</configuration>
 			</plugin>
+			 -->
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
