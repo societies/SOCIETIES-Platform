@@ -222,14 +222,14 @@ public interface IAndroidCSSManager {
 	/**
 	 * Get friend CSS(s) advertisements
 	 * @param client
-	 * @return
+	 * @return List<ACssAdvertisementRecord>
 	 */
 	List<ACssAdvertisementRecord> getCssFriends(String client);
 
 	/**
 	 * Get friend CSS(s) advertisements
 	 * @param client
-	 * @return
+	 * @return List<ACssAdvertisementRecord>
 	 */
 	List<ACssAdvertisementRecord> getSuggestedFriends(String client);
 	/**

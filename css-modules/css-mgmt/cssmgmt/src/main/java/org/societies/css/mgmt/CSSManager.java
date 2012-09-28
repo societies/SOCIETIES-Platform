@@ -205,11 +205,11 @@ public class CSSManager implements ICSSLocalManager {
 					e.printStackTrace();
 				}
 				// internal eventing
-				LOG.info(" :) :) :) :) Generating CSS_Record_Event to notify Record has been created");
+				LOG.info("Generating CSS_Record_Event to notify Record has been created");
 				if(this.getEventMgr() != null){
 					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record Created", this.idManager.getThisNetworkNode().toString(), cssProfile);
 					try {
-						LOG.info(":) :) :) :) Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
+						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
 						this.getEventMgr().publishInternalEvent(event);
 					} catch (EMSException e) {
 						// TODO Auto-generated catch block
@@ -418,11 +418,11 @@ public class CSSManager implements ICSSLocalManager {
 			cssRecord.setIdentityName(profile.getIdentityName());
 			
 			// internal eventing
-			LOG.info(" :) :) :) :) Generating CSS_Record_Event to notify Record has changed");
+			LOG.info("Generating CSS_Record_Event to notify Record has changed");
 			if(this.getEventMgr() != null){
 				InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record modified", this.idManager.getThisNetworkNode().toString(), cssRecord);
 				try {
-					LOG.info(":) :) :) :) Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
+					LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
 					this.getEventMgr().publishInternalEvent(event);
 				} catch (EMSException e) {
 					// TODO Auto-generated catch block
@@ -989,7 +989,7 @@ public class CSSManager implements ICSSLocalManager {
 		// db updated ow send it to friend and forget about it
 		//cssManagerRemote.se
 		System.out.println("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
-		LOG.info("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
+		LOG.info("sending Friend request : " +cssFriendId);
 		cssManagerRemote.sendCssFriendRequest(cssFriendId);
 	}
 	
@@ -1094,10 +1094,10 @@ public class CSSManager implements ICSSLocalManager {
 		if (currentCssRecord.getCssNodes() != null) {
 			for (CssNode cssNode : currentCssRecord.getCssNodes()) {
 				cssNode.getIdentity();
-				LOG.info("[][][][][] cssNode.getIdentity is returning   [][][][][]: " +cssNode.getIdentity());
-				LOG.info("[][][][][] nodeid is returning   [][][][][]: " +nodeid);
+				LOG.info("cssNode.getIdentity is returning: " +cssNode.getIdentity());
+				LOG.info("nodeid is returning: " +nodeid);
 				if (nodeid.equalsIgnoreCase(cssNode.getIdentity())){
-					LOG.info("[][][][][] cssNode.getType() is returning   [][][][][]: " +cssNode.getType());
+					LOG.info("cssNode.getType() is returning: " +cssNode.getType());
 					if (CSSManagerEnums.nodeType.Android.ordinal() == (cssNode.getType())) {
 						Type = "Android";
 					} else if (CSSManagerEnums.nodeType.Rich.ordinal() == (cssNode.getType())) {
@@ -1108,7 +1108,7 @@ public class CSSManager implements ICSSLocalManager {
 				}
 			}
 		}
-		LOG.info("[][][][][] getthisNodeType is returning   [][][][][]: " +Type);
+		LOG.info("getthisNodeType is returning: " +Type);
 		return new AsyncResult<String>(Type);
 	}
 
@@ -1239,7 +1239,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	List<CssAdvertisementRecord> commonFriends = new ArrayList<CssAdvertisementRecord>();
 	String MyId = "";	
 	MyId = idManager.getThisNetworkNode().toString();
-	LOG.info("@#@#@#@#@#@# ==== MyId contains " +MyId);
+	LOG.info("MyId contains " +MyId);
 	
 	LOG.info("CSSManager getFriends method called ");
 	
@@ -1252,9 +1252,9 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	recordList = callback.getResultList();
 	
 	for (CssAdvertisementRecord cssAdd : recordList) {
-		LOG.info("@#@#@#@#@#@# ==== Comparing Id contains " +cssAdd.getId());
+		LOG.info("Comparing Id contains " +cssAdd.getId());
 		if (cssAdd.getId().equalsIgnoreCase(MyId)) {
-			LOG.info("This is my OWN ID not adding it #########  ");
+			LOG.info("This is my OWN ID not adding it");
 		}else {
 			cssFriends.add((cssAdd));
 		}
@@ -1267,7 +1267,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	LOG.info("CSS Directory contains " +cssFriends.size() +" entries");
 	
 	LOG.info("Contacting SN Connector to get list");
-	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ getSocialData() returns " +getSocialData());
+	LOG.info("getSocialData() returns " +getSocialData());
 	
 	// Generate the connector
 	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
@@ -1276,7 +1276,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	while (it.hasNext()){
 	  ISocialConnector conn = it.next();
   	  
-	LOG.info("@@@@@@@@@@@@@@@@@@@@@@@ SocialNetwork connector contains " +conn.getConnectorName());
+	LOG.info("SocialNetwork connector contains " +conn.getConnectorName());
 	
 	//socialdata.updateSocialData();
 	}
@@ -1327,10 +1327,10 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
    // for (int index =0; index < cssFriends.size(); index++)
    // {
     for (CssAdvertisementRecord friend : cssFriends) {
-    	LOG.info("[]][][][][][] CSS Friends iterator List contains " +friend);
+    	LOG.info("CSS Friends iterator List contains " +friend);
         if (socialFriends.contains(friend.getName())) {
         	if (commonFriends.contains(friend)){
-        		LOG.info("This friend is already added to the list @@@@@@@@@@  " +friend);	
+        		LOG.info("This friend is already added to the list:" +friend);	
         	}else {
         		commonFriends.add(friend);
         	}
@@ -1375,13 +1375,13 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 			pendingfriendList = cssRegistry.getCssRequests();
 			
 			for (CssRequest cssrequest : pendingfriendList) {
-		    	LOG.info("[]][][][][][] CSS FriendRequest iterator List contains " +pendingfriendList);
-		    	LOG.info("[]][][][][][] cssrequest status is: " +cssrequest.getRequestStatus());
+		    	LOG.info("CSS FriendRequest iterator List contains " +pendingfriendList);
+		    	LOG.info("cssrequest status is: " +cssrequest.getRequestStatus());
 		        if (cssrequest.getRequestStatus().value().equalsIgnoreCase("pending")) {
 		        	//cssrequest.getCssIdentity();
 		        	pendingList.add(cssrequest.getCssIdentity());
-		        	LOG.info("[]][][][][][] pendingList size is now: " +pendingfriendList.size());
-		        	LOG.info("[]][][][][][] pendingList entry is: " +cssrequest.getCssIdentity());
+		        	LOG.info("pendingList size is now: " +pendingfriendList.size());
+		        	LOG.info("pendingList entry is: " +cssrequest.getCssIdentity());
 		        		
 		        	}
 		        	
