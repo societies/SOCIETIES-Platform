@@ -10,13 +10,15 @@
 	                    "membershipCrit": {
 			                    "criteria": [
 		                    	{
-		                        "attribute": "religion",
-		                        "operation": "equals",
-		                        "value": "Protestant"},
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value1": "Atheist"},
 		                        {
-		                        "attribute": "location",
-		                        "operation": "equals",
-		                        "value": "Peru"}
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru"}
 		                        ]
 		                	},
 	                    "description": "soh barca",
@@ -38,13 +40,15 @@
 	                    "membershipCrit": {
 		                    "criteria": [
 		                    	{
-		                        "attribute": "religion",
-		                        "operation": "equals",
-		                        "value": "Protestant"},
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value2": "Atheist"},
 		                        {
-		                        "attribute": "location",
-		                        "operation": "equals",
-		                        "value": "Peru"}
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru"}
 		                        ]
 		                	},
 	                    "description": "cis do flamengo",
@@ -57,13 +61,15 @@
 	                    "membershipCrit": {
 		                    "criteria": [
 		                    	{
-		                        "attribute": "religion",
-		                        "operation": "equals",
-		                        "value": "Protestant"},
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value2": "Protestant"},
 		                        {
-		                        "attribute": "location",
-		                        "operation": "equals",
-		                        "value": "Peru"}
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru"}
 		                        ]
 		                	},
 	                    "description": "cis do Vasco",
@@ -76,13 +82,15 @@
 	                    "membershipCrit": {
 		                    "criteria": [
 		                    	{
-		                        "attribute": "religion",
-		                        "operation": "equals",
-		                        "value": "Protestant"},
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value2": "Protestant"},
 		                        {
-		                        "attribute": "location",
-		                        "operation": "equals",
-		                        "value": "Peru"}
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru"}
 		                        ]
 		                	},
 	                    "description": "cis do flu",
@@ -98,13 +106,15 @@
                     "membershipCrit": {
 	                    "criteria": [
 	                    	{
-	                        "attribute": "age",
-	                        "operation": "<",
-	                        "value": "25"},
+	                        "attrib": "age",
+	                        "operator": "<",
+	                        "value1": "25",
+	                        "value2": "25"},
 	                        {
-	                        "attribute": "location",
-	                        "operation": "equals",
-	                        "value": "Edinburgh"}
+	                        "attrib": "location",
+	                        "operator": "equals",
+	                        "value1": "Edinburgh",
+	                        "value2": "Edinburgh"}
 	                        ]
 	                	}
 				    },
@@ -116,13 +126,15 @@
                     "membershipCrit": {
 	                    "criteria": [
 	                    	{
-	                        "attribute": "age",
-	                        "operation": ">",
-	                        "value": "25"},
+	                        "attrib": "age",
+	                        "operator": ">",
+	                        "value1": "25",
+	                        "value2": "25"},
 	                        {
-	                        "attribute": "location",
-	                        "operation": "equals",
-	                        "value": "Edinburgh"}
+	                        "attrib": "location",
+	                        "operator": "equals",
+	                        "value1": "Edinburgh",
+	                        "value2": "Edinburgh"}
 	                        ]
 	                	}
 				    }
@@ -137,13 +149,15 @@
 	                    "membershipCrit": {
 		                    "criteria": [
 		                    	{
-		                        "attribute": "religion",
-		                        "operation": "equals",
-		                        "value": "Protestant"},
+		                        "attrib": "religion",
+		                        "operator": "equals",
+		                        "value1": "Protestant",
+		                        "value2": "Atheist"},
 		                        {
-		                        "attribute": "location",
-		                        "operation": "equals",
-		                        "value": "Peru"}
+		                        "attrib": "location",
+		                        "operator": "equals",
+		                        "value1": "Peru",
+		                        "value2": "Peru"}
 		                        ]
 		                	},
 	                    "description": "Where to go if you want help developing Societies services",

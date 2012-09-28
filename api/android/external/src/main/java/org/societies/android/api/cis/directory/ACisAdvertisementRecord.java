@@ -99,4 +99,17 @@ public class ACisAdvertisementRecord extends CisAdvertisementRecord implements P
 		
 		return arecord;
 	}
+	
+	public static CisAdvertisementRecord convertACisAdvertRecord(ACisAdvertisementRecord arecord) {
+		CisAdvertisementRecord record = new CisAdvertisementRecord();
+		record.setCssownerid(arecord.getCssownerid());
+		record.setId(arecord.getId());
+		record.setName(arecord.getName());
+		record.setPassword(arecord.getPassword());
+		record.setType(arecord.getType());
+		//if(arecord.getMembershipCrit()!=null && arecord.getMembershipCrit().getCriteria() != null && arecord.getMembershipCrit().getCriteria().isEmpty()== false)
+		//	record.setMembershipCrit(AMembershipCrit.convertAMembershipCrit(arecord.getMembershipCrit()));
+		
+		return record;
+	}
 }

@@ -62,6 +62,7 @@ import org.societies.api.schema.cis.manager.AskCisManagerForLeave;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.cis.manager.ListCrit;
+import org.societies.api.schema.cis.manager.ListResponse;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 
 import android.app.Service;
@@ -80,7 +81,7 @@ import android.util.Log;
 public class CommunityManagement extends Service implements ICisManager, ICisSubscribed {
 
 	//COMMS REQUIRED VARIABLES
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("communityManager", "communityMethods", "activityfeed");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("communityManager", "communityMethods", "activityfeed", "listResponse");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cis/manager",
 														    	  "http://societies.org/api/schema/activityfeed",	  		
 																  "http://societies.org/api/schema/cis/community");
@@ -160,7 +161,8 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 			listCriteria.add( ACriteria.convertACriteria(acrit));
 		}	
 		rules.setCriteria(listCriteria);
-		cisinfo.setMembershipCrit(rules); //TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX 
+		cisinfo.setMembershipCrit(rules); //TODO: NOT ADDING RULES, THEN THEY WON'T BE CHECKED ON JOINING - NEEDS FIX
+		cisinfo.setPrivacyPolicy(privacyPolicy);
 		//ADD TO BEAN
 		Create create = new Create();
 		create.setCommunity(cisinfo);
@@ -332,8 +334,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 
 		//CREATE JOIN INFO
 		AskCisManagerForJoin join = new AskCisManagerForJoin();
-		//join.setCisAdv( ACisAdvertisementRecord.convertACisAdvertRecord(targetCis));
-		join.setCisAdv( targetCis);
+		join.setCisAdv( ACisAdvertisementRecord.convertACisAdvertRecord(targetCis));
 		//CREATE MESSAGE BEAN
 		CommunityManager messageBean = new CommunityManager();
 		messageBean.setAskCisManagerForJoin(join);
@@ -591,24 +592,28 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 		public void receiveMessage(Stanza stanza, Object msgBean) {
 			Log.d(LOG_TAG, "Callback receiveMessage");	
 			
-			Intent intent = new Intent(returnIntent);
-			
-			if (msgBean==null) Log.d(LOG_TAG, ">>>>msgBean is null");
-			
-			// --------- COMMUNITY MANAGER Bean ---------
-			if (msgBean instanceof CommunityMethods) {
-				Log.d(LOG_TAG, "CommunityManager Result!");
-				CommunityMethods communityMessage = (CommunityMethods) msgBean;
+			if (client != null) {
+				Intent intent = new Intent(returnIntent);
 				
-				// --------- JOIN RESPONSE ---------
-				if (communityMessage.getJoinResponse() != null) {
-					//CONVERT TO PARCEL BEAN
-					Parcelable joined = AJoinResponse.convertJoinResponse(communityMessage.getJoinResponse());
-					//NOTIFY CALLING CLIENT
-					intent.putExtra(INTENT_RETURN_VALUE, joined);
+				if (msgBean==null) Log.d(LOG_TAG, ">>>>msgBean is null");
+				// --------- COMMUNITY MANAGER Bean ---------
+				if (msgBean instanceof CommunityMethods) {
+					Log.d(LOG_TAG, "CommunityManager Result!");
+					CommunityMethods communityMessage = (CommunityMethods) msgBean;
+					
+					// --------- JOIN RESPONSE ---------
+					if (communityMessage.getJoinResponse() != null) {
+						//CONVERT TO PARCEL BEAN
+						Parcelable joined = AJoinResponse.convertJoinResponse(communityMessage.getJoinResponse());
+						//NOTIFY CALLING CLIENT
+						intent.putExtra(INTENT_RETURN_VALUE, joined);
+					}
+					
 				}
+				intent.setPackage(client);
+				CommunityManagement.this.sendBroadcast(intent);
+				CommunityManagement.this.commMgr.unregister(ELEMENT_NAMES, this);
 			}
-
 		}
 
 		public void receiveResult(Stanza returnStanza, Object msgBean) {
@@ -636,27 +641,30 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 						}
 						intent.putExtra(INTENT_RETURN_BOOLEAN,communityResult.getCreate().isResult());
 					}
-					
-					//LIST COMMUNITIES RESULT
 					else if (communityResult.getListResponse() != null) {
-						Log.d(LOG_TAG, "List CIS Result!");
-						List<Community> listReturned = communityResult.getListResponse().getCommunity();
-						//CONVERT TO PARCEL BEANS
-						Parcelable returnArray[] = new Parcelable[listReturned.size()];
-						for (int i=0; i<listReturned.size(); i++) {
-							ACommunity cis = ACommunity.convertCommunity(listReturned.get(i)); 
-							returnArray[i] = cis;
-							Log.d(LOG_TAG, "Added cis: " + cis.getCommunityJid().toString());
-						}
-						//NOTIFY CALLING CLIENT
-						intent.putExtra(INTENT_RETURN_VALUE, returnArray);
+						//TODO: MOVE THE LIST RESPONSE TO HERE FROM BELOW BEAN CHANGED
 					}
-					
 					//ASK FOR JOIN COMMUNITIES RESULT
 					else if (communityResult.getAskCisManagerForJoinResponse() != null) {
 						Log.d(LOG_TAG, "Ask CIS JOIN Response = " + communityResult.getAskCisManagerForJoinResponse().getStatus());
+						return; //WE DON'T WANT TO BROADCAST THIS EVENT
 					}
 				} 
+				//LIST COMMUNITIES RESULT
+				else if(msgBean instanceof ListResponse) {
+					Log.d(LOG_TAG, "List CIS Result!");
+					ListResponse response = (ListResponse) msgBean;
+					List<Community> listReturned = response.getCommunity();
+					//CONVERT TO PARCEL BEANS
+					Parcelable returnArray[] = new Parcelable[listReturned.size()];
+					for (int i=0; i<listReturned.size(); i++) {
+						ACommunity cis = ACommunity.convertCommunity(listReturned.get(i)); 
+						returnArray[i] = cis;
+						Log.d(LOG_TAG, "Added cis: " + cis.getCommunityJid().toString());
+					}
+					//NOTIFY CALLING CLIENT
+					intent.putExtra(INTENT_RETURN_VALUE, returnArray);
+				}
 				// --------- CIS SUBSCRIBED BEAN---------
 				else if(msgBean instanceof CommunityMethods) {
 					Log.d(LOG_TAG, "CommunityMethods Result!");

@@ -54,11 +54,13 @@ var	SocietiesCISManagerService = {
 		var cisName = jQuery("#cisNameOnCisCreate").val(),
             cisType = jQuery("#cisCategoryOnCisCreate").val(),
             cisCriteria = [{
-                    "attribute": "age",
-                    "operation": "greater than",
-                    "value": "18"}],
+                    "attrib": "age",
+                    "operator": "greater than",
+                    "value1": "18",
+                    "value2": "18",
+                    "rank": "1"}],
              cisDescription = jQuery("#cisDescOnCisCreate").val(),
-             privacyPolicy = "<policy />";
+             privacyPolicy = "<RequestPolicy />";
 
 		window.plugins.SocietiesLocalCISManager.createCIS(success, failure, cisName, cisDescription, cisType, cisCriteria, privacyPolicy);
 	},
