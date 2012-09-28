@@ -6,7 +6,7 @@
   <artifactId>RegSynchroniser</artifactId>
   <packaging>bundle</packaging>
   <name>RegSynchroniser</name>
-  <version>${release.version}-SNAPSHOT</version>
+  <version>${release.version}</version>
   
   <properties>
 	<slf4j.version>1.4.3</slf4j.version>
@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>org.societies.css.devicemgmt</groupId>
 			<artifactId>deviceregistry</artifactId>
-			<version>${release.version}-SNAPSHOT</version>
+			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

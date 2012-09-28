@@ -30,7 +30,7 @@
 	<groupId>org.societies.platform.servicelifecycle</groupId>
 	<artifactId>serviceManagement</artifactId>
 	<name>Service Management</name>
-	<version>${release.version}-SNAPSHOT</version>
+	<version>${release.version}</version>
 	<packaging>bundle</packaging>
 
 	<developers>
