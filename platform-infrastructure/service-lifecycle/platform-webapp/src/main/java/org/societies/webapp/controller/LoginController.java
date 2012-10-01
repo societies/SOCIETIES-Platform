@@ -133,7 +133,6 @@ public class LoginController {
 		{
 			//all okay, we're in the correct container
 			model.put("message", "Welcome to your Societies account");
-			model.put("paraCssid", cssId);
 			session.setAttribute("User", cssId);
 			return new ModelAndView("loginviada", model) ;
 		}

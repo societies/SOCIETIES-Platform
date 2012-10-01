@@ -36,6 +36,7 @@ iframe {
 	height: 100%
 }
 </style>
+<title>Societies - Home</title>
 </head>
 <body>
 	<table>

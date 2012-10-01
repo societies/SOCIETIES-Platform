@@ -278,18 +278,20 @@ public class CssDirectory implements ICssDirectory {
 
 		try {
 
-
-			tmpAdvertList = session.createCriteria(CssAdvertisementRecordEntry.class).
-					add(Restrictions.in("id",cssIds)).list();
+			if (cssIds != null && (cssIds.size() > 0))
+			{
+				tmpAdvertList = session.createCriteria(CssAdvertisementRecordEntry.class).
+						add(Restrictions.in("id",cssIds)).list();
 			
-			for (CssAdvertisementRecordEntry entry : tmpAdvertList) {
-				record = new CssAdvertisementRecord();
-				record.setName(entry.getName());
-				record.setId(entry.getId());
-				record.setUri(entry.getUri());
+				for (CssAdvertisementRecordEntry entry : tmpAdvertList) {
+					record = new CssAdvertisementRecord();
+					record.setName(entry.getName());
+					record.setId(entry.getId());
+					record.setUri(entry.getUri());
 
-				returnList.add(record);
+					returnList.add(record);
 
+				}
 			}
 
 		} catch (Exception e) {
