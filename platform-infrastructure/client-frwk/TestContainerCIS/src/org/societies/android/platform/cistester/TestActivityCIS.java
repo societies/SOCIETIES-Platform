@@ -258,7 +258,7 @@ public class TestActivityCIS extends Activity {
     	Log.d(LOG_TAG, "record conversion");
 		ACisAdvertisementRecord aAdrec = ACisAdvertisementRecord.convertCisAdvertRecord(ad);
     	Log.d(LOG_TAG, "sending join");
-		serviceCISsubscribe.Join(CLIENT_PACKAGE, aAdrec);
+		serviceCISManager.Join(CLIENT_PACKAGE, aAdrec);
     	//serviceCISManager.subscribeToCommunity(CLIENT_PACKAGE, cis_name, cis_id);
     	Log.d(LOG_TAG, "join sent");
 
