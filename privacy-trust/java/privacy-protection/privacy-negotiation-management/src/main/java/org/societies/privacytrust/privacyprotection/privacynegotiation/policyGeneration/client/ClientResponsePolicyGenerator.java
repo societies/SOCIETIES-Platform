@@ -86,7 +86,7 @@ public class ClientResponsePolicyGenerator {
 		this.locator = new PPNPOutcomeLocator(policyMgr);
 		this.userFeedback = policyMgr.getUserFeedback();
 	}
-	
+
 	/*
 	 * ALGORITHM:
 	 * FOR each RequestItem in the policy:
@@ -138,27 +138,27 @@ public class ClientResponsePolicyGenerator {
 		ResponsePolicy myResponse = new ResponsePolicy(requestor, new ArrayList<ResponseItem>(), NegotiationStatus.ONGOING);
 
 		List<RequestItem> requestItems = providerPolicy.getRequests();
-		
+
 		boolean isExactMatch = true;
-		
+
 		for (RequestItem item : requestItems){
-			
+
 			//if this item DOES NOT have a CREATE action
 			if (!this.hasCreate(item.getActions())){
 				//if this attribute DOES NOT exist in the context DB
 				if (!this.attrExistsInContext(item.getResource().getDataType())){
-					
+
 					//boolean attrCreated = this.createAttribute(requestor,item.getResource().getContextType());
 					//if (!attrCreated){
 
-						myResponse.addResponseItem(new ResponseItem(item, Decision.NOT_APPLICABLE));
-						isExactMatch = false;
-						continue;
+					myResponse.addResponseItem(new ResponseItem(item, Decision.NOT_APPLICABLE));
+					isExactMatch = false;
+					continue;
 					//}
 				}
 			}
 			PPNPOutcome outcome = this.locator.getPPNPOutcome(requestor, item);
-/*			if (null==outcome){
+			/*			if (null==outcome){
 				JOptionPane.showMessageDialog(null, "Retrieved NULL outcome for:"+item.getResource().getContextType());
 			}else{
 				JOptionPane.showMessageDialog(null, "Retrieved outcome for:"+item.getResource().getContextType());
@@ -167,15 +167,35 @@ public class ClientResponsePolicyGenerator {
 			if (outcome.getEffect().equals(PrivacyOutcomeConstants.BLOCK)){
 				if(item.isOptional()){
 					myResponse.addResponseItem(new ResponseItem(item, Decision.DENY));
-					((RequestorService) requestor).getRequestorServiceId().getServiceInstanceIdentifier()
+					((RequestorService) requestor).getRequestorServiceId().getServiceInstanceIdentifier();
 					isExactMatch = false;
 				}else{
-					int n = JOptionPane.showConfirmDialog(null, "Preference for item: "+item.getResource().getDataType()
+					String fail = "Fail negotiation";
+					String noFail = "Ignore my preference once";
+					String proposalText = "Preference for item: "+item.getResource().getDataType()+"\nfound but will most probably fail the negotiation.";
+					List<String> response = new ArrayList<String>();
+					try {
+						response = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, new String[]{fail,noFail})).get();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+/*					int n = JOptionPane.showConfirmDialog(null, "Preference for item: "+item.getResource().getDataType()
 							+"\nfound but will most probably fail the negotiation.\n"
 							+"\nWould you like to setup a different Privacy Preference?", 
 							"Privacy Policy Negotiation",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE
-							);
-					if (n==JOptionPane.YES_OPTION){
+							);*/
+					
+					if (response.contains(noFail)){
+						myResponse.addResponseItem(new ResponseItem(item, Decision.PERMIT));
+						
+					}else{
+						myResponse.addResponseItem(new ResponseItem(item, Decision.DENY));
+					}
+/*					if (n==JOptionPane.YES_OPTION){
 						PPNPOutcome temp = this.getOutcomeUsingGUI(item, requestor);
 						if (temp==null){
 							myResponse.addResponseItem(new ResponseItem(item, Decision.DENY));
@@ -186,7 +206,7 @@ public class ClientResponsePolicyGenerator {
 					}else{
 						myResponse.addResponseItem(new ResponseItem(item, Decision.DENY));
 						isExactMatch = false;
-					}
+					}*/
 				}
 			}else{
 				boolean changed = false;
@@ -213,13 +233,13 @@ public class ClientResponsePolicyGenerator {
 										+"to resource: "+item.getResource().getDataType()
 										+"\nAllow?";
 							}
-							
+
 							int n = JOptionPane.showConfirmDialog(null, question, 
 									"Privacy Policy Negotiation",
 									JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);	
 							if (n==JOptionPane.YES_OPTION){
 								newActions.add(action);
-								
+
 							}else{
 								changed = true;
 								isExactMatch = false;
@@ -229,7 +249,7 @@ public class ClientResponsePolicyGenerator {
 				}
 				item.setActions(newActions);
 				//CHECKING CONDITIONS
-				
+
 				//can't remove conditions inside the for loop
 				//make a new list and then replace this list 
 				List<Condition> newConditionsList = new ArrayList<Condition>();
@@ -266,7 +286,7 @@ public class ClientResponsePolicyGenerator {
 					}else{//condition exists in both provider and user policies
 						//compare the values
 						if (!(condition.getValueAsString().equalsIgnoreCase(myCondition.getValueAsString()))){
-						//values don't match so, if it's optional, we add the user's version of the condition to the list (changed condition)
+							//values don't match so, if it's optional, we add the user's version of the condition to the list (changed condition)
 							if (condition.isOptional()){
 								newConditionsList.add(myCondition);
 								changed = true;
@@ -312,7 +332,7 @@ public class ClientResponsePolicyGenerator {
 				}
 			}
 		}
-		
+
 		if (isExactMatch){
 			myResponse.setStatus(NegotiationStatus.SUCCESSFUL);
 		}else{
@@ -320,7 +340,7 @@ public class ClientResponsePolicyGenerator {
 		}
 		//JOptionPane.showMessageDialog(null, "Created responsePolicy and returning");
 		return myResponse;
-		
+
 	}
 	private Condition containsIgnoreValue(List<Condition> list, Condition c){
 		for (Condition con : list){
@@ -330,18 +350,18 @@ public class ClientResponsePolicyGenerator {
 		}
 		return null;
 	}
-	
+
 	private boolean containsAction(List<Action> actions, Action a){
 		for (Action action : actions){
 			if (action.getActionType().equals(a.getActionType())){
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
-	private PPNPOutcome getOutcomeUsingGUI(RequestItem item, Requestor subject){
+
+/*	private PPNPOutcome getOutcomeUsingGUI(RequestItem item, Requestor subject){
 		PPNPOutcomeDialog guiDialog = new PPNPOutcomeDialog(subject, this.getClass().getName(), item,this.privPrefMgr);
 		if (guiDialog.wasAccepted()){
 			PPNPOutcome outcome = guiDialog.getOutcome();
@@ -353,18 +373,18 @@ public class ClientResponsePolicyGenerator {
 			return outcome;
 		}
 		this.logging.debug("Outcome not accepted.");
-			return  null;
-		
+		return  null;
+
 		//return outcome;
-	}
+	}*/
 
 
 	private boolean attrExistsInContext(String type){
 		try {
-			
+
 			Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveCssOperator();
 			CtxEntity person = futurePerson.get();
-			
+
 
 			Set<CtxAttribute> attrs = person.getAttributes(type);
 			if (attrs.size()>0){
@@ -382,8 +402,8 @@ public class ClientResponsePolicyGenerator {
 		}
 		return false;
 	}
-	
-	
+
+
 	private boolean hasCreate(List<Action> actions){
 		Iterator<Action> it = actions.iterator();
 		while (it.hasNext()){
@@ -394,7 +414,7 @@ public class ClientResponsePolicyGenerator {
 		}
 		return false;
 	}
-	
+
 	private boolean createAttribute(Requestor requestor, String type){
 		String question="";
 		if (requestor instanceof RequestorCis){
@@ -404,50 +424,56 @@ public class ClientResponsePolicyGenerator {
 		}
 		String permit = "Allow access";
 		String deny = "Deny access";
-		List<String> response = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(question, new String[]{permit,deny})).get();
-		//int n = JOptionPane.showConfirmDialog(null, question, "Non-Existing Attribute", JOptionPane.YES_NO_OPTION);
-		if (n==JOptionPane.YES_OPTION){
-			try {
+		try {
+			List<String> response = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(question, new String[]{permit,deny})).get();
+			//int n = JOptionPane.showConfirmDialog(null, question, "Non-Existing Attribute", JOptionPane.YES_NO_OPTION);
+			if (response.contains(permit)){
+
 				CtxEntityIdentifier personEntityIdentifier = this.getPersonEntity(); 
 				if (personEntityIdentifier==null){
 					this.logging.debug("Unable to find Person entity");
 					return false;
 				}
 				CtxAttribute attr = this.ctxBroker.createAttribute(personEntityIdentifier, type).get();
-				String value = (String)JOptionPane.showInputDialog(
-	                    null,
-	                    "Enter a value for "+ type,
-	                    "New Context Attribute :"+type,
-	                    JOptionPane.PLAIN_MESSAGE,
-	                    null,
-	                    null,
-	                    "");
+				
+				
+				/*String value = (String)JOptionPane.showInputDialog(
+						null,
+						"Enter a value for "+ type,
+						"New Context Attribute :"+type,
+						JOptionPane.PLAIN_MESSAGE,
+						null,
+						null,
+						"");*/
+				String value= "";
 				if (value!=null){
 					attr.setStringValue(value);
 					ctxBroker.update(attr);
 				}
 				return true;
-			} catch (CtxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+		}catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-			return false;
+
+		return false;
 	}
-	
+
 	private CtxEntityIdentifier getPersonEntity(){
-		
+
 		if (null==personEntityID){
-			
-			
+
+
 			try {
-				Future<IndividualCtxEntity> futurePerson = this.ctxBroker.retrieveCssOperator();
+				
+				Future<IndividualCtxEntity> futurePerson = this.ctxBroker.retrieveIndividualEntity(this.policyMgr.getIdm().getThisNetworkNode());
 				IndividualCtxEntity personEntity = futurePerson.get();
 				if (null==personEntity){
 					return null;

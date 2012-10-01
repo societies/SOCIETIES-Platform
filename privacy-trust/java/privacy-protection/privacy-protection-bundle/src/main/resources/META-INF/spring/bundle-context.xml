@@ -139,6 +139,7 @@
 		<property name="commsMgr" ref="commManager"></property>
 		<property name="trustBroker" ref="trustBroker"></property>
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
+		<property name="userFeedback" ref="UserFeedbackGUI"></property>
 	</bean>
 
 
