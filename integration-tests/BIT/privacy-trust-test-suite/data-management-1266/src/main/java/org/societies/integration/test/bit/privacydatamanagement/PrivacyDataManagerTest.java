@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.eclipse.jetty.util.log.Log;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +61,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.util.commonmock.MockIdentity;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -74,10 +72,12 @@ public class PrivacyDataManagerTest
 	public static Integer testCaseNumber = 0;
 
 	private DataIdentifier dataId;
-	private DataIdentifier cisDataId;
+	private DataIdentifier cisPublicDataId;
+	private DataIdentifier cisPrivateDataId;
 	private IIdentity myCssId;
 	private IIdentity otherCssId;
-	private IIdentity cisId;
+	private IIdentity cisPublicId;
+	private IIdentity cisPrivateId;
 	private RequestorCis requestorCis;
 	private RequestorService requestorService;
 	private List<Action> actionsRead;
@@ -99,16 +99,19 @@ public class PrivacyDataManagerTest
 		}
 		// Data
 		myCssId = TestCase1266.commManager.getIdManager().getThisNetworkNode();
-		otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
-		cisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
+		otherCssId =  TestCase1266.commManager.getIdManager().fromJid("emma.societies.local");
+		cisPublicId =  TestCase1266.commManager.getIdManager().fromJid("cis-public.societies.local");
+		cisPrivateId =  TestCase1266.commManager.getIdManager().fromJid("cis-private.societies.local");
 		requestorCis = getRequestorCis();
 		requestorService = getRequestorService();
 		// Data Id
 		try {
 			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId+"/ENTITY/person/1/ATTRIBUTE/name/13");
-			cisDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId+"/cis-member-list/");
+			cisPublicDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisPublicId+"/cis-member-list/");
+			cisPrivateDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisPrivateId+"/cis-member-list/");
 			LOG.info("Data id: "+dataId.getUri()+" (scheme: "+dataId.getScheme()+", type: "+dataId.getType()+")");
-			LOG.info("Cis Data id: "+cisDataId.getUri()+" (scheme: "+cisDataId.getScheme()+", type: "+cisDataId.getType()+")");
+			LOG.info("Public Cis Data id: "+cisPublicDataId.getUri()+" (scheme: "+cisPublicDataId.getScheme()+", type: "+cisPublicDataId.getType()+")");
+			LOG.info("Private Cis Data id: "+cisPrivateDataId.getUri()+" (scheme: "+cisPrivateDataId.getScheme()+", type: "+cisPrivateDataId.getType()+")");
 		}
 		catch (MalformedCtxIdentifierException e) {
 			LOG.error("setUp(): DataId creation error "+e.getMessage()+"\n", e);
@@ -134,15 +137,15 @@ public class PrivacyDataManagerTest
 
 		// - Privacy Policy
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
-		requestItems.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsPublic));
+		requestItems.add(new RequestItem(new Resource(cisPublicDataId), actionsRead, conditionsPublic));
 		List<RequestItem> requestItemsMembersOnly = new ArrayList<RequestItem>();
-		requestItemsMembersOnly.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsMembersOnly));
+		requestItemsMembersOnly.add(new RequestItem(new Resource(cisPublicDataId), actionsRead, conditionsMembersOnly));
 		List<RequestItem> requestItemsPrivate = new ArrayList<RequestItem>();
-		requestItemsPrivate.add(new RequestItem(new Resource(cisDataId), actionsRead, conditionsPrivate));
+		requestItemsPrivate.add(new RequestItem(new Resource(cisPublicDataId), actionsRead, conditionsPrivate));
 
-		privacyPolicy = new RequestPolicy(new RequestorCis(myCssId, cisId), requestItems);
-		privacyPolicyMembersOnly = new RequestPolicy(new RequestorCis(myCssId, cisId), requestItemsMembersOnly);
-		privacyPolicyPrivate = new RequestPolicy(new RequestorCis(myCssId, cisId), requestItemsPrivate);
+		privacyPolicy = new RequestPolicy(new RequestorCis(myCssId, cisPublicId), requestItems);
+		privacyPolicyMembersOnly = new RequestPolicy(new RequestorCis(myCssId, cisPublicId), requestItemsMembersOnly);
+		privacyPolicyPrivate = new RequestPolicy(new RequestorCis(myCssId, cisPublicId), requestItemsPrivate);
 	}
 
 	@After
@@ -211,7 +214,7 @@ public class PrivacyDataManagerTest
 		ResponseItem permission = null;
 		try {
 			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
-			permission = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			permission = TestCase1266.privacyDataManager.checkPermission(requestorService, cisPublicDataId, actionsRead);
 			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicy.getRequestor());
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
@@ -239,8 +242,8 @@ public class PrivacyDataManagerTest
 		ResponseItem permission2 = null;
 		try {
 			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicy);
-			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
-			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
+			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisPublicDataId, actionsRead);
+			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisPublicDataId, actionsRead);
 			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicy.getRequestor());
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
@@ -272,10 +275,10 @@ public class PrivacyDataManagerTest
 		ResponseItem permissionMe = null;
 		try {
 			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicyPrivate);
-			Log.info("[#"+testCaseNumber+"] Requested by: "+requestorService);
-			permissionOther = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
-			Log.info("[#"+testCaseNumber+"] Requested by me: "+myCssId.getJid());
-			permissionMe = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
+			LOG.info("[#"+testCaseNumber+"] Requested by: "+requestorService);
+			permissionOther = TestCase1266.privacyDataManager.checkPermission(requestorService, cisPrivateDataId, actionsRead);
+			LOG.info("[#"+testCaseNumber+"] Requested by me: "+myCssId.getJid());
+			permissionMe = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisPrivateDataId, actionsRead);
 			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicyPrivate.getRequestor());
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
@@ -309,10 +312,10 @@ public class PrivacyDataManagerTest
 		ResponseItem permissionMe2 = null;
 		try {
 			privacyPolicyAdded = TestCase1266.privacyPolicyManager.updatePrivacyPolicy(privacyPolicyPrivate);
-			permissionOther1 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
-			permissionMe1 = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
-			permissionOther2 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisDataId, actionsRead);
-			permissionMe2 = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisDataId, actionsRead);
+			permissionOther1 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisPrivateDataId, actionsRead);
+			permissionMe1 = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisPrivateDataId, actionsRead);
+			permissionOther2 = TestCase1266.privacyDataManager.checkPermission(requestorService, cisPrivateDataId, actionsRead);
+			permissionMe2 = TestCase1266.privacyDataManager.checkPermission(new Requestor(myCssId), cisPrivateDataId, actionsRead);
 			privacyPolicyDeleted = TestCase1266.privacyPolicyManager.deletePrivacyPolicy(privacyPolicyPrivate.getRequestor());
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
@@ -405,6 +408,6 @@ public class PrivacyDataManagerTest
 	}
 
 	private RequestorCis getRequestorCis() throws InvalidFormatException{
-		return new RequestorCis(otherCssId, cisId);
+		return new RequestorCis(otherCssId, cisPublicId);
 	}
 }

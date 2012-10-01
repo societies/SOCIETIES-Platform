@@ -73,13 +73,7 @@
 			<version>1.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<dependency>
-		    <groupId>org.societies.privacytrust.privacyprotection</groupId>
-		    <artifactId>api</artifactId>
-		    <version>${version.pt}</version>
-		    <scope>provided</scope>
-		</dependency>
+	
 	</dependencies>
 
 
