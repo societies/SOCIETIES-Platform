@@ -33,6 +33,8 @@ import java.util.concurrent.Future;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import junit.framework.TestCase;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.context.CtxException;
@@ -45,19 +47,16 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-/*import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPrivacyPreferenceTreeModel;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;*/
 
 /**
  * Describe your class here...
@@ -65,7 +64,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  * @author Eliza
  *
  */
-public class Tester {
+public class Tester2 {
 	
 	private IIdentityManager identityManager;
 	private ICtxBroker ctxBroker;
@@ -75,10 +74,9 @@ public class Tester {
 	private CtxAttribute nameAttribute2;
 	private Requestor requestor;
 	private IIdentity serviceIdentity;
-	//private IPrivacyPreferenceManager privPrefMgr;
 	private IHelloWorld helloWorld;
-	
-	public Tester(){
+	private IPrivacyDataManager privacyDataManager;
+	public Tester2(){
 		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
 	}
 	
@@ -86,9 +84,8 @@ public class Tester {
 	public void setup(){
 		identityManager = Test861.getIdentityManager();
 		ctxBroker = Test861.getCtxBroker();
-		//privPrefMgr = Test861.getPrivPrefMgr();
 		helloWorld = Test861.getHelloWorld();
-		
+		privacyDataManager = Test861.getPrivDataMgr();
 		userIdentity = identityManager.getThisNetworkNode();
 		
 		
@@ -108,15 +105,67 @@ public class Tester {
 		
 		this.setupRequestor();
 		this.createNonInferrableAttribute();
-		//this.createPPNPreference1();
-		//this.createPPNPreference2();
+
 	}
 	
 	@Test
 	public void testRetrieve(){
-			this.helloWorld.retrieveCtxAttribute(CtxAttributeTypes.NAME);
-			this.helloWorld.displayUserLocation();
+			List<CtxAttribute> attrs = this.helloWorld.retrieveCtxAttribute(CtxAttributeTypes.NAME);
+			
+			//this.helloWorld.displayUserLocation();
 	
+			try {
+				ResponseItem rItem = this.privacyDataManager.checkPermission(requestor, this.nameAttribute.getId(), new Action(ActionConstants.READ));
+				ResponseItem rItem2 = this.privacyDataManager.checkPermission(requestor, this.nameAttribute2.getId(), new Action(ActionConstants.READ));
+				
+				
+				if (rItem.getDecision().equals(Decision.DENY)){
+					for (CtxAttribute attr: attrs){
+						if (attr.getStringValue().equalsIgnoreCase("Chuck Norris")){
+							TestCase.fail("HelloWorld service got access to an attribute it shouldn't have");
+						}
+					}
+				}
+				
+				if (rItem.getDecision().equals(Decision.PERMIT)){
+					boolean foundAttribute = false;
+					for (CtxAttribute attr: attrs){
+						if (attr.getStringValue().equalsIgnoreCase("Chuck Norris")){
+							foundAttribute = true;
+						}
+					}
+					
+					if(!foundAttribute){
+						TestCase.fail("HelloWorld service did not get access to an attribute to which access was allowed");
+					}
+				}
+				
+				
+				
+				if (rItem2.getDecision().equals(Decision.DENY)){
+					for (CtxAttribute attr: attrs){
+						if (attr.getStringValue().equalsIgnoreCase("Walker, Texas Ranger")){
+							TestCase.fail("HelloWorld service got access to an attribute it shouldn't have");
+						}
+					}
+				}
+				
+				if (rItem2.getDecision().equals(Decision.PERMIT)){
+					boolean foundAttribute = false;
+					for (CtxAttribute attr: attrs){
+						if (attr.getStringValue().equalsIgnoreCase("Walker, Texas Ranger")){
+							foundAttribute = true;
+						}
+					}
+					
+					if (!foundAttribute){
+						TestCase.fail("HelloWorld service did not get access to an attribute to which access was allowed");
+					}
+				}
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		
 	}
 	
@@ -142,12 +191,13 @@ public class Tester {
 			
 			nameAttribute.setStringValue("Chuck Norris");
 			
+			this.ctxBroker.update(nameAttribute);
 			Future<CtxAttribute> createAttribute2 = this.ctxBroker.createAttribute(this.cssPersonEntity.getId(), CtxAttributeTypes.NAME);
 			
 			nameAttribute2 = createAttribute2.get();
 			
 			nameAttribute2.setStringValue("Walker, Texas Ranger");
-			
+			this.ctxBroker.update(nameAttribute2);
 			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -160,63 +210,4 @@ public class Tester {
 			e.printStackTrace();
 		}
 	}
-	
-	
-/*	private void createPPNPreference1(){
-		
-		Resource resource = new Resource(nameAttribute.getId());
-		List<Action> actions = new ArrayList<Action>();
-		actions.add(new Action(ActionConstants.CREATE));
-		actions.add(new Action(ActionConstants.DELETE));
-		actions.add(new Action(ActionConstants.READ));
-		actions.add(new Action(ActionConstants.WRITE));
-		List<Requestor> requestors = new ArrayList<Requestor>();
-		requestors.add(requestor);
-		RuleTarget target = new RuleTarget(requestors, resource, actions);
-		List<Condition> conditions = new ArrayList<Condition>();
-		try {
-			PPNPOutcome outcome = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, target , conditions);
-			IPrivacyPreference privacyPreference = new PrivacyPreference(outcome);
-			PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(CtxAttributeTypes.NAME, privacyPreference);
-			model.setRequestor(requestor);
-			model.setAffectedDataId(nameAttribute.getId());
-			PPNPreferenceDetails details = new PPNPreferenceDetails(CtxAttributeTypes.NAME);
-			details.setRequestor(requestor);
-			this.privPrefMgr.storePPNPreference(details, privacyPreference);
-			
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-
-		
-	}
-	
-	private void createPPNPreference2(){
-		Resource resource2 = new Resource(nameAttribute2.getId());
-		List<Action> actions2 = new ArrayList<Action>();
-		actions2.add(new Action(ActionConstants.CREATE));
-		actions2.add(new Action(ActionConstants.DELETE));
-		actions2.add(new Action(ActionConstants.READ));
-		actions2.add(new Action(ActionConstants.WRITE));
-		List<Requestor> requestors2 = new ArrayList<Requestor>();
-		requestors2.add(requestor);
-		RuleTarget target2 = new RuleTarget(requestors2, resource2, actions2);
-		List<Condition> conditions2 = new ArrayList<Condition>();
-		try {
-			PPNPOutcome outcome2 = new PPNPOutcome(PrivacyOutcomeConstants.BLOCK, target2 , conditions2);
-			IPrivacyPreference privacyPreference2 = new PrivacyPreference(outcome2);
-			PPNPrivacyPreferenceTreeModel model2 = new PPNPrivacyPreferenceTreeModel(CtxAttributeTypes.NAME, privacyPreference2);
-			model2.setRequestor(requestor);
-			model2.setAffectedDataId(nameAttribute2.getId());
-			PPNPreferenceDetails details2 = new PPNPreferenceDetails(CtxAttributeTypes.NAME);
-			details2.setRequestor(requestor);
-			this.privPrefMgr.storePPNPreference(details2, privacyPreference2);
-			
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-	}*/
 }

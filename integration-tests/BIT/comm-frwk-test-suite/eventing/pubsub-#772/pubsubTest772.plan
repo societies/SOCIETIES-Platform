@@ -8,9 +8,7 @@
 
     <!-- Comms Framework -->
     <artifact type="configuration" name="xc" />
-    <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-    <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
-    <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
+    <artifact type="bundle" name="org.societies.comm.CloudCommsBundle"/>
     
     <!--  Pubsub Test class integration.test.bit.pubsub_772 -->
     <artifact type="bundle" name="org.societies.integration.test.bit.pubsub_772"/>

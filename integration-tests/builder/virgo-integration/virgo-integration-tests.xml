@@ -35,6 +35,7 @@
 		<module>../../../platform-infrastructure/comms-frwk/ExampleServices/api/java/schema</module> <!-- to be removed when third party services example will be available -->
 		<module>../../../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module> <!-- to be removed when third party services example will be available -->
 		<module>../../../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module> <!-- to be removed when third party services example will be available -->
+		<module>../../example-service</module>
 		
 		<!-- BIT Tests -->
 		<module>../../BIT/css-services-test-suite/use-service-759</module>
@@ -44,7 +45,7 @@
 		<module>../../BIT/privacy-trust-test-suite/data-management-1266</module>
 		<module>../../BIT/privacy-trust-test-suite/policy-management-1244</module>
 		<module>../../BIT/privacy-trust-test-suite/negotiation-management-1264</module>
-		<!-- <module>../../BIT/cis-services-test-suite/cis-share-service-962</module> -->
+		<module>../../BIT/cis-services-test-suite/cis-share-service-962</module>
 		<module>../../BIT/cis-services-test-suite/cis-list-services-964</module>
 		<module>../../BIT/cis-test-suite/cis-management/create_cis#958</module>
 		<module>../../BIT/comm-frwk-test-suite/eventing/pubsub-#772</module>

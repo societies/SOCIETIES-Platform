@@ -59,19 +59,19 @@
 			<version>4.1</version><!--$NO-MVN-MAN-VER$-->
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.societies.util</groupId>
 			<artifactId>commonmock</artifactId>
 			<version>1.0</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency> -->
 		<!-- Tools -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
 		<!-- Logs -->
 		<!-- <dependency>
 			<groupId>org.slf4j</groupId>

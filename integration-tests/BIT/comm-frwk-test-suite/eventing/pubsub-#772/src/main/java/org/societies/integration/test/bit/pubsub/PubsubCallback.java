@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.examples.calculatorbean.CalcBeanResult;
-import org.societies.test.Testnode;
 
 /**
  * Describe your class here...
@@ -58,11 +57,18 @@ public class PubsubCallback implements Subscriber {
 	public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
 		LOG.info("### New Pubsub Event topic: " + node);
 		//CHECK WHAT PAYLOAD IS
-		if (item.getClass().equals(Testnode.class)) {
+		if (item instanceof CalcBeanResult) {
 			eventObject = (CalcBeanResult)item;
 			synchronized (this) {
 	            notifyAll( );
 	        }
-		}		
+		}
+		
+		//if (item.getClass().equals(Testnode.class)) {
+		//	eventObject = (CalcBeanResult)item;
+		//	synchronized (this) {
+	    //       notifyAll( );
+	    //    }
+		//}	
 	}
 }

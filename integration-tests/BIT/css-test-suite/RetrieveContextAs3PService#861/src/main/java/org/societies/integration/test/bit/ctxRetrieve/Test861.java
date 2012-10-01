@@ -27,9 +27,8 @@ package org.societies.integration.test.bit.ctxRetrieve;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.integration.test.IntegrationTestCase;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 
 /**
  * Class that tests Context Triggered Personalisation. 
@@ -42,7 +41,7 @@ public class Test861 extends IntegrationTestCase{
 	private static ICtxBroker ctxBroker;
 	private static ICommManager commsMgr;
 	private static IHelloWorld helloWorld;
-	private static IPrivacyPreferenceManager privPrefMgr;
+	private static IPrivacyDataManager privDataMgr;
 	
 	public Test861(){
 		super(751, new Class[]{Tester.class});
@@ -95,16 +94,17 @@ public class Test861 extends IntegrationTestCase{
 	}
 
 	/**
-	 * @return the privPrefMgr
+	 * @return the privDataMgr
 	 */
-	public static IPrivacyPreferenceManager getPrivPrefMgr() {
-		return privPrefMgr;
+	public static IPrivacyDataManager getPrivDataMgr() {
+		return privDataMgr;
 	}
 
 	/**
-	 * @param privPrefMgr the privPrefMgr to set
+	 * @param privDataMgr the privDataMgr to set
 	 */
-	public void setPrivPrefMgr(IPrivacyPreferenceManager privPrefMgr) {
-		Test861.privPrefMgr = privPrefMgr;
+	public void setPrivDataMgr(IPrivacyDataManager privDataMgr) {
+		Test861.privDataMgr = privDataMgr;
 	}
+
 }
