@@ -17,7 +17,7 @@ window.plugins.SocietiesLocalCISManager = {
 			successCallback(phonegapdesktop.internal.getDebugValue('CISDesktopManagerService', 'disconnectService'));
 		}
 	},
-	createCIS: function(successCallback, failureCallback) {
+	createCIS: function(successCallback, failureCallback, name, description, type, criterias, privacyPolicy) {
 		console.log("create CIS desktop invoked");
 		if (phonegapdesktop.internal.randomException("CISDesktopManagerService")) {
 			errorCallback('A random error was generated');

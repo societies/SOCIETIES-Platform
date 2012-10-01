@@ -98,6 +98,7 @@ public class ServiceDiscoveryController {
 			return new ModelAndView("error", model);
 		}
 
+		
 		String node = sdForm.getNode();
 		String method = sdForm.getMethod();
 		Future<List<Service>> asynchResult = null;
@@ -154,4 +155,43 @@ public class ServiceDiscoveryController {
 		
 
 	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/servdiscpilot.html", method = RequestMethod.GET)
+	public ModelAndView ServiceDiscPilot() {
+
+		Map<String, Object> model = new HashMap<String, Object>();
+		Future<List<Service>> asynchResult = null;
+		List<Service> services =  new ArrayList<Service>();
+		
+		
+		String res = "";
+		
+		try {
+		
+			asynchResult=this.getSDService().getLocalServices();
+			res="Your Services";
+				
+			services = asynchResult.get();
+			model.put("services", services);
+			model.put("result", res);
+			
+		}
+		catch (ServiceDiscoveryException e)
+		{
+			//TODO : Make this nice
+			res = "Error <br/>";
+		}
+		catch (Exception ex)
+		{
+			//TODO : Make this nice
+			res = "Error <br/>";
+		};
+		
+		
+		return new ModelAndView("servicediscpilotresult", model);
+		
+
+	}
+	
 }

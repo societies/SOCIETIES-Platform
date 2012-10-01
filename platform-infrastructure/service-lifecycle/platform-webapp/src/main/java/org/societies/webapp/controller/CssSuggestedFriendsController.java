@@ -149,5 +149,65 @@ public class CssSuggestedFriendsController {
 		return new ModelAndView("suggestedfriendsresult", model);
 	}
 	
+	@RequestMapping(value = "/suggestedfriendspilot.html", method = RequestMethod.GET)
+	public ModelAndView SuggestedFriendsPilot() {
+
+		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		String res = null;
+		
+		try {
+		
+		
+				res="CSS Suggested Friends Result ";
+				
+				Future<List<CssAdvertisementRecord>> asynchcssfriends = getCssLocalManager().suggestedFriends();
+				
+				model.put("cssfriends", asynchcssfriends.get());
+				model.put("result", res);
+			
+		}
+		catch (Exception e)
+		{
+			res = "Oops!!!!<br/>";
+		};
+		
+		
+		return new ModelAndView("suggestedfriendsresult", model);
+		
+		
+	}
+	
+	@RequestMapping(value = "/friendspilot.html", method = RequestMethod.GET)
+	public ModelAndView FriendsPilot() {
+
+		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		String res = null;
+		
+		try {
+		
+		
+				res="CSS Friends Result ";
+				
+				Future<List<CssAdvertisementRecord>> asynchcssfriends = getCssLocalManager().getCssFriends();
+				
+				model.put("cssfriends", asynchcssfriends.get());
+				model.put("result", res);
+			
+		}
+		catch (Exception e)
+		{
+			res = "Oops!!!!<br/>";
+		};
+		
+		
+		return new ModelAndView("friendsresult", model);
+		
+		
+	}
+	
 
 }

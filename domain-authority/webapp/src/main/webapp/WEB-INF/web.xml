@@ -4,12 +4,12 @@
 	version="2.5">
 	
 	<welcome-file-list>
-   		<welcome-file>/views/default.jsp</welcome-file>
+   		<welcome-file>/pilot.html</welcome-file>
 	</welcome-file-list>
 	
 	<display-name>Domain Authority web-app</display-name>
 
-	<description>Societies Platform - Domain Authoity Web Application using Spring MVC </description>
+	<description>Societies Platform - Domain Authority Web Application using Spring MVC </description>
 
 <!-- OSGI aware web application context declaration -->
 	<context-param>
