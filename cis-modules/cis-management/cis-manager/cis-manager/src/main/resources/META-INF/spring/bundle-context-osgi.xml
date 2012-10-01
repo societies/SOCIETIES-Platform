@@ -32,6 +32,7 @@
 	
 	<osgi:reference id="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiation" cardinality="1..1" />
 	
+	<osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>	
 	<!--<osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
     <osgi:reference id="serviceControl" interface="org.societies.api.internal.servicelifecycle.IServiceControl"/>-->
 	

@@ -3,10 +3,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
    
-   	<parent>
+	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>0.1</version>
+		<version>RELEASE</version>
 	</parent>
     
     <groupId>org.societies.cis</groupId>
@@ -95,6 +95,14 @@
 			<artifactId>activityfeed</artifactId>
 			<version>${version.cis}</version>
 
+		</dependency>
+		
+		
+		<dependency>
+			<groupId>org.societies.comm.xmpp.pubsub</groupId>
+			<artifactId>PubsubClient</artifactId>
+			<version>${version.comm}</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>

@@ -90,7 +90,7 @@
        <property name="negotiator" ref="NegotiationRequester"/>
         <!-- <property name="iServDiscLocal" ref="serviceDiscovery"/>
         <property name="iServCtrlLocal" ref="serviceControl"/>-->
-                
+         <property name="pubsubClient" ref="PubsubClient"/>       
         
         
     </bean>
