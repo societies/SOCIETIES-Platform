@@ -92,6 +92,7 @@ cursor: pointer;
 		</pre>
 		<input type="submit" value="Submit" />
 		<a href="cismanager.html">Cancel</a>
+		<span class="globalError error"></span>
 		<fieldset class="simple">
 			<legend class="simple-handler">Simple: Select a
 				pre-configured mode</legend>
@@ -179,15 +180,27 @@ cursor: pointer;
 						apply on this resource</label>
 					<c:forEach var="action" items="${ActionList}"
 						varStatus="statusAction">
-						<form:checkbox
-							path="resources[${status.index}].actions[${statusAction.index}].action"
-							value="${action}" />
+						<input type="checkbox" name="resources[${status.index}].actions[${statusAction.index}].action"
+							id="resources${status.index}.actions${statusAction.index}.action1"
+							value="${action}"
+							<c:forEach var="actionAvailable" items="${resource.actions}">
+								<c:if test="${action == actionAvailable.value}">checked="checked"</c:if>
+							</c:forEach>
+							 />
+						<input type="hidden" name="_resources[${status.index}].actions[${statusAction.index}].action"
+							value="on" />
 						<label
-							for="resources${status.index}.actions${statusAction.index}.action1'"
+							for="resources${status.index}.actions${statusAction.index}.action1"
 							class="inline">${action}</label>
-					(<form:checkbox
-							path="resources[${status.index}].actions[${statusAction.index}].optional"
-							value="1" />
+					(<input type="checkbox" name="resources[${status.index}].actions[${statusAction.index}].optional"
+							id="resources${status.index}.actions${statusAction.index}.optional1"
+							value="1"
+							<c:forEach var="actionAvailable" items="${resource.actions}">
+								<c:if test="${actionAvailable.optional}">checked="checked"</c:if>
+							</c:forEach>
+							/>
+						<input type="hidden" name="_resources[${status.index}].actions[${statusAction.index}].optional"
+							value="on" />
 						<label
 							for="resources${status.index}.actions${statusAction.index}.optional1"
 							class="inline">Optional?</label>)

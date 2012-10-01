@@ -37,6 +37,11 @@ public class UrlPath {
 	/**
 	 * URL parameter
 	 */
+	public static final String URL_PARAM_FILE = "file";
+	
+	/**
+	 * URL parameter
+	 */
 	public static final String URL_PARAM_SIGNATURE = "sig";
 	
 	/**

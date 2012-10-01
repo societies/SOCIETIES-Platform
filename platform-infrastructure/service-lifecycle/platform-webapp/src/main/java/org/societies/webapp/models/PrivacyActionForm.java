@@ -59,5 +59,12 @@ public class PrivacyActionForm extends Action {
 	public void setAction(ActionConstants action) {
 		this.action = action;
 	}
+	
+	public String getValue() {
+		return super.getActionType().name();
+	}
+	public void setValue(String value) {
+		this.action = ActionConstants.valueOf(value);
+	}
 
 }

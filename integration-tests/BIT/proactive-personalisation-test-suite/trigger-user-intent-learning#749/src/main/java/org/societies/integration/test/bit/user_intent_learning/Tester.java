@@ -195,7 +195,8 @@ public class Tester {
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 		try {
 			tupleResults  = TestCase749.ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, listOfEscortingAttributeIds, null, null).get();
-			Assert.assertTrue(tupleResults.size() == 24);
+						
+			Assert.assertTrue(tupleResults.size() > 23 );
 			LOG.info("hoc size:"+ tupleResults.size());
 			printHocTuplesDB(tupleResults);
 
@@ -207,9 +208,12 @@ public class Tester {
 				waiting(10);
 				LOG.info("******time :"+i+" "+System.currentTimeMillis() );
 			
-				if(uiModelAttr.getBinaryValue() != null) {
-					retrieveModel();
-					break;
+				if(uiModelAttr != null) {
+					
+					if(uiModelAttr.getBinaryValue() != null) {
+						retrieveModel();
+						break;
+					}
 				}
 			}
 			LOG.info("******end of testing : ");
