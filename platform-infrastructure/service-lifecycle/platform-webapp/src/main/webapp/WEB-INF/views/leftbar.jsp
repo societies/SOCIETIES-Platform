@@ -13,8 +13,8 @@
 	  <tr><td>&nbsp;</td></tr>
 	  
 	  <tr><td><b>Friends</b></td></tr>
-	  <tr><td align="right">My Friends</a></td></tr>
-	  <tr><td align="right">Suggested Friends</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/friendspilot.html">My Friends</a></td></tr>
+	  <tr><td align="right"><a href="${pageContext.request.contextPath}/suggestedfriendspilot.html">Suggested Friends</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 
 	  <tr><td><b>Communities</b></td></tr>
@@ -34,7 +34,7 @@
 	  <tr><td align="right"><a href="${pageContext.request.contextPath}/privacy-policies.html">Privacy Policy</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 	   <tr><td><b>Account</b></td></tr>
-	  <tr><td align="right">Log Out</a></td></tr>
+	  <tr><td align="right"><a href="http://localhost:8080/domain-authority/">Log Out</a></td></tr>
 
 	  <!-- SPACERS -->	  
 	  <tr><td><p><b>&nbsp;</b></p></td></tr>

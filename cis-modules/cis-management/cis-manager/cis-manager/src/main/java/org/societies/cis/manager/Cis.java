@@ -1669,7 +1669,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			p = this.privacyPolicyManager.getPrivacyPolicy(new RequestorCis(this.CISendpoint.getIdManager().fromJid(owner) ,this.cisIdentity));
 			if (p != null && p.toXMLString().isEmpty()==false){
 				c.setPrivacyPolicy("<![CDATA[" + p.toXMLString() + "]]>");
-				}
+			}
 		} catch (PrivacyException e) {
 			LOG.warn("Privacy excpetion when getting privacy on fillCommmunityXMPPobj");
 			e.printStackTrace();

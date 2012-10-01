@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Societies CIS Directory Result</title>
+<title>Societies Friends Result</title>
 </head>
 <body>
 	<!-- HEADER -->
@@ -21,29 +21,13 @@
 <h4>${result}</h4>
 <br/>
 <br/>
-<script language="javascript">
-	function updateForm(cisId, cssId) {    
-		document.forms["cisDirectory"]["cisJid"].value = cisId;
-		document.forms["cisDirectory"]["cssId"].value = cssId;
-		document.forms["cisDirectory"].submit();
-	} 
-</script>
-
-<form id="cisDirectory" name="cisDirectory" method="post" action="cismanager.html">
-<input type="hidden" name="cisJid" id="cisJid">
-<input type="hidden" name="cssId" id="cssId">
-<input type="hidden" name="method" id="method" value="JoinRemoteCIS">
-
 <Table border="1">
-<tr><td><B>CIS Name</B></td><td><B>CSS Owner </B></td></td><td><B>Action</B></td>
-</tr> 
+<tr><td><B>Friend Name</B></td><td><B>CSS Identity</B></td></tr>
 
-	<xc:forEach var="cssNice" items="${cssNiceDetails}">
+	<xc:forEach var="cssfriend" items="${cssfriends}">
         <tr>
-        	<td>${cssNice.adrecord.name}</td>
-        	<td>${cssNice.cssownername}</td>
-            <td><input type="button" value="join" onclick="updateForm('${cssNice.adrecord.id}', '${cssNice.cssownerid}')" ></td> 
-           
+        	<td>${cssfriend.getName()}</td>
+        	<td>${cssfriend.getId()}</td>	         	       
         </tr>
     </xc:forEach>
     	

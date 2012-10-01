@@ -44,7 +44,6 @@ var	SocietiesCISManagerService = {
 
 		function success(data) {
 			console.log("create CIS where data has name = " + data.cisName);
-			$.mobile.changePage("community_profile.html", { transition: "slideup"} );
 			SocietiesCISProfileService.populateCISProfilepage(data);
 		}
 		
@@ -52,7 +51,18 @@ var	SocietiesCISManagerService = {
 			alert("createCIS - failure: " + data);
 		}
 		
-		window.plugins.SocietiesLocalCISManager.createCIS(success, failure);
+		var cisName = jQuery("#cisNameOnCisCreate").val(),
+            cisType = jQuery("#cisCategoryOnCisCreate").val(),
+            cisCriteria = [{
+                    "attrib": "age",
+                    "operator": "greater than",
+                    "value1": "18",
+                    "value2": "18",
+                    "rank": "1"}],
+             cisDescription = jQuery("#cisDescOnCisCreate").val(),
+             privacyPolicy = "<RequestPolicy />";
+
+		window.plugins.SocietiesLocalCISManager.createCIS(success, failure, cisName, cisDescription, cisType, cisCriteria, privacyPolicy);
 	},
 
 	/**
@@ -108,7 +118,7 @@ var	SocietiesCISManagerService = {
 				window.plugins.SocietiesLocalCISManager.findAllCisAdvertisementRecords(success, failure); } );
 	},
 	
-	getJoinResponse: function(cis_id) {
+	getJoinResponse: function(cisAdvert) {
 		console.log("getAllCisDirAds");
 		
 		function success(data) {
@@ -120,6 +130,6 @@ var	SocietiesCISManagerService = {
 			alert("getJoinResponse - failure: " + data);
 		}
 		SocietiesCISManagerHelper.connectToLocalCISManager(function() {
-					window.plugins.SocietiesLocalCISManager.joinCis(cis_id, success, failure); } );
+					window.plugins.SocietiesLocalCISManager.joinCis(cisAdvert, success, failure); } );
 	}
 }
