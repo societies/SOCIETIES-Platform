@@ -125,8 +125,9 @@
 					<instructions>
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Export-Package>org.societies.test</Export-Package>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
+						<!-- <Export-Package>org.societies.test</Export-Package> -->
 					</instructions>
 				</configuration>
 			</plugin>
