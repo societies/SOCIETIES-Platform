@@ -260,6 +260,9 @@ public class CisDirectoryController {
 						}
 						
 					}
+					
+					niceDets.setCssownerid(adverts.get(i).getCssownerid());
+					
 					// If we didn't find it, then just use the cssowneer id
 					if (niceDets.getCssownername().isEmpty())
 					{
