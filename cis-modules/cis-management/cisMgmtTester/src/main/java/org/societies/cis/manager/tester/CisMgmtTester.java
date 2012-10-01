@@ -113,7 +113,7 @@ public class CisMgmtTester implements Subscriber{
 	
 	private String targetCSSId = "xcmanager.thomas.local";
 	
-	private String targetCIS = "cis-402e619a-1617-4a8a-b3ba-9b1006cfabc7.societies.local";
+	private String targetCIS = "cis-49fc0682-74c9-41eb-848c-4eb0c3629c64.societies.local";
 	
 	int join = 0;
 	
