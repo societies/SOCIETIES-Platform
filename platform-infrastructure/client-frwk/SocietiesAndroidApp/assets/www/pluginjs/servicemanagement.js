@@ -20,7 +20,7 @@ window.plugins.ServiceManagementService = {
 		
 	},
 	
-	getServices: function(successCallback, errorCallback){
+	getServices: function(cisId, successCallback, errorCallback){
 		if (phonegapdesktop.internal.randomException("ServiceManagementService")) {
 			errorCallback('A random error was generated');
 		}

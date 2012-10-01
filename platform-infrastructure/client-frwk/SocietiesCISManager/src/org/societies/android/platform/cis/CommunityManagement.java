@@ -471,6 +471,7 @@ public class CommunityManagement extends Service implements ICisManager, ICisSub
 
 		//GETFEED OBJECT
 		GetActivities getFeed = new GetActivities();
+		getFeed.setTimePeriod("")
 		//CREATE MESSAGE BEAN
 		org.societies.api.schema.activityfeed.Activityfeed messageBean = new org.societies.api.schema.activityfeed.Activityfeed();
 		messageBean.setGetActivities(getFeed);
