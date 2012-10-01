@@ -382,6 +382,16 @@ public class PluginCSSManager extends Plugin {
 			for (int i  = 0; i < parcelable.length; i++) {
 				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
 			}
+		} else if (LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS == intent.getAction() || LocalCSSManagerService.FIND_FOR_ALL_CSS == intent.getAction()) {
+			Parcelable parcelable [] =  intent.getParcelableArrayExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
+			advertRecord = new ACssAdvertisementRecord[parcelable.length];
+			
+			Log.d(LOG_TAG, "Number of CSSs: " + parcelable.length);
+			
+			for (int i  = 0; i < parcelable.length; i++) {
+				advertRecord[i] = (ACssAdvertisementRecord) parcelable[i];
+			}
+
 		} else {
 			cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
 		}
@@ -608,6 +618,20 @@ public class PluginCSSManager extends Plugin {
 				}
 			} else if (intent.getAction().equals(LocalCSSManagerService.SUGGESTED_FRIENDS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 18);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(LocalCSSManagerService.FIND_ALL_CSS_ADVERTISEMENT_RECORDS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 15);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			} else if (intent.getAction().equals(LocalCSSManagerService.FIND_FOR_ALL_CSS)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 16);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {

@@ -47,6 +47,8 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.api.schema.css.directory.CssDirectoryBean;
+import org.societies.api.schema.css.directory.CssDirectoryBeanResult;
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
@@ -89,12 +91,15 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	//Pubsub packages
 	private static final String PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
 	//XMPP Communication namespaces and associated entities
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("cssManagerMessageBean", "cssManagerResultBean");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("cssManagerMessageBean", 
+									"cssManagerResultBean", "cssDirectoryBean", "cssDirectoryBeanResult");
     private static final List<String> NAME_SPACES = Arrays.asList(
-    		"http://societies.org/api/schema/cssmanagement");
+    		"http://societies.org/api/schema/cssmanagement", "http://societies.org/api/schema/css/directory",
+			  "http://societies.org/api/schema/cis/directory");
     private static final List<String> PACKAGES = Arrays.asList(
-		"org.societies.api.schema.cssmanagement");
-    //default destination of communication
+		"org.societies.api.schema.cssmanagement", "org.societies.api.schema.css.directory",
+		  "org.societies.api.schema.cis.directory");
+    //default destination of communication - CSS Cloud node
     private static final String DEFAULT_DESTINATION = "xcmanager.societies.local";
     
     private static final List<String> classList = Collections.singletonList(PUBSUB_CLASS);
@@ -127,9 +132,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 	public static final String SUGGESTED_FRIENDS = "org.societies.android.platform.cssmanager.SUGGESTED_FRIENDS";
 	public static final String GET_CSS_FRIENDS = "org.societies.android.platform.cssmanager.GET_CSS_FRIENDS";
-
+	public static final String FIND_ALL_CSS_ADVERTISEMENT_RECORDS = "org.societies.android.platform.cssmanager.FIND_ALL_CSS_ADVERTISEMENT_RECORDS";
+	public static final String FIND_FOR_ALL_CSS = "org.societies.android.platform.cssmanager.FIND_FOR_ALL_CSS";
 	
-    private IIdentity toXCManager = null;
+    private IIdentity cloudNodeIdentity = null;
+    private IIdentity domainNodeIdentity = null;
     private ClientCommunicationMgr ccm;
 
 	private IBinder binder = null;
@@ -139,7 +146,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	
 	private CssRecordDAO cssRecordDAO;
 	
-	private String commsDestination = DEFAULT_DESTINATION;
+	private String cloudCommsDestination = DEFAULT_DESTINATION;
+	private String domainCommsDestination = null;
 	
 	PubsubClientAndroid pubsubClient = null;
 
@@ -271,7 +279,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		messageBean.setProfile(localCssrecord);
 		messageBean.setMethod(MethodType.LOGIN_CSS);
 
-		Stanza stanza = new Stanza(toXCManager);
+		Stanza stanza = new Stanza(cloudNodeIdentity);
 		
 		ICommCallback callback = new CSSManagerCallback(client, LOGIN_CSS);
 
@@ -324,7 +332,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 		messageBean.setMethod(MethodType.LOGOUT_CSS);
 
-		Stanza stanza = new Stanza(toXCManager);
+		Stanza stanza = new Stanza(cloudNodeIdentity);
 		
 		ICommCallback callback = new CSSManagerCallback(client, LOGOUT_CSS);
         try {
@@ -365,7 +373,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		messageBean.setProfile(localCssrecord);
 		messageBean.setMethod(MethodType.MODIFY_CSS_RECORD);
 
-		Stanza stanza = new Stanza(toXCManager);
+		Stanza stanza = new Stanza(cloudNodeIdentity);
 		
 		ICommCallback callback = new CSSManagerCallback(client, MODIFY_ANDROID_CSS_RECORD);
 
@@ -419,7 +427,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		messageBean.setProfile(record);
 		messageBean.setMethod(MethodType.SYNCH_PROFILE);
 
-		Stanza stanza = new Stanza(toXCManager);
+		Stanza stanza = new Stanza(cloudNodeIdentity);
 		
 		ICommCallback callback = new CSSManagerCallback(client, SYNCH_PROFILE);
 		
@@ -458,10 +466,27 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		domainUnreg.execute(params);
 
 	}
-	
 	public List<ACssAdvertisementRecord> findAllCssAdvertisementRecords(String client) {
 		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
 		Log.d(LOG_TAG, "findAllCssAdvertisementRecords called with client: " + client);
+		Log.d(LOG_TAG, "loginCSS called with client: " + client);
+		
+		CssDirectoryBean directoryBean = new CssDirectoryBean();
+		directoryBean.setMethod(org.societies.api.schema.css.directory.MethodType.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
+
+		//N.B. Use Domain Authority node
+		Stanza stanza = new Stanza(this.domainNodeIdentity);
+		
+		ICommCallback callback = new CSSDirectoryCallback(client, LOGIN_CSS);
+
+		try {
+    		ccm.register(ELEMENT_NAMES, callback);
+			ccm.sendIQ(stanza, IQ.Type.GET, directoryBean, callback);
+			Log.d(LOG_TAG, "Send stanza");
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        } 
+
 		return null;
 	}
 
@@ -470,9 +495,26 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("Search term parameter must have a value", null != searchTerm && searchTerm.length() > 0);
 		
 		Log.d(LOG_TAG, "findForAllCss called with client: " + client + " search: " + searchTerm);
+		CssDirectoryBean directoryBean = new CssDirectoryBean();
 		
+		ACssAdvertisementRecord aAdvert = new ACssAdvertisementRecord();
+		aAdvert.setId(searchTerm);
+		directoryBean.setCssA(aAdvert);
+		directoryBean.setMethod(org.societies.api.schema.css.directory.MethodType.FIND_FOR_ALL_CSS);
+
+		//N.B. Use Domain Authority node
+		Stanza stanza = new Stanza(this.domainNodeIdentity);
 		
-		
+		ICommCallback callback = new CSSDirectoryCallback(client, FIND_FOR_ALL_CSS);
+
+		try {
+    		ccm.register(ELEMENT_NAMES, callback);
+			ccm.sendIQ(stanza, IQ.Type.GET, directoryBean, callback);
+			Log.d(LOG_TAG, "Send stanza");
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        } 
+
 		return null;
 	}
 
@@ -483,7 +525,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		messageBean.setMethod(MethodType.GET_CSS_FRIENDS);
 
-		Stanza stanza = new Stanza(toXCManager);
+		Stanza stanza = new Stanza(cloudNodeIdentity);
 		
 		ICommCallback callback = new CSSManagerCallback(client, GET_CSS_FRIENDS);
 		
@@ -505,7 +547,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		messageBean.setMethod(MethodType.SUGGESTED_FRIENDS);
 
-		Stanza stanza = new Stanza(toXCManager);
+		Stanza stanza = new Stanza(cloudNodeIdentity);
 		
 		ICommCallback callback = new CSSManagerCallback(client, SUGGESTED_FRIENDS);
 		
@@ -788,7 +830,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	}
 
 	/**
-	 * Callback used with Android Comms
+	 * Callback used with Android Comms for CSSManager
 	 *
 	 */
 	private class CSSManagerCallback implements ICommCallback {
@@ -810,28 +852,28 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 
 		public void receiveError(Stanza arg0, XMPPError arg1) {
-			Log.d(LOG_TAG, "Callback receiveError");
+			Log.d(LOG_TAG, "CSSManagerCallback Callback receiveError");
 			
 		}
 
 		public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
-			Log.d(LOG_TAG, "Callback receiveInfo");
+			Log.d(LOG_TAG, "CSSManagerCallback Callback receiveInfo");
 			
 		}
 
 		public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-			Log.d(LOG_TAG, "Callback receiveItems");
+			Log.d(LOG_TAG, "CSSManagerCallback Callback receiveItems");
 			
 		}
 
 		public void receiveMessage(Stanza arg0, Object arg1) {
-			Log.d(LOG_TAG, "Callback receiveMessage");
+			Log.d(LOG_TAG, "CSSManagerCallback Callback receiveMessage");
 			
 			
 		}
 
 		public void receiveResult(Stanza arg0, Object retValue) {
-			Log.d(LOG_TAG, "Callback receiveResult");
+			Log.d(LOG_TAG, "CSSManagerCallback Callback receiveResult");
 			
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);
@@ -858,7 +900,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
 				LocalCSSManagerService.this.sendBroadcast(intent);
 
-				Log.d(LOG_TAG, "Callback receiveResult sent return value: " + retValue);
+				Log.d(LOG_TAG, "CSSManagerCallback Callback receiveResult sent return value: " + retValue);
 				
 				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
 			}
@@ -875,6 +917,72 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 				LocalCSSManagerService.this.updateLocalCSSrecord(record);
 			}
 			
+		}
+	}
+	/**
+	 * Callback used with Android Comms for CSSDirectory
+	 *
+	 */
+	private class CSSDirectoryCallback implements ICommCallback {
+		String returnIntent;
+		String client;
+		
+		public CSSDirectoryCallback(String client, String returnIntent) {
+			this.client = client;
+			this.returnIntent = returnIntent;
+		}
+
+		public List<String> getXMLNamespaces() {
+			return NAME_SPACES;
+		}
+
+		public List<String> getJavaPackages() {
+			return PACKAGES;
+		}
+
+
+		public void receiveError(Stanza arg0, XMPPError arg1) {
+			Log.d(LOG_TAG, "CSSDirectoryCallback Callback receiveError");
+			
+		}
+
+		public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+			Log.d(LOG_TAG, "CSSDirectoryCallback Callback receiveInfo");
+			
+		}
+
+		public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+			Log.d(LOG_TAG, "CSSDirectoryCallback Callback receiveItems");
+			
+		}
+
+		public void receiveMessage(Stanza arg0, Object arg1) {
+			Log.d(LOG_TAG, "CSSDirectoryCallback Callback receiveMessage");
+			
+			
+		}
+
+		public void receiveResult(Stanza arg0, Object retValue) {
+			Log.d(LOG_TAG, "CSSDirectoryCallback Callback receiveResult");
+			
+			if (client != null) {
+				Intent intent = new Intent(returnIntent);
+				
+				CssDirectoryBeanResult resultBean = (CssDirectoryBeanResult) retValue;
+				ACssAdvertisementRecord advertArray [] = ACssAdvertisementRecord.getArray(resultBean.getResultCss());
+
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, true);
+				
+				intent.putExtra(INTENT_RETURN_VALUE_KEY, advertArray);
+
+				intent.setPackage(client);
+
+				LocalCSSManagerService.this.sendBroadcast(intent);
+
+				Log.d(LOG_TAG, "CSSDirectoryCallback Callback receiveResult sent return value: " + retValue);
+				
+				LocalCSSManagerService.this.ccm.unregister(LocalCSSManagerService.ELEMENT_NAMES, this);
+			}
 		}
 	}
 	
@@ -945,13 +1053,13 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
     		IIdentity pubsubService = null;
     		
-    		try {
-    	    	pubsubService = IdentityManagerImpl.staticfromJid(LocalCSSManagerService.this.commsDestination);
-    			
-    		} catch (InvalidFormatException e) {
-    			Log.e(LOG_TAG, "Unable to obtain CSS node identity", e);
-    			this.resultStatus = false;
-    		}
+//    		try {
+//    	    	pubsubService = IdentityManagerImpl.staticfromJid(LocalCSSManagerService.this.cloudCommsDestination);
+    			pubsubService = LocalCSSManagerService.this.cloudNodeIdentity;
+//    		} catch (InvalidFormatException e) {
+//    			Log.e(LOG_TAG, "Unable to obtain CSS node identity", e);
+//    			this.resultStatus = false;
+//    		}
 
     		try {
     			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, subscriber);
@@ -984,13 +1092,13 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
     		IIdentity pubsubService = null;
     		
-    		try {
-    	    	pubsubService = IdentityManagerImpl.staticfromJid(LocalCSSManagerService.this.commsDestination);
-    			
-    		} catch (InvalidFormatException e) {
-    			Log.e(LOG_TAG, "Unable to obtain CSS node identity", e);
-    			this.resultStatus = false;
-    		}
+//    		try {
+//	    	pubsubService = IdentityManagerImpl.staticfromJid(LocalCSSManagerService.this.cloudCommsDestination);
+			pubsubService = LocalCSSManagerService.this.cloudNodeIdentity;
+//		} catch (InvalidFormatException e) {
+//			Log.e(LOG_TAG, "Unable to obtain CSS node identity", e);
+//			this.resultStatus = false;
+//		}
 
     		try {
     			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, subscriber);
@@ -1084,12 +1192,18 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
      */
     private void assignConnectionParameters() {
 		//Get the Cloud destination
-		INetworkNode cloudNode = this.ccm.getIdManager().getCloudNode();
-		this.commsDestination = cloudNode.getJid();
-		Log.d(LOG_TAG, "Cloud Node: " + this.commsDestination);
+    	this.cloudCommsDestination = this.ccm.getIdManager().getCloudNode().getJid();
+		Log.d(LOG_TAG, "Cloud Node: " + this.cloudCommsDestination);
+
+    	this.domainCommsDestination = this.ccm.getIdManager().getDomainAuthorityNode().getJid();
+    	Log.d(LOG_TAG, "Domain Authority Node: " + this.domainCommsDestination);
+    			
     	try {
-			toXCManager = IdentityManagerImpl.staticfromJid(this.commsDestination);
-			Log.d(LOG_TAG, "toXCManager: " + toXCManager);
+			this.cloudNodeIdentity = IdentityManagerImpl.staticfromJid(this.cloudCommsDestination);
+			Log.d(LOG_TAG, "Cloud node identity: " + this.cloudNodeIdentity);
+			
+			this.domainNodeIdentity = IdentityManagerImpl.staticfromJid(this.domainCommsDestination);
+			Log.d(LOG_TAG, "Domain node identity: " + this.cloudNodeIdentity);
 			
 		} catch (InvalidFormatException e) {
 			Log.e(LOG_TAG, "Unable to get CSS Node identity", e);
