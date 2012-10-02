@@ -23,6 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 package org.societies.context.exampleRemote.broker;
 import java.io.IOException;
 import java.net.URI;
@@ -388,6 +389,9 @@ public class ContextAware3pService implements IContextAware3pService{
 	public void retrieveRemoteIndiEntity() {
 		LOG.info("retrieve remote Individual Entity id  1");
 		
+		
+		// retrieve remote indi Ent ID
+		
 		IIdentity targetId;
 		try {
 			targetId = this.commsMgr.getIdManager().fromJid("jane.societies.local");
@@ -396,8 +400,30 @@ public class ContextAware3pService implements IContextAware3pService{
 			CtxEntityIdentifier remoteEntityID = this.ctxBroker.retrieveIndividualEntityId(simpleRequestor, targetId).get();
 			LOG.info("retrieve remote Individual Entity id 3   "+remoteEntityID.toString());
 			
-			IndividualCtxEntity entity = (IndividualCtxEntity) this.ctxBroker.retrieve(simpleRequestor, remoteEntityID).get();	
-			LOG.info("retrieve remote Individual Entity  4   "+entity.getAttributes().size());
+			//IndividualCtxEntity entity = (IndividualCtxEntity) this.ctxBroker.retrieve(simpleRequestor, remoteEntityID).get();	
+
+			CtxAttribute attrName = this.ctxBroker.createAttribute(simpleRequestor, remoteEntityID, CtxAttributeTypes.NAME).get();
+			attrName.setStringValue("Aris");
+			CtxAttribute attrNameUpdated = (CtxAttribute) this.ctxBroker.update(simpleRequestor, attrName).get();
+
+			LOG.info("verify that remote ctx attribute name updated   "+attrNameUpdated.getStringValue());
+			
+			// retrieve remote attribute object belonging to individual entity id
+			List<CtxIdentifier> resultsAttrIDs = this.ctxBroker.lookup(simpleRequestor, targetId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();
+			
+			CtxAttributeIdentifier attrIndiEntID = null; 
+			
+			for( CtxIdentifier ctxID: resultsAttrIDs ){
+				CtxAttributeIdentifier attrID = (CtxAttributeIdentifier) ctxID; 
+				CtxEntityIdentifier entID =  attrID.getScope();
+				//attribute id found
+				if(entID.equals(remoteEntityID)) attrIndiEntID = attrID;  
+			}
+			
+			CtxAttribute attrNameRemote = (CtxAttribute) this.ctxBroker.retrieve(simpleRequestor, attrIndiEntID).get();
+					
+			LOG.info("retrieve remote ctxAttribute id   "+attrNameRemote.getId());
+			LOG.info("retrieve remote ctxAttribute value   "+attrNameRemote.getStringValue());
 			
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block

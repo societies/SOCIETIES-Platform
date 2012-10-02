@@ -53,7 +53,7 @@ public class ProviderResponsePolicyGenerator {
 	}
 	public ResponsePolicy generateResponse(ResponsePolicy clientResponse, RequestPolicy myPolicy){
 		if (clientResponse.getStatus().equals(NegotiationStatus.FAILED)){
-			JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 1");
+			//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 1");
 			return new ResponsePolicy(myPolicy.getRequestor(),new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
 		}
 

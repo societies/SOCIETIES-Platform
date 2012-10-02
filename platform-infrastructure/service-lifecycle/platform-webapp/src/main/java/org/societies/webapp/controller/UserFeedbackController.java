@@ -72,7 +72,7 @@ public class UserFeedbackController {
 	}
 	
 
-	@RequestMapping(value = "/get_form.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/{cssId}/get_form.html", method = RequestMethod.GET)
 	public ModelAndView getForm(){
 		//retrieve next request from UF service
 		String returnString = "";

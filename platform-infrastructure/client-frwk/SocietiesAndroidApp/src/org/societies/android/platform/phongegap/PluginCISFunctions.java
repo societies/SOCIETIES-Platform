@@ -509,7 +509,7 @@ public class PluginCISFunctions extends Plugin {
 			}  
 			//>>>>>>>>>  ICisSubscribed METHODS >>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (intent.getAction().equals(CommunityManagement.GET_MEMBERS)) { 
-				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 2);
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 0);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
@@ -528,7 +528,7 @@ public class PluginCISFunctions extends Plugin {
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
 			} else if (intent.getAction().equals(CommunityManagement.GET_CIS_INFO)) { 
-				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 3);
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 1);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
@@ -544,7 +544,7 @@ public class PluginCISFunctions extends Plugin {
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
 			} else if (intent.getAction().equals(CommunityManagement.GET_ACTIVITY_FEED)) { 
-				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 4);
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisSubscribed.methodsArray, 2);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
@@ -563,7 +563,7 @@ public class PluginCISFunctions extends Plugin {
 					Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 				}
 			} else if (intent.getAction().equals(CommunityManagement.ADD_ACTIVITY)) {
-				String mapKey = ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 5);
+				String mapKey = ServiceMethodTranslator.getMethodName(ICisManager.methodsArray, 3);
 				
 				String methodCallbackId = PluginCISFunctions.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {					

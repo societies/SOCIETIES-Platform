@@ -44,6 +44,7 @@ import org.societies.api.cis.management.*;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.*;
 import org.societies.api.identity.IIdentityManager;
@@ -119,6 +120,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private IPrivacyDataManager mockIPrivacyDataManager;
 	private ICtxBroker mockContextBroker;
 	private INegotiation mockNegotiation;
+	
+	private PubsubClient mockPubSubClient;
 	
 	public static String CIS_MANAGER_CSS_ID = "testXcmanager.societies.local";
 	
@@ -255,6 +258,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockNegotiation = mock(INegotiation.class);
 		mockIPrivacyDataManager = mock(IPrivacyDataManager.class);
 		
+		mockPubSubClient = mock(PubsubClient.class);
+		
 		// mocking the IcomManagers
 		mockCISendpoint1 = mock (ICommManager.class);
 		mockCISendpoint2 = mock (ICommManager.class);
@@ -283,6 +288,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		//doNothing().when(mockICisDirRemote2).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
 		//doNothing().when(mockICisDirRemote3).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
+		
+		//pubsub mocking
+		doNothing().when(mockPubSubClient).addJaxbPackages(anyListOf(String.class));
+		doNothing().when(mockPubSubClient).ownerCreate(any(org.societies.api.identity.IIdentity.class),anyString());
+		when(mockPubSubClient.publisherPublish(any(org.societies.api.identity.IIdentity.class)
+				, anyString(), anyString(), anyObject())).thenReturn("");
 		
 		
 		// creating a NetworkNordImpl for each Identity Manager		
@@ -1106,7 +1117,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
 		cisManagerUnderTest.setiServDiscRemote(mockIServDiscRemote);cisManagerUnderTest.setiServCtrlRemote(mockIServCtrlRemote);cisManagerUnderTest.setPrivacyPolicyManager(mockPrivacyPolicyManager);
 		cisManagerUnderTest.setEventMgr(mockEventMgr); cisManagerUnderTest.setInternalCtxBroker(mockContextBroker);
-		cisManagerUnderTest.setNegotiator(mockNegotiation);
+		cisManagerUnderTest.setNegotiator(mockNegotiation);cisManagerUnderTest.setPubsubClient(mockPubSubClient);
 		cisManagerUnderTest.setPrivacyDataManager(mockIPrivacyDataManager);
 		cisManagerUnderTest.init();
 		
