@@ -226,7 +226,7 @@ public class CSSManager implements ICSSLocalManager {
 				
 				cssRecord.getCssNodes().add(cssNode);
 				
-				this.unregisterCSS(cssRecord);
+				this.updateCssRegistry(cssRecord);
 				
 			}
 		} catch (CssRegistrationException e) {
@@ -263,13 +263,17 @@ public class CSSManager implements ICSSLocalManager {
 	public Future<CssInterfaceResult> getCssRecord() {
 		CssInterfaceResult result = new CssInterfaceResult();
 		
-		LOG.info("CSS Manager getCssRecord Called");
+		LOG.debug("CSS Manager getCssRecord Called");
 		
 		try {
-			CssRecord currentCssRecord = this.cssRegistry.getCssRecord();
-			result.setProfile(currentCssRecord);
-			LOG.info("CSS Manager getCssRecord Size is : " +currentCssRecord.getCssNodes().size());
-			result.setResultStatus(true);
+			if (this.cssRegistry.cssRecordExists()) {
+				CssRecord currentCssRecord = this.cssRegistry.getCssRecord();
+				result.setProfile(currentCssRecord);
+				LOG.debug("Number of Css nodes: " + currentCssRecord.getCssNodes().size());
+				result.setResultStatus(true);
+			} else {
+				LOG.error("Unable to find CssRecord");
+			}
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -299,22 +303,27 @@ public class CSSManager implements ICSSLocalManager {
 		CssRecord cssRecord = null;
 		
 		try{
-			cssRecord = this.cssRegistry.getCssRecord();
-			
-			// add new node to login to cloud CssRecord
-			cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
+			if (this.cssRegistry.cssRecordExists()) {
+				cssRecord = this.cssRegistry.getCssRecord();
+				
+				// add new node to login to cloud CssRecord
+				cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
 
-			this.updateCssRegistry(cssRecord);
-			LOG.debug("Updating CSS with local database");
-			
-			result.setProfile(cssRecord);
-			result.setResultStatus(true);
-			
-			CssEvent event = new CssEvent();
-			event.setType(CSSManagerEnums.ADD_CSS_NODE);
-			event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
-			
-			this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+				this.updateCssRegistry(cssRecord);
+				LOG.debug("Updating CSS with local database");
+				
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
+				
+				CssEvent event = new CssEvent();
+				event.setType(CSSManagerEnums.ADD_CSS_NODE);
+				event.setDescription(CSSManagerEnums.ADD_CSS_NODE_DESC);
+				
+				this.publishEvent(CSSManagerEnums.ADD_CSS_NODE, event);
+				
+			} else {
+				LOG.error("CSS record does not exist");
+			}
 
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
@@ -348,30 +357,35 @@ public class CSSManager implements ICSSLocalManager {
 		CssRecord cssRecord = null;
 		
 		try{
-			cssRecord = this.cssRegistry.getCssRecord();
-			
-			// remove new node to login to cloud CssRecord
-			for (Iterator<CssNode> iter = cssRecord.getCssNodes().iterator(); iter
-					.hasNext();) {
-				CssNode node = (CssNode) iter.next();
-				CssNode logoutNode = profile.getCssNodes().get(0);
-				if (node.getIdentity().equals(logoutNode.getIdentity())
-						&& node.getType() == logoutNode.getType()) {
-					iter.remove();
-					break;
+			if (this.cssRegistry.cssRecordExists()) {
+				cssRecord = this.cssRegistry.getCssRecord();
+				
+				// remove new node to login to cloud CssRecord
+				for (Iterator<CssNode> iter = cssRecord.getCssNodes().iterator(); iter
+						.hasNext();) {
+					CssNode node = (CssNode) iter.next();
+					CssNode logoutNode = profile.getCssNodes().get(0);
+					if (node.getIdentity().equals(logoutNode.getIdentity())
+							&& node.getType() == logoutNode.getType()) {
+						iter.remove();
+						break;
+					}
 				}
-			}
 
-			result.setProfile(cssRecord);
-			result.setResultStatus(true);
-			
-			this.updateCssRegistry(cssRecord);
-			
-			CssEvent event = new CssEvent();
-			event.setType(CSSManagerEnums.DEPART_CSS_NODE);
-			event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
-			
-			this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
+				
+				this.updateCssRegistry(cssRecord);
+				
+				CssEvent event = new CssEvent();
+				event.setType(CSSManagerEnums.DEPART_CSS_NODE);
+				event.setDescription(CSSManagerEnums.DEPART_CSS_NODE_DESC);
+				
+				this.publishEvent(CSSManagerEnums.DEPART_CSS_NODE, event);
+				
+			} else {
+				LOG.error("Css Record does not exist");
+			}
 
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
@@ -404,38 +418,43 @@ public class CSSManager implements ICSSLocalManager {
 		CssRecord cssRecord = null;
 		
 		try{
-			cssRecord = this.cssRegistry.getCssRecord();
-			
-			// update profile information
-			cssRecord.setEntity(profile.getEntity());
-			cssRecord.setForeName(profile.getForeName());
-			cssRecord.setName(profile.getName());
-			cssRecord.setEmailID(profile.getEmailID());
-			cssRecord.setImID(profile.getImID());
-			cssRecord.setSocialURI(profile.getSocialURI());
-			cssRecord.setSex(profile.getSex());
-			cssRecord.setHomeLocation(profile.getHomeLocation());
-			cssRecord.setIdentityName(profile.getIdentityName());
-			
-			// internal eventing
-			LOG.info("Generating CSS_Record_Event to notify Record has changed");
-			if(this.getEventMgr() != null){
-				InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record modified", this.idManager.getThisNetworkNode().toString(), cssRecord);
-				try {
-					LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
-					this.getEventMgr().publishInternalEvent(event);
-				} catch (EMSException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					LOG.error("error trying to internally publish SUBS CIS event");
+			if (this.cssRegistry.cssRecordExists()) {
+				cssRecord = this.cssRegistry.getCssRecord();
+				
+				// update profile information
+				cssRecord.setEntity(profile.getEntity());
+				cssRecord.setForeName(profile.getForeName());
+				cssRecord.setName(profile.getName());
+				cssRecord.setEmailID(profile.getEmailID());
+				cssRecord.setImID(profile.getImID());
+				cssRecord.setSocialURI(profile.getSocialURI());
+				cssRecord.setSex(profile.getSex());
+				cssRecord.setHomeLocation(profile.getHomeLocation());
+				cssRecord.setIdentityName(profile.getIdentityName());
+				
+				// internal eventing
+				LOG.info("Generating CSS_Record_Event to notify Record has changed");
+				if(this.getEventMgr() != null){
+					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record modified", this.idManager.getThisNetworkNode().toString(), cssRecord);
+					try {
+						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
+						this.getEventMgr().publishInternalEvent(event);
+					} catch (EMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						LOG.error("error trying to internally publish SUBS CIS event");
+					}
 				}
+
+				this.updateCssRegistry(cssRecord);
+				LOG.debug("Updating CSS with local database");
+
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
+
+			} else {
+				LOG.equals("Css record does not exist");
 			}
-
-			this.updateCssRegistry(cssRecord);
-			LOG.debug("Updating CSS with local database");
-
-			result.setProfile(cssRecord);
-			result.setResultStatus(true);
 			
 
 		} catch (CssRegistrationException e) {

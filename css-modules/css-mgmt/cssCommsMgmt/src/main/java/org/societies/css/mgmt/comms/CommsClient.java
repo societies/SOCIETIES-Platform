@@ -49,8 +49,6 @@ import org.societies.utilities.DBC.Dbc;
 import org.societies.api.identity.INetworkNode;
 
 public class CommsClient implements ICommCallback, ICSSRemoteManager {
-	private final static String EXTERNAL_COMMUNICATION_MANAGER = "XCManager.societies.local";
-	private final static String XMPP_SERVER = "societies.local";
 
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 
@@ -85,7 +83,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 	 * @throws InvalidFormatException
 	 */
 	private IIdentity getIdentity() throws InvalidFormatException {
-		IIdentity toIdentity = idMgr.fromJid(EXTERNAL_COMMUNICATION_MANAGER);
+		IIdentity toIdentity = (IIdentity) idMgr.getCloudNode();
 		return toIdentity;
 
 	}
@@ -152,13 +150,33 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 	@Override
 	public void changeCSSNodeStatus(CssRecord profile,
 			ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-
+		LOG.debug("Remote call on changeCSSNodeStatus - not implemented");
 	}
 
 	@Override
-	public void getCssRecord(ICSSManagerCallback profile) {
-		// TODO Auto-generated method stub
+	public void getCssRecord(ICSSManagerCallback callback) {
+		LOG.debug("Remote call on getCssRecord");
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(null);
+			messageBean.setMethod(MethodType.GET_CSS_RECORD);
+
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 	}
 
