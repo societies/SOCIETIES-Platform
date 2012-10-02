@@ -24,10 +24,8 @@
  */
 package org.societies.android.api.cis.management;
 
-import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
 import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
-import org.societies.api.schema.cis.community.LeaveResponse;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse; 
 
 /**
  * This interface represents CISs that are not owned by this CSS but that this
@@ -37,9 +35,7 @@ import org.societies.api.schema.cis.community.LeaveResponse;
  * Implemented by the CommunityManager APKLib service
  */
 public interface ICisSubscribed {
-	public String methodsArray[] = {"Join(String client, String cisId)",
-							 		"Leave(String client, String cisId)",
-							 		"getMembers(String client, String cisId)",
+	public String methodsArray[] = {"getMembers(String client, String cisId)",
 							 		"getCisInformation(String client, String cisId)",
 							 		"getActivityFeed(String client, String cisId)",
 							 		"addActivity(String client, String cisId, AActivity activity)",
@@ -47,23 +43,6 @@ public interface ICisSubscribed {
 							 		"cleanActivityFeed(String client, String cisId)"
 								};
 	
-	/**
-	 * Join a community
-	 * @param client
-	 * @param targetCis
-	 * @param qualifications
-	 * @return
-	 */
-	public AJoinResponse Join(String client, ACisAdvertisementRecord targetCis);
-	
-	/**
-	 * Leave a Community
-	 * @param client
-	 * @param cisId
-	 * @return
-	 */
-	public LeaveResponse Leave(String client, String cisId);
-
 	/**
 	 * Get the list of members for this community
 	 * @param client

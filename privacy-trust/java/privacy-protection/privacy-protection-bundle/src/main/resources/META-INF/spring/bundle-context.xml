@@ -116,6 +116,7 @@
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 		<property name="identitySelection" ref="identitySelection" />
 		<property name="privacyPolicyManager" ref="privacyPolicyManager"/>
+		<property name="userFeedback" ref="UserFeedbackGUI"></property>
 	</bean>
 
 	<!-- this is the bean for the NegotiationAgent of the current CSS (not the 
@@ -138,6 +139,7 @@
 		<property name="commsMgr" ref="commManager"></property>
 		<property name="trustBroker" ref="trustBroker"></property>
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
+		<property name="userFeedback" ref="UserFeedbackGUI"></property>
 	</bean>
 
 

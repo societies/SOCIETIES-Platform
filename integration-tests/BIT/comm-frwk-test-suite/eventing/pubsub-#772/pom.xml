@@ -30,12 +30,26 @@
 			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- 
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.6</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.societies.maven.converters</groupId>
+		    <artifactId>SimpleXMLConverters</artifactId>
+		    <version>${release.version}</version>
+		    <scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+		-->
 		<dependency>
 		    <groupId>org.societies.integration.test.util</groupId>
 		    <artifactId>integrationtestutil</artifactId>
@@ -64,7 +78,9 @@
 	</dependencies>
 
 	<build>
-		<plugins><!-- USED TO BUILD THE TEST CLASS THAT IS PUT ON PUBSUB NODE -->
+		<plugins>
+			<!-- USED TO BUILD THE TEST CLASS THAT IS PUT ON PUBSUB NODE -->
+			<!--
 		    <plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
@@ -85,6 +101,23 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.societies.maven</groupId>
+				<artifactId>jaxb2simple-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>convert</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+			 		<folderInputDirectory>${project.build.directory}/generated-sources/</folderInputDirectory>
+				</configuration>
+			</plugin>
+			 -->
+			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
@@ -92,8 +125,9 @@
 					<instructions>
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Export-Package>org.societies.test</Export-Package>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
+						<!-- <Export-Package>org.societies.test</Export-Package> -->
 					</instructions>
 				</configuration>
 			</plugin>
