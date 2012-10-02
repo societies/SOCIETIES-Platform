@@ -113,8 +113,9 @@ public class CtxBrokerServer implements IFeatureServer{
 
 		//		LOG.error("Context Broker server received stanza:"+ stanza );
 		//		LOG.error("Context Broker server received payload: "+payload.getClass() );
-		CtxBrokerResponseBean beanResponse = new CtxBrokerResponseBean();
-		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+		CtxBrokerResponseBean beanResponse = null;
+
+		//CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 
 		if (!(payload instanceof CtxBrokerRequestBean))
 			throw new XMPPError(StanzaError.bad_request, "Unknown request bean class: " + payload.getClass());
@@ -126,9 +127,11 @@ public class CtxBrokerServer implements IFeatureServer{
 		}
 
 		switch (cbPayload.getMethod()) {
-		//BrokerMethodBean.RETRIEVEINDIVIDUALENTITYID
+
 		case CREATE_ENTITY:
-			
+
+			beanResponse = new CtxBrokerResponseBean();
+
 			LOG.info("CREATE_ENTITY");
 			String targetIdentityString = cbPayload.getCreateEntity().getTargetCss().toString();
 
@@ -147,7 +150,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				//LOG.info("CREATE_ENTITY  brokerserver newCtxEntity :" +newCtxEntity);
 
 				//create the response based on the created CtxEntity - the response should be a result bean
-				//CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 				CtxEntityBean ctxBean = ctxBeanTranslator.fromCtxEntity(newCtxEntity);
 				//				LOG.info("CREATE_ENTITY  ctxBean created :" +ctxBean);
 				//setup the CtxEntityBean from CtxEntity				
@@ -173,9 +176,10 @@ public class CtxBrokerServer implements IFeatureServer{
 			break;
 
 		case CREATE_ATTRIBUTE:
-			
+
 			LOG.info("CREATE_ATTRIBUTE");
 			//LOG.info(" beanResponse ready:" +beanResponse.getMethod().toString());
+			beanResponse = new CtxBrokerResponseBean();
 			try {
 				String ctxEntityScopeBean =  cbPayload.getCreateAttribute().getScope().getString();
 				CtxEntityIdentifier ctxEntityScope = new CtxEntityIdentifier(ctxEntityScopeBean);
@@ -186,7 +190,7 @@ public class CtxBrokerServer implements IFeatureServer{
 
 				CtxAttribute ctxAttribute = ctxbroker.createAttribute(requestorCreateAttr, ctxEntityScope, type).get();
 				//LOG.error("CREATE_ATTRIBUTE 1 attribute created in remote cm :" +ctxAttribute.getId());
-				//CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 
 				CtxAttributeBean ctxAttributeBean = ctxBeanTranslator.fromCtxAttribute(ctxAttribute); 
 				//LOG.error("CREATE_ATTRIBUTE 2 attr translated to bean :" +ctxAttributeBean);
@@ -215,8 +219,9 @@ public class CtxBrokerServer implements IFeatureServer{
 
 			LOG.info("LOOKUP");
 			//	LOG.info("LOOKUP 1 :");
-			//CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 
+			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+			beanResponse = new CtxBrokerResponseBean();
 			RequestorBean reqBeanLookup = cbPayload.getLookup().getRequestor();
 			Requestor requestor = getRequestorFromBean(reqBeanLookup);
 
@@ -276,7 +281,7 @@ public class CtxBrokerServer implements IFeatureServer{
 
 			LOG.info("RETRIEVE");
 			CtxModelBeanTranslator ctxBeanTranslator2 = CtxModelBeanTranslator.getInstance();
-
+			beanResponse = new CtxBrokerResponseBean();
 			try {
 				RequestorBean reqBeanRetrieve = cbPayload.getRetrieve().getRequestor();
 				Requestor requestorRetrieve = getRequestorFromBean(reqBeanRetrieve);
@@ -310,9 +315,10 @@ public class CtxBrokerServer implements IFeatureServer{
 			break;
 
 		case UPDATE:
-			
+
 			LOG.info("UPDATE");
 			CtxModelBeanTranslator ctxBeanTranslator3 = CtxModelBeanTranslator.getInstance();
+			beanResponse = new CtxBrokerResponseBean();
 			//	LOG.info("UPDATE 1  "+ cbPayload.getUpdate().toString());
 
 			RequestorBean reqBeanUpdate = cbPayload.getUpdate().getRequestor();
@@ -346,58 +352,38 @@ public class CtxBrokerServer implements IFeatureServer{
 			break;
 
 		case RETRIEVE_INDIVIDUAL_ENTITY_ID:
-			
+
 			LOG.info("RETRIEVEINDIVIDUALENTITYID");
 			CtxModelBeanTranslator ctxBeanTranslator4 = CtxModelBeanTranslator.getInstance();
-			LOG.info("RETRIEVEINDIVIDUALENTITYID skata 1");
-			
+			beanResponse = new CtxBrokerResponseBean();
 			RequestorBean reqRetrieveIndiEntIDBean = cbPayload.getRetrieveIndividualEntityId().getRequestor();
-			LOG.info("RETRIEVEINDIVIDUALENTITYID skata 2 "+reqRetrieveIndiEntIDBean.toString());
-			
 			Requestor requestorRetrieveIndiEntID = getRequestorFromBean(reqRetrieveIndiEntIDBean);
-			LOG.info("RETRIEVEINDIVIDUALENTITYID skata 3 "+requestorRetrieveIndiEntID.toString());
-			
 			String individualEntityIdentityString = cbPayload.getRetrieveIndividualEntityId().getTargetCss().toString();
-			LOG.info("RETRIEVEINDIVIDUALENTITYID skata 4 "+individualEntityIdentityString);
-			
+	
 			IIdentity cssId;
 			try {
 				cssId = this.identMgr.fromJid(individualEntityIdentityString);
-				LOG.info("identity "+cssId );
-				LOG.info("requestorRetrieveIndiEntID "+requestorRetrieveIndiEntID.toString() );
 				CtxEntityIdentifier entID = this.ctxbroker.retrieveIndividualEntityId(requestorRetrieveIndiEntID, cssId).get();
-				LOG.info("retrieved entity id  local:  "+entID.toString() );
-			
-				CtxIdentifierBean ctxIdentBean = ctxBeanTranslator4.fromCtxIdentifier(entID);
-				LOG.info("identifier converted to bean :  "+ctxIdentBean.toString() );
-	
-				//check if id or object are returned
-				
-				
-				beanResponse.setRetrieveIndividualEntityIdBeanResult(ctxIdentBean);
-				
-				//CtxIdentifierBean entIdBean = beanResponse.getRetrieveIndividualEntityIdBeanResult();
-				
-				//LOG.info("verify bean :  "+ entIdBean.toString());
+		
+				CtxEntityIdentifierBean ctxEntityIdentBean = (CtxEntityIdentifierBean) ctxBeanTranslator4.fromCtxIdentifier(entID);
+				beanResponse.setCtxBrokerRetrieveIndividualEntityIdBeanResult(ctxEntityIdentBean);
 				
 			} catch (InvalidFormatException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error(e.getLocalizedMessage());
 			} catch (CtxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error(e.getLocalizedMessage());
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error(e.getLocalizedMessage());
 			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error(e.getLocalizedMessage());
 			}
-			
+	
+			break;
+	
 		default: 
 			throw new XMPPError(StanzaError.bad_request, "Nothing to do");
 		}
-		//LOG.error(" beanResponse ready:" +beanResponse.getMethod().toString());
+		LOG.error(" beanResponse ready:" +beanResponse);
 		return beanResponse;
 	}
 	/*
@@ -472,7 +458,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		}
 
 
-		*/
+	 */
 
 
 	@Override

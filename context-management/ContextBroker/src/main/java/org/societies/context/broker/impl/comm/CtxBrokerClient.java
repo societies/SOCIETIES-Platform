@@ -232,7 +232,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 	}
 
-	public void lookupRemote(Requestor requestor, IIdentity targetCss, CtxModelType modelType, String type, ICtxCallback callback){
+	public void lookupRemote(Requestor requestor, IIdentity targetCss, CtxModelType modelType, String type, ICtxCallback callback) throws CtxBrokerException {
 
 		// creating the identity of the CtxBroker that will be contacted
 		IIdentity toIdentity = null;
@@ -278,13 +278,13 @@ public class CtxBrokerClient implements ICommCallback {
 
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
 			//		LOG.info("5  IQGet send");
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new CtxBrokerException("Could not perform remote lookup: "
+					+ e.getLocalizedMessage(), e);
 		} 
 	}
 
-	public void retrieveRemoteIndividualEntId(Requestor requestor, IIdentity targetCss, ICtxCallback callback){
+	public void retrieveRemoteIndividualEntId(Requestor requestor, IIdentity targetCss, ICtxCallback callback) throws CtxBrokerException {
 
 		IIdentity toIdentity = null;
 
@@ -304,19 +304,19 @@ public class CtxBrokerClient implements ICommCallback {
 			retrieveIndEntBean.setTargetCss(toIdentity.getJid());
 
 			cbPacket.setRetrieveIndividualEntityId(retrieveIndEntBean);
-			//	LOG.info("ctxBrokerRetrieveBean ready "+cbPacket.getRetrieve());
-
+			
 			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
 		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			throw new CtxBrokerException("Could not retrieve remote individual ctx entity : "
+					+ e.getLocalizedMessage(), e);
 		}
 
 	}
 
 
-	public void retrieveRemote(Requestor requestor, CtxIdentifier identifier, ICtxCallback callback){
+	public void retrieveRemote(Requestor requestor, CtxIdentifier identifier, ICtxCallback callback) throws CtxBrokerException  {
 
 		// creating the identity of the CtxBroker that will be contacted
 		IIdentity toIdentity = null;
@@ -355,8 +355,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
 		} catch (CommunicationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			throw new CtxBrokerException("Could not retrieve remote ctx model object : "
+					+ e1.getLocalizedMessage(), e1);
 		}
 	}
 
