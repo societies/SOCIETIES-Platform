@@ -13,12 +13,14 @@
 		                        "attrib": "religion",
 		                        "operator": "equals",
 		                        "value1": "Protestant",
-		                        "value1": "Atheist"},
+		                        "value2": "Atheist",
+		                        "rank": "1"},
 		                        {
 		                        "attrib": "location",
 		                        "operator": "equals",
 		                        "value1": "Peru",
-		                        "value2": "Peru"}
+		                        "value2": "Peru",
+		                        "rank": "2"}
 		                        ]
 		                	},
 	                    "description": "soh barca",
@@ -43,12 +45,14 @@
 		                        "attrib": "religion",
 		                        "operator": "equals",
 		                        "value1": "Protestant",
-		                        "value2": "Atheist"},
+		                        "value2": "Atheist",
+		                        "rank": "1"},
 		                        {
 		                        "attrib": "location",
 		                        "operator": "equals",
 		                        "value1": "Peru",
-		                        "value2": "Peru"}
+		                        "value2": "Peru",
+		                        "rank": "2"}
 		                        ]
 		                	},
 	                    "description": "cis do flamengo",
@@ -64,12 +68,14 @@
 		                        "attrib": "religion",
 		                        "operator": "equals",
 		                        "value1": "Protestant",
-		                        "value2": "Protestant"},
+		                        "value2": "Protestant",
+		                        "rank": "1"},
 		                        {
 		                        "attrib": "location",
 		                        "operator": "equals",
 		                        "value1": "Peru",
-		                        "value2": "Peru"}
+		                        "value2": "Peru",
+		                        "rank": "2"}
 		                        ]
 		                	},
 	                    "description": "cis do Vasco",
@@ -85,12 +91,14 @@
 		                        "attrib": "religion",
 		                        "operator": "equals",
 		                        "value1": "Protestant",
-		                        "value2": "Protestant"},
+		                        "value2": "Protestant",
+		                        "rank": "1"},
 		                        {
 		                        "attrib": "location",
 		                        "operator": "equals",
 		                        "value1": "Peru",
-		                        "value2": "Peru"}
+		                        "value2": "Peru",
+		                        "rank": "2"}
 		                        ]
 		                	},
 	                    "description": "cis do flu",
@@ -109,12 +117,14 @@
 	                        "attrib": "age",
 	                        "operator": "<",
 	                        "value1": "25",
-	                        "value2": "25"},
+	                        "value2": "25",
+		                    "rank": "1"},
 	                        {
 	                        "attrib": "location",
 	                        "operator": "equals",
 	                        "value1": "Edinburgh",
-	                        "value2": "Edinburgh"}
+	                        "value2": "Edinburgh",
+		                    "rank": "2"}
 	                        ]
 	                	}
 				    },
@@ -129,12 +139,14 @@
 	                        "attrib": "age",
 	                        "operator": ">",
 	                        "value1": "25",
-	                        "value2": "25"},
+	                        "value2": "25",
+		                    "rank": "1"},
 	                        {
 	                        "attrib": "location",
 	                        "operator": "equals",
 	                        "value1": "Edinburgh",
-	                        "value2": "Edinburgh"}
+	                        "value2": "Edinburgh",
+		                    "rank": "2"}
 	                        ]
 	                	}
 				    }
@@ -152,12 +164,14 @@
 		                        "attrib": "religion",
 		                        "operator": "equals",
 		                        "value1": "Protestant",
-		                        "value2": "Atheist"},
+		                        "value2": "Atheist",
+		                        "rank": "1"},
 		                        {
 		                        "attrib": "location",
 		                        "operator": "equals",
 		                        "value1": "Peru",
-		                        "value2": "Peru"}
+		                        "value2": "Peru",
+		                        "rank": "2"}
 		                        ]
 		                	},
 	                    "description": "Where to go if you want help developing Societies services",

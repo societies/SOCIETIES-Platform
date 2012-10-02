@@ -41,7 +41,7 @@ public class NominalTestCaseLowerTester {
 	/**
 	 * Relative path to the jar file in resources folder
 	 */
-	private static final String SERVICE_PATH = "Calculator-0.1.jar";
+	private static final String SERVICE_PATH = "IntegrationTestService-0.1.jar";
 
 	/**
 	 * Id of the 3P service

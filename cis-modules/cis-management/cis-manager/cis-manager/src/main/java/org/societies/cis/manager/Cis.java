@@ -395,7 +395,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 	public Cis(String cssOwner, String cisName, String cisType, ICISCommunicationMgrFactory ccmFactory
 			,IServiceDiscoveryRemote iServDiscRemote,IServiceControlRemote iServCtrlRemote,
 			IPrivacyPolicyManager privacyPolicyManager, SessionFactory sessionFactory,
-			String description, Hashtable<String, MembershipCriteria> inputCisCriteria) {
+			String description, Hashtable<String, MembershipCriteria> inputCisCriteria,
+			PubsubClient pubsubClient) {
 		
 		this.privacyPolicyManager = privacyPolicyManager;
 		
@@ -403,6 +404,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		this.owner = cssOwner;
 		this.cisType = cisType;
+
 		
 		this.iServCtrlRemote = iServCtrlRemote;
 		this.iServDiscRemote = iServDiscRemote;
@@ -470,19 +472,32 @@ public class Cis implements IFeatureServer, ICisOwned {
 		
 		LOG.info("CIS creating pub sub service");
 		
-//		PubsubServiceRouter psr = new PubsubServiceRouter(CISendpoint);
 
+		this.psc = pubsubClient;
 		
 		LOG.info("CIS pub sub service created");
 		
-		//this.psc = psc;
+
 		
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 		
 		//session = sessionFactory.openSession();
 		LOG.info("activityFeed: "+activityFeed);
-		activityFeed.startUp(sessionFactory,this.getCisId()); // this must be called just after the CisRecord has been set
+		if(null != this.psc){
+			try {
+				LOG.info("starting activ feed with pubsub");
+				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(owner));
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				LOG.info("starting activ feed without pubsub");
+				e.printStackTrace();
+			} // this must be called just after the CisRecord has been set
+		}
+		else{
+			LOG.info("pub sub is null");
+			activityFeed.startUp(sessionFactory,this.getCisId());
+		}
 		this.sessionFactory = sessionFactory;
         //activityFeed.setSessionFactory(this.sessionFactory);
 		this.persist(this);
@@ -500,8 +515,9 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	}
 	
-	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager){
+	public void startAfterDBretrieval(SessionFactory sessionFactory,ICISCommunicationMgrFactory ccmFactory,IPrivacyPolicyManager privacyPolicyManager, PubsubClient pubsubClient){
 		
+		this.psc = pubsubClient;
 		
 		this.privacyPolicyManager = privacyPolicyManager;
 		// first Ill try without members
@@ -545,8 +561,20 @@ public class Cis implements IFeatureServer, ICisOwned {
 		LOG.info("done building criteria from db");
 		
 		
-		activityFeed.startUp(sessionFactory,this.getCisId()); // this must be called just after the CisRecord has been set
-		activityFeed.getActivities("0 1339689547000");
+		if(null != this.psc){
+			try {
+				LOG.info("restoring activ feed with pubsub");
+				activityFeed.startUp(sessionFactory,this.getCisId(),this.psc, this.CISendpoint.getIdManager().fromJid(owner));
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				LOG.info("restoring activ feed without pubsub");
+				e.printStackTrace();
+			} // this must be called just after the CisRecord has been set
+		}
+		else{
+			activityFeed.startUp(sessionFactory,this.getCisId());
+		}
+		//activityFeed.getActivities("0 1339689547000");
 	}
 	
 
@@ -842,12 +870,12 @@ public class Cis implements IFeatureServer, ICisOwned {
 							qualification.put(q.getAttrib(), q.getValue());
 						}
 						
-						
-						if (this.checkQualification(qualification) == false){
-							j.setResult(addresult);
-							LOG.info("qualification mismatched");
-							return result;
-						}
+						// TODO: uncomment qualification check
+						//if (this.checkQualification(qualification) == false){
+						//	j.setResult(addresult);
+						//	LOG.info("qualification mismatched");
+						//	return result;
+						//}
 							
 					}
 					else{
@@ -1172,7 +1200,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 				//}
 				
 					LOG.info("loacl query worked activities called");
-					this.activityFeed.iactivToMarshActv(iActivityList, marshalledActivList);
+					this.activityFeed.iactivToMarshActvList(iActivityList, marshalledActivList);
 
 				/*	
 				Iterator<IActivity> it = iActivityList.iterator();

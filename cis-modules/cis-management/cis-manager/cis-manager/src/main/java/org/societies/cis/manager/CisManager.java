@@ -64,6 +64,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -163,13 +164,26 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	private INegotiation negotiator;
 	private IPrivacyDataManager privacyDataManager;
 
+	private PubsubClient pubsubClient;
 	//Autowiring gets and sets
+	
+	
 	
 	
 	
 	public INegotiation getNegotiator() {
 		return negotiator;
 	}
+
+	public PubsubClient getPubsubClient() {
+		return pubsubClient;
+	}
+
+	public void setPubsubClient(PubsubClient pubsubClient) {
+		LOG.info("pubsub set on CIS Manager");
+		this.pubsubClient = pubsubClient;
+	}
+
 	public IPrivacyDataManager getPrivacyDataManager() {
 		return privacyDataManager;
 	}
@@ -262,7 +276,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		 
 		while(it.hasNext()){
 			 Cis element = it.next();
-			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager);
+			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, this.pubsubClient);
 			 element.setPrivacyDataManager(privacyDataManager);
 			 element.setiServCtrlRemote(this.iServCtrlRemote);
 			 element.setiServDiscRemote(this.iServDiscRemote);
@@ -442,7 +456,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
 		this.ccmFactory,this.iServDiscRemote, this.iServCtrlRemote,this.privacyPolicyManager,this.sessionFactory
-		,description,cisCriteria);
+		,description,cisCriteria,this.pubsubClient);
 		cis.setPrivacyDataManager(privacyDataManager); // TODO: possibly move this to the constructor of the cis
 		if(cis == null)
 			return cis;
@@ -1514,10 +1528,15 @@ public class JoinCallBack implements ICisManagerCallback{
 
 		
 		if (level >= 1) {
+			if (null == pubsubClient) {
+				LOG.info("[Dependency Injection] Missing ICisDirectoryRemote");
+				return false;
+			}
 			if (null == iCisDirRemote) {
 				LOG.info("[Dependency Injection] Missing ICisDirectoryRemote");
 				return false;
 			}
+			
 			if (null == iServDiscRemote) {
 				LOG.info("[Dependency Injection] Missing IServiceDiscoveryRemote");
 				return false;

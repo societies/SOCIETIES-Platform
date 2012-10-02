@@ -78,6 +78,8 @@ public class DecisionMaker extends AbstractDecisionMaker  implements BundleConte
 		servTracker.open();
 		Object[] ls = servTracker.getServices();
 		// List<Service> ls=this.SerDiscovery.getLocalServices().get();
+		if(ls==null)
+			return;
 		for (Object ser : ls) {
 			if (ser instanceof IActionConsumer) {
 				lst.add((IActionConsumer) ser);

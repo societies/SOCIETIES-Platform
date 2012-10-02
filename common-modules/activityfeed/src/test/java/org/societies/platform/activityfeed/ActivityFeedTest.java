@@ -176,8 +176,8 @@ AbstractTransactionalJUnit4SpringContextTests {
 		actFeed.startUp(sessionFactory, Integer.toString(3));
 		String actor="testFilterUser";
 		Activity act1 = new Activity(); act1.setActor(actor); act1.setPublished(Long.toString(System.currentTimeMillis()-100));
-		String timeSeries = Long.toString(System.currentTimeMillis()-1000)+" "+Long.toString(System.currentTimeMillis());
 		actFeed.addActivity(act1);
+		String timeSeries = Long.toString(System.currentTimeMillis()-1000)+" "+Long.toString(System.currentTimeMillis());
 		JSONObject searchQuery = new JSONObject();
 		try {
 			searchQuery.append("filterBy", "actor");

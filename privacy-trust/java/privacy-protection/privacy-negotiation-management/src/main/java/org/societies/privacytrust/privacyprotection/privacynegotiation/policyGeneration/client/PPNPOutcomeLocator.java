@@ -24,11 +24,11 @@
  */
 package org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-
-import javax.swing.JOptionPane;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,16 +36,17 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.personalisation.IPersonalisationManager;
-import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
-import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.gui.PPNPOutcomeDialog;
 
 /**
  * @author Elizabeth
@@ -58,7 +59,7 @@ public class PPNPOutcomeLocator {
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IUserPreferenceManagement prefMgr;
 	private IIdentityManager IDM;
-
+	private PrivacyPolicyNegotiationManager policyMgr;
 	private enum SubjectConstant{
 		IDENTITY_SERVICE_ID, 
 		IDENTITY_GENERIC,
@@ -73,6 +74,7 @@ public class PPNPOutcomeLocator {
 	}	
 
 	public PPNPOutcomeLocator(PrivacyPolicyNegotiationManager policyMgr){
+		this.policyMgr = policyMgr;
 		this.privPrefMgr = policyMgr.getPrivacyPreferenceManager();
 		this.prefMgr = policyMgr.getPrefMgr();
 		this.IDM = policyMgr.getIdm();
@@ -470,26 +472,88 @@ public class PPNPOutcomeLocator {
 			}
 		}*/
 		if (showNotif){
-			int n = JOptionPane.showConfirmDialog(null, "Implement Effect: PERMIT\n"
+		
+			String proposalText = "Implement Effect: PERMIT\n"
+					+ "for resource:"+contextType+"?";
+			try {
+				return this.policyMgr.getUserFeedback().getImplicitFB(ExpProposalType.ACKNACK, new ImpProposalContent(proposalText, 3000)).get();
+				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return true;
+			
+/*			int n = JOptionPane.showConfirmDialog(null, "Implement Effect: PERMIT\n"
 					+ "for resource:"+contextType+"?", "PrivacyPreference Evaluation", JOptionPane.YES_NO_OPTION);
 			if (n==JOptionPane.YES_OPTION){
 				return true;
 			}else{
 				return false;
-			}
+			}*/
 		}else{
 			return true;
 		}
 	}
 
 	private PPNPOutcome popupPPPNPOutcomeDialog(RequestItem item, Requestor requestor){
-		PPNPOutcomeDialog guiDialog = new PPNPOutcomeDialog(requestor, this.getClass().getName(), item, this.privPrefMgr);
+		String proposalText = "";
+		if (requestor instanceof RequestorService){
+			proposalText = "Privacy Policy Negotiation Alert Message:  Provider CSS: "+requestor.getRequestorId().getJid()+" <br/>of service: "+((RequestorService) requestor).getRequestorServiceId().getServiceInstanceIdentifier()+" </br>";
+		}else if (requestor instanceof RequestorCis){
+			proposalText = "Privacy Policy Negotiation Alert Message:  Administering CSS: "+requestor.getRequestorId().getJid()+" <br/> of CIS: "+((RequestorCis) requestor).getCisRequestorId().getJid()+" </br>";
+		}else{
+			proposalText = "Privacy Policy Negotiation Alert Message:  CSS: "+requestor.getRequestorId().getJid()+" <br/>";
+		}
+		
+		String actions = "";
+		
+		if (item.getActions().size()==1){
+			actions = "the action: "+item.getActions().get(0).toString();
+		}else if (item.getActions().size()==2){
+			actions = "the actions: "+item.getActions().get(0).toString()+" and "+item.getActions().get(1).toString();
+		}else if (item.getActions().size()==3){
+			actions = "the actions: "+item.getActions().get(0).toString()+", "+item.getActions().get(1).toString()+" and "+item.getActions().get(2).toString();
+		}else if (item.getActions().size()==4){
+			actions = "the actions: "+item.getActions().get(0).toString()+", "+item.getActions().get(1).toString()+", "+item.getActions().get(2).toString()+" and "+item.getActions().get(3).toString();
+		}
+		proposalText = proposalText+ "needs access to data item: "+item.getResource().getDataType()+" to perform "+actions+".<br/> Do you want to proceed?";
+		
+		String proceed = "Proceed";
+		String cancel = "Cancel";
+		
+		List<String> response = new ArrayList<String>();
+		
+		List<Requestor> reqs = new ArrayList<Requestor>();
+		reqs.add(requestor);
+		RuleTarget target = new RuleTarget(reqs, item.getResource(), item.getActions());
+		try {
+			response = this.policyMgr.getUserFeedback().getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, new String[]{proceed,cancel})).get();
+			if (response.contains(proceed)){
+				this.outcome = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, target, item.getConditions());
+			}else{
+				this.outcome = new PPNPOutcome(PrivacyOutcomeConstants.BLOCK, target, item.getConditions());
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+/*		PPNPOutcomeDialog guiDialog = new PPNPOutcomeDialog(requestor, this.getClass().getName(), item, this.privPrefMgr);
 		this.outcome = guiDialog.getOutcome();
 		if (outcome==null){
 			log("OUTCOME IS NULL :(");
 		}else{
 			log("PPNPOutcomeLocator: got outcome");
-		}
+		}*/
 		return outcome;
 
 	}

@@ -260,9 +260,11 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		setPresence(in.readInt());
 
 	}
+	@Override
 	public int describeContents() {
 		return 0;
 	}
+	@Override
 	/**
 	 * properties must be written in exact sequence as private constructor
 	 */
@@ -292,10 +294,12 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 	}
 	public static final Parcelable.Creator<AndroidCSSRecord> CREATOR = new Parcelable.Creator<AndroidCSSRecord>() {
 
+		@Override
 		public AndroidCSSRecord createFromParcel(Parcel in) {
 			return new AndroidCSSRecord(in);
 		}
 
+		@Override
 		public AndroidCSSRecord[] newArray(int size) {
 			return new AndroidCSSRecord [size];
 		}
