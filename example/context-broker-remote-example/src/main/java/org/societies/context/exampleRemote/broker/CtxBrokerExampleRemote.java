@@ -66,18 +66,13 @@ public class CtxBrokerExampleRemote 	{
 						
 		this.commMgrService = commMgr;
 
-		
-		//LOG.info("remote retrieve of indi entity ");
-		//this.ca3pService.retrieveRemoteIndiEntity();
-		
-		
 		CtxEntity remoteEntity = this.ca3pService.createRemoteCtxEntity("remoteEntityType");
 		LOG.info("*** remoteEntity id : "+ remoteEntity.getId());
 
 		CtxAttribute remoteAttribute = this.ca3pService.createRemoteCtxAttribute(remoteEntity.getId(), CtxAttributeTypes.ADDRESS_HOME_CITY);
 		LOG.info("*** remoteAttribute id : "+ remoteAttribute.getId());		
 		
-		//this.ca3pService.registerForContextUpdates(remoteAttribute.getId(), new MyCtxChangeEventListener());
+		this.ca3pService.registerForContextUpdates(remoteAttribute.getId(), new MyCtxChangeEventListener());
 
 		remoteAttribute.setStringValue("CarnabyStreet12");
 		
@@ -98,6 +93,10 @@ public class CtxBrokerExampleRemote 	{
 			LOG.info("retrieved object id"+ ctxAttrRetrieved.getStringValue());
 		}
 	
+	
+		
+		LOG.info("remote retrieve of indi entity ");
+		this.ca3pService.retrieveRemoteIndiEntity();
 		
 		
 		
