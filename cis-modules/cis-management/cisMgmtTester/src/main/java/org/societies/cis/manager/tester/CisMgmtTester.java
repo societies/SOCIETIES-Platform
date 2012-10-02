@@ -111,9 +111,9 @@ public class CisMgmtTester implements Subscriber{
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisMgmtTester.class);
 	
-	private String targetCSSId = "xcmanager.thomas.local";
+	private String targetCSSId = "xcmanager.societies.local";
 	
-	private String targetCIS = "cis-49fc0682-74c9-41eb-848c-4eb0c3629c64.societies.local";
+	private String targetCIS = "cis-f2b6798c-e2a8-4532-9d64-504f0062f227.societies.local";
 	
 	int join = 0;
 	
@@ -426,7 +426,8 @@ public class CisMgmtTester implements Subscriber{
 			
 			LOG.info("pubsubevent with acitvity " + a.getActor() + " " +a.getVerb()+ " " +a.getTarget());
 		}else{
-			LOG.info("something weird came on the pubsub");
+			
+			LOG.info("something weird came on the pubsub" + item.getClass().toString());
 		}
 
 		
