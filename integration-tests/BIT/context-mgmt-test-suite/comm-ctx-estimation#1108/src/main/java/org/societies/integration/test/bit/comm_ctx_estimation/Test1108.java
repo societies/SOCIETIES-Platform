@@ -83,6 +83,7 @@ public class Test1108 extends IntegrationTestCase{
 	}
 
 	public void setCisManager(ICisManager cisManager) {
+		
 		Test1108.cisManager = cisManager;
 	}
 

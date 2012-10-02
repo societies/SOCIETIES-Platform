@@ -59,7 +59,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.util.commonmock.MockIdentity;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -130,23 +129,23 @@ public class CisDataAccessControlTest
 		// - CIS creation
 		Future<ICisOwned> cisPublicFuture = TestCase1266.cisManager.createCis("Public Cis", "1", null, "My Public Cis", privacyPolicyPublic.toXMLString());
 		cisPublic = cisPublicFuture.get();
-		
+
 		Future<ICisOwned> cisMembersOnlyFuture = TestCase1266.cisManager.createCis("Members only Cis", "1", null, "My Members only Cis", privacyPolicyMembersOnly.toXMLString());
 		cisMembersOnly = cisMembersOnlyFuture.get();
-		
+
 		Future<ICisOwned> cisPrivateFuture = TestCase1266.cisManager.createCis("Private Cis", "1", null, "My Private Cis", privacyPolicyPrivate.toXMLString());
 		cisPrivate = cisPrivateFuture.get();
 
 		// - Identities
 		myCssId = TestCase1266.commManager.getIdManager().getThisNetworkNode();
-		memberCssId = new MockIdentity(IdentityType.CSS, "iamcismember","societies.local");
-		otherCssId = new MockIdentity(IdentityType.CSS, "master","societies.local");
+		memberCssId =  TestCase1266.commManager.getIdManager().fromJid("university.societies.local");
+		otherCssId =  TestCase1266.commManager.getIdManager().fromJid("emma.societies.local");
 		requestorService = getRequestorService();
 
 		// - Let memberCssId joins CIS "Members Only Cis"
 		cisMembersOnly.addMember(memberCssId.getJid(), "participant");
-		
-		
+
+
 		// - Data Id
 		try {
 			cisPublicDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisPublic.getCisId()+"/cis-member-list");
@@ -170,11 +169,11 @@ public class CisDataAccessControlTest
 	{
 		LOG.info("[#"+testCaseNumber+"] "+getClass().getSimpleName()+"::tearDown");
 	}
-	
+
 	@AfterClass
 	public static void tearDownClass() throws Exception
 	{
-		LOG.info("[#"+testCaseNumber+"] CisDataAccessControl::tearDown");
+		LOG.info("[#"+testCaseNumber+"] CisDataAccessControl::tearDownClass");
 		TestCase1266.cisManager.deleteCis(cisPublic.getCisId());
 		TestCase1266.cisManager.deleteCis(cisMembersOnly.getCisId());
 		TestCase1266.cisManager.deleteCis(cisPrivate.getCisId());
@@ -207,7 +206,7 @@ public class CisDataAccessControlTest
 		assertEquals("Second: Bad permission retrieved", Decision.PERMIT.name(), permission2.getDecision().name());
 		assertEquals("Two requests, not the same answer", permission1.toXMLString(), permission2.toXMLString());
 	}
-	
+
 	@Test
 	public void testCheckPermissionMembersOnlyCis()
 	{
@@ -239,7 +238,7 @@ public class CisDataAccessControlTest
 		assertNotNull("Other: No (real) permission retrieved", permissionOther2.getDecision());
 		assertEquals("Other: Bad permission retrieved", Decision.DENY.name(), permissionOther2.getDecision().name());
 		assertEquals("Other: Two requests, not the same answer", permissionOther1.toXMLString(), permissionOther2.toXMLString());
-		
+
 		assertNotNull("Member: No permission retrieved", permissionMember1);
 		assertNotNull("Member: No (real) permission retrieved", permissionMember1.getDecision());
 		assertEquals("Member: Bad permission retrieved",  Decision.PERMIT.name(), permissionMember1.getDecision().name());

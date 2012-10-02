@@ -63,7 +63,7 @@
 				<td>CsS ID:</td>
 				<td><form:input path="cssId" /></td>
 				<td><form:errors path="cssId" cssClass="error" /></td>
-				<td>Users CSS jid eg: paul@societies.com  -- Used for Add member, Remove Member</td>
+				<td>Users CSS jid eg: paul@societies.com  -- Used for Join remote CIS, Add member, Remove Member</td>
 			</tr>
 			<tr>
 				<td>password:</td>

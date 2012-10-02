@@ -48,6 +48,7 @@ var SocietiesLogout = {
 
 		function failure(data) {
 			alert("successfulCSSCloudLogout : " + "failure: " + data);
+			success(data);
 		}
 		
 	    window.plugins.SocietiesLocalCSSManager.logoutCSS(success, failure);

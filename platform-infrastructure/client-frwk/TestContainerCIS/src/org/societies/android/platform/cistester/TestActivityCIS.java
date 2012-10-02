@@ -48,8 +48,8 @@ public class TestActivityCIS extends Activity {
     private ICisSubscribed serviceCISsubscribe;
     private boolean serviceCISsubscribeConnected = false;
     
-    private final String hardCodedTargetJid = "cis-f32a0961-d297-4ede-89db-42d786aff2a6.societies.local";
-    private final String hardCodedTargetName = "gama";
+    private final String hardCodedTargetJid = "cis-358c387c-bc79-44fe-82b0-b628b50093e3.societies.local";
+    private final String hardCodedTargetName = "vasco";
     
     private ICisDirectory serviceCISdir;
     private boolean serviceCISdirConnected = false;

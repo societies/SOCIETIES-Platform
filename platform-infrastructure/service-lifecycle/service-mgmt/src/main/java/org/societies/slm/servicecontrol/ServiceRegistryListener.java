@@ -336,10 +336,15 @@ public class ServiceRegistryListener implements BundleContextAware,
 						getNegotiationProvider().addService(service.getServiceIdentifier(), slaXml, clientHost, clientJar.getPath(), callback);
 						//addService(service.getServiceIdentifier(), clientHost, clientJar.getPath());
 						
-						if(log.isDebugEnabled())
-							log.debug("Adding privacy policy to the Privacy Manager!");
-						String privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
+						String privacyLocation;
+						if(serBndl.getLocation().endsWith("/"))
+							privacyLocation = serBndl.getLocation() + "privacy-policy.xml";
+						else
+							privacyLocation = serBndl.getLocation() + "/privacy-policy.xml";
 						
+						if(log.isDebugEnabled())
+							log.debug("Adding privacy policy to the Privacy Manager... from: " + privacyLocation);
+
 						int index = privacyLocation.indexOf('@');	
 						String privacyPath = privacyLocation.substring(index+1);
 						
@@ -348,7 +353,6 @@ public class ServiceRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Tried to get privacy policy from: " + privacyLocation);
 						
-						
 						RequestorService requestService = new RequestorService(myNode, service.getServiceIdentifier());
 						RequestPolicy policyResult = getPrivacyManager().updatePrivacyPolicy(privacyPolicy, requestService);
 					
@@ -356,17 +360,17 @@ public class ServiceRegistryListener implements BundleContextAware,
 							log.debug("Privacy Policy result is: " + policyResult.toXMLString());	
 						
 					}
-					
-					//The service is now registered, so we update the hashmap
-					if(ServiceControl.installingBundle(serBndl.getBundleId())){
-						if(log.isDebugEnabled())
-							log.debug("ServiceControl is installing the bundle, so we need to tell it it's done");
-						ServiceControl.serviceInstalled(serBndl.getBundleId(), service);
-					}
-					
+										
 				} else{
 					if(log.isDebugEnabled()) log.debug(service.getServiceName() + " already exists, setting status to STARTED");
 					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
+				}
+				
+				//The service is now registered, so we update the hashmap
+				if(ServiceControl.installingBundle(serBndl.getBundleId())){
+					if(log.isDebugEnabled())
+						log.debug("ServiceControl is installing the bundle, so we need to tell it it's done");
+					ServiceControl.serviceInstalled(serBndl.getBundleId(), service);
 				}
 				
 			} catch (Exception e) {

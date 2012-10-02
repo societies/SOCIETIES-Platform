@@ -32,7 +32,7 @@
 		<property name="ctxBroker" ref ="ctxBrokerInternal" />
 		<property name="commsMgr" ref="commsMgr"/>
 		<property name="HelloWorld" ref="HelloWorld"></property>
-		<property name="privPrefMgr" ref="privPrefMgr"></property>
+		<property name="privDataMgr" ref="privDataMgr"></property>
   	</bean>
   	
   	<bean id="HelloWorld" class="org.societies.integration.test.bit.ctxRetrieve.HelloWorld" init-method="initialiseHelloWorld">

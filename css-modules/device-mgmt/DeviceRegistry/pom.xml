@@ -6,7 +6,7 @@
 	<artifactId>deviceregistry</artifactId>
 	<packaging>bundle</packaging>
 	<name>Device Registry</name>
-	<version>${release.version}-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>

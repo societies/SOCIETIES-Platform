@@ -26,7 +26,9 @@
 package org.societies.webapp.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
 
@@ -69,21 +73,25 @@ public class UserFeedbackController {
 	
 
 	@RequestMapping(value = "/get_form.html", method = RequestMethod.GET)
-	public String getForm(){
+	public ModelAndView getForm(){
 		//retrieve next request from UF service
 		String returnString = "";
 		FeedbackForm form = userFeedback.getNextRequest();
 		if(form != null){
 			returnString = gsonMgr.toJson(form);
 		}else{
-			returnString = "NO_REQUESTS";
+			returnString = gsonMgr.toJson(new FeedbackForm().generateEmptyFeedbackForm());
 		}
 		
-		return returnString;
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("data", returnString);
+		return new ModelAndView("data", model);
 	}
 
 	@RequestMapping(value = "/get_form.html", method = RequestMethod.POST)
-	public String submitResponse(String jsonString){
+	public ModelAndView submitResponse(@RequestParam("data") String jsonString){
+		Map<String, Object> model = new HashMap<String, Object>();
+		LOG.info("[Submit response]"+jsonString);
 		
 		//convert json string back to Java types
 		FeedbackForm responseForm; 
@@ -91,7 +99,9 @@ public class UserFeedbackController {
 			responseForm = gsonMgr.fromJson(jsonString, FeedbackForm.class);
 		}catch(Exception e){
 			LOG.error("Submitted response - incorrect format");
-			return gsonMgr.toJson(new Boolean(false));
+			String returnString = gsonMgr.toJson((new FeedbackForm().generateFaillureFeedbackResultForm()));
+			model.put("data", returnString);
+			return new ModelAndView("data", model);
 		}
 
 		//respond back to UF service
@@ -128,9 +138,13 @@ public class UserFeedbackController {
 			userFeedback.submitImplicitResponse(responseForm.getID(), true);
 		}else{
 			LOG.error("Did not recognise response form type from AJAX");
-			return gsonMgr.toJson(new Boolean(false));
+			String returnString = gsonMgr.toJson((new FeedbackForm().generateFaillureFeedbackResultForm()));
+			model.put("data", returnString);
+			return new ModelAndView("data", model);
 		}
 		
-		return gsonMgr.toJson(new Boolean(true));
+		String returnString = gsonMgr.toJson((new FeedbackForm().generateSuccessFeedbackResultForm()));
+		model.put("data", returnString);
+		return new ModelAndView("data", model);
 	}
 }

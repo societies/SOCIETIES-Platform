@@ -78,6 +78,13 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.societies.integration.example.service</groupId>
+			<artifactId>IntegrationTestService</artifactId>
+			<version>0.1</version>
+			<scope>runtime</scope>
+		</dependency>
+		
 	</dependencies>
 	
 	<build>
