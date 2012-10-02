@@ -58,7 +58,6 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.DeleteMember;
-import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.manager.AskCisManagerForJoin;

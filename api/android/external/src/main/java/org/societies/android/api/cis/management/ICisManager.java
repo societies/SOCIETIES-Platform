@@ -27,7 +27,6 @@ package org.societies.android.api.cis.management;
 import java.util.List;
 
 import org.societies.android.api.cis.directory.ACisAdvertisementRecord;
-import org.societies.api.schema.cis.community.LeaveResponse;
 
 /**
  * @author Babak.Farshchian@sintef.no

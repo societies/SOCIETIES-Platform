@@ -70,6 +70,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -126,7 +127,7 @@ public class PrivacyNegotiationTest {
 	private PPNPOutcome statusOutcomeForCis;
 	private PPNegotiationEvent successfulEvent;
 	private FailedNegotiationEvent failedEvent;
-	
+	private IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
 
 	@Before
 	public void setUp(){
@@ -150,6 +151,7 @@ public class PrivacyNegotiationTest {
 		this.negotiationMgr.setNegotiationAgentRemote(negAgent);
 		this.negotiationMgr.setPrivacyPreferenceManager(privacyPreferenceManager);
 		this.negotiationMgr.setPrivacyPolicyManager(privacyPolicyManager);
+		this.negotiationMgr.setUserFeedback(userFeedback);
 		this.setupMockito();
 		
 		this.negotiationMgr.initialisePrivacyPolicyNegotiationManager();

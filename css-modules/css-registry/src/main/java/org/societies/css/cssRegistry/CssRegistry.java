@@ -244,55 +244,60 @@ public class CssRegistry implements ICssRegistry {
 
 			List<CssRegistryEntry> tmpRegistryEntryList = session
 					.createCriteria(CssRegistryEntry.class).list();
+			
+			//Ensure it exists before we start reading values
+			if ((tmpRegistryEntryList != null) && (tmpRegistryEntryList.size() > 0))
+			{	
 
-			cssDetails.setDomainServer(tmpRegistryEntryList.get(0)
-					.getDomainServer());
-			cssDetails.setCssHostingLocation(tmpRegistryEntryList.get(0)
-					.getCssHostingLocation());
-			cssDetails.setEntity(tmpRegistryEntryList.get(0).getEntity());
-			cssDetails.setForeName(tmpRegistryEntryList.get(0).getForeName());
-			cssDetails.setName(tmpRegistryEntryList.get(0).getName());
-			cssDetails.setIdentityName(tmpRegistryEntryList.get(0)
-					.getIdentityName());
-			cssDetails.setPassword(tmpRegistryEntryList.get(0).getPassword());
-			cssDetails.setEmailID(tmpRegistryEntryList.get(0).getEmailID());
-			cssDetails.setImID(tmpRegistryEntryList.get(0).getImID());
-			cssDetails.setSocialURI(tmpRegistryEntryList.get(0).getSocialURI());
-			cssDetails.setSex(tmpRegistryEntryList.get(0).getSex());
-			cssDetails.setHomeLocation(tmpRegistryEntryList.get(0)
-					.getHomeLocation());
-			cssDetails.setCssIdentity(tmpRegistryEntryList.get(0)
-					.getCssIdentity());
-			cssDetails.setStatus(tmpRegistryEntryList.get(0).getStatus());
-			cssDetails.setCssRegistration(tmpRegistryEntryList.get(0)
-					.getCssRegistration());
-			cssDetails.setCssInactivation(tmpRegistryEntryList.get(0)
-					.getCssInactivation());
-			cssDetails.setCssUpTime(tmpRegistryEntryList.get(0).getCssUpTime());
-			cssDetails.setPresence(tmpRegistryEntryList.get(0).getPresence());
+				cssDetails.setDomainServer(tmpRegistryEntryList.get(0)
+						.getDomainServer());
+				cssDetails.setCssHostingLocation(tmpRegistryEntryList.get(0)
+						.getCssHostingLocation());
+				cssDetails.setEntity(tmpRegistryEntryList.get(0).getEntity());
+				cssDetails.setForeName(tmpRegistryEntryList.get(0).getForeName());
+				cssDetails.setName(tmpRegistryEntryList.get(0).getName());
+				cssDetails.setIdentityName(tmpRegistryEntryList.get(0)
+						.getIdentityName());
+				cssDetails.setPassword(tmpRegistryEntryList.get(0).getPassword());
+				cssDetails.setEmailID(tmpRegistryEntryList.get(0).getEmailID());
+				cssDetails.setImID(tmpRegistryEntryList.get(0).getImID());
+				cssDetails.setSocialURI(tmpRegistryEntryList.get(0).getSocialURI());
+				cssDetails.setSex(tmpRegistryEntryList.get(0).getSex());
+				cssDetails.setHomeLocation(tmpRegistryEntryList.get(0)
+						.getHomeLocation());
+				cssDetails.setCssIdentity(tmpRegistryEntryList.get(0)
+						.getCssIdentity());
+				cssDetails.setStatus(tmpRegistryEntryList.get(0).getStatus());
+				cssDetails.setCssRegistration(tmpRegistryEntryList.get(0)
+						.getCssRegistration());
+				cssDetails.setCssInactivation(tmpRegistryEntryList.get(0)
+						.getCssInactivation());
+				cssDetails.setCssUpTime(tmpRegistryEntryList.get(0).getCssUpTime());
+				cssDetails.setPresence(tmpRegistryEntryList.get(0).getPresence());
 
-			List<CssNodeEntry> tmpNodeRegistryEntryList = session
-					.createCriteria(CssNodeEntry.class).list();
+				List<CssNodeEntry> tmpNodeRegistryEntryList = session
+						.createCriteria(CssNodeEntry.class).list();
 
 			
-			log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList size : " +tmpNodeRegistryEntryList.size());
+				log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList size : " +tmpNodeRegistryEntryList.size());
 			
-			if (tmpNodeRegistryEntryList != null) {
-				for (CssNodeEntry savedNode : tmpNodeRegistryEntryList) {
-					cssNodeDetails = new CssNode();
-					log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList identity : " +savedNode.getNodeIdentity());
-					cssNodeDetails.setIdentity(savedNode.getNodeIdentity());
-					cssNodeDetails.setType(savedNode.getType());
-					cssNodeDetails.setStatus(savedNode.getStatus());
-					cssNodeDetails.setCssNodeMAC(savedNode.getcssNodeMAC());
-					log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList MAC : " +savedNode.getcssNodeMAC());
-					log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList Interactable : " +savedNode.getInteractable());
-					cssNodeDetails.setInteractable(savedNode.getInteractable());
+				if (tmpNodeRegistryEntryList != null) {
+					for (CssNodeEntry savedNode : tmpNodeRegistryEntryList) {
+						cssNodeDetails = new CssNode();
+						log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList identity : " +savedNode.getNodeIdentity());
+						cssNodeDetails.setIdentity(savedNode.getNodeIdentity());
+						cssNodeDetails.setType(savedNode.getType());
+						cssNodeDetails.setStatus(savedNode.getStatus());
+						cssNodeDetails.setCssNodeMAC(savedNode.getcssNodeMAC());
+						log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList MAC : " +savedNode.getcssNodeMAC());
+						log.info("$$$$$$$$$$$$$$$$$$$ CSSRegistry tmpNodeRegistryEntryList Interactable : " +savedNode.getInteractable());
+						cssNodeDetails.setInteractable(savedNode.getInteractable());
 
-					if (savedNode.getArchived() == true) 
-						cssDetails.getArchiveCSSNodes().add(cssNodeDetails);
-					else
-						cssDetails.getCssNodes().add(cssNodeDetails);
+						if (savedNode.getArchived() == true) 
+							cssDetails.getArchiveCSSNodes().add(cssNodeDetails);
+						else
+							cssDetails.getCssNodes().add(cssNodeDetails);
+					}
 				}
 			}
 

@@ -67,6 +67,7 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
@@ -93,8 +94,9 @@ public class CisManagerController {
 	private ICisManager cisManager;
 	@Autowired(required=false)
 	private IPrivacyPolicyManager privacyPolicyManager;
-	@Autowired(required=false)
+	@Autowired
 	private ICommManager commMngrRef;
+	
 
 	// -- Data for the Privacy Policy Form
 	private static String[] resourceList;
@@ -167,6 +169,51 @@ public class CisManagerController {
 		return new ModelAndView("cismanager", model);
 	}
 
+	@RequestMapping(value = "/createnewcis.html", method = RequestMethod.GET)
+	public ModelAndView createNewCis() {
+
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("message", "Welcome to the CIS Manager");
+		CisManagerForm cisForm = new CisManagerForm();
+
+		//LIST METHODS AVAIABLE TO TEST
+		Map<String, String> methods = new LinkedHashMap<String, String>();
+		methods.put("CreateCis", "Create a CIS ");
+		methods.put("GetCisList", "List my CISs");
+		methods.put("JoinRemoteCIS", "Join a remote CIS");
+		methods.put("LeaveRemoteCIS", "Leave a remote CIS");
+		methods.put("GetMemberList", "Get list of members of a CIS");
+		methods.put("GetMemberListRemote", "Get list of members from remote CIS");
+		methods.put("AddMember", "Add member to a CIS");
+		methods.put("RemoveMemberFromCIS", "Remove member from a CIS");
+		model.put("methods", methods);
+		
+		//Auto populate 
+		cisForm.setCssId(getCommMngrRef().getIdManager().getThisNetworkNode().getBareJid());
+		cisForm.setCisType("RICH");
+		cisForm.setCisMode(0);
+		
+		model.put("cmForm", cisForm);
+		
+		// TODO: get from CtxAttributeTypes
+		String [] attributeList = {"addressHomeCity", "interests","music","religiouslViews"};
+
+		String [] operatorList = {"equals", "differentFrom"};
+
+		model.put("attributeList", attributeList);
+		model.put("operatorList", operatorList);
+
+		// end of criteria
+
+
+		//model.put("remoteCISsArray", remoteCISs);
+		//model.put("localCISsArray", localCISs);
+		//model.put("log", log);
+		model.put("cismanagerResult", "CIS Management Result :");
+		return new ModelAndView("createnewcis", model);
+	}
+
+	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/cismanager.html", method = RequestMethod.POST)
 	public ModelAndView cssManager(@Valid CisManagerForm cisForm, BindingResult result, Map model, HttpSession session) {
@@ -267,6 +314,7 @@ public class CisManagerController {
 				LOG.info("[CisManagerController] "+cisForm);
 				CisAdvertisementRecord ad = new CisAdvertisementRecord();
 				ad.setId(cisForm.getCisJid());
+				LOG.info(" cisForm.getCssId() is " +  cisForm.getCssId());
 				ad.setCssownerid((null != cisForm.getCssId() && !"".equals(cisForm.getCssId())) ? cisForm.getCssId() : "university.societies.local");
 				// in order to force the join to send qualifications, Ill add some criteria to the AdRecord
 				MembershipCrit membershipCrit = new MembershipCrit();
@@ -408,6 +456,76 @@ public class CisManagerController {
 		return new ModelAndView("cismanagerresult", model);
 	}
 
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/createnewcis.html", method = RequestMethod.POST)
+	public ModelAndView createNewCis(@Valid CisManagerForm cisForm, BindingResult result, Map model, HttpSession session) {
+
+		m_session = session;
+		model.put("message", "Welcome to the CIS Manager Page");
+
+		if (result.hasErrors()) {
+			model.put("res", "CIS Manager form error");
+			return new ModelAndView("cismanager", model);
+		}
+
+		if (getCisManager() == null) {
+			model.put("errormsg", "CIS Manager Service reference not avaiable");
+			return new ModelAndView("error", model);
+		}
+		String res = "Starting...";
+		String method = cisForm.getMethod();
+		res = "Method: " + method;
+
+		try {
+			
+
+				model.put("methodcalled", "CreateCis");
+				res = "Creating CIS...";
+
+				// -- Retrieve CIS Configuration
+				Hashtable<String, MembershipCriteria> cisCriteria = null;
+				if(null !=cisForm && null != cisForm.getValue() && false == cisForm.getValue().isEmpty()){
+					cisCriteria = new Hashtable<String, MembershipCriteria> (); 
+					MembershipCriteria m = new MembershipCriteria();
+					try{
+						Rule r = new Rule(cisForm.getOperator(),new ArrayList(Arrays.asList(cisForm.getValue())));
+						m.setRule(r);
+						cisCriteria.put(cisForm.getAttribute(), m);
+						LOG.info("Membership criteria rule #1: "+ cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue());
+					}
+					catch(InvalidParameterException e){
+						throw new Exception(" excepation of invalid param " + cisForm.getAttribute() + ", " + cisForm.getOperator()+ ", " + cisForm.getValue());
+					}
+				}
+
+				// -- Fill CisCreationForm for next step
+				CisCreationForm cisCreationForm = generateCisCreationForm(cisForm, cisCriteria);
+				cisCreationForm.setMode("SHARED");
+				LOG.info("Proposed CIS Privacy Policy");
+				LOG.info(cisCreationForm.toString());
+
+
+				// Send page to generate the privacy policy
+				generateResourceLists();
+				model.put("res", res);
+				model.put("cisCreationForm", cisCreationForm);
+				model.put("ActionList", new String[]{"READ", "WRITE", "CREATE", "DELETE"});//ActionConstants.values());
+				model.put("ConditionList", ConditionConstants.values());
+				model.put("ResourceList", resourceList);
+				model.put("ResourceHumanList", resourceHumanList);
+				model.put("ResourceSchemeList", resourceSchemeList);
+	} catch (Exception ex) {
+		LOG.error("Error when managing CIS", ex);
+		res += "Oops!!!! <br/>" + ex.getMessage();//.getMessage();
+	}
+		
+		return new ModelAndView("privacy/privacy-policy/create-cis-step-2", model);
+
+			
+	}
+
+	
 	@RequestMapping(value = "/create-cis-step-3.html", method = RequestMethod.POST)
 	public ModelAndView createCisEnd(@Valid CisCreationForm cisCreationForm, BindingResult result, Map model, HttpSession session) {
 		LOG.debug("Create CIS Step 3: CIS creation");
@@ -658,10 +776,17 @@ public class CisManagerController {
 		this.privacyPolicyManager = privacyPolicyManager;
 		LOG.info("[DepencyInjection] IPrivacyPolicyManager injected");
 	}
+	
+	public ICommManager getCommMngrRef() {
+		return this.commMngrRef;
+	}
+	
+	
 	public void setCommMngrRef(ICommManager commMngrRef) {
 		this.commMngrRef = commMngrRef;
 		LOG.info("[DepencyInjection] ICommManager injected");
 	}
+	
 	public ICisManager getCisManager() {
 		return cisManager;
 	}

@@ -30,7 +30,7 @@
 	<groupId>org.societies.security</groupId>
 	<artifactId>secur-services</artifactId>
 	<name>Security Services</name>
-	<version>${release.version}-SNAPSHOT</version>
+	<version>${release.version}</version>
 	<packaging>bundle</packaging>
 
 	<description>This bundle provides some of the low level security services, including ability to digitally sign XML contents, verify signatures and securely store passwords, certificates and documents.</description>

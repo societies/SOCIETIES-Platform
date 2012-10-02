@@ -25,7 +25,7 @@
 package org.societies.android.api.cis.management;
 
 import org.societies.api.schema.activity.Activity;
-import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
+import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse; 
 
 /**
  * This interface represents CISs that are not owned by this CSS but that this

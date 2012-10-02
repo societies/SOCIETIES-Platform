@@ -1055,12 +1055,16 @@ public class CSSManager implements ICSSLocalManager {
 		try {
 				friendList = cssRegistry.getCssFriends();
 				
+				// Only go searching the directory is theor is something to search for
+				if ((friendList != null) && (friendList.size() > 0))
+				{	
 				
-				// first get all the cssdirectory records
-				CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+					//first get all the cssdirectory records
+					CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
-				getCssDirectoryRemote().searchByID(friendList, callback);
-				friendAdList = callback.getResultList();
+					getCssDirectoryRemote().searchByID(friendList, callback);
+					friendAdList = callback.getResultList();
+				}
 				
 			} catch (CssRegistrationException e) {
 				// TODO Auto-generated catch block
@@ -1387,13 +1391,17 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		        	
 		        }	
 				
-				
-			// first get all the cssdirectory records
-			CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+			
+			// Only go searching the directory is theor is something to search for
+			if ((pendingList != null) && (pendingList.size() > 0))
+			{	
+			
+				//first get all the cssdirectory records
+				CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
-			getCssDirectoryRemote().searchByID(pendingList, callback);
-			friendReqList = callback.getResultList();
-
+				getCssDirectoryRemote().searchByID(pendingList, callback);
+				friendReqList = callback.getResultList();
+			}
 				
 			} catch (CssRegistrationException e) {
 				// TODO Auto-generated catch block

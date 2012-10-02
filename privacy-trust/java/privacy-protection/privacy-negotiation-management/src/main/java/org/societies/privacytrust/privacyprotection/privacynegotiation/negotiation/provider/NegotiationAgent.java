@@ -79,7 +79,7 @@ public class NegotiationAgent implements INegotiationAgent{
 			}else{
 				log("FOUND non-null request policy and returning to requestor");
 			}
-			return new AsyncResult<RequestPolicy>(this.getPolicyMgr().getPrivacyPolicy(requestor));
+			return new AsyncResult<RequestPolicy>(requestedPolicy);
 		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

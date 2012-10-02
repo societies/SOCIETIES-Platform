@@ -351,7 +351,7 @@ var	SocietiesLocalCSSManager = {
 	 */
 	getSuggestedFriends: function(successCallback, failureCallback) {
 		var client = "org.societies.android.platform.gui";
-		console.log("Call LocalCSSManagerService - getSuggestedFriends");
+		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -368,7 +368,7 @@ var	SocietiesLocalCSSManager = {
 	 */
 	sendFriendRequest: function(css_id, successCallback, failureCallback) {
 		var client = "org.societies.android.platform.gui";
-		console.log("Call LocalCSSManagerService - sendFriendRequest");
+		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -385,7 +385,7 @@ var	SocietiesLocalCSSManager = {
 	 */
 	findForAllCss: function(searchTerm, successCallback, failureCallback) {
 		var client = "org.societies.android.platform.gui";
-		console.log("Call LocalCSSManagerService - findForAllCss");
+		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error
@@ -402,7 +402,7 @@ var	SocietiesLocalCSSManager = {
 	 */
 	findAllCssAdvertisementRecords: function(successCallback, failureCallback) {
 		var client = "org.societies.android.platform.gui";
-		console.log("Call LocalCSSManagerService - findAllCssAdvertisementRecords");
+		console.log("Call LocalCSSManagerService - readRemoteCSSProfile");
 
 		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 		failureCallback,     //Callback which will be called when plugin action encounters an error

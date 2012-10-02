@@ -1,6 +1,7 @@
 package org.societies.integration.test.bit.useservice;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
@@ -38,7 +39,7 @@ public class SpecificTestCaseUpperTester {
 	/**
 	 * URL of the JAR of the Calculator 3P service Bundle
 	 */
-	private static String serviceBundleUrl;
+	private static URL serviceBundleUrl;
 	/**
 	 * Id of the Calculator 3P service
 	 */
@@ -55,7 +56,9 @@ public class SpecificTestCaseUpperTester {
 		LOG.info("[#759] Prerequisite: The CSS is created");
 		LOG.info("[#759] Prerequisite: The user is logged to the CSS");
 
-		serviceBundleUrl = "file:C:/Application/Virgo/repository/usr/Calculator.jar";
+		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getSystemResource("Calculator-0.3.jar");//NominalTestCaseLowerTester.class.getClassLoader().getResource("Calculator-0.3.jar");//"file:/Calculator-0.3.jar";
+		assertNotNull("Can't find the service JAR location", serviceBundleUrl);
+		LOG.info("[#759] Service location: "+serviceBundleUrl);
 	}
 
 	/**
@@ -182,7 +185,7 @@ public class SpecificTestCaseUpperTester {
 			if (!found) {
 				// - Install the service
 				LOG.info("[#759] Install the service");
-				URL serviceUrl = new URL(serviceBundleUrl);
+				URL serviceUrl = serviceBundleUrl;
 				Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.installService(serviceUrl, "");
 				ServiceControlResult scresult = asynchResult.get();
 				if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
