@@ -72,6 +72,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyM
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
@@ -96,6 +97,8 @@ public class CisManagerController {
 	private IPrivacyPolicyManager privacyPolicyManager;
 	@Autowired
 	private ICommManager commMngrRef;
+	@Autowired
+	private IUserFeedback userFeedback;
 	
 
 	// -- Data for the Privacy Policy Form
@@ -327,12 +330,12 @@ public class CisManagerController {
 
 				this.getCisManager().joinRemoteCIS(ad, icall);
 
-				Thread.sleep(5 * 1000);
-				model.put("joinStatus", resultCallback);
-				if(!resultCallback.startsWith("Failure") ){
+				//Thread.sleep(5 * 1000);
+				model.put("joinStatus", "pending");//resultCallback);
+				/*if(!resultCallback.startsWith("Failure") ){
 					ICis i = getCisManager().getCis(cisForm.getCisJid());
 					model.put("cis", i);
-				}
+				}*/
 
 			} else if (method.equalsIgnoreCase("LeaveRemoteCIS")) {
 				model.put("methodcalled", "LeaveRemoteCIS");
@@ -721,8 +724,18 @@ public class CisManagerController {
 	}
 
 	// callback
-	ICisManagerCallback icall = new ICisManagerCallback(){
+	WebAppCISCallback icall = new WebAppCISCallback(this.userFeedback);
 
+	
+	public class WebAppCISCallback implements ICisManagerCallback{
+		public WebAppCISCallback(IUserFeedback userFeedback){
+			super();
+			this.userFeedback = userFeedback;
+		}
+		
+		IUserFeedback userFeedback;
+		
+		
 
 		public void receiveResult(CommunityMethods communityResultObject) {
 			if(communityResultObject == null){
@@ -732,11 +745,12 @@ public class CisManagerController {
 				if(communityResultObject.getJoinResponse() != null){
 					if(communityResultObject.getJoinResponse().isResult()){
 						resultCallback = "Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
-
+						this.userFeedback.showNotification("Joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());
 						remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
 						m_session.setAttribute("community", remoteCommunity);
 					}else{
 						resultCallback = "Failure when trying to joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
+						this.userFeedback.showNotification("failed to join " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());
 					}
 
 				}
@@ -750,8 +764,8 @@ public class CisManagerController {
 
 			}
 		}
-	};
-
+	}
+	
 	// -- Dependency Injection
 	private boolean isDepencyInjectionDone() {
 		return isDepencyInjectionDone(0);
