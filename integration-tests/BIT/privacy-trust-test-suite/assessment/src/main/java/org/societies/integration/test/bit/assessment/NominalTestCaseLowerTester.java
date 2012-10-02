@@ -196,7 +196,7 @@ public class NominalTestCaseLowerTester {
 		num2 = assessment.getNumDataAccessEvents();
 		LOG.debug("[#1055] testContextBrokerExternalLogging(): Number of data access events: before access = " +
 				num1 + ", after access = " + num2);
-		assertEquals("Number of data access events not increased properly after ctx.retrieveContext()", num1 + 4, num2);
+		assertEquals("Number of data access events not increased properly after ctx.retrieveContext()", num1 + 2, num2);
 	}
 
 //	@Test
