@@ -41,6 +41,8 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -49,9 +51,14 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.springframework.stereotype.Service;
 
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
+
 @Service
 public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
+
+	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
 
 	// Long is a key, allows to store hocAttrs with same values
 	// List<Serializable> contains 3 values: hocID,hocObj, ts
@@ -75,6 +82,17 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		//this can changed to long (ts) in order to have smaller volume of data
 		hocObject.add(2,hocAttr.getLastModified());
 		this.hocObjects.put(i,hocObject);	
+
+		IPerformanceMessage m = new PerformanceMessage();
+		m.setTestContext("UserCtxHistory_Average_Size");
+		m.setSourceComponent(this.getClass()+"");
+		//change to appropriate value
+		m.setPerformanceType(IPerformanceMessage.Delay);
+		m.setOperationType("Create");
+		m.setD82TestTableName("S56");
+		m.setPerformanceNameValue("Size="+hocObject.size());
+
+		PERF_LOG.trace(m.toString());
 
 		return hocAttr;
 	}
