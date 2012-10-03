@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
-import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
 /**
  * Parses the log and creates report about classes and identities that accessed local data.
@@ -44,11 +43,11 @@ import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 public class DataAccessAnalyzer {
 	private static Logger LOG = LoggerFactory.getLogger(DataTransferAnalyzer.class);
 
-	private PrivacyLog privacyLog;
+	private List<DataAccessLogEntry> dataAccess;
 	
-	public DataAccessAnalyzer(PrivacyLog privacyLog) {
+	public DataAccessAnalyzer(List<DataAccessLogEntry> dataAccess) {
 		LOG.info("Constructor");
-		this.privacyLog = privacyLog;
+		this.dataAccess = dataAccess;
 	}
 
 	public List<DataAccessLogEntry> getDataAccess(IIdentity requestor, Date start, Date end) {
@@ -62,7 +61,7 @@ public class DataAccessAnalyzer {
 		}
 		
 		requestorJid = requestor.getJid();
-		for (DataAccessLogEntry da : privacyLog.getDataAccess()) {
+		for (DataAccessLogEntry da : dataAccess) {
 			if (requestorJid.equals(da.getRequestor().getJid()) &&
 					da.getTime().after(start) && da.getTime().before(end)) {
 				matchedEntries.add(da);
@@ -80,7 +79,7 @@ public class DataAccessAnalyzer {
 			return matchedEntries;
 		}
 		
-		for (DataAccessLogEntry da : privacyLog.getDataAccess()) {
+		for (DataAccessLogEntry da : dataAccess) {
 			if (requestor.equals(da.getRequestorClass()) &&
 					da.getTime().after(start) && da.getTime().before(end)) {
 				matchedEntries.add(da);
@@ -97,7 +96,7 @@ public class DataAccessAnalyzer {
 	 * @param end Match only events before this time
 	 * @return All events where requestor matches
 	 */
-	public int getDataAccessSize(IIdentity requestor, Date start, Date end) {
+	public int getNumDataAccessEvents(IIdentity requestor, Date start, Date end) {
 		List<DataAccessLogEntry> matchedEntries = getDataAccess(requestor, start, end);
 		return matchedEntries.size();
 	}
@@ -105,13 +104,41 @@ public class DataAccessAnalyzer {
 	/**
 	 * Get number of events in certain time period where given requestor accessed local data.
 	 * 
-	 * @param requestor Identity of the requestor (the one who requested data access)
+	 * @param requestorClass Class name of the requestor (the one who requested data access)
 	 * @param start Match only events after this time
 	 * @param end Match only events before this time
 	 * @return All events where requestor matches
 	 */
-	public int getDataAccessSize(String requestor, Date start, Date end) {
-		List<DataAccessLogEntry> matchedEntries = getDataAccess(requestor, start, end);
+	public int getNumDataAccessEvents(String requestorClass, Date start, Date end) {
+		List<DataAccessLogEntry> matchedEntries = getDataAccess(requestorClass, start, end);
 		return matchedEntries.size();
+	}
+	
+	public List<IIdentity> getDataAccessRequestors() {
+		
+		List<IIdentity> matches = new ArrayList<IIdentity>();
+		IIdentity requestor;
+		
+		for (DataAccessLogEntry da : dataAccess) {
+			requestor = da.getRequestor();
+			if (!matches.contains(requestor)) {
+				matches.add(requestor);
+			}
+		}
+		return matches;
+	}
+	
+	public List<String> getDataAccessRequestorClasses() {
+		
+		List<String> matches = new ArrayList<String>();
+		String requestor;
+		
+		for (DataAccessLogEntry da : dataAccess) {
+			requestor = da.getRequestorClass();
+			if (!matches.contains(requestor)) {
+				matches.add(requestor);
+			}
+		}
+		return matches;
 	}
 }

@@ -34,9 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.identity.IdentityImpl;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 import org.societies.privacytrust.privacyprotection.assessment.logic.DataAccessAnalyzer;
@@ -86,7 +84,7 @@ public class DataAccessAnalyzerTest {
 		privacyLog.append(new DataAccessLogEntry(time6, id2, class1, id4, -1));
 		privacyLog.append(new DataAccessLogEntry(time7, id2, class1, id1, -1));
 
-		dataAccessAnalyzer = new DataAccessAnalyzer(privacyLog);
+		dataAccessAnalyzer = new DataAccessAnalyzer(privacyLog.getDataAccess());
 	}
 
 	/**
@@ -145,25 +143,25 @@ public class DataAccessAnalyzerTest {
 	public void testGetDataAccessSizeIIdentityDateDate() {
 		
 		// id1
-		assertEquals(4, dataAccessAnalyzer.getDataAccessSize(id1, time1, time7), 0.0);
-		assertEquals(3, dataAccessAnalyzer.getDataAccessSize(id1, time2, time7), 0.0);
-		assertEquals(2, dataAccessAnalyzer.getDataAccessSize(id1, time3, time7), 0.0);
-		assertEquals(1, dataAccessAnalyzer.getDataAccessSize(id1, time4, time7), 0.0);
-		assertEquals(3, dataAccessAnalyzer.getDataAccessSize(id1, time2, time6), 0.0);
-		assertEquals(2, dataAccessAnalyzer.getDataAccessSize(id1, time2, time5), 0.0);
-		assertEquals(1, dataAccessAnalyzer.getDataAccessSize(id1, time2, time4), 0.0);
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(id1, time2, time3), 0.0);
+		assertEquals(4, dataAccessAnalyzer.getNumDataAccessEvents(id1, time1, time7), 0.0);
+		assertEquals(3, dataAccessAnalyzer.getNumDataAccessEvents(id1, time2, time7), 0.0);
+		assertEquals(2, dataAccessAnalyzer.getNumDataAccessEvents(id1, time3, time7), 0.0);
+		assertEquals(1, dataAccessAnalyzer.getNumDataAccessEvents(id1, time4, time7), 0.0);
+		assertEquals(3, dataAccessAnalyzer.getNumDataAccessEvents(id1, time2, time6), 0.0);
+		assertEquals(2, dataAccessAnalyzer.getNumDataAccessEvents(id1, time2, time5), 0.0);
+		assertEquals(1, dataAccessAnalyzer.getNumDataAccessEvents(id1, time2, time4), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(id1, time2, time3), 0.0);
 
 		// id2
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(id2, time1, time5), 0.0);
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(id2, time2, time6), 0.0);
-		assertEquals(1, dataAccessAnalyzer.getDataAccessSize(id2, time3, time7), 0.0);
-		assertEquals(1, dataAccessAnalyzer.getDataAccessSize(id2, time5, time7), 0.0);
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(id2, time6, time7), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(id2, time1, time5), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(id2, time2, time6), 0.0);
+		assertEquals(1, dataAccessAnalyzer.getNumDataAccessEvents(id2, time3, time7), 0.0);
+		assertEquals(1, dataAccessAnalyzer.getNumDataAccessEvents(id2, time5, time7), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(id2, time6, time7), 0.0);
 
 		// Start time after end time => should be 0 entires
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(id1, time2, time1), 0.0);
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(id2, time4, time2), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(id1, time2, time1), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(id2, time4, time2), 0.0);
 
 	}
 
@@ -174,22 +172,22 @@ public class DataAccessAnalyzerTest {
 	public void testGetDataAccessSizeStringDateDate() {
 
 		// class1: times 1, 5, 6, 7
-		assertEquals(2, dataAccessAnalyzer.getDataAccessSize(class1, time1, time7), 0.0);
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(class1, time1, time3), 0.0);
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(class1, time2, time4), 0.0);
-		assertEquals(2, dataAccessAnalyzer.getDataAccessSize(class1, time2, time7), 0.0);
+		assertEquals(2, dataAccessAnalyzer.getNumDataAccessEvents(class1, time1, time7), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(class1, time1, time3), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(class1, time2, time4), 0.0);
+		assertEquals(2, dataAccessAnalyzer.getNumDataAccessEvents(class1, time2, time7), 0.0);
 
 		// class2: time 2
-		assertEquals(1, dataAccessAnalyzer.getDataAccessSize(class2, time1, time7), 0.0);
-		assertEquals(1, dataAccessAnalyzer.getDataAccessSize(class2, time1, time3), 0.0);
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(class2, time2, time4), 0.0);
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(class2, time2, time7), 0.0);
+		assertEquals(1, dataAccessAnalyzer.getNumDataAccessEvents(class2, time1, time7), 0.0);
+		assertEquals(1, dataAccessAnalyzer.getNumDataAccessEvents(class2, time1, time3), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(class2, time2, time4), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(class2, time2, time7), 0.0);
 		
 		// class3: times 3, 4
-		assertEquals(2, dataAccessAnalyzer.getDataAccessSize(class3, time1, time7), 0.0);
-		assertEquals(0, dataAccessAnalyzer.getDataAccessSize(class3, time1, time3), 0.0);
-		assertEquals(1, dataAccessAnalyzer.getDataAccessSize(class3, time2, time4), 0.0);
-		assertEquals(2, dataAccessAnalyzer.getDataAccessSize(class3, time2, time7), 0.0);
+		assertEquals(2, dataAccessAnalyzer.getNumDataAccessEvents(class3, time1, time7), 0.0);
+		assertEquals(0, dataAccessAnalyzer.getNumDataAccessEvents(class3, time1, time3), 0.0);
+		assertEquals(1, dataAccessAnalyzer.getNumDataAccessEvents(class3, time2, time4), 0.0);
+		assertEquals(2, dataAccessAnalyzer.getNumDataAccessEvents(class3, time2, time7), 0.0);
 	}
 
 }

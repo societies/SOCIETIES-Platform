@@ -239,10 +239,10 @@ public class PrivacyAssessmentController {
 			}
 			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
 				List<DataAccessLogEntry> assResult;
-				assResult = assessment.getDataAccessEvents();
-				for (DataAccessLogEntry logEntry : assResult) {
-					logEntry.getRequestorClass();
-				}
+//				assResult = assessment.get;
+//				for (DataAccessLogEntry logEntry : assResult) {
+//					logEntry.getRequestorClass();
+//				}
 				data = new double[][] {
 						{210, 300, 320, 265, 299}
 						};
