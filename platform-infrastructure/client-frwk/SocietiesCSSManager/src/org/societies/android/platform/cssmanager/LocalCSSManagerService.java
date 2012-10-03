@@ -28,6 +28,7 @@ package org.societies.android.platform.cssmanager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Collections;
 
@@ -149,7 +150,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	private String cloudCommsDestination = DEFAULT_DESTINATION;
 	private String domainCommsDestination = null;
 	
-	PubsubClientAndroid pubsubClient = null;
+	private PubsubClientAndroid pubsubClient = null;
+	
+	private HashMap<String, Subscriber> pubsubSubscribes = new HashMap<String, Subscriber>();
 
 	
 	
@@ -793,7 +796,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			
 			if (LocalCSSManagerService.this.ccm.logout()) {
 				Log.d(LOG_TAG, "domain logout successful");
-				LocalCSSManagerService.this.ccm = null;
+				LocalCSSManagerService.this.ccm.UnRegisterCommManager();
 				
 				results[0] = params[0];
 			}
@@ -995,6 +998,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		if (null != this.pubsubClient) {
 			UnSubscribeFromPubsub unSubPubSub = new UnSubscribeFromPubsub(); 
 			unSubPubSub.execute(this.pubsubClient);
+			
 		}
 	}
 	
@@ -1006,11 +1010,11 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Log.d(LOG_TAG, "Starting Pubsub registration: " + System.currentTimeMillis());
 		
 		this.pubsubClient = new PubsubClientAndroid(this);
-
+		
             try {
                 this.pubsubClient.addSimpleClasses(classList);
-                
-    	        Log.d(LOG_TAG, "Subscribing to pubsub");
+
+                Log.d(LOG_TAG, "Subscribing to pubsub");
     	        
     	    	SubscribeToPubsub subPubSub = new SubscribeToPubsub(); 
     	    	subPubSub.execute(this.pubsubClient);
@@ -1019,27 +1023,38 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	        }
 	}
 	
-
-	private Subscriber subscriber = new Subscriber() {
+	/**
+	 * Create a new Subscriber object for Pubsub
+	 * @return Subscriber
+	 */
+	private Subscriber createSubscriber() {
+		Subscriber subscriber = new Subscriber() {
 		
-		public void pubsubEvent(IIdentity identity, String node, String itemId,
-				Object payload) {
-			Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
-			if (payload instanceof CssEvent) {
-				CssEvent event = (CssEvent) payload;
-				Log.d(LOG_TAG, "Received event is :" + event.getType());
-				
-				//Create Android Notification
-				int flags [] = new int [1];
-				flags[0] = Notification.FLAG_AUTO_CANCEL;
+			public void pubsubEvent(IIdentity identity, String node, String itemId,
+					Object payload) {
+				Log.d(LOG_TAG, "Received Pubsub event: " + node + " itemId: " + itemId);
+				if (payload instanceof CssEvent) {
+					CssEvent event = (CssEvent) payload;
+					Log.d(LOG_TAG, "Received event is :" + event.getType());
+					
+					//Create Android Notification
+					int flags [] = new int [1];
+					flags[0] = Notification.FLAG_AUTO_CANCEL;
 
-//				AndroidNotifier notifier = new AndroidNotifier(LocalCSSManagerService.this.getApplicationContext(), Notification.DEFAULT_SOUND, flags);
-//
-//				notifier.notifyEvent(event, event.getType());
+					//Create Android Notification
+					int notifierflags [] = new int [1];
+					notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+					AndroidNotifier notifier = new AndroidNotifier(LocalCSSManagerService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
+
+					notifier.notifyMessage(event.getDescription(), event.getType(), LocalCSSManagerService.class);
+				}
 			}
-		}
-    };
-    /**
+		};
+		return subscriber;
+
+	}
+
+	/**
      * 
      * Async task to un-register for CSSManager Pubsub events
      *
@@ -1062,11 +1077,14 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 //    		}
 
     		try {
-    			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, subscriber);
-    			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, subscriber);
+     			LocalCSSManagerService.this.pubsubSubscribes.put(CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.createSubscriber());
+       			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.ADD_CSS_NODE));
+
+       			LocalCSSManagerService.this.pubsubSubscribes.put(CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.createSubscriber());
+    			pubsubAndClient.subscriberUnsubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.DEPART_CSS_NODE));
+
     			Log.d(LOG_TAG, "Pubsub un-subscription created");
     			Log.d(LOG_TAG, "Finishing Pubsub un-registration: " + System.currentTimeMillis());
-
 
     			
 			} catch (Exception e) {
@@ -1081,6 +1099,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     /**
      * 
      * Async task to register for CSSManager Pubsub events
+     * Note: The Subscriber objects used to subscribe to the relevant Pubsub nodes
+     * are required to be used when un-registering - hence the use of the Map to store them.
      *
      */
     private class SubscribeToPubsub extends AsyncTask<PubsubClientAndroid, Void, Boolean> {
@@ -1092,17 +1112,14 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 
     		IIdentity pubsubService = null;
     		
-//    		try {
-//	    	pubsubService = IdentityManagerImpl.staticfromJid(LocalCSSManagerService.this.cloudCommsDestination);
 			pubsubService = LocalCSSManagerService.this.cloudNodeIdentity;
-//		} catch (InvalidFormatException e) {
-//			Log.e(LOG_TAG, "Unable to obtain CSS node identity", e);
-//			this.resultStatus = false;
-//		}
 
     		try {
-    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, subscriber);
-    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, subscriber);
+    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.ADD_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.ADD_CSS_NODE));
+    			
+    			pubsubAndClient.subscriberSubscribe(pubsubService, CSSManagerEnums.DEPART_CSS_NODE, LocalCSSManagerService.this.pubsubSubscribes.get(CSSManagerEnums.DEPART_CSS_NODE));
+    			LocalCSSManagerService.this.pubsubSubscribes.clear();
+    			
     			Log.d(LOG_TAG, "Pubsub subscription created");
     			Log.d(LOG_TAG, "Finishing Pubsub registration: " + System.currentTimeMillis());
 
