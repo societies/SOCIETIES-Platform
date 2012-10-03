@@ -59,10 +59,11 @@ var	SocietiesCISManagerService = {
                     "value1": "18",
                     "value2": "18",
                     "rank": "1"}],
+             cisCriteriaEmpty = [],
              cisDescription = jQuery("#cisDescOnCisCreate").val(),
              privacyPolicy = "<RequestPolicy />";
 
-		window.plugins.SocietiesLocalCISManager.createCIS(success, failure, cisName, cisDescription, cisType, cisCriteria, privacyPolicy);
+		window.plugins.SocietiesLocalCISManager.createCIS(success, failure, cisName, cisDescription, cisType, cisCriteriaEmpty, privacyPolicy);
 	},
 
 	/**
